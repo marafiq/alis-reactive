@@ -546,6 +546,10 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: remaining `GatherBuilder`
   XML parameter tags now use concise request body, route-template, and URL-read
   wording without changing the public request-input contract.
+- Resolved on `tiny-safe-but-important-refactorings`: plugin declaration XML
+  docs now keep host-page member mapping, root member behavior, return shape, and
+  exact argument contract wording while removing repeated leading articles and
+  self-narrating return text.
 
 ### Implementation Inline Comments
 

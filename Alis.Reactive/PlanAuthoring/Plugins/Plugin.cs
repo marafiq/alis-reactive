@@ -18,7 +18,7 @@ namespace Alis.Reactive
         private readonly PluginMemberDeclarations _members = new PluginMemberDeclarations();
 
         /// <summary>Names the plugin; the runtime resolves the host instance by this name.</summary>
-        /// <param name="name">The host-page plugin registration name.</param>
+        /// <param name="name">Host-page plugin registration name.</param>
         protected Plugin(string name)
         {
             _name = PluginName.Of(name);
@@ -28,9 +28,9 @@ namespace Alis.Reactive
         public string Name => _name.Value;
 
         /// <summary>Declares a plugin function that returns a value.</summary>
-        /// <typeparam name="TReturn">The function return type exposed to downstream value expressions.</typeparam>
-        /// <param name="member">The host-page plugin member to call.</param>
-        /// <returns>The declared plugin function.</returns>
+        /// <typeparam name="TReturn">Function return type exposed to downstream value expressions.</typeparam>
+        /// <param name="member">Host-page plugin member to call.</param>
+        /// <returns>Declared plugin function.</returns>
         protected PluginFunction<TReturn> Function<TReturn>(string member)
         {
             var function = new PluginFunction<TReturn>(Name, member);
@@ -39,18 +39,18 @@ namespace Alis.Reactive
         }
 
         /// <summary>Declares a plugin function that returns a value with an exact argument contract.</summary>
-        /// <typeparam name="TReturn">The function return type exposed to downstream value expressions.</typeparam>
-        /// <param name="member">The host-page plugin member to call.</param>
-        /// <param name="arguments">The ordered argument types accepted by the function.</param>
-        /// <returns>The declared plugin function.</returns>
+        /// <typeparam name="TReturn">Function return type exposed to downstream value expressions.</typeparam>
+        /// <param name="member">Host-page plugin member to call.</param>
+        /// <param name="arguments">Ordered argument types accepted by the function.</param>
+        /// <returns>Declared plugin function.</returns>
         protected PluginFunction<TReturn> Function<TReturn>(
             string member,
             Action<PluginArgumentTypes> arguments) =>
             Function<TReturn>(member).Args(arguments);
 
         /// <summary>Declares the plugin root function as returning a value.</summary>
-        /// <typeparam name="TReturn">The root function return type exposed to downstream value expressions.</typeparam>
-        /// <returns>The declared root plugin function.</returns>
+        /// <typeparam name="TReturn">Root function return type exposed to downstream value expressions.</typeparam>
+        /// <returns>Declared root plugin function.</returns>
         protected PluginFunction<TReturn> Function<TReturn>()
         {
             var function = new PluginFunction<TReturn>(Name);
@@ -59,16 +59,16 @@ namespace Alis.Reactive
         }
 
         /// <summary>Declares the plugin root function with an exact argument contract.</summary>
-        /// <typeparam name="TReturn">The root function return type exposed to downstream value expressions.</typeparam>
-        /// <param name="arguments">The ordered argument types accepted by the root function.</param>
-        /// <returns>The declared root plugin function.</returns>
+        /// <typeparam name="TReturn">Root function return type exposed to downstream value expressions.</typeparam>
+        /// <param name="arguments">Ordered argument types accepted by the root function.</param>
+        /// <returns>Declared root plugin function.</returns>
         protected PluginFunction<TReturn> Function<TReturn>(Action<PluginArgumentTypes> arguments) =>
             Function<TReturn>().Args(arguments);
 
         /// <summary>Declares a readable plugin object property.</summary>
-        /// <typeparam name="TValue">The property value type exposed to downstream value expressions.</typeparam>
-        /// <param name="member">The host-page plugin property to read.</param>
-        /// <returns>The declared plugin property.</returns>
+        /// <typeparam name="TValue">Property value type exposed to downstream value expressions.</typeparam>
+        /// <param name="member">Host-page plugin property to read.</param>
+        /// <returns>Declared plugin property.</returns>
         protected PluginProperty<TValue> Property<TValue>(string member)
         {
             var property = new PluginProperty<TValue>(Name, member);
@@ -77,8 +77,8 @@ namespace Alis.Reactive
         }
 
         /// <summary>Declares a plugin command that performs behavior and returns no value.</summary>
-        /// <param name="member">The host-page plugin member to invoke.</param>
-        /// <returns>The declared plugin command.</returns>
+        /// <param name="member">Host-page plugin member to invoke.</param>
+        /// <returns>Declared plugin command.</returns>
         protected PluginCommand Command(string member)
         {
             var command = new PluginCommand(Name, member);
@@ -87,16 +87,16 @@ namespace Alis.Reactive
         }
 
         /// <summary>Declares a plugin command with an exact argument contract.</summary>
-        /// <param name="member">The host-page plugin member to invoke.</param>
-        /// <param name="arguments">The ordered argument types accepted by the command.</param>
-        /// <returns>The declared plugin command.</returns>
+        /// <param name="member">Host-page plugin member to invoke.</param>
+        /// <param name="arguments">Ordered argument types accepted by the command.</param>
+        /// <returns>Declared plugin command.</returns>
         protected PluginCommand Command(
             string member,
             Action<PluginArgumentTypes> arguments) =>
             Command(member).Args(arguments);
 
         /// <summary>Declares the plugin root command with no return value.</summary>
-        /// <returns>The declared root plugin command.</returns>
+        /// <returns>Declared root plugin command.</returns>
         protected PluginCommand Command()
         {
             var command = new PluginCommand(Name);
@@ -105,8 +105,8 @@ namespace Alis.Reactive
         }
 
         /// <summary>Declares the plugin root command with an exact argument contract.</summary>
-        /// <param name="arguments">The ordered argument types accepted by the root command.</param>
-        /// <returns>The declared root plugin command.</returns>
+        /// <param name="arguments">Ordered argument types accepted by the root command.</param>
+        /// <returns>Declared root plugin command.</returns>
         protected PluginCommand Command(Action<PluginArgumentTypes> arguments) =>
             Command().Args(arguments);
 
@@ -232,7 +232,7 @@ namespace Alis.Reactive
     }
 
     /// <summary>Declaration for a readable Reactive Plan plugin property.</summary>
-    /// <typeparam name="TValue">The property value type exposed to downstream value expressions.</typeparam>
+    /// <typeparam name="TValue">Property value type exposed to downstream value expressions.</typeparam>
     public sealed class PluginProperty<TValue>
     {
         private readonly PluginPropertyId _property;
@@ -268,7 +268,7 @@ namespace Alis.Reactive
     /// Declares a plugin function that returns a typed value. Chain
     /// <c>.Arg&lt;T&gt;()</c> or <c>.Args(...)</c> to set the argument contract.
     /// </summary>
-    /// <typeparam name="TReturn">The function return type exposed to downstream value expressions.</typeparam>
+    /// <typeparam name="TReturn">Function return type exposed to downstream value expressions.</typeparam>
     public sealed class PluginFunction<TReturn> : PluginOperation
     {
         internal PluginFunction(string pluginName, string member)
@@ -282,7 +282,7 @@ namespace Alis.Reactive
         }
 
         /// <summary>Declares one argument accepted by this plugin function.</summary>
-        /// <typeparam name="TArg">The argument type accepted by the function.</typeparam>
+        /// <typeparam name="TArg">Argument type accepted by the function.</typeparam>
         public PluginFunction<TReturn> Arg<TArg>()
         {
             AddArgument<TArg>();
@@ -290,7 +290,7 @@ namespace Alis.Reactive
         }
 
         /// <summary>Appends an exact argument contract without an arity-specific overload.</summary>
-        /// <param name="arguments">The ordered argument types accepted by the function.</param>
+        /// <param name="arguments">Ordered argument types accepted by the function.</param>
         public PluginFunction<TReturn> Args(Action<PluginArgumentTypes> arguments)
         {
             AddArguments(arguments);
@@ -315,7 +315,7 @@ namespace Alis.Reactive
         }
 
         /// <summary>Declares one argument accepted by this plugin command.</summary>
-        /// <typeparam name="TArg">The argument type accepted by the command.</typeparam>
+        /// <typeparam name="TArg">Argument type accepted by the command.</typeparam>
         public PluginCommand Arg<TArg>()
         {
             AddArgument<TArg>();
@@ -323,7 +323,7 @@ namespace Alis.Reactive
         }
 
         /// <summary>Appends an exact argument contract without an arity-specific overload.</summary>
-        /// <param name="arguments">The ordered argument types accepted by the command.</param>
+        /// <param name="arguments">Ordered argument types accepted by the command.</param>
         public PluginCommand Args(Action<PluginArgumentTypes> arguments)
         {
             AddArguments(arguments);
