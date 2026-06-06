@@ -1,5 +1,5 @@
 // Live validation revalidates on blur/vendor change and only clears while typing.
-// RuntimePlan lookup keeps fields on the same component path as execution/gather.
+// Active Plan component lookup keeps fields on the same path as execution/gather.
 
 import type { PlanDocument } from "../types/index";
 import {
