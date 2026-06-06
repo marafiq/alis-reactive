@@ -952,6 +952,9 @@ Rewrite or delete:
   narrating helper mechanics. The Razor-generated-file, fluent-chain,
   NativeActionLink, validation, duplicate event, and chained request comments
   remain only where they prevent analyzer-scope confusion.
+- Resolved on `tiny-safe-but-important-refactorings`: design-system helper XML
+  docs now keep the CSS override-order contract while shortening repeated class
+  string, wrapper, and caller-supplied wording.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
