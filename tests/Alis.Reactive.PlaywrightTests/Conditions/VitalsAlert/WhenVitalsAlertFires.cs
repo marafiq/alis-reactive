@@ -9,6 +9,7 @@ public class WhenVitalsAlertFires : PlaywrightTestBase
 
     private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_VitalsAlertModel";
     private const string HeartRateId = GeneratedTypeScope + "__HeartRate";
+    private const string NormalHeartRateChangedFromInitial = "80";
 
     private NumericTextBoxLocator HeartRate => new(Page, HeartRateId);
 
@@ -46,7 +47,7 @@ public class WhenVitalsAlertFires : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await HeartRate.FillAndBlur("80");
+        await HeartRate.FillAndBlur(NormalHeartRateChangedFromInitial);
 
         await Expect(Page.Locator("#s1-last-reading"))
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
@@ -68,8 +69,7 @@ public class WhenVitalsAlertFires : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Use a value different from the initial 72 so the component raises change.
-        await HeartRate.FillAndBlur("80");
+        await HeartRate.FillAndBlur(NormalHeartRateChangedFromInitial);
 
         await Expect(Page.Locator("#s1-last-reading"))
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
@@ -82,8 +82,7 @@ public class WhenVitalsAlertFires : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Use a value different from the initial 72 so the component raises change.
-        await HeartRate.FillAndBlur("80");
+        await HeartRate.FillAndBlur(NormalHeartRateChangedFromInitial);
 
         await Expect(Page.Locator("#s1-check-status"))
             .ToHaveTextAsync("checked", new() { Timeout = 5000 });

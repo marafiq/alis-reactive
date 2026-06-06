@@ -839,6 +839,9 @@ Rewrite or delete:
   tests now use locator and expected-count names instead of comments narrating
   controller item counts. The placeholder-value and DOM/Reactive Plan join-key
   comments remain because they explain behavior constraints.
+- Resolved on `tiny-safe-but-important-refactorings`: vitals alert tests now name
+  the normal heart-rate value that differs from the initial component value, so
+  repeated "raises change" comments were removed without hiding the event reason.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
