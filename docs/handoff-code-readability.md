@@ -450,6 +450,10 @@ Candidate cleanup:
   docs now keep the form-mode/FormData boundary visible while trimming repeated
   field-wrapper, event-args, and selected-file wording. No upload behavior or
   Playwright file-injection flow changed.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionInputMask` XML
+  docs now describe masked value reads/writes and focus behavior without
+  repeating the field wrapper, model value type, or event-args boilerplate.
+  The mask-format example remains because it is useful public DSL context.
 - Resolved on `tiny-safe-but-important-refactorings`: plugin argument builders
   no longer repeat `TValue` XML type-parameter docs on `ArgValue<TValue>()`;
   the summaries already explain that the plan shape is derived from the type.

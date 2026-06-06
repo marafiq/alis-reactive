@@ -10,7 +10,7 @@ using ComponentRegistrationSource = Alis.Reactive.Fusion.Components.FusionInputM
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Creates a FusionInputMask inside a field wrapper, bound to a model property.
+    /// Renders the masked input component inside a bound input field.
     /// </summary>
     /// <remarks>
     /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Phone)</c>, then call
@@ -19,10 +19,10 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionInputMaskHtmlExtensions
     {
         /// <summary>
-        /// Renders a FusionInputMask bound to the field's model property.
+        /// Renders the masked input component bound to the field's model property.
         /// </summary>
-        /// <typeparam name="TProp">The model value type rendered by the masked input.</typeparam>
-        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <typeparam name="TProp">Model value type rendered by the masked input.</typeparam>
+        /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Callback to build the MaskedTextBox (mask format, placeholder, etc.).</param>
         public static void FusionInputMask<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,

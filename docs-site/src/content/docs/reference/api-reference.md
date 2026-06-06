@@ -2947,7 +2947,7 @@ Name { get; }  // Syncfusion event token exposed as `args.name`.
 
 ### FusionInputMask
 
-A FusionInputMask for entering text with a format mask (e.g. phone numbers).
+Syncfusion masked text input for format-constrained text.
 
 ```csharp
 // Properties
@@ -2975,7 +2975,7 @@ Changed { get; }  // Fires when the masked value changes.
 
 ### FusionInputMaskExtensions
 
-Typed component operations and value reads for `FusionInputMask` in a Reactive Plan pipeline.
+Writes, focuses, and reads the masked input value in a Reactive Plan pipeline.
 
 ```csharp
 FocusIn<T>()
@@ -2985,7 +2985,7 @@ Value<T>()
 
 ### FusionInputMaskHtmlExtensions
 
-Creates a FusionInputMask inside a field wrapper, bound to a model property.
+Renders the masked input component inside a bound input field.
 
 ```csharp
 FusionInputMask<T>(setup, build)
