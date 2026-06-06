@@ -17,8 +17,8 @@ namespace Alis.Reactive.Native.Components
         /// </summary>
         /// <typeparam name="TModel">Current Razor view model.</typeparam>
         /// <typeparam name="TArgs">Payload type selected by <paramref name="eventSelector"/>.</typeparam>
-        /// <param name="builder">Builder returned to continue or finish rendering.</param>
-        /// <param name="plan">Plan that receives the component-event trigger.</param>
+        /// <param name="builder">The NativeButton builder being wired.</param>
+        /// <param name="plan">The Reactive Plan that receives the component-event trigger.</param>
         /// <param name="eventSelector">Selects which event to listen for, such as <c>evt => evt.Click</c>.</param>
         /// <param name="pipeline">Defines the reaction graph that runs when the event fires.</param>
         public static NativeButtonBuilder<TModel> Reactive<TModel, TArgs>(
