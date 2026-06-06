@@ -882,6 +882,9 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: the Events page target
   visibility test now names the event-chain set-reaction targets, so the inline
   controlled-ID explanation was removed without changing the assertions.
+- Resolved on `tiny-safe-but-important-refactorings`: custom-header Playwright
+  tests now name the DomReady data-load wait helper and the chained second
+  request ordering proof, so the two inline timing/order comments were removed.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

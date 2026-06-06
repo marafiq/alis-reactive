@@ -6,18 +6,17 @@ public class WhenCustomHeadersSent : PlaywrightTestBase
     private Task ClickButton(string name) =>
         ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = name }));
 
-    private async Task NavigateAndWaitForBoot()
+    private async Task NavigateAndWaitForDomReadyLoad()
     {
         await NavigateTo("/Sandbox/HttpPipeline/Http");
         await WaitForTraceMessage("booted", 10000);
-        // Wait for the DomReady GET to complete before interacting.
         await Expect(Page.Locator("#load-first")).Not.ToHaveTextAsync("—", new() { Timeout = 15000 });
     }
 
     [Test]
     public async Task literal_headers_arrive_at_server()
     {
-        await NavigateAndWaitForBoot();
+        await NavigateAndWaitForDomReadyLoad();
 
         await ClickButton("Send with Headers");
 
@@ -33,7 +32,7 @@ public class WhenCustomHeadersSent : PlaywrightTestBase
     [Test]
     public async Task literal_headers_apply_success_class()
     {
-        await NavigateAndWaitForBoot();
+        await NavigateAndWaitForDomReadyLoad();
 
         await ClickButton("Send with Headers");
 
@@ -47,7 +46,7 @@ public class WhenCustomHeadersSent : PlaywrightTestBase
     [Test]
     public async Task literal_headers_hide_spinner()
     {
-        await NavigateAndWaitForBoot();
+        await NavigateAndWaitForDomReadyLoad();
 
         await ClickButton("Send with Headers");
 
@@ -60,7 +59,7 @@ public class WhenCustomHeadersSent : PlaywrightTestBase
     [Test]
     public async Task chained_first_request_carries_its_headers()
     {
-        await NavigateAndWaitForBoot();
+        await NavigateAndWaitForDomReadyLoad();
 
         await ClickButton("Chain with Headers");
 
@@ -72,13 +71,12 @@ public class WhenCustomHeadersSent : PlaywrightTestBase
     }
 
     [Test]
-    public async Task chained_second_request_carries_different_headers()
+    public async Task chained_second_request_waits_for_first_response_and_carries_different_headers()
     {
-        await NavigateAndWaitForBoot();
+        await NavigateAndWaitForDomReadyLoad();
 
         await ClickButton("Chain with Headers");
 
-        // The second request only fires after the first completes; each carries separate headers.
         await Expect(Page.Locator("#header-chain-second-version"))
             .ToHaveTextAsync("chain-v2", new() { Timeout = 5000 });
         await Expect(Page.Locator("#header-chain-second-tenant"))
@@ -89,7 +87,7 @@ public class WhenCustomHeadersSent : PlaywrightTestBase
     [Test]
     public async Task chained_headers_spinner_hides_after_both()
     {
-        await NavigateAndWaitForBoot();
+        await NavigateAndWaitForDomReadyLoad();
 
         await ClickButton("Chain with Headers");
 
@@ -102,7 +100,7 @@ public class WhenCustomHeadersSent : PlaywrightTestBase
     [Test]
     public async Task parallel_request_a_carries_its_headers()
     {
-        await NavigateAndWaitForBoot();
+        await NavigateAndWaitForDomReadyLoad();
 
         await ClickButton("Parallel with Headers");
 
@@ -116,7 +114,7 @@ public class WhenCustomHeadersSent : PlaywrightTestBase
     [Test]
     public async Task parallel_request_b_carries_its_headers()
     {
-        await NavigateAndWaitForBoot();
+        await NavigateAndWaitForDomReadyLoad();
 
         await ClickButton("Parallel with Headers");
 
@@ -130,7 +128,7 @@ public class WhenCustomHeadersSent : PlaywrightTestBase
     [Test]
     public async Task parallel_headers_all_settled_fires()
     {
-        await NavigateAndWaitForBoot();
+        await NavigateAndWaitForDomReadyLoad();
 
         await ClickButton("Parallel with Headers");
 
@@ -144,7 +142,7 @@ public class WhenCustomHeadersSent : PlaywrightTestBase
     [Test]
     public async Task parallel_headers_spinner_hides_after_all_settled()
     {
-        await NavigateAndWaitForBoot();
+        await NavigateAndWaitForDomReadyLoad();
 
         await ClickButton("Parallel with Headers");
 
