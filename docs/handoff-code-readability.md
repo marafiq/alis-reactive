@@ -599,6 +599,9 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeButton` XML tags
   now use concise element-ID, button-type, and Reactive Plan wording. No-gather
   and no-payload boundary notes remain.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionDatePicker` XML
+  tags now use concise field-wrapper, model-value, event-args, Reactive Plan,
+  and date-value wording. Public DSL/value-read examples remain.
 
 ### Implementation Inline Comments
 

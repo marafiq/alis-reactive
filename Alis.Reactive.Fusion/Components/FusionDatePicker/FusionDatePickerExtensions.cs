@@ -26,7 +26,7 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("focusOut");
 
         /// <summary>Sets the selected date.</summary>
-        /// <param name="value">The date to set.</param>
+        /// <param name="value">Date to set.</param>
         public static ComponentRef<FusionDatePicker, TModel> SetValue<TModel>(
             this ComponentRef<FusionDatePicker, TModel> self, DateTime value)
             where TModel : class
