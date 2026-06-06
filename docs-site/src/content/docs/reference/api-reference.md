@@ -39,7 +39,7 @@ Vendor { get; }  // Vendor key used to resolve the component implementation at r
 
 ### IdGenerator
 
-Generates collision-free HTML element IDs from model type and property expression.
+Generates stable scoped HTML element IDs from a model type and property expression.
 
 ```csharp
 For(modelType, propertyPath)

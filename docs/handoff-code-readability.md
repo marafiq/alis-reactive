@@ -457,6 +457,10 @@ Candidate cleanup:
   for helper methods. Concise plain comments keep the Reactive Plan path,
   MVC binding-name, and MVC element-ID invariants because those are the parts
   framework developers can accidentally break.
+- Resolved on `tiny-safe-but-important-refactorings`: `IdGenerator` public XML
+  docs no longer claim generated IDs are collision-free. The docs now describe
+  stable model/property-scoped IDs and call out repeated-form sharing without
+  changing the ID algorithm.
 
 ### Implementation Inline Comments
 

@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Generates collision-free HTML element IDs from model type and property expression.
+    /// Generates stable scoped HTML element IDs from a model type and property expression.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -14,8 +14,10 @@ namespace Alis.Reactive
     /// </para>
     /// <para>
     /// All component vendors (Syncfusion, native) produce the same ID for the same
-    /// expression, so cross-component references resolve correctly. The <c>name</c>
-    /// attribute for MVC model binding is not affected: only the <c>id</c> attribute.
+    /// model/property pair, so cross-component references resolve correctly. Repeated
+    /// forms for the same model/property pair share the generated ID unless the
+    /// component is rendered with an explicit scoped ID. The <c>name</c> attribute for
+    /// MVC model binding is not affected: only the <c>id</c> attribute.
     /// </para>
     /// </remarks>
     public static class IdGenerator
