@@ -40,7 +40,7 @@ namespace Alis.Reactive
         /// Builds a scoped camelCase Reactive Plan value path while preserving the selected value type.
         /// </summary>
         /// <typeparam name="TSource">The source type containing the property chain.</typeparam>
-        /// <typeparam name="TProp">The selected value type.</typeparam>
+        /// <typeparam name="TProp">The CLR type selected by the property-access expression.</typeparam>
         /// <param name="prefix">The value-scope prefix to prepend.</param>
         /// <param name="expression">The property-access expression to convert.</param>
         /// <returns>A dot-path like <c>evt.facilityId</c>.</returns>
@@ -53,7 +53,7 @@ namespace Alis.Reactive
         /// <summary>
         /// Builds a camelCase path relative to the current event payload scope.
         /// </summary>
-        /// <typeparam name="TPayload">The event payload type.</typeparam>
+        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
         /// <param name="expression">The property-access expression to convert.</param>
         /// <returns>A dot-path like <c>address.city</c>.</returns>
         public static string ToEventPath<TPayload>(Expression<Func<TPayload, object?>> expression)
@@ -65,8 +65,8 @@ namespace Alis.Reactive
         /// <summary>
         /// Builds a camelCase event-payload path while preserving the selected value type.
         /// </summary>
-        /// <typeparam name="TPayload">The event payload type.</typeparam>
-        /// <typeparam name="TProp">The selected payload value type.</typeparam>
+        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
+        /// <typeparam name="TProp">The CLR type selected from the event payload contract.</typeparam>
         /// <param name="expression">The property-access expression to convert.</param>
         /// <returns>A dot-path like <c>facilityId</c>.</returns>
         public static string ToEventPath<TPayload, TProp>(Expression<Func<TPayload, TProp>> expression)
@@ -78,7 +78,7 @@ namespace Alis.Reactive
         /// <summary>
         /// Builds a camelCase path relative to the active HTTP response body scope.
         /// </summary>
-        /// <typeparam name="TResponse">The response body type.</typeparam>
+        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
         /// <param name="expression">The property-access expression to convert.</param>
         /// <returns>A dot-path like <c>data.name</c>.</returns>
         public static string ToResponsePath<TResponse>(Expression<Func<TResponse, object?>> expression)
@@ -90,8 +90,8 @@ namespace Alis.Reactive
         /// <summary>
         /// Builds a camelCase response-body path while preserving the selected value type.
         /// </summary>
-        /// <typeparam name="TResponse">The response body type.</typeparam>
-        /// <typeparam name="TProp">The selected response value type.</typeparam>
+        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
+        /// <typeparam name="TProp">The CLR type selected from the response body contract.</typeparam>
         /// <param name="expression">The property-access expression to convert.</param>
         /// <returns>A dot-path like <c>data.name</c>.</returns>
         public static string ToResponsePath<TResponse, TProp>(Expression<Func<TResponse, TProp>> expression)
@@ -157,7 +157,7 @@ namespace Alis.Reactive
         /// Extracts the MVC model-binding path while preserving the selected value type.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the property path.</typeparam>
-        /// <typeparam name="TProp">The selected model value type.</typeparam>
+        /// <typeparam name="TProp">The CLR type selected from the model property path.</typeparam>
         /// <param name="expression">The model property expression.</param>
         /// <returns>A dot-separated binding path like <c>"Address.City"</c>.</returns>
         public static string ToPropertyName<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
@@ -187,7 +187,7 @@ namespace Alis.Reactive
         /// Converts a model expression to the MVC DOM element ID while preserving the selected value type.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the property path.</typeparam>
-        /// <typeparam name="TProp">The selected model value type.</typeparam>
+        /// <typeparam name="TProp">The CLR type selected from the model property path.</typeparam>
         /// <param name="expression">The model property expression.</param>
         /// <returns>An underscore-separated element ID like <c>"Address_City"</c>.</returns>
         public static string ToElementId<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
