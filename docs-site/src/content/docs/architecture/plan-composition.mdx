@@ -82,7 +82,7 @@ This is why `IncludeAll()` gathers values from components declared in both the p
 
 ## AJAX-loaded partial views — slot replacement
 
-When a partial view is loaded via AJAX (the `into` command injects HTML), the injected content may contain its own `[data-reactive-plan]` element. `inject.ts` discovers those plans and calls `loadPartialSlot(slotId, plans)` in `boot.ts`:
+When a partial view is loaded via AJAX (the `Into` reaction injects HTML), the injected content may contain its own `[data-reactive-plan]` element. `inject.ts` discovers those plans and calls `loadPartialSlot(slotId, plans)` in `boot.ts`:
 
 ```d2
 direction: right
