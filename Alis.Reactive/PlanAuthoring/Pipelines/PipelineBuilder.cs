@@ -39,7 +39,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Queues a <c>CustomEvent</c> reaction without a payload.</summary>
         /// <param name="eventName">The event name matched by <c>t.CustomEvent(...)</c> triggers.</param>
-        /// <returns>The current builder; chained reactions are appended after the dispatch.</returns>
+        /// <returns>The same pipeline builder; chained reactions run after the dispatch.</returns>
         public PipelineBuilder<TModel> Dispatch(string eventName)
         {
             AddStep(ReactionGraph.Dispatch(eventName));
@@ -50,7 +50,7 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TPayload">The payload contract consumed by matching custom event triggers.</typeparam>
         /// <param name="eventName">The event name matched by <c>t.CustomEvent&lt;TPayload&gt;(...)</c> triggers.</param>
         /// <param name="payload">The payload object serialized into the generated plan.</param>
-        /// <returns>The current builder; chained reactions are appended after the dispatch.</returns>
+        /// <returns>The same pipeline builder; chained reactions run after the dispatch.</returns>
         public PipelineBuilder<TModel> Dispatch<TPayload>(string eventName, TPayload payload)
         {
             AddStep(ReactionGraph.Dispatch(
@@ -71,7 +71,7 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TPayload">The payload contract consumed by matching custom event triggers.</typeparam>
         /// <param name="eventName">The event name matched by <c>t.CustomEvent&lt;TPayload&gt;(...)</c> triggers.</param>
         /// <param name="configure">Maps payload fields to value sources or literals.</param>
-        /// <returns>The current builder; chained reactions are appended after the dispatch.</returns>
+        /// <returns>The same pipeline builder; chained reactions run after the dispatch.</returns>
         public PipelineBuilder<TModel> DispatchWith<TPayload>(
             string eventName,
             Action<DispatchPayloadBuilder<TPayload, TModel>> configure)
@@ -275,7 +275,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Appends a reaction that renders accumulated validation errors into a container.</summary>
         /// <param name="formId">The element ID of the validation error container.</param>
-        /// <returns>The current builder; chained reactions are appended after the validation reaction.</returns>
+        /// <returns>The same pipeline builder; chained reactions run after validation output.</returns>
         public PipelineBuilder<TModel> ValidationErrors(string formId)
         {
             AddStep(ReactionGraph.ShowValidationErrors(formId));
@@ -285,7 +285,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Appends a reaction that injects the previous HTTP success body as HTML.</summary>
         /// <remarks>Must follow an HTTP request. The injected HTML comes from the active success response body.</remarks>
         /// <param name="elementId">The target DOM element ID.</param>
-        /// <returns>The current builder; chained reactions are appended after the injection.</returns>
+        /// <returns>The same pipeline builder; chained reactions run after the injection.</returns>
         public PipelineBuilder<TModel> Into(string elementId)
         {
             Context.DeclareElement(elementId);
