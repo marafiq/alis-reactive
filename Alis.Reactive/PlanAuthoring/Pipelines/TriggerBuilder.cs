@@ -24,7 +24,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Runs a reaction pipeline after the DOM is ready and Reactive Plan listeners are wired.</summary>
-        /// <param name="pipeline">Builds the reaction graph for the DOM-ready trigger.</param>
+        /// <param name="pipeline">Builds the reaction graph for the <c>DomReady</c> trigger.</param>
         public TriggerBuilder<TModel> DomReady(Action<PipelineBuilder<TModel>> pipeline)
         {
             var reactionPipeline = new PipelineBuilder<TModel>(_context);
