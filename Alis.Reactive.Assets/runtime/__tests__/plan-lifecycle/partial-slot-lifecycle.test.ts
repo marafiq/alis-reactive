@@ -26,10 +26,10 @@ describe("partial slot composition", () => {
       }),
     ], wiring);
 
-    const first = appliedPlans.get(planId)!;
-    expect(first.components["address-line"]).toBeDefined();
-    expect(first.types["native.element.address-line"]).toBeDefined();
-    expect(first.behaviors).toContain(initialSlotBehavior);
+    const initialActivePlan = appliedPlans.get(planId)!;
+    expect(initialActivePlan.components["address-line"]).toBeDefined();
+    expect(initialActivePlan.types["native.element.address-line"]).toBeDefined();
+    expect(initialActivePlan.behaviors).toContain(initialSlotBehavior);
     expect(behaviorSignals[0]?.aborted).toBe(false);
 
     const replacementSlotBehavior = behavior();
@@ -41,14 +41,14 @@ describe("partial slot composition", () => {
       }),
     ], wiring);
 
-    const second = appliedPlans.get(planId)!;
+    const replacedActivePlan = appliedPlans.get(planId)!;
     expect(behaviorSignals[0]?.aborted).toBe(true);
-    expect(second.components["address-line"]).toBeUndefined();
-    expect(second.types["native.element.address-line"]).toBeUndefined();
-    expect(second.behaviors).not.toContain(initialSlotBehavior);
-    expect(second.components["zip-code"]).toBeDefined();
-    expect(second.types["native.element.zip-code"]).toBeDefined();
-    expect(second.behaviors).toContain(replacementSlotBehavior);
+    expect(replacedActivePlan.components["address-line"]).toBeUndefined();
+    expect(replacedActivePlan.types["native.element.address-line"]).toBeUndefined();
+    expect(replacedActivePlan.behaviors).not.toContain(initialSlotBehavior);
+    expect(replacedActivePlan.components["zip-code"]).toBeDefined();
+    expect(replacedActivePlan.types["native.element.zip-code"]).toBeDefined();
+    expect(replacedActivePlan.behaviors).toContain(replacementSlotBehavior);
   });
 
   it("unloads an active slot explicitly", () => {
