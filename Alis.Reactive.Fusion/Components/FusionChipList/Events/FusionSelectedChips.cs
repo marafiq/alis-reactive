@@ -10,7 +10,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public sealed class FusionSelectedChips
     {
-        /// <summary>The selected chips' display text (<c>texts</c>).</summary>
+        /// <summary>Selected chip display texts (<c>texts</c>).</summary>
         public string[] Texts { get; set; } = Array.Empty<string>();
 
         /// <summary>

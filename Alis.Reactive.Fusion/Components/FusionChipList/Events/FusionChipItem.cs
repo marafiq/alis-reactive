@@ -8,10 +8,10 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public sealed class FusionChipItem
     {
-        /// <summary>The chip's display text (<c>data[i].text</c>).</summary>
+        /// <summary>Chip display text (<c>data[i].text</c>).</summary>
         public string Text { get; set; } = "";
 
-        /// <summary>The chip's bound value (<c>data[i].value</c>).</summary>
+        /// <summary>Chip bound value (<c>data[i].value</c>).</summary>
         public string Value { get; set; } = "";
     }
 }

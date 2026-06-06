@@ -8,19 +8,19 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public sealed class FusionBulletChartTooltipRenderArgs
     {
-        /// <summary>The actual value of the feature bar.</summary>
+        /// <summary>Actual value of the feature bar.</summary>
         public string Value { get; set; } = string.Empty;
 
-        /// <summary>The target values of the comparative bar.</summary>
+        /// <summary>Target values of the comparative bar.</summary>
         public string[] Target { get; set; } = System.Array.Empty<string>();
 
         /// <summary>Syncfusion event token exposed as <c>args.name</c>.</summary>
         public string Name { get; set; } = string.Empty;
 
-        /// <summary>The tooltip template markup, when template rendering is enabled.</summary>
+        /// <summary>Tooltip template markup when template rendering is enabled.</summary>
         public string? Template { get; set; }
 
-        /// <summary>The tooltip text, when template rendering is not enabled.</summary>
+        /// <summary>Tooltip text when template rendering is not enabled.</summary>
         public string? Text { get; set; }
     }
 

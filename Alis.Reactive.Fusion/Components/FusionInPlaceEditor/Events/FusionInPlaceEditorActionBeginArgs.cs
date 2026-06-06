@@ -14,7 +14,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionInPlaceEditorActionBeginArgs
     {
-        /// <summary>The payload Syncfusion prepared for its built-in submit, keyed by the editor's <c>Name</c>.</summary>
+        /// <summary>Payload Syncfusion prepared for its built-in submit, keyed by the editor's <c>Name</c>.</summary>
         public IDictionary<string, object>? Data { get; set; }
 
         /// <summary>Whether Syncfusion's built-in submit has been cancelled. Set via <see cref="FusionInPlaceEditorActionBeginArgsExtensions.PreventDefault"/>.</summary>

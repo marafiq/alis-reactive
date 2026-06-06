@@ -181,6 +181,9 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: selected Fusion event
   payload field summaries now use concise contract wording for tab selection
   indexes and InPlaceEditor committed values instead of article-led prose.
+- Resolved on `tiny-safe-but-important-refactorings`: remaining Fusion event
+  payload field summaries in ChipList, BulletChart, and InPlaceEditor action
+  begin now keep Syncfusion field meaning without article-led phrasing.
 - Resolved on `tiny-safe-but-important-refactorings`: `ConditionSourceBuilder`
   operator docs now include the parameter tags needed for generated API
   signatures such as `Eq(operand)` versus `Eq(right)`. This keeps the public DSL
