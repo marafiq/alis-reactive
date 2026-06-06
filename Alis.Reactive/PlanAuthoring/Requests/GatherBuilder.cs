@@ -47,8 +47,8 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Adds a value from the triggering event payload to the request body.</summary>
-        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
-        /// <typeparam name="TProp">The CLR type used to shape the selected event-payload body value.</typeparam>
+        /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
+        /// <typeparam name="TProp">Selected event-payload body value type.</typeparam>
         /// <param name="args">The typed event payload parameter from the trigger callback.</param>
         /// <param name="path">The event payload property path to read.</param>
         /// <param name="param">The request body field that receives the payload value.</param>
@@ -94,8 +94,8 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Adds a scalar HTTP header value from the triggering event payload.</summary>
-        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
-        /// <typeparam name="TProp">The CLR type used to shape the selected event-payload header value.</typeparam>
+        /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
+        /// <typeparam name="TProp">Selected event-payload header value type.</typeparam>
         /// <param name="name">The HTTP header that receives the payload value.</param>
         /// <param name="args">The typed event payload parameter from the trigger callback.</param>
         /// <param name="path">The event payload property path to send as a header.</param>
@@ -159,8 +159,8 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Binds a route template parameter to a scalar value from the triggering event payload.</summary>
-        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
-        /// <typeparam name="TProp">The CLR type used to shape the selected event-payload route value.</typeparam>
+        /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
+        /// <typeparam name="TProp">Selected event-payload route value type.</typeparam>
         /// <param name="paramName">The route template placeholder name without braces.</param>
         /// <param name="args">The typed event payload parameter from the trigger callback.</param>
         /// <param name="path">The event payload property path captured as the route value.</param>

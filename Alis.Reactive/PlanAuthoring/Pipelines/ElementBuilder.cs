@@ -55,8 +55,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets the text content from an event payload property.</summary>
-        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
-        /// <param name="source">The typed event payload marker supplied by the trigger callback.</param>
+        /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
+        /// <param name="source">Trigger payload placeholder.</param>
         /// <param name="path">Expression selecting the event payload property to display.</param>
         public PipelineBuilder<TModel> SetText<TPayload>(TPayload source, Expression<Func<TPayload, object>> path)
         {
@@ -93,8 +93,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets the inner HTML from an event payload property.</summary>
-        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
-        /// <param name="source">The typed event payload marker supplied by the trigger callback.</param>
+        /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
+        /// <param name="source">Trigger payload placeholder.</param>
         /// <param name="path">Expression selecting the event payload property containing HTML.</param>
         public PipelineBuilder<TModel> SetHtml<TPayload>(TPayload source, Expression<Func<TPayload, object>> path)
         {

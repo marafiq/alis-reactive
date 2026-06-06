@@ -23,9 +23,9 @@ namespace Alis.Reactive.Builders
         /// <c>p.From(args, e =&gt; e.Data)</c> where <c>e.Data</c> is <c>T[]</c>. The element type
         /// flows through the chain; the lambda is captured into a plan read, never invoked.
         /// </summary>
-        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
+        /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
         /// <typeparam name="TElement">The selected array element type carried through the transform chain.</typeparam>
-        /// <param name="args">The event payload placeholder supplied by the trigger callback.</param>
+        /// <param name="args">Trigger payload placeholder.</param>
         /// <param name="selector">Selects the payload array value to read at runtime.</param>
         /// <returns>A reactive array builder for composing operations such as filtering and counting.</returns>
         public ReactiveArray<TElement> From<TPayload, TElement>(

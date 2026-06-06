@@ -41,10 +41,10 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         /// <summary>Adds an all-of comparison against the triggering event payload.</summary>
-        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
-        /// <typeparam name="TProp">The CLR type used to shape the selected event payload value.</typeparam>
-        /// <param name="payload">The event payload placeholder supplied by the trigger callback.</param>
-        /// <param name="path">Selects the payload value to compare at runtime.</param>
+        /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
+        /// <typeparam name="TProp">Selected event-payload value type.</typeparam>
+        /// <param name="payload">Trigger payload placeholder.</param>
+        /// <param name="path">Payload value compared at runtime.</param>
         /// <returns>A builder for choosing the added comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> And<TPayload, TProp>(
             TPayload payload, Expression<Func<TPayload, TProp>> path)
@@ -56,7 +56,7 @@ namespace Alis.Reactive.Builders.Conditions
 
         /// <summary>Adds an all-of comparison against the active HTTP response body.</summary>
         /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
-        /// <typeparam name="TProp">The CLR type used to shape the selected response-body value.</typeparam>
+        /// <typeparam name="TProp">Selected response-body value type.</typeparam>
         /// <param name="responseBody">The response body placeholder supplied by the response route callback.</param>
         /// <param name="path">Selects the response value to compare at runtime.</param>
         /// <returns>A builder for choosing the added comparison.</returns>
@@ -70,10 +70,10 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         /// <summary>Adds an any-of comparison against the triggering event payload.</summary>
-        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
-        /// <typeparam name="TProp">The CLR type used to shape the selected event payload value.</typeparam>
-        /// <param name="payload">The event payload placeholder supplied by the trigger callback.</param>
-        /// <param name="path">Selects the payload value to compare at runtime.</param>
+        /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
+        /// <typeparam name="TProp">Selected event-payload value type.</typeparam>
+        /// <param name="payload">Trigger payload placeholder.</param>
+        /// <param name="path">Payload value compared at runtime.</param>
         /// <returns>A builder for choosing the added comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> Or<TPayload, TProp>(
             TPayload payload, Expression<Func<TPayload, TProp>> path)
@@ -85,7 +85,7 @@ namespace Alis.Reactive.Builders.Conditions
 
         /// <summary>Adds an any-of comparison against the active HTTP response body.</summary>
         /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
-        /// <typeparam name="TProp">The CLR type used to shape the selected response-body value.</typeparam>
+        /// <typeparam name="TProp">Selected response-body value type.</typeparam>
         /// <param name="responseBody">The response body placeholder supplied by the response route callback.</param>
         /// <param name="path">Selects the response value to compare at runtime.</param>
         /// <returns>A builder for choosing the added comparison.</returns>

@@ -482,6 +482,10 @@ Candidate cleanup:
   argument docs and Native event-payload write docs now say "triggering event
   payload" instead of generic "current event payload," matching existing gather
   terminology.
+- Resolved on `tiny-safe-but-important-refactorings`: repeated event-payload
+  XML type and parameter tags now use concise "Trigger payload contract,"
+  "Trigger payload placeholder," and selected-value wording across core
+  condition, gather, element, array, plugin, and Native payload helpers.
 
 ### Implementation Inline Comments
 
