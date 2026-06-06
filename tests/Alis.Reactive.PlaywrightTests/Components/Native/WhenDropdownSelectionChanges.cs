@@ -75,7 +75,6 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // DomReady already set the value under test.
         await Page.Locator("#check-care-btn").ClickAsync();
 
         var status = Page.Locator("#care-confirmation");
@@ -101,7 +100,6 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     [Test]
     public async Task changing_selection_multiple_times_updates_status_each_time()
     {
-        // The reactive handler must fire on every change, not only the first.
         await NavigateAndBoot();
 
         var select = Page.Locator($"#{ModelIdPrefix}FacilityType");
@@ -125,7 +123,6 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     [Test]
     public async Task clearing_care_level_then_reselecting_updates_condition_both_ways()
     {
-        // The component-read condition must re-evaluate after a clear-to-reselect cycle.
         await NavigateAndBoot();
 
         var select = Page.Locator($"#{ModelIdPrefix}CareLevel");

@@ -97,7 +97,6 @@ public class WhenTextInputChanges : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // DomReady already set the value under test.
         await Page.Locator("#check-name-btn").ClickAsync();
 
         var warning = Page.Locator("#name-warning");
