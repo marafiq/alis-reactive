@@ -3586,7 +3586,7 @@ Typed event descriptors for the `FusionMultiSelect` component.
 
 ```csharp
 // Properties
-Changed { get; }  // Fires when the selected value changes.
+Changed { get; }  // Fires when the selected value array changes.
 Filtering { get; }  // Fires when the user types to filter.
 ```
 

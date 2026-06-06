@@ -31,8 +31,8 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod HidePopupMethod =
             ComponentMethod.Named("hidePopup");
 
-        /// <summary>Sets the selected values.</summary>
-        /// <param name="value">The values to select, or <see langword="null"/> to clear.</param>
+        /// <summary>Replaces the selected value array.</summary>
+        /// <param name="value">The values to select, or <see langword="null"/> to clear the selection.</param>
         public static ComponentRef<FusionMultiSelect, TModel> SetValue<TModel>(
             this ComponentRef<FusionMultiSelect, TModel> self, string[]? value)
             where TModel : class
@@ -97,7 +97,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(HidePopupMethod);
 
-        /// <summary>Reads the current selected values for use in conditions or gather.</summary>
+        /// <summary>Reads the current selected value array for use in conditions or gather.</summary>
         /// <remarks>
         /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
         /// <c>p.When(p.Component&lt;FusionMultiSelect&gt;(m =&gt; m.Skills).Value()).NotNull().Then(p =&gt; { ... })</c>.
