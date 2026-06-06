@@ -40,7 +40,6 @@ namespace Alis.Reactive.Fusion.Components
         /// Pass to a <c>When()</c> condition guard or use as a source argument for component operations:
         /// <c>p.When(p.Component&lt;FusionRichTextEditor&gt;(m =&gt; m.Notes).Value()).NotNull().Then(p =&gt; { ... })</c>.
         /// </remarks>
-        /// <returns>A typed source representing the editor's current HTML content.</returns>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionRichTextEditor, TModel> self)
             where TModel : class

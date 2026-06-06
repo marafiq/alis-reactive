@@ -104,7 +104,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <c>Html.InputField(plan, m => m.X).FusionInPlaceEditor(...)</c> before this read is built
         /// into the plan: no hardcoded shape, no fallback.
         /// </remarks>
-        /// <returns>A typed source representing the editor's current committed value.</returns>
         /// <exception cref="InvalidOperationException">
         /// Thrown when no <c>FusionInPlaceEditor</c> registration exists for <paramref name="self"/>'s
         /// target id. Call <c>Html.InputField(plan, m =&gt; m.X).FusionInPlaceEditor(...)</c> first.

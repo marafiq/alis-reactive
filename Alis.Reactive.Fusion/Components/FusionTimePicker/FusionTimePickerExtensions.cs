@@ -52,7 +52,6 @@ namespace Alis.Reactive.Fusion.Components
         /// Pass to a <c>When()</c> condition guard or use as a source argument for component operations:
         /// <c>p.When(p.Component&lt;FusionTimePicker&gt;(m =&gt; m.CheckInTime).Value()).NotNull().Then(p =&gt; { ... })</c>.
         /// </remarks>
-        /// <returns>A typed source representing the time picker's current value.</returns>
         public static TypedComponentSource<DateTime> Value<TModel>(
             this ComponentRef<FusionTimePicker, TModel> self)
             where TModel : class

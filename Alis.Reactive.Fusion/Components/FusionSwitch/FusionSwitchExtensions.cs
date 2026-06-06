@@ -22,7 +22,6 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>Reads the current checked state for use in conditions or gather.</summary>
-        /// <returns>A typed source representing the switch's current checked state.</returns>
         public static TypedComponentSource<bool> Value<TModel>(
             this ComponentRef<FusionSwitch, TModel> self)
             where TModel : class

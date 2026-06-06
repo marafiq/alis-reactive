@@ -44,14 +44,12 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitCall(DataBindMethod);
 
         /// <summary>Reads the current scalar value for use in conditions or gather.</summary>
-        /// <returns>A typed source representing the slider's current scalar value.</returns>
         public static TypedComponentSource<double> Value<TModel>(
             this ComponentRef<FusionSlider, TModel> self)
             where TModel : class
             => self.Read(ValueProperty);
 
         /// <summary>Reads the current range value for use in gather or display pipelines.</summary>
-        /// <returns>A typed source representing the slider's current range value.</returns>
         public static TypedComponentSource<double[]> RangeValue<TModel>(
             this ComponentRef<FusionSlider, TModel> self)
             where TModel : class

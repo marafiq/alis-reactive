@@ -115,7 +115,6 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(HidePopupMethod);
 
         /// <summary>Reads the current selected value for use in conditions or gather.</summary>
-        /// <returns>A typed source representing the dropdown's current value.</returns>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class

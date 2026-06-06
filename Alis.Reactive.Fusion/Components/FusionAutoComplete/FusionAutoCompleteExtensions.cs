@@ -135,7 +135,6 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitSet(EnabledProperty, ValueExpression.Literal(false));
 
         /// <summary>Reads the current selected value for use in conditions or gather.</summary>
-        /// <returns>A typed source representing the autocomplete's current value.</returns>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class

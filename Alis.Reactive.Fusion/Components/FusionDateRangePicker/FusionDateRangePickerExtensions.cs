@@ -38,7 +38,6 @@ namespace Alis.Reactive.Fusion.Components
         /// Pass to a <c>When()</c> condition guard:
         /// <c>p.When(p.Component&lt;FusionDateRangePicker&gt;(m =&gt; m.StayDates).StartDate()).NotNull().Then(p =&gt; { ... })</c>.
         /// </remarks>
-        /// <returns>A typed source representing the range's start date.</returns>
         public static TypedComponentSource<DateTime> StartDate<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
@@ -49,7 +48,6 @@ namespace Alis.Reactive.Fusion.Components
         /// Pass to a <c>When()</c> condition guard:
         /// <c>p.When(p.Component&lt;FusionDateRangePicker&gt;(m =&gt; m.StayDates).EndDate()).NotNull().Then(p =&gt; { ... })</c>.
         /// </remarks>
-        /// <returns>A typed source representing the range's end date.</returns>
         public static TypedComponentSource<DateTime> EndDate<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
@@ -65,7 +63,6 @@ namespace Alis.Reactive.Fusion.Components
         /// when you need individual date access in conditions.
         /// </para>
         /// </remarks>
-        /// <returns>A typed source representing the full date range (start and end).</returns>
         public static TypedComponentSource<DateTime[]> Value<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class

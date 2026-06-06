@@ -99,21 +99,18 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(ClearMethod);
 
         /// <summary>Reads the current selected value for use in conditions or gather.</summary>
-        /// <returns>A typed source representing the ComboBox's current value.</returns>
         public static TypedComponentSource<string?> Value<TModel>(
             this ComponentRef<FusionComboBox, TModel> self)
             where TModel : class
             => self.Read(ValueProperty);
 
         /// <summary>Reads the current display text for use in conditions or gather.</summary>
-        /// <returns>A typed source representing the ComboBox's current display text.</returns>
         public static TypedComponentSource<string?> Text<TModel>(
             this ComponentRef<FusionComboBox, TModel> self)
             where TModel : class
             => self.Read(TextProperty);
 
         /// <summary>Reads the current selected index for use in conditions or gather.</summary>
-        /// <returns>A typed source representing the ComboBox's current selected index.</returns>
         public static TypedComponentSource<int?> Index<TModel>(
             this ComponentRef<FusionComboBox, TModel> self)
             where TModel : class

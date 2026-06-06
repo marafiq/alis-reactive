@@ -102,7 +102,6 @@ namespace Alis.Reactive.Fusion.Components
         /// Pass to a <c>When()</c> condition guard or use as a source argument for component operations:
         /// <c>p.When(p.Component&lt;FusionMultiSelect&gt;(m =&gt; m.Skills).Value()).NotNull().Then(p =&gt; { ... })</c>.
         /// </remarks>
-        /// <returns>A typed source representing the multi-select's current values.</returns>
         public static TypedComponentSource<string[]> Value<TModel>(
             this ComponentRef<FusionMultiSelect, TModel> self)
             where TModel : class

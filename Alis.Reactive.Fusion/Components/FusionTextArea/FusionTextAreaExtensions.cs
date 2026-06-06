@@ -44,7 +44,6 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(FocusOutMethod);
 
         /// <summary>Reads the current text value for use in conditions or gather.</summary>
-        /// <returns>A typed source representing the textarea's current value.</returns>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionTextArea, TModel> self)
             where TModel : class

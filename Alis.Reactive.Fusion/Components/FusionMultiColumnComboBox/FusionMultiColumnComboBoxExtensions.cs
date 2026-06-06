@@ -111,7 +111,6 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(HidePopupMethod);
 
         /// <summary>Reads the current selected value for use in conditions or gather.</summary>
-        /// <returns>A typed source representing the combo box's current value.</returns>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self)
             where TModel : class
