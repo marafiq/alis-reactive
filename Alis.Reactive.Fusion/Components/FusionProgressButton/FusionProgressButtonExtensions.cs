@@ -36,7 +36,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod FocusInMethod =
             ComponentMethod.Named("focusIn");
 
-        /// <summary>Sets the visible button content and flushes the Syncfusion view.</summary>
+        /// <summary>Sets the visible progress button content.</summary>
         public static ComponentRef<FusionProgressButton, TModel> SetContent<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self,
             string content)
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(ContentProperty, ValueExpression.Literal(content))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets whether the progress button is disabled and flushes the Syncfusion view.</summary>
+        /// <summary>Sets whether the rendered progress button is disabled.</summary>
         public static ComponentRef<FusionProgressButton, TModel> SetDisabled<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self,
             bool disabled)
@@ -54,7 +54,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(DisabledProperty, ValueExpression.Literal(disabled))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets rendered CSS classes on the progress button, then flushes the Syncfusion view.</summary>
+        /// <summary>Sets rendered CSS classes on the progress button.</summary>
         public static ComponentRef<FusionProgressButton, TModel> SetCssClass<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self,
             string cssClass)
@@ -63,7 +63,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(CssClassProperty, ValueExpression.Literal(cssClass))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Enables or disables the Syncfusion progress filler and flushes the Syncfusion view.</summary>
+        /// <summary>Sets whether the rendered progress filler is enabled.</summary>
         public static ComponentRef<FusionProgressButton, TModel> SetProgressEnabled<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self,
             bool enabled)
@@ -93,13 +93,13 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(ProgressCompleteMethod);
 
-        /// <summary>Moves focus into the progress button through Syncfusion's public method.</summary>
+        /// <summary>Moves focus into the rendered progress button.</summary>
         public static ComponentRef<FusionProgressButton, TModel> FocusIn<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self)
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
-        /// <summary>Reads the current Syncfusion content property.</summary>
+        /// <summary>Reads the current rendered progress button content.</summary>
         public static TypedComponentSource<string> Content<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self)
             where TModel : class
@@ -111,13 +111,13 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.Read(DisabledProperty);
 
-        /// <summary>Reads the current Syncfusion CSS class property.</summary>
+        /// <summary>Reads the current rendered progress button CSS classes.</summary>
         public static TypedComponentSource<string> CssClass<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self)
             where TModel : class
             => self.Read(CssClassProperty);
 
-        /// <summary>Reads whether Syncfusion progress filler rendering is enabled.</summary>
+        /// <summary>Reads whether the rendered progress filler is enabled.</summary>
         public static TypedComponentSource<bool> ProgressEnabled<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self)
             where TModel : class

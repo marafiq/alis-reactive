@@ -359,6 +359,11 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: `FusionAIAssistView` XML
   docs now name the typed prompt reads, component methods, and events instead
   of leading with a "non-input component" category label.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion button-family
+  extension XML docs no longer expose `dataBind`/flush mechanics as public
+  IntelliSense wording. Button, DropDownButton, SplitButton, and ProgressButton
+  operations now describe rendered component behavior; Syncfusion wording remains
+  only where it names a public component concept such as item IDs.
 
 ### Implementation Inline Comments
 

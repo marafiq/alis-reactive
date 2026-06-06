@@ -38,7 +38,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod FocusInMethod =
             ComponentMethod.Named("focusIn");
 
-        /// <summary>Sets the visible button content and flushes the Syncfusion view.</summary>
+        /// <summary>Sets the visible button content.</summary>
         public static ComponentRef<FusionButton, TModel> SetContent<TModel>(
             this ComponentRef<FusionButton, TModel> self,
             string content)
@@ -47,7 +47,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(ContentProperty, ValueExpression.Literal(content))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets whether the button is disabled and flushes the Syncfusion view.</summary>
+        /// <summary>Sets whether the rendered button is disabled.</summary>
         public static ComponentRef<FusionButton, TModel> SetDisabled<TModel>(
             this ComponentRef<FusionButton, TModel> self,
             bool disabled)
@@ -56,7 +56,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(DisabledProperty, ValueExpression.Literal(disabled))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets the button icon CSS and position, then flushes the Syncfusion view.</summary>
+        /// <summary>Sets the rendered button icon CSS and position.</summary>
         public static ComponentRef<FusionButton, TModel> SetIcon<TModel>(
             this ComponentRef<FusionButton, TModel> self,
             string iconCss,
@@ -67,7 +67,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(IconPositionProperty, ValueExpression.Literal(ToSyncfusion(position)))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets the button CSS classes and flushes the Syncfusion view.</summary>
+        /// <summary>Sets the rendered button CSS classes.</summary>
         public static ComponentRef<FusionButton, TModel> SetCssClass<TModel>(
             this ComponentRef<FusionButton, TModel> self,
             string cssClass)
@@ -94,19 +94,19 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(IsToggleProperty, ValueExpression.Literal(isToggle))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Invokes the button's native click through Syncfusion's public method.</summary>
+        /// <summary>Invokes the rendered button click.</summary>
         public static ComponentRef<FusionButton, TModel> Click<TModel>(
             this ComponentRef<FusionButton, TModel> self)
             where TModel : class
             => self.EmitCall(ClickMethod);
 
-        /// <summary>Moves focus into the button through Syncfusion's public method.</summary>
+        /// <summary>Moves focus into the rendered button.</summary>
         public static ComponentRef<FusionButton, TModel> FocusIn<TModel>(
             this ComponentRef<FusionButton, TModel> self)
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
-        /// <summary>Reads the current Syncfusion content property.</summary>
+        /// <summary>Reads the current rendered button content.</summary>
         public static TypedComponentSource<string> Content<TModel>(
             this ComponentRef<FusionButton, TModel> self)
             where TModel : class

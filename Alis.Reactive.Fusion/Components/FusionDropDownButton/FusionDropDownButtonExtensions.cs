@@ -32,7 +32,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod RemoveItemsMethod =
             ComponentMethod.Named("removeItems").WithArgs<string[], bool>();
 
-        /// <summary>Sets the visible button content and flushes the Syncfusion view.</summary>
+        /// <summary>Sets the visible dropdown button content.</summary>
         public static ComponentRef<FusionDropDownButton, TModel> SetContent<TModel>(
             this ComponentRef<FusionDropDownButton, TModel> self,
             string content)
@@ -41,7 +41,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(ContentProperty, ValueExpression.Literal(content))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets whether the dropdown button is disabled and flushes the Syncfusion view.</summary>
+        /// <summary>Sets whether the rendered dropdown button is disabled.</summary>
         public static ComponentRef<FusionDropDownButton, TModel> SetDisabled<TModel>(
             this ComponentRef<FusionDropDownButton, TModel> self,
             bool disabled)
@@ -50,7 +50,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(DisabledProperty, ValueExpression.Literal(disabled))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets the rendered CSS classes on the dropdown button and popup, then flushes the Syncfusion view.</summary>
+        /// <summary>Sets the rendered CSS classes on the dropdown button and popup.</summary>
         public static ComponentRef<FusionDropDownButton, TModel> SetCssClass<TModel>(
             this ComponentRef<FusionDropDownButton, TModel> self,
             string cssClass)
@@ -65,7 +65,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(ToggleMethod);
 
-        /// <summary>Moves focus into the dropdown button through Syncfusion's public method.</summary>
+        /// <summary>Moves focus into the rendered dropdown button.</summary>
         public static ComponentRef<FusionDropDownButton, TModel> FocusIn<TModel>(
             this ComponentRef<FusionDropDownButton, TModel> self)
             where TModel : class
@@ -85,7 +85,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(RemoveItemsMethod, RemoveItemsArgs(itemIds, isUniqueId: true));
 
-        /// <summary>Reads the current Syncfusion content property.</summary>
+        /// <summary>Reads the current rendered dropdown button content.</summary>
         public static TypedComponentSource<string> Content<TModel>(
             this ComponentRef<FusionDropDownButton, TModel> self)
             where TModel : class
@@ -97,7 +97,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.Read(DisabledProperty);
 
-        /// <summary>Reads the current Syncfusion CSS class property.</summary>
+        /// <summary>Reads the current rendered dropdown button CSS classes.</summary>
         public static TypedComponentSource<string> CssClass<TModel>(
             this ComponentRef<FusionDropDownButton, TModel> self)
             where TModel : class
