@@ -88,7 +88,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Targets a controlled DOM element for updates in this Reactive Plan pipeline.</summary>
         /// <param name="elementId">The markup ID resolved directly by the runtime.</param>
-        /// <returns>A builder for appending element updates to this pipeline.</returns>
+        /// <returns>Element update builder.</returns>
         public ElementBuilder<TModel> Element(string elementId)
         {
             return new ElementBuilder<TModel>(this, elementId);
@@ -147,7 +147,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Reads a string value from the current URL query string at runtime.</summary>
         /// <param name="paramName">Query parameter name read at runtime.</param>
-        /// <returns>A URL value source for downstream conditions, reactions, or gather.</returns>
+        /// <returns>URL value source for conditions, reactions, or gather.</returns>
         public Conditions.TypedUrlSource<string> FromUrl(string paramName)
         {
             return new Conditions.TypedUrlSource<string>(paramName);
@@ -156,7 +156,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Reads a typed value from the current URL query string at runtime.</summary>
         /// <typeparam name="T">Value type expected by downstream conditions, reactions, or gather.</typeparam>
         /// <param name="paramName">Query parameter name read at runtime.</param>
-        /// <returns>A URL value source for downstream conditions, reactions, or gather.</returns>
+        /// <returns>URL value source for conditions, reactions, or gather.</returns>
         public Conditions.TypedUrlSource<T> FromUrl<T>(string paramName)
         {
             return new Conditions.TypedUrlSource<T>(paramName);
@@ -166,7 +166,7 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
         /// <param name="pluginName">Registered plugin key.</param>
         /// <param name="member">Function member invoked on the host-provided plugin object.</param>
-        /// <returns>A builder for supplying function arguments before the result becomes a typed source.</returns>
+        /// <returns>Plugin function call builder.</returns>
         public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName, string member)
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
@@ -183,7 +183,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Reads the return value from a plan-registered plugin object that is itself callable.</summary>
         /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
         /// <param name="pluginName">Registered plugin key.</param>
-        /// <returns>A builder for supplying root-function arguments before the result becomes a typed source.</returns>
+        /// <returns>Plugin root-function call builder.</returns>
         public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName)
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
@@ -200,7 +200,7 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
         /// <param name="pluginName">Registered plugin key.</param>
         /// <param name="member">Property member read from the host-provided plugin object.</param>
-        /// <returns>A typed plugin property value source.</returns>
+        /// <returns>Typed plugin property value source.</returns>
         public Conditions.TypedPluginPropertySource<T> PluginProperty<T>(string pluginName, string member)
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
@@ -214,7 +214,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Reads the return value declared by a reusable plugin function.</summary>
         /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
         /// <param name="function">Plugin function carrying the plugin key, target member, argument contract, and return shape.</param>
-        /// <returns>A builder for supplying function arguments before the result becomes a typed source.</returns>
+        /// <returns>Plugin function call builder.</returns>
         public PluginMemberBuilder<T, TModel> Plugin<T>(PluginFunction<T> function)
         {
             if (function == null) throw new System.ArgumentNullException(nameof(function));
@@ -225,7 +225,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Reads the value declared by a reusable plugin property.</summary>
         /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
         /// <param name="property">Plugin property carrying the plugin key, property member, and value shape.</param>
-        /// <returns>A typed plugin property value source.</returns>
+        /// <returns>Typed plugin property value source.</returns>
         public Conditions.TypedPluginPropertySource<T> Plugin<T>(PluginProperty<T> property)
         {
             if (property == null) throw new System.ArgumentNullException(nameof(property));
@@ -236,7 +236,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Emits a plugin-call reaction against a named member on a plan-registered plugin.</summary>
         /// <param name="pluginName">Registered plugin key.</param>
         /// <param name="member">Command member invoked on the host-provided plugin object.</param>
-        /// <returns>A plugin-call builder for supplying arguments before <c>Fire()</c> appends the reaction.</returns>
+        /// <returns>Plugin command call builder.</returns>
         public PluginCallBuilder<TModel> Plugin(string pluginName, string member)
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
@@ -251,7 +251,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Emits a plugin-call reaction against a plan-registered plugin object that is itself callable.</summary>
         /// <param name="pluginName">Registered plugin key.</param>
-        /// <returns>A plugin-call builder for supplying root-command arguments before <c>Fire()</c> appends the reaction.</returns>
+        /// <returns>Plugin root-command call builder.</returns>
         public PluginCallBuilder<TModel> Plugin(string pluginName)
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
@@ -265,7 +265,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Emits a plugin-call reaction from a reusable plugin command.</summary>
         /// <param name="command">Plugin command carrying the plugin key, target member, and argument contract.</param>
-        /// <returns>A plugin-call builder for supplying arguments before <c>Fire()</c> appends the reaction.</returns>
+        /// <returns>Plugin command call builder.</returns>
         public PluginCallBuilder<TModel> Plugin(PluginCommand command)
         {
             if (command == null) throw new System.ArgumentNullException(nameof(command));
@@ -275,7 +275,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Appends a reaction that renders accumulated validation errors into a container.</summary>
         /// <param name="formId">The element ID of the validation error container.</param>
-        /// <returns>This pipeline builder; chained reactions run after validation output.</returns>
+        /// <returns>This pipeline builder.</returns>
         public PipelineBuilder<TModel> ValidationErrors(string formId)
         {
             AddStep(ReactionGraph.ShowValidationErrors(formId));
@@ -284,7 +284,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Appends a reaction that injects the previous HTTP success body as HTML.</summary>
         /// <remarks>Must follow an HTTP request. The injected HTML comes from the active success response body.</remarks>
-        /// <param name="elementId">The target DOM element ID.</param>
+        /// <param name="elementId">Target DOM element ID.</param>
         /// <returns>This pipeline builder; chained reactions run after the injection.</returns>
         public PipelineBuilder<TModel> Into(string elementId)
         {

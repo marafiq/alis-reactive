@@ -645,8 +645,9 @@ Candidate cleanup:
   condition operator parameter tags now drop repeated leading articles while
   keeping source-value and runtime-read wording.
 - Resolved on `tiny-safe-but-important-refactorings`: `PipelineBuilder` XML
-  return and URL parameter tags now use shorter wording while preserving chained
-  reaction ordering and runtime URL-read semantics.
+  return and URL/element parameter tags now use shorter wording while preserving
+  chained reaction ordering, plugin-call shape, and runtime URL/DOM-read
+  semantics.
 - Resolved on `tiny-safe-but-important-refactorings`: dispatch-payload and
   element-update XML parameter tags now drop repeated leading articles while
   preserving compile-time literal capture, active response-route scope, and
