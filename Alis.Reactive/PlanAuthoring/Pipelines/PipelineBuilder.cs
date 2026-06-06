@@ -39,7 +39,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Queues a <c>CustomEvent</c> reaction without a payload.</summary>
         /// <param name="eventName">The event name matched by <c>t.CustomEvent(...)</c> triggers.</param>
-        /// <returns>The same pipeline builder; chained reactions run after the dispatch.</returns>
+        /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
         public PipelineBuilder<TModel> Dispatch(string eventName)
         {
             AddStep(ReactionGraph.Dispatch(eventName));
@@ -50,7 +50,7 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TPayload">The payload contract consumed by matching custom event triggers.</typeparam>
         /// <param name="eventName">The event name matched by <c>t.CustomEvent&lt;TPayload&gt;(...)</c> triggers.</param>
         /// <param name="payload">The payload object serialized into the generated plan.</param>
-        /// <returns>The same pipeline builder; chained reactions run after the dispatch.</returns>
+        /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
         public PipelineBuilder<TModel> Dispatch<TPayload>(string eventName, TPayload payload)
         {
             AddStep(ReactionGraph.Dispatch(
@@ -71,7 +71,7 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TPayload">The payload contract consumed by matching custom event triggers.</typeparam>
         /// <param name="eventName">The event name matched by <c>t.CustomEvent&lt;TPayload&gt;(...)</c> triggers.</param>
         /// <param name="configure">Maps payload fields to value sources or literals.</param>
-        /// <returns>The same pipeline builder; chained reactions run after the dispatch.</returns>
+        /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
         public PipelineBuilder<TModel> DispatchWith<TPayload>(
             string eventName,
             Action<DispatchPayloadBuilder<TPayload, TModel>> configure)
@@ -146,7 +146,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Reads a string value from the current URL query string at runtime.</summary>
-        /// <param name="paramName">The query parameter name to read at runtime.</param>
+        /// <param name="paramName">Query parameter name read at runtime.</param>
         /// <returns>A URL value source for downstream conditions, reactions, or gather.</returns>
         public Conditions.TypedUrlSource<string> FromUrl(string paramName)
         {
@@ -155,7 +155,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Reads a typed value from the current URL query string at runtime.</summary>
         /// <typeparam name="T">The value type expected by downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="paramName">The query parameter name to read at runtime.</param>
+        /// <param name="paramName">Query parameter name read at runtime.</param>
         /// <returns>A URL value source for downstream conditions, reactions, or gather.</returns>
         public Conditions.TypedUrlSource<T> FromUrl<T>(string paramName)
         {
@@ -275,7 +275,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Appends a reaction that renders accumulated validation errors into a container.</summary>
         /// <param name="formId">The element ID of the validation error container.</param>
-        /// <returns>The same pipeline builder; chained reactions run after validation output.</returns>
+        /// <returns>This pipeline builder; chained reactions run after validation output.</returns>
         public PipelineBuilder<TModel> ValidationErrors(string formId)
         {
             AddStep(ReactionGraph.ShowValidationErrors(formId));
@@ -285,7 +285,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Appends a reaction that injects the previous HTTP success body as HTML.</summary>
         /// <remarks>Must follow an HTTP request. The injected HTML comes from the active success response body.</remarks>
         /// <param name="elementId">The target DOM element ID.</param>
-        /// <returns>The same pipeline builder; chained reactions run after the injection.</returns>
+        /// <returns>This pipeline builder; chained reactions run after the injection.</returns>
         public PipelineBuilder<TModel> Into(string elementId)
         {
             Context.DeclareElement(elementId);

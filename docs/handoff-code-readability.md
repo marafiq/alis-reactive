@@ -536,6 +536,9 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: text and source-vs-source
   condition operator parameter tags now drop repeated leading articles while
   keeping source-value and runtime-read wording.
+- Resolved on `tiny-safe-but-important-refactorings`: `PipelineBuilder` XML
+  return and URL parameter tags now use shorter wording while preserving chained
+  reaction ordering and runtime URL-read semantics.
 
 ### Implementation Inline Comments
 
