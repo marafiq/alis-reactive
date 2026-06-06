@@ -4,8 +4,8 @@ namespace Alis.Reactive.Fusion.AppLevel
     /// App-level confirm dialog backed by Syncfusion Dialog.
     /// Singleton per page — one Syncfusion Dialog instance serves all confirm condition evaluations.
     ///
-    /// Implements IAppLevelComponent so it can be resolved without an explicit ID:
-    ///   p.Component&lt;FusionConfirm&gt;().Show()
+    /// Implements IAppLevelComponent so it can be resolved without an explicit ID,
+    /// for example <c>p.Component&lt;FusionConfirm&gt;().Show()</c>.
     /// </summary>
     public sealed class FusionConfirm : FusionComponent, IAppLevelComponent
     {
@@ -14,4 +14,3 @@ namespace Alis.Reactive.Fusion.AppLevel
         public string DefaultId => ElementId;
     }
 }
-

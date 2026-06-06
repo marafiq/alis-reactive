@@ -192,7 +192,7 @@ static string GetSummaryInline(XElement member)
 static string NormalizeDocText(string text)
 {
     var lines = text.Replace("\r\n", "\n").Split('\n')
-        .Select(line => line.TrimEnd())
+        .Select(line => line.Trim())
         .ToList();
 
     while (lines.Count > 0 && string.IsNullOrWhiteSpace(lines[0]))

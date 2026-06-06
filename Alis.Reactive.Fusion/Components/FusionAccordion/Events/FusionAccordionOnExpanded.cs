@@ -3,8 +3,8 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Payload for FusionAccordion.Expanded.
     /// Fires after a panel expands or collapses.
-    /// Properties are typed markers for expression-based condition sources:
-    ///   p.When(args, x => x.IsExpanded).Truthy()
+    /// Properties are typed markers for expression-based condition sources, for example
+    /// <c>p.When(args, x => x.IsExpanded).Truthy()</c>.
     /// ExpressionPathHelper resolves x => x.IsExpanded to "evt.isExpanded".
     /// </summary>
     public class FusionAccordionExpandedArgs

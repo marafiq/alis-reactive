@@ -16,14 +16,14 @@ For usage and examples, see the [Grammar Tree](../../csharp-modules/mental-model
 ### ComponentRef<T>
 
 Authoring handle for a plan-registered component target. Native and Fusion
-            extension methods consume it to declare component property sets, method calls,
-            and value reads in the Reactive Plan.
+extension methods consume it to declare component property sets, method calls,
+and value reads in the Reactive Plan.
 
 ### ComponentRegistration
 
 Immutable registration of a component in the Reactive Plan.
-            Populated at view render time by each vertical slice's HtmlExtensions.
-            Consumed by gather (HTTP serialization) and validation field binding.
+Populated at view render time by each vertical slice's HtmlExtensions.
+Consumed by gather (HTTP serialization) and validation field binding.
 
 ```csharp
 // Properties
@@ -38,7 +38,7 @@ Vendor { get; }  // Vendor token, such as `native` or `fusion`, written for runt
 ### ExpressionPathHelper
 
 Converts lambda expressions like `x => x.Address.City` into Reactive Plan
-            value paths, MVC model-binding names, or MVC element IDs.
+value paths, MVC model-binding names, or MVC element IDs.
 
 ```csharp
 ToElementId<T>(expression)
@@ -94,10 +94,10 @@ ValueMember { get; }  // Component member read by gather and validation for mode
 ### Plugin
 
 Declares a Reactive Plan plugin: a named runtime object the DSL does not model,
-            exposing typed readable properties, value-returning functions, and commands
-            with no return value. A plugin is the intentional escape hatch for runtime behavior
-            that does not need a first-class deterministic DSL primitive. Subclass it,
-            name the plugin in the base constructor, and declare members in the body.
+exposing typed readable properties, value-returning functions, and commands
+with no return value. A plugin is the intentional escape hatch for runtime behavior
+that does not need a first-class deterministic DSL primitive. Subclass it,
+name the plugin in the base constructor, and declare members in the body.
 
 ```csharp
 // Properties
@@ -119,7 +119,7 @@ Property<T>()
 ### PluginCommand
 
 Declares a plugin command that returns no value. Chain
-            `.Arg<T>()` or `.Args(...)` to set the argument contract.
+`.Arg<T>()` or `.Args(...)` to set the argument contract.
 
 ```csharp
 Arg<T>()
@@ -129,7 +129,7 @@ Args()
 ### PluginFunction<T>
 
 Declares a plugin function that returns a typed value. Chain
-            `.Arg<T>()` or `.Args(...)` to set the argument contract.
+`.Arg<T>()` or `.Args(...)` to set the argument contract.
 
 ```csharp
 Arg<T>()
@@ -159,7 +159,7 @@ PluginName { get; }  // Plugin registration name resolved by the runtime.
 ### ReactivePlan<T>
 
 Collects reactive behavior for a view: triggers, reactions, and component registrations.
-            Renders the collected behavior as generated Reactive Plan JSON.
+Renders the collected behavior as generated Reactive Plan JSON.
 
 ```csharp
 // Properties
@@ -202,8 +202,8 @@ ObjectEvent { get; }  // Event name emitted into the Reactive Plan.
 ### DispatchPayloadBuilder<T>
 
 Composes a CustomEvent dispatch payload from Reactive Plan value sources and literals.
-            Each field is set via a typed expression on `TPayload`,
-            matching the event-payload contract consumed by typed CustomEvent triggers.
+Each field is set via a typed expression on `TPayload`,
+matching the event-payload contract consumed by typed CustomEvent triggers.
 
 ```csharp
 Set(field, value)
@@ -234,7 +234,7 @@ ToggleClass(className)
 ### IReactionEmitter
 
 Narrow interface for emitting reactions into a pipeline.
-            Used by vendor-specific extensions (Fusion, Native) and ComponentRef.
+Used by vendor-specific extensions (Fusion, Native) and ComponentRef.
 
 ```csharp
 // Properties
@@ -248,7 +248,7 @@ AddStep()
 ### PipelineBuilder<T>
 
 Builds the ordered reactions that execute when a trigger fires: element updates,
-            event dispatches, HTTP calls, component interactions, and conditional logic.
+event dispatches, HTTP calls, component interactions, and conditional logic.
 
 ```csharp
 Component<T>(expr)
@@ -298,7 +298,7 @@ Arg<T>()
 ### PluginCallBuilder<T>
 
 Collects arguments for a Reactive Plan plugin command. Call `Fire`
-            to append the plugin-call reaction to the current pipeline.
+to append the plugin-call reaction to the current pipeline.
 
 ```csharp
 Arg(string value)
@@ -318,7 +318,7 @@ Fire()
 ### PluginMemberBuilder<T>
 
 Collects arguments for a value-returning plan-registered plugin method or root function.
-            Use the builder where a `TypedPluginSource<T>` is expected.
+Use the builder where a `TypedPluginSource<T>` is expected.
 
 ```csharp
 Arg(string value)
@@ -337,8 +337,8 @@ ArgValue<T>(value)
 ### PluginTypeBuilder
 
 Declares the functions, properties, and commands a Reactive Plan may use on a named plugin.
-            For example, `plan.RegisterPlugin("auth", p => p.Method<string>("getToken"))`.
-            Use the argument builder when a host plugin member has fixed argument types.
+For example, `plan.RegisterPlugin("auth", p => p.Method<string>("getToken"))`.
+Use the argument builder when a host plugin member has fixed argument types.
 
 ```csharp
 Command(name)
@@ -378,10 +378,10 @@ SignalR<T>(hubUrl, methodName, pipeline)
 ### ReactiveArray<T>
 
 A typed, deferred array transform. Operators capture authoring intent as
-            Reactive Plan `array-op` nodes; they do not execute on the server. Deliberately not
-            `IEnumerable`/`IQueryable`, so LINQ extension methods
-            are not candidates (no collision) and lambdas are captured, not invoked. Per-element
-            predicates and selectors read the element scope; chains compose as plan nodes.
+Reactive Plan `array-op` nodes; they do not execute on the server. Deliberately not
+`IEnumerable`/`IQueryable`, so LINQ extension methods
+are not candidates (no collision) and lambdas are captured, not invoked. Per-element
+predicates and selectors read the element scope; chains compose as plan nodes.
 
 ```csharp
 All()
@@ -404,9 +404,9 @@ Where()
 ### ReactiveValue<T>
 
 A scalar value produced by an array operation, such as `Count` or `Sum`.
-            It is a `TypedSource<T>`, so it can feed DSL members that read typed
-            sources, including `SetText`, `When`, and dispatch payloads.
-            Gather intake remains limited to component and plugin sources.
+It is a `TypedSource<T>`, so it can feed DSL members that read typed
+sources, including `SetText`, `When`, and dispatch payloads.
+Gather intake remains limited to component and plugin sources.
 
 ---
 
@@ -488,7 +488,7 @@ Then(pipeline)
 ### PayloadTypedSource<T>
 
 Reads a typed value from a Reactive Plan payload scope such as event,
-            success, error, or dispatch.
+success, error, or dispatch.
 
 ### TypedComponentSource<T>
 
@@ -501,18 +501,18 @@ Represents a readable plan-registered plugin property in conditions, reactions, 
 ### TypedPluginSource<T>
 
 Represents the value produced by a plan-registered plugin method call in conditions,
-            reactions, or gather.
+reactions, or gather.
 
 ### TypedSource<T>
 
 Preserves the property type through condition and reaction authoring
-            for compile-time type safety.
+for compile-time type safety.
 
 ### TypedUrlSource<T>
 
 A typed source whose runtime value is read from the browser `window.location` query string.
-            Returned by `PipelineBuilder.FromUrl()` and `PipelineBuilder.FromUrl<T>()`.
-            Can be used anywhere a `TypedSource<T>` is accepted, including conditions and request inputs.
+Returned by `PipelineBuilder.FromUrl()` and `PipelineBuilder.FromUrl<T>()`.
+Can be used anywhere a `TypedSource<T>` is accepted, including conditions and request inputs.
 
 ---
 
@@ -521,7 +521,7 @@ A typed source whose runtime value is read from the browser `window.location` qu
 ### GatherBuilder<T>
 
 Configures HTTP request input: body fields, headers, and route template
-            parameters.
+parameters.
 
 ```csharp
 FromEvent<T>(args, path, param)
@@ -556,7 +556,7 @@ Include<T>(source, paramName)
 ### HttpRequestBuilder<T>
 
 Configures one HTTP request reaction: endpoint, request input,
-            lifecycle reactions, validation, and response routes.
+lifecycle reactions, validation, and response routes.
 
 ```csharp
 AsFormData()
@@ -583,7 +583,7 @@ OnAllSettled(pipeline)
 ### ResponseBuilder<T>
 
 Configures success routes, error routes, and the optional follow-up
-            request for one HTTP request.
+request for one HTTP request.
 
 ```csharp
 Chained(request)
@@ -627,8 +627,8 @@ Required()
 ### InputBoundField<T>
 
 A model-bound input field returned by
-            `InputField<T>`, ready to receive
-            a component extension that renders inside the field wrapper.
+`InputField<T>`, ready to receive
+a component extension that renders inside the field wrapper.
 
 ---
 
@@ -989,8 +989,8 @@ Type { get; }  // Payload typing contract used when authoring typed value paths.
 ### PlanBuildContext
 
 Construction boundary used by the public DSL builders.
-            It delegates domain decisions to the plan authoring state and only exposes the
-            narrow authoring operations the DSL needs while building a Reactive Plan.
+It delegates domain decisions to the plan authoring state and only exposes the
+narrow authoring operations the DSL needs while building a Reactive Plan.
 
 ### PlanScope
 
@@ -1146,7 +1146,7 @@ Reaction { get; }  // Reaction to run after all parallel branches settle.
 ### Shape
 
 Declares the expected type for a value in the Reactive Plan, such as string or number.
-            Used across value expressions, conditions, and validation to ensure type consistency.
+Used across value expressions, conditions, and validation to ensure type consistency.
 
 ```csharp
 // Properties
@@ -1213,8 +1213,8 @@ Kind { get; }  // Wire discriminator for the read access shape.
 ### PlanNodeDiscriminator<T>
 
 Serializes a polymorphic plan node by writing its concrete runtime type's properties, so the
-            node's own `Kind` property becomes the JSON discriminator. The single discriminator
-            mechanism for every plan node family; reading is unsupported because plans are write-only.
+node's own `Kind` property becomes the JSON discriminator. The single discriminator
+mechanism for every plan node family; reading is unsupported because plans are write-only.
 
 ```csharp
 Read()
@@ -1236,7 +1236,7 @@ Builds typed field conditions for client validation rules.
 ### ClientValidationField
 
 Describes a single field's validation rules within a form.
-            The rule source declares the field path and shape before render-time binding.
+The rule source declares the field path and shape before render-time binding.
 
 ### ClientValidationFieldConditionStart<T>
 
@@ -1286,10 +1286,10 @@ Vendor { get; }
 ### FusionConfirm
 
 App-level confirm dialog backed by Syncfusion Dialog.
-             Singleton per page — one Syncfusion Dialog instance serves all confirm condition evaluations.
+Singleton per page — one Syncfusion Dialog instance serves all confirm condition evaluations.
 
-             Implements IAppLevelComponent so it can be resolved without an explicit ID:
-               p.Component<FusionConfirm>().Show()
+Implements IAppLevelComponent so it can be resolved without an explicit ID,
+for example `p.Component<FusionConfirm>().Show()`.
 
 ### FusionToast
 
@@ -1326,7 +1326,7 @@ Warning<T>()
 ### FusionAccordion
 
 Represents a Syncfusion Accordion container component.
-            Exposes panel operations and item events; it is not an input component.
+Exposes panel operations and item events; it is not an input component.
 
 ### FusionAccordionBuilder<T>
 
@@ -1344,10 +1344,10 @@ Expanded { get; }  // Fires after a panel expands or collapses.
 ### FusionAccordionExpandedArgs
 
 Payload for FusionAccordion.Expanded.
-            Fires after a panel expands or collapses.
-            Properties are typed markers for expression-based condition sources:
-              p.When(args, x => x.IsExpanded).Truthy()
-            ExpressionPathHelper resolves x => x.IsExpanded to "evt.isExpanded".
+Fires after a panel expands or collapses.
+Properties are typed markers for expression-based condition sources, for example
+`p.When(args, x => x.IsExpanded).Truthy()`.
+ExpressionPathHelper resolves x => x.IsExpanded to "evt.isExpanded".
 
 ```csharp
 // Properties
@@ -1383,7 +1383,7 @@ Reactive<T>(eventSelector, pipeline)
 ### FusionAIAssistView
 
 Syncfusion EJ2 AIAssistView. Non-input component; reactive behavior is exposed
-            through typed methods, state reads, and events.
+through typed methods, state reads, and events.
 
 ### FusionAIAssistViewBuilder<T>
 
@@ -1403,12 +1403,12 @@ StopRespondingClick { get; }  // Fires when the user stops an active response.
 ### FusionAIAssistViewExtensions
 
 Runtime behavior for Syncfusion AIAssistView. Initial render options remain on
-            Syncfusion's AIAssistViewBuilder.
+Syncfusion's AIAssistViewBuilder.
 
 ### FusionAIAssistViewHtmlExtensions
 
 Factory extension for rendering Syncfusion AIAssistView with reactive event support.
-            Static component configuration stays on Syncfusion's MVC builder.
+Static component configuration stays on Syncfusion's MVC builder.
 
 ### FusionAIAssistViewPromptChangedArgs
 
@@ -1541,7 +1541,7 @@ Reactive<T>()
 ### FusionBreadcrumb
 
 Represents a Syncfusion Breadcrumb navigation component.
-            Exposes active-item state and item-click payloads; it is not an input component.
+Exposes active-item state and item-click payloads; it is not an input component.
 
 ### FusionBreadcrumbBuilder<T>
 
@@ -1602,7 +1602,7 @@ Wires `FusionBreadcrumb` events into the Reactive Plan.
 ### FusionBulletChart
 
 Represents a Syncfusion BulletChart view component.
-            Exposes load, tooltip, click, and navigation event helpers; it is not an input component.
+Exposes load, tooltip, click, and navigation event helpers; it is not an input component.
 
 ### FusionBulletChartBuilder<T>
 
@@ -1717,7 +1717,7 @@ Runtime icon placement values supported by Syncfusion EJ2 Button.
 ### FusionCarousel
 
 Represents a Syncfusion Carousel navigation component.
-            Exposes selected-index state, slide navigation methods, and slide-change events; it is not an input component.
+Exposes selected-index state, slide navigation methods, and slide-change events; it is not an input component.
 
 ### FusionCarouselBuilder<T>
 
@@ -1849,9 +1849,9 @@ Reactive<T>()
 ### FusionChipItem
 
 A selected chip's bound data, as returned in `getSelectedChips().data` (proven in
-            `@syncfusion/ej2-buttons``chip-list.js`: `selectedItems.data.push(this.chips[index])`).
-            Each element is the chip model the developer bound, so the array DSL can operate on the
-            selection by member — e.g. `p.From(payload, x => x.Selection.Data).Where(c => c.Value == "memory")`.
+`@syncfusion/ej2-buttons``chip-list.js`: `selectedItems.data.push(this.chips[index])`).
+Each element is the chip model the developer bound, so the array DSL can operate on the
+selection by member — e.g. `p.From(payload, x => x.Selection.Data).Where(c => c.Value == "memory")`.
 
 ```csharp
 // Properties
@@ -1862,7 +1862,7 @@ Value { get; }  // The chip's bound value (`data[i].value`).
 ### FusionChipList
 
 Syncfusion EJ2 ChipList. Static chip rendering stays on the MVC builder;
-            this type scopes typed post-render behavior and event wiring.
+this type scopes typed post-render behavior and event wiring.
 
 ### FusionColorPicker
 
@@ -1994,7 +1994,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 ### FusionContextMenu
 
 Represents a Syncfusion ContextMenu navigation component.
-            Exposes open/close methods and lifecycle/item selection payloads; it is not an input component.
+Exposes open/close methods and lifecycle/item selection payloads; it is not an input component.
 
 ### FusionContextMenuBeforeCloseArgs
 
@@ -2236,12 +2236,12 @@ Reactive<T>(plan, eventSelector, pipeline)
 ### FusionDialog
 
 Represents a Syncfusion Dialog display component.
-            Exposes show/hide/position methods and lifecycle events; it is not an input component.
+Exposes show/hide/position methods and lifecycle events; it is not an input component.
 
 ### FusionDialogBeforeCloseArgs
 
 Payload for FusionDialog.BeforeClose.
-            Fires before the dialog closes.
+Fires before the dialog closes.
 
 ```csharp
 // Properties
@@ -2252,7 +2252,7 @@ IsInteracted { get; }  // True when the user closed the dialog via X button or o
 ### FusionDialogBeforeOpenArgs
 
 Payload for FusionDialog.BeforeOpen.
-            Fires before the dialog opens. Set cancel to true to prevent opening.
+Fires before the dialog opens. Set cancel to true to prevent opening.
 
 ```csharp
 // Properties
@@ -2266,7 +2266,7 @@ Wraps rendered Syncfusion dialog markup while carrying plan metadata for `.React
 ### FusionDialogClosedArgs
 
 Payload for FusionDialog.Closed.
-            Notification only — fires after the dialog is hidden.
+Notification only — fires after the dialog is hidden.
 
 ### FusionDialogEvents
 
@@ -2302,13 +2302,13 @@ FusionDialog<T>(plan, elementId, build)
 ### FusionDialogOpenedArgs
 
 Payload for FusionDialog.Opened.
-            Notification only — fires after the dialog is visible.
+Notification only — fires after the dialog is visible.
 
 ### FusionDialogOverlayClickArgs
 
 Payload for FusionDialog.OverlayClick.
-            Fires when the modal overlay background is clicked.
-            Notification only — typically used to close the dialog.
+Fires when the modal overlay background is clicked.
+Notification only — typically used to close the dialog.
 
 ### FusionDialogReactiveExtensions
 
@@ -2317,7 +2317,7 @@ Wires `FusionDialog` events into the Reactive Plan.
 ### FusionDropDownButton
 
 Syncfusion EJ2 DropDownButton. Static item and render configuration stays on the MVC builder;
-            this type scopes typed post-render behavior and event wiring.
+this type scopes typed post-render behavior and event wiring.
 
 ### FusionDropDownButtonBuilder<T>
 
@@ -2578,12 +2578,12 @@ IsInteracted { get; }  // Whether user interaction triggered the selection.
 ### FusionGrid
 
 FusionGrid — non-input data grid component with server-side custom binding.
-            Supports sort, page, and filter via the DataStateChange event.
+Supports sort, page, and filter via the DataStateChange event.
 
 ### FusionGridAction
 
 Action details from the dataStateChange event.
-            Contains `requestType` plus context-specific parameters.
+Contains `requestType` plus context-specific parameters.
 
 ```csharp
 // Properties
@@ -2617,8 +2617,8 @@ Where { get; }  // Active text filter criteria from Grid filter UI.
 ### FusionGridDialogFormBuilder<T>
 
 Builds a typed dialog-edit form for a `FusionGrid` row. Each labeled
-            field is declared from a typed row expression; the editing row's current value
-            binds through the Syncfusion `${field}` template token.
+field is declared from a typed row expression; the editing row's current value
+binds through the Syncfusion `${field}` template token.
 
 ```csharp
 Date<T>()
@@ -2630,7 +2630,7 @@ Text<T>()
 ### FusionGridEditTemplates
 
 Creates typed `FusionGrid` cell editors rendered as Syncfusion
-            `EditTemplate` markup.
+`EditTemplate` markup.
 
 ```csharp
 DateInput<T>()
@@ -2718,7 +2718,7 @@ UpdateRow<T>()
 ### FusionGridFieldValidation<T>
 
 Per-field bridge from `ReactiveValidator` client metadata to an EJ2 column
-            `validationRules` object, keyed by typed row field.
+`validationRules` object, keyed by typed row field.
 
 ```csharp
 Field<T>()
@@ -2780,7 +2780,7 @@ Operator { get; }  // Search operator such as `contains`.
 ### FusionGridSortColumn
 
 One sort column in the grid's sorted state.
-            Syncfusion uses lowercase direction values: `ascending` and `descending`.
+Syncfusion uses lowercase direction values: `ascending` and `descending`.
 
 ```csharp
 // Properties
@@ -2816,8 +2816,8 @@ Text filter operators accepted by Syncfusion EJ2 Grid filterByColumn.
 ### FusionGridToolbarClickArgs
 
 Event args for the Syncfusion Grid "toolbarClick" event.
-            Fires when any toolbar item is clicked, including custom items.
-            Read `Item` to branch on which button was pressed.
+Fires when any toolbar item is clicked, including custom items.
+Read `Item` to branch on which button was pressed.
 
 ```csharp
 // Properties
@@ -2828,7 +2828,7 @@ Item { get; }  // The clicked toolbar item.
 ### FusionGridToolbarItem
 
 The toolbar item carried by a Grid "toolbarClick" event.
-            Custom items expose the id and text declared on the builder Toolbar.
+Custom items expose the id and text declared on the builder Toolbar.
 
 ```csharp
 // Properties
@@ -2839,9 +2839,9 @@ Text { get; }  // The toolbar item display text.
 ### FusionGridValidation
 
 Emits Syncfusion-native column `validationRules` from the same`ReactiveValidator` client metadata that powers form validation, so a Grid's
-            in-cell editor validates client-side without a second hand-written ruleset. The
-            validation source stays single (the validator), and EJ2's own `FormValidator`
-            runs the rule on cell save.
+in-cell editor validates client-side without a second hand-written ruleset. The
+validation source stays single (the validator), and EJ2's own `FormValidator`
+runs the rule on cell save.
 
 ```csharp
 From<T>()
@@ -3057,7 +3057,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 ### FusionKanban
 
 Syncfusion EJ2 Kanban. Initial board configuration stays on Syncfusion's
-            KanbanBuilder; this type scopes typed post-render behavior for Reactive Plans.
+KanbanBuilder; this type scopes typed post-render behavior for Reactive Plans.
 
 ### FusionKanbanBuilder<T>
 
@@ -3070,8 +3070,8 @@ Typed Kanban events available to Reactive Plans.
 ### FusionKanbanExtensions
 
 Runtime behavior for Syncfusion Kanban. Initial board setup remains on
-            Syncfusion's KanbanBuilder; these members cover post-render reads,
-            component operations, and method-return sources.
+Syncfusion's KanbanBuilder; these members cover post-render reads,
+component operations, and method-return sources.
 
 ```csharp
 SetDataSource<T>()
@@ -3080,7 +3080,7 @@ SetDataSource<T>()
 ### FusionKanbanHtmlExtensions
 
 Factory extension for rendering Syncfusion Kanban with reactive event support.
-            Static board setup stays on Syncfusion's MVC builder.
+Static board setup stays on Syncfusion's MVC builder.
 
 ### FusionKanbanReactiveExtensions
 
@@ -3089,7 +3089,7 @@ Wires `FusionKanban` events into the Reactive Plan.
 ### FusionListBox
 
 Syncfusion EJ2 ListBox. Static rendering and data binding stay on the MVC builder;
-            this type scopes proven post-render string-value behavior and event wiring.
+this type scopes proven post-render string-value behavior and event wiring.
 
 ### FusionListBoxBuilder<T>
 
@@ -3144,7 +3144,7 @@ Wires `FusionListBox` events into the Reactive Plan.
 ### FusionListView
 
 Syncfusion EJ2 ListView. Static rendering and data binding stay on the MVC builder;
-            this type scopes proven post-render behavior and event wiring.
+this type scopes proven post-render behavior and event wiring.
 
 ### FusionListViewBuilder<T>
 
@@ -3198,12 +3198,12 @@ Text { get; }  // Selected item's visible text.
 ### FusionMention
 
 Syncfusion EJ2 Mention. The MVC builder owns static list configuration;
-            this type scopes typed post-render behavior and event wiring.
+this type scopes typed post-render behavior and event wiring.
 
 ### FusionMenu
 
 Represents a Syncfusion Menu navigation component.
-            Exposes open/close methods and lifecycle/item selection payloads; it is not an input component.
+Exposes open/close methods and lifecycle/item selection payloads; it is not an input component.
 
 ### FusionMenuBeforeCloseArgs
 
@@ -3584,7 +3584,7 @@ Value { get; }  // New OTP value.
 ### FusionPivotView
 
 Syncfusion EJ2 PivotView. Static report setup stays on the Syncfusion MVC builder;
-            this type scopes typed post-render behavior for Reactive Plans.
+this type scopes typed post-render behavior for Reactive Plans.
 
 ### FusionPivotViewBuilder<T>
 
@@ -3597,7 +3597,7 @@ Pivot cell data exposed by Syncfusion inside cellSelecting args.
 ### FusionPivotViewCellSelectingArgs
 
 Payload for PivotView cellSelecting. This event is emitted during normal
-            late event subscription, which matches Reactive Plan runtime wiring.
+late event subscription, which matches Reactive Plan runtime wiring.
 
 ### FusionPivotViewDataBoundArgs
 
@@ -3610,7 +3610,7 @@ Typed PivotView events available to Reactive Plans.
 ### FusionPivotViewExtensions
 
 Runtime behavior for Syncfusion PivotView. Initial report configuration stays on
-            Syncfusion's PivotViewBuilder.
+Syncfusion's PivotViewBuilder.
 
 ### FusionPivotViewHtmlExtensions
 
@@ -3623,7 +3623,7 @@ Wires `FusionPivotView` events into the Reactive Plan.
 ### FusionProgressButton
 
 Syncfusion EJ2 ProgressButton. Static render configuration stays on the MVC builder;
-            this type scopes typed post-render progress behavior and event wiring.
+this type scopes typed post-render progress behavior and event wiring.
 
 ### FusionProgressButtonBuilder<T>
 
@@ -3693,7 +3693,7 @@ Reactive<T>()
 ### FusionRadioButton
 
 Syncfusion EJ2 RadioButton. Static option rendering stays on the MVC builder;
-            this type scopes typed post-render behavior and event wiring.
+this type scopes typed post-render behavior and event wiring.
 
 ### FusionRadioButtonBuilder<T>
 
@@ -3863,13 +3863,13 @@ Reactive<T>(plan, eventSelector, pipeline)
 ### FusionSchedule
 
 Represents a Syncfusion Schedule display component.
-            Exposes scheduler methods and lifecycle events; it is not an input component.
+Exposes scheduler methods and lifecycle events; it is not an input component.
 
 ### FusionScheduleActionBeginArgs
 
 Event payload delivered before Syncfusion Schedule starts an action.
-            Set `Cancel` to prevent the action. `RequestType`
-            identifies the action, for example `eventCreate`, `eventChange`, etc.
+Set `Cancel` to prevent the action. `RequestType`
+identifies the action, for example `eventCreate`, `eventChange`, etc.
 
 ```csharp
 // Properties
@@ -3893,7 +3893,7 @@ Wraps rendered Syncfusion schedule markup while carrying plan metadata for `.Rea
 ### FusionScheduleCellClickArgs
 
 Event payload delivered when a Syncfusion Schedule time cell is clicked.
-            Includes the selected slot and resource group.
+Includes the selected slot and resource group.
 
 ```csharp
 // Properties
@@ -3906,7 +3906,7 @@ StartTime { get; }  // Start time of the clicked cell slot.
 ### FusionScheduleDataBoundArgs
 
 Notification payload delivered after Syncfusion Schedule data has loaded and rendered.
-            Use to hide loaders or update counts after server data loads.
+Use to hide loaders or update counts after server data loads.
 
 ### FusionScheduleEventClickArgs
 
@@ -3935,8 +3935,8 @@ Subject { get; }  // Display title for the appointment.
 ### FusionScheduleEventRenderedArgs
 
 Event payload delivered before Syncfusion Schedule renders an appointment.
-            Use `Data` for conditional styling. Set `Cancel`
-            to prevent the appointment from rendering.
+Use `Data` for conditional styling. Set `Cancel`
+to prevent the appointment from rendering.
 
 ```csharp
 // Properties
@@ -3993,7 +3993,7 @@ FusionSchedule<T>(plan, elementId, build)
 ### FusionScheduleNavigatingArgs
 
 Event payload delivered before Syncfusion Schedule changes date or view.
-            Set `Cancel` to prevent navigation.
+Set `Cancel` to prevent navigation.
 
 ```csharp
 // Properties
@@ -4028,7 +4028,7 @@ Subject { get; }  // Display title for the appointment.
 ### FusionSchedulePopupOpenArgs
 
 Event payload delivered before Syncfusion Schedule opens a popup.
-            Set `Cancel` to prevent the popup.
+Set `Cancel` to prevent the popup.
 
 ```csharp
 // Properties
@@ -4056,9 +4056,9 @@ Reactive<T>(eventSelector, pipeline)
 ### FusionSelectedChips
 
 The result of `ChipList.getSelectedChips()` for a multiple-selection chip list. Mirrors
-            the shipped shape `{ texts, Indexes, data, elements }` (chip-list.js). `Data`
-            carries the selected chip objects, so the array DSL can filter/aggregate the selection by
-            member; `Texts` carries the selected display strings.
+the shipped shape `{ texts, Indexes, data, elements }` (chip-list.js). `Data`
+carries the selected chip objects, so the array DSL can filter/aggregate the selection by
+member; `Texts` carries the selected display strings.
 
 ```csharp
 // Properties
@@ -4070,8 +4070,8 @@ Texts { get; }  // The selected chips' display text (`texts`).
 ### FusionSidebar
 
 Represents a Syncfusion Sidebar navigation component.
-            Exposes open-state reads, show/hide/toggle methods, and transition events;
-            it is not an input component.
+Exposes open-state reads, show/hide/toggle methods, and transition events;
+it is not an input component.
 
 ### FusionSidebarBuilder<T>
 
@@ -4185,17 +4185,17 @@ Reactive<T>(plan, eventSelector, pipeline)
 ### FusionSmartPasteButton
 
 Syncfusion EJ2 SmartPasteButton. Syncfusion does not ship an MVC builder for this
-            package version, so this vertical slice owns the typed render helper.
+package version, so this vertical slice owns the typed render helper.
 
 ### FusionSmartTextArea
 
 Syncfusion EJ2 SmartTextArea. Syncfusion does not ship an MVC builder for this
-            package version, so this vertical slice owns the typed render helper.
+package version, so this vertical slice owns the typed render helper.
 
 ### FusionSplitButton
 
 Syncfusion EJ2 SplitButton. Static render configuration stays on the MVC builder;
-            this type scopes typed post-render behavior and event wiring.
+this type scopes typed post-render behavior and event wiring.
 
 ### FusionSplitButtonBuilder<T>
 
@@ -4208,7 +4208,7 @@ WriteTo()
 ### FusionSplitButtonClickArgs
 
 Event payload delivered when a `FusionSplitButton` primary action is clicked.
-            Syncfusion exposes the clicked HTMLElement, which is intentionally not surfaced in the public API.
+Syncfusion exposes the clicked HTMLElement, which is intentionally not surfaced in the public API.
 
 ### FusionSplitButtonEvents
 
@@ -4276,7 +4276,7 @@ Item { get; }  // Selected item metadata from the Syncfusion select event.
 ### FusionStepper
 
 Represents a Syncfusion Stepper progress/navigation component.
-            Exposes active-step state, navigation methods, and step-change events; it is not an input component.
+Exposes active-step state, navigation methods, and step-change events; it is not an input component.
 
 ### FusionStepperBuilder<T>
 
@@ -4415,12 +4415,12 @@ Reactive<T>()
 ### FusionTab
 
 Represents a Syncfusion Tab navigation component.
-            Exposes selected-tab state, tab visibility methods, and selection events; it is not an input component.
+Exposes selected-tab state, tab visibility methods, and selection events; it is not an input component.
 
 ### FusionTabBuilder<T>
 
 Carries rendered Syncfusion Tab markup and the Reactive Plan for event wiring.
-            Non-input component: no InputField wrapper, label, or validation slot.
+Non-input component: no InputField wrapper, label, or validation slot.
 
 ### FusionTabEvents
 
@@ -4460,11 +4460,11 @@ Reactive<T>(eventSelector, pipeline)
 ### FusionTabSelectedArgs
 
 Event args for the Syncfusion Tab "selected" event.
-             Fires when a tab is selected.
+Fires when a tab is selected.
 
-             Properties are primitives — safe for echo and conditions.
-             Syncfusion args also contain selectedItem/previousItem (DOM objects) — intentionally omitted
-             as they would serialize as [object Object].
+Properties are primitives — safe for echo and conditions.
+Syncfusion args also contain selectedItem/previousItem (DOM objects) — intentionally omitted
+as they would serialize as [object Object].
 
 ```csharp
 // Properties
@@ -4706,7 +4706,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 ### FusionToolbar
 
 Represents a Syncfusion Toolbar command component.
-            Exposes disable/enable behavior and item click events; it is not an input component.
+Exposes disable/enable behavior and item click events; it is not an input component.
 
 ### FusionToolbarBuilder<T>
 
@@ -4764,7 +4764,7 @@ Wires `FusionToolbar` events into the Reactive Plan.
 ### FusionTooltip
 
 Represents a Syncfusion Tooltip display component.
-            Exposes open/close/refresh methods and lifecycle events; it is not an input component.
+Exposes open/close/refresh methods and lifecycle events; it is not an input component.
 
 ### FusionTooltipBeforeCloseArgs
 
@@ -5535,7 +5535,7 @@ Value { get; }  // Option value written to form posts and component reads.
 ### NativeGatherExtensions
 
 Gather shorthand that defaults to `NativeTextBox` when no component
-            type is specified.
+type is specified.
 
 ```csharp
 Include<T>(expr)
