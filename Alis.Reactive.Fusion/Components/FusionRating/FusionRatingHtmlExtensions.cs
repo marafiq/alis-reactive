@@ -17,7 +17,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Renders a FusionRating bound to the field's model property.
         /// </summary>
-        /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Callback to build the FusionRating initial configuration.</param>
         public static void FusionRating<TModel>(

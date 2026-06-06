@@ -21,7 +21,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Renders a FusionColorPicker bound to the field's model property.
         /// </summary>
-        /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
         /// <typeparam name="TProp">The model value type rendered by the color picker.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Callback to build the FusionColorPicker (mode, columns, palette, etc.).</param>

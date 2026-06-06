@@ -13,8 +13,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion BulletChart and carries its controlled component ID into the Reactive Plan.
         /// </summary>
-        /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
-        /// <param name="html">The Razor HTML helper.</param>
         /// <param name="plan">The Reactive Plan that receives bullet chart event wiring.</param>
         /// <param name="elementId">The controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the underlying Syncfusion bullet chart builder.</param>

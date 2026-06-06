@@ -224,6 +224,10 @@ Candidate cleanup:
   event-wiring XML docs no longer repeat generic `TModel` ownership or the
   extension receiver. Event selector, pipeline, and Reactive Plan parameters
   remain documented because they describe the public DSL wiring contract.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion render-factory XML
+  docs no longer repeat generic `TModel` ownership or the Razor HTML helper
+  receiver. Bound value types, field wrappers, Reactive Plan, controlled IDs,
+  and Syncfusion builder callbacks remain documented.
 - Native component builders include long XML examples. Keep the user-facing factory summary and move multi-line usage examples to docs or sandbox guidance.
 - Event payload constructors often say "Creates a new instance. Framework-internal..." repeatedly. Prefer one concise convention across event payload types.
 
@@ -280,9 +284,9 @@ Rewrite or delete:
   builds: once at `vite.design-system.config.ts`, and again at
   `vite.fusion.config.ts` with process `node .../vite build --config
   vite.fusion.config.ts` stuck for more than 90 seconds after printing
-  `build:fusion`. The stuck process tree was cleaned up and the gate passed on
-  rerun after the first occurrence. TODO: add wrapper timeout/progress
-  diagnostics and capture Vite process state if this repeats.
+  `build:fusion`. It repeated on 2026-06-06 during the Fusion factory XML-doc
+  slice and required killing the stuck process tree. TODO: add wrapper
+  timeout/progress diagnostics and capture Vite process state if this repeats.
 - Native and Fusion component files are intentional vertical slices. Do not sweep
   every component just because a repeated XML-doc phrase appears; finish one
   component or one non-component concept at a time and keep the commit boundary

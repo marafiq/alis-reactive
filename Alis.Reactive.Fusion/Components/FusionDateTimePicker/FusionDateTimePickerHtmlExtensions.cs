@@ -21,7 +21,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Renders a FusionDateTimePicker bound to the field's model property.
         /// </summary>
-        /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
         /// <typeparam name="TProp">The model value type rendered by the date-time picker.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Callback to build the FusionDateTimePicker (min/max, format, step, etc.).</param>

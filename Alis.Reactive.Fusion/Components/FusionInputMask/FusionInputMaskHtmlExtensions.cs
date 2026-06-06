@@ -21,7 +21,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Renders a FusionInputMask bound to the field's model property.
         /// </summary>
-        /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
         /// <typeparam name="TProp">The model value type rendered by the masked input.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Callback to build the MaskedTextBox (mask format, placeholder, etc.).</param>
