@@ -349,6 +349,9 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: app-level component XML
   docs now explain the public behavior, "can be referenced without an explicit
   ID," instead of leading with `IAppLevelComponent` implementation mechanics.
+- Resolved on `tiny-safe-but-important-refactorings`: Native loader/drawer TS
+  runtime comments now keep the layout-singleton boundary note without naming
+  the C# `IAppLevelComponent` interface in runtime-side prose.
 
 ### Implementation Inline Comments
 
