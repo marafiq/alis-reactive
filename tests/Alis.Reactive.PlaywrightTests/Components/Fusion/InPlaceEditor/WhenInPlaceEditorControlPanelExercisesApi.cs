@@ -17,7 +17,6 @@ public class WhenInPlaceEditorControlPanelExercisesApi : PlaywrightTestBase
     {
         await NavigateToAndWaitForVisibleSignal(Path, "#card-control-panel");
 
-        // Seed value is "Hello"; Value()-driven condition shows the greeting span.
         await Expect(Page.Locator("#control-echo")).ToHaveTextAsync("Hello", new() { Timeout = 5000 });
         await Expect(Page.Locator("#control-greeting")).ToBeVisibleAsync(new() { Timeout = 2000 });
         AssertNoConsoleErrors();
@@ -28,7 +27,6 @@ public class WhenInPlaceEditorControlPanelExercisesApi : PlaywrightTestBase
     {
         await NavigateToAndWaitForVisibleSignal(Path, "#ctrl-btn-set-hello");
 
-        // Perturb the editor by clicking a different mutation first.
         await Page.Locator("#ctrl-btn-set-null").ClickAsync();
         await Page.Locator("#ctrl-btn-set-hello").ClickAsync();
 
