@@ -257,6 +257,11 @@ Candidate cleanup:
   XML docs no longer repeat "current plugin member/call builder" on every
   fluent argument method. Source, response-body, event-payload, and literal
   parameter docs remain because they describe the plugin argument contract.
+- Resolved on `tiny-safe-but-important-refactorings`: plugin declaration
+  `Arg<T>()` and `Args(...)` XML docs no longer repeat the fluent return type,
+  and the typed plugin-source conversion parameter is named `builder` instead
+  of `b`. Argument-contract docs remain because they describe the public DSL
+  shape.
 
 ### Implementation Inline Comments
 

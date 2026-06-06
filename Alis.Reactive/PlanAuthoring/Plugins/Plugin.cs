@@ -283,7 +283,6 @@ namespace Alis.Reactive
 
         /// <summary>Declares one argument accepted by this plugin function.</summary>
         /// <typeparam name="TArg">The argument type accepted by the function.</typeparam>
-        /// <returns>The current plugin function declaration.</returns>
         public PluginFunction<TReturn> Arg<TArg>()
         {
             AddArgument<TArg>();
@@ -292,7 +291,6 @@ namespace Alis.Reactive
 
         /// <summary>Appends an exact argument contract without an arity-specific overload.</summary>
         /// <param name="arguments">The ordered argument types accepted by the function.</param>
-        /// <returns>The current plugin function declaration.</returns>
         public PluginFunction<TReturn> Args(Action<PluginArgumentTypes> arguments)
         {
             AddArguments(arguments);
@@ -318,7 +316,6 @@ namespace Alis.Reactive
 
         /// <summary>Declares one argument accepted by this plugin command.</summary>
         /// <typeparam name="TArg">The argument type accepted by the command.</typeparam>
-        /// <returns>The current plugin command declaration.</returns>
         public PluginCommand Arg<TArg>()
         {
             AddArgument<TArg>();
@@ -327,7 +324,6 @@ namespace Alis.Reactive
 
         /// <summary>Appends an exact argument contract without an arity-specific overload.</summary>
         /// <param name="arguments">The ordered argument types accepted by the command.</param>
-        /// <returns>The current plugin command declaration.</returns>
         public PluginCommand Args(Action<PluginArgumentTypes> arguments)
         {
             AddArguments(arguments);
