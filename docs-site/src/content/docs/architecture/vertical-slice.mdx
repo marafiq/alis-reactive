@@ -13,7 +13,7 @@ Each component follows the same structure. Here's NativeTextBox as a concrete ex
 
 ```
 NativeTextBox/
-├── NativeTextBox.cs                  component class — Vendor + ReadExpr
+├── NativeTextBox.cs                  component class — Vendor + ValueMember
 ├── NativeTextBoxEvents.cs            event registry — Changed, Focus, Blur
 ├── Events/
 │   └── NativeTextBoxOnChanged.cs     event args — { string? Value }
@@ -26,7 +26,7 @@ NativeTextBox/
 ```d2
 direction: right
 
-component: "Component Class\nsealed, IInputComponent\nVendor + ReadExpr" {
+component: "Component Class\nsealed, IInputComponent\nVendor + ValueMember" {
   shape: rectangle
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"
@@ -38,7 +38,7 @@ events: "Events + Args\nTypedEvent\ntyped arg properties" {
   style.stroke: "#f9ab00"
   style.font-size: 16
 }
-extensions: "Extensions\nSetValue, FocusIn, Value\nuses Emit() on ComponentRef" {
+extensions: "Extensions\nSetValue, FocusIn, Value\nuses EmitSet/EmitCall/Read" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
@@ -50,7 +50,7 @@ reactive: "Reactive Extensions\n.Reactive(plan, evt, args)\ncreates ComponentEve
   style.stroke: "#ea4335"
   style.font-size: 16
 }
-builder: "Builder + Html Factory\nrenders HTML\nregisters in ComponentsMap" {
+builder: "Builder + Html Factory\nrenders HTML\nregisters input component" {
   shape: rectangle
   style.fill: "#f3e8fd"
   style.stroke: "#9334e6"
@@ -78,7 +78,7 @@ reactive -> builder: {
 
 ### 1. Component class — the phantom type
 
-A `sealed class` with a parameterless constructor. Implements `IInputComponent` (or `IAppLevelComponent`). Declares `Vendor` and `ReadExpr` as instance properties. Has zero state — it exists only as a type parameter to constrain extension methods.
+A `sealed class` with a parameterless constructor. Implements `IInputComponent` for model-bound inputs, `IAppLevelComponent` for layout-owned components, or plain `IComponent` for non-input components. Input components declare a `ValueMember`. The type has no runtime state — it exists to constrain extension methods and declare component metadata.
 
 ### 2. Events registry — what the component can fire
 
@@ -102,20 +102,20 @@ Implements `IHtmlContent`. Configuration methods (`Placeholder()`, `CssClass()`,
 
 ### 7. Html factory — the entry point
 
-Extension method on `InputBoundField<TModel, TProp>`. Creates the builder, registers the component in `plan.ComponentsMap`, and calls `setup.Render(builder)` to emit the HTML with label and validation slot.
+Extension method on `InputBoundField<TModel, TProp>`. Creates the builder, calls `setup.RegisterInputComponent(...)`, and calls `setup.Render(builder)` to emit the HTML with label and validation slot.
 
 ## Why vertical slices?
 
 **Isolation.** Each slice owns its behavior completely. Adding FusionTimePicker doesn't touch NativeTextBox. Changing NativeCheckBox's events doesn't affect FusionDropDownList.
 
-**Zero runtime changes.** The slice declares Vendor and ReadExpr. The runtime already knows how to resolve vendors and walk readExprs. The plan carries the metadata. No new switch cases, no new if branches.
+**Zero runtime changes.** The slice declares vendor, input value member, and BrowserObject members through typed extensions. The runtime already knows how to resolve vendors and execute `set`, `call`, and component-event reactions. No new switch cases, no new component-specific runtime branches.
 
 **Duplication is intentional.** Each slice has its own extensions file, its own reactive extensions, its own builder. The code looks similar across slices — that's by design. Shared abstractions would couple slices and make each one harder to understand in isolation.
 
 ```d2
 direction: right
 
-new_slice: "New component\nsealed class\nVendor + ReadExpr\n+ 6 more files" {
+new_slice: "New component\nsealed class\nVendor + ValueMember\n+ slice files" {
   shape: rectangle
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"
@@ -127,7 +127,7 @@ plan: "Plan carries\nsame shape\nas every component" {
   style.stroke: "#f9ab00"
   style.font-size: 18
 }
-runtime: "Runtime unchanged\nSame resolveRoot\nSame bracket notation" {
+runtime: "Runtime unchanged\nSame BrowserObject path" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"

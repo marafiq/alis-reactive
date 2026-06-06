@@ -1,25 +1,30 @@
 ---
 title: Component Model
-description: How the runtime resolves vendor roots and executes component operations — native or Syncfusion — through one code path.
+description: How the runtime resolves component objects and executes native or Syncfusion operations through one code path.
 sidebar:
   order: 8
 ---
 
-A native checkbox is `el.checked`. A Syncfusion date picker is `el.ej2_instances[0].value`. The runtime handles both through one code path. This page explains how.
+A native checkbox is `el.checked`. A Syncfusion date picker is `el.ej2_instances[0].value`. The runtime handles both through BrowserObject contracts. This page explains how.
 
-For the general execution model (bracket notation, command dispatch), see [Runtime](../runtime/).
+For the general execution model, see [Runtime](../runtime/).
 
-## Three metadata fields
+## Component Metadata
 
-Each component declares three things in C#. The plan carries them. The runtime uses them.
+Each component declares the metadata needed to register a component object in the
+Reactive Plan.
 
 | Field | Purpose | Example |
 |-------|---------|---------|
 | **Vendor** | Which root object to resolve | `"native"` or `"fusion"` |
-| **ReadExpr** | Which property to read | `"value"`, `"checked"` |
+| **ValueMember** | Which member gather and validation read for model-bound inputs | `"value"`, `"checked"` |
 | **ComponentType** | What kind of component | `"textbox"`, `"datepicker"` |
+| **BrowserObjectContract** | Which properties, methods, and events the runtime may use | `value`, `focus`, `change` |
 
-When you write `Html.InputField(plan, m => m.DueDate).FusionDatePicker(...)`, the builder registers `{ vendor: "fusion", readExpr: "value", componentType: "datepicker" }` in the plan's component registry.
+When you write `Html.InputField(plan, m => m.DueDate).FusionDatePicker(...)`,
+the builder registers a Fusion component with a `ValueMember` of `"value"`.
+When a pipeline calls `SetValue`, `FocusIn`, or `Value()`, the C# side adds the
+needed BrowserObject contract member to the plan.
 
 ## Vendor resolution — one function, any vendor
 
@@ -47,7 +52,7 @@ fusion_root: "fusion\nroot = el.ej2_instances[0]" {
   style.font-size: 18
 }
 
-bracket: "root[prop] = val\nroot[method](args)\nSame code path" {
+contract: "BrowserObjectContract\nproperty read/write\nmethod call" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
@@ -60,27 +65,32 @@ element -> native_root: vendor {
 element -> fusion_root: vendor {
   style.stroke: "#f9ab00"
 }
-native_root -> bracket {
+native_root -> contract {
   style.stroke: "#34a853"
 }
-fusion_root -> bracket {
+fusion_root -> contract {
   style.stroke: "#34a853"
 }
 ```
 
-`component.ts` is the module that resolves vendor roots (`ej2_instances`). `trigger.ts` also has vendor-aware logic for constructing event detail objects — native components read `readExpr` from the element, while fusion components pass the event object directly. After resolving the root, every operation flows through bracket notation — the same two primitives (`set-prop`, `call`) described in [Runtime](../runtime/).
+`browser-objects/component-driver.ts` resolves the vendor root. Native components
+use the element itself; Fusion components use the Syncfusion EJ2 instance. After
+that, `RuntimeObject` applies the declared BrowserObject contract member.
 
 ## Every interaction, one pattern
 
 | Interaction | Plan carries | Runtime does |
 |-------------|-------------|-------------|
-| **Read** (gather, conditions) | vendor + readExpr | `walk(resolveRoot(el, vendor), readExpr)` |
-| **Write** (SetValue, SetChecked) | vendor + prop | `resolveRoot(el, vendor)[prop] = val` |
-| **Call** (DataBind, ShowPopup) | vendor + method | `resolveRoot(el, vendor)[method]()` |
-| **Wire event** (.Reactive) | vendor + jsEvent | `resolveRoot(el, vendor).addEventListener(jsEvent)` |
+| **Read** (gather, conditions) | component source + member contract | `RuntimeObject.read(member)` |
+| **Write** (`SetValue`, `SetChecked`) | `set` reaction + property contract | `RuntimeObject.set(member, value)` |
+| **Call** (`DataBind`, `ShowPopup`) | `call` reaction + method contract | `RuntimeObject.call(member, args)` |
+| **Wire event** (`.Reactive`) | `startsWhen: component-event` + event contract | wire the component event channel |
 
 ## Adding a new component — zero runtime changes
 
-The component declares its vendor and readExpr. The runtime already knows how to resolve vendors and walk readExprs. No new `if` branches, no new switch cases, no runtime deployment. For the full 7-file pattern, see [The Vertical Slice](../vertical-slice/).
+The component declares its vendor, optional input `ValueMember`, and
+component-specific BrowserObject members through typed extension methods. The
+runtime already knows how to resolve vendors and execute `set`, `call`, and
+component-event reactions. For the full slice pattern, see [The Vertical Slice](../vertical-slice/).
 
 **Previous:** [Runtime](../runtime/)

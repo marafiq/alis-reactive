@@ -14,7 +14,7 @@ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident Nam
     .NativeTextBox(b => b.Placeholder("Enter name"));
 ```
 
-That single call does three things: registers the component in the plan's `ComponentsMap`, renders the HTML with a label and validation slot, and makes the component available for `.Reactive()` event wiring, gather, and `When()` conditions.
+That single call does three things: registers the input component in the plan, renders the HTML with a label and validation slot, and makes the component available for `.Reactive()` event wiring, gather, and `When()` conditions.
 
 ## How do I interact with a component after it renders?
 
@@ -33,8 +33,8 @@ p.Element("echo").SetText(comp.Value());
 
 Standard HTML elements. Vendor is `"native"` -- the runtime reads directly from the DOM element (`el.value`, `el.checked`).
 
-| Component | HTML Element | ReadExpr | Value Type | Key Methods |
-|-----------|-------------|----------|------------|-------------|
+| Component | HTML Element | ValueMember | Value Type | Key Methods |
+|-----------|-------------|-------------|------------|-------------|
 | `NativeTextBox` | `<input type="text">` | `"value"` | `string` | `SetValue`, `FocusIn`, `Value()` |
 | `NativeCheckBox` | `<input type="checkbox">` | `"checked"` | `bool` | `SetChecked`, `FocusIn`, `Value()` |
 | `NativeDropDown` | `<select>` | `"value"` | `string` | `SetValue`, `FocusIn`, `Value()` |
@@ -50,14 +50,14 @@ All input components fire a `Changed` event. NativeButton fires `Click` instead.
 
 Syncfusion EJ2 components. Vendor is `"fusion"` -- the runtime reads via `el.ej2_instances[0]`.
 
-| Component | Syncfusion Control | ReadExpr | Value Type | Key Methods |
-|-----------|-----------|----------|------------|-------------|
+| Component | Syncfusion Control | ValueMember | Value Type | Key Methods |
+|-----------|-----------|-------------|------------|-------------|
 | `FusionAutoComplete` | AutoComplete | `"value"` | `string` | `SetValue`, `SetText`, `SetDataSource`, `DataBind`, `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup`, `Enable`, `Disable` |
 | `FusionNumericTextBox` | NumericTextBox | `"value"` | `decimal` | `SetValue`, `SetMin`, `FocusIn`, `FocusOut`, `Increment`, `Decrement` |
 | `FusionDatePicker` | DatePicker | `"value"` | `DateTime` | `SetValue`, `FocusIn`, `FocusOut` |
 | `FusionDateTimePicker` | DateTimePicker | `"value"` | `DateTime` | `SetValue`, `FocusIn`, `FocusOut` |
 | `FusionTimePicker` | TimePicker | `"value"` | `DateTime` | `SetValue`, `FocusIn`, `FocusOut` |
-| `FusionDateRangePicker` | DateRangePicker | `"startDate"` | `DateTime` | `StartDate()`, `EndDate()`, `Value()` |
+| `FusionDateRangePicker` | DateRangePicker | `"value"` | `DateTime[]` | `StartDate()`, `EndDate()`, `Value()` |
 | `FusionDropDownList` | DropDownList | `"value"` | `string` | `SetValue`, `SetText`, `SetDataSource`, `DataBind`, `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup` |
 | `FusionMultiSelect` | MultiSelect | `"value"` | `string[]` | `SetValue`, `SetDataSource`, `DataBind`, `ShowPopup`, `HidePopup` |
 | `FusionMultiColumnComboBox` | MultiColumnComboBox | `"value"` | `string` | `SetValue`, `SetText`, `SetDataSource`, `DataBind`, `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup` |
@@ -106,6 +106,6 @@ They must be rendered once in your layout:
 
 ## Where is the architecture behind all this?
 
-Every component -- native or Syncfusion -- follows the same pattern: a sealed C# class declares `Vendor` and `ReadExpr`, the plan carries that metadata as JSON, and the runtime executes via vendor-neutral bracket notation. Adding a new component requires zero runtime changes.
+Every component -- native or Syncfusion -- follows the same pattern: a sealed C# class declares `Vendor` and, for inputs, `ValueMember`; typed extensions declare the BrowserObject members needed by the Reactive Plan; and the runtime executes those contracts through one component-object path. Adding a normal component requires zero runtime changes.
 
-For the full architecture -- `walk.ts`, `component.ts`, `resolver.ts`, the vertical slice shape, and `ComponentsMap` -- see [Component Model](../../architecture/component-model/).
+For the full architecture, see [Component Model](../../architecture/component-model/) and [The Vertical Slice](../../architecture/vertical-slice/).
