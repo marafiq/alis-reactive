@@ -623,6 +623,10 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: `FusionRating` XML tags
   now use concise field-wrapper, event-args, Reactive Plan, and rating-value
   wording.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionComboBox` XML tags
+  now use concise field-wrapper, model-value, event-args, Reactive Plan,
+  selected-value, display-text, and index wording. Value/text/index semantics
+  and public examples remain.
 
 ### Implementation Inline Comments
 

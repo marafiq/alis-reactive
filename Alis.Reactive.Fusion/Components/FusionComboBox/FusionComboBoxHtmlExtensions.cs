@@ -21,8 +21,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Renders a FusionComboBox bound to the field's model property.
         /// </summary>
-        /// <typeparam name="TProp">The model value type rendered by the combo box.</typeparam>
-        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <typeparam name="TProp">Model value type rendered by the combo box.</typeparam>
+        /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Callback to build the Syncfusion ComboBox.</param>
         public static void FusionComboBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,

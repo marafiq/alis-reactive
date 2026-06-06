@@ -42,21 +42,21 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("clear");
 
         /// <summary>Sets the selected value, or clears it with <see langword="null"/>.</summary>
-        /// <param name="value">The string value to select.</param>
+        /// <param name="value">String value to select.</param>
         public static ComponentRef<FusionComboBox, TModel> SetValue<TModel>(
             this ComponentRef<FusionComboBox, TModel> self, string? value)
             where TModel : class
             => self.EmitSet(ValueProperty, ValueExpression.LiteralRaw(value, Shape.String));
 
         /// <summary>Sets the displayed text, or clears it with <see langword="null"/>.</summary>
-        /// <param name="text">The display text to select.</param>
+        /// <param name="text">Display text to select.</param>
         public static ComponentRef<FusionComboBox, TModel> SetText<TModel>(
             this ComponentRef<FusionComboBox, TModel> self, string? text)
             where TModel : class
             => self.EmitSet(TextProperty, ValueExpression.LiteralRaw(text, Shape.String));
 
         /// <summary>Sets the selected list index.</summary>
-        /// <param name="index">The zero-based list index to select.</param>
+        /// <param name="index">Zero-based list index to select.</param>
         public static ComponentRef<FusionComboBox, TModel> SetIndex<TModel>(
             this ComponentRef<FusionComboBox, TModel> self, int index)
             where TModel : class

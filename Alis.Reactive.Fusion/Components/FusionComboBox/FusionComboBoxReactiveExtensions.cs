@@ -15,8 +15,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Wires a <see cref="FusionComboBox"/> event into a Reactive Plan pipeline.
         /// </summary>
-        /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>
-        /// <param name="plan">The Reactive Plan that receives the component event trigger.</param>
+        /// <typeparam name="TArgs">Event args type inferred from the event selector.</typeparam>
+        /// <param name="plan">Reactive Plan that receives the component event trigger.</param>
         /// <param name="eventSelector">Selects the component event, for example <c>evt =&gt; evt.Changed</c>.</param>
         /// <param name="pipeline">Reactive Plan pipeline for the selected event.</param>
         public static ComboBoxBuilder Reactive<TModel, TArgs>(
