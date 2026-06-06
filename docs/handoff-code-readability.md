@@ -590,6 +590,9 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeRadioGroup` XML
   tags now use concise model, option-list, Reactive Plan, and event-payload
   wording. Hidden-input target, `net48`, layout, and inline-init notes remain.
+- Resolved on `tiny-safe-but-important-refactorings`: `NativeDropDown` XML tags
+  now use concise model, option-list, placeholder, field-wrapper, Reactive Plan,
+  and event-args wording. Component-reference examples remain.
 
 ### Implementation Inline Comments
 

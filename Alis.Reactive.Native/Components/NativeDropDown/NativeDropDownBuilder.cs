@@ -23,8 +23,8 @@ namespace Alis.Reactive.Native.Components
     /// Created by the <c>.NativeDropDown()</c> factory on
     /// <see cref="InputBoundField{TModel,TProp}"/>.
     /// </remarks>
-    /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-    /// <typeparam name="TProp">The model value type represented by the selected option.</typeparam>
+    /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
+    /// <typeparam name="TProp">Model value type represented by the selected option.</typeparam>
     public class NativeDropDownBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
@@ -68,7 +68,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Replaces the selectable options.
         /// </summary>
-        /// <param name="items">The list of options to display.</param>
+        /// <param name="items">Options to display.</param>
         public NativeDropDownBuilder<TModel, TProp> Items(IEnumerable<SelectListItem> items)
         {
             _items = items;
@@ -78,7 +78,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Replaces the empty-selection placeholder label, such as <c>"-- Select --"</c>.
         /// </summary>
-        /// <param name="optionLabel">The placeholder text for the empty option.</param>
+        /// <param name="optionLabel">Placeholder text for the empty option.</param>
         public NativeDropDownBuilder<TModel, TProp> Placeholder(string optionLabel)
         {
             _placeholder = optionLabel;
