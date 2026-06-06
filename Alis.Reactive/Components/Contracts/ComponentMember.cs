@@ -103,15 +103,12 @@ namespace Alis.Reactive
         internal static ComponentMethod Mapped(string member, string pathExpression) =>
             new ComponentMethod(member, pathExpression, MethodArgumentContract.NoArguments);
 
-        /// <summary>Declares argument shapes for the method contract.</summary>
         internal ComponentMethod WithArgs<T1>() =>
             WithArgs(Shape.FromClrType(typeof(T1)));
 
-        /// <summary>Declares argument shapes for the method contract.</summary>
         internal ComponentMethod WithArgs<T1, T2>() =>
             WithArgs(Shape.FromClrType(typeof(T1)), Shape.FromClrType(typeof(T2)));
 
-        /// <summary>Declares argument shapes for the method contract.</summary>
         internal ComponentMethod WithArgs<T1, T2, T3>() =>
             WithArgs(Shape.FromClrType(typeof(T1)), Shape.FromClrType(typeof(T2)), Shape.FromClrType(typeof(T3)));
 
