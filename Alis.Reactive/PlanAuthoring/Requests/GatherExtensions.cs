@@ -18,8 +18,6 @@ namespace Alis.Reactive.Builders.Requests
         /// body field name. The component contract supplies the value member read at runtime.
         /// </remarks>
         /// <typeparam name="TComponent">The input component contract to read.</typeparam>
-        /// <typeparam name="TModel">The view model used to derive the generated component ID.</typeparam>
-        /// <param name="self">The request-input gather builder.</param>
         /// <param name="expr">The model property expression for the component ID and body field.</param>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
             this GatherBuilder<TModel> self,
@@ -43,8 +41,6 @@ namespace Alis.Reactive.Builders.Requests
         /// input-value contract read the member named by <paramref name="name"/>.
         /// </remarks>
         /// <typeparam name="TComponent">The component contract to read.</typeparam>
-        /// <typeparam name="TModel">The view model that owns the request pipeline.</typeparam>
-        /// <param name="self">The request-input gather builder.</param>
         /// <param name="refId">The explicit controlled component ID rendered in markup.</param>
         /// <param name="name">The request body field to write; for non-input components, also the member to read.</param>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
@@ -66,9 +62,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>
         /// Adds a typed component member read to the request body.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the request pipeline.</typeparam>
         /// <typeparam name="TProp">The component member value type.</typeparam>
-        /// <param name="self">The request-input gather builder.</param>
         /// <param name="source">The component property or method source; its default body field name is used.</param>
         public static GatherBuilder<TModel> Include<TModel, TProp>(
             this GatherBuilder<TModel> self,
@@ -82,9 +76,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>
         /// Adds a typed component member read to an explicit request body field.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the request pipeline.</typeparam>
         /// <typeparam name="TProp">The component member value type.</typeparam>
-        /// <param name="self">The request-input gather builder.</param>
         /// <param name="source">The component property or method source evaluated before the request is sent.</param>
         /// <param name="paramName">The request body field that receives the component member value.</param>
         public static GatherBuilder<TModel> Include<TModel, TProp>(
