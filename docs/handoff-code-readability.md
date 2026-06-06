@@ -59,9 +59,19 @@ Examples and current status:
 
 - Resolved on `tiny-safe-but-important-refactorings`: section banners and repeated
   branch-result comments were removed from the touched Fusion date/time/input tests.
+- Resolved on `tiny-safe-but-important-refactorings`: redundant method XML
+  summaries were removed from `WhenGuardsControlReactiveFlow`, and two test names
+  now carry the branch-clearing and Fusion SetValue cascade intent.
+- Resolved on `tiny-safe-but-important-refactorings`: Native checkbox/dropdown
+  tests no longer repeat plan-shape explanations in both comments and assertion
+  messages; only DOM/Reactive Plan join-key and native DOM value-path notes remain.
 - `WhenAllComponentsGatherIntoOnePost.cs` has long form-fill flows, but helper
   extraction should happen only if it names a reusable domain action. Do not add
   private helper indirection that hides a one-off behavior proof.
+- `WhenMultipleItemsSelected.cs` still has several inline comments, but the current
+  scan found them mostly explaining Syncfusion popup mode, hidden selected items,
+  real keyboard filtering, and generated component IDs. Leave them unless a later
+  behavior slice changes those mechanics.
 - Resolved on `tiny-safe-but-important-refactorings`: simple validation step
   comments such as "fix it", "submit first", and "trigger error first" no longer
   appear in the active validation/conditions/Fusion test scan.
