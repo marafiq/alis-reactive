@@ -17,27 +17,27 @@ describe("partial slot composition", () => {
 
     appliedPlans.register(rootPlan(planId));
 
-    const oldBehavior = behavior();
+    const initialSlotBehavior = behavior();
     appliedPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, {
         types: { "native.element.address-line": objectContract() },
         components: { "address-line": component("address-line") },
-        behaviors: [oldBehavior],
+        behaviors: [initialSlotBehavior],
       }),
     ], wiring);
 
     const first = appliedPlans.get(planId)!;
     expect(first.components["address-line"]).toBeDefined();
     expect(first.types["native.element.address-line"]).toBeDefined();
-    expect(first.behaviors).toContain(oldBehavior);
+    expect(first.behaviors).toContain(initialSlotBehavior);
     expect(behaviorSignals[0]?.aborted).toBe(false);
 
-    const newBehavior = behavior();
+    const replacementSlotBehavior = behavior();
     appliedPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, {
         types: { "native.element.zip-code": objectContract() },
         components: { "zip-code": component("zip-code") },
-        behaviors: [newBehavior],
+        behaviors: [replacementSlotBehavior],
       }),
     ], wiring);
 
@@ -45,10 +45,10 @@ describe("partial slot composition", () => {
     expect(behaviorSignals[0]?.aborted).toBe(true);
     expect(second.components["address-line"]).toBeUndefined();
     expect(second.types["native.element.address-line"]).toBeUndefined();
-    expect(second.behaviors).not.toContain(oldBehavior);
+    expect(second.behaviors).not.toContain(initialSlotBehavior);
     expect(second.components["zip-code"]).toBeDefined();
     expect(second.types["native.element.zip-code"]).toBeDefined();
-    expect(second.behaviors).toContain(newBehavior);
+    expect(second.behaviors).toContain(replacementSlotBehavior);
   });
 
   it("unloads an active slot explicitly", () => {
