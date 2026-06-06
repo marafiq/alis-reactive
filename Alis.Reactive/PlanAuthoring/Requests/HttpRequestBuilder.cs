@@ -56,7 +56,7 @@ namespace Alis.Reactive.Builders.Requests
 
         /// <summary>Serializes gathered body fields as JSON. This is the default body format.</summary>
         public HttpRequestBuilder<TModel> AsJson() { _bodyFormat = RequestBodyFormat.Json; return this; }
-        /// <summary>Serializes gathered body fields as <c>FormData</c>, including browser file values.</summary>
+        /// <summary>Serializes gathered body fields as <c>FormData</c>, including <c>File</c> and <c>FileList</c> values.</summary>
         public HttpRequestBuilder<TModel> AsFormData() { _bodyFormat = RequestBodyFormat.FormData; return this; }
 
         /// <summary>Runs a reaction before the HTTP request is sent.</summary>
