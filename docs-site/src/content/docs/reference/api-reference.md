@@ -254,7 +254,7 @@ Arg<T>()
 ### PluginCallBuilder<T>
 
 Collects arguments for a Reactive Plan plugin command. Call `Fire`
-to append the plugin-call reaction to the current pipeline.
+to append the plugin-call reaction to the owning Reactive Plan pipeline.
 
 ```csharp
 Arg(string value)

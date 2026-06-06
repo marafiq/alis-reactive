@@ -86,7 +86,7 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Targets a controlled DOM element for updates in the current pipeline.</summary>
+        /// <summary>Targets a controlled DOM element for updates in this Reactive Plan pipeline.</summary>
         /// <param name="elementId">The markup ID resolved directly by the runtime.</param>
         /// <returns>A builder for appending element updates to this pipeline.</returns>
         public ElementBuilder<TModel> Element(string elementId)

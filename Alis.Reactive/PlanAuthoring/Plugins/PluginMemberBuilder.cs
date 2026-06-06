@@ -150,7 +150,7 @@ namespace Alis.Reactive.Builders
 
     /// <summary>
     /// Collects arguments for a Reactive Plan plugin command. Call <see cref="Fire"/>
-    /// to append the plugin-call reaction to the current pipeline.
+    /// to append the plugin-call reaction to the owning Reactive Plan pipeline.
     /// </summary>
     /// <typeparam name="TModel">The model type for the pipeline that owns the plugin command.</typeparam>
     public sealed class PluginCallBuilder<TModel> where TModel : class
@@ -265,7 +265,7 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Appends the configured plugin command as a plugin-call reaction in the current pipeline.</summary>
+        /// <summary>Appends the configured plugin command as a plugin-call reaction in the owning Reactive Plan pipeline.</summary>
         public void Fire()
         {
             _emitter.AddStep(ReactionGraph.Call(

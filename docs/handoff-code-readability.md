@@ -474,6 +474,10 @@ Candidate cleanup:
   sources, value expressions, plan scopes, and payload contracts now say which
   DSL builders author them instead of repeating "not constructed in application
   code" across generated API docs.
+- Resolved on `tiny-safe-but-important-refactorings`: core builder XML docs now
+  say "this/owning Reactive Plan pipeline" instead of generic "current
+  pipeline" for element targeting, HTTP reactions, plugin command firing, and
+  component event helper emissions.
 
 ### Implementation Inline Comments
 

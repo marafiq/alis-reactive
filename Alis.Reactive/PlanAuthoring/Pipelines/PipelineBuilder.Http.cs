@@ -5,7 +5,7 @@ namespace Alis.Reactive.Builders
 {
     public partial class PipelineBuilder<TModel> where TModel : class
     {
-        /// <summary>Appends an async HTTP GET reaction to the current pipeline.</summary>
+        /// <summary>Appends an async HTTP GET reaction to this Reactive Plan pipeline.</summary>
         /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
         /// <returns>A request builder for route values, validation, loading/finally reactions, and response routing.</returns>
         public HttpRequestBuilder<TModel> Get(string url)
@@ -13,7 +13,7 @@ namespace Alis.Reactive.Builders
             return _draft.BeginHttp(Context).Get(url);
         }
 
-        /// <summary>Appends an async HTTP POST reaction to the current pipeline.</summary>
+        /// <summary>Appends an async HTTP POST reaction to this Reactive Plan pipeline.</summary>
         /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
         /// <returns>A request builder for gathered input, validation, loading/finally reactions, and response routing.</returns>
         public HttpRequestBuilder<TModel> Post(string url)
@@ -39,7 +39,7 @@ namespace Alis.Reactive.Builders
             return _draft.BeginHttp(Context).Put(url).Gather(gather);
         }
 
-        /// <summary>Appends an async HTTP DELETE reaction to the current pipeline.</summary>
+        /// <summary>Appends an async HTTP DELETE reaction to this Reactive Plan pipeline.</summary>
         /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
         /// <returns>A request builder for route values, validation, loading/finally reactions, and response routing.</returns>
         public HttpRequestBuilder<TModel> Delete(string url)
