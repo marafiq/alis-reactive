@@ -409,6 +409,10 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: InPlaceEditor public XML
   docs now keep event-order, CSS-class, and registered-shape invariants while
   removing Syncfusion method/path narration from consumer IntelliSense.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion template builder
+  XML docs no longer repeat generic type-parameter lines such as "The selected
+  property type." Binding summaries, raw HTML/onclick trust warnings, and
+  Syncfusion template-context remarks remain.
 
 ### Implementation Inline Comments
 

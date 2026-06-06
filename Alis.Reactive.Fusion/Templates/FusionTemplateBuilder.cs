@@ -70,7 +70,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a Syncfusion binding for a template model property.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="property">The template model property to bind.</param>
         public FusionTemplateBuilder<TModel> Text<TProperty>(Expression<Func<TModel, TProperty>> property)
         {
@@ -92,7 +91,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a <c>span</c> bound to a template model property.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="property">The template model property to bind.</param>
         public FusionTemplateBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property) =>
             Span(property, TemplateCss.None);
@@ -100,7 +98,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a styled <c>span</c> bound to a template model property.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="property">The template model property to bind.</param>
         /// <param name="css">The CSS class to emit on the <c>span</c>.</param>
         public FusionTemplateBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property, string css) =>
@@ -136,7 +133,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds an <c>img</c> whose <c>src</c> is bound to a template model property.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="srcProperty">The template model property used for <c>src</c>.</param>
         public FusionTemplateBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty) =>
             Img(srcProperty, TemplateCss.None, TemplateAltText.None);
@@ -144,7 +140,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a styled <c>img</c> whose <c>src</c> is bound to a template model property.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="srcProperty">The template model property used for <c>src</c>.</param>
         /// <param name="css">The CSS class to emit on the <c>img</c>.</param>
         public FusionTemplateBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty, string css) =>
@@ -153,7 +148,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a styled <c>img</c> with bound <c>src</c> and static alt text.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="srcProperty">The template model property used for <c>src</c>.</param>
         /// <param name="css">The CSS class to emit on the <c>img</c>.</param>
         /// <param name="alt">The literal alt text to emit.</param>
@@ -184,7 +178,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a badge whose content is bound to a template model property.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="property">The template model property to bind.</param>
         /// <param name="css">The CSS class to emit on the badge.</param>
         public FusionTemplateBuilder<TModel> Badge<TProperty>(Expression<Func<TModel, TProperty>> property, string css = "e-badge")
@@ -253,7 +246,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a button that calls a JavaScript function with a bound model value.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="text">The literal button text.</param>
         /// <param name="idProperty">The template model property passed to the JavaScript function.</param>
         /// <param name="onClickFn">The JavaScript function name to call.</param>
@@ -267,7 +259,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a styled button that calls a JavaScript function with a bound model value.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="text">The literal button text.</param>
         /// <param name="idProperty">The template model property passed to the JavaScript function.</param>
         /// <param name="onClickFn">The JavaScript function name to call.</param>
@@ -297,7 +288,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a button that dispatches a DOM <c>CustomEvent</c> with <c>detail.id</c> bound from the model.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="text">The literal button text.</param>
         /// <param name="eventName">The DOM event name to dispatch.</param>
         /// <param name="idProperty">The template model property emitted as <c>detail.id</c>.</param>
@@ -310,7 +300,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a styled button that dispatches a DOM <c>CustomEvent</c> with <c>detail.id</c> bound from the model.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="text">The literal button text.</param>
         /// <param name="eventName">The DOM event name to dispatch.</param>
         /// <param name="idProperty">The template model property emitted as <c>detail.id</c>.</param>
@@ -335,8 +324,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a link whose <c>href</c> and text are bound to template model properties.
         /// </summary>
-        /// <typeparam name="THref">The selected href property type.</typeparam>
-        /// <typeparam name="TText">The selected text property type.</typeparam>
         /// <param name="hrefProperty">The template model property used for <c>href</c>.</param>
         /// <param name="textProperty">The template model property used for link text.</param>
         public FusionTemplateBuilder<TModel> Link<THref, TText>(
@@ -347,8 +334,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a styled link whose <c>href</c> and text are bound to template model properties.
         /// </summary>
-        /// <typeparam name="THref">The selected href property type.</typeparam>
-        /// <typeparam name="TText">The selected text property type.</typeparam>
         /// <param name="hrefProperty">The template model property used for <c>href</c>.</param>
         /// <param name="textProperty">The template model property used for link text.</param>
         /// <param name="css">The CSS class to emit on the link.</param>

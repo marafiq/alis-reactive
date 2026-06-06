@@ -20,7 +20,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a <c>span</c> bound to a template model property.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="property">The template model property to bind.</param>
         public FusionConditionalBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property) =>
             Span(property, TemplateCss.None);
@@ -28,7 +27,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a styled <c>span</c> bound to a template model property.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="property">The template model property to bind.</param>
         /// <param name="css">The CSS class to emit on the <c>span</c>.</param>
         public FusionConditionalBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property, string css) =>
@@ -64,7 +62,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a badge whose content is bound to a template model property.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="property">The template model property to bind.</param>
         /// <param name="css">The CSS class to emit on the badge.</param>
         public FusionConditionalBuilder<TModel> Badge<TProperty>(Expression<Func<TModel, TProperty>> property, string css = "e-badge")
@@ -120,7 +117,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds an <c>img</c> whose <c>src</c> is bound to a template model property.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="srcProperty">The template model property used for <c>src</c>.</param>
         public FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty) =>
             Img(srcProperty, TemplateCss.None);
@@ -128,7 +124,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a styled <c>img</c> whose <c>src</c> is bound to a template model property.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="srcProperty">The template model property used for <c>src</c>.</param>
         /// <param name="css">The CSS class to emit on the <c>img</c>.</param>
         public FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty, string css) =>
@@ -171,7 +166,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a button that dispatches a DOM <c>CustomEvent</c> with <c>detail.id</c> bound from the model.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="text">The literal button text.</param>
         /// <param name="eventName">The DOM event name to dispatch.</param>
         /// <param name="idProperty">The template model property emitted as <c>detail.id</c>.</param>
@@ -184,7 +178,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a styled button that dispatches a DOM <c>CustomEvent</c> with <c>detail.id</c> bound from the model.
         /// </summary>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="text">The literal button text.</param>
         /// <param name="eventName">The DOM event name to dispatch.</param>
         /// <param name="idProperty">The template model property emitted as <c>detail.id</c>.</param>
