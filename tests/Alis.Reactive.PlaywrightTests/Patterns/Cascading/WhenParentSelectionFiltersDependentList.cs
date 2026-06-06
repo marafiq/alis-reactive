@@ -6,15 +6,15 @@ namespace Alis.Reactive.PlaywrightTests.Patterns.Cascading;
 /// <summary>
 /// Proves the cascading dropdown DSL path: parent Fusion selection gathers only <c>Country</c>,
 /// loads the child DataSource over HTTP, then save gathers <c>Country</c> and <c>City</c>.
-/// Selection helpers use browser gestures rather than ej2 APIs so Syncfusion raises the
-/// user-facing change event.
+/// Selection helpers use Playwright user gestures rather than Syncfusion instance APIs
+/// so Syncfusion raises the user-facing change event.
 /// </summary>
 [TestFixture]
 public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Patterns/Cascading";
 
-    // Generated component IDs are the DOM/plan join keys under test.
+    // Generated component IDs are the DOM/Reactive Plan join keys under test.
     private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_CascadingModel";
     private const string CountryId = GeneratedTypeScope + "__Country";
     private const string CityId = GeneratedTypeScope + "__City";
