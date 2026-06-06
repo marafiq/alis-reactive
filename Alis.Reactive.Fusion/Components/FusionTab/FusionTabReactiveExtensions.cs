@@ -18,7 +18,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>
         /// <param name="builder">The FusionTab builder being wired.</param>
         /// <param name="eventSelector">Selects the component event, for example <c>evt =&gt; evt.Selected</c>.</param>
-        /// <param name="pipeline">Configures the commands to run when the event fires.</param>
+        /// <param name="pipeline">Configures the reactions to run when the event fires.</param>
         public static FusionTabBuilder<TModel> Reactive<TModel, TArgs>(
             this FusionTabBuilder<TModel> builder,
             Func<FusionTabEvents, TypedEvent<TArgs>> eventSelector,

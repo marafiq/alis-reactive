@@ -21,7 +21,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="builder">The FusionInPlaceEditor builder being wired.</param>
         /// <param name="plan">The Reactive Plan that receives the component event trigger.</param>
         /// <param name="eventSelector">Selects the component event, for example <c>evt =&gt; evt.ActionBegin</c>.</param>
-        /// <param name="pipeline">Configures the commands to run when the event fires.</param>
+        /// <param name="pipeline">Configures the reactions to run when the event fires.</param>
         public static InPlaceEditorBuilder Reactive<TModel, TArgs>(
             this InPlaceEditorBuilder builder,
             ReactivePlan<TModel> plan,
