@@ -526,6 +526,10 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeDropDown`
   selected-value parameter docs now use the same concise selected-option wording
   as the other Native value-write helpers.
+- Resolved on `tiny-safe-but-important-refactorings`: remaining Native
+  `NativeActionLink` and `NativeHiddenField` XML parameter tags were shortened.
+  ActionLink docs still preserve reserved attributes and encoded-rendering
+  behavior because those are public HTML/runtime boundaries.
 
 ### Implementation Inline Comments
 
