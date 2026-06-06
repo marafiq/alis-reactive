@@ -1,6 +1,6 @@
 ---
 title: Plans and Rendering
-description: How to create a reactive plan, add behavior to it, and render it for the browser runtime.
+description: How to create a reactive plan, add behavior to it, and render Reactive Plan JSON.
 sidebar:
   order: 1
 ---

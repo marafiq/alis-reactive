@@ -1,6 +1,6 @@
 # Alis.Reactive
 
-Plan-driven reactive framework for ASP.NET MVC. C# fluent builders produce JSON plans executed by a browser runtime. Zero JavaScript in views.
+Plan-driven reactive framework for ASP.NET MVC. C# fluent builders produce Reactive Plan JSON executed by the runtime. Zero JavaScript in views.
 
 ## Packages
 
