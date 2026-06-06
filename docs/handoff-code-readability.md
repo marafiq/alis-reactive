@@ -814,6 +814,11 @@ Rewrite or delete:
   every component just because a repeated XML-doc phrase appears; finish one
   component or one non-component concept at a time and keep the commit boundary
   reviewable.
+- Resolved on `tiny-safe-but-important-refactorings`: explicit markup/component
+  ID XML docs in `PipelineBuilder`, dispatch payload source docs, and the public
+  `FusionButton` helper now keep the runtime join-key and Reactive Plan facts
+  without "The/A..." narration. Treat the remaining ID docs as contract wording,
+  not generic comment noise.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

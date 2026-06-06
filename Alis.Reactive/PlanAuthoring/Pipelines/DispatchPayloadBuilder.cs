@@ -24,7 +24,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Sets a payload field from a value source evaluated when the dispatch runs.</summary>
         /// <typeparam name="TProp">Field value type, inferred from the expression.</typeparam>
         /// <param name="field">Payload property to populate.</param>
-        /// <param name="source">A component value, URL parameter, or plugin read that provides the field value.</param>
+        /// <param name="source">Component value, URL parameter, or plugin read that supplies the field value.</param>
         public DispatchPayloadBuilder<TPayload, TModel> Set<TProp>(
             Expression<Func<TPayload, TProp>> field,
             TypedSource<TProp> source)

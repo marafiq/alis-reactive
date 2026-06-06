@@ -87,7 +87,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Targets a controlled DOM element for updates in this Reactive Plan pipeline.</summary>
-        /// <param name="elementId">The markup ID resolved directly by the runtime.</param>
+        /// <param name="elementId">Markup ID resolved directly by the runtime.</param>
         /// <returns>Element update builder.</returns>
         public ElementBuilder<TModel> Element(string elementId)
         {
@@ -126,7 +126,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Targets a component registered with an explicit markup ID.</summary>
         /// <typeparam name="TComponent">Component contract that determines available reads, writes, and calls.</typeparam>
-        /// <param name="refId">The controlled component ID already present in markup.</param>
+        /// <param name="refId">Controlled component ID already present in markup.</param>
         /// <returns>An authoring handle joined to the explicit component ID.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>(string refId)
             where TComponent : IComponent, new()
@@ -274,7 +274,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Appends a reaction that renders accumulated validation errors into a container.</summary>
-        /// <param name="formId">The element ID of the validation error container.</param>
+        /// <param name="formId">Validation error container element ID.</param>
         /// <returns>This pipeline builder.</returns>
         public PipelineBuilder<TModel> ValidationErrors(string formId)
         {
