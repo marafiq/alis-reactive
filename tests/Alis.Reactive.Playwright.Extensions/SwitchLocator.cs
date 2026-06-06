@@ -13,7 +13,7 @@ public sealed class SwitchLocator
         _componentId = componentId;
     }
 
-    /// <summary>The clickable wrapper; the component ID belongs to the hidden checkbox.</summary>
+    /// <summary>Clickable wrapper; the component ID belongs to the hidden checkbox.</summary>
     public ILocator Wrapper => _page.Locator($".e-switch-wrapper:has(#{_componentId})");
 
     /// <summary>The hidden checkbox input.</summary>

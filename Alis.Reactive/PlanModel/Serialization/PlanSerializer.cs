@@ -3,8 +3,8 @@ using System.Text.Json;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// The single owner of plan-document to JSON. Emits camelCase property names; node <c>kind</c>
-    /// values pass through verbatim. Compact for transport, formatted for debugging.
+    /// Owns PlanDocument JSON serialization. Emits camelCase property names; node <c>kind</c>
+    /// values pass through verbatim. Compact output is for transport, formatted output is for debugging.
     /// </summary>
     internal static class PlanSerializer
     {

@@ -480,6 +480,12 @@ Candidate cleanup:
   parameter docs now use concise label, model-property, target-ID, drawer-size,
   and shape-comparison wording. Drawer docs also describe panel size as the
   public contract instead of leading with CSS-class mechanics.
+- Resolved on `tiny-safe-but-important-refactorings`: final broad stale-phrase
+  C# hits in `PlanSerializer` and `SwitchLocator` were tightened while keeping
+  the JSON serialization invariant and hidden-checkbox locator boundary.
+- Kept on `tiny-safe-but-important-refactorings`: remaining broad stale-phrase
+  scan hits in `conditions.ts` and `trigger.ts` are runtime invariants for
+  sync-lane condition evaluation and Syncfusion mutable event-arg timing.
 - Resolved on `tiny-safe-but-important-refactorings`: Fusion and Native event
   selector singleton XML docs now use one concise "Selector instance for
   `.Reactive()` event lambdas" wording instead of repeating "Shared instance
