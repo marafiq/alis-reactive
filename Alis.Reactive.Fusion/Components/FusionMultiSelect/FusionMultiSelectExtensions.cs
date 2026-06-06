@@ -32,7 +32,7 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("hidePopup");
 
         /// <summary>Replaces the selected value array.</summary>
-        /// <param name="value">The values to select, or <see langword="null"/> to clear the selection.</param>
+        /// <param name="value">Values to select, or <see langword="null"/> to clear the selection.</param>
         public static ComponentRef<FusionMultiSelect, TModel> SetValue<TModel>(
             this ComponentRef<FusionMultiSelect, TModel> self, string[]? value)
             where TModel : class
@@ -41,7 +41,7 @@ namespace Alis.Reactive.Fusion.Components
                 : ValueExpression.LiteralRaw(value, Shape.ArrayOf(Shape.String)));
 
         /// <summary>Replaces the data source with items from an event payload.</summary>
-        /// <typeparam name="TSource">The event payload type containing the items.</typeparam>
+        /// <typeparam name="TSource">Event payload type containing the items.</typeparam>
         /// <param name="source">Provides the event payload type; runtime reads the active event payload.</param>
         /// <param name="path">Expression selecting the items collection from the payload.</param>
         public static ComponentRef<FusionMultiSelect, TModel> SetDataSource<TModel, TSource>(
@@ -54,8 +54,8 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>Replaces the data source with items from an HTTP response body.</summary>
-        /// <typeparam name="TResponse">The response body type containing the items.</typeparam>
-        /// <param name="source">The response scope used by the generated value expression.</param>
+        /// <typeparam name="TResponse">Response body type containing the items.</typeparam>
+        /// <param name="source">Response scope used by the generated value expression.</param>
         /// <param name="path">Expression selecting the items collection from the response.</param>
         public static ComponentRef<FusionMultiSelect, TModel> SetDataSource<TModel, TResponse>(
             this ComponentRef<FusionMultiSelect, TModel> self,
@@ -72,7 +72,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <see cref="Alis.Reactive.Builders.Arrays.ReactiveArray{T}"/> transform via <c>AsSource()</c>.
         /// Routes any array value into the option list with no HTTP round-trip.
         /// </summary>
-        /// <param name="source">The typed array source.</param>
+        /// <param name="source">Typed array source.</param>
         public static ComponentRef<FusionMultiSelect, TModel> SetDataSource<TModel, TElement>(
             this ComponentRef<FusionMultiSelect, TModel> self,
             TypedSource<TElement[]> source)

@@ -42,7 +42,7 @@ namespace Alis.Reactive.Fusion.Components
         /// Without this, the component briefly shows "No records found" while the
         /// server request is in flight. Call before issuing an HTTP request.
         /// </remarks>
-        /// <param name="pipeline">The pipeline that receives the event-arg filtering mutation.</param>
+        /// <param name="pipeline">Pipeline that receives the event-arg filtering mutation.</param>
         public static void PreventDefault(
             this FusionMultiSelectFilteringArgs args,
             IReactionEmitter pipeline)
@@ -58,9 +58,9 @@ namespace Alis.Reactive.Fusion.Components
         /// Assigning the data source directly does not re-enter Syncfusion's popup
         /// rendering lifecycle.
         /// </remarks>
-        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
-        /// <param name="pipeline">The pipeline that receives the event-arg updateData call.</param>
-        /// <param name="source">The success or error response body scope that supplies popup items.</param>
+        /// <typeparam name="TResponse">Response body contract for the active response route.</typeparam>
+        /// <param name="pipeline">Pipeline that receives the event-arg updateData call.</param>
+        /// <param name="source">Success or error response body scope that supplies popup items.</param>
         /// <param name="path">Expression selecting the items collection from the response.</param>
         public static void UpdateData<TResponse>(
             this FusionMultiSelectFilteringArgs args,

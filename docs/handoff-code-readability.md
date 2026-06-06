@@ -627,6 +627,10 @@ Candidate cleanup:
   now use concise field-wrapper, model-value, event-args, Reactive Plan,
   selected-value, display-text, and index wording. Value/text/index semantics
   and public examples remain.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionMultiSelect` XML
+  tags now use concise event-args, Reactive Plan, field-mapping, selected-value,
+  response-scope, typed-source, and field-wrapper wording. Selected value array,
+  server-filtering lifecycle, and public examples remain.
 
 ### Implementation Inline Comments
 
