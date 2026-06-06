@@ -830,6 +830,11 @@ Rewrite or delete:
   `PlanExtensions` now use concise typed-source, component-extension, disposable
   scope, and Active Plan wording. Keep the remaining `FusionTemplateExpression`
   and `IdGenerator` return examples because they show exact public output shape.
+- Resolved on `tiny-safe-but-important-refactorings`: `ExecutionContext.withElement`
+  now names the element-scope item and available values directly, so the old
+  stack-push narration was deleted. Remaining runtime comments inspected in this
+  area explain runtime boundaries, Active Plan invariants, or JavaScript edge
+  cases and should not be removed without a replacement name/structure.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
