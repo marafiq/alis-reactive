@@ -16,7 +16,7 @@ public sealed class FusionListBoxLocator
 
     public ILocator Root => _page.Locator($"#{_componentId}_parent");
 
-    /// <summary>A list item by exact visible text.</summary>
+    /// <summary>List item matching exact visible text.</summary>
     public ILocator Item(string text) => Root
         .Locator("li.e-list-item")
         .Filter(new() { HasTextString = text })

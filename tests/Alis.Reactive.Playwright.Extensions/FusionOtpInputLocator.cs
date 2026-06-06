@@ -15,10 +15,10 @@ public sealed class FusionOtpInputLocator
 
     public ILocator Host => _page.Locator($"#{_componentId}");
 
-    /// <summary>The hidden input Syncfusion uses as the submitted value.</summary>
+    /// <summary>Hidden input Syncfusion submits as the component value.</summary>
     public ILocator HiddenInput => Host.Locator("input[type='hidden']");
 
-    /// <summary>Gets a visible OTP field by zero-based index.</summary>
+    /// <summary>Visible OTP field at zero-based index.</summary>
     public ILocator Field(int index) => Host.Locator("input.e-otp-input-field").Nth(index);
 
     public async Task<string> HiddenValue() => await HiddenInput.InputValueAsync();

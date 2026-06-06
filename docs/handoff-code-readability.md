@@ -888,6 +888,9 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: payload-flow tests now
   name the PascalCase expression path to camelCase payload JSON proof directly.
   The payload-status ordering comment remains because it protects reaction order.
+- Resolved on `tiny-safe-but-important-refactorings`: Playwright extension XML
+  summaries for ListBox, ListView, and OtpInput locators now use concise locator
+  contract wording instead of article-led or "Gets..." summaries.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

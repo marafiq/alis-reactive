@@ -16,7 +16,7 @@ public sealed class FusionListViewLocator
 
     public ILocator Root => _page.Locator($"#{_componentId}");
 
-    /// <summary>A list item by exact visible text.</summary>
+    /// <summary>List item matching exact visible text.</summary>
     public ILocator Item(string text) =>
         Root.GetByText(text, new() { Exact = true })
             .Locator("xpath=ancestor::li[contains(@class,'e-list-item')][1]");
