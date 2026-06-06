@@ -90,6 +90,10 @@ Examples and current status:
   lifecycle trace test no longer comments every asserted event field; the
   test name and trace-cell assertions carry the flow, while the class-level
   boundary note remains.
+- Resolved on `tiny-safe-but-important-refactorings`: the InPlaceEditor masked
+  MRN invalid-input test no longer narrates the typed invalid value. Syncfusion
+  raw-versus-formatted mask comments remain because they explain the vendor
+  boundary under test.
 - Resolved on `tiny-safe-but-important-refactorings`: CoreBehaviors event and
   payload tests no longer use XML summaries for test-class navigation. Concise
   comments remain only for dispatch-chain intent, payload casing, trace/order

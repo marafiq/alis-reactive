@@ -55,7 +55,6 @@ public class WhenInPlaceEditorQuickEditCommitsMaskedMrn : PlaywrightTestBase
         var inner = Page.Locator("#card-mrn input.e-maskedtextbox").First;
         await Expect(inner).ToBeVisibleAsync(new() { Timeout = 5000 });
 
-        // Type only 2 letters + 4 digits — fails the ^[A-Z]{3}\d{4}$ rule.
         await inner.FillAsync("");
         await inner.PressSequentiallyAsync("AB1234");
 
