@@ -117,16 +117,30 @@ jobs:
           $iis = "$env:ProgramFiles\IIS Express\iisexpress.exe"
           if (-not (Test-Path $iis)) { $iis = "${env:ProgramFiles(x86)}\IIS Express\iisexpress.exe" }
           $app = Join-Path $PWD "examples/net48-mvc-smoke"
+          $log = Join-Path $PWD "iisexpress.out.log"
+          $errlog = Join-Path $PWD "iisexpress.err.log"
           Write-Host "IIS Express: $iis"
           Write-Host "App path:    $app"
-          $proc = Start-Process -FilePath $iis -ArgumentList "/path:$app","/port:5000" -PassThru
+          $proc = Start-Process -FilePath $iis -ArgumentList "/path:$app","/port:5000","/systray:false" -PassThru -RedirectStandardOutput $log -RedirectStandardError $errlog
           try {
-            $ready = $false
-            for ($i = 0; $i -lt 30; $i++) {
-              try { Invoke-WebRequest "http://localhost:5000/" -UseBasicParsing -TimeoutSec 3 | Out-Null; $ready = $true; break }
-              catch { Start-Sleep -Seconds 2 }
+            $ready = $false; $resp = $null
+            for ($i = 0; $i -lt 40; $i++) {
+              try {
+                # -SkipHttpErrorCheck: a 500 startup error still means the server is UP — we want to
+                # SEE that body, not retry forever as if the port were dead.
+                $resp = Invoke-WebRequest "http://localhost:5000/" -UseBasicParsing -TimeoutSec 4 -SkipHttpErrorCheck
+                if ($resp.StatusCode -ge 200) { $ready = $true; break }
+              } catch { Start-Sleep -Seconds 2 }
             }
-            if (-not $ready) { throw "IIS Express did not become ready on http://localhost:5000/" }
+            Write-Host "=== IIS Express stdout ==="; if (Test-Path $log) { Get-Content $log }
+            Write-Host "=== IIS Express stderr ==="; if (Test-Path $errlog) { Get-Content $errlog }
+            if (-not $ready) { throw "IIS Express never responded on http://localhost:5000/ (port dead)." }
+            Write-Host "HTTP status: $($resp.StatusCode)"
+            if ($resp.StatusCode -ge 400) {
+              Write-Host "=== response body (first 4000 chars) ==="
+              Write-Host ($resp.Content.Substring(0, [Math]::Min(4000, $resp.Content.Length)))
+              throw "App returned HTTP $($resp.StatusCode) on / — see the error body above."
+            }
             $env:SMOKE_URL = "http://localhost:5000/"
             $env:SCREENSHOT = "$app\net48-smoke.png"
             node examples/net48-mvc-smoke/ci/verify.mjs
