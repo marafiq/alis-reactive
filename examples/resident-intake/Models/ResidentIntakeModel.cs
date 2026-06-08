@@ -6,9 +6,9 @@ public class ResidentIntakeModel
     public string? LastName { get; set; }
     public DateTime? DateOfBirth { get; set; }
 
-    public string? FacilityId { get; set; }
-    public string? UnitId { get; set; }
-    public string? CareLevel { get; set; }
+    public string FacilityId { get; set; } = string.Empty;
+    public string UnitId { get; set; } = string.Empty;
+    public string CareLevel { get; set; } = string.Empty;
     public DateTime? AdmissionDate { get; set; }
     public decimal? MonthlyRate { get; set; }
 
