@@ -104,6 +104,40 @@ jobs:
           if (-not (Test-Path "$dir/alis-reactive.1.0.0-rc.1.js")) { throw "runtime JS did not land in Content\alisreactive" }
           if (-not (Test-Path "$dir/design-system.1.0.0-rc.1.css")) { throw "design-system CSS did not land in Content\alisreactive" }
 
+      - name: Generate web.config binding redirects from the built bin assemblies
+        shell: pwsh
+        # Classic net48 web apps do not auto-add binding redirects for PackageReference transitives
+        # (the System.Text.Json 9 dependency chain). Rather than hand-guess versions, derive an exact
+        # redirect for every strong-named assembly actually in bin\ and rewrite web.config's <runtime>.
+        run: |
+          $bin = "examples/net48-mvc-smoke/bin"
+          $cfgPath = (Resolve-Path "examples/net48-mvc-smoke/Web.config").Path
+          $ns = "urn:schemas-microsoft-com:asm.v1"
+          [xml]$doc = Get-Content $cfgPath
+          $runtime = $doc.configuration.runtime
+          if (-not $runtime) { $runtime = $doc.CreateElement("runtime"); $doc.configuration.AppendChild($runtime) | Out-Null }
+          $runtime.RemoveAll()
+          $ab = $doc.CreateElement("assemblyBinding", $ns)
+          $runtime.AppendChild($ab) | Out-Null
+          Get-ChildItem "$bin\*.dll" | ForEach-Object {
+            try {
+              $an = [System.Reflection.AssemblyName]::GetAssemblyName($_.FullName)
+              $tok = $an.GetPublicKeyToken()
+              if (-not $tok -or $tok.Length -eq 0) { return }
+              $token = ($tok | ForEach-Object { $_.ToString("x2") }) -join ""
+              $v = $an.Version.ToString()
+              $da = $doc.CreateElement("dependentAssembly", $ns)
+              $id = $doc.CreateElement("assemblyIdentity", $ns)
+              $id.SetAttribute("name", $an.Name); $id.SetAttribute("publicKeyToken", $token); $id.SetAttribute("culture", "neutral")
+              $br = $doc.CreateElement("bindingRedirect", $ns)
+              $br.SetAttribute("oldVersion", "0.0.0.0-$v"); $br.SetAttribute("newVersion", $v)
+              $da.AppendChild($id) | Out-Null; $da.AppendChild($br) | Out-Null
+              $ab.AppendChild($da) | Out-Null
+              Write-Host "redirect: $($an.Name) -> $v"
+            } catch { Write-Host "skip $($_.Name): $($_.Exception.Message)" }
+          }
+          $doc.Save($cfgPath)
+
       - name: Install Playwright (node) + chromium
         shell: bash
         run: |
