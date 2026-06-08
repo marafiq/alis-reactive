@@ -11,8 +11,8 @@
     <div style="max-width: 720px; margin: 2rem auto; padding: 0 1rem;">
         @RenderBody()
     </div>
-    <!-- Runtime JS landed by the package targets. root.ts auto-discovers the [data-reactive-plan]
-         script element @Html.RenderPlan emits and boots the plan — no inline script needed. -->
+    @* Runtime JS landed by the package targets. root.ts auto-discovers the [data-reactive-plan]
+       script element that RenderPlan emits and boots the plan - no inline script needed. *@
     <script src="@Url.Content("~/Content/alisreactive/alis-reactive.1.0.0-rc.1.js")"></script>
 </body>
 </html>
