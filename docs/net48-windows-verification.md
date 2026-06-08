@@ -1,11 +1,16 @@
-# net48 Runtime Verification — Windows Checklist (RC1)
+# net48 Runtime Verification — Windows (RC1)
 
-**Status: NOT YET DONE — requires an interactive Windows machine.** The build + pack of net48 on
-real .NET Framework 4.8 is already proven in CI (`.github/workflows/verify-net48.yml`, runs on
-`windows-latest`). What is **not** yet proven is *runtime behavior* of a classic, old-style
-(non-SDK, `packages.config`) ASP.NET MVC 5 web app consuming the packages — that needs IIS Express
-and a browser on Windows. Mono/macOS is **not** a faithful .NET Framework host and must not be used
-to claim this done.
+**Status: AUTOMATED in CI.** The classic ASP.NET MVC 5 / .NET Framework 4.8 runtime proof now runs on
+`windows-latest` in `.github/workflows/verify-net48.yml` (`net48-runtime-iis` job): it builds
+`examples/net48-mvc-smoke`, hosts it under **IIS Express**, drives it with **Playwright**, and uploads
+a screenshot. See `examples/net48-mvc-smoke/README.md` for the known net48 consumer gotchas this
+surfaced and how each is fixed (asset landing, System.Text.Json 9 binding redirects,
+`WebApplication.targets`/`VSToolsPath`, Native Html-helpers vs Tag Helpers, Razor `@` in comments).
+Mono/macOS is **not** a faithful .NET Framework host and must not be used to claim this done — that is
+why it runs on a real Windows runner.
+
+The manual checklist below remains the reference for the surfaces the automated smoke does not yet
+cover (Syncfusion `.Render()`, the validation bridge).
 
 This checklist closes the five net48 runtime items the RC1 audit surfaced. Run it on Windows with
 Visual Studio (or MSBuild + IIS Express) and .NET Framework 4.8 installed.
