@@ -9,18 +9,18 @@ Every change flows through layers. Each has skills, thinking, and a test harness
 A failing test drives every boundary crossing.
 
 ```
-Layer 1: C# Descriptors & Builders
+Layer 1: C# Plan Domain & Builders
    │  Skills: TDD, modern-csharp, dotnet-xml-docs
    │  Verify: Value Objects, Encapsulation, Serialization impact, SOLID
-   │  Harness: VerifyJson snapshots + AssertSchemaValid
+   │  Harness: plan-domain behavior proven through the Playwright suite (boots real plans)
    │
-   ▼  BOUNDARY: Failing AssertSchemaValid() test drives schema update
+   ▼  BOUNDARY: C# plan shape change → regenerate runtime/types/plan.ts (PlanTypeGenerator)
    │
-Layer 2: JSON Schema (reactive-plan.schema.json)
-   │  The contract. A failing test is the only reason to edit this file.
-   │  Harness: 70 AssertSchemaValid() calls + additionalProperties: false
+Layer 2: Generated TypeScript Plan Contract (runtime/types/plan.ts)
+   │  Generated from the C# plan domain by PlanTypeGenerator. Never hand-edited; JSON schema retired.
+   │  Harness: npm run typecheck — the gate that the contract stays aligned with C#
    │
-   ▼  BOUNDARY: Schema change → failing vitest drives TS type update
+   ▼  BOUNDARY: contract change → failing vitest drives runtime handler update
    │
 Layer 3: TS Types → TS Runtime
    │  Skills: solid-ts-audit
@@ -48,7 +48,7 @@ The harness tracks which layers are verified and which still need work.
 ## Speed Gate
 
 Before editing any file: read it first.
-Before editing schema: have a failing test requiring the change.
+Before changing plan shape: regenerate the TS contract and run typecheck.
 Before committing: verify in browser.
 Before accepting a review finding: trace the code path yourself.
 Before dispatching an agent: specify input evidence and output evidence.
@@ -74,7 +74,7 @@ The validation session took 26 fix commits in one day because the design was dis
 At every boundary crossing, define:
 
 - **Input evidence**: what proves this change is needed? (failing test, user request, bug)
-- **Output evidence**: what proves this change is correct? (passing test, browser verified, schema conforms)
+- **Output evidence**: what proves this change is correct? (passing test, browser verified, typecheck clean)
 - **Review evidence**: was this reviewed against actual code, or accepted on trust?
 
 Five documented false alarms from reviewers confirm: always check actual code before

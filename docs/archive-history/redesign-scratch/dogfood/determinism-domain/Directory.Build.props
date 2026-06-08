@@ -1,5 +1,0 @@
-<Project>
-  <!-- Intentionally empty and does NOT import the repo-root Directory.Build.props.
-       Keeps this determinism dogfood proof self-contained and isolated from
-       framework-wide MSBuild settings (versioning, asset packing, central refs). -->
-</Project>

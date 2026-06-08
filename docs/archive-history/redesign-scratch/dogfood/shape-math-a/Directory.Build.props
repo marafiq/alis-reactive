@@ -1,3 +1,0 @@
-<!-- Isolating empty props so this PBT proof does not inherit repo-wide build settings. -->
-<Project>
-</Project>

@@ -35,9 +35,6 @@ tools/FusionOnboarding/wwwroot/onboarding/fusion/{componentName}/discovery/sourc
 | 4 | Syncfusion MVC XML/builder | decides what remains builder-owned |
 | 5 | Syncfusion docs/skills | accelerates setup only; never replaces proof |
 
-`tools/SyncfusionOnboarding` is not a source of truth for the workflow. Use it
-only when a current proof pass validates a specific file as vendor evidence.
-
 ## Hard Rule
 
 Do not start C# until these facts are written down:

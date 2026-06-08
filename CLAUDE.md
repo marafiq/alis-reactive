@@ -148,7 +148,8 @@ C# `Render()` serializes the plan to JSON inside a `<script type="application/js
 data-reactive-plan>` element. The runtime discovers these elements, parses the JSON, merges
 partials by `planId`, and boots each composed plan. Sandbox URL: `http://localhost:5220`.
 
-`WriteOnlyPolymorphicConverter<T>` enables polymorphic serialization by delegating to the
+`PlanNodeDiscriminator<T>` (`Alis.Reactive/Serialization/PlanNodeDiscriminator.cs`) enables
+polymorphic serialization by delegating to the
 concrete type via `JsonSerializer.Serialize(writer, value, value.GetType(), options)`. Each
 concrete plan model class carries its own `kind` property (e.g., `public string Kind => "set"`)
 which becomes the discriminator in the JSON, matched by TypeScript discriminated unions.
@@ -288,11 +289,10 @@ source and this root file override stale skill guidance.
 | `modern-csharp` | C# 14 patterns that clarify the rich plan domain model |
 | `bdd-testing` | Playwright BDD tests, 5 rules, 7-behavior contract, blind reviewer |
 
-10 hookify rules in `.claude/hookify.*.local.md` enforce quality gates automatically:
-`enforce-csharp8`, `no-public-in-libraries`, `no-raw-inputs`, `bdd-test-enforcement`,
-`bdd-public-api-only`, `xml-docs-quality`, `commit-requires-relevant-tests`,
-`merge-requires-all-tests` (8 active). `no-js-in-views` and `protect-api-surface` exist
-but are currently disabled (`enabled: false`).
+11 hookify rule templates live in `.claude/hookify.*.local.md`. **All are currently disabled
+(`enabled: false`)** — they document candidate quality gates but do not actively enforce anything.
+Enable one by setting `enabled: true` if you want it to run. The public-contract-freeze rules
+(`protect-api-surface`, `no-public-in-libraries`) were removed as noise.
 
 ## Rules
 
@@ -311,7 +311,7 @@ No inline `<script>` blocks — `root.ts` handles discovery and boot automatical
 ### 3. New or Changed Primitive — All Layers
 
 1. C# plan model class — sealed class, `internal` constructor
-2. Polymorphic registration — `WriteOnlyPolymorphicConverter` delegates to concrete type
+2. Polymorphic registration — `PlanNodeDiscriminator<T>` delegates to concrete type
 3. Builder method — PipelineBuilder, ElementBuilder, or TriggerBuilder
 4. Generated TS plan contract — `PlanTypeGenerator` output stays aligned with C#
 5. Runtime handler — new switch case + `assertNever`

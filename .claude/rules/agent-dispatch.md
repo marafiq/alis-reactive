@@ -10,15 +10,15 @@ evidence contract that prevents false alarms, wasted effort, and architecture re
 
 | Layer | Skills to Load | Test Command | Evidence Format |
 |-------|---------------|--------------|-----------------|
-| 1 C# | modern-csharp, bdd-testing (TDD principles) | `dotnet test tests/Alis.Reactive.UnitTests` | AssertSchemaValid() + file:line |
-| 2 Schema | (contract file) | `dotnet test` (70 AssertSchemaValid calls) | Schema diff + failing test output |
+| 1 C# | modern-csharp, bdd-testing (TDD principles) | `scripts/playwright.sh` | Playwright behavior + file:line |
+| 2 Contract | PlanTypeGenerator output | `npm run typecheck` | regenerated `plan.ts` matches C# |
 | 3 TS | solid-ts-audit | `npm test` | vitest output + file:line |
 | 4 Browser | bdd-testing | Playwright tests | Browser state + test name |
 | 5 Docs | dotnet-xml-docs | Rider diagnostics | Sandbox-verified code example |
 
-**Boundary triggers** (each requires a failing test as proof):
-- 1→2: Failing `AssertSchemaValid()` drives schema edit
-- 2→3: Failing vitest drives TS type update
+**Boundary triggers** (each guarded by evidence):
+- 1→2: C# plan-shape change → regenerate `runtime/types/plan.ts`; `npm run typecheck`
+- 2→3: Failing vitest drives the runtime handler
 - 3→4: Eyes first in browser, then Playwright
 - 4→5: Working sandbox example before writing docs
 
@@ -57,10 +57,11 @@ Output evidence: [what proves this change is correct]
 Guardrails:
 - Touching an unexpected layer means the plan is wrong — stop and return to planning.
   Why: wizard session had 3 architecture changes in 30 minutes without a plan.
-- A failing test drives every boundary crossing.
-  Why: 3 schema drift incidents were discovered by accident, not by process.
+- Drive every boundary crossing with evidence: regenerate the TS contract + typecheck for
+  C#→runtime, a failing vitest for runtime, eyes-in-browser for page behavior.
+  Why: a hand-maintained contract drifts from C# silently — generation makes drift a typecheck failure.
 - Verify in browser before claiming done.
-  Why: C# unit tests caught 11 bugs; Playwright caught 1. Browser catches more.
+  Why: a quick browser check repeatedly caught more real bugs than elaborate test infrastructure.
 - After 2 fail rounds, stop coding and WebSearch.
   Why: 2 days of guessing vs 5 minutes of research (M9 in forensic index).
 ```
@@ -70,9 +71,9 @@ Guardrails:
 Task: Add "toggle-class" command to reactive pipeline
 Layers: 1, 2, 3, 4, 5 | Crossings: 1→2, 2→3, 3→4, 4→5
 Skills: modern-csharp, dotnet-xml-docs, solid-ts-audit, bdd-testing
-Read first: existing command descriptors, schema commands section, TS commands.ts
-Input evidence: User request + no existing toggle-class in schema
-Output evidence: VerifyJson snapshot, AssertSchemaValid passes, vitest passes, Playwright passes
+Read first: existing reaction plan models, generated `runtime/types/plan.ts`, TS runtime handlers
+Input evidence: User request + no existing toggle-class reaction in the plan domain
+Output evidence: regenerated plan.ts + typecheck clean, vitest passes, Playwright passes
 ```
 
 **Example B — Single-Layer Refactor:**
@@ -128,7 +129,7 @@ Output design:
 - Verify against actual code before accepting any finding.
 
 Coverage completeness (MANDATORY for test suite reviews):
-- List every item in the scope (schema $defs, TS exports, API members, etc.)
+- List every item in the scope (plan-node kinds, generated TS union variants, API members, etc.)
 - Map each to the test that covers it — by name, not by assumption
 - Report uncovered items as findings ranked by risk
 - "All tests pass" is not a sign-off. "All items are covered or justified" is.
@@ -146,11 +147,11 @@ Output: ranked findings with file:line evidence, most impactful first
 
 **Example — Test Suite Review (with coverage gate):**
 ```
-Task: Review drift detection test suite for completeness
-Scope: all $defs in reactive-plan.schema.json (51 definitions)
-Input: tests/Alis.Reactive.DriftDetection.Tests/**/*.cs
-Output: coverage matrix (definition → test name), uncovered items ranked by risk
-Sign-off requires: every definition mapped to a test or justified as untestable
+Task: Review the runtime vitest suite for completeness
+Scope: every plan-node kind the runtime must handle (the generated union variants)
+Input: Alis.Reactive.Assets/runtime/__tests__/**/*.test.ts
+Output: coverage matrix (kind → test name), uncovered kinds ranked by risk
+Sign-off requires: every kind mapped to a test or justified as untestable
 ```
 
 ## Template 4: BDD Agent
@@ -190,8 +191,8 @@ Output evidence: 7-behavior contract covered, blind reviewer passes all tests
 
 | Layer | Example Evidence |
 |-------|-----------------|
-| 1 C# | `src/Alis.Reactive/Commands/ToggleClassCommand.cs:42` — VerifyJson snapshot showing exact JSON |
-| 2 Schema | `"added 'toggle-class' to commands oneOf"` — AssertSchemaValid() failing output |
+| 1 C# | `Alis.Reactive/PlanModel/.../ToggleClassReaction.cs:42` — Playwright shows the plan boots and behaves |
+| 2 Contract | regenerated `runtime/types/plan.ts` — `npm run typecheck` clean (contract matches C#) |
 | 3 TS | `Scripts/execution/commands.ts:187` — vitest: `"FAIL: toggle-class produces correct mutation"` |
 | 4 Browser | `selecting_care_level_updates_billing_amount` — field shows "$2,400" after selecting "Memory Care" |
 | 5 Docs | `/Sandbox/ToggleClass` verified — zero CS1591 warnings in file |

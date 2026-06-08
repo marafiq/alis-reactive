@@ -7,12 +7,9 @@ pattern: git\s+commit
 
 **Tests must pass before committing**
 
-Before any commit, run the relevant test suites for changed files:
+Before any commit, run the relevant gate for the changed area:
 
-- **Changed `Alis.Reactive/`** → `dotnet test tests/Alis.Reactive.UnitTests`
-- **Changed `Alis.Reactive.Native/`** → `dotnet test tests/Alis.Reactive.Native.UnitTests`
-- **Changed `Alis.Reactive.Fusion/`** → `dotnet test tests/Alis.Reactive.Fusion.UnitTests`
-- **Changed `Alis.Reactive.FluentValidator/`** → `dotnet test tests/Alis.Reactive.FluentValidator.UnitTests`
-- **Changed `Scripts/`** → `npm test`
+- **Changed runtime TS (`Alis.Reactive.Assets/runtime/`)** → `npm test`
+- **Changed framework C# or views** → `bash scripts/playwright.sh` (the C# + page-behavior proof), or the full `bash scripts/test.sh`
 
 Skip only if the user explicitly says to commit without tests.

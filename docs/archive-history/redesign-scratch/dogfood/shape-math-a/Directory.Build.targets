@@ -1,3 +1,0 @@
-<!-- Isolating empty targets so this PBT proof does not inherit repo-wide build targets. -->
-<Project>
-</Project>
