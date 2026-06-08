@@ -82,6 +82,10 @@
   </ItemGroup>
   <PropertyGroup>
     <AlisReactiveVersion Condition="'$(AlisReactiveVersion)' == ''">1.0.0-rc.1</AlisReactiveVersion>
+    <!-- Point the WebApplication targets import at the VS2022 web workload (the runner's MSBuild
+         leaves $(VSToolsPath) at a wrong default, causing MSB4226). -->
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">17.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
