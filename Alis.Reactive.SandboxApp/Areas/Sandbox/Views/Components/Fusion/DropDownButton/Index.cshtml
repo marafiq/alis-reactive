@@ -1,5 +1,4 @@
 @model FusionDropDownButtonModel
-@using Alis.Reactive.Builders.Requests
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
@@ -127,7 +126,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var menu = p.Component<FusionDropDownButton>(menuId);
-                p.Post("/Sandbox/Components/FusionDropDownButton/Echo")
+                p.Post(Url.SandboxRoute("Echo", "DropDownButton"))
                     .Gather(g =>
                     {
                         g.Include(menu.Content(), "content");

@@ -1,5 +1,3 @@
-using Microsoft.Playwright;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
 // Lifecycle event tests prove typed Syncfusion args reach page-visible trace cells.

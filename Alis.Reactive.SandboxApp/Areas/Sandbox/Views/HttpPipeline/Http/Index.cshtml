@@ -1,5 +1,4 @@
 @model HttpShowcaseModel
-@using Alis.Reactive
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
@@ -8,7 +7,7 @@
     var plan = Html.ReactivePlan<HttpShowcaseModel>();
 
     Html.On(plan, t => t.DomReady(p =>
-        p.Get("/Sandbox/HttpPipeline/Http/Residents")
+        p.Get(Url.SandboxRoute("Residents", "Http"))
          .WhileLoading(l => l.Element("load-spinner").Show())
          .Response(r => r
             .OnSuccess<ResidentsResponse>((json, s) =>
@@ -23,7 +22,7 @@
     ));
 
     Html.On(plan, t => t.CustomEvent("native-action-link-grid-refresh", p =>
-        p.Get("/Sandbox/HttpPipeline/Http/NativeActionLinkGrid")
+        p.Get(Url.SandboxRoute("NativeActionLinkGrid", "Http"))
          .Response(r => r.OnSuccess(s => s.Into("native-action-link-grid")))
     ));
 
@@ -74,7 +73,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/HttpPipeline/Http/Save", g => g.Static("name", "John Doe"))
+                p.Post(Url.SandboxRoute("Save", "Http"), g => g.Static("name", "John Doe"))
                  .WhileLoading(l => l.Element("save-spinner").Show())
                  .Response(r => r
                     .OnSuccess<SaveResponse>((json, s) =>
@@ -111,7 +110,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Get("/Sandbox/HttpPipeline/Http/Residents")
+                p.Get(Url.SandboxRoute("Residents", "Http"))
                  .WhileLoading(l => l.Element("chain-spinner").Show())
                  .Response(r => r
                     .OnSuccess<ResidentsResponse>((json, s) =>
@@ -121,7 +120,7 @@
                         s.Element("chain-residents").AddClass("text-green-600");
                     })
                     .Chained(c => c
-                        .Get("/Sandbox/HttpPipeline/Http/Facilities")
+                        .Get(Url.SandboxRoute("Facilities", "Http"))
                         .Response(r2 => r2
                             .OnSuccess<FacilitiesResponse>((json2, s2) =>
                             {
@@ -158,14 +157,14 @@
             {
                 p.Element("parallel-spinner").Show();
                 p.Parallel(
-                    a => a.Get("/Sandbox/HttpPipeline/Http/Residents")
+                    a => a.Get(Url.SandboxRoute("Residents", "Http"))
                           .Response(ra => ra.OnSuccess<ResidentsResponse>((json, sa) =>
                           {
                               sa.Element("parallel-resident-first").SetText(json, x => x.First);
                               sa.Element("parallel-resident-second").SetText(json, x => x.Second);
                               sa.Element("parallel-residents").AddClass("text-green-600");
                           })),
-                    b => b.Get("/Sandbox/HttpPipeline/Http/Facilities")
+                    b => b.Get(Url.SandboxRoute("Facilities", "Http"))
                           .Response(rb => rb.OnSuccess<FacilitiesResponse>((json, sb) =>
                           {
                               sb.Element("parallel-facility-first").SetText(json, x => x.First);
@@ -202,7 +201,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Put("/Sandbox/HttpPipeline/Http/UpdateResident", g => g
+                p.Put(Url.SandboxRoute("UpdateResident", "Http"), g => g
                     .Static("name", "Updated Name")
                     .Static("facilityId", "1"))
                  .WhileLoading(l => l.Element("put-spinner").Show())
@@ -241,7 +240,7 @@
                 p.Confirm("Are you sure you want to delete resident #42?")
                  .Then(t =>
                  {
-                    t.Delete("/Sandbox/HttpPipeline/Http/DeleteResident/42")
+                    t.Delete(Url.SandboxRoute("DeleteResident", "Http", new { id = 42 }))
                      .WhileLoading(l => l.Element("delete-spinner").Show())
                      .Response(r => r
                         .OnSuccess<DeleteResponse>((json, s) =>
@@ -283,7 +282,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/HttpPipeline/Http/SaveFormData", g => g
+                p.Post(Url.SandboxRoute("SaveFormData", "Http"), g => g
                     .Static("FirstName", "John")
                     .Static("LastName", "Doe")
                     .Static("Email", "john@example.com"))
@@ -314,7 +313,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Get("/Sandbox/HttpPipeline/Http/Search")
+                p.Get(Url.SandboxRoute("Search", "Http"))
                  .Gather(g => g.Static("q", "John"))
                  .WhileLoading(l => l.Element("search-spinner").Show())
                  .Response(r => r
@@ -343,7 +342,7 @@
             .CssClass("rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/HttpPipeline/Http/ValidateResident", g => g
+                p.Post(Url.SandboxRoute("ValidateResident", "Http"), g => g
                     .Static("name", "")
                     .Static("facilityId", ""))
                  .WhileLoading(l => l.Element("multi-err-spinner").Show())
@@ -393,8 +392,8 @@
         <native-heading level="H2">11. NativeActionLink &rarr; Standalone Single Action</native-heading>
         <p class="text-sm text-text-secondary mb-3">A single native action link can also execute one request chain on its own and load a success fragment directly into a local target.</p>
         <native-hstack gap="Base">
-            @(Html.NativeActionLink("Run Standalone NativeActionLink", "/Sandbox/HttpPipeline/Http/StandaloneNativeActionLink", p => p
-                .Post("/Sandbox/HttpPipeline/Http/StandaloneNativeActionLink", g => g.Static("command", "run"))
+            @(Html.NativeActionLink("Run Standalone NativeActionLink", Url.SandboxRoute("StandaloneNativeActionLink", "Http"), p => p
+                .Post(Url.SandboxRoute("StandaloneNativeActionLink", "Http"), g => g.Static("command", "run"))
                 .WhileLoading(x => x.Element("standalone-native-action-link-status").SetText("Running standalone NativeActionLink..."))
                 .Response(r => r
                     .OnSuccess(x =>
@@ -421,7 +420,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Get("/Sandbox/HttpPipeline/Http/UrlParamEcho")
+                p.Get(Url.SandboxRoute("UrlParamEcho", "Http"))
                  .Gather(g => g
                      .FromUrl("tab")
                      .FromUrl("facilityId"))
@@ -471,7 +470,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Get("/Sandbox/HttpPipeline/Http/ComposeEcho/{id}")
+                p.Get(Url.SandboxRouteTemplate("ComposeEcho", "Http", "id"))
                  .Gather(g => g
                      .RouteParam("id", p.FromUrl<int>("residentId"))
                      .Header("X-Tab", p.FromUrl("tab"))
@@ -490,12 +489,12 @@
             .CssClass("ml-2 rounded-md bg-surface-alt px-4 py-2 text-sm font-medium text-text-primary border border-border hover:bg-surface-hover transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Get("/Sandbox/HttpPipeline/Http/Residents/{id}")
+                p.Get(Url.SandboxRouteTemplate("ResidentById", "Http", "id"))
                  .Gather(g => g.RouteParam("id", p.FromUrl<int>("residentId")))
                  .Response(r => r
                     .OnSuccess<ResidentByIdResponse>((json, s) =>
                     {
-                        s.Get("/Sandbox/HttpPipeline/Http/Facilities/{facilityId}/Residents/{residentId}")
+                        s.Get(Url.SandboxRouteTemplate("FacilityResident", "Http", "facilityId", "residentId"))
                          .Gather(g => g
                             .RouteParam("facilityId", s.FromUrl<int>("facilityId"))
                             .RouteParam("residentId", json.Read(x => x.ResidentId)))
@@ -524,7 +523,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Get("/Sandbox/HttpPipeline/Http/Residents/{id}")
+                p.Get(Url.SandboxRouteTemplate("ResidentById", "Http", "id"))
                  .Gather(g => g.RouteParam("id", 42))
                  .WhileLoading(l => l.Element("route-single-spinner").Show())
                  .Response(r => r
@@ -553,7 +552,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Get("/Sandbox/HttpPipeline/Http/Facilities/{facilityId}/Residents/{residentId}")
+                p.Get(Url.SandboxRouteTemplate("FacilityResident", "Http", "facilityId", "residentId"))
                  .Gather(g => g
                      .RouteParam("facilityId", 7)
                      .RouteParam("residentId", 99))
@@ -586,7 +585,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Get("/Sandbox/HttpPipeline/Http/Residents/{id}")
+                p.Get(Url.SandboxRouteTemplate("ResidentById", "Http", "id"))
                  .Gather(g => g
                      .RouteParam("id", 42)
                      .Header("X-Step", "first"))
@@ -596,7 +595,7 @@
                     {
                         s.Element("route-chain-first-id").SetText(json, x => x.ResidentId);
                         s.Element("route-chain-first").AddClass("text-green-600");
-                        s.Get("/Sandbox/HttpPipeline/Http/Facilities/{facilityId}/Residents/{residentId}")
+                        s.Get(Url.SandboxRouteTemplate("FacilityResident", "Http", "facilityId", "residentId"))
                          .Gather(g2 => g2
                              .RouteParam("facilityId", 3)
                              .RouteParam("residentId", json.Read(x => x.ResidentId))
@@ -632,7 +631,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Get("/Sandbox/HttpPipeline/Http/ResidentByName/{name}")
+                p.Get(Url.SandboxRouteTemplate("ResidentByName", "Http", "name"))
                  .Gather(g => g.RouteParam("name", "John Doe"))
                  .Response(r => r
                     .OnSuccess<ResidentByNameResponse>((json, s) =>
@@ -657,7 +656,7 @@
 
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Get("/Sandbox/HttpPipeline/Http/EchoHeaders")
+                p.Get(Url.SandboxRoute("EchoHeadersPost", "Http"))
                  .Gather(g => g
                      .Header("X-Api-Version", "2024-01-15")
                      .Header("X-Request-Id", "test-header-123")
@@ -692,7 +691,7 @@
 
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Get("/Sandbox/HttpPipeline/Http/EchoHeaders")
+                p.Get(Url.SandboxRoute("EchoHeadersPost", "Http"))
                  .Gather(g => g
                      .Header("X-Api-Version", "chain-v1")
                      .Header("X-Request-Id", "chain-req-1"))
@@ -705,7 +704,7 @@
                         s.Element("header-chain-first").AddClass("text-green-600");
                     })
                     .Chained(c => c
-                        .Post("/Sandbox/HttpPipeline/Http/EchoHeaders")
+                        .Post(Url.SandboxRoute("EchoHeadersPost", "Http"))
                         .Gather(g2 => g2
                             .Header("X-Api-Version", "chain-v2")
                             .Header("X-Tenant-Id", "chain-tenant-99")
@@ -747,7 +746,7 @@
             {
                 p.Element("header-parallel-spinner").Show();
                 p.Parallel(
-                    a => a.Get("/Sandbox/HttpPipeline/Http/EchoHeaders")
+                    a => a.Get(Url.SandboxRoute("EchoHeadersPost", "Http"))
                           .Gather(g => g
                               .Header("X-Api-Version", "parallel-a")
                               .Header("X-Request-Id", "parallel-req-a"))
@@ -757,7 +756,7 @@
                               sa.Element("header-parallel-a-id").SetText(json, x => x.RequestId);
                               sa.Element("header-parallel-a").AddClass("text-green-600");
                           })),
-                    b => b.Get("/Sandbox/HttpPipeline/Http/EchoHeaders")
+                    b => b.Get(Url.SandboxRoute("EchoHeadersPost", "Http"))
                           .Gather(g => g
                               .Header("X-Api-Version", "parallel-b")
                               .Header("X-Tenant-Id", "parallel-tenant-b"))
@@ -801,7 +800,7 @@
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post("/Sandbox/HttpPipeline/Http/FlakyEndpoint", g => g.Static("name", "John"))
+                    p.Post(Url.SandboxRoute("FlakyEndpoint", "Http"), g => g.Static("name", "John"))
                      .WhileLoading(l => l.Element("finally-spinner").Show())
                      .Response(r => r
                         .OnSuccess(s =>
@@ -817,7 +816,7 @@
                 .CssClass("rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post("/Sandbox/HttpPipeline/Http/FlakyEndpoint", g => g.Static("name", "fail"))
+                    p.Post(Url.SandboxRoute("FlakyEndpoint", "Http"), g => g.Static("name", "fail"))
                      .WhileLoading(l => l.Element("finally-spinner").Show())
                      .Response(r => r
                         .OnError(500, e =>

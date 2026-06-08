@@ -115,7 +115,7 @@
                 p.When(args, x => x.IsExpanded).Truthy()
                     .And(args, x => x.Index).Eq(0)
                     .Then(t => t
-                        .Get("/Sandbox/Components/Accordion/OverviewPartial")
+                        .Get(Url.SandboxRoute("OverviewPartial", "Accordion"))
                         .Response(r => r.OnSuccess(s =>
                         {
                             s.Into("lazy-panel-0");
@@ -125,7 +125,7 @@
                 p.When(args, x => x.IsExpanded).Truthy()
                     .And(args, x => x.Index).Eq(1)
                     .Then(t => t
-                        .Get("/Sandbox/Components/Accordion/CareLevelsPartial")
+                        .Get(Url.SandboxRoute("CareLevelsPartial", "Accordion"))
                         .Response(r => r.OnSuccess(s =>
                         {
                             s.Into("lazy-panel-1");
@@ -135,7 +135,7 @@
                 p.When(args, x => x.IsExpanded).Truthy()
                     .And(args, x => x.Index).Eq(2)
                     .Then(t => t
-                        .Get("/Sandbox/Components/Accordion/ContactPartial")
+                        .Get(Url.SandboxRoute("ContactPartial", "Accordion"))
                         .Response(r => r.OnSuccess(s =>
                         {
                             s.Into("lazy-panel-2");

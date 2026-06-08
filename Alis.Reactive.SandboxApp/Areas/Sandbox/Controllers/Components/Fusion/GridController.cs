@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.Fusion.Components;
@@ -49,6 +46,22 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new ResidentGridEditingModel());
         }
 
+        [HttpGet("ActionCompleteSaveEdit")]
+        public IActionResult ActionCompleteSaveEdit()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/ActionCompleteSaveEdit.cshtml",
+                new ResidentGridEditingModel());
+        }
+
+        [HttpGet("BeginEditNormal")]
+        public IActionResult BeginEditNormal()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/BeginEditNormal.cshtml",
+                new ResidentGridEditingModel());
+        }
+
         [HttpGet("Operations")]
         public IActionResult Operations()
         {
@@ -61,6 +74,175 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                     PatchRiskLevel = "High",
                     PatchOpenTasks = 6
                 });
+        }
+
+        [HttpGet("CareStaffColumns")]
+        public IActionResult CareStaffColumns()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/CareStaffColumns.cshtml",
+                new GridOperationsModel());
+        }
+
+        [HttpGet("BatchTaskUpdate")]
+        public IActionResult BatchTaskUpdate()
+        {
+            ViewBag.EditRows = ResidentDirectory.Take(8).Select(ToGridItem).ToList();
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/BatchTaskUpdate.cshtml",
+                new ResidentGridEditingModel());
+        }
+
+        [HttpGet("InlineEdit")]
+        public IActionResult InlineEdit()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/InlineEdit.cshtml",
+                new ResidentGridEditingModel());
+        }
+
+        [HttpGet("RosterCrud")]
+        public IActionResult RosterCrud()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/RosterCrud.cshtml",
+                new ResidentGridEditingModel());
+        }
+
+        [HttpGet("RosterSelection")]
+        public IActionResult RosterSelection()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/RosterSelection.cshtml",
+                new GridOperationsModel());
+        }
+
+        [HttpGet("KeyedUpdate")]
+        public IActionResult KeyedUpdate()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/KeyedUpdate.cshtml",
+                new GridOperationsModel());
+        }
+
+        [HttpGet("CareReview")]
+        public IActionResult CareReview()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/CareReview.cshtml",
+                new GridOperationsModel());
+        }
+
+        [HttpGet("GridTooling")]
+        public IActionResult GridTooling()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/GridTooling.cshtml",
+                new GridOperationsModel());
+        }
+
+        [HttpGet("RosterExport")]
+        public IActionResult RosterExport()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/RosterExport.cshtml",
+                new GridOperationsModel());
+        }
+
+        [HttpGet("ColumnFit")]
+        public IActionResult ColumnFit()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/ColumnFit.cshtml",
+                new GridOperationsModel());
+        }
+
+        [HttpGet("BatchRiskReview")]
+        public IActionResult BatchRiskReview()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/BatchRiskReview.cshtml",
+                new ResidentGridEditingModel());
+        }
+
+        [HttpGet("LockedResidentEdit")]
+        public IActionResult LockedResidentEdit()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/LockedResidentEdit.cshtml",
+                new ResidentGridEditingModel());
+        }
+
+        [HttpGet("BatchCellEdit")]
+        public IActionResult BatchCellEdit()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/BatchCellEdit.cshtml",
+                new ResidentGridEditingModel());
+        }
+
+        [HttpGet("BatchRosterChange")]
+        public IActionResult BatchRosterChange()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/BatchRosterChange.cshtml",
+                new ResidentGridEditingModel());
+        }
+
+        [HttpGet("ResidentEditForm")]
+        public IActionResult ResidentEditForm()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/ResidentEditForm.cshtml",
+                new ResidentGridEditingModel());
+        }
+
+        [HttpGet("ResidentAdmissionAudit")]
+        public IActionResult ResidentAdmissionAudit()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/ResidentAdmissionAudit.cshtml",
+                new ResidentGridEditingModel());
+        }
+
+        [HttpGet("ServerRoster")]
+        public IActionResult ServerRoster()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/ServerRoster.cshtml",
+                new ResidentGridEditingModel());
+        }
+
+        [HttpGet("BuilderRoster")]
+        public IActionResult BuilderRoster()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/BuilderRoster.cshtml",
+                new ResidentGridEditingModel());
+        }
+
+        [HttpGet("BatchChangeReview")]
+        public IActionResult BatchChangeReview()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/BatchChangeReview.cshtml",
+                new ResidentGridEditingModel());
+        }
+
+        [HttpGet("RemoteAdaptorRoster")]
+        public IActionResult RemoteAdaptorRoster()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/RemoteAdaptorRoster.cshtml",
+                new ResidentGridEditingModel());
+        }
+
+        [HttpGet("PrintableRoster")]
+        public IActionResult PrintableRoster()
+        {
+            return View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/PrintableRoster.cshtml",
+                new ResidentGridEditingModel());
         }
 
         [HttpGet("EditingRows")]
@@ -275,6 +457,32 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
+        [HttpPost("NestedRoster")]
+        public IActionResult NestedRoster()
+        {
+            var page = ResidentDirectory.Take(8).Select(ToGridItem).ToList();
+            return Ok(new ResidentRosterEnvelope
+            {
+                Page = new ResidentDirectoryResponse { Result = page, Count = page.Count }
+            });
+        }
+
+        [HttpPost("UpdateFirstResidentRow")]
+        public IActionResult UpdateFirstResidentRow()
+        {
+            // Key-preserving update: the row keeps resident 6000's primary key so
+            // grid.updateRow replaces the row in place rather than changing its identity.
+            var row = ToGridItem(ResidentDirectory[0]);
+            row.ResidentName = "Amina Server Updated";
+            row.RiskLevel = "High";
+            row.PrimaryNurse = "Clinical Review Team";
+            return Ok(new ResidentGridEditResponse
+            {
+                Row = row,
+                Summary = $"{row.ResidentName} updated on the server"
+            });
+        }
+
         [HttpPost("CreateEditResident")]
         public IActionResult CreateEditResident()
         {
@@ -429,9 +637,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                     return true;
 
                 var actual = ReadDirectoryText(row, filter.Field);
-                var comparison = filter.MatchCase
-                    ? StringComparison.Ordinal
-                    : StringComparison.OrdinalIgnoreCase;
+                var comparison = filter.IgnoreCase
+                    ? StringComparison.OrdinalIgnoreCase
+                    : StringComparison.Ordinal;
 
                 return filter.Operator switch
                 {
@@ -452,7 +660,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
             foreach (var filter in filters)
             {
-                if (filter.Predicates is { Count: > 0 })
+                if (filter.IsComplex && filter.Predicates is { Count: > 0 })
                 {
                     foreach (var child in FlattenGridFilters(filter.Predicates))
                         yield return child;

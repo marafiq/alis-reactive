@@ -6,22 +6,33 @@ namespace Alis.Reactive.Fusion.Components
     /// Event args for Syncfusion Grid's <c>dataStateChange</c> event.
     /// </summary>
     /// <remarks>
-    /// Top-level fields carry the full grid state on every event:
-    /// <c>skip</c>/<c>take</c> for paging and <c>sorted</c> for all active sort columns.
-    /// Always send the full state to the server so paging preserves sort order.
+    /// Syncfusion emits a variant-specific payload for each data-state trigger.
+    /// <c>skip</c>, <c>take</c>, and <c>requiresCounts</c> are common in
+    /// custom-binding rows, while <c>sorted</c>, <c>group</c>, <c>where</c>,
+    /// and <c>search</c> appear only on the trigger variants that emit them.
+    /// Do not infer missing fields from another variant.
     /// </remarks>
     public class FusionGridDataStateChangeArgs
     {
+        /// <summary>Syncfusion event name injected by the EJ2 event observer.</summary>
+        public string? Name { get; set; }
+
         /// <summary>Paging offset (0-based). Always present.</summary>
         public int Skip { get; set; }
 
         /// <summary>Page size. Always present.</summary>
         public int Take { get; set; }
 
-        /// <summary>Active sort columns. Empty when unsorted. Supports multi-sort.</summary>
+        /// <summary>Whether the data response must include both result records and total count.</summary>
+        public bool RequiresCounts { get; set; }
+
+        /// <summary>Active sort columns when this trigger emits sorting state. Supports multi-sort.</summary>
         public List<FusionGridSortColumn>? Sorted { get; set; }
 
-        /// <summary>Active group fields. Empty when ungrouped. Supports nested grouping.</summary>
+        /// <summary>
+        /// Active group fields when this trigger emits grouping state.
+        /// Method-trigger ungrouping omits this payload key rather than emitting an empty array.
+        /// </summary>
         public List<string>? Group { get; set; }
 
         /// <summary>Active text filter criteria from Grid filter UI.</summary>
@@ -64,17 +75,14 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Composite predicate condition such as <c>and</c> or <c>or</c>.</summary>
         public string? Condition { get; set; }
 
+        /// <summary>Whether this predicate node contains nested predicates.</summary>
+        public bool IsComplex { get; set; }
+
         /// <summary>Nested predicates when Syncfusion emits a composite Predicate.</summary>
         public List<FusionGridTextFilterCriterion>? Predicates { get; set; }
 
-        /// <summary>Predicate joining this criterion to the next criterion.</summary>
-        public string? Predicate { get; set; }
-
         /// <summary>Whether the filter ignores case.</summary>
         public bool IgnoreCase { get; set; }
-
-        /// <summary>Whether the filter is case-sensitive.</summary>
-        public bool MatchCase { get; set; }
 
         /// <summary>Whether the filter ignores accents.</summary>
         public bool IgnoreAccent { get; set; }
@@ -118,6 +126,15 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Syncfusion request type, such as <c>sorting</c> or <c>paging</c>.</summary>
         public string? RequestType { get; set; }
+
+        /// <summary>Syncfusion action event name injected by the EJ2 event observer.</summary>
+        public string? Name { get; set; }
+
+        /// <summary>Syncfusion action event type, such as <c>actionBegin</c>.</summary>
+        public string? Type { get; set; }
+
+        /// <summary>Whether the current action can be cancelled.</summary>
+        public bool Cancel { get; set; }
 
         /// <summary>Column name for sorting actions.</summary>
         public string? ColumnName { get; set; }

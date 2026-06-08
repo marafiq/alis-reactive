@@ -1,5 +1,4 @@
 @model OtpInputModel
-@using Alis.Reactive.Builders.Requests
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
@@ -124,7 +123,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var passcode = p.Component<FusionOtpInput>(m => m.Passcode);
-                p.Post("/Sandbox/Components/OtpInput/Echo")
+                p.Post(Url.SandboxRoute("Echo", "OtpInput"))
                     .Gather(g => g.Include(passcode.Value(), "passcode"))
                     .Response(r => r.OnSuccess<OtpInputEchoResponse>((json, s) =>
                     {

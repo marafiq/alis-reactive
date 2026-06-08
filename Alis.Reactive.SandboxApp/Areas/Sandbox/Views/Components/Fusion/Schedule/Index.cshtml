@@ -1,11 +1,9 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.PointInTimeScheduleModel
-@using Alis.Reactive
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.AppLevel
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Schedule
-@using Syncfusion.EJ2.Popups
 @using Alis.Reactive.Fusion.Templates
 @{
     ViewData["Title"] = "Point-in-Time Schedule";
@@ -56,7 +54,7 @@
     {
         p.Element("alis-drawer-title").SetText("Edit Shift Assignment");
         p.Component<NativeDrawer>().SetSize(DrawerSize.Md);
-        p.Get("/Sandbox/Components/Schedule/EditForm")
+        p.Get(Url.SandboxRoute("EditForm", "Schedule"))
          .Gather(g => g.FromEvent(payload, x => x.Id, "assignmentId"))
          .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
         p.Component<NativeDrawer>().Open();
@@ -66,7 +64,7 @@
     {
         p.Element("alis-drawer-title").SetText("Reassign Shift");
         p.Component<NativeDrawer>().SetSize(DrawerSize.Md);
-        p.Get("/Sandbox/Components/Schedule/EditForm")
+        p.Get(Url.SandboxRoute("EditForm", "Schedule"))
          .Gather(g => g.FromEvent(payload, x => x.Id, "assignmentId"))
          .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
         p.Component<NativeDrawer>().Open();
@@ -217,7 +215,7 @@
                 p.Element("event-trace").SetText(args, x => x.StartTime);
                 p.Element("event-shift").SetText(args, x => x.GroupIndex);
 
-                p.Get("/Sandbox/Components/Schedule/NewAssignmentForm")
+                p.Get(Url.SandboxRoute("NewAssignmentForm", "Schedule"))
                  .Gather(g => g
                      .FromEvent(args, x => x.StartTime, "startTime")
                      .FromEvent(args, x => x.EndTime, "endTime")
@@ -240,7 +238,7 @@
                      args.PreventDefault(t);
                      t.Element("alis-drawer-title").SetText("Edit Shift Assignment");
                      t.Component<NativeDrawer>().SetSize(DrawerSize.Md);
-                     t.Get("/Sandbox/Components/Schedule/EditForm")
+                     t.Get(Url.SandboxRoute("EditForm", "Schedule"))
                       .Gather(g => g.FromEvent(args, x => x.Data.Id, "assignmentId"))
                       .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
                      t.Component<NativeDrawer>().Open();

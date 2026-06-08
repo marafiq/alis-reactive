@@ -10,7 +10,7 @@
 
     Html.On(plan, t => t.CustomEvent("do-save", p =>
     {
-        p.Post("/Sandbox/Patterns/Cascading/Save", g =>
+        p.Post(Url.SandboxRoute("Save", "Cascading"), g =>
         {
             g.Include<FusionDropDownList, CascadingModel>(m => m.Country);
             g.Include<FusionDropDownList, CascadingModel>(m => m.City);
@@ -46,7 +46,7 @@
                 .Placeholder("Select a country")
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
-                    p.Get("/Sandbox/Patterns/Cascading/Cities")
+                    p.Get(Url.SandboxRoute("Cities", "Cascading"))
                      .Gather(g => g.Include<FusionDropDownList, CascadingModel>(m => m.Country))
                      .Response(r => r
                         .OnSuccess<CityLookupResponse>((json, s) =>

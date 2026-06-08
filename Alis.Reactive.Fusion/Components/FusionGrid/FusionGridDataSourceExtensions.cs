@@ -37,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
             ResponseBody<TResponse> source)
             where TModel : class
             where TResponse : class
-            => self.EmitSet(DataSourceProperty, ValueExpression.Read(source.Scope, "responseBody"));
+            => self.EmitSet(DataSourceProperty, ValueExpression.ReadWholePayload(source.Scope));
 
         /// <summary>
         /// Replaces the grid data source with items from an event payload.

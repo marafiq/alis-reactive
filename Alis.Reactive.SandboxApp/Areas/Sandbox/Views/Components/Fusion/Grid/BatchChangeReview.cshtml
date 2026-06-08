@@ -1,0 +1,89 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "Care-Ops Batch Change Review";
+
+    const string EditGridId = "batch-review-edit-grid";
+    const string ReviewGridId = "batch-review-changed-grid";
+    const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+
+    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+
+    List<GridColumn> Columns() => new List<GridColumn>
+    {
+        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false },
+        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "200" },
+        new GridColumn { Field = "openTasks", HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right, EditType = "numericedit" }
+    };
+
+    Html.On(plan, t => t.DomReady(p =>
+        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
+            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
+            {
+                s.Component<FusionGrid>(EditGridId).SetDataSource(json);
+                s.Element("review-load-status").SetText("loaded review rows");
+            }))));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Care-Ops Batch Change Review</native-heading>
+    <native-text color="Secondary">
+        A nurse manager batch-edits open-task counts. On commit, the review grid binds straight from the
+        <code>beforeBatchSave</code> event payload's changed records - an event-payload data source.
+    </native-text>
+
+    <p class="font-mono text-sm">Load status: <span id="review-load-status" class="text-text-muted">waiting</span></p>
+
+    <native-hstack gap="Sm" class="flex-wrap">
+        @(Html.NativeButton("review-edit-cell", "Edit Tasks Cell")
+            .CssClass(ButtonSecondary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Component<FusionGrid>(EditGridId).EditCell(0, (ResidentDirectoryGridItem x) => x.OpenTasks);
+                p.Element("review-command").SetText("editCell called");
+            }))
+        @(Html.NativeButton("review-save-cell", "Save Cell")
+            .CssClass(ButtonSecondary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Component<FusionGrid>(EditGridId).SaveCell();
+                p.Element("review-command").SetText("saveCell called");
+            }))
+        @(Html.NativeButton("review-commit", "Commit And Review")
+            .CssClass(ButtonPrimary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Component<FusionGrid>(EditGridId).EndEdit();
+                p.Element("review-command").SetText("endEdit called");
+            }))
+    </native-hstack>
+
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <native-heading level="H2">Batch Edit</native-heading>
+        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, EditGridId, b => b
+            .AllowSelection(true)
+            .Toolbar(new List<string> { "Update", "Cancel" })
+            .EditSettings(new GridEditSettings { AllowEditing = true, AllowEditOnDblClick = false, Mode = EditMode.Batch, ShowConfirmDialog = false })
+            .Columns(Columns()))
+            .Reactive(evt => evt.BeforeBatchSave<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                // SetDataSource [event payload path]: bind the review grid from the event payload array.
+                p.Component<FusionGrid>(ReviewGridId).SetDataSource(args, x => x.BatchChanges.ChangedRecords);
+                p.Element("review-bound-status").SetText("review bound from event");
+            }))
+    </section>
+
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <native-heading level="H2">Changed Residents (bound from beforeBatchSave payload)</native-heading>
+        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, ReviewGridId, b => b
+            .Columns(Columns())))
+        <p class="mt-4 font-mono text-sm">Command: <span id="review-command" class="text-text-muted">waiting</span></p>
+        <p class="font-mono text-sm">Review bind: <span id="review-bound-status" class="text-text-muted">waiting</span></p>
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

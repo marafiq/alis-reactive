@@ -34,14 +34,32 @@ public class WhenBindingArrayToGrid : PlaywrightTestBase
         await NavigateAndWaitForRoster();
         await Expect(Page.Locator("#roster-grid .e-row")).ToHaveCountAsync(5, new() { Timeout = 10000 });
 
-        await Page.Locator("#show-active-btn").ClickAsync();
+        var rosterRequestsAfterClick = 0;
+        void OnRequest(object? _, Microsoft.Playwright.IRequest observedRequest)
+        {
+            if (observedRequest.Url.Contains("/Sandbox/Components/ArrayGrid/Residents"))
+                rosterRequestsAfterClick++;
+        }
 
-        await Expect(Page.Locator("#grid-status"))
-            .ToHaveTextAsync("active only", new() { Timeout = 5000 });
+        Page.Request += OnRequest;
+        try
+        {
+            await Page.Locator("#show-active-btn").ClickAsync();
 
-        await Expect(Page.Locator("#roster-grid .e-row")).ToHaveCountAsync(3, new() { Timeout = 10000 });
-        await Expect(Page.Locator("#roster-grid")).Not.ToContainTextAsync("discharged", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#roster-grid")).Not.ToContainTextAsync("critical", new() { Timeout = 5000 });
+            await Expect(Page.Locator("#grid-status"))
+                .ToHaveTextAsync("active only", new() { Timeout = 5000 });
+
+            await Expect(Page.Locator("#roster-grid .e-row")).ToHaveCountAsync(3, new() { Timeout = 10000 });
+            await Expect(Page.Locator("#roster-grid")).Not.ToContainTextAsync("discharged", new() { Timeout = 5000 });
+            await Expect(Page.Locator("#roster-grid")).Not.ToContainTextAsync("critical", new() { Timeout = 5000 });
+        }
+        finally
+        {
+            Page.Request -= OnRequest;
+        }
+
+        Assert.That(rosterRequestsAfterClick, Is.EqualTo(0),
+            "The active-only workflow must read the current Grid dataSource and rebind client-side without fetching the roster again.");
 
         AssertNoConsoleErrors();
     }

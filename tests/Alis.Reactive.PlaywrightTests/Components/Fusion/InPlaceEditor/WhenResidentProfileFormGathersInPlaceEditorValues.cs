@@ -1,5 +1,3 @@
-using Microsoft.Playwright;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
 // InPlaceEditor fields must participate in IncludeAll gather with the other registered Fusion inputs.

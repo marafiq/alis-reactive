@@ -1,0 +1,142 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "Care-Ops Resident Admission Audit";
+
+    const string GridId = "admission-audit-grid";
+    const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+
+    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+
+    List<GridColumn> AuditColumns() => new List<GridColumn>
+    {
+        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
+        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "200" },
+        new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "160" },
+        new GridColumn { Field = "wing", HeaderText = "Wing", Width = "120" }
+    };
+
+    Html.On(plan, t => t.DomReady(p =>
+        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
+            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
+            {
+                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Element("audit-load-status").SetText("loaded audit rows");
+            }))));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Care-Ops Resident Admission Audit</native-heading>
+    <native-text color="Secondary">
+        Every resident record change is audited: admitting a resident fires the add edit-action and
+        discharging fires the delete edit-action. The audit reads the typed edit-action payload, and a
+        blocked admission is cancelled before it persists.
+    </native-text>
+
+    <p class="font-mono text-sm">Load status: <span id="audit-load-status" class="text-text-muted">waiting</span></p>
+
+    <native-hstack gap="Sm" class="flex-wrap">
+        @(Html.NativeButton("audit-admit", "Admit Zara")
+            .CssClass(ButtonPrimary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Component<FusionGrid>(GridId).AddRecord(new ResidentDirectoryGridItem
+                {
+                    ResidentId = 9100, ResidentName = "Zara Added", Age = 71, CareLevel = "Assisted Living",
+                    Wing = "North", Suite = "N-120", RiskLevel = "Low", PrimaryNurse = "Nora Ellis",
+                    OpenTasks = 1, NextReviewDate = "2026-06-30"
+                });
+                p.Element("audit-command").SetText("admit issued");
+            }))
+        @(Html.NativeButton("audit-admit-blocked", "Admit Blocked Resident")
+            .CssClass(ButtonSecondary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Component<FusionGrid>(GridId).AddRecord(new ResidentDirectoryGridItem
+                {
+                    ResidentId = 9200, ResidentName = "Blocked Admission", Age = 80, CareLevel = "Memory Care",
+                    Wing = "South", Suite = "S-120", RiskLevel = "High", PrimaryNurse = "Owen Park",
+                    OpenTasks = 2, NextReviewDate = "2026-07-01"
+                });
+                p.Element("audit-command").SetText("blocked admit issued");
+            }))
+        @(Html.NativeButton("audit-discharge", "Discharge First Resident")
+            .CssClass(ButtonSecondary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var grid = p.Component<FusionGrid>(GridId);
+                grid.SelectRow(0);
+                grid.DeleteSelectedRecord();
+                p.Element("audit-command").SetText("discharge issued");
+            }))
+    </native-hstack>
+
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+            .AllowSelection(true)
+            .Toolbar(new List<string> { "Add", "Delete", "Update", "Cancel" })
+            .EditSettings(new GridEditSettings
+            {
+                AllowEditing = true,
+                AllowAdding = true,
+                AllowDeleting = true,
+                AllowEditOnDblClick = false,
+                Mode = EditMode.Normal,
+                ShowDeleteConfirmDialog = false
+            })
+            .Columns(AuditColumns()))
+            .Reactive(evt => evt.ActionBegin<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                // Guard each variant so a trailing refresh action does not overwrite the reads.
+                p.When(args, x => x.RequestType).Eq("save")
+                    .Then(t =>
+                    {
+                        t.Element("audit-begin-request").SetText(args, x => x.RequestType);
+                        t.Element("audit-begin-action").SetText(args, x => x.Action);
+                        t.Element("audit-begin-type").SetText(args, x => x.Type);
+                        t.Element("audit-begin-name").SetText(args, x => x.Name);
+                        t.Element("audit-begin-cancel").SetText(args, x => x.Cancel);
+                    });
+                p.When(args, x => x.RequestType).Eq("delete")
+                    .Then(t =>
+                    {
+                        t.Element("audit-begin-request").SetText(args, x => x.RequestType);
+                        t.Element("audit-begin-type").SetText(args, x => x.Type);
+                        t.Element("audit-begin-name").SetText(args, x => x.Name);
+                        t.Element("audit-begin-cancel").SetText(args, x => x.Cancel);
+                    });
+                p.When(args, x => x.Data.ResidentName).Eq("Blocked Admission")
+                    .Then(t =>
+                    {
+                        args.Cancel(t);
+                        t.Element("audit-blocked").SetText("admission blocked");
+                    });
+            })
+            .Reactive(evt => evt.ActionComplete<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                p.Element("audit-complete-request").SetText(args, x => x.RequestType);
+                p.Element("audit-complete-action").SetText(args, x => x.Action);
+                p.When(args, x => x.RequestType).Eq("save")
+                    .Then(t => t.Element("audit-complete-resident").SetText(args, x => x.Data.ResidentName));
+            }))
+
+        <native-grid cols="C3" gap="Base" class="mt-4 font-mono text-sm">
+            <p>Command: <span id="audit-command" class="text-text-muted">waiting</span></p>
+            <p>Begin request: <span id="audit-begin-request" class="text-text-muted">waiting</span></p>
+            <p>Begin action: <span id="audit-begin-action" class="text-text-muted">waiting</span></p>
+            <p>Begin type: <span id="audit-begin-type" class="text-text-muted">waiting</span></p>
+            <p>Begin name: <span id="audit-begin-name" class="text-text-muted">waiting</span></p>
+            <p>Begin cancel: <span id="audit-begin-cancel" class="text-text-muted">waiting</span></p>
+            <p>Complete request: <span id="audit-complete-request" class="text-text-muted">waiting</span></p>
+            <p>Complete action: <span id="audit-complete-action" class="text-text-muted">waiting</span></p>
+            <p>Complete resident: <span id="audit-complete-resident" class="text-text-muted">waiting</span></p>
+            <p>Blocked: <span id="audit-blocked" class="text-text-muted">not blocked</span></p>
+        </native-grid>
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

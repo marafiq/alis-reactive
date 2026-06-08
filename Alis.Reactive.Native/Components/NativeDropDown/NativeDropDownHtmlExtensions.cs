@@ -1,7 +1,4 @@
 using System;
-using Alis.Reactive.Native;
-using Alis.Reactive.Native.Extensions;
-
 using ComponentRegistrationSource = Alis.Reactive.Native.Components.NativeDropDown;
 
 namespace Alis.Reactive.Native.Components

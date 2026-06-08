@@ -17,7 +17,7 @@
 
     Html.On(plan, t => t.CustomEvent("do-gather", p =>
     {
-        p.Post("/Sandbox/Components/AutoComplete/Echo", g =>
+        p.Post(Url.SandboxRoute("Echo", "AutoComplete"), g =>
             g.Include<FusionAutoComplete, AutoCompleteModel>(m => m.Physician))
          .Response(r => r
             .OnSuccess(s =>
@@ -135,7 +135,7 @@
                     .Reactive(plan, evt => evt.Filtering, (args, p) =>
                     {
                         args.PreventDefault(p);
-                        p.Get("/Sandbox/Components/AutoComplete/Medications")
+                        p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
                          .Gather(g => g.FromEvent(args, x => x.Text, "MedicationType"))
                          .Response(r => r
                             .OnSuccess<MedicationSearchResponse>((json, s) =>

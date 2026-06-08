@@ -1,7 +1,6 @@
 @model Step2ClinicalModel
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Fusion.Components
 @{
     var plan = Html.ReactivePlan<Step2ClinicalModel>();
     var saveStep2Url = Url.Action("SaveStep2", "AdmissionAssessment", new { area = "Sandbox" })

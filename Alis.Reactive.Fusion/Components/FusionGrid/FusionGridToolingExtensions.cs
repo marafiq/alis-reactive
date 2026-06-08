@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Fusion.Components
@@ -23,11 +22,14 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod OpenColumnChooserMethod =
             ComponentMethod.Named("openColumnChooser");
 
+        // autoFitColumns is an EJ2 overload (0 args = all, 1 arg = one column). Distinct
+        // plan member names mapped to the same JS path keep the plan contract merge
+        // deterministic; a shared member name conflicts (0 vs 1 argument).
         private static readonly ComponentMethod AutoFitAllColumnsMethod =
-            ComponentMethod.Named("autoFitColumns");
+            ComponentMethod.Mapped("autoFitColumnsAll", "autoFitColumns");
 
         private static readonly ComponentMethod AutoFitColumnMethod =
-            ComponentMethod.Named("autoFitColumns").WithArgs<string>();
+            ComponentMethod.Mapped("autoFitColumnsField", "autoFitColumns").WithArgs<string>();
 
         /// <summary>
         /// Exports the grid to Excel.

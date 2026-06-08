@@ -1,0 +1,123 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "FusionGrid ActionComplete Save Edit Proof";
+
+    const string GridId = "grid-action-complete-save-edit";
+    const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+
+    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+
+    List<GridColumn> Columns() => new List<GridColumn>
+    {
+        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
+        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "170" },
+        new GridColumn { Field = "age", HeaderText = "Age", Width = "90", TextAlign = TextAlign.Right },
+        new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "150" },
+        new GridColumn { Field = "wing", HeaderText = "Wing", Width = "110" },
+        new GridColumn { Field = "suite", HeaderText = "Suite", Width = "110" },
+        new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "120" },
+        new GridColumn { Field = "openTasks", HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right },
+        new GridColumn { Field = "primaryNurse", HeaderText = "Primary Nurse", Width = "150" }
+    };
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
+            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
+            {
+                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Element("ac-load-status").SetText("loaded actionComplete rows");
+            }));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-hstack justify="Between" align="Center" class="flex-wrap gap-3">
+        <div>
+            <native-heading level="H1">FusionGrid ActionComplete Save Edit Proof</native-heading>
+            <native-text color="Secondary">
+                Focused vertical slice for one typed Grid event row.
+            </native-text>
+        </div>
+        <a asp-area="Sandbox" asp-controller="Grid" asp-action="Editing"
+           class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
+            Editing grid
+        </a>
+    </native-hstack>
+
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <native-heading level="H2">ActionComplete Row</native-heading>
+        <p class="mt-2 font-mono text-sm">Load status: <span id="ac-load-status" class="text-text-muted">waiting</span></p>
+
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("ac-select-first", "Select Row 1")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).SelectRow(0);
+                    p.Element("ac-command-status").SetText("row selected");
+                }))
+            @(Html.NativeButton("ac-start-edit", "Start Edit")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).StartEdit();
+                    p.Element("ac-command-status").SetText("startEdit called");
+                }))
+            @(Html.NativeButton("ac-end-edit", "End Edit")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).EndEdit();
+                    p.Element("ac-command-status").SetText("endEdit called");
+                }))
+        </native-hstack>
+
+        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+            .AllowSelection(true)
+            .Toolbar(new List<string> { "Edit", "Update", "Cancel" })
+            .EditSettings(new GridEditSettings
+            {
+                AllowEditing = true,
+                AllowEditOnDblClick = false,
+                Mode = EditMode.Normal
+            })
+            .Columns(Columns()))
+            .Reactive(evt => evt.ActionComplete<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                p.Element("ac-request-type").SetText(args, x => x.RequestType);
+                p.Element("ac-action").SetText(args, x => x.Action);
+                p.Element("ac-type").SetText(args, x => x.Type);
+                p.Element("ac-name").SetText(args, x => x.Name);
+                p.Element("ac-cancel").SetText(args, x => x.Cancel);
+                p.Element("ac-row-index").SetText(args, x => x.RowIndex);
+                p.Element("ac-selected-row").SetText(args, x => x.SelectedRow);
+                p.When(args, x => x.RequestType).Eq("save")
+                    .Then(t =>
+                    {
+                        t.Element("ac-current-resident").SetText(args, x => x.Data.ResidentName);
+                        t.Element("ac-previous-resident").SetText(args, x => x.PreviousData.ResidentName);
+                    });
+            }))
+
+        <native-grid cols="C3" gap="Base" class="mt-4 font-mono text-sm">
+            <p>Command: <span id="ac-command-status" class="text-text-muted">waiting</span></p>
+            <p>Request type: <span id="ac-request-type" class="text-text-muted">waiting</span></p>
+            <p>Action: <span id="ac-action" class="text-text-muted">waiting</span></p>
+            <p>Type: <span id="ac-type" class="text-text-muted">waiting</span></p>
+            <p>Name: <span id="ac-name" class="text-text-muted">waiting</span></p>
+            <p>Cancel: <span id="ac-cancel" class="text-text-muted">waiting</span></p>
+            <p>Row index: <span id="ac-row-index" class="text-text-muted">waiting</span></p>
+            <p>Selected row: <span id="ac-selected-row" class="text-text-muted">waiting</span></p>
+            <p>Current resident: <span id="ac-current-resident" class="text-text-muted">waiting</span></p>
+            <p>Previous resident: <span id="ac-previous-resident" class="text-text-muted">waiting</span></p>
+        </native-grid>
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

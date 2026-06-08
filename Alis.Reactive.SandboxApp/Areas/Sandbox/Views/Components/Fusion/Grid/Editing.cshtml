@@ -1,11 +1,8 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
-@using Alis.Reactive
 @using Alis.Reactive.Builders
-@using Alis.Reactive.Builders.Requests
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
-@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @using Syncfusion.EJ2.Grids
 @{
     ViewData["Title"] = "FusionGrid Editing Workflows";
@@ -36,7 +33,7 @@
 
     void LoadEditingGrids(PipelineBuilder<ResidentGridEditingModel> p)
     {
-        p.Get("/Sandbox/Components/Grid/EditingRows")
+        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
                 s.Component<FusionGrid>(InlineGridId).SetDataSource(json);
@@ -122,7 +119,7 @@
                 .CssClass(ButtonAccent)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post("/Sandbox/Components/Grid/CreateEditResident")
+                    p.Post(Url.SandboxRoute("CreateEditResident", "Grid"))
                         .Response(r => r.OnSuccess<ResidentGridEditResponse>((json, s) =>
                         {
                             s.Component<FusionGrid>(InlineGridId).AddRecord(json, x => x.Row, 0);
@@ -178,6 +175,18 @@
             .Reactive(evt => evt.ActionBegin<ResidentDirectoryGridItem>(), (args, p) =>
             {
                 p.Element("inline-action-begin").SetText(args, x => x.RequestType);
+                p.Element("inline-action-begin-action").SetText(args, x => x.Action);
+                p.Element("inline-action-begin-type").SetText(args, x => x.Type);
+                p.Element("inline-action-begin-event").SetText(args, x => x.Name);
+                p.Element("inline-action-begin-cancel").SetText(args, x => x.Cancel);
+                p.Element("inline-action-begin-row").SetText(args, x => x.RowIndex);
+                p.Element("inline-action-begin-selected-row").SetText(args, x => x.SelectedRow);
+                p.When(args, x => x.RequestType).Eq("save")
+                    .Then(t =>
+                    {
+                        t.Element("inline-action-begin-resident").SetText(args, x => x.Data.ResidentName);
+                        t.Element("inline-action-begin-previous-resident").SetText(args, x => x.PreviousData.ResidentName);
+                    });
             })
             .Reactive(evt => evt.ActionComplete<ResidentDirectoryGridItem>(), (args, p) =>
             {
@@ -191,6 +200,14 @@
             <p>Begin row: <span id="inline-begin-row" class="text-text-muted">waiting</span></p>
             <p>Begin resident: <span id="inline-begin-resident" class="text-text-muted">waiting</span></p>
             <p>Action begin: <span id="inline-action-begin" class="text-text-muted">waiting</span></p>
+            <p>Action begin action: <span id="inline-action-begin-action" class="text-text-muted">waiting</span></p>
+            <p>Action begin type: <span id="inline-action-begin-type" class="text-text-muted">waiting</span></p>
+            <p>Action begin event: <span id="inline-action-begin-event" class="text-text-muted">waiting</span></p>
+            <p>Action begin cancel: <span id="inline-action-begin-cancel" class="text-text-muted">waiting</span></p>
+            <p>Action begin row: <span id="inline-action-begin-row" class="text-text-muted">waiting</span></p>
+            <p>Action begin selected row: <span id="inline-action-begin-selected-row" class="text-text-muted">waiting</span></p>
+            <p>Action begin resident: <span id="inline-action-begin-resident" class="text-text-muted">waiting</span></p>
+            <p>Action begin previous: <span id="inline-action-begin-previous-resident" class="text-text-muted">waiting</span></p>
             <p>Action complete: <span id="inline-action-complete" class="text-text-muted">waiting</span></p>
             <p>Saved resident: <span id="inline-complete-resident" class="text-text-muted">waiting</span></p>
         </native-grid>
@@ -227,7 +244,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var grid = p.Component<FusionGrid>(BatchGridId);
-                    p.Post("/Sandbox/Components/Grid/BatchSummary")
+                    p.Post(Url.SandboxRoute("BatchSummary", "Grid"))
                         .Gather(g => g.Include(grid.BatchChanges<ResidentGridEditingModel, ResidentDirectoryGridItem>(), "batchChanges"))
                         .Response(r => r.OnSuccess<ResidentGridBatchSummaryResponse>((json, s) =>
                         {
@@ -258,15 +275,35 @@
             {
                 p.Element("batch-cell-save-column").SetText(args, x => x.ColumnName);
                 p.Element("batch-cell-save-value").SetText(args, x => x.Value);
+                p.Element("batch-cell-save-previous").SetText(args, x => x.PreviousValue);
+                p.Element("batch-cell-save-resident").SetText(args, x => x.RowData.ResidentName);
+                p.Element("batch-cell-save-cancel").SetText(args, x => x.Cancel);
+                p.When(args, x => x.Value).Eq(99)
+                    .Then(t =>
+                    {
+                        args.Cancel(t);
+                        t.Element("batch-cell-save-cancelled").SetText("blocked 99");
+                    });
             })
             .Reactive(evt => evt.CellSaved<ResidentDirectoryGridItem, int>(), (args, p) =>
             {
+                p.Element("batch-cell-saved-column").SetText(args, x => x.ColumnName);
                 p.Element("batch-cell-saved-value").SetText(args, x => x.Value);
+                p.Element("batch-cell-saved-previous").SetText(args, x => x.PreviousValue);
+                p.Element("batch-cell-saved-resident").SetText(args, x => x.RowData.ResidentName);
             })
             .Reactive(evt => evt.BeforeBatchSave<ResidentDirectoryGridItem>(), (args, p) =>
             {
                 p.Element("batch-before-save-resident").SetText(args, x => x.BatchChanges.ChangedRecords[0].ResidentName);
                 p.Element("batch-before-save-tasks").SetText(args, x => x.BatchChanges.ChangedRecords[0].OpenTasks);
+                p.Element("batch-before-save-cancel").SetText(args, x => x.Cancel);
+                p.When(args, x => x.BatchChanges.ChangedRecords[0].OpenTasks).Eq(8)
+                    .Then(t =>
+                    {
+                        args.Cancel(t);
+                        t.Element("batch-before-save-cancelled").SetText("blocked batch 8");
+                        t.Element("batch-action-complete").SetText("waiting after cancelled batch");
+                    });
             })
             .Reactive(evt => evt.ActionComplete<ResidentDirectoryGridItem>(), (args, p) =>
             {
@@ -277,9 +314,18 @@
             <p>Status: <span id="batch-command-status" class="text-text-muted">waiting</span></p>
             <p>Cell column: <span id="batch-cell-save-column" class="text-text-muted">waiting</span></p>
             <p>Cell value: <span id="batch-cell-save-value" class="text-text-muted">waiting</span></p>
+            <p>Cell previous: <span id="batch-cell-save-previous" class="text-text-muted">waiting</span></p>
+            <p>Cell resident: <span id="batch-cell-save-resident" class="text-text-muted">waiting</span></p>
+            <p>Cell cancel: <span id="batch-cell-save-cancel" class="text-text-muted">waiting</span></p>
+            <p>Cell blocked: <span id="batch-cell-save-cancelled" class="text-text-muted">not blocked</span></p>
+            <p>Cell saved column: <span id="batch-cell-saved-column" class="text-text-muted">waiting</span></p>
             <p>Cell saved: <span id="batch-cell-saved-value" class="text-text-muted">waiting</span></p>
+            <p>Cell saved previous: <span id="batch-cell-saved-previous" class="text-text-muted">waiting</span></p>
+            <p>Cell saved resident: <span id="batch-cell-saved-resident" class="text-text-muted">waiting</span></p>
             <p>Batch resident: <span id="batch-before-save-resident" class="text-text-muted">waiting</span></p>
             <p>Batch tasks: <span id="batch-before-save-tasks" class="text-text-muted">waiting</span></p>
+            <p>Batch cancel: <span id="batch-before-save-cancel" class="text-text-muted">waiting</span></p>
+            <p>Batch blocked: <span id="batch-before-save-cancelled" class="text-text-muted">not blocked</span></p>
             <p>Batch action: <span id="batch-action-complete" class="text-text-muted">waiting</span></p>
             <p>Batch summary: <span id="batch-summary" class="text-text-muted">not gathered</span></p>
         </native-grid>
@@ -376,7 +422,7 @@
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post("/Sandbox/Components/Grid/ValidateEditDraft", g =>
+                    p.Post(Url.SandboxRoute("ValidateEditDraft", "Grid"), g =>
                     {
                         g.Include<FusionTextBox, ResidentGridEditingModel>(m => m.ResidentName);
                         g.Include<FusionDropDownList, ResidentGridEditingModel>(m => m.RiskLevel);

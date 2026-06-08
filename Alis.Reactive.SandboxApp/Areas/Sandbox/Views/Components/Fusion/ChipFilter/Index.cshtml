@@ -1,9 +1,7 @@
 @model ChipFilterModel
-@using Alis.Reactive
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
-@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @using Syncfusion.EJ2.Buttons
 @using Syncfusion.EJ2.Grids
 @{
@@ -30,7 +28,7 @@
          .Then(then => then.Element("memory-on").Show())
          .Else(els => els.Element("memory-off").Show());
 
-        p.Post("/Sandbox/Components/ChipFilter/Filter")
+        p.Post(Url.SandboxRoute("Filter", "ChipFilter"))
          .Gather(g => g.FromEvent(payload, x => x.Selection.Texts, "careLevels"))
          .Response(r => r.OnSuccess<CareResidentResponse>((json, s) =>
          {
@@ -40,7 +38,7 @@
     }));
 
     Html.On(plan, t => t.DomReady(p =>
-        p.Get("/Sandbox/Components/ChipFilter/Residents")
+        p.Get(Url.SandboxRoute("Residents", "ChipFilter"))
          .Response(r => r.OnSuccess<CareResidentResponse>((json, s) =>
          {
              s.Component<FusionGrid>("care-grid").SetDataSource(json, x => x.Residents);

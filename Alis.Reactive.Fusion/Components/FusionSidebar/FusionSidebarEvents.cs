@@ -1,5 +1,3 @@
-using Alis.Reactive.PlanModel;
-
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>

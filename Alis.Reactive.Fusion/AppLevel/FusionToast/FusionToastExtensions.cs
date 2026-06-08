@@ -1,7 +1,11 @@
-using Alis.Reactive;
 using Alis.Reactive.PlanModel;
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Notifications;
 
@@ -132,7 +136,11 @@ namespace Alis.Reactive.Fusion.AppLevel
         /// <summary>
         /// Renders the page-level Syncfusion Toast host in the layout.
         /// </summary>
+#if NET48
+        public static IHtmlString FusionToast(this HtmlHelper html)
+#else
         public static IHtmlContent FusionToast(this IHtmlHelper html)
+#endif
         {
             return html.EJS().Toast(AppLevel.FusionToast.ElementId)
                 .Target("body")

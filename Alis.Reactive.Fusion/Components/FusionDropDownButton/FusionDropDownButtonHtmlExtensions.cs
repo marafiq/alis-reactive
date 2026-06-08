@@ -1,5 +1,9 @@
 using System;
+#if NET48
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.SplitButtons;
 
@@ -14,7 +18,11 @@ namespace Alis.Reactive.Fusion.Components
         /// Renders one Syncfusion DropDownButton with a stable component id.
         /// </summary>
         public static FusionDropDownButtonBuilder<TModel> FusionDropDownButton<TModel>(
+#if NET48
+            this HtmlHelper<TModel> html,
+#else
             this IHtmlHelper<TModel> html,
+#endif
             ReactivePlan<TModel> plan,
             string elementId,
             Action<DropDownButtonBuilder> build)

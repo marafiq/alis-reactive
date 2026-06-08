@@ -92,7 +92,7 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var tagList = p.Component<FusionChipList>("care-tags");
-                        p.Post("/Sandbox/Components/ChipList/QuickFilter")
+                        p.Post(Url.SandboxRoute("QuickFilter", "ChipList"))
                          .Gather(g => g.Include(tagList.SelectedChipValues(), "filters"))
                          .Response(r => r.OnSuccess<ChipQuickFilterResponse>((json, s) =>
                          {

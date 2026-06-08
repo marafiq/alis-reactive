@@ -8,7 +8,7 @@
 
     Html.On(plan, t => t.CustomEvent("fetch-flat", p =>
     {
-        p.Get("/Sandbox/HttpPipeline/ContentType/FlatJson")
+        p.Get(Url.SandboxRoute("FlatJson", "ContentType"))
          .WhileLoading(l => l.Element("flat-spinner").Show())
          .Response(r => r
             .OnSuccess<FlatResponse>((json, s) =>
@@ -22,7 +22,7 @@
 
     Html.On(plan, t => t.CustomEvent("fetch-nested", p =>
     {
-        p.Get("/Sandbox/HttpPipeline/ContentType/NestedJson")
+        p.Get(Url.SandboxRoute("NestedJson", "ContentType"))
          .WhileLoading(l => l.Element("nested-spinner").Show())
          .Response(r => r
             .OnSuccess<NestedResponse>((json, s) =>
@@ -37,7 +37,7 @@
 
     Html.On(plan, t => t.CustomEvent("fetch-partial", p =>
     {
-        p.Get("/Sandbox/HttpPipeline/ContentType/Partial")
+        p.Get(Url.SandboxRoute("Partial", "ContentType"))
          .WhileLoading(l => l.Element("partial-spinner").Show())
          .Response(r => r
             .OnSuccess(s =>

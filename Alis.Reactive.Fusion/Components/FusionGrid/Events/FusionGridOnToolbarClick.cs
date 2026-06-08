@@ -10,8 +10,11 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Toolbar item that raised the click event.</summary>
         public FusionGridToolbarItem Item { get; set; } = new FusionGridToolbarItem();
 
-        /// <summary>Set true to cancel the default toolbar action.</summary>
+        /// <summary>Toolbar action cancel flag carried by Syncfusion.</summary>
         public bool Cancel { get; set; }
+
+        /// <summary>Syncfusion event name.</summary>
+        public string? Name { get; set; }
     }
 
     /// <summary>

@@ -116,6 +116,14 @@ public class WhenUsingFusionGridBilling : PlaywrightTestBase
 
         await Expect(Page.Locator("#toolbar-status"))
             .ToHaveTextAsync("statements queued for emailing", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#toolbar-item-id"))
+            .ToHaveTextAsync("emailStatements", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#toolbar-item-text"))
+            .ToHaveTextAsync("Email Statements", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#toolbar-cancel"))
+            .ToHaveTextAsync("false", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#toolbar-event"))
+            .ToHaveTextAsync("toolbarClick", new() { Timeout = 10000 });
 
         AssertNoConsoleErrors();
     }

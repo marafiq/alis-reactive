@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Alis.Reactive.FluentValidator;
 using FluentValidation;
 
@@ -59,6 +58,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public List<ResidentDirectoryGridItem> Result { get; set; } = new();
         public int Count { get; set; }
         public string Summary { get; set; } = "";
+    }
+
+    /// <summary>Nested envelope so the grid can bind from a nested data-source property path.</summary>
+    public class ResidentRosterEnvelope
+    {
+        public ResidentDirectoryResponse Page { get; set; } = new();
     }
 
     public class ResidentDirectorySelectionResponse

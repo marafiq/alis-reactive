@@ -1,5 +1,4 @@
 @model FusionListBoxModel
-@using Alis.Reactive.Builders.Requests
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
@@ -125,7 +124,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var listBox = p.Component<FusionListBox>(ListBoxId);
-                p.Post("/Sandbox/Components/FusionListBox/Echo")
+                p.Post(Url.SandboxRoute("Echo", "ListBox"))
                     .Gather(g =>
                     {
                         g.Include(listBox.Value(), "value");

@@ -1,5 +1,9 @@
 using System;
+#if NET48
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Kanban;
 
@@ -12,7 +16,11 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionKanbanHtmlExtensions
     {
         public static FusionKanbanBuilder<TModel> FusionKanban<TModel>(
+#if NET48
+            this HtmlHelper<TModel> html,
+#else
             this IHtmlHelper<TModel> html,
+#endif
             ReactivePlan<TModel> plan,
             string elementId,
             Action<KanbanBuilder> build)

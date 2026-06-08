@@ -1,5 +1,4 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.GridModel
-@using Alis.Reactive
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
@@ -8,9 +7,59 @@
 
     var plan = Html.ReactivePlan<GridModel>();
 
+    var demoGroups = new (string Group, (string Action, string Label, string Description)[] Links)[]
+    {
+        ("Boards", new[]
+        {
+            ("Directory", "Resident directory", "Server-driven paging, sorting, filtering, search, grouping, and virtual scrolling with typed row events and public method calls"),
+            ("Operations", "Operations board", "Column show/hide/reorder, keyed cell and row updates, view and selection queries, and typed template actions"),
+            ("Billing", "Billing board", "Server-side paging, sorting, batch rate edits, multi-select bulk increases, validated dialog admits, custom toolbar, and exports"),
+            ("CareOps", "Care-ops board", "Batch cell editing with dropdown, date, and numeric editors, checkbox bulk selection, chip filters, and validation-backed care updates"),
+        }),
+        ("Inline & dialog editing", new[]
+        {
+            ("Editing", "Editing workflows", "Inline, batch, and dialog-template editing with typed method calls, cancelable events, gathered batch changes, and validation-backed grid updates"),
+            ("BeginEditNormal", "BeginEdit (normal + dialog)", "Inline and dialog edit modes with typed startEdit, selectRow, closeEdit calls and a beginEdit event that cancels locked rows"),
+            ("InlineEdit", "Inline edit", "Open, cancel, and commit a row's inline editor via typed startEdit, closeEdit, and endEdit method calls"),
+            ("LockedResidentEdit", "Locked resident edit", "Programmatic row selection and edit start, with a BeginEdit handler that cancels editing for a locked resident"),
+            ("ResidentEditForm", "Edit form templates", "Inline cell editors and a labeled dialog admission form, each typed edit template rendering its own dropdown, date, or number editor"),
+            ("ResidentAdmissionAudit", "Admission audit (add/delete)", "Adding and deleting rows via typed methods, with edit-action payloads audited and a blocked admission cancelled before persisting"),
+            ("ActionCompleteSaveEdit", "ActionComplete proof", "Normal-mode inline editing with Edit/Update/Cancel toolbar, typed select and edit commands, and ActionComplete surfacing save request details"),
+        }),
+        ("Batch editing", new[]
+        {
+            ("BatchTaskUpdate", "Batch task update", "Batch-editing a numeric task-count cell via typed editCell, updateCell, and saveCell method calls on loaded rows"),
+            ("BatchCellEdit", "Batch cell edit", "Batch-mode cell editing via typed editCell/updateCell/saveCell calls, with cellSave and beforeBatchSave validation cancels and gathered batch changes"),
+            ("BatchRiskReview", "Batch risk review", "Batch-mode grid flagging a resident's risk via UpdateCell, then gathering pending batch changes for a posted review summary"),
+            ("BatchRosterChange", "Batch roster change", "Staging an admit and discharge as one batch, then reviewing added and deleted records before commit"),
+            ("BatchChangeReview", "Batch change review", "Batch-editing task counts, then binding a review grid from the beforeBatchSave event payload's changed records"),
+        }),
+        ("Rows, selection & review", new[]
+        {
+            ("RosterCrud", "Roster CRUD", "Add, replace, select, and delete grid rows via typed AddRecord, UpdateRow, and DeleteSelectedRecord method calls"),
+            ("KeyedUpdate", "Keyed update", "Update a resident's cell or replace an entire row by primary key using typed grid method calls"),
+            ("RosterSelection", "Roster selection", "Multiple-row selection via typed SelectRow, SelectRowsByRange, and ClearSelection method calls, with status updates and fetched roster data"),
+            ("CareReview", "Care review", "Multi-row selection with typed grid method calls gathering current-view, row-index, and selected-record summaries from the server"),
+            ("CareStaffColumns", "Care staff columns", "Hiding, restoring, and reordering grid columns via typed method calls, with reorderable headers and DomReady-loaded data"),
+        }),
+        ("Columns, tooling & print", new[]
+        {
+            ("ColumnFit", "Column fit", "Auto-fitting a single wide column or all columns to their content via typed grid method calls"),
+            ("GridTooling", "Grid tooling", "Paged resident grid with column chooser, navigated and toggled by buttons calling typed grid methods"),
+            ("RosterExport", "Roster export", "CSV, Excel, and PDF roster export triggered by typed grid method calls with status feedback"),
+            ("PrintableRoster", "Printable roster", "Printing the resident roster grid via a typed Print method call that opens the browser print view"),
+        }),
+        ("Data source binding", new[]
+        {
+            ("ServerRoster", "Server-backed roster", "Server-backed roster binding with server-driven admit, keyed row update, patch, and nested data-source loads from typed responses"),
+            ("BuilderRoster", "Builder-owned roster", "Server-rendered fixed roster bound directly through the grid builder's own data source with selectable rows, no fetch"),
+            ("RemoteAdaptorRoster", "Remote DataManager adaptor", "Remote DataManager URL-adaptor binding that fetches the paged {result, count} roster itself, with paging and row selection"),
+        }),
+    };
+
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Post("/Sandbox/Components/Grid/Data")
+        p.Post(Url.SandboxRoute("Data", "Grid"))
          .Gather(g => g
              .Static("skip", 0)
              .Static("take", 10))
@@ -24,28 +73,38 @@
 }
 
 <native-vstack gap="Lg">
-    <native-hstack justify="Between" align="Center" class="flex-wrap gap-3">
-        <native-heading level="H1">FusionGrid &mdash; Server-Side Sort, Paging &amp; Filter</native-heading>
-        <native-hstack gap="Sm" class="flex-wrap">
-            <a asp-area="Sandbox" asp-controller="Grid" asp-action="Directory"
-               class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
-                Resident directory
-            </a>
-            <a asp-area="Sandbox" asp-controller="Grid" asp-action="Operations"
-               class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
-                Operations board
-            </a>
-            <a asp-area="Sandbox" asp-controller="Grid" asp-action="Billing"
-               class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
-                Billing board
-            </a>
-        </native-hstack>
-    </native-hstack>
+    <native-heading level="H1">FusionGrid</native-heading>
     <native-text color="Secondary">
-        200 residents in server memory. Grid shows 10 per page with server-side sort + paging.
-        Grid sort and page actions send the full state (skip, take, sorted); the external Min Age
-        filter resets to page 1 and sends the current minAge.
+        A data grid is a complex vertical slice, so each behavior is its own isolated demo below.
+        The live server-driven grid (sort, paging, and an external filter) runs at the bottom of the page.
     </native-text>
+
+    @foreach (var group in demoGroups)
+    {
+        <section>
+            <div class="flex items-center gap-3 mb-4">
+                <span class="w-1 h-6 rounded-full bg-info"></span>
+                <h2 class="text-lg font-semibold text-text-primary">@group.Group</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                @foreach (var link in group.Links)
+                {
+                    <a asp-area="Sandbox" asp-controller="Grid" asp-action="@link.Action"
+                       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+                        <native-hstack justify="Between" align="Start">
+                            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                                @link.Label
+                            </h3>
+                            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+                        </native-hstack>
+                        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                            @link.Description
+                        </p>
+                    </a>
+                }
+            </div>
+        </section>
+    }
 
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">1. Grid with Server-Side Sort, Paging &amp; External Filter</h2>
@@ -64,7 +123,7 @@
                         .Reactive(plan, evt => evt.Changed, (args, p) =>
                         {
                             p.Element("filter-status").SetText("filtering...");
-                            p.Post("/Sandbox/Components/Grid/Data")
+                            p.Post(Url.SandboxRoute("Data", "Grid"))
                              .Gather(g => g
                                  .Static("skip", 0)
                                  .Static("take", 10)
@@ -95,16 +154,32 @@
                 p.When(args, x => x.Action.RequestType).NotEq(FusionGridAction.Refresh)
                     .Then(t =>
                     {
+                        t.Element("evt-name").SetText(args, x => x.Name);
                         t.Element("evt-skip").SetText(args, x => x.Skip);
                         t.Element("evt-take").SetText(args, x => x.Take);
+                        t.Element("evt-requires-counts").SetText(args, x => x.RequiresCounts);
+                        t.Element("evt-action-name").SetText(args, x => x.Action.Name);
+                        t.Element("evt-action-event-type").SetText(args, x => x.Action.Type);
+                        t.Element("evt-action-cancel").SetText(args, x => x.Action.Cancel);
                         t.Element("evt-action-type").SetText(args, x => x.Action.RequestType);
                         t.Element("evt-action-column").SetText(args, x => x.Action.ColumnName);
                         t.Element("evt-action-direction").SetText(args, x => x.Action.Direction);
                         t.Element("evt-action-page").SetText(args, x => x.Action.CurrentPage);
-                        t.Post("/Sandbox/Components/Grid/Data")
+                        t.Element("evt-action-previous-page").SetText(args, x => x.Action.PreviousPage);
+                        t.Element("evt-action-page-size").SetText(args, x => x.Action.PageSize);
+                        t.Post(Url.SandboxRoute("Data", "Grid"))
                          .Gather(g => g
+                             .FromEvent(args, x => x.Name, "eventName")
                              .FromEvent(args, x => x.Skip, "skip")
                              .FromEvent(args, x => x.Take, "take")
+                             .FromEvent(args, x => x.RequiresCounts, "requiresCounts")
+                             .FromEvent(args, x => x.Action.Name, "actionName")
+                             .FromEvent(args, x => x.Action.Type, "actionType")
+                             .FromEvent(args, x => x.Action.Cancel, "actionCancel")
+                             .FromEvent(args, x => x.Action.RequestType, "actionRequestType")
+                             .FromEvent(args, x => x.Action.CurrentPage, "actionCurrentPage")
+                             .FromEvent(args, x => x.Action.PreviousPage, "actionPreviousPage")
+                             .FromEvent(args, x => x.Action.PageSize, "actionPageSize")
                              .FromEvent(args, x => x.Sorted, "sorted")
                              .Include<FusionNumericTextBox, GridModel>(m => m.MinAge))
                          .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
@@ -120,12 +195,19 @@
             <p>Load status: <span id="load-status" class="text-text-muted">&mdash;</span></p>
             <p>Filter status: <span id="filter-status" class="text-text-muted">&mdash;</span></p>
             <p>Action status: <span id="action-status" class="text-text-muted">&mdash;</span></p>
+            <p>Event name: <span id="evt-name" class="text-text-muted">&mdash;</span></p>
             <p>Event skip: <span id="evt-skip" class="text-text-muted">&mdash;</span></p>
             <p>Event take: <span id="evt-take" class="text-text-muted">&mdash;</span></p>
+            <p>Event requiresCounts: <span id="evt-requires-counts" class="text-text-muted">&mdash;</span></p>
+            <p>Event action.name: <span id="evt-action-name" class="text-text-muted">&mdash;</span></p>
+            <p>Event action.type: <span id="evt-action-event-type" class="text-text-muted">&mdash;</span></p>
+            <p>Event action.cancel: <span id="evt-action-cancel" class="text-text-muted">&mdash;</span></p>
             <p>Event action.requestType: <span id="evt-action-type" class="text-text-muted">&mdash;</span></p>
             <p>Event action.columnName: <span id="evt-action-column" class="text-text-muted">&mdash;</span></p>
             <p>Event action.direction: <span id="evt-action-direction" class="text-text-muted">&mdash;</span></p>
             <p>Event action.currentPage: <span id="evt-action-page" class="text-text-muted">&mdash;</span></p>
+            <p>Event action.previousPage: <span id="evt-action-previous-page" class="text-text-muted">&mdash;</span></p>
+            <p>Event action.pageSize: <span id="evt-action-page-size" class="text-text-muted">&mdash;</span></p>
         </native-vstack>
     </section>
 

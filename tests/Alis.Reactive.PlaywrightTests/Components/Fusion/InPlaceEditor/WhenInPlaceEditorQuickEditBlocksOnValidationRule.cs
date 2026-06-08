@@ -1,5 +1,3 @@
-using Microsoft.Playwright;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
 // MonthlyRate validation uses the framework field slot for client-declared rules and server-only errors.

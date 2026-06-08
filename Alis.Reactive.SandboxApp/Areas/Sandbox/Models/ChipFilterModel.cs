@@ -1,4 +1,3 @@
-using System;
 using Alis.Reactive.Fusion.Components;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models

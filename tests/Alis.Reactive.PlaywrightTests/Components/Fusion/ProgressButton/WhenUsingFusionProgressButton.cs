@@ -1,6 +1,5 @@
 using System.Globalization;
 using Alis.Reactive.Playwright.Extensions;
-using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.ProgressButton;
 

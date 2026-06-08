@@ -1,5 +1,9 @@
 using System;
+#if NET48
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Buttons;
 
@@ -18,7 +22,11 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="build">Configures initial Syncfusion Button options.</param>
         /// <returns>Builder that renders the Syncfusion button and carries its Reactive Plan ID.</returns>
         public static FusionButtonBuilder<TModel> FusionButton<TModel>(
+#if NET48
+            this HtmlHelper<TModel> html,
+#else
             this IHtmlHelper<TModel> html,
+#endif
             ReactivePlan<TModel> plan,
             string elementId,
             Action<ButtonBuilder> build)

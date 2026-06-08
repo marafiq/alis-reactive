@@ -24,7 +24,7 @@
     @(Html.NativeButton("submit-btn", "Submit")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {
-            p.Post("/Sandbox/Validation/NestedBugs/SubmitParentChild", g => g.IncludeAll())
+            p.Post(Url.SandboxRoute("SubmitParentChild", "NestedBugs"), g => g.IncludeAll())
              .Validate<ParentChildBugValidator>("parent-child-form")
              .Response(r => r
                 .OnSuccess(s => s.Element("result").SetText("Saved"))

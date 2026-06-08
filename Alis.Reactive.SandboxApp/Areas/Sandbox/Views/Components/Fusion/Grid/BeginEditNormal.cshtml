@@ -1,0 +1,181 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "FusionGrid BeginEdit Edit-Mode Equivalence Proof";
+
+    const string GridId = "grid-begin-edit-normal";
+    const string DialogGridId = "grid-begin-edit-dialog";
+    const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+
+    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+
+    List<GridColumn> Columns() => new List<GridColumn>
+    {
+        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
+        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "170" },
+        new GridColumn { Field = "age", HeaderText = "Age", Width = "90", TextAlign = TextAlign.Right },
+        new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "150" },
+        new GridColumn { Field = "wing", HeaderText = "Wing", Width = "110" },
+        new GridColumn { Field = "suite", HeaderText = "Suite", Width = "110" },
+        new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "120" },
+        new GridColumn { Field = "openTasks", HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right },
+        new GridColumn { Field = "primaryNurse", HeaderText = "Primary Nurse", Width = "150" }
+    };
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
+            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
+            {
+                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Component<FusionGrid>(DialogGridId).SetDataSource(json);
+                s.Element("begin-edit-load-status").SetText("loaded beginEdit rows");
+            }));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-hstack justify="Between" align="Center" class="flex-wrap gap-3">
+        <div>
+            <native-heading level="H1">FusionGrid BeginEdit Edit-Mode Equivalence Proof</native-heading>
+            <native-text color="Secondary">
+                Care-ops edit audit: the same beginEdit payload (resident, row index, edit type) is read
+                from both the inline editor and the dialog editor the facility uses, proving the variants equivalent.
+            </native-text>
+        </div>
+        <a asp-area="Sandbox" asp-controller="Grid" asp-action="Editing"
+           class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
+            Editing grid
+        </a>
+    </native-hstack>
+
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <native-heading level="H2">BeginEdit Row</native-heading>
+        <p class="mt-2 font-mono text-sm">Load status: <span id="begin-edit-load-status" class="text-text-muted">waiting</span></p>
+
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("begin-edit-select-normal", "Select Row 1")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).SelectRow(0);
+                    p.Element("begin-edit-command-status").SetText("normal row selected");
+                }))
+            @(Html.NativeButton("begin-edit-start-normal", "Start Normal Edit")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).StartEdit();
+                    p.Element("begin-edit-command-status").SetText("normal startEdit called");
+                }))
+            @(Html.NativeButton("begin-edit-close", "Close Edit")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).CloseEdit();
+                    p.Element("begin-edit-command-status").SetText("closeEdit called");
+                }))
+            @(Html.NativeButton("begin-edit-select-locked", "Select Locked Row")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).SelectRow(1);
+                    p.Element("begin-edit-command-status").SetText("locked row selected");
+                }))
+            @(Html.NativeButton("begin-edit-start-locked", "Start Locked Edit")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).StartEdit();
+                    p.Element("begin-edit-command-status").SetText("locked startEdit called");
+                }))
+        </native-hstack>
+
+        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+            .AllowSelection(true)
+            .Toolbar(new List<string> { "Edit", "Update", "Cancel" })
+            .EditSettings(new GridEditSettings
+            {
+                AllowEditing = true,
+                AllowEditOnDblClick = false,
+                Mode = EditMode.Normal
+            })
+            .Columns(Columns()))
+            .Reactive(evt => evt.BeginEdit<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                p.Element("begin-edit-resident").SetText(args, x => x.RowData.ResidentName);
+                p.Element("begin-edit-row").SetText(args, x => x.RowIndex);
+                p.Element("begin-edit-type").SetText(args, x => x.Type);
+                p.Element("begin-edit-cancel").SetText(args, x => x.Cancel);
+                p.When(args, x => x.RowData.ResidentId).Eq(6001)
+                    .Then(t =>
+                    {
+                        args.Cancel(t);
+                        t.Element("begin-edit-cancelled").SetText("edit cancelled");
+                    });
+            }))
+
+        <native-grid cols="C3" gap="Base" class="mt-4 font-mono text-sm">
+            <p>Command: <span id="begin-edit-command-status" class="text-text-muted">waiting</span></p>
+            <p>Resident: <span id="begin-edit-resident" class="text-text-muted">waiting</span></p>
+            <p>Row index: <span id="begin-edit-row" class="text-text-muted">waiting</span></p>
+            <p>Type: <span id="begin-edit-type" class="text-text-muted">waiting</span></p>
+            <p>Cancel: <span id="begin-edit-cancel" class="text-text-muted">waiting</span></p>
+            <p>Cancel result: <span id="begin-edit-cancelled" class="text-text-muted">waiting</span></p>
+        </native-grid>
+    </section>
+
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <native-heading level="H2">Dialog Editor Variant</native-heading>
+        <native-text color="Secondary">
+            Same gesture, dialog edit mode. beginEdit must read the identical resident, row index, and type.
+        </native-text>
+
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("begin-edit-select-dialog", "Select Row 1 (Dialog)")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(DialogGridId).SelectRow(0);
+                    p.Element("begin-edit-dialog-command").SetText("dialog row selected");
+                }))
+            @(Html.NativeButton("begin-edit-start-dialog", "Start Dialog Edit")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(DialogGridId).StartEdit();
+                    p.Element("begin-edit-dialog-command").SetText("dialog startEdit called");
+                }))
+        </native-hstack>
+
+        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, DialogGridId, b => b
+            .AllowSelection(true)
+            .Toolbar(new List<string> { "Edit", "Update", "Cancel" })
+            .EditSettings(new GridEditSettings
+            {
+                AllowEditing = true,
+                AllowEditOnDblClick = false,
+                Mode = EditMode.Dialog
+            })
+            .Columns(Columns()))
+            .Reactive(evt => evt.BeginEdit<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                p.Element("begin-edit-dialog-resident").SetText(args, x => x.RowData.ResidentName);
+                p.Element("begin-edit-dialog-row").SetText(args, x => x.RowIndex);
+                p.Element("begin-edit-dialog-type").SetText(args, x => x.Type);
+            }))
+
+        <native-grid cols="C3" gap="Base" class="mt-4 font-mono text-sm">
+            <p>Command: <span id="begin-edit-dialog-command" class="text-text-muted">waiting</span></p>
+            <p>Dialog resident: <span id="begin-edit-dialog-resident" class="text-text-muted">waiting</span></p>
+            <p>Dialog row index: <span id="begin-edit-dialog-row" class="text-text-muted">waiting</span></p>
+            <p>Dialog type: <span id="begin-edit-dialog-type" class="text-text-muted">waiting</span></p>
+        </native-grid>
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

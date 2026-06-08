@@ -1,5 +1,4 @@
 @model FusionProgressButtonModel
-@using Alis.Reactive.Builders.Requests
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
@@ -161,7 +160,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var button = p.Component<FusionProgressButton>(buttonId);
-                p.Post("/Sandbox/Components/FusionProgressButton/Echo")
+                p.Post(Url.SandboxRoute("Echo", "ProgressButton"))
                     .Gather(g =>
                     {
                         g.Include(button.Content(), "content");

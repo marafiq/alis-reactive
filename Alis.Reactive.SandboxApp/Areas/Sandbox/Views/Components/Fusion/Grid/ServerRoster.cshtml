@@ -1,0 +1,132 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "Care-Ops Server-Backed Roster";
+
+    const string GridId = "server-roster-grid";
+    const string KeyedGridId = "server-keyed-grid";
+    const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+
+    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+
+    List<GridColumn> RosterColumns() => new List<GridColumn>
+    {
+        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false },
+        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "200" },
+        new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "160" },
+        new GridColumn { Field = "wing", HeaderText = "Wing", Width = "120" }
+    };
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        // SetDataSource [response path]: read the Result array out of the {Result, Count} body.
+        p.Post(Url.SandboxRoute("DirectoryData", "Grid"))
+            .Response(r => r.OnSuccess<ResidentDirectoryResponse>((json, s) =>
+            {
+                s.Component<FusionGrid>(GridId).SetDataSource(json, x => x.Result);
+                s.Element("server-load-status").SetText("loaded via response path");
+            }));
+        // Keyed grid loads from the whole-array body so server update/patch can replace rows.
+        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
+            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
+            {
+                s.Component<FusionGrid>(KeyedGridId).SetDataSource(json);
+                s.Element("server-keyed-load-status").SetText("keyed grid loaded");
+            }));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Care-Ops Server-Backed Roster</native-heading>
+    <native-text color="Secondary">
+        The roster binds from the server's <code>{ Result, Count }</code> response and applies server-driven
+        admit, row update, and keyed patch by reading the typed <code>Row</code> out of each response.
+    </native-text>
+
+    <p class="font-mono text-sm">Load status: <span id="server-load-status" class="text-text-muted">waiting</span></p>
+    <p class="font-mono text-sm">Keyed load: <span id="server-keyed-load-status" class="text-text-muted">waiting</span></p>
+
+    <native-hstack gap="Sm" class="flex-wrap">
+        @(Html.NativeButton("server-admit", "Admit Server Resident")
+            .CssClass(ButtonPrimary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("CreateEditResident", "Grid"))
+                    .Response(r => r.OnSuccess<ResidentGridEditResponse>((json, s) =>
+                    {
+                        s.Component<FusionGrid>(GridId).AddRecord(json, x => x.Row, 0);
+                        s.Element("server-command").SetText("server resident admitted");
+                    }));
+            }))
+        @(Html.NativeButton("server-update", "Update Keyed Row 0")
+            .CssClass(ButtonSecondary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("UpdateFirstResidentRow", "Grid"))
+                    .Response(r => r.OnSuccess<ResidentGridEditResponse>((json, s) =>
+                    {
+                        s.Component<FusionGrid>(KeyedGridId).UpdateRow(0, json, x => x.Row);
+                        s.Element("server-command").SetText("server row updated");
+                    }));
+            }))
+        @(Html.NativeButton("server-patch", "Patch Resident 6005")
+            .CssClass(ButtonSecondary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("PatchResidentRow", "Grid"))
+                    .Response(r => r.OnSuccess<ResidentGridOperationsResponse>((json, s) =>
+                    {
+                        s.Component<FusionGrid>(KeyedGridId).SetRowData(6005, json, x => x.Row);
+                        s.Element("server-command").SetText("server row patched");
+                    }));
+            }))
+        @(Html.NativeButton("server-nested", "Load Nested Page")
+            .CssClass(ButtonSecondary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                // SetDataSource [nested data-source property path]: read Page.Result out of the envelope.
+                p.Post(Url.SandboxRoute("NestedRoster", "Grid"))
+                    .Response(r => r.OnSuccess<ResidentRosterEnvelope>((json, s) =>
+                    {
+                        s.Component<FusionGrid>(KeyedGridId).SetDataSource(json, x => x.Page.Result);
+                        s.Element("server-command").SetText("loaded nested path");
+                    }));
+            }))
+    </native-hstack>
+
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <native-heading level="H2">Admit (server add)</native-heading>
+        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+            .AllowSelection(true)
+            .EditSettings(new GridEditSettings
+            {
+                AllowEditing = true,
+                AllowAdding = true,
+                AllowDeleting = true,
+                AllowEditOnDblClick = false,
+                Mode = EditMode.Normal
+            })
+            .Columns(RosterColumns())))
+    </section>
+
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <native-heading level="H2">Keyed Update (server update + patch)</native-heading>
+        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, KeyedGridId, b => b
+            .AllowSelection(true)
+            .EditSettings(new GridEditSettings
+            {
+                AllowEditing = true,
+                AllowEditOnDblClick = false,
+                Mode = EditMode.Normal
+            })
+            .Columns(RosterColumns())))
+
+        <p class="mt-4 font-mono text-sm">Command: <span id="server-command" class="text-text-muted">waiting</span></p>
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

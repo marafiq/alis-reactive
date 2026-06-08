@@ -1,5 +1,3 @@
-using System;
-using Alis.Reactive.Builders;
 using Alis.Reactive.Builders.Requests;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.ResponseConditions

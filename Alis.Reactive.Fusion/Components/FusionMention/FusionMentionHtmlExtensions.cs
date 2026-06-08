@@ -1,8 +1,13 @@
 using System;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.DropDowns;
 
@@ -11,7 +16,11 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionMentionHtmlExtensions
     {
         public static FusionMentionBuilder<TModel> FusionMention<TModel>(
+#if NET48
+            this HtmlHelper<TModel> html,
+#else
             this IHtmlHelper<TModel> html,
+#endif
             ReactivePlan<TModel> plan,
             string elementId,
             Action<MentionBuilder> build)
@@ -21,9 +30,15 @@ namespace Alis.Reactive.Fusion.Components
             var builder = html.EJS().Mention(hostId);
             build(builder);
 
+#if NET48
+            var content = new HtmlString(
+                RenderBridge(elementId, hostId, builder.model.Target)
+                + builder.Render().ToHtmlString());
+#else
             var content = new HtmlContentBuilder();
             content.AppendHtml(RenderBridge(elementId, hostId, builder.model.Target));
             content.AppendHtml(builder.Render());
+#endif
 
             return new FusionMentionBuilder<TModel>(plan, elementId, content);
         }

@@ -78,10 +78,10 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Fires after a batch-edit cell is saved.
         /// </summary>
-        public TypedEvent<FusionGridCellSaveArgs<TRow, TValue>> CellSaved<TRow, TValue>()
+        public TypedEvent<FusionGridCellSavedArgs<TRow, TValue>> CellSaved<TRow, TValue>()
             where TRow : class
-            => new TypedEvent<FusionGridCellSaveArgs<TRow, TValue>>(
-                "cellSaved", new FusionGridCellSaveArgs<TRow, TValue>());
+            => new TypedEvent<FusionGridCellSavedArgs<TRow, TValue>>(
+                "cellSaved", new FusionGridCellSavedArgs<TRow, TValue>());
 
         /// <summary>
         /// Fires before pending batch changes are committed.

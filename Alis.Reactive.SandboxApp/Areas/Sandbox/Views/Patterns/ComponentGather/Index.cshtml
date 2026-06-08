@@ -3,9 +3,7 @@
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
-@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @using Syncfusion.EJ2.DropDowns
-@using Microsoft.AspNetCore.Mvc.Rendering
 @{
     ViewData["Title"] = "ComponentGather";
 
@@ -157,7 +155,7 @@
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post("/Sandbox/Patterns/ComponentGather/EchoJson", g => g.IncludeAll())
+                    p.Post(Url.SandboxRoute("EchoJson", "ComponentGather"), g => g.IncludeAll())
                      .Validate<ComponentGatherValidator>("gather-form")
                      .Response(r => r
                         .OnSuccess<GatherEchoResponse>((json, s) =>
@@ -195,7 +193,7 @@
                 .CssClass("rounded-md bg-surface-alt px-4 py-2 text-sm font-medium text-text-primary border border-border hover:bg-surface-hover transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post("/Sandbox/Patterns/ComponentGather/EchoFormData", g => g.IncludeAll())
+                    p.Post(Url.SandboxRoute("EchoFormData", "ComponentGather"), g => g.IncludeAll())
                      .AsFormData()
                      .Validate<ComponentGatherValidator>("gather-form")
                      .Response(r => r
@@ -234,7 +232,7 @@
                 .CssClass("rounded-md bg-surface-alt px-4 py-2 text-sm font-medium text-text-primary border border-border hover:bg-surface-hover transition-colors")
                 .Reactive(plan, (NativeButtonEvents evt) => evt.Click, (args, p) =>
                 {
-                    p.Post("/Sandbox/Patterns/ComponentGather/EchoJson", g => g.Include<NativeTextBox, ComponentGatherModel>(
+                    p.Post(Url.SandboxRoute("EchoJson", "ComponentGather"), g => g.Include<NativeTextBox, ComponentGatherModel>(
                             IdGenerator.For<ComponentGatherModel>(m => m.ResidentName),
                             nameof(ComponentGatherModel.ResidentName)))
                      .Response(r => r.OnSuccess<GatherEchoResponse>((json, s) =>

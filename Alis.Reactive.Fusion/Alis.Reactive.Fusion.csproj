@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFrameworks>net48;net10.0</TargetFrameworks>
         <Nullable>enable</Nullable>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageId>AlisReactive.Fusion</PackageId>
@@ -10,9 +10,20 @@
         <PackageTags>reactive;aspnetcore;syncfusion;ej2;components</PackageTags>
     </PropertyGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
       <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="32.2.8" />
       <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <!-- net48 binds to ASP.NET MVC5 (System.Web.Mvc): same Syncfusion EJ2 builder API
+         via the MVC5 package, different ASP.NET host types. Mirrors the net48 group in
+         Alis.Reactive.csproj; PolySharp + ReferenceAssemblies enable C# 14 on net48. -->
+    <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+      <PackageReference Include="Syncfusion.EJ2.MVC5" Version="32.2.8" />
+      <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
+      <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+      <PackageReference Include="PolySharp" Version="1.*" PrivateAssets="all" />
+      <Reference Include="System.Web" />
     </ItemGroup>
 
     <ItemGroup>

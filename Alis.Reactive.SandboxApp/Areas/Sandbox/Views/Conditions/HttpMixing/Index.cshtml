@@ -19,8 +19,8 @@
         ?? throw new InvalidOperationException("Could not resolve HttpMixing.Classify.");
     var failValidationUrl = Url.Action("FailValidation", "HttpMixing", new { area = "Sandbox" })
         ?? throw new InvalidOperationException("Could not resolve HttpMixing.FailValidation.");
-    var routeAuditUrl = "/Sandbox/Conditions/HttpMixing/Resident/{residentId}/Audit";
-    var routeAuditTrailUrl = "/Sandbox/Conditions/HttpMixing/Resident/{residentId}/AuditTrail/{categorySlug}";
+    var routeAuditUrl = Url.SandboxRouteTemplate("AuditResident", "HttpMixing", "residentId");
+    var routeAuditTrailUrl = Url.SandboxRouteTemplate("AuditResidentTrail", "HttpMixing", "residentId", "categorySlug");
 
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s1-save-then-check", (args, p) =>
     {

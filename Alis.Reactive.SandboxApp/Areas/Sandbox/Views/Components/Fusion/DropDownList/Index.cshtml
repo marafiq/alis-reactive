@@ -17,7 +17,7 @@
 
     Html.On(plan, t => t.CustomEvent("do-gather", p =>
     {
-        p.Post("/Sandbox/Components/DropDownList/Echo", g =>
+        p.Post(Url.SandboxRoute("Echo", "DropDownList"), g =>
             g.Include<FusionDropDownList, DropDownListModel>(m => m.Category))
          .Response(r => r
             .OnSuccess(s =>

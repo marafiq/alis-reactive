@@ -1,0 +1,77 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "Care-Ops Inline Resident Edit";
+
+    const string GridId = "inline-edit-grid";
+    const string Button = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+
+    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+
+    // Focused scenario: a care lead opens, cancels, and commits an inline edit on a resident row.
+    Html.On(plan, t => t.DomReady(p =>
+        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
+            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
+            {
+                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Element("inline-status").SetText("loaded");
+            }))));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Care-Ops Inline Resident Edit</native-heading>
+    <native-text color="Secondary">
+        Open an inline editor on the first resident, cancel it, then commit it.
+    </native-text>
+
+    <native-hstack gap="Sm" class="flex-wrap">
+        @(Html.NativeButton("inline-start-edit", "Edit First Resident")
+            .CssClass(Button)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var grid = p.Component<FusionGrid>(GridId);
+                grid.SelectRow(0);
+                grid.StartEdit();
+                p.Element("inline-status").SetText("startEdit called");
+            }))
+        @(Html.NativeButton("inline-close-edit", "Cancel Edit")
+            .CssClass(Button)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Component<FusionGrid>(GridId).CloseEdit();
+                p.Element("inline-status").SetText("closeEdit called");
+            }))
+        @(Html.NativeButton("inline-end-edit", "Save Edit")
+            .CssClass(Button)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Component<FusionGrid>(GridId).EndEdit();
+                p.Element("inline-status").SetText("endEdit called");
+            }))
+    </native-hstack>
+
+    <p class="font-mono text-sm">Status: <span id="inline-status" class="text-text-muted">waiting</span></p>
+
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+            .AllowSelection(true)
+            .EditSettings(new GridEditSettings
+            {
+                AllowEditing = true,
+                AllowEditOnDblClick = false,
+                Mode = EditMode.Normal,
+                ShowConfirmDialog = false
+            })
+            .Columns(new List<GridColumn>
+            {
+                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", IsPrimaryKey = true, AllowEditing = false, Visible = false },
+                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "220" },
+                new GridColumn { Field = "openTasks", HeaderText = "Open Tasks", Width = "140", TextAlign = TextAlign.Right, EditType = "numericedit" }
+            })))
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

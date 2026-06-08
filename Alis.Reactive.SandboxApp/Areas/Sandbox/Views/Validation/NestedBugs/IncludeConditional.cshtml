@@ -22,7 +22,7 @@
     @(Html.NativeButton("submit-btn", "Submit")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {
-            p.Post("/Sandbox/Validation/NestedBugs/SubmitInclude", g => g.IncludeAll())
+            p.Post(Url.SandboxRoute("SubmitInclude", "NestedBugs"), g => g.IncludeAll())
              .Validate<IncludeBugValidator>("include-form")
              .Response(r => r
                 .OnSuccess(s => s.Element("result").SetText("Saved"))

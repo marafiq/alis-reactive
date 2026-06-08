@@ -1,3 +1,4 @@
+@using System.Text.RegularExpressions
 @{
     if (ViewData["HideSandboxBreadcrumb"] as bool? == true)
     {
@@ -9,32 +10,50 @@
 
     if (segments.Length >= 2 && segments[0].Equals("Sandbox", StringComparison.OrdinalIgnoreCase))
     {
-        var concerns = new Dictionary<string, (string Controller, string Display)>(StringComparer.OrdinalIgnoreCase)
+        // Grouping segments that have no hub index page of their own. Their crumb is
+        // shown but not linked, so navigation never lands on a 404. Every section now
+        // has a real hub route, so this is currently empty — add a segment here only if
+        // it appears in a URL path without a navigable index of its own.
+        var groupingOnly = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        // Display-name overrides where camel-case word splitting is not enough.
+        var displayOverrides = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            ["CoreBehaviors"]     = ("CoreBehaviors", "Core Behaviors"),
-            ["Conditions"]        = ("ConditionsHome", "Conditions"),
-            ["HttpPipeline"]      = ("HttpPipeline", "HTTP Pipeline"),
-            ["Validation"]        = ("ValidationHome", "Validation"),
-            ["Components"]        = ("Components", "Components"),
-            ["Patterns"] = ("Patterns", "Patterns"),
+            ["HttpPipeline"] = "HTTP Pipeline",
         };
 
-        var sandboxUrl = Url.Action("Index", "SandboxHome", new { area = "Sandbox" });
+        string Display(string seg) =>
+            displayOverrides.TryGetValue(seg, out var d)
+                ? d
+                : Regex.Replace(seg, "(?<=[a-z0-9])(?=[A-Z])", " ");
 
-        <nav class="mb-6 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
-            <a href="@sandboxUrl"
-               class="inline-flex items-center gap-1 text-text-secondary hover:text-primary transition-colors">
-                <span>&larr;</span> Sandbox
-            </a>
+        // Each crumb resolves to its own cumulative request path, so every ancestor is a
+        // real, navigable route — no hard-coded controller/action map to drift out of sync.
+        var cumulative = "";
 
-            @if (segments.Length >= 3 && concerns.TryGetValue(segments[1], out var concern))
+        <nav class="mb-6 flex items-center flex-wrap gap-x-2 gap-y-1 text-sm" aria-label="Breadcrumb">
+            @for (var i = 0; i < segments.Length; i++)
             {
-                var concernUrl = Url.Action("Index", concern.Controller, new { area = "Sandbox" });
-                <span class="text-text-muted">/</span>
-                <a href="@concernUrl"
-                   class="text-text-secondary hover:text-primary transition-colors">
-                    @concern.Display
-                </a>
+                cumulative += "/" + segments[i];
+                var isLast = i == segments.Length - 1;
+
+                if (i > 0)
+                {
+                    <span class="text-text-muted" aria-hidden="true">/</span>
+                }
+
+                if (isLast)
+                {
+                    <span class="font-medium text-text-primary" aria-current="page">@Display(segments[i])</span>
+                }
+                else if (groupingOnly.Contains(segments[i]))
+                {
+                    <span class="text-text-secondary">@Display(segments[i])</span>
+                }
+                else
+                {
+                    <a href="@cumulative" class="text-text-secondary hover:text-primary transition-colors">@Display(segments[i])</a>
+                }
             }
         </nav>
     }

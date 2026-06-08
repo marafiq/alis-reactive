@@ -16,7 +16,7 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Get("/Sandbox/Components/Tab/ResidentsPartial")
+        p.Get(Url.SandboxRoute("ResidentsPartial", "Tab"))
          .Response(r => r.OnSuccess(s =>
          {
              s.Into("lazy-tab-content");
@@ -156,7 +156,7 @@
             {
                 p.When(args, x => x.SelectedIndex).Eq(0)
                     .Then(t => t
-                        .Get("/Sandbox/Components/Tab/ResidentsPartial")
+                        .Get(Url.SandboxRoute("ResidentsPartial", "Tab"))
                         .WhileLoading(l => l.Element("lazy-tab-content").SetText("Loading..."))
                         .Response(r => r.OnSuccess(s =>
                         {
@@ -165,7 +165,7 @@
                         })))
                     .ElseIf(args, x => x.SelectedIndex).Eq(1)
                     .Then(t => t
-                        .Get("/Sandbox/Components/Tab/StaffPartial")
+                        .Get(Url.SandboxRoute("StaffPartial", "Tab"))
                         .WhileLoading(l => l.Element("lazy-tab-content").SetText("Loading..."))
                         .Response(r => r.OnSuccess(s =>
                         {
@@ -174,7 +174,7 @@
                         })))
                     .ElseIf(args, x => x.SelectedIndex).Eq(2)
                     .Then(t => t
-                        .Get("/Sandbox/Components/Tab/FacilitiesPartial")
+                        .Get(Url.SandboxRoute("FacilitiesPartial", "Tab"))
                         .WhileLoading(l => l.Element("lazy-tab-content").SetText("Loading..."))
                         .Response(r => r.OnSuccess(s =>
                         {

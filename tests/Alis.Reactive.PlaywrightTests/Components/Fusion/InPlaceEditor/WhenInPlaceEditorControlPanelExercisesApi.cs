@@ -1,5 +1,3 @@
-using Microsoft.Playwright;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
 // Control-panel buttons exercise InPlaceEditor operations through page-visible behavior.

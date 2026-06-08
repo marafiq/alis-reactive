@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Alis.Reactive.Builders;
-using Alis.Reactive.PlanModel;
 using Syncfusion.EJ2.DropDowns;
 
 namespace Alis.Reactive.Fusion.Components

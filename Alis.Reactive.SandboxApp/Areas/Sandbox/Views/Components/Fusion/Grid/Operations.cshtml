@@ -1,11 +1,9 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.GridOperationsModel
-@using Alis.Reactive
 @using Alis.Reactive.Builders
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.Templates
-@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @using Syncfusion.EJ2.Grids
 @{
     ViewData["Title"] = "FusionGrid Operations";
@@ -41,7 +39,7 @@
 
     void LoadOperationsGrid(PipelineBuilder<GridOperationsModel> p)
     {
-        p.Get("/Sandbox/Components/Grid/OperationRows")
+        p.Get(Url.SandboxRoute("OperationRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
                 s.Component<FusionGrid>(GridId).SetDataSource(json);
@@ -53,7 +51,7 @@
 
     Html.On(plan, t => t.CustomEvent<GridTemplateActionPayload>("grid:review-resident", (payload, p) =>
     {
-        p.Post("/Sandbox/Components/Grid/ReviewResident")
+        p.Post(Url.SandboxRoute("ReviewResident", "Grid"))
             .Gather(g => g.FromEvent(payload, x => x.Id, "id"))
             .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
             {
@@ -133,7 +131,7 @@
                 {
                     var grid = p.Component<FusionGrid>(GridId);
                     grid.SelectRowsByRange(0, 2);
-                    p.Post("/Sandbox/Components/Grid/SelectionRecords")
+                    p.Post(Url.SandboxRoute("SelectionRecords", "Grid"))
                         .Gather(g => g.Include(grid.SelectedRecords<GridOperationsModel, ResidentDirectoryGridItem>(), "selectedRecords"))
                         .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         {
@@ -145,7 +143,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var grid = p.Component<FusionGrid>(GridId);
-                    p.Post("/Sandbox/Components/Grid/CurrentViewSummary")
+                    p.Post(Url.SandboxRoute("CurrentViewSummary", "Grid"))
                         .Gather(g => g.Include(grid.CurrentViewRecords<GridOperationsModel, ResidentDirectoryGridItem>(), "records"))
                         .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         {
@@ -157,7 +155,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var grid = p.Component<FusionGrid>(GridId);
-                    p.Post("/Sandbox/Components/Grid/RowIndexSummary")
+                    p.Post(Url.SandboxRoute("RowIndexSummary", "Grid"))
                         .Gather(g => g.Include(grid.RowIndexByPrimaryKey(6005), "rowIndex"))
                         .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         {
@@ -184,7 +182,7 @@
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post("/Sandbox/Components/Grid/PatchResidentRow", g =>
+                    p.Post(Url.SandboxRoute("PatchResidentRow", "Grid"), g =>
                     {
                         g.Include<FusionDropDownList, GridOperationsModel>(m => m.PatchRiskLevel);
                         g.Include<FusionNumericTextBox, GridOperationsModel>(m => m.PatchOpenTasks);

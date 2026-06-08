@@ -1,0 +1,121 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "Care-Ops Resident Edit Form Templates";
+
+    const string InlineGridId = "inline-template-grid";
+    const string DialogGridId = "dialog-template-grid";
+    const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+
+    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+
+    var careLevelOptions = new List<string> { "Independent", "Assisted Living", "Memory Care", "Skilled Nursing" };
+    var riskOptions = new List<string> { "Low", "Moderate", "High" };
+    var nursePairs = new[]
+    {
+        new { Code = "NE", Name = "Nora Ellis" },
+        new { Code = "MS", Name = "Malik Stone" },
+        new { Code = "ER", Name = "Elena Ruiz" },
+        new { Code = "OP", Name = "Owen Park" }
+    };
+
+    // Inline column editors: 2-arg Select, typed 4-arg Select, native DateInput.
+    List<GridColumn> InlineColumns() => new List<GridColumn>
+    {
+        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
+        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "180" },
+        new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "170",
+            EditTemplate = FusionGridEditTemplates.Select((ResidentDirectoryGridItem r) => r.CareLevel, careLevelOptions) },
+        new GridColumn { Field = "primaryNurse", HeaderText = "Primary Nurse", Width = "180",
+            EditTemplate = FusionGridEditTemplates.Select((ResidentDirectoryGridItem r) => r.PrimaryNurse, nursePairs, n => n.Name, n => n.Code) },
+        new GridColumn { Field = "nextReviewDate", HeaderText = "Next Review", Width = "150",
+            EditTemplate = FusionGridEditTemplates.DateInput((ResidentDirectoryGridItem r) => r.NextReviewDate) }
+    };
+
+    // Dialog form editors: labeled Text, Number, Date, 3-arg Select.
+    List<GridColumn> DialogColumns() => new List<GridColumn>
+    {
+        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
+        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "180" },
+        new GridColumn { Field = "openTasks", HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right },
+        new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "140" },
+        new GridColumn { Field = "nextReviewDate", HeaderText = "Next Review", Width = "150" }
+    };
+
+    var dialogTemplate = FusionGridEditTemplates.DialogForm<ResidentDirectoryGridItem>(d => d
+        .Text(m => m.ResidentName, "Resident")
+        .Number(m => m.OpenTasks, "Open Tasks")
+        .Date(m => m.NextReviewDate, "Next Review")
+        .Select(m => m.RiskLevel, "Risk", riskOptions));
+
+    Html.On(plan, t => t.DomReady(p =>
+        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
+            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
+            {
+                s.Component<FusionGrid>(InlineGridId).SetDataSource(json);
+                s.Component<FusionGrid>(DialogGridId).SetDataSource(json);
+                s.Element("edit-form-load-status").SetText("loaded edit form rows");
+            }))));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Care-Ops Resident Edit Form Templates</native-heading>
+    <native-text color="Secondary">
+        The facility edits residents two ways: quick inline cell editors (typed dropdowns and a date
+        picker) and a full dialog admission form. Each typed edit template renders its own editor.
+    </native-text>
+
+    <p class="font-mono text-sm">Load status: <span id="edit-form-load-status" class="text-text-muted">waiting</span></p>
+
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <native-heading level="H2">Inline Cell Editors</native-heading>
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("inline-tpl-edit", "Edit First Row")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(InlineGridId);
+                    grid.SelectRow(0);
+                    grid.StartEdit();
+                    p.Element("inline-tpl-status").SetText("inline edit started");
+                }))
+        </native-hstack>
+        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, InlineGridId, b => b
+            .AllowSelection(true)
+            .EditSettings(new GridEditSettings { AllowEditing = true, AllowEditOnDblClick = false, Mode = EditMode.Normal })
+            .Columns(InlineColumns())))
+        <p class="mt-3 font-mono text-sm">Status: <span id="inline-tpl-status" class="text-text-muted">waiting</span></p>
+    </section>
+
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <native-heading level="H2">Dialog Admission Form</native-heading>
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("dialog-tpl-edit", "Open Admission Form")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(DialogGridId);
+                    grid.SelectRow(0);
+                    grid.StartEdit();
+                    p.Element("dialog-tpl-status").SetText("dialog edit started");
+                }))
+        </native-hstack>
+        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, DialogGridId, b => b
+            .AllowSelection(true)
+            .EditSettings(new GridEditSettings
+            {
+                AllowEditing = true,
+                AllowEditOnDblClick = false,
+                Mode = EditMode.Dialog,
+                Template = dialogTemplate
+            })
+            .Columns(DialogColumns())))
+        <p class="mt-3 font-mono text-sm">Status: <span id="dialog-tpl-status" class="text-text-muted">waiting</span></p>
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

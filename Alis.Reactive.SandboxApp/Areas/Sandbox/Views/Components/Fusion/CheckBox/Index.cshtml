@@ -1,5 +1,4 @@
 @model FusionCheckBoxModel
-@using Alis.Reactive.Builders.Requests
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
@@ -112,7 +111,7 @@
             {
                 var consent = p.Component<FusionCheckBox>(m => m.ConsentAccepted);
                 var review = p.Component<FusionCheckBox>(m => m.ReviewNeeded);
-                p.Post("/Sandbox/Components/FusionCheckBox/Echo")
+                p.Post(Url.SandboxRoute("Echo", "FusionCheckBox"))
                     .Gather(g =>
                     {
                         g.Include(consent.Checked(), "checked");

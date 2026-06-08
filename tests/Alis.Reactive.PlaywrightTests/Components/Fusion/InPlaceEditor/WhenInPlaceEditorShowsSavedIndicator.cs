@@ -1,5 +1,3 @@
-using Microsoft.Playwright;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
 // ActionSuccess and BeginEdit class toggles must survive Syncfusion edit/close cycles on the outer wrapper.

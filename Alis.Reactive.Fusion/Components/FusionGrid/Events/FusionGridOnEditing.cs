@@ -24,14 +24,15 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionGridEditActionArgs<TRow>
         where TRow : class
     {
+        public string? Name { get; set; }
         public string? RequestType { get; set; }
         public string? Action { get; set; }
         public string? Type { get; set; }
         public bool Cancel { get; set; }
         public TRow Data { get; set; } = default!;
         public TRow PreviousData { get; set; } = default!;
+        public int? RowIndex { get; set; }
         public int SelectedRow { get; set; }
-        public int Index { get; set; }
     }
 
     public class FusionGridCellSaveArgs<TRow, TValue>
@@ -42,6 +43,15 @@ namespace Alis.Reactive.Fusion.Components
         public TValue? Value { get; set; }
         public TValue? PreviousValue { get; set; }
         public bool Cancel { get; set; }
+    }
+
+    public class FusionGridCellSavedArgs<TRow, TValue>
+        where TRow : class
+    {
+        public TRow RowData { get; set; } = default!;
+        public string? ColumnName { get; set; }
+        public TValue? Value { get; set; }
+        public TValue? PreviousValue { get; set; }
     }
 
     public class FusionGridBeforeBatchSaveArgs<TRow>

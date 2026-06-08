@@ -1,4 +1,6 @@
+using Alis.Reactive.Fusion.Components;
 using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
@@ -60,8 +62,118 @@ public class WhenUsingFusionGridEditing : PlaywrightTestBase
     }
 
     [Test]
+    public async Task action_begin_save_edit_reads_typed_current_previous_and_action_fields()
+    {
+        Assert.That(
+            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("Row"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("Form"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("Target"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("ForeignKeyData"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("IsScroll"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("PrimaryKey"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("PrimaryKeyValue"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("RowData"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("Index"),
+            Is.Null);
+
+        await NavigateEditing();
+
+        await ClickWhenStable(Page.Locator("#inline-select-first"));
+        await ClickWhenStable(Page.Locator("#inline-start-edit"));
+        await Expect(Page.Locator("#resident-inline-edit-grid .e-editedrow"))
+            .ToBeVisibleAsync(new() { Timeout = 10000 });
+
+        var editInput = Page.Locator("#resident-inline-edit-grid input[name='residentName']");
+        await Expect(editInput).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await editInput.FillAsync("Amina ActionBegin");
+
+        await ClickWhenStable(Page.Locator("#inline-end-edit"));
+
+        await Expect(Page.Locator("#inline-action-begin"))
+            .ToHaveTextAsync("save", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#inline-action-begin-action"))
+            .ToHaveTextAsync("edit", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#inline-action-begin-type"))
+            .ToHaveTextAsync("actionBegin", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#inline-action-begin-event"))
+            .ToHaveTextAsync("actionBegin", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#inline-action-begin-cancel"))
+            .ToHaveTextAsync("false", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#inline-action-begin-row"))
+            .ToHaveTextAsync("0", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#inline-action-begin-selected-row"))
+            .ToHaveTextAsync("-1", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#inline-action-begin-resident"))
+            .ToHaveTextAsync("Amina ActionBegin", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#inline-action-begin-previous-resident"))
+            .ToHaveTextAsync("Amina Patel", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#resident-inline-edit-grid"))
+            .ToContainTextAsync("Amina ActionBegin", new() { Timeout = 10000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task batch_editing_exposes_cell_events_indexed_batch_payload_and_batch_changes_source()
     {
+        Assert.That(
+            typeof(FusionGridCellSaveArgs<ResidentDirectoryGridItem, int>).GetProperty("Cell"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridCellSaveArgs<ResidentDirectoryGridItem, int>).GetProperty("Column"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridCellSaveArgs<ResidentDirectoryGridItem, int>).GetProperty("ColumnObject"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridCellSaveArgs<ResidentDirectoryGridItem, int>).GetProperty("IsForeignKey"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridCellSaveArgs<ResidentDirectoryGridItem, int>).GetProperty("Name"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("Cancel"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("Cell"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("Column"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("ColumnObject"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("IsForeignKey"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("Name"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridBeforeBatchSaveArgs<ResidentDirectoryGridItem>).GetProperty("Name"),
+            Is.Null);
+        Assert.That(
+            typeof(FusionGridEditEventArgsExtensions).GetMethods()
+                .Where(method => method.Name == nameof(FusionGridEditEventArgsExtensions.Cancel))
+                .Any(method => method.GetParameters()[0].ParameterType.Name.StartsWith("FusionGridCellSavedArgs")),
+            Is.False);
+
         await NavigateEditing();
 
         await ClickWhenStable(Page.Locator("#batch-edit-cell"));
@@ -72,7 +184,13 @@ public class WhenUsingFusionGridEditing : PlaywrightTestBase
 
         await Expect(Page.Locator("#batch-cell-save-column")).ToHaveTextAsync("openTasks", new() { Timeout = 10000 });
         await Expect(Page.Locator("#batch-cell-save-value")).ToHaveTextAsync("4", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#batch-cell-save-previous")).ToHaveTextAsync("0", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#batch-cell-save-resident")).ToHaveTextAsync("Amina Patel", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#batch-cell-save-cancel")).ToHaveTextAsync("false", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#batch-cell-saved-column")).ToHaveTextAsync("openTasks", new() { Timeout = 10000 });
         await Expect(Page.Locator("#batch-cell-saved-value")).ToHaveTextAsync("4", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#batch-cell-saved-previous")).ToHaveTextAsync("0", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#batch-cell-saved-resident")).ToHaveTextAsync("Amina Patel", new() { Timeout = 10000 });
 
         await ClickWhenStable(Page.Locator("#batch-update-cell"));
         await Expect(Page.Locator("#resident-batch-edit-grid")).ToContainTextAsync("6", new() { Timeout = 10000 });
@@ -84,7 +202,40 @@ public class WhenUsingFusionGridEditing : PlaywrightTestBase
 
         await ClickWhenStable(Page.Locator("#batch-end-edit"));
         await Expect(Page.Locator("#batch-before-save-tasks")).ToHaveTextAsync("6", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#batch-before-save-resident")).ToHaveTextAsync("Amina Patel", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#batch-before-save-cancel")).ToHaveTextAsync("false", new() { Timeout = 10000 });
         await Expect(Page.Locator("#batch-action-complete")).Not.ToHaveTextAsync("waiting", new() { Timeout = 10000 });
+
+        await ClickWhenStable(Page.Locator("#batch-edit-cell"));
+        await Expect(Page.Locator("#resident-batch-edit-grid input.e-field").First)
+            .ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Page.Locator("#resident-batch-edit-grid input.e-field").First.FillAsync("99");
+        await ClickWhenStable(Page.Locator("#batch-save-cell"));
+        await Expect(Page.Locator("#batch-cell-save-value")).ToHaveTextAsync("99", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#batch-cell-save-previous")).ToHaveTextAsync("6", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#batch-cell-save-cancelled")).ToHaveTextAsync("blocked 99", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#resident-batch-edit-grid")).ToContainTextAsync("6", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#resident-batch-edit-grid")).Not.ToContainTextAsync("99", new() { Timeout = 10000 });
+
+        await ClickWhenStable(Page.Locator("#batch-edit-cell"));
+        await Expect(Page.Locator("#resident-batch-edit-grid input.e-field").First)
+            .ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Page.Locator("#resident-batch-edit-grid input.e-field").First.FillAsync("8");
+        await ClickWhenStable(Page.Locator("#batch-save-cell"));
+        await Expect(Page.Locator("#batch-cell-save-value")).ToHaveTextAsync("8", new() { Timeout = 10000 });
+
+        await ClickWhenStable(Page.Locator("#batch-end-edit"));
+        await Expect(Page.Locator("#batch-before-save-tasks")).ToHaveTextAsync("8", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#batch-before-save-cancelled")).ToHaveTextAsync("blocked batch 8", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#batch-action-complete")).ToHaveTextAsync("waiting after cancelled batch", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#resident-batch-edit-grid")).ToContainTextAsync("8", new() { Timeout = 10000 });
+
+        await ClickWhenStable(Page.Locator("#batch-gather-changes"));
+        await Expect(Page.Locator("#batch-summary")).ToHaveTextAsync(
+            "batch added 0, changed 1, deleted 0",
+            new() { Timeout = 10000 });
+        await Expect(Page.Locator("#batch-action-complete"))
+            .ToHaveTextAsync("waiting after cancelled batch", new() { Timeout = 10000 });
 
         AssertNoConsoleErrors();
     }

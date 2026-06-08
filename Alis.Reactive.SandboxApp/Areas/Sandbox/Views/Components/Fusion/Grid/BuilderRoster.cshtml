@@ -1,0 +1,43 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "Care-Ops Printed Care Roster";
+
+    const string GridId = "builder-roster-grid";
+
+    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+
+    // Initial builder-owned dataSource: the roster is bound at render time through the
+    // Syncfusion builder, with no HTTP round-trip or reaction.
+    var roster = new List<ResidentDirectoryGridItem>
+    {
+        new ResidentDirectoryGridItem { ResidentId = 6000, ResidentName = "Amina Patel", CareLevel = "Independent", Wing = "North" },
+        new ResidentDirectoryGridItem { ResidentId = 6001, ResidentName = "Grace Bennett", CareLevel = "Assisted Living", Wing = "North" },
+        new ResidentDirectoryGridItem { ResidentId = 6002, ResidentName = "Henry Liu", CareLevel = "Memory Care", Wing = "East" }
+    };
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Care-Ops Printed Care Roster</native-heading>
+    <native-text color="Secondary">
+        A fixed shift roster is rendered straight from the server through the grid builder's own
+        data source - no fetch, no reaction.
+    </native-text>
+
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+            .DataSource(roster)
+            .AllowSelection(true)
+            .Columns(new List<GridColumn>
+            {
+                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true },
+                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "200" },
+                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "160" },
+                new GridColumn { Field = "wing", HeaderText = "Wing", Width = "120" }
+            })))
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

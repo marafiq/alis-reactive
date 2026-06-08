@@ -1,0 +1,163 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "Care-Ops Batch Task Update";
+
+    const string BatchGridId = "resident-batch-edit-grid";
+    const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+    const string ButtonAccent = "rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90";
+
+    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+
+    List<GridColumn> EditColumns() => new List<GridColumn>
+    {
+        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
+        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "180" },
+        new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "150" },
+        new GridColumn { Field = "wing", HeaderText = "Wing", Width = "110" },
+        new GridColumn { Field = "openTasks", HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right }
+    };
+
+    Html.On(plan, t => t.DomReady(p =>
+        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
+            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
+            {
+                s.Component<FusionGrid>(BatchGridId).SetDataSource(json);
+                s.Element("batch-load-status").SetText("loaded batch rows");
+            }))));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Care-Ops Batch Task Update</native-heading>
+    <native-text color="Secondary">
+        A nurse manager batch-edits open-task counts across residents. Each cell save fires
+        <code>cellSave</code>/<code>cellSaved</code>; the manager blocks an impossible per-cell value (99),
+        and the system blocks committing a batch that pushes a resident to 8 open tasks via
+        <code>beforeBatchSave</code> before the change persists.
+    </native-text>
+
+    <p class="font-mono text-sm">Load status: <span id="batch-load-status" class="text-text-muted">waiting</span></p>
+
+    <native-hstack gap="Sm" class="flex-wrap">
+        @(Html.NativeButton("batch-edit-cell", "Edit Tasks Cell")
+            .CssClass(ButtonSecondary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Component<FusionGrid>(BatchGridId)
+                    .EditCell(0, (ResidentDirectoryGridItem x) => x.OpenTasks);
+                p.Element("batch-command-status").SetText("editCell called");
+            }))
+        @(Html.NativeButton("batch-update-cell", "Set Tasks To 6")
+            .CssClass(ButtonPrimary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Component<FusionGrid>(BatchGridId)
+                    .UpdateCell(0, (ResidentDirectoryGridItem x) => x.OpenTasks, 6);
+                p.Element("batch-command-status").SetText("updateCell called");
+            }))
+        @(Html.NativeButton("batch-save-cell", "Save Cell")
+            .CssClass(ButtonSecondary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Component<FusionGrid>(BatchGridId).SaveCell();
+                p.Element("batch-command-status").SetText("saveCell called");
+            }))
+        @(Html.NativeButton("batch-gather-changes", "Gather Changes")
+            .CssClass(ButtonAccent)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var grid = p.Component<FusionGrid>(BatchGridId);
+                p.Post(Url.SandboxRoute("BatchSummary", "Grid"))
+                    .Gather(g => g.Include(grid.BatchChanges<ResidentGridEditingModel, ResidentDirectoryGridItem>(), "batchChanges"))
+                    .Response(r => r.OnSuccess<ResidentGridBatchSummaryResponse>((json, s) =>
+                    {
+                        s.Element("batch-summary").SetText(json, x => x.Summary);
+                    }));
+            }))
+        @(Html.NativeButton("batch-end-edit", "Commit Batch")
+            .CssClass(ButtonPrimary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Component<FusionGrid>(BatchGridId).EndEdit();
+                p.Element("batch-command-status").SetText("endEdit called");
+            }))
+    </native-hstack>
+
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, BatchGridId, b => b
+            .AllowSelection(true)
+            .Toolbar(new List<string> { "Update", "Cancel" })
+            .EditSettings(new GridEditSettings
+            {
+                AllowEditing = true,
+                AllowEditOnDblClick = false,
+                Mode = EditMode.Batch,
+                ShowConfirmDialog = false
+            })
+            .Columns(EditColumns()))
+            .Reactive(evt => evt.CellSave<ResidentDirectoryGridItem, int>(), (args, p) =>
+            {
+                p.Element("batch-cell-save-column").SetText(args, x => x.ColumnName);
+                p.Element("batch-cell-save-value").SetText(args, x => x.Value);
+                p.Element("batch-cell-save-previous").SetText(args, x => x.PreviousValue);
+                p.Element("batch-cell-save-resident").SetText(args, x => x.RowData.ResidentName);
+                p.Element("batch-cell-save-cancel").SetText(args, x => x.Cancel);
+                p.When(args, x => x.Value).Eq(99)
+                    .Then(t =>
+                    {
+                        args.Cancel(t);
+                        t.Element("batch-cell-save-cancelled").SetText("blocked 99");
+                    });
+            })
+            .Reactive(evt => evt.CellSaved<ResidentDirectoryGridItem, int>(), (args, p) =>
+            {
+                p.Element("batch-cell-saved-column").SetText(args, x => x.ColumnName);
+                p.Element("batch-cell-saved-value").SetText(args, x => x.Value);
+                p.Element("batch-cell-saved-previous").SetText(args, x => x.PreviousValue);
+                p.Element("batch-cell-saved-resident").SetText(args, x => x.RowData.ResidentName);
+            })
+            .Reactive(evt => evt.BeforeBatchSave<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                p.Element("batch-before-save-resident").SetText(args, x => x.BatchChanges.ChangedRecords[0].ResidentName);
+                p.Element("batch-before-save-tasks").SetText(args, x => x.BatchChanges.ChangedRecords[0].OpenTasks);
+                p.Element("batch-before-save-cancel").SetText(args, x => x.Cancel);
+                p.When(args, x => x.BatchChanges.ChangedRecords[0].OpenTasks).Eq(8)
+                    .Then(t =>
+                    {
+                        args.Cancel(t);
+                        t.Element("batch-before-save-cancelled").SetText("blocked batch 8");
+                        t.Element("batch-action-complete").SetText("waiting after cancelled batch");
+                    });
+            })
+            .Reactive(evt => evt.ActionComplete<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                p.Element("batch-action-complete").SetText(args, x => x.RequestType);
+            }))
+
+        <native-grid cols="C4" gap="Base" class="mt-4 font-mono text-sm">
+            <p>Status: <span id="batch-command-status" class="text-text-muted">waiting</span></p>
+            <p>Cell column: <span id="batch-cell-save-column" class="text-text-muted">waiting</span></p>
+            <p>Cell value: <span id="batch-cell-save-value" class="text-text-muted">waiting</span></p>
+            <p>Cell previous: <span id="batch-cell-save-previous" class="text-text-muted">waiting</span></p>
+            <p>Cell resident: <span id="batch-cell-save-resident" class="text-text-muted">waiting</span></p>
+            <p>Cell cancel: <span id="batch-cell-save-cancel" class="text-text-muted">waiting</span></p>
+            <p>Cell blocked: <span id="batch-cell-save-cancelled" class="text-text-muted">not blocked</span></p>
+            <p>Cell saved column: <span id="batch-cell-saved-column" class="text-text-muted">waiting</span></p>
+            <p>Cell saved: <span id="batch-cell-saved-value" class="text-text-muted">waiting</span></p>
+            <p>Cell saved previous: <span id="batch-cell-saved-previous" class="text-text-muted">waiting</span></p>
+            <p>Cell saved resident: <span id="batch-cell-saved-resident" class="text-text-muted">waiting</span></p>
+            <p>Batch resident: <span id="batch-before-save-resident" class="text-text-muted">waiting</span></p>
+            <p>Batch tasks: <span id="batch-before-save-tasks" class="text-text-muted">waiting</span></p>
+            <p>Batch cancel: <span id="batch-before-save-cancel" class="text-text-muted">waiting</span></p>
+            <p>Batch blocked: <span id="batch-before-save-cancelled" class="text-text-muted">not blocked</span></p>
+            <p>Batch action: <span id="batch-action-complete" class="text-text-muted">waiting</span></p>
+            <p>Batch summary: <span id="batch-summary" class="text-text-muted">not gathered</span></p>
+        </native-grid>
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

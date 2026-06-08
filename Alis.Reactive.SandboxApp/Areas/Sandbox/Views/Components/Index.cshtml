@@ -3,12 +3,17 @@
 }
 
 <h1 class="text-2xl font-bold text-text-primary mb-2">Components</h1>
-<p class="text-text-secondary mb-8">Input vertical slices across all vendors</p>
+<p class="text-text-secondary mb-8">Input and display vertical slices, grouped by component family across the Native and Fusion vendors</p>
+
+<div class="mt-2 mb-6 flex items-center gap-3">
+    <span class="inline-flex items-center rounded-full bg-success/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-success ring-1 ring-success/20">Native</span>
+    <div class="h-px flex-1 bg-border/50"></div>
+</div>
 
 <section class="mb-10">
     <div class="flex items-center gap-3 mb-4">
         <span class="w-1 h-6 rounded-full bg-success"></span>
-        <h2 class="text-lg font-semibold text-text-primary">Native</h2>
+        <h2 class="text-lg font-semibold text-text-primary">Inputs</h2>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <a asp-area="Sandbox" asp-controller="NativeButton" asp-action="Index"
@@ -34,6 +39,19 @@
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
                 Type text and see value binding update other elements reactively via input events
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="NativeTextArea" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    NativeTextArea
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Type in a textarea and see value binding, useful for care notes and long-form input
             </p>
         </a>
 
@@ -89,19 +107,6 @@
             </p>
         </a>
 
-        <a asp-area="Sandbox" asp-controller="NativeTextArea" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    NativeTextArea
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Type in a textarea and see value binding, useful for care notes and long-form input
-            </p>
-        </a>
-
         <a asp-area="Sandbox" asp-controller="NativeHiddenField" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
@@ -119,8 +124,60 @@
 
 <section class="mb-10">
     <div class="flex items-center gap-3 mb-4">
+        <span class="w-1 h-6 rounded-full bg-success"></span>
+        <h2 class="text-lg font-semibold text-text-primary">Operations</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <a asp-area="Sandbox" asp-controller="ArrayOps" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    ArrayOps
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Operate on a resident object array — count, filter, sum, and pluck values entirely client-side
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="DomOps" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    DomOps
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Drive direct DOM operations from reactions — toggle classes and element state without manual scripts
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="ShiftReport" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    ShiftReport
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Operate on a custom event payload array — gather and transform a nurse shift report
+            </p>
+        </a>
+    </div>
+</section>
+
+<div class="mt-2 mb-6 flex items-center gap-3">
+    <span class="inline-flex items-center rounded-full bg-info/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-info ring-1 ring-info/20">Fusion</span>
+    <div class="h-px flex-1 bg-border/50"></div>
+</div>
+
+<section class="mb-10">
+    <div class="flex items-center gap-3 mb-4">
         <span class="w-1 h-6 rounded-full bg-info"></span>
-        <h2 class="text-lg font-semibold text-text-primary">Fusion</h2>
+        <h2 class="text-lg font-semibold text-text-primary">Buttons &amp; Actions</h2>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <a asp-area="Sandbox" asp-controller="Button" asp-action="Index"
@@ -133,71 +190,6 @@
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
                 Syncfusion button with typed content, disabled state, styling, focus, and click methods
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="Menu" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Menu
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Syncfusion menu with typed hamburger open and close methods, nested item payloads, cancelable guards, and selection events
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="ContextMenu" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    ContextMenu
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Syncfusion context menu with typed open and close methods, nested item payloads, cancelable guards, and selection events
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="BulletChart" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    BulletChart
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Syncfusion bullet chart with typed load, render, legend, tooltip payload update, click payloads, and wrapped index reads
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="FusionCheckBox" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    FusionCheckBox
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Syncfusion checkbox with typed checked, indeterminate, disabled, click, focus, and change behavior
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="RadioButton" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    RadioButton
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Syncfusion radio button with typed checked, disabled, selected value, click, focus, and change behavior
             </p>
         </a>
 
@@ -240,19 +232,27 @@
             </p>
         </a>
 
-        <a asp-area="Sandbox" asp-controller="DropDownList" asp-action="Index"
+        <a asp-area="Sandbox" asp-controller="Toolbar" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    DropDownList
+                    Toolbar
                 </h3>
                 <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Syncfusion dropdown — select a value and see it update other components and get included in form submissions
+                Typed toolbar button state, content, click payloads, and enabled/disabled control
             </p>
         </a>
+    </div>
+</section>
 
+<section class="mb-10">
+    <div class="flex items-center gap-3 mb-4">
+        <span class="w-1 h-6 rounded-full bg-info"></span>
+        <h2 class="text-lg font-semibold text-text-primary">Text Entry</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <a asp-area="Sandbox" asp-controller="TextBox" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
@@ -279,45 +279,6 @@
             </p>
         </a>
 
-        <a asp-area="Sandbox" asp-controller="Slider" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Slider
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Numeric scalar and range sliders with typed value reads, writes, and change payloads
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="Rating" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Rating
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Numeric rating control with typed value reads, writes, reset, and value-changed payloads
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="OtpInput" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    OtpInput
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                One-time code entry with typed value reads, writes, focus methods, and input/change payloads
-            </p>
-        </a>
-
         <a asp-area="Sandbox" asp-controller="NumericTextBox" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
@@ -331,107 +292,16 @@
             </p>
         </a>
 
-        <a asp-area="Sandbox" asp-controller="AutoComplete" asp-action="Index"
+        <a asp-area="Sandbox" asp-controller="OtpInput" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    AutoComplete
+                    OtpInput
                 </h3>
                 <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Start typing to see async-filtered suggestions from the server, select one to fire change events
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="MultiSelect" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    MultiSelect
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Pick multiple items from a dropdown, see selected array gathered for POST payloads
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="FusionDatePicker" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    FusionDatePicker
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Pick a date from the calendar popup, see it formatted as ISO for use in conditions and form submissions
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="FusionInPlaceEditor" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    FusionInPlaceEditor
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Click-to-edit a single field, commit via the reactive HTTP pipeline and reuse FluentValidation client metadata
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="DateTimePicker" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    DateTimePicker
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Pick date and time together — useful for medication schedules and appointment booking
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="TimePicker" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    TimePicker
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Pick a time value, see it bound reactively — useful for shift schedules and routine timing
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="DateRangePicker" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    DateRangePicker
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Select a start and end date range for billing periods or stay durations
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="MultiColumnComboBox" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    MultiColumnComboBox
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Search and select from a multi-column grid dropdown showing structured data (name, code, description)
+                One-time code entry with typed value reads, writes, focus methods, and input/change payloads
             </p>
         </a>
 
@@ -461,159 +331,37 @@
             </p>
         </a>
 
-        <a asp-area="Sandbox" asp-controller="Switch" asp-action="Index"
+        <a asp-area="Sandbox" asp-controller="FusionInPlaceEditor" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Switch
+                    FusionInPlaceEditor
                 </h3>
                 <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Flip the toggle switch and see its boolean state drive conditions and update other components
+                Click-to-edit a single field, commit via the reactive HTTP pipeline and reuse FluentValidation client metadata
             </p>
         </a>
+    </div>
+</section>
 
-        <a asp-area="Sandbox" asp-controller="ColorPicker" asp-action="Index"
+<section class="mb-10">
+    <div class="flex items-center gap-3 mb-4">
+        <span class="w-1 h-6 rounded-full bg-info"></span>
+        <h2 class="text-lg font-semibold text-text-primary">Selection &amp; Lists</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <a asp-area="Sandbox" asp-controller="DropDownList" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    ColorPicker
+                    DropDownList
                 </h3>
                 <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Pick a color from the palette, see hex value bound reactively with conditions and toggle popup
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="FileUpload" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    FileUpload
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Select files and see them uploaded via FormData POST, with reactive feedback on upload progress
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="Schedule" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Schedule
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Calendar scheduler with event CRUD — create, drag, and resize appointments with reactive validation
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="Mention" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Mention
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Mention picker with typed search, popup lifecycle, and selected-value event payloads
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="ChipList" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    ChipList
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Chips with typed add, select, remove, return-value sources, and click/delete events
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="SmartComponents" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    SmartComponents
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Smart textarea and paste button with endpoint-backed typed render helpers and runtime methods
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="AIAssistView" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    AIAssistView
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                AI assist chat with typed runtime prompt execution, response updates, and event payloads
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="PivotView" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    PivotView
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Pivot table with typed runtime data refresh, layout persistence, and cell event payloads
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="Kanban" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Kanban
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Care task board with remote data, typed templates, method-return sources, and CRUD event payloads
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="Breadcrumb" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Breadcrumb
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Breadcrumb navigation with typed active item reads and item click payloads
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="Carousel" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Carousel
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Image and content carousel with typed active index, navigation methods, and slide lifecycle events
+                Syncfusion dropdown — select a value and see it update other components and get included in form submissions
             </p>
         </a>
 
@@ -627,6 +375,45 @@
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
                 Typed dropdown combo box with value reads, focus, selection, and filtering payloads
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="MultiColumnComboBox" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    MultiColumnComboBox
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Search and select from a multi-column grid dropdown showing structured data (name, code, description)
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="MultiSelect" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    MultiSelect
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Pick multiple items from a dropdown, see selected array gathered for POST payloads
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="AutoComplete" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    AutoComplete
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Start typing to see async-filtered suggestions from the server, select one to fire change events
             </p>
         </a>
 
@@ -669,42 +456,261 @@
             </p>
         </a>
 
-        <a asp-area="Sandbox" asp-controller="Sidebar" asp-action="Index"
+        <a asp-area="Sandbox" asp-controller="Mention" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Sidebar
+                    Mention
                 </h3>
                 <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Collapsible sidebar with typed open state, show/hide/toggle methods, and open/close events
+                Mention picker with typed search, popup lifecycle, and selected-value event payloads
             </p>
         </a>
 
-        <a asp-area="Sandbox" asp-controller="SmartComponents" asp-action="Index"
+        <a asp-area="Sandbox" asp-controller="ChipList" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    SmartPasteButton
+                    ChipList
                 </h3>
                 <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                AI-assisted paste action button with typed click, focus, and disabled state
+                Chips with typed add, select, remove, return-value sources, and click/delete events
             </p>
         </a>
 
-        <a asp-area="Sandbox" asp-controller="SmartComponents" asp-action="Index"
+        <a asp-area="Sandbox" asp-controller="ChipFilter" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    SmartTextArea
+                    ChipFilter
                 </h3>
                 <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                AI-assisted textarea with typed value reads, writes, focus, and suggestion payloads
+                Multi-select chips act as a live filter over a resident list — selected chips drive the reactive query
+            </p>
+        </a>
+    </div>
+</section>
+
+<section class="mb-10">
+    <div class="flex items-center gap-3 mb-4">
+        <span class="w-1 h-6 rounded-full bg-info"></span>
+        <h2 class="text-lg font-semibold text-text-primary">Toggles, Ratings &amp; Pickers</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <a asp-area="Sandbox" asp-controller="FusionCheckBox" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    FusionCheckBox
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Syncfusion checkbox with typed checked, indeterminate, disabled, click, focus, and change behavior
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="RadioButton" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    RadioButton
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Syncfusion radio button with typed checked, disabled, selected value, click, focus, and change behavior
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="Switch" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    Switch
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Flip the toggle switch and see its boolean state drive conditions and update other components
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="Rating" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    Rating
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Numeric rating control with typed value reads, writes, reset, and value-changed payloads
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="Slider" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    Slider
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Numeric scalar and range sliders with typed value reads, writes, and change payloads
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="ColorPicker" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    ColorPicker
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Pick a color from the palette, see hex value bound reactively with conditions and toggle popup
+            </p>
+        </a>
+    </div>
+</section>
+
+<section class="mb-10">
+    <div class="flex items-center gap-3 mb-4">
+        <span class="w-1 h-6 rounded-full bg-info"></span>
+        <h2 class="text-lg font-semibold text-text-primary">Date &amp; Time</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <a asp-area="Sandbox" asp-controller="FusionDatePicker" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    FusionDatePicker
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Pick a date from the calendar popup, see it formatted as ISO for use in conditions and form submissions
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="DateTimePicker" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    DateTimePicker
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Pick date and time together — useful for medication schedules and appointment booking
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="TimePicker" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    TimePicker
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Pick a time value, see it bound reactively — useful for shift schedules and routine timing
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="DateRangePicker" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    DateRangePicker
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Select a start and end date range for billing periods or stay durations
+            </p>
+        </a>
+    </div>
+</section>
+
+<section class="mb-10">
+    <div class="flex items-center gap-3 mb-4">
+        <span class="w-1 h-6 rounded-full bg-info"></span>
+        <h2 class="text-lg font-semibold text-text-primary">Menus, Navigation &amp; Layout</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <a asp-area="Sandbox" asp-controller="Menu" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    Menu
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Syncfusion menu with typed hamburger open and close methods, nested item payloads, cancelable guards, and selection events
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="ContextMenu" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    ContextMenu
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Syncfusion context menu with typed open and close methods, nested item payloads, cancelable guards, and selection events
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="Tab" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    Tab
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Click tabs to switch panels, see lazy-loaded partial content via HTTP + Into on each selection
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="Accordion" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    Accordion
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Expand panels to lazy-load content from the server, see expand/collapse events drive conditions
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="Breadcrumb" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    Breadcrumb
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Breadcrumb navigation with typed active item reads and item click payloads
             </p>
         </a>
 
@@ -734,16 +740,16 @@
             </p>
         </a>
 
-        <a asp-area="Sandbox" asp-controller="Toolbar" asp-action="Index"
+        <a asp-area="Sandbox" asp-controller="Sidebar" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Toolbar
+                    Sidebar
                 </h3>
                 <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Typed toolbar button state, content, click payloads, and enabled/disabled control
+                Collapsible sidebar with typed open state, show/hide/toggle methods, and open/close events
             </p>
         </a>
     </div>
@@ -752,7 +758,7 @@
 <section class="mb-10">
     <div class="flex items-center gap-3 mb-4">
         <span class="w-1 h-6 rounded-full bg-info"></span>
-        <h2 class="text-lg font-semibold text-text-primary">Fusion Grid</h2>
+        <h2 class="text-lg font-semibold text-text-primary">Data &amp; Grids</h2>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <a asp-area="Sandbox" asp-controller="Grid" asp-action="Index"
@@ -764,72 +770,85 @@
                 <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Data grid with server binding, paging, sorting, filtering, grouping, selection, and editing workflows
+                Data grid hub — directory, editing, batch, roster, tooling, and binding workflows, each opened as its own isolated demo
             </p>
         </a>
 
-        <a asp-area="Sandbox" asp-controller="Grid" asp-action="Directory"
+        <a asp-area="Sandbox" asp-controller="ArrayGrid" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Grid Directory
+                    ArrayGrid
                 </h3>
                 <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Server-bound resident directory with public Grid methods, grouped data, virtual scrolling, and typed row events
+                Bind a Fusion grid to a typed array via p.From/AsSource — a client-side transform into the grid data source, no HTTP
             </p>
         </a>
 
-        <a asp-area="Sandbox" asp-controller="Grid" asp-action="Editing"
+        <a asp-area="Sandbox" asp-controller="PivotView" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Grid Editing
+                    PivotView
                 </h3>
                 <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Inline, batch, and dialog-template editing with typed method calls, batch changes, and validation-backed updates
+                Pivot table with typed runtime data refresh, layout persistence, and cell event payloads
             </p>
         </a>
 
-        <a asp-area="Sandbox" asp-controller="Grid" asp-action="Operations"
+        <a asp-area="Sandbox" asp-controller="Kanban" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Grid Operations
+                    Kanban
                 </h3>
                 <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Runtime column personalization, current-view handoff, keyed row updates, and typed template actions
+                Care task board with remote data, typed templates, method-return sources, and CRUD event payloads
             </p>
         </a>
 
-        <a asp-area="Sandbox" asp-controller="Grid" asp-action="Billing"
+        <a asp-area="Sandbox" asp-controller="Schedule" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Grid Billing
+                    Schedule
                 </h3>
                 <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Month-end billing board: bulk batch charge edits, server rate increases, templated-dialog admits, and roster export
+                Calendar scheduler with event CRUD — create, drag, and resize appointments with reactive validation
             </p>
         </a>
 
-        <a asp-area="Sandbox" asp-controller="Grid" asp-action="CareOps"
+        <a asp-area="Sandbox" asp-controller="Carousel" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Grid Care Operations
+                    Carousel
                 </h3>
                 <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Chip fast-filters, checkbox selection, typed templated cell editors, frozen columns, sticky header, and NativeActionLink discharge
+                Image and content carousel with typed active index, navigation methods, and slide lifecycle events
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="BulletChart" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    BulletChart
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Syncfusion bullet chart with typed load, render, legend, tooltip payload update, click payloads, and wrapped index reads
             </p>
         </a>
     </div>
@@ -837,41 +856,7 @@
 
 <section class="mb-10">
     <div class="flex items-center gap-3 mb-4">
-        <span class="w-1 h-6 rounded-full bg-[#8B5CF6]"></span>
-        <h2 class="text-lg font-semibold text-text-primary">Navigation</h2>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <a asp-area="Sandbox" asp-controller="Tab" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Tab
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Click tabs to switch panels, see lazy-loaded partial content via HTTP + Into on each selection
-            </p>
-        </a>
-
-        <a asp-area="Sandbox" asp-controller="Accordion" asp-action="Index"
-           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-            <native-hstack justify="Between" align="Start">
-                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Accordion
-                </h3>
-                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-            </native-hstack>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Expand panels to lazy-load content from the server, see expand/collapse events drive conditions
-            </p>
-        </a>
-    </div>
-</section>
-
-<section class="mb-10">
-    <div class="flex items-center gap-3 mb-4">
-        <span class="w-1 h-6 rounded-full bg-accent"></span>
+        <span class="w-1 h-6 rounded-full bg-info"></span>
         <h2 class="text-lg font-semibold text-text-primary">Overlays</h2>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -911,6 +896,53 @@
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
                 Hover a target element to surface a tooltip, programmatic Open/Close via the pipeline
+            </p>
+        </a>
+    </div>
+</section>
+
+<section class="mb-10">
+    <div class="flex items-center gap-3 mb-4">
+        <span class="w-1 h-6 rounded-full bg-info"></span>
+        <h2 class="text-lg font-semibold text-text-primary">Files &amp; AI</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <a asp-area="Sandbox" asp-controller="FileUpload" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    FileUpload
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Select files and see them uploaded via FormData POST, with reactive feedback on upload progress
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="SmartComponents" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    Smart Components
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                AI-assisted Smart TextArea and Smart Paste Button with endpoint-backed typed render helpers and runtime methods
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="AIAssistView" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    AIAssistView
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                AI assist chat with typed runtime prompt execution, response updates, and event payloads
             </p>
         </a>
     </div>

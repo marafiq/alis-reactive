@@ -1,12 +1,9 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.CareOpsViewModel
-@using Alis.Reactive
 @using Alis.Reactive.Builders
-@using Alis.Reactive.Builders.Requests
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.Templates
-@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @using Syncfusion.EJ2.Buttons
 @using Syncfusion.EJ2.Grids
 @inject Alis.Reactive.Validation.IClientValidationRuleSource ClientRules
@@ -50,7 +47,7 @@
 
     void LoadCareOps(PipelineBuilder<CareOpsViewModel> p, string status)
     {
-        p.Post("/Sandbox/Components/Grid/CareOpsData")
+        p.Post(Url.SandboxRoute("CareOpsData", "Grid"))
             .Gather(g => { g.Static("skip", 0); g.Static("take", 10); })
             .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
             {
@@ -63,13 +60,13 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         LoadCareOps(p, "loaded care census");
-        p.Get("/Sandbox/Components/Grid/CareOpsActionRows")
+        p.Get(Url.SandboxRoute("CareOpsActionRows", "Grid"))
             .Response(r => r.OnSuccess(s => s.Into("careops-action-rows")));
     }));
 
     Html.On(plan, t => t.CustomEvent("careops-rows-refresh", p =>
     {
-        p.Get("/Sandbox/Components/Grid/CareOpsActionRows")
+        p.Get(Url.SandboxRoute("CareOpsActionRows", "Grid"))
             .Response(r => r.OnSuccess(s => s.Into("careops-action-rows")));
     }));
 
@@ -102,7 +99,7 @@
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post("/Sandbox/Components/Grid/CareOpsAdmit", g =>
+                    p.Post(Url.SandboxRoute("CareOpsAdmit", "Grid"), g =>
                     {
                         g.Include<FusionTextBox, CareOpsViewModel>(m => m.NewResidentName);
                         g.Include<FusionDropDownList, CareOpsViewModel>(m => m.NewWing);
@@ -159,7 +156,7 @@
                     .Selection(Selection.Single))
                     .Reactive(evt => evt.Clicked, (args, p) =>
                     {
-                        p.Post("/Sandbox/Components/Grid/CareOpsData")
+                        p.Post(Url.SandboxRoute("CareOpsData", "Grid"))
                             .Gather(g =>
                             {
                                 g.Static("skip", 0);
@@ -181,7 +178,7 @@
                     .Selection(Selection.Single))
                     .Reactive(evt => evt.Clicked, (args, p) =>
                     {
-                        p.Post("/Sandbox/Components/Grid/CareOpsData")
+                        p.Post(Url.SandboxRoute("CareOpsData", "Grid"))
                             .Gather(g =>
                             {
                                 g.Static("skip", 0);
@@ -214,7 +211,7 @@
                 {
                     var grid = p.Component<FusionGrid>(GridId);
                     grid.SaveCell();
-                    p.Post("/Sandbox/Components/Grid/CareOpsSave")
+                    p.Post(Url.SandboxRoute("CareOpsSave", "Grid"))
                         .Gather(g => g.Include(grid.BatchChanges<CareOpsViewModel, ResidentCareItem>(), "batchChanges"))
                         .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                         {
@@ -228,7 +225,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var grid = p.Component<FusionGrid>(GridId);
-                    p.Post("/Sandbox/Components/Grid/CareOpsBulkNurse")
+                    p.Post(Url.SandboxRoute("CareOpsBulkNurse", "Grid"))
                         .Gather(g =>
                         {
                             g.Static("nurse", "Night Float Team");
@@ -246,7 +243,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var grid = p.Component<FusionGrid>(GridId);
-                    p.Post("/Sandbox/Components/Grid/CareOpsBulkRisk")
+                    p.Post(Url.SandboxRoute("CareOpsBulkRisk", "Grid"))
                         .Gather(g =>
                         {
                             g.Static("risk", "Critical");
@@ -259,9 +256,9 @@
                             s.Element("careops-status").SetText("residents flagged critical");
                         }));
                 }))
-            @(Html.NativeActionLink("Discharge Selected", "/Sandbox/Components/Grid/CareOpsDischargeSelected", p => p
+            @(Html.NativeActionLink("Discharge Selected", Url.SandboxRoute("CareOpsDischargeSelected", "Grid"), p => p
                 .Confirm("Discharge the selected resident(s) from the active census?")
-                .Then(t2 => t2.Post("/Sandbox/Components/Grid/CareOpsDischargeSelected")
+                .Then(t2 => t2.Post(Url.SandboxRoute("CareOpsDischargeSelected", "Grid"))
                     .Gather(g => g.Include(p.Component<FusionGrid>(GridId).SelectedRecords<CareOpsViewModel, ResidentCareItem>(), "selectedRecords"))
                     .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                     {
@@ -309,7 +306,7 @@
                 p.When(args, x => x.Action.RequestType).NotEq(FusionGridAction.Refresh)
                     .Then(t =>
                     {
-                        t.Post("/Sandbox/Components/Grid/CareOpsData")
+                        t.Post(Url.SandboxRoute("CareOpsData", "Grid"))
                             .Gather(g =>
                             {
                                 g.FromEvent(args, x => x.Skip, "skip");

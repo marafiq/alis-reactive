@@ -1,4 +1,3 @@
-using System;
 using Alis.Reactive.DesignSystem.Tokens;
 
 namespace Alis.Reactive.DesignSystem.Layout

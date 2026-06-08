@@ -1,5 +1,4 @@
 @model FusionSplitButtonModel
-@using Alis.Reactive.Builders.Requests
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
@@ -132,7 +131,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var menu = p.Component<FusionSplitButton>(menuId);
-                p.Post("/Sandbox/Components/FusionSplitButton/Echo")
+                p.Post(Url.SandboxRoute("Echo", "SplitButton"))
                     .Gather(g =>
                     {
                         g.Include(menu.Content(), "content");

@@ -1,9 +1,7 @@
 @model ArrayGridModel
-@using Alis.Reactive
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
-@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @using Syncfusion.EJ2.Grids
 @{
     ViewData["Title"] = "ArrayGrid";
@@ -12,7 +10,7 @@
 
     // HTTP array flows through ReactiveArray ordering before binding the grid dataSource.
     Html.On(plan, t => t.DomReady(p =>
-        p.Get("/Sandbox/Components/ArrayGrid/Residents")
+        p.Get(Url.SandboxRoute("Residents", "ArrayGrid"))
          .Response(r => r.OnSuccess<ResidentRosterResponse>((json, s) =>
          {
              var roster = p.From(json.Read(x => x.Residents));

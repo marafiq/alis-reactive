@@ -49,7 +49,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Validation/AllRules/ValidateClient")
+                p.Post(Url.SandboxRoute("ValidateClient", "Validation"))
                  .Validate<AllRulesFormValidator>("all-rules-form")
                  .Response(r => r.OnSuccess(s =>
                  {
@@ -79,7 +79,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Validation/AllRules/Save", g => g.Include(m => m.Server!.Name).Include(m => m.Server!.Email))
+                p.Post(Url.SandboxRoute("Save", "Validation"), g => g.Include(m => m.Server!.Name).Include(m => m.Server!.Email))
                  .Validate<ServerFormValidator>("server-form")
                  .Response(r => r
                     .OnSuccess(s =>
@@ -114,7 +114,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Validation/AllRules/ValidateClient")
+                p.Post(Url.SandboxRoute("ValidateClient", "Validation"))
                  .Validate<ConditionalFormValidator>("conditional-form")
                  .Response(r => r.OnSuccess(s =>
                  {
@@ -159,7 +159,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 mr-2")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Validation/AllRules/ValidateClient")
+                p.Post(Url.SandboxRoute("ValidateClient", "Validation"))
                  .Validate<HiddenFieldsFormValidator>("hidden-fields-form")
                  .Response(r => r.OnSuccess(s =>
                  {
@@ -171,7 +171,7 @@
             .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Validation/AllRules/SaveProfile", g => g
+                p.Post(Url.SandboxRoute("SaveProfile", "Validation"), g => g
                     .Include(m => m.Hidden!.Name)
                     .Include(m => m.Hidden!.Phone)
                     .Include(m => m.Hidden!.Salary))
@@ -210,7 +210,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Validation/AllRules/SaveWithDbCheck", g => g.Include(m => m.Db!.Name).Include(m => m.Db!.Email))
+                p.Post(Url.SandboxRoute("SaveWithDbCheck", "Validation"), g => g.Include(m => m.Db!.Name).Include(m => m.Db!.Email))
                  .Validate<DbFormValidator>("db-form")
                  .Response(r => r
                     .OnSuccess(s =>
@@ -280,7 +280,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Validation/AllRules/ValidateClient")
+                p.Post(Url.SandboxRoute("ValidateClient", "Validation"))
                  .Validate<OrderLinesFormValidator>("order-lines-form")
                  .Response(r => r.OnSuccess(s =>
                  {

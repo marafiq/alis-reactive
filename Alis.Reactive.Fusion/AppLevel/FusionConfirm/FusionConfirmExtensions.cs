@@ -1,6 +1,11 @@
 using Alis.Reactive.PlanModel;
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 
 namespace Alis.Reactive.Fusion.AppLevel
 {
@@ -36,7 +41,11 @@ namespace Alis.Reactive.Fusion.AppLevel
             where TModel : class
             => self.EmitCall(HideMethod);
 
+#if NET48
+        public static IHtmlString FusionConfirmDialog(this HtmlHelper html)
+#else
         public static IHtmlContent FusionConfirmDialog(this IHtmlHelper html)
+#endif
             => new HtmlString($"<div id=\"{FusionConfirm.ElementId}\"></div>\n");
     }
 }

@@ -1,5 +1,4 @@
 @model FusionDropDownTreeModel
-@using Alis.Reactive.Builders.Requests
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
@@ -122,7 +121,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var tree = p.Component<FusionDropDownTree>(m => m.ResidentIds);
-                p.Post("/Sandbox/Components/FusionDropDownTree/Echo")
+                p.Post(Url.SandboxRoute("Echo", "DropDownTree"))
                     .Gather(g =>
                     {
                         g.Include(tree.Value(), "value");

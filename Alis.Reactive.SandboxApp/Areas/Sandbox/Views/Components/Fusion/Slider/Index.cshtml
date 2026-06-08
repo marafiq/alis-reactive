@@ -1,5 +1,4 @@
 @model SliderModel
-@using Alis.Reactive.Builders.Requests
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
@@ -108,7 +107,7 @@
             {
                 var pain = p.Component<FusionSlider>(m => m.PainScore);
                 var range = p.Component<FusionSlider>(m => m.PreferredRange);
-                p.Post("/Sandbox/Components/Slider/Echo")
+                p.Post(Url.SandboxRoute("Echo", "Slider"))
                     .Gather(g => g
                         .Include(pain.Value(), "painScore")
                         .Include(range.RangeValue(), "preferredRange"))

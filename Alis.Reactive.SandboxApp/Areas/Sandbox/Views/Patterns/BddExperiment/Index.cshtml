@@ -2,7 +2,6 @@
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
-@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @{
     ViewData["Title"] = "BDD Experiment";
     var plan = Html.ReactivePlan<BddExperimentModel>();
@@ -24,7 +23,7 @@
 
     Html.On(plan, t => t.CustomEvent("do-submit", p =>
     {
-        p.Post("/Sandbox/Patterns/BddExperiment/Submit", g => g.IncludeAll())
+        p.Post(Url.SandboxRoute("Submit", "BddExperiment"), g => g.IncludeAll())
          .Validate<BddExperimentValidator>("admission-form")
          .WhileLoading(l =>
          {

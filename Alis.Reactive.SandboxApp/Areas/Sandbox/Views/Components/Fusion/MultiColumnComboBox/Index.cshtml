@@ -17,7 +17,7 @@
 
     Html.On(plan, t => t.CustomEvent("do-gather", p =>
     {
-        p.Post("/Sandbox/Components/MultiColumnComboBox/Echo", g =>
+        p.Post(Url.SandboxRoute("Echo", "MultiColumnComboBox"), g =>
             g.Include<FusionMultiColumnComboBox, MultiColumnComboBoxModel>(m => m.Facility))
          .Response(r => r
             .OnSuccess(s =>

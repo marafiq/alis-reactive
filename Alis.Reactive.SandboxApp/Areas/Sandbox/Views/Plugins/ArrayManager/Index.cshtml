@@ -13,7 +13,7 @@
     var slugify = plan.RegisterPlugin<SlugifyPlugin>();
 
     Html.On(plan, t => t.DomReady(p =>
-        p.Get("/Sandbox/Plugins/ArrayManager/Residents")
+        p.Get(Url.SandboxRoute("Residents", "ArrayManager"))
          .Response(r => r.OnSuccess<ResidentsListResponse>((json, s) =>
          {
              TypedPluginSource<int> countSrc = p.Plugin(array.Count).Arg(json, x => x.Items);
@@ -48,7 +48,7 @@
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {
             TypedPluginSource<int> countForGather = p.Plugin(array.Count).Arg("items");
-            p.Get("/Sandbox/Plugins/ArrayManager/PluginEcho")
+            p.Get(Url.SandboxRoute("PluginEcho", "ArrayManager"))
              .Gather(g => g
                  .Header("X-Array-Count", countForGather)
                  .Plugin(countForGather, "count"))
@@ -65,7 +65,7 @@
     Html.NativeButton("arr-filter-btn", "Filter Active & Inspect")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {
-            p.Get("/Sandbox/Plugins/ArrayManager/Residents")
+            p.Get(Url.SandboxRoute("Residents", "ArrayManager"))
              .Response(r => r.OnSuccess<ResidentsListResponse>((json, s) =>
              {
                  TypedPluginSource<object> active = p.Plugin(array.Filter)

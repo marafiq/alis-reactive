@@ -1,5 +1,4 @@
 @model FusionComboBoxModel
-@using Alis.Reactive.Builders.Requests
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
@@ -151,7 +150,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var combo = p.Component<FusionComboBox>(m => m.Resident);
-                p.Post("/Sandbox/Components/FusionComboBox/Echo")
+                p.Post(Url.SandboxRoute("Echo", "ComboBox"))
                     .Gather(g =>
                     {
                         g.Include(combo.Value(), "value");

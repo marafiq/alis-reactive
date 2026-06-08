@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using Alis.Reactive.Native;
-using Alis.Reactive.Native.Extensions;
+#if NET48
+using System.Web;
+#else
 using Microsoft.AspNetCore.Html;
+#endif
 
 using ComponentRegistrationSource = Alis.Reactive.Fusion.Components.FusionSmartTextArea;
 

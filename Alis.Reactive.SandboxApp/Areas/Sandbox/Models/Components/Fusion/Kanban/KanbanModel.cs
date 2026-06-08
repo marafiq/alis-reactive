@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public sealed class KanbanModel

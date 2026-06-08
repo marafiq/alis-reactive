@@ -1,0 +1,111 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "Care-Ops Batch Roster Change";
+
+    const string GridId = "resident-roster-batch-grid";
+    const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+
+    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+
+    List<GridColumn> RosterColumns() => new List<GridColumn>
+    {
+        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
+        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "200" },
+        new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "160" },
+        new GridColumn { Field = "wing", HeaderText = "Wing", Width = "120" }
+    };
+
+    Html.On(plan, t => t.DomReady(p =>
+        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
+            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
+            {
+                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Element("roster-load-status").SetText("loaded roster rows");
+            }))));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Care-Ops Batch Roster Change</native-heading>
+    <native-text color="Secondary">
+        A care director discharges a resident and admits a new one in a single batch, then reviews
+        the pending change before committing. <code>beforeBatchSave</code> reads both the
+        <code>AddedRecords</code> and <code>DeletedRecords</code> of the batch.
+    </native-text>
+
+    <p class="font-mono text-sm">Load status: <span id="roster-load-status" class="text-text-muted">waiting</span></p>
+
+    <native-hstack gap="Sm" class="flex-wrap">
+        @(Html.NativeButton("roster-discharge", "Discharge First Resident")
+            .CssClass(ButtonSecondary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var grid = p.Component<FusionGrid>(GridId);
+                grid.SelectRow(0);
+                grid.DeleteSelectedRecord();
+                p.Element("roster-command-status").SetText("discharge staged");
+            }))
+        @(Html.NativeButton("roster-admit", "Admit Zara")
+            .CssClass(ButtonSecondary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Component<FusionGrid>(GridId).AddRecord(new ResidentDirectoryGridItem
+                {
+                    ResidentId = 9001,
+                    ResidentName = "Zara Admitted",
+                    Age = 70,
+                    CareLevel = "Assisted Living",
+                    Wing = "North",
+                    Suite = "N-118",
+                    RiskLevel = "Low",
+                    PrimaryNurse = "Nora Ellis",
+                    OpenTasks = 1,
+                    NextReviewDate = "2026-06-30"
+                });
+                p.Element("roster-command-status").SetText("admit staged");
+            }))
+        @(Html.NativeButton("roster-review", "Review And Commit")
+            .CssClass(ButtonPrimary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Component<FusionGrid>(GridId).EndEdit();
+                p.Element("roster-command-status").SetText("endEdit called");
+            }))
+    </native-hstack>
+
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+            .AllowSelection(true)
+            .Toolbar(new List<string> { "Add", "Delete", "Update", "Cancel" })
+            .EditSettings(new GridEditSettings
+            {
+                AllowEditing = true,
+                AllowAdding = true,
+                AllowDeleting = true,
+                AllowEditOnDblClick = false,
+                Mode = EditMode.Batch,
+                ShowConfirmDialog = false
+            })
+            .Columns(RosterColumns()))
+            .Reactive(evt => evt.BeforeBatchSave<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                p.Element("roster-added-resident").SetText(args, x => x.BatchChanges.AddedRecords[0].ResidentName);
+                p.Element("roster-deleted-resident").SetText(args, x => x.BatchChanges.DeletedRecords[0].ResidentName);
+                args.Cancel(p);
+                p.Element("roster-review-status").SetText("batch reviewed");
+            }))
+
+        <native-grid cols="C2" gap="Base" class="mt-4 font-mono text-sm">
+            <p>Command: <span id="roster-command-status" class="text-text-muted">waiting</span></p>
+            <p>Review: <span id="roster-review-status" class="text-text-muted">waiting</span></p>
+            <p>Admitted resident: <span id="roster-added-resident" class="text-text-muted">waiting</span></p>
+            <p>Discharged resident: <span id="roster-deleted-resident" class="text-text-muted">waiting</span></p>
+        </native-grid>
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

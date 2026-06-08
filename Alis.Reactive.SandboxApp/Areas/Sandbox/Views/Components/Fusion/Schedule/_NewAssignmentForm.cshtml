@@ -1,9 +1,7 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.NewAssignmentModel
-@using Alis.Reactive
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
-@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @{
     var plan = Html.ReactivePlan<NewAssignmentModel>();
     var staffList = FakeScheduleData.Staff.Select(s => new StaffOption

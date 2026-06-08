@@ -2,16 +2,27 @@ using System;
 using System.Collections.Generic;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 
 namespace Alis.Reactive.Fusion.Components
 {
     public static class FusionSmartPasteButtonHtmlExtensions
     {
+#if NET48
+        public static IHtmlString FusionSmartPasteButton<TModel>(
+            this HtmlHelper<TModel> html,
+            string elementId,
+#else
         public static IHtmlContent FusionSmartPasteButton<TModel>(
             this IHtmlHelper<TModel> html,
             string elementId,
+#endif
             Action<FusionSmartPasteButtonOptions> configure)
         {
             var options = new FusionSmartPasteButtonOptions();

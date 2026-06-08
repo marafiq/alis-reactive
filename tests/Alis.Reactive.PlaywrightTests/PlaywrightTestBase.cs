@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
 
 namespace Alis.Reactive.PlaywrightTests;

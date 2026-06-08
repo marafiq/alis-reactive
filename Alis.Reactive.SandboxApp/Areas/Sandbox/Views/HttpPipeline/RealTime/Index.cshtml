@@ -1,5 +1,4 @@
 @model RealTimeModel
-@using Alis.Reactive
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.SandboxApp.Hubs
@@ -86,7 +85,7 @@
                     .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Post("/Sandbox/HttpPipeline/RealTime/PushNotification")
+                        p.Post(Url.SandboxRoute("PushNotification", "RealTime"))
                          .Gather(g => g
                              .Static("count", 99)
                              .Static("message", "Manual push at " + DateTime.Now.ToString("HH:mm:ss"))
@@ -121,7 +120,7 @@
                     .CssClass("px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Post("/Sandbox/HttpPipeline/RealTime/PushResidentStatus")
+                        p.Post(Url.SandboxRoute("PushResidentStatus", "RealTime"))
                          .Gather(g => g
                              .Static("residentName", "Helen Martinez (Manual)")
                              .Static("status", "Under Review")
@@ -146,7 +145,7 @@
                     .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Get("/Sandbox/HttpPipeline/RealTime/ResidentPanel")
+                        p.Get(Url.SandboxRoute("ResidentPanel", "RealTime"))
                          .Response(r => r.OnSuccess(s => s.Into("panel-container")));
                     }))
             </native-hstack>

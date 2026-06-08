@@ -30,11 +30,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             {
                 Residents = new[]
                 {
-                    new ResidentRow { Name = "Ada", Status = "active",     Age = 71, Balance = 1200 },
                     new ResidentRow { Name = "Bo",  Status = "discharged", Age = 64, Balance = 500 },
-                    new ResidentRow { Name = "Cy",  Status = "active",     Age = 80, Balance = 2000 },
                     new ResidentRow { Name = "Di",  Status = "critical",   Age = 90, Balance = 3000 },
+                    new ResidentRow { Name = "Ada", Status = "active",     Age = 71, Balance = 1200 },
                     new ResidentRow { Name = "Ed",  Status = "active",     Age = 55, Balance = 800 },
+                    new ResidentRow { Name = "Cy",  Status = "active",     Age = 80, Balance = 2000 },
                 },
             });
         }

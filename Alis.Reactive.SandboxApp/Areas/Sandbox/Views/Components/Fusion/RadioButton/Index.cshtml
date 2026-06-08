@@ -1,5 +1,4 @@
 @model FusionRadioButtonModel
-@using Alis.Reactive.Builders.Requests
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
@@ -129,7 +128,7 @@
             {
                 var privateRoom = p.Component<FusionRadioButton>(privateId);
                 var sharedRoom = p.Component<FusionRadioButton>(sharedId);
-                p.Post("/Sandbox/Components/FusionRadioButton/Echo")
+                p.Post(Url.SandboxRoute("Echo", "RadioButton"))
                     .Gather(g =>
                     {
                         g.Include(privateRoom.SelectedValue(), "selectedValue");

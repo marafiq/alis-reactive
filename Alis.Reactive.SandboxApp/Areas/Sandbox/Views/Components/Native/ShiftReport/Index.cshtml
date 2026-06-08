@@ -1,8 +1,6 @@
 @model ShiftReportModel
-@using Alis.Reactive
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @{
     ViewData["Title"] = "ShiftReport";
 
@@ -27,14 +25,14 @@
 
     Html.NativeButton("load-report-btn", "Generate Shift Report")
         .Reactive(plan, evt => evt.Click, (args, p) =>
-            p.Get("/Sandbox/Components/ShiftReport/Alerts")
+            p.Get(Url.SandboxRoute("Alerts", "ShiftReport"))
              .Response(r => r.OnSuccess<AlertsResponse>((json, s) =>
                  s.DispatchWith<ShiftReportPayload>("shift-report", b =>
                      b.Set(x => x.Alerts, json.Read(x => x.Alerts))))));
 
     Html.NativeButton("clear-report-btn", "Generate Clear Report")
         .Reactive(plan, evt => evt.Click, (args, p) =>
-            p.Get("/Sandbox/Components/ShiftReport/AlertsAllClear")
+            p.Get(Url.SandboxRoute("AlertsAllClear", "ShiftReport"))
              .Response(r => r.OnSuccess<AlertsResponse>((json, s) =>
                  s.DispatchWith<ShiftReportPayload>("shift-report", b =>
                      b.Set(x => x.Alerts, json.Read(x => x.Alerts))))));

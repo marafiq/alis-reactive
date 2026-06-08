@@ -1,5 +1,4 @@
 @model ButtonModel
-@using Alis.Reactive.Builders.Requests
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
@@ -126,7 +125,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var button = p.Component<FusionButton>(buttonId);
-                p.Post("/Sandbox/Components/Button/Echo")
+                p.Post(Url.SandboxRoute("Echo", "Button"))
                     .Gather(g =>
                     {
                         g.Include(button.Content(), "content");

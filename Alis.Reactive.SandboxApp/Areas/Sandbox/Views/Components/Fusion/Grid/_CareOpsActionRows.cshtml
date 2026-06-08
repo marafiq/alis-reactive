@@ -1,6 +1,5 @@
 @model IReadOnlyList<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentCareItem>
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 
 @* Per-row NativeActionLink list: each resident gets its own server-rendered action
    links. The runtime wires every <a data-reactive-link> through a single delegated
@@ -15,8 +14,8 @@
                 <span class="text-text-secondary"> · @row.Wing wing · @row.CareLevel · @row.RiskLevel risk</span>
             </div>
             <native-hstack gap="Base">
-                @(Html.NativeActionLink("Flag Critical", $"/Sandbox/Components/Grid/CareOpsFlagOne/{row.ResidentId}", p => p
-                    .Post($"/Sandbox/Components/Grid/CareOpsFlagOne/{row.ResidentId}")
+                @(Html.NativeActionLink("Flag Critical", Url.SandboxRoute("CareOpsFlagOne", "Grid", new { id = row.ResidentId }), p => p
+                    .Post(Url.SandboxRoute("CareOpsFlagOne", "Grid", new { id = row.ResidentId }))
                     .Response(r => r.OnSuccess(s =>
                     {
                         s.Element("careops-rows-status").SetText($"{row.ResidentName} flagged critical");
@@ -24,10 +23,10 @@
                     })))
                     .CssClass("font-medium text-amber-700 hover:text-amber-800")
                     .Attr("data-testid", $"careops-flag-{row.ResidentId}"))
-                @(Html.NativeActionLink("Discharge", $"/Sandbox/Components/Grid/CareOpsDischargeOne/{row.ResidentId}", p => p
+                @(Html.NativeActionLink("Discharge", Url.SandboxRoute("CareOpsDischargeOne", "Grid", new { id = row.ResidentId }), p => p
                     .Confirm($"Discharge {row.ResidentName} from the active census?")
                     .Then(t => t
-                        .Post($"/Sandbox/Components/Grid/CareOpsDischargeOne/{row.ResidentId}")
+                        .Post(Url.SandboxRoute("CareOpsDischargeOne", "Grid", new { id = row.ResidentId }))
                         .Response(r => r.OnSuccess(s =>
                         {
                             s.Element("careops-rows-status").SetText($"{row.ResidentName} discharged");

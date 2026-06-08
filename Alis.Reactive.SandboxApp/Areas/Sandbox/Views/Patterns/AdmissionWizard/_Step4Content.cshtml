@@ -1,7 +1,6 @@
 @model Step4ReviewModel
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Fusion.Components
 @{
     var plan = Html.ReactivePlan<Step4ReviewModel>();
     var loadStepUrl = Url.Action("LoadStep", "AdmissionWizard", new { area = "Sandbox" })

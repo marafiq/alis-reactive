@@ -13,10 +13,13 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Zero-based index of the row after selection.</summary>
         public int RowIndex { get; set; }
 
-        /// <summary>Zero-based index of the previously selected row.</summary>
-        public int PreviousRowIndex { get; set; }
+        /// <summary>Zero-based index of the previously selected row, when one exists.</summary>
+        public int? PreviousRowIndex { get; set; }
 
         /// <summary>Whether user interaction triggered the row selection.</summary>
         public bool IsInteracted { get; set; }
+
+        /// <summary>Syncfusion event name.</summary>
+        public string? Name { get; set; }
     }
 }

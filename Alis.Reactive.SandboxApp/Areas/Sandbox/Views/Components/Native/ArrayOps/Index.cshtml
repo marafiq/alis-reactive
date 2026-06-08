@@ -1,5 +1,4 @@
 @model ArrayOpsModel
-@using Alis.Reactive
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
@@ -10,7 +9,7 @@
 
     // Roster proves array operators compile to plan nodes instead of plugin calls.
     Html.On(plan, t => t.DomReady(p =>
-        p.Get("/Sandbox/Components/ArrayOps/Residents")
+        p.Get(Url.SandboxRoute("Residents", "ArrayOps"))
          .Response(r => r.OnSuccess<ResidentRosterResponse>((json, s) =>
          {
              var residents = p.From(json.Read(x => x.Residents));

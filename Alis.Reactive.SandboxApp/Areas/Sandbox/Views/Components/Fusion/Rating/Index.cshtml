@@ -1,5 +1,4 @@
 @model RatingModel
-@using Alis.Reactive.Builders.Requests
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
@@ -76,7 +75,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var rating = p.Component<FusionRating>(m => m.SatisfactionScore);
-                p.Post("/Sandbox/Components/Rating/Echo")
+                p.Post(Url.SandboxRoute("Echo", "Rating"))
                     .Gather(g => g.Include(rating.Value(), "satisfactionScore"))
                     .Response(r => r.OnSuccess<RatingEchoResponse>((json, s) =>
                     {

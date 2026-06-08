@@ -3,7 +3,6 @@
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.AppLevel
-@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @{
     var plan = Html.ResolvePlan<DrawerResidentModel>();
 
@@ -36,7 +35,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Element("alis-loader-message").SetText("Saving resident...");
-                    p.Post("/Sandbox/Components/Drawer/SubmitResident", g => g.IncludeAll())
+                    p.Post(Url.SandboxRoute("SubmitResident", "Drawer"), g => g.IncludeAll())
                      .Validate<DrawerResidentValidator>("drawer-resident-form")
                      .WhileLoading(loader=> loader.Component<NativeLoader>().SetTarget("drawer-resident-form").SetTimeout(1000).Show())
                      .Response(r => r

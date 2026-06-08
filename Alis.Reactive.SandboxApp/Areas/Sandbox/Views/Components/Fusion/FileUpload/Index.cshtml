@@ -2,8 +2,6 @@
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
-@using Syncfusion.EJ2.Inputs
-@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @{
     ViewData["Title"] = "FusionFileUpload";
 
@@ -45,7 +43,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Components/FileUpload/Echo", g => g.IncludeAll())
+                p.Post(Url.SandboxRoute("Echo", "FileUpload"), g => g.IncludeAll())
                  .AsFormData()
                  .Validate<FileUploadValidator>("upload-form")
                  .Response(r => r

@@ -24,11 +24,15 @@ public class WhenUsingFusionGridOperations : PlaywrightTestBase
     }
 
     [Test]
-    public async Task components_index_links_to_grid_operations_card()
+    public async Task components_index_nests_grid_and_hub_lists_operations_demo()
     {
+        // Organic hierarchy: the Components index nests Grid as a single card into the Grid
+        // hub, which lists the operations scenario as its own isolated demo. Navigation is
+        // driven by clicking visible cards/labels, never hard-coded URLs.
         await NavigateTo("/Sandbox/Components");
+        await ClickWhenStable(Page.Locator("a:has(h3:text-is('Grid'))"));
 
-        await Expect(Page.Locator("a").Filter(new() { HasText = "Grid Operations" }))
+        await Expect(Page.Locator("a").Filter(new() { HasText = "Operations board" }).First)
             .ToBeVisibleAsync();
 
         AssertNoConsoleErrors();
