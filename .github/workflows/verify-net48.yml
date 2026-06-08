@@ -62,3 +62,83 @@ jobs:
           name: nupkgs-net48-windows
           path: nupkgs/*.nupkg
           if-no-files-found: error
+
+  net48-runtime-iis:
+    name: net48 runtime boots under IIS Express (Playwright screenshot proof)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Install npm deps
+        run: npm ci
+
+      - name: Build browser assets
+        run: npm run build:all
+
+      - name: Pack rc.1 packages (local feed for the MVC5 consumer)
+        shell: bash
+        run: scripts/pack.sh 1.0.0-rc.1
+
+      - name: Restore + build the classic MVC5 net48 web app
+        shell: pwsh
+        run: msbuild examples/net48-mvc-smoke/Net48MvcSmoke.csproj /p:Configuration=Release /restore /t:Build
+
+      - name: Confirm runtime assets landed in Content\alisreactive
+        shell: pwsh
+        run: |
+          $dir = "examples/net48-mvc-smoke/Content/alisreactive"
+          Get-ChildItem $dir
+          if (-not (Test-Path "$dir/alis-reactive.1.0.0-rc.1.js")) { throw "runtime JS did not land in Content\alisreactive" }
+          if (-not (Test-Path "$dir/design-system.1.0.0-rc.1.css")) { throw "design-system CSS did not land in Content\alisreactive" }
+
+      - name: Install Playwright (node) + chromium
+        shell: bash
+        run: |
+          cd examples/net48-mvc-smoke/ci
+          npm install
+          npx playwright install chromium
+
+      - name: Launch IIS Express and run the Playwright reactive proof
+        shell: pwsh
+        run: |
+          $iis = "$env:ProgramFiles\IIS Express\iisexpress.exe"
+          if (-not (Test-Path $iis)) { $iis = "${env:ProgramFiles(x86)}\IIS Express\iisexpress.exe" }
+          $app = Join-Path $PWD "examples/net48-mvc-smoke"
+          Write-Host "IIS Express: $iis"
+          Write-Host "App path:    $app"
+          $proc = Start-Process -FilePath $iis -ArgumentList "/path:$app","/port:5000" -PassThru
+          try {
+            $ready = $false
+            for ($i = 0; $i -lt 30; $i++) {
+              try { Invoke-WebRequest "http://localhost:5000/" -UseBasicParsing -TimeoutSec 3 | Out-Null; $ready = $true; break }
+              catch { Start-Sleep -Seconds 2 }
+            }
+            if (-not $ready) { throw "IIS Express did not become ready on http://localhost:5000/" }
+            $env:SMOKE_URL = "http://localhost:5000/"
+            $env:SCREENSHOT = "$app\net48-smoke.png"
+            node examples/net48-mvc-smoke/ci/verify.mjs
+          }
+          finally {
+            if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
+          }
+
+      - name: Upload net48 runtime screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: net48-runtime-screenshot
+          path: examples/net48-mvc-smoke/net48-smoke.png
+          if-no-files-found: warn

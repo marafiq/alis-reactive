@@ -1,0 +1,27 @@
+@model Net48MvcSmoke.Models.SmokeModel
+@{
+    ViewBag.Title = "net48 Runtime Smoke";
+    var plan = Html.ReactivePlan<Net48MvcSmoke.Models.SmokeModel>();
+}
+
+<h1 id="smoke-heading">net48 Runtime Smoke</h1>
+<p>Classic ASP.NET MVC 5 on real .NET Framework 4.8, consuming the shipped AlisReactive net48 packages.</p>
+
+@{ Html.InputField(plan, m => m.Name, o => o.Label("Name"))
+    .NativeTextBox(b => b.Placeholder("Type your name")); }
+
+<div style="margin-top: 1rem;">
+    @{ Html.InputField(plan, m => m.ShowDetails, o => o.Label("Show the proof"))
+        .NativeCheckBox(b => b.Reactive(plan, evt => evt.Changed, (args, pipeline) =>
+        {
+            pipeline.When(args, a => a.Checked).Truthy()
+                .Then(t => t.Element("reactive-proof").Show())
+                .Else(e => e.Element("reactive-proof").Hide());
+        })); }
+</div>
+
+<div id="reactive-proof" hidden style="margin-top: 1rem; padding: 1rem; border: 2px solid green; border-radius: 8px;">
+    <strong>Reactive runtime executed on .NET Framework 4.8 ✓</strong>
+</div>
+
+@Html.RenderPlan(plan)

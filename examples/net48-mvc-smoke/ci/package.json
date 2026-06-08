@@ -1,0 +1,9 @@
+{
+  "name": "net48-smoke-verify",
+  "private": true,
+  "type": "module",
+  "description": "Playwright driver that proves the net48 MVC5 app boots the runtime and runs a reactive interaction in the browser.",
+  "dependencies": {
+    "playwright": "1.52.0"
+  }
+}

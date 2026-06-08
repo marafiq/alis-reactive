@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title — net48 MVC Smoke</title>
+    <!-- Design-system CSS landed by the package targets at Content\alisreactive\ (version-stamped). -->
+    <link rel="stylesheet" href="@Url.Content("~/Content/alisreactive/design-system.1.0.0-rc.1.css")" />
+</head>
+<body class="alis-root">
+    <div style="max-width: 720px; margin: 2rem auto; padding: 0 1rem;">
+        @RenderBody()
+    </div>
+    <!-- Runtime JS landed by the package targets. root.ts auto-discovers the [data-reactive-plan]
+         script element @Html.RenderPlan emits and boots the plan — no inline script needed. -->
+    <script src="@Url.Content("~/Content/alisreactive/alis-reactive.1.0.0-rc.1.js")"></script>
+</body>
+</html>
