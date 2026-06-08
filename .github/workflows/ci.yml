@@ -1,0 +1,92 @@
+name: CI
+
+# Verification gates for every push to main / release/* and every pull request.
+# This workflow NEVER publishes — releasing is done by pushing a version tag, which
+# triggers nuget-publish.yml. Keeping CI and release separate means merging to main
+# can never accidentally ship a package.
+on:
+  push:
+    branches: [main, 'release/*']
+    paths:
+      - 'Alis.Reactive/**'
+      - 'Alis.Reactive.Assets/**'
+      - 'Alis.Reactive.Native/**'
+      - 'Alis.Reactive.DesignSystem/**'
+      - 'Alis.Reactive.Fusion/**'
+      - 'Alis.Reactive.FluentValidator/**'
+      - 'Alis.Reactive.NativeTagHelpers/**'
+      - 'Alis.Reactive.Analyzers/**'
+      - 'Alis.Reactive.SandboxApp/**'
+      - 'tests/**'
+      - 'build/**'
+      - 'Directory.Build.props'
+      - 'global.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'scripts/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+  workflow_dispatch:
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Run non-browser verification gate
+        run: CONFIGURATION=Release scripts/test.sh --no-e2e
+        # 'npm run lint' is intentionally NOT run here yet: the runtime has 10
+        # pre-existing eslint errors. Add it once those are cleared.
+
+  playwright:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Build app and Playwright project
+        run: scripts/build.sh
+
+      - name: Install Playwright browsers
+        run: pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
+
+      - name: Run observable Playwright tests
+        run: scripts/playwright.sh --no-build
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.log
+            tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.trx
+            tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.diag.log
+            tests/Alis.Reactive.PlaywrightTests/bin/TestResults/playwright-traces/*
+          retention-days: 14

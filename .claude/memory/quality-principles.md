@@ -131,17 +131,17 @@ boundary -- it is never one flat flow.
 ### Layer 1: C# Descriptors and Builders
 
 - **Skills:** modern-csharp (TDD principles are in bdd-testing skill). XML docs enforced by `hookify.xml-docs-quality.local.md`.
-- **Thinking:** Value Objects, Encapsulation, SOLID, serialization impact on schema
-- **Tests:** Write FAILING unit test FIRST (Red), review it, THEN write code (Green)
-- **Harness:** `AssertSchemaValid()` validates serialized plan JSON against schema
+- **Thinking:** Value Objects, Encapsulation, SOLID, impact on the generated TS plan contract
+- **Tests:** Prove DSL intent end-to-end through the Playwright suite (no C# unit/snapshot harness exists)
+- **Harness:** Playwright behavior + `npm run typecheck` (the generated `runtime/types/plan.ts` must match C#)
 
-### Boundary 1-2: C# to Schema
+### Boundary 1-2: C# Plan Domain to Generated TS Contract
 
-A failing `AssertSchemaValid()` test is the ONLY reason to edit the schema. Write C# code,
-write failing unit test, test proves schema needs updating, review with evidence, THEN
-update schema. Schema is the CONTRACT.
+The C# plan domain is the contract source. When the plan shape changes, regenerate
+`runtime/types/plan.ts` (PlanTypeGenerator, run by `npm run typecheck`) and confirm the runtime
+still compiles against it. JSON schema is retired — there is no `AssertSchemaValid` step.
 
-### Boundary 2-3: Schema to TS Types
+### Boundary 2-3: Generated Contract to Runtime
 
 Same rigorous process. Schema change triggers thinking about TS type impact. Write failing
 vitest. Update types. Currently no automation validates TS types match schema (known gap).

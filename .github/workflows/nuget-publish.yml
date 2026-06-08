@@ -1,29 +1,14 @@
 name: Publish NuGet packages
 
-# release/* → preview packages (1.0.0-preview.N)
-# main      → stable packages  (1.0.0)
+# Publishes to NuGet.org ONLY when a version tag (v*) is pushed. The published version is
+# derived from the tag, so the tag is the single source of truth for what ships:
+#   git tag v1.0.0-rc.1 && git push origin v1.0.0-rc.1   ->  publishes 1.0.0-rc.1 (prerelease)
+#   git tag v1.0.0      && git push origin v1.0.0         ->  publishes 1.0.0 (stable / GA)
+# NuGet flags any version with a '-' suffix as prerelease automatically. Merging to main does
+# NOT publish anything (that is CI-only, in ci.yml) — releasing is a deliberate tag push.
 on:
   push:
-    branches: [main, 'release/*']
-    paths:
-      - 'Alis.Reactive/**'
-      - 'Alis.Reactive.Assets/**'
-      - 'Alis.Reactive.Native/**'
-      - 'Alis.Reactive.DesignSystem/**'
-      - 'Alis.Reactive.Fusion/**'
-      - 'Alis.Reactive.FluentValidator/**'
-      - 'Alis.Reactive.NativeTagHelpers/**'
-      - 'Alis.Reactive.Analyzers/**'
-      - 'build/**'
-      - 'Directory.Build.props'
-      - 'global.json'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'scripts/build.sh'
-      - 'scripts/test.sh'
-      - 'scripts/playwright.sh'
-      - 'scripts/pack.sh'
-      - '.github/workflows/nuget-publish.yml'
+    tags: ['v*']
   workflow_dispatch:
 
 env:
@@ -49,8 +34,6 @@ jobs:
 
       - name: Run non-browser verification gate
         run: CONFIGURATION=Release scripts/test.sh --no-e2e
-        # 'npm run lint' is intentionally NOT run here yet: the runtime has 10
-        # pre-existing eslint errors. Add it once those are cleared.
 
   playwright:
     runs-on: ubuntu-latest
@@ -86,12 +69,15 @@ jobs:
             tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.log
             tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.trx
             tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.diag.log
-            tests/Alis.Reactive.PlaywrightTests/bin/TestResults/playwright-traces/*
           retention-days: 14
 
   pack-and-publish:
     needs: [test, playwright]
+    # Publish only for an actual version tag — a manual workflow_dispatch on a branch
+    # runs the gates above but will not push packages.
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    environment: nuget-release
     permissions:
       packages: write
     steps:
@@ -108,17 +94,12 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
 
-      - name: Determine package version
+      - name: Derive package version from tag
         id: version
         run: |
-          VERSION_PREFIX=$(dotnet msbuild Alis.Reactive/Alis.Reactive.csproj -getProperty:VersionPrefix -v:q | tail -n 1)
-          if [[ "${{ github.ref }}" == refs/heads/release/* ]]; then
-            echo "package_version=${VERSION_PREFIX}-preview.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
-            echo "is_preview=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "package_version=${VERSION_PREFIX}" >> "$GITHUB_OUTPUT"
-            echo "is_preview=false" >> "$GITHUB_OUTPUT"
-          fi
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "package_version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Publishing version ${VERSION} from tag ${GITHUB_REF_NAME}"
 
       - name: Pack NuGet packages
         run: scripts/pack.sh "${{ steps.version.outputs.package_version }}"
@@ -129,7 +110,7 @@ jobs:
       - name: Upload NuGet artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: nuget-packages-${{ github.run_number }}
+          name: nuget-packages-${{ steps.version.outputs.package_version }}
           path: ./nupkgs/*.nupkg
           retention-days: 30
 

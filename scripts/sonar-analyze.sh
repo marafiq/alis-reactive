@@ -113,24 +113,11 @@ run_analysis() {
     # Build — SonarQube hooks into MSBuild to collect C# analysis data
     dotnet build Alis.Reactive.SandboxApp/Alis.Reactive.SandboxApp.csproj
 
-    # Test with coverage — generates OpenCover XML reports that SonarQube consumes.
-    # Each test project writes to its own subfolder under TestResults/coverage/.
-    log "Running tests with coverage collection..."
-    local test_projects=(
-        "tests/Alis.Reactive.UnitTests"
-        "tests/Alis.Reactive.Native.UnitTests"
-        "tests/Alis.Reactive.Fusion.UnitTests"
-        "tests/Alis.Reactive.FluentValidator.UnitTests"
-    )
-    for proj in "${test_projects[@]}"; do
-        local proj_name
-        proj_name=$(basename "$proj")
-        dotnet test "$proj" \
-            --no-build \
-            --collect:"XPlat Code Coverage" \
-            --results-directory "TestResults/coverage/${proj_name}" \
-            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
-    done
+    # C# line coverage is not collected: there are no C# unit-test projects. The only C# test
+    # project is the Playwright suite (tests/Alis.Reactive.PlaywrightTests), which runs through
+    # scripts/playwright.sh against a live sandbox and is not a unit-coverage source. SonarQube
+    # still analyzes C# code quality; add a C# unit-test project to restore coverage metrics.
+    log "No C# unit-test projects — skipping C# coverage collection (code quality still analyzed)."
 
     # End — uploads all results (C# + TS + coverage) to SonarQube
     dotnet sonarscanner end \

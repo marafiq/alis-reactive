@@ -218,10 +218,10 @@ Nothing silently passes. Unknown rules block. Missing shape throws. Unresolvable
 
 After adding or modifying validation rules:
 
-1. **C# unit test**: `dotnet test tests/Alis.Reactive.FluentValidator.UnitTests` — confirm rule extracts to expected JSON shape via `VerifyJson()` + `AssertSchemaValid()`
-2. **Build**: `npm run build:all && dotnet build` — confirm no compilation errors
+1. **Contract + build**: `npm run typecheck && dotnet build` — the rule's plan model regenerates `runtime/types/plan.ts` and compiles cleanly (no separate C# unit/schema harness exists)
+2. **Build assets**: `npm run build:all` — confirm the browser bundles build with no errors
 3. **Browser**: Open the form, submit invalid data, confirm rules fire client-side
-4. **Playwright**: Run `dotnet test tests/Alis.Reactive.PlaywrightTests` — confirm BDD tests pass for validation behavior
+4. **Playwright**: Run `scripts/playwright.sh` — confirm the BDD tests prove the validation behavior in the browser
 
 If a rule does not fire in the browser but passes C# tests, check: (a) shape is set for numeric/date fields, (b) the form element has the correct `data-reactive-validation-summary` attribute, (c) the input was created with `Html.InputField()` not raw HTML.
 
