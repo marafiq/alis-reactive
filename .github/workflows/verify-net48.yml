@@ -1,0 +1,64 @@
+# Verifies the multi-target libraries compile and pack on REAL .NET Framework 4.8
+# (Windows), not just against the cross-platform reference assemblies used on macOS/Linux.
+# This is the RC1 net48 gate the macOS dev box cannot provide.
+name: verify-net48
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['tiny-safe-but-important-refactorings']
+
+jobs:
+  net48-windows:
+    name: Build + pack net48 on real .NET Framework 4.8 (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install npm deps
+        run: npm ci
+
+      - name: Build browser assets (generates runtime/types/plan.ts + bundles)
+        run: npm run build:all
+
+      - name: Build full solution in Release (net48 compiled against real .NET Framework 4.8)
+        run: dotnet build Alis.Reactive.slnx -c Release
+
+      - name: Explicit net48-only build of every multi-target library
+        shell: bash
+        run: |
+          set -euo pipefail
+          for proj in \
+            Alis.Reactive/Alis.Reactive.csproj \
+            Alis.Reactive.Native/Alis.Reactive.Native.csproj \
+            Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj \
+            Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj \
+            Alis.Reactive.DesignSystem/Alis.Reactive.DesignSystem.csproj ; do
+            echo "::group::net48 build $proj"
+            dotnet build "$proj" -c Release -f net48
+            echo "::endgroup::"
+          done
+
+      - name: Pack six NuGets on Windows
+        shell: bash
+        run: scripts/pack.sh 1.0.0-rc.1
+
+      - name: List produced packages
+        shell: bash
+        run: ls -1 ./nupkgs/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nupkgs-net48-windows
+          path: nupkgs/*.nupkg
+          if-no-files-found: error
