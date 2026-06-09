@@ -8,7 +8,8 @@ To release **any** version, push a tag `vMAJOR.MINOR.PATCH[-prerelease]`. The
 `Publish NuGet packages` workflow (`.github/workflows/nuget-publish.yml`) then:
 
 1. validates the tag is a real SemVer version (a typo'd tag fails fast, before anything is packed),
-2. runs the full gate (non-browser tests + Playwright),
+2. runs the deterministic gate (typecheck + build + vitest + dotnet build); the full Playwright suite
+   also runs but is **non-blocking** (it flakes on the CI runner — see below — and gates PRs in `ci.yml`),
 3. packs all six NuGets at the tag's version (with `.snupkg` symbols),
 4. pushes them to nuget.org (`--skip-duplicate`; symbols ride along), and
 5. cuts a GitHub Release with auto-generated notes, marked **pre-release** when the version has a
@@ -64,7 +65,8 @@ Watch it: `gh run watch $(gh run list --workflow=nuget-publish.yml --limit 1 --j
 | Pack regression (missing/extra package, wrong version) | A pre-publish check requires **all six** packages at the tagged version, or the run fails **before** pushing |
 | Two releases triggered at once | Serialized by a `concurrency` group; the second waits, and an in-flight publish is never cancelled |
 | `NUGET_API_KEY` not configured | Fails immediately with a clear message, before packing |
-| Tests red on the tagged commit | `pack-and-publish` needs `test` + `playwright` green first — nothing publishes on red |
+| Deterministic tests red on the tagged commit | `pack-and-publish` needs the `test` gate (typecheck/build/vitest/dotnet) green — nothing publishes on red |
+| Playwright flakes on the CI runner | Non-blocking at release time (still runs for signal; gates PRs in `ci.yml`) so a known flake cannot block a release |
 | Partial publish (network drop mid-push) | Just re-run the workflow: published packages are skipped, the rest retry — idempotent |
 | Push / merge to `main` | Publishes nothing — only a `v*` tag does |
 | Reproducibility | SDK pinned via `global.json`; deterministic build (`Directory.Build.props`) |
