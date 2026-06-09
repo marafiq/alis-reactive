@@ -16,12 +16,12 @@ A real .NET Framework 4.8 consumer hits the same issues. Each is captured here w
 
 | # | Problem | Fix (see file) |
 |---|---------|----------------|
-| 1 | **Asset delivery.** The package targets copy the runtime JS + design-system/Syncfusion CSS to `Content\alisreactive\{name}.{version}.{ext}`. There is no `asp-append-version` Tag Helper on net48. | Reference the version-stamped files directly: `@Url.Content("~/Content/alisreactive/alis-reactive.<version>.js")` (`Views/Shared/_Layout.cshtml`). |
+| 1 | **Asset delivery.** The package targets copy the runtime JS + design-system CSS to `Content\alisreactive\{name}.{version}.{ext}` (this fixture is **native-only**, so it does not pull the Fusion/Syncfusion CSS). There is no `asp-append-version` Tag Helper on net48. | Reference the version-stamped files directly: `@Url.Content("~/Content/alisreactive/alis-reactive.<version>.js")` (`Views/Shared/_Layout.cshtml`). |
 | 2 | **Binding redirects.** `System.Text.Json` 9 and its transitive chain (`System.Buffers`, `System.Memory`, `System.Runtime.CompilerServices.Unsafe`, `System.Numerics.Vectors`, `System.Threading.Tasks.Extensions`, `Microsoft.Bcl.AsyncInterfaces`) need assembly binding redirects on .NET Framework, or you get `FileLoadException: ... manifest definition does not match the assembly reference`. Classic `packages.config` apps do **not** auto-add them. | `Web.config` `<runtime><assemblyBinding>`. A real consumer runs NuGet's `Add-BindingRedirect` or adds them by hand; this fixture's CI **auto-generates** them from the actual `bin\` assembly versions, so they are always exact. |
 | 3 | **`WebApplication.targets` / `VSToolsPath`.** A classic web app imports `$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets`; on a bare build agent `$(VSToolsPath)` defaults wrong (`MSB4226`). | Set `VisualStudioVersion` + `VSToolsPath` in the `.csproj`. |
 | 4 | **Native components are Html helpers, not Tag Helpers.** `<native-*>` Tag Helpers live in the net10-only `AlisReactive.NativeTagHelpers` package and do not exist under System.Web MVC 5. | Use `Html.InputField(plan, m => m.X).NativeTextBox(...)` / `.NativeCheckBox(...)` (`Views/Home/Index.cshtml`). |
 | 5 | **Razor parses `@` inside HTML comments.** `<!-- ... @Html.RenderPlan ... -->` is compiled as code (`CS1502`). | Use Razor comments `@* ... *@` instead. |
-| 6 | **Client validation** on net48 resolves `ReactiveValidator<T>` through MVC5's `DependencyResolver` bridge (registered in `Global.asax` `Application_Start`). | Not exercised by this minimal smoke yet — tracked in `docs/net48-windows-verification.md`. |
+| 6 | **Client validation** on net48 resolves `ReactiveValidator<T>` through MVC5's `DependencyResolver` — a real consumer registers it in `Global.asax` `Application_Start`. | **Not exercised by this native-only smoke** (no validator is registered here); tracked in `docs/net48-windows-verification.md`. |
 
 ## Run it locally on Windows
 

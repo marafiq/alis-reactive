@@ -73,8 +73,8 @@
   </ItemGroup>
   <ItemGroup>
     <!-- The shipped net48 NuGet packages under test. Their build/buildTransitive targets copy the
-         runtime JS + design-system/syncfusion CSS into Content\alisreactive\ at build. Versions are
-         overridden on the CI restore (-p:AlisReactiveVersion) to point at the freshly-packed rc.1. -->
+         runtime JS + design-system CSS into Content\alisreactive\ at build. AlisReactiveVersion
+         defaults to the rc.1 below; CI packs that same version into the local feed it restores from. -->
     <PackageReference Include="AlisReactive" Version="$(AlisReactiveVersion)" />
     <PackageReference Include="AlisReactive.Native" Version="$(AlisReactiveVersion)" />
     <PackageReference Include="AlisReactive.DesignSystem" Version="$(AlisReactiveVersion)" />

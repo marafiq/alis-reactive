@@ -13,10 +13,10 @@ Plan-driven reactive framework for ASP.NET MVC. C# fluent builders produce React
 | `Alis.Reactive.DesignSystem` | Design-system tokens, layout helpers, and stylesheet |
 | `Alis.Reactive.NativeTagHelpers` | ASP.NET Core Tag Helpers for native components |
 
-`Alis.Reactive`, `Alis.Reactive.Native`, `Alis.Reactive.FluentValidator`, and
-`Alis.Reactive.DesignSystem` multi-target **`net48` and `net10.0`** — the *same* DSL on both
-runtimes (bridged by `#if` shims, never a divergent API). `Alis.Reactive.Fusion` and
-`Alis.Reactive.NativeTagHelpers` are **`net10.0`-only**.
+`Alis.Reactive`, `Alis.Reactive.Native`, `Alis.Reactive.Fusion`, `Alis.Reactive.FluentValidator`,
+and `Alis.Reactive.DesignSystem` multi-target **`net48` and `net10.0`** — the *same* DSL on both
+runtimes (bridged by `#if` shims, never a divergent API). Only `Alis.Reactive.NativeTagHelpers` is
+**`net10.0`-only** (ASP.NET Core Tag Helpers).
 
 ## Getting Started
 
