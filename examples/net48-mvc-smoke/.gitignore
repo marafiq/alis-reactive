@@ -1,0 +1,8 @@
+# Classic MSBuild + NuGet build outputs for this fixture — never commit them.
+bin/
+obj/
+packages/
+# Runtime JS/CSS the package targets copy in at build (version-stamped).
+Content/alisreactive/
+*.user
+*.suo

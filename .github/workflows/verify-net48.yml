@@ -6,7 +6,9 @@ name: verify-net48
 on:
   workflow_dispatch:
   push:
-    branches: ['tiny-safe-but-important-refactorings']
+    branches: [main, 'release/*']
+  pull_request:
+    branches: [main]
 
 jobs:
   net48-windows:
