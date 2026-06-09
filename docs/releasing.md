@@ -55,6 +55,20 @@ Watch it: `gh run watch $(gh run list --workflow=nuget-publish.yml --limit 1 --j
 - **Optional approval gate.** The publish job runs in the `nuget-release` GitHub Environment; add
   required reviewers there (Settings → Environments) if you want a manual approval click before publish.
 
+## Robustness — handled for you (you should not need to revisit this)
+
+| Scenario | What the pipeline does |
+|---|---|
+| Typo'd / non-SemVer tag (`vfoo`, `v1.0`, `v1.0.0.0`) | Fails fast before packing — nothing is published |
+| Re-run the same tag, or re-push it | `--skip-duplicate` skips already-published versions; the GitHub Release is **updated**, not duplicated |
+| Pack regression (missing/extra package, wrong version) | A pre-publish check requires **all six** packages at the tagged version, or the run fails **before** pushing |
+| Two releases triggered at once | Serialized by a `concurrency` group; the second waits, and an in-flight publish is never cancelled |
+| `NUGET_API_KEY` not configured | Fails immediately with a clear message, before packing |
+| Tests red on the tagged commit | `pack-and-publish` needs `test` + `playwright` green first — nothing publishes on red |
+| Partial publish (network drop mid-push) | Just re-run the workflow: published packages are skipped, the rest retry — idempotent |
+| Push / merge to `main` | Publishes nothing — only a `v*` tag does |
+| Reproducibility | SDK pinned via `global.json`; deterministic build (`Directory.Build.props`) |
+
 ## First publish notes
 
 `AlisReactive.DesignSystem` is a new package ID. The first push auto-creates it on nuget.org. If you

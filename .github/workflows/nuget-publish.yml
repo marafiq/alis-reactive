@@ -78,6 +78,10 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment: nuget-release
+    # Serialize releases: never run two publishes at once, and never cancel an in-flight one.
+    concurrency:
+      group: nuget-release
+      cancel-in-progress: false
     permissions:
       contents: write   # to create the GitHub Release; nuget.org publish uses the API key, not GH Packages
     steps:
@@ -86,13 +90,22 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          global-json-file: global.json   # pin the exact SDK for a reproducible release build
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: package-lock.json
+
+      - name: Fail early if the publish secret is missing
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          if [ -z "$NUGET_API_KEY" ]; then
+            echo "::error::NUGET_API_KEY secret is not set — cannot publish. Add it in repo Settings -> Secrets and variables -> Actions."
+            exit 1
+          fi
 
       - name: Derive and validate the version from the tag (SemVer)
         id: version
@@ -110,33 +123,57 @@ jobs:
           echo "Releasing ${VERSION} (prerelease=${PRERELEASE}) from tag ${GITHUB_REF_NAME}"
 
       - name: Pack NuGet packages
+        # pack.sh runs npm ci + npm run build:all itself, then packs all six at -p:Version.
         run: scripts/pack.sh "${{ steps.version.outputs.package_version }}"
 
-      - name: Log package versions
-        run: ls -1 ./nupkgs/
+      - name: Verify the six packages were produced at the tagged version
+        run: |
+          VERSION="${{ steps.version.outputs.package_version }}"
+          EXPECTED=(AlisReactive AlisReactive.Native AlisReactive.Fusion AlisReactive.FluentValidator AlisReactive.DesignSystem AlisReactive.NativeTagHelpers)
+          fail=0
+          for id in "${EXPECTED[@]}"; do
+            if [ ! -f "./nupkgs/${id}.${VERSION}.nupkg" ]; then
+              echo "::error::Missing expected package ./nupkgs/${id}.${VERSION}.nupkg"; fail=1
+            fi
+          done
+          count=$(ls -1 ./nupkgs/*.nupkg 2>/dev/null | wc -l)
+          if [ "$count" -ne "${#EXPECTED[@]}" ]; then
+            echo "::error::Expected ${#EXPECTED[@]} .nupkg files, found ${count}. (If a package was added/removed, update this check.)"; fail=1
+          fi
+          if [ "$fail" -ne 0 ]; then echo "Pack output:"; ls -1 ./nupkgs/ || true; exit 1; fi
+          echo "All ${#EXPECTED[@]} packages present at ${VERSION}."
 
       - name: Upload NuGet artifacts
         uses: actions/upload-artifact@v4
         with:
           name: nuget-packages-${{ steps.version.outputs.package_version }}
-          path: ./nupkgs/*.nupkg
+          path: |
+            ./nupkgs/*.nupkg
+            ./nupkgs/*.snupkg
           retention-days: 30
 
       - name: Publish to NuGet.org
         run: |
+          # --skip-duplicate makes re-runs idempotent: an already-published version is skipped, not an error.
+          # Pushing *.nupkg auto-pushes the adjacent *.snupkg symbol packages.
           dotnet nuget push ./nupkgs/*.nupkg \
             --source "https://api.nuget.org/v3/index.json" \
             --api-key ${{ secrets.NUGET_API_KEY }} \
             --skip-duplicate
 
-      - name: Create the GitHub Release
+      - name: Create or update the GitHub Release (idempotent)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PRERELEASE_FLAG=""
           if [[ "${{ steps.version.outputs.prerelease }}" == "true" ]]; then PRERELEASE_FLAG="--prerelease"; fi
-          gh release create "${GITHUB_REF_NAME}" \
-            --title "${GITHUB_REF_NAME}" \
-            --generate-notes \
-            $PRERELEASE_FLAG \
-            ./nupkgs/*.nupkg
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            echo "Release ${GITHUB_REF_NAME} already exists — refreshing its package assets."
+            gh release upload "${GITHUB_REF_NAME}" ./nupkgs/*.nupkg --clobber
+          else
+            gh release create "${GITHUB_REF_NAME}" \
+              --title "${GITHUB_REF_NAME}" \
+              --generate-notes \
+              $PRERELEASE_FLAG \
+              ./nupkgs/*.nupkg
+          fi
