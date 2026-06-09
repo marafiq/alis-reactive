@@ -79,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: nuget-release
     permissions:
-      packages: write
+      contents: write   # to create the GitHub Release; nuget.org publish uses the API key, not GH Packages
     steps:
       - uses: actions/checkout@v4
 
@@ -94,12 +94,20 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
 
-      - name: Derive package version from tag
+      - name: Derive and validate the version from the tag (SemVer)
         id: version
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
+          # SemVer 2.0: MAJOR.MINOR.PATCH with an optional -prerelease label (alpha/beta/rc/...).
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Tag '${GITHUB_REF_NAME}' is not a SemVer version. Use vMAJOR.MINOR.PATCH[-prerelease] — e.g. v1.0.0-alpha.1, v1.0.0-rc.1, or v1.0.0."
+            exit 1
+          fi
+          # NuGet flags any version with a '-' suffix as a prerelease automatically.
+          if [[ "$VERSION" == *-* ]]; then PRERELEASE=true; else PRERELEASE=false; fi
           echo "package_version=${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "Publishing version ${VERSION} from tag ${GITHUB_REF_NAME}"
+          echo "prerelease=${PRERELEASE}" >> "$GITHUB_OUTPUT"
+          echo "Releasing ${VERSION} (prerelease=${PRERELEASE}) from tag ${GITHUB_REF_NAME}"
 
       - name: Pack NuGet packages
         run: scripts/pack.sh "${{ steps.version.outputs.package_version }}"
@@ -120,3 +128,15 @@ jobs:
             --source "https://api.nuget.org/v3/index.json" \
             --api-key ${{ secrets.NUGET_API_KEY }} \
             --skip-duplicate
+
+      - name: Create the GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PRERELEASE_FLAG=""
+          if [[ "${{ steps.version.outputs.prerelease }}" == "true" ]]; then PRERELEASE_FLAG="--prerelease"; fi
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes \
+            $PRERELEASE_FLAG \
+            ./nupkgs/*.nupkg
