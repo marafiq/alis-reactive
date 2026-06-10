@@ -238,17 +238,18 @@ async function readResponseBody(response: Response): Promise<HttpResponseBody> {
   }
 }
 
-function responseContentKind(contentType: string | null): "json" | "text" | "empty" {
-  const mediaType = responseMediaType(contentType);
-  if (mediaType === undefined) return "empty";
+type ResponseBodyKind = "json" | "text" | "empty";
+
+function responseContentKind(contentType: string | null): ResponseBodyKind {
+  if (contentType === null) return "empty";
+
+  const parameterStart = contentType.indexOf(";");
+  const mediaType =
+    (parameterStart === -1 ? contentType : contentType.slice(0, parameterStart)).trim().toLowerCase();
+
   if (mediaType === "application/json" || mediaType.endsWith("+json")) return "json";
   if (mediaType.startsWith("text/") || mediaType.includes("html")) return "text";
   return "empty";
-}
-
-function responseMediaType(contentType: string | null): string | undefined {
-  if (contentType === null || contentType.length === 0) return undefined;
-  return contentType.split(";")[0]?.trim().toLowerCase() ?? "";
 }
 
 function jsonResponseBodyFrom(textBody: string): HttpResponseBody {
