@@ -92,8 +92,10 @@ with them — prove that in vitest, then Playwright.
 
 **Harness:** vitest + jsdom via `boot()`. Architecture enforcement tests. `npm run typecheck`.
 
-**Known gaps:** Vendor leaks in trigger.ts:45, live-clear.ts:44. Dual condition evaluators
-(21 ops vs 4 ops) can diverge. PlanRegistry over-exported. 3 "ForTests" functions in prod.
+**Known gaps:** Vendor-isolation exceptions and DOM-query boundaries are registered in the
+architecture test's allowlists — the test is current, not any prose list. Two separate
+operator evaluators (conditions vs validation rules) can diverge. Test-reset exports live in
+production modules, aggregated under one boot reset.
 
 ## Boundary: Runtime → Browser
 
@@ -142,5 +144,4 @@ Every code example comes from a working, verified sandbox page.
 
 **Harness:** Rider diagnostics on every file. Sandbox-verified examples.
 
-**Gaps:** 5 docs-site pages reference deleted `IReactivePlan`. 50/78 docs files obsolete.
-No skill usage audit trail.
+**Gaps:** No skill usage audit trail.

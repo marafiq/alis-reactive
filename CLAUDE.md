@@ -113,8 +113,8 @@ source of truth for new plan/runtime work.
 
 ## Plan-Driven IDs — No DOM Scanning
 
-`IdGenerator` (`Alis.Reactive/IdGenerator.cs`) generates every HTML element ID at C# render
-time from the model type and property expression. Format: `{Namespace_TypeName}__{MemberPath}`.
+`IdGenerator` generates every HTML element ID at C# render time from the model type and
+property expression. Format: `{Namespace_TypeName}__{MemberPath}`.
 
 ```
 Model:      Alis.Reactive.SandboxApp.Models.OrderModel
@@ -131,16 +131,19 @@ does not generate fallback IDs. If an ID collides, that is a developer error, no
 concern. No fallbacks, no auto-generated suffixes, no scanning to resolve ambiguity.
 
 The runtime uses `getElementById` for all plan model class and element resolution. Wide DOM
-queries exist in 3 justified locations only:
-- `root.ts:25` — discovers `[data-reactive-plan]` script elements at boot
-- `inject.ts:16` — discovers plans in dynamically injected HTML
-- `retry-indicator.ts:53` — cleans up retry indicator elements by data attribute
+queries (`querySelectorAll`, tag/class scans, DOM traversal) are an anti-pattern in this
+runtime: the plan carries every ID the runtime needs, so needing a wide query means the plan is
+missing information — fix the C# plan model class to carry it. Only two categories of wide
+query are justified, both true external boundaries:
 
-Scoped `querySelector` calls exist in `error-display.ts` and `orchestrator.ts` for validation
-summary element lookups (generated HTML, not plan components).
+- **Plan discovery** — finding `[data-reactive-plan]` script elements in HTML the runtime did
+  not author (initial boot, injected partials).
+- **Self-stamped cleanup** — finding elements by a data attribute the runtime itself wrote
+  (retry indicators and similar).
 
-If you think you need `querySelectorAll` or DOM traversal for plan component resolution, the
-plan is missing information. Fix the C# plan model class to carry it.
+A wide query outside these categories fails the architecture enforcement test in the
+runtime suite. Its allowlist is the only registry of boundary files — this document
+carries the principle, never the file list.
 
 ## The Plan Contract
 
@@ -148,13 +151,13 @@ C# `Render()` serializes the plan to JSON inside a `<script type="application/js
 data-reactive-plan>` element. The runtime discovers these elements, parses the JSON, merges
 partials by `planId`, and boots each composed plan. Sandbox URL: `http://localhost:5220`.
 
-`PlanNodeDiscriminator<T>` (`Alis.Reactive/Serialization/PlanNodeDiscriminator.cs`) enables
-polymorphic serialization by delegating to the
-concrete type via `JsonSerializer.Serialize(writer, value, value.GetType(), options)`. Each
+`PlanNodeDiscriminator<T>` enables polymorphic serialization by delegating to the concrete
+type via `JsonSerializer.Serialize(writer, value, value.GetType(), options)`. Each
 concrete plan model class carries its own `kind` property (e.g., `public string Kind => "set"`)
 which becomes the discriminator in the JSON, matched by TypeScript discriminated unions.
 
-Generated TypeScript types come from the C# plan domain via `PlanTypeGenerator`.
+Generated TypeScript types come from the C# plan domain. Generation runs at the front of
+`npm run typecheck`, so contract drift is a typecheck failure — never a runtime surprise.
 The runtime trusts framework-produced plan JSON as domain output. If external or
 corrupted JSON reaches the browser, runtime failures must expose the domain
 drift with context rather than become normal control flow.
@@ -267,15 +270,15 @@ right watcher and proof command. Framework assets ship from
 
 | Layer | Technology |
 |-------|-----------|
-| C# | .NET 10, C# 14. Use modern C# where it improves the domain model without weakening the DSL contract. |
-| TS | TypeScript 5.8, esbuild ESM, Tailwind CSS v4 |
+| C# | C# 14, compiled for BOTH `net48` and `net10.0` — every shipped package dual-targets (TagHelpers: net10-only by design). A net48 language-feature error (CS8xxx/CS90xx) means rework the feature to what PolySharp polyfills — never work around it. Host-type splits go behind `#if NET48`. |
+| TS | TypeScript + esbuild ESM bundles, Tailwind CSS v4. Versions pinned in `package.json`. |
 | Components | Syncfusion EJ2 32.x (Fusion) + Native HTML. Always through DSL: `Html.InputField(plan, m => m.Name).NativeTextBox(build: b => ...)` |
-| Validation | FluentValidation 12.x remains server authority; `ReactiveValidator<T>` records explicit browser validation metadata through DI |
-| Tests | NUnit 4.3-4.5, Vitest 3.x + jsdom, Playwright 1.52 |
+| Validation | FluentValidation remains server authority (version per target framework, pinned in the csproj); `ReactiveValidator<T>` records explicit browser validation metadata through DI |
+| Tests | NUnit, Vitest + jsdom, Playwright. Versions pinned in the test csproj and `package.json`. |
 
 ## Skills
 
-8 skills in `.claude/skills/`. Load applicable skills when useful, but DSL
+Skills live in `.claude/skills/`. Load applicable skills when useful, but DSL
 source and this root file override stale skill guidance.
 
 | Skill | Use for |
@@ -289,7 +292,7 @@ source and this root file override stale skill guidance.
 | `modern-csharp` | C# 14 patterns that clarify the rich plan domain model |
 | `bdd-testing` | Playwright BDD tests, 5 rules, 7-behavior contract, blind reviewer |
 
-11 hookify rule templates live in `.claude/hookify.*.local.md`. **All are currently disabled
+Hookify rule templates live in `.claude/hookify.*.local.md`. **All are currently disabled
 (`enabled: false`)** — they document candidate quality gates but do not actively enforce anything.
 Enable one by setting `enabled: true` if you want it to run. The public-contract-freeze rules
 (`protect-api-surface`, `no-public-in-libraries`) were removed as noise.
@@ -313,7 +316,7 @@ No inline `<script>` blocks — `root.ts` handles discovery and boot automatical
 1. C# plan model class — sealed class, `internal` constructor
 2. Polymorphic registration — `PlanNodeDiscriminator<T>` delegates to concrete type
 3. Builder method — PipelineBuilder, ElementBuilder, or TriggerBuilder
-4. Generated TS plan contract — `PlanTypeGenerator` output stays aligned with C#
+4. Generated TS plan contract — regenerate; typecheck proves alignment with C#
 5. Runtime handler — new switch case + `assertNever`
 6. C# domain behavior test — prove DSL intent becomes the right plan model
 7. TS runtime behavior test — `Alis.Reactive.Assets/runtime/__tests__/*.test.ts`
@@ -328,9 +331,11 @@ Duplication between slices is intentional.
 ### 5. Vendor Isolation
 
 New component = C# vertical slice with `IInputComponent`. Zero TS runtime changes.
-`resolver.ts` is the only module that maps vendor to DOM root (`resolveVendorRoot`) and wires
-vendor-specific events (`wireEvent`). Adding a third vendor must only touch `resolver.ts` and
-add a `resolution/event-{vendor}.ts` file. Vendor checks in other modules violate this rule.
+Vendor knowledge lives in exactly three runtime roles — the per-vendor driver (vendor →
+component root + event wiring), the per-vendor event adapter, and vendor component
+modules. Everything else stays vendor-blind; resolution dispatches through the registered
+driver. Adding a vendor = register a driver, add its adapter. Enforced by the architecture
+test — its allowlist is the only registry of exceptions.
 
 ### 6. Trust Generated Plans — Boundary Errors Only
 
@@ -458,11 +463,11 @@ Known weaknesses tracked for improvement:
 - **DDD depth**: Domain model uses `null` where Value Objects with constructor invariants
   must enforce valid state. Association and aggregation boundaries are implicit.
   Screaming names (types that express domain intent) are underused.
-- **Serialization**: `[JsonIgnore(Condition = WhenWritingNull)]` attributes scattered
-  across plan model classes instead of explicit serialization contracts.
-- **TS tracing**: `core/trace.ts` is 38 lines using `console.error`/`warn`/`log` dispatched
-  by level. It must move toward OTel-style structured tracing — explicit data flowing through
-  modules, correlation IDs, proper span context, actionable error messages.
+- **Serialization**: two justified `WhenWritingNull` attributes remain (value-domain
+  Predicate/Projection, each with written rationale); explicit serialization contracts over
+  per-property attributes stay the goal.
+- **TS tracing**: scope-tagged, level-filtered console emission today. The goal is
+  OTel-style structure — correlation IDs, span context, actionable errors.
 
 ### 14. Git Worktrees for Feature Work
 
