@@ -51,11 +51,10 @@ judgment drift across iterations — same-commit write-back mitigates, override-
 alarms.
 
 **Done when:** (1) one renamed lifecycle capability, mode-flagged, zero hardcoded
-versions; (2) upgrade driver re-derives the v33 ChipList/Mention drifts (the silent
-break that proved the stakes) from pre-bump baselines; (3) flagships at near-parity,
+versions; (2) upgrade driver re-derives the v33 ChipList/Mention drifts from
+pre-bump baselines; (3) flagships at near-parity,
 matrices green under verifier incl. negative-space rows; (4) judgment automaton live
 with evidence rows + override-rate metric, both usage oracles wired; (5) verifier sweep
 in CI, red rows name their gap; (6) zero new core DSL primitives.
 
-**Out of scope:** streaming; plan-contract de-generation; docs catch-up (plugin docs
-lead with typed `Plugin`).
+**Out of scope:** streaming; plan-contract de-generation; docs catch-up.
