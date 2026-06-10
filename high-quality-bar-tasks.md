@@ -79,6 +79,9 @@ for every consumer who copies them.
 
 ### T3 — Document the `AlisReactive.FluentValidator` public API
 
+**DEFERRED to SHOULD (2026-06-10, Adnan):** the API names are self-describing enough for
+rc2; document post-tag. Criteria below stand unchanged when picked up.
+
 **Evidence:** It is the only shipped package without `<GenerateDocumentationFile>` (the other
 five set it: `Alis.Reactive.csproj:7`, `Fusion:6`, `Native:6`, `DesignSystem:9`,
 `NativeTagHelpers:10`), and the project contains **zero** `/// <summary>` comments across ~89
@@ -263,6 +266,34 @@ listing shows identical content, including Fusion-specific instructions on non-F
       their nupkgs), or the install docs state that the analyzer ships with `AlisReactive` only.
 
 ---
+
+### T15 — FluentValidation client rules through Syncfusion's native validation schema
+
+**Pre-1.0 (Adnan, 2026-06-10) — not an rc2 gate.** Grid already maps client rules to the SF
+schema, but the Playwright suite never exercises INLINE validation errors in grid cells, and
+InPlaceEditor deliberately bypassed SF's native validation slot with a custom pattern. The
+primary use case must be nailed before 1.0.
+
+**Done means:**
+- [ ] Client rules render through SF-native validation for Grid edit (inline cell errors)
+      and InPlaceEditor (native validationRules slot); any custom pattern that remains has a
+      written justification.
+- [ ] Playwright behaviors exercise inline grid validation (invalid cell edit shows the SF
+      inline error; valid edit commits) and InPlaceEditor native validation display.
+
+### T16 — CI Playwright root cause: unlicensed EJ2 trial modal (found 2026-06-10)
+
+The 28 "flaky" CI failures were never timing: CI runners had no Syncfusion license, so EJ2
+overlaid a trial modal that intercepted every interaction (60s waits against covered
+elements). Workflows now pass `Syncfusion__LicenseKey` from the `SYNCFUSION_LICENSE_KEY`
+secret.
+
+**Done means:**
+- [ ] `SYNCFUSION_LICENSE_KEY` repo secret added (manual — repo Settings → Secrets), valid
+      for EJ2 v33 (the rc2 pin).
+- [ ] One green CI playwright leg on the pushed branch.
+- [ ] After consecutive green runs: re-arm publish gating (`needs: [test, playwright]`,
+      drop `continue-on-error`) — supersedes T10.
 
 ## Evidence status at audit time
 
