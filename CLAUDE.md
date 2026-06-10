@@ -77,34 +77,42 @@ bundled by esbuild into `Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js`
 `wwwroot/scripts/` by the shipped `AlisReactive.targets` file with the
 consumer's package version baked into the filename.
 
-## Architecture — 4 Layers, 3 Boundaries
+## Architecture — 5 Layers, 4 Boundaries
 
-Each boundary is guarded by behavior evidence. Tests are production code: they
-must protect DSL behavior and domain language, not mirror implementation
-indirection.
+The one canonical layer model — every rules file, dispatch table, and memory
+document uses this numbering. Each boundary is guarded by behavior evidence.
+Tests are production code: they must protect DSL behavior and domain language,
+not mirror implementation indirection.
 
 ```
-Layer 1  Frozen Public DSL in cshtml
-         Quality: typed authoring, compile-time component/member APIs, no string magic except plugin compatibility
-         Harness: complete facts grounded in actual DSL source plus Playwright slices that use the DSL
+Layer 1  C# DSL & Plan Domain (frozen public authoring surface + rich domain)
+         Quality: typed authoring, compile-time component/member APIs, value objects,
+                  invariants, no string magic except the plugin boundary
+         Harness: domain behavior tests; plans proven end-to-end by Playwright slices using the DSL
          ↓
-         BOUNDARY: DSL intent must be representable without server-side browser execution
+         BOUNDARY: plan shape change → regenerate runtime/types/plan.ts (PlanContractGenerator)
          ↓
-Layer 2  Rich C# Plan Domain
-         Quality: value objects, invariants, reaction graph, object contracts, slot composition vocabulary
-         Harness: domain behavior tests
+Layer 2  Generated TS Plan Contract (runtime/types/plan.ts)
+         Quality: generated discriminated unions — never hand-edited (hook-enforced); JSON schema retired
+         Harness: npm run typecheck (generation runs first; drift is a typecheck failure)
          ↓
-         BOUNDARY: generated TS plan contract
+         BOUNDARY: contract change → failing vitest drives the runtime handler
          ↓
-Layer 3  Generated TypeScript Plan Types + Runtime Domain
-         Quality: generated discriminated unions, immediate/async execution lanes, no fallback behavior
-         Harness: npm run typecheck and focused runtime behavior tests
+Layer 3  TS Runtime Executor
+         Quality: direct executor, sync/async lanes, no fallback behavior, vendor isolation
+         Harness: vitest + boot(), architecture enforcement tests
          ↓
-         BOUNDARY: page-visible behavior
+         BOUNDARY: eyes first in a real browser, then Playwright — browser is truth
          ↓
-Layer 4  Browser Verification + Documentation
-         Quality: real interactions, visible outcomes, no page.evaluate(), glossary aligned with code
-         Harness: sandbox-verified examples
+Layer 4  Browser Verification
+         Quality: real interactions, visible outcomes, no page.evaluate()
+         Harness: manual smoke → Playwright BDD slices
+         ↓
+         BOUNDARY: working sandbox example before writing docs
+         ↓
+Layer 5  Documentation & Skills
+         Quality: dev-facing language, question-driven, glossary aligned with code
+         Harness: sandbox-verified examples, Rider diagnostics
 ```
 
 Detailed flows must be derived from the current DSL source and kept with the
@@ -292,6 +300,11 @@ source and this root file override stale skill guidance.
 | `modern-csharp` | C# 14 patterns that clarify the rich plan domain model |
 | `bdd-testing` | Playwright BDD tests, 5 rules, 7-behavior contract, blind reviewer |
 
+Two deterministic PreToolUse hooks are live in `.claude/settings.json` (scripts in
+`.claude/hooks/`): generated files are protected from hand-edits (`runtime/types/plan.ts`,
+generated onboarding JSON/traces), and Playwright must go through `scripts/playwright.sh`
+instead of raw `dotnet test`. Hooks gate; the one-line rules here teach.
+
 Hookify rule templates live in `.claude/hookify.*.local.md`. **All are currently disabled
 (`enabled: false`)** — they document candidate quality gates but do not actively enforce anything.
 Enable one by setting `enabled: true` if you want it to run. The public-contract-freeze rules
@@ -300,9 +313,12 @@ Enable one by setting `enabled: true` if you want it to run. The public-contract
 Localized `CLAUDE.md` files live beside the work they govern — Fusion slices,
 Playwright tests, the sandbox, the TS runtime, and the onboarding artifact
 tree. Each loads when files in its directory are touched and adds only
-directory-specific constraints; this root file remains authoritative. Explore
-and Plan research subagents skip all CLAUDE.md files — inline the constraints
-an agent needs into its prompt.
+directory-specific constraints; this root file remains authoritative.
+Loading is discovered at session start (verified): guidance created mid-session
+takes effect in the NEXT session. Research subagents (Explore/Plan) do not load
+this hierarchy at startup, though directory CLAUDE.mds still attach when they
+read files there — inline critical constraints into agent prompts rather than
+relying on either.
 
 ## Rules
 
@@ -398,83 +414,29 @@ runtime assets.
 
 ### 11. Code Hygiene
 
-These small practices compound. They are not optional style preferences — they prevent
-entire categories of bugs and keep the codebase readable under pressure.
+These small practices compound — they prevent entire categories of bugs.
+Worked examples live in `.claude/memory/coding-principles.md` (Code Hygiene).
 
-**Revealing names over complex conditions.** Extract boolean expressions into named variables
-that explain intent. The name is the documentation.
-
-```csharp
-// Wrong: condition is opaque
-if (field.Shape != null && field.Shape.Kind != "none" && !field.IsServerOnly)
-    ExtractRule(field);
-
-// Right: name reveals intent
-var requiresClientValidation = field.Shape != null && field.Shape.Kind != "none" && !field.IsServerOnly;
-if (requiresClientValidation)
-    ExtractRule(field);
-```
-
-**Variables close to usage.** Declare a variable where it is first needed, not at the top of
-the method. Long distances between declaration and usage hide bugs and make code harder to
-follow. If a variable is used once, inline it.
-
-**Avoid nesting.** Use early returns and guard clauses to flatten control flow. Deep nesting
-hides logic and makes branches hard to trace.
-
-```csharp
-// Wrong: nested
-if (component != null)
-{
-    if (component.Vendor == "fusion")
-    {
-        // 20 lines of logic
-    }
-}
-
-// Right: guard clause, flat
-if (component == null) return;
-if (component.Vendor != "fusion") return;
-// 20 lines of logic
-```
-
-**No dead code.** Delete unused variables, unreachable branches, commented-out code. Do not
-keep code "for reference" — git has history. Commented-out code is a lie that rots.
-
-**Small methods, single responsibility.** If a method needs a comment explaining what a
-block does, extract that block into a named method. The method name replaces the comment.
+- **Revealing names over complex conditions** — extract booleans into named variables; the name is the documentation.
+- **Variables close to usage** — declare where first needed; if used once, inline it.
+- **Avoid nesting** — early returns and guard clauses; flat control flow.
+- **No dead code** — delete unused/unreachable/commented-out code; git has history.
+- **Small methods, single responsibility** — if a block needs a comment, extract it into a named method.
 
 ### 12. Prefer BDD Vertical Slice Playwright Tests
 
-Every Playwright test is an isolated vertical slice. It tests one user-visible behavior from
-page load through interaction to visible outcome.
-
-**Isolated:** Each test navigates to a fresh page. No shared state between tests. No test
-ordering. If test B breaks when test A is skipped, test B is broken.
-
-**Vertical:** The test exercises the full stack — C# view renders the plan, runtime boots it,
-user interacts, browser reflects the outcome. No mocking. No `page.evaluate()`. No shortcuts.
-Framework tests that verify the gather pipeline may assert on `request.PostData` — this is
-the one justified exception where asserting on non-visible data is correct.
-
-**Behavior-first:** The test name describes what the user sees, not what the code does.
-`selecting_care_level_updates_billing_amount` not `domready_trigger_fires_sequential_reaction`.
-
-Load the `bdd-testing` skill before writing any Playwright test. The 5 BDD rules and the
-7-behavior contract per input component are defined there.
+Every Playwright test is one user-visible behavior, isolated (fresh page, no
+ordering, no shared state), vertical (full stack, no mocking, no
+`page.evaluate()` — the one exception: framework gather-pipeline tests may
+assert `request.PostData`), and behavior-named (what the user sees, not what
+the code does). Load the `bdd-testing` skill before writing any Playwright
+test — the 5 BDD rules and 7-behavior contract are defined there;
+`tests/Alis.Reactive.PlaywrightTests/CLAUDE.md` carries the local rules.
 
 ### 13. Quality Aspirations
 
-Known weaknesses tracked for improvement:
-
-- **DDD depth**: Domain model uses `null` where Value Objects with constructor invariants
-  must enforce valid state. Association and aggregation boundaries are implicit.
-  Screaming names (types that express domain intent) are underused.
-- **Serialization**: two justified `WhenWritingNull` attributes remain (value-domain
-  Predicate/Projection, each with written rationale); explicit serialization contracts over
-  per-property attributes stay the goal.
-- **TS tracing**: scope-tagged, level-filtered console emission today. The goal is
-  OTel-style structure — correlation IDs, span context, actionable errors.
+Known weaknesses are tracked in `.claude/memory/quality-principles.md`
+(Quality Aspirations ledger) — DDD depth, serialization contracts, TS tracing.
 
 ### 14. Git Worktrees for Feature Work
 
@@ -487,13 +449,8 @@ cd .worktrees/<feature-name>
 
 ### Pass Protocol
 
-Start each pass by writing:
-
-```text
-Close matrix row: <DSL source call> -> <domain term> -> <runtime behavior>
-```
-
-Then list:
+Start each pass by writing the matrix row defined in Operating Standard above,
+then list:
 
 1. DSL source files used as requirements.
 2. Sync/async lane expectation.
@@ -529,8 +486,11 @@ If an implementation needs a fallback, registry, generated-plan validator, or
 generic lifecycle concept, prove the DSL graph node that requires it. If none
 exists, delete the concept.
 
-If touching an unexpected layer, the matrix row is incomplete. Stop, record the
-new edge, and redesign before continuing.
+If touching an unexpected layer, the matrix row is incomplete. Stop immediately,
+save what you learned (to memory — context loss is the real cost), record the
+new edge, and redesign before continuing. Present the problem concisely, step by
+step. Why: one session made 3 architecture changes in 30 minutes with no plan;
+another took 26 fix commits in a day because design was discovered by coding.
 
 ### Pre-Flight Checklist
 

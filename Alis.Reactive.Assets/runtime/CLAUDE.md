@@ -21,7 +21,11 @@ component/plugin lookup, malformed non-framework JSON. Fail loud at the source.
 - Sync reactions stay sync. Async is reserved for HTTP, remote triggers, user
   decisions, and partial injection.
 - One value path: `ValueExpression` reads every source. A second resolver is a
-  design smell.
+  design smell — two operator evaluators already exist (conditions vs validation
+  rules) and can diverge; do not add a third.
+- SOLID lenses for structural work: SRP ("who requests changes?"), OCP (one
+  switch case + `assertNever`), LSP (no vendor checks downstream), ISP (narrow
+  exports), DIP (depend inward).
 
 ## Component lifecycle tripwire
 

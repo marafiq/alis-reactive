@@ -1,6 +1,6 @@
 # Agent Dispatch — Strict Input/Output Criteria
 
-Related: `process-pipeline.md` | `process-layers.md` | `process-task-types.md`
+Related: `process-pipeline.md` | `plan-contract-boundary.md` | `process-task-types.md`
 
 This framework serves senior living communities. Residents depend on software built with it.
 Every agent prompt starts from one of the four templates below. Each template embeds the
@@ -11,7 +11,7 @@ evidence contract that prevents false alarms, wasted effort, and architecture re
 | Layer | Skills to Load | Test Command | Evidence Format |
 |-------|---------------|--------------|-----------------|
 | 1 C# | modern-csharp, bdd-testing (TDD principles) | `scripts/playwright.sh` | Playwright behavior + file:line |
-| 2 Contract | PlanTypeGenerator output | `npm run typecheck` | regenerated `plan.ts` matches C# |
+| 2 Contract | PlanContractGenerator output | `npm run typecheck` | regenerated `plan.ts` matches C# |
 | 3 TS | solid-ts-audit | `npm test` | vitest output + file:line |
 | 4 Browser | bdd-testing | Playwright tests | Browser state + test name |
 | 5 Docs | dotnet-xml-docs | Rider diagnostics | Sandbox-verified code example |
@@ -199,9 +199,10 @@ Output evidence: 7-behavior contract covered, blind reviewer passes all tests
 
 ## References (read, do not duplicate)
 
-- Layer details + boundaries + harness: `process-layers.md` (auto-loaded)
-- Task types + 10-step checklist: `process-task-types.md` (auto-loaded)
-- Pipeline + speed gate + wrong plan protocol: `process-pipeline.md` (auto-loaded)
+- Canonical 5-layer model + boundaries + harness: root `CLAUDE.md` (Architecture)
+- Plan-contract boundary rituals: `plan-contract-boundary.md` (loads with plan-domain/contract files)
+- Task routing: `process-task-types.md` (auto-loaded)
+- Pipeline skills + speed gate: `process-pipeline.md` (auto-loaded)
 - BDD principles (consolidated): `memory/bdd-principles.md`
 - Quality principles (audit, review, evidence): `memory/quality-principles.md`
 - Forensic mistake patterns: `memory/forensic-master-index.md`

@@ -208,3 +208,18 @@ solutions and ask "is this direction right?" -- do not ask "what should I do?"
 critical thinking at layer boundaries. Save research and feedback BEFORE executing.
 Present system-level analysis before editing. Get user alignment on the DESIGN before
 writing code. Think in LAYERS, not in flat task types.
+
+---
+
+## 7. Quality Aspirations Ledger
+
+Known weaknesses tracked for improvement (root CLAUDE.md Rule 13 points here):
+
+- **DDD depth**: Domain model uses `null` where Value Objects with constructor invariants
+  must enforce valid state. Association and aggregation boundaries are implicit.
+  Screaming names (types that express domain intent) are underused.
+- **Serialization**: two justified `WhenWritingNull` attributes remain (value-domain
+  Predicate/Projection, each with written rationale); explicit serialization contracts over
+  per-property attributes stay the goal.
+- **TS tracing**: scope-tagged, level-filtered console emission today. The goal is
+  OTel-style structure — correlation IDs, span context, actionable errors.

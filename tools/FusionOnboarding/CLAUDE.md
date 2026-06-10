@@ -26,8 +26,9 @@ that folder's README; the goal lives at
 
 ## Dispatching agents from here
 
-Explore/Plan research subagents skip CLAUDE.md files entirely — inline the
-invariants an agent needs into its prompt. Read-only sweeps must stay read-only:
+Research subagents (Explore/Plan) do not load the CLAUDE.md hierarchy at
+startup — inline the invariants an agent needs into its prompt rather than
+relying on directory attachment. Read-only sweeps must stay read-only:
 no commits, no sandbox mutations.
 
 Run the skill's gate scripts before claiming any row closed; the verifier is
