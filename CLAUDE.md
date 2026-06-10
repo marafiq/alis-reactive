@@ -297,6 +297,13 @@ Hookify rule templates live in `.claude/hookify.*.local.md`. **All are currently
 Enable one by setting `enabled: true` if you want it to run. The public-contract-freeze rules
 (`protect-api-surface`, `no-public-in-libraries`) were removed as noise.
 
+Localized `CLAUDE.md` files live beside the work they govern — Fusion slices,
+Playwright tests, the sandbox, the TS runtime, and the onboarding artifact
+tree. Each loads when files in its directory are touched and adds only
+directory-specific constraints; this root file remains authoritative. Explore
+and Plan research subagents skip all CLAUDE.md files — inline the constraints
+an agent needs into its prompt.
+
 ## Rules
 
 ### 1. DSL Source Before Code
