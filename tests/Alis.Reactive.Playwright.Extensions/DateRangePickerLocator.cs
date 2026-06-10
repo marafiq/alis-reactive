@@ -38,14 +38,14 @@ public sealed class DateRangePickerLocator
     public async Task Fill(string dateRangeText)
     {
         await Input.ClickWhenStableAsync(_page);
-        await Input.PressAsync("Meta+a");
+        await Input.PressAsync("ControlOrMeta+a");
         await Input.PressSequentiallyAsync(dateRangeText, new() { Delay = 30 });
     }
 
     public async Task Clear()
     {
         await Input.ClickWhenStableAsync(_page);
-        await Input.PressAsync("Meta+a");
+        await Input.PressAsync("ControlOrMeta+a");
         await Input.PressAsync("Backspace");
     }
 

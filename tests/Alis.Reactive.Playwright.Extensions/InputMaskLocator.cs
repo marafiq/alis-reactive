@@ -23,7 +23,7 @@ public sealed class InputMaskLocator
     public async Task Clear()
     {
         await Input.ClickAsync();
-        await Input.PressAsync("Meta+a");
+        await Input.PressAsync("ControlOrMeta+a");
         await Input.PressAsync("Backspace");
     }
 

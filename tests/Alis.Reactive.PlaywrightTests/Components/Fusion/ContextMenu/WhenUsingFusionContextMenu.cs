@@ -144,7 +144,7 @@ public class WhenUsingFusionContextMenu : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await ContextMenu.Target.ClickAsync(new() { Button = MouseButton.Right });
+        await ContextMenu.RightClickTarget();
         await Expect(Page.Locator("#menu-visibility")).ToHaveTextAsync("visible", new() { Timeout = 5000 });
         await Expect(Page.Locator("#open-kind")).ToHaveTextAsync("root", new() { Timeout = 5000 });
 
