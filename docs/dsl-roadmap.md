@@ -163,6 +163,79 @@ not difficulty.
 
 ---
 
+## TOP PRIORITY (rc3) — component lifecycle: onboard / audit / upgrade
+
+The canonical, loop-consumable goal lives at
+`docs/superpowers/goals/onboard-or-audit-or-upgrade-sf-components-with-100-percent-behavior-coverage.md`
+— modes, oracles, coverage law, operating loop, and done-criteria. This roadmap does not
+duplicate it.
+
+## Tooling and type-quality direction (Adnan, 2026-06-10)
+
+The agent setup and TS quality need a deliberate pass; the enforcement ladder is:
+**types first, lint second, bespoke tests last.** The source-scanning architecture test
+should stay minimal and shrink — every allowlist entry is migration debt toward a
+compile-time or lint expression of the same rule:
+
+- DOM-query boundaries → eslint `no-restricted-syntax`/`no-restricted-globals` with
+  per-directory overrides (the allowlist becomes lint config, reviewed in diffs).
+- Vendor isolation → eslint `no-restricted-imports` per directory.
+- Absence conventions → types, not conversions: DOM leaves speak `null`, authored domain
+  speaks `undefined`; no `?? undefined` laundering (done 2026-06-10).
+- Open strings → closed unions at the boundary that owns the domain (`ResponseBodyKind`:
+  the framework supports exactly json/text/empty; parsing is the only tricky part and the
+  classification is the type). Hunt remaining stringly surfaces the same way.
+- `npm run lint` is green and belongs in CI as a blocking step (quality ledger T7).
+- Behavior-coverage honesty: docs claim full-coverage discipline; reality is partial
+  (Adnan: URL module, template URLs, and more lack Playwright coverage today — retry was
+  the proof). Reuse the kind/module enumeration to emit a named list of kinds and runtime
+  modules with zero behavior tests; coverage statements in docs defer to that list, never
+  assert "full".
+- Plan contract: kill the intermediators — generation will never be fully automatable
+  (Adnan), so stop pretending. The emitter is itself 1,200 hand-written, unverified lines: a
+  bug there ships systematically wrong contract under a "generated — do not edit" badge that
+  discourages reading the output, whereas a hand-written `plan.ts` bug is local, reviewed in
+  the diff of the exact artifact the runtime consumes, and caught by tsc against real usage.
+  Today is triple bookkeeping: the plan model, the emitter re-describing every node property
+  in strings, and a drift gate policing the two. Target: **hand-write `plan.ts`** as a first-class contract file (humans
+  express the variant splits naturally — the emitter's whole size came from fighting them),
+  delete the emitter and generator tool, and keep sync via a super-strict process: every C#
+  plan-shape change pairs with its `plan.ts` edit in the same commit, and BEHAVIORAL equality
+  is what gets verified — a golden-plan corpus (every node kind exercised once) serialized
+  through the real PlanSerializer into JSON fixtures, imported in TS with
+  `satisfies PlanDocument`, so tsc itself fails the build when the hand-written contract
+  drifts from what the serializer actually writes. Checking is automatable where writing is
+  not, and the check sits at the true boundary (serialized JSON), not at class shapes.
+  The residual drift vector is OMISSION (add a node, forget its golden plan, stay green —
+  how drift crept in historically): closed mechanically from both ends. A C# test
+  enumerates every registered node Kind and asserts the corpus covers it
+  (reflection-as-audit, not generation); on the TS side
+  `Exclude<AnyNodeKind, CoveredFixtureKinds> extends never` makes tsc name any uncovered
+  variant. Humans author the model, the contract, and the golden plan; the machine proves
+  the triangle is closed. Exhaustive corpus authorship is NOT expected of humans or LLMs —
+  neither follows unenforced convention; both follow a red build naming the specific gap.
+  So: seed the corpus by one-time HARVEST (every sandbox page already serializes real plans
+  into its data-reactive-plan script tags — crawl once, keep the JSON), and let the
+  named-gap coverage test force each increment (new kind → red build naming it → author
+  copies the five DSL lines they already wrote for the sandbox view). Side effect: the gate
+  finally enforces the existing rule that every primitive has a sandbox demonstration.
+  Flips CLAUDE.md's "never hand-edit plan.ts" to its opposite on the day this lands.
+
+## Playwright harness charter (pre-1.0, Adnan 2026-06-10)
+
+Today's suite is "ok"; to be the real harness it needs all four, together:
+- **Full coverage** — named-gap lists (kinds/modules with zero behaviors), never claimed,
+  always enumerated. URL module and template URLs are known holes today.
+- **Behavior-driven with real use cases** — user stories against product-shaped pages,
+  not component pokes; primary paths exercised the way the product uses them (T15's
+  grid inline-validation gap is the canonical example).
+- **Isolated** — hermetic page-scoped state as the norm: the per-render drill-world
+  pattern (id baked into the page, server state scoped to it) generalizes to any test
+  needing server-side arrangement. Process-global flags are banned — that class of bug
+  cost a night.
+- **Independent** — no order coupling, no shared-state healing in SetUp/TearDown
+  (needing teardown healing is the smell that isolation was violated upstream).
+
 ## The family at a glance
 
 | Concern | Affordance home | Opt-in | Missing/unstyled |

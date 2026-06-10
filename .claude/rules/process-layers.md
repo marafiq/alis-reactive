@@ -4,7 +4,7 @@ Related: `process-pipeline.md` (overview) | `process-task-types.md` (tasks by la
 
 ## Layer 1 — C# Descriptors & Builders
 
-**Skills:** `modern-csharp`, `dotnet-xml-docs`, `superpowers:test-driven-development`
+**Skills:** `modern-csharp`, `dotnet-xml-docs`, `tdd`
 
 **Before writing code, verify:**
 - Confirm this is a Value Object with invariants enforced by the constructor.
@@ -114,7 +114,7 @@ A quick manual browser check catches more than elaborate Playwright infrastructu
 
 ## Layer 4 — Browser & Playwright
 
-**Skills:** `bdd-testing`, `superpowers:test-driven-development`
+**Skills:** `bdd-testing`, `tdd`, `modern-csharp` (fixtures are C# — the same standards apply)
 
 **The 5 BDD Rules** (from `bdd-principles.md`):
 1. Test describes BEHAVIOR, not implementation

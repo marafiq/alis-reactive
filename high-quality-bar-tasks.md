@@ -289,8 +289,7 @@ elements). Workflows now pass `Syncfusion__LicenseKey` from the `SYNCFUSION_LICE
 secret.
 
 **Done means:**
-- [ ] `SYNCFUSION_LICENSE_KEY` repo secret added (manual — repo Settings → Secrets), valid
-      for EJ2 v33 (the rc2 pin).
+- [ ] `SYNCFUSION_LICENSE_KEY` repo secret added (manual — repo Settings → Secrets), valid for the pinned EJ2 major (32.x at rc2; v33 is the upgrade-mode validation case).
 - [ ] One green CI playwright leg on the pushed branch.
 - [ ] After consecutive green runs: re-arm publish gating (`needs: [test, playwright]`,
       drop `continue-on-error`) — supersedes T10.
