@@ -12,6 +12,10 @@ reactive extensions, and typed event definitions with typed payloads.
 
 ## Invariants when editing here
 
+- The core DSL is frozen during the component lifecycle goal. New typed surface
+  (events, members, builder methods) lands only inside a component slice and
+  must be expressible through the authoritative primitive map — a member the
+  map cannot express is a stop condition, not a license to extend the core.
 - Zero TypeScript runtime changes. Onboarding, auditing, or upgrading a
   component must not touch `Alis.Reactive.Assets/runtime/`. If a runtime change
   seems needed, the plan is missing information — fix the C# descriptor so the

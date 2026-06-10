@@ -16,6 +16,9 @@ that folder's README; the goal lives at
   with proof or excluded with recorded evidence. No silent omissions.
 - Judgment precedent is written back to the pattern map IN THE SAME COMMIT that
   applied it. Precedent left in chat dies with the session.
+- The authoritative primitive map only gains strength: rows are added or
+  tightened with evidence, never loosened or special-cased to make a component
+  fit. A member the map cannot express stops the row.
 - Traces are normalized and diffable — they are the upgrade-mode baseline.
 - Coverage that cannot lie: a row is green only when its consequence proof
   exists — reads consumed by a pipeline, writes visibly changing state,
