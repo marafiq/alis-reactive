@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>FusionGrid actionBegin/Complete Add+Delete Raw EJ2 Probe</title>
+    <link rel="stylesheet" href="/css/syncfusion.dev.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #grid-host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>FusionGrid actionBegin/Complete Add+Delete Raw EJ2 Probe</h1>
+    <p>Variants: <code>actionBegin</code>/<code>actionComplete</code> for the add and delete
+       edit-actions, capturing the typed surface (requestType, action, data, previousData)
+       to compare against the save-edit variant per P009.</p>
+    <div id="grid-host"><div id="grid"></div></div>
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const rows = [
+            { id: 1, name: "Alpha", careLevel: "Memory Care", wing: "North", openTasks: 2 },
+            { id: 2, name: "Beta", careLevel: "Assisted Living", wing: "South", openTasks: 3 },
+            { id: 3, name: "Gamma", careLevel: "Memory Care", wing: "East", openTasks: 4 }
+        ];
+
+        function clean(value, seen = new WeakSet(), depth = 0) {
+            if (value === undefined) return "[Undefined]";
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return { kind: "Element", tagName: value.tagName };
+            if (value instanceof Promise) return "[Promise]";
+            if (depth > 5) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).sort().forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function typedShape(args) {
+            return {
+                ownKeys: Object.keys(args).sort(),
+                requestType: args.requestType,
+                action: args.action,
+                type: args.type,
+                name: args.name,
+                cancel: args.cancel,
+                rowIndex: args.rowIndex,
+                selectedRow: args.selectedRow,
+                data: clean(args.data),
+                previousData: clean(args.previousData),
+                previousDataType: args.previousData === undefined ? "undefined" : args.previousData === null ? "null" : typeof args.previousData
+            };
+        }
+
+        function record(label, value) {
+            trace.push({ at: new Date().toISOString(), label, value: clean(value) });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+        window.__fusionProbe = { trace, record };
+
+        const grid = new ej.grids.Grid({
+            dataSource: rows.map(r => ({ ...r })),
+            allowSelection: true,
+            toolbar: ["Add", "Edit", "Delete", "Update", "Cancel"],
+            editSettings: { allowEditing: true, allowAdding: true, allowDeleting: true, mode: "Normal", allowEditOnDblClick: false, showDeleteConfirmDialog: false },
+            columns: [
+                { field: "id", headerText: "ID", width: 90, isPrimaryKey: true, textAlign: "Right" },
+                { field: "name", headerText: "Name", width: 160 },
+                { field: "careLevel", headerText: "Care Level", width: 160 },
+                { field: "wing", headerText: "Wing", width: 120 },
+                { field: "openTasks", headerText: "Tasks", width: 100, textAlign: "Right", editType: "numericedit" }
+            ],
+            actionBegin: args => {
+                if (args.requestType === "add") record("event:actionBegin:add", typedShape(args));
+                else if (args.requestType === "save") record("event:actionBegin:save-" + args.action, typedShape(args));
+                else if (args.requestType === "delete") record("event:actionBegin:delete", typedShape(args));
+            },
+            actionComplete: args => {
+                if (args.requestType === "save") record("event:actionComplete:save-" + args.action, typedShape(args));
+                else if (args.requestType === "delete") record("event:actionComplete:delete", typedShape(args));
+            }
+        });
+        grid.appendTo(document.getElementById("grid"));
+        window.__fusionProbe.ej2 = grid;
+
+        async function nextFrame() { await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); }
+        async function waitForRows() {
+            for (let i = 0; i < 60; i++) { if (document.querySelectorAll("#grid .e-row").length) return; await nextFrame(); }
+            throw new Error("rows did not render");
+        }
+        async function waitForAddRow() {
+            for (let i = 0; i < 60; i++) { const e = document.querySelector("#grid .e-addedrow input[name='name']"); if (e) return e; await nextFrame(); }
+            throw new Error("added row editor did not render");
+        }
+
+        async function run() {
+            await waitForRows();
+            record("ready", { rowCount: document.querySelectorAll("#grid .e-row").length });
+
+            // Admit (add) a new resident, fill it, and save it.
+            grid.addRecord();
+            const nameInput = await waitForAddRow();
+            nameInput.value = "Zara Added";
+            nameInput.dispatchEvent(new Event("input", { bubbles: true }));
+            nameInput.dispatchEvent(new Event("change", { bubbles: true }));
+            await nextFrame();
+            grid.endEdit();
+            await nextFrame();
+            await nextFrame();
+
+            // Discharge (delete) the first existing resident.
+            grid.selectRow(0);
+            await nextFrame();
+            grid.deleteRecord();
+            await nextFrame();
+            await nextFrame();
+            record("complete", { traceRows: trace.length + 1 });
+        }
+        run().catch(error => record("error", { message: String(error), stack: error && error.stack }));
+    </script>
+</body>
+</html>

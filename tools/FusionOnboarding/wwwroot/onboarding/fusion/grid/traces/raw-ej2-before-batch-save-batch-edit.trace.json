@@ -1,0 +1,349 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "before-batch-save-batch-edit",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-before-batch-save-batch-edit.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "firstRowCells": [
+          "1",
+          "Alpha",
+          "Memory Care",
+          "North",
+          "2"
+        ],
+        "publicMethods": {
+          "editCell": "function",
+          "endEdit": "function",
+          "getBatchChanges": "function",
+          "saveCell": "function"
+        },
+        "rowCount": 3
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "pending-before-end-edit",
+      "value": {
+        "batchChanges": {
+          "addedRecords": [],
+          "changedRecords": [
+            {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha",
+              "openTasks": 6,
+              "wing": "North"
+            }
+          ],
+          "deletedRecords": []
+        },
+        "firstRowCells": [
+          "1",
+          "Alpha",
+          "Memory Care",
+          "North",
+          "6"
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "event:beforeBatchSave:batch-edit",
+      "value": {
+        "beforeBatchSaveShape": {
+          "batchChanges": {
+            "addedRecords": [],
+            "changedRecords": [
+              {
+                "careLevel": "Memory Care",
+                "id": 1,
+                "name": "Alpha",
+                "openTasks": 6,
+                "wing": "North"
+              }
+            ],
+            "deletedRecords": []
+          },
+          "cancel": false
+        },
+        "ownKeys": [
+          "batchChanges",
+          "cancel",
+          "name"
+        ],
+        "properties": {
+          "batchChanges": {
+            "sample": {
+              "addedRecords": [],
+              "changedRecords": [
+                {
+                  "careLevel": "Memory Care",
+                  "id": 1,
+                  "name": "Alpha",
+                  "openTasks": 6,
+                  "wing": "North"
+                }
+              ],
+              "deletedRecords": []
+            },
+            "type": "object"
+          },
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "beforeBatchSave",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "event:actionComplete",
+      "value": {
+        "action": "[Undefined]",
+        "batchChanges": "[Undefined]",
+        "data": "[Undefined]",
+        "name": "actionComplete",
+        "requestType": "batchsave",
+        "type": "[Undefined]"
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "after-normal-end-edit",
+      "value": {
+        "actionCompleteCount": 1,
+        "batchChanges": {
+          "addedRecords": [],
+          "changedRecords": [],
+          "deletedRecords": []
+        },
+        "dataSource": [
+          {
+            "careLevel": "Memory Care",
+            "id": 1,
+            "name": "Alpha",
+            "openTasks": 6,
+            "wing": "North"
+          },
+          {
+            "careLevel": "Assisted Living",
+            "id": 2,
+            "name": "Beta",
+            "openTasks": 3,
+            "wing": "South"
+          },
+          {
+            "careLevel": "Memory Care",
+            "id": 3,
+            "name": "Gamma",
+            "openTasks": 4,
+            "wing": "East"
+          }
+        ],
+        "firstRowCells": [
+          "1",
+          "Alpha",
+          "Memory Care",
+          "North",
+          "6"
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "label": "pending-before-cancelled-end-edit",
+      "value": {
+        "batchChanges": {
+          "addedRecords": [],
+          "changedRecords": [
+            {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha",
+              "openTasks": 8,
+              "wing": "North"
+            }
+          ],
+          "deletedRecords": []
+        },
+        "firstRowCells": [
+          "1",
+          "Alpha",
+          "Memory Care",
+          "North",
+          "8"
+        ]
+      }
+    },
+    {
+      "sequence": 7,
+      "label": "event:beforeBatchSave:batch-edit-before-cancel",
+      "value": {
+        "beforeBatchSaveShape": {
+          "batchChanges": {
+            "addedRecords": [],
+            "changedRecords": [
+              {
+                "careLevel": "Memory Care",
+                "id": 1,
+                "name": "Alpha",
+                "openTasks": 8,
+                "wing": "North"
+              }
+            ],
+            "deletedRecords": []
+          },
+          "cancel": false
+        },
+        "ownKeys": [
+          "batchChanges",
+          "cancel",
+          "name"
+        ],
+        "properties": {
+          "batchChanges": {
+            "sample": {
+              "addedRecords": [],
+              "changedRecords": [
+                {
+                  "careLevel": "Memory Care",
+                  "id": 1,
+                  "name": "Alpha",
+                  "openTasks": 8,
+                  "wing": "North"
+                }
+              ],
+              "deletedRecords": []
+            },
+            "type": "object"
+          },
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "beforeBatchSave",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 8,
+      "label": "event:beforeBatchSave:batch-edit-after-cancel",
+      "value": {
+        "afterCancel": true,
+        "beforeCancel": false,
+        "payload": {
+          "beforeBatchSaveShape": {
+            "batchChanges": {
+              "addedRecords": [],
+              "changedRecords": [
+                {
+                  "careLevel": "Memory Care",
+                  "id": 1,
+                  "name": "Alpha",
+                  "openTasks": 8,
+                  "wing": "North"
+                }
+              ],
+              "deletedRecords": []
+            },
+            "cancel": true
+          },
+          "ownKeys": [
+            "batchChanges",
+            "cancel",
+            "name"
+          ],
+          "properties": {
+            "batchChanges": {
+              "sample": {
+                "addedRecords": [],
+                "changedRecords": [
+                  "[MaxDepth]"
+                ],
+                "deletedRecords": []
+              },
+              "type": "object"
+            },
+            "cancel": {
+              "sample": true,
+              "type": "boolean"
+            },
+            "name": {
+              "sample": "beforeBatchSave",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    {
+      "sequence": 9,
+      "label": "after-cancelled-end-edit",
+      "value": {
+        "actionCompleteCount": 1,
+        "batchChanges": {
+          "addedRecords": [],
+          "changedRecords": [
+            {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha",
+              "openTasks": 8,
+              "wing": "North"
+            }
+          ],
+          "deletedRecords": []
+        },
+        "cancelPreventedBatchCommit": true,
+        "dataSource": [
+          {
+            "careLevel": "Memory Care",
+            "id": 1,
+            "name": "Alpha",
+            "openTasks": 6,
+            "wing": "North"
+          },
+          {
+            "careLevel": "Assisted Living",
+            "id": 2,
+            "name": "Beta",
+            "openTasks": 3,
+            "wing": "South"
+          },
+          {
+            "careLevel": "Memory Care",
+            "id": 3,
+            "name": "Gamma",
+            "openTasks": 4,
+            "wing": "East"
+          }
+        ],
+        "firstRowCells": [
+          "1",
+          "Alpha",
+          "Memory Care",
+          "North",
+          "8"
+        ]
+      }
+    },
+    {
+      "sequence": 10,
+      "label": "complete",
+      "value": {
+        "traceRows": 10
+      }
+    }
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "data-state-change-searching-method",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-data-state-change-searching-method.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "currentPage": 1,
+        "pageSize": 2,
+        "searchSettings": {
+          "fields": [
+            "name",
+            "careLevel",
+            "wing"
+          ],
+          "ignoreAccent": false,
+          "ignoreCase": true,
+          "key": "",
+          "operator": "contains"
+        }
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "event:dataStateChange:searching-method",
+      "value": {
+        "absentKeysChecked": [
+          "where",
+          "group",
+          "sorted"
+        ],
+        "ownKeys": [
+          "action",
+          "name",
+          "requiresCounts",
+          "search",
+          "skip",
+          "take"
+        ],
+        "properties": {
+          "action": {
+            "sample": {
+              "name": "actionBegin",
+              "requestType": "searching",
+              "searchString": "Memory",
+              "type": "actionBegin"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "dataStateChange",
+            "type": "string"
+          },
+          "requiresCounts": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "search": {
+            "sample": [
+              {
+                "fields": [
+                  "name",
+                  "careLevel",
+                  "wing"
+                ],
+                "ignoreAccent": false,
+                "ignoreCase": true,
+                "key": "Memory",
+                "operator": "contains"
+              }
+            ],
+            "type": "array"
+          },
+          "skip": {
+            "sample": 0,
+            "type": "number"
+          },
+          "take": {
+            "sample": 2,
+            "type": "number"
+          }
+        },
+        "searchShape": {
+          "action": {
+            "name": "actionBegin",
+            "requestType": "searching",
+            "searchString": "Memory",
+            "type": "actionBegin"
+          },
+          "search": [
+            {
+              "fields": [
+                "name",
+                "careLevel",
+                "wing"
+              ],
+              "ignoreAccent": false,
+              "ignoreCase": true,
+              "key": "Memory",
+              "operator": "contains"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "method:search",
+      "value": {
+        "currentPage": 1,
+        "pageSize": 2,
+        "searchSettings": {
+          "fields": [
+            "name",
+            "careLevel",
+            "wing"
+          ],
+          "ignoreAccent": false,
+          "ignoreCase": true,
+          "key": "Memory",
+          "operator": "contains"
+        }
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "complete",
+      "value": {
+        "traceRows": 4
+      }
+    }
+  ]
+}

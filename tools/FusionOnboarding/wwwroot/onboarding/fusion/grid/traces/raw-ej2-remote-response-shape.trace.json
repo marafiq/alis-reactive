@@ -1,0 +1,109 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "remote-response-shape",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-remote-response-shape.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "dataSourceShape": {
+          "count": 4,
+          "ownKeys": [
+            "actionArgs",
+            "count",
+            "enablePersistence",
+            "id",
+            "ignoreOnPersist",
+            "json",
+            "result"
+          ],
+          "resultLength": 2
+        },
+        "pager": {
+          "pagerText": "1 of 2 pages (4 items)"
+        },
+        "visibleRows": [
+          [
+            "1",
+            "Charlie",
+            "Review"
+          ],
+          [
+            "2",
+            "Alpha",
+            "Active"
+          ]
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "event:dataStateChange:sorting",
+      "value": {
+        "requiresCounts": true,
+        "responseShape": {
+          "count": 4,
+          "firstResultName": "Alpha",
+          "ownKeys": [
+            "count",
+            "result"
+          ],
+          "resultLength": 2
+        },
+        "skip": 0,
+        "sorted": [
+          {
+            "direction": "ascending",
+            "name": "name"
+          }
+        ],
+        "take": 2
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "dataSource assigned whole response",
+      "value": {
+        "count": 4,
+        "firstResultName": "Alpha",
+        "ownKeys": [
+          "count",
+          "result"
+        ],
+        "resultLength": 2
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "visible rows after remote response",
+      "value": {
+        "pager": {
+          "pagerText": "1 of 2 pages (4 items)"
+        },
+        "visibleRows": [
+          [
+            "2",
+            "Alpha",
+            "Active"
+          ],
+          [
+            "4",
+            "Bravo",
+            "Pending"
+          ]
+        ]
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "complete",
+      "value": {
+        "dataSourceCount": 4,
+        "pagerText": "1 of 2 pages (4 items)",
+        "visibleFirstName": "Alpha"
+      }
+    }
+  ]
+}

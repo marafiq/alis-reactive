@@ -16,12 +16,34 @@ The public DSL remains typed. Internal plan member names may be strings; develop
 
 Loose typing in Syncfusion contracts is not permission to add loose typing in Alis. Public shapes such as `object`, `Record<string, any>`, or broad event args are candidate evidence only. The onboarding decision must narrow them through JS source and an HTML execution trace before exposing a typed C# API. If a member cannot be narrowed and proven, keep it out of the public Fusion slice.
 
+Discovery is exhaustive, but public C# DSL is selective. Record every field,
+member, nested branch, DOM object, method return, and absent key in discovery.
+Then make an explicit judgment call for C#: accept only fields with a clear typed
+use case, predictable shape, and existing primitive mapping. For example, an
+event `target` that exposes deep DOM/document paths is recorded in discovery but
+is excluded from public C# unless a focused row proves a stable typed value that
+actually helps the DSL. Every accepted or excluded call must be documented so a
+later session can continue from evidence instead of guessing.
+
+Judgment calls must stay structured without becoming mechanical. Ask at least:
+
+- What real-world behavior would this member enable in the 95% Senior Living
+  product use cases: resident directories, billing workflows, schedules,
+  care/service coordination, occupancy, staff operations, reporting, and
+  remote data workflows?
+- Is the value stable and predictable enough to become typed C# instead of
+  remaining browser/vendor-owned discovery evidence?
+- Can an existing primitive express it without adding or changing primitives?
+- Is it a value developers will reasonably branch, gather, display, mutate, or
+  call in a vertical slice, or is it incidental metadata from Syncfusion/DOM?
+- Does accepting it make the DSL clearer, or does it pollute the public surface
+  with a field that is rarely useful, variant-specific, duplicate, or unstable?
+
 ## Terminology And Artifact Root
 
 - `Fusion` means the Alis workflow, durable artifacts, skill process, C# vertical slice, sandbox behavior, and Playwright proof.
 - `Syncfusion EJ2` means vendor evidence only: JavaScript, d.ts, XML, Blazor packages, docs, shipped assets, and raw browser behavior.
 - New durable workflow artifacts must use `fusion` in paths and process language.
-- Existing `tools/SyncfusionOnboarding` files are not workflow authority. Treat them as possibly corrupted unless a current proof pass validates a specific file as vendor evidence.
 - Every new onboarding or audit writes its durable evidence under:
 
 ```text
@@ -58,10 +80,25 @@ proof/
 
 The workflow is a deterministic state machine. Do not skip stages, and do not design C# before the discovery, trace, mapping, and name-decision artifacts exist.
 
+Audit means improving skill accuracy, not merely checking a component. Every
+audit row must update or confirm the reusable pattern map before implementation
+continues. If a row exposes a new Syncfusion behavior, event variant, payload
+shape, array shape, method return shape, lifecycle timing, builder-owned
+exclusion, or typed DSL gap, record it in:
+
+```text
+tools/FusionOnboarding/wwwroot/onboarding/fusion/_skill/pattern-map.md
+```
+
+The row artifact and component `audit-report.md` must link the pattern-map row
+that explains how future components avoid the same mistake. If no pattern-map
+row is added or confirmed, the audit is incomplete. Do not hide a component
+defect as a one-off local fix.
+
 Each row must advance through this exact gate chain:
 
 ```text
-raw EJ2 HTML -> raw EJ2 trace JSON -> committed artifact row ->
+one API row in master-usecases-index.md -> raw EJ2 HTML -> raw EJ2 trace JSON -> committed artifact row ->
 typed Fusion C# DSL vertical slice -> authoritative primitive mapping ->
 Playwright behavior over typed Fusion DSL -> audit report
 ```
@@ -70,6 +107,38 @@ Gate rule: a later gate cannot start until the previous gate has a committed
 artifact and the `master-usecases-index.md` row links it. A console observation,
 temporary scratch file, generated stdout, or passing test without a linked
 artifact is not progress for the row.
+
+Work one API row at a time. For complex components, finish events first, one
+event and one trigger variant at a time, then move to properties, then methods.
+Do not combine multiple events, properties, and methods into one proof row just
+to move faster. Each event variant must be separately traced and proven because
+Syncfusion can emit different payload keys for the same event depending on how
+it fires.
+
+Drive proof rows from realistic behavior of the onboarded capability. Tests
+must exercise the user/component behavior that makes the API worth onboarding,
+not a narrow synthetic path shaped to pass the current artifact. If a proof only
+checks helper syntax, plan JSON, or a convenient fake gesture while missing the
+real Syncfusion behavior, reject it and restart the row from discovery.
+
+Remote data is always important for Syncfusion data-capable components. No real
+web app should be assumed to load all data locally, so local/static examples
+cannot close a component while remote/custom-binding behavior remains open. For
+Grid-like components, custom binding and remote-data behavior must include
+realistic data-state/user workflows: server-shaped `{ result, count }` payloads,
+`dataStateChange` request payloads, typed response-body `SetDataSource`, visible
+row refresh, and any relevant `Data`, `Refresh`, DataManager, adaptor, or nested
+data-source behavior. For non-Grid components, identify the component's actual
+remote binding, filtering, lookup, paging, virtualization, lazy-load, or
+server-query lane and make it a first-class audit row. Do not close a component
+by proving only static local-array examples when the component can reasonably
+bind, query, or refresh remote data.
+
+For event rows, event payload is part of the row. Do not write a typed event
+contract from an event name alone. The row must prove exact payload keys,
+missing/optional keys for that trigger, nested object shapes, arrays through
+proper array primitives or whole typed array sources, writable payload fields,
+payload methods, and payload consumer paths before mapping to C#.
 
 Before claiming a component audit/onboarding is closed, run:
 
@@ -81,13 +150,65 @@ node .claude/skills/onboard-fusion-component/scripts/verify-fusion-artifact-gate
 The verifier must pass. A failure means the row is incomplete, even if some
 code compiles or a focused test passes.
 
+Run raw probe traces with the trace runner, not through product sandbox routes:
+
+```bash
+node .claude/skills/onboard-fusion-component/scripts/run-fusion-probe-trace.mjs \
+  --component grid \
+  --api-set core
+```
+
+The runner serves only onboarding artifacts and the same local EJ2/assets used
+by the sandbox, drives a browser, normalizes volatile timestamps/ports, and
+writes `traces/raw-ej2-{api-set}.trace.json`.
+
+Generate the typed public API coverage matrix from current C# source:
+
+```bash
+node .claude/skills/onboard-fusion-component/scripts/write-fusion-typed-api-coverage.mjs \
+  --component grid \
+  --fusion-type FusionGrid \
+  --write
+```
+
+The generated matrix starts fail-closed. Every row remains unproven until linked
+to raw trace, primitive mapping, vertical slice, and typed DSL Playwright proof.
+Event payload contracts must be expanded into property-level rows. A payload
+class row cannot hide unproven public members; each accepted property must have
+its own trace, primitive mapping, vertical slice row, and typed DSL behavior
+proof. If one public property is unproven, keep the payload class and component
+audit open.
+The matrix row key must uniquely identify overloaded public APIs and payload
+mutation methods. Include the source lane or normalized signature for overloads
+such as response-body `SetDataSource`, event-payload `SetDataSource`, and typed
+array `SetDataSource`. Owner-qualify payload mutation methods, such as
+`FusionGridCellSaveArgs.Cancel()`, because lifecycle events with the same C#
+method name are separate behaviors.
+Variant-sensitive event payload properties cannot be marked proven across all
+variants from one shared event row. The row must say which trigger variants
+accept, omit, exclude, or defer each property; otherwise the class/property row
+stays unproven.
+Open behavior lanes must be generated matrix rows, not prose-only warnings.
+When discovery or review identifies a required lane such as remote data,
+DataManager/adaptor, nested data-source paths, response-shape variants,
+overload families, or event-trigger variants, add a stable fail-closed row for
+that lane. The row stays unproven until it has raw trace, primitive map,
+vertical slice, and realistic typed DSL Playwright proof.
+Generated supplemental rows must be artifact-derived. For event variants, read
+the judgment-call artifact as the accepted/excluded decision source; then mark
+only members with current typed DSL behavior proof as `row-proven`. An accepted
+judgment row without behavior proof must become an unproven matrix row.
+
 All artifacts must hold shape end to end. If a defect is found in a Fusion
 component, do not patch the C# slice, sandbox, or Playwright test in isolation.
 Restart the affected row from zero discovery, prove what went wrong in raw EJ2
-and shipped evidence, then update every linked artifact:
+and shipped evidence, update the skill pattern map, then update every linked
+artifact:
 
 ```text
-master-usecases-index.md
+_skill/pattern-map.md
+-> component master-usecases-index.md
+-> master-usecases-index.md
 -> discovery/source-inventory.md
 -> discovery/public-api-surface.json
 -> discovery/event-payload-surface.json
@@ -165,6 +286,12 @@ mapped, named, implemented, and linked to the proof matrix.
    - Execute the probe with browser tooling or focused trace-generation tooling
      before mapping. Save the exact browser-observed output as
      `traces/raw-ej2-{api-set}.trace.json`.
+   - Prefer the trace runner for committed artifacts:
+     ```bash
+     node .claude/skills/onboard-fusion-component/scripts/run-fusion-probe-trace.mjs \
+       --component grid \
+       --api-set core
+     ```
    - Output one `probes/raw-ej2-{api-set}.html` and one committed
      `traces/raw-ej2-{api-set}.trace.json` per accepted API set. If the trace is
      missing, the row is not ready for primitive mapping.
@@ -197,6 +324,15 @@ mapped, named, implemented, and linked to the proof matrix.
      ```
    - Capture every gesture the typed event claims to support. Grid `dataStateChange` is the reference case: sorting, paging, filtering, searching, and grouping can produce different nested payload shapes.
    - If a payload property is an array, keep it typed as `List<T>` or a typed array in the C# event contract. Prove it through the proper array primitive, a typed whole-array gather, or a typed array source consumed by behavior. Do not add untyped element accessors or index-path shortcuts to component slices.
+   - For each event-trigger row, write the payload contract in the artifact:
+     - keys present;
+     - keys absent or undefined for that trigger;
+     - scalar types and nullability;
+     - nested object members;
+     - arrays and their element shape through the proper array primitive;
+     - writable fields and what mutation changes;
+     - payload methods and their visible/runtime effect;
+     - typed C# event arg property names.
    - Output `discovery/event-payload-surface.json` and raw trace links. Every
      payload property, writable property, payload method, nested payload, and
      array source that appears in the typed API must have a trace row before the
@@ -276,6 +412,10 @@ mapped, named, implemented, and linked to the proof matrix.
    - A method return source must be consumed by a realistic pipeline.
    - Event payload properties, writable payload properties, payload methods, nested payloads, and arrays through the proper array primitive must be proven through the typed event contract.
    - Builder-owned exclusions must be listed with the builder evidence that owns initial render configuration.
+   - Exclusion rows are fail-closed. A judgment call, missing request-body
+     field, or removed C# member is not enough to mark the row proven; the row
+     needs explicit source-backed or behavior-backed exclusion proof for the
+     exact public contract member.
 
 10. **Playwright behavior proof**
    - Add a real sandbox view using the typed API.
@@ -300,6 +440,7 @@ mapped, named, implemented, and linked to the proof matrix.
    - For a new component, the report states all accepted members, excluded candidates, deferred proof, exact commands run, and the commit boundary.
    - For an existing component audit, treat existing C# and tests as evidence only. Rebuild the discovery artifact tree, map every public API member, and classify each as proven/correct, unproven, wrong name, stringly or too broad, builder duplicate, missing behavior proof, or deferred proof.
    - For a defect fix, include a "what went wrong" section with the wrong artifact row, the raw EJ2 proof that corrected it, every artifact updated, and the behavior proof that now closes the row.
+   - For every defect, disagreement, invalid probe assumption, missing field, or proof gap found during audit, update or confirm `_skill/pattern-map.md` before implementation. Link the audit finding to raw evidence, pattern-map row, primitive-map row, C# name-decision row, vertical-slice row, and Playwright proof row.
    - Validate the workflow against the current onboarded component inventory before committing skill/process changes. Use [Workflow validation](references/workflow-validation.md) and explicitly stress-test Grid, Kanban, and Schedule.
 
 ## Capability Matrix
@@ -352,6 +493,8 @@ mapped, named, implemented, and linked to the proof matrix.
 - `scripts/create-fusion-probe.mjs` - creates a temporary raw HTML probe.
 - `scripts/inventory-fusion-components.mjs` - creates Stage 1 inventory artifacts for every current Fusion component audit.
 - `scripts/write-fusion-discovery-artifacts.mjs` - writes component-scoped static discovery artifacts and a raw EJ2 probe shell from exact current d.ts/JS/XML evidence.
+- `scripts/run-fusion-probe-trace.mjs` - serves a raw probe through onboarding-only tooling, drives a browser, and writes deterministic trace JSON.
+- `scripts/write-fusion-typed-api-coverage.mjs` - extracts current public typed Fusion API and writes a fail-closed coverage matrix.
 - `scripts/verify-fusion-artifact-gates.mjs` - fail-closed component artifact gate verifier; use before claiming onboarding/audit completion.
 - `references/source-discovery.md` - deterministic source-finding workflow.
 - `references/blazor-metadata.md` - how to use Blazor packages as typed candidate maps without copying bridge-only behavior.

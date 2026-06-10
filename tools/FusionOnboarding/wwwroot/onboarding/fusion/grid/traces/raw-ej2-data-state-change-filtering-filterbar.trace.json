@@ -1,0 +1,214 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "data-state-change-filtering-filterbar",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-data-state-change-filtering-filterbar.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "currentPage": 1,
+        "filterBarInput": {
+          "className": "e-filtertext e-input",
+          "id": "status_filterBarcell",
+          "value": ""
+        },
+        "filterColumns": [],
+        "pageSize": 2
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "event:dataStateChange:filtering-filterbar",
+      "value": {
+        "absentKeysChecked": [
+          "aggregates",
+          "dataSource",
+          "group",
+          "isLazyLoad",
+          "onDemandGroupInfo",
+          "search",
+          "select",
+          "sorted",
+          "table"
+        ],
+        "filterShape": {
+          "action": {
+            "action": "filter",
+            "cancel": false,
+            "columns": [
+              {
+                "actualFilterValue": {},
+                "actualOperator": {},
+                "field": "status",
+                "ignoreAccent": false,
+                "isForeignKey": false,
+                "matchCase": false,
+                "operator": "startswith",
+                "predicate": "and",
+                "predicates": [],
+                "uid": "grid-column2",
+                "value": "Op"
+              }
+            ],
+            "currentFilterObject": {
+              "actualFilterValue": {},
+              "actualOperator": {},
+              "field": "status",
+              "ignoreAccent": false,
+              "isForeignKey": false,
+              "matchCase": false,
+              "operator": "startswith",
+              "predicate": "and",
+              "predicates": [],
+              "uid": "grid-column2",
+              "value": "Op"
+            },
+            "currentFilteringColumn": "status",
+            "name": "actionBegin",
+            "requestType": "filtering",
+            "type": "actionBegin"
+          },
+          "where": [
+            {
+              "condition": "and",
+              "ignoreAccent": false,
+              "ignoreCase": true,
+              "isComplex": true,
+              "predicates": [
+                {
+                  "field": "status",
+                  "ignoreAccent": false,
+                  "ignoreCase": true,
+                  "isComplex": false,
+                  "operator": "startswith",
+                  "predicates": [],
+                  "value": "Op"
+                }
+              ]
+            }
+          ]
+        },
+        "ownKeys": [
+          "action",
+          "name",
+          "requiresCounts",
+          "skip",
+          "take",
+          "where"
+        ],
+        "properties": {
+          "action": {
+            "sample": {
+              "action": "filter",
+              "cancel": false,
+              "columns": [
+                {
+                  "actualFilterValue": {},
+                  "actualOperator": {},
+                  "field": "status",
+                  "ignoreAccent": false,
+                  "isForeignKey": false,
+                  "matchCase": false,
+                  "operator": "startswith",
+                  "predicate": "and",
+                  "predicates": [],
+                  "uid": "grid-column2",
+                  "value": "Op"
+                }
+              ],
+              "currentFilterObject": {
+                "actualFilterValue": {},
+                "actualOperator": {},
+                "field": "status",
+                "ignoreAccent": false,
+                "isForeignKey": false,
+                "matchCase": false,
+                "operator": "startswith",
+                "predicate": "and",
+                "predicates": [],
+                "uid": "grid-column2",
+                "value": "Op"
+              },
+              "currentFilteringColumn": "status",
+              "name": "actionBegin",
+              "requestType": "filtering",
+              "type": "actionBegin"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "dataStateChange",
+            "type": "string"
+          },
+          "requiresCounts": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "skip": {
+            "sample": 0,
+            "type": "number"
+          },
+          "take": {
+            "sample": 2,
+            "type": "number"
+          },
+          "where": {
+            "sample": [
+              {
+                "condition": "and",
+                "ignoreAccent": false,
+                "ignoreCase": true,
+                "isComplex": true,
+                "predicates": [
+                  {
+                    "field": "status",
+                    "ignoreAccent": false,
+                    "ignoreCase": true,
+                    "isComplex": false,
+                    "operator": "startswith",
+                    "predicates": [],
+                    "value": "Op"
+                  }
+                ]
+              }
+            ],
+            "type": "array"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "typed:filterbar-status",
+      "value": {
+        "currentPage": 1,
+        "filterColumns": [
+          {
+            "actualFilterValue": {},
+            "actualOperator": {},
+            "field": "status",
+            "ignoreAccent": false,
+            "isForeignKey": false,
+            "matchCase": false,
+            "operator": "startswith",
+            "predicate": "and",
+            "predicates": [],
+            "uid": "grid-column2",
+            "value": "Op"
+          }
+        ],
+        "inputValue": "Op",
+        "pageSize": 2
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "complete",
+      "value": {
+        "traceRows": 4
+      }
+    }
+  ]
+}

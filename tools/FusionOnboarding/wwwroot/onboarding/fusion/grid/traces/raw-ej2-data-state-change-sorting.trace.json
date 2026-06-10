@@ -1,0 +1,92 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "data-state-change-sorting",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-data-state-change-sorting.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "initialRows": []
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "event:dataStateChange:sorting",
+      "value": {
+        "absentKeysChecked": [
+          "where",
+          "search",
+          "group"
+        ],
+        "ownKeys": [
+          "action",
+          "name",
+          "requiresCounts",
+          "skip",
+          "sorted",
+          "take"
+        ],
+        "properties": {
+          "action": {
+            "sample": {
+              "cancel": false,
+              "columnName": "name",
+              "direction": "Descending",
+              "name": "actionBegin",
+              "requestType": "sorting",
+              "target": null,
+              "type": "actionBegin"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "dataStateChange",
+            "type": "string"
+          },
+          "requiresCounts": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "skip": {
+            "sample": 0,
+            "type": "number"
+          },
+          "sorted": {
+            "sample": [
+              {
+                "direction": "descending",
+                "name": "name"
+              }
+            ],
+            "type": "array"
+          },
+          "take": {
+            "sample": 2,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "method:sortColumn",
+      "value": {
+        "sortedColumns": [
+          {
+            "direction": "Descending",
+            "field": "name"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "complete",
+      "value": {
+        "traceRows": 4
+      }
+    }
+  ]
+}

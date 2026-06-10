@@ -1,0 +1,217 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "action-add-delete",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-action-add-delete.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "rowCount": 3
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "event:actionBegin:add",
+      "value": {
+        "action": "[Undefined]",
+        "cancel": false,
+        "data": {
+          "careLevel": "[Undefined]",
+          "id": "[Undefined]",
+          "name": "[Undefined]",
+          "openTasks": "[Undefined]",
+          "wing": "[Undefined]"
+        },
+        "name": "actionBegin",
+        "ownKeys": [
+          "cancel",
+          "data",
+          "foreignKeyData",
+          "index",
+          "isScroll",
+          "name",
+          "requestType",
+          "rowData",
+          "target",
+          "type"
+        ],
+        "previousData": "[Undefined]",
+        "previousDataType": "undefined",
+        "requestType": "add",
+        "rowIndex": "[Undefined]",
+        "selectedRow": "[Undefined]",
+        "type": "actionBegin"
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "event:actionBegin:save-add",
+      "value": {
+        "action": "add",
+        "cancel": false,
+        "data": {
+          "careLevel": "[Undefined]",
+          "id": null,
+          "name": "Zara Added",
+          "openTasks": null,
+          "wing": "[Undefined]"
+        },
+        "name": "actionBegin",
+        "ownKeys": [
+          "action",
+          "cancel",
+          "data",
+          "foreignKeyData",
+          "form",
+          "index",
+          "isScroll",
+          "name",
+          "previousData",
+          "requestType",
+          "row",
+          "rowData",
+          "selectedRow",
+          "target",
+          "type"
+        ],
+        "previousData": {
+          "careLevel": "[Undefined]",
+          "id": "[Undefined]",
+          "name": "[Undefined]",
+          "openTasks": "[Undefined]",
+          "wing": "[Undefined]"
+        },
+        "previousDataType": "object",
+        "requestType": "save",
+        "rowIndex": "[Undefined]",
+        "selectedRow": 0,
+        "type": "actionBegin"
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "event:actionComplete:save-add",
+      "value": {
+        "action": "add",
+        "cancel": false,
+        "data": {
+          "careLevel": "[Undefined]",
+          "id": null,
+          "name": "Zara Added",
+          "openTasks": null,
+          "wing": "[Undefined]"
+        },
+        "name": "actionComplete",
+        "ownKeys": [
+          "action",
+          "cancel",
+          "data",
+          "foreignKeyData",
+          "form",
+          "index",
+          "isScroll",
+          "name",
+          "previousData",
+          "promise",
+          "query",
+          "requestType",
+          "row",
+          "rowData",
+          "rows",
+          "selectedRow",
+          "target",
+          "type"
+        ],
+        "previousData": {
+          "careLevel": "[Undefined]",
+          "id": "[Undefined]",
+          "name": "[Undefined]",
+          "openTasks": "[Undefined]",
+          "wing": "[Undefined]"
+        },
+        "previousDataType": "object",
+        "requestType": "save",
+        "rowIndex": "[Undefined]",
+        "selectedRow": 0,
+        "type": "actionComplete"
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "event:actionBegin:delete",
+      "value": {
+        "action": "[Undefined]",
+        "cancel": false,
+        "data": [
+          {
+            "careLevel": "[Undefined]",
+            "id": null,
+            "name": "Zara Added",
+            "openTasks": null,
+            "wing": "[Undefined]"
+          }
+        ],
+        "name": "actionBegin",
+        "ownKeys": [
+          "cancel",
+          "data",
+          "foreignKeyData",
+          "name",
+          "requestType",
+          "tr",
+          "type"
+        ],
+        "previousData": "[Undefined]",
+        "previousDataType": "undefined",
+        "requestType": "delete",
+        "rowIndex": "[Undefined]",
+        "selectedRow": "[Undefined]",
+        "type": "actionBegin"
+      }
+    },
+    {
+      "sequence": 6,
+      "label": "event:actionComplete:delete",
+      "value": {
+        "action": "[Undefined]",
+        "cancel": false,
+        "data": [
+          {
+            "careLevel": "[Undefined]",
+            "id": null,
+            "name": "Zara Added",
+            "openTasks": null,
+            "wing": "[Undefined]"
+          }
+        ],
+        "name": "actionComplete",
+        "ownKeys": [
+          "cancel",
+          "data",
+          "foreignKeyData",
+          "name",
+          "promise",
+          "requestType",
+          "rows",
+          "tr",
+          "type"
+        ],
+        "previousData": "[Undefined]",
+        "previousDataType": "undefined",
+        "requestType": "delete",
+        "rowIndex": "[Undefined]",
+        "selectedRow": "[Undefined]",
+        "type": "actionComplete"
+      }
+    },
+    {
+      "sequence": 7,
+      "label": "complete",
+      "value": {
+        "traceRows": 7
+      }
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "data-source-read-refresh",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-data-source-read-refresh.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "dataSourceLength": 2,
+        "visibleRows": [
+          [
+            "1",
+            "Alpha",
+            "Open"
+          ],
+          [
+            "2",
+            "Beta",
+            "Closed"
+          ]
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "dataSource read before replacement",
+      "value": [
+        {
+          "id": 1,
+          "name": "Alpha",
+          "status": "Open"
+        },
+        {
+          "id": 2,
+          "name": "Beta",
+          "status": "Closed"
+        }
+      ]
+    },
+    {
+      "sequence": 3,
+      "label": "dataSource read after assignment before refresh",
+      "value": [
+        {
+          "id": 10,
+          "name": "Delta",
+          "status": "Active"
+        },
+        {
+          "id": 11,
+          "name": "Echo",
+          "status": "Active"
+        },
+        {
+          "id": 12,
+          "name": "Foxtrot",
+          "status": "Review"
+        }
+      ]
+    },
+    {
+      "sequence": 4,
+      "label": "refresh() return",
+      "value": {
+        "type": "undefined",
+        "value": "undefined"
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "visible rows after refresh",
+      "value": [
+        [
+          "10",
+          "Delta",
+          "Active"
+        ],
+        [
+          "11",
+          "Echo",
+          "Active"
+        ],
+        [
+          "12",
+          "Foxtrot",
+          "Review"
+        ]
+      ]
+    },
+    {
+      "sequence": 6,
+      "label": "complete",
+      "value": {
+        "dataSourceLength": 3,
+        "firstVisibleName": "Delta",
+        "lastVisibleName": "Foxtrot"
+      }
+    },
+    {
+      "sequence": 7,
+      "label": "manual dump",
+      "value": {
+        "dataSourceLength": 3,
+        "visibleRows": [
+          [
+            "10",
+            "Delta",
+            "Active"
+          ],
+          [
+            "11",
+            "Echo",
+            "Active"
+          ],
+          [
+            "12",
+            "Foxtrot",
+            "Review"
+          ]
+        ]
+      }
+    }
+  ]
+}

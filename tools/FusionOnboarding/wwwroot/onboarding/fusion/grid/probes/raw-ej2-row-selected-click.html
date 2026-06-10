@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>FusionGrid rowSelected Click Raw EJ2 Probe</title>
+    <link rel="stylesheet" href="/css/syncfusion.dev.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #grid-host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>FusionGrid rowSelected Click Raw EJ2 Probe</h1>
+    <p>One event row: <code>rowSelected</code> fired by visible data-row clicks.</p>
+    <div id="grid-host">
+        <div id="grid"></div>
+    </div>
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const rows = [
+            { id: 1, name: "Alpha", careLevel: "Memory Care", wing: "North" },
+            { id: 2, name: "Beta", careLevel: "Assisted Living", wing: "South" },
+            { id: 3, name: "Gamma", careLevel: "Memory Care", wing: "East" }
+        ];
+
+        function clean(value, seen = new WeakSet(), depth = 0) {
+            if (value === undefined) return "[Undefined]";
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return summarizeElement(value);
+            if (depth > 5) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).sort().forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function summarizeElement(value) {
+            return {
+                kind: "Element",
+                id: value.id || "",
+                tagName: value.tagName,
+                className: value.className || "",
+                ariaColIndex: value.getAttribute("aria-colindex") || "",
+                ariaRowIndex: value.getAttribute("aria-rowindex") || "",
+                text: (value.textContent || "").replace(/\s+/g, " ").trim()
+            };
+        }
+
+        function summarizeRowSelected(args) {
+            if (!args) return null;
+            return {
+                data: clean(args.data),
+                rowIndex: args.rowIndex,
+                previousRowIndex: args.previousRowIndex,
+                isInteracted: args.isInteracted,
+                rowIndexes: clean(args.rowIndexes),
+                isHeaderCheckBoxClicked: clean(args.isHeaderCheckBoxClicked),
+                row: args.row instanceof Element ? summarizeElement(args.row) : null,
+                previousRow: args.previousRow instanceof Element ? summarizeElement(args.previousRow) : clean(args.previousRow),
+                target: args.target instanceof Element ? summarizeElement(args.target) : clean(args.target),
+                foreignKeyData: clean(args.foreignKeyData)
+            };
+        }
+
+        function describePayload(args) {
+            if (args === null || args === undefined) {
+                return { ownKeys: [], properties: {}, value: args === undefined ? "[Undefined]" : null };
+            }
+            const ownKeys = Object.keys(args).sort();
+            const properties = {};
+            ownKeys.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === undefined ? "undefined" : item === null ? "null" : Array.isArray(item) ? "array" : item instanceof Element ? "element" : typeof item,
+                    sample: summarizePayloadProperty(key, item)
+                };
+            });
+            return {
+                ownKeys,
+                properties,
+                rowSelectedShape: summarizeRowSelected(args)
+            };
+        }
+
+        function summarizePayloadProperty(key, item) {
+            if (["row", "previousRow", "target"].includes(key)) {
+                return item instanceof Element ? summarizeElement(item) : clean(item);
+            }
+            return clean(item);
+        }
+
+        function record(label, value) {
+            trace.push({ at: new Date().toISOString(), label, value: clean(value) });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        window.__fusionProbe = { trace, record };
+
+        const grid = new ej.grids.Grid({
+            dataSource: rows,
+            allowSelection: true,
+            selectionSettings: { type: "Single", mode: "Row" },
+            columns: [
+                { field: "id", headerText: "ID", width: 90, isPrimaryKey: true, textAlign: "Right" },
+                { field: "name", headerText: "Name", width: 160 },
+                { field: "careLevel", headerText: "Care Level", width: 160 },
+                { field: "wing", headerText: "Wing", width: 120 }
+            ],
+            rowSelected: args => {
+                record("event:rowSelected:click", describePayload(args));
+            }
+        });
+
+        grid.appendTo(document.getElementById("grid"));
+        window.__fusionProbe.ej2 = grid;
+
+        async function nextFrame() {
+            await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        }
+
+        async function waitForRows() {
+            for (let attempt = 0; attempt < 60; attempt++) {
+                const renderedRows = document.querySelectorAll("#grid .e-row");
+                if (renderedRows.length > 1) return renderedRows;
+                await nextFrame();
+            }
+            throw new Error("Grid rows did not render");
+        }
+
+        function cell(rowIndex, cellIndex) {
+            return document.querySelectorAll("#grid .e-row")[rowIndex]
+                .querySelectorAll(".e-rowcell")[cellIndex];
+        }
+
+        async function run() {
+            await waitForRows();
+            record("ready", {
+                rowCount: document.querySelectorAll("#grid .e-row").length,
+                firstRowCells: [...document.querySelectorAll("#grid .e-row:first-child .e-rowcell")]
+                    .map(item => item.textContent.replace(/\s+/g, " ").trim())
+            });
+            const firstName = cell(0, 1);
+            firstName.click();
+            await nextFrame();
+            record("click:first-row", {
+                clickedText: firstName.textContent.replace(/\s+/g, " ").trim(),
+                selectedIndexes: grid.getSelectedRowIndexes()
+            });
+            const secondName = cell(1, 1);
+            secondName.click();
+            await nextFrame();
+            record("click:second-row", {
+                clickedText: secondName.textContent.replace(/\s+/g, " ").trim(),
+                selectedIndexes: grid.getSelectedRowIndexes()
+            });
+            record("complete", { traceRows: trace.length + 1 });
+        }
+
+        run().catch(error => record("error", { message: String(error), stack: error && error.stack }));
+    </script>
+</body>
+</html>

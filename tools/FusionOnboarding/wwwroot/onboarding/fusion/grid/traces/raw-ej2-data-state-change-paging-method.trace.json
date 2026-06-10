@@ -1,0 +1,80 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "data-state-change-paging-method",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-data-state-change-paging-method.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "currentPage": 1,
+        "pageSize": 2
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "event:dataStateChange:paging-method",
+      "value": {
+        "absentKeysChecked": [
+          "where",
+          "search",
+          "group",
+          "sorted"
+        ],
+        "ownKeys": [
+          "action",
+          "name",
+          "requiresCounts",
+          "skip",
+          "take"
+        ],
+        "properties": {
+          "action": {
+            "sample": {
+              "cancel": false,
+              "currentPage": 2,
+              "name": "actionBegin",
+              "pageSize": 2,
+              "previousPage": 1,
+              "requestType": "paging",
+              "type": "actionBegin"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "dataStateChange",
+            "type": "string"
+          },
+          "requiresCounts": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "skip": {
+            "sample": 2,
+            "type": "number"
+          },
+          "take": {
+            "sample": 2,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "method:goToPage",
+      "value": {
+        "currentPage": 2,
+        "pageSize": 2
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "complete",
+      "value": {
+        "traceRows": 4
+      }
+    }
+  ]
+}

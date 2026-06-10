@@ -1,0 +1,94 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "column-visibility",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-column-visibility.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "headerText": [
+          "ID",
+          "Resident",
+          "Wing",
+          "Care Level",
+          "Risk"
+        ],
+        "visibleFields": [
+          "id",
+          "name",
+          "wing",
+          "careLevel",
+          "riskLevel"
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "method:hideColumns:careLevel",
+      "value": {
+        "headerText": [
+          "ID",
+          "Resident",
+          "Wing",
+          "Care Level",
+          "Risk"
+        ],
+        "visibleFields": [
+          "id",
+          "name",
+          "wing",
+          "riskLevel"
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "method:showColumns:careLevel",
+      "value": {
+        "headerText": [
+          "ID",
+          "Resident",
+          "Wing",
+          "Care Level",
+          "Risk"
+        ],
+        "visibleFields": [
+          "id",
+          "name",
+          "wing",
+          "careLevel",
+          "riskLevel"
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "method:reorderColumns:riskLevel-before-wing",
+      "value": {
+        "headerText": [
+          "ID",
+          "Resident",
+          "Risk",
+          "Wing",
+          "Care Level"
+        ],
+        "visibleFields": [
+          "id",
+          "name",
+          "riskLevel",
+          "wing",
+          "careLevel"
+        ]
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "complete",
+      "value": {
+        "traceRows": 5
+      }
+    }
+  ]
+}

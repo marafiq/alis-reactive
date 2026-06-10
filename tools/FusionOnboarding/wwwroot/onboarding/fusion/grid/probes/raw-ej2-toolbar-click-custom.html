@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>FusionGrid toolbarClick Custom Raw EJ2 Probe</title>
+    <link rel="stylesheet" href="/css/syncfusion.dev.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #grid-host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>FusionGrid toolbarClick Custom Raw EJ2 Probe</h1>
+    <p>One event row: <code>toolbarClick</code> fired by a custom toolbar button.</p>
+    <div id="grid-host">
+        <div id="grid"></div>
+    </div>
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const rows = [
+            { id: 1, name: "Alpha", careLevel: "Memory Care", wing: "North" },
+            { id: 2, name: "Beta", careLevel: "Assisted Living", wing: "South" },
+            { id: 3, name: "Gamma", careLevel: "Memory Care", wing: "East" }
+        ];
+
+        function clean(value, seen = new WeakSet(), depth = 0) {
+            if (value === undefined) return "[Undefined]";
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return summarizeElement(value);
+            if (value instanceof Event) return summarizeEvent(value);
+            if (depth > 5) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).sort().forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function summarizeElement(value) {
+            return {
+                kind: "Element",
+                id: value.id || "",
+                tagName: value.tagName,
+                className: value.className || "",
+                text: (value.textContent || "").replace(/\s+/g, " ").trim()
+            };
+        }
+
+        function summarizeEvent(value) {
+            return {
+                kind: value.constructor && value.constructor.name ? value.constructor.name : "Event",
+                type: value.type,
+                target: value.target instanceof Element ? summarizeElement(value.target) : null
+            };
+        }
+
+        function summarizeToolbarItem(value) {
+            if (!value || typeof value !== "object") return null;
+            return {
+                ownKeys: Object.keys(value).sort(),
+                id: value.id,
+                text: value.text,
+                tooltipText: value.tooltipText,
+                prefixIcon: value.prefixIcon,
+                suffixIcon: value.suffixIcon,
+                disabled: value.disabled,
+                visible: value.visible,
+                type: value.type,
+                align: value.align
+            };
+        }
+
+        function describePayload(args) {
+            if (args === null || args === undefined) {
+                return { ownKeys: [], properties: {}, value: args === undefined ? "[Undefined]" : null };
+            }
+            const ownKeys = Object.keys(args).sort();
+            const properties = {};
+            ownKeys.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === undefined ? "undefined" : item === null ? "null" : Array.isArray(item) ? "array" : item instanceof Event ? "event" : typeof item,
+                    sample: summarizePayloadProperty(key, item)
+                };
+            });
+            return {
+                ownKeys,
+                properties,
+                toolbarClickShape: {
+                    item: summarizeToolbarItem(args.item),
+                    cancel: args.cancel,
+                    name: args.name,
+                    originalEvent: args.originalEvent instanceof Event ? summarizeEvent(args.originalEvent) : clean(args.originalEvent)
+                }
+            };
+        }
+
+        function summarizePayloadProperty(key, item) {
+            if (key === "item") return summarizeToolbarItem(item);
+            if (key === "originalEvent") {
+                return item instanceof Event ? summarizeEvent(item) : clean(item);
+            }
+            return clean(item);
+        }
+
+        function record(label, value) {
+            trace.push({ at: new Date().toISOString(), label, value: clean(value) });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        window.__fusionProbe = { trace, record };
+
+        const grid = new ej.grids.Grid({
+            dataSource: rows,
+            toolbar: [
+                { id: "emailStatements", text: "Email Statements", tooltipText: "Email statements", prefixIcon: "e-icons e-send-1" },
+                "Search"
+            ],
+            columns: [
+                { field: "id", headerText: "ID", width: 90, isPrimaryKey: true, textAlign: "Right" },
+                { field: "name", headerText: "Name", width: 160 },
+                { field: "careLevel", headerText: "Care Level", width: 160 },
+                { field: "wing", headerText: "Wing", width: 120 }
+            ],
+            toolbarClick: args => {
+                record("event:toolbarClick:custom", describePayload(args));
+            }
+        });
+
+        grid.appendTo(document.getElementById("grid"));
+        window.__fusionProbe.ej2 = grid;
+
+        async function nextFrame() {
+            await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        }
+
+        async function waitForToolbarItem() {
+            for (let attempt = 0; attempt < 60; attempt++) {
+                const item = document.querySelector("#emailStatements");
+                if (item) return item;
+                await nextFrame();
+            }
+            throw new Error("Toolbar item did not render");
+        }
+
+        async function run() {
+            const item = await waitForToolbarItem();
+            record("ready", {
+                toolbarItemText: item.textContent.replace(/\s+/g, " ").trim(),
+                toolbarItemId: item.id,
+                rowCount: document.querySelectorAll("#grid .e-row").length
+            });
+            item.click();
+            await nextFrame();
+            record("click:toolbar-custom", {
+                clickedText: item.textContent.replace(/\s+/g, " ").trim(),
+                traceRows: trace.length + 1
+            });
+            record("complete", { traceRows: trace.length + 1 });
+        }
+
+        run().catch(error => record("error", { message: String(error), stack: error && error.stack }));
+    </script>
+</body>
+</html>

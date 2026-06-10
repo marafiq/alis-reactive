@@ -1,0 +1,123 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "data-state-change-paging-pager-click",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-data-state-change-paging-pager-click.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "currentPage": 1,
+        "hasPage2": true,
+        "pageSize": 2,
+        "pages": [
+          {
+            "className": "e-link e-numericitem e-spacing e-currentitem e-active",
+            "text": "1"
+          },
+          {
+            "className": "e-link e-numericitem e-spacing e-pager-default",
+            "text": "2"
+          },
+          {
+            "className": "e-link e-numericitem e-spacing e-pager-default",
+            "text": "3"
+          },
+          {
+            "className": "e-link e-numericitem e-spacing e-pager-default",
+            "text": "4"
+          },
+          {
+            "className": "e-link e-numericitem e-spacing e-pager-default",
+            "text": "5"
+          },
+          {
+            "className": "e-link e-numericitem e-spacing e-pager-default",
+            "text": "6"
+          },
+          {
+            "className": "e-link e-numericitem e-spacing e-pager-default",
+            "text": "7"
+          },
+          {
+            "className": "e-link e-numericitem e-spacing e-pager-default",
+            "text": "8"
+          },
+          {
+            "className": "e-link e-numericitem e-spacing e-pager-default",
+            "text": "9"
+          },
+          {
+            "className": "e-link e-numericitem e-spacing e-pager-default",
+            "text": "10"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "event:dataStateChange:paging-pager-click",
+      "value": {
+        "absentKeysChecked": [
+          "where",
+          "search",
+          "group",
+          "sorted"
+        ],
+        "ownKeys": [
+          "action",
+          "name",
+          "requiresCounts",
+          "skip",
+          "take"
+        ],
+        "properties": {
+          "action": {
+            "sample": {
+              "cancel": false,
+              "currentPage": 2,
+              "name": "actionBegin",
+              "pageSize": 2,
+              "previousPage": 1,
+              "requestType": "paging",
+              "type": "actionBegin"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "dataStateChange",
+            "type": "string"
+          },
+          "requiresCounts": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "skip": {
+            "sample": 2,
+            "type": "number"
+          },
+          "take": {
+            "sample": 2,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "pager-click:after",
+      "value": {
+        "currentPage": 2,
+        "pageSize": 2
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "complete",
+      "value": {
+        "traceRows": 4
+      }
+    }
+  ]
+}

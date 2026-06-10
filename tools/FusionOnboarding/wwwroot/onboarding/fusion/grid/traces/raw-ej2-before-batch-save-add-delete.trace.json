@@ -1,0 +1,92 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "before-batch-save-add-delete",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-before-batch-save-add-delete.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "publicMethods": {
+          "addRecord": "function",
+          "deleteRecord": "function",
+          "endEdit": "function"
+        },
+        "rowCount": 3
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "pending-before-commit",
+      "value": {
+        "batchChanges": {
+          "addedRecords": [
+            {
+              "careLevel": "Assisted Living",
+              "id": 99,
+              "name": "Zara Admitted",
+              "openTasks": 1,
+              "wing": "North"
+            }
+          ],
+          "changedRecords": [],
+          "deletedRecords": [
+            {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha",
+              "openTasks": 2,
+              "wing": "North"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "event:beforeBatchSave:add-delete",
+      "value": {
+        "batchChanges": {
+          "addedRecords": [
+            {
+              "careLevel": "Assisted Living",
+              "id": 99,
+              "name": "Zara Admitted",
+              "openTasks": 1,
+              "wing": "North"
+            }
+          ],
+          "changedRecords": [],
+          "deletedRecords": [
+            {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha",
+              "openTasks": 2,
+              "wing": "North"
+            }
+          ]
+        },
+        "cancel": false,
+        "counts": {
+          "added": 1,
+          "changed": 0,
+          "deleted": 1
+        },
+        "ownKeys": [
+          "batchChanges",
+          "cancel",
+          "name"
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "complete",
+      "value": {
+        "traceRows": 4
+      }
+    }
+  ]
+}

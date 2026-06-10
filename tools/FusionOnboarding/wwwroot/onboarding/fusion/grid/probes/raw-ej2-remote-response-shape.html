@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>FusionGrid Raw EJ2 Remote Response Shape Probe</title>
+    <link rel="stylesheet" href="/css/syncfusion.dev.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #grid-host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>FusionGrid Raw EJ2 Remote Response Shape Probe</h1>
+    <p>
+        Focus: prove custom-binding Grid accepts the whole remote response shape
+        <code>{ result, count }</code> through <code>grid.dataSource</code> and
+        updates visible rows after a <code>dataStateChange</code> sort.
+    </p>
+    <div id="grid-host">
+        <div id="grid"></div>
+    </div>
+
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const rows = [
+            { id: 1, name: "Charlie", status: "Review" },
+            { id: 2, name: "Alpha", status: "Active" },
+            { id: 3, name: "Delta", status: "Active" },
+            { id: 4, name: "Bravo", status: "Pending" }
+        ];
+
+        function clean(value, seen = new WeakSet(), depth = 0) {
+            if (value === null || value === undefined) return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (typeof value !== "object") return value;
+            if (depth > 5) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).sort().forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function record(label, value) {
+            trace.push({ label, value: clean(value) });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        function visibleRows() {
+            return Array.from(document.querySelectorAll("#grid .e-row"))
+                .map(row => Array.from(row.querySelectorAll(".e-rowcell"))
+                    .map(cell => cell.textContent.trim()));
+        }
+
+        function pagerState() {
+            return {
+                pagerText: document.querySelector("#grid .e-parentmsgbar")?.textContent?.replace(/\s+/g, " ").trim() ?? ""
+            };
+        }
+
+        function responseFor(state) {
+            let output = rows.slice();
+            if (Array.isArray(state.sorted)) {
+                state.sorted.slice().reverse().forEach(sort => {
+                    output.sort((left, right) => {
+                        const leftValue = left[sort.name];
+                        const rightValue = right[sort.name];
+                        if (leftValue === rightValue) return 0;
+                        const result = leftValue > rightValue ? 1 : -1;
+                        return sort.direction === "descending" ? -result : result;
+                    });
+                });
+            }
+            const skip = typeof state.skip === "number" ? state.skip : 0;
+            const take = typeof state.take === "number" ? state.take : 2;
+            return { result: output.slice(skip, skip + take), count: output.length };
+        }
+
+        function waitForFirstVisibleName(name) {
+            return new Promise((resolve, reject) => {
+                const started = performance.now();
+                const tick = () => {
+                    if (visibleRows()[0]?.[1] === name) {
+                        resolve();
+                        return;
+                    }
+                    if (performance.now() - started > 5000) {
+                        reject(new Error("Timed out waiting for first visible row " + name));
+                        return;
+                    }
+                    requestAnimationFrame(tick);
+                };
+                tick();
+            });
+        }
+
+        window.__fusionProbe = { trace, record };
+
+        const grid = new ej.grids.Grid({
+            dataSource: responseFor({ skip: 0, take: 2 }),
+            allowPaging: true,
+            allowSorting: true,
+            pageSettings: { pageSize: 2 },
+            columns: [
+                { field: "id", headerText: "ID", width: 80, isPrimaryKey: true, textAlign: "Right" },
+                { field: "name", headerText: "Name", width: 160 },
+                { field: "status", headerText: "Status", width: 140 }
+            ],
+            dataStateChange: args => {
+                const response = responseFor(args);
+                record("event:dataStateChange:sorting", {
+                    skip: args.skip,
+                    take: args.take,
+                    requiresCounts: args.requiresCounts,
+                    sorted: args.sorted,
+                    responseShape: {
+                        ownKeys: Object.keys(response).sort(),
+                        resultLength: response.result.length,
+                        count: response.count,
+                        firstResultName: response.result[0]?.name ?? ""
+                    }
+                });
+                grid.dataSource = response;
+                record("dataSource assigned whole response", {
+                    ownKeys: Object.keys(grid.dataSource).sort(),
+                    resultLength: grid.dataSource.result.length,
+                    count: grid.dataSource.count,
+                    firstResultName: grid.dataSource.result[0]?.name ?? ""
+                });
+            }
+        });
+
+        grid.appendTo("#grid");
+        window.__grid = grid;
+
+        (async () => {
+            await waitForFirstVisibleName("Charlie");
+            record("ready", {
+                dataSourceShape: {
+                    ownKeys: Object.keys(grid.dataSource).sort(),
+                    resultLength: grid.dataSource.result.length,
+                    count: grid.dataSource.count
+                },
+                visibleRows: visibleRows(),
+                pager: pagerState()
+            });
+
+            grid.sortColumn("name", "Ascending", false);
+            await waitForFirstVisibleName("Alpha");
+            record("visible rows after remote response", {
+                visibleRows: visibleRows(),
+                pager: pagerState()
+            });
+            record("complete", {
+                dataSourceCount: grid.dataSource.count,
+                visibleFirstName: visibleRows()[0]?.[1] ?? "",
+                pagerText: pagerState().pagerText
+            });
+        })().catch(error => record("error", { message: String(error), stack: error && error.stack }));
+    </script>
+</body>
+</html>
