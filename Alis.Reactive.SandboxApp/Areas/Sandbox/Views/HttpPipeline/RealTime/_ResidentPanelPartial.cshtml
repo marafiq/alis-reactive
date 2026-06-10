@@ -4,8 +4,11 @@
 @{
     var plan = Html.ReactivePlan<ResidentPanelModel>();
 
-    // Partial uses the same hub method so runtime reuses the parent SignalR connection.
-    Html.On(plan, t => t.SignalR<ResidentStatusPayload>("/hubs/resident-status", "StatusChanged",
+    // Partial uses the parent page's drill-scoped hub URL so the runtime reuses the
+    // existing SignalR connection (same URL = same pooled connection).
+    var drillId = (string?)ViewData["DrillId"] ?? "";
+
+    Html.On(plan, t => t.SignalR<ResidentStatusPayload>($"/hubs/resident-status?drill={drillId}", "StatusChanged",
         (payload, p) =>
     {
         p.Element("panel-resident-name").SetText(payload, x => x.ResidentName);

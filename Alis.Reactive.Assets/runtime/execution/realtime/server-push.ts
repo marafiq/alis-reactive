@@ -1,6 +1,6 @@
 import type { ServerPushTrigger, ReactionGraph, PlanDocument } from "../../types/index";
 import { catchAsyncReactionFailure, executeReaction } from "../reactions/execute";
-import { showRetryIndicators, removeRetryIndicators } from "../requests/retry-indicator";
+import { showRetryIndicator, removeRetryIndicator } from "./retry-indicator";
 import { scope } from "../../diagnostics/trace";
 import { ExecutionContext } from "../../browser-objects/execution-context";
 import { toJavaScriptString } from "../../shared/javascript-string";
@@ -16,7 +16,6 @@ interface WiredBehavior {
 
 interface ManagedSource {
   readonly es: EventSource;
-  readonly targetIds: Set<string>;
   readonly wired: WiredBehavior[];
   stopping: boolean;
 }
@@ -26,7 +25,6 @@ interface ManagedSource {
 const sources = new Map<string, ManagedSource>();
 
 function retrySSE(url: string, behaviors: readonly WiredBehavior[]): void {
-  removeRetryIndicators(url);
   log.info("retry.manual", { url });
 
   for (const wiredBehavior of behaviors) {
@@ -39,12 +37,11 @@ function getOrCreate(url: string): ManagedSource {
   if (cached) return cached;
 
   const es = new EventSource(url);
-  const targetIds = new Set<string>();
   const wired: WiredBehavior[] = [];
 
   es.onopen = () => {
     log.debug("connected", { url });
-    removeRetryIndicators(url);
+    removeRetryIndicator(url);
   };
 
   es.onerror = () => {
@@ -55,17 +52,16 @@ function getOrCreate(url: string): ManagedSource {
     if (es.readyState === EventSource.CLOSED) {
       log.error("connection.closed-permanent", { url });
       sources.delete(url);
-      const retryCanBeShown = managed !== undefined && managed.targetIds.size > 0;
-      if (retryCanBeShown) {
+      if (managed) {
         const wiredBehaviors = managed.wired;
-        showRetryIndicators(url, managed.targetIds, () => retrySSE(url, wiredBehaviors));
+        showRetryIndicator(url, () => retrySSE(url, wiredBehaviors));
       }
     } else {
       log.warn("connection.reconnecting", { url });
     }
   };
 
-  const managed: ManagedSource = { es, targetIds, wired, stopping: false };
+  const managed: ManagedSource = { es, wired, stopping: false };
   sources.set(url, managed);
 
   log.debug("source.created", { url });
