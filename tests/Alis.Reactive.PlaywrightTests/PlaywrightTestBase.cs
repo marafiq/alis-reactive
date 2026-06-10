@@ -36,6 +36,7 @@ public abstract class PlaywrightTestBase : PageTest
         Page.SetDefaultNavigationTimeout(60000);
         await RouteExternalFontsToLocalFallback();
         await RouteLocalSyncfusionRuntime();
+        await DisableSyncfusionScriptAnimations();
 
         Page.Console += (_, msg) =>
         {
@@ -78,6 +79,17 @@ public abstract class PlaywrightTestBase : PageTest
 
         await Context.RouteAsync("https://fonts.gstatic.com/**", async route =>
             await route.FulfillAsync(new() { Status = 204 }));
+    }
+
+    // Playwright's "stable" actionability check fights animated bounding boxes, so tests
+    // disable EJ2 script animations here — at the harness boundary — leaving the sandbox
+    // itself animated and truthful for eyes-first verification.
+    private async Task DisableSyncfusionScriptAnimations()
+    {
+        await Context.AddInitScriptAsync(
+            "window.addEventListener('DOMContentLoaded', () => {" +
+            " window.ej?.base?.setGlobalAnimation?.(window.ej.base.GlobalAnimationMode.Disable);" +
+            " });");
     }
 
     private async Task RouteLocalSyncfusionRuntime()

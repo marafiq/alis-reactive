@@ -22,7 +22,6 @@ public class WebServerFixture
         "/css/design-system.dev.css",
         "/css/syncfusion.dev.css",
         "/css/sandbox.css",
-        "/js/disable-sf-animations.js",
         "/js/sandbox-plugins.js"
     ];
 
