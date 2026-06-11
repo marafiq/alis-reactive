@@ -102,6 +102,7 @@
     <File Path="docs-site/src/content/docs/reference/build-commands.md" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Alis.Reactive.ArchitectureTests/Alis.Reactive.ArchitectureTests.csproj" />
     <Project Path="tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj" />
     <Project Path="tests/Alis.Reactive.Playwright.Extensions/Alis.Reactive.Playwright.Extensions.csproj" />
   </Folder>
