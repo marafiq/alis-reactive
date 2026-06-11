@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Alis.Reactive.PlanModel;
 
-namespace Alis.Reactive.PlanTypeGenerator
+namespace Alis.Reactive.ContractGeneration
 {
     internal static class Program
     {

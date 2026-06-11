@@ -5,8 +5,8 @@
     <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
-    <AssemblyName>Alis.Reactive.PlanTypeGenerator</AssemblyName>
-    <RootNamespace>Alis.Reactive.PlanTypeGenerator</RootNamespace>
+    <AssemblyName>Alis.Reactive.PlanContractGenerator</AssemblyName>
+    <RootNamespace>Alis.Reactive.ContractGeneration</RootNamespace>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 

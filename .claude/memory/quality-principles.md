@@ -138,7 +138,7 @@ boundary -- it is never one flat flow.
 ### Boundary 1-2: C# Plan Domain to Generated TS Contract
 
 The C# plan domain is the contract source. When the plan shape changes, regenerate
-`runtime/types/plan.ts` (PlanTypeGenerator, run by `npm run typecheck`) and confirm the runtime
+`runtime/types/plan.ts` (PlanContractGenerator, run by `npm run typecheck`) and confirm the runtime
 still compiles against it. JSON schema is retired — there is no `AssertSchemaValid` step.
 
 ### Boundary 2-3: Generated Contract to Runtime

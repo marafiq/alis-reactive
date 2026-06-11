@@ -4,7 +4,7 @@ paths:
   - "Alis.Reactive/PlanAuthoring/**"
   - "Alis.Reactive/Serialization/**"
   - "Alis.Reactive/InputField/**"
-  - "tools/PlanTypeGenerator/**"
+  - "tools/PlanContractGenerator/**"
   - "Alis.Reactive.Assets/runtime/types/**"
 ---
 

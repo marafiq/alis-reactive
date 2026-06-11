@@ -6,7 +6,7 @@
   "description": "Framework browser assets — the TypeScript runtime, the design-system CSS, and the Syncfusion CSS. Built by esbuild/vite; shipped by the C# NuGet packages.",
   "scripts": {
     "build": "npm run build:runtime && npm run build:design-system && npm run build:fusion",
-    "generate:plan-types": "dotnet run --project ../tools/PlanTypeGenerator/PlanTypeGenerator.csproj -- runtime/types/plan.ts",
+    "generate:plan-types": "dotnet run --project ../tools/PlanContractGenerator/PlanContractGenerator.csproj -- runtime/types/plan.ts",
     "build:runtime": "npm run generate:plan-types && node esbuild.config.mjs",
     "build:design-system": "vite build --config vite.design-system.config.ts",
     "build:fusion": "vite build --config vite.fusion.config.ts",
