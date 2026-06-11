@@ -12,6 +12,10 @@ with eyes and Playwright; it is not a product.
   `Html.InputField(...)`; non-input elements get explicit developer-chosen IDs.
 - One exercise page demonstrates one primitive or one component slice, reachable
   from the sandbox navigation. A page nobody can reach proves nothing.
+- A page is a journey slice: its model, controller partial, and view nest under
+  the same concern path with aligned names, and it carries only elements a real
+  application page would carry — no echo spans, no debug divs
+  (`memory/bdd-principles.md` → Nested Vertical Slices; Grid's `Billing` is the exemplar).
 - Validators register through DI before the view renders; form scope equals
   validator scope.
 

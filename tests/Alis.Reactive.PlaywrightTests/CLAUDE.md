@@ -9,7 +9,9 @@ them like any production code.
 One user-visible behavior, full stack: the view renders the plan, the runtime
 boots it, a real gesture happens, the browser visibly changes. Isolated (fresh
 navigation, no ordering, no shared state), vertical (no mocking), behavior-named
-(one sentence the user role would say).
+(one sentence the user role would say). A suite derives from one senior-living
+journey and owns its nested slice — model, view, fixture
+(`memory/bdd-principles.md` → Nested Vertical Slices).
 
 ## Non-negotiables
 
@@ -30,6 +32,7 @@ navigation, no ordering, no shared state), vertical (no mocking), behavior-named
 
 Triage in order: is the criterion right, the arrangement right, the tooling
 right? All yes → verify manually in browser to classify locator bug vs app bug.
+Locator bugs are fixed in `Playwright.Extensions`, app bugs in the app.
 Never hack the test to pass. After two fail-fix rounds, stop coding and
 research.
 

@@ -1,6 +1,6 @@
 ---
 name: BDD Principles
-description: Consolidated BDD rules for Playwright tests — 5 rules, framework primitives, 7-behavior contract, blind reviewer protocol
+description: Consolidated BDD rules for Playwright tests — 5 rules, framework primitives, nested vertical slices, 7-behavior contract, blind reviewer protocol
 type: reference
 ---
 
@@ -76,6 +76,32 @@ Tests must also use the public DSL, not internal constructors. Arrange with `Htm
 `CreatePlan()`, `Trigger()`, and builders. Never `new SequentialReaction(...)` or similar
 internal types. The test exercises the same code path as production.
 
+## Nested Vertical Slices
+
+Every suite derives from one senior-living user journey and owns a nested
+vertical slice: its own model, controller partial, view, and fixture, under
+the same concern path in every tree, names aligned. Grid's `Billing` slice
+is the exemplar. A component with many use cases fans out into many
+journeys, each a full slice — never one view or one fixture for everything.
+
+The slice is the test's Arrange; the framework is the system under test.
+Framework refactoring changes no slice. A slice changes only with its own
+journey.
+
+Isolation, each clause checkable:
+
+1. Own model — referenced by no other journey.
+2. Own view — one route; no other fixture navigates to it. Dialog and
+   drawer flows on a page belong to that page's journey.
+3. Own data — unreachable from other journeys and other worlds. No static
+   mutable state; no shared fake-data class. Immutable option lists are fine.
+4. Own world — the fixture passes alone, in parallel, and in any order.
+
+Views carry only elements a real application page would carry — no echo
+spans, no debug divs, no elements that exist only to be asserted. Assert
+what the role sees; framework gather tests may assert the POST body.
+Screenshot test: the page reads as a product screen, not a test rig.
+
 ## 7-Behavior Contract Per Component
 
 Every input component test covers all seven:
@@ -112,9 +138,10 @@ Every input component test covers all seven:
 After writing tests, dispatch a separate agent with only these principles and the test file.
 The reviewer has no context about why tests were written or what the implementation looks like.
 
-The reviewer evaluates each test against all 5 rules, opens the page in headed browser, and
-verifies: does the test assert what a user would see? Does the name describe the behavior?
-Would this test catch a real regression?
+The reviewer evaluates each test against all 5 rules and the Nested Vertical Slices
+contract, opens the page in headed browser, and verifies: does the test assert what a
+user would see? Does the name describe the behavior? Would this test catch a real
+regression? Does the page pass the screenshot test?
 
 Any test that violates any rule is flagged with: (1) exact test method name, (2) which rule
 is violated, (3) evidence -- quoted assertion or test name, (4) what the test should look like.
@@ -126,6 +153,10 @@ is not a defense.
 ## Cascade Preamble for Subagents
 
 > You are writing/reviewing BDD Playwright tests for Alis.Reactive -- a framework serving
-> senior living communities. Read `memory/bdd-principles.md` before writing any test.
+> senior living communities. The domain names the stakes, not the scope: this is a UI
+> framework -- do not reason about HIPAA, PHI, or healthcare compliance.
+> Read `memory/bdd-principles.md` before writing any test.
 > Five Rules: (1) Behavior, (2) Independent, (3) Fails when broken, (4) Real interactions,
 > (5) Blind reviewed. Cardinal Rule: never change framework code.
+> One journey = one nested slice with its own model and view; views carry
+> real-app elements only — no echo spans, no debug divs.
