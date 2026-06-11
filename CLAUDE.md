@@ -1,88 +1,20 @@
 # Alis.Reactive Framework
 
-C# fluent builders express reactive browser intent. `Html.RenderPlan(plan)` serializes that
-intent as plan JSON from the rich C# domain model. Generated TypeScript plan
-types mirror that domain model, and the TypeScript runtime executes plan
-instructions without adding behavior the plan does not describe. C# never
-executes browser behavior. TypeScript never invents information the plan does
-not carry.
+## Architecture
 
-Core architecture rule: DSL -> Rich Plan Domain -> Generated Rich TS Contract ->
-Runtime Executioner. Runtime code executes framework-generated plans; it does
-not defend against impossible bad plans with preflight, rollback, fallback, or
-speculative recovery. Invalid behavior belongs in the C# PlanModel where it can
-be made unrepresentable. Runtime checks are for true external boundaries only:
-DOM lookup, browser API failure, network, and malformed non-framework input.
-Do not model normal execution bookkeeping as validation, claims, rejects,
-lifecycle gates, or registries. If the server-generated plan says source A is
-assigned to target B, the runtime reads A and writes B. Bookkeeping names must
-describe what is remembered for execution or unload, not imply the plan is
-suspicious.
+A developer expresses reactive intent with the C# DSL. The plan domain
+captures that intent. `Html.RenderPlan(plan)` serializes that intent as plan
+JSON inside the view. In the browser, the TypeScript runtime has one job: execute
+that plan. The generated contract (`runtime/types/plan.ts`) mirrors the C#
+domain, so plan-shape drift fails typecheck before it reaches the browser.
 
-## Operating Standard For This Repository
+C# never executes browser behavior. TypeScript never invents behavior the
+plan does not carry. Invalid behavior is made unrepresentable in the C# plan
+domain. The runtime guards external boundaries only: DOM lookup, browser
+APIs, network, and JSON the framework did not produce.
 
-The public DSL source is the requirement. Not samples, XML docs, old unit
-tests, stale `.claude` memory, the current runtime, schema history, or remembered
-clues. When there is doubt, read the actual DSL source again and update the
-matrix before changing code.
-
-Every plan/runtime pass starts with this row:
-
-```text
-Close matrix row: <DSL source call> -> <domain term> -> <runtime behavior>
-```
-
-The row must name the source files, developer intent, C# domain term, JSON and
-generated TS term, runtime executor behavior, sync/async lane, behavior proof,
-and exact commit boundary. If the row cannot be written from source, stop and
-read more source.
-
-Before implementation, update the source-grounded graph and matrix for the
-current pass. Active pass notes may use archived design documents as historical
-context only after the DSL source has been checked; archive-history, redesign
-notes, and remembered plans are not requirements.
-
-Rich domain model means the smallest clear set of concepts that names real DSL
-behavior and removes confusion. It does not mean wrappers, registries, fallback
-paths, claims, validators for generated plans, or impressive names around
-ordinary execution. If a type only carries parameters, hides a branch, requires
-explanation before its value is obvious, or maps to no DSL graph node, delete it
-or inline it.
-
-Progress is reported only from committed, verified work. A module is not done
-until the DSL matrix rows are covered, focused tests pass, generated TS is
-checked when C# plan shape changes, and the closed slice is committed.
-
-Root `CLAUDE.md` is authoritative. Stale `.claude` memories/rules that describe
-JSON schema as the contract are historical context only. The active contract is
-the C# plan domain plus generated TypeScript plan types.
-
-### Do / Do Not
-
-| Do | Do not |
-|----|--------|
-| Read actual DSL source before shared plan/runtime edits | Infer behavior from old tests, docs, memories, or comments |
-| Close one matrix row per commit | Claim progress from uncommitted local edits |
-| Use typed component APIs and object member contracts | Add stringly component APIs outside the plugin boundary |
-| Delete stale wrappers, helpers, and syntax-pinning tests | Preserve confusing code because it already exists |
-| Keep runtime as a direct executor of generated plans | Add plan-shape validators, fallback paths, registries, claims, or rejects |
-| Keep sync reactions sync | Make the runtime async by default |
-| Generate TS types from C# plan domain | Hand-maintain TS plan contract or revive schema as contract |
-| Prove page-visible behavior with Playwright | Use `page.evaluate()` shortcuts for user behavior |
-
-Throughout this document, "the runtime" means the TypeScript code in
-`Alis.Reactive.Assets/runtime/` that executes plans in the browser. It is
-bundled by esbuild into `Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js`
-(IIFE), shipped inside the AlisReactive NuGet, and copied into the consumer's
-`wwwroot/scripts/` by the shipped `AlisReactive.targets` file with the
-consumer's package version baked into the filename.
-
-## Architecture — 5 Layers, 4 Boundaries
-
-The one canonical layer model — every rules file, dispatch table, and memory
-document uses this numbering. Each boundary is guarded by behavior evidence.
-Tests are production code: they must protect DSL behavior and domain language,
-not mirror implementation indirection.
+Five layers, four boundaries. Every rules file, dispatch table, and memory
+document uses this numbering.
 
 ```
 Layer 1  C# DSL & Plan Domain (frozen public authoring surface + rich domain)
@@ -93,7 +25,7 @@ Layer 1  C# DSL & Plan Domain (frozen public authoring surface + rich domain)
          BOUNDARY: plan shape change → regenerate runtime/types/plan.ts (PlanContractGenerator)
          ↓
 Layer 2  Generated TS Plan Contract (runtime/types/plan.ts)
-         Quality: generated discriminated unions — never hand-edited (hook-enforced); JSON schema retired
+         Quality: generated discriminated unions — never hand-edited (hook-enforced)
          Harness: npm run typecheck (generation runs first; drift is a typecheck failure)
          ↓
          BOUNDARY: contract change → failing vitest drives the runtime handler
@@ -115,14 +47,81 @@ Layer 5  Documentation & Skills
          Harness: sandbox-verified examples, Rider diagnostics
 ```
 
-Detailed flows must be derived from the current DSL source and kept with the
-active pass evidence. Archived flow documents are historical context, not the
-source of truth for new plan/runtime work.
+## Must Do
 
-## Plan-Driven IDs — No DOM Scanning
+- Read the DSL source before shared plan and runtime edits. The source is the
+  requirement.
+- Close one matrix row per commit. Report progress only from committed,
+  verified work.
+- Use typed component APIs and object-member contracts. Strings belong only
+  at the plugin boundary.
+- Keep the runtime a direct executor of generated plans.
+- Keep sync reactions sync.
+- Generate the TS plan contract from the C# plan domain. Regenerate and
+  typecheck on every plan-shape change.
+- Delete wrappers, helpers, and syntax-pinning tests that map to no DSL graph
+  node.
+- Prove page-visible behavior with Playwright through real interactions.
 
-`IdGenerator` generates every HTML element ID at C# render time from the model type and
-property expression. Format: `{Namespace_TypeName}__{MemberPath}`.
+## Never Do
+
+- Infer behavior from old tests, docs, memories, or comments.
+- Claim progress from uncommitted local edits.
+- Add stringly component APIs outside the plugin boundary.
+- Add plan-shape validators, fallback paths, registries, claims, or rejects
+  for framework-generated plans.
+- Make the runtime async by default.
+- Hand-edit `runtime/types/plan.ts`.
+- Revive JSON schema as a contract: no schema drift gates, no
+  `AssertSchemaValid`, no schema-first process.
+- Use `page.evaluate()` to simulate user behavior.
+- Preserve confusing code because it already exists.
+
+## Key Concepts
+
+These terms stay consistent across C#, generated TS, runtime code, tests, and
+docs.
+
+**Browser object model.** Every object the runtime touches is a JavaScript
+object with members: properties, methods, and events with callbacks.
+Properties are read and written. Methods take arguments and may return
+values. Events fire callbacks. Components, plugins, and app-level objects all
+share this shape. Any member that returns a value can serve as a source
+wherever the DSL accepts one: reaction values, conditions, gather payloads,
+route params, headers, dispatch payloads, and plugin arguments. Component
+slices expose members through typed APIs.
+
+**ValueExpression.** One concept reads every value: component member, plugin
+member, URL parameter, event payload, success body, error body, request
+snapshot, literal, object, and array. A module that needs a value uses this
+shared path. A second resolver is a defect.
+
+**Rich domain model.** The fewest concepts that name DSL behavior. Wrappers,
+registries, fallback paths, claims, and validators for generated plans do not
+qualify. Delete or inline a type that only carries parameters, hides a
+branch, needs explanation before its value shows, or maps to no DSL graph
+node.
+
+**The runtime.** The TypeScript code in `Alis.Reactive.Assets/runtime/` that
+executes plans in the browser. esbuild bundles it into
+`Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js` (IIFE). It ships
+inside the AlisReactive NuGet. The shipped `AlisReactive.targets` copies it
+into the consumer's `wwwroot/scripts/` with the package version in the
+filename.
+
+**The plan contract.** C# `Render()` serializes the plan to JSON inside a
+`<script type="application/json" data-reactive-plan>` element. The runtime
+discovers these elements, parses the JSON, merges partials by `planId`, and
+boots each composed plan. `PlanNodeDiscriminator<T>` delegates polymorphic
+serialization to the concrete type; each plan model class carries its own
+`kind` property (e.g., `public string Kind => "set"`), matched by TypeScript
+discriminated unions. Type generation runs at the front of `npm run
+typecheck`. When plan shape changes: update the C# domain, regenerate
+`runtime/types/plan.ts`, run `npm run typecheck`, and prove runtime behavior.
+
+**Plan-driven IDs.** `IdGenerator` produces every input element ID at C#
+render time from the model type and property expression. Format:
+`{Namespace_TypeName}__{MemberPath}`.
 
 ```
 Model:      Alis.Reactive.SandboxApp.Models.OrderModel
@@ -130,117 +129,71 @@ Expression: m => m.Address.City
 ID:         Alis_Reactive_SandboxApp_Models_OrderModel__Address_City
 ```
 
-All vendors (Syncfusion, Native) produce the same ID for the same expression. IDs are
-deterministic and collision-free by construction. The plan carries every ID the runtime needs.
+Every vendor produces the same ID for the same expression, so IDs are
+deterministic and collision-free by construction. Non-input IDs (buttons,
+elements, containers) are the developer's choice, made explicit through
+`p.Element("my-id")` or `Html.NativeButton("btn-id", ...)`. A collision there
+is a developer error. No fallback IDs. No generated suffixes. The plan
+carries every ID the runtime needs. The runtime resolves each one with
+`getElementById`. A wide DOM query (`querySelectorAll`, tag or class scans,
+traversal) means the plan is missing information; fix the C# plan model to
+carry it. Two wide-query categories are justified, both external boundaries:
 
-Non-input component IDs (buttons, elements, containers) are the developer's responsibility —
-chosen explicitly via `p.Element("my-id")` or `Html.NativeButton("btn-id", ...)`. The framework
-does not generate fallback IDs. If an ID collides, that is a developer error, not a framework
-concern. No fallbacks, no auto-generated suffixes, no scanning to resolve ambiguity.
+- **Plan discovery** — finding `[data-reactive-plan]` script elements in HTML
+  the runtime did not author (initial boot, injected partials).
+- **Self-stamped cleanup** — finding elements by a data attribute the runtime
+  itself wrote (retry indicators and similar).
 
-The runtime uses `getElementById` for all plan model class and element resolution. Wide DOM
-queries (`querySelectorAll`, tag/class scans, DOM traversal) are an anti-pattern in this
-runtime: the plan carries every ID the runtime needs, so needing a wide query means the plan is
-missing information — fix the C# plan model class to carry it. Only two categories of wide
-query are justified, both true external boundaries:
+Any other wide query fails the architecture enforcement test. Its allowlist
+is the only registry of boundary files; this document carries the principle,
+never the file list.
 
-- **Plan discovery** — finding `[data-reactive-plan]` script elements in HTML the runtime did
-  not author (initial boot, injected partials).
-- **Self-stamped cleanup** — finding elements by a data attribute the runtime itself wrote
-  (retry indicators and similar).
+**Sync and async lanes.** Sync reactions stay sync: property set, method
+call, dispatch, branch evaluation, and component update. Async boundaries:
+HTTP, parallel HTTP, remote triggers, confirm/user decisions, and partial
+injection.
 
-A wide query outside these categories fails the architecture enforcement test in the
-runtime suite. Its allowlist is the only registry of boundary files — this document
-carries the principle, never the file list.
-
-## The Plan Contract
-
-C# `Render()` serializes the plan to JSON inside a `<script type="application/json"
-data-reactive-plan>` element. The runtime discovers these elements, parses the JSON, merges
-partials by `planId`, and boots each composed plan. Sandbox URL: `http://localhost:5220`.
-
-`PlanNodeDiscriminator<T>` enables polymorphic serialization by delegating to the concrete
-type via `JsonSerializer.Serialize(writer, value, value.GetType(), options)`. Each
-concrete plan model class carries its own `kind` property (e.g., `public string Kind => "set"`)
-which becomes the discriminator in the JSON, matched by TypeScript discriminated unions.
-
-Generated TypeScript types come from the C# plan domain. Generation runs at the front of
-`npm run typecheck`, so contract drift is a typecheck failure — never a runtime surprise.
-The runtime trusts framework-produced plan JSON as domain output. If external or
-corrupted JSON reaches the browser, runtime failures must expose the domain
-drift with context rather than become normal control flow.
-
-JSON schema is retired as a plan contract. Do not add schema drift gates,
-`AssertSchemaValid`, or schema-first process. When plan shape changes, update
-the C# domain, regenerate `runtime/types/plan.ts`, run `npm run typecheck`, and
-prove runtime behavior.
-
-## Core Domain Lessons
-
-These terms must stay consistent across C#, generated TS, runtime code, tests,
-and docs.
-
-**Browser object model.** A component/plugin/app object is a JavaScript object
-with properties, methods, and events/callbacks. Properties may be read/written.
-Methods may accept arguments and may return values. Any member that returns a
-value can be a typed source wherever the DSL allows a source: reaction values,
-conditions, gather payloads, route params, headers, dispatch payloads, and
-plugin arguments. Component slices expose those members through typed APIs; do
-not add stringly component escape hatches.
-
-**ValueExpression.** One domain concept reads all values: component member,
-plugin member, URL parameter, event payload, success body, error body, request
-snapshot, literal, object, and array. If a module needs a value, it should use
-the shared value path instead of creating a second resolver.
-
-**Sync and async lanes.** Sync reactions stay sync: property set, method call,
-dispatch, branch evaluation, and ordinary component update. Async boundaries
-are HTTP, parallel HTTP, remote triggers, confirm/user decision, and partial
-injection. Do not make the whole runtime async for convenience.
-
-**HTTP/gather/response.** Gather is `target <- source`: payload, header, and
-route-param targets all read through `ValueExpression`. GET emits query string
-values; POST/PUT/DELETE emit JSON or form-data body as declared. Response
-routes create success/error scopes. The request snapshot creates request scope.
-A chained request runs only after success and may gather from the previous
-success response. Parallel starts branches concurrently and runs completion
-after all settle.
+**HTTP, gather, response.** Gather is `target <- source`: payload, header,
+and route-param targets read through `ValueExpression`. GET emits query
+string values; POST, PUT, and DELETE emit a JSON or form-data body as
+declared. Response routes create success and error scopes. The request
+snapshot creates request scope. A chained request runs only after success and
+may gather from that success response. Parallel starts branches concurrently
+and runs completion after all settle.
 
 **Conditions.** Conditions are deterministic graphs over the same value
-sources. Multiple condition blocks may appear in authored order mixed with
-sets, calls, dispatches, HTTP, parallel, and injection. Else-if/default routing
-must preserve first-match behavior. Do not invent nested branch behavior unless
-the DSL source supports it.
+sources. Condition blocks appear in authored order, mixed with sets, calls,
+dispatches, HTTP, parallel, and injection. Else-if and default routing
+preserve first-match behavior. Nested branch behavior exists only where the
+DSL source defines it.
 
 **Partial slots.** SSR composition joins plan scripts by `PlanId`. Browser
-partial injection uses `SlotId` as the load/unload handle. Active Plans are
-recomposed from the boot snapshot plus currently loaded slots. Component id,
-vendor, and type remain runtime object join keys. Slot unload aborts slot-owned
-behavior and validation wiring, removes slot-owned components/rules, and keeps
-boot/app-level objects mounted.
+partial injection uses `SlotId` as the load and unload handle. Active Plans
+are recomposed from the boot snapshot plus loaded slots. Component id,
+vendor, and type remain the runtime object join keys. Slot unload aborts
+slot-owned behavior and validation wiring, removes slot-owned components and
+rules, and keeps boot-level and app-level objects mounted.
 
-**Validation.** FluentValidation remains server authority. Browser validation is
-explicit client metadata recorded through `ReactiveValidator<T>` and DI. Async,
-MustAsync, and server-only rules stay server-side. Client metadata should be
-simple, deterministic, array/object-capable, and bound by controlled component
-IDs. Avoid reflection-heavy extraction and avoid rebuilding FluentValidation in
-the client rule layer.
+**Validation.** FluentValidation is the server authority. Browser validation
+is client metadata recorded through `ReactiveValidator<T>` and DI. Async,
+MustAsync, and server-only rules stay on the server. Client metadata stays
+deterministic, supports arrays and objects, and binds by component ID. The
+client rule layer does not rebuild FluentValidation and does not extract
+rules through reflection.
 
-**Plugins.** Plugin is the intentional escape hatch when deterministic JSON DSL
-is not enough, such as URL APIs, DOM APIs, or complex array manipulation. Plugin
-names may be stringly at the plugin boundary; component APIs must remain typed.
-Plugin reads and calls still integrate through the same object-member and
-`ValueExpression` concepts.
+**Plugins.** A plugin is the escape hatch where the JSON DSL cannot express
+the work: URL APIs, DOM APIs, array manipulation beyond the DSL. Plugin names
+may be strings at the plugin boundary; component APIs stay typed. Plugin
+reads and calls integrate through object members and `ValueExpression`.
 
-**App-level objects.** Drawer, Toast, Confirm, Loader, ActionLink, and similar
-objects use fixed identifiers when they are page/application services rather
-than model-bound inputs. They are still browser objects with typed members, not
-special runtime globals.
+**App-level objects.** Drawer, Toast, Confirm, Loader, ActionLink, and
+similar page services use fixed identifiers. They are browser objects with
+typed members, not runtime globals.
 
 ## Build & Run
 
-Use the root script wrappers. They are the supported CLI surface for framework
-developers and LLM agents. The detailed command guide is
+Use the root script wrappers. They are the supported CLI surface for
+framework developers and LLM agents. The command guide is
 `docs/developer-cli.md`.
 
 ```bash
@@ -258,11 +211,12 @@ Full gate order:
 npm run typecheck -> npm run build:all -> npm test -> dotnet build -> non-Playwright dotnet tests -> scripts/playwright.sh --no-build
 ```
 
-Playwright must run through `scripts/playwright.sh`, not raw `dotnet test`. The
-wrapper prints active-test progress markers, writes live log/TRX/diag artifacts,
-and rejects stale browser assets or stale `--no-build` binaries.
+Playwright runs through `scripts/playwright.sh`, never raw `dotnet test`. The
+wrapper prints active-test progress markers, writes live log/TRX/diag
+artifacts, and rejects browser assets or `--no-build` binaries that predate
+the current source.
 
-Use this local watch loop when actively editing:
+Watch loop for active editing:
 
 ```bash
 npm run watch:runtime
@@ -271,8 +225,9 @@ dotnet watch --project Alis.Reactive.SandboxApp
 ```
 
 For UI work, use `docs/developer-cli.md#ui-developer-workflows` to choose the
-right watcher and proof command. Framework assets ship from
-`Alis.Reactive.Assets/`; sandbox-only assets live under `Alis.Reactive.SandboxApp/`.
+watcher and the proof command. Framework assets ship from
+`Alis.Reactive.Assets/`; sandbox-only assets live under
+`Alis.Reactive.SandboxApp/`.
 
 ## Tech Stack
 
@@ -281,13 +236,13 @@ right watcher and proof command. Framework assets ship from
 | C# | C# 14, compiled for BOTH `net48` and `net10.0` — every shipped package dual-targets (TagHelpers: net10-only by design). A net48 language-feature error (CS8xxx/CS90xx) means rework the feature to what PolySharp polyfills — never work around it. Host-type splits go behind `#if NET48`. |
 | TS | TypeScript + esbuild ESM bundles, Tailwind CSS v4. Versions pinned in `package.json`. |
 | Components | Syncfusion EJ2 32.x (Fusion) + Native HTML. Always through DSL: `Html.InputField(plan, m => m.Name).NativeTextBox(build: b => ...)` |
-| Validation | FluentValidation remains server authority (version per target framework, pinned in the csproj); `ReactiveValidator<T>` records explicit browser validation metadata through DI |
+| Validation | FluentValidation as server authority (version per target framework, pinned in the csproj); `ReactiveValidator<T>` records browser validation metadata through DI |
 | Tests | NUnit, Vitest + jsdom, Playwright. Versions pinned in the test csproj and `package.json`. |
 
 ## Skills
 
-Skills live in `.claude/skills/`. Load applicable skills when useful, but DSL
-source and this root file override stale skill guidance.
+Skills live in `.claude/skills/`. Load applicable skills when useful. DSL
+source and this root file override skill guidance that has drifted.
 
 | Skill | Use for |
 |-------|---------|
@@ -295,44 +250,50 @@ source and this root file override stale skill guidance.
 | `http-pipeline` | Get/Post, Gather, Response, Chained, Parallel, WhileLoading, Into |
 | `conditions-dsl` | When/Then/ElseIf/Else, operators, guard composition, source types |
 | `validation-rules` | FluentValidation rules, Validate, ValidationErrors, WhenField |
-| `onboard-fusion-component` | Adding Syncfusion components, 7-file vertical slice |
+| `onboard-fusion-component` | Onboard/audit Syncfusion components — artifact gate chain + fail-closed verifier |
 | `solid-ts-audit` | SOLID analysis of TypeScript runtime modules |
-| `modern-csharp` | C# 14 patterns that clarify the rich plan domain model |
-| `bdd-testing` | Playwright BDD tests, 5 rules, 7-behavior contract, blind reviewer |
+| `modern-csharp` | C# 14 patterns that clarify the plan domain model |
+| `bdd-testing` | Playwright BDD tests — nested vertical slices, 5 rules, 7-behavior contract, blind reviewer |
 
-Two deterministic PreToolUse hooks are live in `.claude/settings.json` (scripts in
-`.claude/hooks/`): generated files are protected from hand-edits (`runtime/types/plan.ts`,
-generated onboarding JSON/traces), and Playwright must go through `scripts/playwright.sh`
-instead of raw `dotnet test`. Hooks gate; the one-line rules here teach.
+Two deterministic PreToolUse hooks are live in `.claude/settings.json`
+(scripts in `.claude/hooks/`): generated files are protected from hand-edits
+(`runtime/types/plan.ts`, generated onboarding JSON/traces), and Playwright
+must go through `scripts/playwright.sh` instead of raw `dotnet test`. Hooks
+gate; the one-line rules here teach.
 
-Hookify rule templates live in `.claude/hookify.*.local.md`. **All are currently disabled
-(`enabled: false`)** — they document candidate quality gates but do not actively enforce anything.
-Enable one by setting `enabled: true` if you want it to run. The public-contract-freeze rules
-(`protect-api-surface`, `no-public-in-libraries`) were removed as noise.
+Hookify rule templates live in `.claude/hookify.*.local.md`. **All are
+disabled (`enabled: false`)** — they document candidate quality gates and
+enforce nothing. Enable one by setting `enabled: true`. The
+public-contract-freeze rules (`protect-api-surface`, `no-public-in-libraries`)
+were removed as noise.
 
 Localized `CLAUDE.md` files live beside the work they govern — Fusion slices,
 Playwright tests, the sandbox, the TS runtime, and the onboarding artifact
 tree. Each loads when files in its directory are touched and adds only
-directory-specific constraints; this root file remains authoritative.
-Loading is discovered at session start (verified): guidance created mid-session
-takes effect in the NEXT session. Research subagents (Explore/Plan) do not load
-this hierarchy at startup, though directory CLAUDE.mds still attach when they
-read files there — inline critical constraints into agent prompts rather than
-relying on either.
+directory-specific constraints; this root file remains authoritative. Loading
+is discovered at session start (verified): guidance created mid-session takes
+effect in the NEXT session. Research subagents (Explore/Plan) do not load
+this hierarchy at startup, though directory CLAUDE.mds still attach when the
+subagents read files there — inline critical constraints into agent prompts
+rather than relying on either.
 
 ## Rules
 
 ### 1. DSL Source Before Code
 
-Do not edit implementation first for shared plan/runtime work. Read the actual
-DSL source files, update the graph/matrix row, name the domain term, name the
-runtime behavior, then edit. Local implementation cleanup is allowed only when
-the matrix row is already clear.
+The public DSL source is the requirement. Samples, XML docs, old unit tests,
+`.claude` memory, the current runtime, and schema history are not. Archived
+design documents and remembered plans are historical context, never
+requirements. For shared plan and runtime work: read the DSL source files,
+write the matrix row (see Process), name the domain term and the runtime
+behavior, then edit. Local cleanup may proceed when the matrix row is already
+clear.
 
 ### 2. Plan Is the Only Contract
 
-No manual JS in views. No `document.addEventListener` in `.cshtml`. No `window.alis`.
-No inline `<script>` blocks — `root.ts` handles discovery and boot automatically.
+Views carry no JavaScript. No `document.addEventListener` in `.cshtml`, no
+`window.alis`, no inline `<script>` blocks. `root.ts` discovers and boots
+every plan.
 
 ### 3. New or Changed Primitive — All Layers
 
@@ -348,89 +309,96 @@ No inline `<script>` blocks — `root.ts` handles discovery and boot automatical
 
 ### 4. Vertical Slices — Duplication Over Abstraction
 
-Each component module is self-contained. No shared base classes for behavior.
-Duplication between slices is intentional.
+Each component module is self-contained. Behavior never moves into shared
+base classes. Duplication between slices is intentional.
 
 ### 5. Vendor Isolation
 
-New component = C# vertical slice with `IInputComponent`. Zero TS runtime changes.
-Vendor knowledge lives in exactly three runtime roles — the per-vendor driver (vendor →
-component root + event wiring), the per-vendor event adapter, and vendor component
-modules. Everything else stays vendor-blind; resolution dispatches through the registered
-driver. Adding a vendor = register a driver, add its adapter. Enforced by the architecture
-test — its allowlist is the only registry of exceptions.
+A new component is a C# vertical slice with `IInputComponent` and zero TS
+runtime changes. Vendor knowledge lives in three runtime roles: the
+per-vendor driver (vendor → component root + event wiring), the per-vendor
+event adapter, and vendor component modules. Everything else stays
+vendor-blind and dispatches through the registered driver. Adding a vendor
+means registering a driver and adding its adapter. The architecture test
+enforces this isolation; its allowlist is the only registry of exceptions.
 
 ### 6. Trust Generated Plans — Boundary Errors Only
 
-The runtime and plan domain trust framework-generated plans. Do not add defensive
-throws, validators, rejects, claims, or fallback paths for shapes the typed DSL
-already controls. Errors belong at real boundaries: developer-authored DSL misuse,
-DOM/component/plugin lookup, browser APIs, network, and external JSON. Inside the
-generated plan graph, prefer direct domain state over proof-by-exception.
+The runtime and plan domain trust framework-generated plans. If the plan
+says source A is assigned to target B, the runtime reads A and writes B. Do
+not add defensive throws, validators, rejects, claims, or fallback paths for
+shapes the typed DSL already controls. Errors belong at boundaries:
+developer-authored DSL misuse, DOM/component/plugin lookup, browser APIs,
+network, and JSON the framework did not produce. When such JSON reaches the
+browser, the failure must expose the drift with context instead of becoming
+control flow. Execution bookkeeping is not validation: names describe what is
+remembered for execution or unload, never suspicion of the plan. A fallback
+is a deliberate, justified exception, never the default response to
+uncertainty.
 
-A fallback is a rare, deliberate, justified exception — never the default response
-to uncertainty.
-
-**Null escape hatches require justification.** Every NEW per-property `[JsonIgnore(WhenWritingNull)]`,
-nullable property declaration, or `?? fallback` you add must be PROVEN necessary by answering
-in writing: "Could this be a sentinel/empty/default instead? If yes, why am I taking the shortcut?
-If no, what domain meaning would `Empty`/`None` collide with?" Mechanical addition of null markers
-during a refactor is the failure pattern from `feedback_null_escape_hatch_blindness.md` — when
-removing tech debt, if the count of null markers on ANY surface goes UP, stop and audit each
-new marker for sentinel-replaceability before committing.
+**Null escape hatches require justification.** Every NEW per-property
+`[JsonIgnore(WhenWritingNull)]`, nullable property declaration, or
+`?? fallback` must be PROVEN necessary by answering in writing: "Could this
+be a sentinel/empty/default instead? If yes, why am I taking the shortcut?
+If no, what domain meaning would `Empty`/`None` collide with?" Mechanical
+addition of null markers during a refactor is the failure pattern from
+`feedback_null_escape_hatch_blindness.md` — when removing tech debt, if the
+count of null markers on ANY surface goes UP, stop and audit each new marker
+for sentinel-replaceability before committing.
 
 ### 7. Plan-Driven IDs — No DOM Scanning
 
-`IdGenerator` generates every element ID from the model expression at C# render time.
-The runtime resolves plan components via `getElementById` only. Non-input IDs are the
-developer's explicit choice. No fallback IDs. No scanning.
+The plan carries every ID the runtime needs (see Key Concepts → Plan-driven
+IDs). The runtime resolves each one with `getElementById`. Non-input IDs are
+the developer's choice. No fallback IDs. No scanning.
 
 ### 8. API Surface Is Frozen
 
-No `public` constructors on plan model classes. All plan model class constructors are
-`internal`. All plan model properties use `internal set`. Developers interact through builder
-APIs and factory methods (`Html.On`, `Html.InputField`, `p.Get`, `p.When`) — never through
-constructors.
+No `public` constructors on plan model classes. All plan model class
+constructors are `internal`. All plan model properties use `internal set`.
+Developers interact through builder APIs and factory methods (`Html.On`,
+`Html.InputField`, `p.Get`, `p.When`), never through constructors.
 
 ### 9. Root Cause, Not Patch
 
-Trace the full code path. Identify the exact line. Understand WHY before changing WHAT.
-If stuck after 2 attempts: research online, save findings, dispatch agents with specific
-input and evidence-based output criteria. Fix the root cause. Verify in browser.
+Trace the code path. Identify the line. Understand WHY before changing WHAT.
+After 2 failed attempts: research online, save findings, dispatch agents with
+input evidence and output criteria. Fix the cause. Report "done" in past
+tense with what the browser showed: the gesture performed and the visible
+result.
 
-A patch is a commit that fixes a symptom without understanding the cause. Ten patches is
-ten mistakes. The scout rule applies: leave every file cleaner than you found it. If you
-touch a file and see a code smell, fix it — do not walk past broken windows.
+A patch fixes a symptom without understanding the cause. Ten patches are ten
+mistakes. Leave every touched file cleaner than you found it; fix the code
+smell you see instead of walking past it.
 
 ### 10. Tests Are Production Code
 
-Tests must prove behavior and protect domain language. Delete or rewrite tests
-that only pin helper classes, old JSON shape, stale vocabulary, or internal
-syntax. A test that changes every time implementation changes is design debt.
-
-Use focused runtime tests for pure executor behavior and Playwright for
-page-visible DSL behavior. Playwright sandbox runs must use freshly built
-runtime assets.
+Tests prove behavior and protect domain language. Delete or rewrite a test
+that pins helper classes, old JSON shape, dropped vocabulary, or internal
+syntax. A test that changes whenever implementation changes is design debt.
+Runtime tests cover executor behavior; Playwright covers page-visible DSL
+behavior, on runtime assets built from the current source.
 
 ### 11. Code Hygiene
 
-These small practices compound — they prevent entire categories of bugs.
-Worked examples live in `.claude/memory/coding-principles.md` (Code Hygiene).
+These practices compound — each prevents a category of bugs. Worked examples
+live in `.claude/memory/coding-principles.md` (Code Hygiene).
 
 - **Revealing names over complex conditions** — extract booleans into named variables; the name is the documentation.
 - **Variables close to usage** — declare where first needed; if used once, inline it.
-- **Avoid nesting** — early returns and guard clauses; flat control flow.
+- **No nesting** — early returns and guard clauses; flat control flow.
 - **No dead code** — delete unused/unreachable/commented-out code; git has history.
 - **Small methods, single responsibility** — if a block needs a comment, extract it into a named method.
 
 ### 12. Prefer BDD Vertical Slice Playwright Tests
 
-Every Playwright test is one user-visible behavior, isolated (fresh page, no
-ordering, no shared state), vertical (full stack, no mocking, no
+Every Playwright test is one user-visible behavior: isolated (its own page,
+no ordering, no shared state), vertical (full stack, no mocking, no
 `page.evaluate()` — the one exception: framework gather-pipeline tests may
-assert `request.PostData`), and behavior-named (what the user sees, not what
-the code does). Load the `bdd-testing` skill before writing any Playwright
-test — the 5 BDD rules and 7-behavior contract are defined there;
+assert `request.PostData`), and named for what the user sees. Load the
+`bdd-testing` skill before writing any Playwright test — it carries the
+nested-vertical-slice method and points to the 5 BDD rules and 7-behavior
+contract;
 `tests/Alis.Reactive.PlaywrightTests/CLAUDE.md` carries the local rules.
 
 ### 13. Quality Aspirations
@@ -449,17 +417,28 @@ cd .worktrees/<feature-name>
 
 ### Pass Protocol
 
-Start each pass by writing the matrix row defined in Operating Standard above,
-then list:
+Every plan or runtime pass starts with this row:
+
+```text
+Close matrix row: <DSL source call> -> <domain term> -> <runtime behavior>
+```
+
+The row names the source files, the developer intent, the C# domain term, the
+JSON and generated TS term, the runtime executor behavior, the sync or async
+lane, the behavior proof, and the commit boundary. If the row cannot be
+written from source, stop and read more source.
+
+Then list:
 
 1. DSL source files used as requirements.
-2. Sync/async lane expectation.
+2. Sync or async lane expectation.
 3. Code to delete or simplify.
 4. Tests that prove behavior before commit.
-5. Exact commit boundary.
+5. The commit boundary.
 
-Do not report progress from uncommitted local edits. Do not start a second
-module before the current module has a focused proof and a commit.
+A module is done when its matrix rows are covered, focused tests pass,
+generated TS is checked when plan shape changed, and the slice is committed.
+Do not start a second module before that commit.
 
 ### Source-Grounded Design Loop
 
@@ -469,7 +448,7 @@ module before the current module has a focused proof and a commit.
    partial slot load/unload -> Active Plan composition.
 3. Fill the input/output matrix: DSL call -> developer intent -> C# domain ->
    JSON/generated TS -> runtime executor -> proof.
-4. Delete stale helpers/tests that do not map to the graph.
+4. Delete helpers and tests that map to no graph node.
 5. Implement the smallest domain/runtime change that closes the row.
 6. Run focused runtime/domain tests.
 7. Run `npm run typecheck` when C# plan or generated TS shape changed.
@@ -479,29 +458,34 @@ module before the current module has a focused proof and a commit.
 ### Wrong Plan Protocol
 
 If a pass touches the same module repeatedly without closing it, stop editing
-and redraw the graph from DSL source. Repeated local patches mean the design is
-not clear enough.
+and redraw the graph from DSL source. Repeated local patches mean the design
+is not clear enough.
 
 If an implementation needs a fallback, registry, generated-plan validator, or
 generic lifecycle concept, prove the DSL graph node that requires it. If none
 exists, delete the concept.
 
-If touching an unexpected layer, the matrix row is incomplete. Stop immediately,
-save what you learned (to memory — context loss is the real cost), record the
-new edge, and redesign before continuing. Present the problem concisely, step by
-step. Why: one session made 3 architecture changes in 30 minutes with no plan;
-another took 26 fix commits in a day because design was discovered by coding.
+If a pass touches an unexpected layer, the matrix row is incomplete. Stop
+immediately, save what you learned (to memory — context loss is the real
+cost), record the new edge, and redesign before continuing. Present the
+problem concisely, step by step. Why: one session made 3 architecture changes
+in 30 minutes with no plan; another took 26 fix commits in a day because
+design was discovered by coding.
 
 ### Pre-Flight Checklist
 
-- [ ] Actual DSL source read, not inferred from tests or old docs.
+- [ ] DSL source read, not inferred from tests or old docs.
 - [ ] Matrix row written with source file, DSL input, domain term, generated TS term, runtime output.
 - [ ] Sync/async lane named.
 - [ ] API surface unchanged unless the task explicitly requires a public contract change.
 - [ ] Code to delete/simplify identified.
 - [ ] Behavior proof selected before editing.
+- [ ] Rejected alternative named, with the one fact that killed it.
 
 ### Post-Flight Checklist
+
+Each checked box carries its evidence: the command run and one line of what
+it printed.
 
 - [ ] Focused behavior tests pass.
 - [ ] Generated TS checked when C# plan shape changed.
@@ -509,7 +493,7 @@ another took 26 fix commits in a day because design was discovered by coding.
 - [ ] Playwright behavior proved for page-visible changes.
 - [ ] `git status` inspected.
 - [ ] Commit message names the closed behavior row.
-- [ ] No stale vocabulary, dead code, defensive plan validation, or schema-contract references left behind.
+- [ ] No dropped vocabulary, dead code, defensive plan validation, or schema-contract references left behind.
 
 ### Review Loop — Every Change
 

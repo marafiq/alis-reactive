@@ -55,4 +55,307 @@ won and the guidance files were corrected.
   Revisit after rc3's verifier has earned trust.
 - Deferred, recorded: `modern-csharp` skill split (1,272 lines vs 500 guidance)
   via progressive disclosure; deep root shrink toward ~210; AGENTS.md
-  line-level dedupe (Codex consumer); `bdd-testing` skill description cleanup.
+  line-level dedupe (Codex consumer — resolved 2026-06-11 by direction:
+  AGENTS.md is now a symlink to root `CLAUDE.md`, deleting the
+  older-vocabulary duplicate); `bdd-testing` skill description cleanup
+  (resolved 2026-06-11 by the nested-vertical-slices rewrite below).
+
+## Re-verification 2026-06-11 (fresh look, observed)
+
+Full evidence, fixes, and the goal work plan: `docs/superpowers/plans/rc3-goal-execution.md`.
+
+Held on re-test: E0 spot re-piped 4/12 cases (plan.ts Edit DENY with corrected
+reason; `_skill/pattern-map.md` Edit pass; raw Playwright `dotnet test` DENY;
+`scripts/playwright.sh` pass); E5 re-run matched exactly (51 components, 1
+audited, 459/459 rows proven); 6 nested CLAUDE.mds present; `paths:` frontmatter
+present on `plan-contract-boundary.md`; hooks wired in `.claude/settings.json`.
+
+Corrections:
+
+- Line counts drifted since the log: root `CLAUDE.md` 520 (logged 517),
+  always-loaded total 902 (logged 899).
+- The drift fix `PlanTypeGenerator` → `PlanContractGenerator` had been recorded
+  while only prose changed — an aspiration logged as fact. Ground truth: the
+  generating class `Alis.Reactive.PlanModel.PlanContractGenerator` existed; the
+  runner project still carried the legacy name (`high-quality-bar-tasks.md` T5:
+  "one concept, three names"). RESOLVED 2026-06-11 by realizing the rename on
+  disk: `tools/PlanContractGenerator/PlanContractGenerator.csproj`, assembly
+  `Alis.Reactive.PlanContractGenerator`, runner namespace
+  `Alis.Reactive.ContractGeneration` (the runner must not shadow the domain
+  class name — CS0234 proved it); `Alis.Reactive.slnx`, `package.json` script,
+  `InternalsVisibleTo`, and `plan-contract-boundary.md` `paths:` updated
+  together. Verified: `npm run typecheck` green through the new path,
+  regenerated `plan.ts` byte-identical, `dotnet build` 0 warnings 0 errors.
+- Blind spot found: the setup-under-test table has no tier for user-level
+  `~/.claude/skills/`. Tested 2026-06-11: four stale Alis-specific fusion skills
+  (Apr 8) plus `syncfusion-slice` were model-invocable and taught stringly
+  `self.Set("prop", v)` / `self.Call("method")` APIs — the exact pattern root
+  CLAUDE.md forbids — while the canon skill is `disable-model-invocation: true`
+  and therefore never auto-loads. Four more user-level duplicates
+  (`conditions-dsl`, `http-pipeline`, `reactive-dsl`, `solid-ts-audit`) differed
+  from the project copies under the same names (Mar vs May mtimes).
+  All nine archived to `~/.claude/skills/_archive-alis-2026-06-11/`; project
+  canon is now the only resolution for these names.
+  CORRECTED same day by a blind fresh-session probe: an earlier draft of this
+  bullet called ServerPush/SignalR "removed triggers" — DSL source refutes that
+  (`TriggerBuilder.cs:65,77` ServerPush, `:102` SignalR, `plan.ts:444`
+  `"server-push"`). That inference came from a skill-description diff, not from
+  source. The actual gap is the project `reactive-dsl` skill omitting both
+  triggers.
+
+## Guidance edits before the restructure, recorded from the diff
+
+A session before the 2026-06-11 root-CLAUDE.md restructure edited guidance
+files and wrote no record (the pre-restructure tree was 525 lines against 520
+at HEAD).
+
+This entry reconstructs those edits from `git diff`. The diff is the
+evidence; the session-time reasoning was not captured.
+
+- Evidence-language pass — a claim carries its output:
+  - `agent-dispatch.md` Template 1 now reads "Report each step in past tense
+    with what it printed; a claim without its output is not made". Its
+    guardrail for claiming done names the gesture performed and what the
+    page showed.
+  - `agent-dispatch.md` Template 3 reads "A finding without file:line and
+    its consequence is not made".
+  - `process-pipeline.md` dropped "pragmatic excellence" from its standards
+    line; its Speed Gate commit line matches Template 1's done guardrail.
+  - Root `CLAUDE.md` Rule 9 gained the past-tense reporting sentence,
+    Pre-Flight gained "Rejected alternative named, with the one fact that
+    killed it", and Post-Flight opens with "Each checked box carries its
+    evidence".
+  - Drift this pass left behind: `.claude/memory/quality-principles.md`
+    still taught "Root yourself in pragmatic excellence" as the Right
+    preamble — fixed 2026-06-11; the example now quotes Template 3.
+- Onboarding-skill description — root `CLAUDE.md` skills table and
+  `process-task-types.md` now describe `onboard-fusion-component` as
+  artifact-gated with a fail-closed verifier, matching the skill after the
+  E5 re-run.
+
+## Scope steer 2026-06-11 — domain framing caused compliance drift
+
+The "senior living communities / residents depend on it" framing in prompt
+preambles pulls models toward HIPAA, PHI, and healthcare-compliance
+reasoning. The framework is UI code; no guidance asks for compliance
+analysis.
+
+Every framing site now carries the counter-sentence "The domain names the
+stakes, not the scope: this is a UI framework — do not reason about HIPAA,
+PHI, or healthcare compliance": `agent-dispatch.md` (header, Templates 1, 3,
+4), `process-pipeline.md`, `quality-principles.md` (header and the Positive
+Framing example), `vision_working_principles.md`, and the cascade preamble
+in `bdd-principles.md`.
+
+Sandbox and onboarding docs keep "Senior Living" as the example domain for
+names and workflows — that usage names data, not regulation, and stays.
+
+## bdd-testing rewrite 2026-06-11 — nested vertical slices
+
+Directives: the skill was too prescriptive; the structure is set; one journey
+= one isolated, nested vertical slice (own domain model, view, controller
+partial, fixture) derived from a senior-living user journey; views carry no
+elements that would never appear in a real application page. The Grid
+`Billing` slice already practiced the nesting and is named as the exemplar
+(`BillingModel.cs`, `GridController.Billing.cs`, `Billing.cshtml`,
+`WhenUsingFusionGridBilling.cs` — the journey name joins the four trees).
+
+What changed:
+
+- `SKILL.md` 241 → 124 lines: it now carries the method only — journey →
+  slice → criteria → tests. The component gesture/surface/assertion grammar
+  moved to `references/gestures.md`. Failure triage already lived in
+  `tests/Alis.Reactive.PlaywrightTests/CLAUDE.md`; the skill's copy was
+  deleted and the local file gained the `Playwright.Extensions` pointer.
+- The frontmatter description (its trigger text was duplicated) was replaced —
+  closes the deferred description cleanup above.
+- Enforcement home: `memory/bdd-principles.md` gained "Nested Vertical
+  Slices" so blind reviewers, who receive only the constitution and the test
+  code, enforce it; both cascade preambles (constitution and
+  `agent-dispatch.md` Template 4) gained the one-line restate.
+- Pointer updates: root `CLAUDE.md` skills row and Rule 12, sandbox
+  `CLAUDE.md` view rules.
+- The pattern is named: Nested Vertical Slices. A component with many use
+  cases fans out into many journeys, each a full slice. Grid proves it at
+  scale — about thirty journey views and fixtures, per-journey models,
+  per-journey session-keyed stores (`BillingSessionKey`). In-memory data is
+  journey-owned; no fake-data class serves two journeys.
+- Existing echo-span pages predate the rule; they migrate as they are
+  touched (scout rule), not in a mass pass.
+- Gap found while grounding the pattern: Schedule is pre-pattern — one
+  `Index.cshtml`, one `ScheduleController.cs`, one fixture
+  (`WhenUsingFusionSchedule.cs`), and a shared `FakeScheduleData.cs` store.
+  Migration target when Schedule is next touched: fan its use cases into
+  journey slices on the Grid shape.
+- Upgrade after review ("current is okay — make it great"): isolation became
+  a four-clause checkable contract — own model, own view, own data, own
+  world — with the outcomes named: shared state is where flakiness lives, so
+  isolation keeps the suite stable; realism makes UI emerge — every journey
+  forces a real page into the sandbox, and the suite grows a product. The
+  screenshot test names the realism check: a stranger seeing the page reads
+  a senior-living product screen, not a test rig. The blind reviewer
+  protocol now checks the contract and the screenshot test, so enforcement
+  rides the existing review machinery.
+- Candidate deterministic gate, designed and not yet written: an NUnit
+  architecture test failing any static mutable collection field in sandbox
+  controllers (immutable `static readonly` option lists exempt) — clause 3
+  made mechanical. Tracked here until a slice lands it.
+- Litmus run on the guidance itself ("implementation changes, DSL untouched —
+  does the test change?"): the fixture boot-wait passes by one-home routing —
+  `WaitForTraceMessage("booted")` resolves to a DOM-marker wait inside
+  `PlaywrightTestBase`, the trace string is one constant, so a runtime
+  tracing change touches one file, not the 85 fixtures that pass "booted".
+  One failure found and fixed: contract clause 3 had pinned the storage
+  mechanism (session key, private store method names) at contract altitude —
+  restated as the observable property (no other journey, no other world can
+  reach the data); the mechanism is the exemplar's detail.
+- Corrected by review (user): the slice — view, model, controller, data — is
+  the test's Arrange; the litmus boundary is the framework, the system under
+  test. The AAA line is now in the constitution and the skill's opening.
+  Same pass, on a too-complex flag: both sections were trimmed to facts —
+  rationale paragraphs dropped, clauses shortened.
+- Clarity probe, observed: a blind Explore agent given only the skill, the
+  constitution, and the tests CLAUDE.md answered 7/7 scenario questions with
+  citations and zero UNCLEAR — including fanning Schedule's three use cases
+  into three slices with correctly derived file paths, refusing an echo
+  span, and refusing a shared fake-data class. One branch it missed: the
+  skill's litmus sentence showed only the rewrite branch for a test broken
+  by a framework refactor; it now states both — page behavior unchanged →
+  rewrite the test; page behavior changed → the test caught a regression,
+  report the bug. Run proof same day: `scripts/playwright.sh
+  WhenUsingFusionGridBilling` — 7/7 passed, 24.1s, exit 0.
+- Refactor probe, observed: a blind Explore agent given only the guidance
+  and the Schedule code produced the right target structure — three
+  journeys derived from the real code, controller split into journey
+  partials with a base partial, `Index.cshtml` renamed to the journey name,
+  `FakeScheduleData.cs` dissolved per the no-shared-fake-data clause, every
+  decision cited, real ambiguities marked OPEN. One gap it exposed, fixed
+  with one sentence in clause 2 and the skill: dialog and drawer flows on a
+  page belong to that page's journey (the probe had split them into three
+  fixtures sharing one route; Grid's Billing fixture shows the dialog
+  tested in-journey). Also observed: the constitution's "No vendor prefix"
+  naming row conflicts with Grid's legacy `WhenUsingFusionGrid*` fixture
+  names — the probe followed the constitution; legacy names migrate as
+  touched.
+- Post-fix probes, observed: the litmus two-branch sentence landed — a blind
+  reader routed unchanged-page-behavior → rewrite the test and
+  changed-page-behavior → report the bug, quoting each branch. The
+  dialog/drawer clause landed — a blind reader answered one journey, one
+  fixture, dialog and drawer tested in it, quoting the new sentence from
+  both files.
+- Scope-steer probe, inconclusive: a medication-schedule bait task (the PHI
+  trigger) produced zero HIPAA/PHI/compliance criteria with the steer — and
+  also without it in the control arm. The steer is not contradicted, but
+  this probe cannot attribute the clean output to it. It stays on the
+  strength of the originally observed drift; its effect remains unobserved.
+- Revert and restore, same day: the direction "revert code changes made as a
+  result of probe testing" was first misread as removing the two
+  probe-driven guidance sentences (litmus two-branch, dialog/drawer clause);
+  both were restored on correction — the follow-up probes had verified they
+  land. Ground truth on probe side effects: all probes ran as read-only
+  Explore agents; no code was changed by any probe, so there was nothing to
+  revert in code.
+
+## Open items closed 2026-06-11
+
+- `reactive-dsl` skill gap closed: ServerPush (three overloads) and SignalR
+  (two overloads) added to the trigger grammar, description, and the
+  `Html.On` note — signatures read from
+  `Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs`, named as remote
+  triggers on the async lane.
+- Deterministic gate landed: `tests/Alis.Reactive.ArchitectureTests/`
+  (`SandboxStaticStateTests`) — fails any store-shaped static (dictionary or
+  set, readonly or not) and any non-readonly static collection in
+  `Areas.Sandbox`; readonly seed lists pass. Auto-discovered by
+  `scripts/test.sh` leg 5; added to the slnx. Calibration run failed naming
+  15 fields (the fails-when-broken proof), then went green 2/2 with the
+  16-entry allowlist: 13 keyed-isolation stores (wizard drafts keyed per
+  flow id, `DrillWorlds` keyed per world) and three process-global
+  migration targets — `FakeScheduleData.Store`,
+  `HttpController._deletedNativeActionLinkRows`,
+  `KanbanController.BoardCards` (the last two found by the gate, not
+  previously recorded).
+- Unit-test sync audit (blind agent, claims re-verified at source): vitest
+  suite is in sync — zero stale vocabulary, zero orphan imports, 30 test
+  files all resolving against current modules. Kind coverage: 56 of 65
+  generated union kinds have direct vitest coverage; of the 9 without,
+  `page-ready` and `inject` are exercised through boot/Playwright and host
+  function tests, and `container`/`index`/`nullable`/`open`/`layout-object`
+  ride through higher-level tests. One contract question surfaced:
+  `kind: "typed"` (plan.ts:71, PayloadContract) has zero reads in runtime
+  source — full detail and the pending Layer 1 decision in the dedicated
+  section below.
+- AGENTS.md = root CLAUDE.md via symlink (see deferred-list resolution
+  above).
+
+## rc3 item — `kind: "typed"`: serialized into every plan, read by nothing
+
+Found 2026-06-11 by the coverage-completeness audit (kind → test mapping).
+Layer 1 decision pending. Recorded in full because the mechanism of "why no
+bug yet" is itself a lesson.
+
+**What it is.** `PayloadContract` records which .NET type a typed trigger's
+payload paths were authored against. `CustomEvent<TPayload>`,
+`ServerPush<TPayload>`, and `SignalR<TPayload>` call
+`PayloadContract.ForPayload(typeof(TPayload))` →
+`NamedPayloadContract`, `Kind => "typed"`, carrying the type's full name;
+untyped overloads produce `Kind => "untyped"`
+(`Alis.Reactive/PlanModel/WireTerms/PlanTerms.cs:398-440`). Its working job
+is authoring-time: `SameAs` lets the domain check that behaviors on one
+channel agree on the payload type.
+
+**Where it goes.** `Render()` serializes it on every trigger and payload
+source: `DocumentEventTrigger.payloadType`, `ServerPushTrigger`,
+`SignalRTrigger`, component `Event.payloadType`, `PayloadSource.type`
+(generated contract `plan.ts:62-77,412,434`). The wire value includes the
+.NET type full name (`TypedPayloadContract.type: string`).
+
+**What the runtime does.** Copies `payloadType` through once as bookkeeping
+(`runtime/browser-objects/component-event-contract.ts:15`); zero branches on
+the kind anywhere (grep verified). Payload reads resolve authored dot-paths
+directly against the event's JSON object; the type name is never consulted.
+
+**Why this has not caused a bug.** A write-only field with a total writer
+and zero readers has no failure path — bugs live at read sites.
+
+1. The writer cannot produce an invalid value: the discriminator seals the
+   union to `"typed"`/`"untyped"` by construction.
+2. No reader exists to disagree with the value: unread data cannot alter
+   control flow.
+3. Rule 6 (no validators for framework plans) makes extra wire data inert
+   by design — a validator culture would have choked on it; trust makes it
+   silent.
+4. Generation keeps `plan.ts` in lockstep with C#, so the unused union
+   always typechecks; drift — the one failure that would surface — is
+   impossible by construction.
+
+Why it surfaced only now: tests prove behavior and this kind has none, so
+no test could fail on it. Only the coverage gate (map every kind, justify
+the unmapped) could expose it — the same class of gap as the suite that
+shipped 59 passing tests with a third of its scope uncovered.
+
+**Cost today.** Bytes in every plan JSON; a dead union in the generated
+contract that invites a reader to think a handler is missing; and the .NET
+type full name (server namespace) printed into page JSON — an information
+leak consideration for production apps.
+
+**Risk forward.** A future session "completes" the union — adds a runtime
+handler or validator for `"typed"` — which is the Rule 6 failure pattern
+invited by the contract's shape.
+
+**Resolutions.**
+
+1. Keep serializing, justified: boundary error messages start naming the
+   authored type ("event payload missing path `Status` authored against
+   `OrderPayload`"). The serialized fact earns its bytes; the justification
+   gets written here and in Rule 6's orbit.
+2. Stop serializing (default unless 1 is wanted): `PayloadContract` keeps
+   its `SameAs` job inside C# authoring and leaves the wire format. Plan
+   JSON shrinks, `"typed"`/`"untyped"` leave `plan.ts`, the type-name leak
+   closes. Plan-shape change → full Rule 3 ritual: update the C# domain,
+   regenerate, `npm run typecheck`, prove behavior, one commit.
+3. Runtime checks the contract — rejected: plan validation for
+   framework-generated plans (Rule 6).
+
+The fact that kills option 1 unless someone wants it: no diagnostic
+consumes the type name today. Decision owner: Layer 1 session.
