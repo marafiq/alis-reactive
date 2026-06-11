@@ -315,6 +315,30 @@ source: `DocumentEventTrigger.payloadType`, `ServerPushTrigger`,
 the kind anywhere (grep verified). Payload reads resolve authored dot-paths
 directly against the event's JSON object; the type name is never consulted.
 
+**Root cause (traced, not guessed).** An authoring-time concept was modeled
+as a wire term, and whole-graph serialization did the rest. The evidence:
+
+1. `PayloadContract` was born inside `PlanModel/WireTerms/` in `2beb8693`
+   ("Checkpoint reactive plan domain refactor") as a property of the trigger
+   and event wire models.
+2. Its only consumer in any commit is authoring-time C#:
+   `BrowserObjectContract.cs:417` calls `SameAs` to require that a component
+   event channel declared twice agrees on its payload type.
+3. The runtime never read it — `git log -S 'payloadType.kind'` and
+   `-S 'type.kind === '` over `runtime/` return zero commits. Historical
+   `"untyped"` hits were test arrangement literals (removed in `031a05ac`)
+   or carrier fields: `89fce1c7` stored `payloadType` on
+   `ComponentEventContract` without inspecting it; `f86dcbda` ("Trust
+   declared component event channels") deleted that class and kept carrying
+   the field. There was never a reader to remove.
+
+The trigger and event models must serialize (the runtime needs channels,
+URLs, event names), and `Render()` serializes every property of those
+models. No per-property decision "does the wire need the payload contract?"
+was ever made — whole-model serialization asks that question of no one.
+Same failure shape as Rule 6's null-escape-hatch discipline: a property got
+its wire presence mechanically, not by justification.
+
 **Why this has not caused a bug.** A write-only field with a total writer
 and zero readers has no failure path — bugs live at read sites.
 
@@ -350,10 +374,15 @@ invited by the contract's shape.
    `OrderPayload`"). The serialized fact earns its bytes; the justification
    gets written here and in Rule 6's orbit.
 2. Stop serializing (default unless 1 is wanted): `PayloadContract` keeps
-   its `SameAs` job inside C# authoring and leaves the wire format. Plan
-   JSON shrinks, `"typed"`/`"untyped"` leave `plan.ts`, the type-name leak
-   closes. Plan-shape change → full Rule 3 ritual: update the C# domain,
-   regenerate, `npm run typecheck`, prove behavior, one commit.
+   its `SameAs` job inside C# authoring and leaves the wire format — the
+   fix lands at the root cause: a per-property wire decision
+   (`[JsonIgnore]` on the carrying properties, or moving the agreement
+   check off the wire models). Plan JSON shrinks, `"typed"`/`"untyped"`
+   leave `plan.ts`, the type-name leak closes. Plan-shape change → full
+   Rule 3 ritual: update the C# domain, regenerate, `npm run typecheck`,
+   prove behavior, one commit. The runtime's carrier field
+   (`component-event-contract.ts` `payloadType`) goes with it — it carries
+   a value nothing consumes.
 3. Runtime checks the contract — rejected: plan validation for
    framework-generated plans (Rule 6).
 
