@@ -57,7 +57,8 @@ steps are complete.
 
 ## Component Onboarding (All Layers)
 
-Load `onboard-fusion-component` skill first. 7-file vertical slice. Zero TS runtime changes.
+Load `onboard-fusion-component` skill first. Artifact-gated vertical slice — the
+skill's fail-closed verifier must pass. Zero TS runtime changes.
 If TS changes seem needed, the plan is missing information — fix the C# descriptor.
 Vendor knowledge lives in the three vendor runtime roles (driver, event adapter,
 component modules); the architecture test's allowlist is the only registry.

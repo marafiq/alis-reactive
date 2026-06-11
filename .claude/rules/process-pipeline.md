@@ -1,12 +1,14 @@
 # Process Pipeline — Layered Harness
 
 This framework serves senior living communities. Residents depend on software built with it.
-Correctness over speed. Evidence over assumptions. Pragmatic excellence at every layer.
+The domain names the stakes, not the scope: this is a UI framework — do not reason about
+HIPAA, PHI, or healthcare compliance.
+Correctness over speed. Evidence over assumptions.
 
 ## The Pipeline
 
 The canonical 5-layer model, boundaries, and per-layer harness live in root
-`CLAUDE.md` (Architecture — 5 Layers, 4 Boundaries). A failing test drives
+`CLAUDE.md` (Architecture). A failing test drives
 every boundary crossing. Per-layer skills:
 
 | Layer | Skills |
@@ -24,7 +26,8 @@ The harness tracks which layers are verified and which still need work.
 
 Before editing any file: read it first.
 Before changing plan shape: regenerate the TS contract and run typecheck.
-Before committing: verify in browser.
+Before committing: watch the change happen in the browser; report the gesture and what
+the page showed.
 Before accepting a review finding: trace the code path yourself.
 Before dispatching an agent: specify input evidence and output evidence.
 If editing a file a 2nd time this session: stop, rethink the approach.

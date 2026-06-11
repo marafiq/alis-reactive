@@ -7,6 +7,8 @@ type: reference
 # Quality Principles
 
 This framework serves senior living communities. Residents depend on software built with it.
+The domain names the stakes, not the scope: this is a UI framework — do not reason about
+HIPAA, PHI, or healthcare compliance.
 Correctness over speed. Evidence over assumptions. Pragmatic excellence at every layer.
 
 ---
@@ -101,12 +103,20 @@ Frame stakes positively. Set the bar, do not list prohibitions.
 
 **Wrong:** "Do NOT rubber-stamp. If everything is perfect, explain WHY."
 
-**Right:** "You are reviewing instructions for a Senior Living App Framework. Any lack of
-focus, guessing, or critical thinking will cost dearly. Root yourself in pragmatic excellence."
+**Right:** "You are reviewing instructions for a Senior Living App Framework.
+Residents depend on it. The domain names the stakes, not the scope: this is a
+UI framework — do not reason about HIPAA, PHI, or healthcare compliance.
+A finding without file:line and its consequence is not made."
 
-Every review agent prompt opens with: what the system is (senior living framework), what
-the stakes are (residents depend on it), what standard to meet (pragmatic excellence).
-Rewrite prohibitions as standards.
+Every review agent prompt opens with:
+
+- what the system is — a UI framework for senior living communities
+- what the stakes are — residents depend on it
+- what the scope is not — HIPAA, PHI, healthcare compliance
+- what standard applies — every finding carries file:line and its consequence
+
+The template lives in `agent-dispatch.md` Template 3 — quote it, do not
+paraphrase it. Rewrite prohibitions as standards.
 
 ### Rank by Value, Not Fixed Caps
 

@@ -7,7 +7,8 @@ type: user
 # Working Vision — Alis.Reactive
 
 This framework serves senior living communities. Residents depend on the software built
-with it. Every decision carries weight.
+with it. Every decision carries weight. The domain names the stakes, not the scope: this
+is a UI framework — do not reason about HIPAA, PHI, or healthcare compliance.
 
 ## The Pipeline Is the Architecture
 
