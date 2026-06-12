@@ -739,3 +739,46 @@ before disposition.
 
 Verified after the Merge deletion: scripts/test.sh --no-e2e "All gates
 green"; dotnet build -f net48 0 errors.
+
+## Owner trace — typed payloads are one concept, prosecuted (2026-06-12)
+
+Owner question: SF component events vs custom typed events — same concept
+behind the doors, or duplicated? Traced at source, then prosecuted by a
+blind adversarial pass; refinements re-verified before recording.
+
+The chain, both doors identical:
+- C# authoring: builder overload (e.g. ElementBuilder.cs:61) →
+  ExpressionPathHelper.ToEventPath (lambda member chain → path) →
+  PayloadSource.Event() (PayloadScope: closed set of 7, PlanTerms.cs:361,
+  unknown scope throws) → ValueExpression.ReadPayload/ReadWholePayload —
+  the only factory family; twelve call sites, no second path.
+- Wire: { kind:"read", from:{kind:"payload",scope:"event"}, path, shape } —
+  byte-identical for both doors.
+- Runtime: ExecutionContext.event(payload) is the single slot; ALL of
+  document-event (trigger.ts:51), component-event (trigger.ts:70),
+  ServerPush (server-push.ts:84), SignalR (signalr.ts:119) land there, and
+  dispatch scope resolves to the same slot (execution-context.ts:57-59);
+  values/evaluate.ts is the one resolver.
+
+Prosecution verdict: C2 (one factory family), C4 (closed scope set), C5
+(PayloadContract deletion touched neither door) HOLD. Two corrections
+accepted and re-verified: C1 phrasing — the typed placeholder IS
+instantiated (TriggerBuilder.cs:55, new TPayload()) as authoring ceremony
+so the lambda binds; its state is never read — "never used" overstated.
+C3 scope — the unification is WIDER than claimed: realtime and dispatch
+payloads share the same slot; "two doors" is really four doors plus
+dispatch, one concept.
+
+## Retry-indicator rename episode — the counterexample on record (2026-06-12)
+
+The dataset.alisRetryWired key in retry-indicator.ts was renamed tonight by
+pattern-matching ("alis straggler beside data-reactive markers") without
+reading the file's decision history. Owner refuted it: the latch is part of
+the design settled in 1abb6c91 (DOM is the only registry — markers register
+drops; the dataset stamp registers "click already wired"; the global
+container ID stays the only element handle). Rename reverted; the file is
+byte-identical to the settled design plus the approved marker rename.
+Standing rule extracted to agent memory: dead code and renames go with
+evidence (reachability + decision history) plus an adversarial gate — a
+consistency itch is a deferred-family entry, never an inline edit. The
+alis-prefixed deferred family is listed in codebase-map-2026-06-12.md.
