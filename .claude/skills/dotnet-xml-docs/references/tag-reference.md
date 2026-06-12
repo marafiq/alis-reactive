@@ -52,7 +52,7 @@ Source: [Microsoft Learn — Recommended XML tags](https://learn.microsoft.com/e
 ### `<returns>`
 
 ```xml
-/// <returns>The serialized JSON plan ready for embedding in a <c>data-alis-plan</c> script element.</returns>
+/// <returns>The serialized JSON plan ready for embedding in a <c>data-reactive-plan</c> script element.</returns>
 ```
 
 - One per method with a return value. Do not add to void methods.

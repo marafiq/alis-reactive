@@ -29,7 +29,7 @@ never changes meaning because of them.
 ## Frozen in 1.0 (shipped with RC1 — context for the family)
 
 `<div id="alis-realtime-connection-retry-container" hidden>` in the layout. Visible while
-any live connection (SSE/SignalR) is down; one marker child (`data-alis-retry="<key>"`) per
+any live connection (SSE/SignalR) is down; one marker child (`data-reactive-retry="<key>"`) per
 dropped connection; one click retries everything down; only an actually restored connection
 removes its marker; hidden when none remain. Missing container at drop time: loud
 `container.missing` trace. The anchor problem (where does a page-level condition show?) was
@@ -93,7 +93,7 @@ means the *treatment* is defined once (CSS), not that placement is global. The b
 to kill is the three authored reactions per request (show + hide-on-success +
 hide-on-error), not the placement choice.
 
-**The default (zero DSL):** a request flips `data-alis-loading` on every plan-named update
+**The default (zero DSL):** a request flips `data-reactive-loading` on every plan-named update
 target at send and clears them on settle, in a `finally`. Plan-named means:
 - the `Into` target, and
 - the components/elements the success scope writes — a grid bound from a typed response
@@ -155,7 +155,7 @@ not difficulty.
    once or the vocabulary forks.
 2. The `StreamInto` / `Into` boundary (append-text vs inject-and-boot) as formal contract.
 3. Half-a-response semantics: error scope firing while partial content is already visible.
-4. Loading hand-off: `data-alis-loading` until first token, then a streaming state?
+4. Loading hand-off: `data-reactive-loading` until first token, then a streaming state?
 5. The chat compose loop (create bubble → stream into it → finalize): the bubble wants a
    cloned template — the THIRD appearance of the developer-owned cloneable template concept
    (retry content, loading treatment, message bubble). That convergence likely deserves one

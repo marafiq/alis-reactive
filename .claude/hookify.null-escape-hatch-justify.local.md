@@ -31,6 +31,6 @@ Properties where "null" is usually laziness:
 - Boolean optionals — `bool` with default false is fine
 - Conditions with else-cases — `Condition.None` (always-true) works
 
-**Why this rule exists:** In the `fix/null-design-smell` branch (2026-04-12), 14 new `[JsonIgnore(WhenWritingNull)]` attributes were added without per-property justification. The user's critique was that this LOOKED like adding tech debt even though the total count of null sites went down. The lesson: when removing null tech debt, every NEW null escape hatch must be PROVEN necessary, not mechanically added. See `feedback_null_escape_hatch_blindness.md`.
+**Why this rule exists:** In the `fix/null-design-smell` branch (2026-04-12), 14 new `[JsonIgnore(WhenWritingNull)]` attributes were added without per-property justification. The user's critique was that this LOOKED like adding tech debt even though the total count of null sites went down. The lesson: when removing null tech debt, every NEW null escape hatch must be PROVEN necessary, not mechanically added.
 
 This rule warns (not blocks) — you can still add the attribute, but you must commit a justification. A reviewer will check.
