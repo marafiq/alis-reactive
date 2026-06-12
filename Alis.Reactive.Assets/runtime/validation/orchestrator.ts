@@ -238,24 +238,6 @@ export function revalidateField(planDocument: PlanDocument, containerKey: string
   evaluateComponentRules(componentValidation, surface, container);
 }
 
-export function clearContainerValidation(planDocument: PlanDocument, containerKey: string): void {
-  const runtimePlan = RuntimePlan.from(planDocument);
-  const containerComponent = runtimePlan.components.find(containerKey);
-  const containerScope = containerComponent?.containerScope;
-  if (!containerComponent || !containerScope) return;
-
-  const containerId = containerComponent.id;
-  const summary = validationSummaryForPlan(planDocument.planId);
-  clearContainerErrors({
-    planDocument,
-    runtimePlan,
-    containerId,
-    containerScope,
-    summary,
-    context: ExecutionContext.absent(),
-  });
-}
-
 function evaluateComponentRules(
   componentValidation: ComponentValidation,
   surface: ValidationSurface,
