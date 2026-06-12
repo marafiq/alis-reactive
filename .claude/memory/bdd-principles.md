@@ -73,7 +73,7 @@ Sandbox pages must use framework primitives. Never work around the framework.
 - `Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))` -- never raw label/input combos
 
 Tests must also use the public DSL, not internal constructors. Arrange with `Html.On`,
-`CreatePlan()`, `Trigger()`, and builders. Never `new SequentialReaction(...)` or similar
+`CreatePlan()`, `Trigger()`, and builders. Never `new SequenceReaction(...)` or similar
 internal types. The test exercises the same code path as production.
 
 ## Nested Vertical Slices

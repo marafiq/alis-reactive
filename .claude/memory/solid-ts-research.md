@@ -217,7 +217,7 @@ Therefore: **cost(software) ~= coupling**
 ## Type Explosion — Not a Problem for Us
 - ~40 named types for plan executor with triggers, reactions, commands, guards, HTTP, validation = lean
 - TanStack Query: 60+ types for just data fetching. TypeScript compiler: hundreds
-- Our types map 1:1 to JSON plan primitives — correct design for schema-validated contract
+- Our types map 1:1 to JSON plan primitives — correct design for the generated plan contract
 - TS team warns about quadratic union comparison beyond ~12 members; our largest union is 5
 - Optional fields on existing interfaces handle variants correctly (no need for per-variant subtypes)
 - "Prefer duplication over the wrong abstraction" (Sandi Metz / Kent C. Dodds AHA)

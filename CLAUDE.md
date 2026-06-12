@@ -341,10 +341,10 @@ uncertainty.
 `?? fallback` must be PROVEN necessary by answering in writing: "Could this
 be a sentinel/empty/default instead? If yes, why am I taking the shortcut?
 If no, what domain meaning would `Empty`/`None` collide with?" Mechanical
-addition of null markers during a refactor is the failure pattern from
-`feedback_null_escape_hatch_blindness.md` — when removing tech debt, if the
-count of null markers on ANY surface goes UP, stop and audit each new marker
-for sentinel-replaceability before committing.
+addition of null markers during a refactor is a recorded failure pattern —
+when removing tech debt, if the count of null markers on ANY surface goes
+UP, stop and audit each new marker for sentinel-replaceability before
+committing.
 
 ### 7. Plan-Driven IDs — No DOM Scanning
 

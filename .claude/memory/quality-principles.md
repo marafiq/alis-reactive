@@ -9,7 +9,7 @@ type: reference
 This framework serves senior living communities. Residents depend on software built with it.
 The domain names the stakes, not the scope: this is a UI framework — do not reason about
 HIPAA, PHI, or healthcare compliance.
-Correctness over speed. Evidence over assumptions. Pragmatic excellence at every layer.
+Correctness over speed. Evidence over assumptions.
 
 ---
 
@@ -22,7 +22,7 @@ Before ANY code change from an audit finding, the issue MUST satisfy ALL nine cr
 | 1 | Describe the issue | Clear description of the problem |
 | 2 | Identify root cause | Not symptom — trace to the origin |
 | 3 | Cite evidence | Exact file:line, test output, commit hash |
-| 4 | Confirm no other layer handles it | C# DSL, schema, tests, views — the finding may be prevented elsewhere |
+| 4 | Confirm no other layer handles it | C# DSL, plan contract, tests, views — the finding may be prevented elsewhere |
 | 5 | Provide reproduction | Concrete scenario in browser or test. If NOT REPRODUCIBLE, not a real bug |
 | 6 | Propose fix with framework primitives | No hacks, no workarounds |
 | 7 | State tangible outcome | What does fixing bring? |
@@ -140,7 +140,7 @@ boundary -- it is never one flat flow.
 
 ### Layer 1: C# Descriptors and Builders
 
-- **Skills:** modern-csharp (TDD principles are in bdd-testing skill). XML docs enforced by `hookify.xml-docs-quality.local.md`.
+- **Skills:** modern-csharp (TDD principles are in bdd-testing skill). XML doc quality is reviewed manually (`hookify.xml-docs-quality.local.md` is a disabled template).
 - **Thinking:** Value Objects, Encapsulation, SOLID, impact on the generated TS plan contract
 - **Tests:** Prove DSL intent end-to-end through the Playwright suite (no C# unit/snapshot harness exists)
 - **Harness:** Playwright behavior + `npm run typecheck` (the generated `runtime/types/plan.ts` must match C#)
@@ -153,8 +153,9 @@ still compiles against it. JSON schema is retired — there is no `AssertSchemaV
 
 ### Boundary 2-3: Generated Contract to Runtime
 
-Same rigorous process. Schema change triggers thinking about TS type impact. Write failing
-vitest. Update types. Currently no automation validates TS types match schema (known gap).
+Same rigorous process. A plan-shape change triggers thinking about runtime impact. Write
+failing vitest. Update the handler. Generation at the front of `npm run typecheck` proves
+the contract matches the C# domain — drift is a typecheck failure, not an unguarded gap.
 
 ### Layer 3: TS Runtime
 

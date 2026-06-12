@@ -11,7 +11,7 @@ type: reference
 The public API surface does not change without explicit user approval and full downstream
 analysis. A single parameter rename cascaded across 170+ files in 6 commits.
 
-- A hookify rule blocks API surface edits at the tool level.
+- No live hook blocks API surface edits (hookify templates are disabled) — review manually.
 - Before any change: grep all call sites, read every affected file, present evidence.
 - `internal` to `public` is strictly forbidden. Internal members protect the surface deliberately.
 - Fusion HtmlExtension methods use the `Fusion` prefix (e.g., `.FusionDropDownList()`).
@@ -38,7 +38,7 @@ values propagate silently. A fallback is a rare, deliberate, justified exception
 - No silent fallbacks or default values for missing data — throw immediately.
 - No string matching on type names (`GetType().Name.Contains(...)`) — create proper interfaces.
 - No reflection hacks — use compile-time type safety.
-- No "backward compat" shims — if the schema changes, update all consumers.
+- No "backward compat" shims — if the contract changes, update all consumers.
 - No `// TODO` or `// FIXME` — fix it now or don't write it.
 - If a third-party library lacks the interface you need, write your own.
 - If it feels like a workaround, it IS a workaround — find the clean solution.
