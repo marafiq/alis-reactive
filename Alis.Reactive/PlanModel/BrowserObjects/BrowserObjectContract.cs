@@ -96,20 +96,15 @@ namespace Alis.Reactive.PlanModel
     {
         internal EventName Name { get; }
         internal EventName Channel { get; }
-        internal PayloadContract PayloadType { get; }
 
-        private ObjectEventContract(EventName name, EventName channel, PayloadContract payloadType)
+        private ObjectEventContract(EventName name, EventName channel)
         {
             Name = name ?? throw new System.ArgumentNullException(nameof(name));
             Channel = channel ?? throw new System.ArgumentNullException(nameof(channel));
-            PayloadType = payloadType ?? throw new System.ArgumentNullException(nameof(payloadType));
         }
 
-        internal static ObjectEventContract Create(EventName name, EventName channel, PayloadContract payloadType) =>
-            new ObjectEventContract(name, channel, payloadType);
-
         internal static ObjectEventContract ForComponentEvent(EventName eventName) =>
-            new ObjectEventContract(eventName, eventName, PayloadContract.Untyped);
+            new ObjectEventContract(eventName, eventName);
     }
 
     internal sealed class MethodSignature
@@ -393,19 +388,16 @@ namespace Alis.Reactive.PlanModel
     internal sealed class ObjectEvent
     {
         private readonly EventName _channel;
-        private readonly PayloadContract _payloadType;
 
         public string Channel => _channel.Value;
-        internal PayloadContract PayloadType => _payloadType;
 
-        private ObjectEvent(EventName channel, PayloadContract payloadType)
+        private ObjectEvent(EventName channel)
         {
             _channel = channel ?? throw new System.ArgumentNullException(nameof(channel));
-            _payloadType = payloadType ?? throw new System.ArgumentNullException(nameof(payloadType));
         }
 
         internal static ObjectEvent From(ObjectEventContract contract) =>
-            new ObjectEvent(contract.Channel, contract.PayloadType);
+            new ObjectEvent(contract.Channel);
 
         internal ObjectEvent Merge(ObjectEventContract incoming)
         {
@@ -413,11 +405,6 @@ namespace Alis.Reactive.PlanModel
                 throw new System.InvalidOperationException(
                     $"Event '{incoming.Name.Value}' registered with channel '{Channel}' " +
                     $"but re-registered with channel '{incoming.Channel.Value}'.");
-
-            if (!_payloadType.SameAs(incoming.PayloadType))
-                throw new System.InvalidOperationException(
-                    $"Event '{incoming.Name.Value}' registered with payload type '{_payloadType.DisplayName}' " +
-                    $"but re-registered with payload type '{incoming.PayloadType.DisplayName}'.");
 
             return this;
         }
