@@ -253,6 +253,7 @@ source and this root file override skill guidance that has drifted.
 | `onboard-fusion-component` | Onboard/audit Syncfusion components — artifact gate chain + fail-closed verifier |
 | `solid-ts-audit` | SOLID analysis of TypeScript runtime modules |
 | `modern-csharp` | C# 14 patterns that clarify the plan domain model |
+| `dotnet-xml-docs` | XML doc comments on the C# public surface — tags, formatting, Alis patterns |
 | `bdd-testing` | Playwright BDD tests — nested vertical slices, 5 rules, 7-behavior contract, blind reviewer |
 
 Two deterministic PreToolUse hooks are live in `.claude/settings.json`

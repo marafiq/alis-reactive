@@ -13,7 +13,7 @@ every boundary crossing. Per-layer skills:
 
 | Layer | Skills |
 |-------|--------|
-| 1 C# DSL & plan domain | `tdd`, `modern-csharp`, `dotnet-xml-docs` |
+| 1 C# DSL & plan domain | `modern-csharp`, `dotnet-xml-docs`, `bdd-testing` (TDD principles) |
 | 2 generated TS contract | none — `PlanContractGenerator` owns it; see `.claude/rules/plan-contract-boundary.md` |
 | 3 TS runtime executor | `solid-ts-audit` |
 | 4 browser verification | `bdd-testing` |

@@ -12,7 +12,7 @@ evidence contract that prevents false alarms, wasted effort, and architecture re
 
 | Layer | Skills to Load | Test Command | Evidence Format |
 |-------|---------------|--------------|-----------------|
-| 1 C# | modern-csharp, bdd-testing (TDD principles) | `scripts/playwright.sh` | Playwright behavior + file:line |
+| 1 C# | modern-csharp, dotnet-xml-docs, bdd-testing (TDD principles) | `scripts/playwright.sh` | Playwright behavior + file:line |
 | 2 Contract | PlanContractGenerator output | `npm run typecheck` | regenerated `plan.ts` matches C# |
 | 3 TS | solid-ts-audit | `npm test` | vitest output + file:line |
 | 4 Browser | bdd-testing | Playwright tests | Browser state + test name |
