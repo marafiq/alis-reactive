@@ -104,6 +104,56 @@ ValueExpression/ConditionGraph/ReactionGraph factories, compare operators).
 - `PayloadSource.Request()` also got its owner-confirmed story as an XML doc
   while recording local's, so the next auditor reads it at the factory.
 
+## Full-gate verdict (2026-06-12, after the three deletions)
+
+scripts/test.sh on the cumulative tree: Playwright "Passed: 1219", zero
+Failed in captured output. Playwright is the final stage, so all earlier
+stages (typecheck, build:all, vitest, dotnet build, non-Playwright tests)
+completed to reach it; typecheck/vitest 200/200/dotnet build 0-0 were also
+run first-hand per commit. Captured artifact holds the run's tail (the
+invocation piped through tail -100); the diag/TRX artifacts live under
+tests/Alis.Reactive.PlaywrightTests/TestResults/.
+
+## Fresh-eyes re-audit of last night's deletion commits (same day, later)
+
+Each deletion re-verified in the CURRENT tree, not from commit messages:
+
+1. 1935b34b PayloadContract machinery — zero survivors: grep for
+   PayloadContract|PayloadType|PayloadTypeName|payloadType returns NOTHING
+   in C# or TS, production or tests. No orphaned wire term (PayloadTypeName
+   went with it). Deleted guard (channel re-registered with different
+   payload type) became unrepresentable once typing left: same-name
+   registrations are now necessarily identical.
+2. 1e7a0be3 Merge/channel check — provably unreachable in current tree:
+   ObjectEventContract's ctor is private and its only factory
+   ForComponentEvent(eventName) sets channel ≡ name (single creation site
+   BehaviorGraph.cs:29), so a same-name/different-channel re-registration
+   cannot be constructed. First-wins replacement is semantically identical
+   to the old Merge-returns-existing.
+3. 36c5c1e5 payload contracts off the wire — zero TS readers of
+   payloadType/"untyped"/"named" vocabulary anywhere in runtime incl.
+   tests; contract regenerated many times since, typecheck green; vitest
+   200/200 + Playwright 1219 green on the post-state.
+4. 2fc271f1 retry marker rename — old data-alis-retry: zero source hits;
+   new data-reactive-retry confined to retry-indicator.ts + its test
+   (self-stamped cleanup invariant intact).
+5. 2b54be9e onclick → DSL dispatch — zero inline onclick remain in ANY
+   sandbox view; behavior pinned by reset_all_button_clears_both_vendors
+   and reset_then_interact_proves_components_still_reactive_after_reset
+   (WhenComponentEventsFireCrossVendor.cs:72,:115), inside the green 1219.
+6. 541d20d8/06eca370 literal scrubs — zero stale payload-type literals in
+   vitest fixtures (same grep as #3). Docs scrubs not re-checked
+   line-by-line (no behavior at stake).
+
+Honest bounds: #3's "the runtime never read it historically" rests on last
+night's root-cause doc plus the absence of any reader today plus green
+suites on the post-state — not on a re-read of pre-deletion runtime
+history. #5 rests on the named Playwright tests, not on eyes-in-browser
+this session. #1/#2 deliberately removed a *potential* authoring-time
+guard; with typing and channel divergence unrepresentable, the guard had
+nothing left to fire on — that ruling was prosecuted and recorded last
+night, not re-litigated here.
+
 ## Ranked list — dead at >=99%, adversary-signed (as presented for ruling)
 
 1. **`Alis.Reactive.Assets/runtime/shared/wire-format.ts`** (whole module).
