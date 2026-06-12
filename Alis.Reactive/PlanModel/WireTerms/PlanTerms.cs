@@ -367,7 +367,6 @@ namespace Alis.Reactive.PlanModel
                 { "success", new PayloadScope("success") },
                 { "error", new PayloadScope("error") },
                 { "request", new PayloadScope("request") },
-                { "dispatch", new PayloadScope("dispatch") },
                 { "local", new PayloadScope("local") },
                 { "element", new PayloadScope("element") },
             };
@@ -378,7 +377,6 @@ namespace Alis.Reactive.PlanModel
         internal static PayloadScope Success => Known["success"];
         internal static PayloadScope Error => Known["error"];
         internal static PayloadScope Request => Known["request"];
-        internal static PayloadScope Dispatch => Known["dispatch"];
         internal static PayloadScope Local => Known["local"];
         internal static PayloadScope Element => Known["element"];
         internal static IReadOnlyCollection<string> Values => Known.Keys;

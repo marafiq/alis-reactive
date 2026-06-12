@@ -70,8 +70,6 @@ namespace Alis.Reactive.PlanModel
 
         internal static PayloadSource Request() => new PayloadSource(PayloadScope.Request);
 
-        internal static PayloadSource Dispatch() => new PayloadSource(PayloadScope.Dispatch);
-
         internal static PayloadSource Local() => new PayloadSource(PayloadScope.Local);
 
         /// <summary>Current array element under an array operation (top of the element scope stack).</summary>

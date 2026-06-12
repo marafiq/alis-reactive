@@ -388,7 +388,6 @@ export type PayloadScope =
   | "success"
   | "error"
   | "request"
-  | "dispatch"
   | "local"
   | "element";
 

@@ -56,7 +56,6 @@ export class ExecutionContext {
     const values = this.requireValues(source);
     switch (source.scope) {
       case "event":
-      case "dispatch":
         return values.event;
       case "success":
       case "error":
