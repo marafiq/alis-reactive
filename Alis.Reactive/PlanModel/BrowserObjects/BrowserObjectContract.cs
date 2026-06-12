@@ -396,7 +396,7 @@ namespace Alis.Reactive.PlanModel
         private readonly PayloadContract _payloadType;
 
         public string Channel => _channel.Value;
-        public PayloadContract PayloadType => _payloadType;
+        internal PayloadContract PayloadType => _payloadType;
 
         private ObjectEvent(EventName channel, PayloadContract payloadType)
         {

@@ -22,7 +22,7 @@ namespace Alis.Reactive.Builders.Conditions
         internal static PayloadTypedSource<TPayload, TProp> FromEvent(
             Expression<Func<TPayload, TProp>> expression) =>
             new PayloadTypedSource<TPayload, TProp>(
-                PayloadSource.Event(PayloadContract.ForPayload(typeof(TPayload))),
+                PayloadSource.Event(),
                 expression);
 
         internal override ValueExpression ToValueExpression()

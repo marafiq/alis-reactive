@@ -55,8 +55,7 @@ namespace Alis.Reactive.Builders
         {
             AddStep(ReactionGraph.Dispatch(
                 eventName,
-                ValueExpression.LiteralRaw(payload, Shape.FromClrType(typeof(TPayload))),
-                PayloadContract.ForPayload(typeof(TPayload))));
+                ValueExpression.LiteralRaw(payload, Shape.FromClrType(typeof(TPayload)))));
             return this;
         }
 
@@ -79,10 +78,7 @@ namespace Alis.Reactive.Builders
         {
             var builder = new DispatchPayloadBuilder<TPayload, TModel>();
             configure(builder);
-            AddStep(ReactionGraph.Dispatch(
-                eventName,
-                builder.Build(),
-                PayloadContract.ForPayload(typeof(TPayload))));
+            AddStep(ReactionGraph.Dispatch(eventName, builder.Build()));
             return this;
         }
 

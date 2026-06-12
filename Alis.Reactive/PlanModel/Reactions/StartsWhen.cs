@@ -10,11 +10,9 @@ namespace Alis.Reactive.PlanModel
         private protected StartsWhen() { }
 
         internal static StartsWhen PageReady() => new PageReadyTrigger();
-        internal static StartsWhen DocumentEvent(string eventName) =>
-            new DocumentEventTrigger(eventName, PayloadContract.Untyped);
 
-        internal static StartsWhen DocumentEvent(string eventName, PayloadContract payloadType) =>
-            new DocumentEventTrigger(eventName, payloadType);
+        internal static StartsWhen DocumentEvent(string eventName) =>
+            new DocumentEventTrigger(eventName);
 
         internal static StartsWhen ComponentEvent(string component, string eventName) => new ComponentEventTrigger(component, eventName);
 
@@ -24,14 +22,8 @@ namespace Alis.Reactive.PlanModel
         internal static StartsWhen ServerPush(string url, string eventName) =>
             new ServerPushTrigger(url, ServerPushEventFilter.NamedEvent(eventName));
 
-        internal static StartsWhen ServerPush(string url, string eventName, PayloadContract payloadType) =>
-            new ServerPushTrigger(url, ServerPushEventFilter.NamedEvent(eventName, payloadType));
-
         internal static StartsWhen SignalR(string hubUrl, string method) =>
-            new SignalRTrigger(hubUrl, method, PayloadContract.Untyped);
-
-        internal static StartsWhen SignalR(string hubUrl, string method, PayloadContract payloadType) =>
-            new SignalRTrigger(hubUrl, method, payloadType);
+            new SignalRTrigger(hubUrl, method);
     }
 
     internal sealed class PageReadyTrigger : StartsWhen
@@ -42,16 +34,13 @@ namespace Alis.Reactive.PlanModel
     internal sealed class DocumentEventTrigger : StartsWhen
     {
         private readonly EventName _event;
-        private readonly PayloadContract _payloadType;
 
         public string Kind => "document-event";
         public string Event => _event.Value;
-        public PayloadContract PayloadType => _payloadType;
 
-        internal DocumentEventTrigger(string eventName, PayloadContract payloadType)
+        internal DocumentEventTrigger(string eventName)
         {
             _event = EventName.Of(eventName);
-            _payloadType = payloadType ?? throw new ArgumentNullException(nameof(payloadType));
         }
     }
 
@@ -93,47 +82,35 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly RequestUrl _hubUrl;
         private readonly MemberName _method;
-        private readonly PayloadContract _payloadType;
 
         public string Kind => "signalr";
         public string HubUrl => _hubUrl.Value;
         public string Method => _method.Value;
-        public PayloadContract PayloadType => _payloadType;
 
-        internal SignalRTrigger(string hubUrl, string method, PayloadContract payloadType)
+        internal SignalRTrigger(string hubUrl, string method)
         {
             _hubUrl = RequestUrl.Of(hubUrl);
             _method = MemberName.Of(method);
-            _payloadType = payloadType ?? throw new ArgumentNullException(nameof(payloadType));
         }
     }
 
     [JsonConverter(typeof(PlanNodeDiscriminator<ServerPushEventFilter>))]
     public abstract class ServerPushEventFilter
     {
-        private protected ServerPushEventFilter(PayloadContract payloadType)
-        {
-            _payloadType = payloadType ?? throw new ArgumentNullException(nameof(payloadType));
-        }
-
-        private readonly PayloadContract _payloadType;
+        private protected ServerPushEventFilter() { }
 
         public abstract string Kind { get; }
-        public PayloadContract PayloadType => _payloadType;
 
         internal static ServerPushEventFilter AnyEvent() =>
-            new AnyServerPushEvent(PayloadContract.Untyped);
+            new AnyServerPushEvent();
 
         internal static ServerPushEventFilter NamedEvent(string eventName) =>
-            new NamedServerPushEvent(eventName, PayloadContract.Untyped);
-
-        internal static ServerPushEventFilter NamedEvent(string eventName, PayloadContract payloadType) =>
-            new NamedServerPushEvent(eventName, payloadType);
+            new NamedServerPushEvent(eventName);
     }
 
     internal sealed class AnyServerPushEvent : ServerPushEventFilter
     {
-        internal AnyServerPushEvent(PayloadContract payloadType) : base(payloadType) { }
+        internal AnyServerPushEvent() { }
 
         public override string Kind => "any";
     }
@@ -142,7 +119,7 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly EventName _event;
 
-        internal NamedServerPushEvent(string eventName, PayloadContract payloadType) : base(payloadType)
+        internal NamedServerPushEvent(string eventName)
         {
             _event = EventName.Of(eventName);
         }

@@ -53,9 +53,7 @@ namespace Alis.Reactive.Builders
         {
             var reactionPipeline = new PipelineBuilder<TModel>(_context);
             pipeline(new TPayload(), reactionPipeline);
-            AddBehavior(
-                StartsWhen.DocumentEvent(eventName, PayloadContract.ForPayload(typeof(TPayload))),
-                reactionPipeline);
+            AddBehavior(StartsWhen.DocumentEvent(eventName), reactionPipeline);
             return this;
         }
 
@@ -93,9 +91,7 @@ namespace Alis.Reactive.Builders
         {
             var reactionPipeline = new PipelineBuilder<TModel>(_context);
             pipeline(new TPayload(), reactionPipeline);
-            AddBehavior(
-                StartsWhen.ServerPush(url, eventType, PayloadContract.ForPayload(typeof(TPayload))),
-                reactionPipeline);
+            AddBehavior(StartsWhen.ServerPush(url, eventType), reactionPipeline);
             return this;
         }
 
@@ -123,9 +119,7 @@ namespace Alis.Reactive.Builders
         {
             var reactionPipeline = new PipelineBuilder<TModel>(_context);
             pipeline(new TPayload(), reactionPipeline);
-            AddBehavior(
-                StartsWhen.SignalR(hubUrl, methodName, PayloadContract.ForPayload(typeof(TPayload))),
-                reactionPipeline);
+            AddBehavior(StartsWhen.SignalR(hubUrl, methodName), reactionPipeline);
             return this;
         }
 

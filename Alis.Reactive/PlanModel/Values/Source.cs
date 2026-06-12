@@ -46,55 +46,36 @@ namespace Alis.Reactive.PlanModel
     public sealed class PayloadSource : Source
     {
         private readonly PayloadScope _scope;
-        private readonly PayloadContract _type;
 
         /// <summary>JSON discriminator for payload sources. Always <c>"payload"</c>.</summary>
         public string Kind => "payload";
         /// <summary>Payload scope wire term, for example event or success.</summary>
         public string Scope => _scope.Value;
-        /// <summary>Payload typing contract used when authoring typed value paths.</summary>
-        public PayloadContract Type => _type;
 
         internal PayloadSource(string scope)
-            : this(PayloadScope.From(scope), PayloadContract.Untyped)
+            : this(PayloadScope.From(scope))
         {
         }
 
-        internal PayloadSource(string scope, string type)
-            : this(PayloadScope.From(scope), PayloadContract.Named(type))
-        {
-        }
-
-        private PayloadSource(PayloadScope scope, PayloadContract type)
+        private PayloadSource(PayloadScope scope)
         {
             _scope = scope ?? throw new ArgumentNullException(nameof(scope));
-            _type = type ?? throw new ArgumentNullException(nameof(type));
         }
 
-        internal static PayloadSource Event() => new PayloadSource(PayloadScope.Event, PayloadContract.Untyped);
-        internal static PayloadSource Event(PayloadContract type) => new PayloadSource(PayloadScope.Event, type);
-        internal static PayloadSource Event(string type) => Event(PayloadContract.Named(type));
+        internal static PayloadSource Event() => new PayloadSource(PayloadScope.Event);
 
-        internal static PayloadSource Success() => new PayloadSource(PayloadScope.Success, PayloadContract.Untyped);
-        internal static PayloadSource Success(PayloadContract type) => new PayloadSource(PayloadScope.Success, type);
-        internal static PayloadSource Success(string type) => Success(PayloadContract.Named(type));
+        internal static PayloadSource Success() => new PayloadSource(PayloadScope.Success);
 
-        internal static PayloadSource Error() => new PayloadSource(PayloadScope.Error, PayloadContract.Untyped);
-        internal static PayloadSource Error(PayloadContract type) => new PayloadSource(PayloadScope.Error, type);
-        internal static PayloadSource Error(string type) => Error(PayloadContract.Named(type));
+        internal static PayloadSource Error() => new PayloadSource(PayloadScope.Error);
 
-        internal static PayloadSource Request() => new PayloadSource(PayloadScope.Request, PayloadContract.Untyped);
-        internal static PayloadSource Request(PayloadContract type) => new PayloadSource(PayloadScope.Request, type);
-        internal static PayloadSource Request(string type) => Request(PayloadContract.Named(type));
+        internal static PayloadSource Request() => new PayloadSource(PayloadScope.Request);
 
-        internal static PayloadSource Dispatch() => new PayloadSource(PayloadScope.Dispatch, PayloadContract.Untyped);
-        internal static PayloadSource Dispatch(PayloadContract type) => new PayloadSource(PayloadScope.Dispatch, type);
-        internal static PayloadSource Dispatch(string type) => Dispatch(PayloadContract.Named(type));
+        internal static PayloadSource Dispatch() => new PayloadSource(PayloadScope.Dispatch);
 
-        internal static PayloadSource Local() => new PayloadSource(PayloadScope.Local, PayloadContract.Untyped);
+        internal static PayloadSource Local() => new PayloadSource(PayloadScope.Local);
 
         /// <summary>Current array element under an array operation (top of the element scope stack).</summary>
-        internal static PayloadSource Element() => new PayloadSource(PayloadScope.Element, PayloadContract.Untyped);
+        internal static PayloadSource Element() => new PayloadSource(PayloadScope.Element);
     }
 
     /// <summary>Identifies a plan-registered plugin object as the value source.</summary>

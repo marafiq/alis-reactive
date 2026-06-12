@@ -386,5 +386,20 @@ invited by the contract's shape.
 3. Runtime checks the contract — rejected: plan validation for
    framework-generated plans (Rule 6).
 
-The fact that kills option 1 unless someone wants it: no diagnostic
-consumes the type name today. Decision owner: Layer 1 session.
+**RESOLVED 2026-06-11 — option 2 executed, debt paid, not patched.**
+No `[JsonIgnore]`: the concept left the wire layer structurally.
+`PayloadContract` is now `internal`, lives in
+`PlanModel/BrowserObjects/PayloadContract.cs`, and keeps its one job — the
+`SameAs` channel-agreement check. Triggers (`DocumentEventTrigger`,
+`SignalRTrigger`, `ServerPushEventFilter`), `PayloadSource`, and
+`DispatchPayload` no longer carry it; their dead factory overloads were
+deleted with it. The generator dropped the union and all six field sites;
+the runtime's carrier field (`component-event-contract.ts`) is deleted.
+The type-name leak closes.
+
+Proof: `dotnet build` clean; regenerated `plan.ts` with zero
+`PayloadContract`/`payloadType`/`"typed"`/`"untyped"` occurrences;
+`npm run typecheck` exit 0; vitest 30 files 200/200; focused Playwright
+over every changed wire node — realtime ServerPush + SignalR, typed
+custom-event payloads, typed dispatch, typed response bodies — 80/80,
+exit 0.

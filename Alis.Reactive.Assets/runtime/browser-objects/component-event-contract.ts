@@ -1,10 +1,8 @@
-import type { Event as PlanEvent } from "../types/index";
 import type { RuntimeComponent } from "./runtime-plan";
 
 export interface ComponentEventChannel {
   readonly eventName: string;
   readonly channel: string;
-  readonly payloadType: PlanEvent["payloadType"];
 }
 
 export function componentEventChannel(component: RuntimeComponent, eventName: string): ComponentEventChannel {
@@ -12,6 +10,5 @@ export function componentEventChannel(component: RuntimeComponent, eventName: st
   return {
     eventName,
     channel: declaredEvent.channel,
-    payloadType: declaredEvent.payloadType,
   };
 }

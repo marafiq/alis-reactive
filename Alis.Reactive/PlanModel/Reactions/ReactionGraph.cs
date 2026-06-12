@@ -36,10 +36,7 @@ namespace Alis.Reactive.PlanModel
             new DispatchReaction(eventName, DispatchPayload.None);
 
         internal static ReactionGraph Dispatch(string eventName, ValueExpression data) =>
-            new DispatchReaction(eventName, DispatchPayload.Untyped(data));
-
-        internal static ReactionGraph Dispatch(string eventName, ValueExpression data, PayloadContract payloadType) =>
-            new DispatchReaction(eventName, DispatchPayload.Typed(data, payloadType));
+            new DispatchReaction(eventName, DispatchPayload.Of(data));
 
         internal static ReactionGraph Inject(string slot, ValueExpression value) =>
             new InjectReaction(slot, value);
@@ -367,11 +364,8 @@ namespace Alis.Reactive.PlanModel
 
         internal abstract void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options);
 
-        internal static DispatchPayload Untyped(ValueExpression data) =>
-            new PresentDispatchPayload(data, PayloadContract.Untyped);
-
-        internal static DispatchPayload Typed(ValueExpression data, PayloadContract payloadType) =>
-            new PresentDispatchPayload(data, payloadType);
+        internal static DispatchPayload Of(ValueExpression data) =>
+            new PresentDispatchPayload(data);
     }
 
     internal sealed class NoDispatchPayload : DispatchPayload
@@ -386,12 +380,10 @@ namespace Alis.Reactive.PlanModel
     internal sealed class PresentDispatchPayload : DispatchPayload
     {
         private readonly ValueExpression _data;
-        private readonly PayloadContract _payloadType;
 
-        internal PresentDispatchPayload(ValueExpression data, PayloadContract payloadType)
+        internal PresentDispatchPayload(ValueExpression data)
         {
             _data = data;
-            _payloadType = payloadType;
         }
 
         public override string Kind => "value";
@@ -399,7 +391,6 @@ namespace Alis.Reactive.PlanModel
         internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options)
         {
             PlanJsonWriter.WriteProperty(writer, options, "data", _data);
-            PlanJsonWriter.WriteProperty(writer, options, "payloadType", _payloadType);
         }
     }
 
