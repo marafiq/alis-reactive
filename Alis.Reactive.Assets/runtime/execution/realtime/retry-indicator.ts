@@ -10,7 +10,7 @@ import { scope } from "../../diagnostics/trace";
 const log = scope("retry-indicator");
 
 const RETRY_ELEMENT_ID = "alis-realtime-connection-retry-container";
-const RETRY_ATTR = "data-alis-retry";
+const RETRY_ATTR = "data-reactive-retry";
 const RETRY_EVENT = "alis:retry";
 
 export function showRetryIndicator(connectionKey: string, onRetry: () => void): void {

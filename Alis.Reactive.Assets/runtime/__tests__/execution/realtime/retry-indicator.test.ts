@@ -22,7 +22,7 @@ describe("retry indicator", () => {
   it("does not invoke the behavior when the container is missing", () => {
     showRetryIndicator("/hubs/a", () => {});
 
-    expect(document.querySelector("[data-alis-retry]")).toBeNull();
+    expect(document.querySelector("[data-reactive-retry]")).toBeNull();
   });
 
   it("becomes visible when a live connection drops", () => {
@@ -40,7 +40,7 @@ describe("retry indicator", () => {
     showRetryIndicator("/api/b", () => {});
 
     expect(container.hidden).toBe(false);
-    expect(container.querySelectorAll("[data-alis-retry]")).toHaveLength(2);
+    expect(container.querySelectorAll("[data-reactive-retry]")).toHaveLength(2);
   });
 
   it("one click retries every dropped connection", () => {
