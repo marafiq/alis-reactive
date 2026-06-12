@@ -43,7 +43,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Identifies an execution payload scope, such as event data or an HTTP response body.</summary>
-    public sealed class PayloadSource : Source
+    internal sealed class PayloadSource : Source
     {
         private readonly PayloadScope _scope;
 
