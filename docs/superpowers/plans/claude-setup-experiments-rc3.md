@@ -662,3 +662,42 @@ excluded by direction.
   delete the vestigial machinery (canon: a type mapping to no DSL graph
   node is deleted — recommended) or keep as the seam for future typed
   component-event declarations.
+
+## Closure round — the survivors die, the gate closes (2026-06-12)
+
+Owner directive: stop iterating on dead-shape survivors; delete what
+confuses and close the hole that lets it survive.
+
+- `__tests__` typecheck gate FLIPPED (the deferral above is closed).
+  `tsconfig.json` is now the pure browser project (`types: []`, tests
+  excluded); new `tsconfig.tests.json` extends it with `@types/node`
+  (pinned 22.19.21, matching CI Node 22) and ES2021 lib; `npm run
+  typecheck` runs both. The measured 103 errors burned to zero: 72
+  undefined-narrowing sites under `noUncheckedIndexedAccess`, 10
+  implicit-any params cascading from a missing `ComponentObject` import,
+  7 fetch-mock tuple casts replaced by typed mock signatures, and the
+  real stale shapes the gate exists for — five component reads carrying
+  structured paths where the contract says `EmptyPath`, and the
+  plan-lifecycle fixture emitting `value: { kind: "none" }` where
+  `ComponentValidation.value` is a `ValueExpression` (rewritten to the
+  component property read `ClientValidationFieldBinding.ReadValue()`
+  actually emits). File literals in gather form-data tests are named
+  fabrications now (one commented cast in `runtimeLiteral`).
+- The pending `SameAs` decision is RESOLVED: deleted. Re-verified zero
+  callers of `ObjectEventContract.Create` / `PayloadContract.Named` /
+  `ForPayload`; `PayloadContract.cs` is deleted outright,
+  `ObjectEventContract` carries name + channel only, and
+  `ObjectEvent.Merge` keeps the one live check (channel agreement). The
+  internal class the debt commit left behind no longer exists.
+- Family-rename stragglers fixed from full-output sweeps (no `head`
+  truncation): `dsl-roadmap.md` now says `data-reactive-retry` /
+  `data-reactive-loading`; the promoted dotnet-xml-docs reference taught
+  `data-alis-plan` for the discovery attribute — corrected to
+  `data-reactive-plan` (read from `root.ts:57`); the dangling
+  `feedback_null_escape_hatch_blindness.md` reference in the hookify
+  template dropped. `data-alis-booted` remains the one defended deferral
+  (own slice, own full-gate run).
+
+Verified: scripts/test.sh --no-e2e "All gates green" — typecheck with
+tests included exit 0, zero plan.ts drift, vitest 200/200,
+dotnet build 0 warnings 0 errors, ArchitectureTests 2/2.
