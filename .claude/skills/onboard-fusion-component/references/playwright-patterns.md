@@ -25,9 +25,9 @@ await physician.TypeAndSelect("smi", "Dr. Smith");
 
 ## Test File Structure
 
-Reference: `tests/Alis.Reactive.PlaywrightTests/Components/Fusion/WhenAutoCompleteFiltersRemotely.cs`
+Reference: `tests/Alis.Reactive.PlaywrightTests/Components/Fusion/AutoComplete/WhenAutoCompleteFiltersRemotely.cs`
 
-Test file goes in `tests/Alis.Reactive.PlaywrightTests/Components/Fusion/When{BehaviorHappens}.cs` (e.g., `WhenAutoCompleteSuggests.cs`). Name describes the behavior under test, not the component.
+Test file goes in `tests/Alis.Reactive.PlaywrightTests/Components/Fusion/{Component}/When{BehaviorHappens}.cs` (e.g., `WhenAutoCompleteSuggests.cs`). Name describes the behavior under test, not the component.
 
 ```csharp
 [TestFixture]

@@ -110,7 +110,7 @@ ACTION :=
   | .SetText(payload, x => x.Prop)                     -- event/response phantom
   | .SetText(responseBody, x => x.Prop)                -- typed HTTP response
 
-  -- Text (→ ElementBuilder — supports per-command When)
+  -- Text (→ ElementBuilder)
   | .SetText(bindSource)
   | .SetText(typedSource)                              -- comp.Value()
 
@@ -128,7 +128,6 @@ ACTION :=
 ```
 
 **Return type matters.** `→ PipelineBuilder` chains to next command.
-`→ ElementBuilder` supports `.When()` per-command guard (see conditions-dsl).
 
 ## Component Actions
 

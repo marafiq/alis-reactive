@@ -47,8 +47,10 @@ glob away.
 
 A component with many use cases fans out into many journeys, each a full
 slice. Grid carries about thirty — Billing, CareOps, Directory,
-PrintableRoster — thirty views, thirty fixtures, per-journey models. Never
-one view or one fixture for everything.
+PrintableRoster — thirty views, thirty fixtures. Billing and CareOps own
+their model files and controller partials; the older Grid journeys share
+`GridModel.cs` and predate the full pattern — they migrate as touched.
+Never one view or one fixture for everything.
 
 - The model belongs to the journey and speaks domain language: residents,
   care levels, wings, monthly rates. Similar shapes across journeys stay

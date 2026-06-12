@@ -484,8 +484,8 @@ mapped, named, implemented, and linked to the proof matrix.
 - `Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionExtensions.cs` - two-arg component method call.
 - `Alis.Reactive.Fusion/Components/FusionTooltip/` - non-input display component slice.
 - `Alis.Reactive.Fusion/Components/FusionAutoComplete/` - input component with filtering event behavior.
-- `Alis.Reactive/ComponentRef.cs` - `EmitSet`, `EmitCall`, and `Read<T>` domain entry points.
-- `Alis.Reactive.Assets/runtime/domain/runtime-object.ts` - vendor-neutral property/method execution.
+- `Alis.Reactive/Components/Contracts/ComponentRef.cs` - `EmitSet`, `EmitCall`, and `Read<T>` domain entry points.
+- `Alis.Reactive.Assets/runtime/browser-objects/runtime-object.ts` - vendor-neutral property/method execution.
 - `scripts/inspect-syncfusion-surface.mjs` - extracts JS surface plus MVC builder coverage.
 - `scripts/inspect-syncfusion-blazor-metadata.mjs` - extracts Blazor typed metadata and ILSpy bridge clues from a local NuGet package.
 - `scripts/inspect-syncfusion-event-payload.mjs` - extracts event payload properties/methods from Syncfusion d.ts files.

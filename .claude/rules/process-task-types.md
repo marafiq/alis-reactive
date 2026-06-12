@@ -30,7 +30,7 @@ The harness for each layer applies automatically.
 ## View Writing (Layers 1, 4)
 
 **Layer 1:** Confirm model, fields, component per field. Validator scope = form scope
-(create before the view). Nested properties use `SetValidator()`. End with `@Html.RenderPlan(plan)`.
+(create before the view). Nested properties use `ClientRule(x => x.Child, new ChildValidator())`. End with `@Html.RenderPlan(plan)`.
 All inputs through `Html.InputField()`.
 
 **Layer 4:** Open browser, fill form, submit — verify with own eyes. Then write Playwright.

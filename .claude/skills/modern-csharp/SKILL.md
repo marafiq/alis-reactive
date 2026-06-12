@@ -5,6 +5,15 @@ description: Write modern, high-performance C# code using records, pattern match
 
 # Modern C# Coding Standards
 
+## Repo Override — Plan Domain
+
+In `Alis.Reactive/PlanModel/` and the plan authoring surface, root `CLAUDE.md`
+Rules 3 and 8 override this skill: plan model classes are `sealed class` with
+`internal` constructors and `internal set` properties — never records, never
+public constructors, never `readonly record struct`. The record and
+primary-constructor guidance below applies to general C# (sandbox models,
+tests, tools), not to the plan domain.
+
 ## When to Use This Skill
 
 Use this skill when:
