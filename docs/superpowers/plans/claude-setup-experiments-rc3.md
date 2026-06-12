@@ -439,3 +439,226 @@ direct greps, every finding re-verified at source before acceptance):**
   authoring-time behavior was lost.
 - Claim-precision accepted: the original "every changed wire node" was
   wider than the focused 80 covered — amended above to the exact list.
+
+## Adversarial rounds — Codex, disposition (2026-06-11)
+
+Codex doc review: six findings, all verified real at source, all fixed.
+
+1. Schema-era memory survived every drift pass: vision ("the schema is the
+   soul") and quality-principles ("no automation validates TS types match
+   schema") rewritten to generated-contract truth. The follow-up
+   concept-sweep found three more live schema lines (coding-principles
+   shims rule, quality-principles criterion 4, solid-ts-research) — fixed;
+   the forensic index M23 entry stays, it is a historical record.
+2. PlaygroundSyntax carried the sandbox's only inline-JS violation
+   (`onclick` dispatch) — replaced with `Html.NativeButton(...).Reactive`
+   dispatching through the plan; proven by
+   `reset_all_button_clears_both_vendors` and 24 sibling tests, 25/25.
+   Repo-wide sweep: zero manual JS remains in sandbox views.
+3. Fifteen stale `type:`/`payloadType:` literals in `__tests__` — stripped,
+   vitest 200/200. Root cause sized: `tsconfig.json` excludes `__tests__`
+   from typecheck; including it today produces 103 errors (measured, then
+   reverted). Work item: burn down, then flip the gate.
+4. Grid exemplar overclaim — "per-journey models" is true for Billing and
+   CareOps only; the rest share `GridModel.cs`. Skill corrected; older Grid
+   journeys migrate as touched.
+5. Dangling `feedback_null_escape_hatch_blindness.md` reference in Rule 6 —
+   filename dropped, lesson kept inline.
+6. `dotnet-xml-docs` referenced by three rules files but only user-level —
+   migrated into `.claude/skills/`. Caught by the user: the copy was
+   adopted unread and taught dead vocabulary (`entries` array, `AddEntry`,
+   `Trigger`/`Reaction` — zero code occurrences). Its three Alis examples
+   rewritten to verified vocabulary (`behaviors`, `StartsWhen` →
+   `ReactionGraph`, `TriggerBuilder.CustomEvent`); root skills table row
+   added.
+
+Codex debt review: four findings. #1 public-API delta — independent
+confirmation of the already-recorded decision. #2 stale test shapes plus
+typecheck blindness — instances fixed, root sized at 103 errors. #3 docs
+teaching the removed surface — docs-site already fixed; one NEW catch, the
+onboarding primitive-map's `Dispatch("evt", value[, payloadType])`, fixed;
+missed earlier because the sweep grep was piped through `head -10` and the
+truncated list was treated as complete. #4 proof overstatement — already
+amended. Codex confirmed independently: no lost invariants (it traced
+`BehaviorGraph` → `ForComponentEvent` → `Merge`), no hidden runtime change.
+
+Why the misses happened (named for reuse): token-scoped scrubs, layer-scoped
+proofs, assumed gates that do not exist, memory files outside every scrub
+boundary, fix-momentum adoption of unread content, truncated evidence
+treated as complete.
+
+## Round 2 — blind auditors over the miss territories (2026-06-11)
+
+Three fresh Explore auditors over full memory bodies, docs-site claims, and
+skill examples; every finding re-verified at source before disposition.
+
+- Docs-site auditor: 44 files enumerated, zero refutations — wire shapes,
+  builder signatures, paths, validation rules, and operators all match code.
+  One vestige it passed over: the filename `plan-and-entries.md` (content is
+  clean, "entries" survives only in the slug and two inbound links) —
+  cosmetic rename work item.
+- Skills auditor, two findings, both verified true and fixed:
+  `conditions-dsl` taught that `ResponseBody<T>` is not a `When` source —
+  refuted by `ConditionStart.cs:33` (public overload, plus `And`/`Or`
+  composition); rewritten with the supported truth. `validation-rules`
+  taught a fictional API — namespace
+  `Alis.Reactive.FluentValidator.Validators`, `RuleFor().IsEmpty()`,
+  `IsExclusiveBetween` — zero occurrences anywhere; the real surface (read
+  from `ReactiveClientRuleBuilder.cs` and the working sandbox validators) is
+  `RuleFor` for the server rule plus `ClientRule(...)` with
+  `.Required/.Empty/.ExclusiveRange` recording both sides; three passages
+  corrected. The skill's wider "extractable via FluentValidation" framing
+  predates the recorded-metadata design and needs its own source-grounded
+  pass — work item.
+- Memory auditor: 17 files read end to end. One live error fixed:
+  `SequentialReaction` (no such class) → `SequenceReaction` in
+  bdd-principles and docs-principles. Dated snapshots (commit counts, test
+  counts) judged records, not defects — the auditor's own recount used a
+  describe-count methodology that disagrees with vitest's 200, so neither
+  number was adopted. It also re-confirmed a real code item memory already
+  tracks: `data-alis-retry` vs `data-reactive-*` attribute naming —
+  pre-existing work item.
+
+## Round 3 + finding-is-finding sweep (2026-06-11)
+
+Round 3, three blind auditors over the territories no round had read:
+
+- References auditor: `modern-csharp` contradicted Rules 3/8 (records and
+  public constructors recommended for domain entities; "always
+  `readonly record struct`" for value objects) — fixed with a Repo Override
+  preamble scoping record guidance away from the plan domain; the
+  bdd-testing and dotnet-xml-docs reference files audited clean.
+- Rules auditor: `tdd` listed as a Layer 1 skill but exists only at user
+  level — Layer 1 rows in process-pipeline and agent-dispatch unified to
+  `modern-csharp`, `dotnet-xml-docs`, `bdd-testing` (TDD principles),
+  matching quality-principles' own canon. REJECTED with reason: "Example A
+  contradicts the skill table" — the example is the union across its five
+  declared layers, exactly what the auto-map instruction produces.
+- Docs auditor: superseded-pointer corrected to the archive path;
+  "Framework Fusion CSS"/"Fusion CSS" unified to the scripts' canonical
+  "Syncfusion CSS"; the redesign-directory reference in a historical plan
+  annotated "(directory since removed)".
+
+Finding-is-finding sweep — every parked item re-judged, fixed or defended:
+
+- validation-rules skill, settled at source through the full chain
+  (`Validate<T>` → `ClientValidationRuleBinder` →
+  `ClientValidationRuleSource` → `ReactiveValidatorClientMetadataProvider`
+  → `ReactiveValidator.GetClientRules`): client validation is RECORDED via
+  `ClientRule(...)` — which registers the server FluentValidation rule and
+  the client metadata in one call — and never extracted from plain
+  `RuleFor` rules; zero descriptor-walking exists in the repo. The skill's
+  28 plain-RuleFor "extractable" examples were rewritten to the verified
+  `ClientRule` surface (signatures read from `ReactiveClientRuleBuilder.cs`,
+  usage mirrored from the sandbox validators). Note: this also corrects the
+  skill's stale claim that `url`/`atLeastOne` had "no extraction path" —
+  both exist as ClientRule extensions.
+- `data-alis-retry` → `data-reactive-retry`: renamed (one constant, two
+  test selectors), retry vitest 6/6 after. DEFENDED deferral:
+  `data-alis-booted` touches the boot marker, `PlaywrightTestBase`, and the
+  wrapper probes behind all 1,219 tests — renaming it after tonight's gate
+  would invalidate that evidence for a cosmetic change; own slice, own
+  gate run.
+- `plan-and-entries.md` → `plans-and-rendering.md`; both inbound links
+  updated; zero references to the old slug remain.
+- Echo-element debt sized: exactly 5 sandbox views carry echo-style ids.
+- DEFENDED as-is, reasons on record: `__tests__` typecheck flip (103
+  measured errors — burn-down first), Grid fixture renames (30 files of
+  churn, canonized migrate-as-touched), modern-csharp split (live risk
+  mitigated today by the override preamble).
+
+Full gate after the debt payment: exit 0 — 1,219 Playwright tests passed,
+ArchitectureTests 2/2 discovered by leg 5 on its first gate ride, vitest
+and both builds green.
+
+## Codex round 2 — nine findings, all verified, all fixed (2026-06-11)
+
+The strongest adversarial round of the day. Every finding carried file:line
+plus refuting source; all nine survived my re-verification:
+
+1. Validation skill's WhenFields examples used plain `RuleFor` inside
+   conditions — server-only by construction. Bodies rewritten to
+   `ClientRule(...)`, the dual-purpose note corrected: WhenField scopes the
+   client condition onto `ClientRule` rules declared inside it.
+2. Both docs-site tutorials taught extraction: `your-first-plan.md`'s
+   TodoValidator and `resident-intake.mdx`'s IntakeValidator were plain
+   `RuleFor` — validators that compile, pass server-side, and emit zero
+   browser metadata. Both rewritten; the intake doc now mirrors the real
+   `examples/resident-intake/Validators/IntakeValidator.cs` verbatim, which
+   already used `ClientRule` correctly — the doc had drifted from its own
+   verified source.
+3. Nested-validator guidance taught raw `RuleFor().SetValidator()` which
+   bypasses child client metadata; the live API is
+   `ClientRule(field, validator)` (`ReactiveValidator.cs:63-77`, wraps
+   SetValidator and merges child rules). Fixed in bdd patterns.md (four
+   sites), process-task-types.md, and validation.md.
+4. `ElementBuilder.When` per-command guard documented in two skills —
+   the member does not exist and never did (zero extensions, zero history).
+   conditions-dsl section replaced with "No Per-Command Guard"; reactive-dsl
+   grammar notes corrected.
+5. Memories claimed hook enforcement that is disabled — coding-principles
+   (API-surface hookify) and quality-principles (XML-docs hookify) now state
+   the truth: disabled templates, manual review.
+6. solid-ts-audit audited stale union names (`Command`/`Mutation`/…,
+   `types.ts`, `commands.ts` — none exist) — updated to the generated
+   contract's live unions and paths.
+7. Fusion playwright-patterns exemplar path missed the per-component
+   nesting — corrected to `Components/Fusion/{Component}/`.
+8. Validation skill's full-guide pointer dangled (`docs/
+   validation-rules-guide.md` archived) — repointed to the docs-site page.
+9. Onboarding skill's two core source paths stale (`ComponentRef.cs`,
+   `runtime-object.ts` moved) — corrected to live locations.
+
+Bonus self-catch during closure: `quality-principles.md:12` still carried
+"Pragmatic excellence at every layer" — survived the scrub because my
+verification grep was case-sensitive and the phrase is capitalized. Removed;
+the misses list gains "case-sensitive verification greps". The three
+remaining repo hits are quotes inside today's records — historical evidence,
+correct.
+
+New finding logged, not churned: validation.md teaches `RuleFor` +
+`ClientRule` as pairs while `ClientRule` alone registers both sides
+(pairing may double-register server rules — duplicate-message behavior
+untested). The sandbox `EditAssignmentValidator` pairs; the shipped intake
+example single-calls. Layer 1 style decision + a dup-message test needed.
+
+## Debt re-prosecution round (2026-06-11, post-payment)
+
+Three fresh prosecutors plus the production-artifact proof; docs-site
+excluded by direction.
+
+- Runtime-consumer prosecutor: CLEAN with full trace —
+  `ComponentEventChannel` has one consumer (`trigger.ts:59`) reading only
+  `eventName`/`channel`; across the whole trigger lifecycle no enumeration,
+  spread, destructuring, or equality pattern exists where a removed
+  property changes semantics; strict tsconfig flags would have caught
+  optional access.
+- Cross-assembly prosecutor: CLEAN with full trace — zero PayloadContract
+  reads ever existed in Fusion/Native/FluentValidator/TagHelpers; the one
+  component-event registration path (`BehaviorGraph` →
+  `ForComponentEvent` → `Merge`) is byte-identical parent→HEAD; generator
+  scrub proven by parent-vs-HEAD greps of the generated contract.
+- Production-artifact proof, run directly: net48 leg of the changed plan
+  domain builds clean; `scripts/pack.sh 0.0.1-debtaudit` produced all six
+  NuGets; the shipped `AlisReactive` package carries both `lib/net48` and
+  `lib/net10.0` plus a bundled `alis-reactive.js` with zero `payloadType`
+  occurrences.
+- Codex deep pass: ZERO fresh findings across all five hunt areas (net48,
+  packaging, XML crefs, parallel-work interaction, residual diff surfaces) —
+  with its own verification: its own net48 build 0/0, cref scans clean, the
+  rebuilt bundle already carrying `data-reactive-retry`. Its two verification
+  limits (pack attempt and typecheck blocked by a NuGet scratch lock —
+  contention with the parallel pack run) are covered by the direct runs
+  above. The debt scope is DRY: a full adversarial round returned nothing
+  new from any external reviewer.
+- NEW FINDING from defending against the prosecutor's clean verdict: the
+  surviving `SameAs` justification is degenerate. `ObjectEventContract.Create`
+  — the only entry that could construct a typed contract — has zero callers
+  in any assembly and zero in history; every contract reaching `Merge` is
+  `Untyped`, so the payload-type check can never throw. Dead machinery:
+  `PayloadContract.Named`, `ForPayload`, `NamedPayloadContract`,
+  `PayloadTypeName`, `Create`, and the payload-type half of `Merge`. The
+  channel-mismatch half of `Merge` is live and stays. Decision pending:
+  delete the vestigial machinery (canon: a type mapping to no DSL graph
+  node is deleted — recommended) or keep as the seam for future typed
+  component-event declarations.
