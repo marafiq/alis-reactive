@@ -701,3 +701,41 @@ confuses and close the hole that lets it survive.
 Verified: scripts/test.sh --no-e2e "All gates green" — typecheck with
 tests included exit 0, zero plan.ts drift, vitest 200/200,
 dotnet build 0 warnings 0 errors, ArchitectureTests 2/2.
+
+## Adversarial round over the closure claims (2026-06-12)
+
+Four blind prosecutors over the closure round's own claims (gate flip,
+test edits, deletion, sweeps); every finding re-verified at source
+before disposition.
+
+- REFUTED and fixed: "ObjectEvent.Merge keeps its one live check
+  (channel agreement)." False by the same reasoning that killed the
+  payload check: events key by contract name
+  (BrowserObjectContract.cs:49), the sole producer
+  ForComponentEvent(eventName) hardcodes channel = name
+  (BehaviorGraph.cs:29 is the only caller; plugins declare no events),
+  so existing and incoming channels always equal the key and the throw
+  was unreachable. Deleted: the throw and Merge itself — Declare now
+  states first-registration-wins directly. Channel STAYS: it is a wire
+  term the runtime reads (component-event-contract.ts:12).
+- REFUTED nuance, recorded: the fixture rewrite was called
+  "behavior-identical" in conversation — more precisely the old
+  value: { kind: "none" } was contract-invalid and would have hit
+  assertNever if ever evaluated; the rewrite is a latent-bug fix, not a
+  neutral substitution. No code change needed.
+- REJECTED with evidence: "dsl-roadmap line 31 still stale" — the
+  alis-realtime-connection-retry-container ELEMENT ID is the real
+  shipped id (retry-indicator.ts RETRY_ELEMENT_ID); the doc is accurate.
+  The id's alis- prefix joins data-alis-booted in the deferred
+  family-rename territory: both are public hooks whose rename is an
+  owner decision with its own gate run.
+- CONFIRMED by prosecution: CI enforces the flipped gate
+  (ci.yml runs scripts/test.sh --no-e2e; test.sh:80 runs npm run
+  typecheck first); @types/node pin exact and CI-matched; 0 errors on
+  re-run of both tsc projects; fetch mock signatures match the one real
+  call (http.ts:83 — fetch(url, init)); evaluate path edits match both
+  contract (EmptyPath) and runtime (path unused for object reads); all
+  sweeps re-run unrestricted with zero new survivors.
+
+Verified after the Merge deletion: scripts/test.sh --no-e2e "All gates
+green"; dotnet build -f net48 0 errors.

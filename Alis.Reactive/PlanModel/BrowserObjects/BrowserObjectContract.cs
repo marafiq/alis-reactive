@@ -46,9 +46,7 @@ namespace Alis.Reactive.PlanModel
         {
             if (contract == null) throw new System.ArgumentNullException(nameof(contract));
 
-            if (_events.TryGetValue(contract.Name.Value, out var existing))
-                _events[contract.Name.Value] = existing.Merge(contract);
-            else
+            if (!_events.ContainsKey(contract.Name.Value))
                 _events[contract.Name.Value] = ObjectEvent.From(contract);
 
             return this;
@@ -398,16 +396,6 @@ namespace Alis.Reactive.PlanModel
 
         internal static ObjectEvent From(ObjectEventContract contract) =>
             new ObjectEvent(contract.Channel);
-
-        internal ObjectEvent Merge(ObjectEventContract incoming)
-        {
-            if (Channel != incoming.Channel.Value)
-                throw new System.InvalidOperationException(
-                    $"Event '{incoming.Name.Value}' registered with channel '{Channel}' " +
-                    $"but re-registered with channel '{incoming.Channel.Value}'.");
-
-            return this;
-        }
     }
 
 }
