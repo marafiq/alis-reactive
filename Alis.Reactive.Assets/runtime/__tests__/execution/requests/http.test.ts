@@ -74,7 +74,7 @@ function pathSegment(part: string): PathSegment {
 function payloadRead(scope: PayloadScope, member: string): ValueExpression {
   return {
     kind: "read",
-    from: { kind: "payload", scope, type: { kind: "untyped" } },
+    from: { kind: "payload", scope },
     member,
     path: [{ kind: "property", name: member }],
     shape: stringShape,

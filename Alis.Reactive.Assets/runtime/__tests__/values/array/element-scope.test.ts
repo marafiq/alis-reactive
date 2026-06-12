@@ -6,7 +6,6 @@ import type { PayloadSource, PlanDocument, ValueExpression } from "../../../type
 const elementSource: PayloadSource = {
   kind: "payload",
   scope: "element",
-  type: { kind: "untyped" },
 };
 
 function emptyArrayPlan(): PlanDocument {

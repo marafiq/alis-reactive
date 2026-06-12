@@ -209,7 +209,7 @@ function setText(component: string, value: string): ReactionGraph {
 function setEventCancel(): ReactionGraph {
   return {
     kind: "set",
-    on: { kind: "payload", scope: "event", type: { kind: "untyped" } },
+    on: { kind: "payload", scope: "event" },
     property: "cancel",
     value: { kind: "literal", value: true, shape: booleanShape },
   };

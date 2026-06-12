@@ -68,7 +68,7 @@ function setResidentName(value: string): ReactionGraph {
 function markLocal(value: string): ReactionGraph {
   return {
     kind: "call",
-    on: { kind: "payload", scope: "local", type: { kind: "untyped" } },
+    on: { kind: "payload", scope: "local" },
     method: "mark",
     args: [literal(value)],
   };
@@ -405,7 +405,7 @@ describe("executeReaction member targets", () => {
       },
     };
     const context: ExecContext = { local };
-    const source = { kind: "payload", scope: "local", type: { kind: "untyped" } } as const;
+    const source = { kind: "payload", scope: "local" } as const;
     const setReaction: ReactionGraph = {
       kind: "set",
       on: source,

@@ -36,7 +36,7 @@ function literal(value: JsonValue, shape: Shape): ValueExpression {
 function readEventPayload(path: string, shape: Shape): ValueExpression {
   return {
     kind: "read",
-    from: { kind: "payload", scope: "event", type: { kind: "untyped" } },
+    from: { kind: "payload", scope: "event" },
     member: path,
     path: structuredPath(path),
     shape,

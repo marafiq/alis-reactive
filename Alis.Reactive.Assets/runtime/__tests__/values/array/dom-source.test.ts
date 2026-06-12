@@ -35,7 +35,7 @@ function filterByPrefix(source: ValueExpression, prefix: string): ValueExpressio
 function selfStartsWith(prefix: string): ValidationCondition {
   return {
     kind: "compare",
-    left: { kind: "read", from: { kind: "payload", scope: "element", type: { kind: "untyped" } }, member: "elementValue", path: [], shape: stringShape, access: { kind: "property" } },
+    left: { kind: "read", from: { kind: "payload", scope: "element" }, member: "elementValue", path: [], shape: stringShape, access: { kind: "property" } },
     op: "starts-with",
     right: { kind: "value", value: { kind: "literal", value: prefix, shape: stringShape } },
     shape: stringShape,

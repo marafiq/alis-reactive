@@ -233,7 +233,7 @@ seems to "not fit," it routes, it does not gap:
 
 - **conditions** — `p.When(args, a => a.Prop)` / `When(body, r => r.X)` / `When(typedSource)` (`ConditionStart.cs:20,33,45`)
 - **gather** — body via `Include`/`FromEvent`/`FromUrl`/`Static`; header & route accept any `TypedSource<T>` (`GatherBuilder.cs:55,87,152,290`)
-- **element / dispatch** — `SetText`, `Dispatch("evt", value[, payloadType])` (`ReactionGraph.cs:35`)
+- **element / dispatch** — `SetText`, `Dispatch("evt", value)` (`ReactionGraph.cs:35`)
 
 A computed `ReactiveValue<T>` (e.g. a count) feeds `SetText`/`When`/dispatch
 directly, and reaches a request **body** by carrying it through a named payload

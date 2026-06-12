@@ -70,7 +70,7 @@ function numericLiteral(value: number): NumericLiteralExpression {
 function eventPayloadValue(member: string, shape: Shape): PayloadPathReadExpression {
   return {
     kind: "read",
-    from: { kind: "payload", scope: "event", type: { kind: "untyped" } },
+    from: { kind: "payload", scope: "event" },
     member,
     path: [{ kind: "property", name: member }],
     shape,

@@ -6,7 +6,7 @@ const stringShape: Shape = { kind: "string" };
 const numberShape: Shape = { kind: "number" };
 const noneShape: Shape = { kind: "none" };
 const rawShape: Shape = { kind: "raw" };
-const elementSource: PayloadSource = { kind: "payload", scope: "element", type: { kind: "untyped" } };
+const elementSource: PayloadSource = { kind: "payload", scope: "element" };
 
 const residents = [
   { name: "Ada", status: "active", age: 71, balance: 120 },

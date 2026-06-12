@@ -106,7 +106,7 @@ describe("evaluateValue", () => {
   it("reads payload values by structured path and applies the requested shape", () => {
     const producer: ValueExpression = {
       kind: "read",
-      from: { kind: "payload", scope: "event", type: { kind: "untyped" } },
+      from: { kind: "payload", scope: "event" },
       member: "ignored-when-path-is-structured",
       path: [
         { kind: "property", name: "address" },
@@ -126,7 +126,7 @@ describe("evaluateValue", () => {
   it("allows absent payload paths to evaluate as missing values", () => {
     const producer: ValueExpression = {
       kind: "read",
-      from: { kind: "payload", scope: "event", type: { kind: "untyped" } },
+      from: { kind: "payload", scope: "event" },
       member: "address.zipCode",
       path: [
         { kind: "property", name: "address" },
@@ -160,7 +160,7 @@ describe("evaluateValue", () => {
   it("reads the whole payload through the explicit responseBody member", () => {
     const producer: ValueExpression = {
       kind: "read",
-      from: { kind: "payload", scope: "success", type: { kind: "untyped" } },
+      from: { kind: "payload", scope: "success" },
       member: "responseBody",
       path: [],
       shape: objectShape,
