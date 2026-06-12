@@ -701,7 +701,6 @@ describe("executeReaction member targets", () => {
       payload: {
         kind: "value",
         data: literal("Ada"),
-        payloadType: { kind: "untyped" },
       },
     }, textBoxPlan());
 

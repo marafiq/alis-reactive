@@ -148,7 +148,6 @@ it("dispatches a document event payload", () => {
       startsWhen: {
         kind: "document-event",
         event: "loaded",
-        payloadType: { kind: "untyped" },
       },
       reaction: {
         kind: "dispatch",

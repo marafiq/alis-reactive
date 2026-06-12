@@ -400,6 +400,42 @@ The type-name leak closes.
 Proof: `dotnet build` clean; regenerated `plan.ts` with zero
 `PayloadContract`/`payloadType`/`"typed"`/`"untyped"` occurrences;
 `npm run typecheck` exit 0; vitest 30 files 200/200; focused Playwright
-over every changed wire node — realtime ServerPush + SignalR, typed
-custom-event payloads, typed dispatch, typed response bodies — 80/80,
-exit 0.
+80/80 exit 0 over SignalR, named ServerPush, document-event payload flows,
+component events, dispatch payloads, and payload scopes
+event/success/error/request/dispatch/element. Not in the focused 80: the
+"any" ServerPush filter (no sandbox view demonstrates it anywhere — gap
+below) and the "local" payload scope (full-gate coverage).
+
+**Adversarial review disposition (own pass; four blind prosecutors plus
+direct greps, every finding re-verified at source before acceptance):**
+
+- Accepted, fixed: docs-site still taught the removed surface —
+  `writing-tests.md:151` example, `the-contract.mdx` trigger table rows,
+  `api-reference.md` PayloadContract section (auto-generated; regenerated
+  via ApiDocGenerator, zero occurrences after).
+- Accepted, fixed: nine `payloadType: { kind: "untyped" }` literals in five
+  vitest arrangement files — old JSON shape pinned in tests (Rule 10);
+  removed, vitest 200/200 after.
+- Accepted, recorded: the commit removed public reachability the message
+  did not name — `PayloadContract` (public→internal), `PayloadSource.Type`
+  and `ServerPushEventFilter.PayloadType` (public properties deleted). The
+  public builder/authoring surface is unchanged (verified signature by
+  signature). Accepted as a deliberate, task-required pre-release change.
+- Accepted, recorded: the "any" ServerPush event filter has no sandbox view
+  and no Playwright coverage anywhere — a pre-existing Rule 3 step 9 gap
+  surfaced by this audit, not introduced by the commit. Work item.
+- Rejected (evidence): "archived plan JSON deserialization breaks" — no
+  deserializer exists; every converter `Read` throws "Plan types are
+  write-only" (`ReactionGraph.cs:193,249,352`), and plans render
+  per-request consumed by the same-version bundle.
+- Rejected (evidence): "old TypeScript runtime expects the fields" — the
+  runtime never read them (`git log -S 'payloadType.kind'`: zero commits),
+  and `plan.ts` is internal to the bundle build, shipped with the same
+  commit.
+- Rejected: deprecation-period/semver demands — ungrounded in the repo's
+  pre-release stage; the change was the explicitly directed task.
+- Lost-invariant prosecutor returned empty: the `SameAs` channel-agreement
+  check survives intact with its exception and message unchanged; no
+  authoring-time behavior was lost.
+- Claim-precision accepted: the original "every changed wire node" was
+  wider than the focused 80 covered — amended above to the exact list.

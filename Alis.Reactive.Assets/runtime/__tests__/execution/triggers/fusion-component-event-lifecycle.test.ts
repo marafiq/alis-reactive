@@ -69,7 +69,6 @@ describe("fusion component event lifecycle", () => {
         "fusion.fake": fusionEventType({
           beginEdit: {
             channel: "beginEdit",
-            payloadType: { kind: "untyped" },
           },
         }),
       },
@@ -167,7 +166,6 @@ function nativeTextType(): BrowserObjectContract {
 function fusionEventType(events: BrowserObjectContract["events"] = {
   changed: {
     channel: "change",
-    payloadType: { kind: "untyped" },
   },
 }): BrowserObjectContract {
   return {

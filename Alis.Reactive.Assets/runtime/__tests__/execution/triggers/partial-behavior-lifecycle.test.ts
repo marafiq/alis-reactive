@@ -27,7 +27,6 @@ describe("partial behavior lifecycle", () => {
             startsWhen: {
               kind: "document-event",
               event: "drawer:tick",
-              payloadType: { kind: "untyped" },
             },
             reaction: branch([
               { guard: { kind: "when", condition: falseCondition() }, reaction: setText("status", "outer guarded") },

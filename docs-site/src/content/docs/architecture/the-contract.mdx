@@ -49,10 +49,10 @@ Each behavior has two fields:
 | Kind | Key fields | DSL source |
 |------|------------|------------|
 | `page-ready` | none | `t.DomReady(...)` |
-| `document-event` | `event`, `payloadType` | `t.CustomEvent(...)` |
+| `document-event` | `event` | `t.CustomEvent(...)` |
 | `component-event` | `component`, `event` | component `.Reactive(...)` |
 | `server-push` | `url`, `eventFilter` | `t.ServerPush(...)` |
-| `signalr` | `hubUrl`, `method`, `payloadType` | `t.SignalR(...)` |
+| `signalr` | `hubUrl`, `method` | `t.SignalR(...)` |
 
 Public DSL names are developer-facing. Wire names are generated plan contract terms.
 

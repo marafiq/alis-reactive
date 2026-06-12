@@ -19,7 +19,6 @@ describe("component event trigger contracts", () => {
     boot(planWithComponentEvent({
       changed: {
         channel: "click",
-        payloadType: { kind: "untyped" },
       },
     }));
 

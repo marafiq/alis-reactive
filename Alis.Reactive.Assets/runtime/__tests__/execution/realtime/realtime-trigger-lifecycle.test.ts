@@ -176,7 +176,6 @@ describe("realtime trigger lifecycle", () => {
             eventFilter: {
               kind: "named",
               event: "residentUpdated",
-              payloadType: { kind: "untyped" },
             },
           },
           reaction: setText("status", "first"),
@@ -192,7 +191,6 @@ describe("realtime trigger lifecycle", () => {
             eventFilter: {
               kind: "named",
               event: "residentUpdated",
-              payloadType: { kind: "untyped" },
             },
           },
           reaction: setText("secondary", "second"),
@@ -232,7 +230,6 @@ describe("realtime trigger lifecycle", () => {
             kind: "signalr",
             hubUrl: "/residentHub",
             method: "ResidentUpdated",
-            payloadType: { kind: "untyped" },
           },
           reaction: setText("status", "first"),
         },
@@ -245,7 +242,6 @@ describe("realtime trigger lifecycle", () => {
             kind: "signalr",
             hubUrl: "/residentHub",
             method: "ResidentUpdated",
-            payloadType: { kind: "untyped" },
           },
           reaction: setText("secondary", "second"),
         },
