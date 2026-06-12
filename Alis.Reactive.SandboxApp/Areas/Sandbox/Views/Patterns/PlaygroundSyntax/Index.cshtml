@@ -82,8 +82,9 @@
             One pipeline mutates Fusion NumericTextBox + Native &lt;select&gt; + DOM element.
         </p>
         <native-hstack gap="Sm">
-            <button onclick="document.dispatchEvent(new CustomEvent('reset-all'))"
-                    class="px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium">Reset All Fields</button>
+            @(Html.NativeButton("reset-all-btn", "Reset All Fields")
+                .CssClass("px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("reset-all")))
         </native-hstack>
     </native-card-body>
     </native-card>
