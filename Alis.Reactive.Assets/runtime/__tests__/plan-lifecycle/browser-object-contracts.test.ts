@@ -34,7 +34,7 @@ describe("browser object contract merging", () => {
     appliedPlans.unloadPartialSlot("first-slot");
 
     expect(appliedPlans.get(planId)?.types[sharedTypeKey]).toBeDefined();
-    expect(appliedPlans.get(planId)?.types[sharedTypeKey].properties.token).toBeDefined();
+    expect(appliedPlans.get(planId)?.types[sharedTypeKey]?.properties.token).toBeDefined();
 
     appliedPlans.unloadPartialSlot("second-slot");
 
@@ -58,12 +58,12 @@ describe("browser object contract merging", () => {
       }),
     ], wiring);
 
-    expect(Object.keys(appliedPlans.get(planId)?.types[sharedTypeKey].properties ?? {}))
+    expect(Object.keys(appliedPlans.get(planId)?.types[sharedTypeKey]?.properties ?? {}))
       .toEqual(["classRemove", "classToggle"]);
 
     appliedPlans.unloadPartialSlot("first-slot");
 
-    expect(Object.keys(appliedPlans.get(planId)?.types[sharedTypeKey].properties ?? {}))
+    expect(Object.keys(appliedPlans.get(planId)?.types[sharedTypeKey]?.properties ?? {}))
       .toEqual(["classToggle"]);
 
     appliedPlans.unloadPartialSlot("second-slot");
@@ -88,12 +88,12 @@ describe("browser object contract merging", () => {
       }),
     ], wiring);
 
-    expect(appliedPlans.get(planId)?.types[sharedTypeKey].properties.token.shape)
+    expect(appliedPlans.get(planId)?.types[sharedTypeKey]?.properties.token?.shape)
       .toEqual({ kind: "string" });
 
     appliedPlans.unloadPartialSlot("second-slot");
 
-    expect(appliedPlans.get(planId)?.types[sharedTypeKey].properties.token.shape)
+    expect(appliedPlans.get(planId)?.types[sharedTypeKey]?.properties.token?.shape)
       .toEqual({ kind: "any" });
   });
 
@@ -126,7 +126,7 @@ describe("browser object contract merging", () => {
       }),
     ], wiring);
 
-    expect(appliedPlans.get(planId)?.types[sharedTypeKey].properties.profile.shape)
+    expect(appliedPlans.get(planId)?.types[sharedTypeKey]?.properties.profile?.shape)
       .toEqual({
         kind: "object",
         fields: {
@@ -154,7 +154,7 @@ describe("browser object contract merging", () => {
       }),
     ], wiring);
 
-    const method = appliedPlans.get(planId)?.types[sharedTypeKey].methods.normalize;
+    const method = appliedPlans.get(planId)?.types[sharedTypeKey]?.methods.normalize;
     expect(method?.arguments).toEqual({ kind: "exact", shapes: [{ kind: "string" }] });
     expect(method?.returns).toEqual({ kind: "string" });
   });
@@ -179,7 +179,7 @@ describe("browser object contract merging", () => {
       }),
     ], wiring);
 
-    expect(appliedPlans.get(planId)?.types[sharedTypeKey].properties.token.shape)
+    expect(appliedPlans.get(planId)?.types[sharedTypeKey]?.properties.token?.shape)
       .toEqual({ kind: "number" });
   });
 
@@ -213,12 +213,12 @@ describe("browser object contract merging", () => {
 
     const merged = appliedPlans.get(planId)!;
     expect(merged.components["alis-drawer"]).toBeDefined();
-    expect(Object.keys(merged.types[drawerTypeKey].properties)).toEqual(["classAdd", "classRemove"]);
+    expect(Object.keys(merged.types[drawerTypeKey]!.properties)).toEqual(["classAdd", "classRemove"]);
 
     appliedPlans.unloadPartialSlot("alis-drawer-content");
 
     expect(appliedPlans.get(planId)?.components["alis-drawer"]).toBeDefined();
-    expect(Object.keys(appliedPlans.get(planId)?.types[drawerTypeKey].properties ?? {}))
+    expect(Object.keys(appliedPlans.get(planId)?.types[drawerTypeKey]?.properties ?? {}))
       .toEqual(["classAdd"]);
   });
 
@@ -259,18 +259,18 @@ describe("browser object contract merging", () => {
       }),
     ], wiring);
 
-    expect(Object.keys(appliedPlans.get(planId)?.types[drawerTypeKey].properties ?? {}))
+    expect(Object.keys(appliedPlans.get(planId)?.types[drawerTypeKey]?.properties ?? {}))
       .toEqual(["classAdd", "classRemove", "classToggle"]);
 
     appliedPlans.unloadPartialSlot("first-drawer-content");
 
     expect(appliedPlans.get(planId)?.components["alis-drawer"]).toBeDefined();
-    expect(Object.keys(appliedPlans.get(planId)?.types[drawerTypeKey].properties ?? {}))
+    expect(Object.keys(appliedPlans.get(planId)?.types[drawerTypeKey]?.properties ?? {}))
       .toEqual(["classAdd", "classToggle"]);
 
     appliedPlans.unloadPartialSlot("second-drawer-content");
 
-    expect(Object.keys(appliedPlans.get(planId)?.types[drawerTypeKey].properties ?? {}))
+    expect(Object.keys(appliedPlans.get(planId)?.types[drawerTypeKey]?.properties ?? {}))
       .toEqual(["classAdd"]);
   });
 
@@ -301,11 +301,11 @@ describe("browser object contract merging", () => {
       }),
     ], wiring);
 
-    expect(appliedPlans.get(planId)?.types[typeKey].properties.value.access).toBe("readwrite");
+    expect(appliedPlans.get(planId)?.types[typeKey]?.properties.value?.access).toBe("readwrite");
 
     appliedPlans.unloadPartialSlot("care-unit-editor");
 
-    expect(appliedPlans.get(planId)?.types[typeKey].properties.value.access).toBe("read");
+    expect(appliedPlans.get(planId)?.types[typeKey]?.properties.value?.access).toBe("read");
   });
 
   it("allows a partial behavior to reference a root-owned injection host element", () => {
@@ -336,13 +336,13 @@ describe("browser object contract merging", () => {
       }),
     ], wiring);
 
-    expect(Object.keys(appliedPlans.get(planId)?.types[hostTypeKey].properties ?? {}))
+    expect(Object.keys(appliedPlans.get(planId)?.types[hostTypeKey]?.properties ?? {}))
       .toEqual(["html", "hidden"]);
 
     appliedPlans.unloadPartialSlot("step-container");
 
     expect(appliedPlans.get(planId)?.components["step-container"]).toBeDefined();
-    expect(Object.keys(appliedPlans.get(planId)?.types[hostTypeKey].properties ?? {}))
+    expect(Object.keys(appliedPlans.get(planId)?.types[hostTypeKey]?.properties ?? {}))
       .toEqual(["html"]);
   });
 

@@ -248,7 +248,7 @@ describe("realtime trigger lifecycle", () => {
       ]),
     ]);
 
-    const connection = signalR.connections[0];
+    const connection = signalR.connections[0]!;
     expect(connection).toBeDefined();
     connection.emit("ResidentUpdated", {});
     expect(document.getElementById("status")?.textContent).toBe("first");
@@ -303,7 +303,7 @@ class FakeEventSource extends EventTarget {
   static single(url: string): FakeEventSource {
     const sources = FakeEventSource.created.get(url) ?? [];
     expect(sources).toHaveLength(1);
-    return sources[0];
+    return sources[0]!;
   }
 
   static reset(): void {

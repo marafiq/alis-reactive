@@ -13,13 +13,14 @@
     "watch:runtime": "node esbuild.config.mjs --watch",
     "watch:design-system": "vite build --config vite.design-system.config.ts --watch",
     "watch:fusion": "vite build --config vite.fusion.config.ts --watch",
-    "typecheck": "npm run generate:plan-types && tsc --project tsconfig.json --noEmit",
+    "typecheck": "npm run generate:plan-types && tsc --project tsconfig.json --noEmit && tsc --project tsconfig.tests.json --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest"
   },
   "devDependencies": {
     "@syncfusion/ej2": "32.2.8",
     "@tailwindcss/vite": "^4.2.4",
+    "@types/node": "22.19.21",
     "esbuild": "^0.28.0",
     "jsdom": "^27.0.1",
     "tailwindcss": "^4.2.1",

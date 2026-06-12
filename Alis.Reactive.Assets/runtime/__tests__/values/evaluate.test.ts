@@ -214,7 +214,7 @@ describe("evaluateValue", () => {
       kind: "read",
       from: { kind: "component", component: "resident-name" },
       member: "value",
-      path: [{ kind: "property", name: "value" }],
+      path: [],
       shape: stringShape,
       access: { kind: "property" },
     };
@@ -222,7 +222,7 @@ describe("evaluateValue", () => {
       kind: "read",
       from: { kind: "component", component: "resident-name" },
       member: "appendSuffix",
-      path: [{ kind: "property", name: "appendSuffix" }],
+      path: [],
       shape: stringShape,
       access: {
         kind: "method",
@@ -251,7 +251,7 @@ describe("evaluateValue", () => {
       kind: "read",
       from: { kind: "component", component: "resident-name" },
       member: "value",
-      path: [{ kind: "property", name: "value" }],
+      path: [],
       shape: stringShape,
       access: { kind: "property" },
     };
@@ -287,7 +287,7 @@ describe("evaluateValue", () => {
       kind: "read",
       from: { kind: "component", component: "resident-name" },
       member: "value",
-      path: [{ kind: "property", name: "value" }],
+      path: [],
       shape: stringShape,
       access: { kind: "property" },
     };
@@ -404,7 +404,7 @@ describe("evaluateValue", () => {
       kind: "read",
       from: { kind: "component", component: "save" },
       member: "describeAge",
-      path: [{ kind: "property", name: "describeAge" }],
+      path: [],
       shape: stringShape,
       access: {
         kind: "method",

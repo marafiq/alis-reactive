@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { AppliedPlans } from "../../lifecycle/applied-plans";
+import type { ComponentObject } from "../../types/index";
 import {
   testPlanWiring,
   partialPlan,
@@ -37,7 +38,7 @@ describe("validation container loads", () => {
     ], wiring);
 
     const merged = appliedPlans.get(planId)!;
-    const container = merged.components["resident-form"].container;
+    const container = merged.components["resident-form"]!.container;
     const validationScope = expectValidationContainer(container);
 
     expect(validationScope.validationRules.map(rule => rule.component)).toEqual([
@@ -109,7 +110,7 @@ describe("validation container loads", () => {
       }),
     ], wiring);
 
-    const extendedContainer = expectValidationContainer(appliedPlans.get(planId)!.components["resident-form"].container);
+    const extendedContainer = expectValidationContainer(appliedPlans.get(planId)!.components["resident-form"]!.container);
     expect(extendedContainer.validationRules.map(rule => rule.component)).toEqual([
       "first-name",
       "zip-code",
@@ -120,7 +121,7 @@ describe("validation container loads", () => {
 
     appliedPlans.unloadPartialSlot("address-slot");
 
-    const restoredContainer = expectValidationContainer(appliedPlans.get(planId)!.components["resident-form"].container);
+    const restoredContainer = expectValidationContainer(appliedPlans.get(planId)!.components["resident-form"]!.container);
     expect(restoredContainer.validationRules.map(rule => rule.component)).toEqual([
       "first-name",
       "zip-code",
@@ -209,14 +210,14 @@ describe("validation container loads", () => {
       }),
     ], wiring);
 
-    const beforeUnload = expectValidationContainer(appliedPlans.get(planId)!.components["resident-form"].container);
+    const beforeUnload = expectValidationContainer(appliedPlans.get(planId)!.components["resident-form"]!.container);
     expect(beforeUnload.validationRules.map(rule => rule.component)).toEqual(["first-name", "city"]);
     expect(beforeUnload.validationRules.find(rule => rule.component === "city")?.rules[0]?.message)
       .toBe("address city required");
 
     appliedPlans.unloadPartialSlot("address-slot");
 
-    const afterUnload = expectValidationContainer(appliedPlans.get(planId)!.components["resident-form"].container);
+    const afterUnload = expectValidationContainer(appliedPlans.get(planId)!.components["resident-form"]!.container);
     expect(afterUnload.validationRules.map(rule => rule.component)).toEqual(["first-name", "city"]);
     expect(afterUnload.validationRules.find(rule => rule.component === "city")?.rules[0]?.message)
       .toBe("contact city required");

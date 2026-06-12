@@ -12,7 +12,8 @@
     "isolatedModules": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "types": []
   },
   "include": ["runtime/**/*.ts"],
   "exclude": ["runtime/__tests__/**"]

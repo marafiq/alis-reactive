@@ -39,7 +39,7 @@ describe("boot plan composition", () => {
 
     expect(composed.map(plan => plan.planId)).toEqual([residentPlanId, "Billing.Root"]);
 
-    const resident = composed[0];
+    const resident = composed[0]!;
     expect(resident.scope).toEqual({ kind: "root" });
     expect(Object.keys(resident.types)).toEqual([
       "native.element.resident-name",
@@ -70,9 +70,9 @@ describe("boot plan composition", () => {
     ]);
 
     expect(composed).toHaveLength(1);
-    expect(composed[0].scope).toEqual({ kind: "root" });
-    expect(Object.keys(composed[0].components)).toEqual(["address-line", "resident-name"]);
-    expect(composed[0].behaviors).toEqual([partialReady, rootReady]);
+    expect(composed[0]!.scope).toEqual({ kind: "root" });
+    expect(Object.keys(composed[0]!.components)).toEqual(["address-line", "resident-name"]);
+    expect(composed[0]!.behaviors).toEqual([partialReady, rootReady]);
   });
 
   it("merges initial type contracts instead of letting root overwrite partial write access", () => {
@@ -92,8 +92,8 @@ describe("boot plan composition", () => {
       },
     ]);
 
-    expect(composed[0].types[typeKey].properties.value.access).toBe("readwrite");
-    expect(composed[0].components[componentId].binding.kind).toBe("registered-input");
+    expect(composed[0]!.types[typeKey]!.properties.value!.access).toBe("readwrite");
+    expect(composed[0]!.components[componentId]!.binding.kind).toBe("registered-input");
   });
 
   it("does not let an initial reference-only plan erase a registered input definition", () => {
@@ -113,8 +113,8 @@ describe("boot plan composition", () => {
       }),
     ]);
 
-    expect(composed[0].types[typeKey].properties.value.access).toBe("readwrite");
-    expect(composed[0].components[componentId].binding.kind).toBe("registered-input");
+    expect(composed[0]!.types[typeKey]!.properties.value!.access).toBe("readwrite");
+    expect(composed[0]!.components[componentId]!.binding.kind).toBe("registered-input");
   });
 
   it("coalesces duplicate initial owned component definitions from the first DOM", () => {
@@ -134,8 +134,8 @@ describe("boot plan composition", () => {
       }),
     ]);
 
-    expect(composed[0].types[typeKey].properties.value.access).toBe("readwrite");
-    expect(composed[0].components[componentId]).toEqual(registeredInputComponent(componentId, typeKey));
+    expect(composed[0]!.types[typeKey]!.properties.value!.access).toBe("readwrite");
+    expect(composed[0]!.components[componentId]).toEqual(registeredInputComponent(componentId, typeKey));
   });
 
   it("coalesces duplicate initial owned component definitions when the partial appears before the root", () => {
@@ -155,8 +155,8 @@ describe("boot plan composition", () => {
       },
     ]);
 
-    expect(composed[0].types[typeKey].properties.value.access).toBe("readwrite");
-    expect(composed[0].components[componentId]).toEqual(registeredInputComponent(componentId, typeKey));
+    expect(composed[0]!.types[typeKey]!.properties.value!.access).toBe("readwrite");
+    expect(composed[0]!.components[componentId]).toEqual(registeredInputComponent(componentId, typeKey));
   });
 
   it("merges an initial layout-object reference without replacing the root component", () => {
@@ -176,8 +176,8 @@ describe("boot plan composition", () => {
       }),
     ]);
 
-    expect(composed[0].components[componentId]).toEqual(layoutComponent(componentId, typeKey));
-    expect(Object.keys(composed[0].types[typeKey].properties)).toEqual(["title", "content"]);
+    expect(composed[0]!.components[componentId]).toEqual(layoutComponent(componentId, typeKey));
+    expect(Object.keys(composed[0]!.types[typeKey]!.properties)).toEqual(["title", "content"]);
   });
 
   it("lets an initial partial layout object appear before the root plan", () => {
@@ -197,9 +197,9 @@ describe("boot plan composition", () => {
       },
     ]);
 
-    expect(composed[0].scope).toEqual({ kind: "root" });
-    expect(composed[0].components[componentId]).toEqual(layoutComponent(componentId, typeKey));
-    expect(Object.keys(composed[0].types[typeKey].properties)).toEqual(["content", "title"]);
+    expect(composed[0]!.scope).toEqual({ kind: "root" });
+    expect(composed[0]!.components[componentId]).toEqual(layoutComponent(componentId, typeKey));
+    expect(Object.keys(composed[0]!.types[typeKey]!.properties)).toEqual(["content", "title"]);
   });
 
   it("uses component merge semantics when composing validation containers", () => {
@@ -224,7 +224,7 @@ describe("boot plan composition", () => {
       }),
     ]);
 
-    const container = composed[0].components["resident-form"].container;
+    const container = composed[0]!.components["resident-form"]!.container;
     const validationScope = expectValidationContainer(container);
 
     expect(validationScope.validationRules.map(rule => rule.component)).toEqual([
@@ -258,7 +258,7 @@ describe("boot plan composition", () => {
       },
     ]);
 
-    const container = composed[0].components["resident-form"].container;
+    const container = composed[0]!.components["resident-form"]!.container;
     const validationScope = expectValidationContainer(container);
 
     expect(validationScope.validationRules.map(rule => rule.component)).toEqual([

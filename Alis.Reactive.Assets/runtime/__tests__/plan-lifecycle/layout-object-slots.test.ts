@@ -39,13 +39,13 @@ describe("layout object slots", () => {
     ], wiring);
 
     expect(appliedPlans.get(planId)?.components.alisFusionToast).toBeDefined();
-    expect(Object.keys(appliedPlans.get(planId)?.types[toastTypeKey].properties ?? {}))
+    expect(Object.keys(appliedPlans.get(planId)?.types[toastTypeKey]?.properties ?? {}))
       .toEqual(["title", "content"]);
 
     appliedPlans.unloadPartialSlot("first-toast-slot");
 
     expect(appliedPlans.get(planId)?.components.alisFusionToast).toBeDefined();
-    expect(Object.keys(appliedPlans.get(planId)?.types[toastTypeKey].properties ?? {}))
+    expect(Object.keys(appliedPlans.get(planId)?.types[toastTypeKey]?.properties ?? {}))
       .toEqual(["content"]);
 
     appliedPlans.unloadPartialSlot("second-toast-slot");

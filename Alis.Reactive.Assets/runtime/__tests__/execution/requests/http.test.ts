@@ -173,7 +173,7 @@ function responseJson(body: unknown, status = 200): Response {
 }
 
 function mockFetch(responses: Response[]) {
-  const fetchMock = vi.fn(async () => {
+  const fetchMock = vi.fn(async (_url: string, _init: RequestInit) => {
     const response = responses.shift();
     if (response === undefined) return new Response("", { status: 204 });
 
@@ -213,7 +213,7 @@ describe("executeRequest HTTP request lane", () => {
     expect(document.getElementById("complete")?.textContent).toBe("Ada");
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const [url, init] = fetchMock.mock.calls[0]!;
     expect(url).toBe("/residents/42");
     expect(init.method).toBe("POST");
     expect(init.headers).toMatchObject({
@@ -301,8 +301,8 @@ describe("executeRequest HTTP request lane", () => {
     expect(document.getElementById("facility")?.textContent).toBe("West Wing");
     expect(fetchMock).toHaveBeenCalledTimes(2);
 
-    const [firstUrl, firstInit] = fetchMock.mock.calls[0] as [string, RequestInit];
-    const [secondUrl, secondInit] = fetchMock.mock.calls[1] as [string, RequestInit];
+    const [firstUrl, firstInit] = fetchMock.mock.calls[0]!;
+    const [secondUrl, secondInit] = fetchMock.mock.calls[1]!;
     expect(firstUrl).toBe("/residents/42");
     expect(firstInit.headers).toMatchObject({ "X-Hop": "first" });
     expect(secondUrl).toBe("/facilities/west%20wing");
@@ -355,7 +355,7 @@ describe("executeRequest HTTP request lane", () => {
     expect(document.getElementById("facility")?.textContent).toBe("Resident #42 at Facility #3");
     expect(fetchMock).toHaveBeenCalledTimes(2);
 
-    const [secondUrl] = fetchMock.mock.calls[1] as [string, RequestInit];
+    const [secondUrl] = fetchMock.mock.calls[1]!;
     expect(secondUrl).toBe("/facilities/3/residents/42");
   });
 
@@ -414,7 +414,7 @@ describe("executeRequest HTTP request lane", () => {
     expect(document.getElementById("facility")?.textContent).toBe("Memory Wing");
     expect(fetchMock).toHaveBeenCalledTimes(2);
 
-    const [secondUrl, secondInit] = fetchMock.mock.calls[1] as [string, RequestInit];
+    const [secondUrl, secondInit] = fetchMock.mock.calls[1]!;
     expect(secondUrl).toBe("/facilities/7/follow-up");
     expect(secondInit.method).toBe("POST");
     expect(secondInit.headers).toMatchObject({

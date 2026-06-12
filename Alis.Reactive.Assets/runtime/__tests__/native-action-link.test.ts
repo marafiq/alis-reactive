@@ -57,7 +57,7 @@ async function nextTask(): Promise<void> {
 
 describe("native action link", () => {
   it("binds the clicked href to the single serialized request", async () => {
-    const fetchMock = vi.fn(async () => new Response("", { status: 204 }));
+    const fetchMock = vi.fn(async (_url: string, _init: RequestInit) => new Response("", { status: 204 }));
     vi.stubGlobal("fetch", fetchMock);
 
     const anchor = renderActionLink(requestReaction("/placeholder"));
@@ -67,13 +67,13 @@ describe("native action link", () => {
     await nextTask();
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const [url, init] = fetchMock.mock.calls[0]!;
     expect(url).toBe("/residents/42/delete");
     expect(init.method).toBe("DELETE");
   });
 
   it("binds the clicked href when the request is inside an action-link branch", async () => {
-    const fetchMock = vi.fn(async () => new Response("", { status: 204 }));
+    const fetchMock = vi.fn(async (_url: string, _init: RequestInit) => new Response("", { status: 204 }));
     const beforeRequest = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
     document.addEventListener("action-link-before-request", beforeRequest);
@@ -104,7 +104,7 @@ describe("native action link", () => {
 
     expect(beforeRequest).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const [url, init] = fetchMock.mock.calls[0]!;
     expect(url).toBe("/residents/42/delete");
     expect(init.method).toBe("DELETE");
   });

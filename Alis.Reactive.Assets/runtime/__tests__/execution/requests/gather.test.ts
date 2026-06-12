@@ -55,8 +55,10 @@ function readUrlParameter(name: string, shape: Shape): ValueExpression {
   };
 }
 
+// Real plans never carry File values in literal JSON — they reach gather as
+// evaluated browser reads. This fabricates that runtime-evaluated value directly.
 function runtimeLiteral(value: unknown, shape: Shape): ValueExpression {
-  return { kind: "literal", value, shape };
+  return { kind: "literal", value: value as JsonValue, shape };
 }
 
 function target(name: string): RequestPayloadTarget {
