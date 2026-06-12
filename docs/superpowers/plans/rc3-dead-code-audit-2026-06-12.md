@@ -88,7 +88,23 @@ ValueExpression/ConditionGraph/ReactionGraph factories, compare operators).
 | wire-format.ts dead | UPHELD | No barrel, no tsconfig alias, not an esbuild entry (entry is runtime/root.ts), no architecture-test allowlist entry, no dynamic import |
 | clearContainerValidation dead | UPHELD | No namespace import, no plugin-catalog/app-object string-name exposure, no C#/.cshtml reference, unload routes through wireLiveValidation |
 
-## Ranked list — dead at >=99%, adversary-signed
+## Outcome — owner rulings and execution (2026-06-12, same night)
+
+- Item 4 `local`: owner gave the staged story — pipeline-local variable,
+  hold a value read from a JS object for reuse within ONE flat scope
+  (`var x = read(); b = x`). RULED KEEP. Story recorded as XML doc on
+  `PayloadSource.Local()` and in the member-grammar coverage matrix row.
+  The execute.test.ts probes stay — they exercise the staged shape.
+- Items 1-3: no story offered. Deleted in ranked order, one row per commit:
+  1. wire-format.ts — commit 9326e56e (typecheck clean, vitest 200/200)
+  2. clearContainerValidation — commit 15baf75f (typecheck clean, vitest 200/200)
+  3. dispatch scope vertical — commit 85f26ceb (contract regenerated, union
+     narrowed to 6 scopes, typecheck clean both legs, vitest 200/200,
+     dotnet build 0/0)
+- `PayloadSource.Request()` also got its owner-confirmed story as an XML doc
+  while recording local's, so the next auditor reads it at the factory.
+
+## Ranked list — dead at >=99%, adversary-signed (as presented for ruling)
 
 1. **`Alis.Reactive.Assets/runtime/shared/wire-format.ts`** (whole module).
    Deletion shape: delete file. Nothing regenerates, nothing re-probes.

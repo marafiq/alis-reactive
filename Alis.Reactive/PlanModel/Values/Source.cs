@@ -68,8 +68,14 @@ namespace Alis.Reactive.PlanModel
 
         internal static PayloadSource Error() => new PayloadSource(PayloadScope.Error);
 
+        /// <summary>Request snapshot scope. Designed landing zone (owner-confirmed 2026-06-12):
+        /// the runtime keeps the request snapshot for deterministic retry; the authoring door is future surface.</summary>
         internal static PayloadSource Request() => new PayloadSource(PayloadScope.Request);
 
+        /// <summary>Pipeline-local variable scope, one flat scope per execution: hold a value read
+        /// from a browser object so later steps reuse it (var x = read(); b = x). Designed landing
+        /// zone (owner-confirmed 2026-06-12): the runtime resolver case exists; the authoring door
+        /// and the context writer are future surface.</summary>
         internal static PayloadSource Local() => new PayloadSource(PayloadScope.Local);
 
         /// <summary>Current array element under an array operation (top of the element scope stack).</summary>
