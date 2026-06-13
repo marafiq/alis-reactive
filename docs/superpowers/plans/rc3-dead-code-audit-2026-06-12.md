@@ -180,3 +180,143 @@ runtime writer (local), behavior already served by event scope (dispatch).
 Items 1-2 have no staged-feature story: one duplicates a live method
 verbatim; the other is runtime code no plan node can invoke (the runtime
 is not frozen surface — the C# DSL is).
+
+---
+
+# RC3 Public-Contract Tightening (sibling theme, 2026-06-12 → continued 2026-06-13)
+
+Distinct from dead-code deletion: these types are NOT dead — they are wire
+shape wrongly marked `public`. Rule 8 freezes the DSL *authoring grammar*
+(builders, `Typed*` types, factory entry points). Plan-model wire classes
+have internal constructors and travel as their public *base* type; the
+concrete leaf being `public` is un-cleaned surface, safe to narrow to
+`internal`. Serialization is unaffected (STJ reflection is visibility-blind;
+public *properties* are the wire and stay public). The PlanContractGenerator
+emits TS interface/union names from STRING LITERALS, so `plan.ts` is
+byte-identical across every visibility change — verified each row.
+
+## Committed
+- `PayloadSource` → internal — commit `a71ba35a`. Full gate green incl.
+  Playwright 1219/1219 (serialization proof).
+
+## In flight (gate running at time of note)
+- 7-class batch → internal: `ObjectExpression`, `ArrayExpression`,
+  `ArrayOperationExpression`, `CompareCondition`, `LiteralExpression`,
+  `ReadExpression`, `Shape`. Fast legs green (solution build 0/0 both TFMs,
+  `plan.ts` byte-identical, vitest 200/200, ArchitectureTests 2/2);
+  Playwright leg running. Merit basis: every public exposer resolves to a
+  type already internal or internalised in this same batch — e.g. the
+  Validation `public … Value` props sit on PRIVATE nested classes inside
+  `internal ValidationRuleExecution`; `BrowserObjectContract`'s three
+  `public Shape` members sit on already-`internal` types; `Compare()`
+  returns the `ConditionGraph` base, not `CompareCondition`.
+
+## CONCLUSION — bare `Source` family (deep-read 2026-06-13, source-grounded)
+
+The DSL surface is the `Typed*Source<T>` builders (`TypedComponentSource`,
+`TypedPluginSource`, `TypedUrlSource` in `PlanAuthoring/Conditions/`) —
+developers NAME these (`TypedPluginSource<int> countSrc = p.Plugin(...)`,
+ArrayManager view). The bare PlanModel `*Source` classes are the wire those
+builders compile down to. Live authoring code names only the `Typed*` ones;
+bare types appear solely in `docs/archive-history/rc1-docs/` (non-authoritative).
+Every `ValueExpression` factory touching a Source type (`Read(Source from…)`,
+`Invoke(RuntimeObjectSource…)`) is `internal static` → internal params, no
+conflict. Zero vendor / sandbox / test references to any bare type.
+
+| Type | Internal-ready | Evidence / condition |
+|---|---|---|
+| `ComponentSource` | YES, now | no public signature names it; `.Of()` internal; only `var` locals (CS0053 ignores locals) |
+| `PluginSource` | YES, now | same (`PluginMemberBuilder.cs:272` local) |
+| `UrlSource` | YES, now | same (`.Instance` internal; `ValueExpression.cs:56/59` locals) |
+| `DomSource` | YES, now | same (`ValueExpression.cs:66` local) |
+| `RuntimeObjectSource` | YES | only internal `Invoke`/`Method` params name it; goes internal AFTER its two leaves (public-derived-from-internal-base is illegal) |
+| `Source` (root) | **NOT YET** | sibling-pinned by `public Source On` on PUBLIC `SetReaction` (ReactionGraph.cs:253/260) + `CallReaction` (ReactionGraph.cs:275/283). The third exposer `ReadExpression.From` (ValueExpression.cs:297) is already internal via the 7-batch. |
+
+Intermediate state is legal: `internal ComponentSource : RuntimeObjectSource`,
+`internal RuntimeObjectSource : Source(public)` — internal-from-public base is
+fine; `SetReaction.On` keeps compiling while `Source` stays public.
+
+### Next batches (ordered)
+1. 5-type `Source` batch NOW-ready: `ComponentSource`, `PluginSource`,
+   `UrlSource`, `DomSource`, `RuntimeObjectSource`. Same proof loop.
+2. ReactionGraph-family batch unlocks the root `Source`: internalise
+   `SetReaction` + `CallReaction` (verify siblings `DispatchReaction`,
+   `BranchReaction`, `SequenceReaction`, `ParallelReaction`,
+   `InjectReaction`, `ShowValidationErrorsReaction` — same wire-node pattern),
+   THEN `Source` → internal falls out.
+
+## CEILING of the theme (proven 2026-06-13) — the whole wire layer is meant to be internal
+
+`RenderPlan<TModel>(html, ReactivePlan<TModel> plan)` (PlanExtensions.cs:93/112)
+— the developer holds `ReactivePlan<TModel>` (public, PlanAuthoring/ReactivePlan.cs:12),
+which calls `plan.Render()` internally. Its public surface names ZERO wire types.
+The serialized wire ROOT, `PlanDocument`, is ALREADY `internal`
+(PlanModel/Document/PlanDocument.cs:9) — and `public IReadOnlyList<Behavior> Behaviors`
+holds an already-`internal` `Behavior`. The plan serializes green at 1219 with an
+internal root: PROOF that STJ serializes public-MODIFIER properties regardless of the
+declaring class's accessibility, and that the entire PlanModel layer can be internal.
+
+Therefore all ~56 public PlanModel types are un-cleaned legacy surface. The permanent
+public floor is `ReactivePlan<TModel>` + builders + the `Typed*Source<T>` family — none
+name a wire type. Waves: internalise LEAVES first (concrete sealed nodes; safe because
+they are never a serialized property's DECLARED type — properties are declared as the
+base, the leaf is only the runtime type, serialized via reflection on its public props),
+then the abstract UNION BASES (safe once every class declaring a base-typed public
+member is itself internal; no external API pins them). Build is the judge each wave;
+plan.ts stays byte-identical (generator emits names from string literals).
+
+### DEFINITIVE VERDICT (deep-verified 2026-06-13, inverse method): the ENTIRE PlanModel wire layer is internal-ready
+
+Verified by the inverse question — "what permanently-public member names a wire type?" —
+which covers every family at once. Findings, all source-grounded:
+- ZERO permanently-public members (PlanAuthoring builders, ReactivePlan, Components,
+  Razor, Validation) name ANY wire type — bases or leaves. Grep run with AND without
+  `=>` exclusion.
+- `Typed*Source<T>.ToValueExpression()` is `internal override` (TypedSource.cs:11 +
+  each impl) — the builder→wire conversion never surfaces `ValueExpression`.
+- Vendor PUBLIC APIs name only the `Typed*Source<T>` wrappers (legit DSL), never a
+  bare wire type. The one cross-assembly consumer, `NativeActionLinkPayload`
+  (NativeActionLinkSerializer.cs:131), is `internal sealed` — public props on an
+  internal class, IVT-fed. Not a pin.
+- Sandbox / test / developer code names ZERO bare wire types.
+- `Path`/`PathSegment`/`ComponentRole`/`InputBinding`: zero public exposure outside PlanModel.
+- No public generic constraint `where T : <wireBase>` anywhere.
+
+Conclusion: all ~56 public PlanModel types → internal is achievable. Permanent public
+floor = `ReactivePlan<TModel>` + builders + `Typed*Source<T>` + `Html` entry points +
+`ComponentRef` + interfaces — none name a wire type. The serialized root `PlanDocument`
+is already internal and green at 1219, proving the pattern end-to-end.
+
+Wave ordering (build-enforced; flip each family self-consistently): leaves → intermediate
+bases → root bases. The C# compiler is the final judge of ordering (CS0050/0053);
+since every type goes internal, the end state is self-consistent. plan.ts stays
+byte-identical throughout (generator emits names from string literals).
+
+Residual (build-time only, not exposure): interface-impl / generic-constraint edge cases
+the inverse grep can't see — caught by the per-family solution build, never shipped.
+
+Per-family levers (all internal-ready; ordering note in parens):
+- Values: `ValueExpression`(base last) + Literal/Read/Object/Array/ArrayOp [in 7-batch];
+  `ValueReadAccess`(base) + Property/Method; `Source`(base last) + Component/Plugin/Url/Dom +
+  RuntimeObjectSource(mid); `Shape` [in 7-batch]; `Path`, `PathSegment`.
+- Conditions: `ConditionGraph`(base last) + Compare[in 7-batch]/All/Any/Not/Confirm.
+- Reactions: `ReactionGraph`(base last) + 9 leaves; `BranchGuard`(base)+cases; `BranchCase`;
+  `ParallelCompletion`(base)+No/Settled; (`Behavior`/`BehaviorGraph` already internal);
+  `ServerPushEventFilter`.
+- Requests: `RequestPlan`, `ResponseRoute`; `RequestChain`(base)+FollowUp/Terminal;
+  `RequestInput`(base)+No; `RequestInputTarget`(base)+Header/Payload/RouteParameter;
+  `RequestValidationTarget`(base)+Container/No; `ResponseStatusMatch`(base)+Any/Exact.
+- WireTerms: `PlanScope`(base)+Partial/Root.
+- BrowserObjects: `InputBinding`, `ComponentRole`.
+- Validation: `ValidationContainerBinding`.
+
+## Dead-code deletion theme — SWEEP RESULT (nothing pending)
+All prior-session dead-code items are resolved: wire-format.ts, dispatch
+scope, clearContainerValidation, PayloadContract, Merge/channel-check =
+DELETED; request + local scopes = KEEP (owner-staged stories recorded at the
+factories); call-on-payload success/error width = KEEP (inherent to one
+`PayloadSource` type inside `CallTargetSource`, not separately deletable);
+alis-prefix family = deferred feature work, not dead. The matrix's remaining
+OPEN rows (M5b set/call-PayloadSource) are GROUNDED-alive features needing
+Playwright proof slices — a TESTING task, not a deletion. No dead-code
+deletion is pending.
