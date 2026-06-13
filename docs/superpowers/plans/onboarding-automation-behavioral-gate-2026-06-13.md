@@ -147,23 +147,21 @@ framework untouched, eyes-first:
 - `clicking_an_assigned_shift_shows_staff_details_and_edit_actions` (2316379b) — QuickInfo template.
 - `editing_a_shift_opens_the_edit_drawer_with_the_assignment_form` (19cc7a2c) — drawer + partial load.
 
-## CRUD blocker — ROOT-CAUSED, with the reliable path (do this first next session)
+## CRUD — SOLVED (commit 860b3619), goal exit d proven
 
-The stateful create/assign→persist→reload test (goal exit d) is blocked by a real
-automation issue: the staff `FusionDropDownList` popup, loaded via partial into the
-`NativeDrawer`, opens unreliably under Playwright (popup goes `display:none` / never
-reaches `.e-popup-open`; a settled MANUAL click works). Confirmed across ~7 attempts
-using drawer-`visible` waits, `ClickWhenStable`, keyboard `ArrowDown`, and open-popup
-scoping. Removed rather than ship a flaky test.
+`assigning_staff_to_an_open_shift_reduces_open_shifts_and_persists_on_reload`:
+open unassigned shift → pick staff → Save → `#unassigned-count` drops →
+`Page.ReloadAsync()` → count still dropped (server persistence). Full
+`WhenUsingFusionSchedule` fixture green (6/6).
 
-THE FIX (proven by the repo's own working drawer-CRUD test): the resident `_AddResidentFormPartial`
-picks its choice field with `NativeRadioGroup` (pre-visible options, `GetByText("…").Click()`),
-NOT a dropdown popup — that test passes reliably. So: change the schedule assign/edit
-form's staff field from `FusionDropDownList` to `NativeRadioGroup` (or a clean dedicated
-"staffing an open shift" journey slice that does), then the CRUD is reliably testable:
-open unassigned shift → pick staff radio → Save (`ClickWhenStable`) → `#unassigned-count`
-drops → `Page.ReloadAsync()` → count still dropped. Exemplar:
-`tests/.../Components/AppLevel/WhenDrawerOpensAndCloses.cs::filling_and_submitting_resident_form_shows_success`.
+Root cause that cost ~7 rounds: the staff `FusionDropDownList` popup, loaded via
+partial into the `NativeDrawer`, opens unreliably under Playwright (popup
+`display:none` / never `.e-popup-open`; a settled MANUAL click works). FIX
+(matches the repo's passing resident-form drawer test): the assign/edit staff
+field now uses `NativeRadioGroup` (pre-visible options, no popup) — costs no
+component coverage since staff selection is incidental to the Schedule proof.
+LESSON for the other 50 components: do not drive a `FusionDropDownList` popup
+inside a `NativeDrawer` from Playwright; use radio/pre-visible options.
 
 ## Next session starts here
 
