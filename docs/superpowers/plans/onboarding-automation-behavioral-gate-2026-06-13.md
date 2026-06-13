@@ -139,18 +139,42 @@ covered-by-variant inflation (fan-out cap + declared reasons).
   flow, not before it.
 - Fan-out across the remaining 49 components to the same bar.
 
+## FusionSchedule — committed behavioral rows (verified, filtered runs green)
+
+Three real fails-when-broken behaviors, all on the existing schedule page, locator-based,
+framework untouched, eyes-first:
+- `schedule_binds_the_weeks_shift_assignments_from_the_server` (commit 39ce3161) — server data-bind.
+- `clicking_an_assigned_shift_shows_staff_details_and_edit_actions` (2316379b) — QuickInfo template.
+- `editing_a_shift_opens_the_edit_drawer_with_the_assignment_form` (19cc7a2c) — drawer + partial load.
+
+## CRUD blocker — ROOT-CAUSED, with the reliable path (do this first next session)
+
+The stateful create/assign→persist→reload test (goal exit d) is blocked by a real
+automation issue: the staff `FusionDropDownList` popup, loaded via partial into the
+`NativeDrawer`, opens unreliably under Playwright (popup goes `display:none` / never
+reaches `.e-popup-open`; a settled MANUAL click works). Confirmed across ~7 attempts
+using drawer-`visible` waits, `ClickWhenStable`, keyboard `ArrowDown`, and open-popup
+scoping. Removed rather than ship a flaky test.
+
+THE FIX (proven by the repo's own working drawer-CRUD test): the resident `_AddResidentFormPartial`
+picks its choice field with `NativeRadioGroup` (pre-visible options, `GetByText("…").Click()`),
+NOT a dropdown popup — that test passes reliably. So: change the schedule assign/edit
+form's staff field from `FusionDropDownList` to `NativeRadioGroup` (or a clean dedicated
+"staffing an open shift" journey slice that does), then the CRUD is reliably testable:
+open unassigned shift → pick staff radio → Save (`ClickWhenStable`) → `#unassigned-count`
+drops → `Page.ReloadAsync()` → count still dropped. Exemplar:
+`tests/.../Components/AppLevel/WhenDrawerOpensAndCloses.cs::filling_and_submitting_resident_form_shows_success`.
+
 ## Next session starts here
 
-1. Drive FusionSchedule as an AUDIT (skill stages, existing C#/tests = evidence
-   only): rebuild discovery artifacts, regenerate the fail-closed matrix (67 members).
-2. Persistence is already adequate (in-memory HTTP-backed, POST→GET visible) —
-   matches the Grid exemplar (Session-backed). Do NOT build SQLite. Add a
-   reload-preserves-state assertion where Gate 6 applies.
-3. Eyes-first in the browser, then write the 7-behavior + CRUD Playwright slice
-   covering every matrix member (fails-when-broken each).
-4. Author `proof/behavioral-coverage.json`; run
+1. Land the CRUD via the NativeRadioGroup path above (the one blocker on exit d).
+2. Continue the remaining FusionSchedule behaviors toward the 67-member matrix
+   (regenerable: `write-fusion-typed-api-coverage.mjs --component schedule --fusion-type FusionSchedule --write`).
+3. Author `proof/behavioral-coverage.json`; run
    `drive-component-gates.mjs --component schedule --full` until every gate PASS.
-5. Blind-review verdict quoted into `proof/blind-review.md`.
+4. Blind-review verdict quoted into `proof/blind-review.md`.
+5. Persistence is already adequate (in-memory HTTP-backed, POST→GET visible) — matches
+   the Grid exemplar (Session-backed). Do NOT build SQLite.
 
 ## Parity / audit dimension (the "audit" in automate-audit-upgrade)
 
