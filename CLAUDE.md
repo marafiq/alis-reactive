@@ -498,6 +498,17 @@ it printed.
 
 ### Review Loop — Every Change
 
+**Review the live tree, and name it.** Every review — agent or human,
+adversarial or routine — runs against the current branch's working tree at HEAD,
+never a frozen historical commit. The reviewer confirms the target up front
+(`git rev-parse --abbrev-ref HEAD`, `git rev-parse HEAD`, clean `git status`) and
+states that branch + SHA in its output; a dispatched review agent is given the
+branch and HEAD SHA and told to verify it before reading code. Why: a review
+pinned to an already-merged commit raised four "unpaid debt" findings, every one
+already closed by later commits on the branch — stale-tree false alarms and a
+misleading verdict are the cost of an unnamed, out-of-date review target. A
+finding only counts when its `file:line` still exists at HEAD.
+
 Review against the matrix, not against implementation preference:
 
 1. **Design Review**: Does the DSL graph fully explain the chosen domain terms?
