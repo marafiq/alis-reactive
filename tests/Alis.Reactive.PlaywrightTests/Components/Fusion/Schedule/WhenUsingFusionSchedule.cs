@@ -143,4 +143,21 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task clicking_an_unassigned_shift_offers_to_assign_staff()
+    {
+        await NavigateAndWaitForSchedule();
+
+        await Page.GetByText(new Regex("UNASSIGNED")).First.ClickAsync();
+
+        // The QuickInfo template renders its unassigned branch: an Assign Staff
+        // action (assigned shifts get Edit/Reassign instead). The action exists
+        // only in that branch's footer, so it fails if the conditional template or
+        // the event wiring breaks.
+        await Expect(Page.GetByText("Assign Staff", new() { Exact = true }))
+            .ToBeVisibleAsync(new() { Timeout = 10000 });
+
+        AssertNoConsoleErrors();
+    }
 }
