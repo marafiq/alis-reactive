@@ -141,11 +141,28 @@ covered-by-variant inflation (fan-out cap + declared reasons).
 
 ## FusionSchedule — committed behavioral rows (verified, filtered runs green)
 
-Three real fails-when-broken behaviors, all on the existing schedule page, locator-based,
-framework untouched, eyes-first:
-- `schedule_binds_the_weeks_shift_assignments_from_the_server` (commit 39ce3161) — server data-bind.
-- `clicking_an_assigned_shift_shows_staff_details_and_edit_actions` (2316379b) — QuickInfo template.
-- `editing_a_shift_opens_the_edit_drawer_with_the_assignment_form` (19cc7a2c) — drawer + partial load.
+Six real fails-when-broken behaviors, locator-based, framework untouched, eyes-first:
+- `schedule_binds_the_weeks_shift_assignments_from_the_server` (39ce3161) — server data-bind.
+- `clicking_an_assigned_shift_shows_staff_details_and_edit_actions` (2316379b) — QuickInfo template (assigned).
+- `editing_a_shift_opens_the_edit_drawer_with_the_assignment_form` (19cc7a2c) — schedule:edit → drawer + partial.
+- `assigning_staff_to_an_open_shift_reduces_open_shifts_and_persists_on_reload` (860b3619) — stateful CRUD, reload-persists (exit d).
+- `clicking_an_unassigned_shift_offers_to_assign_staff` (b52f9ab5) — QuickInfo conditional (unassigned branch).
+- `reassigning_a_shift_opens_the_assignment_drawer` (f32c7749) — schedule:reassign handler.
+
+Reliable behaviors are now largely exhausted; the rest hit iffy SF interactions:
+
+**FINDING — view toggle may be broken.** Clicking the Month/Day toolbar buttons does
+NOT switch the view: the SF instance `currentView` stays `"Week"` and status stays
+`"Ready"` (Navigating never fires) after a click. Could be a real bug in the
+Navigating-reload wiring or an interaction that won't drive without a specific gesture.
+Verify next session with a trusted Playwright click; if it genuinely does not switch,
+report it (Cardinal Rule) rather than hack a test around it. This blocks the Navigating
+event-payload coverage.
+
+**FINDING — assign-form required validation didn't display** when the staff field is the
+drawer-injected `NativeRadioGroup` (the directly-rendered resident form's does). Possibly
+injected-form client-validation wiring. The CRUD positive path is green; the empty-submit
+validation behavior is unproven.
 
 ## CRUD — SOLVED (commit 860b3619), goal exit d proven
 
