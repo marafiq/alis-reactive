@@ -63,4 +63,25 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task clicking_an_assigned_shift_shows_staff_details_and_edit_actions()
+    {
+        await NavigateAndWaitForSchedule();
+
+        // Click an assigned shift (one labelled with a staff role).
+        await Page.GetByText(new Regex(@"\((CNA|RN|LPN)\)")).First.ClickAsync();
+
+        // EventClick opens the QuickInfo popup, whose custom template binds the
+        // assignment: the staff phone in the content and Edit/Reassign actions in
+        // the footer. None of this text exists in the DOM until the popup opens and
+        // the template renders the clicked appointment's data, so each assertion
+        // fails if the event wiring or the QuickInfo template breaks.
+        await Expect(Page.GetByText("Reassign", new() { Exact = true }))
+            .ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Page.GetByText(new Regex(@"\d{3}-\d{4}")).First)
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
 }
