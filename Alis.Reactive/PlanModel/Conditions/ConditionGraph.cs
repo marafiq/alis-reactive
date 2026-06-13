@@ -37,7 +37,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Compares two values using a relational operator.</summary>
     [JsonConverter(typeof(CompareConditionJsonConverter))]
-    public sealed class CompareCondition : ConditionGraph
+    internal sealed class CompareCondition : ConditionGraph
     {
         private readonly CompareOperator _op;
         private readonly ComparisonOperands _operands;
