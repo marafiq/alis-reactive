@@ -15,6 +15,7 @@ Runs the ordered verification gate:
   4. dotnet build
   5. non-Playwright dotnet test projects, if any
   6. scripts/playwright.sh --no-build
+  7. behavioral coverage gate (0b) over behaviorally-audited Fusion components
 
 Options:
   --no-e2e    Skip the Playwright browser leg after typecheck, assets, vitest,
@@ -93,8 +94,15 @@ run_dotnet_tests
 if [ "$run_e2e" -eq 1 ]; then
   echo "[test] running observable Playwright"
   CONFIGURATION="$configuration" scripts/playwright.sh --no-build
+  # 0b behavioral coverage gate: the fresh TRX from the run above is the truth
+  # source. For every component that claims behavioral coverage
+  # (proof/behavioral-coverage.json), this confirms each mapped member's test
+  # exists in that TRX and passed. Components without a map are below bar, not a
+  # failure. Skipped under --no-e2e: no fresh TRX means no behavioral proof.
+  echo "[test] behavioral coverage gate (0b)"
+  node .claude/skills/onboard-fusion-component/scripts/verify-behavioral-coverage.mjs --all
 else
-  echo "[test] skipping Playwright (--no-e2e)"
+  echo "[test] skipping Playwright and behavioral coverage gate (--no-e2e)"
 fi
 
 echo "All gates green."
