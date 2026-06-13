@@ -121,11 +121,17 @@ covered-by-variant inflation (fan-out cap + declared reasons).
   at HEAD — it is an AUDIT (the slice exists), and far from the bar:
   - Only one small Playwright file (`WhenUsingFusionSchedule.cs`, ~1.4k); the
     7-behavior + stateful-CRUD contract is not met.
-  - The sandbox is backed by `FakeScheduleData.cs` (static) — a REJECT for a
-    stateful data component. The schedule sandbox must become SQLite-backed with
-    create/update/delete and reload-preserves-state (automation-gates Gate 6).
-  - No discovery artifacts beyond source-inventory + master index; no
-    `behavioral-coverage.json`.
+  - Persistence is adequate, contrary to the prompt: the schedule sandbox is an
+    in-memory mutable `ConcurrentDictionary` store with HTTP create/assign/unassign
+    that is POST→GET visible. The prompt said "SQLite + reload-preserves-state",
+    but the EXEMPLAR (Grid CareOps) persists via `HttpContext.Session`
+    (JSON-serialized) — VERIFIED at `GridController.CareOps.cs:31,41` — and NO Grid
+    Playwright test calls `Reload`. So in-memory/session HTTP-backed (automation-gates
+    Gate 6 literally says "in-memory HTTP-backed sandbox") is the operative bar, NOT
+    SQLite. Do not build SQLite infra for Schedule; it already meets the Grid bar.
+  - The real gap is BEHAVIORAL: only 2 Playwright tests (gather/route-template,
+    no create/assign/unassign coverage), no `behavioral-coverage.json`, no
+    discovery artifacts beyond source-inventory + master index.
   - Driver run today: a=PASS, 0a=PASS, b=GAP, c=FAIL, f=FAIL, e=GAP — the exact
     gaps to close, in order. Multi-commit, spans sessions.
 - Parity tool depends on the discovery artifact `public-api-surface.json`
@@ -136,13 +142,24 @@ covered-by-variant inflation (fan-out cap + declared reasons).
 ## Next session starts here
 
 1. Drive FusionSchedule as an AUDIT (skill stages, existing C#/tests = evidence
-   only): rebuild discovery artifacts, regenerate the fail-closed matrix.
-2. Rebuild the schedule sandbox SQLite-backed (replace `FakeScheduleData`); prove
-   create/update/delete + reload-preserves-state.
-3. Write the 7-behavior + CRUD Playwright slice covering every matrix member.
+   only): rebuild discovery artifacts, regenerate the fail-closed matrix (67 members).
+2. Persistence is already adequate (in-memory HTTP-backed, POST→GET visible) —
+   matches the Grid exemplar (Session-backed). Do NOT build SQLite. Add a
+   reload-preserves-state assertion where Gate 6 applies.
+3. Eyes-first in the browser, then write the 7-behavior + CRUD Playwright slice
+   covering every matrix member (fails-when-broken each).
 4. Author `proof/behavioral-coverage.json`; run
    `drive-component-gates.mjs --component schedule --full` until every gate PASS.
 5. Blind-review verdict quoted into `proof/blind-review.md`.
+
+## Parity / audit dimension (the "audit" in automate-audit-upgrade)
+
+Parity (vendor surface vs typed C#) is not a standalone number: a d.ts has
+hundreds of members, most builder-owned/internal. A meaningful parity % needs the
+discovery classification (`public-api-surface.json`: onboarded-typed | builder-owned
+| excluded-with-evidence). So parity is computed FROM the discovery artifacts, as
+part of the per-component audit — not a pre-step. The driver names it a GAP until
+that classification + a parity computation over it exists.
 
 ## Baseline
 
