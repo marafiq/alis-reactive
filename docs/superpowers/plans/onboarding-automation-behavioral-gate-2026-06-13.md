@@ -88,13 +88,19 @@ covered-by-variant inflation (fan-out cap + declared reasons).
     green baseline below ran on the pre-edit tree (the gate line is a verified
     exit-0 no-op in a reachable spot); re-run as the authoritative end-to-end
     green after units 2–3 land.
+- **Unit 2 — loophole #2 closed in `verify-fusion-artifact-gates.mjs`.** Committed.
+  A surgical `Status:`-line check (not a whole-file scan, so legit prose like
+  "partial injection" is never a false positive) flags
+  `partial|wip|stub|some|todo-later|pending|incomplete|draft` on a proof file's
+  status line. Combined with the matrix's existing `Status: audited.` requirement,
+  matrix-status and proof-status cannot disagree and still pass.
+  - VERIFIED both ways through the real verifier: Grid now FAILS (exit 1) with
+    `proof/playwright-proof.md status line declares open work ("partial")`; an
+    A/B on a temp copy with only the status line flipped to `audited.` clears the
+    marker (count 1 → 0). Node `--check` clean.
 
 ## Remaining (this is many sessions — fan-out is the bulk)
 
-- Unit 1: `verify-behavioral-coverage.mjs` + self-test (bites both ways) + wired
-  into `scripts/test.sh`. (built + self-test green + `--all` no-op green; commit pending baseline)
-- Unit 2: harden `verify-fusion-artifact-gates.mjs` for loophole #2 (status
-  denylist `partial|wip|stub|some|todo-later` + matrix-status == proof-status).
 - Unit 3: one-command driver that chains the deterministic gates (ALIS009 via
   build, 0a coverage, 0b behavioral, artifact verifier, parity, full gate) and
   fails loud on any gap.

@@ -23,6 +23,14 @@ const required = [
   ["audit report", "proof/audit-report.md"]
 ];
 
+// Status markers that mean "not closed". Checked on a file's `Status:` line ONLY
+// (never the whole file) so legitimate prose like "partial injection" or "some
+// residents" is never a false positive. The lie this catches is goal loophole 2:
+// a component whose proof STATUS still says partial/wip/stub while the matrix
+// claims audited. matrix-status (must be `audited`) AND proof-status (must be
+// closed) together force agreement — they cannot disagree and still pass.
+const OPEN_STATUS = /\b(partial|wip|stub|todo[- ]?later|some|pending|unproven|incomplete|in progress|not (?:started|complete)|draft)\b/i;
+
 const files = required.map(([label, path]) => ({
   label,
   path,
@@ -83,6 +91,10 @@ for (const path of [
   }
   if (/\b(pending|unproven|missing|todo|failed-closed|incomplete|not started|not complete)\b/i.test(text)) {
     problems.push(`${path} contains open, failed-closed, incomplete, pending, unproven, missing, or todo markers`);
+  }
+  const openStatus = statusLineOpenMarker(text);
+  if (openStatus) {
+    problems.push(`${path} status line declares open work ("${openStatus}"); a closed component states an audited/proven status`);
   }
 }
 
@@ -167,6 +179,14 @@ function linksWithPrefix(markdown, prefix) {
     }
   }
   return Array.from(links).sort();
+}
+
+// Returns the open-status word found on the file's `Status:` line, or null.
+function statusLineOpenMarker(text) {
+  const line = text.split(/\r?\n/).find(item => /^\s*Status:/i.test(item));
+  if (!line) return null;
+  const match = line.match(OPEN_STATUS);
+  return match ? match[0] : null;
 }
 
 function matrixOpenMarkers(markdown) {
