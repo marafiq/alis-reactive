@@ -98,12 +98,22 @@ covered-by-variant inflation (fan-out cap + declared reasons).
     `proof/playwright-proof.md status line declares open work ("partial")`; an
     A/B on a temp copy with only the status line flipped to `audited.` clears the
     marker (count 1 → 0). Node `--check` clean.
+- **Unit 3 — one-command driver `drive-component-gates.mjs`.** Committed.
+  Chains every deterministic gate for a chosen component and fails loud on any
+  gap, labelling each PASS/FAIL/GAP/SKIP and mapping to the per-component exit
+  letters: a ALIS009 (slice build), 0a no-sandbox-usage (FusionCoverage filtered
+  to the component), b parity (GAP — tool unbuilt, named not hidden), c 0b
+  behavioral, f artifacts, e blind-review verdict presence, g full gate (`--full`).
+  - VERIFIED it FIRES: `--component schedule` → exit 1 with `b=GAP, c=FAIL,
+    f=FAIL, e=GAP, g=SKIP` (and a=PASS, 0a=PASS — Schedule's slice is ALIS009-clean
+    and sandbox-referenced). Node `--check` clean.
+  - Known: the all-PASS (exit 0) path is unreachable until the parity tool exists
+    (b is always GAP) AND a component is fully onboarded. That is correct
+    fail-loud behavior; the exit-0 branch is a trivial `blocking.length === 0`
+    check, exercised when FusionSchedule reaches the bar.
 
 ## Remaining (this is many sessions — fan-out is the bulk)
 
-- Unit 3: one-command driver that chains the deterministic gates (ALIS009 via
-  build, 0a coverage, 0b behavioral, artifact verifier, parity, full gate) and
-  fails loud on any gap.
 - Parity tool (per-component exit b): no parity tool exists yet; the matrix
   generator extracts C# members and `inspect-syncfusion-surface.mjs` extracts the
   vendor surface, but no ≥95% computation is wired. Distinct deliverable.
