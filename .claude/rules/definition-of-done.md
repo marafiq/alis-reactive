@@ -30,6 +30,13 @@ of done cannot cite the command run and one line of its output, it is not done.
    / green / 100%" beyond what was literally checked. If a bar was set, the number
    is the report, not an adjective — and quoted from the run, never from memory.
 
+7. **Analyzer diagnostics are work, not noise.** Every analyzer warning/error
+   (ALIS009 typed-gate, ALIS010 coverage, …) is ADDRESSED — fixed, or exempted
+   with a documented reason (`[TypedDslExemption]` and the like) — never
+   normalized, never accumulated as "expected output", never taken for granted.
+   A warning is suppressed or deferred ONLY when the owner explicitly says to
+   skip it. Treating a standing warning as acceptable is drift.
+
 ## What "100% coverage" MEANS (it cannot be hacked — BDD defines it)
 
 Coverage is NOT a count of matrix rows linked to a proof file. By **BDD Rule 3
