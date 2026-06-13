@@ -13,13 +13,13 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Identifies a plan-declared object whose members can be evaluated at runtime.</summary>
-    public abstract class RuntimeObjectSource : Source
+    internal abstract class RuntimeObjectSource : Source
     {
         private protected RuntimeObjectSource() { }
     }
 
     /// <summary>Identifies a plan-registered component as the value source.</summary>
-    public sealed class ComponentSource : RuntimeObjectSource
+    internal sealed class ComponentSource : RuntimeObjectSource
     {
         private readonly ComponentKey _component;
 
@@ -83,7 +83,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Identifies a plan-registered plugin object as the value source.</summary>
-    public sealed class PluginSource : RuntimeObjectSource
+    internal sealed class PluginSource : RuntimeObjectSource
     {
         private readonly PluginName _name;
         private readonly BrowserObjectId _type;
@@ -103,7 +103,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Reads from the browser <c>window.location</c> query string.</summary>
-    public sealed class UrlSource : Source
+    internal sealed class UrlSource : Source
     {
         /// <summary>JSON discriminator for URL query sources. Always <c>"url"</c>.</summary>
         public string Kind => "url";
@@ -117,7 +117,7 @@ namespace Alis.Reactive.PlanModel
     /// primitive that resolves component/plugin members. Element IDs are plan-carried, and the
     /// runtime resolves them with <c>getElementById</c> only, without DOM scanning.
     /// </remarks>
-    public sealed class DomSource : Source
+    internal sealed class DomSource : Source
     {
         private readonly string _element;
 
