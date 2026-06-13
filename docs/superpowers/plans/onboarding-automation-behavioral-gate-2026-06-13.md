@@ -7,6 +7,41 @@ rows each time. Source of truth is the code; this ledger is the running map.
 
 Goal doc: `docs/superpowers/plans/GOAL-deterministic-onboarding-automation.md`.
 
+## Deterministic backbone — COMPLETE (all gates bite; committed + verified)
+
+Every non-bypassable gate the goal names now exists and fails loud:
+- **ALIS009 (exit a)** — live; `dotnet build` is the typed gate.
+- **0a no-sandbox-usage** — `tools/FusionCoverage` (delivered before this session).
+- **0b behavioral coverage (exit c, terminal 1)** — `verify-behavioral-coverage.mjs`;
+  TRX-verified; self-test bites both ways; wired BLOCKING in `scripts/test.sh`.
+- **parity (exit b)** — `compute-fusion-parity.mjs`; deterministic, generated;
+  self-test bites; real signal `grid → 34.1% FAIL` (319 members unaccounted).
+- **artifact verifier (exit f)** — `verify-fusion-artifact-gates.mjs`; loophole #2
+  closed (a `partial`/`wip` proof status can no longer pass an `audited` matrix).
+- **one-command driver (terminal 2)** — `drive-component-gates.mjs`; runs a/0a/b/c/f/e/g
+  for a component and fails loud; verified on grid + schedule.
+- **behavioral status reporter (terminal 3 mechanism)** — `report-fusion-behavioral-status.mjs`;
+  reports the per-component behavioral bar (parity + 0b), NOT the doc gate.
+
+Honest standing from the behavioral reporter: **0/51 behaviorally onboarded.** The
+documentation gate's "1 audited" (grid) is corrected — grid is `34.1% parity FAIL,
+no behavioral map`. Terminal 4 (full `scripts/test.sh`) is GREEN over the current tree
+(1202 Playwright passed/0 failed) — but the onboarded SET is empty.
+
+## What remains is per-component APPLICATION (judgment-heavy, genuinely multi-session)
+
+Onboarding even ONE component to the bar is large and judgment-heavy, confirmed:
+- Discovery is not push-button — Schedule's `dataBinding`/`dataBound` payload types are
+  ambiguous across ~70 vendor d.ts files; the generator fail-closes and needs manual
+  disambiguation (which d.ts is authoritative per type).
+- Parity ≥95% means classifying hundreds of vendor members per component as
+  onboarded-typed / builder-owned / excluded-with-evidence (grid: 319 to classify).
+- 100% behavioral coverage means a fails-when-broken test per matrix member.
+- Then blind review + full gate, ×51.
+
+The backbone makes all of this MACHINE-CHECKABLE and un-fakeable. Applying it to 51
+components to GREEN is the multi-session bulk the goal anticipates.
+
 ## Verified state of the world (read at HEAD `04635938`, branch `tiny-safe-but-important-refactorings`)
 
 - 51 Fusion components total (confirmed: `verify-behavioral-coverage.mjs --all`
