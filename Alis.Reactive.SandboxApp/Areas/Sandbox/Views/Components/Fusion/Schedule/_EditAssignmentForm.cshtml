@@ -5,11 +5,9 @@
 @using Alis.Reactive.Fusion.Components
 @{
     var plan = Html.ReactivePlan<EditAssignmentModel>();
-    var staffList = FakeScheduleData.Staff.Select(s => new StaffOption
-    {
-        Text = $"{s.Name} ({s.Role})",
-        Value = s.Id
-    }).ToList();
+    var staffOptions = FakeScheduleData.Staff
+        .Select(s => new RadioButtonItem(s.Id.ToString(), $"{s.Name} ({s.Role})"))
+        .ToArray();
 }
 
 <native-vstack gap="Base" class="p-4">
@@ -21,10 +19,7 @@
 
     <native-vstack gap="Sm">
         @{ Html.InputField(plan, m => m.StaffId, o => o.Required().Label("Staff Member"))
-            .FusionDropDownList(b => b
-                .Placeholder("Select staff member")
-                .DataSource(staffList)
-                .Fields<StaffOption>(t => t.Text, v => v.Value)); }
+            .NativeRadioGroup(b => b.Items(staffOptions)); }
 
         @{ Html.InputField(plan, m => m.Notes, o => o.Label("Care Notes"))
             .NativeTextArea(b => b.Rows(3).Placeholder("Care instructions, special requirements...")); }
@@ -37,7 +32,7 @@
             {
                 p.Post("/api/schedule/assign", g => g
                      .Include<NativeHiddenField, EditAssignmentModel>(m => m.AssignmentId)
-                     .Include<FusionDropDownList, EditAssignmentModel>(m => m.StaffId))
+                     .Include<NativeRadioGroup, EditAssignmentModel>(m => m.StaffId))
                  .Validate<EditAssignmentValidator>("assignment-form")
                  .Response(r => r
                      .OnSuccess(s =>

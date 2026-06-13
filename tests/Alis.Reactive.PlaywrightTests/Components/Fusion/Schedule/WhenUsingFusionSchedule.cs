@@ -106,4 +106,41 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task assigning_staff_to_an_open_shift_reduces_open_shifts_and_persists_on_reload()
+    {
+        await NavigateAndWaitForSchedule();
+
+        // The page shows how many shifts still need coverage.
+        var openShifts = Page.Locator("#unassigned-count");
+        await Expect(openShifts).ToHaveTextAsync(new Regex(@"^\d+$"), new() { Timeout = 10000 });
+        var before = int.Parse(await openShifts.InnerTextAsync());
+        Assert.That(before, Is.GreaterThan(0), "the scenario needs at least one open shift to cover");
+
+        // Open an unassigned shift and choose to staff it.
+        await Page.GetByText(new Regex("UNASSIGNED")).First.ClickAsync();
+        await Page.GetByText("Assign Staff", new() { Exact = true }).ClickAsync();
+
+        // Wait for the drawer to finish sliding in and its form to render.
+        await Expect(Page.Locator("#alis-drawer")).ToHaveClassAsync(new Regex("alis-drawer--visible"), new() { Timeout = 10000 });
+        await Expect(Page.Locator("#assignment-form")).ToBeVisibleAsync(new() { Timeout = 10000 });
+
+        // Pick a staff member from the radio group (pre-visible options, no popup),
+        // then save.
+        await Page.Locator("#assignment-form").GetByText("Tom Hardy (LPN)").ClickAsync();
+        await ClickWhenStable(Page.Locator("#btn-save-assignment"));
+
+        // The save persists server-side (POST /api/schedule/assign); the schedule
+        // reloads and one fewer shift needs coverage.
+        await Expect(openShifts).ToHaveTextAsync((before - 1).ToString(), new() { Timeout = 15000 });
+
+        // Reload the whole page: the assignment is still there — it persisted on the
+        // server, not only in the client's component state.
+        await Page.ReloadAsync();
+        await WaitForTraceMessage("booted", 10000);
+        await Expect(openShifts).ToHaveTextAsync((before - 1).ToString(), new() { Timeout = 10000 });
+
+        AssertNoConsoleErrors();
+    }
 }
