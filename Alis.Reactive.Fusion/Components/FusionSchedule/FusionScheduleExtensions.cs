@@ -116,10 +116,17 @@ namespace Alis.Reactive.Fusion.Components
             return self.EmitCall(DataBindMethod);
         }
 
+        // ONBOARDING GAP (not dead code): these four event-CRUD methods take a raw
+        // ValueExpression, which devs cannot author (ValueExpression is internal wire;
+        // the DSL exposes only typed APIs per component, e.g. FusionGrid.UpdateCell's
+        // typed overload). They are parked internal until onboarded with typed
+        // signatures (typed value/source + private ValueExpression overload, the
+        // FusionGrid pattern). Internal makes the gap enforceable: the sandbox can no
+        // longer call or appear to call them, so the missing typed API cannot hide.
         /// <summary>
         /// Adds one schedule event or an event collection from a value expression.
         /// </summary>
-        public static ComponentRef<FusionSchedule, TModel> AddEvent<TModel>(
+        internal static ComponentRef<FusionSchedule, TModel> AddEvent<TModel>(
             this ComponentRef<FusionSchedule, TModel> self, ValueExpression data)
             where TModel : class
             => self.EmitCall(AddEventMethod, new System.Collections.Generic.List<ValueExpression> { data });
@@ -127,7 +134,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Saves an existing schedule event from a value expression.
         /// </summary>
-        public static ComponentRef<FusionSchedule, TModel> SaveEvent<TModel>(
+        internal static ComponentRef<FusionSchedule, TModel> SaveEvent<TModel>(
             this ComponentRef<FusionSchedule, TModel> self, ValueExpression data)
             where TModel : class
             => self.EmitCall(SaveEventMethod, new System.Collections.Generic.List<ValueExpression> { data });
@@ -135,7 +142,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Deletes a schedule event by identifier.
         /// </summary>
-        public static ComponentRef<FusionSchedule, TModel> DeleteEvent<TModel>(
+        internal static ComponentRef<FusionSchedule, TModel> DeleteEvent<TModel>(
             this ComponentRef<FusionSchedule, TModel> self, ValueExpression eventId)
             where TModel : class
             => self.EmitCall(DeleteEventMethod, new System.Collections.Generic.List<ValueExpression> { eventId });
@@ -143,7 +150,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Opens the built-in schedule editor for event data and an editor action.
         /// </summary>
-        public static ComponentRef<FusionSchedule, TModel> OpenEditor<TModel>(
+        internal static ComponentRef<FusionSchedule, TModel> OpenEditor<TModel>(
             this ComponentRef<FusionSchedule, TModel> self, ValueExpression data, string action = "Add")
             where TModel : class
             => self.EmitCall(OpenEditorMethod, new System.Collections.Generic.List<ValueExpression> { data, ValueExpression.Literal(action) });

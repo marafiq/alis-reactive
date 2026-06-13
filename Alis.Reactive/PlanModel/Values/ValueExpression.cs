@@ -10,7 +10,7 @@ namespace Alis.Reactive.PlanModel
     /// Wire base for Reactive Plan value nodes authored through DSL value expressions.
     /// </summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ValueExpression>))]
-    public abstract class ValueExpression
+    internal abstract class ValueExpression
     {
         private protected ValueExpression() { }
 
