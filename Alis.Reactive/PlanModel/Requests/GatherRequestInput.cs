@@ -81,7 +81,7 @@ namespace Alis.Reactive.PlanModel
         public abstract string Kind { get; }
     }
 
-    public sealed class RequestPayloadTarget : RequestInputTarget
+    internal sealed class RequestPayloadTarget : RequestInputTarget
     {
         private readonly BindingPath _path;
 
@@ -98,7 +98,7 @@ namespace Alis.Reactive.PlanModel
             new RequestPayloadTarget(path);
     }
 
-    public sealed class RequestHeaderTarget : RequestInputTarget
+    internal sealed class RequestHeaderTarget : RequestInputTarget
     {
         private readonly HeaderName _name;
 
@@ -114,7 +114,7 @@ namespace Alis.Reactive.PlanModel
             new RequestHeaderTarget(name);
     }
 
-    public sealed class RequestRouteParameterTarget : RequestInputTarget
+    internal sealed class RequestRouteParameterTarget : RequestInputTarget
     {
         private readonly RouteParameterName _name;
 

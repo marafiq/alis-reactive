@@ -5,7 +5,7 @@ using Alis.Reactive.Serialization;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>HTTP request definition in a Reactive Plan.</summary>
-    public sealed class RequestPlan
+    internal sealed class RequestPlan
     {
         private readonly RequestEndpoint _endpoint;
         private readonly RequestInput _input;
@@ -143,7 +143,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Represents a request with no chained follow-up request.</summary>
-    public sealed class TerminalRequestChain : RequestChain
+    internal sealed class TerminalRequestChain : RequestChain
     {
         /// <summary>JSON discriminator for terminal request chains. Always <c>"terminal"</c>.</summary>
         public override string Kind => "terminal";
@@ -151,7 +151,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Represents a request followed by another request after successful completion.</summary>
-    public sealed class FollowUpRequestChain : RequestChain
+    internal sealed class FollowUpRequestChain : RequestChain
     {
         private readonly RequestPlan _next;
 
@@ -187,14 +187,14 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Represents a request that does not run client validation before sending.</summary>
-    public sealed class NoRequestValidationTarget : RequestValidationTarget
+    internal sealed class NoRequestValidationTarget : RequestValidationTarget
     {
         /// <summary>JSON discriminator for requests without client validation. Always <c>"none"</c>.</summary>
         public override string Kind => "none";
     }
 
     /// <summary>Represents a request that validates a component container before sending.</summary>
-    public sealed class ContainerRequestValidationTarget : RequestValidationTarget
+    internal sealed class ContainerRequestValidationTarget : RequestValidationTarget
     {
         private readonly ComponentId _container;
 
@@ -211,7 +211,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Routes an HTTP response status match to a reaction.</summary>
-    public sealed class ResponseRoute
+    internal sealed class ResponseRoute
     {
         /// <summary>HTTP status match that selects this response route.</summary>
         public ResponseStatusMatch Match { get; }
@@ -250,14 +250,14 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Matches any HTTP response status in the current success or error group.</summary>
-    public sealed class AnyResponseStatusMatch : ResponseStatusMatch
+    internal sealed class AnyResponseStatusMatch : ResponseStatusMatch
     {
         /// <summary>JSON discriminator for any-status matches. Always <c>"any"</c>.</summary>
         public override string Kind => "any";
     }
 
     /// <summary>Matches one exact HTTP response status code.</summary>
-    public sealed class ExactResponseStatusMatch : ResponseStatusMatch
+    internal sealed class ExactResponseStatusMatch : ResponseStatusMatch
     {
         private readonly HttpResponseStatusCode _statusCode;
 
