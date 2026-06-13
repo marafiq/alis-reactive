@@ -117,11 +117,32 @@ covered-by-variant inflation (fan-out cap + declared reasons).
 - Parity tool (per-component exit b): no parity tool exists yet; the matrix
   generator extracts C# members and `inspect-syncfusion-surface.mjs` extracts the
   vendor surface, but no ≥95% computation is wired. Distinct deliverable.
-- FusionSchedule event-CRUD to the full bar (the goal's proof target): discovery
-  probes + traces, SQLite-backed sandbox CRUD with reload-preserves-state, 7
-  behaviors, full behavioral-coverage.json map, blind-reviewer verdict, all gates
-  green. Multi-commit, spans sessions.
+- FusionSchedule event-CRUD to the full bar (the goal's proof target). Assessed
+  at HEAD — it is an AUDIT (the slice exists), and far from the bar:
+  - Only one small Playwright file (`WhenUsingFusionSchedule.cs`, ~1.4k); the
+    7-behavior + stateful-CRUD contract is not met.
+  - The sandbox is backed by `FakeScheduleData.cs` (static) — a REJECT for a
+    stateful data component. The schedule sandbox must become SQLite-backed with
+    create/update/delete and reload-preserves-state (automation-gates Gate 6).
+  - No discovery artifacts beyond source-inventory + master index; no
+    `behavioral-coverage.json`.
+  - Driver run today: a=PASS, 0a=PASS, b=GAP, c=FAIL, f=FAIL, e=GAP — the exact
+    gaps to close, in order. Multi-commit, spans sessions.
+- Parity tool depends on the discovery artifact `public-api-surface.json`
+  (vendor-member classification), so it is naturally built alongside the audit
+  flow, not before it.
 - Fan-out across the remaining 49 components to the same bar.
+
+## Next session starts here
+
+1. Drive FusionSchedule as an AUDIT (skill stages, existing C#/tests = evidence
+   only): rebuild discovery artifacts, regenerate the fail-closed matrix.
+2. Rebuild the schedule sandbox SQLite-backed (replace `FakeScheduleData`); prove
+   create/update/delete + reload-preserves-state.
+3. Write the 7-behavior + CRUD Playwright slice covering every matrix member.
+4. Author `proof/behavioral-coverage.json`; run
+   `drive-component-gates.mjs --component schedule --full` until every gate PASS.
+5. Blind-review verdict quoted into `proof/blind-review.md`.
 
 ## Baseline
 
