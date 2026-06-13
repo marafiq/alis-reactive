@@ -1,5 +1,13 @@
 # Alis.Reactive Framework
 
+> **Active working branch — everyone, every agent, including Codex:
+> `tiny-safe-but-important-refactorings`.** All current work commits here; local
+> `main` is only a stale baseline, never a place to branch from or commit to.
+> This is enforced, not just asked: a `pre-commit` guard refuses commits on any
+> other branch (source of truth `git config alis.activeBranch`; installer
+> `scripts/install-git-hooks.sh` — re-run it after clone). Confirm
+> `git rev-parse --abbrev-ref HEAD` before working.
+
 ## Architecture
 
 A developer expresses reactive intent with the C# DSL. The plan domain
