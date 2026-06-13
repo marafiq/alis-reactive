@@ -9,6 +9,14 @@ shipped untyped with zero artifacts because nothing blocked it).
 
 Make the BUILD the gate, not the agent.
 
+**Before acting, read the code to build real context** — do not act from this
+prompt or memory. Read: the root `CLAUDE.md`; the target component slice under
+`Alis.Reactive.Fusion/Components/` (or Native); the DSL/runtime source it
+touches; any existing artifacts under `tools/FusionOnboarding/.../{component}/`;
+ALIS009 + `[TypedDslExemption]`; an exemplar fully-onboarded slice (FusionGrid).
+This work continues on the current RC3 branch (not a fresh `main`); build context
+from the current tree as it stands.
+
 ## The automation must
 1. Extract vendor JS surface (`d.ts`/`.js`) + implemented C# surface (Roslyn) →
    compute **parity**; un-onboarded public members below bar = FAIL.
