@@ -84,4 +84,26 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task editing_a_shift_opens_the_edit_drawer_with_the_assignment_form()
+    {
+        await NavigateAndWaitForSchedule();
+
+        // Open the QuickInfo for an assigned shift, then choose Edit.
+        await Page.GetByText(new Regex(@"\((CNA|RN|LPN)\)")).First.ClickAsync();
+        await Page.GetByText("Edit", new() { Exact = true }).ClickAsync();
+
+        // schedule:edit loads the EditForm partial into the drawer and opens it.
+        // "Save Assignment" and the "Assignment #N" label live only in that partial,
+        // so they are absent until the dispatch loads the drawer content — each
+        // fails if the QuickInfo action, the custom-event wiring, or the partial
+        // load into the drawer breaks.
+        await Expect(Page.GetByText("Save Assignment"))
+            .ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Page.GetByText(new Regex(@"Assignment #\d+")))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
 }
