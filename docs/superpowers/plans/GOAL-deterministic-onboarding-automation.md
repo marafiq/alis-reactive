@@ -17,6 +17,26 @@ ALIS009 + `[TypedDslExemption]`; an exemplar fully-onboarded slice (FusionGrid).
 This work continues on the current RC3 branch (not a fresh `main`); build context
 from the current tree as it stands.
 
+## TASK ZERO (build the deterministic coverage signals BEFORE onboarding any component)
+The automation cannot honestly onboard anything until coverage is machine-known.
+Build these first — they are the spine every later phase leans on:
+0a. **Coverage "no sandbox usage" signal — as a TOOL, not an in-build analyzer.**
+    PROVEN 2026-06-13: an in-build Roslyn analyzer (ALIS010 prototype) does NOT see
+    Razor-view usage — generated view trees aren't reached, so it false-positives
+    on heavily-used members (`NativeButton.Reactive`, `CssClass` flagged despite
+    dozens of view calls; 1,482 warnings). Wrong mechanism. Build it instead as a
+    standalone Roslyn tool over MSBuildWorkspace (load SandboxApp, get the FULL
+    compilation INCLUDING generated views, enumerate public slice members, diff
+    against actual invocations) OR derive usage from the rendered plan JSON. Goal:
+    for each public component-slice member with zero sandbox-view usage, report
+    "no sandbox usage — cannot be Playwright-covered." Deterministic,
+    false-positive-free (verify against `NativeButton.Reactive` = not flagged).
+    NECESSARY condition (used in a view), not sufficiency.
+0b. **Behavioral coverage gate.** Parses the matrix → resolves each member's test
+    FQN against the suite → confirms `Outcome="Passed"` in the latest TRX by exit
+    code; wired blocking into `scripts/test.sh`. This is sufficiency.
+Together with ALIS009 (typed, Error): typed → used (warn) → proven-passing (block).
+
 ## The automation must
 1. Extract vendor JS surface (`d.ts`/`.js`) + implemented C# surface (Roslyn) →
    compute **parity**; un-onboarded public members below bar = FAIL.
