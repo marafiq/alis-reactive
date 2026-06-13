@@ -97,7 +97,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Plan scope for the root view plan.</summary>
-    public sealed class RootPlanScope : PlanScope
+    internal sealed class RootPlanScope : PlanScope
     {
         internal RootPlanScope() { }
 
@@ -106,7 +106,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Plan scope for a partial plan that can be loaded into a DOM slot.</summary>
-    public sealed class PartialPlanScope : PlanScope
+    internal sealed class PartialPlanScope : PlanScope
     {
         internal PartialPlanScope() { }
 

@@ -81,7 +81,7 @@ namespace Alis.Reactive.PlanModel
             new BrowserObject(_id, _vendor, _type, ComponentRole.ValidationContainer, _binding, _container.WithValidationRulesMerged(validationRules));
     }
 
-    public sealed class ComponentRole
+    internal sealed class ComponentRole
     {
         private readonly string _kind;
 
