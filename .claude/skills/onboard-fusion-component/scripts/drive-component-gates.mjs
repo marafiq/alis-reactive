@@ -73,11 +73,8 @@ function main() {
   // sufficient; a non-zero count is a real gap (cannot be Playwright-covered).
   record("0a", "no-sandbox-usage signal (FusionCoverage)", coverageGate(fusionType));
 
-  // b — parity. No parity tool is wired yet; name the gap, never hide it.
-  record("b", "parity >= 95% (vendor surface vs typed C#)", {
-    status: "GAP",
-    detail: "parity tool not implemented — build it; do not claim parity by hand"
-  });
+  // b — parity, computed by the deterministic parity tool.
+  record("b", "parity >= 95% (vendor surface vs typed C#)", parityGate(component));
 
   // c — 0b behavioral coverage gate.
   record("c", "100% behavioral coverage (0b, TRX-verified)",
@@ -128,6 +125,15 @@ function coverageGate(fusionType) {
     return { status: "PASS", detail: "every slice member is referenced in the sandbox assembly" };
   }
   return { status: "FAIL", detail: `${uncovered.length} member(s) with NO sandbox reference (cannot be covered): ${uncovered[0]}${uncovered.length > 1 ? ", ..." : ""}` };
+}
+
+function parityGate(component) {
+  const result = run(process.execPath, [join(SKILL_SCRIPTS, "compute-fusion-parity.mjs"), "--component", component]);
+  const parityLine = result.stdout.split(/\r?\n/).find(line => line.startsWith("parity"));
+  const detail = (parityLine ?? "").replace(/^parity\s*:\s*/, "").trim();
+  if (result.code === 0) return { status: "PASS", detail };
+  if (result.code === 2) return { status: "GAP", detail: "no discovery public-api-surface.json — run discovery first" };
+  return { status: "FAIL", detail: detail || "below threshold" };
 }
 
 function blindReviewGate(component) {
