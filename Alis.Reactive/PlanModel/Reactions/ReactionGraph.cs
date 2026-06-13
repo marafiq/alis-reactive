@@ -54,7 +54,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Executes a list of reactions in declaration order.</summary>
-    public sealed class SequenceReaction : ReactionGraph
+    internal sealed class SequenceReaction : ReactionGraph
     {
         private readonly IReadOnlyList<ReactionGraph> _steps;
 
@@ -70,7 +70,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Executes a list of reactions concurrently.</summary>
-    public sealed class ParallelReaction : ReactionGraph
+    internal sealed class ParallelReaction : ReactionGraph
     {
         private readonly IReadOnlyList<ReactionGraph> _steps;
         private readonly ParallelCompletion _completion;
@@ -107,14 +107,14 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Represents a parallel reaction with no completion reaction.</summary>
-    public sealed class NoParallelCompletion : ParallelCompletion
+    internal sealed class NoParallelCompletion : ParallelCompletion
     {
         /// <summary>JSON discriminator for no completion reaction. Always <c>"none"</c>.</summary>
         public override string Kind => "none";
     }
 
     /// <summary>Runs a reaction after every parallel branch has settled.</summary>
-    public sealed class SettledParallelCompletion : ParallelCompletion
+    internal sealed class SettledParallelCompletion : ParallelCompletion
     {
         private readonly ReactionGraph _reaction;
 
@@ -131,7 +131,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Evaluates conditions and executes the first matching case.</summary>
-    public sealed class BranchReaction : ReactionGraph
+    internal sealed class BranchReaction : ReactionGraph
     {
         private readonly IReadOnlyList<BranchCase> _cases;
 
@@ -153,7 +153,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Pairs an explicit guard with a reaction to execute. A default guard is the else case.</summary>
     [JsonConverter(typeof(BranchCaseJsonConverter))]
-    public sealed class BranchCase
+    internal sealed class BranchCase
     {
         /// <summary>Guard that decides whether this case runs.</summary>
         public BranchGuard Guard { get; }
@@ -250,7 +250,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Sets a property value on a component or DOM element.</summary>
-    public sealed class SetReaction : ReactionGraph
+    internal sealed class SetReaction : ReactionGraph
     {
         private readonly MemberName _property;
 
@@ -272,7 +272,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Calls a method on a component or DOM element.</summary>
-    public sealed class CallReaction : ReactionGraph
+    internal sealed class CallReaction : ReactionGraph
     {
         private readonly MemberName _method;
         private readonly IReadOnlyList<ValueExpression> _args;
@@ -303,7 +303,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Sends an HTTP request as defined by the enclosed <see cref="RequestPlan"/>.</summary>
-    public sealed class RequestReaction : ReactionGraph
+    internal sealed class RequestReaction : ReactionGraph
     {
         /// <summary>JSON discriminator for HTTP request reactions. Always <c>"request"</c>.</summary>
         public string Kind => "request";
@@ -315,7 +315,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Dispatches a <c>CustomEvent</c>.</summary>
     [JsonConverter(typeof(DispatchReactionJsonConverter))]
-    public sealed class DispatchReaction : ReactionGraph
+    internal sealed class DispatchReaction : ReactionGraph
     {
         private readonly EventName _event;
         private readonly DispatchPayload _payload;
@@ -412,7 +412,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Injects HTML into a partial slot.</summary>
-    public sealed class InjectReaction : ReactionGraph
+    internal sealed class InjectReaction : ReactionGraph
     {
         private readonly ComponentKey _slot;
 
@@ -431,7 +431,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Displays accumulated validation errors in the target container.</summary>
-    public sealed class ShowValidationErrorsReaction : ReactionGraph
+    internal sealed class ShowValidationErrorsReaction : ReactionGraph
     {
         private readonly ComponentId _container;
 
