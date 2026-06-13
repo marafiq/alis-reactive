@@ -160,4 +160,22 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task reassigning_a_shift_opens_the_assignment_drawer()
+    {
+        await NavigateAndWaitForSchedule();
+
+        await Page.GetByText(new Regex(@"\((CNA|RN|LPN)\)")).First.ClickAsync();
+        await Page.GetByText("Reassign", new() { Exact = true }).ClickAsync();
+
+        // schedule:reassign is a distinct custom-event handler from schedule:edit;
+        // it loads the assignment form into the drawer. "Save Assignment" and the
+        // "Assignment #N" label exist only in that partial, so this fails if the
+        // reassign action or its event wiring breaks.
+        await Expect(Page.GetByText("Save Assignment")).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Page.GetByText(new Regex(@"Assignment #\d+"))).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
 }
