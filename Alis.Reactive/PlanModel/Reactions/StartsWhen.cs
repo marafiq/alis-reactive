@@ -95,7 +95,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     [JsonConverter(typeof(PlanNodeDiscriminator<ServerPushEventFilter>))]
-    public abstract class ServerPushEventFilter
+    internal abstract class ServerPushEventFilter
     {
         private protected ServerPushEventFilter() { }
 

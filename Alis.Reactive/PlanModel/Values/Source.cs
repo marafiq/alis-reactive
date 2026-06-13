@@ -7,7 +7,7 @@ namespace Alis.Reactive.PlanModel
     /// Wire base for value source identifiers authored through DSL value reads.
     /// </summary>
     [System.Text.Json.Serialization.JsonConverter(typeof(PlanNodeDiscriminator<Source>))]
-    public abstract class Source
+    internal abstract class Source
     {
         private protected Source() { }
     }

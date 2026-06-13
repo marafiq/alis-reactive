@@ -84,7 +84,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Wire base for plan merge scope emitted by root and partial plans.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<PlanScope>))]
-    public abstract class PlanScope
+    internal abstract class PlanScope
     {
         private protected PlanScope() { }
 

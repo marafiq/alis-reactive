@@ -35,7 +35,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Property navigation segment: a property name or array index.</summary>
     [JsonConverter(typeof(PathSegmentJsonConverter))]
-    public sealed class PathSegment : IEquatable<PathSegment>
+    internal sealed class PathSegment : IEquatable<PathSegment>
     {
         private readonly PathSegmentBody _body;
 
@@ -174,7 +174,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Ordered path segments for navigating nested properties on a value.</summary>
     [JsonConverter(typeof(PathJsonConverter))]
-    public sealed class Path : IEquatable<Path>
+    internal sealed class Path : IEquatable<Path>
     {
         internal static readonly Path None = new Path(Array.Empty<PathSegment>());
 

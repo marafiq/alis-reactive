@@ -10,7 +10,7 @@ namespace Alis.Reactive.PlanModel
     /// Wire base for Reactive Plan predicates authored through condition builders.
     /// </summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ConditionGraph>))]
-    public abstract class ConditionGraph
+    internal abstract class ConditionGraph
     {
         private protected ConditionGraph() { }
 

@@ -423,7 +423,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Base wire contract for how a value read accesses its target member.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ValueReadAccess>))]
-    public abstract class ValueReadAccess
+    internal abstract class ValueReadAccess
     {
         private protected ValueReadAccess() { }
 

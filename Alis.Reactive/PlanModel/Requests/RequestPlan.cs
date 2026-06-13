@@ -128,7 +128,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     [JsonConverter(typeof(PlanNodeDiscriminator<RequestChain>))]
-    public abstract class RequestChain
+    internal abstract class RequestChain
     {
         private protected RequestChain() { }
 
@@ -170,7 +170,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Wire base for request validation targets authored through request builders.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<RequestValidationTarget>))]
-    public abstract class RequestValidationTarget
+    internal abstract class RequestValidationTarget
     {
         private protected RequestValidationTarget() { }
 
@@ -235,7 +235,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Wire base for HTTP response status matches authored through response routes.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ResponseStatusMatch>))]
-    public abstract class ResponseStatusMatch
+    internal abstract class ResponseStatusMatch
     {
         private protected ResponseStatusMatch() { }
 

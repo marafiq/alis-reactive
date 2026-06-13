@@ -10,7 +10,7 @@ namespace Alis.Reactive.PlanModel
     /// Wire base for Reactive Plan reactions authored through pipeline builders.
     /// </summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ReactionGraph>))]
-    public abstract class ReactionGraph
+    internal abstract class ReactionGraph
     {
         private protected ReactionGraph() { }
 
@@ -91,7 +91,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Wire base for parallel completion behavior authored by request/parallel builders.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ParallelCompletion>))]
-    public abstract class ParallelCompletion
+    internal abstract class ParallelCompletion
     {
         private protected ParallelCompletion() { }
 
@@ -194,7 +194,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     [JsonConverter(typeof(BranchGuardJsonConverter))]
-    public abstract class BranchGuard
+    internal abstract class BranchGuard
     {
         private protected BranchGuard() { }
 

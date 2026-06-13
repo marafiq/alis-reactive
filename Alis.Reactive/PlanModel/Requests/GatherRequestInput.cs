@@ -74,7 +74,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     [JsonConverter(typeof(PlanNodeDiscriminator<RequestInputTarget>))]
-    public abstract class RequestInputTarget
+    internal abstract class RequestInputTarget
     {
         private protected RequestInputTarget() { }
 

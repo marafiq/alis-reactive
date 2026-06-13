@@ -106,7 +106,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     [System.Text.Json.Serialization.JsonConverter(typeof(PlanNodeDiscriminator<InputBinding>))]
-    public abstract class InputBinding
+    internal abstract class InputBinding
     {
         private protected InputBinding() { }
 

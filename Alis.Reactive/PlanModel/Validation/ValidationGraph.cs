@@ -5,7 +5,7 @@ using Alis.Reactive.Validation;
 namespace Alis.Reactive.PlanModel
 {
     [System.Text.Json.Serialization.JsonConverter(typeof(PlanNodeDiscriminator<ValidationContainerBinding>))]
-    public abstract class ValidationContainerBinding
+    internal abstract class ValidationContainerBinding
     {
         private protected ValidationContainerBinding() { }
 

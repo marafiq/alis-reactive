@@ -5,7 +5,7 @@ namespace Alis.Reactive.PlanModel
 {
     /// <summary>Wire base for request input strategies authored through gather builders.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<RequestInput>))]
-    public abstract class RequestInput
+    internal abstract class RequestInput
     {
         private protected RequestInput() { }
 
