@@ -60,6 +60,11 @@ namespace Alis.Reactive.Fusion.Components
         /// <see langword="null"/> when no declared rule maps client-side (every rule on
         /// the field is conditional, cross-field, or otherwise server-only).
         /// </summary>
+        [Alis.Reactive.Components.TypedDslExemption(
+            "EJ2 GridColumn.ValidationRules is a vendor MVC-builder slot typed as object; this " +
+            "bridges typed ReactiveValidator client rules into it. Owed refinement: a phantom " +
+            "return type (still assignable to the object slot) and inline-grid bulk-edit " +
+            "Playwright coverage of the validator, which is currently unexercised.")]
         public object? Field<TField>(Expression<Func<TRow, TField>> field)
         {
             if (field == null) throw new ArgumentNullException(nameof(field));

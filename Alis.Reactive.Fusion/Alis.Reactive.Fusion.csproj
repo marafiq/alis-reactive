@@ -28,6 +28,9 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
+      <!-- Run the typed-DSL analyzer (ALIS009) on this slice's own source so untyped
+           public component API fails the build here, not ships to consumers. -->
+      <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
       <!-- Fusion components emit design-system classes and the Syncfusion theme
            consumes design-system brand tokens: the design system is a real
            dependency, and this flows its CSS package to Fusion consumers. -->
