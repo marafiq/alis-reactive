@@ -438,14 +438,14 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Access contract for reading a source member as a property.</summary>
-    public sealed class PropertyValueReadAccess : ValueReadAccess
+    internal sealed class PropertyValueReadAccess : ValueReadAccess
     {
         /// <summary>Wire discriminator for property reads. Always <c>"property"</c>.</summary>
         public override string Kind => "property";
     }
 
     /// <summary>Access contract for invoking a source member as a method.</summary>
-    public sealed class MethodValueReadAccess : ValueReadAccess
+    internal sealed class MethodValueReadAccess : ValueReadAccess
     {
         private readonly IReadOnlyList<ValueExpression> _args;
 
