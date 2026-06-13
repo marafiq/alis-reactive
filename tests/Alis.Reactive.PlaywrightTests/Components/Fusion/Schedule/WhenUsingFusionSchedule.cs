@@ -42,4 +42,25 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task schedule_binds_the_weeks_shift_assignments_from_the_server()
+    {
+        await NavigateAndWaitForSchedule();
+
+        // The DomReady GET returns the week's assignments; OnSuccess SetDataSource
+        // binds them and the Schedule renders each as an appointment labelled with
+        // the staff member and role. If SetDataSource or the load breaks, no
+        // appointment renders and this fails.
+        await Expect(Page.GetByText(new Regex(@"\((CNA|RN|LPN)\)")).First)
+            .ToBeVisibleAsync(new() { Timeout = 10000 });
+
+        // The same success response carries UnassignedCount, read into the page
+        // after databind. While the data source is unbound it shows "--"; a numeric
+        // value proves the typed response body was consumed.
+        await Expect(Page.Locator("#unassigned-count"))
+            .ToHaveTextAsync(new Regex(@"^\d+$"), new() { Timeout = 10000 });
+
+        AssertNoConsoleErrors();
+    }
 }
