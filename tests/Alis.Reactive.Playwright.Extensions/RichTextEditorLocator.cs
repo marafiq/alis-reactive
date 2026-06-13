@@ -24,14 +24,14 @@ public sealed class RichTextEditorLocator
     public async Task Fill(string text)
     {
         await Focus();
-        await _page.Keyboard.PressAsync("Meta+a");
+        await _page.Keyboard.PressAsync("ControlOrMeta+a");
         await _page.Keyboard.TypeAsync(text);
     }
 
     public async Task Clear()
     {
         await Focus();
-        await _page.Keyboard.PressAsync("Meta+a");
+        await _page.Keyboard.PressAsync("ControlOrMeta+a");
         await _page.Keyboard.PressAsync("Backspace");
     }
 

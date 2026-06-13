@@ -5,7 +5,7 @@ import type { PlanDocument, Shape, ValueExpression } from "../../../types/index"
 const stringShape: Shape = { kind: "string" };
 const numberShape: Shape = { kind: "number" };
 const rawShape: Shape = { kind: "raw" };
-const elementSource = { kind: "payload", scope: "element", type: { kind: "untyped" } } as const;
+const elementSource = { kind: "payload", scope: "element" } as const;
 
 type ElementMethodOptions = {
   method: string;

@@ -62,11 +62,13 @@ public class TodoValidator : ReactiveValidator<TodoModel>
 {
     public TodoValidator()
     {
-        RuleFor(x => x.Title).NotEmpty().MaximumLength(200);
+        ClientRule(x => x.Title)
+            .Required("'Title' is required.")
+            .MaxLength(200, "'Title' must be at most 200 characters.");
 
         WhenField(x => x.IsUrgent, () =>
         {
-            RuleFor(x => x.DueDate).NotEmpty().WithMessage("Urgent todos need a due date");
+            ClientRule(x => x.DueDate).Required("Urgent todos need a due date");
         });
     }
 }
@@ -182,7 +184,7 @@ Four files — `TodoModel.cs`, `TodoValidator.cs`, `TodoController.cs`, `Index.c
 
 - **Conditional visibility.** `Html.InputField` renders the checkbox bound to `m => m.IsUrgent`. `.Reactive()` wires its `change` event. `When/Then/Else` evaluates `args.Checked` (typed as `bool?`) and shows or hides the due date section.
 
-- **Client-side validation.** `Validate<TodoValidator>` extracts the FluentValidation rules at render time and embeds them in the JSON plan. The `WhenField(x => x.IsUrgent)` conditional rule only fires when the checkbox is checked. Validation runs before the HTTP request — if it fails, the request never fires.
+- **Client-side validation.** `Validate<TodoValidator>` embeds the validator's `ClientRule(...)` metadata in the JSON plan at render time. The `WhenField(x => x.IsUrgent)` conditional rule only fires when the checkbox is checked. Validation runs before the HTTP request — if it fails, the request never fires.
 
 - **HTTP post with toast.** `IncludeAll()` gathers `Title`, `IsUrgent`, and `DueDate` from all registered components. On success, `FusionToast` shows a notification. On 400, `ValidationErrors` routes server errors to the form fields.
 
@@ -193,4 +195,4 @@ You can see this example running in the sandbox at `/Sandbox/Todo`.
 ## Next Steps
 
 - [The Contract](../../architecture/the-contract/) -- how the JSON plan works
-- [Features](../../csharp-modules/plan-and-entries/) -- full reference for plans, triggers, conditions, and HTTP
+- [Features](../../csharp-modules/plans-and-rendering/) -- full reference for plans, triggers, conditions, and HTTP

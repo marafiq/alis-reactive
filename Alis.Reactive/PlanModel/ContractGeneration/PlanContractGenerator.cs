@@ -71,16 +71,8 @@ namespace Alis.Reactive.PlanModel
                 .Requires("kind", Literal("exact"))
                 .Requires("shapes", "Shape[]"));
 
-            contract.Declare(Union("PayloadContract", "UntypedPayloadContract", "TypedPayloadContract"));
-            contract.Declare(Interface("UntypedPayloadContract")
-                .Requires("kind", Literal("untyped")));
-            contract.Declare(Interface("TypedPayloadContract")
-                .Requires("kind", Literal("typed"))
-                .Requires("type", "string"));
-
             contract.Declare(Interface("Event")
-                .Requires("channel", "string")
-                .Requires("payloadType", "PayloadContract"));
+                .Requires("channel", "string"));
 
             contract.Declare(Alias("Vendor", "string"));
 
@@ -296,8 +288,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("PayloadSource")
                 .Requires("kind", Literal("payload"))
-                .Requires("scope", "PayloadScope")
-                .Requires("type", "PayloadContract"));
+                .Requires("scope", "PayloadScope"));
 
             contract.Declare(Interface("Behavior")
                 .Requires("startsWhen", "StartsWhen")
@@ -316,8 +307,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("DocumentEventTrigger")
                 .Requires("kind", Literal("document-event"))
-                .Requires("event", "string")
-                .Requires("payloadType", "PayloadContract"));
+                .Requires("event", "string"));
 
             contract.Declare(Interface("ComponentEventTrigger")
                 .Requires("kind", Literal("component-event"))
@@ -334,18 +324,15 @@ namespace Alis.Reactive.PlanModel
                 "AnyServerPushEventFilter",
                 "NamedServerPushEventFilter"));
             contract.Declare(Interface("AnyServerPushEventFilter")
-                .Requires("kind", Literal("any"))
-                .Requires("payloadType", "PayloadContract"));
+                .Requires("kind", Literal("any")));
             contract.Declare(Interface("NamedServerPushEventFilter")
                 .Requires("kind", Literal("named"))
-                .Requires("event", "string")
-                .Requires("payloadType", "PayloadContract"));
+                .Requires("event", "string"));
 
             contract.Declare(Interface("SignalRTrigger")
                 .Requires("kind", Literal("signalr"))
                 .Requires("hubUrl", "string")
-                .Requires("method", "string")
-                .Requires("payloadType", "PayloadContract"));
+                .Requires("method", "string"));
 
             contract.Declare(Union(
                 "ReactionGraph",
@@ -426,8 +413,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("PresentDispatchPayload")
                 .Requires("kind", Literal("value"))
-                .Requires("data", "ValueExpression")
-                .Requires("payloadType", "PayloadContract"));
+                .Requires("data", "ValueExpression"));
 
             contract.Declare(Interface("InjectReaction")
                 .Requires("kind", Literal("inject"))

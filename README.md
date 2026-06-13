@@ -114,11 +114,13 @@ touch the framework internals.
    to see the packaged design system end to end.)*
 
 2. **Link the stylesheet and mark the root** in `_Layout.cshtml` — exactly as the
-   example app and sandbox do:
+   example app and sandbox do. The filename carries the version of the package you
+   installed (a `1.2.3` package yields `design-system.1.2.3.css`), so after your first
+   build check `wwwroot/css/` for the exact names and link those:
 
    ```html
-   <link rel="stylesheet" href="~/css/design-system.1.0.0-preview.2.css" asp-append-version="true"/>
-   <link rel="stylesheet" href="~/css/syncfusion.1.0.0-preview.2.css" asp-append-version="true"/>  <!-- if using Fusion -->
+   <link rel="stylesheet" href="~/css/design-system.<version>.css" asp-append-version="true"/>
+   <link rel="stylesheet" href="~/css/syncfusion.<version>.css" asp-append-version="true"/>  <!-- if using Fusion -->
    ...
    <body class="alis-root h-full">   <!-- the design system is scoped under .alis-root -->
    ```

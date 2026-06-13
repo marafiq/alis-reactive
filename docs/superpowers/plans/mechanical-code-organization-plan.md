@@ -6,7 +6,7 @@ Pass goal for this plan-only pass:
 Close matrix row: N/A, repository organization only -> navigable module map -> runtime behavior unchanged
 ```
 
-This is not a rewrite plan. It intentionally ignores `docs/design/redesign/` and
+This is not a rewrite plan. It intentionally ignores `docs/design/redesign/` (directory since removed) and
 does not propose logical code changes, runtime behavior changes, DSL changes,
 route changes, or feature changes. The only allowed implementation work from
 this plan is mechanical movement of files, import updates, project-file updates

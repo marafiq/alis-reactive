@@ -1,0 +1,389 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "begin-edit-normal",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-begin-edit-normal.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "cancelRowCount": 3,
+        "firstRowCells": [
+          "1",
+          "Alpha",
+          "Memory Care",
+          "North",
+          "2"
+        ],
+        "readRowCount": 3
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "event:beginEdit:normal",
+      "value": {
+        "beginEditShape": {
+          "cancel": false,
+          "foreignKeyData": {},
+          "isScroll": false,
+          "primaryKey": [
+            "id"
+          ],
+          "primaryKeyValue": [
+            1
+          ],
+          "requestType": "beginEdit",
+          "row": {
+            "className": "e-row",
+            "id": "",
+            "kind": "Element",
+            "tagName": "TR",
+            "text": "1AlphaMemory CareNorth2"
+          },
+          "rowData": {
+            "careLevel": "Memory Care",
+            "id": 1,
+            "name": "Alpha",
+            "openTasks": 2,
+            "wing": "North"
+          },
+          "rowIndex": 0,
+          "target": "[Undefined]",
+          "type": "edit"
+        },
+        "ownKeys": [
+          "cancel",
+          "foreignKeyData",
+          "isScroll",
+          "name",
+          "primaryKey",
+          "primaryKeyValue",
+          "requestType",
+          "row",
+          "rowData",
+          "rowIndex",
+          "target",
+          "type"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "foreignKeyData": {
+            "sample": {},
+            "type": "object"
+          },
+          "isScroll": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "beginEdit",
+            "type": "string"
+          },
+          "primaryKey": {
+            "sample": [
+              "id"
+            ],
+            "type": "array"
+          },
+          "primaryKeyValue": {
+            "sample": [
+              1
+            ],
+            "type": "array"
+          },
+          "requestType": {
+            "sample": "beginEdit",
+            "type": "string"
+          },
+          "row": {
+            "sample": {
+              "className": "e-row",
+              "id": "",
+              "kind": "Element",
+              "tagName": "TR",
+              "text": "1AlphaMemory CareNorth2"
+            },
+            "type": "element"
+          },
+          "rowData": {
+            "sample": {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha",
+              "openTasks": 2,
+              "wing": "North"
+            },
+            "type": "object"
+          },
+          "rowIndex": {
+            "sample": 0,
+            "type": "number"
+          },
+          "target": {
+            "sample": "[Undefined]",
+            "type": "undefined"
+          },
+          "type": {
+            "sample": "edit",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "edit-started",
+      "value": {
+        "hasEditedRow": true,
+        "traceRows": 3
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "event:beginEdit:cancel",
+      "value": {
+        "after": {
+          "beginEditShape": {
+            "cancel": true,
+            "foreignKeyData": {},
+            "isScroll": false,
+            "primaryKey": [
+              "id"
+            ],
+            "primaryKeyValue": [
+              1
+            ],
+            "requestType": "beginEdit",
+            "row": {
+              "className": "e-row",
+              "id": "",
+              "kind": "Element",
+              "tagName": "TR",
+              "text": "1AlphaMemory CareNorth2"
+            },
+            "rowData": {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha",
+              "openTasks": 2,
+              "wing": "North"
+            },
+            "rowIndex": 0,
+            "target": "[Undefined]",
+            "type": "edit"
+          },
+          "ownKeys": [
+            "cancel",
+            "foreignKeyData",
+            "isScroll",
+            "name",
+            "primaryKey",
+            "primaryKeyValue",
+            "requestType",
+            "row",
+            "rowData",
+            "rowIndex",
+            "target",
+            "type"
+          ],
+          "properties": {
+            "cancel": {
+              "sample": true,
+              "type": "boolean"
+            },
+            "foreignKeyData": {
+              "sample": {},
+              "type": "object"
+            },
+            "isScroll": {
+              "sample": false,
+              "type": "boolean"
+            },
+            "name": {
+              "sample": "beginEdit",
+              "type": "string"
+            },
+            "primaryKey": {
+              "sample": [
+                "id"
+              ],
+              "type": "array"
+            },
+            "primaryKeyValue": {
+              "sample": [
+                1
+              ],
+              "type": "array"
+            },
+            "requestType": {
+              "sample": "beginEdit",
+              "type": "string"
+            },
+            "row": {
+              "sample": {
+                "className": "e-row",
+                "id": "",
+                "kind": "Element",
+                "tagName": "TR",
+                "text": "1AlphaMemory CareNorth2"
+              },
+              "type": "element"
+            },
+            "rowData": {
+              "sample": {
+                "careLevel": "Memory Care",
+                "id": 1,
+                "name": "Alpha",
+                "openTasks": 2,
+                "wing": "North"
+              },
+              "type": "object"
+            },
+            "rowIndex": {
+              "sample": 0,
+              "type": "number"
+            },
+            "target": {
+              "sample": "[Undefined]",
+              "type": "undefined"
+            },
+            "type": {
+              "sample": "edit",
+              "type": "string"
+            }
+          }
+        },
+        "before": {
+          "beginEditShape": {
+            "cancel": false,
+            "foreignKeyData": {},
+            "isScroll": false,
+            "primaryKey": [
+              "id"
+            ],
+            "primaryKeyValue": [
+              1
+            ],
+            "requestType": "beginEdit",
+            "row": {
+              "className": "e-row",
+              "id": "",
+              "kind": "Element",
+              "tagName": "TR",
+              "text": "1AlphaMemory CareNorth2"
+            },
+            "rowData": {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha",
+              "openTasks": 2,
+              "wing": "North"
+            },
+            "rowIndex": 0,
+            "target": "[Undefined]",
+            "type": "edit"
+          },
+          "ownKeys": [
+            "cancel",
+            "foreignKeyData",
+            "isScroll",
+            "name",
+            "primaryKey",
+            "primaryKeyValue",
+            "requestType",
+            "row",
+            "rowData",
+            "rowIndex",
+            "target",
+            "type"
+          ],
+          "properties": {
+            "cancel": {
+              "sample": false,
+              "type": "boolean"
+            },
+            "foreignKeyData": {
+              "sample": {},
+              "type": "object"
+            },
+            "isScroll": {
+              "sample": false,
+              "type": "boolean"
+            },
+            "name": {
+              "sample": "beginEdit",
+              "type": "string"
+            },
+            "primaryKey": {
+              "sample": [
+                "id"
+              ],
+              "type": "array"
+            },
+            "primaryKeyValue": {
+              "sample": [
+                1
+              ],
+              "type": "array"
+            },
+            "requestType": {
+              "sample": "beginEdit",
+              "type": "string"
+            },
+            "row": {
+              "sample": {
+                "className": "e-row",
+                "id": "",
+                "kind": "Element",
+                "tagName": "TR",
+                "text": "1AlphaMemory CareNorth2"
+              },
+              "type": "element"
+            },
+            "rowData": {
+              "sample": {
+                "careLevel": "Memory Care",
+                "id": 1,
+                "name": "Alpha",
+                "openTasks": 2,
+                "wing": "North"
+              },
+              "type": "object"
+            },
+            "rowIndex": {
+              "sample": 0,
+              "type": "number"
+            },
+            "target": {
+              "sample": "[Undefined]",
+              "type": "undefined"
+            },
+            "type": {
+              "sample": "edit",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "edit-cancelled",
+      "value": {
+        "hasEditedRow": false,
+        "traceRows": 5
+      }
+    },
+    {
+      "sequence": 6,
+      "label": "complete",
+      "value": {
+        "traceRows": 6
+      }
+    }
+  ]
+}

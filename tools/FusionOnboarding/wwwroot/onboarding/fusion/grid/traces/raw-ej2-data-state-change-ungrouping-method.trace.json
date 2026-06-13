@@ -1,0 +1,198 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "data-state-change-ungrouping-method",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-data-state-change-ungrouping-method.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "currentPage": 1,
+        "groupSettings": {
+          "columns": []
+        },
+        "pageSize": 2
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "event:dataStateChange:grouping-method",
+      "value": {
+        "absentKeysChecked": [
+          "where",
+          "search",
+          "aggregates"
+        ],
+        "groupShape": {
+          "action": {
+            "columnName": "careLevel",
+            "name": "actionBegin",
+            "preventFocusOnGroup": false,
+            "requestType": "grouping",
+            "type": "actionBegin"
+          },
+          "group": [
+            "careLevel"
+          ]
+        },
+        "ownKeys": [
+          "action",
+          "group",
+          "groups",
+          "name",
+          "requiresCounts",
+          "skip",
+          "sorted",
+          "take"
+        ],
+        "properties": {
+          "action": {
+            "sample": {
+              "columnName": "careLevel",
+              "name": "actionBegin",
+              "preventFocusOnGroup": false,
+              "requestType": "grouping",
+              "type": "actionBegin"
+            },
+            "type": "object"
+          },
+          "group": {
+            "sample": [
+              "careLevel"
+            ],
+            "type": "array"
+          },
+          "groups": {
+            "sample": [
+              "careLevel"
+            ],
+            "type": "array"
+          },
+          "name": {
+            "sample": "dataStateChange",
+            "type": "string"
+          },
+          "requiresCounts": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "skip": {
+            "sample": 0,
+            "type": "number"
+          },
+          "sorted": {
+            "sample": [
+              {
+                "direction": "ascending",
+                "name": "careLevel"
+              }
+            ],
+            "type": "array"
+          },
+          "take": {
+            "sample": 2,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "method:groupColumn",
+      "value": {
+        "captionText": [
+          "Care Level: Assisted Living - 2 items",
+          "Care Level: Independent - 1 item",
+          "Care Level: Memory Care - 2 items"
+        ],
+        "currentPage": 1,
+        "groupSettings": {
+          "columns": [
+            "careLevel"
+          ]
+        },
+        "pageSize": 2
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "event:dataStateChange:ungrouping-method",
+      "value": {
+        "absentKeysChecked": [
+          "where",
+          "search",
+          "aggregates"
+        ],
+        "groupShape": {
+          "action": {
+            "columnName": "careLevel",
+            "name": "actionBegin",
+            "requestType": "ungrouping",
+            "type": "actionBegin"
+          },
+          "group": []
+        },
+        "ownKeys": [
+          "action",
+          "name",
+          "requiresCounts",
+          "skip",
+          "take"
+        ],
+        "properties": {
+          "action": {
+            "sample": {
+              "columnName": "careLevel",
+              "name": "actionBegin",
+              "requestType": "ungrouping",
+              "type": "actionBegin"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "dataStateChange",
+            "type": "string"
+          },
+          "requiresCounts": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "skip": {
+            "sample": 0,
+            "type": "number"
+          },
+          "take": {
+            "sample": 2,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "method:ungroupColumn",
+      "value": {
+        "captionText": [],
+        "currentPage": 1,
+        "firstRowCells": [
+          "1",
+          "Alpha",
+          "Memory Care",
+          "North"
+        ],
+        "groupSettings": {
+          "columns": []
+        },
+        "pageSize": 2
+      }
+    },
+    {
+      "sequence": 6,
+      "label": "complete",
+      "value": {
+        "traceRows": 6
+      }
+    }
+  ]
+}

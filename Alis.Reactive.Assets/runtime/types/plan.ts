@@ -59,22 +59,8 @@ export interface ExactMethodArgumentContract {
   shapes: Shape[];
 }
 
-export type PayloadContract =
-  | UntypedPayloadContract
-  | TypedPayloadContract;
-
-export interface UntypedPayloadContract {
-  kind: "untyped";
-}
-
-export interface TypedPayloadContract {
-  kind: "typed";
-  type: string;
-}
-
 export interface Event {
   channel: string;
-  payloadType: PayloadContract;
 }
 
 export type Vendor = string;
@@ -402,14 +388,12 @@ export type PayloadScope =
   | "success"
   | "error"
   | "request"
-  | "dispatch"
   | "local"
   | "element";
 
 export interface PayloadSource {
   kind: "payload";
   scope: PayloadScope;
-  type: PayloadContract;
 }
 
 export interface Behavior {
@@ -431,7 +415,6 @@ export interface PageReadyTrigger {
 export interface DocumentEventTrigger {
   kind: "document-event";
   event: string;
-  payloadType: PayloadContract;
 }
 
 export interface ComponentEventTrigger {
@@ -452,20 +435,17 @@ export type ServerPushEventFilter =
 
 export interface AnyServerPushEventFilter {
   kind: "any";
-  payloadType: PayloadContract;
 }
 
 export interface NamedServerPushEventFilter {
   kind: "named";
   event: string;
-  payloadType: PayloadContract;
 }
 
 export interface SignalRTrigger {
   kind: "signalr";
   hubUrl: string;
   method: string;
-  payloadType: PayloadContract;
 }
 
 export type ReactionGraph =
@@ -562,7 +542,6 @@ export interface NoDispatchPayload {
 export interface PresentDispatchPayload {
   kind: "value";
   data: ValueExpression;
-  payloadType: PayloadContract;
 }
 
 export interface InjectReaction {

@@ -41,9 +41,10 @@ var comp = p.Component<FusionAutoComplete>(m => m.Name);
 var comp = s.Component<FusionSwitch>(m => m.IsActive);    -- 's' in response handler
 ```
 
-**NOT supported as source:** `ResponseBody<T>` — `When(json, x => x.Prop)` does NOT compile.
-`ResponseBody<T>` is a phantom. Only `SetText(json, x => x.Prop)` has that overload.
-For conditions on response data, use component reads or dispatch to a typed CustomEvent.
+**`ResponseBody<T>` as source: supported.** Inside a response route,
+`s.When(json, x => x.Prop)` starts a condition on the response body
+(`ConditionStart.cs:33`), and guards compose with `.And(json, x => x.Prop)`
+/ `.Or(json, x => x.Prop)`.
 
 ## Operator — What to Check
 
@@ -157,20 +158,12 @@ BRANCH_CHAIN :=
 
 Each branch body is a full pipeline — Element, Component, Dispatch, HTTP, nested When.
 
-## Per-Command Guard
+## No Per-Command Guard
 
-```
-PER_COMMAND_GUARD :=
-  var el = p.Element("id");
-  el.SetText(typedSource);                               -- returns ElementBuilder
-  el.When(payload, x => x.Prop, csb => csb.OPERATOR);   -- guard on previous command
-```
-
-`.When()` is ONLY on `ElementBuilder` — returned by `.SetText(TypedSource)`,
-`.SetText(BindSource)`, `.SetHtml(TypedSource)`, `.SetHtml(BindSource)`.
-
-**NOT after:** `.Show()`, `.Hide()`, `.AddClass()`, `.SetText("static")`,
-`.SetText(payload, x => x.Prop)` — these return `PipelineBuilder`.
+There is no per-command `.When()` — `ElementBuilder` has no `When` member
+(`ElementBuilder.cs`). Guards are pipeline-level only: wrap the commands in a
+`p.When(SOURCE).OPERATOR.Then(...)` branch. To guard a single `SetText`, put
+that one command inside the branch body.
 
 For guarding Show/Hide/AddClass, use full `When/Then`:
 ```
@@ -233,13 +226,12 @@ p.When(comp.Value()).NotNull()
 ```
 These are independent — both evaluate, neither blocks the other.
 
-**Condition inside HTTP response (component source only):**
+**Condition inside HTTP response (body or component source):**
 ```
 .OnSuccess<TResp>((json, s) =>
 {
-    s.Element("name").SetText(json, x => x.Name);       -- SetText works with ResponseBody
-    var comp = s.Component<FusionSwitch>(m => m.Active);
-    s.When(comp.Value()).Truthy()                        -- When needs component source
+    s.Element("name").SetText(json, x => x.Name);       -- SetText reads ResponseBody
+    s.When(json, x => x.Active).Truthy()                 -- When reads ResponseBody too
      .Then(t => t.Element("status").SetText("Active"));
 })
 ```

@@ -142,8 +142,8 @@ export class RuntimeComponent {
     return element;
   }
 
-  tryElement(): HTMLElement | undefined {
-    return document.getElementById(this.id) ?? undefined;
+  tryElement(): HTMLElement | null {
+    return document.getElementById(this.id);
   }
 
   root(): unknown {

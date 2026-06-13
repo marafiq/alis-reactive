@@ -68,7 +68,7 @@ function setResidentName(value: string): ReactionGraph {
 function markLocal(value: string): ReactionGraph {
   return {
     kind: "call",
-    on: { kind: "payload", scope: "local", type: { kind: "untyped" } },
+    on: { kind: "payload", scope: "local" },
     method: "mark",
     args: [literal(value)],
   };
@@ -244,7 +244,7 @@ describe("executeReaction member targets", () => {
   it("fails with component context when a vendor runtime is not registered", () => {
     document.body.innerHTML = `<div id="resident-widget"></div>`;
     const plan = customWidgetPlan();
-    plan.components["resident-widget"].vendor = "missing-widget-vendor";
+    plan.components["resident-widget"]!.vendor = "missing-widget-vendor";
 
     expect(() => executeReaction({
       kind: "set",
@@ -405,7 +405,7 @@ describe("executeReaction member targets", () => {
       },
     };
     const context: ExecContext = { local };
-    const source = { kind: "payload", scope: "local", type: { kind: "untyped" } } as const;
+    const source = { kind: "payload", scope: "local" } as const;
     const setReaction: ReactionGraph = {
       kind: "set",
       on: source,
@@ -624,7 +624,7 @@ describe("executeReaction member targets", () => {
 
   it("starts every parallel request before waiting and runs completion after all settle", async () => {
     const releases: Array<() => void> = [];
-    const fetchMock = vi.fn(() => new Promise<Response>(resolve => {
+    const fetchMock = vi.fn((_url: string, _init: RequestInit) => new Promise<Response>(resolve => {
       releases.push(() => resolve(responseJson({ ok: true })));
     }));
     vi.stubGlobal("fetch", fetchMock);
@@ -701,7 +701,6 @@ describe("executeReaction member targets", () => {
       payload: {
         kind: "value",
         data: literal("Ada"),
-        payloadType: { kind: "untyped" },
       },
     }, textBoxPlan());
 

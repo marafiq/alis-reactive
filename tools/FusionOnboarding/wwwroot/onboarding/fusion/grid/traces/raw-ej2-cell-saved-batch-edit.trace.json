@@ -1,0 +1,470 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "cell-saved-batch-edit",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-cell-saved-batch-edit.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "firstRowCells": [
+          "1",
+          "Alpha",
+          "Memory Care",
+          "North",
+          "2"
+        ],
+        "publicMethods": {
+          "editCell": "function",
+          "saveCell": "function"
+        },
+        "rowCount": 3
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "editing-cell",
+      "value": {
+        "editedCellText": "",
+        "initialValue": "2.00",
+        "inputName": null
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "event:cellSaved:batch-edit",
+      "value": {
+        "cellSavedShape": {
+          "cancel": false,
+          "cell": {
+            "className": "e-rowcell e-rightalign e-selectionbackground e-active e-updatedtd",
+            "id": "",
+            "kind": "Element",
+            "tagName": "TD",
+            "text": "6"
+          },
+          "column": {
+            "allowEditing": true,
+            "editType": "numericedit",
+            "field": "openTasks",
+            "headerText": "Tasks",
+            "isPrimaryKey": "[Undefined]",
+            "type": "number"
+          },
+          "columnName": "openTasks",
+          "columnObject": {
+            "allowEditing": true,
+            "editType": "numericedit",
+            "field": "openTasks",
+            "headerText": "Tasks",
+            "isPrimaryKey": "[Undefined]",
+            "type": "number"
+          },
+          "isForeignKey": false,
+          "previousValue": 2,
+          "rowData": {
+            "careLevel": "Memory Care",
+            "id": 1,
+            "name": "Alpha",
+            "openTasks": 2,
+            "wing": "North"
+          },
+          "value": 6
+        },
+        "ownKeys": [
+          "cancel",
+          "cell",
+          "column",
+          "columnName",
+          "columnObject",
+          "isForeignKey",
+          "name",
+          "previousValue",
+          "rowData",
+          "value"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "cell": {
+            "sample": {
+              "className": "e-rowcell e-rightalign e-selectionbackground e-active e-updatedtd",
+              "id": "",
+              "kind": "Element",
+              "tagName": "TD",
+              "text": "6"
+            },
+            "type": "element"
+          },
+          "column": {
+            "sample": {
+              "allowEditing": true,
+              "editType": "numericedit",
+              "field": "openTasks",
+              "headerText": "Tasks",
+              "isPrimaryKey": "[Undefined]",
+              "type": "number"
+            },
+            "type": "object"
+          },
+          "columnName": {
+            "sample": "openTasks",
+            "type": "string"
+          },
+          "columnObject": {
+            "sample": {
+              "allowEditing": true,
+              "editType": "numericedit",
+              "field": "openTasks",
+              "headerText": "Tasks",
+              "isPrimaryKey": "[Undefined]",
+              "type": "number"
+            },
+            "type": "object"
+          },
+          "isForeignKey": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "cellSaved",
+            "type": "string"
+          },
+          "previousValue": {
+            "sample": 2,
+            "type": "number"
+          },
+          "rowData": {
+            "sample": {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha",
+              "openTasks": 2,
+              "wing": "North"
+            },
+            "type": "object"
+          },
+          "value": {
+            "sample": 6,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "save-cell",
+      "value": {
+        "batchChanges": {
+          "addedRecords": [],
+          "changedRecords": [
+            {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha",
+              "openTasks": 6,
+              "wing": "North"
+            }
+          ],
+          "deletedRecords": []
+        },
+        "firstRowCells": [
+          "1",
+          "Alpha",
+          "Memory Care",
+          "North",
+          "6"
+        ],
+        "traceRows": 4
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "event:cellSaved:batch-edit:before-cancel",
+      "value": {
+        "cellSavedShape": {
+          "cancel": false,
+          "cell": {
+            "className": "e-rowcell e-rightalign e-selectionbackground e-active e-updatedtd",
+            "id": "",
+            "kind": "Element",
+            "tagName": "TD",
+            "text": "8"
+          },
+          "column": {
+            "allowEditing": true,
+            "editType": "numericedit",
+            "field": "openTasks",
+            "headerText": "Tasks",
+            "isPrimaryKey": "[Undefined]",
+            "type": "number"
+          },
+          "columnName": "openTasks",
+          "columnObject": {
+            "allowEditing": true,
+            "editType": "numericedit",
+            "field": "openTasks",
+            "headerText": "Tasks",
+            "isPrimaryKey": "[Undefined]",
+            "type": "number"
+          },
+          "isForeignKey": false,
+          "previousValue": 6,
+          "rowData": {
+            "careLevel": "Memory Care",
+            "id": 1,
+            "name": "Alpha",
+            "openTasks": 6,
+            "wing": "North"
+          },
+          "value": 8
+        },
+        "ownKeys": [
+          "cancel",
+          "cell",
+          "column",
+          "columnName",
+          "columnObject",
+          "isForeignKey",
+          "name",
+          "previousValue",
+          "rowData",
+          "value"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "cell": {
+            "sample": {
+              "className": "e-rowcell e-rightalign e-selectionbackground e-active e-updatedtd",
+              "id": "",
+              "kind": "Element",
+              "tagName": "TD",
+              "text": "8"
+            },
+            "type": "element"
+          },
+          "column": {
+            "sample": {
+              "allowEditing": true,
+              "editType": "numericedit",
+              "field": "openTasks",
+              "headerText": "Tasks",
+              "isPrimaryKey": "[Undefined]",
+              "type": "number"
+            },
+            "type": "object"
+          },
+          "columnName": {
+            "sample": "openTasks",
+            "type": "string"
+          },
+          "columnObject": {
+            "sample": {
+              "allowEditing": true,
+              "editType": "numericedit",
+              "field": "openTasks",
+              "headerText": "Tasks",
+              "isPrimaryKey": "[Undefined]",
+              "type": "number"
+            },
+            "type": "object"
+          },
+          "isForeignKey": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "cellSaved",
+            "type": "string"
+          },
+          "previousValue": {
+            "sample": 6,
+            "type": "number"
+          },
+          "rowData": {
+            "sample": {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha",
+              "openTasks": 6,
+              "wing": "North"
+            },
+            "type": "object"
+          },
+          "value": {
+            "sample": 8,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 6,
+      "label": "event:cellSaved:batch-edit:after-cancel",
+      "value": {
+        "afterCancel": true,
+        "beforeCancel": false,
+        "payload": {
+          "cellSavedShape": {
+            "cancel": true,
+            "cell": {
+              "className": "e-rowcell e-rightalign e-selectionbackground e-active e-updatedtd",
+              "id": "",
+              "kind": "Element",
+              "tagName": "TD",
+              "text": "8"
+            },
+            "column": {
+              "allowEditing": true,
+              "editType": "numericedit",
+              "field": "openTasks",
+              "headerText": "Tasks",
+              "isPrimaryKey": "[Undefined]",
+              "type": "number"
+            },
+            "columnName": "openTasks",
+            "columnObject": {
+              "allowEditing": true,
+              "editType": "numericedit",
+              "field": "openTasks",
+              "headerText": "Tasks",
+              "isPrimaryKey": "[Undefined]",
+              "type": "number"
+            },
+            "isForeignKey": false,
+            "previousValue": 6,
+            "rowData": {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha",
+              "openTasks": 6,
+              "wing": "North"
+            },
+            "value": 8
+          },
+          "ownKeys": [
+            "cancel",
+            "cell",
+            "column",
+            "columnName",
+            "columnObject",
+            "isForeignKey",
+            "name",
+            "previousValue",
+            "rowData",
+            "value"
+          ],
+          "properties": {
+            "cancel": {
+              "sample": true,
+              "type": "boolean"
+            },
+            "cell": {
+              "sample": {
+                "className": "e-rowcell e-rightalign e-selectionbackground e-active e-updatedtd",
+                "id": "",
+                "kind": "Element",
+                "tagName": "TD",
+                "text": "8"
+              },
+              "type": "element"
+            },
+            "column": {
+              "sample": {
+                "allowEditing": true,
+                "editType": "numericedit",
+                "field": "openTasks",
+                "headerText": "Tasks",
+                "isPrimaryKey": "[Undefined]",
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "columnName": {
+              "sample": "openTasks",
+              "type": "string"
+            },
+            "columnObject": {
+              "sample": {
+                "allowEditing": true,
+                "editType": "numericedit",
+                "field": "openTasks",
+                "headerText": "Tasks",
+                "isPrimaryKey": "[Undefined]",
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "isForeignKey": {
+              "sample": false,
+              "type": "boolean"
+            },
+            "name": {
+              "sample": "cellSaved",
+              "type": "string"
+            },
+            "previousValue": {
+              "sample": 6,
+              "type": "number"
+            },
+            "rowData": {
+              "sample": {
+                "careLevel": "Memory Care",
+                "id": 1,
+                "name": "Alpha",
+                "openTasks": 6,
+                "wing": "North"
+              },
+              "type": "object"
+            },
+            "value": {
+              "sample": 8,
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    {
+      "sequence": 7,
+      "label": "cancel-attempt-save-cell",
+      "value": {
+        "batchChanges": {
+          "addedRecords": [],
+          "changedRecords": [
+            {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha",
+              "openTasks": 8,
+              "wing": "North"
+            }
+          ],
+          "deletedRecords": []
+        },
+        "cancelPreventedSavedValue": false,
+        "firstRowCells": [
+          "1",
+          "Alpha",
+          "Memory Care",
+          "North",
+          "8"
+        ],
+        "traceRows": 7
+      }
+    },
+    {
+      "sequence": 8,
+      "label": "complete",
+      "value": {
+        "traceRows": 8
+      }
+    }
+  ]
+}

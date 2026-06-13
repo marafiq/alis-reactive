@@ -161,7 +161,7 @@ function writeMountedRegisteredInput(
   const binding = component.definition.binding;
   if (binding.kind === "none") return;
 
-  const registeredInputIsMounted = component.tryElement() !== undefined;
+  const registeredInputIsMounted = component.tryElement() !== null;
   if (!registeredInputIsMounted) return;
 
   const runtimeObject = component.object();

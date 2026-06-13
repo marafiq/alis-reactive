@@ -1,6 +1,6 @@
 ---
 name: reactive-dsl
-description: Use when writing C# reactive plan code in .cshtml views — Html.On, triggers (DomReady, CustomEvent, component .Reactive), pipeline commands (Element, Dispatch, Component), and plan rendering. The core DSL grammar for Alis.Reactive.
+description: Use when writing C# reactive plan code in .cshtml views — Html.On, triggers (DomReady, CustomEvent, ServerPush, SignalR, component .Reactive), pipeline commands (Element, Dispatch, Component), and plan rendering. The core DSL grammar for Alis.Reactive.
 ---
 
 # Reactive DSL Grammar
@@ -58,9 +58,15 @@ TRIGGER :=
   | DomReady(p => { PIPELINE })
   | CustomEvent("name", p => { PIPELINE })
   | CustomEvent<TPayload>("name", (payload, p) => { PIPELINE })
+  | ServerPush("url", p => { PIPELINE })                              -- SSE, every message
+  | ServerPush("url", "eventType", p => { PIPELINE })                 -- SSE, filtered
+  | ServerPush<TPayload>("url", "eventType", (payload, p) => { PIPELINE })
+  | SignalR("hubUrl", "methodName", p => { PIPELINE })
+  | SignalR<TPayload>("hubUrl", "methodName", (payload, p) => { PIPELINE })
 ```
 
 `TPayload` must be `class, new()`. Payload is a phantom — properties become `evt.` dot-paths.
+ServerPush and SignalR are remote triggers — the async lane.
 
 Component events use `.Reactive()` on the builder, not `Html.On`:
 
@@ -104,7 +110,7 @@ ACTION :=
   | .SetText(payload, x => x.Prop)                     -- event/response phantom
   | .SetText(responseBody, x => x.Prop)                -- typed HTTP response
 
-  -- Text (→ ElementBuilder — supports per-command When)
+  -- Text (→ ElementBuilder)
   | .SetText(bindSource)
   | .SetText(typedSource)                              -- comp.Value()
 
@@ -122,7 +128,6 @@ ACTION :=
 ```
 
 **Return type matters.** `→ PipelineBuilder` chains to next command.
-`→ ElementBuilder` supports `.When()` per-command guard (see conditions-dsl).
 
 ## Component Actions
 
@@ -273,7 +278,7 @@ args is a phantom with no pipeline binding.
 - Switch/NativeCheckBox model property MUST be `bool`
 - DomReady fires AFTER all custom-event listeners wired (two-phase boot)
 - `.Reactive()` stays close to its component — it is the last call inside the build callback
-- `Html.On` is for triggers not tied to a specific component (DomReady, CustomEvent)
+- `Html.On` is for triggers not tied to a specific component (DomReady, CustomEvent, ServerPush, SignalR)
 - Every view ends with `@Html.RenderPlan(plan)` — no exceptions
 - When adding a new sandbox view, update the section's `Index.cshtml` to link to it
 

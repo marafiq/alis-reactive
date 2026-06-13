@@ -69,7 +69,6 @@ describe("fusion component event lifecycle", () => {
         "fusion.fake": fusionEventType({
           beginEdit: {
             channel: "beginEdit",
-            payloadType: { kind: "untyped" },
           },
         }),
       },
@@ -167,7 +166,6 @@ function nativeTextType(): BrowserObjectContract {
 function fusionEventType(events: BrowserObjectContract["events"] = {
   changed: {
     channel: "change",
-    payloadType: { kind: "untyped" },
   },
 }): BrowserObjectContract {
   return {
@@ -211,7 +209,7 @@ function setText(component: string, value: string): ReactionGraph {
 function setEventCancel(): ReactionGraph {
   return {
     kind: "set",
-    on: { kind: "payload", scope: "event", type: { kind: "untyped" } },
+    on: { kind: "payload", scope: "event" },
     property: "cancel",
     value: { kind: "literal", value: true, shape: booleanShape },
   };

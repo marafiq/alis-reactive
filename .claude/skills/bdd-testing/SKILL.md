@@ -1,214 +1,115 @@
 ---
 name: bdd-testing
 description: >
-  Writes BDD Playwright browser tests and TS unit tests for Alis.Reactive using PagePlan<TModel> typed locators and user-story-driven criteria. Use when asked to "write a test", "add Playwright tests", "test this component", "fix a failing test", "add a test for this view", or "why is this test failing".
-  or adding new test scenarios for Alis.Reactive. Also use when the user asks to
-  "write a test", "add Playwright tests", "test this component", "fix a failing test",
-  "add a test for this view", or "why is this test failing". Derives tests from
-  user stories using PagePlan<TModel> typed locators.
+  Derives Playwright BDD tests from senior-living user journeys for
+  Alis.Reactive. One journey = one nested vertical slice: its own domain
+  model, view, controller partial, and fixture, exercised through
+  PagePlan<TModel> typed locators against real-app elements only. Also routes
+  Vitest and NUnit work to their layers. Use when asked to "write a test",
+  "add Playwright tests", "test this component", "add a test for this view",
+  "fix a failing test", or "why is this test failing".
 ---
 
 # BDD Testing — Alis.Reactive
 
-## Principle
-
 > Sensitive to behavior, insensitive to structure. — Kent Beck
 
-Refactoring internals must NEVER break a Playwright test. If it does, the test
-is coupled to implementation — rewrite the test.
+Refactoring framework internals must never break a Playwright test. If a
+test breaks and the page behavior is unchanged, the test was coupled to
+implementation — rewrite it. If the page behavior changed, the test caught a
+regression — report the bug. The slice is the test's Arrange; it changes
+only with its own journey.
 
-## Process — Follow in Order
+The structure is set; this skill does not re-derive it. The 5 rules,
+7-behavior contract, nested-vertical-slice rules, and blind-reviewer protocol
+live in `.claude/memory/bdd-principles.md`. Non-negotiables and failure
+triage live in `tests/Alis.Reactive.PlaywrightTests/CLAUDE.md`. View rules live in
+`Alis.Reactive.SandboxApp/CLAUDE.md`. What follows is the method: journey →
+slice → criteria → tests.
 
-### Step 1: Write the Story BEFORE looking at the view
+## Nested Vertical Slices
 
-```
-As a [role]
-I want [feature]
-So that [business value]
-```
-
-The story comes from the DOMAIN, not from the code.
-
-### Step 2: List criteria the [role] would confirm
-
-Each criterion = ONE sentence the role would say:
-
-```
-✓ "I can search for a physician by name and select them"
-✓ "The system tells me which information is missing"
-✓ "My complete admission reaches the server with correct data"
-
-✗ "echo span updates"               — no role says this
-✗ "componentType validates"          — infrastructure
-✗ "ej2 value equals expected"        — implementation
-```
-
-Ask: would [role] say this sentence? If not, it's not a criterion.
-
-### Step 3: Each criterion = one test
-
-One When. One Then. Multiple cycles = multiple tests.
-
-Exception: State-cycle tests (fill -> clear -> refill) may stay as one test when they
-verify the FULL lifecycle of a single behavior. Split when the steps test DIFFERENT behaviors.
-
-### Step 4: Choose the Right Locator Pattern
-
-**Note:** The codebase is mid-migration. Both `PagePlan<TModel>` and `ComponentScope`/direct
-locators coexist. New tests should prefer `PagePlan<TModel>` for compile-time safety.
-
-Three locator patterns exist. Choose the right one for the element:
-
-**1. `PagePlan<TModel>` — expression-based, compile-time safety (preferred for new tests)**
-
-```csharp
-_plan = await PagePlan<TModel>.FromPage(Page);
-var physician = _plan.AutoComplete(m => m.Physician);
-await _plan.ErrorFor(m => m.Physician);  // validation error
-```
-
-Reads the plan JSON from the page. Model renames break tests at compile time.
-
-**2. `ComponentScope` — string-based, when model expressions aren't available**
-
-```csharp
-var scope = new ComponentScope(Page, "Alis_Reactive_SandboxApp_Models_ResidentModel");
-var rate = scope.NumericTextBox("MonthlyRate");
-await scope.Element("echo");  // any element by raw ID
-```
-
-Uses IdGenerator pattern (`{TypeScope}__{PropertyName}`). Used when the test
-project doesn't reference the model type or for multi-scope pages.
-
-**3. Direct `Page.Locator` — for explicit-ID elements not model-bound**
-
-```csharp
-private ILocator SubmitBtn => Page.Locator("#submit-btn");
-private ILocator Result => Page.Locator("#result");
-```
-
-For buttons, echo spans, and other elements with explicit IDs set in the view.
-
-### Step 4b: Component Types and Surfaces
+The pattern. A suite starts from one senior-living user journey — month-end
+billing, a care-ops roster, a respite-stay booking — and owns an isolated
+vertical slice, nested under the same concern path in every tree, names
+aligned:
 
 ```
-COMPONENT (via PagePlan or ComponentScope):
-  | .AutoComplete("Prop")     -- Type, SelectItem, TypeAndSelect, Clear, Focus, Blur
-  | .DropDownList("Prop")     -- Select("text"), Open, Focus
-  | .NumericTextBox("Prop")   -- Fill, FillAndBlur, Clear, Focus, Blur
-  | .Switch("Prop")           -- Toggle
-  | .TextBox("Prop")          -- Fill, FillAndBlur, Clear, Focus, Blur
-  | .DatePicker("Prop")       -- FillAndBlur, SelectDate, Clear, Focus, Blur
-  | .TimePicker("Prop")       -- FillAndBlur, Clear, Focus, Blur
-  | .DateTimePicker("Prop")   -- FillAndBlur, Clear, Focus, Blur
-  NOTE: DatePicker/TimePicker/DateTimePicker — SelectDate (popup gesture) is reliable.
-        FillAndBlur (text gesture) may not set ej2.value. Prefer SelectDate when available.
-        See DatePickerLocator.cs: "typed input does NOT always update the instance."
-  | .DateRangePicker("Prop")  -- FillAndBlur, Clear, Focus, Blur
-  | .MultiColumnComboBox("Prop") -- Select, Focus
-  | .InputMask("Prop")        -- Fill, FillAndBlur, Clear, Focus, Blur
-  | .RichTextEditor("Prop")   -- Fill, Clear, Focus, Blur
-  | .MultiSelect("Prop")      -- Open, Select, Clear, Focus, Blur
-
-SURFACE :=
-  | _plan.Element("explicit-id")        -- status spans, echo divs, results
-  | _plan.ErrorFor(m => m.Prop)         -- validation error for a model property
-  | component.Input                     -- the input element (for value assertions)
-  | component.PopupItems                -- popup suggestions (AutoComplete)
-  | component.PopupItem("Dr. Smith")    -- specific popup suggestion by text (AutoComplete)
-  | component.CalendarIcon              -- calendar icon button (DatePicker family, opens popup)
-  | component.Popup                     -- calendar popup container (DatePicker family)
-
-ASSERTION :=
-  | Expect(SURFACE).ToContainTextAsync(...)
-  | Expect(SURFACE).ToBeVisibleAsync()
-  | Expect(SURFACE).ToHaveValueAsync(...)
-  | Assert.That(request.PostData, Does.Contain(...))   -- framework tests only
+Areas/Sandbox/Models/Components/Fusion/Grid/BillingModel.cs            journey model
+Areas/Sandbox/Controllers/Components/Fusion/GridController.Billing.cs  controller partial
+Areas/Sandbox/Views/Components/Fusion/Grid/Billing.cshtml              journey view
+tests/.../Components/Fusion/Grid/WhenUsingFusionGridBilling.cs         fixture
 ```
 
-**Always** `_plan.ComponentType(m => m.Prop)` or `scope.ComponentType("Prop")` — never `Page.Locator("#hardcoded-id")` for model-bound elements.
-**Always** `_plan.ErrorFor(m => m.Prop)` — never raw `span[data-valmsg-for]` selectors.
-**Always** gestures — never `EvaluateAsync` or `ej2_instances`.
+The Grid slices are the exemplar. The journey name (`Billing`) is the join
+key across the four trees — given any one file, the rest of the slice is one
+glob away.
 
-### Step 5: Verify outcomes
+A component with many use cases fans out into many journeys, each a full
+slice. Grid carries about thirty — Billing, CareOps, Directory,
+PrintableRoster — thirty views, thirty fixtures. Billing and CareOps own
+their model files and controller partials; the older Grid journeys share
+`GridModel.cs` and predate the full pattern — they migrate as touched.
+Never one view or one fixture for everything.
 
-```
-FRAMEWORK TESTS (testing the gather pipeline):
-  Verify POST body — Assert.That(request.PostData, Does.Contain(...))
+- The model belongs to the journey and speaks domain language: residents,
+  care levels, wings, monthly rates. Similar shapes across journeys stay
+  separate types (root Rule 4: duplication over abstraction).
+- The view is the journey's own page. Dialog and drawer flows on a page
+  belong to that page's journey.
+- The data is the journey's own, seeded per browser context; no shared
+  fake-data class. Parallel tests never collide.
+- The fixture exercises that journey's view only.
 
-APP TESTS (testing real application behavior):
-  Verify server response on screen — the round-trip proves data reached server
+The isolation contract and the screenshot test live in `bdd-principles.md`;
+the blind reviewer checks both.
 
-COMPONENT EXERCISE PAGES (no HTTP, testing reactive state changes):
-  Verify element text and visibility — Expect(echo).ToContainTextAsync(...)
-  Verify conditional show/hide — Expect(panel).ToBeVisibleAsync() / ToBeHiddenAsync()
-```
+## Real-App Elements Only
 
-Happy path without verifying what was sent/received (or what changed on screen) is INCOMPLETE.
+Every element in the view is one a real senior-living page would carry. No
+echo spans, no debug divs, no elements that exist only to be asserted.
 
-### Step 6: Validate
+The observable outcome of a behavior is what the role sees on a real page:
 
-```
-- [ ] Traces to a criterion from the story
-- [ ] Name is ONE sentence the [role] would say
-- [ ] Uses PagePlan<TModel> — no hardcoded IDs
-- [ ] Uses gestures — no ej2, no EvaluateAsync
-- [ ] Framework: verifies POST body. App: verifies screen after round-trip. Exercise: verifies reactive state via element text/visibility
-- [ ] Survives refactoring of internals
-```
+- a validation message — `_plan.ErrorFor(m => m.Prop)`
+- a value in a real field or summary line — balance due, monthly total
+- a panel, row, or dialog appearing or disappearing
+- an app-level object the page uses anyway — Toast, Drawer, Confirm
+- framework gather tests only: the POST body — `request.PostData`
 
-## Stop and Check
+If a behavior seems observable only through a synthetic element, the view is
+not a real page yet. Redesign the view, not the assertion. The check is the
+screenshot test: a stranger seeing the page reads a senior-living product
+screen — not a test rig.
 
-**"I'll write one test that fills everything and submits"**
-→ Multiple behaviors. Split.
+## Method
 
-**"I'll test that the echo span updates"**
-→ No role cares. Test the behavior the echo serves.
+1. **Write the story before looking at any view.**
+   `As a [role] / I want [feature] / So that [value]`. The role and journey
+   come from the senior-living domain, not from the code.
 
-**"I'll use Page.Locator('#some-id')"**
-→ Use `_plan.TextBox(m => m.Field)`. Hardcoded IDs break on rename.
+2. **List criteria as sentences the role would say.** Unhappy paths are
+   mandatory — a happy-path-only suite passes while the feature lies.
 
-**"I'll check ej2_instances[0].value"**
-→ Implementation. Assert what the user sees or what the server received.
+   ```
+   ✓ "I can search for a physician by name and select them"
+   ✓ "The system tells me which information is missing"
+   ✗ "echo span updates"        — no role says this
+   ✗ "ej2 value equals expected" — implementation
+   ```
 
-**"The test name describes the framework action"**
-→ Name it as the role would. "incomplete_admission_tells_user_which_fields_are_missing."
+3. **One criterion = one test.** One When, one Then. A fill → clear → refill
+   cycle may stay one test when it proves one behavior's lifecycle; split
+   when the steps prove different behaviors.
 
-**"I'll assert raw POST body in an app test"**
-→ POST format is implementation. Assert the screen after round-trip.
+4. **Locate through the plan.** Preference order: `PagePlan<TModel>`
+   expressions → `ComponentScope` when the model type is unavailable → raw
+   locator only for explicit-ID elements. Gestures, surfaces, and assertions
+   per component: `references/gestures.md`.
 
-**"The popup click doesn't work, let me hack the selector"**
-→ STOP. Use the proven gesture for that component. See `references/patterns.md`.
-
-## When a Test Fails — Triage in Order
-
-```
-1. Is the test testing the correct thing?
-   → Does the criterion match a real user need?
-
-2. Is the test arranged correctly? (Arrange-Act-Assert)
-   → Right state? Right action? Right outcome?
-
-3. Is the test using the right tools?
-   → PagePlan locators? Correct gestures? No hardcoded selectors?
-
-4. ALL YES → the test is correct. Do NOT hack it.
-
-5. Verify manually in browser.
-   → Open the page, do what the test does, see what happens.
-   → This determines: locator bug vs app bug.
-
-6. Classify:
-   LOCATOR BUG: gesture doesn't work reliably
-     → Fix the locator in Playwright.Extensions.
-     → Verify with isolated test + browser experiment first.
-
-   APP BUG: behavior genuinely broken
-     → Fix the app. Use systematic-debugging skill.
-     → The test caught a real bug. Celebrate.
-
-7. NEVER hack the test to make it pass.
-```
+5. **Prove the outcome on a real-app surface** (list above), then check each
+   test: traces to a criterion, named as the role speaks, survives internal
+   refactoring.
 
 ## Fixture Shape
 
@@ -237,5 +138,6 @@ public class When{BehaviorHappens} : PlaywrightTestBase
 
 ## References
 
-- **`references/patterns.md`** — Fixture code, validation errors, POST interception
+- **`references/gestures.md`** — per-component gestures, surfaces, assertions
+- **`references/patterns.md`** — fixture code, validation errors, POST interception
 - **`references/first-principles.md`** — Dan North, Kent Beck, Ian Cooper research

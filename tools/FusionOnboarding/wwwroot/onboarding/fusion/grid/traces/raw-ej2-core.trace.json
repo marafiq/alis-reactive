@@ -1,0 +1,1653 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "core",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-core.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "load",
+      "value": {
+        "functions": [],
+        "ownKeys": [],
+        "properties": {},
+        "value": "undefined"
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "headerCellInfo",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cell",
+          "name",
+          "node"
+        ],
+        "properties": {
+          "cell": {
+            "sample": {
+              "cellType": 1,
+              "className": "",
+              "colIndex": 0,
+              "column": {
+                "allowEditing": true,
+                "allowFiltering": true,
+                "allowGrouping": true,
+                "allowReordering": true,
+                "allowResizing": true,
+                "allowSearching": true,
+                "allowSorting": true,
+                "autoFit": false,
+                "disableHtmlEncode": true,
+                "edit": "[MaxDepth]",
+                "enableColumnSpan": true,
+                "enableGroupByFormat": false,
+                "enableRowSpan": true,
+                "field": "id",
+                "filter": "[MaxDepth]",
+                "foreignKeyField": "id",
+                "getEditTemplate": "[Function]",
+                "getFilterTemplate": "[Function]",
+                "headerText": "ID",
+                "index": 0,
+                "parent": "[MaxDepth]",
+                "showColumnMenu": true,
+                "showInColumnChooser": true,
+                "sortDirection": "Descending",
+                "templateOptions": "[MaxDepth]",
+                "textAlign": "Right",
+                "toJSON": "[Function]",
+                "uid": "grid-column0",
+                "valueAccessor": "[Function]",
+                "visible": true,
+                "width": 90
+              },
+              "index": 0,
+              "isDataCell": false,
+              "isRowSpanned": false,
+              "isSpanned": false,
+              "isTemplate": false,
+              "rowID": "",
+              "visible": true
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "headerCellInfo",
+            "type": "string"
+          },
+          "node": {
+            "sample": "[Element#TH]",
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "headerCellInfo",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cell",
+          "name",
+          "node"
+        ],
+        "properties": {
+          "cell": {
+            "sample": {
+              "cellType": 1,
+              "className": "",
+              "colIndex": 1,
+              "column": {
+                "allowEditing": true,
+                "allowFiltering": true,
+                "allowGrouping": true,
+                "allowReordering": true,
+                "allowResizing": true,
+                "allowSearching": true,
+                "allowSorting": true,
+                "autoFit": false,
+                "disableHtmlEncode": true,
+                "edit": "[MaxDepth]",
+                "enableColumnSpan": true,
+                "enableGroupByFormat": false,
+                "enableRowSpan": true,
+                "field": "name",
+                "filter": "[MaxDepth]",
+                "foreignKeyField": "name",
+                "getEditTemplate": "[Function]",
+                "getFilterTemplate": "[Function]",
+                "headerText": "Name",
+                "index": 1,
+                "parent": "[MaxDepth]",
+                "showColumnMenu": true,
+                "showInColumnChooser": true,
+                "sortDirection": "Descending",
+                "templateOptions": "[MaxDepth]",
+                "toJSON": "[Function]",
+                "uid": "grid-column1",
+                "valueAccessor": "[Function]",
+                "visible": true,
+                "width": 160
+              },
+              "index": 0,
+              "isDataCell": false,
+              "isRowSpanned": false,
+              "isSpanned": false,
+              "isTemplate": false,
+              "rowID": "",
+              "visible": true
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "headerCellInfo",
+            "type": "string"
+          },
+          "node": {
+            "sample": "[Element#TH]",
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "headerCellInfo",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cell",
+          "name",
+          "node"
+        ],
+        "properties": {
+          "cell": {
+            "sample": {
+              "cellType": 1,
+              "className": "e-lastcell",
+              "colIndex": 2,
+              "column": {
+                "allowEditing": true,
+                "allowFiltering": true,
+                "allowGrouping": true,
+                "allowReordering": true,
+                "allowResizing": true,
+                "allowSearching": true,
+                "allowSorting": true,
+                "autoFit": false,
+                "disableHtmlEncode": true,
+                "edit": "[MaxDepth]",
+                "enableColumnSpan": true,
+                "enableGroupByFormat": false,
+                "enableRowSpan": true,
+                "field": "status",
+                "filter": "[MaxDepth]",
+                "foreignKeyField": "status",
+                "getEditTemplate": "[Function]",
+                "getFilterTemplate": "[Function]",
+                "headerText": "Status",
+                "index": 2,
+                "parent": "[MaxDepth]",
+                "showColumnMenu": true,
+                "showInColumnChooser": true,
+                "sortDirection": "Descending",
+                "templateOptions": "[MaxDepth]",
+                "toJSON": "[Function]",
+                "uid": "grid-column2",
+                "valueAccessor": "[Function]",
+                "visible": true,
+                "width": 140
+              },
+              "index": 0,
+              "isDataCell": false,
+              "isRowSpanned": false,
+              "isSpanned": false,
+              "isTemplate": false,
+              "rowID": "",
+              "visible": true
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "headerCellInfo",
+            "type": "string"
+          },
+          "node": {
+            "sample": "[Element#TH]",
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "created",
+      "value": {
+        "functions": [],
+        "ownKeys": [],
+        "properties": {},
+        "value": "undefined"
+      }
+    },
+    {
+      "sequence": 6,
+      "label": "ready",
+      "value": {
+        "apiSet": "core",
+        "className": "Grid",
+        "component": "grid",
+        "namespace": "ej.grids"
+      }
+    },
+    {
+      "sequence": 7,
+      "label": "beforeDataBound",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "actionArgs",
+          "aggregates",
+          "count",
+          "name",
+          "query",
+          "result"
+        ],
+        "properties": {
+          "actionArgs": {
+            "sample": {},
+            "type": "object"
+          },
+          "aggregates": {
+            "sample": {},
+            "type": "object"
+          },
+          "count": {
+            "sample": 3,
+            "type": "number"
+          },
+          "name": {
+            "sample": "beforeDataBound",
+            "type": "string"
+          },
+          "query": {
+            "sample": {
+              "distincts": [],
+              "expands": [],
+              "fKey": "",
+              "groupedColumns": [],
+              "isChild": false,
+              "isCountRequired": true,
+              "key": "",
+              "lazyLoad": [],
+              "params": [],
+              "queries": [
+                "[MaxDepth]"
+              ],
+              "sortedColumns": [],
+              "subQuery": null
+            },
+            "type": "object"
+          },
+          "result": {
+            "sample": [
+              {
+                "id": 1,
+                "name": "Alpha",
+                "status": "Open"
+              },
+              {
+                "id": 2,
+                "name": "Beta",
+                "status": "Closed"
+              }
+            ],
+            "type": "array"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 8,
+      "label": "queryCellInfo",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cell",
+          "colSpan",
+          "column",
+          "data",
+          "foreignKeyData",
+          "name",
+          "requestType",
+          "rowSpan"
+        ],
+        "properties": {
+          "cell": {
+            "sample": "[Element#TD]",
+            "type": "object"
+          },
+          "colSpan": {
+            "sample": 1,
+            "type": "number"
+          },
+          "column": {
+            "sample": {
+              "allowEditing": true,
+              "allowFiltering": true,
+              "allowGrouping": true,
+              "allowReordering": true,
+              "allowResizing": true,
+              "allowSearching": true,
+              "allowSorting": true,
+              "autoFit": false,
+              "disableHtmlEncode": true,
+              "edit": {},
+              "enableColumnSpan": true,
+              "enableGroupByFormat": false,
+              "enableRowSpan": true,
+              "field": "id",
+              "filter": {},
+              "foreignKeyField": "id",
+              "getEditTemplate": "[Function]",
+              "getFilterTemplate": "[Function]",
+              "headerText": "ID",
+              "index": 0,
+              "parent": {
+                "addNewRowFocus": true,
+                "allowServerDataBinding": false,
+                "ariaService": "[MaxDepth]",
+                "asyncTimeOut": 50,
+                "autoFitColumnsResize": false,
+                "bulkChanges": "[MaxDepth]",
+                "changedProperties": "[MaxDepth]",
+                "checkAllRows": "None",
+                "childChangedProperties": "[MaxDepth]",
+                "clipboardModule": "[MaxDepth]",
+                "columnModel": "[MaxDepth]",
+                "componentRefresh": "[Function]",
+                "contentModule": "[MaxDepth]",
+                "contentRowIndexes": "[MaxDepth]",
+                "dataBoundFunction": "[Function]",
+                "defaultChartLocale": "[MaxDepth]",
+                "defaultLocale": "[MaxDepth]",
+                "disableSelectedRecords": "[MaxDepth]",
+                "element": "[Element#grid]",
+                "enableDeepCompare": false,
+                "enableLogger": true,
+                "filterModule": "[MaxDepth]",
+                "filterOperators": "[MaxDepth]",
+                "finalUpdate": "[Function]",
+                "fixedColumns": "[MaxDepth]",
+                "fixedCount": 0,
+                "fixedcount": 0,
+                "focusModule": "[MaxDepth]",
+                "freezeColumnRefresh": true,
+                "frozenLeftColumns": "[MaxDepth]",
+                "frozenLeftCount": 0,
+                "frozenRightColumns": "[MaxDepth]",
+                "frozenRightCount": 0,
+                "getShowHideService": "[MaxDepth]",
+                "gridPager": "[Element#DIV]",
+                "headerModule": "[MaxDepth]",
+                "ignoreCollectionWatch": true,
+                "inViewIndexes": "[MaxDepth]",
+                "isAddNewRow": false,
+                "isAngular": false,
+                "isAutoFitColumns": false,
+                "isAutoGen": false,
+                "isAutoGenerateColumns": false,
+                "isChangeDataSourceCall": false,
+                "isCheckBoxSelection": false,
+                "isComplexArraySetter": false,
+                "isDestroyed": false,
+                "isEdit": false,
+                "isExportGrid": false,
+                "isInitial": true,
+                "isInitialLoad": false,
+                "isManualRefresh": false,
+                "isPersistSelection": false,
+                "isPreparedFrozenColumns": true,
+                "isPreventScrollEvent": false,
+                "isProtectedOnChange": false,
+                "isReact": false,
+                "isReactHybrid": false,
+                "isRendered": false,
+                "isServerRendered": false,
+                "isSpan": false,
+                "isStringTemplate": false,
+                "isVirtualAdaptive": true,
+                "isVue": false,
+                "isWidgetsDestroyed": false,
+                "islazyloadRequest": false,
+                "keyA": false,
+                "keyConfigs": "[MaxDepth]",
+                "keyboardModule": "[MaxDepth]",
+                "leftcount": 0,
+                "localObserver": "[MaxDepth]",
+                "localeObj": "[Circular]",
+                "lockcolPositionCount": 0,
+                "loggerModule": "[MaxDepth]",
+                "media": "[MaxDepth]",
+                "mediaBindInstance": "[MaxDepth]",
+                "mediaCol": "[MaxDepth]",
+                "mergeCells": "[MaxDepth]",
+                "mergePersistData": "[Function]",
+                "mergedColumns": false,
+                "modelObserver": "[MaxDepth]",
+                "moduleLoader": "[MaxDepth]",
+                "movableColumns": "[MaxDepth]",
+                "movableCount": 3,
+                "movablecount": 3,
+                "needsID": true,
+                "oldProperties": "[MaxDepth]",
+                "pageRequireRefresh": true,
+                "pageTemplateChange": false,
+                "pagerModule": "[MaxDepth]",
+                "partialSelectedIndexes": "[MaxDepth]",
+                "partialSelectedRecords": "[MaxDepth]",
+                "pinnedRowIndexes": "[MaxDepth]",
+                "pinnedTopRecords": "[MaxDepth]",
+                "pinnedTopRowKeys": "[MaxDepth]",
+                "pinnedTopRowModels": "[MaxDepth]",
+                "prevPageMoving": false,
+                "preventAutoFit": false,
+                "printModule": "[MaxDepth]",
+                "properties": "[MaxDepth]",
+                "randomId": "[MaxDepth]",
+                "refreshing": false,
+                "renderModule": "[MaxDepth]",
+                "requireTemplateRef": true,
+                "rightcount": 0,
+                "rowUid": 0,
+                "scrollModule": "[Circular]",
+                "searchModule": "[MaxDepth]",
+                "selectVirtualRowOnAdd": false
+              },
+              "parserFn": "[Function]",
+              "showColumnMenu": true,
+              "showInColumnChooser": true,
+              "sortDirection": "Descending",
+              "templateOptions": {
+                "enableAriaLabel": true
+              },
+              "textAlign": "Right",
+              "toJSON": "[Function]",
+              "type": "number",
+              "uid": "grid-column0",
+              "valueAccessor": "[Function]",
+              "visible": true,
+              "width": 90
+            },
+            "type": "object"
+          },
+          "data": {
+            "sample": {
+              "id": 1,
+              "name": "Alpha",
+              "status": "Open"
+            },
+            "type": "object"
+          },
+          "foreignKeyData": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "queryCellInfo",
+            "type": "string"
+          },
+          "requestType": {
+            "type": "undefined"
+          },
+          "rowSpan": {
+            "sample": 1,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 9,
+      "label": "queryCellInfo",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cell",
+          "colSpan",
+          "column",
+          "data",
+          "foreignKeyData",
+          "name",
+          "requestType",
+          "rowSpan"
+        ],
+        "properties": {
+          "cell": {
+            "sample": "[Element#TD]",
+            "type": "object"
+          },
+          "colSpan": {
+            "sample": 1,
+            "type": "number"
+          },
+          "column": {
+            "sample": {
+              "allowEditing": true,
+              "allowFiltering": true,
+              "allowGrouping": true,
+              "allowReordering": true,
+              "allowResizing": true,
+              "allowSearching": true,
+              "allowSorting": true,
+              "autoFit": false,
+              "disableHtmlEncode": true,
+              "edit": {},
+              "enableColumnSpan": true,
+              "enableGroupByFormat": false,
+              "enableRowSpan": true,
+              "field": "name",
+              "filter": {},
+              "foreignKeyField": "name",
+              "getEditTemplate": "[Function]",
+              "getFilterTemplate": "[Function]",
+              "headerText": "Name",
+              "index": 1,
+              "parent": {
+                "addNewRowFocus": true,
+                "allowServerDataBinding": false,
+                "ariaService": "[MaxDepth]",
+                "asyncTimeOut": 50,
+                "autoFitColumnsResize": false,
+                "bulkChanges": "[MaxDepth]",
+                "changedProperties": "[MaxDepth]",
+                "checkAllRows": "None",
+                "childChangedProperties": "[MaxDepth]",
+                "clipboardModule": "[MaxDepth]",
+                "columnModel": "[MaxDepth]",
+                "componentRefresh": "[Function]",
+                "contentModule": "[MaxDepth]",
+                "contentRowIndexes": "[MaxDepth]",
+                "dataBoundFunction": "[Function]",
+                "defaultChartLocale": "[MaxDepth]",
+                "defaultLocale": "[MaxDepth]",
+                "disableSelectedRecords": "[MaxDepth]",
+                "element": "[Element#grid]",
+                "enableDeepCompare": false,
+                "enableLogger": true,
+                "filterModule": "[MaxDepth]",
+                "filterOperators": "[MaxDepth]",
+                "finalUpdate": "[Function]",
+                "fixedColumns": "[MaxDepth]",
+                "fixedCount": 0,
+                "fixedcount": 0,
+                "focusModule": "[MaxDepth]",
+                "freezeColumnRefresh": true,
+                "frozenLeftColumns": "[MaxDepth]",
+                "frozenLeftCount": 0,
+                "frozenRightColumns": "[MaxDepth]",
+                "frozenRightCount": 0,
+                "getShowHideService": "[MaxDepth]",
+                "gridPager": "[Element#DIV]",
+                "headerModule": "[MaxDepth]",
+                "ignoreCollectionWatch": true,
+                "inViewIndexes": "[MaxDepth]",
+                "isAddNewRow": false,
+                "isAngular": false,
+                "isAutoFitColumns": false,
+                "isAutoGen": false,
+                "isAutoGenerateColumns": false,
+                "isChangeDataSourceCall": false,
+                "isCheckBoxSelection": false,
+                "isComplexArraySetter": false,
+                "isDestroyed": false,
+                "isEdit": false,
+                "isExportGrid": false,
+                "isInitial": true,
+                "isInitialLoad": false,
+                "isManualRefresh": false,
+                "isPersistSelection": false,
+                "isPreparedFrozenColumns": true,
+                "isPreventScrollEvent": false,
+                "isProtectedOnChange": false,
+                "isReact": false,
+                "isReactHybrid": false,
+                "isRendered": false,
+                "isServerRendered": false,
+                "isSpan": false,
+                "isStringTemplate": false,
+                "isVirtualAdaptive": true,
+                "isVue": false,
+                "isWidgetsDestroyed": false,
+                "islazyloadRequest": false,
+                "keyA": false,
+                "keyConfigs": "[MaxDepth]",
+                "keyboardModule": "[MaxDepth]",
+                "leftcount": 0,
+                "localObserver": "[MaxDepth]",
+                "localeObj": "[Circular]",
+                "lockcolPositionCount": 0,
+                "loggerModule": "[MaxDepth]",
+                "media": "[MaxDepth]",
+                "mediaBindInstance": "[MaxDepth]",
+                "mediaCol": "[MaxDepth]",
+                "mergeCells": "[MaxDepth]",
+                "mergePersistData": "[Function]",
+                "mergedColumns": false,
+                "modelObserver": "[MaxDepth]",
+                "moduleLoader": "[MaxDepth]",
+                "movableColumns": "[MaxDepth]",
+                "movableCount": 3,
+                "movablecount": 3,
+                "needsID": true,
+                "oldProperties": "[MaxDepth]",
+                "pageRequireRefresh": true,
+                "pageTemplateChange": false,
+                "pagerModule": "[MaxDepth]",
+                "partialSelectedIndexes": "[MaxDepth]",
+                "partialSelectedRecords": "[MaxDepth]",
+                "pinnedRowIndexes": "[MaxDepth]",
+                "pinnedTopRecords": "[MaxDepth]",
+                "pinnedTopRowKeys": "[MaxDepth]",
+                "pinnedTopRowModels": "[MaxDepth]",
+                "prevPageMoving": false,
+                "preventAutoFit": false,
+                "printModule": "[MaxDepth]",
+                "properties": "[MaxDepth]",
+                "randomId": "[MaxDepth]",
+                "refreshing": false,
+                "renderModule": "[MaxDepth]",
+                "requireTemplateRef": true,
+                "rightcount": 0,
+                "rowUid": 0,
+                "scrollModule": "[Circular]",
+                "searchModule": "[MaxDepth]",
+                "selectVirtualRowOnAdd": false
+              },
+              "showColumnMenu": true,
+              "showInColumnChooser": true,
+              "sortDirection": "Descending",
+              "templateOptions": {
+                "enableAriaLabel": true
+              },
+              "toJSON": "[Function]",
+              "type": "string",
+              "uid": "grid-column1",
+              "valueAccessor": "[Function]",
+              "visible": true,
+              "width": 160
+            },
+            "type": "object"
+          },
+          "data": {
+            "sample": {
+              "id": 1,
+              "name": "Alpha",
+              "status": "Open"
+            },
+            "type": "object"
+          },
+          "foreignKeyData": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "queryCellInfo",
+            "type": "string"
+          },
+          "requestType": {
+            "type": "undefined"
+          },
+          "rowSpan": {
+            "sample": 1,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 10,
+      "label": "queryCellInfo",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cell",
+          "colSpan",
+          "column",
+          "data",
+          "foreignKeyData",
+          "name",
+          "requestType",
+          "rowSpan"
+        ],
+        "properties": {
+          "cell": {
+            "sample": "[Element#TD]",
+            "type": "object"
+          },
+          "colSpan": {
+            "sample": 1,
+            "type": "number"
+          },
+          "column": {
+            "sample": {
+              "allowEditing": true,
+              "allowFiltering": true,
+              "allowGrouping": true,
+              "allowReordering": true,
+              "allowResizing": true,
+              "allowSearching": true,
+              "allowSorting": true,
+              "autoFit": false,
+              "disableHtmlEncode": true,
+              "edit": {},
+              "enableColumnSpan": true,
+              "enableGroupByFormat": false,
+              "enableRowSpan": true,
+              "field": "status",
+              "filter": {},
+              "foreignKeyField": "status",
+              "getEditTemplate": "[Function]",
+              "getFilterTemplate": "[Function]",
+              "headerText": "Status",
+              "index": 2,
+              "parent": {
+                "addNewRowFocus": true,
+                "allowServerDataBinding": false,
+                "ariaService": "[MaxDepth]",
+                "asyncTimeOut": 50,
+                "autoFitColumnsResize": false,
+                "bulkChanges": "[MaxDepth]",
+                "changedProperties": "[MaxDepth]",
+                "checkAllRows": "None",
+                "childChangedProperties": "[MaxDepth]",
+                "clipboardModule": "[MaxDepth]",
+                "columnModel": "[MaxDepth]",
+                "componentRefresh": "[Function]",
+                "contentModule": "[MaxDepth]",
+                "contentRowIndexes": "[MaxDepth]",
+                "dataBoundFunction": "[Function]",
+                "defaultChartLocale": "[MaxDepth]",
+                "defaultLocale": "[MaxDepth]",
+                "disableSelectedRecords": "[MaxDepth]",
+                "element": "[Element#grid]",
+                "enableDeepCompare": false,
+                "enableLogger": true,
+                "filterModule": "[MaxDepth]",
+                "filterOperators": "[MaxDepth]",
+                "finalUpdate": "[Function]",
+                "fixedColumns": "[MaxDepth]",
+                "fixedCount": 0,
+                "fixedcount": 0,
+                "focusModule": "[MaxDepth]",
+                "freezeColumnRefresh": true,
+                "frozenLeftColumns": "[MaxDepth]",
+                "frozenLeftCount": 0,
+                "frozenRightColumns": "[MaxDepth]",
+                "frozenRightCount": 0,
+                "getShowHideService": "[MaxDepth]",
+                "gridPager": "[Element#DIV]",
+                "headerModule": "[MaxDepth]",
+                "ignoreCollectionWatch": true,
+                "inViewIndexes": "[MaxDepth]",
+                "isAddNewRow": false,
+                "isAngular": false,
+                "isAutoFitColumns": false,
+                "isAutoGen": false,
+                "isAutoGenerateColumns": false,
+                "isChangeDataSourceCall": false,
+                "isCheckBoxSelection": false,
+                "isComplexArraySetter": false,
+                "isDestroyed": false,
+                "isEdit": false,
+                "isExportGrid": false,
+                "isInitial": true,
+                "isInitialLoad": false,
+                "isManualRefresh": false,
+                "isPersistSelection": false,
+                "isPreparedFrozenColumns": true,
+                "isPreventScrollEvent": false,
+                "isProtectedOnChange": false,
+                "isReact": false,
+                "isReactHybrid": false,
+                "isRendered": false,
+                "isServerRendered": false,
+                "isSpan": false,
+                "isStringTemplate": false,
+                "isVirtualAdaptive": true,
+                "isVue": false,
+                "isWidgetsDestroyed": false,
+                "islazyloadRequest": false,
+                "keyA": false,
+                "keyConfigs": "[MaxDepth]",
+                "keyboardModule": "[MaxDepth]",
+                "leftcount": 0,
+                "localObserver": "[MaxDepth]",
+                "localeObj": "[Circular]",
+                "lockcolPositionCount": 0,
+                "loggerModule": "[MaxDepth]",
+                "media": "[MaxDepth]",
+                "mediaBindInstance": "[MaxDepth]",
+                "mediaCol": "[MaxDepth]",
+                "mergeCells": "[MaxDepth]",
+                "mergePersistData": "[Function]",
+                "mergedColumns": false,
+                "modelObserver": "[MaxDepth]",
+                "moduleLoader": "[MaxDepth]",
+                "movableColumns": "[MaxDepth]",
+                "movableCount": 3,
+                "movablecount": 3,
+                "needsID": true,
+                "oldProperties": "[MaxDepth]",
+                "pageRequireRefresh": true,
+                "pageTemplateChange": false,
+                "pagerModule": "[MaxDepth]",
+                "partialSelectedIndexes": "[MaxDepth]",
+                "partialSelectedRecords": "[MaxDepth]",
+                "pinnedRowIndexes": "[MaxDepth]",
+                "pinnedTopRecords": "[MaxDepth]",
+                "pinnedTopRowKeys": "[MaxDepth]",
+                "pinnedTopRowModels": "[MaxDepth]",
+                "prevPageMoving": false,
+                "preventAutoFit": false,
+                "printModule": "[MaxDepth]",
+                "properties": "[MaxDepth]",
+                "randomId": "[MaxDepth]",
+                "refreshing": false,
+                "renderModule": "[MaxDepth]",
+                "requireTemplateRef": true,
+                "rightcount": 0,
+                "rowUid": 0,
+                "scrollModule": "[Circular]",
+                "searchModule": "[MaxDepth]",
+                "selectVirtualRowOnAdd": false
+              },
+              "showColumnMenu": true,
+              "showInColumnChooser": true,
+              "sortDirection": "Descending",
+              "templateOptions": {
+                "enableAriaLabel": true
+              },
+              "toJSON": "[Function]",
+              "type": "string",
+              "uid": "grid-column2",
+              "valueAccessor": "[Function]",
+              "visible": true,
+              "width": 140
+            },
+            "type": "object"
+          },
+          "data": {
+            "sample": {
+              "id": 1,
+              "name": "Alpha",
+              "status": "Open"
+            },
+            "type": "object"
+          },
+          "foreignKeyData": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "queryCellInfo",
+            "type": "string"
+          },
+          "requestType": {
+            "type": "undefined"
+          },
+          "rowSpan": {
+            "sample": 1,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 11,
+      "label": "rowDataBound",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "data",
+          "isSelectable",
+          "name",
+          "row",
+          "rowHeight"
+        ],
+        "properties": {
+          "data": {
+            "sample": {
+              "id": 1,
+              "name": "Alpha",
+              "status": "Open"
+            },
+            "type": "object"
+          },
+          "isSelectable": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "rowDataBound",
+            "type": "string"
+          },
+          "row": {
+            "sample": "[Element#TR]",
+            "type": "object"
+          },
+          "rowHeight": {
+            "sample": null,
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 12,
+      "label": "queryCellInfo",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cell",
+          "colSpan",
+          "column",
+          "data",
+          "foreignKeyData",
+          "name",
+          "requestType",
+          "rowSpan"
+        ],
+        "properties": {
+          "cell": {
+            "sample": "[Element#TD]",
+            "type": "object"
+          },
+          "colSpan": {
+            "sample": 1,
+            "type": "number"
+          },
+          "column": {
+            "sample": {
+              "allowEditing": true,
+              "allowFiltering": true,
+              "allowGrouping": true,
+              "allowReordering": true,
+              "allowResizing": true,
+              "allowSearching": true,
+              "allowSorting": true,
+              "autoFit": false,
+              "disableHtmlEncode": true,
+              "edit": {},
+              "enableColumnSpan": true,
+              "enableGroupByFormat": false,
+              "enableRowSpan": true,
+              "field": "id",
+              "filter": {},
+              "foreignKeyField": "id",
+              "getEditTemplate": "[Function]",
+              "getFilterTemplate": "[Function]",
+              "headerText": "ID",
+              "index": 0,
+              "parent": {
+                "addNewRowFocus": true,
+                "allowServerDataBinding": false,
+                "ariaService": "[MaxDepth]",
+                "asyncTimeOut": 50,
+                "autoFitColumnsResize": false,
+                "bulkChanges": "[MaxDepth]",
+                "changedProperties": "[MaxDepth]",
+                "checkAllRows": "None",
+                "childChangedProperties": "[MaxDepth]",
+                "clipboardModule": "[MaxDepth]",
+                "columnModel": "[MaxDepth]",
+                "componentRefresh": "[Function]",
+                "contentModule": "[MaxDepth]",
+                "contentRowIndexes": "[MaxDepth]",
+                "dataBoundFunction": "[Function]",
+                "defaultChartLocale": "[MaxDepth]",
+                "defaultLocale": "[MaxDepth]",
+                "disableSelectedRecords": "[MaxDepth]",
+                "element": "[Element#grid]",
+                "enableDeepCompare": false,
+                "enableLogger": true,
+                "filterModule": "[MaxDepth]",
+                "filterOperators": "[MaxDepth]",
+                "finalUpdate": "[Function]",
+                "fixedColumns": "[MaxDepth]",
+                "fixedCount": 0,
+                "fixedcount": 0,
+                "focusModule": "[MaxDepth]",
+                "freezeColumnRefresh": true,
+                "frozenLeftColumns": "[MaxDepth]",
+                "frozenLeftCount": 0,
+                "frozenRightColumns": "[MaxDepth]",
+                "frozenRightCount": 0,
+                "getShowHideService": "[MaxDepth]",
+                "gridPager": "[Element#DIV]",
+                "headerModule": "[MaxDepth]",
+                "ignoreCollectionWatch": true,
+                "inViewIndexes": "[MaxDepth]",
+                "isAddNewRow": false,
+                "isAngular": false,
+                "isAutoFitColumns": false,
+                "isAutoGen": false,
+                "isAutoGenerateColumns": false,
+                "isChangeDataSourceCall": false,
+                "isCheckBoxSelection": false,
+                "isComplexArraySetter": false,
+                "isDestroyed": false,
+                "isEdit": false,
+                "isExportGrid": false,
+                "isInitial": true,
+                "isInitialLoad": false,
+                "isManualRefresh": false,
+                "isPersistSelection": false,
+                "isPreparedFrozenColumns": true,
+                "isPreventScrollEvent": false,
+                "isProtectedOnChange": false,
+                "isReact": false,
+                "isReactHybrid": false,
+                "isRendered": false,
+                "isServerRendered": false,
+                "isSpan": false,
+                "isStringTemplate": false,
+                "isVirtualAdaptive": true,
+                "isVue": false,
+                "isWidgetsDestroyed": false,
+                "islazyloadRequest": false,
+                "keyA": false,
+                "keyConfigs": "[MaxDepth]",
+                "keyboardModule": "[MaxDepth]",
+                "leftcount": 0,
+                "localObserver": "[MaxDepth]",
+                "localeObj": "[Circular]",
+                "lockcolPositionCount": 0,
+                "loggerModule": "[MaxDepth]",
+                "media": "[MaxDepth]",
+                "mediaBindInstance": "[MaxDepth]",
+                "mediaCol": "[MaxDepth]",
+                "mergeCells": "[MaxDepth]",
+                "mergePersistData": "[Function]",
+                "mergedColumns": false,
+                "modelObserver": "[MaxDepth]",
+                "moduleLoader": "[MaxDepth]",
+                "movableColumns": "[MaxDepth]",
+                "movableCount": 3,
+                "movablecount": 3,
+                "needsID": true,
+                "oldProperties": "[MaxDepth]",
+                "pageRequireRefresh": true,
+                "pageTemplateChange": false,
+                "pagerModule": "[MaxDepth]",
+                "partialSelectedIndexes": "[MaxDepth]",
+                "partialSelectedRecords": "[MaxDepth]",
+                "pinnedRowIndexes": "[MaxDepth]",
+                "pinnedTopRecords": "[MaxDepth]",
+                "pinnedTopRowKeys": "[MaxDepth]",
+                "pinnedTopRowModels": "[MaxDepth]",
+                "prevPageMoving": false,
+                "preventAutoFit": false,
+                "printModule": "[MaxDepth]",
+                "properties": "[MaxDepth]",
+                "randomId": "[MaxDepth]",
+                "refreshing": false,
+                "renderModule": "[MaxDepth]",
+                "requireTemplateRef": true,
+                "rightcount": 0,
+                "rowUid": 0,
+                "scrollModule": "[Circular]",
+                "searchModule": "[MaxDepth]",
+                "selectVirtualRowOnAdd": false
+              },
+              "parserFn": "[Function]",
+              "showColumnMenu": true,
+              "showInColumnChooser": true,
+              "sortDirection": "Descending",
+              "templateOptions": {
+                "enableAriaLabel": true
+              },
+              "textAlign": "Right",
+              "toJSON": "[Function]",
+              "type": "number",
+              "uid": "grid-column0",
+              "valueAccessor": "[Function]",
+              "visible": true,
+              "width": 90
+            },
+            "type": "object"
+          },
+          "data": {
+            "sample": {
+              "id": 2,
+              "name": "Beta",
+              "status": "Closed"
+            },
+            "type": "object"
+          },
+          "foreignKeyData": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "queryCellInfo",
+            "type": "string"
+          },
+          "requestType": {
+            "type": "undefined"
+          },
+          "rowSpan": {
+            "sample": 1,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 13,
+      "label": "queryCellInfo",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cell",
+          "colSpan",
+          "column",
+          "data",
+          "foreignKeyData",
+          "name",
+          "requestType",
+          "rowSpan"
+        ],
+        "properties": {
+          "cell": {
+            "sample": "[Element#TD]",
+            "type": "object"
+          },
+          "colSpan": {
+            "sample": 1,
+            "type": "number"
+          },
+          "column": {
+            "sample": {
+              "allowEditing": true,
+              "allowFiltering": true,
+              "allowGrouping": true,
+              "allowReordering": true,
+              "allowResizing": true,
+              "allowSearching": true,
+              "allowSorting": true,
+              "autoFit": false,
+              "disableHtmlEncode": true,
+              "edit": {},
+              "enableColumnSpan": true,
+              "enableGroupByFormat": false,
+              "enableRowSpan": true,
+              "field": "name",
+              "filter": {},
+              "foreignKeyField": "name",
+              "getEditTemplate": "[Function]",
+              "getFilterTemplate": "[Function]",
+              "headerText": "Name",
+              "index": 1,
+              "parent": {
+                "addNewRowFocus": true,
+                "allowServerDataBinding": false,
+                "ariaService": "[MaxDepth]",
+                "asyncTimeOut": 50,
+                "autoFitColumnsResize": false,
+                "bulkChanges": "[MaxDepth]",
+                "changedProperties": "[MaxDepth]",
+                "checkAllRows": "None",
+                "childChangedProperties": "[MaxDepth]",
+                "clipboardModule": "[MaxDepth]",
+                "columnModel": "[MaxDepth]",
+                "componentRefresh": "[Function]",
+                "contentModule": "[MaxDepth]",
+                "contentRowIndexes": "[MaxDepth]",
+                "dataBoundFunction": "[Function]",
+                "defaultChartLocale": "[MaxDepth]",
+                "defaultLocale": "[MaxDepth]",
+                "disableSelectedRecords": "[MaxDepth]",
+                "element": "[Element#grid]",
+                "enableDeepCompare": false,
+                "enableLogger": true,
+                "filterModule": "[MaxDepth]",
+                "filterOperators": "[MaxDepth]",
+                "finalUpdate": "[Function]",
+                "fixedColumns": "[MaxDepth]",
+                "fixedCount": 0,
+                "fixedcount": 0,
+                "focusModule": "[MaxDepth]",
+                "freezeColumnRefresh": true,
+                "frozenLeftColumns": "[MaxDepth]",
+                "frozenLeftCount": 0,
+                "frozenRightColumns": "[MaxDepth]",
+                "frozenRightCount": 0,
+                "getShowHideService": "[MaxDepth]",
+                "gridPager": "[Element#DIV]",
+                "headerModule": "[MaxDepth]",
+                "ignoreCollectionWatch": true,
+                "inViewIndexes": "[MaxDepth]",
+                "isAddNewRow": false,
+                "isAngular": false,
+                "isAutoFitColumns": false,
+                "isAutoGen": false,
+                "isAutoGenerateColumns": false,
+                "isChangeDataSourceCall": false,
+                "isCheckBoxSelection": false,
+                "isComplexArraySetter": false,
+                "isDestroyed": false,
+                "isEdit": false,
+                "isExportGrid": false,
+                "isInitial": true,
+                "isInitialLoad": false,
+                "isManualRefresh": false,
+                "isPersistSelection": false,
+                "isPreparedFrozenColumns": true,
+                "isPreventScrollEvent": false,
+                "isProtectedOnChange": false,
+                "isReact": false,
+                "isReactHybrid": false,
+                "isRendered": false,
+                "isServerRendered": false,
+                "isSpan": false,
+                "isStringTemplate": false,
+                "isVirtualAdaptive": true,
+                "isVue": false,
+                "isWidgetsDestroyed": false,
+                "islazyloadRequest": false,
+                "keyA": false,
+                "keyConfigs": "[MaxDepth]",
+                "keyboardModule": "[MaxDepth]",
+                "leftcount": 0,
+                "localObserver": "[MaxDepth]",
+                "localeObj": "[Circular]",
+                "lockcolPositionCount": 0,
+                "loggerModule": "[MaxDepth]",
+                "media": "[MaxDepth]",
+                "mediaBindInstance": "[MaxDepth]",
+                "mediaCol": "[MaxDepth]",
+                "mergeCells": "[MaxDepth]",
+                "mergePersistData": "[Function]",
+                "mergedColumns": false,
+                "modelObserver": "[MaxDepth]",
+                "moduleLoader": "[MaxDepth]",
+                "movableColumns": "[MaxDepth]",
+                "movableCount": 3,
+                "movablecount": 3,
+                "needsID": true,
+                "oldProperties": "[MaxDepth]",
+                "pageRequireRefresh": true,
+                "pageTemplateChange": false,
+                "pagerModule": "[MaxDepth]",
+                "partialSelectedIndexes": "[MaxDepth]",
+                "partialSelectedRecords": "[MaxDepth]",
+                "pinnedRowIndexes": "[MaxDepth]",
+                "pinnedTopRecords": "[MaxDepth]",
+                "pinnedTopRowKeys": "[MaxDepth]",
+                "pinnedTopRowModels": "[MaxDepth]",
+                "prevPageMoving": false,
+                "preventAutoFit": false,
+                "printModule": "[MaxDepth]",
+                "properties": "[MaxDepth]",
+                "randomId": "[MaxDepth]",
+                "refreshing": false,
+                "renderModule": "[MaxDepth]",
+                "requireTemplateRef": true,
+                "rightcount": 0,
+                "rowUid": 0,
+                "scrollModule": "[Circular]",
+                "searchModule": "[MaxDepth]",
+                "selectVirtualRowOnAdd": false
+              },
+              "showColumnMenu": true,
+              "showInColumnChooser": true,
+              "sortDirection": "Descending",
+              "templateOptions": {
+                "enableAriaLabel": true
+              },
+              "toJSON": "[Function]",
+              "type": "string",
+              "uid": "grid-column1",
+              "valueAccessor": "[Function]",
+              "visible": true,
+              "width": 160
+            },
+            "type": "object"
+          },
+          "data": {
+            "sample": {
+              "id": 2,
+              "name": "Beta",
+              "status": "Closed"
+            },
+            "type": "object"
+          },
+          "foreignKeyData": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "queryCellInfo",
+            "type": "string"
+          },
+          "requestType": {
+            "type": "undefined"
+          },
+          "rowSpan": {
+            "sample": 1,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 14,
+      "label": "queryCellInfo",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cell",
+          "colSpan",
+          "column",
+          "data",
+          "foreignKeyData",
+          "name",
+          "requestType",
+          "rowSpan"
+        ],
+        "properties": {
+          "cell": {
+            "sample": "[Element#TD]",
+            "type": "object"
+          },
+          "colSpan": {
+            "sample": 1,
+            "type": "number"
+          },
+          "column": {
+            "sample": {
+              "allowEditing": true,
+              "allowFiltering": true,
+              "allowGrouping": true,
+              "allowReordering": true,
+              "allowResizing": true,
+              "allowSearching": true,
+              "allowSorting": true,
+              "autoFit": false,
+              "disableHtmlEncode": true,
+              "edit": {},
+              "enableColumnSpan": true,
+              "enableGroupByFormat": false,
+              "enableRowSpan": true,
+              "field": "status",
+              "filter": {},
+              "foreignKeyField": "status",
+              "getEditTemplate": "[Function]",
+              "getFilterTemplate": "[Function]",
+              "headerText": "Status",
+              "index": 2,
+              "parent": {
+                "addNewRowFocus": true,
+                "allowServerDataBinding": false,
+                "ariaService": "[MaxDepth]",
+                "asyncTimeOut": 50,
+                "autoFitColumnsResize": false,
+                "bulkChanges": "[MaxDepth]",
+                "changedProperties": "[MaxDepth]",
+                "checkAllRows": "None",
+                "childChangedProperties": "[MaxDepth]",
+                "clipboardModule": "[MaxDepth]",
+                "columnModel": "[MaxDepth]",
+                "componentRefresh": "[Function]",
+                "contentModule": "[MaxDepth]",
+                "contentRowIndexes": "[MaxDepth]",
+                "dataBoundFunction": "[Function]",
+                "defaultChartLocale": "[MaxDepth]",
+                "defaultLocale": "[MaxDepth]",
+                "disableSelectedRecords": "[MaxDepth]",
+                "element": "[Element#grid]",
+                "enableDeepCompare": false,
+                "enableLogger": true,
+                "filterModule": "[MaxDepth]",
+                "filterOperators": "[MaxDepth]",
+                "finalUpdate": "[Function]",
+                "fixedColumns": "[MaxDepth]",
+                "fixedCount": 0,
+                "fixedcount": 0,
+                "focusModule": "[MaxDepth]",
+                "freezeColumnRefresh": true,
+                "frozenLeftColumns": "[MaxDepth]",
+                "frozenLeftCount": 0,
+                "frozenRightColumns": "[MaxDepth]",
+                "frozenRightCount": 0,
+                "getShowHideService": "[MaxDepth]",
+                "gridPager": "[Element#DIV]",
+                "headerModule": "[MaxDepth]",
+                "ignoreCollectionWatch": true,
+                "inViewIndexes": "[MaxDepth]",
+                "isAddNewRow": false,
+                "isAngular": false,
+                "isAutoFitColumns": false,
+                "isAutoGen": false,
+                "isAutoGenerateColumns": false,
+                "isChangeDataSourceCall": false,
+                "isCheckBoxSelection": false,
+                "isComplexArraySetter": false,
+                "isDestroyed": false,
+                "isEdit": false,
+                "isExportGrid": false,
+                "isInitial": true,
+                "isInitialLoad": false,
+                "isManualRefresh": false,
+                "isPersistSelection": false,
+                "isPreparedFrozenColumns": true,
+                "isPreventScrollEvent": false,
+                "isProtectedOnChange": false,
+                "isReact": false,
+                "isReactHybrid": false,
+                "isRendered": false,
+                "isServerRendered": false,
+                "isSpan": false,
+                "isStringTemplate": false,
+                "isVirtualAdaptive": true,
+                "isVue": false,
+                "isWidgetsDestroyed": false,
+                "islazyloadRequest": false,
+                "keyA": false,
+                "keyConfigs": "[MaxDepth]",
+                "keyboardModule": "[MaxDepth]",
+                "leftcount": 0,
+                "localObserver": "[MaxDepth]",
+                "localeObj": "[Circular]",
+                "lockcolPositionCount": 0,
+                "loggerModule": "[MaxDepth]",
+                "media": "[MaxDepth]",
+                "mediaBindInstance": "[MaxDepth]",
+                "mediaCol": "[MaxDepth]",
+                "mergeCells": "[MaxDepth]",
+                "mergePersistData": "[Function]",
+                "mergedColumns": false,
+                "modelObserver": "[MaxDepth]",
+                "moduleLoader": "[MaxDepth]",
+                "movableColumns": "[MaxDepth]",
+                "movableCount": 3,
+                "movablecount": 3,
+                "needsID": true,
+                "oldProperties": "[MaxDepth]",
+                "pageRequireRefresh": true,
+                "pageTemplateChange": false,
+                "pagerModule": "[MaxDepth]",
+                "partialSelectedIndexes": "[MaxDepth]",
+                "partialSelectedRecords": "[MaxDepth]",
+                "pinnedRowIndexes": "[MaxDepth]",
+                "pinnedTopRecords": "[MaxDepth]",
+                "pinnedTopRowKeys": "[MaxDepth]",
+                "pinnedTopRowModels": "[MaxDepth]",
+                "prevPageMoving": false,
+                "preventAutoFit": false,
+                "printModule": "[MaxDepth]",
+                "properties": "[MaxDepth]",
+                "randomId": "[MaxDepth]",
+                "refreshing": false,
+                "renderModule": "[MaxDepth]",
+                "requireTemplateRef": true,
+                "rightcount": 0,
+                "rowUid": 0,
+                "scrollModule": "[Circular]",
+                "searchModule": "[MaxDepth]",
+                "selectVirtualRowOnAdd": false
+              },
+              "showColumnMenu": true,
+              "showInColumnChooser": true,
+              "sortDirection": "Descending",
+              "templateOptions": {
+                "enableAriaLabel": true
+              },
+              "toJSON": "[Function]",
+              "type": "string",
+              "uid": "grid-column2",
+              "valueAccessor": "[Function]",
+              "visible": true,
+              "width": 140
+            },
+            "type": "object"
+          },
+          "data": {
+            "sample": {
+              "id": 2,
+              "name": "Beta",
+              "status": "Closed"
+            },
+            "type": "object"
+          },
+          "foreignKeyData": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "queryCellInfo",
+            "type": "string"
+          },
+          "requestType": {
+            "type": "undefined"
+          },
+          "rowSpan": {
+            "sample": 1,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 15,
+      "label": "rowDataBound",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "data",
+          "isSelectable",
+          "name",
+          "row",
+          "rowHeight"
+        ],
+        "properties": {
+          "data": {
+            "sample": {
+              "id": 2,
+              "name": "Beta",
+              "status": "Closed"
+            },
+            "type": "object"
+          },
+          "isSelectable": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "rowDataBound",
+            "type": "string"
+          },
+          "row": {
+            "sample": "[Element#TR]",
+            "type": "object"
+          },
+          "rowHeight": {
+            "sample": null,
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 16,
+      "label": "dataBound",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "sample": "dataBound",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 17,
+      "label": "own keys",
+      "value": [
+        "addNewRowFocus",
+        "allowServerDataBinding",
+        "ariaService",
+        "asyncTimeOut",
+        "autoFitColumnsResize",
+        "bulkChanges",
+        "changedProperties",
+        "checkAllRows",
+        "childChangedProperties",
+        "clipboardModule",
+        "columnChooserFooterTemplateFn",
+        "columnChooserHeaderTemplateFn",
+        "columnChooserTemplateFn",
+        "columnModel",
+        "commandDelIndex",
+        "componentRefresh",
+        "contentMaskTable",
+        "contentModule",
+        "contentRowIndexes",
+        "dataBoundFunction"
+      ]
+    },
+    {
+      "sequence": 18,
+      "label": "prototype methods",
+      "value": [
+        "accessMount",
+        "actionBegin",
+        "actionComplete",
+        "actionFailure",
+        "addEventListener",
+        "addInstance",
+        "addListener",
+        "addMovableRows",
+        "addOnPersist",
+        "addRecord",
+        "addRowObject",
+        "addShimmerEffect",
+        "appendTo",
+        "applyBiggerTheme",
+        "applyMaskRow",
+        "applyTextWrap",
+        "attachUnloadEvent",
+        "autoFitColumns",
+        "batchAdd",
+        "batchAsyncUpdate"
+      ]
+    }
+  ]
+}

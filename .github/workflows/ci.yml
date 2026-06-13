@@ -56,6 +56,10 @@ jobs:
 
   playwright:
     runs-on: ubuntu-latest
+    env:
+      # Without a registered license, EJ2 overlays a trial modal that intercepts every
+      # interaction — the historical source of the "flaky" CI Playwright legs.
+      Syncfusion__LicenseKey: ${{ secrets.SYNCFUSION_LICENSE_KEY }}
     steps:
       - uses: actions/checkout@v4
 

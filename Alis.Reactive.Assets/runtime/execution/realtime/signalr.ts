@@ -1,7 +1,7 @@
 import * as signalR from "@microsoft/signalr";
 import type { SignalRTrigger, ReactionGraph, PlanDocument } from "../../types/index";
 import { catchAsyncReactionFailure, executeReaction } from "../reactions/execute";
-import { showRetryIndicators, removeRetryIndicators } from "../requests/retry-indicator";
+import { showRetryIndicator, removeRetryIndicator } from "./retry-indicator";
 import { scope } from "../../diagnostics/trace";
 import { ExecutionContext } from "../../browser-objects/execution-context";
 import { objectRecordFrom } from "../../browser-objects/object-record";
@@ -12,7 +12,6 @@ const log = scope("signalr");
 interface ManagedConnection {
   readonly connection: signalR.HubConnection;
   startPromise: Promise<void>;
-  readonly targetIds: Set<string>;
   subscriptionCount: number;
   stopping: boolean;
 }
@@ -27,6 +26,7 @@ async function startWithRetry(connection: signalR.HubConnection, hubUrl: string)
     try {
       await connection.start();
       log.info("connected", { hubUrl });
+      removeRetryIndicator(hubUrl);
       return;
     } catch (error) {
       const delay = reconnectDelayForAttempt(attempt);
@@ -37,14 +37,14 @@ async function startWithRetry(connection: signalR.HubConnection, hubUrl: string)
 
   log.error("start.failed", { hubUrl, attempts: reconnectDelays.length });
   const managed = hubs.get(hubUrl);
-  if (managed) showRetryIndicators(hubUrl, managed.targetIds, () => retryConnection(hubUrl));
+  if (managed) showRetryIndicator(hubUrl, () => retryConnection(hubUrl));
 }
 
 function retryConnection(hubUrl: string): void {
   const managed = hubs.get(hubUrl);
   if (!managed) {
     log.warn("retry.no-connection", { hubUrl });
-    removeRetryIndicators(hubUrl);
+    removeRetryIndicator(hubUrl);
     return;
   }
 
@@ -55,7 +55,6 @@ function retryConnection(hubUrl: string): void {
   }
 
   log.info("retry.manual", { hubUrl });
-  removeRetryIndicators(hubUrl);
   managed.startPromise = startWithRetry(connection, hubUrl);
 }
 
@@ -74,15 +73,13 @@ function getOrCreate(hubUrl: string): ManagedConnection {
     })
     .build();
 
-  const targetIds = new Set<string>();
-
   connection.onreconnecting(err => {
     log.warn("connection.reconnecting", { hubUrl, error: signalRErrorMessage(err) });
   });
 
   connection.onreconnected(connectionId => {
     log.info("connection.reconnected", { hubUrl, connectionId });
-    removeRetryIndicators(hubUrl);
+    removeRetryIndicator(hubUrl);
   });
 
   connection.onclose(err => {
@@ -94,13 +91,13 @@ function getOrCreate(hubUrl: string): ManagedConnection {
       hubs.delete(hubUrl);
     } else {
       log.warn("connection.disconnected", { hubUrl, error: signalRErrorMessage(err) });
-      showRetryIndicators(hubUrl, targetIds, () => retryConnection(hubUrl));
+      showRetryIndicator(hubUrl, () => retryConnection(hubUrl));
     }
   });
 
   const startPromise = startWithRetry(connection, hubUrl);
 
-  managed = { connection, startPromise, targetIds, subscriptionCount: 0, stopping: false };
+  managed = { connection, startPromise, subscriptionCount: 0, stopping: false };
   hubs.set(hubUrl, managed);
 
   return managed;

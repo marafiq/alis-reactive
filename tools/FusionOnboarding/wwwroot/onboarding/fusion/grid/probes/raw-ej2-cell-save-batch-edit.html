@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>FusionGrid cellSave Batch Edit Raw EJ2 Probe</title>
+    <link rel="stylesheet" href="/css/syncfusion.dev.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #grid-host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>FusionGrid cellSave Batch Edit Raw EJ2 Probe</h1>
+    <p>One event row: <code>cellSave</code> fired by saving a changed batch-edit cell.</p>
+    <div id="grid-host">
+        <div id="grid"></div>
+    </div>
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const rows = [
+            { id: 1, name: "Alpha", careLevel: "Memory Care", wing: "North", openTasks: 2 },
+            { id: 2, name: "Beta", careLevel: "Assisted Living", wing: "South", openTasks: 3 },
+            { id: 3, name: "Gamma", careLevel: "Memory Care", wing: "East", openTasks: 4 }
+        ];
+
+        function clean(value, seen = new WeakSet(), depth = 0) {
+            if (value === undefined) return "[Undefined]";
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return summarizeElement(value);
+            if (value instanceof Event) return summarizeEvent(value);
+            if (value instanceof Promise) return "[Promise]";
+            if (depth > 5) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).sort().forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function summarizeElement(value) {
+            return {
+                kind: "Element",
+                id: value.id || "",
+                tagName: value.tagName,
+                className: value.className || "",
+                text: (value.textContent || "").replace(/\s+/g, " ").trim()
+            };
+        }
+
+        function summarizeEvent(value) {
+            return {
+                kind: value.constructor && value.constructor.name ? value.constructor.name : "Event",
+                type: value.type,
+                target: value.target instanceof Element ? summarizeElement(value.target) : null
+            };
+        }
+
+        function describePayload(args) {
+            if (args === null || args === undefined) {
+                return { ownKeys: [], properties: {}, value: args === undefined ? "[Undefined]" : null };
+            }
+
+            const ownKeys = Object.keys(args).sort();
+            const properties = {};
+            ownKeys.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === undefined ? "undefined" : item === null ? "null" : Array.isArray(item) ? "array" : item instanceof Element ? "element" : item instanceof Event ? "event" : typeof item,
+                    sample: summarizePayloadProperty(key, item)
+                };
+            });
+
+            return {
+                ownKeys,
+                properties,
+                cellSaveShape: {
+                    rowData: clean(args.rowData),
+                    columnName: args.columnName,
+                    value: args.value,
+                    previousValue: args.previousValue,
+                    cancel: args.cancel,
+                    isForeignKey: args.isForeignKey,
+                    column: summarizeColumn(args.column),
+                    columnObject: summarizeColumn(args.columnObject),
+                    cell: args.cell instanceof Element ? summarizeElement(args.cell) : clean(args.cell)
+                }
+            };
+        }
+
+        function summarizePayloadProperty(key, item) {
+            if (key === "cell") return item instanceof Element ? summarizeElement(item) : clean(item);
+            if (key === "column" || key === "columnObject") return summarizeColumn(item);
+            return clean(item);
+        }
+
+        function summarizeColumn(item) {
+            if (!item || typeof item !== "object") return clean(item);
+            return {
+                field: item.field,
+                headerText: item.headerText,
+                type: item.type,
+                isPrimaryKey: item.isPrimaryKey,
+                editType: item.editType,
+                allowEditing: item.allowEditing
+            };
+        }
+
+        function record(label, value) {
+            trace.push({ at: new Date().toISOString(), label, value: clean(value) });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        window.__fusionProbe = { trace, record };
+
+        const grid = new ej.grids.Grid({
+            dataSource: rows,
+            allowSelection: true,
+            toolbar: ["Update", "Cancel"],
+            editSettings: {
+                allowEditing: true,
+                mode: "Batch",
+                allowEditOnDblClick: false,
+                showConfirmDialog: false
+            },
+            columns: [
+                { field: "id", headerText: "ID", width: 90, isPrimaryKey: true, textAlign: "Right", allowEditing: false },
+                { field: "name", headerText: "Name", width: 160 },
+                { field: "careLevel", headerText: "Care Level", width: 160 },
+                { field: "wing", headerText: "Wing", width: 120 },
+                { field: "openTasks", headerText: "Tasks", width: 100, textAlign: "Right", editType: "numericedit" }
+            ],
+            cellSave: args => {
+                if (args.value === 99) {
+                    record("event:cellSave:batch-edit-before-cancel", describePayload(args));
+                    args.cancel = true;
+                    record("event:cellSave:batch-edit-after-cancel", describePayload(args));
+                    return;
+                }
+
+                record("event:cellSave:batch-edit", describePayload(args));
+            }
+        });
+
+        grid.appendTo(document.getElementById("grid"));
+        window.__fusionProbe.ej2 = grid;
+
+        async function nextFrame() {
+            await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        }
+
+        async function waitForRows() {
+            for (let attempt = 0; attempt < 60; attempt++) {
+                const renderedRows = document.querySelectorAll("#grid .e-row");
+                if (renderedRows.length > 0) return renderedRows;
+                await nextFrame();
+            }
+            throw new Error("Grid rows did not render");
+        }
+
+        async function waitForCellEditor() {
+            for (let attempt = 0; attempt < 60; attempt++) {
+                const input = document.querySelector("#grid .e-editedbatchcell input, #grid input[name='openTasks'], #grid input.e-field");
+                if (input) return input;
+                await nextFrame();
+            }
+            throw new Error("Batch cell editor did not render");
+        }
+
+        async function waitForCellSaveEvent(label) {
+            for (let attempt = 0; attempt < 60; attempt++) {
+                if (trace.some(item => item.label === label)) return;
+                await nextFrame();
+            }
+            throw new Error(label + " event did not fire");
+        }
+
+        function setEditorValue(input, value) {
+            const widget = input.ej2_instances && input.ej2_instances[0];
+            if (widget && "value" in widget) {
+                widget.value = value;
+                if (typeof widget.dataBind === "function") widget.dataBind();
+            }
+            input.value = String(value);
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+            input.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+
+        async function run() {
+            await waitForRows();
+            record("ready", {
+                rowCount: document.querySelectorAll("#grid .e-row").length,
+                firstRowCells: [...document.querySelectorAll("#grid .e-row:first-child .e-rowcell")]
+                    .map(item => item.textContent.replace(/\s+/g, " ").trim()),
+                publicMethods: {
+                    editCell: typeof grid.editCell,
+                    saveCell: typeof grid.saveCell
+                }
+            });
+
+            grid.editCell(0, "openTasks");
+            const input = await waitForCellEditor();
+            record("editing-cell", {
+                inputName: input.getAttribute("name"),
+                initialValue: input.value,
+                editedCellText: document.querySelector("#grid .e-editedbatchcell")?.textContent?.replace(/\s+/g, " ").trim() ?? ""
+            });
+
+            setEditorValue(input, 6);
+            await nextFrame();
+            grid.saveCell();
+            await waitForCellSaveEvent("event:cellSave:batch-edit");
+            await nextFrame();
+
+            record("save-cell", {
+                firstRowCells: [...document.querySelectorAll("#grid .e-row:first-child .e-rowcell")]
+                    .map(item => item.textContent.replace(/\s+/g, " ").trim()),
+                batchChanges: clean(grid.getBatchChanges()),
+                traceRows: trace.length + 1
+            });
+
+            grid.editCell(0, "openTasks");
+            const blockedInput = await waitForCellEditor();
+            record("editing-cell-before-cancel", {
+                inputName: blockedInput.getAttribute("name"),
+                initialValue: blockedInput.value
+            });
+            setEditorValue(blockedInput, 99);
+            await nextFrame();
+            grid.saveCell();
+            await waitForCellSaveEvent("event:cellSave:batch-edit-after-cancel");
+            await nextFrame();
+
+            record("cancelled-save-cell", {
+                firstRowCells: [...document.querySelectorAll("#grid .e-row:first-child .e-rowcell")]
+                    .map(item => item.textContent.replace(/\s+/g, " ").trim()),
+                batchChanges: clean(grid.getBatchChanges()),
+                blockedValueAccepted: [...document.querySelectorAll("#grid .e-row:first-child .e-rowcell")]
+                    .some(item => item.textContent.replace(/\s+/g, " ").trim() === "99"),
+                traceRows: trace.length + 1
+            });
+            record("complete", { traceRows: trace.length + 1 });
+        }
+
+        run().catch(error => record("error", { message: String(error), stack: error && error.stack }));
+    </script>
+</body>
+</html>

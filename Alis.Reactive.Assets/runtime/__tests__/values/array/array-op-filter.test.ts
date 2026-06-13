@@ -5,7 +5,7 @@ import type { PayloadSource, PlanDocument, Shape, ValidationCondition, ValueExpr
 const stringShape: Shape = { kind: "string" };
 const noneShape: Shape = { kind: "none" };
 const rawShape: Shape = { kind: "raw" };
-const elementSource: PayloadSource = { kind: "payload", scope: "element", type: { kind: "untyped" } };
+const elementSource: PayloadSource = { kind: "payload", scope: "element" };
 
 function emptyArrayPlan(): PlanDocument {
   return {

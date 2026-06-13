@@ -7,7 +7,9 @@ type: reference
 # Quality Principles
 
 This framework serves senior living communities. Residents depend on software built with it.
-Correctness over speed. Evidence over assumptions. Pragmatic excellence at every layer.
+The domain names the stakes, not the scope: this is a UI framework — do not reason about
+HIPAA, PHI, or healthcare compliance.
+Correctness over speed. Evidence over assumptions.
 
 ---
 
@@ -20,7 +22,7 @@ Before ANY code change from an audit finding, the issue MUST satisfy ALL nine cr
 | 1 | Describe the issue | Clear description of the problem |
 | 2 | Identify root cause | Not symptom — trace to the origin |
 | 3 | Cite evidence | Exact file:line, test output, commit hash |
-| 4 | Confirm no other layer handles it | C# DSL, schema, tests, views — the finding may be prevented elsewhere |
+| 4 | Confirm no other layer handles it | C# DSL, plan contract, tests, views — the finding may be prevented elsewhere |
 | 5 | Provide reproduction | Concrete scenario in browser or test. If NOT REPRODUCIBLE, not a real bug |
 | 6 | Propose fix with framework primitives | No hacks, no workarounds |
 | 7 | State tangible outcome | What does fixing bring? |
@@ -101,12 +103,20 @@ Frame stakes positively. Set the bar, do not list prohibitions.
 
 **Wrong:** "Do NOT rubber-stamp. If everything is perfect, explain WHY."
 
-**Right:** "You are reviewing instructions for a Senior Living App Framework. Any lack of
-focus, guessing, or critical thinking will cost dearly. Root yourself in pragmatic excellence."
+**Right:** "You are reviewing instructions for a Senior Living App Framework.
+Residents depend on it. The domain names the stakes, not the scope: this is a
+UI framework — do not reason about HIPAA, PHI, or healthcare compliance.
+A finding without file:line and its consequence is not made."
 
-Every review agent prompt opens with: what the system is (senior living framework), what
-the stakes are (residents depend on it), what standard to meet (pragmatic excellence).
-Rewrite prohibitions as standards.
+Every review agent prompt opens with:
+
+- what the system is — a UI framework for senior living communities
+- what the stakes are — residents depend on it
+- what the scope is not — HIPAA, PHI, healthcare compliance
+- what standard applies — every finding carries file:line and its consequence
+
+The template lives in `agent-dispatch.md` Template 3 — quote it, do not
+paraphrase it. Rewrite prohibitions as standards.
 
 ### Rank by Value, Not Fixed Caps
 
@@ -130,7 +140,7 @@ boundary -- it is never one flat flow.
 
 ### Layer 1: C# Descriptors and Builders
 
-- **Skills:** modern-csharp (TDD principles are in bdd-testing skill). XML docs enforced by `hookify.xml-docs-quality.local.md`.
+- **Skills:** modern-csharp (TDD principles are in bdd-testing skill). XML doc quality is reviewed manually (`hookify.xml-docs-quality.local.md` is a disabled template).
 - **Thinking:** Value Objects, Encapsulation, SOLID, impact on the generated TS plan contract
 - **Tests:** Prove DSL intent end-to-end through the Playwright suite (no C# unit/snapshot harness exists)
 - **Harness:** Playwright behavior + `npm run typecheck` (the generated `runtime/types/plan.ts` must match C#)
@@ -138,13 +148,14 @@ boundary -- it is never one flat flow.
 ### Boundary 1-2: C# Plan Domain to Generated TS Contract
 
 The C# plan domain is the contract source. When the plan shape changes, regenerate
-`runtime/types/plan.ts` (PlanTypeGenerator, run by `npm run typecheck`) and confirm the runtime
+`runtime/types/plan.ts` (PlanContractGenerator, run by `npm run typecheck`) and confirm the runtime
 still compiles against it. JSON schema is retired — there is no `AssertSchemaValid` step.
 
 ### Boundary 2-3: Generated Contract to Runtime
 
-Same rigorous process. Schema change triggers thinking about TS type impact. Write failing
-vitest. Update types. Currently no automation validates TS types match schema (known gap).
+Same rigorous process. A plan-shape change triggers thinking about runtime impact. Write
+failing vitest. Update the handler. Generation at the front of `npm run typecheck` proves
+the contract matches the C# domain — drift is a typecheck failure, not an unguarded gap.
 
 ### Layer 3: TS Runtime
 
@@ -208,3 +219,18 @@ solutions and ask "is this direction right?" -- do not ask "what should I do?"
 critical thinking at layer boundaries. Save research and feedback BEFORE executing.
 Present system-level analysis before editing. Get user alignment on the DESIGN before
 writing code. Think in LAYERS, not in flat task types.
+
+---
+
+## 7. Quality Aspirations Ledger
+
+Known weaknesses tracked for improvement (root CLAUDE.md Rule 13 points here):
+
+- **DDD depth**: Domain model uses `null` where Value Objects with constructor invariants
+  must enforce valid state. Association and aggregation boundaries are implicit.
+  Screaming names (types that express domain intent) are underused.
+- **Serialization**: two justified `WhenWritingNull` attributes remain (value-domain
+  Predicate/Projection, each with written rationale); explicit serialization contracts over
+  per-property attributes stay the goal.
+- **TS tracing**: scope-tagged, level-filtered console emission today. The goal is
+  OTel-style structure — correlation IDs, span context, actionable errors.

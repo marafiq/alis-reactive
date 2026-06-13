@@ -46,7 +46,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var reactionPipeline = new PipelineBuilder<TModel>(_context);
             pipeline(
-                new ResponseBody<TResponse>(PayloadSource.Success(PayloadContract.ForPayload(typeof(TResponse)))),
+                new ResponseBody<TResponse>(PayloadSource.Success()),
                 reactionPipeline);
             _draft.AddSuccessRoute(reactionPipeline.BuildReaction());
             return this;
@@ -85,7 +85,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var reactionPipeline = new PipelineBuilder<TModel>(_context);
             pipeline(
-                new ResponseBody<TError>(PayloadSource.Error(PayloadContract.ForPayload(typeof(TError)))),
+                new ResponseBody<TError>(PayloadSource.Error()),
                 reactionPipeline);
             _draft.AddErrorRoute(reactionPipeline.BuildReaction());
             return this;
@@ -104,7 +104,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var reactionPipeline = new PipelineBuilder<TModel>(_context);
             pipeline(
-                new ResponseBody<TError>(PayloadSource.Error(PayloadContract.ForPayload(typeof(TError)))),
+                new ResponseBody<TError>(PayloadSource.Error()),
                 reactionPipeline);
             _draft.AddErrorRoute(statusCode, reactionPipeline.BuildReaction());
             return this;

@@ -1,0 +1,295 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "data-state-change-clear-grouping-method",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-data-state-change-clear-grouping-method.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "currentPage": 1,
+        "groupSettings": {
+          "columns": []
+        },
+        "pageSize": 2
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "event:dataStateChange:grouping-setup",
+      "value": {
+        "absentKeysChecked": [
+          "where",
+          "search",
+          "aggregates"
+        ],
+        "groupShape": {
+          "action": {
+            "columnName": "careLevel",
+            "name": "actionBegin",
+            "preventFocusOnGroup": false,
+            "requestType": "grouping",
+            "type": "actionBegin"
+          },
+          "group": [
+            "careLevel"
+          ],
+          "hasTopLevelGroup": true
+        },
+        "ownKeys": [
+          "action",
+          "group",
+          "groups",
+          "name",
+          "requiresCounts",
+          "skip",
+          "sorted",
+          "take"
+        ],
+        "properties": {
+          "action": {
+            "sample": {
+              "columnName": "careLevel",
+              "name": "actionBegin",
+              "preventFocusOnGroup": false,
+              "requestType": "grouping",
+              "type": "actionBegin"
+            },
+            "type": "object"
+          },
+          "group": {
+            "sample": [
+              "careLevel"
+            ],
+            "type": "array"
+          },
+          "groups": {
+            "sample": [
+              "careLevel"
+            ],
+            "type": "array"
+          },
+          "name": {
+            "sample": "dataStateChange",
+            "type": "string"
+          },
+          "requiresCounts": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "skip": {
+            "sample": 0,
+            "type": "number"
+          },
+          "sorted": {
+            "sample": [
+              {
+                "direction": "ascending",
+                "name": "careLevel"
+              }
+            ],
+            "type": "array"
+          },
+          "take": {
+            "sample": 2,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "event:dataStateChange:grouping-setup",
+      "value": {
+        "absentKeysChecked": [
+          "where",
+          "search",
+          "aggregates"
+        ],
+        "groupShape": {
+          "action": {
+            "columnName": "wing",
+            "name": "actionBegin",
+            "preventFocusOnGroup": false,
+            "requestType": "grouping",
+            "type": "actionBegin"
+          },
+          "group": [
+            "careLevel",
+            "wing"
+          ],
+          "hasTopLevelGroup": true
+        },
+        "ownKeys": [
+          "action",
+          "group",
+          "groups",
+          "name",
+          "requiresCounts",
+          "skip",
+          "sorted",
+          "take"
+        ],
+        "properties": {
+          "action": {
+            "sample": {
+              "columnName": "wing",
+              "name": "actionBegin",
+              "preventFocusOnGroup": false,
+              "requestType": "grouping",
+              "type": "actionBegin"
+            },
+            "type": "object"
+          },
+          "group": {
+            "sample": [
+              "careLevel",
+              "wing"
+            ],
+            "type": "array"
+          },
+          "groups": {
+            "sample": [
+              "careLevel",
+              "wing"
+            ],
+            "type": "array"
+          },
+          "name": {
+            "sample": "dataStateChange",
+            "type": "string"
+          },
+          "requiresCounts": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "skip": {
+            "sample": 0,
+            "type": "number"
+          },
+          "sorted": {
+            "sample": [
+              {
+                "direction": "ascending",
+                "name": "wing"
+              },
+              {
+                "direction": "ascending",
+                "name": "careLevel"
+              }
+            ],
+            "type": "array"
+          },
+          "take": {
+            "sample": 2,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "method:groupColumn:setup",
+      "value": {
+        "captionText": [
+          "Care Level: Assisted Living - 2 items",
+          "Care Level: Independent - 1 item",
+          "Care Level: Memory Care - 2 items"
+        ],
+        "currentPage": 1,
+        "groupSettings": {
+          "columns": [
+            "careLevel",
+            "wing"
+          ]
+        },
+        "pageSize": 2
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "event:dataStateChange:clear-grouping-method:1",
+      "value": {
+        "absentKeysChecked": [
+          "group",
+          "groups",
+          "where",
+          "search",
+          "sorted",
+          "aggregates"
+        ],
+        "groupShape": {
+          "action": {
+            "columnName": "wing",
+            "name": "actionBegin",
+            "requestType": "ungrouping",
+            "type": "actionBegin"
+          },
+          "group": "absent",
+          "hasTopLevelGroup": false
+        },
+        "ownKeys": [
+          "action",
+          "name",
+          "requiresCounts",
+          "skip",
+          "take"
+        ],
+        "properties": {
+          "action": {
+            "sample": {
+              "columnName": "wing",
+              "name": "actionBegin",
+              "requestType": "ungrouping",
+              "type": "actionBegin"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "dataStateChange",
+            "type": "string"
+          },
+          "requiresCounts": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "skip": {
+            "sample": 0,
+            "type": "number"
+          },
+          "take": {
+            "sample": 2,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 6,
+      "label": "method:clearGrouping",
+      "value": {
+        "captionText": [],
+        "clearGroupingEventCount": 1,
+        "currentPage": 1,
+        "firstRowCells": [
+          "1",
+          "Alpha",
+          "Memory Care",
+          "North"
+        ],
+        "groupSettings": {
+          "columns": []
+        },
+        "pageSize": 2
+      }
+    },
+    {
+      "sequence": 7,
+      "label": "complete",
+      "value": {
+        "traceRows": 7
+      }
+    }
+  ]
+}

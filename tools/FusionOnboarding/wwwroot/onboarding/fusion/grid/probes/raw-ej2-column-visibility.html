@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>FusionGrid Column Visibility Raw EJ2 Probe</title>
+    <link rel="stylesheet" href="/css/syncfusion.dev.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #grid-host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>FusionGrid Column Visibility Raw EJ2 Probe</h1>
+    <p>Three methods: <code>hideColumns(field,"field")</code>, <code>showColumns(field,"field")</code>, <code>reorderColumns(from,before)</code>.</p>
+    <div id="grid-host">
+        <div id="grid"></div>
+    </div>
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const rows = [
+            { id: 1, name: "Alice Hardy", wing: "North", careLevel: "Assisted", riskLevel: "Low" },
+            { id: 2, name: "Boris Vance", wing: "South", careLevel: "Memory", riskLevel: "High" },
+            { id: 3, name: "Carmen Diaz", wing: "North", careLevel: "Skilled", riskLevel: "Medium" }
+        ];
+
+        function clean(value, seen = new WeakSet(), depth = 0) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 5) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).sort().forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function record(label, value) {
+            trace.push({ at: new Date().toISOString(), label, value: clean(value) });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        function visibleFields() {
+            return grid.getVisibleColumns().map(column => column.field);
+        }
+
+        function headerText() {
+            return Array.from(document.querySelectorAll("#grid .e-headercell .e-headertext"))
+                .map(node => node.textContent.trim())
+                .filter(Boolean);
+        }
+
+        window.__fusionProbe = { trace, record };
+
+        const grid = new ej.grids.Grid({
+            dataSource: rows,
+            allowReordering: true,
+            columns: [
+                { field: "id", headerText: "ID", width: 80, isPrimaryKey: true, textAlign: "Right" },
+                { field: "name", headerText: "Resident", width: 170 },
+                { field: "wing", headerText: "Wing", width: 120 },
+                { field: "careLevel", headerText: "Care Level", width: 150 },
+                { field: "riskLevel", headerText: "Risk", width: 120 }
+            ]
+        });
+
+        grid.appendTo(document.getElementById("grid"));
+        window.__fusionProbe.ej2 = grid;
+
+        async function nextFrame() {
+            await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        }
+
+        async function run() {
+            record("ready", { visibleFields: visibleFields(), headerText: headerText() });
+
+            grid.hideColumns("careLevel", "field");
+            await nextFrame();
+            record("method:hideColumns:careLevel", { visibleFields: visibleFields(), headerText: headerText() });
+
+            grid.showColumns("careLevel", "field");
+            await nextFrame();
+            record("method:showColumns:careLevel", { visibleFields: visibleFields(), headerText: headerText() });
+
+            grid.reorderColumns("riskLevel", "wing");
+            await nextFrame();
+            await new Promise(resolve => setTimeout(resolve, 250));
+            await nextFrame();
+            record("method:reorderColumns:riskLevel-before-wing", { visibleFields: visibleFields(), headerText: headerText() });
+
+            record("complete", { traceRows: trace.length + 1 });
+        }
+
+        run().catch(error => record("error", { message: String(error), stack: error && error.stack }));
+    </script>
+</body>
+</html>

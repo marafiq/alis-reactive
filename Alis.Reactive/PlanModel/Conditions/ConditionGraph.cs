@@ -10,7 +10,7 @@ namespace Alis.Reactive.PlanModel
     /// Wire base for Reactive Plan predicates authored through condition builders.
     /// </summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ConditionGraph>))]
-    public abstract class ConditionGraph
+    internal abstract class ConditionGraph
     {
         private protected ConditionGraph() { }
 
@@ -37,7 +37,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Compares two values using a relational operator.</summary>
     [JsonConverter(typeof(CompareConditionJsonConverter))]
-    public sealed class CompareCondition : ConditionGraph
+    internal sealed class CompareCondition : ConditionGraph
     {
         private readonly CompareOperator _op;
         private readonly ComparisonOperands _operands;
@@ -191,7 +191,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Logical AND: all child conditions must be true.</summary>
-    public sealed class AllCondition : ConditionGraph
+    internal sealed class AllCondition : ConditionGraph
     {
         private readonly IReadOnlyList<ConditionGraph> _terms;
 
@@ -207,7 +207,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Logical OR: at least one child condition must be true.</summary>
-    public sealed class AnyCondition : ConditionGraph
+    internal sealed class AnyCondition : ConditionGraph
     {
         private readonly IReadOnlyList<ConditionGraph> _terms;
 
@@ -223,7 +223,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Logical NOT: inverts a single child condition.</summary>
-    public sealed class NotCondition : ConditionGraph
+    internal sealed class NotCondition : ConditionGraph
     {
         /// <summary>JSON discriminator for logical NOT conditions. Always <c>"not"</c>.</summary>
         public string Kind => "not";
@@ -237,7 +237,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Prompts the user for confirmation before the reaction proceeds.</summary>
-    public sealed class ConfirmCondition : ConditionGraph
+    internal sealed class ConfirmCondition : ConditionGraph
     {
         /// <summary>JSON discriminator for async confirmation conditions. Always <c>"confirm"</c>.</summary>
         public string Kind => "confirm";

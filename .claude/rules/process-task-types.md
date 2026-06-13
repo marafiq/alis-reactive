@@ -1,6 +1,6 @@
 # Task Types by Layers Touched
 
-Related: `process-pipeline.md` (overview) | `process-layers.md` (layer details)
+Related: `process-pipeline.md` (overview) | `plan-contract-boundary.md` (loads with plan-domain/contract files)
 
 Tasks are categorized by which pipeline layers they cross.
 The harness for each layer applies automatically.
@@ -30,7 +30,7 @@ The harness for each layer applies automatically.
 ## View Writing (Layers 1, 4)
 
 **Layer 1:** Confirm model, fields, component per field. Validator scope = form scope
-(create before the view). Nested properties use `SetValidator()`. End with `@Html.RenderPlan(plan)`.
+(create before the view). Nested properties use `ClientRule(x => x.Child, new ChildValidator())`. End with `@Html.RenderPlan(plan)`.
 All inputs through `Html.InputField()`.
 
 **Layer 4:** Open browser, fill form, submit — verify with own eyes. Then write Playwright.
@@ -48,26 +48,20 @@ All inputs through `Html.InputField()`.
 
 If touching an unexpected layer, the plan is wrong. Stop and return to planning.
 
-## New Primitive (All Layers, 8-Step Checklist)
+## New Primitive (All Layers)
 
-| Step | Layer | What |
-|------|-------|------|
-| 1. C# plan model | 1 | sealed class, `internal` constructor |
-| 2. Polymorphic registration | 1 | `PlanNodeDiscriminator<T>` writes the concrete type; its `Kind` is the discriminator |
-| 3. Builder method | 1 | PipelineBuilder, ElementBuilder, or TriggerBuilder |
-| 4. Generated TS contract | 1→2 | Regenerate `runtime/types/plan.ts`; `npm run typecheck` |
-| 5. Runtime handler | 3 | New switch case + `assertNever` |
-| 6. TS runtime test | 3 | Runtime behavior via `boot()` in vitest |
-| 7. Playwright test | 4 | Full user journey in browser — the C# + page-behavior proof |
-| 8. Sandbox view | 4→5 | Demonstrate the primitive |
-
-May span sessions. Track which steps are complete.
+The canonical 9-step checklist is root `CLAUDE.md` Rule 3 (it includes the C#
+domain behavior test). The boundary rituals load with the files via
+`plan-contract-boundary.md`. Spans layers 1→5; may span sessions — track which
+steps are complete.
 
 ## Component Onboarding (All Layers)
 
-Load `onboard-fusion-component` skill first. 7-file vertical slice. Zero TS runtime changes.
+Load `onboard-fusion-component` skill first. Artifact-gated vertical slice — the
+skill's fail-closed verifier must pass. Zero TS runtime changes.
 If TS changes seem needed, the plan is missing information — fix the C# descriptor.
-`resolver.ts` owns all vendor knowledge.
+Vendor knowledge lives in the three vendor runtime roles (driver, event adapter,
+component modules); the architecture test's allowlist is the only registry.
 
 ## Writing Tests (Matches Tested Layer)
 
@@ -104,7 +98,8 @@ the gaps that passing tests hide.
 2. Create sandbox example — build, run, verify.
 3. Copy verified code to docs.
 4. Question → answer structure. Progressive disclosure.
-5. Dev-facing language only.
+5. Dev-facing language only — no "runtime", "script tags", "descriptors" in user docs.
+6. No em-dashes in XML docs (Rider flags them); Rider diagnostics clean on every touched file.
 
 ## Code Review (All PR Layers)
 
@@ -113,10 +108,9 @@ For each layer the PR touches:
 2. Confirm each boundary crossing was driven by a failing test.
 3. Apply 9-point evidence criteria to every finding.
 4. Trace actual runtime paths — both SF and native components.
-5. **Verify coverage completeness** — list every item in scope, map each to a test.
-   Report uncovered items. "Tests pass" is not sign-off; "all items covered or justified" is.
-   Why: a past PR shipped 59 passing tests with roughly a third of its scope uncovered.
-   Two review rounds checked test quality but never asked what was missing.
+5. **Verify coverage completeness** — apply the Coverage Completeness Gate above:
+   list every item in scope, map each to a test, report uncovered items.
+   "Tests pass" is not sign-off; "all items covered or justified" is.
 
 ## Agent Dispatch Template
 

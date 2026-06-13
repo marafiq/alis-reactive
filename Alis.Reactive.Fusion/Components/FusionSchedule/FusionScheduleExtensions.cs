@@ -6,6 +6,32 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
+    /// Editor action for schedule event operations. Mirrors the Syncfusion EJ2 Schedule
+    /// <c>CurrentAction</c> values one-to-one; each name serializes to its EJ2 string.
+    /// </summary>
+    public enum ScheduleAction
+    {
+        /// <summary>Add a new event.</summary>
+        Add,
+        /// <summary>Save an edited event.</summary>
+        Save,
+        /// <summary>Delete an event.</summary>
+        Delete,
+        /// <summary>Delete a single occurrence of a recurring series.</summary>
+        DeleteOccurrence,
+        /// <summary>Delete an entire recurring series.</summary>
+        DeleteSeries,
+        /// <summary>Edit a single occurrence of a recurring series.</summary>
+        EditOccurrence,
+        /// <summary>Edit an entire recurring series.</summary>
+        EditSeries,
+        /// <summary>Edit this and following occurrences.</summary>
+        EditFollowingEvents,
+        /// <summary>Delete this and following occurrences.</summary>
+        DeleteFollowingEvents,
+    }
+
+    /// <summary>
     /// Reads schedule state and updates rendered schedule events from a Reactive Plan pipeline.
     /// </summary>
     /// <remarks>
@@ -45,10 +71,10 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("addEvent").WithArgs<object>();
 
         private static readonly ComponentMethod SaveEventMethod =
-            ComponentMethod.Named("saveEvent").WithArgs<object>();
+            ComponentMethod.Named("saveEvent").WithArgs<object, string>();
 
         private static readonly ComponentMethod DeleteEventMethod =
-            ComponentMethod.Named("deleteEvent").WithArgs<object>();
+            ComponentMethod.Named("deleteEvent").WithArgs<object, string>();
 
         private static readonly ComponentMethod OpenEditorMethod =
             ComponentMethod.Named("openEditor").WithArgs<object, string>();
@@ -117,36 +143,69 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Adds one schedule event or an event collection from a value expression.
+        /// Adds a schedule event (or event collection) bound from a typed success-response path.
         /// </summary>
-        public static ComponentRef<FusionSchedule, TModel> AddEvent<TModel>(
+        public static ComponentRef<FusionSchedule, TModel> AddEvent<TModel, TResponse>(
+            this ComponentRef<FusionSchedule, TModel> self,
+            ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
+            where TModel : class
+            where TResponse : class
+            => self.AddEvent(ValueExpression.Read(source.Scope, ExpressionPathHelper.ToResponsePath(path)));
+
+        /// <summary>
+        /// Saves an existing schedule event bound from a typed success-response path.
+        /// </summary>
+        public static ComponentRef<FusionSchedule, TModel> SaveEvent<TModel, TResponse>(
+            this ComponentRef<FusionSchedule, TModel> self,
+            ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path,
+            ScheduleAction action = ScheduleAction.Save)
+            where TModel : class
+            where TResponse : class
+            => self.SaveEvent(ValueExpression.Read(source.Scope, ExpressionPathHelper.ToResponsePath(path)), action);
+
+        /// <summary>
+        /// Deletes a schedule event identified by a typed success-response path.
+        /// </summary>
+        public static ComponentRef<FusionSchedule, TModel> DeleteEvent<TModel, TResponse>(
+            this ComponentRef<FusionSchedule, TModel> self,
+            ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> idPath,
+            ScheduleAction action = ScheduleAction.Delete)
+            where TModel : class
+            where TResponse : class
+            => self.DeleteEvent(ValueExpression.Read(source.Scope, ExpressionPathHelper.ToResponsePath(idPath)), action);
+
+        /// <summary>
+        /// Opens the built-in schedule editor for event data bound from a typed success-response path.
+        /// </summary>
+        public static ComponentRef<FusionSchedule, TModel> OpenEditor<TModel, TResponse>(
+            this ComponentRef<FusionSchedule, TModel> self,
+            ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path,
+            ScheduleAction action)
+            where TModel : class
+            where TResponse : class
+            => self.OpenEditor(ValueExpression.Read(source.Scope, ExpressionPathHelper.ToResponsePath(path)), action);
+
+        // Internal wire overloads: the public API above is typed; ValueExpression is internal
+        // (developers never author it), built here from the resolved typed success-response source.
+        private static ComponentRef<FusionSchedule, TModel> AddEvent<TModel>(
             this ComponentRef<FusionSchedule, TModel> self, ValueExpression data)
             where TModel : class
             => self.EmitCall(AddEventMethod, new System.Collections.Generic.List<ValueExpression> { data });
 
-        /// <summary>
-        /// Saves an existing schedule event from a value expression.
-        /// </summary>
-        public static ComponentRef<FusionSchedule, TModel> SaveEvent<TModel>(
-            this ComponentRef<FusionSchedule, TModel> self, ValueExpression data)
+        private static ComponentRef<FusionSchedule, TModel> SaveEvent<TModel>(
+            this ComponentRef<FusionSchedule, TModel> self, ValueExpression data, ScheduleAction action)
             where TModel : class
-            => self.EmitCall(SaveEventMethod, new System.Collections.Generic.List<ValueExpression> { data });
+            => self.EmitCall(SaveEventMethod, new System.Collections.Generic.List<ValueExpression> { data, ValueExpression.Literal(action.ToString()) });
 
-        /// <summary>
-        /// Deletes a schedule event by identifier.
-        /// </summary>
-        public static ComponentRef<FusionSchedule, TModel> DeleteEvent<TModel>(
-            this ComponentRef<FusionSchedule, TModel> self, ValueExpression eventId)
+        private static ComponentRef<FusionSchedule, TModel> DeleteEvent<TModel>(
+            this ComponentRef<FusionSchedule, TModel> self, ValueExpression eventId, ScheduleAction action)
             where TModel : class
-            => self.EmitCall(DeleteEventMethod, new System.Collections.Generic.List<ValueExpression> { eventId });
+            => self.EmitCall(DeleteEventMethod, new System.Collections.Generic.List<ValueExpression> { eventId, ValueExpression.Literal(action.ToString()) });
 
-        /// <summary>
-        /// Opens the built-in schedule editor for event data and an editor action.
-        /// </summary>
-        public static ComponentRef<FusionSchedule, TModel> OpenEditor<TModel>(
-            this ComponentRef<FusionSchedule, TModel> self, ValueExpression data, string action = "Add")
+        private static ComponentRef<FusionSchedule, TModel> OpenEditor<TModel>(
+            this ComponentRef<FusionSchedule, TModel> self, ValueExpression data, ScheduleAction action)
             where TModel : class
-            => self.EmitCall(OpenEditorMethod, new System.Collections.Generic.List<ValueExpression> { data, ValueExpression.Literal(action) });
+            => self.EmitCall(OpenEditorMethod, new System.Collections.Generic.List<ValueExpression> { data, ValueExpression.Literal(action.ToString()) });
 
         /// <summary>
         /// Closes the built-in schedule editor.

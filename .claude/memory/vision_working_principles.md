@@ -7,14 +7,15 @@ type: user
 # Working Vision — Alis.Reactive
 
 This framework serves senior living communities. Residents depend on the software built
-with it. Every decision carries weight.
+with it. Every decision carries weight. The domain names the stakes, not the scope: this
+is a UI framework — do not reason about HIPAA, PHI, or healthcare compliance.
 
 ## The Pipeline Is the Architecture
 
-C# → Schema → TS Types → TS Runtime → Browser → Docs. This is not just a build order.
-It is the architecture. Each layer has its own thinking, skills, and test harness.
-A failing test is the only reason to cross a boundary. The schema is the soul — it is
-the contract between C# intent and JS execution.
+C# Plan Domain → Generated TS Contract → TS Runtime → Browser → Docs. This is not
+just a build order. It is the architecture. Each layer has its own thinking, skills,
+and test harness. A failing test is the only reason to cross a boundary. The generated
+contract is the soul — it carries C# intent to JS execution, and drift fails typecheck.
 
 ## Thoughtful Design Over Rushing
 

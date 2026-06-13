@@ -26,39 +26,39 @@ import { assertNever } from "../shared/assert-never";
 const log = scope("validation");
 
 interface ValidationSummary {
-  readonly element: HTMLElement | undefined;
+  readonly element: HTMLElement | null;
 }
 
 function validationSummaryForPlan(planId: string): ValidationSummary {
-  return { element: findSummaryElement(planId) ?? undefined };
+  return { element: findSummaryElement(planId) };
 }
 
 function addSummaryError(summary: ValidationSummary, componentKey: string, message: string): boolean {
-  if (summary.element === undefined) return false;
+  if (summary.element === null) return false;
 
   addToSummary(summary.element, componentKey, message);
   return true;
 }
 
 function removeSummaryError(summary: ValidationSummary, componentKey: string): void {
-  if (summary.element === undefined) return;
+  if (summary.element === null) return;
 
   removeSummaryEntry(summary.element, componentKey);
 }
 
 function summaryHasError(summary: ValidationSummary, componentKey: string): boolean {
-  if (summary.element === undefined) return false;
+  if (summary.element === null) return false;
 
   return hasSummaryEntry(summary.element, componentKey);
 }
 
 function showSummaryWhen(summary: ValidationSummary, hasErrors: boolean): void {
-  if (summary.element === undefined) return;
+  if (summary.element === null) return;
   if (hasErrors) showSummaryDiv(summary.element);
 }
 
 function clearAndHideSummary(summary: ValidationSummary): void {
-  if (summary.element === undefined) return;
+  if (summary.element === null) return;
 
   clearSummary(summary.element);
   hideSummaryDiv(summary.element);
@@ -190,7 +190,7 @@ function placeServerErrorOnFieldOrSummary(
   if (component === undefined) return addSummaryError(surface.summary, error.name, message);
 
   const element = component.tryElement();
-  if (element === undefined) return addSummaryError(surface.summary, error.name, message);
+  if (element === null) return addSummaryError(surface.summary, error.name, message);
 
   const inlineMessageSlotCanRender = canRenderInlineValidationMessage(component.id);
   if (inlineMessageSlotCanRender) {
@@ -236,24 +236,6 @@ export function revalidateField(planDocument: PlanDocument, containerKey: string
   };
 
   evaluateComponentRules(componentValidation, surface, container);
-}
-
-export function clearContainerValidation(planDocument: PlanDocument, containerKey: string): void {
-  const runtimePlan = RuntimePlan.from(planDocument);
-  const containerComponent = runtimePlan.components.find(containerKey);
-  const containerScope = containerComponent?.containerScope;
-  if (!containerComponent || !containerScope) return;
-
-  const containerId = containerComponent.id;
-  const summary = validationSummaryForPlan(planDocument.planId);
-  clearContainerErrors({
-    planDocument,
-    runtimePlan,
-    containerId,
-    containerScope,
-    summary,
-    context: ExecutionContext.absent(),
-  });
 }
 
 function evaluateComponentRules(

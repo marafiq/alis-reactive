@@ -1,0 +1,280 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "data-state-change-clear-filtering-method",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-data-state-change-clear-filtering-method.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "currentPage": 1,
+        "filterColumns": [],
+        "pageSize": 2
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "event:dataStateChange:filtering-setup",
+      "value": {
+        "absentKeysChecked": [
+          "search",
+          "group",
+          "sorted"
+        ],
+        "filterShape": {
+          "action": {
+            "action": "filter",
+            "cancel": false,
+            "columns": [
+              {
+                "actualFilterValue": {},
+                "actualOperator": {},
+                "field": "status",
+                "ignoreAccent": false,
+                "isForeignKey": false,
+                "matchCase": false,
+                "operator": "equal",
+                "predicate": "and",
+                "predicates": [],
+                "uid": "grid-column2",
+                "value": "Open"
+              }
+            ],
+            "currentFilterObject": {
+              "actualFilterValue": {},
+              "actualOperator": {},
+              "field": "status",
+              "ignoreAccent": false,
+              "isForeignKey": false,
+              "matchCase": false,
+              "operator": "equal",
+              "predicate": "and",
+              "predicates": [],
+              "uid": "grid-column2",
+              "value": "Open"
+            },
+            "currentFilteringColumn": "status",
+            "name": "actionBegin",
+            "requestType": "filtering",
+            "type": "actionBegin"
+          },
+          "hasTopLevelWhere": true,
+          "where": [
+            {
+              "condition": "and",
+              "ignoreAccent": false,
+              "ignoreCase": true,
+              "isComplex": true,
+              "predicates": [
+                {
+                  "field": "status",
+                  "ignoreAccent": false,
+                  "ignoreCase": true,
+                  "isComplex": false,
+                  "operator": "equal",
+                  "predicates": [],
+                  "value": "Open"
+                }
+              ]
+            }
+          ]
+        },
+        "ownKeys": [
+          "action",
+          "name",
+          "requiresCounts",
+          "skip",
+          "take",
+          "where"
+        ],
+        "properties": {
+          "action": {
+            "sample": {
+              "action": "filter",
+              "cancel": false,
+              "columns": [
+                {
+                  "actualFilterValue": {},
+                  "actualOperator": {},
+                  "field": "status",
+                  "ignoreAccent": false,
+                  "isForeignKey": false,
+                  "matchCase": false,
+                  "operator": "equal",
+                  "predicate": "and",
+                  "predicates": [],
+                  "uid": "grid-column2",
+                  "value": "Open"
+                }
+              ],
+              "currentFilterObject": {
+                "actualFilterValue": {},
+                "actualOperator": {},
+                "field": "status",
+                "ignoreAccent": false,
+                "isForeignKey": false,
+                "matchCase": false,
+                "operator": "equal",
+                "predicate": "and",
+                "predicates": [],
+                "uid": "grid-column2",
+                "value": "Open"
+              },
+              "currentFilteringColumn": "status",
+              "name": "actionBegin",
+              "requestType": "filtering",
+              "type": "actionBegin"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "dataStateChange",
+            "type": "string"
+          },
+          "requiresCounts": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "skip": {
+            "sample": 0,
+            "type": "number"
+          },
+          "take": {
+            "sample": 2,
+            "type": "number"
+          },
+          "where": {
+            "sample": [
+              {
+                "condition": "and",
+                "ignoreAccent": false,
+                "ignoreCase": true,
+                "isComplex": true,
+                "predicates": [
+                  {
+                    "field": "status",
+                    "ignoreAccent": false,
+                    "ignoreCase": true,
+                    "isComplex": false,
+                    "operator": "equal",
+                    "predicates": [],
+                    "value": "Open"
+                  }
+                ]
+              }
+            ],
+            "type": "array"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "method:filterByColumn",
+      "value": {
+        "currentPage": 1,
+        "filterColumns": [
+          {
+            "actualFilterValue": {},
+            "actualOperator": {},
+            "field": "status",
+            "ignoreAccent": false,
+            "isForeignKey": false,
+            "matchCase": false,
+            "operator": "equal",
+            "predicate": "and",
+            "predicates": [],
+            "uid": "grid-column2",
+            "value": "Open"
+          }
+        ],
+        "firstRowCells": [
+          "1",
+          "Alpha",
+          "Open",
+          "Low"
+        ],
+        "pageSize": 2
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "event:dataStateChange:clear-filtering-method",
+      "value": {
+        "absentKeysChecked": [
+          "where",
+          "search",
+          "group",
+          "sorted"
+        ],
+        "filterShape": {
+          "action": {
+            "columns": [],
+            "currentFilterObject": null,
+            "name": "actionBegin",
+            "requestType": "refresh"
+          },
+          "hasTopLevelWhere": false,
+          "where": "absent"
+        },
+        "ownKeys": [
+          "action",
+          "name",
+          "requiresCounts",
+          "skip",
+          "take"
+        ],
+        "properties": {
+          "action": {
+            "sample": {
+              "columns": [],
+              "currentFilterObject": null,
+              "name": "actionBegin",
+              "requestType": "refresh"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "dataStateChange",
+            "type": "string"
+          },
+          "requiresCounts": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "skip": {
+            "sample": 0,
+            "type": "number"
+          },
+          "take": {
+            "sample": 2,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "method:clearFiltering",
+      "value": {
+        "currentPage": 1,
+        "filterColumns": [],
+        "firstRowCells": [
+          "1",
+          "Alpha",
+          "Open",
+          "Low"
+        ],
+        "pageSize": 2
+      }
+    },
+    {
+      "sequence": 6,
+      "label": "complete",
+      "value": {
+        "traceRows": 6
+      }
+    }
+  ]
+}

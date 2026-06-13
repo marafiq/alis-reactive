@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>FusionGrid dataStateChange Paging Method Raw EJ2 Probe</title>
+    <link rel="stylesheet" href="/css/syncfusion.dev.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #grid-host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>FusionGrid dataStateChange Paging Method Raw EJ2 Probe</h1>
+    <p>One event row: <code>dataStateChange</code> fired by <code>goToPage(2)</code>.</p>
+    <div id="grid-host">
+        <div id="grid"></div>
+    </div>
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const rows = [
+            { id: 1, name: "Alpha", status: "Open", risk: "Low" },
+            { id: 2, name: "Beta", status: "Closed", risk: "High" },
+            { id: 3, name: "Gamma", status: "Open", risk: "Medium" },
+            { id: 4, name: "Delta", status: "Closed", risk: "Low" },
+            { id: 5, name: "Epsilon", status: "Open", risk: "High" }
+        ];
+
+        function clean(value, seen = new WeakSet(), depth = 0) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) {
+                return {
+                    kind: "Element",
+                    id: value.id || "",
+                    tagName: value.tagName,
+                    className: value.className || "",
+                    text: (value.textContent || "").replace(/\s+/g, " ").trim()
+                };
+            }
+            if (depth > 5) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).sort().forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function describePayload(args) {
+            if (args === null || args === undefined) {
+                return { ownKeys: [], properties: {}, value: args === undefined ? "undefined" : null };
+            }
+            const ownKeys = Object.keys(args).sort();
+            const properties = {};
+            ownKeys.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === null ? "null" : Array.isArray(item) ? "array" : item instanceof Element ? "element" : typeof item,
+                    sample: clean(item)
+                };
+            });
+            return {
+                ownKeys,
+                properties,
+                absentKeysChecked: ["where", "search", "group", "sorted"]
+                    .filter(key => !Object.prototype.hasOwnProperty.call(args, key))
+            };
+        }
+
+        function record(label, value) {
+            trace.push({ at: new Date().toISOString(), label, value: clean(value) });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        function applyState(state) {
+            const skip = typeof state.skip === "number" ? state.skip : 0;
+            const take = typeof state.take === "number" ? state.take : rows.length;
+            return { result: rows.slice(skip, skip + take), count: rows.length };
+        }
+
+        window.__fusionProbe = { trace, record };
+
+        const grid = new ej.grids.Grid({
+            dataSource: applyState({ skip: 0, take: 2 }),
+            columns: [
+                { field: "id", headerText: "ID", width: 90, isPrimaryKey: true, textAlign: "Right" },
+                { field: "name", headerText: "Name", width: 160 },
+                { field: "status", headerText: "Status", width: 140 },
+                { field: "risk", headerText: "Risk", width: 120 }
+            ],
+            allowPaging: true,
+            pageSettings: { pageSize: 2 },
+            dataStateChange: args => {
+                record("event:dataStateChange:paging-method", describePayload(args));
+                grid.dataSource = applyState(args);
+            }
+        });
+
+        grid.appendTo(document.getElementById("grid"));
+        window.__fusionProbe.ej2 = grid;
+
+        async function nextFrame() {
+            await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        }
+
+        async function run() {
+            await nextFrame();
+            record("ready", {
+                currentPage: grid.pageSettings.currentPage,
+                pageSize: grid.pageSettings.pageSize
+            });
+            grid.goToPage(2);
+            await nextFrame();
+            record("method:goToPage", {
+                currentPage: grid.pageSettings.currentPage,
+                pageSize: grid.pageSettings.pageSize
+            });
+            record("complete", { traceRows: trace.length + 1 });
+        }
+
+        run().catch(error => record("error", { message: String(error), stack: error && error.stack }));
+    </script>
+</body>
+</html>

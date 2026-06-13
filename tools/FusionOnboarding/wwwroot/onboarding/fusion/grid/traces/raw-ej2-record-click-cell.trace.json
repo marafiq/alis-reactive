@@ -1,0 +1,206 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "record-click-cell",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-record-click-cell.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "firstRowCells": [
+          "1",
+          "Alpha",
+          "Memory Care",
+          "North"
+        ],
+        "rowCount": 3
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "event:recordClick:cell",
+      "value": {
+        "ownKeys": [
+          "cancel",
+          "cell",
+          "cellIndex",
+          "column",
+          "event",
+          "name",
+          "row",
+          "rowData",
+          "rowIndex",
+          "target"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "cell": {
+            "sample": {
+              "ariaColIndex": "2",
+              "ariaRowIndex": "",
+              "className": "e-rowcell",
+              "id": "",
+              "kind": "Element",
+              "tagName": "TD",
+              "text": "Alpha"
+            },
+            "type": "element"
+          },
+          "cellIndex": {
+            "sample": 1,
+            "type": "number"
+          },
+          "column": {
+            "sample": {
+              "field": "name",
+              "headerText": "Name",
+              "index": 1,
+              "uid": "[uid]"
+            },
+            "type": "object"
+          },
+          "event": {
+            "sample": {
+              "button": 0,
+              "buttons": 0,
+              "detail": 0,
+              "kind": "MouseEvent",
+              "target": {
+                "ariaColIndex": "2",
+                "ariaRowIndex": "",
+                "className": "e-rowcell",
+                "id": "",
+                "kind": "Element",
+                "tagName": "TD",
+                "text": "Alpha"
+              },
+              "type": "click"
+            },
+            "type": "mouse-event"
+          },
+          "name": {
+            "sample": "recordClick",
+            "type": "string"
+          },
+          "row": {
+            "sample": {
+              "ariaColIndex": "",
+              "ariaRowIndex": "1",
+              "className": "e-row",
+              "id": "",
+              "kind": "Element",
+              "tagName": "TR",
+              "text": "1AlphaMemory CareNorth"
+            },
+            "type": "element"
+          },
+          "rowData": {
+            "sample": {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha",
+              "wing": "North"
+            },
+            "type": "object"
+          },
+          "rowIndex": {
+            "sample": 0,
+            "type": "number"
+          },
+          "target": {
+            "sample": {
+              "ariaColIndex": "2",
+              "ariaRowIndex": "",
+              "className": "e-rowcell",
+              "id": "",
+              "kind": "Element",
+              "tagName": "TD",
+              "text": "Alpha"
+            },
+            "type": "element"
+          }
+        },
+        "recordClickShape": {
+          "cancel": false,
+          "cell": {
+            "ariaColIndex": "2",
+            "ariaRowIndex": "",
+            "className": "e-rowcell",
+            "id": "",
+            "kind": "Element",
+            "tagName": "TD",
+            "text": "Alpha"
+          },
+          "cellIndex": 1,
+          "column": {
+            "field": "name",
+            "headerText": "Name",
+            "index": 1,
+            "uid": "[uid]"
+          },
+          "event": {
+            "button": 0,
+            "buttons": 0,
+            "detail": 0,
+            "kind": "MouseEvent",
+            "target": {
+              "ariaColIndex": "2",
+              "ariaRowIndex": "",
+              "className": "e-rowcell",
+              "id": "",
+              "kind": "Element",
+              "tagName": "TD",
+              "text": "Alpha"
+            },
+            "type": "click"
+          },
+          "name": "recordClick",
+          "row": {
+            "ariaColIndex": "",
+            "ariaRowIndex": "1",
+            "className": "e-row",
+            "id": "",
+            "kind": "Element",
+            "tagName": "TR",
+            "text": "1AlphaMemory CareNorth"
+          },
+          "rowData": {
+            "careLevel": "Memory Care",
+            "id": 1,
+            "name": "Alpha",
+            "wing": "North"
+          },
+          "rowIndex": 0,
+          "target": {
+            "ariaColIndex": "2",
+            "ariaRowIndex": "",
+            "className": "e-rowcell",
+            "id": "",
+            "kind": "Element",
+            "tagName": "TD",
+            "text": "Alpha"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "click:cell",
+      "value": {
+        "clickedText": "Alpha",
+        "traceRows": 3
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "complete",
+      "value": {
+        "traceRows": 4
+      }
+    }
+  ]
+}

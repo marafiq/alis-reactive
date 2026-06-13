@@ -922,15 +922,6 @@ Property navigation segment: a property name or array index.
 Kind { get; }  // JSON discriminator for path segments: `property` or `index`.
 ```
 
-### PayloadContract
-
-Wire base for payload typing contracts authored by typed triggers.
-
-```csharp
-// Properties
-Kind { get; }  // JSON discriminator for payload typing contracts.
-```
-
 ### PayloadSource
 
 Identifies an execution payload scope, such as event data or an HTTP response body.
@@ -939,7 +930,6 @@ Identifies an execution payload scope, such as event data or an HTTP response bo
 // Properties
 Kind { get; }  // JSON discriminator for payload sources. Always `"payload"`.
 Scope { get; }  // Payload scope wire term, for example event or success.
-Type { get; }  // Payload typing contract used when authoring typed value paths.
 ```
 
 ### PlanScope
@@ -2532,12 +2522,15 @@ Contains `requestType` plus context-specific parameters.
 
 ```csharp
 // Properties
+Cancel { get; }  // Whether the current action can be cancelled.
 ColumnName { get; }  // Column name for sorting actions.
 CurrentPage { get; }  // Page number after the data-state action.
 Direction { get; }  // Sort direction for sorting actions.
+Name { get; }  // Syncfusion action event name injected by the EJ2 event observer.
 PageSize { get; }  // Page size after the data-state action.
 PreviousPage { get; }  // Previous page number before the action.
 RequestType { get; }  // Syncfusion request type, such as `sorting` or `paging`.
+Type { get; }  // Syncfusion action event type, such as `actionBegin`.
 ```
 
 ### FusionGridBuilder<T>
@@ -2551,10 +2544,12 @@ Event args for Syncfusion Grid's `dataStateChange` event.
 ```csharp
 // Properties
 Action { get; }  // Action details such as request type, column name, direction, and current page.
-Group { get; }  // Active group fields. Empty when ungrouped. Supports nested grouping.
+Group { get; }  // Active group fields when this trigger emits grouping state. Method-trigger ungrouping omits this payload key rather than emitting an empty array.
+Name { get; }  // Syncfusion event name injected by the EJ2 event observer.
+RequiresCounts { get; }  // Whether the data response must include both result records and total count.
 Search { get; }  // Active search criteria from Grid toolbar or public search method.
 Skip { get; }  // Paging offset (0-based). Always present.
-Sorted { get; }  // Active sort columns. Empty when unsorted. Supports multi-sort.
+Sorted { get; }  // Active sort columns when this trigger emits sorting state. Supports multi-sort.
 Take { get; }  // Page size. Always present.
 Where { get; }  // Active text filter criteria from Grid filter UI.
 ```
@@ -2705,7 +2700,8 @@ Event args for the Syncfusion Grid "rowSelected" event.
 // Properties
 Data { get; }  // Row data carried by the selected row event.
 IsInteracted { get; }  // Whether user interaction triggered the row selection.
-PreviousRowIndex { get; }  // Zero-based index of the previously selected row.
+Name { get; }  // Syncfusion event name.
+PreviousRowIndex { get; }  // Zero-based index of the previously selected row, when one exists.
 RowIndex { get; }  // Zero-based index of the row after selection.
 ```
 
@@ -2747,9 +2743,8 @@ Condition { get; }  // Composite predicate condition such as `and` or `or`.
 Field { get; }  // Field being filtered.
 IgnoreAccent { get; }  // Whether the filter ignores accents.
 IgnoreCase { get; }  // Whether the filter ignores case.
-MatchCase { get; }  // Whether the filter is case-sensitive.
+IsComplex { get; }  // Whether this predicate node contains nested predicates.
 Operator { get; }  // Filter operator such as `contains`, `equal`, or `startswith`.
-Predicate { get; }  // Predicate joining this criterion to the next criterion.
 Predicates { get; }  // Nested predicates when Syncfusion emits a composite Predicate.
 Value { get; }  // Filter text supplied by this criterion.
 ```
@@ -2766,8 +2761,9 @@ Read `Item` to branch on which button was pressed.
 
 ```csharp
 // Properties
-Cancel { get; }  // Set true to cancel the default toolbar action.
+Cancel { get; }  // Toolbar action cancel flag carried by Syncfusion.
 Item { get; }  // Toolbar item that raised the click event.
+Name { get; }  // Syncfusion event name.
 ```
 
 ### FusionGridToolbarItem

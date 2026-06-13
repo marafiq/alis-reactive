@@ -10,7 +10,7 @@ namespace Alis.Reactive.PlanModel
     /// Wire base for Reactive Plan value nodes authored through DSL value expressions.
     /// </summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ValueExpression>))]
-    public abstract class ValueExpression
+    internal abstract class ValueExpression
     {
         private protected ValueExpression() { }
 
@@ -262,7 +262,7 @@ namespace Alis.Reactive.PlanModel
     /// <remarks>
     /// Created when a literal is passed to a builder such as <c>p.Element("id").SetText("hello")</c>.
     /// </remarks>
-    public sealed class LiteralExpression : ValueExpression
+    internal sealed class LiteralExpression : ValueExpression
     {
         /// <summary>Wire discriminator for literal value nodes. Always <c>"literal"</c>.</summary>
         public string Kind => "literal";
@@ -285,7 +285,7 @@ namespace Alis.Reactive.PlanModel
     /// <remarks>
     /// Created by source-reading builders such as <c>p.Plugin&lt;int&gt;("array", "count").Arg(json, x =&gt; x.Items)</c>.
     /// </remarks>
-    public sealed class ReadExpression : ValueExpression
+    internal sealed class ReadExpression : ValueExpression
     {
         private readonly ValueRead _read;
 
@@ -423,7 +423,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Base wire contract for how a value read accesses its target member.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ValueReadAccess>))]
-    public abstract class ValueReadAccess
+    internal abstract class ValueReadAccess
     {
         private protected ValueReadAccess() { }
 
@@ -438,14 +438,14 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Access contract for reading a source member as a property.</summary>
-    public sealed class PropertyValueReadAccess : ValueReadAccess
+    internal sealed class PropertyValueReadAccess : ValueReadAccess
     {
         /// <summary>Wire discriminator for property reads. Always <c>"property"</c>.</summary>
         public override string Kind => "property";
     }
 
     /// <summary>Access contract for invoking a source member as a method.</summary>
-    public sealed class MethodValueReadAccess : ValueReadAccess
+    internal sealed class MethodValueReadAccess : ValueReadAccess
     {
         private readonly IReadOnlyList<ValueExpression> _args;
 
@@ -480,7 +480,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Object value node assembled from named field expressions.</summary>
-    public sealed class ObjectExpression : ValueExpression
+    internal sealed class ObjectExpression : ValueExpression
     {
         private readonly IReadOnlyDictionary<string, ValueExpression> _fields;
 
@@ -501,7 +501,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Array value node assembled from ordered item expressions.</summary>
-    public sealed class ArrayExpression : ValueExpression
+    internal sealed class ArrayExpression : ValueExpression
     {
         private readonly IReadOnlyList<ValueExpression> _items;
 
@@ -528,7 +528,7 @@ namespace Alis.Reactive.PlanModel
     /// the declared output. Predicate and projection are present only for
     /// operations that need them.
     /// </remarks>
-    public sealed class ArrayOperationExpression : ValueExpression
+    internal sealed class ArrayOperationExpression : ValueExpression
     {
         /// <summary>Wire discriminator for array operation nodes. Always <c>"array-op"</c>.</summary>
         public string Kind => "array-op";

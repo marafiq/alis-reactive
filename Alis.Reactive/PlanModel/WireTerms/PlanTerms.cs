@@ -84,7 +84,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Wire base for plan merge scope emitted by root and partial plans.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<PlanScope>))]
-    public abstract class PlanScope
+    internal abstract class PlanScope
     {
         private protected PlanScope() { }
 
@@ -97,7 +97,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Plan scope for the root view plan.</summary>
-    public sealed class RootPlanScope : PlanScope
+    internal sealed class RootPlanScope : PlanScope
     {
         internal RootPlanScope() { }
 
@@ -106,7 +106,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Plan scope for a partial plan that can be loaded into a DOM slot.</summary>
-    public sealed class PartialPlanScope : PlanScope
+    internal sealed class PartialPlanScope : PlanScope
     {
         internal PartialPlanScope() { }
 
@@ -367,7 +367,6 @@ namespace Alis.Reactive.PlanModel
                 { "success", new PayloadScope("success") },
                 { "error", new PayloadScope("error") },
                 { "request", new PayloadScope("request") },
-                { "dispatch", new PayloadScope("dispatch") },
                 { "local", new PayloadScope("local") },
                 { "element", new PayloadScope("element") },
             };
@@ -378,7 +377,6 @@ namespace Alis.Reactive.PlanModel
         internal static PayloadScope Success => Known["success"];
         internal static PayloadScope Error => Known["error"];
         internal static PayloadScope Request => Known["request"];
-        internal static PayloadScope Dispatch => Known["dispatch"];
         internal static PayloadScope Local => Known["local"];
         internal static PayloadScope Element => Known["element"];
         internal static IReadOnlyCollection<string> Values => Known.Keys;
@@ -393,64 +391,4 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    /// <summary>Wire base for payload typing contracts authored by typed triggers.</summary>
-    [JsonConverter(typeof(PlanNodeDiscriminator<PayloadContract>))]
-    public abstract class PayloadContract
-    {
-        private protected PayloadContract() { }
-
-        internal static PayloadContract Untyped { get; } = new UntypedPayloadContract();
-
-        internal static PayloadContract Named(string value) => new NamedPayloadContract(value);
-
-        internal static PayloadContract ForPayload(Type payloadType)
-        {
-            if (payloadType == null) throw new ArgumentNullException(nameof(payloadType));
-            return Named(payloadType.FullName
-                ?? throw new ArgumentException("Payload type must have a full name.", nameof(payloadType)));
-        }
-
-        /// <summary>JSON discriminator for payload typing contracts.</summary>
-        public abstract string Kind { get; }
-
-        internal abstract string DisplayName { get; }
-
-        internal abstract bool SameAs(PayloadContract other);
-    }
-
-    internal sealed class UntypedPayloadContract : PayloadContract
-    {
-        public override string Kind => "untyped";
-
-        internal override string DisplayName => "<untyped>";
-
-        internal override bool SameAs(PayloadContract other) =>
-            other is UntypedPayloadContract;
-    }
-
-    internal sealed class NamedPayloadContract : PayloadContract
-    {
-        private readonly PlanString _name;
-
-        internal NamedPayloadContract(string value)
-        {
-            _name = PayloadTypeName.Of(value);
-        }
-
-        public override string Kind => "typed";
-
-        public string Type => _name.Value;
-
-        internal override string DisplayName => _name.Value;
-
-        internal override bool SameAs(PayloadContract other) =>
-            other is NamedPayloadContract named && named._name.Equals(_name);
-    }
-
-    internal sealed class PayloadTypeName : PlanString
-    {
-        private PayloadTypeName(string value) : base(value, nameof(value)) { }
-
-        internal static PayloadTypeName Of(string value) => new PayloadTypeName(value);
-    }
 }

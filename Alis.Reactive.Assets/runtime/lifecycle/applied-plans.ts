@@ -139,12 +139,21 @@ export const appliedPlans = new AppliedPlans();
 export function composeInitialPlans(bootPlans: PlanDocument[]): PlanDocument[] {
   const activePlans = new Map<PlanId, PlanDocument>();
   for (const bootPlan of bootPlans) {
-    const activePlan = activePlans.get(bootPlan.planId) ?? emptyPlan(bootPlan.planId);
-    activePlans.set(bootPlan.planId, activePlan);
-    MergePolicy.composeBootPlanInto(activePlan, bootPlan);
+    MergePolicy.composeBootPlanInto(composedPlanFor(activePlans, bootPlan.planId), bootPlan);
   }
 
   return Array.from(activePlans.values());
+}
+
+// SSR composition: several boot scripts on one page may share a planId; the first
+// occurrence creates the composed plan, the rest merge into it.
+function composedPlanFor(activePlans: Map<PlanId, PlanDocument>, planId: PlanId): PlanDocument {
+  const existingPlan = activePlans.get(planId);
+  if (existingPlan !== undefined) return existingPlan;
+
+  const createdPlan = emptyPlan(planId);
+  activePlans.set(planId, createdPlan);
+  return createdPlan;
 }
 
 function resetPlanDocument(planDocument: PlanDocument, planId: PlanId): void {

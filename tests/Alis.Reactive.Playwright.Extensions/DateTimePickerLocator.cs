@@ -37,14 +37,14 @@ public sealed class DateTimePickerLocator
     public async Task Fill(string dateTimeText)
     {
         await Input.ClickWhenStableAsync(_page);
-        await Input.PressAsync("Meta+a");
+        await Input.PressAsync("ControlOrMeta+a");
         await Input.PressSequentiallyAsync(dateTimeText, new() { Delay = 30 });
     }
 
     public async Task Clear()
     {
         await Input.ClickWhenStableAsync(_page);
-        await Input.PressAsync("Meta+a");
+        await Input.PressAsync("ControlOrMeta+a");
         await Input.PressAsync("Backspace");
     }
 

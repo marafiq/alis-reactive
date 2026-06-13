@@ -1,0 +1,253 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "action-begin-save-edit",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-action-begin-save-edit.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "firstRowCells": [
+          "1",
+          "Alpha",
+          "Memory Care",
+          "North",
+          "2"
+        ],
+        "rowCount": 3
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "event:actionBegin:other",
+      "value": {
+        "action": "[Undefined]",
+        "ownKeys": [
+          "cancel",
+          "foreignKeyData",
+          "isScroll",
+          "name",
+          "primaryKey",
+          "primaryKeyValue",
+          "requestType",
+          "row",
+          "rowData",
+          "rowIndex",
+          "target",
+          "type"
+        ],
+        "requestType": "beginEdit",
+        "type": "actionBegin"
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "event:actionBegin:save-edit",
+      "value": {
+        "actionBeginShape": {
+          "action": "edit",
+          "cancel": false,
+          "data": {
+            "careLevel": "Memory Care",
+            "id": 1,
+            "name": "Alpha Edited",
+            "openTasks": 2,
+            "wing": "North"
+          },
+          "foreignKeyData": {},
+          "form": {
+            "className": "e-gridform e-lib e-formvalidator",
+            "id": {
+              "kind": "Element",
+              "id": "gridid",
+              "tagName": "INPUT",
+              "className": "e-field e-input e-defaultcell e-ralign e-control e-textbox e-lib e-disabled",
+              "text": ""
+            },
+            "kind": "Element",
+            "tagName": "FORM",
+            "text": ""
+          },
+          "index": "[Undefined]",
+          "previousData": {
+            "careLevel": "Memory Care",
+            "id": 1,
+            "name": "Alpha",
+            "openTasks": 2,
+            "wing": "North"
+          },
+          "promise": "[Undefined]",
+          "requestType": "save",
+          "row": {
+            "className": "e-row e-editedrow",
+            "id": "",
+            "kind": "Element",
+            "tagName": "TR",
+            "text": ""
+          },
+          "rowData": {
+            "careLevel": "Memory Care",
+            "id": 1,
+            "name": "Alpha",
+            "openTasks": 2,
+            "wing": "North"
+          },
+          "selectedRow": -1,
+          "target": "[Undefined]",
+          "type": "actionBegin"
+        },
+        "ownKeys": [
+          "action",
+          "cancel",
+          "data",
+          "foreignKeyData",
+          "form",
+          "isScroll",
+          "name",
+          "previousData",
+          "primaryKey",
+          "primaryKeyValue",
+          "requestType",
+          "row",
+          "rowData",
+          "rowIndex",
+          "selectedRow",
+          "target",
+          "type"
+        ],
+        "properties": {
+          "action": {
+            "sample": "edit",
+            "type": "string"
+          },
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "data": {
+            "sample": {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha Edited",
+              "openTasks": 2,
+              "wing": "North"
+            },
+            "type": "object"
+          },
+          "foreignKeyData": {
+            "sample": {},
+            "type": "object"
+          },
+          "form": {
+            "sample": {
+              "className": "e-gridform e-lib e-formvalidator",
+              "id": {
+                "kind": "Element",
+                "id": "gridid",
+                "tagName": "INPUT",
+                "className": "e-field e-input e-defaultcell e-ralign e-control e-textbox e-lib e-disabled",
+                "text": ""
+              },
+              "kind": "Element",
+              "tagName": "FORM",
+              "text": ""
+            },
+            "type": "element"
+          },
+          "isScroll": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "actionBegin",
+            "type": "string"
+          },
+          "previousData": {
+            "sample": {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha",
+              "openTasks": 2,
+              "wing": "North"
+            },
+            "type": "object"
+          },
+          "primaryKey": {
+            "sample": [
+              "id"
+            ],
+            "type": "array"
+          },
+          "primaryKeyValue": {
+            "sample": [
+              1
+            ],
+            "type": "array"
+          },
+          "requestType": {
+            "sample": "save",
+            "type": "string"
+          },
+          "row": {
+            "sample": {
+              "className": "e-row e-editedrow",
+              "id": "",
+              "kind": "Element",
+              "tagName": "TR",
+              "text": ""
+            },
+            "type": "element"
+          },
+          "rowData": {
+            "sample": {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha",
+              "openTasks": 2,
+              "wing": "North"
+            },
+            "type": "object"
+          },
+          "rowIndex": {
+            "sample": 0,
+            "type": "number"
+          },
+          "selectedRow": {
+            "sample": -1,
+            "type": "number"
+          },
+          "target": {
+            "sample": "[Undefined]",
+            "type": "undefined"
+          },
+          "type": {
+            "sample": "actionBegin",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "save-edit",
+      "value": {
+        "firstRowCells": [
+          "1",
+          "Alpha Edited",
+          "Memory Care",
+          "North",
+          "2"
+        ],
+        "traceRows": 4
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "complete",
+      "value": {
+        "traceRows": 5
+      }
+    }
+  ]
+}

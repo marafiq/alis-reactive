@@ -22,10 +22,24 @@ public sealed class InputMaskLocator
 
     public async Task Clear()
     {
+        await ClearOnce();
+        // EJ2 repositions the caret asynchronously after click; on slow machines the
+        // select-all can land inside that dance and get reset before Backspace.
+        if (HasEnteredCharacters(await Input.InputValueAsync()))
+        {
+            await ClearOnce();
+        }
+    }
+
+    private async Task ClearOnce()
+    {
         await Input.ClickAsync();
-        await Input.PressAsync("Meta+a");
+        await Input.PressAsync("ControlOrMeta+a");
         await Input.PressAsync("Backspace");
     }
+
+    private static bool HasEnteredCharacters(string maskedValue) =>
+        maskedValue.Any(char.IsLetterOrDigit);
 
     public async Task Focus() => await Input.ClickAsync();
 

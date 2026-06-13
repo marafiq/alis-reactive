@@ -1,0 +1,302 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "row-selected-click",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-row-selected-click.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "firstRowCells": [
+          "1",
+          "Alpha",
+          "Memory Care",
+          "North"
+        ],
+        "rowCount": 3
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "event:rowSelected:click",
+      "value": {
+        "ownKeys": [
+          "data",
+          "foreignKeyData",
+          "isHeaderCheckBoxClicked",
+          "isInteracted",
+          "name",
+          "previousRow",
+          "previousRowIndex",
+          "row",
+          "rowIndex",
+          "rowIndexes",
+          "target"
+        ],
+        "properties": {
+          "data": {
+            "sample": {
+              "careLevel": "Memory Care",
+              "id": 1,
+              "name": "Alpha",
+              "wing": "North"
+            },
+            "type": "object"
+          },
+          "foreignKeyData": {
+            "sample": {},
+            "type": "object"
+          },
+          "isHeaderCheckBoxClicked": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "isInteracted": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "rowSelected",
+            "type": "string"
+          },
+          "previousRow": {
+            "sample": "[Undefined]",
+            "type": "undefined"
+          },
+          "previousRowIndex": {
+            "sample": "[Undefined]",
+            "type": "undefined"
+          },
+          "row": {
+            "sample": {
+              "ariaColIndex": "",
+              "ariaRowIndex": "1",
+              "className": "e-row",
+              "id": "",
+              "kind": "Element",
+              "tagName": "TR",
+              "text": "1AlphaMemory CareNorth"
+            },
+            "type": "element"
+          },
+          "rowIndex": {
+            "sample": 0,
+            "type": "number"
+          },
+          "rowIndexes": {
+            "sample": 0,
+            "type": "number"
+          },
+          "target": {
+            "sample": {
+              "ariaColIndex": "2",
+              "ariaRowIndex": "",
+              "className": "e-rowcell e-focus e-focused e-selectionbackground e-active",
+              "id": "",
+              "kind": "Element",
+              "tagName": "TD",
+              "text": "Alpha"
+            },
+            "type": "element"
+          }
+        },
+        "rowSelectedShape": {
+          "data": {
+            "careLevel": "Memory Care",
+            "id": 1,
+            "name": "Alpha",
+            "wing": "North"
+          },
+          "foreignKeyData": {},
+          "isHeaderCheckBoxClicked": false,
+          "isInteracted": true,
+          "previousRow": "[Undefined]",
+          "previousRowIndex": "[Undefined]",
+          "row": {
+            "ariaColIndex": "",
+            "ariaRowIndex": "1",
+            "className": "e-row",
+            "id": "",
+            "kind": "Element",
+            "tagName": "TR",
+            "text": "1AlphaMemory CareNorth"
+          },
+          "rowIndex": 0,
+          "rowIndexes": 0,
+          "target": {
+            "ariaColIndex": "2",
+            "ariaRowIndex": "",
+            "className": "e-rowcell e-focus e-focused e-selectionbackground e-active",
+            "id": "",
+            "kind": "Element",
+            "tagName": "TD",
+            "text": "Alpha"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "click:first-row",
+      "value": {
+        "clickedText": "Alpha",
+        "selectedIndexes": [
+          0
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "event:rowSelected:click",
+      "value": {
+        "ownKeys": [
+          "data",
+          "foreignKeyData",
+          "isHeaderCheckBoxClicked",
+          "isInteracted",
+          "name",
+          "previousRow",
+          "previousRowIndex",
+          "row",
+          "rowIndex",
+          "rowIndexes",
+          "target"
+        ],
+        "properties": {
+          "data": {
+            "sample": {
+              "careLevel": "Assisted Living",
+              "id": 2,
+              "name": "Beta",
+              "wing": "South"
+            },
+            "type": "object"
+          },
+          "foreignKeyData": {
+            "sample": {},
+            "type": "object"
+          },
+          "isHeaderCheckBoxClicked": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "isInteracted": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "rowSelected",
+            "type": "string"
+          },
+          "previousRow": {
+            "sample": {
+              "ariaColIndex": "",
+              "ariaRowIndex": "1",
+              "className": "e-row",
+              "id": "",
+              "kind": "Element",
+              "tagName": "TR",
+              "text": "1AlphaMemory CareNorth"
+            },
+            "type": "element"
+          },
+          "previousRowIndex": {
+            "sample": 0,
+            "type": "number"
+          },
+          "row": {
+            "sample": {
+              "ariaColIndex": "",
+              "ariaRowIndex": "2",
+              "className": "e-row e-altrow",
+              "id": "",
+              "kind": "Element",
+              "tagName": "TR",
+              "text": "2BetaAssisted LivingSouth"
+            },
+            "type": "element"
+          },
+          "rowIndex": {
+            "sample": 1,
+            "type": "number"
+          },
+          "rowIndexes": {
+            "sample": 1,
+            "type": "number"
+          },
+          "target": {
+            "sample": {
+              "ariaColIndex": "2",
+              "ariaRowIndex": "",
+              "className": "e-rowcell e-focus e-focused e-selectionbackground e-active",
+              "id": "",
+              "kind": "Element",
+              "tagName": "TD",
+              "text": "Beta"
+            },
+            "type": "element"
+          }
+        },
+        "rowSelectedShape": {
+          "data": {
+            "careLevel": "Assisted Living",
+            "id": 2,
+            "name": "Beta",
+            "wing": "South"
+          },
+          "foreignKeyData": {},
+          "isHeaderCheckBoxClicked": false,
+          "isInteracted": true,
+          "previousRow": {
+            "ariaColIndex": "",
+            "ariaRowIndex": "1",
+            "className": "e-row",
+            "id": "",
+            "kind": "Element",
+            "tagName": "TR",
+            "text": "1AlphaMemory CareNorth"
+          },
+          "previousRowIndex": 0,
+          "row": {
+            "ariaColIndex": "",
+            "ariaRowIndex": "2",
+            "className": "e-row e-altrow",
+            "id": "",
+            "kind": "Element",
+            "tagName": "TR",
+            "text": "2BetaAssisted LivingSouth"
+          },
+          "rowIndex": 1,
+          "rowIndexes": 1,
+          "target": {
+            "ariaColIndex": "2",
+            "ariaRowIndex": "",
+            "className": "e-rowcell e-focus e-focused e-selectionbackground e-active",
+            "id": "",
+            "kind": "Element",
+            "tagName": "TD",
+            "text": "Beta"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "click:second-row",
+      "value": {
+        "clickedText": "Beta",
+        "selectedIndexes": [
+          1
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "label": "complete",
+      "value": {
+        "traceRows": 6
+      }
+    }
+  ]
+}

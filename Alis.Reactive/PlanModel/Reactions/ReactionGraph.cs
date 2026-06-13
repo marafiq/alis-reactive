@@ -10,7 +10,7 @@ namespace Alis.Reactive.PlanModel
     /// Wire base for Reactive Plan reactions authored through pipeline builders.
     /// </summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ReactionGraph>))]
-    public abstract class ReactionGraph
+    internal abstract class ReactionGraph
     {
         private protected ReactionGraph() { }
 
@@ -36,10 +36,7 @@ namespace Alis.Reactive.PlanModel
             new DispatchReaction(eventName, DispatchPayload.None);
 
         internal static ReactionGraph Dispatch(string eventName, ValueExpression data) =>
-            new DispatchReaction(eventName, DispatchPayload.Untyped(data));
-
-        internal static ReactionGraph Dispatch(string eventName, ValueExpression data, PayloadContract payloadType) =>
-            new DispatchReaction(eventName, DispatchPayload.Typed(data, payloadType));
+            new DispatchReaction(eventName, DispatchPayload.Of(data));
 
         internal static ReactionGraph Inject(string slot, ValueExpression value) =>
             new InjectReaction(slot, value);
@@ -57,7 +54,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Executes a list of reactions in declaration order.</summary>
-    public sealed class SequenceReaction : ReactionGraph
+    internal sealed class SequenceReaction : ReactionGraph
     {
         private readonly IReadOnlyList<ReactionGraph> _steps;
 
@@ -73,7 +70,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Executes a list of reactions concurrently.</summary>
-    public sealed class ParallelReaction : ReactionGraph
+    internal sealed class ParallelReaction : ReactionGraph
     {
         private readonly IReadOnlyList<ReactionGraph> _steps;
         private readonly ParallelCompletion _completion;
@@ -94,7 +91,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Wire base for parallel completion behavior authored by request/parallel builders.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ParallelCompletion>))]
-    public abstract class ParallelCompletion
+    internal abstract class ParallelCompletion
     {
         private protected ParallelCompletion() { }
 
@@ -110,14 +107,14 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Represents a parallel reaction with no completion reaction.</summary>
-    public sealed class NoParallelCompletion : ParallelCompletion
+    internal sealed class NoParallelCompletion : ParallelCompletion
     {
         /// <summary>JSON discriminator for no completion reaction. Always <c>"none"</c>.</summary>
         public override string Kind => "none";
     }
 
     /// <summary>Runs a reaction after every parallel branch has settled.</summary>
-    public sealed class SettledParallelCompletion : ParallelCompletion
+    internal sealed class SettledParallelCompletion : ParallelCompletion
     {
         private readonly ReactionGraph _reaction;
 
@@ -134,7 +131,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Evaluates conditions and executes the first matching case.</summary>
-    public sealed class BranchReaction : ReactionGraph
+    internal sealed class BranchReaction : ReactionGraph
     {
         private readonly IReadOnlyList<BranchCase> _cases;
 
@@ -156,7 +153,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Pairs an explicit guard with a reaction to execute. A default guard is the else case.</summary>
     [JsonConverter(typeof(BranchCaseJsonConverter))]
-    public sealed class BranchCase
+    internal sealed class BranchCase
     {
         /// <summary>Guard that decides whether this case runs.</summary>
         public BranchGuard Guard { get; }
@@ -197,7 +194,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     [JsonConverter(typeof(BranchGuardJsonConverter))]
-    public abstract class BranchGuard
+    internal abstract class BranchGuard
     {
         private protected BranchGuard() { }
 
@@ -253,7 +250,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Sets a property value on a component or DOM element.</summary>
-    public sealed class SetReaction : ReactionGraph
+    internal sealed class SetReaction : ReactionGraph
     {
         private readonly MemberName _property;
 
@@ -275,7 +272,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Calls a method on a component or DOM element.</summary>
-    public sealed class CallReaction : ReactionGraph
+    internal sealed class CallReaction : ReactionGraph
     {
         private readonly MemberName _method;
         private readonly IReadOnlyList<ValueExpression> _args;
@@ -306,7 +303,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Sends an HTTP request as defined by the enclosed <see cref="RequestPlan"/>.</summary>
-    public sealed class RequestReaction : ReactionGraph
+    internal sealed class RequestReaction : ReactionGraph
     {
         /// <summary>JSON discriminator for HTTP request reactions. Always <c>"request"</c>.</summary>
         public string Kind => "request";
@@ -318,7 +315,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Dispatches a <c>CustomEvent</c>.</summary>
     [JsonConverter(typeof(DispatchReactionJsonConverter))]
-    public sealed class DispatchReaction : ReactionGraph
+    internal sealed class DispatchReaction : ReactionGraph
     {
         private readonly EventName _event;
         private readonly DispatchPayload _payload;
@@ -367,11 +364,8 @@ namespace Alis.Reactive.PlanModel
 
         internal abstract void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options);
 
-        internal static DispatchPayload Untyped(ValueExpression data) =>
-            new PresentDispatchPayload(data, PayloadContract.Untyped);
-
-        internal static DispatchPayload Typed(ValueExpression data, PayloadContract payloadType) =>
-            new PresentDispatchPayload(data, payloadType);
+        internal static DispatchPayload Of(ValueExpression data) =>
+            new PresentDispatchPayload(data);
     }
 
     internal sealed class NoDispatchPayload : DispatchPayload
@@ -386,12 +380,10 @@ namespace Alis.Reactive.PlanModel
     internal sealed class PresentDispatchPayload : DispatchPayload
     {
         private readonly ValueExpression _data;
-        private readonly PayloadContract _payloadType;
 
-        internal PresentDispatchPayload(ValueExpression data, PayloadContract payloadType)
+        internal PresentDispatchPayload(ValueExpression data)
         {
             _data = data;
-            _payloadType = payloadType;
         }
 
         public override string Kind => "value";
@@ -399,7 +391,6 @@ namespace Alis.Reactive.PlanModel
         internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options)
         {
             PlanJsonWriter.WriteProperty(writer, options, "data", _data);
-            PlanJsonWriter.WriteProperty(writer, options, "payloadType", _payloadType);
         }
     }
 
@@ -421,7 +412,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Injects HTML into a partial slot.</summary>
-    public sealed class InjectReaction : ReactionGraph
+    internal sealed class InjectReaction : ReactionGraph
     {
         private readonly ComponentKey _slot;
 
@@ -440,7 +431,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Displays accumulated validation errors in the target container.</summary>
-    public sealed class ShowValidationErrorsReaction : ReactionGraph
+    internal sealed class ShowValidationErrorsReaction : ReactionGraph
     {
         private readonly ComponentId _container;
 

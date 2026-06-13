@@ -175,46 +175,44 @@
           "status": "found"
         },
         {
-          "extends": [],
+          "extends": [
+            "GridActionEventArgs"
+          ],
           "members": [
             {
-              "declaredOn": "SearchEventArgs",
+              "declaredOn": "GridActionEventArgs",
+              "inheritedVia": "GridActionEventArgs",
               "kind": "property",
               "name": "cancel",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "boolean"
+            },
+            {
+              "declaredOn": "GridActionEventArgs",
+              "inheritedVia": "GridActionEventArgs",
+              "kind": "property",
+              "name": "requestType",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Action"
             },
             {
               "declaredOn": "SearchEventArgs",
               "kind": "property",
-              "name": "caseSensitive",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
-              "type": "boolean"
-            },
-            {
-              "declaredOn": "SearchEventArgs",
-              "kind": "property",
-              "name": "path",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
+              "name": "searchString",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "string"
             },
             {
-              "declaredOn": "SearchEventArgs",
+              "declaredOn": "GridActionEventArgs",
+              "inheritedVia": "GridActionEventArgs",
               "kind": "property",
-              "name": "searchText",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
+              "name": "type",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "string"
-            },
-            {
-              "declaredOn": "SearchEventArgs",
-              "kind": "property",
-              "name": "showHiddenItems",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
-              "type": "boolean"
             }
           ],
           "name": "SearchEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         },
         {
@@ -598,47 +596,47 @@
               "declaredOn": "DeleteEventArgs",
               "kind": "property",
               "name": "cancel",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "boolean"
             },
             {
               "declaredOn": "DeleteEventArgs",
               "kind": "property",
               "name": "data",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
-              "type": "string | number | ChipModel"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object[]"
             },
             {
               "declaredOn": "DeleteEventArgs",
               "kind": "property",
-              "name": "element",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
-              "type": "HTMLElement"
+              "name": "foreignKeyData",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object"
             },
             {
               "declaredOn": "DeleteEventArgs",
               "kind": "property",
-              "name": "event",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
-              "type": "MouseEventArgs | KeyboardEventArgs"
+              "name": "requestType",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "string"
             },
             {
               "declaredOn": "DeleteEventArgs",
               "kind": "property",
-              "name": "index",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
-              "type": "number"
+              "name": "tr",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element[]"
             },
             {
               "declaredOn": "DeleteEventArgs",
               "kind": "property",
-              "name": "text",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
+              "name": "type",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "string"
             }
           ],
           "name": "DeleteEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         },
         {
@@ -851,41 +849,167 @@
             {
               "declaredOn": "NotifyArgs",
               "kind": "property",
-              "name": "module",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
+              "name": "action",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "string"
             },
             {
               "declaredOn": "NotifyArgs",
               "kind": "property",
-              "name": "newProp",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
-              "type": "FileManagerModel"
+              "name": "args",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "NotifyArgs"
             },
             {
               "declaredOn": "NotifyArgs",
               "kind": "property",
-              "name": "oldProp",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
-              "type": "FileManagerModel"
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
             },
             {
               "declaredOn": "NotifyArgs",
               "kind": "property",
-              "name": "selectedNode",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
+              "name": "count",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "enable",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "focusElement",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "isFrozen",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "isFrozenRowsRender",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "module",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "oldProperties",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "string[]"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "preventFocusOnGroup",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "promise",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Promise<Object>"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "properties",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "records",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object[]"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "renderFrozenRightContent",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "renderMovableContent",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "requestType",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Action"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "rowObject",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Row<Column>"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "rows",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Row<Column>[]"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "scrollTop",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "searchString",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "string"
             },
             {
               "declaredOn": "NotifyArgs",
               "kind": "property",
               "name": "target",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
-              "type": "Element"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "virtualInfo",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "VirtualInfo"
             }
           ],
           "name": "NotifyArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         },
         {
@@ -1115,46 +1239,44 @@
           "status": "found"
         },
         {
-          "extends": [],
+          "extends": [
+            "GridActionEventArgs"
+          ],
           "members": [
             {
-              "declaredOn": "SearchEventArgs",
+              "declaredOn": "GridActionEventArgs",
+              "inheritedVia": "GridActionEventArgs",
               "kind": "property",
               "name": "cancel",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "boolean"
+            },
+            {
+              "declaredOn": "GridActionEventArgs",
+              "inheritedVia": "GridActionEventArgs",
+              "kind": "property",
+              "name": "requestType",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Action"
             },
             {
               "declaredOn": "SearchEventArgs",
               "kind": "property",
-              "name": "caseSensitive",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
-              "type": "boolean"
-            },
-            {
-              "declaredOn": "SearchEventArgs",
-              "kind": "property",
-              "name": "path",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
+              "name": "searchString",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "string"
             },
             {
-              "declaredOn": "SearchEventArgs",
+              "declaredOn": "GridActionEventArgs",
+              "inheritedVia": "GridActionEventArgs",
               "kind": "property",
-              "name": "searchText",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
+              "name": "type",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "string"
-            },
-            {
-              "declaredOn": "SearchEventArgs",
-              "kind": "property",
-              "name": "showHiddenItems",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
-              "type": "boolean"
             }
           ],
           "name": "SearchEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         },
         {
@@ -1538,47 +1660,47 @@
               "declaredOn": "DeleteEventArgs",
               "kind": "property",
               "name": "cancel",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "boolean"
             },
             {
               "declaredOn": "DeleteEventArgs",
               "kind": "property",
               "name": "data",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
-              "type": "string | number | ChipModel"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object[]"
             },
             {
               "declaredOn": "DeleteEventArgs",
               "kind": "property",
-              "name": "element",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
-              "type": "HTMLElement"
+              "name": "foreignKeyData",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object"
             },
             {
               "declaredOn": "DeleteEventArgs",
               "kind": "property",
-              "name": "event",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
-              "type": "MouseEventArgs | KeyboardEventArgs"
+              "name": "requestType",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "string"
             },
             {
               "declaredOn": "DeleteEventArgs",
               "kind": "property",
-              "name": "index",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
-              "type": "number"
+              "name": "tr",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element[]"
             },
             {
               "declaredOn": "DeleteEventArgs",
               "kind": "property",
-              "name": "text",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
+              "name": "type",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "string"
             }
           ],
           "name": "DeleteEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         },
         {
@@ -1791,41 +1913,167 @@
             {
               "declaredOn": "NotifyArgs",
               "kind": "property",
-              "name": "module",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
+              "name": "action",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "string"
             },
             {
               "declaredOn": "NotifyArgs",
               "kind": "property",
-              "name": "newProp",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
-              "type": "FileManagerModel"
+              "name": "args",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "NotifyArgs"
             },
             {
               "declaredOn": "NotifyArgs",
               "kind": "property",
-              "name": "oldProp",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
-              "type": "FileManagerModel"
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
             },
             {
               "declaredOn": "NotifyArgs",
               "kind": "property",
-              "name": "selectedNode",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
+              "name": "count",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "enable",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "focusElement",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "isFrozen",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "isFrozenRowsRender",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "module",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "oldProperties",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "string[]"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "preventFocusOnGroup",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "promise",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Promise<Object>"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "properties",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "records",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object[]"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "renderFrozenRightContent",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "renderMovableContent",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "requestType",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Action"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "rowObject",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Row<Column>"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "rows",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Row<Column>[]"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "scrollTop",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "searchString",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "string"
             },
             {
               "declaredOn": "NotifyArgs",
               "kind": "property",
               "name": "target",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
-              "type": "Element"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "NotifyArgs",
+              "kind": "property",
+              "name": "virtualInfo",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "VirtualInfo"
             }
           ],
           "name": "NotifyArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         },
         {
@@ -1895,20 +2143,13 @@
             {
               "declaredOn": "FailureEventArgs",
               "kind": "property",
-              "name": "action",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
-              "type": "string"
-            },
-            {
-              "declaredOn": "FailureEventArgs",
-              "kind": "property",
               "name": "error",
-              "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
-              "type": "Object"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Error"
             }
           ],
           "name": "FailureEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-filemanager/src/file-manager/base/interface.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         }
       ]
@@ -2371,11 +2612,37 @@
       "eventType": "DetailTemplateDetachArgs",
       "payloadTypes": [
         {
+          "aliasOf": "DetailTemplateDetach[]",
           "extends": [],
-          "members": [],
+          "members": [
+            {
+              "declaredOn": "DetailTemplateDetach",
+              "inheritedVia": "DetailTemplateDetach",
+              "kind": "property",
+              "name": "detailRow",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "DetailTemplateDetach",
+              "inheritedVia": "DetailTemplateDetach",
+              "kind": "property",
+              "name": "detailRowObject",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Row<Column>"
+            },
+            {
+              "declaredOn": "DetailTemplateDetach",
+              "inheritedVia": "DetailTemplateDetach",
+              "kind": "property",
+              "name": "parentRowObject",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Row<Column>"
+            }
+          ],
           "name": "DetailTemplateDetachArgs",
-          "sourcePath": "",
-          "status": "not-found"
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+          "status": "found"
         }
       ]
     },
@@ -2384,11 +2651,12 @@
       "eventType": "Object",
       "payloadTypes": [
         {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
           "extends": [],
           "members": [],
           "name": "Object",
           "sourcePath": "",
-          "status": "not-found"
+          "status": "builtin-object"
         }
       ]
     },
@@ -2480,26 +2748,33 @@
               "declaredOn": "BeforePasteEventArgs",
               "kind": "property",
               "name": "cancel",
-              "sourcePath": "node_modules/@syncfusion/ej2-documenteditor/src/document-editor/base/events-helper.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "boolean"
             },
             {
               "declaredOn": "BeforePasteEventArgs",
               "kind": "property",
-              "name": "pasteContent",
-              "sourcePath": "node_modules/@syncfusion/ej2-documenteditor/src/document-editor/base/events-helper.d.ts",
-              "type": "string"
+              "name": "column",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Column"
             },
             {
               "declaredOn": "BeforePasteEventArgs",
               "kind": "property",
-              "name": "pasteType",
-              "sourcePath": "node_modules/@syncfusion/ej2-documenteditor/src/document-editor/base/events-helper.d.ts",
-              "type": "PasteType"
+              "name": "data",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "string | number | boolean | Date"
+            },
+            {
+              "declaredOn": "BeforePasteEventArgs",
+              "kind": "property",
+              "name": "rowIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number"
             }
           ],
           "name": "BeforePasteEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-documenteditor/src/document-editor/base/events-helper.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         }
       ]
@@ -2509,11 +2784,12 @@
       "eventType": "Object",
       "payloadTypes": [
         {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
           "extends": [],
           "members": [],
           "name": "Object",
           "sourcePath": "",
-          "status": "not-found"
+          "status": "builtin-object"
         }
       ]
     },
@@ -2742,95 +3018,114 @@
       "eventType": "CellEditArgs",
       "payloadTypes": [
         {
-          "extends": [],
+          "extends": [
+            "CellEditSameArgs",
+            "IPrimaryKey"
+          ],
           "members": [
             {
-              "declaredOn": "CellEditArgs",
+              "declaredOn": "ICancel",
+              "inheritedVia": "CellEditSameArgs",
               "kind": "property",
               "name": "cancel",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "boolean"
             },
             {
-              "declaredOn": "CellEditArgs",
+              "declaredOn": "CellEditSameArgs",
+              "inheritedVia": "CellEditSameArgs",
               "kind": "property",
               "name": "cell",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "Element"
             },
             {
-              "declaredOn": "CellEditArgs",
+              "declaredOn": "CellEditSameArgs",
+              "inheritedVia": "CellEditSameArgs",
+              "kind": "property",
+              "name": "column",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Column"
+            },
+            {
+              "declaredOn": "CellEditSameArgs",
+              "inheritedVia": "CellEditSameArgs",
               "kind": "property",
               "name": "columnName",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "string"
             },
             {
-              "declaredOn": "CellEditArgs",
+              "declaredOn": "CellEditSameArgs",
+              "inheritedVia": "CellEditSameArgs",
               "kind": "property",
               "name": "columnObject",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "Column"
             },
             {
               "declaredOn": "CellEditArgs",
               "kind": "property",
               "name": "foreignKeyData",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "Object"
             },
             {
-              "declaredOn": "CellEditArgs",
+              "declaredOn": "CellEditSameArgs",
+              "inheritedVia": "CellEditSameArgs",
               "kind": "property",
               "name": "isForeignKey",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "boolean"
             },
             {
-              "declaredOn": "CellEditArgs",
+              "declaredOn": "IPrimaryKey",
+              "inheritedVia": "IPrimaryKey",
               "kind": "property",
               "name": "primaryKey",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "string[]"
             },
             {
               "declaredOn": "CellEditArgs",
               "kind": "property",
               "name": "row",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "Element"
             },
             {
-              "declaredOn": "CellEditArgs",
+              "declaredOn": "CellEditSameArgs",
+              "inheritedVia": "CellEditSameArgs",
               "kind": "property",
               "name": "rowData",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "IGanttData"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object"
             },
             {
               "declaredOn": "CellEditArgs",
               "kind": "property",
               "name": "type",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "string"
             },
             {
               "declaredOn": "CellEditArgs",
               "kind": "property",
               "name": "validationRules",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "Object"
             },
             {
-              "declaredOn": "CellEditArgs",
+              "declaredOn": "CellEditSameArgs",
+              "inheritedVia": "CellEditSameArgs",
               "kind": "property",
               "name": "value",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "string"
             }
           ],
           "name": "CellEditArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         }
       ]
@@ -3091,19 +3386,90 @@
       "payloadTypes": [
         {
           "extends": [
-            "GridCellSelectingEventArgs"
+            "CellSelectEventArgs"
           ],
           "members": [
             {
+              "declaredOn": "CellDeselectEventArgs",
+              "inheritedVia": "CellSelectEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "CellSelectEventArgs",
+              "inheritedVia": "CellSelectEventArgs",
+              "kind": "property",
+              "name": "cellIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "IIndex"
+            },
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "inheritedVia": "CellSelectEventArgs",
+              "kind": "property",
+              "name": "cellIndexes",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "ISelectedCell[]"
+            },
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "inheritedVia": "CellSelectEventArgs",
+              "kind": "property",
+              "name": "cells",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element[]"
+            },
+            {
+              "declaredOn": "CellSelectEventArgs",
+              "inheritedVia": "CellSelectEventArgs",
+              "kind": "property",
+              "name": "currentCell",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "inheritedVia": "CellSelectEventArgs",
+              "kind": "property",
+              "name": "data",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object"
+            },
+            {
               "declaredOn": "CellSelectingEventArgs",
               "kind": "property",
+              "name": "isCtrlPressed",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "isShiftPressed",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "CellSelectEventArgs",
+              "inheritedVia": "CellSelectEventArgs",
+              "kind": "property",
+              "name": "previousRowCell",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "CellSelectEventArgs",
+              "inheritedVia": "CellSelectEventArgs",
+              "kind": "property",
               "name": "previousRowCellIndex",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "number"
             }
           ],
           "name": "CellSelectingEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         }
       ]
@@ -3912,27 +4278,74 @@
       "eventType": "ContextMenuClickEventArgs",
       "payloadTypes": [
         {
-          "extends": [
-            "GridContextMenuClickEventArgs"
-          ],
+          "extends": [],
           "members": [
             {
               "declaredOn": "ContextMenuClickEventArgs",
               "kind": "property",
-              "name": "rowData",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "IGanttData"
+              "name": "chartType",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "ChartType"
             },
             {
               "declaredOn": "ContextMenuClickEventArgs",
               "kind": "property",
-              "name": "type",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "ContextMenuType"
+              "name": "column",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Column"
+            },
+            {
+              "declaredOn": "ContextMenuClickEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "ContextMenuClickEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "ContextMenuClickEventArgs",
+              "kind": "property",
+              "name": "gridInstance",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "IGrid"
+            },
+            {
+              "declaredOn": "ContextMenuClickEventArgs",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "MenuItemModel"
+            },
+            {
+              "declaredOn": "ContextMenuClickEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ContextMenuClickEventArgs",
+              "kind": "property",
+              "name": "records",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object[]"
+            },
+            {
+              "declaredOn": "ContextMenuClickEventArgs",
+              "kind": "property",
+              "name": "rowInfo",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "RowInfo"
             }
           ],
           "name": "ContextMenuClickEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         }
       ]
@@ -3943,82 +4356,106 @@
       "payloadTypes": [
         {
           "extends": [
-            "GridContextMenuOpenEventArgs"
+            "BeforeOpenCloseMenuEventArgs"
           ],
           "members": [
             {
-              "declaredOn": "ContextMenuOpenEventArgs",
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
               "kind": "property",
-              "name": "chartRow",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "Element"
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "boolean"
             },
             {
               "declaredOn": "ContextMenuOpenEventArgs",
               "kind": "property",
-              "name": "disableItems",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "string[]"
+              "name": "column",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Column"
             },
             {
-              "declaredOn": "ContextMenuOpenEventArgs",
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
               "kind": "property",
-              "name": "gridRow",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "Element"
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "HTMLElement"
             },
             {
-              "declaredOn": "ContextMenuOpenEventArgs",
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
               "kind": "property",
-              "name": "hideChildItems",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "string[]"
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "Event"
             },
             {
-              "declaredOn": "ContextMenuOpenEventArgs",
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
               "kind": "property",
-              "name": "hideItems",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "string[]"
+              "name": "isFocused",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "boolean"
             },
             {
-              "declaredOn": "ContextMenuOpenEventArgs",
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "items",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "MenuItemModel[]"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
               "kind": "property",
               "name": "left",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
               "type": "number"
             },
             {
-              "declaredOn": "ContextMenuOpenEventArgs",
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
               "kind": "property",
-              "name": "rowData",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "IGanttData"
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "parentItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "MenuItemModel"
             },
             {
               "declaredOn": "ContextMenuOpenEventArgs",
               "kind": "property",
-              "name": "target",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "Element"
+              "name": "rowInfo",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "RowInfo"
             },
             {
-              "declaredOn": "ContextMenuOpenEventArgs",
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "showSubMenuOn",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "MenuOpenType"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
               "kind": "property",
               "name": "top",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
               "type": "number"
-            },
-            {
-              "declaredOn": "ContextMenuOpenEventArgs",
-              "kind": "property",
-              "name": "type",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "ContextMenuType"
             }
           ],
           "name": "ContextMenuOpenEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         }
       ]
@@ -4029,82 +4466,106 @@
       "payloadTypes": [
         {
           "extends": [
-            "GridContextMenuOpenEventArgs"
+            "BeforeOpenCloseMenuEventArgs"
           ],
           "members": [
             {
-              "declaredOn": "ContextMenuOpenEventArgs",
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
               "kind": "property",
-              "name": "chartRow",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "Element"
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "boolean"
             },
             {
               "declaredOn": "ContextMenuOpenEventArgs",
               "kind": "property",
-              "name": "disableItems",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "string[]"
+              "name": "column",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Column"
             },
             {
-              "declaredOn": "ContextMenuOpenEventArgs",
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
               "kind": "property",
-              "name": "gridRow",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "Element"
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "HTMLElement"
             },
             {
-              "declaredOn": "ContextMenuOpenEventArgs",
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
               "kind": "property",
-              "name": "hideChildItems",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "string[]"
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "Event"
             },
             {
-              "declaredOn": "ContextMenuOpenEventArgs",
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
               "kind": "property",
-              "name": "hideItems",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "string[]"
+              "name": "isFocused",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "boolean"
             },
             {
-              "declaredOn": "ContextMenuOpenEventArgs",
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "items",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "MenuItemModel[]"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
               "kind": "property",
               "name": "left",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
               "type": "number"
             },
             {
-              "declaredOn": "ContextMenuOpenEventArgs",
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
               "kind": "property",
-              "name": "rowData",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "IGanttData"
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "parentItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "MenuItemModel"
             },
             {
               "declaredOn": "ContextMenuOpenEventArgs",
               "kind": "property",
-              "name": "target",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "Element"
+              "name": "rowInfo",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "RowInfo"
             },
             {
-              "declaredOn": "ContextMenuOpenEventArgs",
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "showSubMenuOn",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "MenuOpenType"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "inheritedVia": "BeforeOpenCloseMenuEventArgs",
               "kind": "property",
               "name": "top",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
               "type": "number"
-            },
-            {
-              "declaredOn": "ContextMenuOpenEventArgs",
-              "kind": "property",
-              "name": "type",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "ContextMenuType"
             }
           ],
           "name": "ContextMenuOpenEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         }
       ]
@@ -4114,11 +4575,12 @@
       "eventType": "Object",
       "payloadTypes": [
         {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
           "extends": [],
           "members": [],
           "name": "Object",
           "sourcePath": "",
-          "status": "not-found"
+          "status": "builtin-object"
         }
       ]
     },
@@ -4127,11 +4589,12 @@
       "eventType": "Object",
       "payloadTypes": [
         {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
           "extends": [],
           "members": [],
           "name": "Object",
           "sourcePath": "",
-          "status": "not-found"
+          "status": "builtin-object"
         }
       ]
     },
@@ -4343,11 +4806,12 @@
       "eventType": "Object",
       "payloadTypes": [
         {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
           "extends": [],
           "members": [],
           "name": "Object",
           "sourcePath": "",
-          "status": "not-found"
+          "status": "builtin-object"
         }
       ]
     },
@@ -4867,12 +5331,19 @@
               "declaredOn": "KeyboardEventArgs",
               "kind": "property",
               "name": "action",
-              "sourcePath": "node_modules/@syncfusion/ej2-base/src/keyboard.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "string"
+            },
+            {
+              "declaredOn": "KeyboardEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
             }
           ],
           "name": "KeyboardEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-base/src/keyboard.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         }
       ]
@@ -4966,11 +5437,12 @@
       "eventType": "Object",
       "payloadTypes": [
         {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
           "extends": [],
           "members": [],
           "name": "Object",
           "sourcePath": "",
-          "status": "not-found"
+          "status": "builtin-object"
         }
       ]
     },
@@ -5096,54 +5568,54 @@
               "declaredOn": "PdfQueryCellInfoEventArgs",
               "kind": "property",
               "name": "cell",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "PdfTreeGridCell"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "PdfGridCell"
+            },
+            {
+              "declaredOn": "PdfQueryCellInfoEventArgs",
+              "kind": "property",
+              "name": "colSpan",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number"
             },
             {
               "declaredOn": "PdfQueryCellInfoEventArgs",
               "kind": "property",
               "name": "column",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "ColumnModel"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Column"
             },
             {
               "declaredOn": "PdfQueryCellInfoEventArgs",
               "kind": "property",
               "name": "data",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "Object"
             },
             {
               "declaredOn": "PdfQueryCellInfoEventArgs",
               "kind": "property",
               "name": "hyperLink",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "Hyperlink"
             },
             {
               "declaredOn": "PdfQueryCellInfoEventArgs",
               "kind": "property",
-              "name": "image",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "Image"
-            },
-            {
-              "declaredOn": "PdfQueryCellInfoEventArgs",
-              "kind": "property",
               "name": "style",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "PdfGanttCellStyle"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "PdfStyle"
             },
             {
               "declaredOn": "PdfQueryCellInfoEventArgs",
               "kind": "property",
               "name": "value",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "Date | string | number | boolean | PdfTextWebLink | PdfImage"
             }
           ],
           "name": "PdfQueryCellInfoEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         }
       ]
@@ -5227,54 +5699,54 @@
               "declaredOn": "QueryCellInfoEventArgs",
               "kind": "property",
               "name": "cell",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "Element"
             },
             {
               "declaredOn": "QueryCellInfoEventArgs",
               "kind": "property",
               "name": "colSpan",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "number"
             },
             {
               "declaredOn": "QueryCellInfoEventArgs",
               "kind": "property",
               "name": "column",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "Column"
             },
             {
               "declaredOn": "QueryCellInfoEventArgs",
               "kind": "property",
               "name": "data",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "IGanttData"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object"
             },
             {
               "declaredOn": "QueryCellInfoEventArgs",
               "kind": "property",
               "name": "foreignKeyData",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "Object"
             },
             {
               "declaredOn": "QueryCellInfoEventArgs",
               "kind": "property",
               "name": "requestType",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "string"
             },
             {
               "declaredOn": "QueryCellInfoEventArgs",
               "kind": "property",
               "name": "rowSpan",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "number"
             }
           ],
           "name": "QueryCellInfoEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         }
       ]
@@ -5368,41 +5840,81 @@
       "eventType": "RecordDoubleClickEventArgs",
       "payloadTypes": [
         {
-          "extends": [
-            "GridRecordDoubleClickEventArgs"
-          ],
+          "extends": [],
           "members": [
             {
               "declaredOn": "RecordDoubleClickEventArgs",
               "kind": "property",
+              "name": "cell",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "RecordDoubleClickEventArgs",
+              "kind": "property",
+              "name": "cellIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "RecordDoubleClickEventArgs",
+              "kind": "property",
+              "name": "column",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Column"
+            },
+            {
+              "declaredOn": "RecordDoubleClickEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "TouchEvent | MouseEvent"
+            },
+            {
+              "declaredOn": "RecordDoubleClickEventArgs",
+              "kind": "property",
+              "name": "foreignKeyData",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "RecordDoubleClickEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "RecordDoubleClickEventArgs",
+              "kind": "property",
               "name": "row",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "Element"
             },
             {
               "declaredOn": "RecordDoubleClickEventArgs",
               "kind": "property",
               "name": "rowData",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "IGanttData"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object"
             },
             {
               "declaredOn": "RecordDoubleClickEventArgs",
               "kind": "property",
               "name": "rowIndex",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "number"
             },
             {
               "declaredOn": "RecordDoubleClickEventArgs",
               "kind": "property",
               "name": "target",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "Element"
             }
           ],
           "name": "RecordDoubleClickEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         }
       ]
@@ -5526,27 +6038,39 @@
       "eventType": "RowDataBoundEventArgs",
       "payloadTypes": [
         {
-          "extends": [
-            "GridRowDataBoundEventArgs"
-          ],
+          "extends": [],
           "members": [
             {
               "declaredOn": "RowDataBoundEventArgs",
               "kind": "property",
               "name": "data",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "IGanttData"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "RowDataBoundEventArgs",
+              "kind": "property",
+              "name": "isSelectable",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
             },
             {
               "declaredOn": "RowDataBoundEventArgs",
               "kind": "property",
               "name": "row",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "Element"
+            },
+            {
+              "declaredOn": "RowDataBoundEventArgs",
+              "kind": "property",
+              "name": "rowHeight",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number"
             }
           ],
           "name": "RowDataBoundEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         }
       ]
@@ -5556,34 +6080,67 @@
       "eventType": "RowDeselectEventArgs",
       "payloadTypes": [
         {
-          "extends": [
-            "GridRowDeselectEventArgs"
-          ],
+          "extends": [],
           "members": [
             {
               "declaredOn": "RowDeselectEventArgs",
               "kind": "property",
               "name": "data",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "IGanttData[]"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object | Object[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "foreignKeyData",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object | Object[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "isHeaderCheckboxClicked",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
             },
             {
               "declaredOn": "RowDeselectEventArgs",
               "kind": "property",
               "name": "row",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "Element"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element | Element[]"
             },
             {
               "declaredOn": "RowDeselectEventArgs",
               "kind": "property",
               "name": "rowIndex",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "number"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "rowIndexes",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
             }
           ],
           "name": "RowDeselectEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         }
       ]
@@ -5609,24 +6166,64 @@
               "inheritedVia": "RowDeselectEventArgs",
               "kind": "property",
               "name": "data",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "IGanttData[]"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object | Object[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "foreignKeyData",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object | Object[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "isHeaderCheckboxClicked",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
             },
             {
               "declaredOn": "RowDeselectEventArgs",
               "inheritedVia": "RowDeselectEventArgs",
               "kind": "property",
               "name": "row",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "Element"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element | Element[]"
             },
             {
               "declaredOn": "RowDeselectEventArgs",
               "inheritedVia": "RowDeselectEventArgs",
               "kind": "property",
               "name": "rowIndex",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
               "type": "number"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "rowIndexes",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
             }
           ],
           "name": "RowDeselectingEventArgs",
@@ -5921,19 +6518,97 @@
       "payloadTypes": [
         {
           "extends": [
-            "GridRowSelectEventArgs"
+            "RowDeselectEventArgs"
           ],
           "members": [
             {
-              "declaredOn": "RowSelectEventArgs",
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
               "kind": "property",
               "name": "data",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "IGanttData"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object | Object[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "foreignKeyData",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object | Object[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "isHeaderCheckboxClicked",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RowSelectEventArgs",
+              "kind": "property",
+              "name": "previousRow",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "RowSelectEventArgs",
+              "kind": "property",
+              "name": "previousRowIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "row",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element | Element[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "rowIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "rowIndexes",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number[]"
+            },
+            {
+              "declaredOn": "RowSelectEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
             }
           ],
           "name": "RowSelectEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         }
       ]
@@ -5944,19 +6619,121 @@
       "payloadTypes": [
         {
           "extends": [
-            "GridRowSelectingEventArgs"
+            "RowSelectEventArgs"
           ],
           "members": [
             {
               "declaredOn": "RowSelectingEventArgs",
               "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowSelectEventArgs",
+              "kind": "property",
               "name": "data",
-              "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
-              "type": "IGanttData"
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object | Object[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowSelectEventArgs",
+              "kind": "property",
+              "name": "foreignKeyData",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object | Object[]"
+            },
+            {
+              "declaredOn": "RowSelectingEventArgs",
+              "kind": "property",
+              "name": "isCtrlPressed",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowSelectEventArgs",
+              "kind": "property",
+              "name": "isHeaderCheckboxClicked",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowSelectEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RowSelectingEventArgs",
+              "kind": "property",
+              "name": "isShiftPressed",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RowSelectEventArgs",
+              "inheritedVia": "RowSelectEventArgs",
+              "kind": "property",
+              "name": "previousRow",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "RowSelectEventArgs",
+              "inheritedVia": "RowSelectEventArgs",
+              "kind": "property",
+              "name": "previousRowIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowSelectEventArgs",
+              "kind": "property",
+              "name": "row",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element | Element[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowSelectEventArgs",
+              "kind": "property",
+              "name": "rowIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowSelectEventArgs",
+              "kind": "property",
+              "name": "rowIndexes",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number[]"
+            },
+            {
+              "declaredOn": "RowSelectEventArgs",
+              "inheritedVia": "RowSelectEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowSelectEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
             }
           ],
           "name": "RowSelectingEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-gantt/src/gantt/base/interface.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
           "status": "found"
         }
       ]
@@ -5966,60 +6743,42 @@
       "eventType": "ClickEventArgs",
       "payloadTypes": [
         {
-          "extends": [],
+          "extends": [
+            "BaseEventArgs"
+          ],
           "members": [
             {
               "declaredOn": "ClickEventArgs",
               "kind": "property",
               "name": "cancel",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
               "type": "boolean"
             },
             {
               "declaredOn": "ClickEventArgs",
               "kind": "property",
-              "name": "data",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
-              "type": "string | number | ChipModel"
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+              "type": "ItemModel"
             },
             {
-              "declaredOn": "ClickEventArgs",
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
               "kind": "property",
-              "name": "element",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
-              "type": "HTMLElement"
-            },
-            {
-              "declaredOn": "ClickEventArgs",
-              "kind": "property",
-              "name": "event",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
-              "type": "MouseEventArgs | KeyboardEventArgs"
-            },
-            {
-              "declaredOn": "ClickEventArgs",
-              "kind": "property",
-              "name": "index",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
-              "type": "number"
-            },
-            {
-              "declaredOn": "ClickEventArgs",
-              "kind": "property",
-              "name": "selected",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
-              "type": "boolean"
-            },
-            {
-              "declaredOn": "ClickEventArgs",
-              "kind": "property",
-              "name": "text",
-              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
               "type": "string"
+            },
+            {
+              "declaredOn": "ClickEventArgs",
+              "kind": "property",
+              "name": "originalEvent",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+              "type": "Event"
             }
           ],
           "name": "ClickEventArgs",
-          "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/chips/chip-list.d.ts",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
           "status": "found"
         }
       ]

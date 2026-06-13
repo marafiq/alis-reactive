@@ -147,13 +147,13 @@ public class ServerPartialValidator : ReactiveValidator<ResidentModel>
 {
     public ServerPartialValidator()
     {
-        RuleFor(x => x.Name).NotEmpty();
-        RuleFor(x => x.Email).NotEmpty().EmailAddress();
+        ClientRule(x => x.Name).Required("Name is required.");
+        ClientRule(x => x.Email).Required("Email is required.").Email("Enter a valid email.");
         WhenField(x => x.IsVeteran, () =>
         {
-            RuleFor(x => x.VeteranId).NotEmpty();
+            ClientRule(x => x.VeteranId).Required("Veteran ID is required.");
         });
-        RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator());
+        ClientRule(x => x.Address, new ResidentAddressValidator());
     }
 }
 
@@ -161,13 +161,13 @@ public class ServerPartialValidator : ReactiveValidator<ResidentModel>
 .Validate<ResidentValidator>("partial-form")
 ```
 
-Nested properties must use SetValidator (adapter limitation):
+Nested properties must use ClientRule(field, validator) — it wraps SetValidator and merges the child client metadata:
 
 ```csharp
 // CORRECT
-RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator());
+ClientRule(x => x.Address, new ResidentAddressValidator());
 
-// WRONG — adapter silently drops these
+// WRONG — plain RuleFor is server-only; no client metadata
 RuleFor(x => x.Address.Street).NotEmpty();
 ```
 
@@ -177,7 +177,7 @@ Conditional AJAX rules use WhenField:
 // CORRECT
 WhenField(x => x.AddressType, "Custom Address", () =>
 {
-    RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator());
+    ClientRule(x => x.Address, new ResidentAddressValidator());
 });
 ```
 
@@ -231,7 +231,7 @@ expect(summaryDiv().textContent).toContain("Hidden required");  // IN summary
 | Symptom | Wrong Fix | Right Fix |
 |---------|-----------|-----------|
 | Phantom summary errors | Revert unenriched→summary | Fix validator scope (too wide) |
-| Address rules not extracted | Add direct `RuleFor(x.Address.Street)` | Use `SetValidator` (adapter limitation) |
+| Address rules missing client-side | Direct `RuleFor(x.Address.Street)` | Use `ClientRule(x => x.Address, new AddressValidator())` |
 | Condition fires on empty dropdown | Revert fail-closed | Fix eq/neq to return false on empty source |
 | Hidden field error silently passes | Remove hidden field validation | Move `valid = false` outside `if (summaryEl)` |
 

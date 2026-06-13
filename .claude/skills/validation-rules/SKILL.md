@@ -1,6 +1,6 @@
 ---
 name: validation-rules-alis-reactive
-description: Guides writing FluentValidation rules on TModel that extract to client-side validation in Alis.Reactive — 16 extractable rule types, Shape type inference, cross-property, dates, WhenField conditions. Use this skill when adding or modifying validators, validation views, or validation tests.
+description: Guides validators for Alis.Reactive — server rules via FluentValidation, client rules recorded in the same call through ReactiveValidator<T>'s ClientRule(...), WhenField conditions, Shape inference, cross-property, dates. Use this skill when adding or modifying validators, validation views, or validation tests.
 ---
 
 # Validation Rules for Alis.Reactive
@@ -17,72 +17,80 @@ Use when:
 
 | Need | Use | Import |
 |------|-----|--------|
-| Unconditional rules only | `AbstractValidator<T>` | `using FluentValidation;` |
-| WhenField/WhenFieldNot conditions | `ReactiveValidator<T>` | `using Alis.Reactive.FluentValidator;` + `using FluentValidation;` |
-| `.IsEmpty()` or `.IsExclusiveBetween()` | Add import | `using Alis.Reactive.FluentValidator.Validators;` |
+| Server-only rules | `AbstractValidator<T>` | `using FluentValidation;` |
+| Client rules (`ClientRule(...)`) and WhenField conditions | `ReactiveValidator<T>` | `using Alis.Reactive.FluentValidator;` + `using FluentValidation;` |
 
-## Extractable Rules — Quick Reference
+## Client Rules — Quick Reference
 
-> 16 rule types are extractable via FluentValidation. Two additional types (`url` and `atLeastOne`) exist in the schema and TS runtime but have no FluentValidation extraction path yet.
+> Client validation is recorded, not extracted. `ClientRule(x => x.Prop)`
+> registers the server FluentValidation rule AND the client metadata in one
+> call (`ReactiveValidator.ClientRule` wraps `RuleFor`; the extensions live in
+> `ReactiveClientRuleBuilder.cs`). A plain `RuleFor(...)` is server-only by
+> construction — nothing reaches the browser from it. Every extension takes
+> the error message explicitly.
 
 ### Text (shape: "string", automatic)
 
 ```csharp
-RuleFor(x => x.Name).NotEmpty();                          // required — fails when empty
-RuleFor(x => x.Name).MinimumLength(2);                    // minLength — skips empty
-RuleFor(x => x.Name).MaximumLength(100);                  // maxLength — skips empty
-RuleFor(x => x.Email).EmailAddress();                     // email — skips empty
-RuleFor(x => x.Phone).Matches(@"^\d{3}-\d{4}$");         // regex — skips empty
-RuleFor(x => x.Card).CreditCard();                        // creditCard — skips empty
-RuleFor(x => x.Nickname).IsEmpty();                       // empty — passes when empty
-RuleFor(x => x.Status).NotEqual("deleted");               // notEqual — skips empty
+ClientRule(x => x.Name).Required("Name is required.");             // required — fails when empty
+ClientRule(x => x.Name).MinLength(2, "Min 2 characters.");         // minLength — skips empty
+ClientRule(x => x.Name).MaxLength(100, "Max 100 characters.");     // maxLength — skips empty
+ClientRule(x => x.Email).Email("Enter a valid email.");            // email — skips empty
+ClientRule(x => x.Phone).Regex(@"^\d{3}-\d{4}$", "Bad format.");   // regex — skips empty
+ClientRule(x => x.Card).CreditCard("Enter a valid card.");         // creditCard — skips empty
+ClientRule(x => x.Site).Url("Enter a valid URL.");                 // url — skips empty
+ClientRule(x => x.Nickname).Empty("Must be empty.");               // empty — passes when empty
+ClientRule(x => x.Status).NotEqual("deleted", "Already deleted."); // notEqual — skips empty
 ```
 
 ### Numeric (shape.kind: "number", automatic from int/decimal/etc.)
 
 ```csharp
-RuleFor(x => x.Age).InclusiveBetween(0, 120);             // range — boundaries included
-RuleFor(x => x.Score).IsExclusiveBetween(0m, 100m);       // exclusiveRange — boundaries excluded
-RuleFor(x => x.Salary).GreaterThanOrEqualTo(0m);          // min — skips empty
-RuleFor(x => x.Salary).LessThanOrEqualTo(500_000m);       // max — skips empty
-RuleFor(x => x.Rate).GreaterThan(0m);                     // gt — FAILS when empty (implies required)
-RuleFor(x => x.Deposit).LessThan(1_000_000m);             // lt — skips empty
+ClientRule(x => x.Age).Range(0, 120, "0–120.");                    // range — boundaries included
+ClientRule(x => x.Score).ExclusiveRange(0m, 100m, "0–100 excl."); // exclusiveRange — boundaries excluded
+ClientRule(x => x.Salary).Min(0m, "No negatives.");                // min — skips empty
+ClientRule(x => x.Salary).Max(500_000m, "Too high.");              // max — skips empty
+ClientRule(x => x.Rate).GreaterThan(0m, "Must be positive.");      // gt — FAILS when empty (implies required)
+ClientRule(x => x.Deposit).LessThan(1_000_000m, "Too high.");      // lt — skips empty
 
 // Common pattern: required + range-bounded
-RuleFor(x => x.Age).NotEmpty()                              // required — fails when empty
-                    .InclusiveBetween(18, 120);              // range — only reached if not empty
+ClientRule(x => x.Age).Required("Age is required.")
+                      .Range(18, 120, "18–120.");
 ```
 
 ### Date (shape.kind: "date", automatic from DateTime/DateOnly/DateTimeOffset)
 
 ```csharp
-RuleFor(x => x.Admission).GreaterThanOrEqualTo(new DateTime(2020, 1, 1)); // min date
-RuleFor(x => x.Discharge).GreaterThan(x => x.Admission);                  // gt cross-property
+ClientRule(x => x.Admission).Min(new DateTime(2020, 1, 1), "Too early.");   // min date
+ClientRule(x => x.Discharge).GreaterThan(x => x.Admission, "After admission."); // gt cross-property
 ```
 
 > **WARNING: `DateTime.Today` / `DateTime.Now` freezes at construction time.** The constraint value is captured when the validator constructor runs. If the validator is registered as a singleton in DI, the date is frozen at app startup. Use fixed dates (e.g., `new DateTime(2020, 1, 1)`) for client-side rules. For dynamic date constraints (e.g., "must be after today"), use server-only `.When()` guards instead.
 
-### Cross-Property (field set automatically, peer auto-included in descriptor)
+### Cross-Property (peer auto-included in the plan)
 
 ```csharp
-RuleFor(x => x.ConfirmEmail).Equal(x => x.Email);            // equalTo — skips empty
-RuleFor(x => x.AltEmail).NotEqual(x => x.Email);             // notEqualTo — skips empty
-RuleFor(x => x.End).GreaterThanOrEqualTo(x => x.Start);      // min cross-property
-RuleFor(x => x.End).GreaterThan(x => x.Start);               // gt cross-property
-RuleFor(x => x.Start).LessThan(x => x.End);                  // lt cross-property
-RuleFor(x => x.Start).LessThanOrEqualTo(x => x.End);        // max cross-property
+ClientRule(x => x.ConfirmEmail).EqualTo(x => x.Email, "Must match email.");      // equalTo — skips empty
+ClientRule(x => x.AltEmail).NotEqualTo(x => x.Email, "Must differ.");            // notEqualTo — skips empty
+ClientRule(x => x.End).GreaterThanOrEqualTo(x => x.Start, "After start.");       // min cross-property
+ClientRule(x => x.End).GreaterThan(x => x.Start, "Strictly after start.");       // gt cross-property
+ClientRule(x => x.Start).LessThan(x => x.End, "Before end.");                    // lt cross-property
+ClientRule(x => x.Start).LessThanOrEqualTo(x => x.End, "Not after end.");        // max cross-property
 ```
 
-### Server-Only (Not Extractable)
+### Server-Only
 
-These rules are silently dropped by the adapter and only enforced server-side:
+A plain `RuleFor(...)` rule is server-only by construction — nothing reaches
+the browser unless `ClientRule(...)` records it. Rules with no client-side
+equivalent stay `RuleFor`-only:
 
-| Rule | Why not extractable |
-|------|-------------------|
+| Rule | Why server-only |
+|------|-----------------|
 | `Null()` | No client-side equivalent |
 | `PrecisionScale()` | No client-side equivalent |
 | `IsInEnum()` | No client-side equivalent |
 | `IsEnumName()` | No client-side equivalent |
+| `MustAsync()` / DB lookups | Async and server state stay on the server |
 
 ## Conditional Rules
 
@@ -144,24 +152,24 @@ WhenFieldArrayContains(x => x.Tags, "urgent", () => { ... });   // array-contain
 ```csharp
 WhenFields(c => c.Field(x => x.IsEmployed).Truthy()
                   .And(c.Field(x => x.Age).Gte(18)),
-    () => { RuleFor(x => x.JobTitle).NotEmpty(); });
+    () => { ClientRule(x => x.JobTitle).Required("Required when employed."); });
 
 WhenFields(c => c.Field(x => x.CareLevel).Eq("memory-care")
                   .Or(c.Field(x => x.CareLevel).Eq("skilled-nursing")),
-    () => { RuleFor(x => x.Notes).NotEmpty(); });
+    () => { ClientRule(x => x.Notes).Required("Notes are required."); });
 
 WhenFields(c => c.Field(x => x.IsEmployed).Truthy().Not(),
-    () => { RuleFor(x => x.Notes).NotEmpty(); });
+    () => { ClientRule(x => x.Notes).Required("Notes are required."); });
 
 // Complex: (employed AND salary > 50k) OR age >= 65
 WhenFields(c =>
     c.Field(x => x.IsEmployed).Truthy()
      .And(c.Field(x => x.Salary).Gt(50000m))
      .Or(c.Field(x => x.Age).Gte(65)),
-    () => { RuleFor(x => x.Email).NotEmpty(); });
+    () => { ClientRule(x => x.Email).Required("Email is required."); });
 ```
 
-> **Dual purpose:** Every WhenField* method registers both a server-side FV `.When()` predicate and a client-side `FieldCondition` for browser evaluation. FV's `.When()` still works for server-only conditions (DB lookups, service calls).
+> **Dual purpose:** Every WhenField* method registers a server-side FV `.When()` predicate and scopes the client-side `FieldCondition` onto the `ClientRule(...)` rules declared inside it. Plain `RuleFor` inside a WhenField stays server-only. FV's `.When()` still works for server-only conditions (DB lookups, service calls).
 
 > **Case sensitivity:** WhenField value comparison is case-sensitive. The condition value must exactly match what the component gathers.
 
@@ -193,8 +201,8 @@ WhenFields(c =>
 
 | Wrong | Right | Why |
 |-------|-------|-----|
-| `RuleFor(x).Empty()` | `RuleFor(x).IsEmpty()` | FV's Empty has no interface |
-| `RuleFor(x).ExclusiveBetween(a,b)` | `RuleFor(x).IsExclusiveBetween(a,b)` | FV can't distinguish from inclusive |
+| `RuleFor(x).Empty()` alone | `ClientRule(x).Empty(message)` | client metadata is recorded through `ClientRule` (`ReactiveClientRuleBuilder.cs:89`), not extracted from FV |
+| `RuleFor(x).ExclusiveBetween(a,b)` alone | `ClientRule(x).ExclusiveRange(a,b,message)` | same — `ReactiveClientRuleBuilder.cs:158` records server rule and client metadata together |
 | `.When(x => x.Bool)` | `WhenField(x => x.Bool, () => {})` | `.When()` is server-only |
 | Manual `min` rule without shape | Let adapter set it | Runtime throws without shape |
 | `p.Element("input-id")` for inputs | `Html.InputField(plan, m => m.Prop)` | Element() is for display, not input |
@@ -208,7 +216,7 @@ WhenFields(c =>
 | `gt` | **Fails** | gt implies required |
 | All others | **Skips** | Use `required` separately for emptiness |
 
-> **Nullable fields with `gt` become effectively required.** Because `gt` fails on empty, applying `.GreaterThan(x => x.Start)` to an optional `DateTime?` field makes it required on the client even if the model allows null. There is NO extractable mechanism for "validate only when the field has a value" — `.When(x => x.Field.HasValue, ...)` is server-only and not extracted. Workaround: use a different validation strategy for optional cross-property date fields (e.g., validate server-side only, or redesign the form so the field is always required when visible via `WhenField`).
+> **Nullable fields with `gt` become effectively required.** Because `gt` fails on empty, applying `ClientRule(x => x.End).GreaterThan(x => x.Start, ...)` to an optional `DateTime?` field makes it required on the client even if the model allows null. There is NO extractable mechanism for "validate only when the field has a value" — `.When(x => x.Field.HasValue, ...)` is server-only and not extracted. Workaround: use a different validation strategy for optional cross-property date fields (e.g., validate server-side only, or redesign the form so the field is always required when visible via `WhenField`).
 
 ## Fail-Closed
 
@@ -227,4 +235,4 @@ If a rule does not fire in the browser but passes C# tests, check: (a) shape is 
 
 ## Full Guide
 
-See `docs/validation-rules-guide.md` for complete walkthrough with models, views, controllers, plan JSON examples, and date handling details.
+See the docs-site page `csharp-modules/reactivity/validation.md` for complete walkthrough with models, views, controllers, plan JSON examples, and date handling details.

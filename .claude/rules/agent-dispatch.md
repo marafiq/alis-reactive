@@ -1,8 +1,10 @@
 # Agent Dispatch — Strict Input/Output Criteria
 
-Related: `process-pipeline.md` | `process-layers.md` | `process-task-types.md`
+Related: `process-pipeline.md` | `plan-contract-boundary.md` | `process-task-types.md`
 
 This framework serves senior living communities. Residents depend on software built with it.
+The domain names the stakes, not the scope: this is a UI framework — do not reason about
+HIPAA, PHI, or healthcare compliance.
 Every agent prompt starts from one of the four templates below. Each template embeds the
 evidence contract that prevents false alarms, wasted effort, and architecture reversals.
 
@@ -10,8 +12,8 @@ evidence contract that prevents false alarms, wasted effort, and architecture re
 
 | Layer | Skills to Load | Test Command | Evidence Format |
 |-------|---------------|--------------|-----------------|
-| 1 C# | modern-csharp, bdd-testing (TDD principles) | `scripts/playwright.sh` | Playwright behavior + file:line |
-| 2 Contract | PlanTypeGenerator output | `npm run typecheck` | regenerated `plan.ts` matches C# |
+| 1 C# | modern-csharp, dotnet-xml-docs, bdd-testing (TDD principles) | `scripts/playwright.sh` | Playwright behavior + file:line |
+| 2 Contract | PlanContractGenerator output | `npm run typecheck` | regenerated `plan.ts` matches C# |
 | 3 TS | solid-ts-audit | `npm test` | vitest output + file:line |
 | 4 Browser | bdd-testing | Playwright tests | Browser state + test name |
 | 5 Docs | dotnet-xml-docs | Rider diagnostics | Sandbox-verified code example |
@@ -45,8 +47,11 @@ Task: [description]
 Layers: [from lookup table]
 Boundary crossings: [from lookup table]
 
-You are working on a Senior Living App Framework. Any lack of focus, guessing,
-or skipped verification will cost dearly. Root yourself in pragmatic excellence.
+You are working on a Senior Living App Framework. The domain names the stakes,
+not the scope: this is a UI framework — do not reason about HIPAA, PHI, or
+healthcare compliance. Any lack of focus, guessing, or skipped verification
+will cost dearly. Report each step in past tense with what it printed; a claim
+without its output is not made.
 
 FIRST: Load skills — [auto-map from Layer-Skill table]
 THEN: Read [specific file paths for the area being changed]
@@ -60,7 +65,7 @@ Guardrails:
 - Drive every boundary crossing with evidence: regenerate the TS contract + typecheck for
   C#→runtime, a failing vitest for runtime, eyes-in-browser for page behavior.
   Why: a hand-maintained contract drifts from C# silently — generation makes drift a typecheck failure.
-- Verify in browser before claiming done.
+- Done is claimed with the browser evidence: the gesture performed and what the page showed.
   Why: a quick browser check repeatedly caught more real bugs than elaborate test infrastructure.
 - After 2 fail rounds, stop coding and WebSearch.
   Why: 2 days of guessing vs 5 minutes of research (M9 in forensic index).
@@ -117,7 +122,9 @@ Output: ranked findings, most impactful first, stop when signal drops
 
 ```
 You are reviewing [what] for a Senior Living App Framework.
-Pragmatic excellence is the standard. Stakes are real.
+Residents depend on it. The domain names the stakes, not the scope: this is a
+UI framework — do not reason about HIPAA, PHI, or healthcare compliance.
+A finding without file:line and its consequence is not made.
 
 Input: [specific files, PR diff, or agent output to review]
 Criteria: 9-point evidence contract + layer-specific harness from lookup table
@@ -158,11 +165,15 @@ Sign-off requires: every kind mapped to a test or justified as untestable
 
 **Cascade preamble** (include in every BDD agent prompt):
 > You are writing Playwright tests for Alis.Reactive — a framework serving
-> senior living communities. Load skill: bdd-testing. Read the BDD Constitution
+> senior living communities. The domain names the stakes, not the scope: this
+> is a UI framework — do not reason about HIPAA, PHI, or healthcare compliance.
+> Load skill: bdd-testing. Read the BDD Constitution
 > at `memory/bdd-principles.md` before writing any test.
 > Five Rules: (1) Behavior, (2) Independent, (3) Fails when broken,
 > (4) Real interactions, (5) Blind reviewed.
 > Cardinal Rule: framework code is read-only.
+> One journey = one nested slice with its own model and view; views carry
+> real-app elements only — no echo spans, no debug divs.
 
 **7-behavior contract** per component: Renders, Interacts, Validates,
 Conditionally Validates, Live-Clears, Gathers, Submits.
@@ -199,9 +210,10 @@ Output evidence: 7-behavior contract covered, blind reviewer passes all tests
 
 ## References (read, do not duplicate)
 
-- Layer details + boundaries + harness: `process-layers.md` (auto-loaded)
-- Task types + 10-step checklist: `process-task-types.md` (auto-loaded)
-- Pipeline + speed gate + wrong plan protocol: `process-pipeline.md` (auto-loaded)
+- Canonical 5-layer model + boundaries + harness: root `CLAUDE.md` (Architecture)
+- Plan-contract boundary rituals: `plan-contract-boundary.md` (loads with plan-domain/contract files)
+- Task routing: `process-task-types.md` (auto-loaded)
+- Pipeline skills + speed gate: `process-pipeline.md` (auto-loaded)
 - BDD principles (consolidated): `memory/bdd-principles.md`
 - Quality principles (audit, review, evidence): `memory/quality-principles.md`
 - Forensic mistake patterns: `memory/forensic-master-index.md`

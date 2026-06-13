@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>FusionGrid Raw EJ2 dataSource Read Refresh Probe</title>
+    <link rel="stylesheet" href="/css/syncfusion.dev.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #grid-host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>FusionGrid Raw EJ2 dataSource Read Refresh Probe</h1>
+    <p>
+        Focus: prove the EJ2 Grid object exposes a readable/writable
+        <code>dataSource</code> property and that <code>refresh()</code> applies
+        a post-render replacement to visible rows.
+    </p>
+    <div id="grid-host">
+        <div id="grid"></div>
+    </div>
+
+    <button id="dump">Dump Trace</button>
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+
+        function clean(value) {
+            if (value === null || value === undefined) return value;
+            if (Array.isArray(value)) return value.map(clean);
+            if (typeof value !== "object") return value;
+            const output = {};
+            for (const key of Object.keys(value).sort()) {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item);
+            }
+            return output;
+        }
+
+        function record(label, value) {
+            trace.push({ label, value: clean(value) });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        function visibleRows() {
+            return Array.from(document.querySelectorAll("#grid .e-row"))
+                .map(row => Array.from(row.querySelectorAll(".e-rowcell"))
+                    .map(cell => cell.textContent.trim()));
+        }
+
+        function waitForVisibleName(name) {
+            return new Promise((resolve, reject) => {
+                const started = performance.now();
+                const tick = () => {
+                    if (visibleRows().some(row => row.includes(name))) {
+                        resolve();
+                        return;
+                    }
+                    if (performance.now() - started > 5000) {
+                        reject(new Error("Timed out waiting for visible row " + name));
+                        return;
+                    }
+                    requestAnimationFrame(tick);
+                };
+                tick();
+            });
+        }
+
+        window.__fusionProbe = { trace, record };
+
+        const initialRows = [
+            { id: 1, name: "Alpha", status: "Open" },
+            { id: 2, name: "Beta", status: "Closed" }
+        ];
+        const replacementRows = [
+            { id: 10, name: "Delta", status: "Active" },
+            { id: 11, name: "Echo", status: "Active" },
+            { id: 12, name: "Foxtrot", status: "Review" }
+        ];
+
+        const grid = new ej.grids.Grid({
+            dataSource: initialRows,
+            columns: [
+                { field: "id", headerText: "ID", width: 80, textAlign: "Right" },
+                { field: "name", headerText: "Name", width: 160 },
+                { field: "status", headerText: "Status", width: 140 }
+            ]
+        });
+
+        grid.appendTo("#grid");
+        window.__grid = grid;
+
+        (async () => {
+            await waitForVisibleName("Alpha");
+            record("ready", {
+                dataSourceLength: grid.dataSource.length,
+                visibleRows: visibleRows()
+            });
+
+            record("dataSource read before replacement", grid.dataSource);
+
+            grid.dataSource = replacementRows;
+            record("dataSource read after assignment before refresh", grid.dataSource);
+
+            const refreshResult = grid.refresh();
+            record("refresh() return", {
+                type: typeof refreshResult,
+                value: refreshResult === undefined ? "undefined" : refreshResult
+            });
+
+            await waitForVisibleName("Delta");
+            record("visible rows after refresh", visibleRows());
+            record("complete", {
+                dataSourceLength: grid.dataSource.length,
+                firstVisibleName: visibleRows()[0]?.[1] ?? "",
+                lastVisibleName: visibleRows().at(-1)?.[1] ?? ""
+            });
+        })().catch(error => record("error", { message: String(error) }));
+
+        document.getElementById("dump").addEventListener("click", () => {
+            record("manual dump", {
+                dataSourceLength: grid.dataSource.length,
+                visibleRows: visibleRows()
+            });
+        });
+    </script>
+</body>
+</html>

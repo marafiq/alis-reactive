@@ -1,6 +1,6 @@
 # Deterministic Fusion Onboarding Skill Goal
 
-> Superseded by `docs/superpowers/plans/final-deterministic-fusion-onboarding-goal.md`.
+> Superseded by `docs/archive-history/final-deterministic-fusion-onboarding-goal.md`.
 > Use the final goal document as the authority. This earlier draft is historical
 > reviewer context only; do not use any stale array wording here to override the
 > current proper array primitive rule.

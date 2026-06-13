@@ -1,0 +1,127 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "data-state-change-sorting-header-click",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-data-state-change-sorting-header-click.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "hasHeader": true,
+        "header": {
+          "className": "e-headercell e-mousepointer",
+          "id": "",
+          "kind": "Element",
+          "tagName": "TH",
+          "text": "NamePress Enter to sort"
+        },
+        "headers": [
+          {
+            "ariaLabel": null,
+            "className": "e-headercell e-rightalign e-mousepointer",
+            "text": "IDPress Enter to sort"
+          },
+          {
+            "ariaLabel": null,
+            "className": "e-headercell e-mousepointer",
+            "text": "NamePress Enter to sort"
+          },
+          {
+            "ariaLabel": null,
+            "className": "e-headercell e-mousepointer",
+            "text": "StatusPress Enter to sort"
+          },
+          {
+            "ariaLabel": null,
+            "className": "e-headercell e-lastcell e-mousepointer",
+            "text": "RiskPress Enter to sort"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "event:dataStateChange:sorting-header-click",
+      "value": {
+        "absentKeysChecked": [
+          "where",
+          "search",
+          "group"
+        ],
+        "ownKeys": [
+          "action",
+          "name",
+          "requiresCounts",
+          "skip",
+          "sorted",
+          "take"
+        ],
+        "properties": {
+          "action": {
+            "sample": {
+              "cancel": false,
+              "columnName": "name",
+              "direction": "Ascending",
+              "name": "actionBegin",
+              "requestType": "sorting",
+              "target": {
+                "className": "e-headercell e-mousepointer e-focus",
+                "id": "",
+                "kind": "Element",
+                "tagName": "TH",
+                "text": "NamePress Enter to sort"
+              },
+              "type": "actionBegin"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "dataStateChange",
+            "type": "string"
+          },
+          "requiresCounts": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "skip": {
+            "sample": 0,
+            "type": "number"
+          },
+          "sorted": {
+            "sample": [
+              {
+                "direction": "ascending",
+                "name": "name"
+              }
+            ],
+            "type": "array"
+          },
+          "take": {
+            "sample": 2,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "header-click:after",
+      "value": {
+        "sortedColumns": [
+          {
+            "direction": "Ascending",
+            "field": "name"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "complete",
+      "value": {
+        "traceRows": 4
+      }
+    }
+  ]
+}

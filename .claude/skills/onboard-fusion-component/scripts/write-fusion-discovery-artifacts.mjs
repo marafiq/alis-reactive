@@ -13,7 +13,7 @@ const dtsPath = requireArg(args, "dts");
 const jsPath = args.js ?? "";
 const xmlPath = requireArg(args, "xml");
 const apiSet = args["api-set"] ?? "core";
-const artifactRoot = resolve(`tools/FusionOnboarding/wwwroot/onboarding/fusion/${component}`);
+const artifactRoot = resolve(args.root ?? `tools/FusionOnboarding/wwwroot/onboarding/fusion/${component}`);
 const dtsRoot = args["dts-root"] ?? "node_modules/@syncfusion";
 const blazorPackage = args["blazor-package"] ?? "";
 const blazorVersion = args["blazor-version"] ?? "";
@@ -36,7 +36,11 @@ const publicMembers = extractMembers(classBody)
   .map(member => describePublicMember(member, builderMethods, dtsPath))
   .sort(byMember);
 const events = publicMembers.filter(member => member.kind === "event");
-const eventPayloads = discoverEventPayloads(events, dtsRoot);
+const eventPayloads = discoverEventPayloads(events, dtsRoot, dtsPath);
+const payloadProblems = payloadResolutionProblems(eventPayloads);
+if (payloadProblems.length > 0) {
+  fail(`Event payload discovery is not deterministic:\n${payloadProblems.map(problem => `- ${problem}`).join("\n")}`);
+}
 const blazorReport = inspectBlazor({ blazorPackage, blazorVersion, className });
 
 const files = new Map([
@@ -299,30 +303,78 @@ function extractBuilderMethods(xmlText, builderName) {
   return uniqueRows(rows, row => `${row.name}(${row.signature})`).sort(byName);
 }
 
-function discoverEventPayloads(events, root) {
+function discoverEventPayloads(events, root, sourcePath) {
   const files = walk(root).filter(file => file.endsWith(".d.ts"));
   const cache = new Map();
+  const imports = buildImportIndex(sourcePath);
   return events.map(event => {
     const typeNames = event.type.split("|").map(type => cleanTypeName(type)).filter(Boolean);
     return {
       event: event.name,
       eventType: event.type,
-      payloadTypes: typeNames.map(typeName => describeType(typeName, files, cache))
+      payloadTypes: typeNames.map(typeName => describeType(typeName, files, cache, {
+        currentFile: sourcePath,
+        dtsRoot: root,
+        imports
+      }))
     };
   });
 }
 
-function describeType(typeName, files, cache, stack = []) {
-  if (cache.has(typeName)) return cache.get(typeName);
+function describeType(typeName, files, cache, context, stack = []) {
+  if (isBuiltinPayloadType(typeName)) {
+    return {
+      name: typeName,
+      status: "builtin-object",
+      sourcePath: "",
+      extends: [],
+      members: [],
+      decision: "broad vendor object; record in discovery, require focused runtime row before public C# DSL"
+    };
+  }
+
+  const cacheKey = resolutionCacheKey(typeName, context);
+  if (cache.has(cacheKey)) return cache.get(cacheKey);
   if (stack.includes(typeName)) {
     return { name: typeName, status: "cycle", sourcePath: "", extends: [], members: [] };
   }
 
-  const declaration = findDeclaration(typeName, files);
+  const declaration = findDeclaration(typeName, files, context);
+  if (declaration?.ambiguous) {
+    const ambiguous = {
+      name: typeName,
+      status: "ambiguous",
+      sourcePath: "",
+      candidates: declaration.candidates,
+      extends: [],
+      members: []
+    };
+    cache.set(cacheKey, ambiguous);
+    return ambiguous;
+  }
+
   if (!declaration) {
     const missing = { name: typeName, status: "not-found", sourcePath: "", extends: [], members: [] };
-    cache.set(typeName, missing);
+    cache.set(cacheKey, missing);
     return missing;
+  }
+
+  if (declaration.aliasOf) {
+    const resolvedAlias = describeType(cleanTypeName(declaration.aliasOf), files, cache, {
+      currentFile: declaration.sourcePath,
+      dtsRoot: context.dtsRoot,
+      imports: buildImportIndex(declaration.sourcePath)
+    }, [...stack, typeName]);
+    const result = {
+      ...resolvedAlias,
+      name: typeName,
+      status: resolvedAlias.status === "found" ? "found" : resolvedAlias.status,
+      sourcePath: declaration.sourcePath,
+      aliasOf: declaration.aliasOf,
+      members: resolvedAlias.members.map(member => ({ ...member, inheritedVia: cleanTypeName(declaration.aliasOf) }))
+    };
+    cache.set(cacheKey, result);
+    return result;
   }
 
   const directMembers = extractMembers(declaration.body)
@@ -332,10 +384,14 @@ function describeType(typeName, files, cache, stack = []) {
       type: member.type,
       declaredOn: typeName,
       sourcePath: declaration.sourcePath
-    }))
-    .sort(byMember);
+  }))
+  .sort(byMember);
   const inherited = declaration.extends
-    .map(base => describeType(base, files, cache, [...stack, typeName]))
+    .map(base => describeType(base, files, cache, {
+      currentFile: declaration.sourcePath,
+      dtsRoot: context.dtsRoot,
+      imports: buildImportIndex(declaration.sourcePath)
+    }, [...stack, typeName]))
     .flatMap(base => base.members.map(member => ({ ...member, inheritedVia: base.name })));
   const result = {
     name: typeName,
@@ -344,24 +400,131 @@ function describeType(typeName, files, cache, stack = []) {
     extends: declaration.extends,
     members: [...directMembers, ...inherited].sort(byMember)
   };
-  cache.set(typeName, result);
+  cache.set(cacheKey, result);
   return result;
 }
 
-function findDeclaration(typeName, files) {
+function findDeclaration(typeName, files, context) {
+  const candidates = [];
   for (const file of files) {
     const text = readFileSync(file, "utf8");
     const expression = new RegExp(`(?:export\\s+declare\\s+|export\\s+|declare\\s+)?(interface|class)\\s+${escapeRegExp(typeName)}\\b([^\\{]*)\\{`, "g");
     const match = expression.exec(text);
-    if (!match) continue;
-    const open = text.indexOf("{", match.index);
-    return {
-      sourcePath: file,
-      body: readBalancedBody(text, open),
-      extends: extractExtends(match[2])
-    };
+    const aliasExpression = new RegExp(`(?:export\\s+declare\\s+|export\\s+|declare\\s+)?type\\s+${escapeRegExp(typeName)}\\s*=\\s*([^;]+);`, "g");
+    const aliasMatch = aliasExpression.exec(text);
+    if (match) {
+      const open = text.indexOf("{", match.index);
+      candidates.push({
+        sourcePath: file,
+        body: readBalancedBody(text, open),
+        extends: extractExtends(match[2])
+      });
+    }
+    if (aliasMatch) {
+      candidates.push({
+        sourcePath: file,
+        aliasOf: aliasMatch[1].trim()
+      });
+    }
   }
-  return null;
+
+  if (candidates.length === 0) return null;
+
+  const importedFrom = context.imports.get(typeName);
+  if (importedFrom) {
+    const importTarget = resolveImportTarget(importedFrom, context.currentFile, context.dtsRoot);
+    const importedMatches = candidates.filter(candidate => matchesImportTarget(candidate.sourcePath, importTarget));
+    if (importedMatches.length === 1) return importedMatches[0];
+    if (importedMatches.length > 1) {
+      return { ambiguous: true, candidates: importedMatches.map(candidate => candidate.sourcePath).sort() };
+    }
+  }
+
+  const currentPackage = syncfusionPackageRoot(context.currentFile);
+  const packageMatches = currentPackage
+    ? candidates.filter(candidate => normalizePath(candidate.sourcePath).startsWith(currentPackage))
+    : [];
+  if (packageMatches.length === 1) return packageMatches[0];
+  if (packageMatches.length > 1) {
+    return { ambiguous: true, candidates: packageMatches.map(candidate => candidate.sourcePath).sort() };
+  }
+
+  return {
+    ambiguous: true,
+    candidates: candidates.map(candidate => candidate.sourcePath).sort(),
+    reason: "type declaration is not reachable from the component import graph or current package"
+  };
+}
+
+function buildImportIndex(sourcePath) {
+  if (!sourcePath || !existsSync(sourcePath)) return new Map();
+  const text = readFileSync(sourcePath, "utf8");
+  const imports = new Map();
+  const expression = /import\s+(?:type\s+)?\{([^}]+)\}\s+from\s+['"]([^'"]+)['"]/g;
+  let match;
+  while ((match = expression.exec(text)) !== null) {
+    const names = match[1].split(",").map(item => item.trim()).filter(Boolean);
+    for (const name of names) {
+      const localName = name.includes(" as ") ? name.split(/\s+as\s+/).at(-1).trim() : name;
+      imports.set(localName, match[2]);
+    }
+  }
+  return imports;
+}
+
+function resolveImportTarget(importedFrom, currentFile, dtsRoot) {
+  if (importedFrom.startsWith(".")) {
+    const target = normalizePath(join(dirname(currentFile), importedFrom));
+    return existsSync(`${target}.d.ts`) ? `${target}.d.ts` : target;
+  }
+
+  if (importedFrom.startsWith("@syncfusion/")) {
+    const rootPrefix = normalizePath(dtsRoot).replace(/\/@syncfusion$/u, "");
+    const packageName = importedFrom.split("/").slice(0, 2).join("/");
+    return `${rootPrefix}/${packageName}`;
+  }
+
+  return importedFrom;
+}
+
+function matchesImportTarget(sourcePath, importTarget) {
+  const source = normalizePath(sourcePath);
+  const target = normalizePath(importTarget);
+  return source === target || source.startsWith(`${target}/`);
+}
+
+function syncfusionPackageRoot(sourcePath) {
+  const normalized = normalizePath(sourcePath);
+  const match = normalized.match(/^(.*node_modules\/@syncfusion\/[^/]+)/u);
+  return match ? match[1] : "";
+}
+
+function payloadResolutionProblems(events) {
+  const problems = [];
+  for (const event of events) {
+    for (const payload of event.payloadTypes ?? []) {
+      if (payload.status === "ambiguous") {
+        const candidates = (payload.candidates ?? []).join(", ");
+        problems.push(`${event.event}.${payload.name} is ambiguous${candidates ? `: ${candidates}` : ""}`);
+      }
+      if (payload.status === "not-found") {
+        problems.push(`${event.event}.${payload.name} was not found in reachable Syncfusion declarations`);
+      }
+    }
+  }
+  return problems;
+}
+
+function isBuiltinPayloadType(typeName) {
+  return ["Object", "object", "Function", "Record"].includes(typeName);
+}
+
+function resolutionCacheKey(typeName, context) {
+  return [
+    typeName,
+    normalizePath(context.currentFile || ""),
+    context.imports.get(typeName) || ""
+  ].join("|");
 }
 
 function extractExtends(header) {
@@ -689,7 +852,7 @@ Playwright proof -> audit report
 
 | Use Case | API Members | Event Payloads | Builder-Owned? | Primitive | C# Target | Proof Status |
 |---|---|---|---|---|---|---|
-| component inventory | current Fusion source, sandbox, and tests inventoried | n/a | n/a | n/a | n/a | inventory committed |
+| component inventory | current Fusion source, sandbox, and tests inventoried | n/a | n/a | n/a | n/a | inventory artifact linked |
 | shipped EJ2 static discovery | [public-api-surface.json](discovery/public-api-surface.json) | [event-payload-surface.json](discovery/event-payload-surface.json) | [mvc-builder-coverage.md](discovery/mvc-builder-coverage.md) | pending mapping | pending naming | static-discovery only |
 | raw EJ2 ${apiSet} probe | [raw-ej2-${apiSet}.html](probes/raw-ej2-${apiSet}.html) | pending runtime gesture traces | pending runtime confirmation | pending mapping | pending naming | trace not yet executed |
 
@@ -764,6 +927,10 @@ function uniqueRows(rows, keySelector) {
 
 function unique(values) {
   return Array.from(new Set(values)).sort();
+}
+
+function normalizePath(value) {
+  return value.replace(/\\/g, "/");
 }
 
 function byName(left, right) {

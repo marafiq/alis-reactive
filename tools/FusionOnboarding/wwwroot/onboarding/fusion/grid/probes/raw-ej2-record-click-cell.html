@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>FusionGrid recordClick Cell Raw EJ2 Probe</title>
+    <link rel="stylesheet" href="/css/syncfusion.dev.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #grid-host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>FusionGrid recordClick Cell Raw EJ2 Probe</h1>
+    <p>One event row: <code>recordClick</code> fired by a visible data cell click.</p>
+    <div id="grid-host">
+        <div id="grid"></div>
+    </div>
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const rows = [
+            { id: 1, name: "Alpha", careLevel: "Memory Care", wing: "North" },
+            { id: 2, name: "Beta", careLevel: "Assisted Living", wing: "South" },
+            { id: 3, name: "Gamma", careLevel: "Memory Care", wing: "East" }
+        ];
+
+        function clean(value, seen = new WeakSet(), depth = 0) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return summarizeElement(value);
+            if (value instanceof MouseEvent) return summarizeMouseEvent(value);
+            if (depth > 5) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).sort().forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function summarizeElement(value) {
+            return {
+                kind: "Element",
+                id: value.id || "",
+                tagName: value.tagName,
+                className: value.className || "",
+                ariaColIndex: value.getAttribute("aria-colindex") || "",
+                ariaRowIndex: value.getAttribute("aria-rowindex") || "",
+                text: (value.textContent || "").replace(/\s+/g, " ").trim()
+            };
+        }
+
+        function summarizeMouseEvent(value) {
+            return {
+                kind: "MouseEvent",
+                type: value.type,
+                button: value.button,
+                buttons: value.buttons,
+                detail: value.detail,
+                target: value.target instanceof Element ? summarizeElement(value.target) : null
+            };
+        }
+
+        function summarizeColumn(value) {
+            if (!value || typeof value !== "object") return null;
+            return {
+                field: value.field,
+                headerText: value.headerText,
+                index: value.index,
+                uid: value.uid ? "[uid]" : ""
+            };
+        }
+
+        function summarizeRecordClick(args) {
+            if (!args) return null;
+            return {
+                name: args.name,
+                rowIndex: args.rowIndex,
+                cellIndex: args.cellIndex,
+                rowData: clean(args.rowData),
+                column: summarizeColumn(args.column),
+                cell: args.cell instanceof Element ? summarizeElement(args.cell) : null,
+                row: args.row instanceof Element ? summarizeElement(args.row) : null,
+                target: args.target instanceof Element ? summarizeElement(args.target) : null,
+                event: args.event instanceof MouseEvent ? summarizeMouseEvent(args.event) : null,
+                cancel: args.cancel,
+                foreignKeyData: clean(args.foreignKeyData)
+            };
+        }
+
+        function describePayload(args) {
+            if (args === null || args === undefined) {
+                return { ownKeys: [], properties: {}, value: args === undefined ? "undefined" : null };
+            }
+            const ownKeys = Object.keys(args).sort();
+            const properties = {};
+            ownKeys.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === null ? "null" : Array.isArray(item) ? "array" : item instanceof Element ? "element" : item instanceof MouseEvent ? "mouse-event" : typeof item,
+                    sample: summarizePayloadProperty(key, item)
+                };
+            });
+            return {
+                ownKeys,
+                properties,
+                recordClickShape: summarizeRecordClick(args)
+            };
+        }
+
+        function summarizePayloadProperty(key, item) {
+            if (key === "column") return summarizeColumn(item);
+            if (["cell", "row", "target"].includes(key)) {
+                return item instanceof Element ? summarizeElement(item) : null;
+            }
+            if (key === "event") {
+                return item instanceof MouseEvent ? summarizeMouseEvent(item) : null;
+            }
+            return clean(item);
+        }
+
+        function record(label, value) {
+            trace.push({ at: new Date().toISOString(), label, value: clean(value) });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        window.__fusionProbe = { trace, record };
+
+        const grid = new ej.grids.Grid({
+            dataSource: rows,
+            columns: [
+                { field: "id", headerText: "ID", width: 90, isPrimaryKey: true, textAlign: "Right" },
+                { field: "name", headerText: "Name", width: 160 },
+                { field: "careLevel", headerText: "Care Level", width: 160 },
+                { field: "wing", headerText: "Wing", width: 120 }
+            ],
+            recordClick: args => {
+                record("event:recordClick:cell", describePayload(args));
+            }
+        });
+
+        grid.appendTo(document.getElementById("grid"));
+        window.__fusionProbe.ej2 = grid;
+
+        async function nextFrame() {
+            await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        }
+
+        async function waitForRows() {
+            for (let attempt = 0; attempt < 60; attempt++) {
+                const rows = document.querySelectorAll("#grid .e-row");
+                if (rows.length > 0) return rows;
+                await nextFrame();
+            }
+            throw new Error("Grid rows did not render");
+        }
+
+        async function run() {
+            await waitForRows();
+            record("ready", {
+                rowCount: document.querySelectorAll("#grid .e-row").length,
+                firstRowCells: [...document.querySelectorAll("#grid .e-row:first-child .e-rowcell")]
+                    .map(cell => cell.textContent.replace(/\s+/g, " ").trim())
+            });
+            const nameCell = document.querySelector("#grid .e-row:first-child .e-rowcell:nth-child(2)");
+            nameCell.click();
+            await nextFrame();
+            record("click:cell", {
+                clickedText: nameCell.textContent.replace(/\s+/g, " ").trim(),
+                traceRows: trace.length + 1
+            });
+            record("complete", { traceRows: trace.length + 1 });
+        }
+
+        run().catch(error => record("error", { message: String(error), stack: error && error.stack }));
+    </script>
+</body>
+</html>

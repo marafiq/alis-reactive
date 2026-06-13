@@ -358,7 +358,7 @@ WhenFields(c => c.Field(x => x.Status).Eq("Discharged").Not(), () =>
 
 ## How do nested validators handle conditions?
 
-When a validator uses `SetValidator()` for a nested property, conditions compose automatically:
+When a validator registers a nested validator with `ClientRule(field, validator)`, conditions compose automatically:
 
 ```csharp
 public class ResidentIntakeValidator : ReactiveValidator<ResidentIntakeModel>
@@ -367,7 +367,7 @@ public class ResidentIntakeValidator : ReactiveValidator<ResidentIntakeModel>
     {
         WhenField(x => x.HasInsurance, () =>
         {
-            RuleFor(x => x.Insurance).SetValidator(new InsuranceValidator());
+            ClientRule(x => x.Insurance, new InsuranceValidator());
         });
     }
 }

@@ -139,7 +139,14 @@ export function validationContainer(id: string, validationRules: ComponentValida
 export function validationRule(componentKey: string, message = `${componentKey} required`): ComponentValidation {
   return {
     component: componentKey,
-    value: { kind: "none" },
+    value: {
+      kind: "read",
+      from: { kind: "component", component: componentKey },
+      member: "value",
+      path: [],
+      shape: { kind: "string" },
+      access: { kind: "property" },
+    },
     serverFieldName: componentKey,
     rules: [
       {

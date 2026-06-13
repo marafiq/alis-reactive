@@ -27,7 +27,7 @@ namespace Alis.Reactive.PlanModel
     /// Used across value expressions, conditions, and validation to ensure type consistency.
     /// </summary>
     [JsonConverter(typeof(ShapeJsonConverter))]
-    public sealed class Shape : IEquatable<Shape>
+    internal sealed class Shape : IEquatable<Shape>
     {
         internal static readonly Shape String = Scalar("string");
         internal static readonly Shape Number = Scalar("number");

@@ -11,7 +11,7 @@ type: reference
 The public API surface does not change without explicit user approval and full downstream
 analysis. A single parameter rename cascaded across 170+ files in 6 commits.
 
-- A hookify rule blocks API surface edits at the tool level.
+- No live hook blocks API surface edits (hookify templates are disabled) — review manually.
 - Before any change: grep all call sites, read every affected file, present evidence.
 - `internal` to `public` is strictly forbidden. Internal members protect the surface deliberately.
 - Fusion HtmlExtension methods use the `Fusion` prefix (e.g., `.FusionDropDownList()`).
@@ -38,7 +38,7 @@ values propagate silently. A fallback is a rare, deliberate, justified exception
 - No silent fallbacks or default values for missing data — throw immediately.
 - No string matching on type names (`GetType().Name.Contains(...)`) — create proper interfaces.
 - No reflection hacks — use compile-time type safety.
-- No "backward compat" shims — if the schema changes, update all consumers.
+- No "backward compat" shims — if the contract changes, update all consumers.
 - No `// TODO` or `// FIXME` — fix it now or don't write it.
 - If a third-party library lacks the interface you need, write your own.
 - If it feels like a workaround, it IS a workaround — find the clean solution.
@@ -125,3 +125,39 @@ These patterns are forbidden. Each was learned the hard way.
 5. **Claiming "all tests pass" while the browser is broken.** Passing tests are necessary but not sufficient. Done means: tests pass AND browser works AND user confirms. Test count means nothing — test quality catches bugs.
 
 6. **Ignoring user feedback and continuing to patch.** When told to stop patching, ACTUALLY STOP. Step back, read the code, think, then make ONE correct change.
+
+## Code Hygiene — Worked Examples
+
+Root CLAUDE.md Rule 11 states the principles; these are the worked examples.
+
+**Revealing names over complex conditions.** Extract boolean expressions into named
+variables that explain intent. The name is the documentation.
+
+```csharp
+// Wrong: condition is opaque
+if (field.Shape != null && field.Shape.Kind != "none" && !field.IsServerOnly)
+    ExtractRule(field);
+
+// Right: name reveals intent
+var requiresClientValidation = field.Shape != null && field.Shape.Kind != "none" && !field.IsServerOnly;
+if (requiresClientValidation)
+    ExtractRule(field);
+```
+
+**Avoid nesting.** Use early returns and guard clauses to flatten control flow.
+
+```csharp
+// Wrong: nested
+if (component != null)
+{
+    if (component.Vendor == "fusion")
+    {
+        // 20 lines of logic
+    }
+}
+
+// Right: guard clause, flat
+if (component == null) return;
+if (component.Vendor != "fusion") return;
+// 20 lines of logic
+```

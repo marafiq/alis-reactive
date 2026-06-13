@@ -22,4 +22,21 @@ public sealed class FusionContextMenuLocator
     public ILocator CloseButton => _page.Locator("#close-context-menu-btn");
 
     public ILocator Item(string text) => _page.GetByRole(AriaRole.Menuitem, new() { Name = text });
+
+    /// <summary>
+    /// Right-clicks the target and retries once if the menu does not appear —
+    /// on slow machines the first right-click can land before EJ2 wires its handler.
+    /// </summary>
+    public async Task RightClickTarget()
+    {
+        await Target.ClickAsync(new() { Button = MouseButton.Right });
+        try
+        {
+            await Root.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 2000 });
+        }
+        catch (TimeoutException)
+        {
+            await Target.ClickAsync(new() { Button = MouseButton.Right });
+        }
+    }
 }

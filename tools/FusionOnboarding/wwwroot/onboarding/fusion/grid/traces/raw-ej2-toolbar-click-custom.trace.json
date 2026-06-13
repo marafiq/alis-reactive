@@ -1,0 +1,134 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "grid",
+  "apiSet": "toolbar-click-custom",
+  "probe": "onboarding/fusion/grid/probes/raw-ej2-toolbar-click-custom.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "rowCount": 0,
+        "toolbarItemId": "emailStatements",
+        "toolbarItemText": "Email Statements"
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "event:toolbarClick:custom",
+      "value": {
+        "ownKeys": [
+          "cancel",
+          "item",
+          "name",
+          "originalEvent"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "item": {
+            "sample": {
+              "align": "Left",
+              "disabled": false,
+              "id": "emailStatements",
+              "ownKeys": [
+                "callChildDataBind",
+                "changedProperties",
+                "childChangedProperties",
+                "controlParent",
+                "finalUpdate",
+                "isComplexArraySetter",
+                "isParentArray",
+                "oldProperties",
+                "parentObj",
+                "propName",
+                "properties"
+              ],
+              "prefixIcon": "e-icons e-send-1",
+              "suffixIcon": "",
+              "text": "Email Statements",
+              "tooltipText": "Email statements",
+              "type": "Button",
+              "visible": true
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "toolbarClick",
+            "type": "string"
+          },
+          "originalEvent": {
+            "sample": {
+              "kind": "PointerEvent",
+              "target": {
+                "className": "e-tbar-btn e-tbtn-txt e-control e-btn e-lib",
+                "id": "emailStatements",
+                "kind": "Element",
+                "tagName": "BUTTON",
+                "text": "Email Statements"
+              },
+              "type": "click"
+            },
+            "type": "event"
+          }
+        },
+        "toolbarClickShape": {
+          "cancel": false,
+          "item": {
+            "align": "Left",
+            "disabled": false,
+            "id": "emailStatements",
+            "ownKeys": [
+              "callChildDataBind",
+              "changedProperties",
+              "childChangedProperties",
+              "controlParent",
+              "finalUpdate",
+              "isComplexArraySetter",
+              "isParentArray",
+              "oldProperties",
+              "parentObj",
+              "propName",
+              "properties"
+            ],
+            "prefixIcon": "e-icons e-send-1",
+            "suffixIcon": "",
+            "text": "Email Statements",
+            "tooltipText": "Email statements",
+            "type": "Button",
+            "visible": true
+          },
+          "name": "toolbarClick",
+          "originalEvent": {
+            "kind": "PointerEvent",
+            "target": {
+              "className": "e-tbar-btn e-tbtn-txt e-control e-btn e-lib",
+              "id": "emailStatements",
+              "kind": "Element",
+              "tagName": "BUTTON",
+              "text": "Email Statements"
+            },
+            "type": "click"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "click:toolbar-custom",
+      "value": {
+        "clickedText": "Email Statements",
+        "traceRows": 3
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "complete",
+      "value": {
+        "traceRows": 4
+      }
+    }
+  ]
+}
