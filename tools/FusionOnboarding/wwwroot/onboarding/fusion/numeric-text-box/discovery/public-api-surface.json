@@ -418,7 +418,7 @@
     "builderName": "NumericTextBoxBuilder",
     "className": "NumericTextBox",
     "dtsPath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
-    "jsPath": "",
+    "jsPath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.js",
     "namespace": "ej.inputs",
     "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
   }
