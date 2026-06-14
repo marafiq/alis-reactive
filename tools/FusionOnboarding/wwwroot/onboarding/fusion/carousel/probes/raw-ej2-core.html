@@ -8,6 +8,7 @@
     <style>
         body { font-family: system-ui, sans-serif; margin: 20px; }
         #carousel-host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        .carousel-slide { display: flex; flex-direction: column; gap: 8px; padding: 24px; }
         table { border-collapse: collapse; margin: 16px 0; width: 100%; }
         th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
         th { background: #f6f8fa; }
@@ -17,7 +18,20 @@
 </head>
 <body>
     <h1>FusionCarousel Raw EJ2 core Probe</h1>
-    <p>Status: generated static probe. Execute in the sandbox/browser, interact with the component, then save <code>window.__fusionProbe.trace</code> as <code>traces/raw-ej2-core.trace.json</code>.</p>
+    <p>
+        Raw <code>ej.navigations.Carousel</code> probe for the <strong>Guided Care-Plan Review</strong>
+        journey: three care-plan section slides (Medications, Therapy Goals, Discharge Steps), manual
+        navigation only (autoplay and play-button off). Medications (index 0) is the locked sign-off
+        gate: any move that would land back on it (<code>nextIndex === 0</code>) is cancelled via
+        <code>args.cancel = true</code>. Drives only the onboarded runtime surface
+        (<code>selectedIndex</code> read, <code>next()</code>/<code>prev()</code>,
+        <code>slideChanging</code>/<code>slideChanged</code> payloads, payload <code>cancel</code> write).
+        Empirical note proven by this probe: a <code>prev()</code> from index 0 does NOT raise
+        <code>slideChanging</code> at all (EJ2 short-circuits it), so the cancel guard must key on
+        <code>nextIndex === 0</code> (a Previous from index 1), the move EJ2 actually raises.
+        Execute through <code>run-fusion-probe-trace.mjs --component carousel --api-set core</code>;
+        the trace is saved as <code>traces/raw-ej2-core.trace.json</code>.
+    </p>
     <div id="carousel-host">
         <div id="carousel"></div>
     </div>
@@ -29,13 +43,13 @@
     <table>
         <thead><tr><th>JS Member</th><th>Kind</th><th>Type</th><th>Builder</th><th>Decision</th></tr></thead>
         <tbody>
-<tr><td><code>destroy</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>skip: lifecycle cleanup, not Fusion plan behavior</td></tr>
-<tr><td><code>next</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
-<tr><td><code>pause</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
-<tr><td><code>play</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
-<tr><td><code>prev</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
-<tr><td><code>slideChanged</code></td><td>event</td><td>SlideChangedEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
-<tr><td><code>slideChanging</code></td><td>event</td><td>SlideChangingEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>selectedIndex</code></td><td>property</td><td>number</td><td>initial value yes; runtime read no</td><td>runtime property read: SelectedIndex()</td></tr>
+<tr><td><code>next</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>runtime method: Next() advances one slide</td></tr>
+<tr><td><code>prev</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>runtime method: Previous() moves back one slide</td></tr>
+<tr><td><code>play</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>excluded: autoplay transport, no use in a deliberate review (parity-accounting.json)</td></tr>
+<tr><td><code>pause</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>excluded: autoplay transport, partner of play() (parity-accounting.json)</td></tr>
+<tr><td><code>slideChanged</code></td><td>event</td><td>SlideChangedEventArgs</td><td>yes</td><td>typed event: currentIndex/previousIndex/isSwiped/slideDirection</td></tr>
+<tr><td><code>slideChanging</code></td><td>event</td><td>SlideChangingEventArgs</td><td>yes</td><td>typed event: currentIndex/nextIndex/isSwiped/slideDirection plus writable cancel</td></tr>
         </tbody>
     </table>
 
@@ -74,12 +88,7 @@
 
         function describePayload(args) {
             if (args === null || args === undefined) {
-                return {
-                    ownKeys: [],
-                    functions: [],
-                    properties: {},
-                    value: args === undefined ? "undefined" : null
-                };
+                return { ownKeys: [], functions: [], properties: {}, value: args === undefined ? "undefined" : null };
             }
             const own = Object.keys(args).sort();
             const properties = {};
@@ -108,37 +117,59 @@
         };
         window.__fusionProbe = probe;
 
+        function slide(section, detail) {
+            return "<div class='carousel-slide'><strong>" + section + "</strong><span>" + detail + "</span></div>";
+        }
+
         const ej2 = new ej.navigations.Carousel({
-            dataSource: [
-                { id: 1, name: "Alpha", status: "Open" },
-                { id: 2, name: "Beta", status: "Closed" },
-                { id: 3, name: "Gamma", status: "Open" }
+            items: [
+                { template: slide("Medications", "Current prescriptions and timing.") },
+                { template: slide("Therapy Goals", "Mobility targets for this week.") },
+                { template: slide("Discharge Steps", "Family teaching and follow-up tasks.") }
             ],
-            columns: [
-                { field: "id", headerText: "ID", width: 90, textAlign: "Right" },
-                { field: "name", headerText: "Name", width: 160 },
-                { field: "status", headerText: "Status", width: 140 }
-            ],
-            allowPaging: true,
-            allowSorting: true,
-            allowFiltering: true,
-            pageSettings: { pageSize: 2 },
-            slideChanged: args => probe.event("slideChanged", args),
-                slideChanging: args => probe.event("slideChanging", args)
+            selectedIndex: 0,
+            animationEffect: "None",
+            autoPlay: false,
+            buttonsVisibility: "Hidden",
+            showIndicators: false,
+            showPlayButton: false,
+            allowKeyboardInteraction: false,
+            enableTouchSwipe: false,
+            loop: false,
+            slideChanging: args => {
+                probe.event("slideChanging", args);
+                // Medications (index 0) is the locked sign-off gate: cancel any move
+                // that would land back on it. EJ2 only raises slideChanging for this
+                // as a Previous from index 1 (nextIndex === 0); a prev() from index 0
+                // never fires the event at all (proven empirically by this probe).
+                if (args.nextIndex === 0) {
+                    args.cancel = true;
+                    probe.record("slideChanging.cancel", { currentIndex: args.currentIndex, nextIndex: args.nextIndex, slideDirection: args.slideDirection, cancel: args.cancel });
+                }
+            },
+            slideChanged: args => {
+                probe.event("slideChanged", args);
+                probe.record("selectedIndex.read", ej2.selectedIndex);
+            }
         });
 
         ej2.appendTo(target);
         probe.ej2 = ej2;
-        record("ready", {
-            component: "carousel",
-            apiSet: "core",
-            namespace: "ej.navigations",
-            className: "Carousel"
-        });
+        probe.record("appended.selectedIndex", ej2.selectedIndex);
+        record("ready", { component: "carousel", apiSet: "core", namespace: "ej.navigations", className: "Carousel" });
+
+        ej2.next();                                  // Medications -> Therapy Goals
+        probe.record("after.next.selectedIndex", ej2.selectedIndex);
+        ej2.next();                                  // Therapy Goals -> Discharge Steps
+        ej2.prev();                                  // Discharge Steps -> Therapy Goals (allowed)
+        probe.record("after.prev.selectedIndex", ej2.selectedIndex);
+        ej2.prev();                                  // Therapy Goals -> Medications (nextIndex 0, cancelled)
+        probe.record("after.blocked.prev.selectedIndex", ej2.selectedIndex);
 
         document.getElementById("dump").addEventListener("click", () => {
             record("own keys", Object.keys(ej2).sort());
             record("prototype methods", functionNames(ej2));
+            record("selectedIndex.read", ej2.selectedIndex);
         });
 
         document.getElementById("clear").addEventListener("click", () => {

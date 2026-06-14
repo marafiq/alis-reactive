@@ -19,7 +19,14 @@
     <h1>FusionSidebar Raw EJ2 core Probe</h1>
     <p>Status: generated static probe. Execute in the sandbox/browser, interact with the component, then save <code>window.__fusionProbe.trace</code> as <code>traces/raw-ej2-core.trace.json</code>.</p>
     <div id="sidebar-host">
-        <div id="sidebar"></div>
+        <div id="sidebar">
+            <nav>
+                <a href="#care-plan">Care plan</a>
+                <a href="#medications">Medications</a>
+                <a href="#visits">Visits</a>
+            </nav>
+        </div>
+        <div class="e-main-content">Resident Care Dashboard</div>
     </div>
 
     <button id="dump">Dump Keys</button>
@@ -113,26 +120,17 @@
         };
         window.__fusionProbe = probe;
 
-        const ej2 = new ej.ej.navigations.Sidebar({
-            dataSource: [
-                { id: 1, name: "Alpha", status: "Open" },
-                { id: 2, name: "Beta", status: "Closed" },
-                { id: 3, name: "Gamma", status: "Open" }
-            ],
-            columns: [
-                { field: "id", headerText: "ID", width: 90, textAlign: "Right" },
-                { field: "name", headerText: "Name", width: 160 },
-                { field: "status", headerText: "Status", width: 140 }
-            ],
-            allowPaging: true,
-            allowSorting: true,
-            allowFiltering: true,
-            pageSettings: { pageSize: 2 },
+        const ej2 = new ej.navigations.Sidebar({
+            type: "Push",
+            position: "Left",
+            isOpen: false,
+            animate: false,
+            width: "240px",
             change: args => probe.event("change", args),
-                close: args => probe.event("close", args),
-                created: args => probe.event("created", args),
-                destroyed: args => probe.event("destroyed", args),
-                open: args => probe.event("open", args)
+            close: args => probe.event("close", args),
+            created: args => probe.event("created", args),
+            destroyed: args => probe.event("destroyed", args),
+            open: args => probe.event("open", args)
         });
 
         ej2.appendTo(target);
@@ -140,9 +138,26 @@
         record("ready", {
             component: "sidebar",
             apiSet: "core",
-            namespace: "ej.ej.navigations",
+            namespace: "ej.navigations",
             className: "Sidebar"
         });
+
+        // Drive the real open/close lifecycle so the trace carries the open and
+        // close EventArgs payloads (isInteracted false for these API calls) and the
+        // change event, then read isOpen between them.
+        probe.call("show()", () => { ej2.show(); return null; });
+        probe.member("isOpen after show", () => ej2.isOpen);
+        probe.call("hide()", () => { ej2.hide(); return null; });
+        probe.member("isOpen after hide", () => ej2.isOpen);
+        probe.call("toggle()", () => { ej2.toggle(); return null; });
+        probe.member("isOpen after toggle", () => ej2.isOpen);
+
+        // Return the panel to its tucked-away state so nothing overlays the page,
+        // then dump the instance own-keys and prototype methods inline (the open
+        // panel would otherwise intercept the manual Dump-Keys click).
+        ej2.hide();
+        record("own keys", Object.keys(ej2).sort());
+        record("prototype methods", functionNames(ej2));
 
         document.getElementById("dump").addEventListener("click", () => {
             record("own keys", Object.keys(ej2).sort());

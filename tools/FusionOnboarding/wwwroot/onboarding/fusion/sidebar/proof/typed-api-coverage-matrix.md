@@ -1,0 +1,25 @@
+# FusionSidebar Typed API Coverage Matrix
+
+Status: audited.
+
+Generated from current public typed Fusion API under:
+
+```text
+Alis.Reactive.Fusion/Components/FusionSidebar
+```
+
+This matrix is fail-closed. A row with `unproven`, `pending`, or a missing
+trace/mapping/Playwright link means the component is not audited.
+
+| Public API | Kind | Source | Raw Trace Row | Primitive Map Row | Vertical Slice Row | Playwright DSL Proof | Status |
+|---|---|---|---|---|---|---|---|
+| `FusionSidebarTransitionArgs` | event-payload-contract | `Alis.Reactive.Fusion/Components/FusionSidebar/Events/FusionSidebarTransitionArgs.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.opening_the_menu_loads_the_live_care_service_list` | row-proven |
+| `FusionSidebarTransitionArgs.IsInteracted` | event-payload-property | `Alis.Reactive.Fusion/Components/FusionSidebar/Events/FusionSidebarTransitionArgs.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.dismissing_the_menu_by_tapping_the_dashboard_records_that_you_closed_it` | row-proven |
+| `Closed` | event-selector | `Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarEvents.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.closing_the_menu_with_the_button_tucks_it_away` | row-proven |
+| `Opened` | event-selector | `Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarEvents.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.opening_the_menu_loads_the_live_care_service_list` | row-proven |
+| `Hide(this ComponentRef<FusionSidebar, TModel> self)` | method | `Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarExtensions.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.closing_the_menu_with_the_button_tucks_it_away` | row-proven |
+| `IsOpen(this ComponentRef<FusionSidebar, TModel> self)` | method | `Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarExtensions.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.closing_the_menu_posts_that_the_panel_is_now_shut` | row-proven |
+| `Show(this ComponentRef<FusionSidebar, TModel> self)` | method | `Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarExtensions.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.opening_the_menu_slides_the_care_services_panel_into_view` | row-proven |
+| `Toggle(this ComponentRef<FusionSidebar, TModel> self)` | method | `Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarExtensions.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.the_menu_button_toggles_the_panel_open_then_collapse_toggles_it_shut` | row-proven |
+| `FusionSidebar(#if NET48 this HtmlHelper<TModel> html, #else this IHtmlHelper<TModel> html, #endif ReactivePlan<TModel> plan, string elementId, Action<SidebarBuilder> build)` | method | `Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarHtmlExtensions.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.the_dashboard_opens_with_the_care_services_menu_tucked_away` | row-proven |
+| `Reactive` | event-selector | `Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarReactiveExtensions.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.opening_the_menu_loads_the_live_care_service_list` | row-proven |

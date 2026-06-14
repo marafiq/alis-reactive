@@ -4,20 +4,20 @@
   "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion",
   "summary": {
     "componentCount": 51,
-    "audited": 12,
-    "withTypedMatrix": 14,
-    "totalMatrixRows": 689,
-    "rowProvenMatrixRows": 621,
+    "audited": 16,
+    "withTypedMatrix": 18,
+    "totalMatrixRows": 738,
+    "rowProvenMatrixRows": 670,
     "unprovenMatrixRows": 68,
     "totalRawProbes": 74,
-    "totalRawTraces": 40,
+    "totalRawTraces": 44,
     "byStatus": {
-      "artifact-incomplete": 39,
-      "audited": 12
+      "artifact-incomplete": 35,
+      "audited": 16
     },
     "byNextStage": {
-      "mapping": 36,
-      "audited": 12,
+      "mapping": 32,
+      "audited": 16,
       "static-discovery": 3
     }
   },
@@ -216,34 +216,27 @@
       "componentName": "Carousel",
       "artifactName": "carousel",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/carousel",
-      "requiredPresent": 6,
+      "requiredPresent": 12,
       "requiredTotal": 12,
-      "missingRequired": [
-        "mapping/primitive-map.md",
-        "mapping/csharp-name-decisions.md",
-        "mapping/vertical-slice-plan.md",
-        "proof/typed-api-coverage-matrix.md",
-        "proof/playwright-proof.md",
-        "proof/audit-report.md"
-      ],
+      "missingRequired": [],
       "unlinkedRequired": [],
       "probeCount": 1,
-      "traceCount": 0,
+      "traceCount": 1,
       "matrix": {
-        "exists": false,
-        "status": "missing",
-        "totalRows": 0,
-        "rowProvenRows": 0,
+        "exists": true,
+        "status": "audited",
+        "totalRows": 19,
+        "rowProvenRows": 19,
         "unprovenRows": 0,
         "firstUnprovenRow": null
       },
       "openAuditMarkers": false,
-      "mechanicalStatus": "artifact-incomplete",
+      "mechanicalStatus": "audited",
       "nextAction": {
-        "stage": "mapping",
-        "action": "create missing artifact mapping/primitive-map.md",
-        "command": "complete the previous gate before writing this artifact",
-        "reason": "6 required artifact files are missing"
+        "stage": "audited",
+        "action": "none",
+        "command": "node .claude/skills/onboard-fusion-component/scripts/verify-fusion-artifact-gates.mjs --component carousel",
+        "reason": "component is mechanically audited"
       }
     },
     {
@@ -1321,34 +1314,27 @@
       "componentName": "Sidebar",
       "artifactName": "sidebar",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/sidebar",
-      "requiredPresent": 6,
+      "requiredPresent": 12,
       "requiredTotal": 12,
-      "missingRequired": [
-        "mapping/primitive-map.md",
-        "mapping/csharp-name-decisions.md",
-        "mapping/vertical-slice-plan.md",
-        "proof/typed-api-coverage-matrix.md",
-        "proof/playwright-proof.md",
-        "proof/audit-report.md"
-      ],
+      "missingRequired": [],
       "unlinkedRequired": [],
       "probeCount": 1,
-      "traceCount": 0,
+      "traceCount": 1,
       "matrix": {
-        "exists": false,
-        "status": "missing",
-        "totalRows": 0,
-        "rowProvenRows": 0,
+        "exists": true,
+        "status": "audited",
+        "totalRows": 10,
+        "rowProvenRows": 10,
         "unprovenRows": 0,
         "firstUnprovenRow": null
       },
       "openAuditMarkers": false,
-      "mechanicalStatus": "artifact-incomplete",
+      "mechanicalStatus": "audited",
       "nextAction": {
-        "stage": "mapping",
-        "action": "create missing artifact mapping/primitive-map.md",
-        "command": "complete the previous gate before writing this artifact",
-        "reason": "6 required artifact files are missing"
+        "stage": "audited",
+        "action": "none",
+        "command": "node .claude/skills/onboard-fusion-component/scripts/verify-fusion-artifact-gates.mjs --component sidebar",
+        "reason": "component is mechanically audited"
       }
     },
     {
@@ -1566,34 +1552,27 @@
       "componentName": "Tab",
       "artifactName": "tab",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/tab",
-      "requiredPresent": 6,
+      "requiredPresent": 12,
       "requiredTotal": 12,
-      "missingRequired": [
-        "mapping/primitive-map.md",
-        "mapping/csharp-name-decisions.md",
-        "mapping/vertical-slice-plan.md",
-        "proof/typed-api-coverage-matrix.md",
-        "proof/playwright-proof.md",
-        "proof/audit-report.md"
-      ],
+      "missingRequired": [],
       "unlinkedRequired": [],
       "probeCount": 1,
-      "traceCount": 0,
+      "traceCount": 1,
       "matrix": {
-        "exists": false,
-        "status": "missing",
-        "totalRows": 0,
-        "rowProvenRows": 0,
+        "exists": true,
+        "status": "audited",
+        "totalRows": 10,
+        "rowProvenRows": 10,
         "unprovenRows": 0,
         "firstUnprovenRow": null
       },
       "openAuditMarkers": false,
-      "mechanicalStatus": "artifact-incomplete",
+      "mechanicalStatus": "audited",
       "nextAction": {
-        "stage": "mapping",
-        "action": "create missing artifact mapping/primitive-map.md",
-        "command": "complete the previous gate before writing this artifact",
-        "reason": "6 required artifact files are missing"
+        "stage": "audited",
+        "action": "none",
+        "command": "node .claude/skills/onboard-fusion-component/scripts/verify-fusion-artifact-gates.mjs --component tab",
+        "reason": "component is mechanically audited"
       }
     },
     {
@@ -1685,34 +1664,27 @@
       "componentName": "Toolbar",
       "artifactName": "toolbar",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/toolbar",
-      "requiredPresent": 6,
+      "requiredPresent": 12,
       "requiredTotal": 12,
-      "missingRequired": [
-        "mapping/primitive-map.md",
-        "mapping/csharp-name-decisions.md",
-        "mapping/vertical-slice-plan.md",
-        "proof/typed-api-coverage-matrix.md",
-        "proof/playwright-proof.md",
-        "proof/audit-report.md"
-      ],
+      "missingRequired": [],
       "unlinkedRequired": [],
       "probeCount": 1,
-      "traceCount": 0,
+      "traceCount": 1,
       "matrix": {
-        "exists": false,
-        "status": "missing",
-        "totalRows": 0,
-        "rowProvenRows": 0,
+        "exists": true,
+        "status": "audited",
+        "totalRows": 10,
+        "rowProvenRows": 10,
         "unprovenRows": 0,
         "firstUnprovenRow": null
       },
       "openAuditMarkers": false,
-      "mechanicalStatus": "artifact-incomplete",
+      "mechanicalStatus": "audited",
       "nextAction": {
-        "stage": "mapping",
-        "action": "create missing artifact mapping/primitive-map.md",
-        "command": "complete the previous gate before writing this artifact",
-        "reason": "6 required artifact files are missing"
+        "stage": "audited",
+        "action": "none",
+        "command": "node .claude/skills/onboard-fusion-component/scripts/verify-fusion-artifact-gates.mjs --component toolbar",
+        "reason": "component is mechanically audited"
       }
     },
     {

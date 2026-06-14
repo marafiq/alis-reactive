@@ -1,0 +1,24 @@
+{
+  "component": "sidebar",
+  "fusionType": "FusionSidebar",
+  "note": "Per-component parity judgment for compute-fusion-parity.mjs. builder.covered members are scored builder-owned automatically; this file accounts for the rest. onboarded = vendor member names the typed C# slice exposes as runtime DSL; excluded = vendor members with a source-grounded reason they are neither builder render config nor useful runtime DSL.",
+  "onboarded": [
+    "show",
+    "hide",
+    "toggle"
+  ],
+  "excluded": [
+    {
+      "name": "defaultBackdropDiv",
+      "reason": "Internal DOM handle, not a developer value. sidebar.d.ts line 214 declares `defaultBackdropDiv: HTMLElement` — the backdrop <div> Syncfusion itself creates and owns; it is never authored, read for a decision, gathered, or displayed in a senior-living workflow. Exposing it would put a raw vendor HTMLElement on the typed surface, which the onboarding rules forbid; backdrop visibility is configured at render via the builder's ShowBackdrop, not by reaching the element."
+    },
+    {
+      "name": "height",
+      "reason": "Marked @private in vendor source. sidebar.d.ts lines 120-124 annotate `height: string | number` with `@default 'auto' @private`. A @private member is not part of Syncfusion's supported public contract, so it cannot be safely typed as runtime DSL; sidebar sizing for the resident-navigation panel is render configuration set through the builder (Width), not a post-render runtime read/write."
+    },
+    {
+      "name": "locale",
+      "reason": "Marked @private in vendor source. sidebar.d.ts lines 79-83 annotate `locale: string` with `@default 'en-US' @private`. Globalization/locale is an app-wide concern handled by the host application's culture, not a per-sidebar runtime value a plan branches on, gathers, or mutates; promoting a @private vendor field to the typed DSL is unsupported and not a real senior-living use case."
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "component": "carousel",
+  "note": "Hand-authored per-component JUDGMENT input documented by compute-fusion-parity.mjs (not script-generated; reviewed like any judgment step). onboarded = vendor methods the typed C# slice exposes (next->Next(), prev->Previous()); excluded = vendor methods with a source-grounded reason they are not useful as runtime DSL for this component's Senior Living use.",
+  "onboarded": [
+    "next",
+    "prev"
+  ],
+  "excluded": [
+    {
+      "name": "play",
+      "reason": "Autoplay transport control (carousel.d.ts:411 'play(): void' — 'Method to play the slides programmatically'). It only has meaning when autoPlay is on and an interval timer rotates slides. Excluded because no Senior Living carousel use case wants slides to auto-advance: the proven journey is a deliberate, nurse-guided bedside care-plan review read and acknowledged at the resident's pace (the sandbox sets AutoPlay(false) and ShowPlayButton(false)). A plan that calls play() would auto-skip clinical content the resident must see, so no developer would write it. The runtime need is explicit slide navigation, onboarded as the typed Next()/Previous() methods."
+    },
+    {
+      "name": "pause",
+      "reason": "Autoplay transport control (carousel.d.ts:417 'pause(): void' — 'Method to pause the slides programmatically'). It is the partner of play() and only stops an already-running autoplay timer; with AutoPlay(false) there is no timer to pause, so it is dead in every Senior Living use case for this component (deliberate reviews, announcement boards a resident steps through, image galleries). Excluded for the same reason as play(): the runtime need is explicit slide navigation via the typed Next()/Previous() methods, not autoplay transport. Initial AutoPlay/PauseOnHover/EnableTouchSwipe configuration stays builder-owned."
+    }
+  ]
+}

@@ -1,0 +1,211 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "tab",
+  "apiSet": "core",
+  "probe": "onboarding/fusion/tab/probes/raw-ej2-core.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "created",
+      "value": {
+        "functions": [],
+        "ownKeys": [],
+        "properties": {},
+        "value": "undefined"
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "ready",
+      "value": {
+        "apiSet": "core",
+        "className": "Tab",
+        "component": "tab",
+        "namespace": "ej.navigations"
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "selecting",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "event",
+          "isInteracted",
+          "isSwiped",
+          "name",
+          "previousIndex",
+          "previousItem",
+          "selectedContent",
+          "selectedIndex",
+          "selectedItem",
+          "selectingContent",
+          "selectingIndex",
+          "selectingItem"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "event": {
+            "type": "undefined"
+          },
+          "isInteracted": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "isSwiped": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "selecting",
+            "type": "string"
+          },
+          "previousIndex": {
+            "sample": 0,
+            "type": "number"
+          },
+          "previousItem": {
+            "sample": "[Element#e-item-tab_0]",
+            "type": "object"
+          },
+          "selectedContent": {
+            "sample": "[Element#e-content-tab_0]",
+            "type": "object"
+          },
+          "selectedIndex": {
+            "sample": 0,
+            "type": "number"
+          },
+          "selectedItem": {
+            "sample": "[Element#e-item-tab_0]",
+            "type": "object"
+          },
+          "selectingContent": {
+            "sample": null,
+            "type": "null"
+          },
+          "selectingIndex": {
+            "sample": 1,
+            "type": "number"
+          },
+          "selectingItem": {
+            "sample": "[Element#e-item-tab_1]",
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "selected",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "isInteracted",
+          "isSwiped",
+          "name",
+          "preventFocus",
+          "previousIndex",
+          "previousItem",
+          "selectedContent",
+          "selectedIndex",
+          "selectedItem"
+        ],
+        "properties": {
+          "isInteracted": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "isSwiped": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "selected",
+            "type": "string"
+          },
+          "preventFocus": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "previousIndex": {
+            "sample": 0,
+            "type": "number"
+          },
+          "previousItem": {
+            "sample": "[Element#e-item-tab_0]",
+            "type": "object"
+          },
+          "selectedContent": {
+            "sample": "[Element#e-content-tab_1]",
+            "type": "object"
+          },
+          "selectedIndex": {
+            "sample": 1,
+            "type": "number"
+          },
+          "selectedItem": {
+            "sample": "[Element#e-item-tab_1]",
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "own keys",
+      "value": [
+        "allowServerDataBinding",
+        "bdrLine",
+        "btnCls",
+        "bulkChanges",
+        "changedProperties",
+        "childChangedProperties",
+        "cntEle",
+        "content",
+        "draggableItems",
+        "element",
+        "finalUpdate",
+        "hdrEle",
+        "hide",
+        "ignoreCollectionWatch",
+        "initRender",
+        "isAdd",
+        "isAngular",
+        "isComplexArraySetter",
+        "isDestroyed",
+        "isIconAlone"
+      ]
+    },
+    {
+      "sequence": 6,
+      "label": "prototype methods",
+      "value": [
+        "accessMount",
+        "addEventListener",
+        "addInstance",
+        "addOnPersist",
+        "addTab",
+        "addVerticalClass",
+        "added",
+        "adding",
+        "addingTabContent",
+        "appendTo",
+        "attachUnloadEvent",
+        "bindDraggable",
+        "bindSwipeEvents",
+        "changeOrientation",
+        "changeToolbarOrientation",
+        "checkPopupOverflow",
+        "clearChanges",
+        "clearTabTemplate",
+        "clearTemplate",
+        "clickHandler"
+      ]
+    }
+  ]
+}

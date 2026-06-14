@@ -1,0 +1,34 @@
+{
+  "component": "toolbar",
+  "fusionType": "FusionToolbar",
+  "note": "Hand-authored per-component parity JUDGMENT (the compute-fusion-parity.mjs accounting file; not script-generated). Covers the 7 method members the Syncfusion MVC builder does not cover. The builder owns the other 14 members (builder.covered=true in public-api-surface.json) and `destroy` is a `skip:` lifecycle decision. `disable` is the one onboarded runtime method (typed Disable(bool) in FusionToolbarExtensions.cs); the remaining 6 are excluded with source-grounded evidence. enableItems/hideItem are recorded as deferred per-item candidates rather than dropped, because onboarding them would add a NEW typed method to the framework Fusion slice (out of scope for this audit, which proves the existing typed surface).",
+  "onboarded": [
+    "disable"
+  ],
+  "excluded": [
+    {
+      "name": "changeOrientation",
+      "reason": "Marked @hidden in Syncfusion source: node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts carries an @hidden JSDoc tag (line 434) on the block immediately above changeOrientation(): void (line 437). The skill forbids promoting hidden/internal Syncfusion members. Toolbar orientation is initial-render configuration on ToolbarBuilder (the orientation option), not a proven post-render plan behavior."
+    },
+    {
+      "name": "addItems",
+      "reason": "Builder-owned item-collection concern. The toolbar item set is configured at render through ToolbarBuilder.Items(...) (the items property is builder.covered=true in public-api-surface.json). addItems(items: ItemModel[], index?) rebuilds that collection at runtime from an ItemModel[] DOM-template array, a dynamic-DOM authoring concern rather than a typed scalar the DSL expresses; no Senior Living command-bar use case rebuilds the fixed account command set client-side."
+    },
+    {
+      "name": "removeItems",
+      "reason": "Builder-owned item-collection concern, the inverse of addItems. removeItems(args: number | HTMLElement | NodeList | Element | HTMLElement[]) targets items by index or raw DOM element/NodeList. The item set is builder-owned (items property builder.covered=true); removing commands at runtime by DOM handle is a dynamic-DOM concern with no Senior Living use case and no typed scalar the DSL maps."
+    },
+    {
+      "name": "refreshOverflow",
+      "reason": "Layout-internal reflow. refreshOverflow(): void (toolbar.d.ts:449) only re-runs the toolbar overflow rendering (scrollable/popup/multirow) and is documented as needed after loading items dynamically. It takes no arguments, returns void, and exposes no plan value; it is only meaningful paired with the builder-owned addItems/removeItems, both excluded. Overflow mode is builder-owned (overflowMode/scrollStep are builder.covered=true)."
+    },
+    {
+      "name": "enableItems",
+      "reason": "Deferred per-item candidate, not dropped. enableItems(items: number | HTMLElement | NodeList, isEnable?) enables/disables a specific item by index or DOM element. It is a genuine runtime behavior, but exposing it as typed DSL requires adding a NEW typed method to the framework Fusion slice (Alis.Reactive.Fusion/Components/FusionToolbar), which is out of scope for this audit of the existing typed surface. The whole-toolbar Disable(bool) already proves the enable/disable runtime lane (e-disabled toggles on the root, confirmed in probes/raw-ej2-core.html). Recorded for a future dedicated per-item onboarding row."
+    },
+    {
+      "name": "hideItem",
+      "reason": "Deferred per-item candidate, not dropped. hideItem(index: number | HTMLElement | Element, value?) shows/hides a specific item by index or DOM element. Like enableItems, exposing it as typed DSL requires a NEW typed method in the framework Fusion slice, out of scope for this audit. Item visibility (the visible ItemModel flag) is configured at render through ToolbarBuilder.Items(...). Recorded for a future dedicated per-item onboarding row."
+    }
+  ]
+}

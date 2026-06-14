@@ -19,13 +19,27 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         [HttpPost("OpenPanel")]
         public IActionResult OpenPanel([FromBody] FusionSidebarOpenRequest request)
         {
-            var openMode = request.IsInteracted ? "user opened" : "workflow opened";
+            var openedNote = request.OpenedByCoordinator
+                ? "You opened the care-services menu."
+                : "Care-services menu opened.";
 
             return Ok(new FusionSidebarOpenResponse
             {
-                OpenMode = openMode,
-                PanelTitle = "Resident navigation",
-                Message = $"{openMode} resident navigation panel"
+                ServicesSummary = "3 care services available",
+                OpenedNote = openedNote
+            });
+        }
+
+        [HttpPost("CloseActivity")]
+        public IActionResult CloseActivity([FromBody] FusionSidebarCloseRequest request)
+        {
+            var activityNote = request.IsOpen
+                ? "Care-services menu is still open."
+                : "Care-services menu closed — services hidden.";
+
+            return Ok(new FusionSidebarCloseResponse
+            {
+                ActivityNote = activityNote
             });
         }
     }

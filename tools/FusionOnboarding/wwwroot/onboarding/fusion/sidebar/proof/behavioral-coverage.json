@@ -1,0 +1,62 @@
+{
+  "component": "sidebar",
+  "fusionType": "FusionSidebar",
+  "coverage": [
+    {
+      "member": "FusionSidebar(#if NET48 this HtmlHelper<TModel> html, #else this IHtmlHelper<TModel> html, #endif ReactivePlan<TModel> plan, string elementId, Action<SidebarBuilder> build)",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.the_dashboard_opens_with_the_care_services_menu_tucked_away",
+      "catches": "the FusionSidebar builder stops rendering the panel onto the dashboard (the test asserts the controlled root #care-services-panel renders e-close, tucked away, at first paint)"
+    },
+    {
+      "member": "Show(this ComponentRef<FusionSidebar, TModel> self)",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.opening_the_menu_slides_the_care_services_panel_into_view",
+      "catches": "Show() stops opening the panel (the test clicks Open and asserts the root becomes e-open and the Care plan nav link inside the panel becomes visible)"
+    },
+    {
+      "member": "Opened",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.opening_the_menu_loads_the_live_care_service_list",
+      "catches": "the Opened event selector stops firing the reactive handler when the panel opens, so the open status and the server-loaded service list never appear"
+    },
+    {
+      "member": "Reactive",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.opening_the_menu_loads_the_live_care_service_list",
+      "catches": "the .Reactive wiring stops connecting the sidebar open event to its plan pipeline, so opening the panel runs no reaction and the live service list never loads"
+    },
+    {
+      "member": "FusionSidebarTransitionArgs",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.opening_the_menu_loads_the_live_care_service_list",
+      "catches": "the transition event arg contract stops delivering the open payload into the plan, so the open POST never fires and the server services summary ('3 care services available') never appears"
+    },
+    {
+      "member": "FusionSidebarTransitionArgs.IsInteracted",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.dismissing_the_menu_by_tapping_the_dashboard_records_that_you_closed_it",
+      "catches": "IsInteracted stops distinguishing a coordinator who dismissed the panel themselves (tapping the dashboard fires close WITH an event -> true -> 'You closed the care-services menu.') from the button's API close (false -> 'closed automatically', asserted by closing_the_menu_with_the_button_tucks_it_away)"
+    },
+    {
+      "member": "Hide(this ComponentRef<FusionSidebar, TModel> self)",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.closing_the_menu_with_the_button_tucks_it_away",
+      "catches": "Hide() stops closing the panel (the test opens then clicks Close and asserts the root returns to e-close)"
+    },
+    {
+      "member": "Closed",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.closing_the_menu_with_the_button_tucks_it_away",
+      "catches": "the Closed event selector stops firing the reactive handler when the panel closes via Hide(), so the 'Care-services menu closed automatically.' status never appears"
+    },
+    {
+      "member": "IsOpen(this ComponentRef<FusionSidebar, TModel> self)",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.closing_the_menu_posts_that_the_panel_is_now_shut",
+      "catches": "the IsOpen() source stops yielding the panel state into the close gather body (the test asserts the close POST carries \"isOpen\":false after Hide())"
+    },
+    {
+      "member": "Toggle(this ComponentRef<FusionSidebar, TModel> self)",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.the_menu_button_toggles_the_panel_open_then_collapse_toggles_it_shut",
+      "catches": "Toggle() stops flipping the panel state (the test toggles the tucked-away panel open via the header button, then toggles the open panel shut via the in-panel Collapse; failing whether Toggle stops opening or stops closing)"
+    }
+  ],
+  "acceptedFanout": [
+    {
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar.WhenUsingFusionSidebar.opening_the_menu_loads_the_live_care_service_list",
+      "reason": "one user gesture (clicking Open) with DISTINCT fails-when-broken assertions per member: the open status text appearing (Opened event firing the handler), the reaction connecting at all (Reactive wiring), and the server service list 'wired through the event payload POST appearing (FusionSidebarTransitionArgs delivered into the gather). Each member has its own assertion, not one assertion claimed for many."
+    }
+  ]
+}

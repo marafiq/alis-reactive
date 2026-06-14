@@ -12,27 +12,27 @@ it makes the current cross-component gap measurable and fail-closed.
 | Metric | Count |
 |---|---:|
 | Components | 51 |
-| Audited components | 12 |
-| Components with typed matrix | 14 |
-| Total matrix rows | 689 |
-| Row-proven matrix rows | 621 |
+| Audited components | 16 |
+| Components with typed matrix | 18 |
+| Total matrix rows | 738 |
+| Row-proven matrix rows | 670 |
 | Unproven matrix rows | 68 |
 | Raw probes | 74 |
-| Raw traces | 40 |
+| Raw traces | 44 |
 
 ## Status Counts
 
 | Status | Components |
 |---|---:|
-| artifact-incomplete | 39 |
-| audited | 12 |
+| artifact-incomplete | 35 |
+| audited | 16 |
 
 ## Next Action Counts
 
 | Next Stage | Components |
 |---|---:|
-| audited | 12 |
-| mapping | 36 |
+| audited | 16 |
+| mapping | 32 |
 | static-discovery | 3 |
 
 ## Components
@@ -45,7 +45,7 @@ it makes the current cross-component gap measurable and fail-closed.
 | FusionBreadcrumb | `breadcrumb/` | audited | audited | none | 12/12 | 1 | 1 | 13 | 13 | 0 |
 | FusionBulletChart | `bullet-chart/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
 | FusionButton | `button/` | audited | audited | none | 12/12 | 1 | 1 | 14 | 14 | 0 |
-| FusionCarousel | `carousel/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
+| FusionCarousel | `carousel/` | audited | audited | none | 12/12 | 1 | 1 | 19 | 19 | 0 |
 | FusionCheckBox | `check-box/` | audited | audited | none | 12/12 | 1 | 1 | 13 | 13 | 0 |
 | FusionChipList | `chip-list/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionColorPicker | `color-picker/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
@@ -77,16 +77,16 @@ it makes the current cross-component gap measurable and fail-closed.
 | FusionRating | `rating/` | audited | audited | none | 12/12 | 1 | 1 | 10 | 10 | 0 |
 | FusionRichTextEditor | `rich-text-editor/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
 | FusionSchedule | `schedule/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 3/12 | 0 | 0 | 67 | 0 | 67 |
-| FusionSidebar | `sidebar/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
+| FusionSidebar | `sidebar/` | audited | audited | none | 12/12 | 1 | 1 | 10 | 10 | 0 |
 | FusionSlider | `slider/` | audited | audited | none | 12/12 | 1 | 1 | 14 | 14 | 0 |
 | FusionSmartPasteButton | `smart-paste-button/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
 | FusionSmartTextArea | `smart-text-area/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
 | FusionSplitButton | `split-button/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
 | FusionStepper | `stepper/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
 | FusionSwitch | `switch/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 8/12 | 0 | 0 | 8 | 7 | 1 |
-| FusionTab | `tab/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
+| FusionTab | `tab/` | audited | audited | none | 12/12 | 1 | 1 | 10 | 10 | 0 |
 | FusionTextArea | `text-area/` | audited | audited | none | 12/12 | 1 | 1 | 21 | 21 | 0 |
 | FusionTextBox | `text-box/` | audited | audited | none | 12/12 | 1 | 1 | 22 | 22 | 0 |
 | FusionTimePicker | `time-picker/` | audited | audited | none | 12/12 | 1 | 1 | 10 | 10 | 0 |
-| FusionToolbar | `toolbar/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
+| FusionToolbar | `toolbar/` | audited | audited | none | 12/12 | 1 | 1 | 10 | 10 | 0 |
 | FusionTooltip | `tooltip/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |

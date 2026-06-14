@@ -7,88 +7,82 @@
     ViewData["Title"] = "FusionToolbar";
 
     const string ToolbarId = "resident-toolbar";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
 
     var plan = Html.ReactivePlan<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Toolbar.FusionToolbarModel>();
-    var items = new List<ToolbarItem>
-    {
-        new() { Id = "toolbar-save", Text = "Save", Type = ItemType.Button },
-        new() { Id = "toolbar-delete", Text = "Delete", Type = ItemType.Button }
-    };
 
-    Html.On(plan, t => t.DomReady(p =>
+    var commands = new List<ToolbarItem>
     {
-        p.Element("toolbar-disabled").SetText("false");
-        p.Element("clicked-state").SetText("pending");
-        p.Element("clicked-id").SetText("pending");
-        p.Element("clicked-text").SetText("pending");
-        p.Element("clicked-disabled").SetText("pending");
-    }));
+        new() { Id = "pay-balance", Text = "Pay balance", PrefixIcon = "e-icons e-medium e-billing", Type = ItemType.Button },
+        new() { Id = "request-maintenance", Text = "Request maintenance", PrefixIcon = "e-icons e-medium e-edit", Type = ItemType.Button },
+        new() { Id = "message-care-team", Text = "Message care team", PrefixIcon = "e-icons e-medium e-comment-show", Type = ItemType.Button }
+    };
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionToolbar</native-heading>
-    <native-text color="Secondary">
-        Navigation component. Exercises disable/enable behavior and clicked item metadata.
-    </native-text>
+    <div>
+        <native-heading level="H1">@Model.ResidentName — Account</native-heading>
+        <native-text color="Secondary">
+            Balance due: <span class="font-semibold text-text">$@Model.BalanceDue.ToString("0.00")</span>.
+            Use the command bar to pay, request maintenance, or message your care team.
+        </native-text>
+    </div>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Toolbar</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            The toolbar starts enabled. Clicking an item records its typed payload fields.
-        </p>
+        <native-vstack gap="Base">
+            @(Html.FusionToolbar(plan, ToolbarId, b =>
+            {
+                b.Items(commands);
+                b.CssClass("rounded-md");
+                b.Width("520px");
+            })
+            .Reactive(evt => evt.Clicked, (args, p) =>
+            {
+                p.When(args, x => x.Item.Id).Eq("pay-balance")
+                    .Then(pay =>
+                    {
+                        pay.Component<FusionToolbar>(ToolbarId).Disable(true);
+                        pay.Element("account-status").SetText("Processing your payment. The command bar is locked until it completes.");
+                        pay.Element("payment-panel").AddClass("hidden");
 
-        @(Html.FusionToolbar(plan, ToolbarId, b =>
-        {
-            b.Items(items);
-            b.CssClass("rounded-md");
-            b.Width("360px");
-        })
-        .Reactive(evt => evt.Clicked, (args, p) =>
-        {
-            p.Element("clicked-state").SetText("clicked");
-            p.Element("clicked-id").SetText(args, x => x.Item.Id);
-            p.Element("clicked-text").SetText(args, x => x.Item.Text);
-            p.Element("clicked-disabled").SetText(args, x => x.Item.Disabled);
-        }))
-    </native-card-body></native-card>
+                        pay.Post(Url.SandboxRoute("Confirm", "Toolbar"))
+                            .Gather(g => g
+                                .FromEvent(args, x => x.Item.Id, "commandId")
+                                .FromEvent(args, x => x.Item.Text, "commandText")
+                                .FromEvent(args, x => x.Item.Disabled, "commandDisabled"))
+                            .Response(r => r.OnSuccess<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Toolbar.ResidentCommandResponse>((json, s) =>
+                            {
+                                s.Element("payment-confirmation").SetText(json, x => x.Confirmation);
+                                s.Element("payment-panel").RemoveClass("hidden");
+                            }));
+                    })
+                    .Else(other =>
+                    {
+                        other.Element("account-status").SetText(args, x => x.Item.Text);
+                        other.Element("account-status-panel").RemoveClass("hidden");
+                    });
+            }))
 
-    <native-card><native-card-body>
-        <native-heading level="H2">Commands</native-heading>
-        <native-hstack gap="Sm" class="flex-wrap">
-            @(Html.NativeButton("disable-toolbar-btn", "Disable")
-                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (_, p) =>
-                {
-                    p.Component<FusionToolbar>(ToolbarId).Disable(true);
-                    p.Element("toolbar-disabled").SetText("true");
-                    p.Element("command-state").SetText("disabled");
-                }))
-            @(Html.NativeButton("enable-toolbar-btn", "Enable")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (_, p) =>
-                {
-                    p.Component<FusionToolbar>(ToolbarId).Disable(false);
-                    p.Element("toolbar-disabled").SetText("false");
-                    p.Element("command-state").SetText("enabled");
-                }))
-        </native-hstack>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Trace</native-heading>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>Toolbar disabled: <span id="toolbar-disabled" class="text-text-muted">pending</span></p>
-            <p>Clicked state: <span id="clicked-state" class="text-text-muted">pending</span></p>
-            <p>Clicked id: <span id="clicked-id" class="text-text-muted">pending</span></p>
-            <p>Clicked text: <span id="clicked-text" class="text-text-muted">pending</span></p>
-            <p>Clicked disabled: <span id="clicked-disabled" class="text-text-muted">pending</span></p>
-            <p>Command state: <span id="command-state" class="text-text-muted">pending</span></p>
+            <div id="account-status-panel" class="hidden rounded-md border border-border bg-surface-subtle p-3">
+                <native-text>You started: <span id="account-status" class="font-medium text-text"></span></native-text>
+            </div>
         </native-vstack>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>
+        <native-vstack gap="Base">
+            <div id="payment-panel" class="hidden rounded-md border border-green-300 bg-green-50 p-4">
+                <native-text><span id="payment-confirmation" class="font-medium text-green-800"></span></native-text>
+            </div>
+            @(Html.NativeButton("payment-done", "Done — unlock the command bar")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Component<FusionToolbar>(ToolbarId).Disable(false);
+                    p.Element("account-status").SetText("Your payment is complete. The command bar is ready again.");
+                    p.Element("account-status-panel").RemoveClass("hidden");
+                }))
+        </native-vstack>
     </native-card-body></native-card>
 </native-vstack>
 

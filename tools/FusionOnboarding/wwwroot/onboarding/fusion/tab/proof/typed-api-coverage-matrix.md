@@ -1,0 +1,25 @@
+# FusionTab Typed API Coverage Matrix
+
+Status: audited.
+
+Generated from current public typed Fusion API under:
+
+```text
+Alis.Reactive.Fusion/Components/FusionTab
+```
+
+This matrix is fail-closed. A row with `unproven`, `pending`, or a missing
+trace/mapping/Playwright link means the component is not audited.
+
+| Public API | Kind | Source | Raw Trace Row | Primitive Map Row | Vertical Slice Row | Playwright DSL Proof | Status |
+|---|---|---|---|---|---|---|---|
+| `FusionTabSelectedArgs` | event-payload-contract | `Alis.Reactive.Fusion/Components/FusionTab/Events/FusionTabOnSelected.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Tab.WhenTabSwitches.opening_the_medications_section_shows_the_current_medications` | row-proven |
+| `FusionTabSelectedArgs.IsSwiped` | event-payload-property | `Alis.Reactive.Fusion/Components/FusionTab/Events/FusionTabOnSelected.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Tab.WhenTabSwitches.opening_a_section_by_clicking_is_recorded_as_a_deliberate_selection` | row-proven |
+| `FusionTabSelectedArgs.PreviousIndex` | event-payload-property | `Alis.Reactive.Fusion/Components/FusionTab/Events/FusionTabOnSelected.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Tab.WhenTabSwitches.moving_between_sections_records_where_the_coordinator_came_from` | row-proven |
+| `FusionTabSelectedArgs.SelectedIndex` | event-payload-property | `Alis.Reactive.Fusion/Components/FusionTab/Events/FusionTabOnSelected.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Tab.WhenTabSwitches.opening_the_medications_section_shows_the_current_medications` | row-proven |
+| `Selected` | event-selector | `Alis.Reactive.Fusion/Components/FusionTab/FusionTabEvents.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Tab.WhenTabSwitches.opening_the_medications_section_shows_the_current_medications` | row-proven |
+| `HideTab(this ComponentRef<FusionTab, TModel> self, int index, bool isHidden = true)` | method | `Alis.Reactive.Fusion/Components/FusionTab/FusionTabExtensions.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Tab.WhenTabSwitches.hiding_billing_removes_it_from_the_workspace` | row-proven |
+| `Select(this ComponentRef<FusionTab, TModel> self, int index)` | method | `Alis.Reactive.Fusion/Components/FusionTab/FusionTabExtensions.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Tab.WhenTabSwitches.the_log_incident_shortcut_jumps_straight_to_incident_reports` | row-proven |
+| `SetSelectedItem(this ComponentRef<FusionTab, TModel> self, int index)` | method | `Alis.Reactive.Fusion/Components/FusionTab/FusionTabExtensions.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Tab.WhenTabSwitches.resuming_returns_the_coordinator_to_the_medications_section` | row-proven |
+| `FusionTab(#if NET48 this HtmlHelper<TModel> html, #else this IHtmlHelper<TModel> html, #endif ReactivePlan<TModel> plan, string elementId, Action<TabBuilder> build)` | method | `Alis.Reactive.Fusion/Components/FusionTab/FusionTabHtmlExtensions.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Tab.WhenTabSwitches.workspace_opens_showing_the_care_schedule_section` | row-proven |
+| `Reactive` | event-selector | `Alis.Reactive.Fusion/Components/FusionTab/FusionTabReactiveExtensions.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Tab.WhenTabSwitches.opening_the_medications_section_shows_the_current_medications` | row-proven |

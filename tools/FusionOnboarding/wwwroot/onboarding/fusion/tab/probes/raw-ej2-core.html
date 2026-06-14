@@ -125,21 +125,13 @@
         };
         window.__fusionProbe = probe;
 
-        const ej2 = new ej.ej.navigations.Tab.Tab({
-            dataSource: [
-                { id: 1, name: "Alpha", status: "Open" },
-                { id: 2, name: "Beta", status: "Closed" },
-                { id: 3, name: "Gamma", status: "Open" }
+        const ej2 = new ej.navigations.Tab({
+            items: [
+                { header: { text: "Alpha" }, content: "Alpha content" },
+                { header: { text: "Beta" }, content: "Beta content" },
+                { header: { text: "Gamma" }, content: "Gamma content" }
             ],
-            columns: [
-                { field: "id", headerText: "ID", width: 90, textAlign: "Right" },
-                { field: "name", headerText: "Name", width: 160 },
-                { field: "status", headerText: "Status", width: 140 }
-            ],
-            allowPaging: true,
-            allowSorting: true,
-            allowFiltering: true,
-            pageSettings: { pageSize: 2 },
+            selectedItem: 0,
             added: args => probe.event("added", args),
                 adding: args => probe.event("adding", args),
                 created: args => probe.event("created", args),
@@ -158,9 +150,14 @@
         record("ready", {
             component: "tab",
             apiSet: "core",
-            namespace: "ej.ej.navigations.Tab",
+            namespace: "ej.navigations",
             className: "Tab"
         });
+
+        // Drive the real selection gesture so the trace carries the selected-event
+        // payload (selectedIndex / previousIndex / isSwiped) and the hideTab effect.
+        ej2.select(1);
+        ej2.hideTab(2, true);
 
         document.getElementById("dump").addEventListener("click", () => {
             record("own keys", Object.keys(ej2).sort());
