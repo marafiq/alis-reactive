@@ -5,125 +5,125 @@
 @{
     ViewData["Title"] = "FusionTextArea";
 
-    var plan = Html.ReactivePlan<TextAreaModel>();
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+    const string SubmitReady = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
 
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        var note = p.Component<FusionTextArea>(m => m.CareNote);
-        note.SetValue("Resident prefers morning medication rounds.");
-        p.Element("value-echo").SetText(note.Value());
-    }));
+    var lastShiftNote = Model.CareNote;
+
+    var plan = Html.ReactivePlan<TextAreaModel>();
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionTextArea</native-heading>
+    <div>
+        <native-heading level="H1">Resident Daily Care Log</native-heading>
+        <native-text color="Secondary">
+            We carried over last shift's note. Update it for this shift, then save it to the resident's daily log.
+        </native-text>
+    </div>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Runtime Value and Events</native-heading>
-        <native-grid cols="C2" gap="Base">
-            @{ Html.InputField(plan, m => m.CareNote, o => o.Label("Care Note"))
+        <native-vstack gap="Base">
+            @{ Html.InputField(plan, m => m.CareNote, o => o.Label("Care note for this shift"))
                 .FusionTextArea(b => b
-                    .Placeholder("Care note")
+                    .Placeholder("Describe how the resident's shift went")
                     .Rows(4)
                     .ShowClearButton(true)
                     .Reactive(plan, evt => evt.Input, (args, p) =>
                     {
-                        p.Element("input-value").SetText(args, x => x.Value);
-                        p.Element("input-previous").SetText(args, x => x.PreviousValue);
+                        p.Element("note-draft").SetText(args, x => x.Value);
+                        p.Element("note-draft-previous").SetText(args, x => x.PreviousValue);
                     })
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
-                        p.Element("change-value").SetText(args, x => x.Value);
-                        p.Element("change-previous").SetText(args, x => x.PreviousValue);
-                        p.Element("change-interacted").SetText(args, x => x.IsInteracted);
-                        p.When(args, x => x.Value).NotEmpty()
-                            .Then(t => t.Element("args-condition").SetText("note entered"))
-                            .Else(e => e.Element("args-condition").SetText("no note"));
+                        p.Element("note-committed").SetText(args, x => x.Value);
+                        p.Element("note-replaced").SetText(args, x => x.PreviousValue);
+
+                        p.When(args, x => x.IsInteracted).Truthy()
+                            .Then(edited => edited.Element("note-commit-status")
+                                .SetText("Edited by you this shift — ready to save."))
+                            .Else(carried => carried.Element("note-commit-status")
+                                .SetText("Filled from last shift's note, not edited by hand."));
                     })
                     .Reactive(plan, evt => evt.Focus, (args, p) =>
                     {
-                        p.Element("focus-state").SetText("focused");
-                        p.Element("focus-value").SetText(args, x => x.Value);
+                        p.Element("note-presence").SetText("You are editing this note now.");
+                        p.Element("note-focus-snapshot").SetText(args, x => x.Value);
                     })
                     .Reactive(plan, evt => evt.Blur, (args, p) =>
                     {
-                        p.Element("focus-state").SetText("blurred");
-                        p.Element("blur-value").SetText(args, x => x.Value);
+                        p.Element("note-presence").SetText("Autosave pending — your changes are held.");
+                        p.Element("note-blur-snapshot").SetText(args, x => x.Value);
                     })); }
-        </native-grid>
-    </native-card-body></native-card>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">Value Source</native-heading>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>DomReady value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-            <p>Input value: <span id="input-value" class="text-text-muted">&mdash;</span></p>
-            <p>Input previous: <span id="input-previous" class="text-text-muted">&mdash;</span></p>
-            <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
-            <p>Change previous: <span id="change-previous" class="text-text-muted">&mdash;</span></p>
-            <p>Change interacted: <span id="change-interacted" class="text-text-muted">&mdash;</span></p>
-            <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
+            <native-vstack gap="Xs">
+                <native-text color="Secondary">Status: <span id="note-presence" class="font-medium text-text">Open the note to start editing.</span></native-text>
+                <native-text color="Secondary">Committed note: <span id="note-committed" class="font-medium text-text">@Model.CareNote</span></native-text>
+                <native-text color="Secondary"><span id="note-commit-status">Carried over from last shift.</span></native-text>
+                <native-text color="Secondary">Note in the field now: <span id="note-restored" class="text-text-muted">@Model.CareNote</span></native-text>
+            </native-vstack>
+
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("resume-editing", "Resume editing the note")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionTextArea>(m => m.CareNote).FocusIn();
+                    }))
+                @(Html.NativeButton("close-note", "Done documenting — close the note")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionTextArea>(m => m.CareNote).FocusOut();
+                    }))
+                @(Html.NativeButton("restore-note", "Use last shift's note")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var note = p.Component<FusionTextArea>(m => m.CareNote);
+                        note.SetValue(lastShiftNote);
+                        p.Element("note-restored").SetText(note.Value());
+                    }))
+            </native-hstack>
         </native-vstack>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Focus Methods</native-heading>
-        <native-hstack gap="Sm">
-            @(Html.NativeButton("focus-in-btn", "Focus Care Note")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+        <native-vstack gap="Base">
+            <native-heading level="H2">Undo context</native-heading>
+            <native-text color="Secondary">Live preview as you type: <span id="note-draft" class="font-medium text-text">@Model.CareNote</span></native-text>
+            <native-text color="Secondary">Before this keystroke: <span id="note-draft-previous" class="text-text-muted">@Model.CareNote</span></native-text>
+            <native-text color="Secondary">This save will replace: <span id="note-replaced" class="text-text-muted">@Model.CareNote</span></native-text>
+            <native-text color="Secondary">Snapshot when you opened the note: <span id="note-focus-snapshot" class="text-text-muted">—</span></native-text>
+            <native-text color="Secondary">Snapshot when you left the note: <span id="note-blur-snapshot" class="text-text-muted">—</span></native-text>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-text color="Secondary">When the note is complete, save it to the resident's daily log.</native-text>
+            @(Html.NativeButton("save-note", "Save note to daily log")
+                .CssClass(SubmitReady)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionTextArea>(m => m.CareNote).FocusIn();
+                    var note = p.Component<FusionTextArea>(m => m.CareNote);
+                    p.When(note.Value()).IsEmpty()
+                        .Then(empty => empty.Element("note-save-guard")
+                            .SetText("Please write a care note before saving."))
+                        .Else(ready =>
+                            ready.Post(Url.SandboxRoute("Echo", "TextArea"))
+                                .Gather(g => g.Include(note.Value(), "careNote"))
+                                .Response(r => r.OnSuccess<CareNoteEchoResponse>((json, s) =>
+                                {
+                                    s.Element("note-save-guard").SetText("");
+                                    s.Element("note-confirmation").SetText(json, x => x.Summary);
+                                    s.Element("note-confirmation-panel").RemoveClass("hidden");
+                                })));
                 }))
-        </native-hstack>
-        <native-vstack gap="Xs" class="font-mono text-sm mt-3">
-            <p>Focus state: <span id="focus-state" class="text-text-muted">&mdash;</span></p>
-            <p>Focus value: <span id="focus-value" class="text-text-muted">&mdash;</span></p>
-            <p>Blur value: <span id="blur-value" class="text-text-muted">&mdash;</span></p>
+            <native-text color="Secondary"><span id="note-save-guard" class="text-amber-700"></span></native-text>
+            <div id="note-confirmation-panel" class="hidden rounded-md border border-green-300 bg-green-50 p-4">
+                <native-text><span id="note-confirmation" class="font-medium text-green-800"></span></native-text>
+            </div>
         </native-vstack>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">FocusOut Method</native-heading>
-        <native-grid cols="C2" gap="Base">
-            @{ Html.InputField(plan, m => m.AutoBlurNote, o => o.Label("Auto Blur Note"))
-                .FusionTextArea(b => b
-                    .Placeholder("Click here to trigger FocusOut")
-                    .Rows(3)
-                    .Value("FocusOut proof")
-                    .Reactive(plan, evt => evt.Focus, (args, p) =>
-                    {
-                        p.Component<FusionTextArea>(m => m.AutoBlurNote).FocusOut();
-                        p.Element("focusout-method-state").SetText("focusout called");
-                    })
-                    .Reactive(plan, evt => evt.Blur, (args, p) =>
-                    {
-                        p.Element("autoblur-state").SetText("blurred");
-                    })); }
-        </native-grid>
-        <native-vstack gap="Xs" class="font-mono text-sm mt-3">
-            <p>FocusOut method: <span id="focusout-method-state" class="text-text-muted">&mdash;</span></p>
-            <p>Auto blur state: <span id="autoblur-state" class="text-text-muted">&mdash;</span></p>
-        </native-vstack>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Component Condition</native-heading>
-        @(Html.NativeButton("check-note-btn", "Check Care Note")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var note = p.Component<FusionTextArea>(m => m.CareNote);
-                p.When(note.Value()).NotEmpty()
-                    .Then(t => t.Element("note-warning").SetText("care note set"))
-                    .Else(e => e.Element("note-warning").SetText("care note required"));
-            }))
-        <p class="font-mono text-sm mt-2">Warning: <span id="note-warning" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
     </native-card-body></native-card>
 </native-vstack>
 

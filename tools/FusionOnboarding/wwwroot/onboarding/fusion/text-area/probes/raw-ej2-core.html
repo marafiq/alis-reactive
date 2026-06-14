@@ -113,21 +113,10 @@
         };
         window.__fusionProbe = probe;
 
-        const ej2 = new ej.ej.inputs.TextArea.TextArea({
-            dataSource: [
-                { id: 1, name: "Alpha", status: "Open" },
-                { id: 2, name: "Beta", status: "Closed" },
-                { id: 3, name: "Gamma", status: "Open" }
-            ],
-            columns: [
-                { field: "id", headerText: "ID", width: 90, textAlign: "Right" },
-                { field: "name", headerText: "Name", width: 160 },
-                { field: "status", headerText: "Status", width: 140 }
-            ],
-            allowPaging: true,
-            allowSorting: true,
-            allowFiltering: true,
-            pageSettings: { pageSize: 2 },
+        const ej2 = new ej.inputs.TextArea({
+            value: "Resident resting comfortably; no concerns this shift.",
+            placeholder: "Document this shift",
+            rows: 3,
             blur: args => probe.event("blur", args),
                 change: args => probe.event("change", args),
                 created: args => probe.event("created", args),
@@ -141,7 +130,7 @@
         record("ready", {
             component: "text-area",
             apiSet: "core",
-            namespace: "ej.ej.inputs.TextArea",
+            namespace: "ej.inputs",
             className: "TextArea"
         });
 
