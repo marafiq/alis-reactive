@@ -12,27 +12,28 @@ it makes the current cross-component gap measurable and fail-closed.
 | Metric | Count |
 |---|---:|
 | Components | 51 |
-| Audited components | 1 |
-| Components with typed matrix | 1 |
-| Total matrix rows | 459 |
-| Row-proven matrix rows | 459 |
-| Unproven matrix rows | 0 |
-| Raw probes | 29 |
-| Raw traces | 29 |
+| Audited components | 2 |
+| Components with typed matrix | 3 |
+| Total matrix rows | 536 |
+| Row-proven matrix rows | 469 |
+| Unproven matrix rows | 67 |
+| Raw probes | 30 |
+| Raw traces | 30 |
 
 ## Status Counts
 
 | Status | Components |
 |---|---:|
-| artifact-incomplete | 50 |
-| audited | 1 |
+| artifact-incomplete | 49 |
+| audited | 2 |
 
 ## Next Action Counts
 
 | Next Stage | Components |
 |---|---:|
-| audited | 1 |
-| static-discovery | 50 |
+| audited | 2 |
+| mapping | 7 |
+| static-discovery | 42 |
 
 ## Components
 
@@ -43,10 +44,10 @@ it makes the current cross-component gap measurable and fail-closed.
 | FusionAutoComplete | `auto-complete/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionBreadcrumb | `breadcrumb/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionBulletChart | `bullet-chart/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
-| FusionButton | `button/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
+| FusionButton | `button/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionCarousel | `carousel/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
-| FusionCheckBox | `check-box/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
-| FusionChipList | `chip-list/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
+| FusionCheckBox | `check-box/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 0 | 0 | 0 | 0 | 0 |
+| FusionChipList | `chip-list/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionColorPicker | `color-picker/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionComboBox | `combo-box/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionContextMenu | `context-menu/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
@@ -68,24 +69,24 @@ it makes the current cross-component gap measurable and fail-closed.
 | FusionMenu | `menu/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionMultiColumnComboBox | `multi-column-combo-box/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionMultiSelect | `multi-select/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
-| FusionNumericTextBox | `numeric-text-box/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
+| FusionNumericTextBox | `numeric-text-box/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionOtpInput | `otp-input/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionPivotView | `pivot-view/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionProgressButton | `progress-button/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
-| FusionRadioButton | `radio-button/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
-| FusionRating | `rating/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
+| FusionRadioButton | `radio-button/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 0 | 0 | 0 | 0 | 0 |
+| FusionRating | `rating/` | audited | audited | none | 12/12 | 1 | 1 | 10 | 10 | 0 |
 | FusionRichTextEditor | `rich-text-editor/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
-| FusionSchedule | `schedule/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
+| FusionSchedule | `schedule/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 3/12 | 0 | 0 | 67 | 0 | 67 |
 | FusionSidebar | `sidebar/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionSlider | `slider/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionSmartPasteButton | `smart-paste-button/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionSmartTextArea | `smart-text-area/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionSplitButton | `split-button/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionStepper | `stepper/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
-| FusionSwitch | `switch/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
+| FusionSwitch | `switch/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionTab | `tab/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionTextArea | `text-area/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
-| FusionTextBox | `text-box/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
+| FusionTextBox | `text-box/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionTimePicker | `time-picker/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionToolbar | `toolbar/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionTooltip | `tooltip/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
