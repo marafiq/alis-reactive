@@ -12,7 +12,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         {
             return View("~/Areas/Sandbox/Views/Components/Fusion/Rating/Index.cshtml", new RatingModel
             {
-                SatisfactionScore = 2
+                SatisfactionScore = 3
             });
         }
 
@@ -22,7 +22,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Ok(new RatingEchoResponse
             {
                 SatisfactionScore = request.SatisfactionScore,
-                Summary = "score:" + request.SatisfactionScore
+                Summary = "Thank you. We recorded your satisfaction rating of "
+                    + request.SatisfactionScore + " of 5 stars."
             });
         }
     }
