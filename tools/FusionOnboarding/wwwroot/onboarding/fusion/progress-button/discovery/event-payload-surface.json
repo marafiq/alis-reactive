@@ -1,0 +1,179 @@
+{
+  "component": "progress-button",
+  "counts": {
+    "events": 5,
+    "payloadTypes": 2
+  },
+  "events": [
+    {
+      "event": "begin",
+      "eventType": "ProgressEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "ProgressEventArgs",
+              "kind": "property",
+              "name": "currentDuration",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ProgressEventArgs",
+              "kind": "property",
+              "name": "percent",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "ProgressEventArgs",
+              "kind": "property",
+              "name": "step",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "ProgressEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Event",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "Event",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "end",
+      "eventType": "ProgressEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "ProgressEventArgs",
+              "kind": "property",
+              "name": "currentDuration",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ProgressEventArgs",
+              "kind": "property",
+              "name": "percent",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "ProgressEventArgs",
+              "kind": "property",
+              "name": "step",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "ProgressEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "fail",
+      "eventType": "Event",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "Event",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "progress",
+      "eventType": "ProgressEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "ProgressEventArgs",
+              "kind": "property",
+              "name": "currentDuration",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ProgressEventArgs",
+              "kind": "property",
+              "name": "percent",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "ProgressEventArgs",
+              "kind": "property",
+              "name": "step",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "ProgressEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionProgressButton",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "ProgressButton",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.splitbuttons"
+  }
+}

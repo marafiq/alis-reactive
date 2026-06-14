@@ -1,0 +1,2906 @@
+{
+  "component": "pivot-view",
+  "counts": {
+    "builderMethods": 94,
+    "events": 51,
+    "members": 246,
+    "methods": 62,
+    "properties": 133
+  },
+  "fusionType": "FusionPivotView",
+  "members": [
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionBegin",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PivotActionBeginEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "actionBeginMethod",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionComplete",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PivotActionCompleteEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "actionCompleteMethod",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionFailure",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PivotActionFailureEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "actionFailureMethod",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "error: Error) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "actionObj",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PivotActionCompleteEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "addInternalEvents",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "afterServiceInvoke",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "AfterServiceInvokeEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "aggregateCellInfo",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "AggregateEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "aggregateMenuOpen",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "AggregateMenuOpenEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "aggregateTypes",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "AggregateTypes[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowCalculatedField",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowConditionalFormatting",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowDataCompression",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowDeferLayoutUpdate",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowDrillThrough",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "allowEngineExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowExcelExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowGrouping",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowNumberFormatting",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowPdfExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "appendChartElement",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "appendHtml",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "node: Element, innerHtml: string | Element) => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "applyColumnSelection",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "e: MouseEvent | KeyboardEventArgs, target: Element, colStart: number, colEnd: number, rowStart: number) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "applyFormatting",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "pivotValues: IAxisSet[][], dataSourceSettings?: DataSourceSettingsModel) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "applyRowSelection",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "colIndex: number, rowIndex: number, e: MouseEvent | KeyboardEvent) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "axisFieldModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "AxisFields"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeColumnsRender",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ColumnRenderEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "BeforeExportEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeServiceInvoke",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "BeforeServiceInvokeEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beginDrillThrough",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "BeginDrillThroughEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "bindTriggerEvents",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "args?: Object) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "calculatedFieldCreate",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "CalculatedFieldCreateEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "calculatedFieldModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "CalculatedField"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "cellClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "CellClickEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "cellDeselected",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "CellDeselectEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "cellSelected",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PivotCellSelectedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "cellSelecting",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PivotCellSelectedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "cellTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "chart",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "Chart | AccumulationChart"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "chartExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "type: ExportType, pdfExportProperties?: PdfExportProperties, isMultipleExport?: boolean, pdfDoc?: Object, isBlob?: boolean) => Promise<Object>"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "chartExportModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ChartExport"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "chartSeriesCreated",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ChartSeriesCreatedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.PivotView.PivotViewChartSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "chartSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ChartSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "chartTypes",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ChartSeriesType[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "clearSelection",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ele: Element, e: MouseEvent | KeyboardEventArgs) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "clonedDataSet",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "IDataSet[] | string[][]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "clonedReport",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "DataSourceSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "commonModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "Common"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "conditionalFormatting",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "IConditionalFormatSettings"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "conditionalFormattingModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ConditionalFormatting"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "contextMenuClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ContextMenuClickEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "contextMenuModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PivotContextMenu"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "contextMenuOpen",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "BeforeOpenCloseMenuEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "copy",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "withHeader?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "createCalculatedFieldDialog",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "created",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "cssClass",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "csvExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "excelExportProperties?: ExcelExportProperties, isMultipleExport?: boolean, workbook?: Workbook, isBlob?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "currencyCode",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "currentAction",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "currentView",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "Primary"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "dataBound",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.PivotView.PivotViewDataSourceSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "dataSourceSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "DataSourceSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "dataType",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "defaultFieldListOrder",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "Sorting"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "skip: lifecycle cleanup, not Fusion plan behavior",
+      "kind": "method",
+      "name": "destroy",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "destroyed",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "destroyEngine",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.PivotView.PivotViewDisplayOption"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "displayOption",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "DisplayOptionModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "drill",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "DrillArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "drillThrough",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "DrillThroughEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "drillThroughElement",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "drillThroughModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "DrillThrough"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "drillThroughValue",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "IAxisSet"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "editCompleted",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "EditCompletedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.PivotView.PivotViewCellEditSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "editSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "CellEditSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableFieldSearching",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableHtmlSanitizer",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enablePaging",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableValueSorting",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableVirtualization",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "encodeHtml",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "value: string) => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "engineModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PivotEngine"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "enginePopulated",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "EnginePopulatedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "enginePopulating",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "EnginePopulatingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "excelExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "excelExportProperties?: ExcelExportProperties, isMultipleExport?: boolean, workbook?: Workbook, isBlob?: boolean) => Promise<Workbook>"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "excelExportModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ExcelExport"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "exportAllPages",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "exportAsPivot",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "exportType?: PivotExportType) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "exportComplete",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ExportCompleteEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "exportSpecifiedPages",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ExportPageSize"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "exportType",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "fetchReport",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "FetchReportArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "fieldDragStart",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "FieldDragStartEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "fieldDrop",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "FieldDropEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "fieldListModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "FieldList"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "fieldListRefreshed",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "FieldListRefreshedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "fieldListSpinnerElement",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "HTMLElement"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "fieldRemove",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "FieldRemoveEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "fillGridColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "gridcolumns: ColumnModel[]) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "filterTargetID",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "HTMLElement"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "firstColWidth",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "number | string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getActionCompleteName",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getAfterServiceInvoke",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "response: AfterServiceInvokeEventArgs) => AfterServiceInvokeEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getAllSummaryType",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => AggregateTypes[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getBeforeServiceInvoke",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "args: BeforeServiceInvokeEventArgs) => BeforeServiceInvokeEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getCellTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getChartSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getEngine",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "action: string, drillItem?: IDrilledItem, sortItem?: ISort, aggField?: IFieldOptions, cField?: ICalculatedFields, filterItem?: IFilter, memberName?: string, rawDataArgs?: FetchRawDataArgs, editArgs?: UpdateRawDataArgs, excelExportProperties?: ExcelExportProperties, isPivotTableExport?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getGridWidthAsNumber",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getHeaderField",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "rowIndex: number, colIndex: number, axis: string) => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getHeaderSortInfo",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "sortingObj: HeadersSortEventArgs) => HeadersSortEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getHeightAsNumber",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getPageSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getRowText",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "rowIndex: number, colIndex: number) => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getStackedColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "gridcolumns: ColumnModel[], stackedColumns: ColumnModel[]) => ColumnModel[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getTooltipTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getValuesHeader",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "pivotCell: IAxisSet, type: string) => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getWidthAsNumber",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "globalize",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "Internationalization"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "grid",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "Grid"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.PivotView.PivotViewGridSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "gridSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "GridSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "groupingBarModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "GroupingBar"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.PivotView.PivotViewGroupingBarSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "groupingBarSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "GroupingBarSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "groupingModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "Grouping"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "guid",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String",
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "height",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "string | number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "hideWaitingPopup",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "horizontalScrollScale",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "hyperlinkCellClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "HyperCellClickEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.PivotView.PivotViewHyperlinkSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "hyperlinkSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "HyperlinkSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "initEngine",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isAdaptive",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isChartLoaded",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isColumnCellHyperlink",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isDragging",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isEmptyGrid",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isInitial",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isModified",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isRowCellHyperlink",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isScrolling",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isServerWaitingPopup",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isStaticFieldList",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isStaticRefresh",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isSummaryCellHyperlink",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isTabular",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isTouchMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isValueCellHyperlink",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isWindowResized",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "keyboardModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "KeyboardInteraction"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "lastAggregationInfo",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "IFieldOptions"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "lastCalcFieldInfo",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ICalculatedFields"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "lastCellClicked",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "lastColumn",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "lastFilterInfo",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "IFilter"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "lastGridSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "GridSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "lastSortInfo",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ISort"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "layoutRefresh",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "load",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "LoadEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "loadOnDemandInMemberEditor",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "loadPersistData",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "persistData: string) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "loadReport",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "LoadReportArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "localeObj",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "L10n"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "maxNodeLimitInMemberEditor",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "maxRowsInDrillThrough",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "memberEditorOpen",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "MemberEditorOpenEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "memberFiltering",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "MemberFilteringEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "minHeight",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "minWidth",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "mouseEventArgs",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "MouseEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "newReport",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "NewReportArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "notEmpty",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "numberFormatting",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "NumberFormattingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "numberFormattingModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "NumberFormatting"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "olapEngineModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "OlapEngine"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "onContentReady",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "onDrill",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "target: Element, chartDrillInfo?: ChartLabelInfo) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "onFieldDropped",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "FieldDroppedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "onHeadersSort",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "HeadersSortEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "onPdfCellRender",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PdfCellRenderArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "onWindowResize",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "pagerModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "Pager"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.PivotView.PivotViewPagerSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "pagerSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PagerSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.PivotView.PivotViewPageSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "pageSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PageSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "pdfExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "pdfExportProperties?: PdfExportProperties, isMultipleExport?: boolean, pdfDoc?: Object, isBlob?: boolean, exportBothTableAndChart?: boolean) => Promise<Object>"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "pdfExportModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PDFExport"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "pivotButtonModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PivotButton"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "pivotChartModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PivotChart"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "pivotColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PivotColumn[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "pivotCommon",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PivotCommon"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "pivotDeferLayoutUpdate",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "pivotFieldListModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PivotFieldList"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "pivotValues",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "IAxisSet[][]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "pivotView",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "PivotView"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "posCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "printChart",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "refresh",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "refreshData",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "removeInternalEvents",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "removeReport",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "RemoveReportArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "renameReport",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "RenameReportArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "renderContextMenu",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "renderModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "Render"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "renderPivotGrid",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "requiredModules",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => ModuleDeclaration[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "resizedValue",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "resizeInfo",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ResizeInfo"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "rowDeselected",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "RowDeselectEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "rowSelected",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "RowSelectEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "saveReport",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "SaveReportArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "scrollDirection",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "scrollerBrowserLimit",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "scrollPosObject",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ScrollInfo"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "selected",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "CellSelectEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setCommonColumnsWidth",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "columns: ColumnModel[], width: number) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setGridColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "gridcolumns: ColumnModel[]) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showConditionalFormattingDialog",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showFieldList",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showGroupingBar",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showNumberFormattingDialog",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showToolbar",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showTooltip",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showValuesButton",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showWaitingPopup",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "spinnerTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "templateParser",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "template: string | Function) => Function"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "toolbar",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ToolbarItems[] | ItemModel[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "toolbarClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ClickEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "toolbarModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "Toolbar"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "toolbarRender",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "ToolbarArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "toolbarTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "tooltip",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "Tooltip"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "tooltipTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "totColWidth",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "triggerColumnRenderEvent",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "gridcolumns: ColumnModel[]) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "updateDataSource",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "updateGroupingReport",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "newGroupSettings: IGroupSettings[], updateGroupType: GroupType) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "updatePageSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "isInit: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "verticalScrollScale",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "virtualDiv",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "HTMLElement"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "virtualHeaderDiv",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "HTMLElement"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "virtualscrollModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "VirtualScroll"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.PivotView.PivotViewVirtualScrollSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "virtualScrollSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "VirtualScrollSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String",
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "width",
+      "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+      "type": "string | number"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "PivotViewBuilder",
+    "className": "PivotView",
+    "dtsPath": "node_modules/@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts",
+    "jsPath": "",
+    "namespace": "ej.pivotview",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}

@@ -1,0 +1,490 @@
+{
+  "component": "time-picker",
+  "counts": {
+    "builderMethods": 35,
+    "events": 9,
+    "members": 37,
+    "methods": 6,
+    "properties": 22
+  },
+  "fusionType": "FusionTimePicker",
+  "members": [
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowEdit",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "blur",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "BlurEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "change",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "ChangeEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "cleared",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "ClearedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "close",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "PopupEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "created",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "cssClass",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "skip: lifecycle cleanup, not Fusion plan behavior",
+      "kind": "method",
+      "name": "destroy",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "destroyed",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enabled",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableMask",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enablePersistence",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Inputs.FloatLabelType"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "floatLabelType",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "FloatLabelType | string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "focus",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "FocusEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "focusIn",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "focusOut",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "format",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "string | TimeFormatObject"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "fullScreenMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "hide",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "itemRender",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "ItemEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Calendars.TimePickerMaskPlaceholder"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "maskPlaceholder",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "TimeMaskPlaceholderModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "max",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "Date"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "min",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "Date"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "open",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "PopupEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "openOnFocus",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "placeholder",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "readonly",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "requiredModules",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": ") => ModuleDeclaration[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "scrollTo",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "Date"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "serverTimezoneOffset",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "show",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "event?: KeyboardEvent | MouseEvent | Event) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showClearButton",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "step",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "strictMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "value",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "Date"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String",
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "width",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "string | number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Int32"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "zIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+      "type": "number"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "TimePickerBuilder",
+    "className": "TimePicker",
+    "dtsPath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+    "jsPath": "",
+    "namespace": "ej.ej.calendars.TimePicker",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}

@@ -1,0 +1,348 @@
+{
+  "component": "color-picker",
+  "counts": {
+    "events": 9,
+    "payloadTypes": 6
+  },
+  "events": [
+    {
+      "event": "beforeClose",
+      "eventType": "BeforeOpenCloseEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "BeforeOpenCloseEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "BeforeOpenCloseEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeModeSwitch",
+      "eventType": "ModeSwitchEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "ModeSwitchEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "ModeSwitchEventArgs",
+              "kind": "property",
+              "name": "mode",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ModeSwitchEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeOpen",
+      "eventType": "BeforeOpenCloseEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "BeforeOpenCloseEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "BeforeOpenCloseEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeTileRender",
+      "eventType": "PaletteTileEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "PaletteTileEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "PaletteTileEventArgs",
+              "kind": "property",
+              "name": "presetName",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "PaletteTileEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "PaletteTileEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "change",
+      "eventType": "ColorPickerEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "ColorPickerEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ColorPickerEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ColorPickerEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Event",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "Event",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "onModeSwitch",
+      "eventType": "ModeSwitchEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "ModeSwitchEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "ModeSwitchEventArgs",
+              "kind": "property",
+              "name": "mode",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ModeSwitchEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "open",
+      "eventType": "OpenEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "OpenEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "OpenEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "select",
+      "eventType": "ColorPickerEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "ColorPickerEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ColorPickerEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ColorPickerEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionColorPicker",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "ColorPicker",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.inputs"
+  }
+}

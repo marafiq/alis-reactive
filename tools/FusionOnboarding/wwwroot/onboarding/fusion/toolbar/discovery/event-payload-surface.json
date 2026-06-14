@@ -1,0 +1,179 @@
+{
+  "component": "toolbar",
+  "counts": {
+    "events": 5,
+    "payloadTypes": 4
+  },
+  "events": [
+    {
+      "event": "beforeCreate",
+      "eventType": "BeforeCreateArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "BeforeCreateArgs",
+              "kind": "property",
+              "name": "enableCollision",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "BeforeCreateArgs",
+              "kind": "property",
+              "name": "scrollStep",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "BeforeCreateArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "clicked",
+      "eventType": "ClickEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "ClickEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ClickEventArgs",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+              "type": "ItemModel"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ClickEventArgs",
+              "kind": "property",
+              "name": "originalEvent",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+              "type": "Event"
+            }
+          ],
+          "name": "ClickEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Event",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "Event",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "destroyed",
+      "eventType": "Event",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "Event",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "keyDown",
+      "eventType": "KeyDownEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "KeyDownEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "KeyDownEventArgs",
+              "kind": "property",
+              "name": "currentItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "KeyDownEventArgs",
+              "kind": "property",
+              "name": "nextItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "KeyDownEventArgs",
+              "kind": "property",
+              "name": "originalEvent",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+              "type": "KeyboardEventArgs"
+            }
+          ],
+          "name": "KeyDownEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionToolbar",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "Toolbar",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.ej.navigations.Toolbar"
+  }
+}

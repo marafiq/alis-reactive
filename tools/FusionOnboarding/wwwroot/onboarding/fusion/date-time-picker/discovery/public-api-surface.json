@@ -1,0 +1,550 @@
+{
+  "component": "date-time-picker",
+  "counts": {
+    "builderMethods": 48,
+    "events": 7,
+    "members": 42,
+    "methods": 7,
+    "properties": 28
+  },
+  "fusionType": "FusionDateTimePicker",
+  "members": [
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowEdit",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "blur",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Calendars.CalendarType"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "calendarMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "CalendarType"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "cleared",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "ClearedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "close",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "created",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Calendars.DayHeaderFormats"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "dayHeaderFormat",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "DayHeaderFormats"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Calendars.CalendarView"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "depth",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "CalendarView"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "skip: lifecycle cleanup, not Fusion plan behavior",
+      "kind": "method",
+      "name": "destroy",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "destroyed",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableMask",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enablePersistence",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Int32"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "firstDayOfWeek",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "focus",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "focusIn",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "focusOut",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "fullScreenMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "hide",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "e?: KeyboardEvent | MouseEvent | Event) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isMultiSelection",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Calendars.DateTimePickerMaskPlaceholder"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "maskPlaceholder",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "MaskPlaceholderModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "max",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "Date"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "maxTime",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "Date"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "min",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "Date"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "minTime",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "Date"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "open",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "openOnFocus",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "placeholder",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "requiredModules",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": ") => ModuleDeclaration[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "scrollTo",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "Date"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "serverTimezoneOffset",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "show",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "type?: string, e?: MouseEvent | KeyboardEvent | KeyboardEventArgs) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showClearButton",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showTodayButton",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Calendars.CalendarView"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "start",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "CalendarView"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "step",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "strictMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "timeFormat",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "toggle",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "e?: KeyboardEventArgs) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "value",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "Date"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "values",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "Date[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "weekNumber",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Int32"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "zIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+      "type": "number"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "DateTimePickerBuilder",
+    "className": "DateTimePicker",
+    "dtsPath": "node_modules/@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts",
+    "jsPath": "",
+    "namespace": "ej.calendars",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}

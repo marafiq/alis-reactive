@@ -1,0 +1,155 @@
+{
+  "component": "carousel",
+  "counts": {
+    "events": 2,
+    "payloadTypes": 2
+  },
+  "events": [
+    {
+      "event": "slideChanged",
+      "eventType": "SlideChangedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "SlideChangedEventArgs",
+              "kind": "property",
+              "name": "currentIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/carousel/carousel.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "SlideChangedEventArgs",
+              "kind": "property",
+              "name": "currentSlide",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/carousel/carousel.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "SlideChangedEventArgs",
+              "kind": "property",
+              "name": "isSwiped",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/carousel/carousel.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "SlideChangedEventArgs",
+              "kind": "property",
+              "name": "previousIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/carousel/carousel.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "SlideChangedEventArgs",
+              "kind": "property",
+              "name": "previousSlide",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/carousel/carousel.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "SlideChangedEventArgs",
+              "kind": "property",
+              "name": "slideDirection",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/carousel/carousel.d.ts",
+              "type": "CarouselSlideDirection"
+            }
+          ],
+          "name": "SlideChangedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/carousel/carousel.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "slideChanging",
+      "eventType": "SlideChangingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "SlideChangingEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/carousel/carousel.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SlideChangingEventArgs",
+              "kind": "property",
+              "name": "currentIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/carousel/carousel.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "SlideChangingEventArgs",
+              "kind": "property",
+              "name": "currentSlide",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/carousel/carousel.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "SlideChangingEventArgs",
+              "kind": "property",
+              "name": "isSwiped",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/carousel/carousel.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "SlideChangingEventArgs",
+              "kind": "property",
+              "name": "nextIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/carousel/carousel.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "SlideChangingEventArgs",
+              "kind": "property",
+              "name": "nextSlide",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/carousel/carousel.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "SlideChangingEventArgs",
+              "kind": "property",
+              "name": "slideDirection",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/carousel/carousel.d.ts",
+              "type": "CarouselSlideDirection"
+            }
+          ],
+          "name": "SlideChangingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/carousel/carousel.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionCarousel",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "Carousel",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.navigations"
+  }
+}

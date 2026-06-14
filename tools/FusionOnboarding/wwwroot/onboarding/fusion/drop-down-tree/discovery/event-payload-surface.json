@@ -1,0 +1,351 @@
+{
+  "component": "drop-down-tree",
+  "counts": {
+    "events": 13,
+    "payloadTypes": 9
+  },
+  "events": [
+    {
+      "event": "actionFailure",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "beforeOpen",
+      "eventType": "DdtBeforeOpenEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "DdtBeforeOpenEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "boolean"
+            }
+          ],
+          "name": "DdtBeforeOpenEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "blur",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "change",
+      "eventType": "DdtChangeEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "DdtChangeEventArgs",
+              "kind": "property",
+              "name": "e",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "MouseEvent | KeyboardEvent"
+            },
+            {
+              "declaredOn": "DdtChangeEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "DdtChangeEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "DdtChangeEventArgs",
+              "kind": "property",
+              "name": "oldValue",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "string[]"
+            },
+            {
+              "declaredOn": "DdtChangeEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "string[]"
+            }
+          ],
+          "name": "DdtChangeEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "close",
+      "eventType": "DdtPopupEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "DdtPopupEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "DdtPopupEventArgs",
+              "kind": "property",
+              "name": "popup",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "Popup"
+            }
+          ],
+          "name": "DdtPopupEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "dataBound",
+      "eventType": "DdtDataBoundEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [],
+          "name": "DdtDataBoundEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "destroyed",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "filtering",
+      "eventType": "DdtFilteringEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "DdtFilteringEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "DdtFilteringEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "DdtFilteringEventArgs",
+              "kind": "property",
+              "name": "fields",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "FieldsModel"
+            },
+            {
+              "declaredOn": "DdtFilteringEventArgs",
+              "kind": "property",
+              "name": "preventDefaultAction",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "DdtFilteringEventArgs",
+              "kind": "property",
+              "name": "text",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "DdtFilteringEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "focus",
+      "eventType": "DdtFocusEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "DdtFocusEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "MouseEvent | FocusEvent | TouchEvent | KeyboardEvent"
+            },
+            {
+              "declaredOn": "DdtFocusEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "boolean"
+            }
+          ],
+          "name": "DdtFocusEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "keyPress",
+      "eventType": "DdtKeyPressEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "DdtKeyPressEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "DdtKeyPressEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "KeyboardEventArgs"
+            }
+          ],
+          "name": "DdtKeyPressEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "open",
+      "eventType": "DdtPopupEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "DdtPopupEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "DdtPopupEventArgs",
+              "kind": "property",
+              "name": "popup",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "Popup"
+            }
+          ],
+          "name": "DdtPopupEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "select",
+      "eventType": "DdtSelectEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "DdtSelectEventArgs",
+              "kind": "property",
+              "name": "action",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "DdtSelectEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "DdtSelectEventArgs",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+              "type": "HTMLLIElement"
+            }
+          ],
+          "name": "DdtSelectEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionDropDownTree",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "DropDownTree",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.dropdowns"
+  }
+}

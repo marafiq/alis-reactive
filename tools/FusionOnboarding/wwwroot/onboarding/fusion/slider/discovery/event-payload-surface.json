@@ -1,0 +1,219 @@
+{
+  "component": "slider",
+  "counts": {
+    "events": 6,
+    "payloadTypes": 5
+  },
+  "events": [
+    {
+      "event": "change",
+      "eventType": "SliderChangeEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "SliderChangeEventArgs",
+              "kind": "property",
+              "name": "action",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "SliderChangeEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SliderChangeEventArgs",
+              "kind": "property",
+              "name": "previousValue",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+              "type": "number | number[]"
+            },
+            {
+              "declaredOn": "SliderChangeEventArgs",
+              "kind": "property",
+              "name": "text",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "SliderChangeEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+              "type": "number | number[]"
+            }
+          ],
+          "name": "SliderChangeEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "changed",
+      "eventType": "SliderChangeEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "SliderChangeEventArgs",
+              "kind": "property",
+              "name": "action",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "SliderChangeEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SliderChangeEventArgs",
+              "kind": "property",
+              "name": "previousValue",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+              "type": "number | number[]"
+            },
+            {
+              "declaredOn": "SliderChangeEventArgs",
+              "kind": "property",
+              "name": "text",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "SliderChangeEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+              "type": "number | number[]"
+            }
+          ],
+          "name": "SliderChangeEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "renderedTicks",
+      "eventType": "SliderTickRenderedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "SliderTickRenderedEventArgs",
+              "kind": "property",
+              "name": "tickElements",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+              "type": "HTMLElement[]"
+            },
+            {
+              "declaredOn": "SliderTickRenderedEventArgs",
+              "kind": "property",
+              "name": "ticksWrapper",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+              "type": "HTMLElement"
+            }
+          ],
+          "name": "SliderTickRenderedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "renderingTicks",
+      "eventType": "SliderTickEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "SliderTickEventArgs",
+              "kind": "property",
+              "name": "text",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "SliderTickEventArgs",
+              "kind": "property",
+              "name": "tickElement",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "SliderTickEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "SliderTickEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "tooltipChange",
+      "eventType": "SliderTooltipEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "SliderTooltipEventArgs",
+              "kind": "property",
+              "name": "text",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "SliderTooltipEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+              "type": "number | number[]"
+            }
+          ],
+          "name": "SliderTooltipEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionSlider",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "Slider",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.ej.inputs"
+  }
+}

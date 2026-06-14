@@ -1,0 +1,394 @@
+{
+  "component": "mention",
+  "counts": {
+    "events": 11,
+    "payloadTypes": 5
+  },
+  "events": [
+    {
+      "event": "actionBegin",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "actionComplete",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "actionFailure",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "beforeOpen",
+      "eventType": "PopupEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "animation",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "AnimationModel"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "MouseEvent | KeyboardEventArgs | TouchEvent | Object"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "popup",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "Popup"
+            }
+          ],
+          "name": "PopupEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "change",
+      "eventType": "MentionChangeEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "SelectEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "SelectEventArgs",
+              "inheritedVia": "SelectEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "inheritedVia": "SelectEventArgs",
+              "kind": "property",
+              "name": "e",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "MouseEvent | KeyboardEvent | TouchEvent"
+            },
+            {
+              "declaredOn": "MentionChangeEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "inheritedVia": "SelectEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "inheritedVia": "SelectEventArgs",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "HTMLLIElement"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "inheritedVia": "SelectEventArgs",
+              "kind": "property",
+              "name": "itemData",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "FieldSettingsModel"
+            },
+            {
+              "declaredOn": "MentionChangeEventArgs",
+              "kind": "property",
+              "name": "previousItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+              "type": "HTMLLIElement"
+            },
+            {
+              "declaredOn": "MentionChangeEventArgs",
+              "kind": "property",
+              "name": "previousItemData",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+              "type": "FieldSettingsModel"
+            },
+            {
+              "declaredOn": "MentionChangeEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+              "type": "number | string | boolean"
+            }
+          ],
+          "name": "MentionChangeEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "closed",
+      "eventType": "PopupEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "animation",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "AnimationModel"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "MouseEvent | KeyboardEventArgs | TouchEvent | Object"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "popup",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "Popup"
+            }
+          ],
+          "name": "PopupEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "destroyed",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "filtering",
+      "eventType": "FilteringEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "FilteringEventArgs",
+              "kind": "property",
+              "name": "baseEventArgs",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "FilteringEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "FilteringEventArgs",
+              "kind": "property",
+              "name": "preventDefaultAction",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "FilteringEventArgs",
+              "kind": "property",
+              "name": "text",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "FilteringEventArgs",
+              "kind": "method",
+              "name": "updateData",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "dataSource: { [key: string]: Object; }[] | DataManager | string[] | number[] | boolean[], query?: Query, fields?: FieldSettingsModel) => void"
+            }
+          ],
+          "name": "FilteringEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "opened",
+      "eventType": "PopupEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "animation",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "AnimationModel"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "MouseEvent | KeyboardEventArgs | TouchEvent | Object"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "popup",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "Popup"
+            }
+          ],
+          "name": "PopupEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "select",
+      "eventType": "SelectEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "e",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "MouseEvent | KeyboardEvent | TouchEvent"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "HTMLLIElement"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "itemData",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "FieldSettingsModel"
+            }
+          ],
+          "name": "SelectEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionMention",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "Mention",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.ej.dropdowns"
+  }
+}

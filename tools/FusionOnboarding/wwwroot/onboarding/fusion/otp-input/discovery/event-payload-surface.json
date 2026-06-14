@@ -1,0 +1,226 @@
+{
+  "component": "otp-input",
+  "counts": {
+    "events": 5,
+    "payloadTypes": 4
+  },
+  "events": [
+    {
+      "event": "blur",
+      "eventType": "OtpFocusEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "OtpFocusEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "OtpFocusEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "OtpFocusEventArgs",
+              "kind": "property",
+              "name": "index",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "OtpFocusEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "OtpFocusEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "string | number"
+            }
+          ],
+          "name": "OtpFocusEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Event",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "Event",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "focus",
+      "eventType": "OtpFocusEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "OtpFocusEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "OtpFocusEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "OtpFocusEventArgs",
+              "kind": "property",
+              "name": "index",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "OtpFocusEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "OtpFocusEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "string | number"
+            }
+          ],
+          "name": "OtpFocusEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "input",
+      "eventType": "OtpInputEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "OtpInputEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "OtpInputEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "OtpInputEventArgs",
+              "kind": "property",
+              "name": "index",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "OtpInputEventArgs",
+              "kind": "property",
+              "name": "previousValue",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "string | number"
+            },
+            {
+              "declaredOn": "OtpInputEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "string | number"
+            }
+          ],
+          "name": "OtpInputEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "valueChanged",
+      "eventType": "OtpChangedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "OtpChangedEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "OtpChangedEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "OtpChangedEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "OtpChangedEventArgs",
+              "kind": "property",
+              "name": "previousValue",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "string | number"
+            },
+            {
+              "declaredOn": "OtpChangedEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+              "type": "string | number"
+            }
+          ],
+          "name": "OtpChangedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionOtpInput",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "OtpInput",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.inputs"
+  }
+}

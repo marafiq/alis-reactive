@@ -1,0 +1,632 @@
+{
+  "component": "file-upload",
+  "counts": {
+    "events": 20,
+    "payloadTypes": 12
+  },
+  "events": [
+    {
+      "event": "actionComplete",
+      "eventType": "ActionCompleteEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ActionCompleteEventArgs",
+              "kind": "property",
+              "name": "fileData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo[]"
+            }
+          ],
+          "name": "ActionCompleteEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeRemove",
+      "eventType": "BeforeRemoveEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BeforeRemoveEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            }
+          ],
+          "name": "BeforeRemoveEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeUpload",
+      "eventType": "BeforeUploadEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BeforeUploadEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            }
+          ],
+          "name": "BeforeUploadEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "canceling",
+      "eventType": "CancelEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "CancelEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "CancelEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "ProgressEventInit"
+            },
+            {
+              "declaredOn": "CancelEventArgs",
+              "kind": "property",
+              "name": "fileData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo"
+            }
+          ],
+          "name": "CancelEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "change",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "chunkFailure",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "chunkSuccess",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "chunkUploading",
+      "eventType": "UploadingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "chunkSize",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "currentChunkIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "currentRequest",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "XMLHttpRequest"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "fileData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo"
+            }
+          ],
+          "name": "UploadingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "clearing",
+      "eventType": "ClearingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ClearingEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ClearingEventArgs",
+              "kind": "property",
+              "name": "filesData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo[]"
+            }
+          ],
+          "name": "ClearingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "failure",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "fileListRendering",
+      "eventType": "FileListRenderingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "FileListRenderingEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "FileListRenderingEventArgs",
+              "kind": "property",
+              "name": "fileInfo",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo"
+            },
+            {
+              "declaredOn": "FileListRenderingEventArgs",
+              "kind": "property",
+              "name": "index",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "FileListRenderingEventArgs",
+              "kind": "property",
+              "name": "isPreload",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            }
+          ],
+          "name": "FileListRenderingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "pausing",
+      "eventType": "PauseResumeEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PauseResumeEventArgs",
+              "kind": "property",
+              "name": "chunkCount",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "PauseResumeEventArgs",
+              "kind": "property",
+              "name": "chunkIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "PauseResumeEventArgs",
+              "kind": "property",
+              "name": "chunkSize",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "PauseResumeEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "PauseResumeEventArgs",
+              "kind": "property",
+              "name": "file",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo"
+            }
+          ],
+          "name": "PauseResumeEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "progress",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "removing",
+      "eventType": "RemovingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "RemovingEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RemovingEventArgs",
+              "kind": "property",
+              "name": "currentRequest",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "XMLHttpRequest"
+            },
+            {
+              "declaredOn": "RemovingEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "MouseEvent | TouchEvent | KeyboardEventArgs"
+            },
+            {
+              "declaredOn": "RemovingEventArgs",
+              "kind": "property",
+              "name": "filesData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo[]"
+            },
+            {
+              "declaredOn": "RemovingEventArgs",
+              "kind": "property",
+              "name": "postRawFile",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            }
+          ],
+          "name": "RemovingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "rendering",
+      "eventType": "RenderingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "RenderingEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "RenderingEventArgs",
+              "kind": "property",
+              "name": "fileInfo",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo"
+            },
+            {
+              "declaredOn": "RenderingEventArgs",
+              "kind": "property",
+              "name": "index",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "RenderingEventArgs",
+              "kind": "property",
+              "name": "isPreload",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            }
+          ],
+          "name": "RenderingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "resuming",
+      "eventType": "PauseResumeEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PauseResumeEventArgs",
+              "kind": "property",
+              "name": "chunkCount",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "PauseResumeEventArgs",
+              "kind": "property",
+              "name": "chunkIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "PauseResumeEventArgs",
+              "kind": "property",
+              "name": "chunkSize",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "PauseResumeEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "PauseResumeEventArgs",
+              "kind": "property",
+              "name": "file",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo"
+            }
+          ],
+          "name": "PauseResumeEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "selected",
+      "eventType": "SelectedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "MouseEvent | TouchEvent | DragEvent | ClipboardEvent"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "filesData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo[]"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "isCanceled",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "isModified",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "modifiedFilesData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo[]"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "progressInterval",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "SelectedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "success",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "uploading",
+      "eventType": "UploadingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "chunkSize",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "currentChunkIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "currentRequest",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "XMLHttpRequest"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "fileData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo"
+            }
+          ],
+          "name": "UploadingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionFileUpload",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "Uploader",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.inputs"
+  }
+}

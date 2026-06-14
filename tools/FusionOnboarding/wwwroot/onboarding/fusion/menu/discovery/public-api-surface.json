@@ -1,0 +1,148 @@
+{
+  "component": "menu",
+  "counts": {
+    "builderMethods": 25,
+    "events": 0,
+    "members": 10,
+    "methods": 2,
+    "properties": 8
+  },
+  "fusionType": "FusionMenu",
+  "members": [
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "close",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/menu/menu.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableHtmlSanitizer",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/menu/menu.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableScrolling",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/menu/menu.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Navigations.MenuFieldSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "fields",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/menu/menu.d.ts",
+      "type": "FieldSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "hamburgerMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/menu/menu.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "open",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/menu/menu.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Navigations.Orientation"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "orientation",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/menu/menu.d.ts",
+      "type": "Orientation"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "target",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/menu/menu.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "template",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/menu/menu.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "title",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/menu/menu.d.ts",
+      "type": "string"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "MenuBuilder",
+    "className": "Menu",
+    "dtsPath": "node_modules/@syncfusion/ej2-navigations/src/menu/menu.d.ts",
+    "jsPath": "",
+    "namespace": "ej.ej.navigations",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}

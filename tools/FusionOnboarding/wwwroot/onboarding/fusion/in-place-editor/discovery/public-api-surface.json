@@ -1,0 +1,680 @@
+{
+  "component": "in-place-editor",
+  "counts": {
+    "builderMethods": 44,
+    "events": 12,
+    "members": 53,
+    "methods": 7,
+    "properties": 34
+  },
+  "fusionType": "FusionInPlaceEditor",
+  "members": [
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionBegin",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "ActionBeginEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionFailure",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "ActionEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.InPlaceEditor.ActionBlur"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "actionOnBlur",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "ActionBlur"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionSuccess",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "ActionEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.InPlaceEditor.AdaptorType"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "adaptor",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "AdaptorType"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "atcModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "AutoComplete"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeSanitizeHtml",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "BeforeSanitizeHtmlArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beginEdit",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "BeginEditEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "cancelButton",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "ButtonModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "cancelClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "MouseEvent"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "change",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "ChangeEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "colorModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "ColorPicker"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "comboBoxModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "ComboBox"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "created",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "Event"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "cssClass",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "dateRangeModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "DateRangePicker"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "skip: lifecycle cleanup, not Fusion plan behavior",
+      "kind": "method",
+      "name": "destroy",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "destroyed",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "Event"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "disabled",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.InPlaceEditor.EditableType"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "editableOn",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "EditableType"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "emptyText",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableEditMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableHtmlParse",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableHtmlSanitizer",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enablePersistence",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "endEdit",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "EndEditEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "extendModelValue",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "val: string | number | boolean | Date | object | DateRange | string[] | Date[] | number[] | boolean[] | object[]) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.InPlaceEditor.RenderMode"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "mode",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "RenderMode"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "model",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "AutoCompleteModel | ColorPickerModel | ComboBoxModel | DatePickerModel | DateRangePickerModel | DateTimePickerModel | DropDownListModel | MaskedTextBoxModel | MultiSelectModel | NumericTextBoxModel | RichTextEditorModel | SliderModel | TextBoxModel | TimePickerModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "multiSelectModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "MultiSelect"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "name",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "needsID",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.InPlaceEditor.InPlaceEditorPopupSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "popupSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "PopupSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String",
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "primaryKey",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "string | number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "printValue",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "requiredModules",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": ") => ModuleDeclaration[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "rteModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "Rte"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "sanitizeHelper",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "value: string) => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "save",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "saveButton",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "ButtonModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setValue",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showButtons",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "sliderModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "Slider"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "submitClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "MouseEvent"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "submitOnEnter",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "template",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "string | HTMLElement | Function"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.InPlaceEditor.TextOptionType"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "textOption",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "textOptionType"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "timeModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "TimePicker"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.InPlaceEditor.InputType"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "type",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "InputType"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "url",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "validate",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "validating",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "ValidateEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object",
+          "System.String",
+          "System.Double",
+          "System.String[]",
+          "System.Double[]"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "value",
+      "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+      "type": "string | number | Date | string[] | Date[] | number[]"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "InPlaceEditorBuilder",
+    "className": "InPlaceEditor",
+    "dtsPath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+    "jsPath": "",
+    "namespace": "ej.inplaceeditor",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}

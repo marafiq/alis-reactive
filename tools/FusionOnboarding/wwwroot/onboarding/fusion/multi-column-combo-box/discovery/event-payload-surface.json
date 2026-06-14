@@ -1,0 +1,317 @@
+{
+  "component": "multi-column-combo-box",
+  "counts": {
+    "events": 9,
+    "payloadTypes": 6
+  },
+  "events": [
+    {
+      "event": "actionBegin",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "actionComplete",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "actionFailure",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "change",
+      "eventType": "ChangeEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "MouseEvent | KeyboardEvent | TouchEvent"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "itemElement",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "previousItemElement",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "number | string"
+            }
+          ],
+          "name": "ChangeEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "close",
+      "eventType": "PopupEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "animation",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "AnimationModel"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "MouseEvent | KeyboardEvent | TouchEvent"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "popup",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "Popup"
+            }
+          ],
+          "name": "PopupEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Event",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "Event",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "filtering",
+      "eventType": "FilteringEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "FilteringEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "FilteringEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "FilteringEventArgs",
+              "kind": "property",
+              "name": "preventDefaultAction",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "FilteringEventArgs",
+              "kind": "property",
+              "name": "text",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "FilteringEventArgs",
+              "kind": "method",
+              "name": "updateData",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "dataSource: { [key: string]: Object; }[] | DataManager | DataResult, query?: Query, fields?: FieldSettingsModel) => void"
+            }
+          ],
+          "name": "FilteringEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "open",
+      "eventType": "PopupEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "animation",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "AnimationModel"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "MouseEvent | KeyboardEvent | TouchEvent"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "popup",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "Popup"
+            }
+          ],
+          "name": "PopupEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "select",
+      "eventType": "SelectEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "MouseEvent | KeyboardEvent | TouchEvent"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "itemElement",
+              "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+              "type": "HTMLElement"
+            }
+          ],
+          "name": "SelectEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionMultiColumnComboBox",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "MultiColumnComboBox",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.multicolumncombobox"
+  }
+}

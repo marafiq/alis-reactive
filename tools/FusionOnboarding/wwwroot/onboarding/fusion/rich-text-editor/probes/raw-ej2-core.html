@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>FusionRichTextEditor Raw EJ2 core Probe</title>
+    <link rel="stylesheet" href="/css/syncfusion.dev.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #rich-text-editor-host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+        th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f6f8fa; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+        button { margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <h1>FusionRichTextEditor Raw EJ2 core Probe</h1>
+    <p>Status: generated static probe. Execute in the sandbox/browser, interact with the component, then save <code>window.__fusionProbe.trace</code> as <code>traces/raw-ej2-core.trace.json</code>.</p>
+    <div id="rich-text-editor-host">
+        <div id="rich-text-editor"></div>
+    </div>
+
+    <button id="dump">Dump Keys</button>
+    <button id="clear">Clear Trace</button>
+
+    <h2>Candidate Rows</h2>
+    <table>
+        <thead><tr><th>JS Member</th><th>Kind</th><th>Type</th><th>Builder</th><th>Decision</th></tr></thead>
+        <tbody>
+<tr><td><code>actionBegin</code></td><td>event</td><td>ActionBeginEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>actionComplete</code></td><td>event</td><td>ActionCompleteEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>addAIPromptResponse</code></td><td>method</td><td>outputResponse: string | Object, isFinalUpdate?: boolean) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>addAnchorAriaLabel</code></td><td>method</td><td>value: string) =&gt; string</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>addAudioVideoWrapper</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>afterImageDelete</code></td><td>event</td><td>AfterImageDeleteEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>afterMediaDelete</code></td><td>event</td><td>AfterMediaDeleteEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>afterPasteCleanup</code></td><td>event</td><td>object</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>aiAssistantModule</code></td><td>property</td><td>AIAssistant</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>aiAssistantPromptRequest</code></td><td>event</td><td>AIAssistantPromptRequestArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>aiAssistantStopRespondingClick</code></td><td>event</td><td>AIAssistantStopRespondingArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>aiAssistantToolbarClick</code></td><td>event</td><td>AIAssitantToolbarClickEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>audioModule</code></td><td>property</td><td>Audio</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>autoFormatModule</code></td><td>property</td><td>AutoFormat</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>autoResize</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>beforeClipboardWrite</code></td><td>event</td><td>ClipboardWriteEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeDialogClose</code></td><td>event</td><td>BeforeCloseEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeDialogOpen</code></td><td>event</td><td>BeforeOpenEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeFileUpload</code></td><td>event</td><td>BeforeUploadEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeImageDrop</code></td><td>event</td><td>ImageDropEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeImageUpload</code></td><td>event</td><td>BeforeUploadEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeMediaDrop</code></td><td>event</td><td>MediaDropEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforePasteCleanup</code></td><td>event</td><td>PasteCleanupArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforePopupClose</code></td><td>event</td><td>BeforePopupOpenCloseEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforePopupOpen</code></td><td>event</td><td>BeforePopupOpenCloseEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeQuickToolbarOpen</code></td><td>event</td><td>BeforeQuickToolbarOpenArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeSanitizeHtml</code></td><td>event</td><td>BeforeSanitizeHtmlArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>blur</code></td><td>event</td><td>Object</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>change</code></td><td>event</td><td>ChangeEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>cleanList</code></td><td>method</td><td>e: KeyboardEvent) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>clearAIPromptHistory</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>clearUndoRedo</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>clipboardAction</code></td><td>method</td><td>action: string, event: MouseEvent | KeyboardEvent | ClipboardEvent) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>clipBoardCleanupModule</code></td><td>property</td><td>ClipBoardCleanup</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>clipBoardHandler</code></td><td>method</td><td>e: ClipboardEvent | KeyboardEvent) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>closeDialog</code></td><td>method</td><td>type: DialogType) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>codeBlockModule</code></td><td>property</td><td>CodeBlock</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>contentModule</code></td><td>property</td><td>IRenderer</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>countModule</code></td><td>property</td><td>Count</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>created</code></td><td>event</td><td>Object</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>currentTarget</code></td><td>property</td><td>HTMLElement</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>destroy</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>skip: lifecycle cleanup, not Fusion plan behavior</td></tr>
+<tr><td><code>destroyed</code></td><td>event</td><td>Object</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>dialogClose</code></td><td>event</td><td>Object</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>dialogOpen</code></td><td>event</td><td>Object</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>disableToolbarItem</code></td><td>method</td><td>items: string | string[], muteToolbarUpdate?: boolean) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>documentExporting</code></td><td>event</td><td>ExportingEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>emojiPickerModule</code></td><td>property</td><td>EmojiPicker</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>enableToolbarItem</code></td><td>method</td><td>items: string | string[], muteToolbarUpdate?: boolean) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>ensureModuleInjected</code></td><td>method</td><td>module: Function) =&gt; boolean</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>enterKeyModule</code></td><td>property</td><td>EnterKeyAction</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>executeAIPrompt</code></td><td>method</td><td>prompt: string) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>executeCommand</code></td><td>method</td><td>commandName: CommandName, value?: string | HTMLElement | ILinkCommandsArgs | IImageCommandsArgs | ITableCommandsArgs | FormatPainterSettingsModel | IAudioCommandsArgs | IVideoCommandsArgs | ICodeBlockCommandsArgs, option?: ExecuteCommandOption) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>fileManagerModule</code></td><td>property</td><td>FileManager</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>fileRemoving</code></td><td>event</td><td>RemovingEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>fileSelected</code></td><td>event</td><td>SelectedEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>fileUploadFailed</code></td><td>event</td><td>Object</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>fileUploading</code></td><td>event</td><td>UploadingEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>fileUploadSuccess</code></td><td>event</td><td>Object</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>focus</code></td><td>event</td><td>Object</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>focusIn</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>focusOut</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>formatPainterModule</code></td><td>property</td><td>FormatPainter</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>fullScreenModule</code></td><td>property</td><td>FullScreen</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>getAIPromptHistory</code></td><td>method</td><td>) =&gt; PromptModel[]</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>getBaseToolbarObject</code></td><td>method</td><td>) =&gt; BaseToolbar</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>getCharCount</code></td><td>method</td><td>) =&gt; number</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>getContent</code></td><td>method</td><td>) =&gt; Element</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>getCssClass</code></td><td>method</td><td>isSpace?: boolean) =&gt; string</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>getHtml</code></td><td>method</td><td>) =&gt; string</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>getID</code></td><td>method</td><td>) =&gt; string</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>getInsertImgMaxWidth</code></td><td>method</td><td>) =&gt; string | number</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>getInsertVidMaxWidth</code></td><td>method</td><td>) =&gt; string | number</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>getRange</code></td><td>method</td><td>) =&gt; Range</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>getSelectedHtml</code></td><td>method</td><td>) =&gt; string</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>getSelection</code></td><td>method</td><td>) =&gt; string</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>getText</code></td><td>method</td><td>) =&gt; string</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>getToolbar</code></td><td>method</td><td>) =&gt; HTMLElement</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>getToolbarElement</code></td><td>method</td><td>) =&gt; Element</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>getXhtml</code></td><td>method</td><td>) =&gt; string</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+        </tbody>
+    </table>
+
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const target = document.getElementById("rich-text-editor");
+
+        function clean(value, seen = new WeakSet(), depth = 0) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 4) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.slice(0, 20).map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).sort().slice(0, 120).forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function functionNames(value) {
+            const names = new Set();
+            let current = value;
+            while (current && current !== Object.prototype) {
+                Object.getOwnPropertyNames(current).forEach(name => {
+                    if (name !== "constructor" && typeof value[name] === "function") names.add(name);
+                });
+                current = Object.getPrototypeOf(current);
+            }
+            return Array.from(names).sort();
+        }
+
+        function describePayload(args) {
+            if (args === null || args === undefined) {
+                return {
+                    ownKeys: [],
+                    functions: [],
+                    properties: {},
+                    value: args === undefined ? "undefined" : null
+                };
+            }
+            const own = Object.keys(args).sort();
+            const properties = {};
+            own.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === null ? "null" : Array.isArray(item) ? "array" : typeof item,
+                    sample: clean(item)
+                };
+            });
+            return { ownKeys: own, functions: functionNames(args), properties };
+        }
+
+        function record(label, value) {
+            trace.push({ at: new Date().toISOString(), label, value: clean(value) });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        const probe = {
+            target,
+            trace,
+            record,
+            event: (label, args) => record(label, describePayload(args)),
+            member: (label, read) => record(label, read()),
+            call: (label, invoke) => record(label, invoke())
+        };
+        window.__fusionProbe = probe;
+
+        const ej2 = new ej.richtexteditor.RichTextEditor({
+            dataSource: [
+                { id: 1, name: "Alpha", status: "Open" },
+                { id: 2, name: "Beta", status: "Closed" },
+                { id: 3, name: "Gamma", status: "Open" }
+            ],
+            columns: [
+                { field: "id", headerText: "ID", width: 90, textAlign: "Right" },
+                { field: "name", headerText: "Name", width: 160 },
+                { field: "status", headerText: "Status", width: 140 }
+            ],
+            allowPaging: true,
+            allowSorting: true,
+            allowFiltering: true,
+            pageSettings: { pageSize: 2 },
+            actionBegin: args => probe.event("actionBegin", args),
+                actionComplete: args => probe.event("actionComplete", args),
+                afterImageDelete: args => probe.event("afterImageDelete", args),
+                afterMediaDelete: args => probe.event("afterMediaDelete", args),
+                afterPasteCleanup: args => probe.event("afterPasteCleanup", args),
+                aiAssistantPromptRequest: args => probe.event("aiAssistantPromptRequest", args),
+                aiAssistantStopRespondingClick: args => probe.event("aiAssistantStopRespondingClick", args),
+                aiAssistantToolbarClick: args => probe.event("aiAssistantToolbarClick", args),
+                beforeClipboardWrite: args => probe.event("beforeClipboardWrite", args),
+                beforeDialogClose: args => probe.event("beforeDialogClose", args),
+                beforeDialogOpen: args => probe.event("beforeDialogOpen", args),
+                beforeFileUpload: args => probe.event("beforeFileUpload", args),
+                beforeImageDrop: args => probe.event("beforeImageDrop", args),
+                beforeImageUpload: args => probe.event("beforeImageUpload", args),
+                beforeMediaDrop: args => probe.event("beforeMediaDrop", args),
+                beforePasteCleanup: args => probe.event("beforePasteCleanup", args),
+                beforePopupClose: args => probe.event("beforePopupClose", args),
+                beforePopupOpen: args => probe.event("beforePopupOpen", args),
+                beforeQuickToolbarOpen: args => probe.event("beforeQuickToolbarOpen", args),
+                beforeSanitizeHtml: args => probe.event("beforeSanitizeHtml", args),
+                blur: args => probe.event("blur", args),
+                change: args => probe.event("change", args),
+                created: args => probe.event("created", args),
+                destroyed: args => probe.event("destroyed", args),
+                dialogClose: args => probe.event("dialogClose", args),
+                dialogOpen: args => probe.event("dialogOpen", args),
+                documentExporting: args => probe.event("documentExporting", args),
+                fileRemoving: args => probe.event("fileRemoving", args),
+                fileSelected: args => probe.event("fileSelected", args),
+                fileUploadFailed: args => probe.event("fileUploadFailed", args),
+                fileUploading: args => probe.event("fileUploading", args),
+                fileUploadSuccess: args => probe.event("fileUploadSuccess", args),
+                focus: args => probe.event("focus", args),
+                imageRemoving: args => probe.event("imageRemoving", args),
+                imageSelected: args => probe.event("imageSelected", args),
+                imageUploadFailed: args => probe.event("imageUploadFailed", args),
+                imageUploading: args => probe.event("imageUploading", args),
+                imageUploadSuccess: args => probe.event("imageUploadSuccess", args),
+                quickToolbarClose: args => probe.event("quickToolbarClose", args),
+                quickToolbarOpen: args => probe.event("quickToolbarOpen", args),
+                resizeStart: args => probe.event("resizeStart", args),
+                resizeStop: args => probe.event("resizeStop", args),
+                resizing: args => probe.event("resizing", args),
+                selectionChanged: args => probe.event("selectionChanged", args),
+                slashMenuItemSelect: args => probe.event("slashMenuItemSelect", args),
+                toolbarClick: args => probe.event("toolbarClick", args),
+                toolbarStatusUpdate: args => probe.event("toolbarStatusUpdate", args),
+                updatedToolbarStatus: args => probe.event("updatedToolbarStatus", args),
+                wordImporting: args => probe.event("wordImporting", args)
+        });
+
+        ej2.appendTo(target);
+        probe.ej2 = ej2;
+        record("ready", {
+            component: "rich-text-editor",
+            apiSet: "core",
+            namespace: "ej.richtexteditor",
+            className: "RichTextEditor"
+        });
+
+        document.getElementById("dump").addEventListener("click", () => {
+            record("own keys", Object.keys(ej2).sort());
+            record("prototype methods", functionNames(ej2));
+        });
+
+        document.getElementById("clear").addEventListener("click", () => {
+            trace.length = 0;
+            document.getElementById("trace").textContent = "[]";
+        });
+    </script>
+</body>
+</html>

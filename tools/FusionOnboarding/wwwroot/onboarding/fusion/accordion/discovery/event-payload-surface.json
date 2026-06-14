@@ -1,0 +1,214 @@
+{
+  "component": "accordion",
+  "counts": {
+    "events": 5,
+    "payloadTypes": 4
+  },
+  "events": [
+    {
+      "event": "clicked",
+      "eventType": "AccordionClickArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "AccordionClickArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "AccordionClickArgs",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+              "type": "AccordionItemModel"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "AccordionClickArgs",
+              "kind": "property",
+              "name": "originalEvent",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+              "type": "Event"
+            }
+          ],
+          "name": "AccordionClickArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Event",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "Event",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "destroyed",
+      "eventType": "Event",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "Event",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "expanded",
+      "eventType": "ExpandedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "ExpandedEventArgs",
+              "kind": "property",
+              "name": "content",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "ExpandedEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "ExpandedEventArgs",
+              "kind": "property",
+              "name": "index",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "ExpandedEventArgs",
+              "kind": "property",
+              "name": "isExpanded",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ExpandedEventArgs",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+              "type": "AccordionItemModel"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ExpandedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "expanding",
+      "eventType": "ExpandEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "ExpandEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ExpandEventArgs",
+              "kind": "property",
+              "name": "content",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "ExpandEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "ExpandEventArgs",
+              "kind": "property",
+              "name": "index",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "ExpandEventArgs",
+              "kind": "property",
+              "name": "isExpanded",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ExpandEventArgs",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+              "type": "AccordionItemModel"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ExpandEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionAccordion",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "Accordion",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.navigations"
+  }
+}

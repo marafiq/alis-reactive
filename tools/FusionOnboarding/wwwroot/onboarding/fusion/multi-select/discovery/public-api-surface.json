@@ -1,0 +1,1058 @@
+{
+  "component": "multi-select",
+  "counts": {
+    "builderMethods": 80,
+    "events": 17,
+    "members": 82,
+    "methods": 14,
+    "properties": 51
+  },
+  "fusionType": "FusionMultiSelect",
+  "members": [
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "actionFailureTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "addItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "items: { [key: string]: Object; }[] | { [key: string]: Object; } | string | boolean | number | string[] | boolean[] | number[], itemIndex?: number) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "addTagOnBlur",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowCustomValue",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowFiltering",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowObjectBinding",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowResize",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeOpen",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeSelectAll",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "ISelectAllEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "blur",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "change",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "MultiSelectChangeEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "changeOnBlur",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "chipSelection",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "clear",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "close",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "PopupEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "closePopupOnSelect",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "cssClass",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "customValueSelection",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "CustomValueEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "debounceDelay",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "delimiterChar",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "skip: lifecycle cleanup, not Fusion plan behavior",
+      "kind": "method",
+      "name": "destroy",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "disableItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "item: string | number | object | HTMLLIElement) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enabled",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableGroupCheckBox",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableHtmlSanitizer",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enablePersistence",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableSelectionOrder",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableVirtualization",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.DropDowns.MultiSelectFieldSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "fields",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "FieldSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "filter",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "dataSource: { [key: string]: Object; }[] | DataManager | string[] | number[] | boolean[], query?: Query, fields?: FieldSettingsModel) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "filterBarPlaceholder",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "filtering",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "FilteringEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.DropDowns.FilterType"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "filterType",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "FilterType"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Inputs.FloatLabelType"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "floatLabelType",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "FloatLabelType"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "focus",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "focusIn",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "focusOut",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "footerTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getItems",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": ") => Element[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "groupTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "headerTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "hidePopup",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "e?: MouseEvent | KeyboardEventArgs) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "hideSelectedItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "hideSpinner",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "ignoreAccent",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "ignoreCase",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "isDeviceFullScreen",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "itemTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "locale",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "maximumSelectionLength",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.DropDowns.VisualMode"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "mode",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "visualMode"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "noRecordsTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "open",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "PopupEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "openOnClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "placeholder",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "popupHeight",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string | number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "popupWidth",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string | number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "query",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "Query"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "readonly",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "removed",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "RemoveEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "removing",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "RemoveEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "requiredModules",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": ") => ModuleDeclaration[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "resizeStart",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "resizeStop",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "resizing",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "selectAll",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "state: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "selectAllText",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "selectedAll",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "ISelectAllEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showClearButton",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showDropDownIcon",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showPopup",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "e?: MouseEvent | KeyboardEventArgs | TouchEvent) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showSelectAll",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showSpinner",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "sortOrder",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "SortOrder"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "tagging",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "TaggingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "text",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string | null"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "ulElement",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "HTMLElement"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "unSelectAllText",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object",
+          "System.Double[]",
+          "System.String[]"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "value",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "number[] | string[] | boolean[] | object[] | null"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "valueTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "width",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "string | number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "zIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+      "type": "number"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "MultiSelectBuilder",
+    "className": "MultiSelect",
+    "dtsPath": "node_modules/@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts",
+    "jsPath": "",
+    "namespace": "ej.dropdowns",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}

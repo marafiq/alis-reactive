@@ -1,0 +1,2561 @@
+{
+  "component": "pivot-view",
+  "counts": {
+    "events": 51,
+    "payloadTypes": 48
+  },
+  "events": [
+    {
+      "event": "actionBegin",
+      "eventType": "PivotActionBeginEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PivotActionBeginEventArgs",
+              "kind": "property",
+              "name": "actionName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "PivotActionBeginEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "PivotActionBeginEventArgs",
+              "kind": "property",
+              "name": "dataSourceSettings",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataOptions"
+            },
+            {
+              "declaredOn": "PivotActionBeginEventArgs",
+              "kind": "property",
+              "name": "fieldInfo",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "FieldItemInfo"
+            }
+          ],
+          "name": "PivotActionBeginEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "actionComplete",
+      "eventType": "PivotActionCompleteEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PivotActionCompleteEventArgs",
+              "kind": "property",
+              "name": "actionInfo",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "PivotActionInfo"
+            },
+            {
+              "declaredOn": "PivotActionCompleteEventArgs",
+              "kind": "property",
+              "name": "actionName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "PivotActionCompleteEventArgs",
+              "kind": "property",
+              "name": "dataSourceSettings",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataOptions"
+            },
+            {
+              "declaredOn": "PivotActionCompleteEventArgs",
+              "kind": "property",
+              "name": "fieldInfo",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "FieldItemInfo"
+            }
+          ],
+          "name": "PivotActionCompleteEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "actionFailure",
+      "eventType": "PivotActionFailureEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PivotActionFailureEventArgs",
+              "kind": "property",
+              "name": "actionName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "PivotActionFailureEventArgs",
+              "kind": "property",
+              "name": "errorInfo",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "Error"
+            }
+          ],
+          "name": "PivotActionFailureEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "afterServiceInvoke",
+      "eventType": "AfterServiceInvokeEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "AfterServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "action",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "AfterServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "response",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "AfterServiceInvokeEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "aggregateCellInfo",
+      "eventType": "AggregateEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "AggregateEventArgs",
+              "kind": "property",
+              "name": "aggregateType",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "SummaryTypes"
+            },
+            {
+              "declaredOn": "AggregateEventArgs",
+              "kind": "property",
+              "name": "cellSets",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataSet[]"
+            },
+            {
+              "declaredOn": "AggregateEventArgs",
+              "kind": "property",
+              "name": "column",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IAxisSet"
+            },
+            {
+              "declaredOn": "AggregateEventArgs",
+              "kind": "property",
+              "name": "columnCellType",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "AggregateEventArgs",
+              "kind": "property",
+              "name": "fieldName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "AggregateEventArgs",
+              "kind": "property",
+              "name": "row",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IAxisSet"
+            },
+            {
+              "declaredOn": "AggregateEventArgs",
+              "kind": "property",
+              "name": "rowCellType",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "AggregateEventArgs",
+              "kind": "property",
+              "name": "skipFormatting",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "AggregateEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "AggregateEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "aggregateMenuOpen",
+      "eventType": "AggregateMenuOpenEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "AggregateMenuOpenEventArgs",
+              "kind": "property",
+              "name": "aggregateTypes",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "AggregateTypes[]"
+            },
+            {
+              "declaredOn": "AggregateMenuOpenEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "AggregateMenuOpenEventArgs",
+              "kind": "property",
+              "name": "displayMenuCount",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "AggregateMenuOpenEventArgs",
+              "kind": "property",
+              "name": "fieldName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "AggregateMenuOpenEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeColumnsRender",
+      "eventType": "ColumnRenderEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ColumnRenderEventArgs",
+              "kind": "property",
+              "name": "columns",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "PivotColumn[]"
+            },
+            {
+              "declaredOn": "ColumnRenderEventArgs",
+              "kind": "property",
+              "name": "dataSourceSettings",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataOptions"
+            },
+            {
+              "declaredOn": "ColumnRenderEventArgs",
+              "kind": "property",
+              "name": "stackedColumns",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "ColumnModel[]"
+            }
+          ],
+          "name": "ColumnRenderEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeExport",
+      "eventType": "BeforeExportEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "allowRepeatHeader",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "columnSize",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "currentExportView",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "ExportView"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "dataCollections",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IAxisSet[][]"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "excelExportProperties",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "ExcelExportProperties"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "fileName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "footer",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "header",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "height",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "isBlob",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "isMultipleExport",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "orientation",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "PdfPageOrientation"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "pdfDoc",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "pdfExportProperties",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "PdfExportProperties"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "pdfMargins",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "PdfMargins"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "style",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "PdfTheme"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "type",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "ExportType"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "width",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "BeforeExportEventArgs",
+              "kind": "property",
+              "name": "workbook",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "Workbook"
+            }
+          ],
+          "name": "BeforeExportEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeServiceInvoke",
+      "eventType": "BeforeServiceInvokeEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BeforeServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "action",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "BeforeServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "aggregatedItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IFieldOptions"
+            },
+            {
+              "declaredOn": "BeforeServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "calculatedItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "ICalculatedFields"
+            },
+            {
+              "declaredOn": "BeforeServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "customProperties",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "BeforeServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "dataSourceSettings",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataOptions"
+            },
+            {
+              "declaredOn": "BeforeServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "drillItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDrilledItem"
+            },
+            {
+              "declaredOn": "BeforeServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "editArgs",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "UpdateRawDataArgs"
+            },
+            {
+              "declaredOn": "BeforeServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "excelExportProperties",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "ExcelExportProperties"
+            },
+            {
+              "declaredOn": "BeforeServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "exportAllPages",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "fetchRawDataArgs",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "FetchRawDataArgs"
+            },
+            {
+              "declaredOn": "BeforeServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "filterItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IFilter"
+            },
+            {
+              "declaredOn": "BeforeServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "hash",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "BeforeServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "internalProperties",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "BeforeServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "isGroupingUpdated",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "memberName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "BeforeServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "request",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "XMLHttpRequest"
+            },
+            {
+              "declaredOn": "BeforeServiceInvokeEventArgs",
+              "kind": "property",
+              "name": "sortItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "ISort"
+            }
+          ],
+          "name": "BeforeServiceInvokeEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beginDrillThrough",
+      "eventType": "BeginDrillThroughEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BeginDrillThroughEventArgs",
+              "kind": "property",
+              "name": "cellInfo",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "DrillThroughEventArgs"
+            },
+            {
+              "declaredOn": "BeginDrillThroughEventArgs",
+              "kind": "property",
+              "name": "gridObj",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "Grid"
+            },
+            {
+              "declaredOn": "BeginDrillThroughEventArgs",
+              "kind": "property",
+              "name": "type",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "BeginDrillThroughEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "calculatedFieldCreate",
+      "eventType": "CalculatedFieldCreateEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "CalculatedFieldCreateEventArgs",
+              "kind": "property",
+              "name": "calculatedField",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "ICalculatedFields"
+            },
+            {
+              "declaredOn": "CalculatedFieldCreateEventArgs",
+              "kind": "property",
+              "name": "calculatedFieldSettings",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "ICalculatedFieldSettings[]"
+            },
+            {
+              "declaredOn": "CalculatedFieldCreateEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "CalculatedFieldCreateEventArgs",
+              "kind": "property",
+              "name": "dataSourceSettings",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataOptions"
+            },
+            {
+              "declaredOn": "CalculatedFieldCreateEventArgs",
+              "kind": "property",
+              "name": "fieldName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "CalculatedFieldCreateEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "cellClick",
+      "eventType": "CellClickEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "CellClickEventArgs",
+              "kind": "property",
+              "name": "currentCell",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "CellClickEventArgs",
+              "kind": "property",
+              "name": "data",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "CellClickEventArgs",
+              "kind": "property",
+              "name": "nativeEvent",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "MouseEvent"
+            }
+          ],
+          "name": "CellClickEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "cellDeselected",
+      "eventType": "CellDeselectEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "kind": "property",
+              "name": "cellIndexes",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "ISelectedCell[]"
+            },
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "kind": "property",
+              "name": "cells",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element[]"
+            },
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "kind": "property",
+              "name": "data",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object"
+            }
+          ],
+          "name": "CellDeselectEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "cellSelected",
+      "eventType": "PivotCellSelectedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "CellSelectingEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "PivotCellSelectedEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "CellSelectEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "cellIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "IIndex"
+            },
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "cellIndexes",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "ISelectedCell[]"
+            },
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "cells",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element[]"
+            },
+            {
+              "declaredOn": "CellSelectEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "currentCell",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "PivotCellSelectedEventArgs",
+              "kind": "property",
+              "name": "currentTarget",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "PivotCellSelectedEventArgs",
+              "kind": "property",
+              "name": "data",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IAxisSet"
+            },
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "data",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "PivotCellSelectedEventArgs",
+              "kind": "property",
+              "name": "isCellClick",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "CellSelectingEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "isCtrlPressed",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "CellSelectingEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "isShiftPressed",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "PivotCellSelectedEventArgs",
+              "kind": "property",
+              "name": "pivotValues",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IAxisSet[][]"
+            },
+            {
+              "declaredOn": "CellSelectEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "previousRowCell",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "CellSelectEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "previousRowCellIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "PivotCellSelectedEventArgs",
+              "kind": "property",
+              "name": "selectedCellsInfo",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "CellSelectedObject[]"
+            },
+            {
+              "declaredOn": "PivotCellSelectedEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "Element"
+            }
+          ],
+          "name": "PivotCellSelectedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "cellSelecting",
+      "eventType": "PivotCellSelectedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "CellSelectingEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "PivotCellSelectedEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "CellSelectEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "cellIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "IIndex"
+            },
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "cellIndexes",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "ISelectedCell[]"
+            },
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "cells",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element[]"
+            },
+            {
+              "declaredOn": "CellSelectEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "currentCell",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "PivotCellSelectedEventArgs",
+              "kind": "property",
+              "name": "currentTarget",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "PivotCellSelectedEventArgs",
+              "kind": "property",
+              "name": "data",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IAxisSet"
+            },
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "data",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "PivotCellSelectedEventArgs",
+              "kind": "property",
+              "name": "isCellClick",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "CellSelectingEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "isCtrlPressed",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "CellSelectingEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "isShiftPressed",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "PivotCellSelectedEventArgs",
+              "kind": "property",
+              "name": "pivotValues",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IAxisSet[][]"
+            },
+            {
+              "declaredOn": "CellSelectEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "previousRowCell",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "CellSelectEventArgs",
+              "inheritedVia": "CellSelectingEventArgs",
+              "kind": "property",
+              "name": "previousRowCellIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "PivotCellSelectedEventArgs",
+              "kind": "property",
+              "name": "selectedCellsInfo",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "CellSelectedObject[]"
+            },
+            {
+              "declaredOn": "PivotCellSelectedEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "Element"
+            }
+          ],
+          "name": "PivotCellSelectedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "chartSeriesCreated",
+      "eventType": "ChartSeriesCreatedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ChartSeriesCreatedEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ChartSeriesCreatedEventArgs",
+              "kind": "property",
+              "name": "series",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "SeriesModel[]"
+            }
+          ],
+          "name": "ChartSeriesCreatedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "conditionalFormatting",
+      "eventType": "IConditionalFormatSettings",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "IConditionalFormatSettings",
+              "kind": "property",
+              "name": "applyGrandTotals",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/base/engine.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "IConditionalFormatSettings",
+              "kind": "property",
+              "name": "conditions",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/base/engine.d.ts",
+              "type": "Condition"
+            },
+            {
+              "declaredOn": "IConditionalFormatSettings",
+              "kind": "property",
+              "name": "label",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/base/engine.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "IConditionalFormatSettings",
+              "kind": "property",
+              "name": "measure",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/base/engine.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "IConditionalFormatSettings",
+              "kind": "property",
+              "name": "style",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/base/engine.d.ts",
+              "type": "IStyle"
+            },
+            {
+              "declaredOn": "IConditionalFormatSettings",
+              "kind": "property",
+              "name": "value1",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/base/engine.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "IConditionalFormatSettings",
+              "kind": "property",
+              "name": "value2",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/base/engine.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "IConditionalFormatSettings",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/base/engine.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "contextMenuClick",
+      "eventType": "ContextMenuClickEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ContextMenuClickEventArgs",
+              "kind": "property",
+              "name": "chartType",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "ChartType"
+            },
+            {
+              "declaredOn": "ContextMenuClickEventArgs",
+              "kind": "property",
+              "name": "column",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Column"
+            },
+            {
+              "declaredOn": "ContextMenuClickEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "ContextMenuClickEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "ContextMenuClickEventArgs",
+              "kind": "property",
+              "name": "gridInstance",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "IGrid"
+            },
+            {
+              "declaredOn": "ContextMenuClickEventArgs",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "MenuItemModel"
+            },
+            {
+              "declaredOn": "ContextMenuClickEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ContextMenuClickEventArgs",
+              "kind": "property",
+              "name": "records",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object[]"
+            },
+            {
+              "declaredOn": "ContextMenuClickEventArgs",
+              "kind": "property",
+              "name": "rowInfo",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "RowInfo"
+            }
+          ],
+          "name": "ContextMenuClickEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "contextMenuOpen",
+      "eventType": "BeforeOpenCloseMenuEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "isFocused",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "items",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "MenuItemModel[]"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "left",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "parentItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "MenuItemModel"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "showSubMenuOn",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "MenuOpenType"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "top",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "BeforeOpenCloseMenuEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/common/menu-base.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "dataBound",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "destroyed",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "drill",
+      "eventType": "DrillArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "DrillArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "DrillArgs",
+              "kind": "property",
+              "name": "drillInfo",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDrilledItem"
+            },
+            {
+              "declaredOn": "DrillArgs",
+              "kind": "property",
+              "name": "pivotview",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "PivotView"
+            }
+          ],
+          "name": "DrillArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "drillThrough",
+      "eventType": "DrillThroughEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "DrillThroughEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "DrillThroughEventArgs",
+              "kind": "property",
+              "name": "columnHeaders",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "DrillThroughEventArgs",
+              "kind": "property",
+              "name": "currentCell",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IAxisSet"
+            },
+            {
+              "declaredOn": "DrillThroughEventArgs",
+              "kind": "property",
+              "name": "currentTarget",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "DrillThroughEventArgs",
+              "kind": "property",
+              "name": "gridColumns",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "ColumnModel[]"
+            },
+            {
+              "declaredOn": "DrillThroughEventArgs",
+              "kind": "property",
+              "name": "rawData",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataSet[]"
+            },
+            {
+              "declaredOn": "DrillThroughEventArgs",
+              "kind": "property",
+              "name": "rowHeaders",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "DrillThroughEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "DrillThroughEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "editCompleted",
+      "eventType": "EditCompletedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "EditCompletedEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "EditCompletedEventArgs",
+              "kind": "property",
+              "name": "currentData",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataSet[]"
+            },
+            {
+              "declaredOn": "EditCompletedEventArgs",
+              "kind": "property",
+              "name": "previousData",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataSet[]"
+            },
+            {
+              "declaredOn": "EditCompletedEventArgs",
+              "kind": "property",
+              "name": "previousPosition",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "number[]"
+            }
+          ],
+          "name": "EditCompletedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "enginePopulated",
+      "eventType": "EnginePopulatedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "EnginePopulatedEventArgs",
+              "kind": "property",
+              "name": "dataSourceSettings",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataOptions"
+            },
+            {
+              "declaredOn": "EnginePopulatedEventArgs",
+              "kind": "property",
+              "name": "pivotFieldList",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IFieldListOptions"
+            },
+            {
+              "declaredOn": "EnginePopulatedEventArgs",
+              "kind": "property",
+              "name": "pivotValues",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IAxisSet[][]"
+            }
+          ],
+          "name": "EnginePopulatedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "enginePopulating",
+      "eventType": "EnginePopulatingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "EnginePopulatingEventArgs",
+              "kind": "property",
+              "name": "dataSourceSettings",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataOptions"
+            }
+          ],
+          "name": "EnginePopulatingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "exportComplete",
+      "eventType": "ExportCompleteEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ExportCompleteEventArgs",
+              "kind": "property",
+              "name": "type",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ExportCompleteEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "fetchReport",
+      "eventType": "FetchReportArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "FetchReportArgs",
+              "kind": "property",
+              "name": "reportName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string[]"
+            }
+          ],
+          "name": "FetchReportArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "fieldDragStart",
+      "eventType": "FieldDragStartEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "FieldDragStartEventArgs",
+              "kind": "property",
+              "name": "axis",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "FieldDragStartEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "FieldDragStartEventArgs",
+              "kind": "property",
+              "name": "dataSourceSettings",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataOptions"
+            },
+            {
+              "declaredOn": "FieldDragStartEventArgs",
+              "kind": "property",
+              "name": "fieldItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IFieldOptions"
+            },
+            {
+              "declaredOn": "FieldDragStartEventArgs",
+              "kind": "property",
+              "name": "fieldName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "FieldDragStartEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "fieldDrop",
+      "eventType": "FieldDropEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "FieldDropEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "FieldDropEventArgs",
+              "kind": "property",
+              "name": "dataSourceSettings",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataOptions"
+            },
+            {
+              "declaredOn": "FieldDropEventArgs",
+              "kind": "property",
+              "name": "draggedAxis",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "FieldDropEventArgs",
+              "kind": "property",
+              "name": "dropAxis",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "FieldDropEventArgs",
+              "kind": "property",
+              "name": "dropField",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IFieldOptions"
+            },
+            {
+              "declaredOn": "FieldDropEventArgs",
+              "kind": "property",
+              "name": "dropPosition",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "FieldDropEventArgs",
+              "kind": "property",
+              "name": "fieldName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "FieldDropEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "fieldListRefreshed",
+      "eventType": "FieldListRefreshedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "FieldListRefreshedEventArgs",
+              "kind": "property",
+              "name": "dataSourceSettings",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataOptions"
+            },
+            {
+              "declaredOn": "FieldListRefreshedEventArgs",
+              "kind": "property",
+              "name": "pivotValues",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IAxisSet[][]"
+            }
+          ],
+          "name": "FieldListRefreshedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "fieldRemove",
+      "eventType": "FieldRemoveEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "FieldRemoveEventArgs",
+              "kind": "property",
+              "name": "axis",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "FieldRemoveEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "FieldRemoveEventArgs",
+              "kind": "property",
+              "name": "dataSourceSettings",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataOptions"
+            },
+            {
+              "declaredOn": "FieldRemoveEventArgs",
+              "kind": "property",
+              "name": "fieldItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IFieldOptions"
+            },
+            {
+              "declaredOn": "FieldRemoveEventArgs",
+              "kind": "property",
+              "name": "fieldName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "FieldRemoveEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "hyperlinkCellClick",
+      "eventType": "HyperCellClickEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "HyperCellClickEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "HyperCellClickEventArgs",
+              "kind": "property",
+              "name": "currentCell",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "HyperCellClickEventArgs",
+              "kind": "property",
+              "name": "data",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "HyperCellClickEventArgs",
+              "kind": "property",
+              "name": "nativeEvent",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "MouseEvent"
+            }
+          ],
+          "name": "HyperCellClickEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "load",
+      "eventType": "LoadEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "LoadEventArgs",
+              "kind": "property",
+              "name": "dataSourceSettings",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataOptions"
+            },
+            {
+              "declaredOn": "LoadEventArgs",
+              "kind": "property",
+              "name": "defaultFieldListOrder",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "Sorting"
+            },
+            {
+              "declaredOn": "LoadEventArgs",
+              "kind": "property",
+              "name": "fieldsType",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IStringIndex"
+            },
+            {
+              "declaredOn": "LoadEventArgs",
+              "kind": "property",
+              "name": "pivotview",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "PivotView"
+            }
+          ],
+          "name": "LoadEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "loadReport",
+      "eventType": "LoadReportArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "LoadReportArgs",
+              "kind": "property",
+              "name": "report",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "LoadReportArgs",
+              "kind": "property",
+              "name": "reportName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "LoadReportArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "memberEditorOpen",
+      "eventType": "MemberEditorOpenEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "MemberEditorOpenEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "MemberEditorOpenEventArgs",
+              "kind": "property",
+              "name": "fieldName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "MemberEditorOpenEventArgs",
+              "kind": "property",
+              "name": "filterSetting",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IFilter"
+            }
+          ],
+          "name": "MemberEditorOpenEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "memberFiltering",
+      "eventType": "MemberFilteringEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "MemberFilteringEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "MemberFilteringEventArgs",
+              "kind": "property",
+              "name": "dataSourceSettings",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataOptions"
+            },
+            {
+              "declaredOn": "MemberFilteringEventArgs",
+              "kind": "property",
+              "name": "filterSettings",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IFilter"
+            }
+          ],
+          "name": "MemberFilteringEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "newReport",
+      "eventType": "NewReportArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "NewReportArgs",
+              "kind": "property",
+              "name": "report",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "NewReportArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "numberFormatting",
+      "eventType": "NumberFormattingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "NumberFormattingEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "NumberFormattingEventArgs",
+              "kind": "property",
+              "name": "formatName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "NumberFormattingEventArgs",
+              "kind": "property",
+              "name": "formatSettings",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IFormatSettings[]"
+            }
+          ],
+          "name": "NumberFormattingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "onFieldDropped",
+      "eventType": "FieldDroppedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "FieldDroppedEventArgs",
+              "kind": "property",
+              "name": "dataSourceSettings",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IDataOptions"
+            },
+            {
+              "declaredOn": "FieldDroppedEventArgs",
+              "kind": "property",
+              "name": "droppedAxis",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "FieldDroppedEventArgs",
+              "kind": "property",
+              "name": "droppedField",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IFieldOptions"
+            },
+            {
+              "declaredOn": "FieldDroppedEventArgs",
+              "kind": "property",
+              "name": "droppedPosition",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "FieldDroppedEventArgs",
+              "kind": "property",
+              "name": "fieldName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "FieldDroppedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "onHeadersSort",
+      "eventType": "HeadersSortEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "HeadersSortEventArgs",
+              "kind": "property",
+              "name": "fieldName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "HeadersSortEventArgs",
+              "kind": "property",
+              "name": "IsOrderChanged",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "HeadersSortEventArgs",
+              "kind": "property",
+              "name": "levelName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "HeadersSortEventArgs",
+              "kind": "property",
+              "name": "members",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string[] | number[]"
+            },
+            {
+              "declaredOn": "HeadersSortEventArgs",
+              "kind": "property",
+              "name": "sortOrder",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "Sorting"
+            }
+          ],
+          "name": "HeadersSortEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "onPdfCellRender",
+      "eventType": "PdfCellRenderArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PdfCellRenderArgs",
+              "kind": "property",
+              "name": "cell",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "PdfGridCell"
+            },
+            {
+              "declaredOn": "PdfCellRenderArgs",
+              "kind": "property",
+              "name": "column",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "PdfGridColumn"
+            },
+            {
+              "declaredOn": "PdfCellRenderArgs",
+              "kind": "property",
+              "name": "pivotCell",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "IAxisSet"
+            },
+            {
+              "declaredOn": "PdfCellRenderArgs",
+              "kind": "property",
+              "name": "style",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "PdfStyle"
+            }
+          ],
+          "name": "PdfCellRenderArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "removeReport",
+      "eventType": "RemoveReportArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "RemoveReportArgs",
+              "kind": "property",
+              "name": "report",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "RemoveReportArgs",
+              "kind": "property",
+              "name": "reportName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "RemoveReportArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "renameReport",
+      "eventType": "RenameReportArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "RenameReportArgs",
+              "kind": "property",
+              "name": "isReportExists",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RenameReportArgs",
+              "kind": "property",
+              "name": "rename",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "RenameReportArgs",
+              "kind": "property",
+              "name": "report",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "RenameReportArgs",
+              "kind": "property",
+              "name": "reportName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "RenameReportArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "rowDeselected",
+      "eventType": "RowDeselectEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "data",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object | Object[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "foreignKeyData",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object | Object[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "isHeaderCheckboxClicked",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "row",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element | Element[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "rowIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "rowIndexes",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
+            }
+          ],
+          "name": "RowDeselectEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "rowSelected",
+      "eventType": "RowSelectEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "RowDeselectEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "data",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object | Object[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "foreignKeyData",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object | Object[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "isHeaderCheckboxClicked",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RowSelectEventArgs",
+              "kind": "property",
+              "name": "previousRow",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "RowSelectEventArgs",
+              "kind": "property",
+              "name": "previousRowIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "row",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element | Element[]"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "rowIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "rowIndexes",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number[]"
+            },
+            {
+              "declaredOn": "RowSelectEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "RowDeselectEventArgs",
+              "inheritedVia": "RowDeselectEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
+            }
+          ],
+          "name": "RowSelectEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "saveReport",
+      "eventType": "SaveReportArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "SaveReportArgs",
+              "kind": "property",
+              "name": "report",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "SaveReportArgs",
+              "kind": "property",
+              "name": "reportName",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "SaveReportArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "selected",
+      "eventType": "CellSelectEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "CellDeselectEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "inheritedVia": "CellDeselectEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "CellSelectEventArgs",
+              "kind": "property",
+              "name": "cellIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "IIndex"
+            },
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "inheritedVia": "CellDeselectEventArgs",
+              "kind": "property",
+              "name": "cellIndexes",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "ISelectedCell[]"
+            },
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "inheritedVia": "CellDeselectEventArgs",
+              "kind": "property",
+              "name": "cells",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element[]"
+            },
+            {
+              "declaredOn": "CellSelectEventArgs",
+              "kind": "property",
+              "name": "currentCell",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "CellDeselectEventArgs",
+              "inheritedVia": "CellDeselectEventArgs",
+              "kind": "property",
+              "name": "data",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "CellSelectEventArgs",
+              "kind": "property",
+              "name": "previousRowCell",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "CellSelectEventArgs",
+              "kind": "property",
+              "name": "previousRowCellIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "CellSelectEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "toolbarClick",
+      "eventType": "ClickEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "ClickEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ClickEventArgs",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+              "type": "ItemModel"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ClickEventArgs",
+              "kind": "property",
+              "name": "originalEvent",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+              "type": "Event"
+            }
+          ],
+          "name": "ClickEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "toolbarRender",
+      "eventType": "ToolbarArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ToolbarArgs",
+              "kind": "property",
+              "name": "customToolbar",
+              "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+              "type": "ItemModel[]"
+            }
+          ],
+          "name": "ToolbarArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-pivotview/src/common/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionPivotView",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "PivotView",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.pivotview"
+  }
+}

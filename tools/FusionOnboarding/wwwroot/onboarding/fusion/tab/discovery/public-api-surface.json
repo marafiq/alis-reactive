@@ -1,0 +1,557 @@
+{
+  "component": "tab",
+  "counts": {
+    "builderMethods": 35,
+    "events": 11,
+    "members": 43,
+    "methods": 12,
+    "properties": 20
+  },
+  "fusionType": "FusionTab",
+  "members": [
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "added",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "AddEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "adding",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "AddEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "addTab",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "items: TabItemModel[], index?: number) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowDragAndDrop",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Navigations.TabAnimationSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "animation",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "TabAnimationSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "clearTemplates",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "created",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "Event"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "cssClass",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "skip: lifecycle cleanup, not Fusion plan behavior",
+      "kind": "method",
+      "name": "destroy",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "destroyed",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "Event"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "disable",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "value: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "dragArea",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "dragged",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "DragEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "dragging",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "DragEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableHtmlSanitizer",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enablePersistence",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "enableTab",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "index: number, value: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getItemIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "tabItemId: string) => number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Navigations.HeaderPosition"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "headerPlacement",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "HeaderPosition"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String",
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "height",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "string | number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Navigations.HeightStyles"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "heightAdjustMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "HeightStyles"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "hideTab",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "index: number, value?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Collections.Generic.List{Syncfusion.EJ2.Navigations.TabItem}"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "items",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "TabItemModel[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Navigations.ContentLoad"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "loadOn",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "ContentLoad"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "onDragStart",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "DragEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Navigations.OverflowMode"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "overflowMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "OverflowMode"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "refresh",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "refreshActiveTab",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "refreshActiveTabBorder",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "refreshOverflow",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "removed",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "RemoveEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "removeTab",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "index: number) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "removing",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "RemoveEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "reorderActiveTab",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "scrollStep",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "select",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "args: number | HTEle, event?: Event) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "selected",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "SelectEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "selectedItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "selecting",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "SelectingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showCloseButton",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Navigations.TabSwipeMode"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "swipeMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "TabSwipeMode"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "tabId",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String",
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "width",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+      "type": "string | number"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "TabBuilder",
+    "className": "Tab",
+    "dtsPath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+    "jsPath": "",
+    "namespace": "ej.ej.navigations.Tab",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}

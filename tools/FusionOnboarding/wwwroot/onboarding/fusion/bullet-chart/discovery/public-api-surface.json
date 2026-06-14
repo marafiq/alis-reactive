@@ -1,0 +1,1143 @@
+{
+  "component": "bullet-chart",
+  "counts": {
+    "builderMethods": 52,
+    "events": 6,
+    "members": 93,
+    "methods": 13,
+    "properties": 74
+  },
+  "fusionType": "FusionBulletChart",
+  "members": [
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "animateSeries",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.BulletChartAnimation"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "animation",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "AnimationModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "availableSize",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "Size"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforePrint",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "IPrintEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.BulletChartContainerBorder"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "border",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "BorderModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "bottomSize",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "bulletAxis",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "BulletChartAxis"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "bulletChartLegendModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "BulletChartLegend"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "bulletChartMouseClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "IBulletMouseEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "bulletChartOnMouseClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "e: PointerEvent | TouchEvent) => boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "bulletChartRect",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "Rect"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "bulletMouseLeave",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "e: PointerEvent) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "bulletTooltipModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "BulletTooltip"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "categoryField",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.BulletChartBulletLabelStyle"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "categoryLabelStyle",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "BulletLabelStyleModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "chartKeyDown",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "e: KeyboardEvent) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "chartKeyUp",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "e: KeyboardEvent) => boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "containerHeight",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "containerWidth",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "createSvg",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "chart: BulletChart) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.BulletChartBulletDataLabel"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "dataLabel",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "BulletDataLabelModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "dataModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "Data"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "dataSource",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "delayRedraw",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "skip: lifecycle cleanup, not Fusion plan behavior",
+      "kind": "method",
+      "name": "destroy",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableGroupSeparator",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "format",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getActualIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "index: number, totalLength: number) => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getBulletBounds",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "maxTitlteWidth: number, titleHeight: number, subTitleHeight: number, margin: MarginModel) => Rect"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getMaxLabelWidth",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": ") => Size"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "height",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "initialClipRect",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "Rect"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "interval",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "intervalDivs",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "number[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "intl",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "Internationalization"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isTouch",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "labelFormat",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.LabelsPlacement"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "labelPosition",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "LabelsPlacement"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.BulletChartBulletLabelStyle"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "labelStyle",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "BulletLabelStyleModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "leftSize",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "legendRender",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "IBulletLegendRenderEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.BulletChartBulletChartLegendSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "legendSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "BulletChartLegendSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "load",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "IBulletLoadedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "loaded",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "IBulletLoadedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "locale",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.BulletChartMajorTickLines"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "majorTickLines",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "MajorTickLinesSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.BulletChartMargin"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "margin",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "MarginModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "maximum",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "maxLabelSize",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "Size"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "maxTitleSize",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "Size"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "minimum",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.BulletChartMinorTickLines"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "minorTickLines",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "MinorTickLinesSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "minorTicksPerInterval",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "mouseX",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "mouseY",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "opposedPosition",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.OrientationType"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "orientation",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "OrientationType"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "print",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "id?: string[] | string | Element) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "query",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "Query"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "rangeCollection",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "number[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Collections.Generic.List{Syncfusion.EJ2.Charts.Range}"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "ranges",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "RangeModel[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "redraw",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "removeSvg",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "renderer",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "SvgRenderer"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "requiredModules",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": ") => ModuleDeclaration[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "resizeBound",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "any"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "rightSize",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "scale",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "ScaleGroup"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setTabIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "previousElement: HTMLElement, currentElement: HTMLElement) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "subtitle",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.BulletChartBulletLabelStyle"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "subtitleStyle",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "BulletLabelStyleModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "svgObject",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "HTMLElement"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "tabIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "targetColor",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "targetField",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "targetTypes",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "TargetType[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "targetWidth",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.ChartTheme"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "theme",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "ChartTheme"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "themeStyle",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "IBulletStyle"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.TickPosition"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "tickPosition",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "TickPosition"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "title",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.TextPosition"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "titlePosition",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "TextPosition"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.BulletChartBulletLabelStyle"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "titleStyle",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "BulletLabelStyleModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.BulletChartBulletTooltipSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "tooltip",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "BulletTooltipSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "tooltipRender",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "IBulletchartTooltipEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "topSize",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.FeatureType"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "type",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "FeatureType"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Charts.BulletChartValueBorder"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "valueBorder",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "BorderModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "valueField",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "valueFill",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "valueHeight",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "visibleRanges",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "Range[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "width",
+      "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+      "type": "string"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "BulletChartBuilder",
+    "className": "BulletChart",
+    "dtsPath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts",
+    "jsPath": "",
+    "namespace": "ej.charts",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}

@@ -1,0 +1,236 @@
+{
+  "component": "stepper",
+  "counts": {
+    "events": 4,
+    "payloadTypes": 4
+  },
+  "events": [
+    {
+      "event": "beforeStepRender",
+      "eventType": "StepperRenderingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "StepperRenderingEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "StepperRenderingEventArgs",
+              "kind": "property",
+              "name": "index",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "StepperRenderingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "stepChanged",
+      "eventType": "StepperChangedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "StepperChangedEventArgs",
+              "kind": "property",
+              "name": "activeStep",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "StepperChangedEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "StepperChangedEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "StepperChangedEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "StepperChangedEventArgs",
+              "kind": "property",
+              "name": "previousStep",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "StepperChangedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "stepChanging",
+      "eventType": "StepperChangingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "StepperChangedEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "StepperChangedEventArgs",
+              "inheritedVia": "StepperChangedEventArgs",
+              "kind": "property",
+              "name": "activeStep",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "StepperChangingEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "StepperChangedEventArgs",
+              "inheritedVia": "StepperChangedEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "StepperChangedEventArgs",
+              "inheritedVia": "StepperChangedEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "StepperChangedEventArgs",
+              "inheritedVia": "StepperChangedEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "StepperChangedEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "StepperChangedEventArgs",
+              "inheritedVia": "StepperChangedEventArgs",
+              "kind": "property",
+              "name": "previousStep",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "StepperChangingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "stepClick",
+      "eventType": "StepperClickEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "StepperClickEventArgs",
+              "kind": "property",
+              "name": "activeStep",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "StepperClickEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "StepperClickEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "StepperClickEventArgs",
+              "kind": "property",
+              "name": "previousStep",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "StepperClickEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/stepper/stepper.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionStepper",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "Stepper",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.ej.navigations"
+  }
+}

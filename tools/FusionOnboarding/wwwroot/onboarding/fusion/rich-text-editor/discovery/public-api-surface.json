@@ -1,0 +1,2551 @@
+{
+  "component": "rich-text-editor",
+  "counts": {
+    "builderMethods": 109,
+    "events": 49,
+    "members": 211,
+    "methods": 66,
+    "properties": 96
+  },
+  "fusionType": "FusionRichTextEditor",
+  "members": [
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionBegin",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ActionBeginEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionComplete",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ActionCompleteEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "addAIPromptResponse",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "outputResponse: string | Object, isFinalUpdate?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "addAnchorAriaLabel",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "value: string) => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "addAudioVideoWrapper",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "afterImageDelete",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "AfterImageDeleteEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "afterMediaDelete",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "AfterMediaDeleteEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "afterPasteCleanup",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "aiAssistantModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "AIAssistant"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "aiAssistantPromptRequest",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "AIAssistantPromptRequestArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorAIAssistantSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "aiAssistantSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "AIAssistantSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "aiAssistantStopRespondingClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "AIAssistantStopRespondingArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "aiAssistantToolbarClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "AIAssitantToolbarClickEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "audioModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Audio"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "autoFormatModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "AutoFormat"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "autoResize",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "autoSaveOnIdle",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorBackgroundColor"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "backgroundColor",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "BackgroundColorModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeClipboardWrite",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ClipboardWriteEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeDialogClose",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "BeforeCloseEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeDialogOpen",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "BeforeOpenEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeFileUpload",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "BeforeUploadEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeImageDrop",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ImageDropEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeImageUpload",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "BeforeUploadEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeMediaDrop",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "MediaDropEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforePasteCleanup",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "PasteCleanupArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforePopupClose",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "BeforePopupOpenCloseEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforePopupOpen",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "BeforePopupOpenCloseEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeQuickToolbarOpen",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "BeforeQuickToolbarOpenArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeSanitizeHtml",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "BeforeSanitizeHtmlArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "blur",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorBulletFormatList"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "bulletFormatList",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "BulletFormatListModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "change",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ChangeEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "cleanList",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "e: KeyboardEvent) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "clearAIPromptHistory",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "clearUndoRedo",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "clipboardAction",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "action: string, event: MouseEvent | KeyboardEvent | ClipboardEvent) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "clipBoardCleanupModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ClipBoardCleanup"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "clipBoardHandler",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "e: ClipboardEvent | KeyboardEvent) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "closeDialog",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "type: DialogType) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "codeBlockModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "CodeBlock"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorCodeBlockSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "codeBlockSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "CodeBlockSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "contentModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "IRenderer"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "countModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Count"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "created",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "cssClass",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "currentTarget",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "HTMLElement"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "skip: lifecycle cleanup, not Fusion plan behavior",
+      "kind": "method",
+      "name": "destroy",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "destroyed",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "dialogClose",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "dialogOpen",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "disableToolbarItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "items: string | string[], muteToolbarUpdate?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "documentExporting",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ExportingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.EditorMode"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "editorMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "EditorMode"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "emojiPickerModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "EmojiPicker"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorEmojiSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "emojiPickerSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "EmojiSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableAutoUrl",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableClipboardCleanup",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enabled",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableHtmlEncode",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableHtmlSanitizer",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableMarkdownAutoFormat",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enablePersistence",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableResize",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableTabKey",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "enableToolbarItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "items: string | string[], muteToolbarUpdate?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableXhtml",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "ensureModuleInjected",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "module: Function) => boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.EnterKey"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enterKey",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "EnterKey"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "enterKeyModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "EnterKeyAction"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "executeAIPrompt",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "prompt: string) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "executeCommand",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "commandName: CommandName, value?: string | HTMLElement | ILinkCommandsArgs | IImageCommandsArgs | ITableCommandsArgs | FormatPainterSettingsModel | IAudioCommandsArgs | IVideoCommandsArgs | ICodeBlockCommandsArgs, option?: ExecuteCommandOption) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorExportPdf"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "exportPdf",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ExportPdfModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorExportWord"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "exportWord",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ExportWordModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "fileManagerModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "FileManager"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorFileManagerSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "fileManagerSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "FileManagerSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "fileRemoving",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "RemovingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "fileSelected",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "SelectedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "fileUploadFailed",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "fileUploading",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "UploadingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "fileUploadSuccess",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "floatingToolbarOffset",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "focus",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "focusIn",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "focusOut",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorFontColor"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "fontColor",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "FontColorModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorFontFamily"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "fontFamily",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "FontFamilyModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorFontSize"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "fontSize",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "FontSizeModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorFormat"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "format",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "FormatModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "formatPainterModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "FormatPainter"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorFormatPainterSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "formatPainterSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "FormatPainterSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorFormatter"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "formatter",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "IFormatter"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "fullScreenModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "FullScreen"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getAIPromptHistory",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => PromptModel[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getBaseToolbarObject",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => BaseToolbar"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getCharCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getContent",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getCssClass",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "isSpace?: boolean) => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getHtml",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getID",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getInsertImgMaxWidth",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => string | number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getInsertVidMaxWidth",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => string | number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getRange",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => Range"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getSelectedHtml",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getSelection",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getText",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getToolbar",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => HTMLElement"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getToolbarElement",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getXhtml",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String",
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "height",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "string | number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "hideAIAssistantPopup",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "hideInlineToolbar",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "htmlEditorModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "HtmlEditor"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorIFrameSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "iframeSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "IFrameSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "imageModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Image"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "imageRemoving",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "RemovingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "imageSelected",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "SelectedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "imageUploadFailed",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ImageFailedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "imageUploading",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "UploadingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "imageUploadSuccess",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ImageSuccessEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "importExportModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ImportExport"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorImportWord"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "importWord",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ImportWordModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorInlineMode"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "inlineMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "InlineModeModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "inputElement",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "HTMLElement"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorAudioSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "insertAudioSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "AudioSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorImageSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "insertImageSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ImageSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorVideoSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "insertVideoSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "VideoSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "invokeChangeEvent",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isBlur",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "isEntireRTEContentSelected",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isFocusOut",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isModalDialog",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isRTE",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isRTEFocused",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "isSelectionInRTE",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "keyboardModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "KeyboardEvents"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "keyDown",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "e: KeyboardEvent) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "lineHeight",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "LineHeightModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "linkModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Link"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "localeObj",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "L10n"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "markdownEditorModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "MarkdownEditor"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "maxLength",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "needsID",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorNumberFormatList"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "numberFormatList",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "NumberFormatListModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "onCopy",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "e?: MouseEvent | KeyboardEvent | ClipboardEvent) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "onCut",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "e?: MouseEvent | KeyboardEvent | ClipboardEvent) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "onPaste",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "e?: ClipboardEvent) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "pasteCleanupModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "PasteCleanup"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorPasteCleanupSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "pasteCleanupSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "PasteCleanupSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "placeholder",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "preventDefaultResize",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "e: FocusEvent | MouseEvent) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "print",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "quickToolbarClose",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "quickToolbarModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "QuickToolbar"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "quickToolbarOpen",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorQuickToolbarSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "quickToolbarSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "QuickToolbarSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "readonly",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "refreshUI",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "removeToolbarItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "items: string | string[]) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "renderModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Render"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "renderTemplates",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "callBack: any) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "requiredModules",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => ModuleDeclaration[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "resizeModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Resize"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "resizeStart",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ResizeArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "resizeStop",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ResizeArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "resizing",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ResizeArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "rootContainer",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "HTMLElement"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "sanitizeHtml",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "value: string) => string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "saveInterval",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "scrollParentElements",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "HTMLElement[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "selectAll",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "selectionChanged",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "SelectionChangedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "selectRange",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "range: Range) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "serializeValue",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "value: string) => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "serviceLocator",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ServiceLocator"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setEnable",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setPlaceHolder",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setReadOnly",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "initial?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.ShiftEnterKey"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "shiftEnterKey",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ShiftEnterKey"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showAIAssistantPopup",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showCharCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showDialog",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "type: DialogType) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showEmojiPicker",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "x?: number, y?: number) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showFullScreen",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showInlineToolbar",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showSourceCode",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showTooltip",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "slashMenuItemSelect",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "SlashMenuItemSelectArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "slashMenuModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "SlashMenu"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorSlashMenuSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "slashMenuSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "SlashMenuSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "sourceCodeModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ViewSource"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "tableModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Table"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorTableSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "tableSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "TableSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "toolbarClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "toolbarModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Toolbar"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.RichTextEditor.RichTextEditorToolbarSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "toolbarSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ToolbarSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "toolbarStatusUpdate",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "undoRedoSteps",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "undoRedoTimer",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "unWireScrollElementsEvents",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "updatedToolbarStatus",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "ToolbarStatusEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "updateValue",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "value?: string) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "updateValueData",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "userAgentData",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "CustomUserAgentData"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "value",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "valueContainer",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "HTMLTextAreaElement"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "valueTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "videoModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "Video"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String",
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "width",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "string | number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "wireScrollElementsEvents",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "wordImporting",
+      "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+      "type": "UploadingEventArgs"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "RichTextEditorBuilder",
+    "className": "RichTextEditor",
+    "dtsPath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts",
+    "jsPath": "",
+    "namespace": "ej.richtexteditor",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}

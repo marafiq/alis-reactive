@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>FusionColorPicker Raw EJ2 core Probe</title>
+    <link rel="stylesheet" href="/css/syncfusion.dev.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #color-picker-host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+        th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f6f8fa; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+        button { margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <h1>FusionColorPicker Raw EJ2 core Probe</h1>
+    <p>Status: generated static probe. Execute in the sandbox/browser, interact with the component, then save <code>window.__fusionProbe.trace</code> as <code>traces/raw-ej2-core.trace.json</code>.</p>
+    <div id="color-picker-host">
+        <div id="color-picker"></div>
+    </div>
+
+    <button id="dump">Dump Keys</button>
+    <button id="clear">Clear Trace</button>
+
+    <h2>Candidate Rows</h2>
+    <table>
+        <thead><tr><th>JS Member</th><th>Kind</th><th>Type</th><th>Builder</th><th>Decision</th></tr></thead>
+        <tbody>
+<tr><td><code>beforeClose</code></td><td>event</td><td>BeforeOpenCloseEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeModeSwitch</code></td><td>event</td><td>ModeSwitchEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeOpen</code></td><td>event</td><td>BeforeOpenCloseEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeTileRender</code></td><td>event</td><td>PaletteTileEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>change</code></td><td>event</td><td>ColorPickerEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>created</code></td><td>event</td><td>Event</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>destroy</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>skip: lifecycle cleanup, not Fusion plan behavior</td></tr>
+<tr><td><code>focusIn</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>getValue</code></td><td>method</td><td>value?: string, type?: string) =&gt; string</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>onModeSwitch</code></td><td>event</td><td>ModeSwitchEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>open</code></td><td>event</td><td>OpenEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>select</code></td><td>event</td><td>ColorPickerEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>toggle</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+        </tbody>
+    </table>
+
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const target = document.getElementById("color-picker");
+
+        function clean(value, seen = new WeakSet(), depth = 0) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 4) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.slice(0, 20).map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).sort().slice(0, 120).forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function functionNames(value) {
+            const names = new Set();
+            let current = value;
+            while (current && current !== Object.prototype) {
+                Object.getOwnPropertyNames(current).forEach(name => {
+                    if (name !== "constructor" && typeof value[name] === "function") names.add(name);
+                });
+                current = Object.getPrototypeOf(current);
+            }
+            return Array.from(names).sort();
+        }
+
+        function describePayload(args) {
+            if (args === null || args === undefined) {
+                return {
+                    ownKeys: [],
+                    functions: [],
+                    properties: {},
+                    value: args === undefined ? "undefined" : null
+                };
+            }
+            const own = Object.keys(args).sort();
+            const properties = {};
+            own.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === null ? "null" : Array.isArray(item) ? "array" : typeof item,
+                    sample: clean(item)
+                };
+            });
+            return { ownKeys: own, functions: functionNames(args), properties };
+        }
+
+        function record(label, value) {
+            trace.push({ at: new Date().toISOString(), label, value: clean(value) });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        const probe = {
+            target,
+            trace,
+            record,
+            event: (label, args) => record(label, describePayload(args)),
+            member: (label, read) => record(label, read()),
+            call: (label, invoke) => record(label, invoke())
+        };
+        window.__fusionProbe = probe;
+
+        const ej2 = new ej.inputs.ColorPicker({
+            dataSource: [
+                { id: 1, name: "Alpha", status: "Open" },
+                { id: 2, name: "Beta", status: "Closed" },
+                { id: 3, name: "Gamma", status: "Open" }
+            ],
+            columns: [
+                { field: "id", headerText: "ID", width: 90, textAlign: "Right" },
+                { field: "name", headerText: "Name", width: 160 },
+                { field: "status", headerText: "Status", width: 140 }
+            ],
+            allowPaging: true,
+            allowSorting: true,
+            allowFiltering: true,
+            pageSettings: { pageSize: 2 },
+            beforeClose: args => probe.event("beforeClose", args),
+                beforeModeSwitch: args => probe.event("beforeModeSwitch", args),
+                beforeOpen: args => probe.event("beforeOpen", args),
+                beforeTileRender: args => probe.event("beforeTileRender", args),
+                change: args => probe.event("change", args),
+                created: args => probe.event("created", args),
+                onModeSwitch: args => probe.event("onModeSwitch", args),
+                open: args => probe.event("open", args),
+                select: args => probe.event("select", args)
+        });
+
+        ej2.appendTo(target);
+        probe.ej2 = ej2;
+        record("ready", {
+            component: "color-picker",
+            apiSet: "core",
+            namespace: "ej.inputs",
+            className: "ColorPicker"
+        });
+
+        document.getElementById("dump").addEventListener("click", () => {
+            record("own keys", Object.keys(ej2).sort());
+            record("prototype methods", functionNames(ej2));
+        });
+
+        document.getElementById("clear").addEventListener("click", () => {
+            trace.length = 0;
+            document.getElementById("trace").textContent = "[]";
+        });
+    </script>
+</body>
+</html>

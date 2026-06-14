@@ -1,0 +1,86 @@
+{
+  "component": "combo-box",
+  "counts": {
+    "events": 2,
+    "payloadTypes": 2
+  },
+  "events": [
+    {
+      "event": "customValueSpecifier",
+      "eventType": "CustomValueSpecifierEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "CustomValueSpecifierEventArgs",
+              "kind": "property",
+              "name": "text",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "CustomValueSpecifierEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "filtering",
+      "eventType": "FilteringEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "FilteringEventArgs",
+              "kind": "property",
+              "name": "baseEventArgs",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "Object"
+            },
+            {
+              "declaredOn": "FilteringEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "FilteringEventArgs",
+              "kind": "property",
+              "name": "preventDefaultAction",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "FilteringEventArgs",
+              "kind": "property",
+              "name": "text",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "FilteringEventArgs",
+              "kind": "method",
+              "name": "updateData",
+              "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+              "type": "dataSource: { [key: string]: Object; }[] | DataManager | string[] | number[] | boolean[], query?: Query, fields?: FieldSettingsModel) => void"
+            }
+          ],
+          "name": "FilteringEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionComboBox",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "ComboBox",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.dropdowns"
+  }
+}

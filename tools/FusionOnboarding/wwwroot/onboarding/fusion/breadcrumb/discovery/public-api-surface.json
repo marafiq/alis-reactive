@@ -1,0 +1,226 @@
+{
+  "component": "breadcrumb",
+  "counts": {
+    "builderMethods": 17,
+    "events": 3,
+    "members": 16,
+    "methods": 1,
+    "properties": 12
+  },
+  "fusionType": "FusionBreadcrumb",
+  "members": [
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "activeItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeItemRender",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts",
+      "type": "BreadcrumbBeforeItemRenderEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "created",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts",
+      "type": "Event"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "cssClass",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "skip: lifecycle cleanup, not Fusion plan behavior",
+      "kind": "method",
+      "name": "destroy",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "disabled",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableActiveItemNavigation",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableNavigation",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "itemClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts",
+      "type": "BreadcrumbClickEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Collections.Generic.List{Syncfusion.EJ2.Navigations.BreadcrumbItem}"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "items",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts",
+      "type": "BreadcrumbItemModel[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "itemTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "locale",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Int32"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "maxItems",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Navigations.BreadcrumbOverflowMode"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "overflowMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts",
+      "type": "string | BreadcrumbOverflowMode"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "separatorTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "url",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts",
+      "type": "string"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "BreadcrumbBuilder",
+    "className": "Breadcrumb",
+    "dtsPath": "node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts",
+    "jsPath": "",
+    "namespace": "ej.navigations",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}

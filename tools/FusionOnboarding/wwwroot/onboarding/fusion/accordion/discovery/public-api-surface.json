@@ -1,0 +1,296 @@
+{
+  "component": "accordion",
+  "counts": {
+    "builderMethods": 21,
+    "events": 5,
+    "members": 22,
+    "methods": 7,
+    "properties": 10
+  },
+  "fusionType": "FusionAccordion",
+  "members": [
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "addItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "item: AccordionItemModel | AccordionItemModel[] | Object | Object[], index?: number) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Navigations.AccordionAnimationSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "animation",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "AccordionAnimationSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "clicked",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "AccordionClickArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "created",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "Event"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "dataSource",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "Object[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "skip: lifecycle cleanup, not Fusion plan behavior",
+      "kind": "method",
+      "name": "destroy",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "destroyed",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "Event"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableHtmlSanitizer",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "enableItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "index: number, isEnable: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "expanded",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "ExpandedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double[]"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "expandedIndices",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "number[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "expanding",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "ExpandEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "expandItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "isExpand: boolean, index?: number) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Navigations.ExpandMode"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "expandMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "ExpandMode"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "headerTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String",
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "height",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "string | number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "hideItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "index: number, isHidden?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Collections.Generic.List{Syncfusion.EJ2.Navigations.AccordionItem}"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "items",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "AccordionItemModel[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "itemTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "removeItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "index: number) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "select",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "index: number) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String",
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "width",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+      "type": "string | number"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "AccordionBuilder",
+    "className": "Accordion",
+    "dtsPath": "node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts",
+    "jsPath": "",
+    "namespace": "ej.navigations",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}

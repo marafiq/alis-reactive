@@ -1,0 +1,169 @@
+{
+  "component": "list-view",
+  "counts": {
+    "events": 5,
+    "payloadTypes": 4
+  },
+  "events": [
+    {
+      "event": "actionBegin",
+      "eventType": "object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "actionComplete",
+      "eventType": "MouseEvent",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "MouseEvent",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "actionFailure",
+      "eventType": "MouseEvent",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "MouseEvent",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "scroll",
+      "eventType": "ScrolledEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ScrolledEventArgs",
+              "kind": "property",
+              "name": "distanceY",
+              "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "ScrolledEventArgs",
+              "kind": "property",
+              "name": "originalEvent",
+              "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "ScrolledEventArgs",
+              "kind": "property",
+              "name": "scrollDirection",
+              "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+              "type": "direction"
+            }
+          ],
+          "name": "ScrolledEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "select",
+      "eventType": "SelectEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs",
+            "SelectedItem"
+          ],
+          "members": [
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+              "type": "MouseEvent | KeyboardEvent"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "index",
+              "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "isChecked",
+              "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectedItem",
+              "inheritedVia": "SelectedItem",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+              "type": "HTMLElement | Element"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "SelectedItem",
+              "inheritedVia": "SelectedItem",
+              "kind": "property",
+              "name": "text",
+              "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "SelectEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionListView",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "ListView",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.ej.lists"
+  }
+}

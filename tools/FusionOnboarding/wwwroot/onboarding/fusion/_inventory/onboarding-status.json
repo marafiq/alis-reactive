@@ -9,16 +9,16 @@
     "totalMatrixRows": 623,
     "rowProvenMatrixRows": 555,
     "unprovenMatrixRows": 68,
-    "totalRawProbes": 35,
+    "totalRawProbes": 74,
     "totalRawTraces": 35,
     "byStatus": {
       "artifact-incomplete": 44,
       "audited": 7
     },
     "byNextStage": {
-      "static-discovery": 42,
+      "mapping": 41,
       "audited": 7,
-      "mapping": 2
+      "static-discovery": 3
     }
   },
   "components": [
@@ -27,13 +27,9 @@
       "componentName": "AIAssistView",
       "artifactName": "ai-assist-view",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/ai-assist-view",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -42,7 +38,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -55,10 +51,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component ai-assist-view --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -66,13 +62,9 @@
       "componentName": "Accordion",
       "artifactName": "accordion",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/accordion",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -81,7 +73,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -94,10 +86,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component accordion --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -105,13 +97,9 @@
       "componentName": "AutoComplete",
       "artifactName": "auto-complete",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/auto-complete",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -120,7 +108,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -133,10 +121,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component auto-complete --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -144,13 +132,9 @@
       "componentName": "Breadcrumb",
       "artifactName": "breadcrumb",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/breadcrumb",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -159,7 +143,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -172,10 +156,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component breadcrumb --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -183,13 +167,9 @@
       "componentName": "BulletChart",
       "artifactName": "bullet-chart",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/bullet-chart",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -198,7 +178,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -211,10 +191,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component bullet-chart --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -250,13 +230,9 @@
       "componentName": "Carousel",
       "artifactName": "carousel",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/carousel",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -265,7 +241,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -278,10 +254,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component carousel --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -352,13 +328,9 @@
       "componentName": "ColorPicker",
       "artifactName": "color-picker",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/color-picker",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -367,7 +339,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -380,10 +352,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component color-picker --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -391,13 +363,9 @@
       "componentName": "ComboBox",
       "artifactName": "combo-box",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/combo-box",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -406,7 +374,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -419,10 +387,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component combo-box --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -430,13 +398,9 @@
       "componentName": "ContextMenu",
       "artifactName": "context-menu",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/context-menu",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -445,7 +409,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -458,10 +422,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component context-menu --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -469,13 +433,9 @@
       "componentName": "DatePicker",
       "artifactName": "date-picker",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/date-picker",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -484,7 +444,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -497,10 +457,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component date-picker --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -508,13 +468,9 @@
       "componentName": "DateRangePicker",
       "artifactName": "date-range-picker",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/date-range-picker",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -523,7 +479,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -536,10 +492,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component date-range-picker --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -547,13 +503,9 @@
       "componentName": "DateTimePicker",
       "artifactName": "date-time-picker",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/date-time-picker",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -562,7 +514,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -575,10 +527,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component date-time-picker --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -586,13 +538,9 @@
       "componentName": "Dialog",
       "artifactName": "dialog",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/dialog",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -601,7 +549,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -614,10 +562,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component dialog --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -625,13 +573,9 @@
       "componentName": "DropDownButton",
       "artifactName": "drop-down-button",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/drop-down-button",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -640,7 +584,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -653,10 +597,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component drop-down-button --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -664,13 +608,9 @@
       "componentName": "DropDownList",
       "artifactName": "drop-down-list",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/drop-down-list",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -679,7 +619,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -692,10 +632,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component drop-down-list --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -703,13 +643,9 @@
       "componentName": "DropDownTree",
       "artifactName": "drop-down-tree",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/drop-down-tree",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -718,7 +654,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -731,10 +667,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component drop-down-tree --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -742,13 +678,9 @@
       "componentName": "FileUpload",
       "artifactName": "file-upload",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/file-upload",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -757,7 +689,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -770,10 +702,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component file-upload --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -809,13 +741,9 @@
       "componentName": "InPlaceEditor",
       "artifactName": "in-place-editor",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/in-place-editor",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -824,7 +752,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -837,10 +765,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component in-place-editor --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -926,13 +854,9 @@
       "componentName": "ListBox",
       "artifactName": "list-box",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/list-box",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -941,7 +865,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -954,10 +878,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component list-box --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -965,13 +889,9 @@
       "componentName": "ListView",
       "artifactName": "list-view",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/list-view",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -980,7 +900,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -993,10 +913,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component list-view --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1004,13 +924,9 @@
       "componentName": "Mention",
       "artifactName": "mention",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/mention",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1019,7 +935,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1032,10 +948,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component mention --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1043,13 +959,9 @@
       "componentName": "Menu",
       "artifactName": "menu",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/menu",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1058,7 +970,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1071,10 +983,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component menu --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1082,13 +994,9 @@
       "componentName": "MultiColumnComboBox",
       "artifactName": "multi-column-combo-box",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/multi-column-combo-box",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1097,7 +1005,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1110,10 +1018,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component multi-column-combo-box --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1121,13 +1029,9 @@
       "componentName": "MultiSelect",
       "artifactName": "multi-select",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/multi-select",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1136,7 +1040,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1149,10 +1053,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component multi-select --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1188,13 +1092,9 @@
       "componentName": "OtpInput",
       "artifactName": "otp-input",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/otp-input",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1203,7 +1103,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1216,10 +1116,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component otp-input --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1227,13 +1127,9 @@
       "componentName": "PivotView",
       "artifactName": "pivot-view",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/pivot-view",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1242,7 +1138,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1255,10 +1151,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component pivot-view --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1266,13 +1162,9 @@
       "componentName": "ProgressButton",
       "artifactName": "progress-button",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/progress-button",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1281,7 +1173,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1294,10 +1186,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component progress-button --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1361,13 +1253,9 @@
       "componentName": "RichTextEditor",
       "artifactName": "rich-text-editor",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/rich-text-editor",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1376,7 +1264,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1389,10 +1277,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component rich-text-editor --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1447,13 +1335,9 @@
       "componentName": "Sidebar",
       "artifactName": "sidebar",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/sidebar",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1462,7 +1346,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1475,10 +1359,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component sidebar --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1486,13 +1370,9 @@
       "componentName": "Slider",
       "artifactName": "slider",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/slider",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1501,7 +1381,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1514,10 +1394,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component slider --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1525,13 +1405,9 @@
       "componentName": "SmartPasteButton",
       "artifactName": "smart-paste-button",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/smart-paste-button",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1540,7 +1416,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1553,10 +1429,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component smart-paste-button --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1564,13 +1440,9 @@
       "componentName": "SmartTextArea",
       "artifactName": "smart-text-area",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/smart-text-area",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1579,7 +1451,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1592,10 +1464,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component smart-text-area --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1603,13 +1475,9 @@
       "componentName": "SplitButton",
       "artifactName": "split-button",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/split-button",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1618,7 +1486,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1631,10 +1499,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component split-button --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1642,13 +1510,9 @@
       "componentName": "Stepper",
       "artifactName": "stepper",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/stepper",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1657,7 +1521,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1670,10 +1534,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component stepper --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1723,13 +1587,9 @@
       "componentName": "Tab",
       "artifactName": "tab",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/tab",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1738,7 +1598,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1751,10 +1611,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component tab --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1762,13 +1622,9 @@
       "componentName": "TextArea",
       "artifactName": "text-area",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/text-area",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1777,7 +1633,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1790,10 +1646,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component text-area --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1829,13 +1685,9 @@
       "componentName": "TimePicker",
       "artifactName": "time-picker",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/time-picker",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1844,7 +1696,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1857,10 +1709,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component time-picker --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1868,13 +1720,9 @@
       "componentName": "Toolbar",
       "artifactName": "toolbar",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/toolbar",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1883,7 +1731,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1896,10 +1744,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component toolbar --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     },
     {
@@ -1907,13 +1755,9 @@
       "componentName": "Tooltip",
       "artifactName": "tooltip",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/tooltip",
-      "requiredPresent": 2,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
-        "discovery/mvc-builder-coverage.md",
-        "discovery/blazor-candidates.md",
-        "discovery/public-api-surface.json",
-        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1922,7 +1766,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 0,
+      "probeCount": 1,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1935,10 +1779,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "static-discovery",
-        "action": "create missing artifact discovery/mvc-builder-coverage.md",
-        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component tooltip --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "stage": "mapping",
+        "action": "create missing artifact mapping/primitive-map.md",
+        "command": "complete the previous gate before writing this artifact",
+        "reason": "6 required artifact files are missing"
       }
     }
   ]

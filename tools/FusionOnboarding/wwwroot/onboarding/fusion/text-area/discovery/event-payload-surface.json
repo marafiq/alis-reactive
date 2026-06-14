@@ -1,0 +1,222 @@
+{
+  "component": "text-area",
+  "counts": {
+    "events": 6,
+    "payloadTypes": 5
+  },
+  "events": [
+    {
+      "event": "blur",
+      "eventType": "FocusOutEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "FocusOutEventArgs",
+              "kind": "property",
+              "name": "container",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "FocusOutEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "FocusOutEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "FocusOutEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "change",
+      "eventType": "ChangedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "FocusInEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "FocusInEventArgs",
+              "inheritedVia": "FocusInEventArgs",
+              "kind": "property",
+              "name": "container",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "FocusInEventArgs",
+              "inheritedVia": "FocusInEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "ChangedEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ChangedEventArgs",
+              "kind": "property",
+              "name": "isInteraction",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ChangedEventArgs",
+              "kind": "property",
+              "name": "previousValue",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "FocusInEventArgs",
+              "inheritedVia": "FocusInEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ChangedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "destroyed",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "focus",
+      "eventType": "FocusInEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "FocusInEventArgs",
+              "kind": "property",
+              "name": "container",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "FocusInEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "FocusInEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "FocusInEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "input",
+      "eventType": "InputEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "FocusInEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "FocusInEventArgs",
+              "inheritedVia": "FocusInEventArgs",
+              "kind": "property",
+              "name": "container",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "FocusInEventArgs",
+              "inheritedVia": "FocusInEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "InputEventArgs",
+              "kind": "property",
+              "name": "previousValue",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "FocusInEventArgs",
+              "inheritedVia": "FocusInEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "InputEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionTextArea",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "TextArea",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.ej.inputs.TextArea"
+  }
+}

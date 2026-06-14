@@ -1,0 +1,530 @@
+{
+  "component": "mention",
+  "counts": {
+    "builderMethods": 38,
+    "events": 11,
+    "members": 40,
+    "methods": 6,
+    "properties": 23
+  },
+  "fusionType": "FusionMention",
+  "members": [
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionBegin",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionComplete",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionFailure",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowSpaces",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeOpen",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "PopupEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "change",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "MentionChangeEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "closed",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "PopupEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "created",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "cssClass",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "debounceDelay",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "skip: lifecycle cleanup, not Fusion plan behavior",
+      "kind": "method",
+      "name": "destroy",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "destroyed",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "disableItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "item: string | number | object | HTMLLIElement) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "displayTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.DropDowns.MentionFieldSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "fields",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "FieldSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "filtering",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "FilteringEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.DropDowns.FilterType"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "filterType",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "FilterType"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "hidePopup",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "e?: MouseEvent | KeyboardEventArgs) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "hideSpinner",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "highlight",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "ignoreCase",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "itemTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "locale",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Char"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "mentionChar",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Int32"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "minLength",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "noRecordsTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "opened",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "PopupEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "popupHeight",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "string | number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "popupWidth",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "string | number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "query",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "Query"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "requireLeadingSpace",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "search",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "text: string, positionX: number, positionY: number) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "select",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "SelectEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showMentionChar",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showPopup",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.DropDowns.SortOrder"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "sortOrder",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "SortOrder"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "spinnerTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "suffixText",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Int32"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "suggestionCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "target",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+      "type": "HTMLElement | string"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "MentionBuilder",
+    "className": "Mention",
+    "dtsPath": "node_modules/@syncfusion/ej2-dropdowns/src/mention/mention.d.ts",
+    "jsPath": "",
+    "namespace": "ej.ej.dropdowns",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}
