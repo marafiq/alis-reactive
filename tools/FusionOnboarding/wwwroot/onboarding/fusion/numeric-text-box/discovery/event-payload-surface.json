@@ -1,0 +1,193 @@
+{
+  "component": "numeric-text-box",
+  "counts": {
+    "events": 5,
+    "payloadTypes": 4
+  },
+  "events": [
+    {
+      "event": "blur",
+      "eventType": "NumericBlurEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "NumericBlurEventArgs",
+              "kind": "property",
+              "name": "container",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "NumericBlurEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+              "type": "MouseEvent | FocusEvent | TouchEvent | KeyboardEvent"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "NumericBlurEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "NumericBlurEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "change",
+      "eventType": "ChangeEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "isInteraction",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "previousValue",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "ChangeEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "destroyed",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "focus",
+      "eventType": "NumericFocusEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "NumericFocusEventArgs",
+              "kind": "property",
+              "name": "container",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "NumericFocusEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+              "type": "MouseEvent | FocusEvent | TouchEvent | KeyboardEvent"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "NumericFocusEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "NumericFocusEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionNumericTextBox",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "NumericTextBox",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.inputs"
+  }
+}

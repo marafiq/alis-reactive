@@ -1,0 +1,165 @@
+{
+  "component": "rating",
+  "counts": {
+    "events": 4,
+    "payloadTypes": 4
+  },
+  "events": [
+    {
+      "event": "beforeItemRender",
+      "eventType": "RatingItemEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "RatingItemEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/rating/rating.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "RatingItemEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/rating/rating.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "RatingItemEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/rating/rating.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Event",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "Event",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "onItemHover",
+      "eventType": "RatingHoverEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "RatingHoverEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/rating/rating.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "RatingHoverEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/rating/rating.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "RatingHoverEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/rating/rating.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "RatingHoverEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/rating/rating.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "valueChanged",
+      "eventType": "RatingChangedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "RatingChangedEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/rating/rating.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "RatingChangedEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/rating/rating.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "RatingChangedEventArgs",
+              "kind": "property",
+              "name": "previousValue",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/rating/rating.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "RatingChangedEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/rating/rating.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "RatingChangedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/rating/rating.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionRating",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "Rating",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.inputs"
+  }
+}

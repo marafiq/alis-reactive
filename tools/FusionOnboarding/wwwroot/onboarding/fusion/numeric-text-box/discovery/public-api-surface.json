@@ -1,0 +1,425 @@
+{
+  "component": "numeric-text-box",
+  "counts": {
+    "builderMethods": 29,
+    "events": 5,
+    "members": 32,
+    "methods": 6,
+    "properties": 21
+  },
+  "fusionType": "FusionNumericTextBox",
+  "members": [
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowMouseWheel",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "appendTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "blur",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "NumericBlurEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "change",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "ChangeEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "created",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "cssClass",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "currency",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "decimals",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "decrement",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "step?: number) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "skip: lifecycle cleanup, not Fusion plan behavior",
+      "kind": "method",
+      "name": "destroy",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "destroyed",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enabled",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enablePersistence",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Inputs.FloatLabelType"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "floatLabelType",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "FloatLabelType"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "focus",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "NumericFocusEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "focusIn",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "focusOut",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "format",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getText",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": ") => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "increment",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "step?: number) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "max",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "min",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "placeholder",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "prependTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "readonly",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showClearButton",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showSpinButton",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "step",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "strictMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "validateDecimalOnType",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "value",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String",
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "width",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+      "type": "number | string"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "NumericTextBoxBuilder",
+    "className": "NumericTextBox",
+    "dtsPath": "node_modules/@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts",
+    "jsPath": "",
+    "namespace": "ej.inputs",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}
