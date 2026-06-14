@@ -5,102 +5,112 @@
 @{
     ViewData["Title"] = "FusionSwitch";
 
-    var plan = Html.ReactivePlan<SwitchModel>();
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+    const string SubmitReady = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
 
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        p.Component<FusionSwitch>(m => m.ReceiveNotifications).SetChecked(false);
-        var comp = p.Component<FusionSwitch>(m => m.EmailAlerts);
-        p.Element("value-echo").SetText(comp.Value());
-    }));
+    var plan = Html.ReactivePlan<SwitchModel>();
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionSwitch — Full API</native-heading>
-    <native-text color="Secondary">
-        Exercises all supported FusionSwitch API: property writes, property reads,
-        events with typed conditions, and component-read conditions.
-        Senior living domain: notification preferences, email/SMS alerts.
-    </native-text>
+    <div>
+        <native-heading level="H1">Care Alert Preferences</native-heading>
+        <native-text color="Secondary">
+            Choose whether we send you care alerts, and how we deliver them. Turn the master switch off to pause every alert,
+            or pick the channels that suit you, then save.
+        </native-text>
+    </div>
 
     <native-card><native-card-body>
-        <native-heading level="H2">1. Property Write (SetChecked)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Switch starts checked. On DomReady, <code>SetChecked(false)</code> unchecks it
-            via structured prop on the Syncfusion ej2 instance.
-        </p>
-        <native-grid cols="C2" gap="Base">
-            @{ Html.InputField(plan, m => m.ReceiveNotifications, o => o.Label("Receive Notifications"))
+        <native-vstack gap="Base">
+            <native-heading level="H2">Receive care alerts</native-heading>
+            @{ Html.InputField(plan, m => m.ReceiveCareAlerts, o => o.Label("Receive care alerts"))
                 .FusionSwitch(b => b
+                    .OnLabel("On")
+                    .OffLabel("Off")
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
-                        p.Element("change-value").SetText(args, x => x.Checked);
                         p.When(args, x => x.Checked).Truthy()
-                            .Then(t => t.Element("args-condition").SetText("notifications enabled"))
-                            .Else(e => e.Element("args-condition").SetText("notifications disabled"));
-                        var comp = p.Component<FusionSwitch>(m => m.ReceiveNotifications);
-                        p.When(comp.Value()).Truthy()
-                            .Then(then =>
-                            {
-                                then.Element("selected-indicator").Show();
-                                then.Element("selected-indicator").SetText("notifications active");
-                            })
-                            .Else(else_ =>
-                            {
-                                else_.Element("selected-indicator").Hide();
-                            });
+                            .Then(on => on.Element("alerts-status")
+                                .SetText("Care alerts are on. Choose how we should reach you below."))
+                            .Else(off => off.Element("alerts-status")
+                                .SetText("Care alerts are paused. We will not send reminders until you turn them back on."));
                     })); }
-        </native-grid>
-    </native-card-body></native-card>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">2. Property Read (Value as Source)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, reads the email alerts switch's <code>checked</code> property and displays it in a text element.
-        </p>
-        @{ Html.InputField(plan, m => m.EmailAlerts, o => o.Label("Email Alerts"))
-            .FusionSwitch(b => { }); }
-        <p class="font-mono text-sm mt-2">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
+            <native-text color="Secondary"><span id="alerts-status">Care alerts are on. Choose how we should reach you below.</span></native-text>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">3. Events (Changed + Typed Condition)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            The notifications switch wires a Changed event. Toggle shows the new state.
-            <code>When(args, x =&gt; x.Checked).Truthy()</code> tests typed event-args condition.
-        </p>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
-            <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
-            <p>Active: <span id="selected-indicator" hidden class="text-emerald-600">&mdash;</span></p>
+            @(Html.NativeButton("pause-alerts", "Pause all alerts")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionSwitch>(m => m.ReceiveCareAlerts).SetChecked(false);
+                    p.Element("alerts-status")
+                        .SetText("Care alerts are paused. We will not send reminders until you turn them back on.");
+                }))
         </native-vstack>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">4. Component Value Condition</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Button reads SMS alerts switch via <code>When(comp.Value()).Truthy()</code>
-            and shows a confirmation or warning.
-        </p>
-        @{ Html.InputField(plan, m => m.SmsAlerts, o => o.Label("SMS Alerts"))
-            .FusionSwitch(b => { }); }
-        <native-hstack gap="None" class="mt-3">
-            @(Html.NativeButton("check-sms-btn", "Check SMS Alert Status")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var comp = p.Component<FusionSwitch>(m => m.SmsAlerts);
-                    p.When(comp.Value()).Truthy()
-                        .Then(t => t.Element("sms-warning").SetText("SMS alerts are enabled"))
-                        .Else(e => e.Element("sms-warning").SetText("SMS alerts are disabled"));
-                }))
-        </native-hstack>
-        <p class="font-mono text-sm mt-2">Status: <span id="sms-warning" class="text-text-muted">&mdash;</span></p>
+        <native-vstack gap="Base">
+            <native-heading level="H2">Delivery channels</native-heading>
+
+            @{ Html.InputField(plan, m => m.EmailReminders, o => o.Label("Email reminders"))
+                .FusionSwitch(b => b.OnLabel("On").OffLabel("Off")); }
+
+            @{ Html.InputField(plan, m => m.TextMessageAlerts, o => o.Label("Text-message alerts"))
+                .FusionSwitch(b => b.OnLabel("On").OffLabel("Off")); }
+
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("review-email", "Review email reminders")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var email = p.Component<FusionSwitch>(m => m.EmailReminders);
+                        p.When(email.Value()).Truthy()
+                            .Then(on => on.Element("email-review").SetText("Email reminders are on."))
+                            .Else(off => off.Element("email-review").SetText("Email reminders are off."));
+                    }))
+                @(Html.NativeButton("review-text", "Review text-message alerts")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var text = p.Component<FusionSwitch>(m => m.TextMessageAlerts);
+                        p.When(text.Value()).Truthy()
+                            .Then(on => on.Element("text-review").SetText("Text-message alerts are on."))
+                            .Else(off => off.Element("text-review").SetText("Text-message alerts are off."));
+                    }))
+            </native-hstack>
+
+            <native-vstack gap="Xs">
+                <native-text color="Secondary"><span id="email-review">Use the button to check your email reminders.</span></native-text>
+                <native-text color="Secondary"><span id="text-review">Use the button to check your text-message alerts.</span></native-text>
+            </native-vstack>
+        </native-vstack>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+        <native-vstack gap="Base">
+            @(Html.NativeButton("save-preferences", "Save my alert preferences")
+                .CssClass(SubmitReady)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var receive = p.Component<FusionSwitch>(m => m.ReceiveCareAlerts);
+                    var email = p.Component<FusionSwitch>(m => m.EmailReminders);
+                    var text = p.Component<FusionSwitch>(m => m.TextMessageAlerts);
+                    p.Post(Url.SandboxRoute("Save", "Switch"))
+                        .Gather(g => g
+                            .Include(receive.Value(), "receiveCareAlerts")
+                            .Include(email.Value(), "emailReminders")
+                            .Include(text.Value(), "textMessageAlerts"))
+                        .Response(r => r.OnSuccess<CareAlertPreferencesResponse>((json, s) =>
+                        {
+                            s.Element("save-confirmation").SetText(json, x => x.Summary);
+                            s.Element("save-confirmation-panel").RemoveClass("hidden");
+                        }));
+                }))
+            <div id="save-confirmation-panel" class="hidden rounded-md border border-green-300 bg-green-50 p-4">
+                <native-text><span id="save-confirmation" class="font-medium text-green-800"></span></native-text>
+            </div>
+        </native-vstack>
     </native-card-body></native-card>
 </native-vstack>
 

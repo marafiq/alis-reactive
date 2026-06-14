@@ -1,0 +1,20 @@
+{
+  "component": "switch",
+  "onboarded": [
+    "checked"
+  ],
+  "excluded": [
+    {
+      "name": "toggle",
+      "reason": "Syncfusion source switch.js:432 toggle() { this.clickHandler(); } flips checked by replaying the user click handler. Reactive plans set switch state deterministically through the typed SetChecked(bool) write (ComponentProperty<bool>.Named(checked)), which sets the exact target state rather than blindly inverting it. A blind invert has no senior-living journey (a care-preferences toggle is set to a known on/off, never flipped to an unknown state), and adding it would duplicate SetChecked with a less predictable contract."
+    },
+    {
+      "name": "click",
+      "reason": "Syncfusion source switch.js:470 click() { this.element.click(); } programmatically dispatches a native checkbox click, i.e. it simulates the user gesture the reactive event already handles. Plans drive state with the typed SetChecked(bool) write and respond to real user toggles through the Changed event; replaying a synthetic click from the plan duplicates SetChecked while bypassing the event contract. No resident workflow needs the framework to fake-click its own switch."
+    },
+    {
+      "name": "focusIn",
+      "reason": "Syncfusion source switch.js:479 focusIn() { this.element.focus(); } moves DOM focus onto the switch input. Focus management is a native browser/DOM concern, not switch-state plan behavior, and is incidental metadata rather than a value a reactive plan branches, gathers, displays, or mutates. No senior-living journey (notification/alert preferences) requires the plan to programmatically focus a toggle; keeping it out preserves a switch slice that is only about state."
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "component": "switch",
+  "fusionType": "FusionSwitch",
+  "coverage": [
+    { "member": "FusionSwitch(this InputBoundField<TModel, bool> setup, Action<SwitchBuilder> build)", "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Switch.WhenSwitchToggles.preferences_open_showing_the_resident_saved_toggles", "catches": "the FusionSwitch builder stops rendering each switch bound to its model property (the test asserts care alerts open checked, email reminders checked, text-message alerts unchecked — exactly the saved preferences)" },
+    { "member": "Reactive", "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Switch.WhenSwitchToggles.turning_care_alerts_off_tells_the_resident_alerts_are_paused", "catches": "the .Reactive wiring stops connecting the master switch's change event to its plan pipeline, so toggling care alerts off runs no reaction and the status line never changes to paused" },
+    { "member": "Changed", "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Switch.WhenSwitchToggles.turning_care_alerts_off_tells_the_resident_alerts_are_paused", "catches": "the Changed event stops firing the reactive handler when the resident toggles the switch, so the visible alerts-status message never updates after the toggle" },
+    { "member": "FusionSwitchChangeArgs", "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Switch.WhenSwitchToggles.turning_care_alerts_off_tells_the_resident_alerts_are_paused", "catches": "the change event arg contract stops delivering the change payload into the plan, so the When(args ...) branch cannot run and the paused message never appears" },
+    { "member": "FusionSwitchChangeArgs.Checked", "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Switch.WhenSwitchToggles.turning_care_alerts_back_on_tells_the_resident_to_pick_channels", "catches": "Checked stops carrying the new switch state into the branch (the test toggles off then on and asserts the message flips from 'paused' to 'on. Choose how we should reach you' — only a correct Checked value in BOTH directions passes)" },
+    { "member": "SetChecked(this ComponentRef<FusionSwitch, TModel> self, bool isChecked)", "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Switch.WhenSwitchToggles.pausing_all_alerts_turns_the_master_switch_off", "catches": "SetChecked stops writing checked=false onto the master switch (the test asserts the switch is checked, clicks Pause all alerts, and asserts the switch becomes unchecked)" },
+    { "member": "Value(this ComponentRef<FusionSwitch, TModel> self)", "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Switch.WhenSwitchToggles.saving_posts_each_switch_value_to_the_server", "catches": "the Value source stops yielding each switch's live checked state into the gather body (the test asserts the POST carries receiveCareAlerts:true, emailReminders:false after toggling email off, and textMessageAlerts:false)" }
+  ],
+  "acceptedFanout": [],
+  "knownGaps": [
+    {
+      "member": "FusionSwitchChangeArgs.IsInteracted",
+      "status": "UNCOVERED — unbacked vendor payload key",
+      "evidence": "The Syncfusion EJ2 switch 'change' event emits the payload { checked, event, name } only. Confirmed three ways: (1) source node_modules/@syncfusion/ej2-buttons/src/switch/switch.js:97 builds changeEventArgs = { checked, event }; (2) the generated discovery artifact discovery/event-payload-surface.json lists ChangeEventArgs members as checked, event, name with no isInteracted; (3) a live browser capture on /Sandbox/Components/Switch of the real change payload after a trusted toggle returned keys [checked, event, name], hasIsInteracted=false. The runtime event-fusion.ts adapter passes the vendor args through unchanged and injects nothing. So FusionSwitchChangeArgs.IsInteracted is always undefined at runtime and has no observable behavior; no fails-when-broken test can exist for it.",
+      "whyNotMapped": "BDD Rule 3 forbids a test that still passes when the member is broken — IsInteracted is already effectively broken (never populated), so any assertion would be a pass-hack. Removing the unbacked property from the slice (the skill's prescribed correction) edits Alis.Reactive.Fusion/Components/FusionSwitch/Events/FusionSwitchOnChanged.cs, which the CARDINAL RULE forbids. This is a framework-slice onboarding defect outside this task's edit scope, reported rather than faked."
+    }
+  ]
+}
