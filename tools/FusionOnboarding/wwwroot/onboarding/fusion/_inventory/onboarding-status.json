@@ -4,21 +4,21 @@
   "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion",
   "summary": {
     "componentCount": 51,
-    "audited": 2,
-    "withTypedMatrix": 3,
-    "totalMatrixRows": 536,
-    "rowProvenMatrixRows": 469,
+    "audited": 3,
+    "withTypedMatrix": 4,
+    "totalMatrixRows": 550,
+    "rowProvenMatrixRows": 483,
     "unprovenMatrixRows": 67,
-    "totalRawProbes": 30,
-    "totalRawTraces": 30,
+    "totalRawProbes": 31,
+    "totalRawTraces": 31,
     "byStatus": {
-      "artifact-incomplete": 49,
-      "audited": 2
+      "artifact-incomplete": 48,
+      "audited": 3
     },
     "byNextStage": {
       "static-discovery": 42,
-      "mapping": 7,
-      "audited": 2
+      "audited": 3,
+      "mapping": 6
     }
   },
   "components": [
@@ -222,34 +222,27 @@
       "componentName": "Button",
       "artifactName": "button",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/button",
-      "requiredPresent": 6,
+      "requiredPresent": 12,
       "requiredTotal": 12,
-      "missingRequired": [
-        "mapping/primitive-map.md",
-        "mapping/csharp-name-decisions.md",
-        "mapping/vertical-slice-plan.md",
-        "proof/typed-api-coverage-matrix.md",
-        "proof/playwright-proof.md",
-        "proof/audit-report.md"
-      ],
+      "missingRequired": [],
       "unlinkedRequired": [],
-      "probeCount": 0,
-      "traceCount": 0,
+      "probeCount": 1,
+      "traceCount": 1,
       "matrix": {
-        "exists": false,
-        "status": "missing",
-        "totalRows": 0,
-        "rowProvenRows": 0,
+        "exists": true,
+        "status": "audited",
+        "totalRows": 14,
+        "rowProvenRows": 14,
         "unprovenRows": 0,
         "firstUnprovenRow": null
       },
       "openAuditMarkers": false,
-      "mechanicalStatus": "artifact-incomplete",
+      "mechanicalStatus": "audited",
       "nextAction": {
-        "stage": "mapping",
-        "action": "create missing artifact mapping/primitive-map.md",
-        "command": "complete the previous gate before writing this artifact",
-        "reason": "6 required artifact files are missing"
+        "stage": "audited",
+        "action": "none",
+        "command": "node .claude/skills/onboard-fusion-component/scripts/verify-fusion-artifact-gates.mjs --component button",
+        "reason": "component is mechanically audited"
       }
     },
     {

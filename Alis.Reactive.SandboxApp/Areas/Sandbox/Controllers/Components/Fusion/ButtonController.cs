@@ -13,17 +13,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return View("~/Areas/Sandbox/Views/Components/Fusion/Button/Index.cshtml", new ButtonModel());
         }
 
-        [HttpPost("Echo")]
-        public IActionResult Echo([FromBody] ButtonEchoRequest request)
+        [HttpPost("RecordCheckIn")]
+        public IActionResult RecordCheckIn([FromBody] ButtonCheckInRequest request)
         {
-            return Ok(new ButtonEchoResponse
+            var priority = request.Recommended ? "as the recommended next step" : "for routine review";
+            var followUp = request.FollowUp ? "with a follow-up flagged" : "with no follow-up needed";
+
+            return Ok(new ButtonCheckInResponse
             {
-                Content = request.Content,
-                Disabled = request.Disabled,
-                CssClass = request.CssClass,
-                IsPrimary = request.IsPrimary,
-                IsToggle = request.IsToggle,
-                Summary = request.Content + ":" + request.Disabled + ":" + request.IsPrimary + ":" + request.IsToggle
+                Confirmation =
+                    $"Recorded \"{request.Action}\" {priority} {followUp}. Priority style: {request.Priority}."
             });
         }
     }

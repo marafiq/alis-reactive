@@ -1,34 +1,35 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
+    /// <summary>
+    /// Daily Wellness Check-In journey: a care-team member opens the check-in for the
+    /// resident assigned to them, prepares the action, then records the visit.
+    /// </summary>
     public sealed class ButtonModel
     {
+        /// <summary>The resident this check-in belongs to, carried into the action label.</summary>
+        public string ResidentName { get; set; } = "Eleanor Whitfield";
     }
 
-    public sealed class ButtonEchoRequest
+    /// <summary>
+    /// The check-in summary the action button's runtime state is gathered into when the
+    /// care-team member records the visit.
+    /// </summary>
+    public sealed class ButtonCheckInRequest
     {
-        public string Content { get; set; } = string.Empty;
+        public string Action { get; set; } = string.Empty;
 
-        public bool Disabled { get; set; }
+        public bool Locked { get; set; }
 
-        public string CssClass { get; set; } = string.Empty;
+        public string Priority { get; set; } = string.Empty;
 
-        public bool IsPrimary { get; set; }
+        public bool Recommended { get; set; }
 
-        public bool IsToggle { get; set; }
+        public bool FollowUp { get; set; }
     }
 
-    public sealed class ButtonEchoResponse
+    /// <summary>The server's confirmation of a recorded daily wellness check-in.</summary>
+    public sealed class ButtonCheckInResponse
     {
-        public string Content { get; set; } = string.Empty;
-
-        public bool Disabled { get; set; }
-
-        public string CssClass { get; set; } = string.Empty;
-
-        public bool IsPrimary { get; set; }
-
-        public bool IsToggle { get; set; }
-
-        public string Summary { get; set; } = string.Empty;
+        public string Confirmation { get; set; } = string.Empty;
     }
 }

@@ -12,27 +12,27 @@ it makes the current cross-component gap measurable and fail-closed.
 | Metric | Count |
 |---|---:|
 | Components | 51 |
-| Audited components | 2 |
-| Components with typed matrix | 3 |
-| Total matrix rows | 536 |
-| Row-proven matrix rows | 469 |
+| Audited components | 3 |
+| Components with typed matrix | 4 |
+| Total matrix rows | 550 |
+| Row-proven matrix rows | 483 |
 | Unproven matrix rows | 67 |
-| Raw probes | 30 |
-| Raw traces | 30 |
+| Raw probes | 31 |
+| Raw traces | 31 |
 
 ## Status Counts
 
 | Status | Components |
 |---|---:|
-| artifact-incomplete | 49 |
-| audited | 2 |
+| artifact-incomplete | 48 |
+| audited | 3 |
 
 ## Next Action Counts
 
 | Next Stage | Components |
 |---|---:|
-| audited | 2 |
-| mapping | 7 |
+| audited | 3 |
+| mapping | 6 |
 | static-discovery | 42 |
 
 ## Components
@@ -44,7 +44,7 @@ it makes the current cross-component gap measurable and fail-closed.
 | FusionAutoComplete | `auto-complete/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionBreadcrumb | `breadcrumb/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionBulletChart | `bullet-chart/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
-| FusionButton | `button/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 0 | 0 | 0 | 0 | 0 |
+| FusionButton | `button/` | audited | audited | none | 12/12 | 1 | 1 | 14 | 14 | 0 |
 | FusionCarousel | `carousel/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionCheckBox | `check-box/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionChipList | `chip-list/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 0 | 0 | 0 | 0 | 0 |
