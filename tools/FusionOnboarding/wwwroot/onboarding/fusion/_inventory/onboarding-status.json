@@ -4,21 +4,21 @@
   "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion",
   "summary": {
     "componentCount": 51,
-    "audited": 3,
-    "withTypedMatrix": 4,
-    "totalMatrixRows": 550,
-    "rowProvenMatrixRows": 483,
-    "unprovenMatrixRows": 67,
-    "totalRawProbes": 31,
-    "totalRawTraces": 31,
+    "audited": 7,
+    "withTypedMatrix": 10,
+    "totalMatrixRows": 655,
+    "rowProvenMatrixRows": 555,
+    "unprovenMatrixRows": 100,
+    "totalRawProbes": 35,
+    "totalRawTraces": 35,
     "byStatus": {
-      "artifact-incomplete": 48,
-      "audited": 3
+      "artifact-incomplete": 44,
+      "audited": 7
     },
     "byNextStage": {
       "static-discovery": 42,
-      "audited": 3,
-      "mapping": 6
+      "audited": 7,
+      "mapping": 2
     }
   },
   "components": [
@@ -289,34 +289,27 @@
       "componentName": "CheckBox",
       "artifactName": "check-box",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/check-box",
-      "requiredPresent": 6,
+      "requiredPresent": 12,
       "requiredTotal": 12,
-      "missingRequired": [
-        "mapping/primitive-map.md",
-        "mapping/csharp-name-decisions.md",
-        "mapping/vertical-slice-plan.md",
-        "proof/typed-api-coverage-matrix.md",
-        "proof/playwright-proof.md",
-        "proof/audit-report.md"
-      ],
+      "missingRequired": [],
       "unlinkedRequired": [],
-      "probeCount": 0,
-      "traceCount": 0,
+      "probeCount": 1,
+      "traceCount": 1,
       "matrix": {
-        "exists": false,
-        "status": "missing",
-        "totalRows": 0,
-        "rowProvenRows": 0,
+        "exists": true,
+        "status": "audited",
+        "totalRows": 13,
+        "rowProvenRows": 13,
         "unprovenRows": 0,
         "firstUnprovenRow": null
       },
       "openAuditMarkers": false,
-      "mechanicalStatus": "artifact-incomplete",
+      "mechanicalStatus": "audited",
       "nextAction": {
-        "stage": "mapping",
-        "action": "create missing artifact mapping/primitive-map.md",
-        "command": "complete the previous gate before writing this artifact",
-        "reason": "6 required artifact files are missing"
+        "stage": "audited",
+        "action": "none",
+        "command": "node .claude/skills/onboard-fusion-component/scripts/verify-fusion-artifact-gates.mjs --component check-box",
+        "reason": "component is mechanically audited"
       }
     },
     {
@@ -324,13 +317,12 @@
       "componentName": "ChipList",
       "artifactName": "chip-list",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/chip-list",
-      "requiredPresent": 6,
+      "requiredPresent": 7,
       "requiredTotal": 12,
       "missingRequired": [
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
-        "proof/typed-api-coverage-matrix.md",
         "proof/playwright-proof.md",
         "proof/audit-report.md"
       ],
@@ -338,12 +330,21 @@
       "probeCount": 0,
       "traceCount": 0,
       "matrix": {
-        "exists": false,
-        "status": "missing",
-        "totalRows": 0,
+        "exists": true,
+        "status": "unproven",
+        "totalRows": 32,
         "rowProvenRows": 0,
-        "unprovenRows": 0,
-        "firstUnprovenRow": null
+        "unprovenRows": 32,
+        "firstUnprovenRow": {
+          "publicApi": "FusionChipData",
+          "kind": "event-payload-contract",
+          "source": "Alis.Reactive.Fusion/Components/FusionChipList/Events/FusionChipData.cs",
+          "rawTrace": "pending",
+          "primitiveMap": "pending",
+          "verticalSlice": "pending",
+          "playwrightProof": "pending",
+          "status": "unproven"
+        }
       },
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
@@ -351,7 +352,7 @@
         "stage": "mapping",
         "action": "create missing artifact mapping/primitive-map.md",
         "command": "complete the previous gate before writing this artifact",
-        "reason": "6 required artifact files are missing"
+        "reason": "5 required artifact files are missing"
       }
     },
     {
@@ -1167,34 +1168,27 @@
       "componentName": "NumericTextBox",
       "artifactName": "numeric-text-box",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/numeric-text-box",
-      "requiredPresent": 6,
+      "requiredPresent": 12,
       "requiredTotal": 12,
-      "missingRequired": [
-        "mapping/primitive-map.md",
-        "mapping/csharp-name-decisions.md",
-        "mapping/vertical-slice-plan.md",
-        "proof/typed-api-coverage-matrix.md",
-        "proof/playwright-proof.md",
-        "proof/audit-report.md"
-      ],
+      "missingRequired": [],
       "unlinkedRequired": [],
-      "probeCount": 0,
-      "traceCount": 0,
+      "probeCount": 1,
+      "traceCount": 1,
       "matrix": {
-        "exists": false,
-        "status": "missing",
-        "totalRows": 0,
-        "rowProvenRows": 0,
+        "exists": true,
+        "status": "audited",
+        "totalRows": 18,
+        "rowProvenRows": 18,
         "unprovenRows": 0,
         "firstUnprovenRow": null
       },
       "openAuditMarkers": false,
-      "mechanicalStatus": "artifact-incomplete",
+      "mechanicalStatus": "audited",
       "nextAction": {
-        "stage": "mapping",
-        "action": "create missing artifact mapping/primitive-map.md",
-        "command": "complete the previous gate before writing this artifact",
-        "reason": "6 required artifact files are missing"
+        "stage": "audited",
+        "action": "none",
+        "command": "node .claude/skills/onboard-fusion-component/scripts/verify-fusion-artifact-gates.mjs --component numeric-text-box",
+        "reason": "component is mechanically audited"
       }
     },
     {
@@ -1319,34 +1313,27 @@
       "componentName": "RadioButton",
       "artifactName": "radio-button",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/radio-button",
-      "requiredPresent": 6,
+      "requiredPresent": 12,
       "requiredTotal": 12,
-      "missingRequired": [
-        "mapping/primitive-map.md",
-        "mapping/csharp-name-decisions.md",
-        "mapping/vertical-slice-plan.md",
-        "proof/typed-api-coverage-matrix.md",
-        "proof/playwright-proof.md",
-        "proof/audit-report.md"
-      ],
+      "missingRequired": [],
       "unlinkedRequired": [],
-      "probeCount": 0,
-      "traceCount": 0,
+      "probeCount": 1,
+      "traceCount": 1,
       "matrix": {
-        "exists": false,
-        "status": "missing",
-        "totalRows": 0,
-        "rowProvenRows": 0,
+        "exists": true,
+        "status": "audited",
+        "totalRows": 12,
+        "rowProvenRows": 12,
         "unprovenRows": 0,
         "firstUnprovenRow": null
       },
       "openAuditMarkers": false,
-      "mechanicalStatus": "artifact-incomplete",
+      "mechanicalStatus": "audited",
       "nextAction": {
-        "stage": "mapping",
-        "action": "create missing artifact mapping/primitive-map.md",
-        "command": "complete the previous gate before writing this artifact",
-        "reason": "6 required artifact files are missing"
+        "stage": "audited",
+        "action": "none",
+        "command": "node .claude/skills/onboard-fusion-component/scripts/verify-fusion-artifact-gates.mjs --component radio-button",
+        "reason": "component is mechanically audited"
       }
     },
     {
@@ -1702,26 +1689,33 @@
       "componentName": "Switch",
       "artifactName": "switch",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/switch",
-      "requiredPresent": 6,
+      "requiredPresent": 8,
       "requiredTotal": 12,
       "missingRequired": [
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
-        "proof/typed-api-coverage-matrix.md",
-        "proof/playwright-proof.md",
-        "proof/audit-report.md"
+        "proof/playwright-proof.md"
       ],
       "unlinkedRequired": [],
       "probeCount": 0,
       "traceCount": 0,
       "matrix": {
-        "exists": false,
-        "status": "missing",
-        "totalRows": 0,
-        "rowProvenRows": 0,
-        "unprovenRows": 0,
-        "firstUnprovenRow": null
+        "exists": true,
+        "status": "unproven",
+        "totalRows": 8,
+        "rowProvenRows": 7,
+        "unprovenRows": 1,
+        "firstUnprovenRow": {
+          "publicApi": "FusionSwitchChangeArgs.IsInteracted",
+          "kind": "event-payload-property",
+          "source": "Alis.Reactive.Fusion/Components/FusionSwitch/Events/FusionSwitchOnChanged.cs",
+          "rawTrace": "pending",
+          "primitiveMap": "pending",
+          "verticalSlice": "pending",
+          "playwrightProof": "pending",
+          "status": "unproven"
+        }
       },
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
@@ -1729,7 +1723,7 @@
         "stage": "mapping",
         "action": "create missing artifact mapping/primitive-map.md",
         "command": "complete the previous gate before writing this artifact",
-        "reason": "6 required artifact files are missing"
+        "reason": "4 required artifact files are missing"
       }
     },
     {
@@ -1815,34 +1809,27 @@
       "componentName": "TextBox",
       "artifactName": "text-box",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/text-box",
-      "requiredPresent": 6,
+      "requiredPresent": 12,
       "requiredTotal": 12,
-      "missingRequired": [
-        "mapping/primitive-map.md",
-        "mapping/csharp-name-decisions.md",
-        "mapping/vertical-slice-plan.md",
-        "proof/typed-api-coverage-matrix.md",
-        "proof/playwright-proof.md",
-        "proof/audit-report.md"
-      ],
+      "missingRequired": [],
       "unlinkedRequired": [],
-      "probeCount": 0,
-      "traceCount": 0,
+      "probeCount": 1,
+      "traceCount": 1,
       "matrix": {
-        "exists": false,
-        "status": "missing",
-        "totalRows": 0,
-        "rowProvenRows": 0,
+        "exists": true,
+        "status": "audited",
+        "totalRows": 22,
+        "rowProvenRows": 22,
         "unprovenRows": 0,
         "firstUnprovenRow": null
       },
       "openAuditMarkers": false,
-      "mechanicalStatus": "artifact-incomplete",
+      "mechanicalStatus": "audited",
       "nextAction": {
-        "stage": "mapping",
-        "action": "create missing artifact mapping/primitive-map.md",
-        "command": "complete the previous gate before writing this artifact",
-        "reason": "6 required artifact files are missing"
+        "stage": "audited",
+        "action": "none",
+        "command": "node .claude/skills/onboard-fusion-component/scripts/verify-fusion-artifact-gates.mjs --component text-box",
+        "reason": "component is mechanically audited"
       }
     },
     {
