@@ -10,6 +10,9 @@ export const meta = {
 
 const SK = '.claude/skills/onboard-fusion-component/scripts'
 const MAX_AUTHOR_ROUNDS = 3
+const RESULT_SCHEMA = { type: 'object', additionalProperties: false,
+  required: ['guaranteePassed', 'remainingGaps', 'verifyFinalLine'],
+  properties: { guaranteePassed: { type: 'boolean' }, remainingGaps: { type: 'string' }, verifyFinalLine: { type: 'string' } } }
 
 // --- Select the targets ----------------------------------------------------
 phase('Select')
@@ -84,9 +87,5 @@ function AUTHOR(t, round, gaps) {
 `\nReturn: guaranteePassed (true ONLY if verify-onboarding-complete printed "DONE — 100% onboarded, guaranteed." / exit 0), ` +
 `remainingGaps (the exact members still UNMAPPED/UNTESTED if not), and the verify command's final line.`
 }
-
-const RESULT_SCHEMA = { type: 'object', additionalProperties: false,
-  required: ['guaranteePassed', 'remainingGaps', 'verifyFinalLine'],
-  properties: { guaranteePassed: { type: 'boolean' }, remainingGaps: { type: 'string' }, verifyFinalLine: { type: 'string' } } }
 
 function pascal(s) { return s.split('-').map(p => p[0].toUpperCase() + p.slice(1)).join('') }
