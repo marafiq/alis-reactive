@@ -237,6 +237,19 @@ watcher and the proof command. Framework assets ship from
 `Alis.Reactive.Assets/`; sandbox-only assets live under
 `Alis.Reactive.SandboxApp/`.
 
+## Onboard / Audit / Upgrade Fusion components (deterministic)
+
+```text
+/onboard-fusion-component {"component":"switch","fusionType":"FusionSwitch"}   # one component to 100%
+/onboard-fusion-component {"all":true}                                          # all incomplete to 100%
+node .claude/skills/onboard-fusion-component/scripts/verify-onboarding-complete.mjs --all   # audit/upgrade: the 100% gate
+```
+
+Pipeline (deterministic): discover → audit (every typed member → core DSL primitive,
+`audit-primitive-coverage.mjs`) → observe (`observe-plan.mjs`) → author from the plan →
+Playwright → `verify-onboarding-complete.mjs`. A component is "onboarded" IFF that gate
+exits 0; the driver loops authoring until it does or fails loud. Never claim done otherwise.
+
 ## Tech Stack
 
 | Layer | Technology |
