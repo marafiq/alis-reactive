@@ -5,172 +5,170 @@
 @{
     ViewData["Title"] = "FusionRadioButton";
 
-    const string privateId = "private-room-radio";
-    const string sharedId = "shared-room-radio";
-    var plan = Html.ReactivePlan<FusionRadioButtonModel>();
+    const string studioId = "room-studio";
+    const string oneBedroomId = "room-one-bedroom";
+    const string companionId = "room-companion-suite";
 
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        var shared = p.Component<FusionRadioButton>(sharedId);
-        shared.SetChecked(true);
-        p.Element("selected-echo").SetText(shared.SelectedValue());
-        p.Element("shared-checked-echo").SetText(shared.Checked());
-    }));
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+    const string SubmitReady = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+
+    var plan = Html.ReactivePlan<FusionRadioButtonModel>();
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionRadioButton</native-heading>
+    <div>
+        <native-heading level="H1">Move-in Room &amp; Care Plan</native-heading>
+        <native-text color="Secondary">
+            Confirm the room for this resident's move-in. Choose a room to see what it includes, then confirm with the move-in desk.
+        </native-text>
+    </div>
 
     <native-card><native-card-body>
-        <native-heading level="H2">State and Events</native-heading>
-        <native-vstack gap="Sm">
-            @(Html.FusionRadioButton(plan, privateId, b => b
-                .Name("roomType")
-                .Value("Private")
-                .Label("Private room"))
-                .Reactive(evt => evt.Changed, (args, p) =>
-                {
-                    p.Element("change-value").SetText(args, x => x.Value);
-                    p.When(args, x => x.Value).Eq("Private")
-                        .Then(t => t.Element("args-condition").SetText("private"))
-                        .Else(e => e.Element("args-condition").SetText("not private"));
-                }))
+        <native-vstack gap="Base">
+            <native-heading level="H2">Which room is she moving into?</native-heading>
 
-            @(Html.FusionRadioButton(plan, sharedId, b => b
-                .Name("roomType")
-                .Value("Shared")
-                .Label("Shared room"))
-                .Reactive(evt => evt.Changed, (args, p) =>
-                {
-                    p.Element("change-value").SetText(args, x => x.Value);
-                    p.When(args, x => x.Value).Eq("Shared")
-                        .Then(t => t.Element("args-condition").SetText("shared"))
-                        .Else(e => e.Element("args-condition").SetText("not shared"));
-                }))
-        </native-vstack>
-
-        <native-hstack gap="Sm" class="mt-4 flex-wrap">
-            @(Html.NativeButton("set-private-btn", "Set Private")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var privateRoom = p.Component<FusionRadioButton>(privateId);
-                    var sharedRoom = p.Component<FusionRadioButton>(sharedId);
-                    privateRoom.SetChecked(true);
-                    p.Element("selected-echo").SetText(privateRoom.SelectedValue());
-                    p.Element("private-checked-echo").SetText(privateRoom.Checked());
-                    p.Element("shared-checked-echo").SetText(sharedRoom.Checked());
-                    p.Element("command-state").SetText("private set");
-                }))
-            @(Html.NativeButton("set-shared-btn", "Set Shared")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var privateRoom = p.Component<FusionRadioButton>(privateId);
-                    var sharedRoom = p.Component<FusionRadioButton>(sharedId);
-                    sharedRoom.SetChecked(true);
-                    p.Element("selected-echo").SetText(sharedRoom.SelectedValue());
-                    p.Element("private-checked-echo").SetText(privateRoom.Checked());
-                    p.Element("shared-checked-echo").SetText(sharedRoom.Checked());
-                    p.Element("command-state").SetText("shared set");
-                }))
-            @(Html.NativeButton("disable-shared-btn", "Disable Shared")
-                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var sharedRoom = p.Component<FusionRadioButton>(sharedId);
-                    sharedRoom.SetDisabled(true);
-                    p.Element("disabled-echo").SetText(sharedRoom.Disabled());
-                    p.Element("command-state").SetText("shared disabled");
-                }))
-            @(Html.NativeButton("enable-shared-btn", "Enable Shared")
-                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var sharedRoom = p.Component<FusionRadioButton>(sharedId);
-                    sharedRoom.SetDisabled(false);
-                    p.Element("disabled-echo").SetText(sharedRoom.Disabled());
-                    p.Element("command-state").SetText("shared enabled");
-                }))
-            @(Html.NativeButton("click-shared-btn", "Click Shared")
-                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var sharedRoom = p.Component<FusionRadioButton>(sharedId);
-                    sharedRoom.Click();
-                    p.Element("selected-echo").SetText(sharedRoom.SelectedValue());
-                    p.Element("click-state").SetText("click called");
-                }))
-            @(Html.NativeButton("focus-private-btn", "Focus Private")
-                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionRadioButton>(privateId).FocusIn();
-                    p.Element("focus-state").SetText("focus called");
-                }))
-            @(Html.NativeButton("check-selected-btn", "Check Selected")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var privateRoom = p.Component<FusionRadioButton>(privateId);
-                    p.When(privateRoom.SelectedValue()).Eq("Private")
-                        .Then(t => t.Element("selected-state").SetText("private selected"))
-                        .Else(e => e.Element("selected-state").SetText("other selected"));
-                }))
-        </native-hstack>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Gather</native-heading>
-        @(Html.NativeButton("gather-btn", "Gather RadioButton")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var privateRoom = p.Component<FusionRadioButton>(privateId);
-                var sharedRoom = p.Component<FusionRadioButton>(sharedId);
-                p.Post(Url.SandboxRoute("Echo", "RadioButton"))
-                    .Gather(g =>
+            <native-vstack gap="Sm">
+                @(Html.FusionRadioButton(plan, studioId, b => b
+                    .Name("roomChoice")
+                    .Value("Studio Apartment")
+                    .Label("Studio apartment"))
+                    .Reactive(evt => evt.Changed, (args, p) =>
                     {
-                        g.Include(privateRoom.SelectedValue(), "selectedValue");
-                        g.Include(privateRoom.Checked(), "privateChecked");
-                        g.Include(sharedRoom.Checked(), "sharedChecked");
-                        g.Include(sharedRoom.Disabled(), "sharedDisabled");
-                    })
-                    .Response(r => r.OnSuccess<FusionRadioButtonEchoResponse>((json, s) =>
-                    {
-                        s.Element("gather-selected").SetText(json, x => x.SelectedValue);
-                        s.Element("gather-private-checked").SetText(json, x => x.PrivateChecked);
-                        s.Element("gather-shared-checked").SetText(json, x => x.SharedChecked);
-                        s.Element("gather-shared-disabled").SetText(json, x => x.SharedDisabled);
-                        s.Element("gather-summary").SetText(json, x => x.Summary);
-                    }));
-            }))
-    </native-card-body></native-card>
+                        p.Element("chosen-room").SetText(args, x => x.Value);
+                        p.Element("room-detail").SetText("A studio suits a resident who wants a compact, easy-to-navigate space.");
+                        p.Element("companion-availability").SetText("");
+                    }))
 
-    <native-card><native-card-body>
-        <native-heading level="H2">Trace</native-heading>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>Command: <span id="command-state" class="text-text-muted">pending</span></p>
-            <p>Selected echo: <span id="selected-echo" class="text-text-muted">pending</span></p>
-            <p>Private checked: <span id="private-checked-echo" class="text-text-muted">pending</span></p>
-            <p>Shared checked: <span id="shared-checked-echo" class="text-text-muted">pending</span></p>
-            <p>Disabled echo: <span id="disabled-echo" class="text-text-muted">pending</span></p>
-            <p>Change value: <span id="change-value" class="text-text-muted">pending</span></p>
-            <p>Args condition: <span id="args-condition" class="text-text-muted">pending</span></p>
-            <p>Click state: <span id="click-state" class="text-text-muted">pending</span></p>
-            <p>Focus state: <span id="focus-state" class="text-text-muted">pending</span></p>
-            <p>Selected state: <span id="selected-state" class="text-text-muted">pending</span></p>
-            <p>Gather selected: <span id="gather-selected" class="text-text-muted">pending</span></p>
-            <p>Gather private checked: <span id="gather-private-checked" class="text-text-muted">pending</span></p>
-            <p>Gather shared checked: <span id="gather-shared-checked" class="text-text-muted">pending</span></p>
-            <p>Gather shared disabled: <span id="gather-shared-disabled" class="text-text-muted">pending</span></p>
-            <p>Gather summary: <span id="gather-summary" class="text-text-muted">pending</span></p>
+                @(Html.FusionRadioButton(plan, oneBedroomId, b => b
+                    .Name("roomChoice")
+                    .Value("One-Bedroom Apartment")
+                    .Label("One-bedroom apartment"))
+                    .Reactive(evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("chosen-room").SetText(args, x => x.Value);
+                        p.Element("room-detail").SetText("A one-bedroom gives a separate living area for visiting family.");
+                        p.Element("companion-availability").SetText("");
+                    }))
+
+                @(Html.FusionRadioButton(plan, companionId, b => b
+                    .Name("roomChoice")
+                    .Value("Shared Companion Suite")
+                    .Label("Shared companion suite"))
+                    .Reactive(evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("chosen-room").SetText(args, x => x.Value);
+
+                        p.When(args, x => x.Value).Eq("Shared Companion Suite")
+                            .Then(t => t.Element("room-detail")
+                                .SetText("A companion suite pairs two residents who prefer not to live alone."))
+                            .Else(e => e.Element("room-detail")
+                                .SetText("Choose a room to see what it includes."));
+                    }))
+            </native-vstack>
+
+            <native-vstack gap="Xs">
+                <native-text>
+                    Selected room: <span id="chosen-room" class="font-semibold text-text">No room chosen yet</span>
+                </native-text>
+                <native-text color="Secondary"><span id="room-detail">Choose a room to see what it includes.</span></native-text>
+                <native-text color="Secondary"><span id="companion-availability"></span></native-text>
+            </native-vstack>
         </native-vstack>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+        <native-vstack gap="Base">
+            <native-heading level="H2">Help her decide</native-heading>
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("apply-last-assessment", "Apply the room from her last assessment")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var companion = p.Component<FusionRadioButton>(companionId);
+                        companion.SetChecked(true);
+                        p.Element("chosen-room").SetText(companion.SelectedValue());
+
+                        p.When(companion.SelectedValue()).Eq("Shared Companion Suite")
+                            .Then(t => t.Element("room-detail")
+                                .SetText("Her last assessment recommended the shared companion suite."))
+                            .Else(e => e.Element("room-detail")
+                                .SetText("Choose a room to see what it includes."));
+                    }))
+
+                @(Html.NativeButton("recommend-studio", "Pick her recommended studio and take me to it")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var studio = p.Component<FusionRadioButton>(studioId);
+                        studio.Click();
+                        studio.FocusIn();
+                    }))
+            </native-hstack>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-heading level="H2">Companion suite availability</native-heading>
+            <native-text color="Secondary">
+                If the companion suite is full this month, take it off the list so it cannot be confirmed.
+            </native-text>
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("mark-companion-full", "Companion suite is full this month")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var companion = p.Component<FusionRadioButton>(companionId);
+                        companion.SetDisabled(true);
+
+                        p.When(companion.Disabled()).Truthy()
+                            .Then(t => t.Element("companion-availability")
+                                .SetText("The companion suite is full this month and can't be chosen."))
+                            .Else(e => e.Element("companion-availability")
+                                .SetText("The companion suite is open for move-in."));
+                    }))
+
+                @(Html.NativeButton("reopen-companion", "Companion suite opened up")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var companion = p.Component<FusionRadioButton>(companionId);
+                        companion.SetDisabled(false);
+
+                        p.When(companion.Disabled()).Truthy()
+                            .Then(t => t.Element("companion-availability")
+                                .SetText("The companion suite is full this month and can't be chosen."))
+                            .Else(e => e.Element("companion-availability")
+                                .SetText("The companion suite is open for move-in."));
+                    }))
+            </native-hstack>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            @(Html.NativeButton("confirm-move-in", "Confirm move-in with the desk")
+                .CssClass(SubmitReady)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var companion = p.Component<FusionRadioButton>(companionId);
+                    p.Post(Url.SandboxRoute("ConfirmPlan", "RadioButton"))
+                        .Gather(g =>
+                        {
+                            g.Include(companion.SelectedValue(), "room");
+                            g.Include(companion.Checked(), "companionSuiteChosen");
+                            g.Include(companion.Disabled(), "companionSuiteUnavailable");
+                        })
+                        .Response(r => r.OnSuccess<RoomPlanResponse>((json, s) =>
+                        {
+                            s.Element("desk-confirmation").SetText(json, x => x.Confirmation);
+                            s.Element("desk-confirmation-panel").RemoveClass("hidden");
+                        }));
+                }))
+            <div id="desk-confirmation-panel" class="hidden rounded-md border border-green-300 bg-green-50 p-4">
+                <native-text><span id="desk-confirmation" class="font-medium text-green-800"></span></native-text>
+            </div>
+        </native-vstack>
     </native-card-body></native-card>
 </native-vstack>
 

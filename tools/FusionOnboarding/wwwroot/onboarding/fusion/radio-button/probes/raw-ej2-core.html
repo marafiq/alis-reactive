@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Fusion RadioButton Raw EJ2 core Probe</title>
+    <link rel="stylesheet" href="/vendor/syncfusion/bootstrap.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #radio-host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        #radio-host label { display: block; margin-bottom: 8px; }
+        table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+        th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f6f8fa; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+        button { margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <h1>Fusion RadioButton Raw EJ2 core Probe</h1>
+    <p>Status: generated static probe. Execute in the sandbox/browser, exercise the radio group, then save <code>window.__fusionProbe.trace</code> as <code>traces/raw-ej2-core.trace.json</code>. Three radios share the <code>room</code> group so <code>change</code> carries the chosen value and <code>getSelectedValue()</code> reads the group selection.</p>
+    <div id="radio-host">
+        <input type="radio" id="room-studio" />
+        <input type="radio" id="room-one-bedroom" />
+        <input type="radio" id="room-companion" />
+    </div>
+
+    <button id="dump">Dump Keys</button>
+    <button id="clear">Clear Trace</button>
+
+    <h2>Candidate Rows</h2>
+    <table>
+        <thead><tr><th>JS Member</th><th>Kind</th><th>Type</th><th>Builder</th><th>Decision</th></tr></thead>
+        <tbody>
+<tr><td><code>change</code></td><td>event</td><td>ChangeArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>created</code></td><td>event</td><td>Event</td><td>yes</td><td>candidate: typed event; DOM-native payload, lifecycle only</td></tr>
+<tr><td><code>checked</code></td><td>property</td><td>boolean</td><td>no</td><td>candidate: runtime property source/write; raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>disabled</code></td><td>property</td><td>boolean</td><td>yes</td><td>candidate: runtime property source/write; raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>value</code></td><td>property</td><td>string</td><td>yes</td><td>builder-owned per-button value; surfaced through the change payload and getSelectedValue</td></tr>
+<tr><td><code>name</code></td><td>property</td><td>string</td><td>yes</td><td>builder-owned group name</td></tr>
+<tr><td><code>label</code></td><td>property</td><td>string</td><td>yes</td><td>builder-owned unless post-render read/write behavior is proven necessary</td></tr>
+<tr><td><code>labelPosition</code></td><td>property</td><td>RadioLabelPosition</td><td>yes</td><td>builder-owned unless post-render read/write behavior is proven necessary</td></tr>
+<tr><td><code>cssClass</code></td><td>property</td><td>string</td><td>yes</td><td>builder-owned unless post-render read/write behavior is proven necessary</td></tr>
+<tr><td><code>enableHtmlSanitizer</code></td><td>property</td><td>boolean</td><td>yes</td><td>builder-owned unless post-render read/write behavior is proven necessary</td></tr>
+<tr><td><code>getSelectedValue</code></td><td>method</td><td>) =&gt; string</td><td>no</td><td>candidate: runtime method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>click</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>focusIn</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>destroy</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>skip: lifecycle cleanup, not Fusion plan behavior</td></tr>
+        </tbody>
+    </table>
+
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+
+        function clean(value, seen = new WeakSet(), depth = 0) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 4) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.slice(0, 20).map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).sort().slice(0, 120).forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function functionNames(value) {
+            const names = new Set();
+            let current = value;
+            while (current && current !== Object.prototype) {
+                Object.getOwnPropertyNames(current).forEach(name => {
+                    if (name !== "constructor" && typeof value[name] === "function") names.add(name);
+                });
+                current = Object.getPrototypeOf(current);
+            }
+            return Array.from(names).sort();
+        }
+
+        function describePayload(args) {
+            if (args === null || args === undefined) {
+                return {
+                    ownKeys: [],
+                    functions: [],
+                    properties: {},
+                    value: args === undefined ? "undefined" : null
+                };
+            }
+            const own = Object.keys(args).sort();
+            const properties = {};
+            own.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === null ? "null" : Array.isArray(item) ? "array" : typeof item,
+                    sample: clean(item)
+                };
+            });
+            return { ownKeys: own, functions: functionNames(args), properties };
+        }
+
+        function record(label, value) {
+            trace.push({ at: new Date().toISOString(), label, value: clean(value) });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        const probe = {
+            trace,
+            record,
+            event: (label, args) => record(label, describePayload(args)),
+            member: (label, read) => record(label, read()),
+            call: (label, invoke) => record(label, invoke())
+        };
+        window.__fusionProbe = probe;
+
+        const studio = new ej.buttons.RadioButton({
+            label: "Studio Apartment",
+            name: "room",
+            value: "Studio Apartment",
+            checked: true,
+            change: args => probe.event("change", args),
+            created: args => probe.event("created", args)
+        });
+        const oneBedroom = new ej.buttons.RadioButton({
+            label: "One-bedroom Apartment",
+            name: "room",
+            value: "One-bedroom Apartment",
+            change: args => probe.event("change", args)
+        });
+        const companion = new ej.buttons.RadioButton({
+            label: "Shared Companion Suite",
+            name: "room",
+            value: "Shared Companion Suite",
+            change: args => probe.event("change", args)
+        });
+
+        studio.appendTo("#room-studio");
+        oneBedroom.appendTo("#room-one-bedroom");
+        companion.appendTo("#room-companion");
+        probe.ej2 = companion;
+
+        record("ready", {
+            component: "radio-button",
+            apiSet: "core",
+            namespace: "ej.buttons",
+            className: "RadioButton"
+        });
+
+        document.getElementById("dump").addEventListener("click", () => {
+            // Read the post-render properties the typed slice maps.
+            probe.member("checked [studio, initial]", () => studio.checked);
+            probe.member("checked [companion, initial]", () => companion.checked);
+            probe.member("disabled [companion, initial]", () => companion.disabled);
+            probe.member("value [companion]", () => companion.value);
+
+            // Selecting the companion suite by clicking it fires change and moves the group selection.
+            probe.call("click [companion]", () => { companion.click(); return "clicked"; });
+            probe.member("getSelectedValue [after companion click]", () => companion.getSelectedValue());
+            probe.member("checked [companion, after click]", () => companion.checked);
+
+            // Programmatic disable, then read it back.
+            companion.disabled = true;
+            companion.dataBind();
+            probe.member("disabled [companion, after set + dataBind]", () => companion.disabled);
+
+            // Move keyboard focus into the studio radio.
+            probe.call("focusIn [studio]", () => { studio.focusIn(); return "focused"; });
+
+            record("own keys", Object.keys(companion).sort());
+            record("prototype methods", functionNames(companion));
+        });
+
+        document.getElementById("clear").addEventListener("click", () => {
+            trace.length = 0;
+            document.getElementById("trace").textContent = "[]";
+        });
+    </script>
+</body>
+</html>

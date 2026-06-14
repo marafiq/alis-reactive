@@ -1,31 +1,28 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
+    /// <summary>
+    /// Move-in Room and Care Plan intake: the room a coordinator confirms for a
+    /// new resident. The selection lives in the rendered radio group; this model
+    /// carries the property the field binds to.
+    /// </summary>
     public sealed class FusionRadioButtonModel
     {
-        public string RoomType { get; set; } = string.Empty;
+        public string RoomChoice { get; set; } = string.Empty;
     }
 
-    public sealed class FusionRadioButtonEchoRequest
+    /// <summary>Room and care confirmation the coordinator submits to the move-in desk.</summary>
+    public sealed class RoomPlanRequest
     {
-        public string SelectedValue { get; set; } = string.Empty;
+        public string Room { get; set; } = string.Empty;
 
-        public bool PrivateChecked { get; set; }
+        public bool CompanionSuiteChosen { get; set; }
 
-        public bool SharedChecked { get; set; }
-
-        public bool SharedDisabled { get; set; }
+        public bool CompanionSuiteUnavailable { get; set; }
     }
 
-    public sealed class FusionRadioButtonEchoResponse
+    /// <summary>What the move-in desk confirms back to the coordinator.</summary>
+    public sealed class RoomPlanResponse
     {
-        public string SelectedValue { get; set; } = string.Empty;
-
-        public bool PrivateChecked { get; set; }
-
-        public bool SharedChecked { get; set; }
-
-        public bool SharedDisabled { get; set; }
-
-        public string Summary { get; set; } = string.Empty;
+        public string Confirmation { get; set; } = string.Empty;
     }
 }
