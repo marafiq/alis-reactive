@@ -1,6 +1,6 @@
 # FusionTextBox Blazor Naming Candidates
 
-Status: not-requested.
+Status: not-installed.
 
 Syncfusion class: `TextBox`
 
@@ -12,11 +12,11 @@ trace proof before C# naming decisions are accepted.
 
 | Field | Value |
 |---|---|
-| Package | `not supplied` |
-| Version | `not supplied` |
-| Package root | `not supplied` |
-| Status | not-requested |
-| Note | No Syncfusion Blazor package was supplied for this discovery pass. |
+| Package | `Syncfusion.Blazor.Inputs` |
+| Version | `32.2.8` |
+| Package root | `/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.blazor.inputs/32.2.8` |
+| Status | not-installed |
+| Note | Install Syncfusion.Blazor.Inputs 32.2.8 or pass decompiled metadata before making C# naming decisions. |
 
 ## Current Decision
 

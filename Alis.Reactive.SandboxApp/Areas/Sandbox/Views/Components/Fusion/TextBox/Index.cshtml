@@ -5,124 +5,163 @@
 @{
     ViewData["Title"] = "FusionTextBox";
 
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+    const string SubmitReady = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+
     var plan = Html.ReactivePlan<TextBoxModel>();
 
+    // On open, surface the directory-lookup affordance the coordinator uses to find a
+    // resident: a search icon appended inside the preferred-name field.
     Html.On(plan, t => t.DomReady(p =>
     {
-        var name = p.Component<FusionTextBox>(m => m.ResidentName);
-        name.SetValue("Amina Patel");
-        name.AddAppendIcon("e-icons e-search");
-        p.Element("value-echo").SetText(name.Value());
+        p.Component<FusionTextBox>(m => m.PreferredName).AddAppendIcon("e-icons e-search");
     }));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionTextBox</native-heading>
+    <div>
+        <native-heading level="H1">Resident Profile</native-heading>
+        <native-text color="Secondary">
+            Update the name this resident goes by and a dietary note for kitchen staff, then save the profile.
+        </native-text>
+    </div>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Runtime Value, Icon, and Events</native-heading>
-        <native-grid cols="C2" gap="Base">
-            @{ Html.InputField(plan, m => m.ResidentName, o => o.Label("Resident Name"))
+        <native-vstack gap="Base">
+            <native-heading level="H2">Preferred name</native-heading>
+
+            @{ Html.InputField(plan, m => m.PreferredName, o => o.Label("Name this resident goes by"))
                 .FusionTextBox(b => b
-                    .Placeholder("Resident name")
+                    .Placeholder("Search residents by name")
                     .ShowClearButton(true)
                     .Reactive(plan, evt => evt.Input, (args, p) =>
                     {
-                        p.Element("input-value").SetText(args, x => x.Value);
-                        p.Element("input-previous").SetText(args, x => x.PreviousValue);
+                        // Live preview of the name as the coordinator types it, and what the
+                        // current keystrokes are replacing on the resident's record.
+                        p.Element("name-preview").SetText(args, x => x.Value);
+                        p.Element("name-replacing").SetText(args, x => x.PreviousValue);
+
+                        p.When(args, x => x.Value).NotEmpty()
+                            .Then(named => named.Element("name-preview-hint")
+                                .SetText("This is how staff will see the resident on the directory."))
+                            .Else(empty => empty.Element("name-preview-hint")
+                                .SetText("Enter the name the resident prefers."));
                     })
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
-                        p.Element("change-value").SetText(args, x => x.Value);
-                        p.Element("change-previous").SetText(args, x => x.PreviousValue);
-                        p.Element("change-interacted").SetText(args, x => x.IsInteracted);
-                        p.When(args, x => x.Value).NotEmpty()
-                            .Then(t => t.Element("args-condition").SetText("name entered"))
-                            .Else(e => e.Element("args-condition").SetText("no name"));
-                    })
-                    .Reactive(plan, evt => evt.Focus, (args, p) =>
-                    {
-                        p.Element("focus-state").SetText("focused");
-                        p.Element("focus-value").SetText(args, x => x.Value);
-                    })
-                    .Reactive(plan, evt => evt.Blur, (args, p) =>
-                    {
-                        p.Element("focus-state").SetText("blurred");
-                        p.Element("blur-value").SetText(args, x => x.Value);
-                    })); }
-        </native-grid>
-    </native-card-body></native-card>
+                        // On commit (focus leaves), record the saved name, what it changed from,
+                        // and whether the coordinator made the edit or it was filled for them.
+                        p.Element("name-committed").SetText(args, x => x.Value);
+                        p.Element("name-changed-from").SetText(args, x => x.PreviousValue);
 
-    <native-card><native-card-body>
-        <native-heading level="H2">Value Source</native-heading>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>DomReady value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-            <p>Input value: <span id="input-value" class="text-text-muted">&mdash;</span></p>
-            <p>Input previous: <span id="input-previous" class="text-text-muted">&mdash;</span></p>
-            <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
-            <p>Change previous: <span id="change-previous" class="text-text-muted">&mdash;</span></p>
-            <p>Change interacted: <span id="change-interacted" class="text-text-muted">&mdash;</span></p>
-            <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
+                        p.When(args, x => x.IsInteracted).Truthy()
+                            .Then(edited => edited.Element("name-edit-source")
+                                .SetText("Edited by you."))
+                            .Else(filled => filled.Element("name-edit-source")
+                                .SetText("Filled from the resident's record."));
+                    })); }
+
+            <native-vstack gap="Xs">
+                <native-text>
+                    Directory preview: <span id="name-preview" class="font-semibold text-text">@Model.PreferredName</span>
+                </native-text>
+                <native-text color="Secondary"><span id="name-preview-hint">This is how staff will see the resident on the directory.</span></native-text>
+                <native-text color="Secondary">Replacing the name on record: <span id="name-replacing">@Model.PreferredName</span></native-text>
+            </native-vstack>
+
+            <div class="rounded-md border border-border bg-surface-subtle p-3">
+                <native-vstack gap="Xs">
+                    <native-text>Last saved name: <span id="name-committed" class="font-medium text-text">@Model.PreferredName</span></native-text>
+                    <native-text color="Secondary">Changed from: <span id="name-changed-from">@Model.PreferredName</span></native-text>
+                    <native-text color="Secondary"><span id="name-edit-source">No edits yet this visit.</span></native-text>
+                </native-vstack>
+            </div>
+
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("use-legal-name", $"Use legal name ({Model.LegalName})")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionTextBox>(m => m.PreferredName).SetValue(Model.LegalName);
+                        p.Element("name-preview").SetText(
+                            p.Component<FusionTextBox>(m => m.PreferredName).Value());
+                    }))
+                @(Html.NativeButton("start-editing-name", "Edit name")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionTextBox>(m => m.PreferredName).FocusIn();
+                    }))
+                @(Html.NativeButton("done-editing-name", "Done")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionTextBox>(m => m.PreferredName).FocusOut();
+                    }))
+            </native-hstack>
         </native-vstack>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Focus Methods</native-heading>
-        <native-hstack gap="Sm">
-            @(Html.NativeButton("focus-in-btn", "Focus Resident Name")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+        <native-vstack gap="Base">
+            <native-heading level="H2">Dietary note for kitchen staff</native-heading>
+
+            @{ Html.InputField(plan, m => m.DietaryNote, o => o.Label("Dietary preferences and restrictions"))
+                .FusionTextBox(b => b
+                    .Value(Model.DietaryNote)
+                    .Placeholder("e.g. low sodium, no shellfish")
+                    .ShowClearButton(true)
+                    .Reactive(plan, evt => evt.Focus, (args, p) =>
+                    {
+                        // When the coordinator starts editing, show kitchen-staff guidance and the
+                        // note that was already on file when they opened the field.
+                        p.Element("dietary-guidance")
+                            .SetText("Kitchen staff read this exactly as written. Be specific.");
+                        p.Element("dietary-on-open").SetText(args, x => x.Value);
+                    })
+                    .Reactive(plan, evt => evt.Blur, (args, p) =>
+                    {
+                        // When focus leaves, confirm the note that was captured.
+                        p.Element("dietary-guidance").SetText("Dietary note captured for kitchen staff.");
+                        p.Element("dietary-captured").SetText(args, x => x.Value);
+                    })); }
+
+            <native-vstack gap="Xs">
+                <native-text color="Secondary"><span id="dietary-guidance">Add anything kitchen staff should know before meals.</span></native-text>
+                <native-text color="Secondary">Note on file when you opened the field: <span id="dietary-on-open">not opened yet</span></native-text>
+                <native-text>Captured note: <span id="dietary-captured" class="font-medium text-text">@Model.DietaryNote</span></native-text>
+            </native-vstack>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-text color="Secondary"><span id="save-status">Save the profile when the resident's details are complete.</span></native-text>
+            @(Html.NativeButton("save-profile", "Save resident profile")
+                .CssClass(SubmitReady)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionTextBox>(m => m.ResidentName).FocusIn();
+                    var name = p.Component<FusionTextBox>(m => m.PreferredName);
+                    var diet = p.Component<FusionTextBox>(m => m.DietaryNote);
+
+                    // A profile must carry a name before it can be saved.
+                    p.When(name.Value()).NotEmpty()
+                        .Then(ok => ok.Post(Url.SandboxRoute("Save", "TextBox"))
+                            .Gather(g => g
+                                .Include(name.Value(), "preferredName")
+                                .Include(diet.Value(), "dietaryNote"))
+                            .Response(r => r.OnSuccess<ProfileSaveResponse>((json, s) =>
+                            {
+                                s.Element("save-confirmation").SetText(json, x => x.Confirmation);
+                                s.Element("save-confirmation-panel").RemoveClass("hidden");
+                            })))
+                        .Else(missing => missing.Element("save-status")
+                            .SetText("Add a preferred name before saving the profile."));
                 }))
-        </native-hstack>
-        <native-vstack gap="Xs" class="font-mono text-sm mt-3">
-            <p>Focus state: <span id="focus-state" class="text-text-muted">&mdash;</span></p>
-            <p>Focus value: <span id="focus-value" class="text-text-muted">&mdash;</span></p>
-            <p>Blur value: <span id="blur-value" class="text-text-muted">&mdash;</span></p>
+            <div id="save-confirmation-panel" class="hidden rounded-md border border-green-300 bg-green-50 p-4">
+                <native-text><span id="save-confirmation" class="font-medium text-green-800"></span></native-text>
+            </div>
         </native-vstack>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">FocusOut Method</native-heading>
-        <native-grid cols="C2" gap="Base">
-            @{ Html.InputField(plan, m => m.AutoBlurNote, o => o.Label("Auto Blur Note"))
-                .FusionTextBox(b => b
-                    .Placeholder("Click here to trigger FocusOut")
-                    .Value("FocusOut proof")
-                    .Reactive(plan, evt => evt.Focus, (args, p) =>
-                    {
-                        p.Component<FusionTextBox>(m => m.AutoBlurNote).FocusOut();
-                        p.Element("focusout-method-state").SetText("focusout called");
-                    })
-                    .Reactive(plan, evt => evt.Blur, (args, p) =>
-                    {
-                        p.Element("autoblur-state").SetText("blurred");
-                    })); }
-        </native-grid>
-        <native-vstack gap="Xs" class="font-mono text-sm mt-3">
-            <p>FocusOut method: <span id="focusout-method-state" class="text-text-muted">&mdash;</span></p>
-            <p>Auto blur state: <span id="autoblur-state" class="text-text-muted">&mdash;</span></p>
-        </native-vstack>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Component Condition</native-heading>
-        @(Html.NativeButton("check-name-btn", "Check Resident Name")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var name = p.Component<FusionTextBox>(m => m.ResidentName);
-                p.When(name.Value()).NotEmpty()
-                    .Then(t => t.Element("name-warning").SetText("resident name set"))
-                    .Else(e => e.Element("name-warning").SetText("resident name required"));
-            }))
-        <p class="font-mono text-sm mt-2">Warning: <span id="name-warning" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
     </native-card-body></native-card>
 </native-vstack>
 

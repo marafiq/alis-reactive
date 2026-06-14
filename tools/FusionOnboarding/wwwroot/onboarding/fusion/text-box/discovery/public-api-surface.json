@@ -340,7 +340,7 @@
     "builderName": "TextBoxBuilder",
     "className": "TextBox",
     "dtsPath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts",
-    "jsPath": "",
+    "jsPath": "node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.js",
     "namespace": "ej.inputs",
     "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
   }
