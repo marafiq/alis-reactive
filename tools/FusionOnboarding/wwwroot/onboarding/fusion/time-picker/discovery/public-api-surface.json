@@ -483,8 +483,8 @@
     "builderName": "TimePickerBuilder",
     "className": "TimePicker",
     "dtsPath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
-    "jsPath": "",
-    "namespace": "ej.ej.calendars.TimePicker",
-    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+    "jsPath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.js",
+    "namespace": "ej.calendars",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/33.2.10/lib/net10.0/Syncfusion.EJ2.xml"
   }
 }

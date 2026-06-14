@@ -1,0 +1,27 @@
+{
+  "component": "slider",
+  "note": "Per-component parity JUDGMENT artifact (hand-authored, as the compute-fusion-parity.mjs header specifies). The Syncfusion SliderBuilder owns initial-render configuration; the Fusion slice adds the post-render runtime surface (value read/write, range read/write, change/changed event payloads). 'onboarded' lists the vendor members the typed slice exposes after render. 'excluded' lists vendor members with no proven Senior Living runtime DSL need, each with a source-grounded reason from node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts.",
+  "onboarded": [
+    "value",
+    "change",
+    "changed"
+  ],
+  "excluded": [
+    {
+      "name": "initialTooltip",
+      "reason": "Undocumented internal flag (slider.d.ts:356 carries no doc comment and is set internally by tooltip wiring) that gates whether the tooltip renders on first paint. It is render-time tooltip behavior governed by SliderBuilder.Tooltip(...) configuration, never a value a resident-facing plan reads, writes, branches, or gathers. No Senior Living workflow (temperature, quiet hours, care preferences) needs to mutate it after render."
+    },
+    {
+      "name": "readonly",
+      "reason": "Builder-owned initial-render configuration: slider.d.ts:413 documents it as 'render the slider in read-only mode to restrict any user interaction' with @default false. Whether a preference slider is editable is decided once at render by the view author through the SliderBuilder, not toggled by a reactive plan; the slice has no proven runtime read/write use case for it across resident directories, billing, schedules, or care coordination."
+    },
+    {
+      "name": "reposition",
+      "reason": "slider.d.ts:653 documents reposition() as 'used to reposition slider' - it recomputes handle pixel positions after an external layout change (resize, container reflow). Syncfusion already repositions on its own resize handling; this is an imperative layout-recovery method with no visible domain outcome a plan would assert, so it has no typed runtime DSL use case for a Senior Living preferences form."
+    },
+    {
+      "name": "setTooltip",
+      "reason": "slider.d.ts:713 setTooltip(args?: string) imperatively sets tooltip content text. Tooltip presence and format are configured at render through SliderBuilder.Tooltip(...); the resident-facing value the plan cares about is the numeric value (onboarded via Value()/RangeValue() and the change/changed payload), not the tooltip display string. No proven Senior Living workflow drives tooltip text from a plan, so it stays vendor/builder-owned."
+    }
+  ]
+}

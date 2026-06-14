@@ -301,6 +301,6 @@
   "syncfusion": {
     "className": "TimePicker",
     "dtsRoot": "node_modules/@syncfusion",
-    "namespace": "ej.ej.calendars.TimePicker"
+    "namespace": "ej.calendars"
   }
 }

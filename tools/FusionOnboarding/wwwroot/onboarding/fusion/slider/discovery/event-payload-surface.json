@@ -214,6 +214,6 @@
   "syncfusion": {
     "className": "Slider",
     "dtsRoot": "node_modules/@syncfusion",
-    "namespace": "ej.ej.inputs"
+    "namespace": "ej.inputs"
   }
 }

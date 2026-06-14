@@ -1,0 +1,47 @@
+{
+  "component": "accordion",
+  "fusionType": "FusionAccordion",
+  "coverage": [
+    {
+      "member": "FusionAccordion(#if NET48 this HtmlHelper<TModel> html, #else this IHtmlHelper<TModel> html, #endif ReactivePlan<TModel> plan, string elementId, Action<AccordionBuilder> build)",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Accordion.WhenUsingFusionAccordion.the_care_plan_opens_showing_its_three_sections",
+      "catches": "the FusionAccordion builder extension stops rendering the accordion bound to the plan, so the care-plan page shows none of its three section headers (the test asserts My Care Team, My Services & Monthly Charges, and My Care Agreement are all present, with the agreement section locked via e-overlay)"
+    },
+    {
+      "member": "Expanded",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Accordion.WhenUsingFusionAccordion.opening_the_care_team_section_shows_its_content_and_names_it_as_open",
+      "catches": "the Expanded event selector stops firing the reactive handler when the resident opens a section, so the open-section label never updates (the test opens My Care Team and asserts the label reads 'My Care Team')"
+    },
+    {
+      "member": "Reactive",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Accordion.WhenUsingFusionAccordion.opening_the_care_team_section_shows_its_content_and_names_it_as_open",
+      "catches": "the .Reactive wiring stops connecting the accordion's expanded event to its plan pipeline, so opening a section runs no reaction and the open-section label stays unchanged"
+    },
+    {
+      "member": "FusionAccordionExpandedArgs",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Accordion.WhenUsingFusionAccordion.opening_the_care_team_section_shows_its_content_and_names_it_as_open",
+      "catches": "the FusionAccordionExpandedArgs payload contract stops delivering the expand payload into the plan, so the branch that names the open section never runs and the label does not change to 'My Care Team'"
+    },
+    {
+      "member": "FusionAccordionExpandedArgs.Index",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Accordion.WhenUsingFusionAccordion.opening_a_different_section_names_that_section_not_the_first",
+      "catches": "Index stops carrying the real panel index (e.g. stuck at 0), so opening the second section would still name the first; the test opens My Care Team then My Services & Monthly Charges and asserts the label follows to the second section's name"
+    },
+    {
+      "member": "FusionAccordionExpandedArgs.IsExpanded",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Accordion.WhenUsingFusionAccordion.closing_the_open_section_shows_no_section_open",
+      "catches": "IsExpanded stops distinguishing expand from collapse (e.g. always true), so collapsing a section would not route the Else branch; the test opens then closes My Care Team and asserts the label becomes 'No section open'"
+    },
+    {
+      "member": "ExpandItem(this ComponentRef<FusionAccordion, TModel> self, bool isExpand, int index)",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Accordion.WhenUsingFusionAccordion.opening_my_care_plan_summary_expands_the_care_team_section",
+      "catches": "ExpandItem stops expanding the addressed panel, so clicking 'Open my care plan summary' leaves the care-team section collapsed; the test asserts the care-team content (Primary nurse: Maria Alvarez, RN) is hidden before the click and visible after it"
+    },
+    {
+      "member": "EnableItem(this ComponentRef<FusionAccordion, TModel> self, int index, bool isEnable = true)",
+      "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Accordion.WhenUsingFusionAccordion.confirming_the_care_agreement_unlocks_the_agreement_section",
+      "catches": "EnableItem stops unlocking the addressed panel, so the care-agreement section keeps its disabled overlay (e-overlay) and cannot be opened; the test asserts the section carries e-overlay and is unreadable while locked, then that confirming the agreement (EnableItem(2, true)) removes e-overlay and lets the resident open and read the section"
+    }
+  ],
+  "acceptedFanout": []
+}

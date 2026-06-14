@@ -1,0 +1,28 @@
+{
+  "component": "time-picker",
+  "fusionType": "FusionTimePicker",
+  "vendorClass": "ej.calendars.TimePicker",
+  "note": "Per-component parity JUDGMENT consumed by compute-fusion-parity.mjs (hand-authored judgment file, not generated evidence). Covers the 6 vendor members the Syncfusion MVC builder does not mark covered for ej2-calendars/src/timepicker/timepicker.d.ts. FusionTimePicker is a single time-of-day input (FusionTimePicker.ValueMember => \"value\"; the typed event payload Value is DateTime?). focusIn/focusOut are onboarded as typed runtime methods (FusionTimePickerExtensions.FocusIn/FocusOut, EmitCall \"focusIn\"/\"focusOut\"). The remaining four are excluded with source-grounded reasons that each cite the exact timepicker.d.ts member they rest on: the show/hide popup toggles the resident already drives by clicking the clock icon, the render-time readonly field config the Syncfusion MVC builder owns, and module-loading metadata that has no DSL primitive mapping.",
+  "onboarded": [
+    "focusIn",
+    "focusOut"
+  ],
+  "excluded": [
+    {
+      "name": "show",
+      "reason": "Opens the time-list popup (timepicker.d.ts line 648-654 `show(event?: KeyboardEvent | MouseEvent | Event): void`, doc 'Opens the popup to show the list items'). Opening the time list is an interaction the resident performs by clicking the clock icon / focusing the field; selecting a time through that popup is already proven by the TimePickerLocator.SelectTime gesture. No senior-living journey must force the time-list open from a plan reaction, so this interaction-level vendor control is excluded rather than wrapped as DSL."
+    },
+    {
+      "name": "hide",
+      "reason": "Closes the time-list popup (timepicker.d.ts line 642-647 `hide(): void`, doc 'Hides the TimePicker popup'), the dismissal counterpart to show. Popup dismissal is user-driven (pick a time, blur, Escape) and Syncfusion handles it; no time-of-day journey needs a plan reaction to force-close the popup, so it is excluded as interaction-level vendor behavior on the same grounds as show."
+    },
+    {
+      "name": "readonly",
+      "reason": "Read-only input toggle (timepicker.d.ts line 297-302 `readonly: boolean`, doc 'Specifies the component in readonly state', '@default false'). This is render-time field configuration the Syncfusion MVC TimePicker builder owns through TimePickerBuilder; no proven medication/wake-up/shift time journey toggles read-only AFTER render through the plan. Excluded from the runtime DSL surface for lack of a proven post-render read/write need."
+    },
+    {
+      "name": "requiredModules",
+      "reason": "Internal module-declaration metadata (timepicker.d.ts line 516 `requiredModules(): ModuleDeclaration[]`) used by Syncfusion to lazy-load feature modules. It is framework plumbing, not a time-of-day value or an action with a visible effect, and has no DSL primitive mapping (not a source for conditions/gather/HTTP, not a state-changing write/void method). Recorded in discovery; excluded as non-DSL vendor internals."
+    }
+  ]
+}

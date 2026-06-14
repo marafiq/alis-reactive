@@ -4,7 +4,7 @@ Status: static-discovery.
 
 Syncfusion class: `TimePicker`
 MVC builder: `TimePickerBuilder`
-XML source: `/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml`
+XML source: `/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/33.2.10/lib/net10.0/Syncfusion.EJ2.xml`
 
 Builder coverage is initial-render evidence only. A builder-owned member is not
 accepted as a Fusion runtime API unless raw EJ2 trace proves post-render

@@ -1,0 +1,574 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "breadcrumb",
+  "apiSet": "core",
+  "probe": "onboarding/fusion/breadcrumb/probes/raw-ej2-core.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "beforeItemRender",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "element",
+          "item",
+          "name"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "element": {
+            "sample": "[Element#8931-0]",
+            "type": "object"
+          },
+          "item": {
+            "sample": {
+              "iconCss": "e-icons e-home",
+              "url": "http://127.0.0.1:62376/"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "beforeItemRender",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "beforeItemRender",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "element",
+          "item",
+          "name"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "element": {
+            "sample": "[Element#LI]",
+            "type": "object"
+          },
+          "item": {
+            "sample": {
+              "nextItem": {
+                "callChildDataBind": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "controlParent": "[MaxDepth]",
+                "finalUpdate": "[Function]",
+                "isComplexArraySetter": false,
+                "isParentArray": true,
+                "oldProperties": "[MaxDepth]",
+                "parentObj": "[Circular]",
+                "propName": "items",
+                "properties": "[MaxDepth]"
+              },
+              "previousItem": {
+                "callChildDataBind": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "controlParent": "[Circular]",
+                "finalUpdate": "[Function]",
+                "isComplexArraySetter": false,
+                "isParentArray": true,
+                "oldProperties": "[MaxDepth]",
+                "parentObj": "[Circular]",
+                "propName": "items",
+                "properties": "[MaxDepth]"
+              }
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "beforeItemRender",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "beforeItemRender",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "element",
+          "item",
+          "name"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "element": {
+            "sample": "[Element#18c4-0]",
+            "type": "object"
+          },
+          "item": {
+            "sample": {
+              "text": "onboarding",
+              "url": "http://127.0.0.1:62376/onboarding"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "beforeItemRender",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "beforeItemRender",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "element",
+          "item",
+          "name"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "element": {
+            "sample": "[Element#LI]",
+            "type": "object"
+          },
+          "item": {
+            "sample": {
+              "nextItem": {
+                "callChildDataBind": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "controlParent": "[MaxDepth]",
+                "finalUpdate": "[Function]",
+                "isComplexArraySetter": false,
+                "isParentArray": true,
+                "oldProperties": "[MaxDepth]",
+                "parentObj": "[Circular]",
+                "propName": "items",
+                "properties": "[MaxDepth]"
+              },
+              "previousItem": {
+                "callChildDataBind": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "controlParent": "[Circular]",
+                "finalUpdate": "[Function]",
+                "isComplexArraySetter": false,
+                "isParentArray": true,
+                "oldProperties": "[MaxDepth]",
+                "parentObj": "[Circular]",
+                "propName": "items",
+                "properties": "[MaxDepth]"
+              }
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "beforeItemRender",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "beforeItemRender",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "element",
+          "item",
+          "name"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "element": {
+            "sample": "[Element#ccb2-0]",
+            "type": "object"
+          },
+          "item": {
+            "sample": {
+              "text": "fusion",
+              "url": "http://127.0.0.1:62376/onboarding/fusion"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "beforeItemRender",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 6,
+      "label": "beforeItemRender",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "element",
+          "item",
+          "name"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "element": {
+            "sample": "[Element#LI]",
+            "type": "object"
+          },
+          "item": {
+            "sample": {
+              "nextItem": {
+                "callChildDataBind": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "controlParent": "[MaxDepth]",
+                "finalUpdate": "[Function]",
+                "isComplexArraySetter": false,
+                "isParentArray": true,
+                "oldProperties": "[MaxDepth]",
+                "parentObj": "[Circular]",
+                "propName": "items",
+                "properties": "[MaxDepth]"
+              },
+              "previousItem": {
+                "callChildDataBind": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "controlParent": "[Circular]",
+                "finalUpdate": "[Function]",
+                "isComplexArraySetter": false,
+                "isParentArray": true,
+                "oldProperties": "[MaxDepth]",
+                "parentObj": "[Circular]",
+                "propName": "items",
+                "properties": "[MaxDepth]"
+              }
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "beforeItemRender",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 7,
+      "label": "beforeItemRender",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "element",
+          "item",
+          "name"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "element": {
+            "sample": "[Element#132c-0]",
+            "type": "object"
+          },
+          "item": {
+            "sample": {
+              "text": "breadcrumb",
+              "url": "http://127.0.0.1:62376/onboarding/fusion/breadcrumb"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "beforeItemRender",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 8,
+      "label": "beforeItemRender",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "element",
+          "item",
+          "name"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "element": {
+            "sample": "[Element#LI]",
+            "type": "object"
+          },
+          "item": {
+            "sample": {
+              "nextItem": {
+                "callChildDataBind": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "controlParent": "[MaxDepth]",
+                "finalUpdate": "[Function]",
+                "isComplexArraySetter": false,
+                "isParentArray": true,
+                "oldProperties": "[MaxDepth]",
+                "parentObj": "[Circular]",
+                "propName": "items",
+                "properties": "[MaxDepth]"
+              },
+              "previousItem": {
+                "callChildDataBind": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "controlParent": "[Circular]",
+                "finalUpdate": "[Function]",
+                "isComplexArraySetter": false,
+                "isParentArray": true,
+                "oldProperties": "[MaxDepth]",
+                "parentObj": "[Circular]",
+                "propName": "items",
+                "properties": "[MaxDepth]"
+              }
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "beforeItemRender",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 9,
+      "label": "beforeItemRender",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "element",
+          "item",
+          "name"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "element": {
+            "sample": "[Element#8577-0]",
+            "type": "object"
+          },
+          "item": {
+            "sample": {
+              "text": "probes",
+              "url": "http://127.0.0.1:62376/onboarding/fusion/breadcrumb/probes"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "beforeItemRender",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 10,
+      "label": "beforeItemRender",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "element",
+          "item",
+          "name"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "element": {
+            "sample": "[Element#LI]",
+            "type": "object"
+          },
+          "item": {
+            "sample": {
+              "nextItem": {
+                "callChildDataBind": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "controlParent": "[MaxDepth]",
+                "finalUpdate": "[Function]",
+                "isComplexArraySetter": false,
+                "isParentArray": true,
+                "oldProperties": "[MaxDepth]",
+                "parentObj": "[Circular]",
+                "propName": "items",
+                "properties": "[MaxDepth]"
+              },
+              "previousItem": {
+                "callChildDataBind": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "controlParent": "[Circular]",
+                "finalUpdate": "[Function]",
+                "isComplexArraySetter": false,
+                "isParentArray": true,
+                "oldProperties": "[MaxDepth]",
+                "parentObj": "[Circular]",
+                "propName": "items",
+                "properties": "[MaxDepth]"
+              }
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "beforeItemRender",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 11,
+      "label": "beforeItemRender",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "element",
+          "item",
+          "name"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "element": {
+            "sample": "[Element#e34c-0]",
+            "type": "object"
+          },
+          "item": {
+            "sample": {
+              "text": "raw-ej2-core.html",
+              "url": "http://127.0.0.1:62376/onboarding/fusion/breadcrumb/probes/raw-ej2-core.html"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "beforeItemRender",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 12,
+      "label": "created",
+      "value": {
+        "functions": [],
+        "ownKeys": [],
+        "properties": {},
+        "value": "undefined"
+      }
+    },
+    {
+      "sequence": 13,
+      "label": "ready",
+      "value": {
+        "apiSet": "core",
+        "className": "Breadcrumb",
+        "component": "breadcrumb",
+        "namespace": "ej.navigations"
+      }
+    },
+    {
+      "sequence": 14,
+      "label": "own keys",
+      "value": [
+        "_maxItems",
+        "allowFiltering",
+        "allowPaging",
+        "allowServerDataBinding",
+        "allowSorting",
+        "bulkChanges",
+        "changedProperties",
+        "childChangedProperties",
+        "columns",
+        "dataSource",
+        "delegateClickHanlder",
+        "element",
+        "endIndex",
+        "finalUpdate",
+        "ignoreCollectionWatch",
+        "isAngular",
+        "isComplexArraySetter",
+        "isDestroyed",
+        "isPopupCreated",
+        "isProtectedOnChange"
+      ]
+    },
+    {
+      "sequence": 15,
+      "label": "prototype methods",
+      "value": [
+        "accessMount",
+        "addEventListener",
+        "addInstance",
+        "addOnPersist",
+        "appendTo",
+        "attachUnloadEvent",
+        "beforeItemRender",
+        "beforeItemRenderChanges",
+        "calculateMaxItems",
+        "clearChanges",
+        "clearTemplate",
+        "clickHandler",
+        "createElement",
+        "created",
+        "dataBind",
+        "delegateClickHanlder",
+        "destroy",
+        "detachUnloadEvent",
+        "detectFunction",
+        "documentClickHandler"
+      ]
+    }
+  ]
+}

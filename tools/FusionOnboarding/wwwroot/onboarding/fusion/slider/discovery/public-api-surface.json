@@ -374,8 +374,8 @@
     "builderName": "SliderBuilder",
     "className": "Slider",
     "dtsPath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.d.ts",
-    "jsPath": "",
-    "namespace": "ej.ej.inputs",
+    "jsPath": "node_modules/@syncfusion/ej2-inputs/src/slider/slider.js",
+    "namespace": "ej.inputs",
     "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
   }
 }

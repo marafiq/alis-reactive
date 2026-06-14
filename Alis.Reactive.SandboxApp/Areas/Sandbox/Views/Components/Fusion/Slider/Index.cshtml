@@ -6,146 +6,140 @@
 @{
     ViewData["Title"] = "FusionSlider";
 
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+    const string SubmitReady = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+
     var plan = Html.ReactivePlan<SliderModel>();
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        var pain = p.Component<FusionSlider>(m => m.PainScore);
-        pain.SetValue(35);
-        p.Element("value-echo").SetText(pain.Value());
-
-        var range = p.Component<FusionSlider>(m => m.PreferredRange);
-        range.SetRangeValue(15, 75);
-        p.Element("range-echo").SetText(range.RangeValue());
-    }));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionSlider</native-heading>
+    <div>
+        <native-heading level="H1">Comfort &amp; Care Preferences</native-heading>
+        <native-text color="Secondary">
+            We carried over the comfort settings you saved last month. Adjust your room temperature and your afternoon rest window, then save.
+        </native-text>
+    </div>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Scalar Value and Events</native-heading>
-        <native-grid cols="C2" gap="Base">
-            @{ Html.InputField(plan, m => m.PainScore, o => o.Label("Pain Score"))
+        <native-vstack gap="Base">
+            <native-heading level="H2">Room temperature</native-heading>
+            @{ Html.InputField(plan, m => m.RoomTemperature, o => o.Label("Set the temperature that keeps your room comfortable"))
                 .FusionSlider(b => b
-                    .Min(0)
-                    .Max(100)
-                    .Step(5)
-                    .Value(25)
+                    .Min(60)
+                    .Max(80)
+                    .Step(2)
+                    .Value(Model.RoomTemperature)
                     .Reactive(plan, evt => evt.Change, (args, p) =>
                     {
-                        p.Element("change-value").SetText(args, x => x.Value);
-                        p.Element("change-previous").SetText(args, x => x.PreviousValue);
-                        p.Element("change-text").SetText(args, x => x.Text);
-                        p.Element("change-action").SetText(args, x => x.Action);
-                        p.Element("change-interacted").SetText(args, x => x.IsInteracted);
+                        // The live reading follows the handle as the resident drags it.
+                        p.Element("comfort-reading").SetText(args, x => x.Text);
+
+                        p.When(args, x => x.Value).Gte(74d)
+                            .Then(warm => warm.Element("comfort-zone")
+                                .SetText("That's on the warm side — comfortable if you tend to feel cold."))
+                            .ElseIf(args, x => x.Value).Gte(66d)
+                            .Then(mid => mid.Element("comfort-zone")
+                                .SetText("That's a comfortable mid-range temperature for most residents."))
+                            .Else(cool => cool.Element("comfort-zone")
+                                .SetText("That's on the cool side — we'll have a blanket ready."));
                     })
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
-                        p.Element("changed-value").SetText(args, x => x.Value);
-                        p.Element("changed-previous").SetText(args, x => x.PreviousValue);
-                        p.Element("changed-text").SetText(args, x => x.Text);
-                        p.Element("changed-action").SetText(args, x => x.Action);
-                        p.When(args, x => x.Value).Gte(50d)
-                            .Then(t => t.Element("args-condition").SetText("at least 50"))
-                            .Else(e => e.Element("args-condition").SetText("below 50"));
+                        // When the handle settles, record what it changed from and how.
+                        p.Element("settle-from").SetText(args, x => x.PreviousValue);
+                        p.Element("settle-action").SetText(args, x => x.Action);
+
+                        p.When(args, x => x.IsInteracted).Truthy()
+                            .Then(chosen => chosen.Element("comfort-source")
+                                .SetText("You set this temperature yourself."))
+                            .Else(applied => applied.Element("comfort-source")
+                                .SetText("We applied the temperature recommended by your care team."));
                     })); }
-        </native-grid>
 
-        <native-hstack gap="Sm" class="mt-4">
-            @(Html.NativeButton("set-score-btn", "Set Score")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var pain = p.Component<FusionSlider>(m => m.PainScore);
-                    pain.SetValue(65);
-                    p.Element("value-echo").SetText(pain.Value());
-                    p.Element("command-state").SetText("score set");
-                }))
-            @(Html.NativeButton("check-score-btn", "Check Score")
-                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var pain = p.Component<FusionSlider>(m => m.PainScore);
-                    p.When(pain.Value()).Gte(50d)
-                        .Then(t => t.Element("score-state").SetText("high"))
-                        .Else(e => e.Element("score-state").SetText("low"));
-                }))
-        </native-hstack>
-    </native-card-body></native-card>
+            <native-vstack gap="Xs">
+                <native-text>
+                    Current setting: <span id="comfort-reading" class="font-semibold text-text">@Model.RoomTemperature</span>&deg;F
+                </native-text>
+                <native-text color="Secondary"><span id="comfort-zone">This is the temperature you saved last month.</span></native-text>
+                <native-text color="Secondary">
+                    Adjusted from <span id="settle-from">@Model.RoomTemperature</span>&deg;F (<span id="settle-action">saved</span>)
+                </native-text>
+                <native-text color="Secondary"><span id="comfort-source">Adjust the slider above, or apply our recommendation.</span></native-text>
+            </native-vstack>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">Range Value</native-heading>
-        <native-grid cols="C2" gap="Base">
-            @{ Html.InputField(plan, m => m.PreferredRange, o => o.Label("Preferred Range"))
-                .FusionSlider(b => b
-                    .Min(0)
-                    .Max(100)
-                    .Step(5)
-                    .Type(SliderType.Range)
-                    .Value(new double[] { 20, 60 })); }
-        </native-grid>
-
-        <native-hstack gap="Sm" class="mt-4">
-            @(Html.NativeButton("set-range-btn", "Set Range")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var range = p.Component<FusionSlider>(m => m.PreferredRange);
-                    range.SetRangeValue(30, 90);
-                    p.Element("range-echo").SetText(range.RangeValue());
-                    p.Element("command-state").SetText("range set");
-                }))
-        </native-hstack>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Gather</native-heading>
-        @(Html.NativeButton("gather-btn", "Gather Values")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var pain = p.Component<FusionSlider>(m => m.PainScore);
-                var range = p.Component<FusionSlider>(m => m.PreferredRange);
-                p.Post(Url.SandboxRoute("Echo", "Slider"))
-                    .Gather(g => g
-                        .Include(pain.Value(), "painScore")
-                        .Include(range.RangeValue(), "preferredRange"))
-                    .Response(r => r.OnSuccess<SliderEchoResponse>((json, s) =>
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("apply-recommended-temp", "Apply the recommended 72°F")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        s.Element("gather-score").SetText(json, x => x.PainScore);
-                        s.Element("gather-range").SetText(json, x => x.PreferredRange);
-                        s.Element("gather-summary").SetText(json, x => x.Summary);
-                    }));
-            }))
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Trace</native-heading>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>Command: <span id="command-state" class="text-text-muted">&mdash;</span></p>
-            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-            <p>Range echo: <span id="range-echo" class="text-text-muted">&mdash;</span></p>
-            <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
-            <p>Change previous: <span id="change-previous" class="text-text-muted">&mdash;</span></p>
-            <p>Change text: <span id="change-text" class="text-text-muted">&mdash;</span></p>
-            <p>Change action: <span id="change-action" class="text-text-muted">&mdash;</span></p>
-            <p>Change interacted: <span id="change-interacted" class="text-text-muted">&mdash;</span></p>
-            <p>Changed value: <span id="changed-value" class="text-text-muted">&mdash;</span></p>
-            <p>Changed previous: <span id="changed-previous" class="text-text-muted">&mdash;</span></p>
-            <p>Changed text: <span id="changed-text" class="text-text-muted">&mdash;</span></p>
-            <p>Changed action: <span id="changed-action" class="text-text-muted">&mdash;</span></p>
-            <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
-            <p>Score state: <span id="score-state" class="text-text-muted">&mdash;</span></p>
-            <p>Gather score: <span id="gather-score" class="text-text-muted">&mdash;</span></p>
-            <p>Gather range: <span id="gather-range" class="text-text-muted">&mdash;</span></p>
-            <p>Gather summary: <span id="gather-summary" class="text-text-muted">&mdash;</span></p>
+                        p.Component<FusionSlider>(m => m.RoomTemperature).SetValue(72);
+                    }))
+                @(Html.NativeButton("check-temp-guidance", "Check this temperature")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var temp = p.Component<FusionSlider>(m => m.RoomTemperature);
+                        p.When(temp.Value()).Gte(74d)
+                            .Then(warm => warm.Element("temp-guidance")
+                                .SetText("A care manager will check in to make sure that's not too warm overnight."))
+                            .Else(ok => ok.Element("temp-guidance")
+                                .SetText("That temperature is within the comfortable range — no follow-up needed."));
+                    }))
+            </native-hstack>
+            <native-text color="Secondary"><span id="temp-guidance"></span></native-text>
         </native-vstack>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+        <native-vstack gap="Base">
+            <native-heading level="H2">Afternoon rest window</native-heading>
+            <native-text color="Secondary">
+                The hours when staff hold non-urgent visits so you can rest.
+            </native-text>
+            @{ Html.InputField(plan, m => m.QuietHours, o => o.Label("Choose your afternoon rest window"))
+                .FusionSlider(b => b
+                    .Min(12)
+                    .Max(18)
+                    .Step(1)
+                    .Type(SliderType.Range)
+                    .Value(Model.QuietHours)); }
+
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("apply-recommended-rest", "Apply the recommended 2–4 PM window")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var rest = p.Component<FusionSlider>(m => m.QuietHours);
+                        rest.SetRangeValue(14, 16);
+                        p.Element("rest-summary").SetText(rest.RangeValue());
+                    }))
+            </native-hstack>
+            <native-text color="Secondary">Saved rest window (start, end hours): <span id="rest-summary">@string.Join(", ", Model.QuietHours)</span></native-text>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            @(Html.NativeButton("save-preferences", "Save my comfort preferences")
+                .CssClass(SubmitReady)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var temp = p.Component<FusionSlider>(m => m.RoomTemperature);
+                    var rest = p.Component<FusionSlider>(m => m.QuietHours);
+                    p.Post(Url.SandboxRoute("Save", "Slider"))
+                        .Gather(g => g
+                            .Include(temp.Value(), "roomTemperature")
+                            .Include(rest.RangeValue(), "quietHours"))
+                        .Response(r => r.OnSuccess<ComfortPreferencesResponse>((json, s) =>
+                        {
+                            s.Element("save-confirmation").SetText(json, x => x.Summary);
+                            s.Element("save-confirmation-panel").RemoveClass("hidden");
+                        }));
+                }))
+            <div id="save-confirmation-panel" class="hidden rounded-md border border-green-300 bg-green-50 p-4">
+                <native-text><span id="save-confirmation" class="font-medium text-green-800"></span></native-text>
+            </div>
+        </native-vstack>
     </native-card-body></native-card>
 </native-vstack>
 
