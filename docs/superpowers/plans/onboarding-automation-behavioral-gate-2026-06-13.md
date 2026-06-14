@@ -7,16 +7,33 @@ rows each time. Source of truth is the code; this ledger is the running map.
 
 Goal doc: `docs/superpowers/plans/GOAL-deterministic-onboarding-automation.md`.
 
-## MILESTONE: 2/51 FULLY ONBOARDED (rating, button) — pipeline proven + reproducing
+## MILESTONE: 6/51 onboarded a-f (full gate confirming g) — autonomous batch landed
 
-- **rating** 7/7 (first; full details below) and **button** 7/7 (parity 100%, 0b green,
-  blind-review PASS, artifacts pass, full gate green) — both re-verified at source, both
-  green in one full gate (1203/0; behavioral gate "2 behaviorally-audited components green").
-- **Reusable fan-out engine**: the `onboard-fusion-component-bdd` Workflow (parity-accounting
-  → BDD rework → blind review → artifact tree), re-invokable per component via args. button
-  was onboarded by re-running it — the pipeline reproduces. The remaining 49 are the
-  multi-session fan-out (~40 min/component via the engine + batched full gates), each
-  re-verified at source before commit.
+- **rating, button, check-box, radio-button, numeric-text-box, text-box** — each parity
+  100% (tool), 0b every member → a fails-when-broken test, blind-review **PASS**, artifacts
+  pass, zero framework edits, no page.evaluate. All re-verified at source before commit
+  (parity + artifacts + blind verdict + forbidden-pattern greps). Full gate running to
+  confirm exit g + the combined-TRX 0b for all six.
+- **Batch engine landed 4 in one autonomous run.** A batch Workflow re-ran the proven
+  `onboard-fusion-component-bdd` engine sequentially over 6 parity-audited components
+  (no build collisions). 4 reached a-f and were verified + committed. The engine reproduces
+  the pipeline without per-component authoring.
+- **switch — BLOCKED below 0b on a verified framework defect (RC3 finding).** 9 BDD tests
+  pass, parity 100%, but `FusionSwitchChangeArgs.IsInteracted` is a typed public property the
+  EJ2 switch `change` event never emits (verified three ways: `switch.js:97` builds
+  `{checked,event}`; generated `event-payload-surface.json`; live browser capture
+  `[checked,event,name]`). Always undefined at runtime → no honest fails-when-broken test
+  (BDD Rule 3). Fix = remove the unbacked property from
+  `Alis.Reactive.Fusion/.../FusionSwitchOnChanged.cs` — a public-contract change for the RC3
+  workstream, NOT an autonomous edit. Committed as a documented below-bar hand-off
+  (`behavioral-coverage.blocked.json`; see `switch/proof/audit-report.md`). Closes fast once
+  the contract decision is made.
+- **chip-list — needs re-run.** Its engine agent died on an API socket drop mid-rename,
+  leaving the model partially renamed and the build broken; a later agent patched around it
+  with a `Compile Remove`. Both reverted at the root: ChipList restored to its compiling HEAD
+  state (build 0/0 with ChipList included), the patch-around removed. Re-run fresh.
+
+### rating (first component) — exit-by-exit (kept for reference)
 
 ### rating (first component) — exit-by-exit (kept for reference)
 

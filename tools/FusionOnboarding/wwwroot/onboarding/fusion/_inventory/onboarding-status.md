@@ -13,10 +13,10 @@ it makes the current cross-component gap measurable and fail-closed.
 |---|---:|
 | Components | 51 |
 | Audited components | 7 |
-| Components with typed matrix | 10 |
-| Total matrix rows | 655 |
+| Components with typed matrix | 9 |
+| Total matrix rows | 623 |
 | Row-proven matrix rows | 555 |
-| Unproven matrix rows | 100 |
+| Unproven matrix rows | 68 |
 | Raw probes | 35 |
 | Raw traces | 35 |
 
@@ -47,7 +47,7 @@ it makes the current cross-component gap measurable and fail-closed.
 | FusionButton | `button/` | audited | audited | none | 12/12 | 1 | 1 | 14 | 14 | 0 |
 | FusionCarousel | `carousel/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionCheckBox | `check-box/` | audited | audited | none | 12/12 | 1 | 1 | 13 | 13 | 0 |
-| FusionChipList | `chip-list/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 7/12 | 0 | 0 | 32 | 0 | 32 |
+| FusionChipList | `chip-list/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionColorPicker | `color-picker/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionComboBox | `combo-box/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionContextMenu | `context-menu/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |

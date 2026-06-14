@@ -5,10 +5,10 @@
   "summary": {
     "componentCount": 51,
     "audited": 7,
-    "withTypedMatrix": 10,
-    "totalMatrixRows": 655,
+    "withTypedMatrix": 9,
+    "totalMatrixRows": 623,
     "rowProvenMatrixRows": 555,
-    "unprovenMatrixRows": 100,
+    "unprovenMatrixRows": 68,
     "totalRawProbes": 35,
     "totalRawTraces": 35,
     "byStatus": {
@@ -317,12 +317,13 @@
       "componentName": "ChipList",
       "artifactName": "chip-list",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/chip-list",
-      "requiredPresent": 7,
+      "requiredPresent": 6,
       "requiredTotal": 12,
       "missingRequired": [
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
+        "proof/typed-api-coverage-matrix.md",
         "proof/playwright-proof.md",
         "proof/audit-report.md"
       ],
@@ -330,21 +331,12 @@
       "probeCount": 0,
       "traceCount": 0,
       "matrix": {
-        "exists": true,
-        "status": "unproven",
-        "totalRows": 32,
+        "exists": false,
+        "status": "missing",
+        "totalRows": 0,
         "rowProvenRows": 0,
-        "unprovenRows": 32,
-        "firstUnprovenRow": {
-          "publicApi": "FusionChipData",
-          "kind": "event-payload-contract",
-          "source": "Alis.Reactive.Fusion/Components/FusionChipList/Events/FusionChipData.cs",
-          "rawTrace": "pending",
-          "primitiveMap": "pending",
-          "verticalSlice": "pending",
-          "playwrightProof": "pending",
-          "status": "unproven"
-        }
+        "unprovenRows": 0,
+        "firstUnprovenRow": null
       },
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
@@ -352,7 +344,7 @@
         "stage": "mapping",
         "action": "create missing artifact mapping/primitive-map.md",
         "command": "complete the previous gate before writing this artifact",
-        "reason": "5 required artifact files are missing"
+        "reason": "6 required artifact files are missing"
       }
     },
     {
