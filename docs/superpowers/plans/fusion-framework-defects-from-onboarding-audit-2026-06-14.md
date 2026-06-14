@@ -90,7 +90,42 @@ Signage" view, 7 passing tests); only `Disable()` blocked. Re-run closes it once
 
 ---
 
+## 4. date-picker — `SetValue(DateTime)` (runtime date-shape conversion bug)
+
+**Defect.** `SetValue(DateTime)` never lands on the EJ2 DatePicker. `FusionDatePickerExtensions.cs:34`
+emits `LiteralRaw(value.ToString("yyyy-MM-dd"), Shape.Date)`; the runtime set path
+(`runtime-object.ts` → `runtime-value.usingDeclaredShape` → `shape-convert.ts` `toDate`)
+converts that to an **epoch number** (e.g. `1782878400000`). EJ2 `DatePicker.value` rejects
+both an epoch number and a date-only string — it accepts only a `Date` object or a full ISO
+string — so the value never sets.
+
+**Evidence.** Browser-verified: after `SetValue`, `ej2.value` stays `null` and the DOM input
+shows the raw epoch. `FusionDatePickerExtensions.cs:34` (the `Shape.Date` literal) → `shape-convert.ts`
+`toDate` (epoch conversion) → EJ2 rejects. 9/10 date-picker members proved by passing tests; only
+`SetValue` is blocked, kept failing as the spec.
+
+**Fix (runtime + Fusion).** The date set path must hand EJ2 a `Date` object or full ISO string,
+not an epoch number. Lives in `Alis.Reactive.Assets/runtime` (shape-convert) and/or
+`Alis.Reactive.Fusion` (the emitted literal shape).
+
+**Blast radius — checked, not assumed.** The date-picker agent flagged TimePicker /
+DateTimePicker / DateRangePicker as sharing `LiteralRaw(…, Shape.Date)` with no SetValue test.
+**Re-verified at source: TimePicker is NOT affected** — its `applying_the_standard_round` test
+writes a time via SetValue and asserts the input shows `08:00` (real readback); that test PASSES,
+so TimePicker's SetValue genuinely works (time-picker onboarded clean, 11/51). DateTimePicker /
+DateRangePicker remain unverified (not yet onboarded) — confirm with a SetValue readback test
+when they are.
+
+**Disposition.** date-picker reverted to HEAD. Re-run closes it once the date shape conversion
+is fixed.
+
+---
+
 ## Also deferred (not defects — onboarding-path gaps)
+
+- **stepper** — onboarding reached 0b PASS (24/24) + parity 100%, but the **blind reviewer
+  REJECTED** the view as a test rig, not a product screen (same class as otp-input). Reverted;
+  needs a product-screen view rework, then re-run.
 
 - **otp-input** — onboarding reached 0b PASS (26/26) + artifacts, but the **blind reviewer
   REJECTED** the view: a debug dashboard (state-echo spans: "code so far", "box 0", "was X

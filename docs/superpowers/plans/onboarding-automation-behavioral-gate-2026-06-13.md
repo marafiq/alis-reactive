@@ -7,7 +7,15 @@ rows each time. Source of truth is the code; this ledger is the running map.
 
 Goal doc: `docs/superpowers/plans/GOAL-deterministic-onboarding-automation.md`.
 
-## MILESTONE: 7/51 onboarded; 37/51 discovered; 3 framework defects found by audit
+## MILESTONE: 11/51 onboarded; 37/51 discovered; 4 framework defects found by audit
+
+**11 onboarded** (full bar): rating, button, check-box, radio-button, numeric-text-box,
+text-box, text-area + **time-picker, slider, breadcrumb, accordion** (batch 3 — full gate
+confirming). **Batch 3** (date-picker, time-picker, slider, breadcrumb, stepper, accordion):
+4 clean. date-picker = **4th framework defect** (SetValue writes an epoch number EJ2 rejects);
+stepper deferred (blind REJECT, test-rig view). All defects in the findings doc, reverted to
+HEAD pending decisions. Source correction: the date-picker agent's "blast radius to TimePicker"
+was DISPROVEN at source — TimePicker SetValue works (readback test passes). Detail below.
 
 **7 onboarded** (full bar): rating, button, check-box, radio-button, numeric-text-box,
 text-box (gate-confirmed 1196/0), **+ text-area** (this batch — parity 28/28, 0b, blind
