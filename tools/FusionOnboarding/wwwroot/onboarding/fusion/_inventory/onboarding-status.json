@@ -4,20 +4,20 @@
   "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion",
   "summary": {
     "componentCount": 51,
-    "audited": 7,
-    "withTypedMatrix": 9,
-    "totalMatrixRows": 623,
-    "rowProvenMatrixRows": 555,
+    "audited": 8,
+    "withTypedMatrix": 10,
+    "totalMatrixRows": 644,
+    "rowProvenMatrixRows": 576,
     "unprovenMatrixRows": 68,
     "totalRawProbes": 74,
-    "totalRawTraces": 35,
+    "totalRawTraces": 36,
     "byStatus": {
-      "artifact-incomplete": 44,
-      "audited": 7
+      "artifact-incomplete": 43,
+      "audited": 8
     },
     "byNextStage": {
-      "mapping": 41,
-      "audited": 7,
+      "mapping": 40,
+      "audited": 8,
       "static-discovery": 3
     }
   },
@@ -1622,34 +1622,27 @@
       "componentName": "TextArea",
       "artifactName": "text-area",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/text-area",
-      "requiredPresent": 6,
+      "requiredPresent": 12,
       "requiredTotal": 12,
-      "missingRequired": [
-        "mapping/primitive-map.md",
-        "mapping/csharp-name-decisions.md",
-        "mapping/vertical-slice-plan.md",
-        "proof/typed-api-coverage-matrix.md",
-        "proof/playwright-proof.md",
-        "proof/audit-report.md"
-      ],
+      "missingRequired": [],
       "unlinkedRequired": [],
       "probeCount": 1,
-      "traceCount": 0,
+      "traceCount": 1,
       "matrix": {
-        "exists": false,
-        "status": "missing",
-        "totalRows": 0,
-        "rowProvenRows": 0,
+        "exists": true,
+        "status": "audited",
+        "totalRows": 21,
+        "rowProvenRows": 21,
         "unprovenRows": 0,
         "firstUnprovenRow": null
       },
       "openAuditMarkers": false,
-      "mechanicalStatus": "artifact-incomplete",
+      "mechanicalStatus": "audited",
       "nextAction": {
-        "stage": "mapping",
-        "action": "create missing artifact mapping/primitive-map.md",
-        "command": "complete the previous gate before writing this artifact",
-        "reason": "6 required artifact files are missing"
+        "stage": "audited",
+        "action": "none",
+        "command": "node .claude/skills/onboard-fusion-component/scripts/verify-fusion-artifact-gates.mjs --component text-area",
+        "reason": "component is mechanically audited"
       }
     },
     {

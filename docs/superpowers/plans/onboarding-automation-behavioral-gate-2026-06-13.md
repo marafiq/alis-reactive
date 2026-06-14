@@ -7,7 +7,21 @@ rows each time. Source of truth is the code; this ledger is the running map.
 
 Goal doc: `docs/superpowers/plans/GOAL-deterministic-onboarding-automation.md`.
 
-## MILESTONE: 6/51 onboarded a-f (full gate confirming g) — autonomous batch landed
+## MILESTONE: 7/51 onboarded; 37/51 discovered; 3 framework defects found by audit
+
+**7 onboarded** (full bar): rating, button, check-box, radio-button, numeric-text-box,
+text-box (gate-confirmed 1196/0), **+ text-area** (this batch — parity 28/28, 0b, blind
+PASS, artifacts; full gate confirming). **37 discovered** (build-free, verified, committed).
+
+**Batch 2 (chip-list, otp-input, color-picker, text-area)** — only text-area onboarded
+cleanly. The audit surfaced **3 real framework defects** (see
+`fusion-framework-defects-from-onboarding-audit-2026-06-14.md`), all reverted to HEAD
+pending a framework decision (NOT autonomous edits): switch `IsInteracted` (public-contract,
+RC3), chip-list `Indexes` (runtime payload-casing bug), color-picker `Disable()` (vendor
+driver bypasses EJ2 reflection). otp-input deferred — blind reviewer REJECTed a debug-dashboard
+view (the blind gate working); needs a view rework. This is the goal's "audit + upgrade" value:
+100%-coverage onboarding forces dead/unreflected typed members into the open instead of
+shipping them. Earlier 6-component details below.
 
 - **rating, button, check-box, radio-button, numeric-text-box, text-box** — each parity
   100% (tool), 0b every member → a fails-when-broken test, blind-review **PASS**, artifacts

@@ -12,27 +12,27 @@ it makes the current cross-component gap measurable and fail-closed.
 | Metric | Count |
 |---|---:|
 | Components | 51 |
-| Audited components | 7 |
-| Components with typed matrix | 9 |
-| Total matrix rows | 623 |
-| Row-proven matrix rows | 555 |
+| Audited components | 8 |
+| Components with typed matrix | 10 |
+| Total matrix rows | 644 |
+| Row-proven matrix rows | 576 |
 | Unproven matrix rows | 68 |
 | Raw probes | 74 |
-| Raw traces | 35 |
+| Raw traces | 36 |
 
 ## Status Counts
 
 | Status | Components |
 |---|---:|
-| artifact-incomplete | 44 |
-| audited | 7 |
+| artifact-incomplete | 43 |
+| audited | 8 |
 
 ## Next Action Counts
 
 | Next Stage | Components |
 |---|---:|
-| audited | 7 |
-| mapping | 41 |
+| audited | 8 |
+| mapping | 40 |
 | static-discovery | 3 |
 
 ## Components
@@ -85,7 +85,7 @@ it makes the current cross-component gap measurable and fail-closed.
 | FusionStepper | `stepper/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
 | FusionSwitch | `switch/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 8/12 | 0 | 0 | 8 | 7 | 1 |
 | FusionTab | `tab/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
-| FusionTextArea | `text-area/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
+| FusionTextArea | `text-area/` | audited | audited | none | 12/12 | 1 | 1 | 21 | 21 | 0 |
 | FusionTextBox | `text-box/` | audited | audited | none | 12/12 | 1 | 1 | 22 | 22 | 0 |
 | FusionTimePicker | `time-picker/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
 | FusionToolbar | `toolbar/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
