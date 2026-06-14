@@ -29,23 +29,24 @@ function main() {
   const components = listComponents();
   const rows = components.map(componentStatus);
 
-  const onboarded = rows.filter(r => r.verdict === "onboarded");
-  console.log(`# Fusion behavioral onboarding status (per-component bar: parity + 0b)`);
+  const passing = rows.filter(r => r.verdict === "det-gates-pass");
+  console.log(`# Fusion onboarding status — deterministic gates (parity + 0b + artifacts)`);
+  console.log(`# "det-gates-pass" is NOT full onboarding: blind-review (e) and a green full gate (g) are also required.`);
   console.log("");
-  console.log(`Components            : ${rows.length}`);
-  console.log(`Behaviorally onboarded: ${onboarded.length}/${rows.length}`);
+  console.log(`Components                  : ${rows.length}`);
+  console.log(`Deterministic gates passing : ${passing.length}/${rows.length}`);
   console.log("");
-  console.log(`${pad("component", 26)} ${pad("parity", 22)} ${pad("behavioral(0b)", 18)} verdict`);
+  console.log(`${pad("component", 22)} ${pad("parity", 20)} ${pad("0b", 8)} ${pad("artifacts", 11)} verdict`);
   console.log("-".repeat(86));
   for (const r of rows) {
-    console.log(`${pad(r.component, 26)} ${pad(r.parity, 22)} ${pad(r.behavioral, 18)} ${r.verdict}`);
+    console.log(`${pad(r.component, 22)} ${pad(r.parity, 20)} ${pad(r.behavioral, 8)} ${pad(r.artifacts, 11)} ${r.verdict}`);
   }
   console.log("");
-  console.log(`${onboarded.length}/${rows.length} behaviorally onboarded.` +
-    (onboarded.length < rows.length ? " The rest are below the bar (no discovery / no behavioral map / gate failing)." : ""));
+  console.log(`${passing.length}/${rows.length} pass the deterministic gates.` +
+    (passing.length < rows.length ? " The rest are below the bar (no discovery / no behavioral map / a gate failing)." : ""));
 
-  // Exit non-zero until every component is onboarded, so this can gate too.
-  process.exit(onboarded.length === rows.length ? 0 : 1);
+  // Exit non-zero until every component passes (so this can gate too).
+  process.exit(passing.length === rows.length ? 0 : 1);
 }
 
 function listComponents() {
@@ -59,8 +60,19 @@ function listComponents() {
 function componentStatus(component) {
   const parity = parityStatus(component);
   const behavioral = behavioralStatus(component);
-  const verdict = parity.pass && behavioral.pass ? "onboarded" : "below-bar";
-  return { component, parity: parity.label, behavioral: behavioral.label, verdict };
+  // The artifact verifier is heavier (spawns generators), so only run it once the
+  // cheap gates pass — otherwise the component is already below-bar.
+  const artifacts = (parity.pass && behavioral.pass) ? artifactStatus(component) : { pass: false, label: "-" };
+  // "det-gates-pass" = the DETERMINISTIC gates (parity + 0b + artifacts) all pass.
+  // It is NOT full onboarding: the blind-review verdict (e) and a green full gate (g)
+  // are additional, judgment/expensive gates this cheap reporter does not run.
+  const verdict = parity.pass && behavioral.pass && artifacts.pass ? "det-gates-pass" : "below-bar";
+  return { component, parity: parity.label, behavioral: behavioral.label, artifacts: artifacts.label, verdict };
+}
+
+function artifactStatus(component) {
+  const r = spawnSync(process.execPath, [join(SKILL_SCRIPTS, "verify-fusion-artifact-gates.mjs"), "--component", component], { encoding: "utf8" });
+  return { pass: r.status === 0, label: r.status === 0 ? "PASS" : "FAIL" };
 }
 
 function parityStatus(component) {
