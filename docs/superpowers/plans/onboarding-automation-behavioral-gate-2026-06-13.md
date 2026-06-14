@@ -7,7 +7,18 @@ rows each time. Source of truth is the code; this ledger is the running map.
 
 Goal doc: `docs/superpowers/plans/GOAL-deterministic-onboarding-automation.md`.
 
-## MILESTONE: rating FULLY ONBOARDED — first component, 7/7 exits (1/51)
+## MILESTONE: 2/51 FULLY ONBOARDED (rating, button) — pipeline proven + reproducing
+
+- **rating** 7/7 (first; full details below) and **button** 7/7 (parity 100%, 0b green,
+  blind-review PASS, artifacts pass, full gate green) — both re-verified at source, both
+  green in one full gate (1203/0; behavioral gate "2 behaviorally-audited components green").
+- **Reusable fan-out engine**: the `onboard-fusion-component-bdd` Workflow (parity-accounting
+  → BDD rework → blind review → artifact tree), re-invokable per component via args. button
+  was onboarded by re-running it — the pipeline reproduces. The remaining 49 are the
+  multi-session fan-out (~40 min/component via the engine + batched full gates), each
+  re-verified at source before commit.
+
+### rating (first component) — exit-by-exit (kept for reference)
 
 The pipeline is proven end-to-end on a real component (goal sequence step 2). rating
 passes EVERY per-component exit, each re-verified by me at source (not trusting agents):
