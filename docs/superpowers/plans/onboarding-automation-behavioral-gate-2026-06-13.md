@@ -31,9 +31,13 @@ no behavioral map`. Terminal 4 (full `scripts/test.sh`) is GREEN over the curren
 ## What remains is per-component APPLICATION (judgment-heavy, genuinely multi-session)
 
 Onboarding even ONE component to the bar is large and judgment-heavy, confirmed:
-- Discovery is not push-button — Schedule's `dataBinding`/`dataBound` payload types are
-  ambiguous across ~70 vendor d.ts files; the generator fail-closes and needs manual
-  disambiguation (which d.ts is authoritative per type).
+- Discovery is not push-button for ANY component (empirically confirmed). The generator
+  (`write-fusion-discovery-artifacts.mjs`) fail-closes on event-payload resolution:
+  Schedule's `dataBinding`/`dataBound` are ambiguous across ~70 vendor d.ts files; even
+  simple CheckBox's `created` resolves to a DOM-native `Event` the generator can't find
+  in Syncfusion declarations. So every component needs either per-event disambiguation
+  or a generator fix to handle DOM-native/unresolvable payload types — this is the
+  judgment-gated first step before parity/coverage even begin.
 - Parity ≥95% means classifying hundreds of vendor members per component as
   onboarded-typed / builder-owned / excluded-with-evidence (grid: 319 to classify).
 - 100% behavioral coverage means a fails-when-broken test per matrix member.
@@ -41,6 +45,24 @@ Onboarding even ONE component to the bar is large and judgment-heavy, confirmed:
 
 The backbone makes all of this MACHINE-CHECKABLE and un-fakeable. Applying it to 51
 components to GREEN is the multi-session bulk the goal anticipates.
+
+## Agent orchestration — demonstrated + working (with reliability gaps found)
+
+A Workflow fanned 8 agents (62s) to run discovery + the parity tool across 8 simple
+components; parity re-verified at source and committed (rating PASS 95.8%, others
+discovered with honest FAIL numbers). This is the goal's model: agents do per-component
+judgment, the deterministic parity tool produces the un-fakeable number, I re-verify.
+
+Two gaps found scaling it (must fix before a reliable 51-wide fan-out):
+- **d.ts-choice determinism.** Parity depends on WHICH vendor d.ts the agent feeds
+  discovery. A second run picked `rating-model.d.ts` (the options model, 22 members)
+  instead of `rating.d.ts` (the component class, 24 incl. methods/events) → a FALSE
+  `100%` that hid the runtime surface. Caught by re-verifying at source; restored the
+  correct 95.8%. FIX: pin the class `.d.ts` per component (data map) so the audit is
+  deterministic — do not let agents free-choose the d.ts.
+- **Workflow args plumbing.** Re-invoking the saved script with `args=[43 components]`
+  ran the DEFAULT 8 instead — the args did not reach the script's `args` global.
+  FIX before fanning the remaining 43.
 
 ## Verified state of the world (read at HEAD `04635938`, branch `tiny-safe-but-important-refactorings`)
 
