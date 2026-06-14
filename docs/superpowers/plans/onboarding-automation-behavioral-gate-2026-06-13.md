@@ -319,3 +319,29 @@ that classification + a parity computation over it exists.
 `BASELINE_EXIT=0`, "All gates green.", **1196 Playwright tests passed, 0 failed**
 (57.0 min). Final TRX `playwright-20260613-070709.trx`. The run predated the
 `test.sh` edit, so it is a clean measurement of the untouched tree.
+
+## Fan-out mechanics (for continuation)
+
+- **Onboarding engine** (proven): Workflow `onboard-fusion-component-bdd` (script under
+  this session's `workflows/scripts/`). Runs parity-accounting → BDD rework → blind review
+  → artifact tree for ONE component that already has discovery. Re-verify + full gate is the
+  parent's job. Re-run per component via `workflow({scriptPath}, [c])` (the function's 2nd
+  arg DOES plumb).
+- **Batch onboarding**: a wrapper that loops the engine sequentially over a component list
+  (no build collisions). Sequential because each engine run builds + runs Playwright.
+- **Discovery (build-free)** for a not-yet-discovered component:
+  1. `discover-syncfusion-component.mjs --class <EjClass>` → candidate d.ts rows.
+  2. Pick the canonical row: `src/<name>/<name>.d.ts` with a non-empty MVC builder and an
+     `ej.<area>.<Class>` global. Reject `*-model.d.ts`, `helpers/e2e/*`, `modules/*`, `renderer/*`.
+  3. `write-fusion-discovery-artifacts.mjs --component <c> --class <EjClass> --namespace <ej.ns> --dts <chosen> --xml ~/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml --write`
+  4. Validate `discovery/public-api-surface.json`: members>0 AND counts.builderMethods>0.
+  Discovery reads d.ts + the shared MVC XML and writes JSON — NO build — so a discovery
+  batch runs safely CONCURRENT with a build-heavy onboarding run.
+- **⚠ Workflow `args` plumbing**: the Workflow tool's top-level `args` field does NOT reach
+  the script's `args` global (observed twice: a discovery run returned total:0). EMBED the
+  component list as a `const` in the script instead (or use the `workflow()` function's 2nd
+  arg for nested calls, which does plumb).
+- **Remaining**: ~41 discovering now (`discover-fusion-batch`), chip-list re-running
+  (`onboard-fusion-component-bdd`). After discovery: onboard in batches of ~6 + one full
+  gate per batch, re-verify each at source. switch waits on the RC3 `IsInteracted` decision;
+  grid's committed matrix is stale (says audited, generator says unproven) — re-onboard.
