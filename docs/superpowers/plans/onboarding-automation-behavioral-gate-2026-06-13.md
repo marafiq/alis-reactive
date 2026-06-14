@@ -7,6 +7,34 @@ rows each time. Source of truth is the code; this ledger is the running map.
 
 Goal doc: `docs/superpowers/plans/GOAL-deterministic-onboarding-automation.md`.
 
+## MILESTONE: rating FULLY ONBOARDED — first component, 7/7 exits (1/51)
+
+The pipeline is proven end-to-end on a real component (goal sequence step 2). rating
+passes EVERY per-component exit, each re-verified by me at source (not trusting agents):
+- **a** ALIS009 — `dotnet build` succeeded 0/0.
+- **0a** no-sandbox-usage — FusionCoverage: every slice member referenced.
+- **b** parity — `compute-fusion-parity --component rating` → 23/24 = 95.8% PASS.
+- **c** 100% behavioral coverage — `verify-behavioral-coverage --component rating` →
+  [PASS] 10/10 members, fails-when-broken tests, verified against the latest TRX.
+- **d** N/A — rating is a simple input (no stateful CRUD); its applicable behaviors covered.
+- **e** BDD-valid + blind review — a blind-reviewer agent (could REJECT) returned PASS;
+  quoted in proof/blind-review.md.
+- **f** artifacts — `verify-fusion-artifact-gates --component rating` → passed.
+- **g** full gate — `scripts/test.sh` GREEN: 1202 Playwright passed / 0 failed, and the
+  0b behavioral gate leg verified rating inside it ("1 behaviorally-audited component green").
+
+`drive-component-gates --component rating --full` → all gates PASS. Reporter: 1/51.
+
+How it was built (the goal's model — agents do judgment, deterministic gates verify, blind
+review, I re-verify): agent parity-audit fanned discovery+parity across 8 components → agent
+reworked rating's view+tests to BDD-clean real-app behaviors (no echo spans) → blind reviewer
+PASS → agent completed the artifact tree (real browser-generated trace) → matrix row-proven
+now derives from the 0b/TRX truth. Every agent claim re-verified at source before commit.
+
+Remaining: 50 components (the fan-out), each needing the same a→g. The d.ts-pinning +
+Workflow-args fixes (recorded below) harden the fan-out. grid's committed matrix is stale
+(audited vs generated-unproven) — re-onboard it to this bar like rating.
+
 ## Deterministic backbone — COMPLETE (all gates bite; committed + verified)
 
 Every non-bypassable gate the goal names now exists and fails loud:
