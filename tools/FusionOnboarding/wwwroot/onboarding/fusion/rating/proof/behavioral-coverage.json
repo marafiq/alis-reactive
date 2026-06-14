@@ -1,0 +1,19 @@
+{
+  "component": "rating",
+  "fusionType": "FusionRating",
+  "coverage": [
+    { "member": "FusionRatingValueChangedArgs", "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.reset_method_resets_rating_and_valuechanged_event_exposes_payload", "catches": "the ValueChanged event arg contract stops delivering the change payload into the plan" },
+    { "member": "FusionRatingValueChangedArgs.IsInteracted", "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.reset_method_resets_rating_and_valuechanged_event_exposes_payload", "catches": "IsInteracted stops reflecting that a reset is programmatic (the test asserts #changed-interacted is false)" },
+    { "member": "FusionRatingValueChangedArgs.PreviousValue", "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.reset_method_resets_rating_and_valuechanged_event_exposes_payload", "catches": "PreviousValue stops carrying the value before the change (the test asserts #changed-previous is 4)" },
+    { "member": "FusionRatingValueChangedArgs.Value", "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.reset_method_resets_rating_and_valuechanged_event_exposes_payload", "catches": "Value stops carrying the new rating value (the test asserts #changed-value is 0 after reset)" },
+    { "member": "ValueChanged", "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.reset_method_resets_rating_and_valuechanged_event_exposes_payload", "catches": "the ValueChanged event stops firing the reactive handler on a value change" },
+    { "member": "Reset(this ComponentRef<FusionRating, TModel> self)", "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.reset_method_resets_rating_and_valuechanged_event_exposes_payload", "catches": "Reset stops clearing the rating to 0 (the test asserts the visible value and source become 0)" },
+    { "member": "Reactive", "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.reset_method_resets_rating_and_valuechanged_event_exposes_payload", "catches": "the .Reactive wiring stops connecting the rating change event to its plan handler" },
+    { "member": "SetValue(this ComponentRef<FusionRating, TModel> self, double value)", "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.set_value_updates_visible_rating_and_value_source", "catches": "SetValue stops setting the rating to the given value (the test asserts the visible rating and source become 4)" },
+    { "member": "Value(this ComponentRef<FusionRating, TModel> self)", "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.gather_consumes_rating_value_source", "catches": "the Value source stops yielding the current rating into a gather body (the test asserts the POST carries score:4)" },
+    { "member": "FusionRating(this InputBoundField<TModel, double> setup, Action<RatingBuilder> build)", "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.domready_sets_visible_value_and_reads_value_source", "catches": "the FusionRating builder stops rendering the rating bound to the model value (the test asserts the rendered value is 3)" }
+  ],
+  "acceptedFanout": [
+    { "test": "Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.reset_method_resets_rating_and_valuechanged_event_exposes_payload", "reason": "one reset+valueChanged user gesture with DISTINCT fails-when-broken assertions per member: #changed-value (Value), #changed-previous (PreviousValue), #changed-interacted (IsInteracted), value->0 (Reset), and the event firing the handler (ValueChanged/Reactive). Not one assertion claimed for many members — each has its own assertion in this test." }
+  ]
+}
