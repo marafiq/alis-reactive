@@ -1,0 +1,11 @@
+{
+  "component": "check-box",
+  "fusionType": "FusionCheckBox",
+  "note": "Per-component parity judgment consumed by compute-fusion-parity.mjs (its header names discovery/parity-accounting.json as the per-component JUDGMENT file, reviewed like any judgment step; not script-generated). builder-owned members (change, created, cssClass, disabled, enableHtmlSanitizer, indeterminate, label, labelPosition, name, value) are counted from public-api-surface.json builder.covered and are NOT repeated here. destroy carries a skip: discovery decision and is excluded by that. Only the three members with builder.covered=false and no skip decision are accounted below — each is exposed typed in Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBoxExtensions.cs.",
+  "onboarded": [
+    "checked",
+    "click",
+    "focusIn"
+  ],
+  "excluded": []
+}

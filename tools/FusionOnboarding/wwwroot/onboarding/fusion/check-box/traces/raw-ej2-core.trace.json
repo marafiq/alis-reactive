@@ -1,0 +1,155 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "check-box",
+  "apiSet": "core",
+  "probe": "onboarding/fusion/check-box/probes/raw-ej2-core.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "component": "check-box",
+        "apiSet": "core",
+        "namespace": "ej.buttons",
+        "className": "CheckBox",
+        "id": "checkbox-probe",
+        "traceFile": "/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/tools/FusionOnboarding/wwwroot/onboarding/fusion/check-box/traces/raw-ej2-core.trace.json"
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "checked initial read",
+      "value": false
+    },
+    {
+      "sequence": 3,
+      "label": "change",
+      "value": {
+        "ownKeys": [
+          "checked",
+          "event",
+          "name"
+        ],
+        "functions": [],
+        "properties": {
+          "checked": {
+            "type": "boolean",
+            "sample": true
+          },
+          "event": {
+            "type": "object",
+            "sample": {
+              "isTrusted": false
+            }
+          },
+          "name": {
+            "type": "string",
+            "sample": "change"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "click() method",
+      "value": true
+    },
+    {
+      "sequence": 5,
+      "label": "checked after click",
+      "value": true
+    },
+    {
+      "sequence": 6,
+      "label": "dataBind() after indeterminate set",
+      "value": null
+    },
+    {
+      "sequence": 7,
+      "label": "indeterminate read",
+      "value": true
+    },
+    {
+      "sequence": 8,
+      "label": "frame class after indeterminate",
+      "value": "e-icons e-frame e-stop"
+    },
+    {
+      "sequence": 9,
+      "label": "dataBind() after disabled set",
+      "value": null
+    },
+    {
+      "sequence": 10,
+      "label": "disabled read",
+      "value": true
+    },
+    {
+      "sequence": 11,
+      "label": "wrapper class after disabled",
+      "value": "e-checkbox-wrapper e-wrapper e-checkbox-disabled"
+    },
+    {
+      "sequence": 12,
+      "label": "focusIn() method",
+      "value": null
+    },
+    {
+      "sequence": 13,
+      "label": "active element after focusIn",
+      "value": "checkbox-probe"
+    },
+    {
+      "sequence": 14,
+      "label": "own keys",
+      "value": [
+        "allowServerDataBinding",
+        "bulkChanges",
+        "changedProperties",
+        "childChangedProperties",
+        "clickTriggered",
+        "element",
+        "finalUpdate",
+        "ignoreCollectionWatch",
+        "initialCheckedValue",
+        "isAngular",
+        "isComplexArraySetter",
+        "isDestroyed",
+        "isFocused",
+        "isMouseClick",
+        "isProtectedOnChange",
+        "isReact",
+        "isReactHybrid",
+        "isRendered",
+        "isServerRendered",
+        "isStringTemplate"
+      ]
+    },
+    {
+      "sequence": 15,
+      "label": "prototype methods",
+      "value": [
+        "change",
+        "changeHandler",
+        "changeState",
+        "checked",
+        "click",
+        "clickHandler",
+        "constructor",
+        "created",
+        "cssClass",
+        "destroy",
+        "disabled",
+        "enableHtmlSanitizer",
+        "focusHandler",
+        "focusIn",
+        "focusOutHandler",
+        "formResetHandler",
+        "getLabel",
+        "getModuleName",
+        "getPersistData",
+        "getWrapper"
+      ]
+    }
+  ]
+}
