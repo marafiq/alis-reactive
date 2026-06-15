@@ -5,10 +5,10 @@
   "summary": {
     "componentCount": 51,
     "audited": 16,
-    "withTypedMatrix": 17,
-    "totalMatrixRows": 671,
+    "withTypedMatrix": 18,
+    "totalMatrixRows": 676,
     "rowProvenMatrixRows": 670,
-    "unprovenMatrixRows": 1,
+    "unprovenMatrixRows": 6,
     "totalRawProbes": 72,
     "totalRawTraces": 44,
     "byStatus": {
@@ -1362,7 +1362,7 @@
       "componentName": "SmartPasteButton",
       "artifactName": "smart-paste-button",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/smart-paste-button",
-      "requiredPresent": 2,
+      "requiredPresent": 3,
       "requiredTotal": 12,
       "missingRequired": [
         "discovery/mvc-builder-coverage.md",
@@ -1372,7 +1372,6 @@
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
-        "proof/typed-api-coverage-matrix.md",
         "proof/playwright-proof.md",
         "proof/audit-report.md"
       ],
@@ -1380,12 +1379,21 @@
       "probeCount": 0,
       "traceCount": 0,
       "matrix": {
-        "exists": false,
-        "status": "missing",
-        "totalRows": 0,
+        "exists": true,
+        "status": "unproven",
+        "totalRows": 5,
         "rowProvenRows": 0,
-        "unprovenRows": 0,
-        "firstUnprovenRow": null
+        "unprovenRows": 5,
+        "firstUnprovenRow": {
+          "publicApi": "Click(this ComponentRef<FusionSmartPasteButton, TModel> self)",
+          "kind": "method",
+          "source": "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonExtensions.cs",
+          "rawTrace": "pending",
+          "primitiveMap": "pending",
+          "verticalSlice": "pending",
+          "playwrightProof": "pending",
+          "status": "unproven"
+        }
       },
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
@@ -1393,7 +1401,7 @@
         "stage": "static-discovery",
         "action": "create missing artifact discovery/mvc-builder-coverage.md",
         "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component smart-paste-button --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "10 required artifact files are missing"
+        "reason": "9 required artifact files are missing"
       }
     },
     {

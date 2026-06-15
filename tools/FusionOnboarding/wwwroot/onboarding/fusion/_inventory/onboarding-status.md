@@ -13,10 +13,10 @@ it makes the current cross-component gap measurable and fail-closed.
 |---|---:|
 | Components | 51 |
 | Audited components | 16 |
-| Components with typed matrix | 17 |
-| Total matrix rows | 671 |
+| Components with typed matrix | 18 |
+| Total matrix rows | 676 |
 | Row-proven matrix rows | 670 |
-| Unproven matrix rows | 1 |
+| Unproven matrix rows | 6 |
 | Raw probes | 72 |
 | Raw traces | 44 |
 
@@ -79,7 +79,7 @@ it makes the current cross-component gap measurable and fail-closed.
 | FusionSchedule | `schedule/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionSidebar | `sidebar/` | audited | audited | none | 12/12 | 1 | 1 | 10 | 10 | 0 |
 | FusionSlider | `slider/` | audited | audited | none | 12/12 | 1 | 1 | 14 | 14 | 0 |
-| FusionSmartPasteButton | `smart-paste-button/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
+| FusionSmartPasteButton | `smart-paste-button/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 3/12 | 0 | 0 | 5 | 0 | 5 |
 | FusionSmartTextArea | `smart-text-area/` | artifact-incomplete | static-discovery | create missing artifact discovery/mvc-builder-coverage.md | 2/12 | 0 | 0 | 0 | 0 | 0 |
 | FusionSplitButton | `split-button/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
 | FusionStepper | `stepper/` | artifact-incomplete | mapping | create missing artifact mapping/primitive-map.md | 6/12 | 1 | 0 | 0 | 0 | 0 |
