@@ -1,116 +1,59 @@
 ---
-title: Reactive
-description: Plan-driven reactive framework for ASP.NET MVC.
+title: Alis.Reactive
+description: Plan-driven reactive UI for ASP.NET MVC.
 template: splash
 hero:
-  tagline: Developers write fluent C# to express reactivity intent. It produces a JSON plan. The JS runtime executes it. No bespoke JavaScript in views. Ever.
+  tagline: Write reactive intent in C#. Render a Reactive Plan. Let the browser runtime execute that plan.
   actions:
-    - text: See It In Action
-      link: /alis-reactive/examples/resident-intake/
+    - text: Build the First Plan
+      link: /alis-reactive/getting-started/your-first-plan/
       icon: right-arrow
-    - text: Architecture
-      link: /alis-reactive/architecture/three-layers/
+    - text: Learn the Model
+      link: /alis-reactive/csharp-modules/mental-model/
       icon: open-book
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+Alis.Reactive is for .NET developers who want browser behavior without
+handwritten JavaScript in Razor views.
 
-## What It Looks Like
+The public DSL has a small shape. Create a `ReactivePlan<TModel>`, render
+model-bound inputs and components, attach triggers, and use the pipeline for
+browser work.
 
-<CardGrid>
-	<Card title="Cascading Dropdowns" icon="random">
-		Pick a facility — units populate automatically. Two parallel GETs, zero JavaScript.
-		```csharp
-		pipeline.Get("/Intake/Units")
-		    .Gather(g => g.Include<FusionDropDownList,
-		        Model>(m => m.FacilityId))
-		    .Response(r => r.OnSuccess<UnitsResponse>(
-		        (json, s) => s.Component<FusionDropDownList>(
-		            m => m.UnitId)
-		            .SetDataSource(json, j => j.Units)
-		            .DataBind()));
-		```
-		[See full example](./examples/resident-intake/)
-	</Card>
-	<Card title="Conditional Visibility" icon="approve-check">
-		Check a box — a section appears. Pick a value — another section appears. All declarative.
-		```csharp
-		pipeline.When(args, a => a.Checked).Truthy()
-		    .Then(t => t.Element("section").Show())
-		    .Else(e => e.Element("section").Hide());
-		```
-		[Conditions reference](./csharp-modules/reactivity/conditions/)
-	</Card>
-	<Card title="HTTP + Validation + Toast" icon="rocket">
-		One pipeline: confirm, validate, POST, loading overlay, toast, chained follow-up request.
-		```csharp
-		pipeline.Confirm("Submit?")
-		    .Then(t => t
-		        .Post("/save", g => g.IncludeAll())
-		        .Validate<MyValidator>("form")
-		        .Response(r => r.OnSuccess(s =>
-		            s.Component<FusionToast>()
-		                .SetContent("Saved!")
-		                .Success().Show())));
-		```
-		[HTTP pipeline](./csharp-modules/reactivity/http-pipeline/)
-	</Card>
-	<Card title="Dynamic Partials" icon="puzzle">
-		Load a server-rendered partial with input fields via `Into()`. Plan merging enriches validation automatically.
-		```csharp
-		// Partial uses ResolvePlan — merges into Active Plan
-		var plan = Html.ResolvePlan<Model>();
-		Html.InputField(plan, m => m.Room,
-		    o => o.Required().Label("Room"))
-		    .NativeTextBox(b => b.Placeholder("..."));
-		```
-		[Worked example](./examples/resident-intake/)
-	</Card>
-</CardGrid>
+The last step is always explicit: render the plan once with
+`Html.RenderPlan(plan)`.
 
-## Core Principles
+```csharp
+@{
+    var plan = Html.ReactivePlan<TodoModel>();
+}
 
-<CardGrid>
-	<Card title="Plan Is the Contract" icon="document">
-		The JSON plan is the **only** contract between C# and JS. No shortcuts, no manual JS in views.
-	</Card>
-	<Card title="Three Test Layers" icon="approve-check">
-		Every primitive is tested at C# unit, generated TypeScript contract/runtime unit, and Playwright browser layers.
-	</Card>
-	<Card title="Vertical Slices" icon="puzzle">
-		Each component is a self-contained 7-file slice. Duplication over abstraction. Zero shared base classes.
-	</Card>
-	<Card title="Zero Runtime Changes" icon="rocket">
-		Adding a new component requires only a new C# vertical slice. The JS runtime stays on the same component contract.
-	</Card>
-</CardGrid>
+@{ Html.InputField(plan, m => m.Title, o => o.Label("Title"))
+    .NativeTextBox(b => b.Placeholder("What needs to be done?")); }
 
-## Explore
+@(Html.NativeButton("save-btn", "Save")
+    .Reactive(plan, evt => evt.Click, (_, p) =>
+    {
+        p.Post("/Todo/Save", g => g.IncludeAll())
+         .Validate<TodoValidator>("todo-form")
+         .Response(r => r.OnSuccess(s =>
+             s.Component<FusionToast>()
+              .SetContent("Saved")
+              .Success()
+              .Show()));
+    }))
 
-<CardGrid>
-	<Card title="Getting Started" icon="star">
-		[Why Alis.Reactive?](./why/) — the problem and the solution.
-		[Your First Plan](./getting-started/your-first-plan/) — build a Todo app step by step.
-		[Resident Intake Example](./examples/resident-intake/) — full worked example with 25+ features.
-	</Card>
-	<Card title="Architecture" icon="setting">
-		[Three Layers](./architecture/three-layers/) — C#, JSON, JS.
-		[The Contract](./architecture/the-contract/) — JSON plan deep dive.
-		[Fluent Builders](./architecture/fluent-builders/) — how the DSL works.
-		[Vertical Slice](./architecture/vertical-slice/) — component architecture.
-	</Card>
-	<Card title="Features" icon="seti:csharp">
-		[Triggers](./csharp-modules/reactivity/triggers-and-reactions/) — DomReady, CustomEvent, .Reactive().
-		[Element Updates](./csharp-modules/reactivity/element-mutations/) — DOM text, HTML, classes, visibility.
-		[Conditions](./csharp-modules/reactivity/conditions/) — When/Then/Else with 21 operators.
-		[HTTP Pipeline](./csharp-modules/reactivity/http-pipeline/) — GET/POST, Gather, Response, Parallel.
-		[HTTP Pipeline Extensions](./csharp-modules/reactivity/http-pipeline-extensions/) — Headers, URL Templates, URL Query Params.
-		[Plugin System](./csharp-modules/reactivity/plugins/) — JS plugin reads, void calls, nesting.
-	</Card>
-	<Card title="Components" icon="puzzle">
-		[Overview](./components/overview/) — vendor-agnostic component model.
-		[Native](./components/native-components/) — 8 HTML input components.
-		[Syncfusion](./components/fusion/) — 22 Syncfusion EJ2 components.
-	</Card>
-</CardGrid>
+@Html.RenderPlan(plan)
+```
+
+The JSON plan is the contract. C# does not execute browser behavior. The runtime
+does not invent behavior outside the plan.
+
+## Read Next
+
+- [Why Alis.Reactive?](./why/)
+- [Your First Plan](./getting-started/your-first-plan/)
+- [Reactive Plan](./csharp-modules/mental-model/)
+- [Events, Payloads, Members](./csharp-modules/reactivity/events-members-values/)
+- [HTTP and Validation](./csharp-modules/reactivity/http-and-validation/)

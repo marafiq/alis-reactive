@@ -1,111 +1,82 @@
 ---
-title: Components Overview
-description: Every input component available in Reactive -- native HTML and Syncfusion EJ2 -- with their key properties and methods.
-sidebar:
-  order: 1
+title: Components
+description: How native, Fusion, and app-level components fit the same public DSL.
 ---
 
-## What does `Html.InputField` do?
+Components are browser objects registered in the Reactive Plan.
 
-It creates a labeled, validation-ready wrapper around any input component. You pick the model property, set options, then chain the component builder:
+They all follow the same shape: event, payload, property, method.
 
-```csharp
-Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident Name"))
-    .NativeTextBox(b => b.Placeholder("Enter name"));
-```
+## Render
 
-That single call does three things: registers the input component in the plan, renders the HTML with a label and validation slot, and makes the component available for `.Reactive()` event wiring, gather, and `When()` conditions.
-
-## How do I interact with a component after it renders?
-
-Through `p.Component<T>(m => m.Property)` inside any pipeline. This gives you a `ComponentRef` with typed extension methods:
+Model-bound components start with `Html.InputField(...)`.
 
 ```csharp
-// Write a value
-p.Component<NativeTextBox>(m => m.ResidentName).SetValue("Jane Doe");
-
-// Read a value (as a typed source for conditions or SetText)
-var comp = p.Component<NativeTextBox>(m => m.ResidentName);
-p.Element("echo").SetText(comp.Value());
+@{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care Level"))
+    .FusionDropDownList(b => b.Placeholder("Select care level")); }
 ```
 
-## Native Components
+The model expression gives the component a deterministic ID. The same expression
+targets the component later.
 
-Standard HTML elements. Vendor is `"native"` -- the runtime reads directly from the DOM element (`el.value`, `el.checked`).
+## React
 
-| Component | HTML Element | ValueMember | Value Type | Key Methods |
-|-----------|-------------|-------------|------------|-------------|
-| `NativeTextBox` | `<input type="text">` | `"value"` | `string` | `SetValue`, `FocusIn`, `Value()` |
-| `NativeCheckBox` | `<input type="checkbox">` | `"checked"` | `bool` | `SetChecked`, `FocusIn`, `Value()` |
-| `NativeDropDown` | `<select>` | `"value"` | `string` | `SetValue`, `FocusIn`, `Value()` |
-| `NativeTextArea` | `<textarea>` | `"value"` | `string` | `SetValue`, `FocusIn`, `Value()` |
-| `NativeCheckList` | checkbox group | `"value"` | `string[]` | `SetValue`, `FocusIn`, `Value()` |
-| `NativeRadioGroup` | radio group | `"value"` | `string` | `SetValue`, `FocusIn`, `Value()` |
-| `NativeButton` | `<button>` | -- | -- | `SetText`, `FocusIn` |
-| `NativeHiddenField` | `<input type="hidden">` | `"value"` | `string` | `SetValue`, `Value()` |
-
-All input components fire a `Changed` event. NativeButton fires `Click` instead.
-
-## Syncfusion Components
-
-Syncfusion EJ2 components. Vendor is `"fusion"` -- the runtime reads via `el.ej2_instances[0]`.
-
-| Component | Syncfusion Control | ValueMember | Value Type | Key Methods |
-|-----------|-----------|-------------|------------|-------------|
-| `FusionAutoComplete` | AutoComplete | `"value"` | `string` | `SetValue`, `SetText`, `SetDataSource`, `DataBind`, `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup`, `Enable`, `Disable` |
-| `FusionNumericTextBox` | NumericTextBox | `"value"` | `decimal` | `SetValue`, `SetMin`, `FocusIn`, `FocusOut`, `Increment`, `Decrement` |
-| `FusionDatePicker` | DatePicker | `"value"` | `DateTime` | `SetValue`, `FocusIn`, `FocusOut` |
-| `FusionDateTimePicker` | DateTimePicker | `"value"` | `DateTime` | `SetValue`, `FocusIn`, `FocusOut` |
-| `FusionTimePicker` | TimePicker | `"value"` | `DateTime` | `SetValue`, `FocusIn`, `FocusOut` |
-| `FusionDateRangePicker` | DateRangePicker | `"value"` | `DateTime[]` | `StartDate()`, `EndDate()`, `Value()` |
-| `FusionDropDownList` | DropDownList | `"value"` | `string` | `SetValue`, `SetText`, `SetDataSource`, `DataBind`, `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup` |
-| `FusionMultiSelect` | MultiSelect | `"value"` | `string[]` | `SetValue`, `SetDataSource`, `DataBind`, `ShowPopup`, `HidePopup` |
-| `FusionMultiColumnComboBox` | MultiColumnComboBox | `"value"` | `string` | `SetValue`, `SetText`, `SetDataSource`, `DataBind`, `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup` |
-| `FusionSwitch` | Switch | `"checked"` | `bool` | `SetChecked` |
-| `FusionInputMask` | MaskedTextBox | `"value"` | `string` | `SetValue`, `FocusIn` |
-| `FusionRichTextEditor` | RichTextEditor | `"value"` | `string` | `SetValue`, `FocusIn` |
-| `FusionFileUpload` | Uploader | `"filesData"` | -- | read-only, no `SetValue` |
-| `FusionInPlaceEditor` | InPlaceEditor | `"value"` | `string` | `SetValue`, `Enable`, `Disable`, `Save`, `Focus`, `Validate` |
-
-All Fusion input components fire `Changed`. Some also fire `Filtering` (AutoComplete, MultiSelect), `Focus`/`Blur` (NumericTextBox, DropDownList), or `Selected` (FileUpload).
-
-## App-Level Components
-
-Singletons that exist once per page. Referenced without a model expression -- no `Html.InputField`, no binding path.
-
-| Component | Vendor | Default ID | Key Methods |
-|-----------|--------|-----------|-------------|
-| `NativeDrawer` | native | `"alis-drawer"` | `Open`, `Close`, `SetSize` |
-| `NativeLoader` | native | `"alis-loader"` | `Show`, `Hide`, `SetTarget`, `SetTimeout` |
-| `FusionToast` | fusion | `"alisFusionToast"` | `SetTitle`, `SetContent`, `SetTimeout`, `Success`, `Warning`, `Danger`, `Info`, `Show`, `Hide`, `ShowCloseButton`, `ShowProgressBar` |
-| `FusionConfirm` | fusion | `"alisConfirmDialog"` | `SetContent`, `Show`, `Hide` |
-
-### How do I use them?
+Component `.Reactive(...)` attaches a typed event.
 
 ```csharp
-// Drawer -- set title, size, load content, open
-p.Element("alis-drawer-title").SetText("Resident Details");
-p.Component<NativeDrawer>().SetSize(DrawerSize.Md);
-p.Component<NativeDrawer>().Open();
-
-// Toast -- configure and show
-p.Component<FusionToast>().SetContent("Saved").Success().Show();
-
-// Loader -- show/hide around an HTTP request
-p.Component<NativeLoader>().Show();
+.Reactive(plan, evt => evt.Changed, (args, p) =>
+{
+    p.When(args, x => x.Value).Eq("memory")
+     .Then(t => t.Element("memory-care-panel").Show())
+     .Else(e => e.Element("memory-care-panel").Hide());
+})
 ```
 
-They must be rendered once in your layout:
+The payload type belongs to the selected event. IntelliSense shows the payload
+members for that event.
+
+## Target
+
+Use `p.Component<TComponent>(...)` to work with the component later.
 
 ```csharp
-@Html.NativeDrawer()
-@Html.NativeLoader()
-@Html.FusionToast()
-@Html.FusionConfirmDialog()
+p.Component<FusionDropDownList>(m => m.CareLevel)
+ .SetValue("assisted")
+ .DataBind();
 ```
 
-## Where is the architecture behind all this?
+Each extension method maps to a real browser member.
 
-Every component -- native or Syncfusion -- follows the same pattern: a sealed C# class declares `Vendor` and, for inputs, `ValueMember`; typed extensions declare the BrowserObject members needed by the Reactive Plan; and the runtime executes those contracts through one component-object path. Adding a normal component requires zero runtime changes.
+## Read
 
-For the full architecture, see [Component Model](../../architecture/component-model/) and [The Vertical Slice](../../architecture/vertical-slice/).
+Readable members return typed sources.
+
+```csharp
+var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel).Value();
+
+p.When(careLevel).Eq("memory")
+ .Then(t => t.Element("memory-care-panel").Show());
+```
+
+The same typed source can feed conditions, gather, dispatch payloads, and plugin
+arguments.
+
+## Families
+
+| Family | Use for |
+| --- | --- |
+| Native | Normal HTML inputs and buttons. |
+| Fusion | Syncfusion EJ2 controls with richer browser behavior. |
+| App-level | Layout-owned services such as toast, confirm, loader, and drawer. |
+
+App-level components are targeted without a model expression:
+
+```csharp
+p.Component<FusionToast>()
+ .SetContent("Saved")
+ .Success()
+ .Show();
+```
+
+Do not learn Alis.Reactive by memorizing every component. Learn the object
+model. A new component should still read as event, payload, property, method.
