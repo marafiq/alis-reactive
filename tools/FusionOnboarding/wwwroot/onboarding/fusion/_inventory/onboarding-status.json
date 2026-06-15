@@ -5,20 +5,20 @@
   "summary": {
     "componentCount": 51,
     "audited": 16,
-    "withTypedMatrix": 18,
-    "totalMatrixRows": 738,
+    "withTypedMatrix": 17,
+    "totalMatrixRows": 671,
     "rowProvenMatrixRows": 670,
-    "unprovenMatrixRows": 68,
-    "totalRawProbes": 74,
+    "unprovenMatrixRows": 1,
+    "totalRawProbes": 72,
     "totalRawTraces": 44,
     "byStatus": {
       "artifact-incomplete": 35,
       "audited": 16
     },
     "byNextStage": {
-      "mapping": 32,
+      "mapping": 30,
       "audited": 16,
-      "static-discovery": 3
+      "static-discovery": 5
     }
   },
   "components": [
@@ -1267,7 +1267,7 @@
       "componentName": "Schedule",
       "artifactName": "schedule",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/schedule",
-      "requiredPresent": 3,
+      "requiredPresent": 2,
       "requiredTotal": 12,
       "missingRequired": [
         "discovery/mvc-builder-coverage.md",
@@ -1277,6 +1277,7 @@
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
+        "proof/typed-api-coverage-matrix.md",
         "proof/playwright-proof.md",
         "proof/audit-report.md"
       ],
@@ -1284,21 +1285,12 @@
       "probeCount": 0,
       "traceCount": 0,
       "matrix": {
-        "exists": true,
-        "status": "unproven",
-        "totalRows": 67,
+        "exists": false,
+        "status": "missing",
+        "totalRows": 0,
         "rowProvenRows": 0,
-        "unprovenRows": 67,
-        "firstUnprovenRow": {
-          "publicApi": "FusionScheduleActionBeginArgs",
-          "kind": "event-payload-contract",
-          "source": "Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnActionBegin.cs",
-          "rawTrace": "pending",
-          "primitiveMap": "pending",
-          "verticalSlice": "pending",
-          "playwrightProof": "pending",
-          "status": "unproven"
-        }
+        "unprovenRows": 0,
+        "firstUnprovenRow": null
       },
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
@@ -1306,7 +1298,7 @@
         "stage": "static-discovery",
         "action": "create missing artifact discovery/mvc-builder-coverage.md",
         "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component schedule --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
-        "reason": "9 required artifact files are missing"
+        "reason": "10 required artifact files are missing"
       }
     },
     {
@@ -1370,9 +1362,13 @@
       "componentName": "SmartPasteButton",
       "artifactName": "smart-paste-button",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/smart-paste-button",
-      "requiredPresent": 6,
+      "requiredPresent": 2,
       "requiredTotal": 12,
       "missingRequired": [
+        "discovery/mvc-builder-coverage.md",
+        "discovery/blazor-candidates.md",
+        "discovery/public-api-surface.json",
+        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1381,7 +1377,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 1,
+      "probeCount": 0,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1394,10 +1390,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "mapping",
-        "action": "create missing artifact mapping/primitive-map.md",
-        "command": "complete the previous gate before writing this artifact",
-        "reason": "6 required artifact files are missing"
+        "stage": "static-discovery",
+        "action": "create missing artifact discovery/mvc-builder-coverage.md",
+        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component smart-paste-button --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
+        "reason": "10 required artifact files are missing"
       }
     },
     {
@@ -1405,9 +1401,13 @@
       "componentName": "SmartTextArea",
       "artifactName": "smart-text-area",
       "artifactRoot": "tools/FusionOnboarding/wwwroot/onboarding/fusion/smart-text-area",
-      "requiredPresent": 6,
+      "requiredPresent": 2,
       "requiredTotal": 12,
       "missingRequired": [
+        "discovery/mvc-builder-coverage.md",
+        "discovery/blazor-candidates.md",
+        "discovery/public-api-surface.json",
+        "discovery/event-payload-surface.json",
         "mapping/primitive-map.md",
         "mapping/csharp-name-decisions.md",
         "mapping/vertical-slice-plan.md",
@@ -1416,7 +1416,7 @@
         "proof/audit-report.md"
       ],
       "unlinkedRequired": [],
-      "probeCount": 1,
+      "probeCount": 0,
       "traceCount": 0,
       "matrix": {
         "exists": false,
@@ -1429,10 +1429,10 @@
       "openAuditMarkers": false,
       "mechanicalStatus": "artifact-incomplete",
       "nextAction": {
-        "stage": "mapping",
-        "action": "create missing artifact mapping/primitive-map.md",
-        "command": "complete the previous gate before writing this artifact",
-        "reason": "6 required artifact files are missing"
+        "stage": "static-discovery",
+        "action": "create missing artifact discovery/mvc-builder-coverage.md",
+        "command": "node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs --component smart-text-area --class <SyncfusionClass> --namespace <ej.namespace> --dts <path> --xml <path> --write",
+        "reason": "10 required artifact files are missing"
       }
     },
     {
