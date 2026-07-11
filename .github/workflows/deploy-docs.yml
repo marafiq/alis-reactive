@@ -11,8 +11,6 @@ on:
       - 'Alis.Reactive.Fusion/**'
       - 'Alis.Reactive.FluentValidator/**'
       - 'Alis.Reactive.SandboxApp/wwwroot/**'
-      - 'examples/**'
-      - 'scripts/rebuild-example-app.sh'
       - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
@@ -34,18 +32,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-
-      - name: Regenerate example zip
-        working-directory: .
-        run: ./scripts/rebuild-example-app.sh
-
-      - name: Install D2 diagram tool
-        run: curl -fsSL https://d2lang.com/install.sh | sh -s --
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -62,116 +48,8 @@ jobs:
           name: docs-dist
           path: docs-site/dist
 
-  playwright:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: package-lock.json
-
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Build JS + CSS bundles
-        run: npm run build:all
-
-      - name: Build all C# projects
-        run: dotnet build
-
-      - name: Install Playwright browsers
-        run: pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
-
-      - name: Run Playwright tests (attempt 1)
-        id: pw1
-        run: |
-          dotnet test tests/Alis.Reactive.PlaywrightTests \
-            --no-build \
-            --logger "html;LogFileName=playwright-report.html" \
-            --logger "trx;LogFileName=playwright-results.trx" \
-            --results-directory TestResults \
-            -- NUnit.NumberOfTestWorkers=1
-        continue-on-error: true
-
-      - name: Retry failed tests (attempt 2)
-        id: pw2
-        if: steps.pw1.outcome == 'failure'
-        run: |
-          FAILED=$(grep 'outcome="Failed"' TestResults/playwright-results.trx \
-            | sed 's/.*testName="//' | sed 's/".*//' | sort -u \
-            | grep -v "ResultSummary" | paste -sd '|' -)
-          if [ -n "$FAILED" ]; then
-            echo "Retrying: $FAILED"
-            dotnet test tests/Alis.Reactive.PlaywrightTests \
-              --no-build --filter "$FAILED" \
-              --logger "html;LogFileName=retry-2-report.html" \
-              --logger "trx;LogFileName=retry-2-results.trx" \
-              --results-directory TestResults \
-              -- NUnit.NumberOfTestWorkers=1
-          fi
-        continue-on-error: true
-
-      - name: Retry failed tests (attempt 3)
-        id: pw3
-        if: steps.pw2.outcome == 'failure'
-        run: |
-          FAILED=$(grep 'outcome="Failed"' TestResults/retry-2-results.trx \
-            | sed 's/.*testName="//' | sed 's/".*//' | sort -u \
-            | grep -v "ResultSummary" | paste -sd '|' -)
-          if [ -n "$FAILED" ]; then
-            echo "Retrying: $FAILED"
-            dotnet test tests/Alis.Reactive.PlaywrightTests \
-              --no-build --filter "$FAILED" \
-              --logger "html;LogFileName=retry-3-report.html" \
-              --logger "trx;LogFileName=retry-3-results.trx" \
-              --results-directory TestResults \
-              -- NUnit.NumberOfTestWorkers=1
-          fi
-        continue-on-error: true
-
-      - name: Retry failed tests (attempt 4 — final)
-        id: pw4
-        if: steps.pw3.outcome == 'failure'
-        run: |
-          FAILED=$(grep 'outcome="Failed"' TestResults/retry-3-results.trx \
-            | sed 's/.*testName="//' | sed 's/".*//' | sort -u \
-            | grep -v "ResultSummary" | paste -sd '|' -)
-          if [ -n "$FAILED" ]; then
-            echo "Final retry: $FAILED"
-            dotnet test tests/Alis.Reactive.PlaywrightTests \
-              --no-build --filter "$FAILED" \
-              --logger "html;LogFileName=retry-4-report.html" \
-              --logger "trx;LogFileName=retry-4-results.trx" \
-              --results-directory TestResults \
-              -- NUnit.NumberOfTestWorkers=1
-          fi
-        continue-on-error: true
-
-      - name: Upload Playwright report + screenshots
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: |
-            TestResults/playwright-report.html
-            TestResults/playwright-results.trx
-            TestResults/retry-*-report.html
-            TestResults/retry-*-results.trx
-            TestResults/playwright-traces/
-          retention-days: 14
-
   deploy:
-    needs: [build-docs, playwright]
-    if: always() && needs.build-docs.result == 'success'
+    needs: build-docs
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -183,14 +61,7 @@ jobs:
           name: docs-dist
           path: site
 
-      - name: Download Playwright report
-        uses: actions/download-artifact@v4
-        continue-on-error: true
-        with:
-          name: playwright-report
-          path: site/reports/playwright
-
-      - name: Upload merged Pages artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: site

@@ -1,22 +1,29 @@
 ---
 title: Your First Reactive Plan
-description: Build a Todo app step by step — model, validator, view — with zero JavaScript.
+description: Build one reactive Razor view with inputs, an event, validation, HTTP, and a toast.
 ---
 
-Build a Todo page step by step. By the end you'll have conditional visibility, client-side validation, and an HTTP post with a toast notification — all in C#.
+This page builds one small Todo form. It uses the public DSL only.
 
-## Prerequisites
+## Install Packages
 
-Add the framework packages to your ASP.NET MVC project:
+Use the same package version for each Alis.Reactive package.
 
 ```xml
-<!-- YourApp.csproj -->
-<PackageReference Include="Alis.Reactive.Native" />
-<PackageReference Include="Alis.Reactive.Fusion" />
-<PackageReference Include="Alis.Reactive.FluentValidator" />
+<PackageReference Include="AlisReactive.Native" Version="..." />
+<PackageReference Include="AlisReactive.Fusion" Version="..." />
+<PackageReference Include="AlisReactive.FluentValidator" Version="..." />
 ```
 
-In `Program.cs`, register reactive validation:
+If you use the design system directly, add:
+
+```xml
+<PackageReference Include="AlisReactive.DesignSystem" Version="..." />
+```
+
+## Register Validation
+
+Register the FluentValidation bridge in `Program.cs`.
 
 ```csharp
 using Alis.Reactive.FluentValidator;
@@ -25,24 +32,27 @@ builder.Services.AddReactiveFluentValidation(validation =>
     validation.AddFromAssemblyContaining<Program>());
 ```
 
-In `_Layout.cshtml`, load the runtime (once, for all pages). `AlisReactive.targets`
-in the NuGet package copies the bundle into your `wwwroot/scripts/` with your
-package version baked in — reference it with the same version:
+## Load Browser Assets
+
+Package builds copy versioned assets into `wwwroot`. Link the copied filenames
+from `_Layout.cshtml`.
 
 ```html
-<link rel="stylesheet" href="~/css/design-system.@Version.css" asp-append-version="true"/>
-<script src="~/scripts/alis-reactive.@Version.js" asp-append-version="true"></script>
+<link rel="stylesheet" href="~/css/design-system.{version}.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/syncfusion.{version}.css" asp-append-version="true" />
+
+<script src="https://cdn.syncfusion.com/ej2/32.2.8/dist/ej2.min.js"></script>
+@Html.EJS().ScriptManager()
+@Html.FusionToast()
+<script src="~/scripts/alis-reactive.{version}.js" asp-append-version="true"></script>
 ```
 
-Replace `@Version` with your installed AlisReactive package version
-(e.g. `1.0.0`). The bundle is a classic IIFE script — do not add `type="module"`.
+Replace `{version}` with the package version you installed.
 
-## Step 1: The Model
-
-Create `Models/TodoModel.cs`:
+## Create the Model
 
 ```csharp
-public class TodoModel
+public sealed class TodoModel
 {
     public string? Title { get; set; }
     public bool IsUrgent { get; set; }
@@ -50,15 +60,15 @@ public class TodoModel
 }
 ```
 
-## Step 2: The Validator
+## Create the Validator
 
-Create `Validators/TodoValidator.cs`:
+`ClientRule(...)` records metadata for browser validation and also adds the
+server-side FluentValidation rule.
 
 ```csharp
 using Alis.Reactive.FluentValidator;
-using FluentValidation;
 
-public class TodoValidator : ReactiveValidator<TodoModel>
+public sealed class TodoValidator : ReactiveValidator<TodoModel>
 {
     public TodoValidator()
     {
@@ -68,97 +78,82 @@ public class TodoValidator : ReactiveValidator<TodoModel>
 
         WhenField(x => x.IsUrgent, () =>
         {
-            ClientRule(x => x.DueDate).Required("Urgent todos need a due date");
+            ClientRule(x => x.DueDate)
+                .Required("Urgent todos need a due date.");
         });
     }
 }
 ```
 
-`ReactiveValidator<T>` extends `AbstractValidator<T>`. `WhenField` works both server-side (FluentValidation's `.When()`) and client-side (extracted into the JSON plan as a conditional rule). One rule, two enforcement points, zero drift.
+Plain `RuleFor(...)` is server-only. Use `ClientRule(...)` for rules that must
+be in the Reactive Plan.
 
-## Step 3: The Controller
-
-Create `Controllers/TodoController.cs`:
+## Add the Endpoint
 
 ```csharp
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
-public class TodoController(IValidator<TodoModel> validator) : Controller
+public sealed class TodoController(IValidator<TodoModel> validator) : Controller
 {
     public IActionResult Index() => View(new TodoModel());
 
     [HttpPost]
-    public IActionResult Save([FromBody] TodoModel? model)
+    public IActionResult Save([FromBody] TodoModel model)
     {
-        if (model == null)
-            return BadRequest(new { errors = new Dictionary<string, string[]>
-                { ["Title"] = new[] { "Request body is required." } } });
-
         var result = validator.Validate(model);
 
         if (!result.IsValid)
         {
             var errors = result.Errors
                 .GroupBy(e => e.PropertyName)
-                .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(e => e.ErrorMessage).ToArray());
+
             return BadRequest(new { errors });
         }
 
-        return Ok(new { message = "Todo saved!" });
+        return Ok(new { message = "Todo saved." });
     }
 }
 ```
 
-Register the validator in `Program.cs` (FluentValidation's DI is built-in):
+## Add the View
 
-```csharp
-builder.Services.AddScoped<IValidator<TodoModel>, TodoValidator>();
-```
-
-The `Save` endpoint runs the same `TodoValidator` server-side via DI. On validation failure it returns 400 with an `errors` dictionary — the runtime's `ValidationErrors("todo-form")` routes these to the correct fields.
-
-## Step 4: The View
-
-Create `Views/Todo/Index.cshtml`:
+The view creates the plan, renders inputs, wires events, and renders the plan at
+the end.
 
 ```csharp
 @model TodoModel
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Builders.Requests
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.AppLevel
+
 @{
     var plan = Html.ReactivePlan<TodoModel>();
 }
 
-<h1>New Todo</h1>
-
 <form id="todo-form">
-    @{ Html.InputField(plan, m => m.Title, o => o.Required().Label("Title"))
-        .NativeTextBox(b => b
-            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-            .Placeholder("What needs to be done?")); }
+    @{ Html.InputField(plan, m => m.Title, o => o.Label("Title").Required())
+        .NativeTextBox(b => b.Placeholder("What needs to be done?")); }
 
     @{ Html.InputField(plan, m => m.IsUrgent, o => o.Label("Urgent"))
-        .NativeCheckBox(b => b
-            .CssClass("h-4 w-4 rounded border-border text-accent")
-            .Reactive(plan, evt => evt.Changed, (args, p) =>
-            {
-                p.When(args, a => a.Checked).Truthy()
-                    .Then(t => t.Element("due-date-section").Show())
-                    .Else(e => e.Element("due-date-section").Hide());
-            })); }
+        .NativeCheckBox(b => b.Reactive(plan, evt => evt.Changed, (args, p) =>
+        {
+            p.When(args, x => x.Checked).Truthy()
+             .Then(t => t.Element("due-date").Show())
+             .Else(e => e.Element("due-date").Hide());
+        })); }
 
-    <div id="due-date-section" hidden>
+    <div id="due-date" hidden>
         @{ Html.InputField(plan, m => m.DueDate, o => o.Label("Due Date"))
             .FusionDatePicker(b => b.Placeholder("Select due date")); }
     </div>
 
-    @(Html.NativeButton("save-btn", "Save Todo")
-        .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
-        .Reactive(plan, evt => evt.Click, (args, p) =>
+    @(Html.NativeButton("save-btn", "Save")
+        .Reactive(plan, evt => evt.Click, (_, p) =>
         {
             p.Post("/Todo/Save", g => g.IncludeAll())
              .Validate<TodoValidator>("todo-form")
@@ -166,10 +161,10 @@ Create `Views/Todo/Index.cshtml`:
                 .OnSuccess(s =>
                 {
                     s.Component<FusionToast>()
-                        .SetTitle("Todo")
-                        .SetContent("Todo saved successfully")
-                        .Success()
-                        .Show();
+                     .SetTitle("Todo")
+                     .SetContent("Todo saved.")
+                     .Success()
+                     .Show();
                 })
                 .OnError(400, e => e.ValidationErrors("todo-form")));
         }))
@@ -178,21 +173,18 @@ Create `Views/Todo/Index.cshtml`:
 @Html.RenderPlan(plan)
 ```
 
-## What Just Happened
+## What Happened
 
-Four files — `TodoModel.cs`, `TodoValidator.cs`, `TodoController.cs`, `Index.cshtml` — produce a page with three interactive behaviors:
+`Html.ReactivePlan<TModel>()` creates the plan for this view.
 
-- **Conditional visibility.** `Html.InputField` renders the checkbox bound to `m => m.IsUrgent`. `.Reactive()` wires its `change` event. `When/Then/Else` evaluates `args.Checked` (typed as `bool?`) and shows or hides the due date section.
+`Html.InputField(...)` registers each model-bound input. The runtime later uses
+those registrations for gather and validation.
 
-- **Client-side validation.** `Validate<TodoValidator>` embeds the validator's `ClientRule(...)` metadata in the JSON plan at render time. The `WhenField(x => x.IsUrgent)` conditional rule only fires when the checkbox is checked. Validation runs before the HTTP request — if it fails, the request never fires.
+`.Reactive(...)` wires a typed component event. The checkbox payload exposes
+`Checked`, so the condition reads `args.Checked`.
 
-- **HTTP post with toast.** `IncludeAll()` gathers `Title`, `IsUrgent`, and `DueDate` from all registered components. On success, `FusionToast` shows a notification. On 400, `ValidationErrors` routes server errors to the form fields.
+`p.Post(...).Gather(...)` sends values read from registered inputs. The
+`Validate<TValidator>(...)` call runs client validation before the request.
 
-Native checkbox and Syncfusion DatePicker in the same form, same fluent API. Zero JavaScript.
-
-You can see this example running in the sandbox at `/Sandbox/Todo`.
-
-## Next Steps
-
-- [The Contract](../../architecture/the-contract/) -- how the JSON plan works
-- [Features](../../csharp-modules/plans-and-rendering/) -- full reference for plans, triggers, conditions, and HTTP
+`Response(...)` routes success and error outcomes. The success path writes to
+the app-level `FusionToast`. The error path displays server validation errors.

@@ -1,43 +1,4 @@
-/* ── D2 diagrams — compact inline, click to open full size ── */
-svg[data-d2-version] {
-  max-height: 250px;
-  width: auto;
-  margin: 1rem auto;
-  display: block;
-  cursor: zoom-in;
-  transition: opacity 0.15s;
-  border-radius: 6px;
-}
-
-svg[data-d2-version]:hover {
-  opacity: 0.8;
-}
-
-/* Full-screen modal overlay */
-.d2-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: zoom-out;
-  padding: 2rem;
-}
-
-.d2-modal svg {
-  max-width: 90vw;
-  max-height: 90vh;
-  width: auto;
-  height: auto;
-  background: white;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-}
-
-/* ── Hide right TOC sidebar — content gets full width ── */
+/* Keep the compact docs readable for code-heavy pages. */
 .right-sidebar-container {
   display: none;
 }
@@ -46,7 +7,6 @@ svg[data-d2-version]:hover {
   --sl-content-width: 100%;
 }
 
-/* ── Light theme readability ── */
 :root[data-theme='light'] {
   --sl-color-text: #1a1a2e;
   --sl-color-text-accent: #2563eb;
@@ -76,4 +36,8 @@ svg[data-d2-version]:hover {
 
 :root[data-theme='light'] .sl-markdown-content th {
   background: #f8fafc;
+}
+
+.sl-markdown-content table {
+  font-size: 0.92rem;
 }
