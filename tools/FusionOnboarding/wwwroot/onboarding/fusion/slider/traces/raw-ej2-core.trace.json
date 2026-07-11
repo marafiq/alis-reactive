@@ -1,0 +1,80 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "slider",
+  "apiSet": "core",
+  "probe": "onboarding/fusion/slider/probes/raw-ej2-core.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "created",
+      "value": {
+        "functions": [],
+        "ownKeys": [],
+        "properties": {},
+        "value": "undefined"
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "ready",
+      "value": {
+        "apiSet": "core",
+        "className": "Slider",
+        "component": "slider",
+        "namespace": "ej.inputs"
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "own keys",
+      "value": [
+        "activeHandle",
+        "allowFiltering",
+        "allowPaging",
+        "allowServerDataBinding",
+        "allowSorting",
+        "bulkChanges",
+        "changedProperties",
+        "childChangedProperties",
+        "columns",
+        "customAriaText",
+        "dataSource",
+        "drag",
+        "element",
+        "finalUpdate",
+        "firstHandle",
+        "handlePos1",
+        "handleVal1",
+        "hiddenInput",
+        "horDir",
+        "ignoreCollectionWatch"
+      ]
+    },
+    {
+      "sequence": 4,
+      "label": "prototype methods",
+      "value": [
+        "accessMount",
+        "add",
+        "addEventListener",
+        "addInstance",
+        "addOnPersist",
+        "addTooltipClass",
+        "appendTo",
+        "attachUnloadEvent",
+        "buttonClick",
+        "buttonFocusOut",
+        "buttonTitle",
+        "buttonUp",
+        "change",
+        "changeEvent",
+        "changeEventArgs",
+        "changeHandleValue",
+        "changeOrientation",
+        "changeRtl",
+        "changeSliderType",
+        "changed"
+      ]
+    }
+  ]
+}

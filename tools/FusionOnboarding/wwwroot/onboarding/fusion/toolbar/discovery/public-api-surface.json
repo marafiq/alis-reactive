@@ -1,0 +1,294 @@
+{
+  "component": "toolbar",
+  "counts": {
+    "builderMethods": 20,
+    "events": 5,
+    "members": 22,
+    "methods": 8,
+    "properties": 9
+  },
+  "fusionType": "FusionToolbar",
+  "members": [
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "addItems",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "items: ItemModel[], index?: number) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowKeyboard",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeCreate",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "BeforeCreateArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "changeOrientation",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "clicked",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "ClickEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "created",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "Event"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "cssClass",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "skip: lifecycle cleanup, not Fusion plan behavior",
+      "kind": "method",
+      "name": "destroy",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "destroyed",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "Event"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "disable",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "value: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableCollision",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableHtmlSanitizer",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "enableItems",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "items: number | HTMLElement | NodeList, isEnable?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String",
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "height",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "string | number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "hideItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "index: number | HTMLElement | Element, value?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Collections.Generic.List{Syncfusion.EJ2.Navigations.ToolbarItem}"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "items",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "ItemModel[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "keyDown",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "KeyDownEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Navigations.OverflowMode"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "overflowMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "OverflowMode"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "refreshOverflow",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "removeItems",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "args: number | HTMLElement | NodeList | Element | HTMLElement[]) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "scrollStep",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String",
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "width",
+      "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+      "type": "string | number"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "ToolbarBuilder",
+    "className": "Toolbar",
+    "dtsPath": "node_modules/@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts",
+    "jsPath": "",
+    "namespace": "ej.ej.navigations.Toolbar",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}

@@ -1364,3 +1364,42 @@ Common false-positive to reject:
 
 - treating the save-edit proof as covering add/delete because the C# class is
   shared - the runtime payload differs and the probe proves it.
+
+### P025: A Disabled-Item-Only Payload Member Is Proven Through The Gather Body, Not A Disabled-Item Click
+
+Trigger condition: a click-event payload carries a member whose interesting value
+(e.g. `true`) is only present when the clicked item is disabled/restricted
+(`item.disabled`, and similar per-item flags on list/nav components).
+
+Raw EJ2 evidence required (committed): observe in a real browser whether a disabled
+item fires the click event at all. First evidence: Syncfusion Breadcrumb sets
+`pointer-events: none` on `.e-breadcrumb-item.e-disabled`
+(`@syncfusion/ej2-navigations/styles/breadcrumb/*.css`), and a real-browser probe
+confirmed clicking a disabled crumb fires NO `itemClick`. The component's
+`clickHandler` only triggers `itemClick` for an enabled item, then sets that item
+active.
+
+Consequence for proof:
+
+- a real gesture can only ever deliver the member's enabled value (`disabled =
+  false`) - the disabled value is unreachable by any trusted click;
+- a visible Truthy/Else branch over the member CANNOT be fails-when-broken: a broken
+  read returns falsy/undefined and takes the same Else branch as a correct `false`,
+  so the assertion still passes (covered-by-variant inflation);
+- the fails-when-broken proof is the gather body: assert the member rides the POST
+  under its declared key with its enabled value (e.g. `"disabled":false`) via the
+  framework-gather `request.PostData` exception. If the member's payload mapping
+  breaks, the exact key/value is absent and the assertion fails.
+
+Resolution rule:
+
+- prove the member through the gather body (PostData) with the only reachable value,
+  OR exclude it with this evidence if no gather/use case exists;
+- never rely on clicking a disabled item, and never claim a Truthy/Else visible
+  branch proves the member.
+
+Common false-positive to reject:
+
+- a sandbox that puts a disabled item in the trail and a test that "clicks" it - the
+  click never fires the event (pointer-events:none), so the test proves nothing
+  about the member.

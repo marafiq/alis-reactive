@@ -15,5 +15,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 "~/Areas/Sandbox/Views/Components/Fusion/Toolbar/Index.cshtml",
                 new FusionToolbarModel());
         }
+
+        [HttpPost("Confirm")]
+        public IActionResult Confirm([FromBody] ResidentCommandRequest request)
+        {
+            return Ok(new ResidentCommandResponse
+            {
+                Confirmation = "Your payment of $248.50 was received. Reference: "
+                    + request.CommandId + "."
+            });
+        }
     }
 }

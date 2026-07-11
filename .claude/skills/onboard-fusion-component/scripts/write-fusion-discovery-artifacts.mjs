@@ -333,6 +333,17 @@ function describeType(typeName, files, cache, context, stack = []) {
     };
   }
 
+  if (isGlobalDomType(typeName)) {
+    return {
+      name: typeName,
+      status: "dom-native",
+      sourcePath: "",
+      extends: [],
+      members: [],
+      decision: "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload"
+    };
+  }
+
   const cacheKey = resolutionCacheKey(typeName, context);
   if (cache.has(cacheKey)) return cache.get(cacheKey);
   if (stack.includes(typeName)) {
@@ -517,6 +528,20 @@ function payloadResolutionProblems(events) {
 
 function isBuiltinPayloadType(typeName) {
   return ["Object", "object", "Function", "Record"].includes(typeName);
+}
+
+// Global/DOM browser types are well-defined and not Syncfusion declarations, so they
+// resolve as a known leaf (an event emitting one is not an onboardable Fusion payload)
+// instead of fail-closing as "not found". Accurate discovery, not a shortcut.
+function isGlobalDomType(typeName) {
+  return [
+    "Event", "UIEvent", "MouseEvent", "KeyboardEvent", "FocusEvent", "PointerEvent",
+    "TouchEvent", "WheelEvent", "InputEvent", "DragEvent", "ClipboardEvent",
+    "AnimationEvent", "TransitionEvent", "CompositionEvent", "ProgressEvent",
+    "Element", "HTMLElement", "HTMLInputElement", "HTMLDivElement", "HTMLCollection",
+    "Node", "NodeList", "EventTarget", "DataTransfer", "Date", "RegExp", "Promise",
+    "Blob", "File", "FileList", "Window", "Document"
+  ].includes(typeName);
 }
 
 function resolutionCacheKey(typeName, context) {

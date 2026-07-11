@@ -1,0 +1,80 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "time-picker",
+  "apiSet": "core",
+  "probe": "onboarding/fusion/time-picker/probes/raw-ej2-core.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "created",
+      "value": {
+        "functions": [],
+        "ownKeys": [],
+        "properties": {},
+        "value": "undefined"
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "ready",
+      "value": {
+        "apiSet": "core",
+        "className": "TimePicker",
+        "component": "time-picker",
+        "namespace": "ej.calendars"
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "own keys",
+      "value": [
+        "activeIndex",
+        "allowFiltering",
+        "allowPaging",
+        "allowServerDataBinding",
+        "allowSorting",
+        "anchor",
+        "angularTag",
+        "bulkChanges",
+        "changedProperties",
+        "childChangedProperties",
+        "cloneElement",
+        "columns",
+        "dataSource",
+        "defaultCulture",
+        "disableItemCollection",
+        "element",
+        "finalUpdate",
+        "formElement",
+        "formatString",
+        "globalize"
+      ]
+    },
+    {
+      "sequence": 4,
+      "label": "prototype methods",
+      "value": [
+        "accessMount",
+        "addEventListener",
+        "addInstance",
+        "addOnPersist",
+        "addSelection",
+        "appendTo",
+        "attachUnloadEvent",
+        "bindClearEvent",
+        "bindEvents",
+        "blur",
+        "change",
+        "changeEvent",
+        "checkAttributes",
+        "checkDateValue",
+        "checkErrorState",
+        "checkInValue",
+        "checkInvalidValue",
+        "checkTimeFormat",
+        "checkValue",
+        "checkValueChange"
+      ]
+    }
+  ]
+}

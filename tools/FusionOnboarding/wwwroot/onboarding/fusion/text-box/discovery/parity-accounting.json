@@ -1,0 +1,24 @@
+{
+  "component": "text-box",
+  "fusionType": "FusionTextBox",
+  "note": "Per-component parity JUDGMENT file read by compute-fusion-parity.mjs (its header names this the optional hand-authored judgment input). 'onboarded' lists vendor members the FusionTextBox C# slice already exposes as typed runtime DSL (Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxExtensions.cs). 'excluded' lists vendor members deliberately kept off the typed public surface, each with a source-grounded reason. Vendor surface evidence: node_modules/@syncfusion/ej2-inputs/src/textbox/textbox.d.ts.",
+  "onboarded": [
+    "addIcon",
+    "focusIn",
+    "focusOut"
+  ],
+  "excluded": [
+    {
+      "name": "addAttributes",
+      "reason": "Signature addAttributes(attributes: {[key:string]:string}): void takes an arbitrary stringly attribute dictionary (textbox.d.ts:299). Exposing it typed would put an open string->string member map on the public Fusion slice, which the onboarding operating rule and root Rule 8 forbid (no arbitrary member strings outside the plugin boundary). Initial HTML attributes are builder-owned via TextBoxBuilder.HtmlAttributes; arbitrary post-render attribute mutation is a plugin-boundary concern, not a typed component API."
+    },
+    {
+      "name": "removeAttributes",
+      "reason": "Signature removeAttributes(attributes: string[]): void takes an arbitrary array of attribute-name strings (textbox.d.ts:308). Same stringly-surface exclusion as addAttributes: a typed component slice must not accept arbitrary attribute-name strings. No senior-living journey (resident directory, billing, scheduling, care coordination) needs to strip arbitrary DOM attributes at runtime through the DSL; this stays a plugin-boundary escape hatch if ever needed."
+    },
+    {
+      "name": "readonly",
+      "reason": "boolean property controlling whether the user may change the text (textbox.d.ts:75, default false). Initial read-only state is builder-owned (TextBoxBuilder.Readonly at render); the common runtime disable-this-field need is already served by the builder-owned enabled property. A proven post-render read-only-toggle journey is not part of this slice and is recorded here as a deferred candidate rather than onboarded without behavior proof."
+    }
+  ]
+}

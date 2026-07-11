@@ -5,104 +5,98 @@
 @{
     ViewData["Title"] = "FusionRating";
 
-    var plan = Html.ReactivePlan<RatingModel>();
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+    const string SubmitReady = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
 
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        var rating = p.Component<FusionRating>(m => m.SatisfactionScore);
-        rating.SetValue(3);
-        p.Element("value-echo").SetText(rating.Value());
-    }));
+    var plan = Html.ReactivePlan<RatingModel>();
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionRating</native-heading>
+    <div>
+        <native-heading level="H1">Monthly Care Satisfaction Survey</native-heading>
+        <native-text color="Secondary">
+            We carried over the rating you submitted last month. Review it, update it if your experience has changed, then submit.
+        </native-text>
+    </div>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Value, Reset, and Events</native-heading>
-        <native-grid cols="C2" gap="Base">
-            @{ Html.InputField(plan, m => m.SatisfactionScore, o => o.Label("Satisfaction Score"))
+        <native-vstack gap="Base">
+            @{ Html.InputField(plan, m => m.SatisfactionScore, o => o.Label("Overall satisfaction with your care this month"))
                 .FusionRating(b => b
-                    .Value(2)
+                    .Value(Model.SatisfactionScore)
+                    .Min(0)
+                    .ItemsCount(5)
                     .AllowReset(true)
                     .ShowLabel(true)
                     .Reactive(plan, evt => evt.ValueChanged, (args, p) =>
                     {
-                        p.Element("changed-value").SetText(args, x => x.Value);
-                        p.Element("changed-previous").SetText(args, x => x.PreviousValue);
-                        p.Element("changed-interacted").SetText(args, x => x.IsInteracted);
-                        p.When(args, x => x.Value).Eq(0d)
-                            .Then(t => t.Element("args-condition").SetText("reset"))
-                            .Else(e => e.Element("args-condition").SetText("rated"));
+                        p.Element("survey-rating").SetText(args, x => x.Value);
+
+                        p.When(args, x => x.Value).Gte(4d)
+                            .Then(high => high.Element("survey-sentiment")
+                                .SetText("We're so glad your care is meeting your expectations."))
+                            .ElseIf(args, x => x.Value).Gte(1d)
+                            .Then(mid => mid.Element("survey-sentiment")
+                                .SetText("Thank you. A care manager will follow up to see how we can improve."))
+                            .Else(none => none.Element("survey-sentiment")
+                                .SetText("Please choose a rating to tell us how your care has been."));
+
+                        p.Element("survey-change-note").SetText(args, x => x.PreviousValue);
+
+                        p.When(args, x => x.IsInteracted).Truthy()
+                            .Then(ready => ready.Element("survey-readiness")
+                                .SetText("Thank you for rating your care yourself — your rating is ready to submit."))
+                            .Else(cleared => cleared.Element("survey-readiness")
+                                .SetText("Your rating was cleared. Please rate your care to continue."));
                     })); }
-        </native-grid>
 
-        <native-hstack gap="Sm" class="mt-4">
-            @(Html.NativeButton("set-rating-btn", "Set Rating")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var rating = p.Component<FusionRating>(m => m.SatisfactionScore);
-                    rating.SetValue(4);
-                    p.Element("value-echo").SetText(rating.Value());
-                    p.Element("command-state").SetText("rating set");
-                }))
-            @(Html.NativeButton("reset-rating-btn", "Reset Rating")
-                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var rating = p.Component<FusionRating>(m => m.SatisfactionScore);
-                    rating.Reset();
-                    p.Element("value-echo").SetText(rating.Value());
-                    p.Element("command-state").SetText("rating reset");
-                }))
-            @(Html.NativeButton("check-rating-btn", "Check Rating")
-                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var rating = p.Component<FusionRating>(m => m.SatisfactionScore);
-                    p.When(rating.Value()).Gte(3d)
-                        .Then(t => t.Element("rating-state").SetText("satisfied"))
-                        .Else(e => e.Element("rating-state").SetText("needs follow-up"));
-                }))
-        </native-hstack>
-    </native-card-body></native-card>
+            <native-vstack gap="Xs">
+                <native-text>
+                    Your rating: <span id="survey-rating" class="font-semibold text-text">@Model.SatisfactionScore</span> of 5 stars
+                </native-text>
+                <native-text color="Secondary"><span id="survey-sentiment">This is the rating you submitted last month.</span></native-text>
+                <native-text color="Secondary">Previous rating before this change: <span id="survey-change-note">@Model.SatisfactionScore</span> stars</native-text>
+            </native-vstack>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">Gather</native-heading>
-        @(Html.NativeButton("gather-btn", "Gather Rating")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var rating = p.Component<FusionRating>(m => m.SatisfactionScore);
-                p.Post(Url.SandboxRoute("Echo", "Rating"))
-                    .Gather(g => g.Include(rating.Value(), "satisfactionScore"))
-                    .Response(r => r.OnSuccess<RatingEchoResponse>((json, s) =>
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("restore-rating", "Restore my last submitted rating")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        s.Element("gather-score").SetText(json, x => x.SatisfactionScore);
-                        s.Element("gather-summary").SetText(json, x => x.Summary);
-                    }));
-            }))
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Trace</native-heading>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>Command: <span id="command-state" class="text-text-muted">&mdash;</span></p>
-            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-            <p>Changed value: <span id="changed-value" class="text-text-muted">&mdash;</span></p>
-            <p>Changed previous: <span id="changed-previous" class="text-text-muted">&mdash;</span></p>
-            <p>Changed interacted: <span id="changed-interacted" class="text-text-muted">&mdash;</span></p>
-            <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
-            <p>Rating state: <span id="rating-state" class="text-text-muted">&mdash;</span></p>
-            <p>Gather score: <span id="gather-score" class="text-text-muted">&mdash;</span></p>
-            <p>Gather summary: <span id="gather-summary" class="text-text-muted">&mdash;</span></p>
+                        p.Component<FusionRating>(m => m.SatisfactionScore).SetValue(Model.SatisfactionScore);
+                        p.Element("survey-rating").SetText(p.Component<FusionRating>(m => m.SatisfactionScore).Value());
+                        p.Element("survey-sentiment").SetText("Restored the rating you submitted last month.");
+                    }))
+                @(Html.NativeButton("clear-rating", "Clear my rating")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionRating>(m => m.SatisfactionScore).Reset();
+                    }))
+            </native-hstack>
         </native-vstack>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+        <native-vstack gap="Base">
+            <native-text color="Secondary"><span id="survey-readiness">Adjust your rating above, then submit.</span></native-text>
+            @(Html.NativeButton("survey-submit", "Submit my satisfaction rating")
+                .CssClass(SubmitReady)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var rating = p.Component<FusionRating>(m => m.SatisfactionScore);
+                    p.Post(Url.SandboxRoute("Echo", "Rating"))
+                        .Gather(g => g.Include(rating.Value(), "satisfactionScore"))
+                        .Response(r => r.OnSuccess<RatingEchoResponse>((json, s) =>
+                        {
+                            s.Element("survey-confirmation").SetText(json, x => x.Summary);
+                            s.Element("survey-confirmation-panel").RemoveClass("hidden");
+                        }));
+                }))
+            <div id="survey-confirmation-panel" class="hidden rounded-md border border-green-300 bg-green-50 p-4">
+                <native-text><span id="survey-confirmation" class="font-medium text-green-800"></span></native-text>
+            </div>
+        </native-vstack>
     </native-card-body></native-card>
 </native-vstack>
 

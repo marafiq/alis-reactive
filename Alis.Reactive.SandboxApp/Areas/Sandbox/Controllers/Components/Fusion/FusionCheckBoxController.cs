@@ -12,21 +12,35 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         {
             return View("~/Areas/Sandbox/Views/Components/Fusion/CheckBox/Index.cshtml", new FusionCheckBoxModel
             {
-                ConsentAccepted = false,
-                ReviewNeeded = false
+                AgreementAccepted = false,
+                WeeklyHousekeeping = false
             });
         }
 
-        [HttpPost("Echo")]
-        public IActionResult Echo([FromBody] FusionCheckBoxEchoRequest request)
+        [HttpPost("SaveAgreement")]
+        public IActionResult SaveAgreement([FromBody] MoveInAgreementRequest request)
         {
-            return Ok(new FusionCheckBoxEchoResponse
+            return Ok(new MoveInAgreementResponse
             {
-                Checked = request.Checked,
-                Indeterminate = request.Indeterminate,
-                Disabled = request.Disabled,
-                Summary = request.Checked + ":" + request.Indeterminate + ":" + request.Disabled
+                Summary = BuildSummary(request)
             });
+        }
+
+        private static string BuildSummary(MoveInAgreementRequest request)
+        {
+            if (!request.AgreementAccepted)
+            {
+                return "Please accept the residency agreement before saving your services.";
+            }
+
+            if (request.HousekeepingNeedsFollowUp)
+            {
+                return "Agreement saved. A coordinator will follow up about weekly housekeeping.";
+            }
+
+            return request.WeeklyHousekeeping
+                ? "Agreement saved. Weekly housekeeping is included in your move-in services."
+                : "Agreement saved. Weekly housekeeping was not added to your move-in services.";
         }
     }
 }

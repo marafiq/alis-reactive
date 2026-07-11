@@ -1,0 +1,235 @@
+{
+  "component": "date-picker",
+  "counts": {
+    "events": 7,
+    "payloadTypes": 6
+  },
+  "events": [
+    {
+      "event": "blur",
+      "eventType": "BlurEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BlurEventArgs",
+              "kind": "property",
+              "name": "model",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+              "type": "Object"
+            }
+          ],
+          "name": "BlurEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "cleared",
+      "eventType": "ClearedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ClearedEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+              "type": "MouseEvent | Event"
+            }
+          ],
+          "name": "ClearedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "close",
+      "eventType": "PreventableEventArgs | PopupObjectArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PreventableEventArgs",
+              "kind": "property",
+              "name": "preventDefault",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts",
+              "type": "Function"
+            }
+          ],
+          "name": "PreventableEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts",
+          "status": "found"
+        },
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PopupObjectArgs",
+              "kind": "property",
+              "name": "appendTo",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "PopupObjectArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "PopupObjectArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts",
+              "type": "MouseEvent | KeyboardEvent | Event"
+            },
+            {
+              "declaredOn": "PopupObjectArgs",
+              "kind": "property",
+              "name": "popup",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts",
+              "type": "Popup"
+            },
+            {
+              "declaredOn": "PopupObjectArgs",
+              "kind": "property",
+              "name": "preventDefault",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts",
+              "type": "Function"
+            }
+          ],
+          "name": "PopupObjectArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "destroyed",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "focus",
+      "eventType": "FocusEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "FocusEventArgs",
+              "kind": "property",
+              "name": "model",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+              "type": "Object"
+            }
+          ],
+          "name": "FocusEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "open",
+      "eventType": "PreventableEventArgs | PopupObjectArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PreventableEventArgs",
+              "kind": "property",
+              "name": "preventDefault",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts",
+              "type": "Function"
+            }
+          ],
+          "name": "PreventableEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts",
+          "status": "found"
+        },
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PopupObjectArgs",
+              "kind": "property",
+              "name": "appendTo",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "PopupObjectArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "PopupObjectArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts",
+              "type": "MouseEvent | KeyboardEvent | Event"
+            },
+            {
+              "declaredOn": "PopupObjectArgs",
+              "kind": "property",
+              "name": "popup",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts",
+              "type": "Popup"
+            },
+            {
+              "declaredOn": "PopupObjectArgs",
+              "kind": "property",
+              "name": "preventDefault",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts",
+              "type": "Function"
+            }
+          ],
+          "name": "PopupObjectArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionDatePicker",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "DatePicker",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.calendars"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "component": "accordion",
+  "fusionType": "FusionAccordion",
+  "note": "Per-component parity judgment consumed by compute-fusion-parity.mjs (its header names discovery/parity-accounting.json as the per-component JUDGMENT file, reviewed like any judgment step; not script-generated). The 15 builder-owned members (animation, clicked, created, dataSource, destroyed, enableHtmlSanitizer, expandedIndices, expanding, expandMode, headerTemplate, height, items, itemTemplate, width) are counted from public-api-surface.json builder.covered=true and are NOT repeated here. destroy carries a 'skip: lifecycle cleanup, not Fusion plan behavior' discovery decision and is excluded by that. Only the 6 vendor methods with builder.covered=false and no skip decision are accounted below. Reasons are grounded in EJ2 d.ts JSDoc at node_modules/@syncfusion/ej2-navigations/src/accordion/accordion.d.ts (lines cited) and the authoritative DSL primitive map.",
+  "onboarded": [
+    "expandItem",
+    "enableItem"
+  ],
+  "excluded": [
+    {
+      "name": "addItem",
+      "reason": "Builder-owned, structural composition. d.ts:391-399 addItem(item: AccordionItemModel | AccordionItemModel[] | Object | Object[], index?) adds a panel at runtime. The panel set is declared through the builder's 'items' property (builder.covered=true). Its only argument is a vendor AccordionItemModel or loose Object/Object[]; the typed DSL has no primitive to construct a panel descriptor without a stringly/loose-object escape hatch, and onboarding may not add or broaden a primitive. Dynamic panel composition is initial-render configuration, not the post-render read/write/method-return/event behavior the Fusion slice scope covers."
+    },
+    {
+      "name": "removeItem",
+      "reason": "Builder-owned, structural composition. d.ts:401-407 removeItem(index) deletes a panel declared by the builder's 'items' property. Same scope boundary as addItem: changing which panels exist is composition owned by the builder, not a runtime value source, write, method-return, or event the reactive plan branches/gathers/displays. The senior-living journey controls panel availability through enableItem (lock a section), never by destroying it."
+    },
+    {
+      "name": "hideItem",
+      "reason": "Incidental and duplicative for the 95% product use cases. d.ts:415-423 hideItem(index, isHidden?) shows/hides a panel. Panel availability control in the senior-living domain (lock the billing section until care level is confirmed) is expressed by enableItem(index, isEnable), which is onboarded and carries the clearer enable/disable semantic. Adding hide/show alongside enable/disable would pollute the public surface with a near-duplicate availability control that no resident or staff workflow needs distinctly from enable/disable."
+    },
+    {
+      "name": "select",
+      "reason": "Browser/accessibility focus management, not reactive plan state. d.ts:408-414 select(index) 'Sets focus to the specified index item header.' It moves keyboard focus to a header and returns void; it yields no value to branch, gather, display, or post, and changes no panel content a resident sees. Per the skill's judgment criteria this is incidental DOM/focus behavior, not a typed value developers reasonably branch, gather, or mutate in a vertical slice."
+    }
+  ]
+}

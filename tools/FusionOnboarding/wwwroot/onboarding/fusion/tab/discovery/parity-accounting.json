@@ -1,0 +1,51 @@
+{
+  "component": "tab",
+  "fusionType": "FusionTab",
+  "note": "Judgment artifact read by compute-fusion-parity.mjs (documented there as the per-component hand-authored judgment input; there is no generator for it). 'onboarded' lists the vendor member names the C# slice exposes as typed runtime DSL beyond what the MVC builder already covers; the builder-covered 'selectedItem' property is accounted as builder-owned by the tool and is written at runtime through the typed SetSelectedItem member. 'excluded' carries one source-grounded reason per remaining vendor member that is builder-authoring or vendor layout housekeeping rather than runtime journey DSL. Reasons are grounded in node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts.",
+  "onboarded": [
+    "select",
+    "hideTab"
+  ],
+  "excluded": [
+    {
+      "name": "tabId",
+      "reason": "The control's own element id (tab.d.ts 'tabId: string'). It equals the elementId the developer already passes to Html.FusionTab(plan, elementId, ...), so reading it back as a runtime source yields nothing the plan does not already hold. Tabs are addressed by their authored index, not by this id."
+    },
+    {
+      "name": "addTab",
+      "reason": "addTab(items: TabItemModel[], index?) inserts new tabs at runtime from a vendor TabItemModel markup array (tab.d.ts 'Adds new items to the Tab'). The facility navigation tab set is authored statically in the TabBuilder; mutating the collection is builder-authoring territory and its argument is a vendor model array, not a DSL ValueExpression source."
+    },
+    {
+      "name": "removeTab",
+      "reason": "removeTab(index) deletes a tab at runtime (tab.d.ts 'Removes the items in the Tab from the specified index'). The runtime 'this tab is unavailable now' behavior is covered by the onboarded HideTab; permanently removing an authored navigation tab is builder-authoring, not a senior-living journey reaction."
+    },
+    {
+      "name": "enableTab",
+      "reason": "enableTab(index, value) greys a single tab without removing it (tab.d.ts 'Enables or disables the specified Tab item'). The onboarded HideTab already expresses runtime per-tab availability for this slice; per-tab enable/disable is a builder-time presentation concern with no distinct resident-facing journey here."
+    },
+    {
+      "name": "disable",
+      "reason": "disable(value) disables the entire Tab control (tab.d.ts 'Specifies the value to disable/enable the Tab component'). A facility navigation panel is an always-available surface; whole-control disable is a static builder concern, not a runtime reaction in this journey."
+    },
+    {
+      "name": "getItemIndex",
+      "reason": "getItemIndex(tabItemId: string) is a string-id-to-index lookup helper (tab.d.ts 'Gets the item index from the Tab'). The plan already addresses tabs by their authored zero-based index (Select(2), HideTab(3)); a reverse id-to-index lookup adds no journey value and returns vendor bookkeeping."
+    },
+    {
+      "name": "refresh",
+      "reason": "refresh() re-renders the whole Tab (tab.d.ts 'Refresh the tab component'). Vendor layout housekeeping invoked internally on property change; it produces no resident-facing state a reactive plan would drive."
+    },
+    {
+      "name": "refreshActiveTab",
+      "reason": "refreshActiveTab() re-renders the active tab's contents (tab.d.ts 'To refresh the active tab contents'). Internal vendor re-render housekeeping with no DSL value as a typed runtime member."
+    },
+    {
+      "name": "refreshActiveTabBorder",
+      "reason": "refreshActiveTabBorder() repaints the active-tab indicator (tab.d.ts 'To refresh the active tab indicator'). Pure vendor visual-layout housekeeping, not journey behavior."
+    },
+    {
+      "name": "refreshOverflow",
+      "reason": "refreshOverflow() recomputes header overflow fit (tab.d.ts 'Reorganizes and adjusts the Tab headers to fit the available width without re-rendering'). Vendor layout recalculation triggered by visibility/count changes; not a resident-facing reactive member."
+    }
+  ]
+}

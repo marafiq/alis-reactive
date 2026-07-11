@@ -20,18 +20,18 @@ from the current tree as it stands.
 ## TASK ZERO (build the deterministic coverage signals BEFORE onboarding any component)
 The automation cannot honestly onboard anything until coverage is machine-known.
 Build these first — they are the spine every later phase leans on:
-0a. **Coverage "no sandbox usage" signal — as a TOOL, not an in-build analyzer.**
-    PROVEN 2026-06-13: an in-build Roslyn analyzer (ALIS010 prototype) does NOT see
-    Razor-view usage — generated view trees aren't reached, so it false-positives
-    on heavily-used members (`NativeButton.Reactive`, `CssClass` flagged despite
-    dozens of view calls; 1,482 warnings). Wrong mechanism. Build it instead as a
-    standalone Roslyn tool over MSBuildWorkspace (load SandboxApp, get the FULL
-    compilation INCLUDING generated views, enumerate public slice members, diff
-    against actual invocations) OR derive usage from the rendered plan JSON. Goal:
-    for each public component-slice member with zero sandbox-view usage, report
-    "no sandbox usage — cannot be Playwright-covered." Deterministic,
-    false-positive-free (verify against `NativeButton.Reactive` = not flagged).
-    NECESSARY condition (used in a view), not sufficiency.
+0a. **Coverage "no sandbox usage" signal — DELIVERED; consume it, do NOT rebuild.**
+    Built as `tools/FusionCoverage` (run:
+    `dotnet run --project tools/FusionCoverage -- Alis.Reactive.SandboxApp/bin/Debug/net10.0`).
+    It reads compiled IL — the public Fusion/Native slice surface from their dlls vs the
+    SandboxApp dll's MemberReference table (views compile into the dll, so their calls land
+    there) — and lists every public component-slice member with zero sandbox references.
+    Chosen over an in-build analyzer because the analyzer cannot see Razor-generated view
+    trees (the ALIS010 prototype false-positived on `NativeButton.Reactive`/`CssClass`; 1,482
+    warnings). Overload-precise (param-type keys) and adversarially verified false-positive-free
+    (`NativeButton.Reactive` not flagged; `NativeButtonBuilder.CssClass` used vs
+    `NativeCheckListBuilder.CssClass` unused correctly separated). NECESSARY condition
+    (referenced in a view), not sufficiency — behavioral proof is 0b below.
 0b. **Behavioral coverage gate.** Parses the matrix → resolves each member's test
     FQN against the suite → confirms `Outcome="Passed"` in the latest TRX by exit
     code; wired blocking into `scripts/test.sh`. This is sufficiency.

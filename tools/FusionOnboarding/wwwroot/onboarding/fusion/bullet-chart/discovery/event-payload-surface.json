@@ -1,0 +1,280 @@
+{
+  "component": "bullet-chart",
+  "counts": {
+    "events": 6,
+    "payloadTypes": 5
+  },
+  "events": [
+    {
+      "event": "beforePrint",
+      "eventType": "IPrintEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "IChartEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "IChartEventArgs",
+              "inheritedVia": "IChartEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/chart/model/chart-interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "IPrintEventArgs",
+              "kind": "property",
+              "name": "htmlContent",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/chart/model/chart-interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "IChartEventArgs",
+              "inheritedVia": "IChartEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/chart/model/chart-interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "IPrintEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-charts/src/chart/model/chart-interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "bulletChartMouseClick",
+      "eventType": "IBulletMouseEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "IBulletChartEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "IBulletChartEventArgs",
+              "inheritedVia": "IBulletChartEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "IBulletChartEventArgs",
+              "inheritedVia": "IBulletChartEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "IBulletMouseEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "IBulletMouseEventArgs",
+              "kind": "property",
+              "name": "x",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "IBulletMouseEventArgs",
+              "kind": "property",
+              "name": "y",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "number"
+            }
+          ],
+          "name": "IBulletMouseEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "legendRender",
+      "eventType": "IBulletLegendRenderEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "IBulletChartEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "IBulletChartEventArgs",
+              "inheritedVia": "IBulletChartEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "IBulletLegendRenderEventArgs",
+              "kind": "property",
+              "name": "fill",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "IBulletChartEventArgs",
+              "inheritedVia": "IBulletChartEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "IBulletLegendRenderEventArgs",
+              "kind": "property",
+              "name": "shape",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "LegendShape"
+            },
+            {
+              "declaredOn": "IBulletLegendRenderEventArgs",
+              "kind": "property",
+              "name": "text",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "IBulletLegendRenderEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "load",
+      "eventType": "IBulletLoadedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "IBulletLoadedEventArgs",
+              "kind": "property",
+              "name": "bulletChart",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "BulletChart"
+            },
+            {
+              "declaredOn": "IBulletLoadedEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "IBulletLoadedEventArgs",
+              "kind": "property",
+              "name": "theme",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "ChartTheme"
+            }
+          ],
+          "name": "IBulletLoadedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "loaded",
+      "eventType": "IBulletLoadedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "IBulletLoadedEventArgs",
+              "kind": "property",
+              "name": "bulletChart",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "BulletChart"
+            },
+            {
+              "declaredOn": "IBulletLoadedEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "IBulletLoadedEventArgs",
+              "kind": "property",
+              "name": "theme",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "ChartTheme"
+            }
+          ],
+          "name": "IBulletLoadedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "tooltipRender",
+      "eventType": "IBulletchartTooltipEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "IBulletchartTooltipEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "IBulletchartTooltipEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "string[] | number[] | string"
+            },
+            {
+              "declaredOn": "IBulletchartTooltipEventArgs",
+              "kind": "property",
+              "name": "template",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "IBulletchartTooltipEventArgs",
+              "kind": "property",
+              "name": "text",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "IBulletchartTooltipEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+              "type": "string | number"
+            }
+          ],
+          "name": "IBulletchartTooltipEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionBulletChart",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "BulletChart",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.charts"
+  }
+}

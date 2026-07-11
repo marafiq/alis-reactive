@@ -13,17 +13,23 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return View("~/Areas/Sandbox/Views/Components/Fusion/RadioButton/Index.cshtml", new FusionRadioButtonModel());
         }
 
-        [HttpPost("Echo")]
-        public IActionResult Echo([FromBody] FusionRadioButtonEchoRequest request)
+        [HttpPost("ConfirmPlan")]
+        public IActionResult ConfirmPlan([FromBody] RoomPlanRequest request)
         {
-            return Ok(new FusionRadioButtonEchoResponse
+            return Ok(new RoomPlanResponse
             {
-                SelectedValue = request.SelectedValue,
-                PrivateChecked = request.PrivateChecked,
-                SharedChecked = request.SharedChecked,
-                SharedDisabled = request.SharedDisabled,
-                Summary = request.SelectedValue + ":" + request.PrivateChecked + ":" + request.SharedChecked + ":" + request.SharedDisabled
+                Confirmation = BuildConfirmation(request)
             });
+        }
+
+        private static string BuildConfirmation(RoomPlanRequest request)
+        {
+            if (request.CompanionSuiteChosen && request.CompanionSuiteUnavailable)
+            {
+                return "Companion suite is full this month — please choose another room before confirming.";
+            }
+
+            return $"Move-in confirmed: {request.Room}.";
         }
     }
 }

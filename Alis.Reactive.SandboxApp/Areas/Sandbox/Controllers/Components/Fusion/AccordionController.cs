@@ -16,22 +16,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new AccordionModel());
         }
 
-        [HttpGet("OverviewPartial")]
-        public IActionResult OverviewPartial()
+        // The monthly-charges section detail is fetched on demand the first time the
+        // resident opens that section, modelling a real care-plan page that does not
+        // ship every resident's billing detail in the initial document.
+        [HttpGet("MonthlyChargesDetail")]
+        public IActionResult MonthlyChargesDetail()
         {
-            return PartialView("~/Areas/Sandbox/Views/Components/Fusion/Accordion/_OverviewPartial.cshtml");
-        }
-
-        [HttpGet("CareLevelsPartial")]
-        public IActionResult CareLevelsPartial()
-        {
-            return PartialView("~/Areas/Sandbox/Views/Components/Fusion/Accordion/_CareLevelsPartial.cshtml");
-        }
-
-        [HttpGet("ContactPartial")]
-        public IActionResult ContactPartial()
-        {
-            return PartialView("~/Areas/Sandbox/Views/Components/Fusion/Accordion/_ContactPartial.cshtml");
+            return PartialView(
+                "~/Areas/Sandbox/Views/Components/Fusion/Accordion/_MonthlyChargesPartial.cshtml");
         }
     }
 }

@@ -1,0 +1,183 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "toolbar",
+  "apiSet": "core",
+  "probe": "onboarding/fusion/toolbar/probes/raw-ej2-core.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "beforeCreate",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "enableCollision",
+          "name",
+          "scrollStep"
+        ],
+        "properties": {
+          "enableCollision": {
+            "sample": true,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "beforeCreate",
+            "type": "string"
+          },
+          "scrollStep": {
+            "type": "undefined"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "created",
+      "value": {
+        "functions": [],
+        "ownKeys": [],
+        "properties": {},
+        "value": "undefined"
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "ready",
+      "value": {
+        "apiSet": "core",
+        "className": "Toolbar",
+        "component": "toolbar",
+        "namespace": "ej.navigations"
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "after-disable-true",
+      "value": {
+        "hasOverlay": true,
+        "rootClasses": [
+          "e-control",
+          "e-keyboard",
+          "e-lib",
+          "e-overlay",
+          "e-toolbar"
+        ]
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "after-disable-false",
+      "value": {
+        "hasOverlay": false,
+        "rootClasses": [
+          "e-control",
+          "e-keyboard",
+          "e-lib",
+          "e-toolbar"
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "label": "after-enableItems-disable-0",
+      "value": {
+        "item0Disabled": false
+      }
+    },
+    {
+      "sequence": 7,
+      "label": "after-enableItems-enable-0",
+      "value": {
+        "item0Disabled": false
+      }
+    },
+    {
+      "sequence": 8,
+      "label": "after-hideItem-1-true",
+      "value": {
+        "item1Visible": true
+      }
+    },
+    {
+      "sequence": 9,
+      "label": "after-hideItem-1-false",
+      "value": {
+        "item1Visible": true
+      }
+    },
+    {
+      "sequence": 10,
+      "label": "after-addItems",
+      "value": {
+        "ids": [
+          "pay-balance",
+          "request-maintenance",
+          "message-care-team",
+          "extra"
+        ]
+      }
+    },
+    {
+      "sequence": 11,
+      "label": "after-removeItems",
+      "value": {
+        "ids": [
+          "pay-balance",
+          "request-maintenance",
+          "message-care-team"
+        ]
+      }
+    },
+    {
+      "sequence": 12,
+      "label": "own keys",
+      "value": [
+        "allowServerDataBinding",
+        "bulkChanges",
+        "changedProperties",
+        "childChangedProperties",
+        "clickEvent",
+        "element",
+        "finalUpdate",
+        "ignoreCollectionWatch",
+        "isAngular",
+        "isComplexArraySetter",
+        "isDestroyed",
+        "isExtendedOpen",
+        "isProtectedOnChange",
+        "isReact",
+        "isReactHybrid",
+        "isRendered",
+        "isServerRendered",
+        "isStringTemplate",
+        "isVertical",
+        "isVue"
+      ]
+    },
+    {
+      "sequence": 13,
+      "label": "prototype methods",
+      "value": [
+        "accessMount",
+        "activeEleRemove",
+        "activeEleSwitch",
+        "add",
+        "addEventListener",
+        "addInstance",
+        "addItems",
+        "addOnPersist",
+        "appendTo",
+        "attachUnloadEvent",
+        "beforeCreate",
+        "buttonRendering",
+        "changeOrientation",
+        "checkOverflow",
+        "checkPopupRefresh",
+        "checkPriority",
+        "clearChanges",
+        "clearProperty",
+        "clearTemplate",
+        "clearToolbarTemplate"
+      ]
+    }
+  ]
+}

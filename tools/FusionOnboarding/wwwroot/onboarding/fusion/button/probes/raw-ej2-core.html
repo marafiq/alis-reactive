@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>FusionButton Raw EJ2 core Probe</title>
+    <link rel="stylesheet" href="/css/syncfusion.dev.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #button-host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+        th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f6f8fa; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+        button { margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <h1>FusionButton Raw EJ2 core Probe</h1>
+    <p>Status: generated static probe. Execute through the onboarding trace runner; it
+       instantiates <code>ej.buttons.Button</code>, exercises the runtime API set
+       (post-render property reads/writes, <code>click()</code>, <code>focusIn()</code>),
+       and saves <code>window.__fusionProbe.trace</code> as <code>traces/raw-ej2-core.trace.json</code>.</p>
+    <div id="button-host">
+        <button id="action"></button>
+    </div>
+
+    <button id="dump">Dump Keys</button>
+    <button id="clear">Clear Trace</button>
+
+    <h2>Candidate Rows</h2>
+    <table>
+        <thead><tr><th>JS Member</th><th>Kind</th><th>Type</th><th>Builder</th><th>Decision</th></tr></thead>
+        <tbody>
+<tr><td><code>click</code></td><td>method</td><td>) =&gt; void</td><td>yes</td><td>runtime method: post-render invoke proven necessary (latches toggle active state)</td></tr>
+<tr><td><code>content</code></td><td>property</td><td>string</td><td>yes</td><td>runtime property source/write: post-render read and write proven necessary</td></tr>
+<tr><td><code>created</code></td><td>event</td><td>Event</td><td>yes</td><td>builder-owned lifecycle event; no typed Senior Living payload use case</td></tr>
+<tr><td><code>cssClass</code></td><td>property</td><td>string</td><td>yes</td><td>runtime property source/write: post-render read and write proven necessary</td></tr>
+<tr><td><code>destroy</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>skip: lifecycle cleanup, not Fusion plan behavior</td></tr>
+<tr><td><code>disabled</code></td><td>property</td><td>boolean</td><td>yes</td><td>runtime property source/write: post-render read and write proven necessary</td></tr>
+<tr><td><code>enableHtmlSanitizer</code></td><td>property</td><td>boolean</td><td>yes</td><td>builder-owned unless post-render read/write behavior is proven necessary</td></tr>
+<tr><td><code>focusIn</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>runtime method: post-render invoke proven necessary (moves keyboard focus)</td></tr>
+<tr><td><code>iconCss</code></td><td>property</td><td>string</td><td>yes</td><td>runtime property write: post-render write proven necessary (via SetIcon)</td></tr>
+<tr><td><code>iconPosition</code></td><td>property</td><td>string | IconPosition</td><td>yes</td><td>runtime property write: post-render write proven necessary (via SetIcon)</td></tr>
+<tr><td><code>isPrimary</code></td><td>property</td><td>boolean</td><td>yes</td><td>runtime property source/write: post-render read and write proven necessary</td></tr>
+<tr><td><code>isToggle</code></td><td>property</td><td>boolean</td><td>yes</td><td>runtime property source/write: post-render read and write proven necessary</td></tr>
+<tr><td><code>locale</code></td><td>property</td><td>string</td><td>no</td><td>skip: @private culture/i18n config; plain Button has no localized strings</td></tr>
+        </tbody>
+    </table>
+
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const target = document.getElementById("action");
+
+        function clean(value, seen = new WeakSet(), depth = 0) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 4) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.slice(0, 20).map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).sort().slice(0, 120).forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function functionNames(value) {
+            const names = new Set();
+            let current = value;
+            while (current && current !== Object.prototype) {
+                Object.getOwnPropertyNames(current).forEach(name => {
+                    if (name !== "constructor" && typeof value[name] === "function") names.add(name);
+                });
+                current = Object.getPrototypeOf(current);
+            }
+            return Array.from(names).sort();
+        }
+
+        function record(label, value) {
+            trace.push({ at: new Date().toISOString(), label, value: clean(value) });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        const probe = {
+            target,
+            trace,
+            record,
+            member: (label, read) => record(label, read()),
+            call: (label, invoke) => record(label, invoke())
+        };
+        window.__fusionProbe = probe;
+
+        // Initial render configuration is the builder's job; here we instantiate the same way and
+        // then exercise ONLY the post-render runtime surface the Fusion slice onboards.
+        const ej2 = new ej.buttons.Button({
+            content: "Begin daily check-in",
+            iconCss: "e-icons e-circle-check",
+            iconPosition: "Left",
+            isToggle: false
+        });
+        ej2.appendTo(target);
+        probe.ej2 = ej2;
+
+        record("ready", {
+            component: "button",
+            apiSet: "core",
+            namespace: "ej.buttons",
+            className: "Button"
+        });
+
+        // content write + read (SetContent / Content source)
+        ej2.content = "Begin check-in for Eleanor Whitfield";
+        ej2.dataBind();
+        probe.member("content after set", () => ({ property: ej2.content, domText: target.textContent }));
+
+        // disabled write + read (SetDisabled / Disabled source)
+        ej2.disabled = true;
+        ej2.dataBind();
+        probe.member("disabled after set true", () => ({ property: ej2.disabled, domDisabled: target.disabled }));
+        ej2.disabled = false;
+        ej2.dataBind();
+        probe.member("disabled after set false", () => ({ property: ej2.disabled, domDisabled: target.disabled }));
+
+        // iconCss + iconPosition write (SetIcon)
+        ej2.iconCss = "e-icons e-check";
+        ej2.iconPosition = "Right";
+        ej2.dataBind();
+        probe.member("icon after set", () => ({
+            iconCss: ej2.iconCss,
+            iconPosition: ej2.iconPosition,
+            iconSpanClass: target.querySelector("span.e-btn-icon") ? target.querySelector("span.e-btn-icon").className : null
+        }));
+
+        // cssClass write + read (SetCssClass / CssClass source)
+        ej2.cssClass = "e-warning urgent-visit";
+        ej2.dataBind();
+        probe.member("cssClass after set", () => ({ property: ej2.cssClass, domClass: target.className }));
+
+        // isPrimary write + read (SetPrimary / IsPrimary source)
+        ej2.isPrimary = true;
+        ej2.dataBind();
+        probe.member("isPrimary after set", () => ({ property: ej2.isPrimary, hasPrimaryClass: target.classList.contains("e-primary") }));
+
+        // isToggle write + read (SetToggle / IsToggle source), then click() to latch e-active
+        ej2.isToggle = true;
+        ej2.dataBind();
+        probe.member("isToggle after set", () => ({ property: ej2.isToggle }));
+        probe.call("click latches active (toggle on)", () => {
+            ej2.click();
+            return { hasActiveClass: target.classList.contains("e-active") };
+        });
+
+        // focusIn() moves focus to the rendered button
+        probe.call("focusIn focuses button", () => {
+            ej2.focusIn();
+            return { documentActiveIsButton: document.activeElement === target };
+        });
+
+        document.getElementById("dump").addEventListener("click", () => {
+            record("own keys", Object.keys(ej2).sort());
+            record("prototype methods", functionNames(ej2));
+            record("complete", { done: true });
+        });
+
+        document.getElementById("clear").addEventListener("click", () => {
+            trace.length = 0;
+            document.getElementById("trace").textContent = "[]";
+        });
+    </script>
+</body>
+</html>

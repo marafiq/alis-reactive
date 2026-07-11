@@ -1,0 +1,668 @@
+{
+  "component": "file-upload",
+  "counts": {
+    "builderMethods": 41,
+    "events": 20,
+    "members": 52,
+    "methods": 13,
+    "properties": 19
+  },
+  "fusionType": "FusionFileUpload",
+  "members": [
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionComplete",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "ActionCompleteEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowedExtensions",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Inputs.UploaderAsyncSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "asyncSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "AsyncSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "autoUpload",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeRemove",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "BeforeRemoveEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeUpload",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "BeforeUploadEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Inputs.UploaderButtonsProps"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "buttons",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "ButtonsPropsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "bytesToSize",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "bytes: number) => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "cancel",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "fileData?: FileInfo[]) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "canceling",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "CancelEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "change",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "chunkFailure",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "chunkSuccess",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "chunkUploading",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "UploadingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "clearAll",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "clearing",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "ClearingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "created",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "createFileList",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "fileData: FileInfo[]) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "cssClass",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "skip: lifecycle cleanup, not Fusion plan behavior",
+      "kind": "method",
+      "name": "destroy",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "directoryUpload",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "dropArea",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "string | HTMLElement"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Inputs.DropEffect"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "dropEffect",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "DropEffect"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enabled",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableHtmlSanitizer",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "failure",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "fileList",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "HTMLElement[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "fileListRendering",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "FileListRenderingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Collections.Generic.List{Syncfusion.EJ2.Inputs.UploaderUploadedFiles}"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "files",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "FilesPropModel[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "filesData",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "FileInfo[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFilesData",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "index?: number) => FileInfo[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "maxFileSize",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "minFileSize",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "multiple",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "pause",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "fileData?: FileInfo | FileInfo[], custom?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "pausing",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "PauseResumeEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "progress",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "remove",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "fileData?: FileInfo | FileInfo[], customTemplate?: boolean, removeDirectly?: boolean, postRawFile?: boolean, args?: MouseEvent | TouchEvent | KeyboardEventArgs) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "removing",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "RemovingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "rendering",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "RenderingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "resume",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "fileData?: FileInfo | FileInfo[], custom?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "resuming",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "PauseResumeEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "retry",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "fileData?: FileInfo | FileInfo[], fromcanceledStage?: boolean, custom?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "selected",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "SelectedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "sequentialUpload",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showFileList",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "sortFileList",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "filesData?: FileList) => File[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "success",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "template",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "traverseFileTree",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "item: any, event?: MouseEvent | TouchEvent | DragEvent | ClipboardEvent) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "upload",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "files?: FileInfo | FileInfo[], custom?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "uploading",
+      "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+      "type": "UploadingEventArgs"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "UploaderBuilder",
+    "className": "Uploader",
+    "dtsPath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+    "jsPath": "",
+    "namespace": "ej.inputs",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}

@@ -1,0 +1,600 @@
+{
+  "component": "list-view",
+  "counts": {
+    "builderMethods": 33,
+    "events": 5,
+    "members": 48,
+    "methods": 20,
+    "properties": 23
+  },
+  "fusionType": "FusionListView",
+  "members": [
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionBegin",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionComplete",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "MouseEvent"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionFailure",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "MouseEvent"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "addItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "data: { [key: string]: Object; }[], fields?: Fields, index?: number) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "animation",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "AnimationSettings"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "back",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "checkAllItems",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Lists.CheckBoxPosition"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "checkBoxPosition",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "checkBoxPosition"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "checkItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "item: Fields | HTMLElement | Element) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "cssClass",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "skip: lifecycle cleanup, not Fusion plan behavior",
+      "kind": "method",
+      "name": "destroy",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "disableHtmlEncode",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "disableItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "item: Fields | HTMLElement | Element) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enable",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enabled",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableHtmlSanitizer",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "enableItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "item: Fields | HTMLElement | Element) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableVirtualization",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Lists.ListViewFieldSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "fields",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "FieldSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "findItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "item: Fields | HTMLElement | Element) => SelectedItem"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getSelectedItems",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": ") => SelectedItem | SelectedCollection | UISelectedItem | NestedListData"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "groupTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "headerTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "headerTitle",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String",
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "height",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "number | string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "hideItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "item: Fields | HTMLElement | Element) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "localData",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "DataSource[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "query",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "Query"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "refreshItemHeight",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "removeItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "item: Fields | HTMLElement | Element) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "removeMultipleItems",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "item: HTMLElement[] | Element[] | Fields[]) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "requiredModules",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": ") => ModuleDeclaration[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "scroll",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "ScrolledEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "select",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "SelectEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "selectItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "item: Fields | HTMLElement | Element) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "selectMultipleItems",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "item: Fields[] | HTMLElement[] | Element[]) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showCheckBox",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showHeader",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showIcon",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "item: Fields | HTMLElement | Element) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Lists.SortOrder"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "sortOrder",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "SortOrder"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "targetElement",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "Element"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "template",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "uncheckAllItems",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "uncheckItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "item: Fields | HTMLElement | Element) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "unselectItem",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "item?: Fields | HTMLElement | Element) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "virtualizationModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "Virtualization"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String",
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "width",
+      "sourcePath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+      "type": "number | string"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "ListViewBuilder",
+    "className": "ListView",
+    "dtsPath": "node_modules/@syncfusion/ej2-lists/src/list-view/list-view.d.ts",
+    "jsPath": "",
+    "namespace": "ej.ej.lists",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}

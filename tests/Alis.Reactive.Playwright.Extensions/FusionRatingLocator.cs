@@ -13,19 +13,14 @@ public sealed class FusionRatingLocator
         _componentId = componentId;
     }
 
-    public ILocator Input => _page.Locator($"#{_componentId}");
+    /// <summary>The rendered rating list, the slider element that carries the current value.</summary>
+    public ILocator RatingList => _page.Locator($"#{_componentId}_item-list");
 
-    public async Task<string?> ValueAttribute() =>
-        await Input.GetAttributeAsync("value");
+    /// <summary>The clickable star at the given one-based position.</summary>
+    public ILocator Star(int position) =>
+        RatingList.Locator(".e-rating-item-container").Nth(position - 1);
 
-    /// <summary>ARIA value from the visible rating list.</summary>
-    public async Task<string?> AriaValue() =>
-        await _page.EvaluateAsync<string?>(
-            @"id => {
-                const el = document.getElementById(id);
-                const root = el?.parentElement ?? document;
-                const list = root.querySelector('.e-rating-item-list') ?? document.querySelector('.e-rating-item-list');
-                return list ? list.getAttribute('aria-valuenow') : null;
-            }",
-            _componentId);
+    /// <summary>Clicks the star at the given one-based position the way a resident would.</summary>
+    public async Task RateStars(int position) =>
+        await Star(position).ClickAsync();
 }

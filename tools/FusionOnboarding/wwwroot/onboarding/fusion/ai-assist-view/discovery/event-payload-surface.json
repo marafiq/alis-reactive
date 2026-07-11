@@ -1,0 +1,235 @@
+{
+  "component": "ai-assist-view",
+  "counts": {
+    "events": 7,
+    "payloadTypes": 5
+  },
+  "events": [
+    {
+      "event": "attachmentRemoved",
+      "eventType": "object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "attachmentUploadFailure",
+      "eventType": "object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "attachmentUploadSuccess",
+      "eventType": "object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "beforeAttachmentUpload",
+      "eventType": "BeforeUploadEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BeforeUploadEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            }
+          ],
+          "name": "BeforeUploadEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "promptChanged",
+      "eventType": "PromptChangedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "PromptChangedEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "PromptChangedEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "PromptChangedEventArgs",
+              "kind": "property",
+              "name": "previousValue",
+              "sourcePath": "node_modules/@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "PromptChangedEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "PromptChangedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "promptRequest",
+      "eventType": "PromptRequestEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "PromptRequestEventArgs",
+              "kind": "property",
+              "name": "attachedFiles",
+              "sourcePath": "node_modules/@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts",
+              "type": "FileInfo[]"
+            },
+            {
+              "declaredOn": "PromptRequestEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "PromptRequestEventArgs",
+              "kind": "property",
+              "name": "prompt",
+              "sourcePath": "node_modules/@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "PromptRequestEventArgs",
+              "kind": "property",
+              "name": "promptSuggestions",
+              "sourcePath": "node_modules/@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts",
+              "type": "string[]"
+            },
+            {
+              "declaredOn": "PromptRequestEventArgs",
+              "kind": "property",
+              "name": "responseToolbarItems",
+              "sourcePath": "node_modules/@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts",
+              "type": "ToolbarItemModel[]"
+            }
+          ],
+          "name": "PromptRequestEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "stopRespondingClick",
+      "eventType": "StopRespondingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "StopRespondingEventArgs",
+              "kind": "property",
+              "name": "dataIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "StopRespondingEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "StopRespondingEventArgs",
+              "kind": "property",
+              "name": "prompt",
+              "sourcePath": "node_modules/@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "StopRespondingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionAiAssistView",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "AIAssistView",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.interactivechat"
+  }
+}

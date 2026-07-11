@@ -1,0 +1,153 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "radio-button",
+  "apiSet": "core",
+  "probe": "onboarding/fusion/radio-button/probes/raw-ej2-core.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "created",
+      "value": {
+        "functions": [],
+        "ownKeys": [],
+        "properties": {},
+        "value": "undefined"
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "ready",
+      "value": {
+        "apiSet": "core",
+        "className": "RadioButton",
+        "component": "radio-button",
+        "namespace": "ej.buttons"
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "checked [studio, initial]",
+      "value": true
+    },
+    {
+      "sequence": 4,
+      "label": "checked [companion, initial]",
+      "value": false
+    },
+    {
+      "sequence": 5,
+      "label": "disabled [companion, initial]",
+      "value": false
+    },
+    {
+      "sequence": 6,
+      "label": "value [companion]",
+      "value": "Shared Companion Suite"
+    },
+    {
+      "sequence": 7,
+      "label": "change",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "event",
+          "name",
+          "value"
+        ],
+        "properties": {
+          "event": {
+            "sample": {
+              "isTrusted": true
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "change",
+            "type": "string"
+          },
+          "value": {
+            "sample": "Shared Companion Suite",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 8,
+      "label": "click [companion]",
+      "value": "clicked"
+    },
+    {
+      "sequence": 9,
+      "label": "getSelectedValue [after companion click]",
+      "value": "Shared Companion Suite"
+    },
+    {
+      "sequence": 10,
+      "label": "checked [companion, after click]",
+      "value": true
+    },
+    {
+      "sequence": 11,
+      "label": "disabled [companion, after set + dataBind]",
+      "value": true
+    },
+    {
+      "sequence": 12,
+      "label": "focusIn [studio]",
+      "value": "focused"
+    },
+    {
+      "sequence": 13,
+      "label": "own keys",
+      "value": [
+        "allowServerDataBinding",
+        "bulkChanges",
+        "changedProperties",
+        "childChangedProperties",
+        "element",
+        "finalUpdate",
+        "formElement",
+        "ignoreCollectionWatch",
+        "initialCheckedValue",
+        "isAngular",
+        "isComplexArraySetter",
+        "isDestroyed",
+        "isFocused",
+        "isProtectedOnChange",
+        "isReact",
+        "isReactHybrid",
+        "isRendered",
+        "isServerRendered",
+        "isStringTemplate",
+        "isVue"
+      ]
+    },
+    {
+      "sequence": 14,
+      "label": "prototype methods",
+      "value": [
+        "accessMount",
+        "addEventListener",
+        "addInstance",
+        "addOnPersist",
+        "appendTo",
+        "attachUnloadEvent",
+        "change",
+        "changeHandler",
+        "clearChanges",
+        "clearTemplate",
+        "click",
+        "createElement",
+        "dataBind",
+        "destroy",
+        "detachUnloadEvent",
+        "detectFunction",
+        "finalUpdate",
+        "focusHandler",
+        "focusIn",
+        "focusOutHandler"
+      ]
+    }
+  ]
+}

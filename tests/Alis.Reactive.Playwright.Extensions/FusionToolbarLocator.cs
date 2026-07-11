@@ -2,6 +2,10 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
+/// <summary>
+/// Locates a rendered Syncfusion Toolbar and its command items the way a user sees them.
+/// Toolbar items render with the developer-chosen item id as their element id.
+/// </summary>
 public sealed class FusionToolbarLocator
 {
     private readonly IPage _page;
@@ -13,11 +17,19 @@ public sealed class FusionToolbarLocator
         _componentId = componentId;
     }
 
+    /// <summary>The rendered toolbar root.</summary>
     public ILocator Root => _page.Locator($"#{_componentId}");
 
-    public ILocator SaveItem => _page.Locator("#toolbar-save");
+    /// <summary>
+    /// The toolbar root only when it carries Syncfusion's disabled state class.
+    /// EJ2 Toolbar.disable(true) adds <c>e-overlay</c> to the root element
+    /// (ej2-navigations toolbar.js: CLS_DISABLE = 'e-overlay').
+    /// </summary>
+    public ILocator DisabledRoot => _page.Locator($"#{_componentId}.e-overlay");
 
-    public ILocator DeleteItem => _page.Locator("#toolbar-delete");
+    /// <summary>A toolbar command item by its developer-chosen id.</summary>
+    public ILocator Command(string itemId) => _page.Locator($"#{itemId}");
 
-    public ILocator DisabledRoot => _page.Locator($"#{_componentId}.e-disabled");
+    /// <summary>Clicks a toolbar command the way a resident would.</summary>
+    public async Task ClickCommand(string itemId) => await Command(itemId).ClickAsync();
 }

@@ -1,0 +1,11 @@
+{
+  "component": "radio-button",
+  "note": "Per-component parity JUDGMENT consumed by compute-fusion-parity.mjs (this file is hand-authored judgment, not script-generated — the parity tool's own docstring says so). 'onboarded' lists vendor members the FusionRadioButton C# slice exposes as typed runtime DSL. 'excluded' lists vendor members deliberately kept out with a source-grounded reason. The 9 builder.covered vendor members (change, created, cssClass, disabled, enableHtmlSanitizer, label, labelPosition, name, value) are already counted builder-owned by the tool and are not repeated here; 'destroy' is auto-excluded by its skip: discoveryDecision.",
+  "onboarded": [
+    "checked",
+    "click",
+    "focusIn",
+    "getSelectedValue"
+  ],
+  "excluded": []
+}

@@ -1,0 +1,25 @@
+# FusionRating Typed API Coverage Matrix
+
+Status: audited.
+
+Generated from current public typed Fusion API under:
+
+```text
+Alis.Reactive.Fusion/Components/FusionRating
+```
+
+This matrix is fail-closed. A row with `unproven`, `pending`, or a missing
+trace/mapping/Playwright link means the component is not audited.
+
+| Public API | Kind | Source | Raw Trace Row | Primitive Map Row | Vertical Slice Row | Playwright DSL Proof | Status |
+|---|---|---|---|---|---|---|---|
+| `FusionRatingValueChangedArgs` | event-payload-contract | `Alis.Reactive.Fusion/Components/FusionRating/Events/FusionRatingOnValueChanged.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.rating_their_care_shows_the_score_and_a_matching_message` | row-proven |
+| `FusionRatingValueChangedArgs.IsInteracted` | event-payload-property | `Alis.Reactive.Fusion/Components/FusionRating/Events/FusionRatingOnValueChanged.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.clearing_a_rating_the_resident_chose_marks_it_unrated` | row-proven |
+| `FusionRatingValueChangedArgs.PreviousValue` | event-payload-property | `Alis.Reactive.Fusion/Components/FusionRating/Events/FusionRatingOnValueChanged.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.lowering_their_rating_records_what_it_changed_from` | row-proven |
+| `FusionRatingValueChangedArgs.Value` | event-payload-property | `Alis.Reactive.Fusion/Components/FusionRating/Events/FusionRatingOnValueChanged.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.rating_their_care_shows_the_score_and_a_matching_message` | row-proven |
+| `ValueChanged` | event-selector | `Alis.Reactive.Fusion/Components/FusionRating/FusionRatingEvents.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.rating_their_care_shows_the_score_and_a_matching_message` | row-proven |
+| `Reset(this ComponentRef<FusionRating, TModel> self)` | method | `Alis.Reactive.Fusion/Components/FusionRating/FusionRatingExtensions.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.clearing_a_rating_the_resident_chose_marks_it_unrated` | row-proven |
+| `SetValue(this ComponentRef<FusionRating, TModel> self, double value)` | method | `Alis.Reactive.Fusion/Components/FusionRating/FusionRatingExtensions.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.restoring_brings_back_the_rating_submitted_last_month` | row-proven |
+| `Value(this ComponentRef<FusionRating, TModel> self)` | method | `Alis.Reactive.Fusion/Components/FusionRating/FusionRatingExtensions.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.submitting_posts_the_rating_score_to_the_server` | row-proven |
+| `FusionRating(this InputBoundField<TModel, double> setup, Action<RatingBuilder> build)` | method | `Alis.Reactive.Fusion/Components/FusionRating/FusionRatingHtmlExtensions.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.survey_opens_showing_the_rating_carried_over_from_last_month` | row-proven |
+| `Reactive` | event-selector | `Alis.Reactive.Fusion/Components/FusionRating/FusionRatingReactiveExtensions.cs` | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | [behavioral-coverage.json](behavioral-coverage.json) | `Alis.Reactive.PlaywrightTests.Components.Fusion.Rating.WhenUsingFusionRating.rating_their_care_shows_the_score_and_a_matching_message` | row-proven |

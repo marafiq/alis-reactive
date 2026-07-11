@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>FusionToolbar Raw EJ2 core Probe</title>
+    <link rel="stylesheet" href="/css/syncfusion.dev.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #toolbar-host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+        button { margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <h1>FusionToolbar Raw EJ2 core Probe</h1>
+    <p>Status: generated static probe. Execute in the sandbox/browser, interact with the component, then save <code>window.__fusionProbe.trace</code> as <code>traces/raw-ej2-core.trace.json</code>.</p>
+    <div id="toolbar-host">
+        <div id="toolbar"></div>
+    </div>
+
+    <button id="dump">Dump Keys</button>
+    <button id="clear">Clear Trace</button>
+
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const target = document.getElementById("toolbar");
+
+        function clean(value, seen = new WeakSet(), depth = 0) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 4) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.slice(0, 20).map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).sort().slice(0, 120).forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function functionNames(value) {
+            const names = new Set();
+            let current = value;
+            while (current && current !== Object.prototype) {
+                Object.getOwnPropertyNames(current).forEach(name => {
+                    if (name !== "constructor" && typeof value[name] === "function") names.add(name);
+                });
+                current = Object.getPrototypeOf(current);
+            }
+            return Array.from(names).sort();
+        }
+
+        function describePayload(args) {
+            if (args === null || args === undefined) {
+                return { ownKeys: [], functions: [], properties: {}, value: args === undefined ? "undefined" : null };
+            }
+            const own = Object.keys(args).sort();
+            const properties = {};
+            own.forEach(key => {
+                const item = args[key];
+                properties[key] = { type: item === null ? "null" : Array.isArray(item) ? "array" : typeof item, sample: clean(item) };
+            });
+            return { ownKeys: own, functions: functionNames(args), properties };
+        }
+
+        function record(label, value) {
+            trace.push({ at: new Date().toISOString(), label, value: clean(value) });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        const probe = {
+            target,
+            trace,
+            record,
+            event: (label, args) => record(label, describePayload(args)),
+            member: (label, read) => record(label, read()),
+            call: (label, invoke) => record(label, invoke())
+        };
+        window.__fusionProbe = probe;
+
+        const ej2 = new ej.navigations.Toolbar({
+            items: [
+                { id: "pay-balance", text: "Pay balance", type: "Button" },
+                { id: "request-maintenance", text: "Request maintenance", type: "Button" },
+                { id: "message-care-team", text: "Message care team", type: "Button", disabled: true }
+            ],
+            width: "520px",
+            clicked: args => probe.event("clicked", args),
+            created: args => probe.event("created", args),
+            beforeCreate: args => probe.event("beforeCreate", args),
+            destroyed: args => probe.event("destroyed", args),
+            keyDown: args => probe.event("keyDown", args)
+        });
+
+        ej2.appendTo(target);
+        probe.ej2 = ej2;
+
+        record("ready", {
+            component: "toolbar",
+            apiSet: "core",
+            namespace: "ej.navigations",
+            className: "Toolbar"
+        });
+
+        // disable(true) — runtime root state. EJ2 adds CLS_DISABLE = 'e-overlay' to the root.
+        ej2.disable(true);
+        record("after-disable-true", {
+            rootClasses: Array.from(target.classList).sort(),
+            hasOverlay: target.classList.contains("e-overlay")
+        });
+        ej2.disable(false);
+        record("after-disable-false", {
+            rootClasses: Array.from(target.classList).sort(),
+            hasOverlay: target.classList.contains("e-overlay")
+        });
+
+        // enableItems(index, isEnable) — per-item disabled state (excluded candidate evidence).
+        ej2.enableItems(0, false);
+        record("after-enableItems-disable-0", { item0Disabled: ej2.items[0].disabled });
+        ej2.enableItems(0, true);
+        record("after-enableItems-enable-0", { item0Disabled: ej2.items[0].disabled });
+
+        // hideItem(index, value) — per-item visibility (excluded candidate evidence).
+        ej2.hideItem(1, true);
+        record("after-hideItem-1-true", { item1Visible: ej2.items[1].visible });
+        ej2.hideItem(1, false);
+        record("after-hideItem-1-false", { item1Visible: ej2.items[1].visible });
+
+        // addItems / removeItems — builder-owned item-collection mutation (excluded candidate evidence).
+        ej2.addItems([{ id: "extra", text: "Extra", type: "Button" }], 3);
+        record("after-addItems", { ids: ej2.items.map(i => i.id) });
+        ej2.removeItems(3);
+        record("after-removeItems", { ids: ej2.items.map(i => i.id) });
+
+        document.getElementById("dump").addEventListener("click", () => {
+            record("own keys", Object.keys(ej2).sort());
+            record("prototype methods", functionNames(ej2));
+        });
+
+        document.getElementById("clear").addEventListener("click", () => {
+            trace.length = 0;
+            document.getElementById("trace").textContent = "[]";
+        });
+    </script>
+</body>
+</html>

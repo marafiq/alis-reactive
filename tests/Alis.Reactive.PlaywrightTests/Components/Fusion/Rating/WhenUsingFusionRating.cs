@@ -2,6 +2,9 @@ using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Rating;
 
+// Journey: a resident reviews and updates their Monthly Care Satisfaction Survey.
+// The survey carries over last month's rating; the resident rates by clicking stars,
+// can restore last month's score, can clear it, then submits.
 [TestFixture]
 public class WhenUsingFusionRating : PlaywrightTestBase
 {
@@ -9,104 +12,144 @@ public class WhenUsingFusionRating : PlaywrightTestBase
     private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_RatingModel";
     private const string SatisfactionScoreId = GeneratedTypeScope + "__SatisfactionScore";
 
-    private FusionRatingLocator SatisfactionScore => new(Page, SatisfactionScoreId);
+    private FusionRatingLocator SatisfactionRating => new(Page, SatisfactionScoreId);
+    private ILocator ScoreText => Page.Locator("#survey-rating");
+    private ILocator SentimentText => Page.Locator("#survey-sentiment");
+    private ILocator ChangeNoteText => Page.Locator("#survey-change-note");
+    private ILocator ReadinessText => Page.Locator("#survey-readiness");
+    private ILocator Confirmation => Page.Locator("#survey-confirmation");
+    private ILocator RestoreButton => Page.Locator("#restore-rating");
+    private ILocator ClearButton => Page.Locator("#clear-rating");
+    private ILocator SubmitButton => Page.Locator("#survey-submit");
 
-    private async Task NavigateAndBoot()
+    private async Task OpenSurvey()
     {
-        await NavigateToAndWaitForTextSignal(Path, "#value-echo");
+        await NavigateToAndWaitForBoot(Path);
+        await Expect(SatisfactionRating.RatingList).ToBeVisibleAsync(new() { Timeout = 10000 });
     }
 
+    // RENDERS — the FusionRating builder renders the rating bound to the carried-over model value.
     [Test]
-    public async Task page_loads_without_errors()
+    public async Task survey_opens_showing_the_rating_carried_over_from_last_month()
     {
-        await NavigateAndBoot();
-        await Expect(Page).ToHaveTitleAsync("FusionRating — Alis.Reactive Sandbox");
+        await OpenSurvey();
+
+        await Expect(SatisfactionRating.Star(1)).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(SatisfactionRating.RatingList).ToHaveAttributeAsync("aria-valuenow", "3");
+        await Expect(ScoreText).ToHaveTextAsync("3");
+
         AssertNoConsoleErrors();
     }
 
+    // INTERACTS — clicking a star fires ValueChanged through the .Reactive wiring; the
+    // FusionRatingValueChangedArgs payload carries the new Value into the visible response.
     [Test]
-    public async Task plan_json_contains_typed_rating_members()
+    public async Task rating_their_care_shows_the_score_and_a_matching_message()
     {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
+        await OpenSurvey();
 
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""));
-        Assert.That(planJson, Does.Contain(SatisfactionScoreId));
-        Assert.That(planJson, Does.Contain("\"value\""));
-        Assert.That(planJson, Does.Contain("\"dataBind\""));
-        Assert.That(planJson, Does.Contain("\"reset\""));
-        Assert.That(planJson, Does.Contain("\"valueChanged\""));
+        await SatisfactionRating.RateStars(5);
+
+        await Expect(SatisfactionRating.RatingList).ToHaveAttributeAsync("aria-valuenow", "5");
+        await Expect(ScoreText).ToHaveTextAsync("5");
+        await Expect(SentimentText).ToHaveTextAsync("We're so glad your care is meeting your expectations.");
+
         AssertNoConsoleErrors();
     }
 
+    // Lowering the rating proves FusionRatingValueChangedArgs.PreviousValue carries the value
+    // before the change, and the mid-score branch over args.Value routes the follow-up message.
     [Test]
-    public async Task domready_sets_visible_value_and_reads_value_source()
+    public async Task lowering_their_rating_records_what_it_changed_from()
     {
-        await NavigateAndBoot();
+        await OpenSurvey();
 
-        await Expect(Page.Locator("#value-echo")).ToHaveTextAsync("3", new() { Timeout = 5000 });
-        Assert.That(await SatisfactionScore.ValueAttribute(), Is.EqualTo("3"));
-        Assert.That(await SatisfactionScore.AriaValue(), Is.EqualTo("3"));
+        await SatisfactionRating.RateStars(2);
+
+        await Expect(ScoreText).ToHaveTextAsync("2");
+        await Expect(ChangeNoteText).ToHaveTextAsync("3");
+        await Expect(SentimentText).ToHaveTextAsync("Thank you. A care manager will follow up to see how we can improve.");
+
         AssertNoConsoleErrors();
     }
 
+    // Clearing proves Reset() returns the rating to unrated, and FusionRatingValueChangedArgs.IsInteracted
+    // distinguishes a rating the resident chose (true) from a programmatic clear (false).
     [Test]
-    public async Task set_value_updates_visible_rating_and_value_source()
+    public async Task clearing_a_rating_the_resident_chose_marks_it_unrated()
     {
-        await NavigateAndBoot();
+        await OpenSurvey();
 
-        await Page.Locator("#set-rating-btn").ClickAsync();
+        await SatisfactionRating.RateStars(4);
+        await Expect(ReadinessText)
+            .ToHaveTextAsync("Thank you for rating your care yourself — your rating is ready to submit.");
 
-        await Expect(Page.Locator("#command-state")).ToHaveTextAsync("rating set", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#value-echo")).ToHaveTextAsync("4", new() { Timeout = 5000 });
-        Assert.That(await SatisfactionScore.ValueAttribute(), Is.EqualTo("4"));
-        Assert.That(await SatisfactionScore.AriaValue(), Is.EqualTo("4"));
+        await ClearButton.ClickAsync();
+
+        await Expect(SatisfactionRating.RatingList).ToHaveAttributeAsync("aria-valuenow", "0");
+        await Expect(ScoreText).ToHaveTextAsync("0");
+        await Expect(ReadinessText)
+            .ToHaveTextAsync("Your rating was cleared. Please rate your care to continue.");
+
         AssertNoConsoleErrors();
     }
 
+    // Restoring proves SetValue() writes the given value back onto the rating, and the Value() source
+    // reads the restored value back out for display.
     [Test]
-    public async Task reset_method_resets_rating_and_valuechanged_event_exposes_payload()
+    public async Task restoring_brings_back_the_rating_submitted_last_month()
     {
-        await NavigateAndBoot();
+        await OpenSurvey();
 
-        await Page.Locator("#set-rating-btn").ClickAsync();
-        await Page.Locator("#reset-rating-btn").ClickAsync();
+        await SatisfactionRating.RateStars(5);
+        await Expect(SatisfactionRating.RatingList).ToHaveAttributeAsync("aria-valuenow", "5");
 
-        await Expect(Page.Locator("#command-state")).ToHaveTextAsync("rating reset", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#value-echo")).ToHaveTextAsync("0", new() { Timeout = 5000 });
-        Assert.That(await SatisfactionScore.ValueAttribute(), Is.EqualTo("0"));
-        Assert.That(await SatisfactionScore.AriaValue(), Is.EqualTo("0"));
-        await Expect(Page.Locator("#changed-value")).ToHaveTextAsync("0", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#changed-previous")).ToHaveTextAsync("4", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#changed-interacted")).ToHaveTextAsync("false", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#args-condition")).ToHaveTextAsync("reset", new() { Timeout = 5000 });
+        await RestoreButton.ClickAsync();
+
+        await Expect(SatisfactionRating.RatingList).ToHaveAttributeAsync("aria-valuenow", "3");
+        await Expect(ScoreText).ToHaveTextAsync("3");
+
         AssertNoConsoleErrors();
     }
 
+    // SUBMITS — the Value() source feeds the gather body; the server confirmation the resident sees
+    // reflects the submitted score.
     [Test]
-    public async Task component_value_condition_reads_current_value()
+    public async Task submitting_sends_the_rating_and_confirms_it()
     {
-        await NavigateAndBoot();
+        await OpenSurvey();
 
-        await Page.Locator("#check-rating-btn").ClickAsync();
-        await Expect(Page.Locator("#rating-state")).ToHaveTextAsync("satisfied", new() { Timeout = 5000 });
+        await SatisfactionRating.RateStars(5);
+        await SubmitButton.ClickAsync();
 
-        await Page.Locator("#reset-rating-btn").ClickAsync();
-        await Page.Locator("#check-rating-btn").ClickAsync();
-        await Expect(Page.Locator("#rating-state")).ToHaveTextAsync("needs follow-up", new() { Timeout = 5000 });
+        await Expect(Confirmation)
+            .ToHaveTextAsync("Thank you. We recorded your satisfaction rating of 5 of 5 stars.",
+                new() { Timeout = 10000 });
+
         AssertNoConsoleErrors();
     }
 
+    // GATHERS — the framework gather pipeline carries the Value() source into the POST body under the
+    // declared key. (Framework gather test: asserts request.PostData.)
     [Test]
-    public async Task gather_consumes_rating_value_source()
+    public async Task submitting_posts_the_rating_score_to_the_server()
     {
-        await NavigateAndBoot();
+        await OpenSurvey();
 
-        await Page.Locator("#set-rating-btn").ClickAsync();
-        await Page.Locator("#gather-btn").ClickAsync();
+        await SatisfactionRating.RateStars(5);
 
-        await Expect(Page.Locator("#gather-score")).ToHaveTextAsync("4", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#gather-summary")).ToHaveTextAsync("score:4", new() { Timeout = 5000 });
+        var requestTask = Page.WaitForRequestAsync(request =>
+            request.Url.Contains("/Sandbox/Components/Rating/Echo") && request.Method == "POST",
+            new() { Timeout = 10000 });
+
+        await SubmitButton.ClickAsync();
+
+        var request = await requestTask;
+        var body = request.PostData ?? "";
+
+        Assert.That(body, Does.Contain("\"satisfactionScore\":5"),
+            "the gather pipeline must carry the rating Value() source under its declared key");
+
         AssertNoConsoleErrors();
     }
 }

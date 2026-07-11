@@ -4,151 +4,99 @@
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Navigations
 @{
-    ViewData["Title"] = "FusionAccordion";
+    ViewData["Title"] = "My Care Plan";
+
+    const string ButtonPrimary = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
 
     var plan = Html.ReactivePlan<AccordionModel>();
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        p.Component<FusionAccordion>("demo-accordion").ExpandItem(true, 1);
-        p.Element("expand-result").SetText("Panel 1 expanded via ExpandItem");
-    }));
-
-    Html.On(plan, t => t.CustomEvent("disable-panel", p =>
-    {
-        p.Component<FusionAccordion>("demo-accordion").EnableItem(2, false);
-        p.Element("enable-result").SetText("Panel 2 disabled via EnableItem");
-    }));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionAccordion — Full API</native-heading>
-    <native-text color="Secondary">
-        Non-input container component. Exercises events (expanded), methods (expandItem, enableItem),
-        and typed conditions on event args. Senior living domain: facility information sections.
-    </native-text>
+    <div>
+        <native-heading level="H1">My Care Plan</native-heading>
+        <native-text color="Secondary">
+            @Model.ResidentName — @Model.CommunityName. Open a section to read its details. Your care
+            agreement section unlocks once you confirm you have reviewed it.
+        </native-text>
+    </div>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">1. Method Call (ExpandItem on DomReady)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, <code>ExpandItem(true, 1)</code> expands the second panel programmatically.
-        </p>
-        <p class="font-mono text-sm mt-2">ExpandItem result: <span id="expand-result" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">2. Accordion Component</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Three panels with facility information. The expanded event fires after any panel
-            expand/collapse, reporting <code>index</code> and <code>isExpanded</code>.
-        </p>
-
-        @(Html.FusionAccordion(plan, "demo-accordion", b => b
-            .Items(new List<AccordionItem>
-            {
-                new AccordionItem { Header = "Facility Overview", Content = "<p>Sunrise Senior Living provides assisted living, memory care, and independent living communities across 30 states.</p>" },
-                new AccordionItem { Header = "Care Levels", Content = "<p>Level 1: Independent Living. Level 2: Assisted Living. Level 3: Memory Care. Level 4: Skilled Nursing.</p>" },
-                new AccordionItem { Header = "Contact Information", Content = "<p>Main Office: (555) 123-4567. Emergency: (555) 987-6543. Admissions: admissions@sunrise.example.com</p>" }
-            }))
-            .Reactive(evt => evt.Expanded, (args, p) =>
-            {
-                p.Element("expanded-index").SetText(args, x => x.Index);
-                p.Element("expanded-state").SetText(args, x => x.IsExpanded);
-
-                p.When(args, x => x.IsExpanded).Truthy()
-                    .Then(t => t.Element("condition-result").SetText("Panel expanded"))
-                    .Else(e => e.Element("condition-result").SetText("Panel collapsed"));
-            }))
-
-        <native-vstack gap="Xs" class="font-mono text-sm mt-4">
-            <p>Last expanded index: <span id="expanded-index" class="text-text-muted">&mdash;</span></p>
-            <p>Is expanded: <span id="expanded-state" class="text-text-muted">&mdash;</span></p>
-        </native-vstack>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">3. Condition (When/Then/Else)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            <code>When(args, x =&gt; x.IsExpanded).Truthy()</code> shows "Panel expanded" or "Panel collapsed"
-            based on the expanded event args.
-        </p>
-        <p class="font-mono text-sm mt-2">Condition result: <span id="condition-result" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">4. Method Call (EnableItem via Button)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Clicking the button dispatches <code>"disable-panel"</code>, which calls
-            <code>EnableItem(2, false)</code> to disable the third panel.
-        </p>
-
-        @(Html.NativeButton("btn-disable", "Disable Contact Panel")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+    <native-hstack gap="Sm" class="flex-wrap items-center">
+        @(Html.NativeButton("open-summary", "Open my care plan summary")
+            .CssClass(ButtonPrimary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Dispatch("disable-panel");
+                p.Component<FusionAccordion>("care-plan").ExpandItem(true, 0);
             }))
-
-        <p class="font-mono text-sm mt-2">EnableItem result: <span id="enable-result" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
+        <native-text color="Secondary">
+            Currently open: <span id="open-section" class="font-semibold text-text">No section open</span>
+        </native-text>
+    </native-hstack>
 
     <native-card><native-card-body>
-        <native-heading level="H2">5. Lazy-Load Content on Expand (HTTP + Into)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Each panel expand fires the <code>expanded</code> event. When <code>isExpanded</code> is true,
-            an HTTP GET fetches a partial view and injects it via <code>Into()</code> into a content container.
-        </p>
-
-        @{
-            var lazyAccordionItems = new List<AccordionItem>
+        @(Html.FusionAccordion(plan, "care-plan", b => b
+            .Items(new List<AccordionItem>
             {
-                new AccordionItem { Header = "Facility Overview", Content = "<div id='lazy-panel-0' class='text-sm text-text-muted p-2'>Click to load...</div>" },
-                new AccordionItem { Header = "Care Levels & Pricing", Content = "<div id='lazy-panel-1' class='text-sm text-text-muted p-2'>Click to load...</div>" },
-                new AccordionItem { Header = "Contact Information", Content = "<div id='lazy-panel-2' class='text-sm text-text-muted p-2'>Click to load...</div>" },
-            };
-        }
-
-        @(Html.FusionAccordion(plan, "lazy-accordion", b => b
-            .Items(lazyAccordionItems))
+                new AccordionItem
+                {
+                    Header = "My Care Team",
+                    Content = "<div class='p-1 text-sm'><p class='mb-2'>Your care is coordinated by a dedicated team.</p>" +
+                              "<ul class='list-disc pl-5 space-y-1'>" +
+                              "<li>Primary nurse: Maria Alvarez, RN</li>" +
+                              "<li>Care manager: David Chen</li>" +
+                              "<li>Wellness coordinator: Priya Nair</li></ul></div>"
+                },
+                new AccordionItem
+                {
+                    Header = "My Services & Monthly Charges",
+                    Content = "<div id='charges-detail' class='p-1 text-sm text-text-muted'>" +
+                              "Open this section to load this month's charges.</div>"
+                },
+                new AccordionItem
+                {
+                    Header = "My Care Agreement",
+                    Disabled = true,
+                    Content = "<div class='p-1 text-sm'><p>Your signed care agreement dated 1 March 2026 is on file. " +
+                              "A printed copy is available from the front desk on request.</p></div>"
+                }
+            }))
             .Reactive(evt => evt.Expanded, (args, p) =>
             {
+                // Which section the resident is reading, named from the panel index.
                 p.When(args, x => x.IsExpanded).Truthy()
-                    .And(args, x => x.Index).Eq(0)
-                    .Then(t => t
-                        .Get(Url.SandboxRoute("OverviewPartial", "Accordion"))
-                        .Response(r => r.OnSuccess(s =>
-                        {
-                            s.Into("lazy-panel-0");
-                            s.Element("lazy-load-status").SetText("Overview loaded");
-                        })));
+                    .Then(open =>
+                        open.When(args, x => x.Index).Eq(0)
+                            .Then(t => t.Element("open-section").SetText("My Care Team"))
+                            .ElseIf(args, x => x.Index).Eq(1)
+                            .Then(t => t.Element("open-section").SetText("My Services & Monthly Charges"))
+                            .Else(t => t.Element("open-section").SetText("My Care Agreement")))
+                    .Else(closed => closed.Element("open-section").SetText("No section open"));
 
+                // Charges detail is fetched on demand the first time the charges section opens.
                 p.When(args, x => x.IsExpanded).Truthy()
                     .And(args, x => x.Index).Eq(1)
                     .Then(t => t
-                        .Get(Url.SandboxRoute("CareLevelsPartial", "Accordion"))
-                        .Response(r => r.OnSuccess(s =>
-                        {
-                            s.Into("lazy-panel-1");
-                            s.Element("lazy-load-status").SetText("Care Levels loaded");
-                        })));
-
-                p.When(args, x => x.IsExpanded).Truthy()
-                    .And(args, x => x.Index).Eq(2)
-                    .Then(t => t
-                        .Get(Url.SandboxRoute("ContactPartial", "Accordion"))
-                        .Response(r => r.OnSuccess(s =>
-                        {
-                            s.Into("lazy-panel-2");
-                            s.Element("lazy-load-status").SetText("Contact loaded");
-                        })));
+                        .Get(Url.SandboxRoute("MonthlyChargesDetail", "Accordion"))
+                        .Response(r => r.OnSuccess(s => s.Into("charges-detail"))));
             }))
-
-        <p class="font-mono text-sm mt-4">Load status: <span id="lazy-load-status" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>
+        <native-vstack gap="Sm">
+            <native-text>
+                <span id="agreement-status" class="text-text-secondary">
+                    Your care agreement section is locked until you confirm you have reviewed it.
+                </span>
+            </native-text>
+            @(Html.NativeButton("confirm-agreement", "I have reviewed my care agreement")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionAccordion>("care-plan").EnableItem(2, true);
+                    p.Element("agreement-status")
+                        .SetText("Care agreement confirmed. Your care agreement section is now available.");
+                }))
+        </native-vstack>
     </native-card-body></native-card>
 </native-vstack>
 

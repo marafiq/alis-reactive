@@ -1,0 +1,333 @@
+{
+  "component": "date-range-picker",
+  "counts": {
+    "events": 11,
+    "payloadTypes": 7
+  },
+  "events": [
+    {
+      "event": "blur",
+      "eventType": "BlurEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BlurEventArgs",
+              "kind": "property",
+              "name": "model",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+              "type": "Object"
+            }
+          ],
+          "name": "BlurEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "change",
+      "eventType": "RangeEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "RangeEventArgs",
+              "kind": "property",
+              "name": "daySpan",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/daterangepicker/daterangepicker.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "RangeEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/daterangepicker/daterangepicker.d.ts",
+              "type": "HTMLElement | HTMLInputElement"
+            },
+            {
+              "declaredOn": "RangeEventArgs",
+              "kind": "property",
+              "name": "endDate",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/daterangepicker/daterangepicker.d.ts",
+              "type": "Date"
+            },
+            {
+              "declaredOn": "RangeEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/daterangepicker/daterangepicker.d.ts",
+              "type": "MouseEvent | KeyboardEvent | TouchEvent | Event"
+            },
+            {
+              "declaredOn": "RangeEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/daterangepicker/daterangepicker.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "RangeEventArgs",
+              "kind": "property",
+              "name": "startDate",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/daterangepicker/daterangepicker.d.ts",
+              "type": "Date"
+            },
+            {
+              "declaredOn": "RangeEventArgs",
+              "kind": "property",
+              "name": "text",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/daterangepicker/daterangepicker.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "RangeEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/daterangepicker/daterangepicker.d.ts",
+              "type": "Date[] | DateRange"
+            }
+          ],
+          "name": "RangeEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/daterangepicker/daterangepicker.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "cleared",
+      "eventType": "ClearedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ClearedEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+              "type": "MouseEvent | Event"
+            }
+          ],
+          "name": "ClearedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "close",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "destroyed",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "focus",
+      "eventType": "FocusEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "FocusEventArgs",
+              "kind": "property",
+              "name": "model",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+              "type": "Object"
+            }
+          ],
+          "name": "FocusEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "navigated",
+      "eventType": "NavigatedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "NavigatedEventArgs",
+              "kind": "property",
+              "name": "date",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+              "type": "Date"
+            },
+            {
+              "declaredOn": "NavigatedEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+              "type": "KeyboardEvent | MouseEvent | Event"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "NavigatedEventArgs",
+              "kind": "property",
+              "name": "view",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "NavigatedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "open",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "renderDayCell",
+      "eventType": "RenderDayCellEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "RenderDayCellEventArgs",
+              "kind": "property",
+              "name": "currentView",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "RenderDayCellEventArgs",
+              "kind": "property",
+              "name": "date",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+              "type": "Date"
+            },
+            {
+              "declaredOn": "RenderDayCellEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "RenderDayCellEventArgs",
+              "kind": "property",
+              "name": "isDisabled",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RenderDayCellEventArgs",
+              "kind": "property",
+              "name": "isOutOfRange",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "RenderDayCellEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "select",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionDateRangePicker",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "DateRangePicker",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.calendars"
+  }
+}

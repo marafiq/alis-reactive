@@ -1,108 +1,165 @@
+using Alis.Reactive.Playwright.Extensions;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Tab;
 
+// Journey: a care coordinator works a resident's Care Workspace — a tabbed surface with
+// Care Schedule, Medications, Incident Reports, and Billing sections. The coordinator moves
+// between sections, jumps straight to logging an incident, resumes in Medications, and hides
+// Billing from the view when it should not be shown.
 [TestFixture]
 public class WhenTabSwitches : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Tab";
+    private const string Workspace = "care-workspace";
 
-    private async Task NavigateAndBoot()
+    private FusionTabLocator CareWorkspace => new(Page, Workspace);
+    private ILocator ActiveSection => Page.Locator("#active-section");
+    private ILocator SectionContext => Page.Locator("#section-context");
+    private ILocator NavigationMode => Page.Locator("#navigation-mode");
+    private ILocator BillingAccess => Page.Locator("#billing-access");
+    private ILocator ResumeButton => Page.Locator("#resume-medications");
+    private ILocator LogIncidentButton => Page.Locator("#log-incident");
+    private ILocator HideBillingButton => Page.Locator("#hide-billing");
+    private ILocator ShowBillingButton => Page.Locator("#show-billing");
+
+    private async Task OpenWorkspace()
     {
-        await NavigateToAndWaitForTextSignal(Path, "#set-selected-result");
+        await NavigateToAndWaitForBoot(Path);
+        await Expect(CareWorkspace.Header(0)).ToBeVisibleAsync(new() { Timeout = 10000 });
     }
 
+    // RENDERS — the FusionTab builder renders the workspace on its first section with that
+    // section's content visible.
     [Test]
-    public async Task domready_selects_second_tab()
+    public async Task workspace_opens_showing_the_care_schedule_section()
     {
-        await NavigateAndBoot();
-        await Expect(Page.Locator("#set-selected-result"))
-            .ToHaveTextAsync("SetSelectedItem applied (tab 2)", new() { Timeout = 5000 });
+        await OpenWorkspace();
+
+        await Expect(CareWorkspace.ActiveHeader).ToHaveTextAsync("Care Schedule");
+        await Expect(CareWorkspace.ActiveContent).ToContainTextAsync("Today's care schedule");
+        await Expect(ActiveSection).ToHaveTextAsync("Care Schedule");
+
         AssertNoConsoleErrors();
     }
 
+    // INTERACTS — clicking the Medications header fires the Selected event through the .Reactive
+    // wiring; the FusionTabSelectedArgs.SelectedIndex routes the workspace to Medications and its
+    // content shows.
     [Test]
-    public async Task clicking_tab_echoes_selected_index()
+    public async Task opening_the_medications_section_shows_the_current_medications()
     {
-        await NavigateAndBoot();
+        await OpenWorkspace();
 
-        var firstTab = Page.Locator("#demo-tab .e-tab-header .e-toolbar-item").First;
-        await ClickWhenStable(firstTab);
+        await CareWorkspace.OpenSection(1);
 
-        await Expect(Page.Locator("#selected-index"))
-            .ToHaveTextAsync("0", new() { Timeout = 5000 });
+        await Expect(CareWorkspace.ActiveHeader).ToHaveTextAsync("Medications");
+        await Expect(CareWorkspace.ActiveContent).ToContainTextAsync("Lisinopril 10 mg");
+        await Expect(ActiveSection).ToHaveTextAsync("Medications");
+
         AssertNoConsoleErrors();
     }
 
+    // FusionTabSelectedArgs.PreviousIndex — the workspace names the section the coordinator just
+    // left. Moving from Medications to Incident Reports must read that the move came from Medications.
     [Test]
-    public async Task selecting_residents_tab_shows_condition_text()
+    public async Task moving_between_sections_records_where_the_coordinator_came_from()
     {
-        await NavigateAndBoot();
+        await OpenWorkspace();
 
-        var firstTab = Page.Locator("#demo-tab .e-tab-header .e-toolbar-item").First;
-        await ClickWhenStable(firstTab);
+        await CareWorkspace.OpenSection(1);
+        await Expect(SectionContext).ToHaveTextAsync("You moved here from Care Schedule.");
 
-        await Expect(Page.Locator("#condition-result"))
-            .ToHaveTextAsync("Residents tab active", new() { Timeout = 5000 });
+        await CareWorkspace.OpenSection(2);
+
+        await Expect(ActiveSection).ToHaveTextAsync("Incident Reports");
+        await Expect(SectionContext).ToHaveTextAsync("You moved here from Medications.");
+
         AssertNoConsoleErrors();
     }
 
+    // FusionTabSelectedArgs.IsSwiped — a section opened by clicking is recorded as a deliberate
+    // selection, not a swipe. Clicking must show the selection wording, never the swipe wording.
     [Test]
-    public async Task select_button_navigates_to_facilities_tab()
+    public async Task opening_a_section_by_clicking_is_recorded_as_a_deliberate_selection()
     {
-        await NavigateAndBoot();
+        await OpenWorkspace();
 
-        var selectBtn = Page.Locator("#select-tab-btn");
-        await ClickWhenStable(selectBtn);
+        await CareWorkspace.OpenSection(2);
 
-        await Expect(Page.Locator("#method-result"))
-            .ToHaveTextAsync("select(2) called", new() { Timeout = 5000 });
+        await Expect(NavigationMode).ToHaveTextAsync("Last navigation: opened by selection.");
+
         AssertNoConsoleErrors();
     }
 
+    // SetSelectedItem — the "Resume in Medications" action writes the selected section index, so
+    // the workspace jumps to Medications and shows its content without the coordinator touching the
+    // tab strip.
     [Test]
-    public async Task hide_button_hides_reports_tab()
+    public async Task resuming_returns_the_coordinator_to_the_medications_section()
     {
-        await NavigateAndBoot();
+        await OpenWorkspace();
+        await Expect(CareWorkspace.ActiveHeader).ToHaveTextAsync("Care Schedule");
 
-        var hideBtn = Page.Locator("#hide-tab-btn");
-        await ClickWhenStable(hideBtn);
+        await ResumeButton.ClickAsync();
 
-        await Expect(Page.Locator("#hide-result"))
-            .ToHaveTextAsync("hideTab(3, true) called", new() { Timeout = 5000 });
+        await Expect(CareWorkspace.ActiveHeader).ToHaveTextAsync("Medications");
+        await Expect(CareWorkspace.ActiveContent).ToContainTextAsync("Lisinopril 10 mg");
+        await Expect(ActiveSection).ToHaveTextAsync("Medications");
+
         AssertNoConsoleErrors();
     }
 
+    // Select — the "Log an incident now" shortcut calls the select method to jump straight to the
+    // Incident Reports section.
     [Test]
-    public async Task show_button_restores_reports_tab()
+    public async Task the_log_incident_shortcut_jumps_straight_to_incident_reports()
     {
-        await NavigateAndBoot();
+        await OpenWorkspace();
+        await Expect(CareWorkspace.ActiveHeader).ToHaveTextAsync("Care Schedule");
 
-        await ClickWhenStable(Page.Locator("#hide-tab-btn"));
-        await Expect(Page.Locator("#hide-result"))
-            .ToHaveTextAsync("hideTab(3, true) called", new() { Timeout = 5000 });
+        await LogIncidentButton.ClickAsync();
 
-        await ClickWhenStable(Page.Locator("#show-tab-btn"));
-        await Expect(Page.Locator("#hide-result"))
-            .ToHaveTextAsync("hideTab(3, false) called", new() { Timeout = 5000 });
+        await Expect(CareWorkspace.ActiveHeader).ToHaveTextAsync("Incident Reports");
+        await Expect(CareWorkspace.ActiveContent).ToContainTextAsync("No incidents reported");
+        await Expect(ActiveSection).ToHaveTextAsync("Incident Reports");
+
         AssertNoConsoleErrors();
     }
 
+    // HideTab — hiding Billing takes the Billing section out of the tab strip the coordinator sees
+    // and tells them it is hidden. The Billing header is no longer visible and the visible sections
+    // drop from four to three.
     [Test]
-    public async Task lazy_tab_loads_content_via_http_on_boot()
+    public async Task hiding_billing_removes_it_from_the_workspace()
     {
-        await NavigateAndBoot();
+        await OpenWorkspace();
+        await Expect(CareWorkspace.VisibleHeaders).ToHaveCountAsync(4);
 
-        await Expect(Page.Locator("#lazy-load-status"))
-            .ToHaveTextAsync("Residents loaded on boot", new() { Timeout = 10000 });
+        await HideBillingButton.ClickAsync();
+
+        await Expect(CareWorkspace.HeaderByText("Billing")).ToBeHiddenAsync();
+        await Expect(CareWorkspace.VisibleHeaders).ToHaveCountAsync(3);
+        await Expect(BillingAccess).ToHaveTextAsync("Billing is hidden from this workspace.");
+
         AssertNoConsoleErrors();
     }
 
+    // HideTab (show) — restoring Billing brings the section back into the tab strip. After hiding it,
+    // the restore action makes the Billing header visible again and returns the strip to four sections.
     [Test]
-    public async Task plan_json_contains_tab_behaviors()
+    public async Task restoring_billing_brings_the_tab_back()
     {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("demo-tab"));
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""));
+        await OpenWorkspace();
+
+        await HideBillingButton.ClickAsync();
+        await Expect(CareWorkspace.HeaderByText("Billing")).ToBeHiddenAsync();
+
+        await ShowBillingButton.ClickAsync();
+
+        await Expect(CareWorkspace.HeaderByText("Billing")).ToBeVisibleAsync();
+        await Expect(CareWorkspace.VisibleHeaders).ToHaveCountAsync(4);
+        await Expect(BillingAccess).ToHaveTextAsync("Billing is visible to coordinators.");
+
         AssertNoConsoleErrors();
     }
 }

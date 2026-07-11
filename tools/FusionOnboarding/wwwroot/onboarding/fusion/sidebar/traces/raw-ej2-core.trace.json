@@ -1,0 +1,889 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "sidebar",
+  "apiSet": "core",
+  "probe": "onboarding/fusion/sidebar/probes/raw-ej2-core.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "created",
+      "value": {
+        "functions": [],
+        "ownKeys": [],
+        "properties": {},
+        "value": "undefined"
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "ready",
+      "value": {
+        "apiSet": "core",
+        "className": "Sidebar",
+        "component": "sidebar",
+        "namespace": "ej.navigations"
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "open",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "element",
+          "event",
+          "isInteracted",
+          "model",
+          "name"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "element": {
+            "sample": "[Element#sidebar]",
+            "type": "object"
+          },
+          "event": {
+            "sample": null,
+            "type": "null"
+          },
+          "isInteracted": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "model": {
+            "sample": {
+              "allowServerDataBinding": true,
+              "bulkChanges": {},
+              "changedProperties": {},
+              "childChangedProperties": {},
+              "documentClickContext": "[Function]",
+              "element": "[Element#sidebar]",
+              "finalUpdate": "[Function]",
+              "ignoreCollectionWatch": false,
+              "isAngular": false,
+              "isComplexArraySetter": false,
+              "isDestroyed": false,
+              "isProtectedOnChange": false,
+              "isReact": false,
+              "isReactHybrid": false,
+              "isRendered": true,
+              "isServerRendered": false,
+              "isStringTemplate": false,
+              "isVue": false,
+              "localObserver": {
+                "boundedEvents": "[MaxDepth]",
+                "context": "[Circular]",
+                "ranArray": "[MaxDepth]"
+              },
+              "mainContentEle": {
+                "allowServerDataBinding": true,
+                "bulkChanges": "[MaxDepth]",
+                "cancelEvent": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "element": "[Element#BODY]",
+                "endEvent": "[Function]",
+                "finalUpdate": "[Function]",
+                "ignoreCollectionWatch": false,
+                "isComplexArraySetter": false,
+                "isDestroyed": false,
+                "isProtectedOnChange": false,
+                "isRendered": false,
+                "isServerRendered": false,
+                "modeclear": "[Function]",
+                "modelObserver": "[MaxDepth]",
+                "moveEvent": "[Function]",
+                "oldProperties": "[MaxDepth]",
+                "properties": "[MaxDepth]",
+                "refreshing": false,
+                "startEvent": "[Function]",
+                "swipeFn": "[Function]",
+                "tapCount": 0,
+                "touchAction": true
+              },
+              "modelObserver": {
+                "boundedEvents": "[MaxDepth]",
+                "context": "[Circular]",
+                "ranArray": "[MaxDepth]"
+              },
+              "moduleLoader": {
+                "loadedModules": "[MaxDepth]",
+                "parent": "[Circular]"
+              },
+              "needsID": false,
+              "oldProperties": {},
+              "properties": {
+                "animate": false,
+                "change": "[Function]",
+                "close": "[Function]",
+                "closeOnDocumentClick": false,
+                "created": "[Function]",
+                "destroyed": "[Function]",
+                "enableDock": false,
+                "enableGestures": true,
+                "enablePersistence": false,
+                "enableRtl": false,
+                "isOpen": false,
+                "locale": "en-US",
+                "mediaQuery": null,
+                "open": "[Function]",
+                "position": "Left",
+                "target": null,
+                "type": "Push",
+                "width": "240px",
+                "zIndex": 1000
+              },
+              "randomId": {
+                "0": 5391,
+                "1": 59839,
+                "2": 27238,
+                "3": 47232,
+                "4": 56582
+              },
+              "refreshing": false,
+              "sidebarEle": {
+                "allowServerDataBinding": true,
+                "bulkChanges": "[MaxDepth]",
+                "cancelEvent": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "element": "[Element#sidebar]",
+                "endEvent": "[Function]",
+                "finalUpdate": "[Function]",
+                "ignoreCollectionWatch": false,
+                "isComplexArraySetter": false,
+                "isDestroyed": false,
+                "isProtectedOnChange": false,
+                "isRendered": false,
+                "isServerRendered": false,
+                "modeclear": "[Function]",
+                "modelObserver": "[MaxDepth]",
+                "moveEvent": "[Function]",
+                "oldProperties": "[MaxDepth]",
+                "properties": "[MaxDepth]",
+                "refreshing": false,
+                "startEvent": "[Function]",
+                "swipeFn": "[Function]",
+                "tapCount": 0,
+                "touchAction": true
+              },
+              "sidebarEleCopy": "[Element#sidebar]",
+              "tabIndex": null,
+              "targetEle": "[Element#DIV]"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "open",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "change",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "element",
+          "name"
+        ],
+        "properties": {
+          "element": {
+            "sample": "[Element#sidebar]",
+            "type": "object"
+          },
+          "name": {
+            "sample": "change",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "show()",
+      "value": null
+    },
+    {
+      "sequence": 6,
+      "label": "isOpen after show",
+      "value": true
+    },
+    {
+      "sequence": 7,
+      "label": "close",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "element",
+          "event",
+          "isInteracted",
+          "model",
+          "name"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "element": {
+            "sample": "[Element#sidebar]",
+            "type": "object"
+          },
+          "event": {
+            "sample": null,
+            "type": "null"
+          },
+          "isInteracted": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "model": {
+            "sample": {
+              "allowServerDataBinding": true,
+              "bulkChanges": {},
+              "changedProperties": {},
+              "childChangedProperties": {},
+              "documentClickContext": "[Function]",
+              "element": "[Element#sidebar]",
+              "finalUpdate": "[Function]",
+              "ignoreCollectionWatch": false,
+              "isAngular": false,
+              "isComplexArraySetter": false,
+              "isDestroyed": false,
+              "isProtectedOnChange": false,
+              "isReact": false,
+              "isReactHybrid": false,
+              "isRendered": true,
+              "isServerRendered": false,
+              "isStringTemplate": false,
+              "isVue": false,
+              "localObserver": {
+                "boundedEvents": "[MaxDepth]",
+                "context": "[Circular]",
+                "ranArray": "[MaxDepth]"
+              },
+              "mainContentEle": {
+                "allowServerDataBinding": true,
+                "bulkChanges": "[MaxDepth]",
+                "cancelEvent": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "element": "[Element#BODY]",
+                "endEvent": "[Function]",
+                "finalUpdate": "[Function]",
+                "ignoreCollectionWatch": false,
+                "isComplexArraySetter": false,
+                "isDestroyed": false,
+                "isProtectedOnChange": false,
+                "isRendered": false,
+                "isServerRendered": false,
+                "modeclear": "[Function]",
+                "modelObserver": "[MaxDepth]",
+                "moveEvent": "[Function]",
+                "oldProperties": "[MaxDepth]",
+                "properties": "[MaxDepth]",
+                "refreshing": false,
+                "startEvent": "[Function]",
+                "swipeFn": "[Function]",
+                "tapCount": 0,
+                "touchAction": true
+              },
+              "modelObserver": {
+                "boundedEvents": "[MaxDepth]",
+                "context": "[Circular]",
+                "ranArray": "[MaxDepth]"
+              },
+              "moduleLoader": {
+                "loadedModules": "[MaxDepth]",
+                "parent": "[Circular]"
+              },
+              "needsID": false,
+              "oldProperties": {},
+              "properties": {
+                "animate": false,
+                "change": "[Function]",
+                "close": "[Function]",
+                "closeOnDocumentClick": false,
+                "created": "[Function]",
+                "destroyed": "[Function]",
+                "enableDock": false,
+                "enableGestures": true,
+                "enablePersistence": false,
+                "enableRtl": false,
+                "isOpen": true,
+                "locale": "en-US",
+                "mediaQuery": null,
+                "open": "[Function]",
+                "position": "Left",
+                "showBackdrop": false,
+                "target": null,
+                "type": "Push",
+                "width": "240px",
+                "zIndex": 1000
+              },
+              "randomId": {
+                "0": 5391,
+                "1": 59839,
+                "2": 27238,
+                "3": 47232,
+                "4": 56582
+              },
+              "refreshing": false,
+              "sidebarEle": {
+                "allowServerDataBinding": true,
+                "bulkChanges": "[MaxDepth]",
+                "cancelEvent": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "element": "[Element#sidebar]",
+                "endEvent": "[Function]",
+                "finalUpdate": "[Function]",
+                "ignoreCollectionWatch": false,
+                "isComplexArraySetter": false,
+                "isDestroyed": false,
+                "isProtectedOnChange": false,
+                "isRendered": false,
+                "isServerRendered": false,
+                "modeclear": "[Function]",
+                "modelObserver": "[MaxDepth]",
+                "moveEvent": "[Function]",
+                "oldProperties": "[MaxDepth]",
+                "properties": "[MaxDepth]",
+                "refreshing": false,
+                "startEvent": "[Function]",
+                "swipeFn": "[Function]",
+                "tapCount": 0,
+                "touchAction": true
+              },
+              "sidebarEleCopy": "[Element#sidebar]",
+              "tabIndex": null,
+              "targetEle": "[Element#DIV]"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "close",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 8,
+      "label": "change",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "element",
+          "name"
+        ],
+        "properties": {
+          "element": {
+            "sample": "[Element#sidebar]",
+            "type": "object"
+          },
+          "name": {
+            "sample": "change",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 9,
+      "label": "hide()",
+      "value": null
+    },
+    {
+      "sequence": 10,
+      "label": "isOpen after hide",
+      "value": false
+    },
+    {
+      "sequence": 11,
+      "label": "open",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "element",
+          "event",
+          "isInteracted",
+          "model",
+          "name"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "element": {
+            "sample": "[Element#sidebar]",
+            "type": "object"
+          },
+          "event": {
+            "sample": null,
+            "type": "null"
+          },
+          "isInteracted": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "model": {
+            "sample": {
+              "allowServerDataBinding": true,
+              "bulkChanges": {},
+              "changedProperties": {},
+              "childChangedProperties": {},
+              "documentClickContext": "[Function]",
+              "element": "[Element#sidebar]",
+              "finalUpdate": "[Function]",
+              "ignoreCollectionWatch": false,
+              "isAngular": false,
+              "isComplexArraySetter": false,
+              "isDestroyed": false,
+              "isProtectedOnChange": false,
+              "isReact": false,
+              "isReactHybrid": false,
+              "isRendered": true,
+              "isServerRendered": false,
+              "isStringTemplate": false,
+              "isVue": false,
+              "localObserver": {
+                "boundedEvents": "[MaxDepth]",
+                "context": "[Circular]",
+                "ranArray": "[MaxDepth]"
+              },
+              "mainContentEle": {
+                "allowServerDataBinding": true,
+                "bulkChanges": "[MaxDepth]",
+                "cancelEvent": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "element": "[Element#BODY]",
+                "endEvent": "[Function]",
+                "finalUpdate": "[Function]",
+                "ignoreCollectionWatch": false,
+                "isComplexArraySetter": false,
+                "isDestroyed": false,
+                "isProtectedOnChange": false,
+                "isRendered": false,
+                "isServerRendered": false,
+                "modeclear": "[Function]",
+                "modelObserver": "[MaxDepth]",
+                "moveEvent": "[Function]",
+                "oldProperties": "[MaxDepth]",
+                "properties": "[MaxDepth]",
+                "refreshing": false,
+                "startEvent": "[Function]",
+                "swipeFn": "[Function]",
+                "tapCount": 0,
+                "touchAction": true
+              },
+              "modelObserver": {
+                "boundedEvents": "[MaxDepth]",
+                "context": "[Circular]",
+                "ranArray": "[MaxDepth]"
+              },
+              "moduleLoader": {
+                "loadedModules": "[MaxDepth]",
+                "parent": "[Circular]"
+              },
+              "needsID": false,
+              "oldProperties": {},
+              "properties": {
+                "animate": false,
+                "change": "[Function]",
+                "close": "[Function]",
+                "closeOnDocumentClick": false,
+                "created": "[Function]",
+                "destroyed": "[Function]",
+                "enableDock": false,
+                "enableGestures": true,
+                "enablePersistence": false,
+                "enableRtl": false,
+                "isOpen": false,
+                "locale": "en-US",
+                "mediaQuery": null,
+                "open": "[Function]",
+                "position": "Left",
+                "showBackdrop": false,
+                "target": null,
+                "type": "Push",
+                "width": "240px",
+                "zIndex": 1000
+              },
+              "randomId": {
+                "0": 5391,
+                "1": 59839,
+                "2": 27238,
+                "3": 47232,
+                "4": 56582
+              },
+              "refreshing": false,
+              "sidebarEle": {
+                "allowServerDataBinding": true,
+                "bulkChanges": "[MaxDepth]",
+                "cancelEvent": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "element": "[Element#sidebar]",
+                "endEvent": "[Function]",
+                "finalUpdate": "[Function]",
+                "ignoreCollectionWatch": false,
+                "isComplexArraySetter": false,
+                "isDestroyed": false,
+                "isProtectedOnChange": false,
+                "isRendered": false,
+                "isServerRendered": false,
+                "modeclear": "[Function]",
+                "modelObserver": "[MaxDepth]",
+                "moveEvent": "[Function]",
+                "oldProperties": "[MaxDepth]",
+                "properties": "[MaxDepth]",
+                "refreshing": false,
+                "startEvent": "[Function]",
+                "swipeFn": "[Function]",
+                "tapCount": 0,
+                "touchAction": true
+              },
+              "sidebarEleCopy": "[Element#sidebar]",
+              "tabIndex": null,
+              "targetEle": "[Element#DIV]"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "open",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 12,
+      "label": "change",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "element",
+          "name"
+        ],
+        "properties": {
+          "element": {
+            "sample": "[Element#sidebar]",
+            "type": "object"
+          },
+          "name": {
+            "sample": "change",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 13,
+      "label": "toggle()",
+      "value": null
+    },
+    {
+      "sequence": 14,
+      "label": "isOpen after toggle",
+      "value": true
+    },
+    {
+      "sequence": 15,
+      "label": "close",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "element",
+          "event",
+          "isInteracted",
+          "model",
+          "name"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "element": {
+            "sample": "[Element#sidebar]",
+            "type": "object"
+          },
+          "event": {
+            "sample": null,
+            "type": "null"
+          },
+          "isInteracted": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "model": {
+            "sample": {
+              "allowServerDataBinding": true,
+              "bulkChanges": {},
+              "changedProperties": {},
+              "childChangedProperties": {},
+              "documentClickContext": "[Function]",
+              "element": "[Element#sidebar]",
+              "finalUpdate": "[Function]",
+              "ignoreCollectionWatch": false,
+              "isAngular": false,
+              "isComplexArraySetter": false,
+              "isDestroyed": false,
+              "isProtectedOnChange": false,
+              "isReact": false,
+              "isReactHybrid": false,
+              "isRendered": true,
+              "isServerRendered": false,
+              "isStringTemplate": false,
+              "isVue": false,
+              "localObserver": {
+                "boundedEvents": "[MaxDepth]",
+                "context": "[Circular]",
+                "ranArray": "[MaxDepth]"
+              },
+              "mainContentEle": {
+                "allowServerDataBinding": true,
+                "bulkChanges": "[MaxDepth]",
+                "cancelEvent": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "element": "[Element#BODY]",
+                "endEvent": "[Function]",
+                "finalUpdate": "[Function]",
+                "ignoreCollectionWatch": false,
+                "isComplexArraySetter": false,
+                "isDestroyed": false,
+                "isProtectedOnChange": false,
+                "isRendered": false,
+                "isServerRendered": false,
+                "modeclear": "[Function]",
+                "modelObserver": "[MaxDepth]",
+                "moveEvent": "[Function]",
+                "oldProperties": "[MaxDepth]",
+                "properties": "[MaxDepth]",
+                "refreshing": false,
+                "startEvent": "[Function]",
+                "swipeFn": "[Function]",
+                "tapCount": 0,
+                "touchAction": true
+              },
+              "modelObserver": {
+                "boundedEvents": "[MaxDepth]",
+                "context": "[Circular]",
+                "ranArray": "[MaxDepth]"
+              },
+              "moduleLoader": {
+                "loadedModules": "[MaxDepth]",
+                "parent": "[Circular]"
+              },
+              "needsID": false,
+              "oldProperties": {},
+              "properties": {
+                "animate": false,
+                "change": "[Function]",
+                "close": "[Function]",
+                "closeOnDocumentClick": false,
+                "created": "[Function]",
+                "destroyed": "[Function]",
+                "enableDock": false,
+                "enableGestures": true,
+                "enablePersistence": false,
+                "enableRtl": false,
+                "isOpen": true,
+                "locale": "en-US",
+                "mediaQuery": null,
+                "open": "[Function]",
+                "position": "Left",
+                "showBackdrop": false,
+                "target": null,
+                "type": "Push",
+                "width": "240px",
+                "zIndex": 1000
+              },
+              "randomId": {
+                "0": 5391,
+                "1": 59839,
+                "2": 27238,
+                "3": 47232,
+                "4": 56582
+              },
+              "refreshing": false,
+              "sidebarEle": {
+                "allowServerDataBinding": true,
+                "bulkChanges": "[MaxDepth]",
+                "cancelEvent": "[Function]",
+                "changedProperties": "[MaxDepth]",
+                "childChangedProperties": "[MaxDepth]",
+                "element": "[Element#sidebar]",
+                "endEvent": "[Function]",
+                "finalUpdate": "[Function]",
+                "ignoreCollectionWatch": false,
+                "isComplexArraySetter": false,
+                "isDestroyed": false,
+                "isProtectedOnChange": false,
+                "isRendered": false,
+                "isServerRendered": false,
+                "modeclear": "[Function]",
+                "modelObserver": "[MaxDepth]",
+                "moveEvent": "[Function]",
+                "oldProperties": "[MaxDepth]",
+                "properties": "[MaxDepth]",
+                "refreshing": false,
+                "startEvent": "[Function]",
+                "swipeFn": "[Function]",
+                "tapCount": 0,
+                "touchAction": true
+              },
+              "sidebarEleCopy": "[Element#sidebar]",
+              "tabIndex": null,
+              "targetEle": "[Element#DIV]"
+            },
+            "type": "object"
+          },
+          "name": {
+            "sample": "close",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 16,
+      "label": "change",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "element",
+          "name"
+        ],
+        "properties": {
+          "element": {
+            "sample": "[Element#sidebar]",
+            "type": "object"
+          },
+          "name": {
+            "sample": "change",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 17,
+      "label": "own keys",
+      "value": [
+        "allowServerDataBinding",
+        "bulkChanges",
+        "changedProperties",
+        "childChangedProperties",
+        "documentClickContext",
+        "element",
+        "finalUpdate",
+        "ignoreCollectionWatch",
+        "isAngular",
+        "isComplexArraySetter",
+        "isDestroyed",
+        "isProtectedOnChange",
+        "isReact",
+        "isReactHybrid",
+        "isRendered",
+        "isServerRendered",
+        "isStringTemplate",
+        "isVue",
+        "localObserver",
+        "mainContentEle"
+      ]
+    },
+    {
+      "sequence": 18,
+      "label": "prototype methods",
+      "value": [
+        "accessMount",
+        "addClass",
+        "addEventListener",
+        "addInstance",
+        "addOnPersist",
+        "appendTo",
+        "attachUnloadEvent",
+        "change",
+        "checkMediaQuery",
+        "checkType",
+        "clearChanges",
+        "clearTemplate",
+        "close",
+        "createBackDrop",
+        "createElement",
+        "created",
+        "dataBind",
+        "destroy",
+        "destroyBackDrop",
+        "destroyed"
+      ]
+    },
+    {
+      "sequence": 19,
+      "label": "own keys",
+      "value": [
+        "allowServerDataBinding",
+        "bulkChanges",
+        "changedProperties",
+        "childChangedProperties",
+        "documentClickContext",
+        "element",
+        "finalUpdate",
+        "ignoreCollectionWatch",
+        "isAngular",
+        "isComplexArraySetter",
+        "isDestroyed",
+        "isProtectedOnChange",
+        "isReact",
+        "isReactHybrid",
+        "isRendered",
+        "isServerRendered",
+        "isStringTemplate",
+        "isVue",
+        "localObserver",
+        "mainContentEle"
+      ]
+    },
+    {
+      "sequence": 20,
+      "label": "prototype methods",
+      "value": [
+        "accessMount",
+        "addClass",
+        "addEventListener",
+        "addInstance",
+        "addOnPersist",
+        "appendTo",
+        "attachUnloadEvent",
+        "change",
+        "checkMediaQuery",
+        "checkType",
+        "clearChanges",
+        "clearTemplate",
+        "close",
+        "createBackDrop",
+        "createElement",
+        "created",
+        "dataBind",
+        "destroy",
+        "destroyBackDrop",
+        "destroyed"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "component": "sidebar",
+  "counts": {
+    "events": 5,
+    "payloadTypes": 3
+  },
+  "events": [
+    {
+      "event": "change",
+      "eventType": "ChangeEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ChangeEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "close",
+      "eventType": "EventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "EventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "EventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "EventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts",
+              "type": "MouseEvent | Event"
+            },
+            {
+              "declaredOn": "EventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "EventArgs",
+              "kind": "property",
+              "name": "model",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts",
+              "type": "SidebarModel"
+            }
+          ],
+          "name": "EventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "destroyed",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "open",
+      "eventType": "EventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "EventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "EventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "EventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts",
+              "type": "MouseEvent | Event"
+            },
+            {
+              "declaredOn": "EventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "EventArgs",
+              "kind": "property",
+              "name": "model",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts",
+              "type": "SidebarModel"
+            }
+          ],
+          "name": "EventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionSidebar",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "Sidebar",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.ej.navigations"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "component": "breadcrumb",
+  "fusionType": "FusionBreadcrumb",
+  "note": "Hand-authored JUDGMENT file (compute-fusion-parity.mjs reads it; no generator writes it). The generated vendor surface in discovery/public-api-surface.json has 16 members. 14 carry builder.covered=true (Syncfusion BreadcrumbBuilder owns initial render); destroy() is a skip: discovery decision (lifecycle cleanup, not plan behavior); locale is the only candidate the builder does not cover and is excluded below with source evidence. The FusionBreadcrumb slice additionally onboards runtime behavior on top of two builder-covered members (activeItem read/write + dataBind, itemClick typed event); they are recorded under onboarded for traceability. The parity tool still counts them as builder-owned because builder.covered=true, which is correct: initial render stays on the builder, the slice adds the post-render reactive lane.",
+  "onboarded": [
+    "activeItem",
+    "itemClick"
+  ],
+  "excluded": [
+    {
+      "name": "locale",
+      "reason": "Syncfusion marks locale @private and @aspIgnore in node_modules/@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts:207-210 — it is an internal globalization hook, not a public runtime value. No Senior Living navigation use case reads or branches on a private locale key (care/service trails, resident-directory and billing breadcrumbs act on item text/url/id); the MVC BreadcrumbBuilder does not expose it. Onboarding a vendor-private member as typed DSL would expose an unstable internal contract; excluded from the public Fusion slice."
+    }
+  ]
+}

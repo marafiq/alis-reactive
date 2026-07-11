@@ -1,0 +1,341 @@
+{
+  "component": "in-place-editor",
+  "counts": {
+    "events": 12,
+    "payloadTypes": 9
+  },
+  "events": [
+    {
+      "event": "actionBegin",
+      "eventType": "ActionBeginEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ActionBeginEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "boolean"
+            }
+          ],
+          "name": "ActionBeginEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "actionFailure",
+      "eventType": "ActionEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ActionEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ActionEventArgs",
+              "kind": "property",
+              "name": "data",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "object"
+            },
+            {
+              "declaredOn": "ActionEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ActionEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "actionSuccess",
+      "eventType": "ActionEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ActionEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ActionEventArgs",
+              "kind": "property",
+              "name": "data",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "object"
+            },
+            {
+              "declaredOn": "ActionEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ActionEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeSanitizeHtml",
+      "eventType": "BeforeSanitizeHtmlArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BeforeSanitizeHtmlArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeSanitizeHtmlArgs",
+              "kind": "property",
+              "name": "helper",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+              "type": "Function"
+            },
+            {
+              "declaredOn": "BeforeSanitizeHtmlArgs",
+              "kind": "property",
+              "name": "selectors",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+              "type": "SanitizeSelectors"
+            }
+          ],
+          "name": "BeforeSanitizeHtmlArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beginEdit",
+      "eventType": "BeginEditEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BeginEditEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeginEditEventArgs",
+              "kind": "property",
+              "name": "cancelFocus",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeginEditEventArgs",
+              "kind": "property",
+              "name": "mode",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "RenderMode"
+            }
+          ],
+          "name": "BeginEditEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "cancelClick",
+      "eventType": "MouseEvent",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "MouseEvent",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "change",
+      "eventType": "ChangeEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "itemData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "FieldSettingsModel"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "previousItemData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "FieldSettingsModel"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "previousValue",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "string | string[] | number | number[] | boolean[] | Date | Date[] | DateRange"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "string | string[] | number | number[] | boolean[] | Date | Date[] | DateRange"
+            }
+          ],
+          "name": "ChangeEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Event",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "Event",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "destroyed",
+      "eventType": "Event",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "Event",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "endEdit",
+      "eventType": "EndEditEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "EndEditEventArgs",
+              "kind": "property",
+              "name": "action",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "EndEditEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "EndEditEventArgs",
+              "kind": "property",
+              "name": "mode",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "RenderMode"
+            }
+          ],
+          "name": "EndEditEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "submitClick",
+      "eventType": "MouseEvent",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "MouseEvent",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "validating",
+      "eventType": "ValidateEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "ActionBeginEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "ActionBeginEventArgs",
+              "inheritedVia": "ActionBeginEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ValidateEventArgs",
+              "kind": "property",
+              "name": "errorMessage",
+              "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ValidateEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionInPlaceEditor",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "InPlaceEditor",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.inplaceeditor"
+  }
+}

@@ -1,0 +1,482 @@
+{
+  "component": "tooltip",
+  "counts": {
+    "events": 8,
+    "payloadTypes": 2
+  },
+  "events": [
+    {
+      "event": "afterClose",
+      "eventType": "TooltipEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "collidedPosition",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "type",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "TooltipEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "afterOpen",
+      "eventType": "TooltipEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "collidedPosition",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "type",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "TooltipEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeClose",
+      "eventType": "TooltipEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "collidedPosition",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "type",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "TooltipEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeCollision",
+      "eventType": "TooltipEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "collidedPosition",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "type",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "TooltipEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeOpen",
+      "eventType": "TooltipEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "collidedPosition",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "type",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "TooltipEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeRender",
+      "eventType": "TooltipEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "collidedPosition",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "TooltipEventArgs",
+              "kind": "property",
+              "name": "type",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "TooltipEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "destroyed",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionTooltip",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "Tooltip",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.ej.popups.Tooltip"
+  }
+}

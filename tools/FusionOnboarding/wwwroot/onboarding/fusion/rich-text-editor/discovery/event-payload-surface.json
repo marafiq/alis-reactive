@@ -1,0 +1,1812 @@
+{
+  "component": "rich-text-editor",
+  "counts": {
+    "events": 49,
+    "payloadTypes": 30
+  },
+  "events": [
+    {
+      "event": "actionBegin",
+      "eventType": "ActionBeginEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ActionBeginEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ActionBeginEventArgs",
+              "kind": "property",
+              "name": "emojiPickerArgs",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "IEmojiPickerArgs"
+            },
+            {
+              "declaredOn": "ActionBeginEventArgs",
+              "kind": "property",
+              "name": "exportValue",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ActionBeginEventArgs",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "IToolbarItemModel | IDropDownItemModel"
+            },
+            {
+              "declaredOn": "ActionBeginEventArgs",
+              "kind": "property",
+              "name": "itemCollection",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "IItemCollectionArgs"
+            },
+            {
+              "declaredOn": "ActionBeginEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ActionBeginEventArgs",
+              "kind": "property",
+              "name": "originalEvent",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "MouseEvent | KeyboardEvent | DragEvent"
+            },
+            {
+              "declaredOn": "ActionBeginEventArgs",
+              "kind": "property",
+              "name": "requestType",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ActionBeginEventArgs",
+              "kind": "property",
+              "name": "selectType",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ActionBeginEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "actionComplete",
+      "eventType": "ActionCompleteEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ActionCompleteEventArgs",
+              "kind": "property",
+              "name": "editorMode",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ActionCompleteEventArgs",
+              "kind": "property",
+              "name": "elements",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "Node[]"
+            },
+            {
+              "declaredOn": "ActionCompleteEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "MouseEvent | KeyboardEvent"
+            },
+            {
+              "declaredOn": "ActionCompleteEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ActionCompleteEventArgs",
+              "kind": "property",
+              "name": "range",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "Range"
+            },
+            {
+              "declaredOn": "ActionCompleteEventArgs",
+              "kind": "property",
+              "name": "requestType",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ActionCompleteEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "afterImageDelete",
+      "eventType": "AfterImageDeleteEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "AfterImageDeleteEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "Node"
+            },
+            {
+              "declaredOn": "AfterImageDeleteEventArgs",
+              "kind": "property",
+              "name": "src",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "AfterImageDeleteEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "afterMediaDelete",
+      "eventType": "AfterMediaDeleteEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "AfterMediaDeleteEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "Node"
+            },
+            {
+              "declaredOn": "AfterMediaDeleteEventArgs",
+              "kind": "property",
+              "name": "src",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "AfterMediaDeleteEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "afterPasteCleanup",
+      "eventType": "object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "aiAssistantPromptRequest",
+      "eventType": "AIAssistantPromptRequestArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "AIAssistantPromptRequestArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "AIAssistantPromptRequestArgs",
+              "kind": "property",
+              "name": "html",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "AIAssistantPromptRequestArgs",
+              "kind": "property",
+              "name": "prompt",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "AIAssistantPromptRequestArgs",
+              "kind": "property",
+              "name": "promptSuggestions",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "string[]"
+            },
+            {
+              "declaredOn": "AIAssistantPromptRequestArgs",
+              "kind": "property",
+              "name": "responseToolbarItems",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "ToolbarItemModel[]"
+            },
+            {
+              "declaredOn": "AIAssistantPromptRequestArgs",
+              "kind": "property",
+              "name": "text",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "AIAssistantPromptRequestArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "aiAssistantStopRespondingClick",
+      "eventType": "AIAssistantStopRespondingArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "AIAssistantStopRespondingArgs",
+              "kind": "property",
+              "name": "dataIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "AIAssistantStopRespondingArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "AIAssistantStopRespondingArgs",
+              "kind": "property",
+              "name": "prompt",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "AIAssistantStopRespondingArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "aiAssistantToolbarClick",
+      "eventType": "AIAssitantToolbarClickEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "AIAssitantToolbarClickEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "AIAssitantToolbarClickEventArgs",
+              "kind": "property",
+              "name": "dataIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "AIAssitantToolbarClickEventArgs",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "IAIAssistantToolbarItem"
+            },
+            {
+              "declaredOn": "AIAssitantToolbarClickEventArgs",
+              "kind": "property",
+              "name": "originalEvent",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "AIAssitantToolbarClickEventArgs",
+              "kind": "property",
+              "name": "requestType",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "AssistantToolbarType"
+            }
+          ],
+          "name": "AIAssitantToolbarClickEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeClipboardWrite",
+      "eventType": "ClipboardWriteEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ClipboardWriteEventArgs",
+              "kind": "property",
+              "name": "htmlContent",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ClipboardWriteEventArgs",
+              "kind": "property",
+              "name": "operation",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ClipboardWriteEventArgs",
+              "kind": "property",
+              "name": "plainTextContent",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ClipboardWriteEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeDialogClose",
+      "eventType": "BeforeCloseEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BeforeCloseEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/dialog/dialog.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeCloseEventArgs",
+              "kind": "property",
+              "name": "closedBy",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/dialog/dialog.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "BeforeCloseEventArgs",
+              "kind": "property",
+              "name": "container",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/dialog/dialog.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "BeforeCloseEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/dialog/dialog.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "BeforeCloseEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/dialog/dialog.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "BeforeCloseEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/dialog/dialog.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeCloseEventArgs",
+              "kind": "property",
+              "name": "preventFocus",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/dialog/dialog.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeCloseEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/dialog/dialog.d.ts",
+              "type": "HTMLElement | string"
+            }
+          ],
+          "name": "BeforeCloseEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-popups/src/dialog/dialog.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeDialogOpen",
+      "eventType": "BeforeOpenEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BeforeOpenEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/dialog/dialog.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeOpenEventArgs",
+              "kind": "property",
+              "name": "container",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/dialog/dialog.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "BeforeOpenEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/dialog/dialog.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "BeforeOpenEventArgs",
+              "kind": "property",
+              "name": "maxHeight",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/dialog/dialog.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "BeforeOpenEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-popups/src/dialog/dialog.d.ts",
+              "type": "HTMLElement | string"
+            }
+          ],
+          "name": "BeforeOpenEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-popups/src/dialog/dialog.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeFileUpload",
+      "eventType": "BeforeUploadEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BeforeUploadEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            }
+          ],
+          "name": "BeforeUploadEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeImageDrop",
+      "eventType": "ImageDropEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "DragEvent"
+          ],
+          "members": [
+            {
+              "declaredOn": "ImageDropEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ImageDropEventArgs",
+              "kind": "property",
+              "name": "rangeOffset",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "ImageDropEventArgs",
+              "kind": "property",
+              "name": "rangeParent",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "Element"
+            }
+          ],
+          "name": "ImageDropEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeImageUpload",
+      "eventType": "BeforeUploadEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BeforeUploadEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            }
+          ],
+          "name": "BeforeUploadEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeMediaDrop",
+      "eventType": "MediaDropEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "DragEvent"
+          ],
+          "members": [
+            {
+              "declaredOn": "MediaDropEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "MediaDropEventArgs",
+              "kind": "property",
+              "name": "mediaType",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "MediaDropEventArgs",
+              "kind": "property",
+              "name": "rangeOffset",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "MediaDropEventArgs",
+              "kind": "property",
+              "name": "rangeParent",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "Element"
+            }
+          ],
+          "name": "MediaDropEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforePasteCleanup",
+      "eventType": "PasteCleanupArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PasteCleanupArgs",
+              "kind": "property",
+              "name": "filesData",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "FileInfo[]"
+            },
+            {
+              "declaredOn": "PasteCleanupArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "PasteCleanupArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforePopupClose",
+      "eventType": "BeforePopupOpenCloseEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BeforePopupOpenCloseEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforePopupOpenCloseEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "BeforePopupOpenCloseEventArgs",
+              "kind": "property",
+              "name": "originalEvent",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "BeforePopupOpenCloseEventArgs",
+              "kind": "property",
+              "name": "popup",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "Popup"
+            },
+            {
+              "declaredOn": "BeforePopupOpenCloseEventArgs",
+              "kind": "property",
+              "name": "type",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "EditorPopupType"
+            }
+          ],
+          "name": "BeforePopupOpenCloseEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforePopupOpen",
+      "eventType": "BeforePopupOpenCloseEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BeforePopupOpenCloseEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforePopupOpenCloseEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "BeforePopupOpenCloseEventArgs",
+              "kind": "property",
+              "name": "originalEvent",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "BeforePopupOpenCloseEventArgs",
+              "kind": "property",
+              "name": "popup",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "Popup"
+            },
+            {
+              "declaredOn": "BeforePopupOpenCloseEventArgs",
+              "kind": "property",
+              "name": "type",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "EditorPopupType"
+            }
+          ],
+          "name": "BeforePopupOpenCloseEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeQuickToolbarOpen",
+      "eventType": "BeforeQuickToolbarOpenArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BeforeQuickToolbarOpenArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeQuickToolbarOpenArgs",
+              "kind": "property",
+              "name": "popup",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "Popup"
+            },
+            {
+              "declaredOn": "BeforeQuickToolbarOpenArgs",
+              "kind": "property",
+              "name": "positionX",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "BeforeQuickToolbarOpenArgs",
+              "kind": "property",
+              "name": "positionY",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "BeforeQuickToolbarOpenArgs",
+              "kind": "property",
+              "name": "targetElement",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "BeforeQuickToolbarOpenArgs",
+              "kind": "property",
+              "name": "type",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "TriggerType"
+            }
+          ],
+          "name": "BeforeQuickToolbarOpenArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeSanitizeHtml",
+      "eventType": "BeforeSanitizeHtmlArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BeforeSanitizeHtmlArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeSanitizeHtmlArgs",
+              "kind": "property",
+              "name": "helper",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "Function"
+            },
+            {
+              "declaredOn": "BeforeSanitizeHtmlArgs",
+              "kind": "property",
+              "name": "selectors",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "SanitizeSelectors"
+            }
+          ],
+          "name": "BeforeSanitizeHtmlArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "blur",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "change",
+      "eventType": "ChangeEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ChangeEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "destroyed",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "dialogClose",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "dialogOpen",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "documentExporting",
+      "eventType": "ExportingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ExportingEventArgs",
+              "kind": "property",
+              "name": "exportType",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "ExportDocumentType"
+            }
+          ],
+          "name": "ExportingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "fileRemoving",
+      "eventType": "RemovingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "RemovingEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RemovingEventArgs",
+              "kind": "property",
+              "name": "currentRequest",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "XMLHttpRequest"
+            },
+            {
+              "declaredOn": "RemovingEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "MouseEvent | TouchEvent | KeyboardEventArgs"
+            },
+            {
+              "declaredOn": "RemovingEventArgs",
+              "kind": "property",
+              "name": "filesData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo[]"
+            },
+            {
+              "declaredOn": "RemovingEventArgs",
+              "kind": "property",
+              "name": "postRawFile",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            }
+          ],
+          "name": "RemovingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "fileSelected",
+      "eventType": "SelectedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "MouseEvent | TouchEvent | DragEvent | ClipboardEvent"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "filesData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo[]"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "isCanceled",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "isModified",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "modifiedFilesData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo[]"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "progressInterval",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "SelectedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "fileUploadFailed",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "fileUploading",
+      "eventType": "UploadingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "chunkSize",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "currentChunkIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "currentRequest",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "XMLHttpRequest"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "fileData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo"
+            }
+          ],
+          "name": "UploadingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "fileUploadSuccess",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "focus",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "imageRemoving",
+      "eventType": "RemovingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "RemovingEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "RemovingEventArgs",
+              "kind": "property",
+              "name": "currentRequest",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "XMLHttpRequest"
+            },
+            {
+              "declaredOn": "RemovingEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "MouseEvent | TouchEvent | KeyboardEventArgs"
+            },
+            {
+              "declaredOn": "RemovingEventArgs",
+              "kind": "property",
+              "name": "filesData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo[]"
+            },
+            {
+              "declaredOn": "RemovingEventArgs",
+              "kind": "property",
+              "name": "postRawFile",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            }
+          ],
+          "name": "RemovingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "imageSelected",
+      "eventType": "SelectedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "MouseEvent | TouchEvent | DragEvent | ClipboardEvent"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "filesData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo[]"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "isCanceled",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "isModified",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "modifiedFilesData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo[]"
+            },
+            {
+              "declaredOn": "SelectedEventArgs",
+              "kind": "property",
+              "name": "progressInterval",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "SelectedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "imageUploadFailed",
+      "eventType": "ImageFailedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ImageFailedEventArgs",
+              "kind": "property",
+              "name": "e",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "object"
+            },
+            {
+              "declaredOn": "ImageFailedEventArgs",
+              "kind": "property",
+              "name": "file",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "FileInfo"
+            },
+            {
+              "declaredOn": "ImageFailedEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ImageFailedEventArgs",
+              "kind": "property",
+              "name": "operation",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ImageFailedEventArgs",
+              "kind": "property",
+              "name": "response",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "ResponseEventArgs"
+            },
+            {
+              "declaredOn": "ImageFailedEventArgs",
+              "kind": "property",
+              "name": "statusText",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ImageFailedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "imageUploading",
+      "eventType": "UploadingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "chunkSize",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "currentChunkIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "currentRequest",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "XMLHttpRequest"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "fileData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo"
+            }
+          ],
+          "name": "UploadingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "imageUploadSuccess",
+      "eventType": "ImageSuccessEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ImageSuccessEventArgs",
+              "kind": "property",
+              "name": "detectImageSource",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "ImageInputSource"
+            },
+            {
+              "declaredOn": "ImageSuccessEventArgs",
+              "kind": "property",
+              "name": "e",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "object"
+            },
+            {
+              "declaredOn": "ImageSuccessEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "ImageSuccessEventArgs",
+              "kind": "property",
+              "name": "file",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "FileInfo"
+            },
+            {
+              "declaredOn": "ImageSuccessEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ImageSuccessEventArgs",
+              "kind": "property",
+              "name": "operation",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ImageSuccessEventArgs",
+              "kind": "property",
+              "name": "response",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "ResponseEventArgs"
+            },
+            {
+              "declaredOn": "ImageSuccessEventArgs",
+              "kind": "property",
+              "name": "statusText",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ImageSuccessEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "quickToolbarClose",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "quickToolbarOpen",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "resizeStart",
+      "eventType": "ResizeArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ResizeArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ResizeArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "MouseEvent | TouchEvent"
+            },
+            {
+              "declaredOn": "ResizeArgs",
+              "kind": "property",
+              "name": "requestType",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ResizeArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "resizeStop",
+      "eventType": "ResizeArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ResizeArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ResizeArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "MouseEvent | TouchEvent"
+            },
+            {
+              "declaredOn": "ResizeArgs",
+              "kind": "property",
+              "name": "requestType",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ResizeArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "resizing",
+      "eventType": "ResizeArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ResizeArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ResizeArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "MouseEvent | TouchEvent"
+            },
+            {
+              "declaredOn": "ResizeArgs",
+              "kind": "property",
+              "name": "requestType",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ResizeArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "selectionChanged",
+      "eventType": "SelectionChangedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "SelectionChangedEventArgs",
+              "kind": "property",
+              "name": "editorMode",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "EditorMode | string"
+            },
+            {
+              "declaredOn": "SelectionChangedEventArgs",
+              "kind": "property",
+              "name": "selectedContent",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "SelectionChangedEventArgs",
+              "kind": "property",
+              "name": "selection",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+              "type": "Selection"
+            }
+          ],
+          "name": "SelectionChangedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/common/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "slashMenuItemSelect",
+      "eventType": "SlashMenuItemSelectArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "SlashMenuItemSelectArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SlashMenuItemSelectArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SlashMenuItemSelectArgs",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "HTMLLIElement"
+            },
+            {
+              "declaredOn": "SlashMenuItemSelectArgs",
+              "kind": "property",
+              "name": "itemData",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "ISlashMenuItem"
+            },
+            {
+              "declaredOn": "SlashMenuItemSelectArgs",
+              "kind": "property",
+              "name": "originalEvent",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "MouseEvent | KeyboardEvent | TouchEvent"
+            }
+          ],
+          "name": "SlashMenuItemSelectArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "toolbarClick",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "toolbarStatusUpdate",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "updatedToolbarStatus",
+      "eventType": "ToolbarStatusEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ToolbarStatusEventArgs",
+              "kind": "property",
+              "name": "html",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "object"
+            },
+            {
+              "declaredOn": "ToolbarStatusEventArgs",
+              "kind": "property",
+              "name": "markdown",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "object"
+            },
+            {
+              "declaredOn": "ToolbarStatusEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ToolbarStatusEventArgs",
+              "kind": "property",
+              "name": "redo",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ToolbarStatusEventArgs",
+              "kind": "property",
+              "name": "undo",
+              "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+              "type": "boolean"
+            }
+          ],
+          "name": "ToolbarStatusEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "wordImporting",
+      "eventType": "UploadingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "chunkSize",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "currentChunkIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "currentRequest",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "XMLHttpRequest"
+            },
+            {
+              "declaredOn": "UploadingEventArgs",
+              "kind": "property",
+              "name": "fileData",
+              "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+              "type": "FileInfo"
+            }
+          ],
+          "name": "UploadingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-inputs/src/uploader/uploader.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionRichTextEditor",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "RichTextEditor",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.richtexteditor"
+  }
+}

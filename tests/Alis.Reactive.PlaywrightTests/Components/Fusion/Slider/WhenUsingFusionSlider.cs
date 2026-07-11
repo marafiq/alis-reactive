@@ -2,140 +2,191 @@ using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Slider;
 
+// Journey: a resident sets their Comfort & Care Preferences. The page carries over
+// the room temperature and afternoon rest window they saved last month. The resident
+// adjusts the temperature with the slider, can apply the care team's recommendation,
+// sets the rest window, then saves.
 [TestFixture]
 public class WhenUsingFusionSlider : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Slider";
     private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_SliderModel";
-    private const string PainScoreId = GeneratedTypeScope + "__PainScore";
-    private const string PreferredRangeId = GeneratedTypeScope + "__PreferredRange";
+    private const string RoomTemperatureId = GeneratedTypeScope + "__RoomTemperature";
+    private const string QuietHoursId = GeneratedTypeScope + "__QuietHours";
 
-    private FusionSliderLocator PainScore => new(Page, PainScoreId);
-    private FusionSliderLocator PreferredRange => new(Page, PreferredRangeId);
+    private FusionSliderLocator RoomTemperature => new(Page, RoomTemperatureId);
+    private FusionSliderLocator QuietHours => new(Page, QuietHoursId);
 
-    private async Task NavigateAndBoot()
+    private ILocator ComfortReading => Page.Locator("#comfort-reading");
+    private ILocator ComfortZone => Page.Locator("#comfort-zone");
+    private ILocator SettleFrom => Page.Locator("#settle-from");
+    private ILocator SettleAction => Page.Locator("#settle-action");
+    private ILocator ComfortSource => Page.Locator("#comfort-source");
+    private ILocator TempGuidance => Page.Locator("#temp-guidance");
+    private ILocator RestSummary => Page.Locator("#rest-summary");
+    private ILocator SaveConfirmation => Page.Locator("#save-confirmation");
+
+    private ILocator ApplyRecommendedTemp => Page.Locator("#apply-recommended-temp");
+    private ILocator CheckTempGuidance => Page.Locator("#check-temp-guidance");
+    private ILocator ApplyRecommendedRest => Page.Locator("#apply-recommended-rest");
+    private ILocator SavePreferences => Page.Locator("#save-preferences");
+
+    private async Task OpenPreferences()
     {
-        await NavigateToAndWaitForTextSignal(Path, "#value-echo");
+        await NavigateToAndWaitForBoot(Path);
+        await Expect(RoomTemperature.Handle()).ToBeVisibleAsync(new() { Timeout = 10000 });
     }
 
+    // RENDERS — the FusionSlider builder renders the slider bound to the carried-over model value.
     [Test]
-    public async Task page_loads_without_errors()
+    public async Task preferences_open_showing_the_temperature_carried_over_from_last_month()
     {
-        await NavigateAndBoot();
-        await Expect(Page).ToHaveTitleAsync("FusionSlider — Alis.Reactive Sandbox");
+        await OpenPreferences();
+
+        await Expect(RoomTemperature.Handle()).ToHaveAttributeAsync("aria-valuenow", "68");
+        await Expect(ComfortReading).ToHaveTextAsync("68");
+
         AssertNoConsoleErrors();
     }
 
+    // INTERACTS / Change — nudging the handle fires the Change event through the .Reactive wiring;
+    // the FusionSliderChangeArgs payload carries Text into the live reading and Value into the
+    // comfort-zone branch as the resident moves the slider.
     [Test]
-    public async Task plan_json_contains_typed_slider_members()
+    public async Task warming_the_room_updates_the_live_reading_and_the_comfort_note()
     {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
+        await OpenPreferences();
 
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""));
-        Assert.That(planJson, Does.Contain(PainScoreId));
-        Assert.That(planJson, Does.Contain(PreferredRangeId));
-        Assert.That(planJson, Does.Contain("\"rangeValue\""));
-        Assert.That(planJson, Does.Contain("\"dataBind\""));
-        Assert.That(planJson, Does.Contain("\"change\""));
-        Assert.That(planJson, Does.Contain("\"changed\""));
+        await RoomTemperature.NudgeUp();
+
+        await Expect(RoomTemperature.Handle()).ToHaveAttributeAsync("aria-valuenow", "70");
+        await Expect(ComfortReading).ToHaveTextAsync("70");
+        await Expect(ComfortZone)
+            .ToHaveTextAsync("That's a comfortable mid-range temperature for most residents.");
+
         AssertNoConsoleErrors();
     }
 
+    // Changed — when the handle settles, the Changed event's PreviousValue records the value before
+    // the change and Action names how it changed.
     [Test]
-    public async Task domready_sets_scalar_value_and_reads_value_source()
+    public async Task adjusting_the_temperature_records_what_it_changed_from()
     {
-        await NavigateAndBoot();
+        await OpenPreferences();
 
-        await Expect(Page.Locator("#value-echo")).ToHaveTextAsync("35", new() { Timeout = 5000 });
-        Assert.That(await PainScore.ValueNow(), Is.EqualTo("35"));
+        await RoomTemperature.NudgeUp();
+
+        await Expect(SettleFrom).ToHaveTextAsync("68");
+        await Expect(SettleAction).ToHaveTextAsync("changed");
+
         AssertNoConsoleErrors();
     }
 
+    // IsInteracted — a temperature the resident chose reads as their own; a temperature applied for
+    // them reads as a recommendation. FusionSliderChangeArgs.IsInteracted distinguishes the two.
     [Test]
-    public async Task domready_sets_range_value_and_reads_range_source()
+    public async Task choosing_a_temperature_reads_differently_from_applying_a_recommendation()
     {
-        await NavigateAndBoot();
+        await OpenPreferences();
 
-        await Expect(Page.Locator("#range-echo")).ToHaveTextAsync("15,75", new() { Timeout = 5000 });
-        Assert.That(await PreferredRange.ValueNow(0), Is.EqualTo("15"));
-        Assert.That(await PreferredRange.ValueNow(1), Is.EqualTo("75"));
+        await RoomTemperature.NudgeUp();
+        await Expect(ComfortSource).ToHaveTextAsync("You set this temperature yourself.");
+
+        await ApplyRecommendedTemp.ClickAsync();
+
+        await Expect(RoomTemperature.Handle()).ToHaveAttributeAsync("aria-valuenow", "72");
+        await Expect(ComfortSource)
+            .ToHaveTextAsync("We applied the temperature recommended by your care team.");
+
         AssertNoConsoleErrors();
     }
 
+    // SetValue — applying the recommendation writes 72 onto the slider and repaints the handle there.
     [Test]
-    public async Task set_value_updates_visible_slider_and_change_payload()
+    public async Task applying_the_recommended_temperature_moves_the_slider_to_72()
     {
-        await NavigateAndBoot();
+        await OpenPreferences();
 
-        await Page.Locator("#set-score-btn").ClickAsync();
+        await ApplyRecommendedTemp.ClickAsync();
 
-        await Expect(Page.Locator("#command-state")).ToHaveTextAsync("score set", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#value-echo")).ToHaveTextAsync("65", new() { Timeout = 5000 });
-        Assert.That(await PainScore.ValueNow(), Is.EqualTo("65"));
-        await Expect(Page.Locator("#change-value")).ToHaveTextAsync("65", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#change-previous")).ToHaveTextAsync("35", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#change-text")).ToHaveTextAsync("65", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#change-action")).ToHaveTextAsync("change", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#change-interacted")).ToHaveTextAsync("false", new() { Timeout = 5000 });
+        await Expect(RoomTemperature.Handle()).ToHaveAttributeAsync("aria-valuenow", "72");
+
         AssertNoConsoleErrors();
     }
 
+    // Value() — the guidance button reads the slider's current value through a condition; a warm
+    // setting routes the overnight-check message.
     [Test]
-    public async Task changed_event_exposes_value_previous_text_and_action()
+    public async Task checking_a_warm_temperature_warns_about_an_overnight_check()
     {
-        await NavigateAndBoot();
+        await OpenPreferences();
 
-        await Page.Locator("#set-score-btn").ClickAsync();
+        await RoomTemperature.NudgeUp();
+        await RoomTemperature.NudgeUp();
+        await RoomTemperature.NudgeUp();
+        await Expect(RoomTemperature.Handle()).ToHaveAttributeAsync("aria-valuenow", "74");
 
-        await Expect(Page.Locator("#changed-value")).ToHaveTextAsync("65", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#changed-previous")).ToHaveTextAsync("35", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#changed-text")).ToHaveTextAsync("65", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#changed-action")).ToHaveTextAsync("changed", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#args-condition")).ToHaveTextAsync("at least 50", new() { Timeout = 5000 });
+        await CheckTempGuidance.ClickAsync();
+
+        await Expect(TempGuidance)
+            .ToHaveTextAsync("A care manager will check in to make sure that's not too warm overnight.");
+
         AssertNoConsoleErrors();
     }
 
+    // SetRangeValue + RangeValue — applying the recommended window writes both handles, and the
+    // RangeValue source reads the written window back into the saved summary.
     [Test]
-    public async Task component_value_condition_reads_current_value()
+    public async Task applying_the_recommended_rest_window_moves_both_handles_and_updates_the_summary()
     {
-        await NavigateAndBoot();
+        await OpenPreferences();
 
-        await Page.Locator("#check-score-btn").ClickAsync();
-        await Expect(Page.Locator("#score-state")).ToHaveTextAsync("low", new() { Timeout = 5000 });
+        await ApplyRecommendedRest.ClickAsync();
 
-        await Page.Locator("#set-score-btn").ClickAsync();
-        await Page.Locator("#check-score-btn").ClickAsync();
-        await Expect(Page.Locator("#score-state")).ToHaveTextAsync("high", new() { Timeout = 5000 });
+        await Expect(QuietHours.Handle(0)).ToHaveAttributeAsync("aria-valuenow", "14");
+        await Expect(QuietHours.Handle(1)).ToHaveAttributeAsync("aria-valuenow", "16");
+        await Expect(RestSummary).ToHaveTextAsync("14,16");
+
         AssertNoConsoleErrors();
     }
 
+    // SUBMITS — the Value() and RangeValue() sources feed the gather body; the server confirmation
+    // the resident sees reflects the submitted temperature and rest window.
     [Test]
-    public async Task set_range_value_updates_visible_slider_and_range_source()
+    public async Task saving_confirms_the_temperature_and_rest_window()
     {
-        await NavigateAndBoot();
+        await OpenPreferences();
 
-        await Page.Locator("#set-range-btn").ClickAsync();
+        await SavePreferences.ClickAsync();
 
-        await Expect(Page.Locator("#command-state")).ToHaveTextAsync("range set", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#range-echo")).ToHaveTextAsync("30,90", new() { Timeout = 5000 });
-        Assert.That(await PreferredRange.ValueNow(0), Is.EqualTo("30"));
-        Assert.That(await PreferredRange.ValueNow(1), Is.EqualTo("90"));
+        await Expect(SaveConfirmation)
+            .ToHaveTextAsync("Saved. We'll keep your room at 68°F and hold non-urgent visits from 13:00 to 15:00.",
+                new() { Timeout = 10000 });
+
         AssertNoConsoleErrors();
     }
 
+    // GATHERS — the framework gather pipeline carries the Value() and RangeValue() sources into the
+    // POST body under their declared keys. (Framework gather test: asserts request.PostData.)
     [Test]
-    public async Task gather_consumes_scalar_and_range_value_sources()
+    public async Task saving_posts_the_temperature_and_rest_window_to_the_server()
     {
-        await NavigateAndBoot();
+        await OpenPreferences();
 
-        await Page.Locator("#set-score-btn").ClickAsync();
-        await Page.Locator("#set-range-btn").ClickAsync();
-        await Page.Locator("#gather-btn").ClickAsync();
+        var requestTask = Page.WaitForRequestAsync(request =>
+            request.Url.Contains("/Sandbox/Components/Slider/Save") && request.Method == "POST",
+            new() { Timeout = 10000 });
 
-        await Expect(Page.Locator("#gather-score")).ToHaveTextAsync("65", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#gather-range")).ToHaveTextAsync("30,90", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#gather-summary")).ToHaveTextAsync("65:30,90", new() { Timeout = 5000 });
+        await SavePreferences.ClickAsync();
+
+        var request = await requestTask;
+        var body = request.PostData ?? "";
+
+        Assert.That(body, Does.Contain("\"roomTemperature\":68"),
+            "the gather pipeline must carry the Value() source under its declared key");
+        Assert.That(body, Does.Contain("\"quietHours\":[13,15]"),
+            "the gather pipeline must carry the RangeValue() source under its declared key");
+
         AssertNoConsoleErrors();
     }
 }

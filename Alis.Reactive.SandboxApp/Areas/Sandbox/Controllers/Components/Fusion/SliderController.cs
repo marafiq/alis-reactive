@@ -12,19 +12,20 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         {
             return View("~/Areas/Sandbox/Views/Components/Fusion/Slider/Index.cshtml", new SliderModel
             {
-                PainScore = 25,
-                PreferredRange = [20, 60]
+                RoomTemperature = 68,
+                QuietHours = [13, 15]
             });
         }
 
-        [HttpPost("Echo")]
-        public IActionResult Echo([FromBody] SliderEchoRequest request)
+        [HttpPost("Save")]
+        public IActionResult Save([FromBody] ComfortPreferencesRequest request)
         {
-            return Ok(new SliderEchoResponse
+            var start = request.QuietHours.Length > 0 ? request.QuietHours[0] : 0;
+            var end = request.QuietHours.Length > 1 ? request.QuietHours[1] : 0;
+            return Ok(new ComfortPreferencesResponse
             {
-                PainScore = request.PainScore,
-                PreferredRange = request.PreferredRange,
-                Summary = request.PainScore + ":" + string.Join(",", request.PreferredRange)
+                Summary = "Saved. We'll keep your room at " + request.RoomTemperature
+                    + "°F and hold non-urgent visits from " + start + ":00 to " + end + ":00."
             });
         }
     }

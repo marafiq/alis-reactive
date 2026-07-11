@@ -1,0 +1,15 @@
+{
+  "component": "context-menu",
+  "counts": {
+    "events": 0,
+    "payloadTypes": 0
+  },
+  "events": [],
+  "fusionType": "FusionContextMenu",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "ContextMenu",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.navigations"
+  }
+}

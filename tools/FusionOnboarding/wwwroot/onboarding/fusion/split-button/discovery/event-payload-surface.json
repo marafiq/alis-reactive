@@ -1,0 +1,345 @@
+{
+  "component": "split-button",
+  "counts": {
+    "events": 8,
+    "payloadTypes": 5
+  },
+  "events": [
+    {
+      "event": "beforeClose",
+      "eventType": "BeforeOpenCloseMenuEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "items",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "ItemModel[]"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "BeforeOpenCloseMenuEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeItemRender",
+      "eventType": "MenuEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "MenuEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "MenuEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "MenuEventArgs",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "ItemModel"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "MenuEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "beforeOpen",
+      "eventType": "BeforeOpenCloseMenuEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "BeforeOpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "items",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "ItemModel[]"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "BeforeOpenCloseMenuEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "click",
+      "eventType": "ClickEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "ClickEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/split-button/split-button.d.ts",
+              "type": "Element"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ClickEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/split-button/split-button.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "close",
+      "eventType": "OpenCloseMenuEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "OpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "OpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "items",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "ItemModel[]"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "OpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "parentItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "ItemModel"
+            }
+          ],
+          "name": "OpenCloseMenuEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Event",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "Event",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "open",
+      "eventType": "OpenCloseMenuEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "OpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "OpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "items",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "ItemModel[]"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "OpenCloseMenuEventArgs",
+              "kind": "property",
+              "name": "parentItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "ItemModel"
+            }
+          ],
+          "name": "OpenCloseMenuEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "select",
+      "eventType": "MenuEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "MenuEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "MenuEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "MenuEventArgs",
+              "kind": "property",
+              "name": "item",
+              "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+              "type": "ItemModel"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "MenuEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/common/common.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionSplitButton",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "SplitButton",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.ej.splitbuttons"
+  }
+}

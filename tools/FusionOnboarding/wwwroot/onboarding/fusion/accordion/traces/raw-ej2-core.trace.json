@@ -1,0 +1,80 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "accordion",
+  "apiSet": "core",
+  "probe": "onboarding/fusion/accordion/probes/raw-ej2-core.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "created",
+      "value": {
+        "functions": [],
+        "ownKeys": [],
+        "properties": {},
+        "value": "undefined"
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "ready",
+      "value": {
+        "apiSet": "core",
+        "className": "Accordion",
+        "component": "accordion",
+        "namespace": "ej.navigations"
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "own keys",
+      "value": [
+        "allowFiltering",
+        "allowPaging",
+        "allowServerDataBinding",
+        "allowSorting",
+        "bulkChanges",
+        "changedProperties",
+        "childChangedProperties",
+        "columns",
+        "element",
+        "finalUpdate",
+        "ignoreCollectionWatch",
+        "initExpand",
+        "isAngular",
+        "isComplexArraySetter",
+        "isDestroy",
+        "isDestroyed",
+        "isNested",
+        "isProtectedOnChange",
+        "isReact",
+        "isReactHybrid"
+      ]
+    },
+    {
+      "sequence": 4,
+      "label": "prototype methods",
+      "value": [
+        "accessMount",
+        "add",
+        "addEventListener",
+        "addInstance",
+        "addItem",
+        "addOnPersist",
+        "afterContentRender",
+        "angularnativeCondiCheck",
+        "appendTo",
+        "ariaAttrUpdate",
+        "attachUnloadEvent",
+        "clearAccordionTemplate",
+        "clearChanges",
+        "clearTemplate",
+        "clickHandler",
+        "clicked",
+        "collapse",
+        "collapseAnimation",
+        "collapseProgress",
+        "contentRendering"
+      ]
+    }
+  ]
+}

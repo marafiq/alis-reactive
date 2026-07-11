@@ -1,0 +1,240 @@
+{
+  "component": "auto-complete",
+  "counts": {
+    "builderMethods": 61,
+    "events": 1,
+    "members": 18,
+    "methods": 3,
+    "properties": 14
+  },
+  "fusionType": "FusionAutoComplete",
+  "members": [
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "allowFiltering",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.DropDowns.AutoCompleteFieldSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "fields",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "FieldSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "filter",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "dataSource: { [key: string]: Object; }[] | DataManager | string[] | number[] | boolean[], query?: Query, fields?: FieldSettingsModel) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "filterBarPlaceholder",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "filtering",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "FilteringEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.DropDowns.FilterType"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "filterType",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "FilterType"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Inputs.FloatLabelType"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "floatLabelType",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "FloatLabelType"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "hidePopup",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "e?: MouseEvent | KeyboardEventArgs | TouchEvent) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "highlight",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "ignoreCase",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "index",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "number | null"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "minLength",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "query",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "Query"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showPopup",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "e?: MouseEvent | KeyboardEventArgs | TouchEvent) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showPopupButton",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "suggestionCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "text",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "string | null"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "valueTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+      "type": "string | Function"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "AutoCompleteBuilder",
+    "className": "AutoComplete",
+    "dtsPath": "node_modules/@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts",
+    "jsPath": "",
+    "namespace": "ej.dropdowns",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}

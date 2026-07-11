@@ -1,0 +1,20 @@
+{
+  "onboarded": [
+    "focusIn",
+    "focusOut"
+  ],
+  "excluded": [
+    {
+      "name": "readonly",
+      "reason": "EJ2 boolean property (src/textarea/textarea.d.ts:33, default false). The Syncfusion MVC TextAreaBuilder ships no Readonly setter (verified: only Enabled(bool) is exposed), so read-only is a static initial-render concern, and runtime interactivity is already governed by the builder-owned `enabled` property. A care-note journey enters and edits notes; no plan reads, branches, gathers, or toggles readonly after render, so promoting it to typed runtime DSL would add a property with no journey consumer."
+    },
+    {
+      "name": "addAttributes",
+      "reason": "EJ2 method addAttributes(attributes: {[key: string]: string}): void (src/textarea/textarea.d.ts:266). It mutates arbitrary HTML attributes keyed by free-form strings; onboarding it would require a public stringly attributeName surface, which the Fusion slice rules forbid outside the plugin boundary. Initial HTML attributes are builder-owned via TextAreaBuilder.HtmlAttributes, so this is not a typed runtime gap."
+    },
+    {
+      "name": "removeAttributes",
+      "reason": "EJ2 method removeAttributes(attributes: string[]): void (src/textarea/textarea.d.ts:275). Same free-form string-keyed attribute escape hatch as addAttributes; a typed C# member cannot wrap it without exposing arbitrary attribute strings on the component slice. Initial HTML attributes are builder-owned via TextAreaBuilder.HtmlAttributes."
+    }
+  ]
+}

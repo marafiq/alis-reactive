@@ -1,0 +1,298 @@
+{
+  "component": "progress-button",
+  "counts": {
+    "builderMethods": 18,
+    "events": 5,
+    "members": 22,
+    "methods": 5,
+    "properties": 12
+  },
+  "fusionType": "FusionProgressButton",
+  "members": [
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.SplitButtons.ProgressButtonAnimationSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "animationSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "AnimationSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "begin",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "ProgressEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "content",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "created",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "Event"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "cssClass",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "skip: lifecycle cleanup, not Fusion plan behavior",
+      "kind": "method",
+      "name": "destroy",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "disabled",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "duration",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableHtmlSanitizer",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableProgress",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "end",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "ProgressEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "fail",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "Event"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "focusIn",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "iconCss",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Buttons.IconPosition"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "iconPosition",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "string | IconPosition"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "isPrimary",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "isToggle",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "progress",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "ProgressEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "progressComplete",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.SplitButtons.ProgressButtonSpinSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "spinSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "SpinSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "start",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": "percent?: number) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "stop",
+      "sourcePath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+      "type": ") => void"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "ProgressButtonBuilder",
+    "className": "ProgressButton",
+    "dtsPath": "node_modules/@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts",
+    "jsPath": "",
+    "namespace": "ej.splitbuttons",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}

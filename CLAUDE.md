@@ -1,5 +1,13 @@
 # Alis.Reactive Framework
 
+> **Active working branch — everyone, every agent, including Codex:
+> `tiny-safe-but-important-refactorings`.** All current work commits here; local
+> `main` is only a stale baseline, never a place to branch from or commit to.
+> This is enforced, not just asked: a `pre-commit` guard refuses commits on any
+> other branch (source of truth `git config alis.activeBranch`; installer
+> `scripts/install-git-hooks.sh` — re-run it after clone). Confirm
+> `git rev-parse --abbrev-ref HEAD` before working.
+
 ## Architecture
 
 A developer expresses reactive intent with the C# DSL. The plan domain
@@ -228,6 +236,19 @@ For UI work, use `docs/developer-cli.md#ui-developer-workflows` to choose the
 watcher and the proof command. Framework assets ship from
 `Alis.Reactive.Assets/`; sandbox-only assets live under
 `Alis.Reactive.SandboxApp/`.
+
+## Onboard / Audit / Upgrade Fusion components (deterministic)
+
+```text
+/onboard-fusion-component {"component":"switch","fusionType":"FusionSwitch"}   # one component to 100%
+/onboard-fusion-component {"all":true}                                          # all incomplete to 100%
+node .claude/skills/onboard-fusion-component/scripts/verify-onboarding-complete.mjs --all   # audit/upgrade: the 100% gate
+```
+
+Pipeline (deterministic): discover → audit (every typed member → core DSL primitive,
+`audit-primitive-coverage.mjs`) → observe (`observe-plan.mjs`) → author from the plan →
+Playwright → `verify-onboarding-complete.mjs`. A component is "onboarded" IFF that gate
+exits 0; the driver loops authoring until it does or fails loud. Never claim done otherwise.
 
 ## Tech Stack
 
@@ -497,6 +518,17 @@ it printed.
 - [ ] No dropped vocabulary, dead code, defensive plan validation, or schema-contract references left behind.
 
 ### Review Loop — Every Change
+
+**Review the live tree, and name it.** Every review — agent or human,
+adversarial or routine — runs against the current branch's working tree at HEAD,
+never a frozen historical commit. The reviewer confirms the target up front
+(`git rev-parse --abbrev-ref HEAD`, `git rev-parse HEAD`, clean `git status`) and
+states that branch + SHA in its output; a dispatched review agent is given the
+branch and HEAD SHA and told to verify it before reading code. Why: a review
+pinned to an already-merged commit raised four "unpaid debt" findings, every one
+already closed by later commits on the branch — stale-tree false alarms and a
+misleading verdict are the cost of an unnamed, out-of-date review target. A
+finding only counts when its `file:line` still exists at HEAD.
 
 Review against the matrix, not against implementation preference:
 

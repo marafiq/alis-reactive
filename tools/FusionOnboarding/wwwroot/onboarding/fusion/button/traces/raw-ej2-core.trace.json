@@ -1,0 +1,147 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "button",
+  "apiSet": "core",
+  "probe": "onboarding/fusion/button/probes/raw-ej2-core.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "ready",
+      "value": {
+        "apiSet": "core",
+        "className": "Button",
+        "component": "button",
+        "namespace": "ej.buttons"
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "content after set",
+      "value": {
+        "domText": "Begin check-in for Eleanor Whitfield",
+        "property": "Begin check-in for Eleanor Whitfield"
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "disabled after set true",
+      "value": {
+        "domDisabled": true,
+        "property": true
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "disabled after set false",
+      "value": {
+        "domDisabled": false,
+        "property": false
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "icon after set",
+      "value": {
+        "iconCss": "e-icons e-check",
+        "iconPosition": "Right",
+        "iconSpanClass": "e-btn-icon e-icons e-check e-icon-right"
+      }
+    },
+    {
+      "sequence": 6,
+      "label": "cssClass after set",
+      "value": {
+        "domClass": "e-control e-btn e-lib e-warning urgent-visit",
+        "property": "e-warning urgent-visit"
+      }
+    },
+    {
+      "sequence": 7,
+      "label": "isPrimary after set",
+      "value": {
+        "hasPrimaryClass": true,
+        "property": true
+      }
+    },
+    {
+      "sequence": 8,
+      "label": "isToggle after set",
+      "value": {
+        "property": true
+      }
+    },
+    {
+      "sequence": 9,
+      "label": "click latches active (toggle on)",
+      "value": {
+        "hasActiveClass": true
+      }
+    },
+    {
+      "sequence": 10,
+      "label": "focusIn focuses button",
+      "value": {
+        "documentActiveIsButton": true
+      }
+    },
+    {
+      "sequence": 11,
+      "label": "own keys",
+      "value": [
+        "allowServerDataBinding",
+        "bulkChanges",
+        "changedProperties",
+        "childChangedProperties",
+        "element",
+        "finalUpdate",
+        "ignoreCollectionWatch",
+        "isAngular",
+        "isComplexArraySetter",
+        "isDestroyed",
+        "isProtectedOnChange",
+        "isReact",
+        "isReactHybrid",
+        "isRendered",
+        "isServerRendered",
+        "isStringTemplate",
+        "isVue",
+        "localObserver",
+        "modelObserver",
+        "moduleLoader"
+      ]
+    },
+    {
+      "sequence": 12,
+      "label": "prototype methods",
+      "value": [
+        "accessMount",
+        "addEventListener",
+        "addInstance",
+        "addOnPersist",
+        "appendTo",
+        "attachUnloadEvent",
+        "btnClickHandler",
+        "clearChanges",
+        "clearTemplate",
+        "click",
+        "controlStatus",
+        "createElement",
+        "dataBind",
+        "destroy",
+        "detachUnloadEvent",
+        "detectFunction",
+        "finalUpdate",
+        "focusIn",
+        "getActualProperties",
+        "getInjectedModules"
+      ]
+    },
+    {
+      "sequence": 13,
+      "label": "complete",
+      "value": {
+        "done": true
+      }
+    }
+  ]
+}

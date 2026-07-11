@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>FusionPivotView Raw EJ2 core Probe</title>
+    <link rel="stylesheet" href="/css/syncfusion.dev.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #pivot-view-host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+        th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f6f8fa; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+        button { margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <h1>FusionPivotView Raw EJ2 core Probe</h1>
+    <p>Status: generated static probe. Execute in the sandbox/browser, interact with the component, then save <code>window.__fusionProbe.trace</code> as <code>traces/raw-ej2-core.trace.json</code>.</p>
+    <div id="pivot-view-host">
+        <div id="pivot-view"></div>
+    </div>
+
+    <button id="dump">Dump Keys</button>
+    <button id="clear">Clear Trace</button>
+
+    <h2>Candidate Rows</h2>
+    <table>
+        <thead><tr><th>JS Member</th><th>Kind</th><th>Type</th><th>Builder</th><th>Decision</th></tr></thead>
+        <tbody>
+<tr><td><code>actionBegin</code></td><td>event</td><td>PivotActionBeginEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>actionBeginMethod</code></td><td>method</td><td>) =&gt; boolean</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>actionComplete</code></td><td>event</td><td>PivotActionCompleteEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>actionCompleteMethod</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>actionFailure</code></td><td>event</td><td>PivotActionFailureEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>actionFailureMethod</code></td><td>method</td><td>error: Error) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>actionObj</code></td><td>property</td><td>PivotActionCompleteEventArgs</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>addInternalEvents</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>afterServiceInvoke</code></td><td>event</td><td>AfterServiceInvokeEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>aggregateCellInfo</code></td><td>event</td><td>AggregateEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>aggregateMenuOpen</code></td><td>event</td><td>AggregateMenuOpenEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>allowEngineExport</code></td><td>property</td><td>boolean</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>appendChartElement</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>appendHtml</code></td><td>method</td><td>node: Element, innerHtml: string | Element) =&gt; Element</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>applyColumnSelection</code></td><td>method</td><td>e: MouseEvent | KeyboardEventArgs, target: Element, colStart: number, colEnd: number, rowStart: number) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>applyFormatting</code></td><td>method</td><td>pivotValues: IAxisSet[][], dataSourceSettings?: DataSourceSettingsModel) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>applyRowSelection</code></td><td>method</td><td>colIndex: number, rowIndex: number, e: MouseEvent | KeyboardEvent) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>axisFieldModule</code></td><td>property</td><td>AxisFields</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>beforeColumnsRender</code></td><td>event</td><td>ColumnRenderEventArgs</td><td>no</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeExport</code></td><td>event</td><td>BeforeExportEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeServiceInvoke</code></td><td>event</td><td>BeforeServiceInvokeEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beginDrillThrough</code></td><td>event</td><td>BeginDrillThroughEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>bindTriggerEvents</code></td><td>method</td><td>args?: Object) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>calculatedFieldCreate</code></td><td>event</td><td>CalculatedFieldCreateEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>calculatedFieldModule</code></td><td>property</td><td>CalculatedField</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>cellClick</code></td><td>event</td><td>CellClickEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>cellDeselected</code></td><td>event</td><td>CellDeselectEventArgs</td><td>no</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>cellSelected</code></td><td>event</td><td>PivotCellSelectedEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>cellSelecting</code></td><td>event</td><td>PivotCellSelectedEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>chart</code></td><td>property</td><td>Chart | AccumulationChart</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>chartExport</code></td><td>method</td><td>type: ExportType, pdfExportProperties?: PdfExportProperties, isMultipleExport?: boolean, pdfDoc?: Object, isBlob?: boolean) =&gt; Promise&lt;Object&gt;</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>chartExportModule</code></td><td>property</td><td>ChartExport</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>chartSeriesCreated</code></td><td>event</td><td>ChartSeriesCreatedEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>clearSelection</code></td><td>method</td><td>ele: Element, e: MouseEvent | KeyboardEventArgs) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>clonedDataSet</code></td><td>property</td><td>IDataSet[] | string[][]</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>clonedReport</code></td><td>property</td><td>DataSourceSettingsModel</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>commonModule</code></td><td>property</td><td>Common</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>conditionalFormatting</code></td><td>event</td><td>IConditionalFormatSettings</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>conditionalFormattingModule</code></td><td>property</td><td>ConditionalFormatting</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>contextMenuClick</code></td><td>event</td><td>ContextMenuClickEventArgs</td><td>no</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>contextMenuModule</code></td><td>property</td><td>PivotContextMenu</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>contextMenuOpen</code></td><td>event</td><td>BeforeOpenCloseMenuEventArgs</td><td>no</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>copy</code></td><td>method</td><td>withHeader?: boolean) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>createCalculatedFieldDialog</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>created</code></td><td>event</td><td>Object</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>csvExport</code></td><td>method</td><td>excelExportProperties?: ExcelExportProperties, isMultipleExport?: boolean, workbook?: Workbook, isBlob?: boolean) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>currencyCode</code></td><td>property</td><td>string</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>currentAction</code></td><td>property</td><td>string</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>currentView</code></td><td>property</td><td>Primary</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>dataBound</code></td><td>event</td><td>Object</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>dataType</code></td><td>property</td><td>string</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>defaultFieldListOrder</code></td><td>property</td><td>Sorting</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>destroy</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>skip: lifecycle cleanup, not Fusion plan behavior</td></tr>
+<tr><td><code>destroyed</code></td><td>event</td><td>Object</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>destroyEngine</code></td><td>property</td><td>boolean</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>drill</code></td><td>event</td><td>DrillArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>drillThrough</code></td><td>event</td><td>DrillThroughEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>drillThroughElement</code></td><td>property</td><td>Element</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>drillThroughModule</code></td><td>property</td><td>DrillThrough</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>drillThroughValue</code></td><td>property</td><td>IAxisSet</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>editCompleted</code></td><td>event</td><td>EditCompletedEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>encodeHtml</code></td><td>method</td><td>value: string) =&gt; string</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>engineModule</code></td><td>property</td><td>PivotEngine</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>enginePopulated</code></td><td>event</td><td>EnginePopulatedEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>enginePopulating</code></td><td>event</td><td>EnginePopulatingEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>excelExport</code></td><td>method</td><td>excelExportProperties?: ExcelExportProperties, isMultipleExport?: boolean, workbook?: Workbook, isBlob?: boolean) =&gt; Promise&lt;Workbook&gt;</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>excelExportModule</code></td><td>property</td><td>ExcelExport</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>exportAsPivot</code></td><td>method</td><td>exportType?: PivotExportType) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>exportComplete</code></td><td>event</td><td>ExportCompleteEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>exportSpecifiedPages</code></td><td>property</td><td>ExportPageSize</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>exportType</code></td><td>property</td><td>string</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>fetchReport</code></td><td>event</td><td>FetchReportArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>fieldDragStart</code></td><td>event</td><td>FieldDragStartEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>fieldDrop</code></td><td>event</td><td>FieldDropEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>fieldListModule</code></td><td>property</td><td>FieldList</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>fieldListRefreshed</code></td><td>event</td><td>FieldListRefreshedEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>fieldListSpinnerElement</code></td><td>property</td><td>HTMLElement</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>fieldRemove</code></td><td>event</td><td>FieldRemoveEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>fillGridColumns</code></td><td>method</td><td>gridcolumns: ColumnModel[]) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>filterTargetID</code></td><td>property</td><td>HTMLElement</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+        </tbody>
+    </table>
+
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const target = document.getElementById("pivot-view");
+
+        function clean(value, seen = new WeakSet(), depth = 0) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 4) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.slice(0, 20).map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).sort().slice(0, 120).forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function functionNames(value) {
+            const names = new Set();
+            let current = value;
+            while (current && current !== Object.prototype) {
+                Object.getOwnPropertyNames(current).forEach(name => {
+                    if (name !== "constructor" && typeof value[name] === "function") names.add(name);
+                });
+                current = Object.getPrototypeOf(current);
+            }
+            return Array.from(names).sort();
+        }
+
+        function describePayload(args) {
+            if (args === null || args === undefined) {
+                return {
+                    ownKeys: [],
+                    functions: [],
+                    properties: {},
+                    value: args === undefined ? "undefined" : null
+                };
+            }
+            const own = Object.keys(args).sort();
+            const properties = {};
+            own.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === null ? "null" : Array.isArray(item) ? "array" : typeof item,
+                    sample: clean(item)
+                };
+            });
+            return { ownKeys: own, functions: functionNames(args), properties };
+        }
+
+        function record(label, value) {
+            trace.push({ at: new Date().toISOString(), label, value: clean(value) });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        const probe = {
+            target,
+            trace,
+            record,
+            event: (label, args) => record(label, describePayload(args)),
+            member: (label, read) => record(label, read()),
+            call: (label, invoke) => record(label, invoke())
+        };
+        window.__fusionProbe = probe;
+
+        const ej2 = new ej.pivotview.PivotView({
+            dataSource: [
+                { id: 1, name: "Alpha", status: "Open" },
+                { id: 2, name: "Beta", status: "Closed" },
+                { id: 3, name: "Gamma", status: "Open" }
+            ],
+            columns: [
+                { field: "id", headerText: "ID", width: 90, textAlign: "Right" },
+                { field: "name", headerText: "Name", width: 160 },
+                { field: "status", headerText: "Status", width: 140 }
+            ],
+            allowPaging: true,
+            allowSorting: true,
+            allowFiltering: true,
+            pageSettings: { pageSize: 2 },
+            actionBegin: args => probe.event("actionBegin", args),
+                actionComplete: args => probe.event("actionComplete", args),
+                actionFailure: args => probe.event("actionFailure", args),
+                afterServiceInvoke: args => probe.event("afterServiceInvoke", args),
+                aggregateCellInfo: args => probe.event("aggregateCellInfo", args),
+                aggregateMenuOpen: args => probe.event("aggregateMenuOpen", args),
+                beforeColumnsRender: args => probe.event("beforeColumnsRender", args),
+                beforeExport: args => probe.event("beforeExport", args),
+                beforeServiceInvoke: args => probe.event("beforeServiceInvoke", args),
+                beginDrillThrough: args => probe.event("beginDrillThrough", args),
+                calculatedFieldCreate: args => probe.event("calculatedFieldCreate", args),
+                cellClick: args => probe.event("cellClick", args),
+                cellDeselected: args => probe.event("cellDeselected", args),
+                cellSelected: args => probe.event("cellSelected", args),
+                cellSelecting: args => probe.event("cellSelecting", args),
+                chartSeriesCreated: args => probe.event("chartSeriesCreated", args),
+                conditionalFormatting: args => probe.event("conditionalFormatting", args),
+                contextMenuClick: args => probe.event("contextMenuClick", args),
+                contextMenuOpen: args => probe.event("contextMenuOpen", args),
+                created: args => probe.event("created", args),
+                dataBound: args => probe.event("dataBound", args),
+                destroyed: args => probe.event("destroyed", args),
+                drill: args => probe.event("drill", args),
+                drillThrough: args => probe.event("drillThrough", args),
+                editCompleted: args => probe.event("editCompleted", args),
+                enginePopulated: args => probe.event("enginePopulated", args),
+                enginePopulating: args => probe.event("enginePopulating", args),
+                exportComplete: args => probe.event("exportComplete", args),
+                fetchReport: args => probe.event("fetchReport", args),
+                fieldDragStart: args => probe.event("fieldDragStart", args),
+                fieldDrop: args => probe.event("fieldDrop", args),
+                fieldListRefreshed: args => probe.event("fieldListRefreshed", args),
+                fieldRemove: args => probe.event("fieldRemove", args),
+                hyperlinkCellClick: args => probe.event("hyperlinkCellClick", args),
+                load: args => probe.event("load", args),
+                loadReport: args => probe.event("loadReport", args),
+                memberEditorOpen: args => probe.event("memberEditorOpen", args),
+                memberFiltering: args => probe.event("memberFiltering", args),
+                newReport: args => probe.event("newReport", args),
+                numberFormatting: args => probe.event("numberFormatting", args),
+                onFieldDropped: args => probe.event("onFieldDropped", args),
+                onHeadersSort: args => probe.event("onHeadersSort", args),
+                onPdfCellRender: args => probe.event("onPdfCellRender", args),
+                removeReport: args => probe.event("removeReport", args),
+                renameReport: args => probe.event("renameReport", args),
+                rowDeselected: args => probe.event("rowDeselected", args),
+                rowSelected: args => probe.event("rowSelected", args),
+                saveReport: args => probe.event("saveReport", args),
+                selected: args => probe.event("selected", args),
+                toolbarClick: args => probe.event("toolbarClick", args),
+                toolbarRender: args => probe.event("toolbarRender", args)
+        });
+
+        ej2.appendTo(target);
+        probe.ej2 = ej2;
+        record("ready", {
+            component: "pivot-view",
+            apiSet: "core",
+            namespace: "ej.pivotview",
+            className: "PivotView"
+        });
+
+        document.getElementById("dump").addEventListener("click", () => {
+            record("own keys", Object.keys(ej2).sort());
+            record("prototype methods", functionNames(ej2));
+        });
+
+        document.getElementById("clear").addEventListener("click", () => {
+            trace.length = 0;
+            document.getElementById("trace").textContent = "[]";
+        });
+    </script>
+</body>
+</html>

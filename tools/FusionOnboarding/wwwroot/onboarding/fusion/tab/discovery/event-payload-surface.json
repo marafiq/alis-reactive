@@ -1,0 +1,640 @@
+{
+  "component": "tab",
+  "counts": {
+    "events": 11,
+    "payloadTypes": 6
+  },
+  "events": [
+    {
+      "event": "added",
+      "eventType": "AddEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "AddEventArgs",
+              "kind": "property",
+              "name": "addedItems",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "TabItemModel[]"
+            },
+            {
+              "declaredOn": "AddEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "AddEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "adding",
+      "eventType": "AddEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "AddEventArgs",
+              "kind": "property",
+              "name": "addedItems",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "TabItemModel[]"
+            },
+            {
+              "declaredOn": "AddEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "AddEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Event",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "Event",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "destroyed",
+      "eventType": "Event",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "Event",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    },
+    {
+      "event": "dragged",
+      "eventType": "DragEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "clonedElement",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "draggedItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "droppedItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "MouseEvent"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "index",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            }
+          ],
+          "name": "DragEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "dragging",
+      "eventType": "DragEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "clonedElement",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "draggedItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "droppedItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "MouseEvent"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "index",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            }
+          ],
+          "name": "DragEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "onDragStart",
+      "eventType": "DragEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "clonedElement",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "draggedItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "droppedItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "MouseEvent"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "index",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "DragEventArgs",
+              "kind": "property",
+              "name": "target",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            }
+          ],
+          "name": "DragEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "removed",
+      "eventType": "RemoveEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "RemoveEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "RemoveEventArgs",
+              "kind": "property",
+              "name": "removedIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "RemoveEventArgs",
+              "kind": "property",
+              "name": "removedItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            }
+          ],
+          "name": "RemoveEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "removing",
+      "eventType": "RemoveEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "RemoveEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "RemoveEventArgs",
+              "kind": "property",
+              "name": "removedIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "RemoveEventArgs",
+              "kind": "property",
+              "name": "removedItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            }
+          ],
+          "name": "RemoveEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "selected",
+      "eventType": "SelectEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "isSwiped",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "preventFocus",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "previousIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "previousItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "selectedContent",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "selectedIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "kind": "property",
+              "name": "selectedItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            }
+          ],
+          "name": "SelectEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "selecting",
+      "eventType": "SelectingEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "SelectEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "SelectEventArgs",
+              "inheritedVia": "SelectEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectingEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "inheritedVia": "SelectEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "inheritedVia": "SelectEventArgs",
+              "kind": "property",
+              "name": "isSwiped",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "SelectEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "inheritedVia": "SelectEventArgs",
+              "kind": "property",
+              "name": "preventFocus",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "inheritedVia": "SelectEventArgs",
+              "kind": "property",
+              "name": "previousIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "inheritedVia": "SelectEventArgs",
+              "kind": "property",
+              "name": "previousItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "inheritedVia": "SelectEventArgs",
+              "kind": "property",
+              "name": "selectedContent",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "inheritedVia": "SelectEventArgs",
+              "kind": "property",
+              "name": "selectedIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "SelectEventArgs",
+              "inheritedVia": "SelectEventArgs",
+              "kind": "property",
+              "name": "selectedItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "SelectingEventArgs",
+              "kind": "property",
+              "name": "selectingContent",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "SelectingEventArgs",
+              "kind": "property",
+              "name": "selectingIndex",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "number"
+            },
+            {
+              "declaredOn": "SelectingEventArgs",
+              "kind": "property",
+              "name": "selectingItem",
+              "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+              "type": "HTMLElement"
+            }
+          ],
+          "name": "SelectingEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-navigations/src/tab/tab.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionTab",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "Tab",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.ej.navigations.Tab"
+  }
+}

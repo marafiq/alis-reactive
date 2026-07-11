@@ -1,0 +1,462 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "carousel",
+  "apiSet": "core",
+  "probe": "onboarding/fusion/carousel/probes/raw-ej2-core.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "appended.selectedIndex",
+      "value": 0
+    },
+    {
+      "sequence": 2,
+      "label": "ready",
+      "value": {
+        "apiSet": "core",
+        "className": "Carousel",
+        "component": "carousel",
+        "namespace": "ej.navigations"
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "slideChanging",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "currentIndex",
+          "currentSlide",
+          "isSwiped",
+          "name",
+          "nextIndex",
+          "nextSlide",
+          "slideDirection"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "currentIndex": {
+            "sample": 0,
+            "type": "number"
+          },
+          "currentSlide": {
+            "sample": "[Element#carousel_item_0]",
+            "type": "object"
+          },
+          "isSwiped": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "slideChanging",
+            "type": "string"
+          },
+          "nextIndex": {
+            "sample": 1,
+            "type": "number"
+          },
+          "nextSlide": {
+            "sample": "[Element#carousel_item_1]",
+            "type": "object"
+          },
+          "slideDirection": {
+            "sample": "Next",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "slideChanged",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "currentIndex",
+          "currentSlide",
+          "isSwiped",
+          "name",
+          "previousIndex",
+          "previousSlide",
+          "slideDirection"
+        ],
+        "properties": {
+          "currentIndex": {
+            "sample": 1,
+            "type": "number"
+          },
+          "currentSlide": {
+            "sample": "[Element#carousel_item_1]",
+            "type": "object"
+          },
+          "isSwiped": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "slideChanged",
+            "type": "string"
+          },
+          "previousIndex": {
+            "sample": 0,
+            "type": "number"
+          },
+          "previousSlide": {
+            "sample": "[Element#carousel_item_0]",
+            "type": "object"
+          },
+          "slideDirection": {
+            "sample": "Next",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "selectedIndex.read",
+      "value": 1
+    },
+    {
+      "sequence": 6,
+      "label": "after.next.selectedIndex",
+      "value": 1
+    },
+    {
+      "sequence": 7,
+      "label": "slideChanging",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "currentIndex",
+          "currentSlide",
+          "isSwiped",
+          "name",
+          "nextIndex",
+          "nextSlide",
+          "slideDirection"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "currentIndex": {
+            "sample": 1,
+            "type": "number"
+          },
+          "currentSlide": {
+            "sample": "[Element#carousel_item_1]",
+            "type": "object"
+          },
+          "isSwiped": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "slideChanging",
+            "type": "string"
+          },
+          "nextIndex": {
+            "sample": 2,
+            "type": "number"
+          },
+          "nextSlide": {
+            "sample": "[Element#carousel_item_2]",
+            "type": "object"
+          },
+          "slideDirection": {
+            "sample": "Next",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 8,
+      "label": "slideChanged",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "currentIndex",
+          "currentSlide",
+          "isSwiped",
+          "name",
+          "previousIndex",
+          "previousSlide",
+          "slideDirection"
+        ],
+        "properties": {
+          "currentIndex": {
+            "sample": 2,
+            "type": "number"
+          },
+          "currentSlide": {
+            "sample": "[Element#carousel_item_2]",
+            "type": "object"
+          },
+          "isSwiped": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "slideChanged",
+            "type": "string"
+          },
+          "previousIndex": {
+            "sample": 1,
+            "type": "number"
+          },
+          "previousSlide": {
+            "sample": "[Element#carousel_item_1]",
+            "type": "object"
+          },
+          "slideDirection": {
+            "sample": "Next",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 9,
+      "label": "selectedIndex.read",
+      "value": 2
+    },
+    {
+      "sequence": 10,
+      "label": "slideChanging",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "currentIndex",
+          "currentSlide",
+          "isSwiped",
+          "name",
+          "nextIndex",
+          "nextSlide",
+          "slideDirection"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "currentIndex": {
+            "sample": 2,
+            "type": "number"
+          },
+          "currentSlide": {
+            "sample": "[Element#carousel_item_2]",
+            "type": "object"
+          },
+          "isSwiped": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "slideChanging",
+            "type": "string"
+          },
+          "nextIndex": {
+            "sample": 1,
+            "type": "number"
+          },
+          "nextSlide": {
+            "sample": "[Element#carousel_item_1]",
+            "type": "object"
+          },
+          "slideDirection": {
+            "sample": "Previous",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 11,
+      "label": "slideChanged",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "currentIndex",
+          "currentSlide",
+          "isSwiped",
+          "name",
+          "previousIndex",
+          "previousSlide",
+          "slideDirection"
+        ],
+        "properties": {
+          "currentIndex": {
+            "sample": 1,
+            "type": "number"
+          },
+          "currentSlide": {
+            "sample": "[Element#carousel_item_1]",
+            "type": "object"
+          },
+          "isSwiped": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "slideChanged",
+            "type": "string"
+          },
+          "previousIndex": {
+            "sample": 2,
+            "type": "number"
+          },
+          "previousSlide": {
+            "sample": "[Element#carousel_item_2]",
+            "type": "object"
+          },
+          "slideDirection": {
+            "sample": "Previous",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 12,
+      "label": "selectedIndex.read",
+      "value": 1
+    },
+    {
+      "sequence": 13,
+      "label": "after.prev.selectedIndex",
+      "value": 1
+    },
+    {
+      "sequence": 14,
+      "label": "slideChanging",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "cancel",
+          "currentIndex",
+          "currentSlide",
+          "isSwiped",
+          "name",
+          "nextIndex",
+          "nextSlide",
+          "slideDirection"
+        ],
+        "properties": {
+          "cancel": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "currentIndex": {
+            "sample": 1,
+            "type": "number"
+          },
+          "currentSlide": {
+            "sample": "[Element#carousel_item_1]",
+            "type": "object"
+          },
+          "isSwiped": {
+            "sample": false,
+            "type": "boolean"
+          },
+          "name": {
+            "sample": "slideChanging",
+            "type": "string"
+          },
+          "nextIndex": {
+            "sample": 0,
+            "type": "number"
+          },
+          "nextSlide": {
+            "sample": "[Element#carousel_item_0]",
+            "type": "object"
+          },
+          "slideDirection": {
+            "sample": "Previous",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 15,
+      "label": "slideChanging.cancel",
+      "value": {
+        "cancel": true,
+        "currentIndex": 1,
+        "nextIndex": 0,
+        "slideDirection": "Previous"
+      }
+    },
+    {
+      "sequence": 16,
+      "label": "after.blocked.prev.selectedIndex",
+      "value": 1
+    },
+    {
+      "sequence": 17,
+      "label": "own keys",
+      "value": [
+        "allowServerDataBinding",
+        "autoSlideInterval",
+        "bulkChanges",
+        "changedProperties",
+        "childChangedProperties",
+        "element",
+        "finalUpdate",
+        "ignoreCollectionWatch",
+        "isAngular",
+        "isComplexArraySetter",
+        "isDestroyed",
+        "isProtectedOnChange",
+        "isReact",
+        "isReactHybrid",
+        "isRendered",
+        "isServerRendered",
+        "isStringTemplate",
+        "isSwipe",
+        "isVue",
+        "itemsContainer"
+      ]
+    },
+    {
+      "sequence": 18,
+      "label": "prototype methods",
+      "value": [
+        "accessMount",
+        "addEventListener",
+        "addInstance",
+        "addOnPersist",
+        "appendTo",
+        "applyAnimation",
+        "applySlideInterval",
+        "attachUnloadEvent",
+        "autoSlide",
+        "autoSlideChange",
+        "clearChanges",
+        "clearTemplate",
+        "createElement",
+        "dataBind",
+        "destroy",
+        "destroyButtons",
+        "detachUnloadEvent",
+        "detectFunction",
+        "finalUpdate",
+        "getActualProperties"
+      ]
+    },
+    {
+      "sequence": 19,
+      "label": "selectedIndex.read",
+      "value": 1
+    }
+  ]
+}

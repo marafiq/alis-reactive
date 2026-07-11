@@ -1,0 +1,210 @@
+{
+  "status": "raw-ej2-trace",
+  "component": "rating",
+  "apiSet": "core",
+  "probe": "onboarding/fusion/rating/probes/raw-ej2-core.html",
+  "trace": [
+    {
+      "sequence": 1,
+      "label": "beforeItemRender",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "element",
+          "name",
+          "value"
+        ],
+        "properties": {
+          "element": {
+            "sample": "[Element#SPAN]",
+            "type": "object"
+          },
+          "name": {
+            "sample": "beforeItemRender",
+            "type": "string"
+          },
+          "value": {
+            "sample": 1,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 2,
+      "label": "beforeItemRender",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "element",
+          "name",
+          "value"
+        ],
+        "properties": {
+          "element": {
+            "sample": "[Element#SPAN]",
+            "type": "object"
+          },
+          "name": {
+            "sample": "beforeItemRender",
+            "type": "string"
+          },
+          "value": {
+            "sample": 2,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "label": "beforeItemRender",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "element",
+          "name",
+          "value"
+        ],
+        "properties": {
+          "element": {
+            "sample": "[Element#SPAN]",
+            "type": "object"
+          },
+          "name": {
+            "sample": "beforeItemRender",
+            "type": "string"
+          },
+          "value": {
+            "sample": 3,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 4,
+      "label": "beforeItemRender",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "element",
+          "name",
+          "value"
+        ],
+        "properties": {
+          "element": {
+            "sample": "[Element#SPAN]",
+            "type": "object"
+          },
+          "name": {
+            "sample": "beforeItemRender",
+            "type": "string"
+          },
+          "value": {
+            "sample": 4,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 5,
+      "label": "beforeItemRender",
+      "value": {
+        "functions": [],
+        "ownKeys": [
+          "element",
+          "name",
+          "value"
+        ],
+        "properties": {
+          "element": {
+            "sample": "[Element#SPAN]",
+            "type": "object"
+          },
+          "name": {
+            "sample": "beforeItemRender",
+            "type": "string"
+          },
+          "value": {
+            "sample": 5,
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 6,
+      "label": "created",
+      "value": {
+        "functions": [],
+        "ownKeys": [],
+        "properties": {},
+        "value": "undefined"
+      }
+    },
+    {
+      "sequence": 7,
+      "label": "ready",
+      "value": {
+        "apiSet": "core",
+        "className": "Rating",
+        "component": "rating",
+        "namespace": "ej.inputs"
+      }
+    },
+    {
+      "sequence": 8,
+      "label": "own keys",
+      "value": [
+        "allowServerDataBinding",
+        "bulkChanges",
+        "changedProperties",
+        "childChangedProperties",
+        "currentValue",
+        "element",
+        "emptyTemplateFunction",
+        "finalUpdate",
+        "fullTemplateFunction",
+        "ignoreCollectionWatch",
+        "isAngular",
+        "isComplexArraySetter",
+        "isDestroyed",
+        "isProtectedOnChange",
+        "isReact",
+        "isReactHybrid",
+        "isRendered",
+        "isServerRendered",
+        "isStringTemplate",
+        "isTouchSelected"
+      ]
+    },
+    {
+      "sequence": 9,
+      "label": "prototype methods",
+      "value": [
+        "accessMount",
+        "addEventListener",
+        "addInstance",
+        "addOnPersist",
+        "appendTo",
+        "attachUnloadEvent",
+        "beforeItemRender",
+        "calculateCurrentValue",
+        "clearChanges",
+        "clearLabelPosition",
+        "clearTemplate",
+        "clickHandler",
+        "closeRatingTooltip",
+        "createElement",
+        "created",
+        "dataBind",
+        "destroy",
+        "detachUnloadEvent",
+        "detectFunction",
+        "displayLabel"
+      ]
+    }
+  ]
+}

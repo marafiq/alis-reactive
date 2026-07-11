@@ -1,0 +1,306 @@
+{
+  "component": "time-picker",
+  "counts": {
+    "events": 9,
+    "payloadTypes": 7
+  },
+  "events": [
+    {
+      "event": "blur",
+      "eventType": "BlurEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BlurEventArgs",
+              "kind": "property",
+              "name": "model",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+              "type": "Object"
+            }
+          ],
+          "name": "BlurEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "change",
+      "eventType": "ChangeEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "HTMLInputElement | HTMLElement"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "KeyboardEventArgs | FocusEvent | MouseEvent | Event"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "isInteracted",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "text",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "Date"
+            }
+          ],
+          "name": "ChangeEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "cleared",
+      "eventType": "ClearedEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "ClearedEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+              "type": "MouseEvent | Event"
+            }
+          ],
+          "name": "ClearedEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "close",
+      "eventType": "PopupEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "appendTo",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "MouseEvent | KeyboardEvent | FocusEvent | Event"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "popup",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "Popup"
+            }
+          ],
+          "name": "PopupEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "destroyed",
+      "eventType": "Object",
+      "payloadTypes": [
+        {
+          "decision": "broad vendor object; record in discovery, require focused runtime row before public C# DSL",
+          "extends": [],
+          "members": [],
+          "name": "Object",
+          "sourcePath": "",
+          "status": "builtin-object"
+        }
+      ]
+    },
+    {
+      "event": "focus",
+      "eventType": "FocusEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "FocusEventArgs",
+              "kind": "property",
+              "name": "model",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+              "type": "Object"
+            }
+          ],
+          "name": "FocusEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/calendar/calendar.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "itemRender",
+      "eventType": "ItemEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "ItemEventArgs",
+              "kind": "property",
+              "name": "element",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "ItemEventArgs",
+              "kind": "property",
+              "name": "isDisabled",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ItemEventArgs",
+              "kind": "property",
+              "name": "text",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "ItemEventArgs",
+              "kind": "property",
+              "name": "value",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "Date"
+            }
+          ],
+          "name": "ItemEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "open",
+      "eventType": "PopupEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "appendTo",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "HTMLElement"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "MouseEvent | KeyboardEvent | FocusEvent | Event"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "string"
+            },
+            {
+              "declaredOn": "PopupEventArgs",
+              "kind": "property",
+              "name": "popup",
+              "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+              "type": "Popup"
+            }
+          ],
+          "name": "PopupEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionTimePicker",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "TimePicker",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.calendars"
+  }
+}

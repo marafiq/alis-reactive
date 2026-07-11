@@ -1,0 +1,21 @@
+{
+  "component": "numeric-text-box",
+  "fusionType": "FusionNumericTextBox",
+  "note": "Per-component parity judgment consumed by compute-fusion-parity.mjs (its header names discovery/parity-accounting.json as the per-component JUDGMENT file, reviewed like any judgment step; not script-generated). builder-owned members (allowMouseWheel, appendTemplate, blur, change, created, cssClass, currency, decimals, destroyed, enabled, enablePersistence, floatLabelType, focus, format, max, min, placeholder, prependTemplate, showClearButton, showSpinButton, step, strictMode, validateDecimalOnType, value, width) are counted from public-api-surface.json builder.covered and are NOT repeated here. destroy carries a skip: discovery decision and is excluded by that. The six members with builder.covered=false and no skip decision are accounted below.",
+  "onboarded": [
+    "increment",
+    "decrement",
+    "focusIn",
+    "focusOut"
+  ],
+  "excluded": [
+    {
+      "name": "getText",
+      "reason": "numerictextbox.d.ts:395 getText(): string returns the vendor-formatted display string (currency/format/decimals applied), which the MVC builder already controls at render via Format/Currency/Decimals. The typed runtime read the DSL needs is the numeric value, already onboarded as the typed Value() source for conditions/gather; getText would add a second, format-coupled string read of the same state with no distinct typed use case in resident-billing or care workflows. Excluded as a builder-owned display concern, not runtime DSL behavior."
+    },
+    {
+      "name": "readonly",
+      "reason": "numerictextbox.d.ts:139 readonly: boolean is initial read-only render configuration owned by the Syncfusion MVC builder (set once when the field renders). No senior-living journey proves a post-render runtime read or write of read-only state on a numeric field, and the builder already exposes it as a static option. Excluded as builder-owned static configuration with no proven post-render read/write behavior."
+    }
+  ]
+}

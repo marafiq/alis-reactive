@@ -1,0 +1,14 @@
+{
+  "component": "button",
+  "fusionType": "FusionButton",
+  "note": "Per-component parity judgment consumed by compute-fusion-parity.mjs (its header names discovery/parity-accounting.json as the per-component JUDGMENT file, reviewed like any judgment step). builder-owned members (content, cssClass, disabled, iconCss, iconPosition, isPrimary, isToggle, click, created, enableHtmlSanitizer) are counted from public-api-surface.json builder.covered and are NOT repeated here. destroy carries a skip: discovery decision and is excluded by that. Only the two members with builder.covered=false and no skip decision are accounted below.",
+  "onboarded": [
+    "focusIn"
+  ],
+  "excluded": [
+    {
+      "name": "locale",
+      "reason": "EJ2 Button.locale is marked @private in node_modules/@syncfusion/ej2-buttons/src/button/button.d.ts:96 and only overrides the global culture/localization value for the component. The plain EJ2 Button registers no localized constants (no L10n/getConstant in button.js) and has no built-in localizable text (no spin text, no placeholder), so locale changes nothing a resident or care-team member sees. It is inert i18n/culture configuration, not a post-render runtime value developers branch, gather, display, or mutate in a Senior Living plan. Localization, if needed, is set globally at app bootstrap, not per-button through the reactive DSL."
+    }
+  ]
+}

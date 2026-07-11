@@ -170,8 +170,9 @@ function includeMember(member, fusionType) {
 function coverageMatrixMarkdown({ component, fusionType, sourceRoot, artifactRoot, members }) {
   const supplemental = supplementalMatrixRows(component, artifactRoot);
   const variantIndex = buildVariantCoverageIndex(supplemental);
+  const behavioralMap = loadBehavioralCoverageMap(artifactRoot);
   const allRows = [...members, ...supplemental];
-  const rows = allRows.map(member => matrixRow(component, member, artifactRoot, variantIndex));
+  const rows = allRows.map(member => matrixRow(component, member, artifactRoot, variantIndex, behavioralMap));
   const audited = rows.every(row => row.endsWith("| row-proven |"));
   return `# ${fusionType} Typed API Coverage Matrix
 
@@ -192,9 +193,44 @@ ${rows.join("\n")}
 `;
 }
 
-function matrixRow(component, member, artifactRoot, variantIndex) {
-  const coverage = member.coverage ?? rowCoverage(component, member, variantIndex);
+function matrixRow(component, member, artifactRoot, variantIndex, behavioralMap) {
+  // A member is row-proven when the behavioral-coverage.json maps it to a test —
+  // that map is what the 0b gate resolves against the latest TRX (exists + Passed).
+  // So row-proven here derives from the TRX truth, never a self-declared string.
+  const behavioralTest = behavioralMap ? behavioralMap.get(member.name) : undefined;
+  const coverage = behavioralTest
+    ? behavioralCoverage(behavioralTest)
+    : (member.coverage ?? rowCoverage(component, member, variantIndex));
   return `| \`${member.name}\` | ${member.kind} | \`${relativePath(member.file)}\` | ${coverage.rawTrace} | ${coverage.primitiveMap} | ${coverage.verticalSlice} | ${coverage.playwrightProof} | ${coverage.status} |`;
+}
+
+// Reads proof/behavioral-coverage.json -> Map(matrix member name -> proving test FQN).
+// Returns null when absent (then the matrix falls back to its prior per-component logic,
+// so components without a behavioral map — e.g. grid — are unchanged).
+function loadBehavioralCoverageMap(artifactRoot) {
+  const path = join(artifactRoot, "proof/behavioral-coverage.json");
+  if (!existsSync(path)) return null;
+  try {
+    const raw = JSON.parse(readFileSync(path, "utf8"));
+    const map = new Map();
+    for (const entry of raw.coverage ?? []) {
+      if (typeof entry.member === "string" && typeof entry.test === "string") map.set(entry.member, entry.test);
+    }
+    return map.size > 0 ? map : null;
+  } catch {
+    return null;
+  }
+}
+
+function behavioralCoverage(testFqn) {
+  const link = "[behavioral-coverage.json](behavioral-coverage.json)";
+  return {
+    rawTrace: link,
+    primitiveMap: link,
+    verticalSlice: link,
+    playwrightProof: `\`${testFqn}\``,
+    status: "row-proven"
+  };
 }
 
 function supplementalMatrixRows(component, artifactRoot) {

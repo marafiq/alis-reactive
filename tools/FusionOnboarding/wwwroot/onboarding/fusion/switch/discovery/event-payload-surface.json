@@ -1,0 +1,103 @@
+{
+  "component": "switch",
+  "counts": {
+    "events": 3,
+    "payloadTypes": 3
+  },
+  "events": [
+    {
+      "event": "beforeChange",
+      "eventType": "BeforeChangeEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [],
+          "members": [
+            {
+              "declaredOn": "BeforeChangeEventArgs",
+              "kind": "property",
+              "name": "cancel",
+              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/common/common.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeChangeEventArgs",
+              "kind": "property",
+              "name": "checked",
+              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/common/common.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "BeforeChangeEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/common/common.d.ts",
+              "type": "Event"
+            }
+          ],
+          "name": "BeforeChangeEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/common/common.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "change",
+      "eventType": "ChangeEventArgs",
+      "payloadTypes": [
+        {
+          "extends": [
+            "BaseEventArgs"
+          ],
+          "members": [
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "checked",
+              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/common/common.d.ts",
+              "type": "boolean"
+            },
+            {
+              "declaredOn": "ChangeEventArgs",
+              "kind": "property",
+              "name": "event",
+              "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/common/common.d.ts",
+              "type": "Event"
+            },
+            {
+              "declaredOn": "BaseEventArgs",
+              "inheritedVia": "BaseEventArgs",
+              "kind": "property",
+              "name": "name",
+              "sourcePath": "node_modules/@syncfusion/ej2-base/src/event-handler.d.ts",
+              "type": "string"
+            }
+          ],
+          "name": "ChangeEventArgs",
+          "sourcePath": "node_modules/@syncfusion/ej2-buttons/src/common/common.d.ts",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "event": "created",
+      "eventType": "Event",
+      "payloadTypes": [
+        {
+          "decision": "DOM-native browser type (not a Syncfusion declaration); record in discovery, not an onboardable Fusion payload",
+          "extends": [],
+          "members": [],
+          "name": "Event",
+          "sourcePath": "",
+          "status": "dom-native"
+        }
+      ]
+    }
+  ],
+  "fusionType": "FusionSwitch",
+  "status": "static-discovery",
+  "syncfusion": {
+    "className": "Switch",
+    "dtsRoot": "node_modules/@syncfusion",
+    "namespace": "ej.buttons"
+  }
+}
