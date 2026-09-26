@@ -32,7 +32,7 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
   a single 80-minute job that reruns from scratch on any hiccup is the wrong shape for it.
 - **Pinned toolchain.** .NET SDK `10.0.101` (`global.json`); Node 22 in CI; `Microsoft.Playwright.NUnit`
   1.52.0, `NUnit` 4.5.0, `NUnit3TestAdapter` 5.0.0
-  (`tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj:16-19`).
+  (`tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj:12-15`).
 
 ## What each workflow is for, and what gates what
 
