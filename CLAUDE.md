@@ -6,13 +6,9 @@
 > branch. Model and cutover: `docs/BRANCHING.md`. Release runbook:
 > `docs/RELEASING.md`. CI design: `docs/CI.md`. A `pre-commit` guard
 > (`scripts/install-git-hooks.sh`, re-run after clone) refuses direct commits
-> on `main` and `release/*`.
->
-> **Until PR #136 merges,** the release line is still
-> `tiny-safe-but-important-refactorings` (`v1.0.0-rc.3` was tagged there):
-> branch from it and target it with pull requests, and push no new release tag
-> before the cutover in `docs/BRANCHING.md` — the publish workflow rejects a
-> tag whose commit is not on `main`.
+> on `main` and `release/*`. `main` became the release line on 2026-09-26
+> (fast-forwarded to `0a1dca3e`, the `v1.0.0-rc.3` commit); the remaining
+> cutover steps are listed in `docs/BRANCHING.md`.
 
 ## Architecture
 
@@ -436,9 +432,8 @@ Known weaknesses are tracked in `.claude/memory/quality-principles.md`
 
 ### 14. Git Worktrees for Feature Work
 
-Branch from `origin/main` (until the cutover in `docs/BRANCHING.md`: from the
-release line named at the top of this file), work in a worktree, land by pull
-request. Prefixes: `feature/`, `fix/`, `chore/`, `docs/`.
+Branch from `origin/main`, work in a worktree, land by pull request.
+Prefixes: `feature/`, `fix/`, `chore/`, `docs/`.
 
 ```bash
 git worktree add .worktrees/<feature-name> -b feature/<feature-name> origin/main

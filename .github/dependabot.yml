@@ -31,6 +31,11 @@ updates:
       npm-minor-and-patch:
         patterns: ["*"]
         update-types: [minor, patch]
+    ignore:
+      # Syncfusion is bumped deliberately, never by Dependabot: the npm and NuGet Syncfusion
+      # versions move together to the same exact version, one patch behind the newest weekly
+      # release, and every major needs a new license key. See docs/CI.md ("Changing CI").
+      - dependency-name: "@syncfusion/*"
 
   - package-ecosystem: npm
     directory: /docs-site
@@ -60,7 +65,7 @@ updates:
         patterns: ["*"]
         update-types: [minor, patch]
     ignore:
-      # Syncfusion EJ2 is pinned to the 32.x line on purpose (v33 is the upgrade-mode validation
-      # case in high-quality-bar-tasks.md). Minor and patch updates within 32.x are welcome.
+      # Syncfusion is bumped deliberately, never by Dependabot: Syncfusion.EJ2.AspNet.Core,
+      # Syncfusion.EJ2.MVC5 and @syncfusion/ej2 move together to the same exact version, one patch
+      # behind the newest weekly release, and every major needs a new license key.
       - dependency-name: "Syncfusion.*"
-        update-types: ["version-update:semver-major"]

@@ -7,11 +7,11 @@ and merging to `main` never publishes. The publish workflow is
 `.github/workflows/nuget-publish.yml`; the branch model and the one-time cutover are in
 `docs/BRANCHING.md`; the CI that gates every release is described in `docs/CI.md`.
 
-> **Transition.** Until PR #136 merges, the release line is still the branch
-> `tiny-safe-but-important-refactorings`, and `v1.0.0-rc.3` was tagged there. Run the cutover in
-> `docs/BRANCHING.md` first; from then on this page applies verbatim. The publish workflow rejects a
-> tag whose commit is not on `main` (or on a `release/*` branch), so a tag pushed before the cutover
-> fails in seconds and publishes nothing.
+> **Cutover status.** `main` became the release line on 2026-09-26 09:55Z: it was fast-forwarded to
+> `0a1dca3e`, the commit `v1.0.0-rc.3` was cut from, so that tag is reachable from `main` and this
+> page applies verbatim. The remaining one-time steps (retire the per-RC branches, apply the
+> protection) are in `docs/BRANCHING.md`. The publish workflow rejects a tag whose commit is not on
+> `main` (or on a `release/*` branch): such a tag fails in seconds and publishes nothing.
 
 ## Where is the release candidate? (one screen)
 
@@ -114,7 +114,7 @@ pushing anything. It reads local refs only (`refs/tags/*`, `refs/remotes/origin/
 git fetch origin --tags
 
 # 1. A good tag: annotated and reachable from main -> exit 0 and the release summary line.
-scripts/verify-release-tag.sh v1.0.0-rc.1; echo "exit=$?"
+scripts/verify-release-tag.sh v1.0.0-rc.3; echo "exit=$?"
 
 # 2. A LOCAL lightweight probe tag on a commit that is not on main -> exit 4, "lightweight tag".
 OFF="$(git rev-parse HEAD)"   # any commit not on main or release/*, e.g. your feature branch tip
@@ -131,10 +131,11 @@ git tag -d vprobe
 ```
 
 Probe tags are local and deleted right after; never push one. Real tags today: `v1.0.0-rc.2` exits
-`4` (it is lightweight). `v1.0.0-rc.3` is annotated and **not** on `main`, yet exits `0` until the
-cutover, because the per-RC branch `release/1.0.0-rc3` points at the same commit and the guard
-accepts `release/*` for hotfix lines. That is one more reason the cutover deletes per-RC branches
-(`docs/BRANCHING.md`, step 4): after it, only `main` and true hotfix lines can vouch for a tag.
+`4` (it is lightweight); `v1.0.0-rc.1` and `v1.0.0-rc.3` exit `0` with `reachable_from=main`. Until
+the per-RC branch `release/1.0.0-rc3` is deleted (`docs/BRANCHING.md`, step 4) it also vouches for
+the rc.3 commit, because the guard accepts `release/*` for hotfix lines; after that step only `main`
+and true hotfix lines can vouch for a tag. Proof run on 2026-09-26: rc.3 `0`, a local lightweight
+probe off `main` `4`, a local annotated probe off `main` `6`.
 
 ## Cut GA
 

@@ -43,8 +43,9 @@ Facts, read from git and the GitHub API on that date:
   `01c4b672`, already in `main`) and `release/1.0.0-rc3` (at `0a1dca3e`, created the same day as tag
   `v1.0.0-rc.3` at the same commit). Two names for one commit invite drift, and neither is what the
   publish workflow reads (it reads the tag).
-- `v1.0.0-rc.3` was cut from the feature branch, so it is not reachable from `main`;
-  `v1.0.0-rc.2` is a lightweight tag (no tagger, date or message).
+- `v1.0.0-rc.3` was cut from the feature branch, so it was not reachable from `main` until the
+  fast-forward at 09:55Z that same day (cutover step 1 below); `v1.0.0-rc.2` is a lightweight tag
+  (no tagger, date or message).
 - 28 remote branches fully merged into `main`, and eight open pull requests (#124, #126 to #131)
   whose heads are already in `main`; #122 is an abandoned redesign draft with three commits nowhere
   else.
@@ -155,17 +156,17 @@ gh repo edit marafiq/alis-reactive --delete-branch-on-merge   # merged PR branch
 
 ## Cutover (ordered; exact commands; run them, in this order, once)
 
-Preconditions: this page's PR has merged into `tiny-safe-but-important-refactorings`, and the local
-full gate (`scripts/test.sh`) on that branch is green.
+Steps 1 and 2 were done on 2026-09-26 (see below); the local full gate (`scripts/test.sh`) was
+green on `0a1dca3e` (1232/1232) before step 1. Run the remaining steps in order, once.
 
 ```bash
-# 1. Make main the release line: merge PR #136 with a merge commit (the branch already contains
-#    merge commits from main; squashing would rewrite 56 commits of history).
-gh pr merge 136 --merge
+# 1. DONE 2026-09-26 09:55Z. main had no commits of its own, so it was fast-forwarded to the
+#    release line's tip instead of merged:  git push origin 0a1dca3e:refs/heads/main
+#    GitHub marked PR #136 merged; `git describe --tags --abbrev=0 main` prints v1.0.0-rc.3.
 
-# 2. Verify: main now contains the whole release line and the RC tag.
+# 2. DONE 2026-09-26. Verify any time:
 git fetch origin --tags
-git rev-list --count origin/main..origin/tiny-safe-but-important-refactorings   # expect 0
+git rev-list --count origin/main..origin/tiny-safe-but-important-refactorings   # 0
 git merge-base --is-ancestor v1.0.0-rc.3 origin/main && echo "rc.3 is on main"
 
 # 3. Retire the old working-branch guard in every clone (installer removes alis.activeBranch and
@@ -200,15 +201,14 @@ git merge-base --is-ancestor origin/tiny-safe-but-important-refactorings origin/
 
 # 8. Apply the protection above (rulesets, environment, repository setting).
 
-# 9. Update the CLAUDE.md transition note (the "Until PR #136 merges" block) in a small PR from main.
+# 9. DONE in this page's PR: CLAUDE.md's top block names main as the trunk and release line.
 
 # 10. Cut the next release candidate from main per docs/RELEASING.md.
 git tag -a v1.0.0-rc.4 -m "AlisReactive 1.0.0-rc.4" "$(git rev-parse origin/main)" && git push origin v1.0.0-rc.4
 ```
 
-Ordering matters at one point: between merging this page's PR into the release line and step 1,
-**do not push a release tag** — the new `verify-tag` gate rejects a tag whose commit is not on
-`main`, and the release line is not `main` until step 1.
+Tag only `main`'s tip: the `verify-tag` gate rejects a tag whose commit is not on `main` (or a
+`release/*` hotfix line), so a mis-placed tag fails in seconds and publishes nothing.
 
 ## After the cutover: the one-screen answer
 
