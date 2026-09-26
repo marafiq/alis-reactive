@@ -8,24 +8,26 @@ on:
   push:
     branches: [main, 'release/*']
   pull_request:
-    branches: [main]
+    branches: [main, 'release/*']   # a hotfix PR into release/X.Y gets the same net48 proof as main
+
+# Least privilege: these jobs only read the repository.
+permissions:
+  contents: read
+
+# A new push to a pull request supersedes its running net48 jobs; pushes to main / release/* never cancel.
+concurrency:
+  group: net48-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   net48-windows:
     name: Build + pack net48 on real .NET Framework 4.8 (Windows)
     runs-on: windows-latest
+    timeout-minutes: 30   # observed: about 3 minutes
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup .NET (from global.json)
-        uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
+      - uses: ./.github/actions/setup-toolchain
 
       - name: Install npm deps
         run: npm ci
@@ -68,21 +70,14 @@ jobs:
   net48-runtime-iis:
     name: net48 runtime boots under IIS Express (Playwright screenshot proof)
     runs-on: windows-latest
+    timeout-minutes: 40   # observed: about 4 minutes
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup .NET (from global.json)
-        uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
+      - uses: ./.github/actions/setup-toolchain
 
       - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
 
       - name: Install npm deps
         run: npm ci
