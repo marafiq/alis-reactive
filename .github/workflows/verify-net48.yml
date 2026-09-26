@@ -25,7 +25,7 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 30   # observed: about 3 minutes
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ./.github/actions/setup-toolchain
 
@@ -61,7 +61,7 @@ jobs:
         shell: bash
         run: ls -1 ./nupkgs/
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: nupkgs-net48-windows
           path: nupkgs/*.nupkg
@@ -72,12 +72,12 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 40   # observed: about 4 minutes
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ./.github/actions/setup-toolchain
 
       - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
+        uses: microsoft/setup-msbuild@30375c66a4eea26614e0d39710365f22f8b0af57 # v3.0.0
 
       - name: Install npm deps
         run: npm ci
@@ -182,7 +182,7 @@ jobs:
 
       - name: Upload net48 runtime screenshot
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: net48-runtime-screenshot
           path: examples/net48-mvc-smoke/net48-smoke.png
