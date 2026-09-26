@@ -20,7 +20,7 @@
   "devDependencies": {
     "@syncfusion/ej2": "32.2.8",
     "@tailwindcss/vite": "^4.2.4",
-    "@types/node": "22.19.21",
+    "@types/node": "26.6.2",
     "esbuild": "^0.28.0",
     "jsdom": "^27.0.1",
     "tailwindcss": "^4.2.1",
