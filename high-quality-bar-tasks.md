@@ -220,7 +220,7 @@ pipeline whose only browser harness is advisory will eventually ship a browser r
       sharding, or per-suite timeout design — documented, not guessed).
 - [ ] Three consecutive green `playwright` CI runs on the main/release branch (run URLs listed).
 - [ ] `nuget-publish.yml`: `continue-on-error` removed and `pack-and-publish` has
-      `needs: [test, playwright]`; `docs/releasing.md` updated to match.
+      `needs: [test, playwright]`; `docs/RELEASING.md` updated to match.
 
 ### T11 — Justify or remove the `?? emptyPlan` fallback in plan composition
 

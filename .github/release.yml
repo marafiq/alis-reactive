@@ -1,0 +1,35 @@
+# Shapes the notes GitHub generates for a Release (`gh release create --generate-notes` in
+# nuget-publish.yml, or the "Generate release notes" button). Merged pull requests are grouped by
+# label; the first matching category wins; unlabelled PRs land in "Other changes".
+# Reference: https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes
+changelog:
+  exclude:
+    labels:
+      - skip-changelog
+      - chore
+      - dependencies
+    authors:
+      - dependabot
+      - dependabot[bot]
+      - github-actions[bot]
+  categories:
+    - title: Breaking changes
+      labels:
+        - breaking-change
+    - title: New features
+      labels:
+        - enhancement
+    - title: Bug fixes
+      labels:
+        - bug
+        - critical
+    - title: Refactoring and code quality
+      labels:
+        - refactor
+        - sonarqube
+    - title: Documentation
+      labels:
+        - documentation
+    - title: Other changes
+      labels:
+        - "*"
