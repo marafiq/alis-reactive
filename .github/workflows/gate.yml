@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30   # observed: about 2 minutes (docs/CI.md, "Facts")
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ./.github/actions/setup-toolchain
 
@@ -71,7 +71,7 @@ jobs:
       # the actual cause of the historical red legs (fixed in 2d5f9562).
       Syncfusion__LicenseKey: ${{ secrets.SYNCFUSION_LICENSE_KEY }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ./.github/actions/setup-toolchain
 
@@ -101,7 +101,7 @@ jobs:
 
       - name: Upload failure artifacts (logs, TRX, diagnostics, traces, screenshots)
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-${{ matrix.shard }}
           path: |
