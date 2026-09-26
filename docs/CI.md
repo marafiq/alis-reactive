@@ -80,19 +80,39 @@ Sharding is the Playwright-recommended way to parallelize across machines
 Expected time per shard, from the per-test `elapsed=` markers of run 29164122260 (single worker,
 `ubuntu-latest`, 2026-07-11):
 
-| Shard | Filter (summary) | Tests | Test time | Expected job time |
-|-------|------------------|-------|-----------|-------------------|
-| `fusion-a-f-and-core` | Fusion A-F, `CoreBehaviors` | 187 + 32 | 719 s + 129 s = 848 s | ~16 min |
-| `fusion-g-l-and-http` | Fusion G-L, `HttpPipeline` | 129 + 116 | 543 s + 385 s = 928 s | ~18 min |
-| `fusion-m-z` | Fusion M-Z | 222 | 809 s | ~16 min |
-| `components-and-validation` | `Components.*` except Fusion (Native, AppLevel), `Validation` | 134 + 140 | 504 s + 553 s = 1057 s | ~20 min |
-| `conditions-patterns-and-rest` | everything not in the others (`Conditions`, `Patterns`, future namespaces) | 159 + 113 | 574 s + 478 s = 1052 s | ~20 min |
+| Shard | Filter (summary) | Tests (`--list`) | Test time (2026-07-11 log) | Expected job time |
+|-------|------------------|------------------|----------------------------|-------------------|
+| `fusion-a-f-and-core` | Fusion A-F, `CoreBehaviors` | 217 | 719 s + 129 s = 848 s | ~16 min |
+| `fusion-g-l-and-http` | Fusion G-L, `HttpPipeline` | 256 | 543 s + 385 s = 928 s | ~18 min |
+| `fusion-m-z` | Fusion M-Z | 213 | 809 s | ~16 min |
+| `components-and-validation` | `Components.*` except Fusion (Native, AppLevel), `Validation` | 274 | 504 s + 553 s = 1057 s | ~20 min |
+| `conditions-patterns-and-rest` | everything not in the others (`Conditions`, `Patterns`, future namespaces) | 272 | 574 s + 478 s = 1052 s | ~20 min |
+
+The test counts are the `--list` output at the commit that introduced the shards: sum 1232 = the
+discovered set, union identical to the full list, zero duplicates.
+
+`scripts/playwright.sh --shard <name> --list --no-build` prints the fully qualified names a shard
+selects without running them: `dotnet test --list-tests` (with the NUnit adapter's
+`DisplayName=FullName`) gives the discovered set, and because `--list-tests` ignores `--filter`
+(observed: every shard listed all 1232 tests), `scripts/vstest-filter.mjs` applies the shard's
+expression with the VSTest grammar (`~ !~ = != | &`, parentheses, case-insensitive values). The
+partition proof is: the five lists concatenated equal the full list
+(`scripts/playwright.sh --list --no-build`), every test exactly once:
+
+```bash
+for s in fusion-a-f-and-core fusion-g-l-and-http fusion-m-z components-and-validation conditions-patterns-and-rest; do
+  scripts/playwright.sh --shard "$s" --list --no-build > "/tmp/shard-$s.txt"; wc -l < "/tmp/shard-$s.txt"
+done
+scripts/playwright.sh --list --no-build > /tmp/all.txt
+cat /tmp/shard-*.txt | sort > /tmp/union.txt
+diff <(sort /tmp/all.txt) /tmp/union.txt && echo "no gaps"; sort /tmp/union.txt | uniq -d | wc -l   # 0 = no duplicates
+```
 
 Job time adds about 2 min of setup (checkout, toolchain, `scripts/build.sh` 76 s, browser install
 28 s). Wall clock for the browser leg: about 20 minutes instead of about 80, at roughly the same
-total runner minutes. Test counts are `[Test]` attributes per directory; times are from one run and
-will drift. **Unchecked until the first sharded run:** the real per-shard times. Re-balance by
-moving a letter or a namespace between shards in `shard_filter()`; keep every letter present once.
+total runner minutes. Times are from one run and will drift. Re-balance by moving a letter or a
+namespace between shards in `shard_filter()`; keep every letter present exactly once and one
+complement shard, then re-run the partition proof above.
 
 ### Retries: only what failed, with artifacts only on failure
 

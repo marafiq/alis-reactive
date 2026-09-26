@@ -33,7 +33,8 @@ pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 instal
 | Full Playwright | `scripts/playwright.sh` | Use this instead of raw `dotnet test` for browser tests. |
 | Filtered Playwright | `scripts/playwright.sh --filter "FullyQualifiedName~Components.Fusion.Grid"` | Supports any VSTest filter. |
 | Pack NuGets | `scripts/pack.sh <version>` | Builds assets and Release binaries, clears old packages from `./nupkgs`, then packs the six shipped NuGets. Local inspection only: publishing is tag-driven (`docs/RELEASING.md`). |
-| One CI shard of Playwright | `scripts/playwright.sh --shard fusion-m-z` | Runs the same fixed partition CI runs (`docs/CI.md`). `--print-filter` shows the VSTest filter; `--retry-failed 1` re-runs only the failures once and lists what then passed. |
+| One CI shard of Playwright | `scripts/playwright.sh --shard fusion-m-z` | Runs the same fixed partition CI runs (`docs/CI.md`). `--print-filter` shows the VSTest filter; `--list` prints the selected test names without running them; `--retry-failed 1` re-runs only the failures once and lists what then passed. |
+| Prove the release-tag guard | `scripts/verify-release-tag.sh v1.0.0-rc.1` | The check `nuget-publish.yml` runs before a release, on your clone: annotated, SemVer, reachable from `main` / `release/*`. Exit codes and probe recipe in `docs/RELEASING.md`, "Prove the guard". |
 
 Every wrapper supports `--help`.
 

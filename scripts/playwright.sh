@@ -16,6 +16,7 @@ hang_timeout="${PLAYWRIGHT_HANG_TIMEOUT:-10m}"
 filter=""
 shard=""
 print_filter=0
+list_only=0
 retry_failed=0
 no_build=0
 
@@ -193,6 +194,7 @@ Usage:
   scripts/playwright.sh Components.Fusion.Grid
   scripts/playwright.sh --shard fusion-m-z --no-build
   scripts/playwright.sh --shard fusion-m-z --print-filter
+  scripts/playwright.sh --shard fusion-m-z --list --no-build
 
 Options:
   --filter <expr>       VSTest filter expression to pass through unchanged.
@@ -201,6 +203,12 @@ Options:
                         fusion-g-l-and-http, fusion-m-z, components-and-validation,
                         conditions-patterns-and-rest. Cannot be combined with --filter.
   --print-filter        Print the resolved VSTest filter and exit without running.
+  --list                Print the fully qualified names the filter or shard selects, one
+                        per line, without running them: dotnet test --list-tests for the
+                        discovered set (it ignores --filter), then the same filter grammar
+                        applied by scripts/vstest-filter.mjs. The five shards' lists
+                        together must equal the full list, each test exactly once
+                        (docs/CI.md, "Sharding").
   --retry-failed <n>    After a red run, re-run only the failed tests, up to n more
                         times (default 0). A test that then passes is reported as flaky:
                         [playwright:flaky] lines and TestResults/observable/flaky-<stamp>.txt.
@@ -249,6 +257,10 @@ while [ "$#" -gt 0 ]; do
       ;;
     --print-filter)
       print_filter=1
+      shift
+      ;;
+    --list)
+      list_only=1
       shift
       ;;
     --retry-failed)
@@ -323,6 +335,37 @@ esac
 
 if [ "$print_filter" -eq 1 ]; then
   printf '%s\n' "${filter:-<full suite>}"
+  exit 0
+fi
+
+# Listing needs the test assembly but no browser assets and no sandbox, so it builds without the
+# npm step and skips the asset freshness checks.
+if [ "$list_only" -eq 1 ]; then
+  if [ "$no_build" -eq 0 ]; then
+    echo "[playwright:runner] building test project for listing (browser assets not needed)" >&2
+    dotnet build "$project" -c "$configuration" -p:BuildReactiveBrowserAssets=false >&2
+  else
+    check_no_build_is_fresh
+  fi
+  # The NUnit adapter's default display name is the bare method name; FullName makes each line a
+  # fully qualified, unique test name. dotnet test --list-tests lists every discovered test and
+  # ignores --filter, so the shard or --filter expression is applied afterwards with the same
+  # grammar (scripts/vstest-filter.mjs).
+  list_cmd=(
+    dotnet test "$project"
+    -c "$configuration"
+    -p:BuildReactiveBrowserAssets=false
+    --no-build
+    --nologo
+    --list-tests
+    -- NUnit.DisplayName=FullName
+  )
+  discovered="$("${list_cmd[@]}" | awk '/^The following Tests are available:/ { listing = 1; next } listing && /^    / { sub(/^    /, ""); print }')"
+  if [ -n "$filter" ]; then
+    printf '%s\n' "$discovered" | node scripts/vstest-filter.mjs "$filter" | sort
+  else
+    printf '%s\n' "$discovered" | sort
+  fi
   exit 0
 fi
 
