@@ -1,0 +1,71 @@
+# Weekly, grouped dependency updates for the three ecosystems this repo builds with. One PR per
+# ecosystem per week for minor/patch bumps; majors arrive as their own PR so they get a real review.
+# Dependabot keeps SHA-pinned actions current as long as the pin carries a "# vX.Y.Z" comment.
+# Reference: https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Etc/UTC
+    labels: [dependencies]
+    open-pull-requests-limit: 5
+    groups:
+      github-actions:
+        patterns: ["*"]
+
+  - package-ecosystem: npm
+    # The root package-lock.json covers the npm workspaces (Alis.Reactive.Assets, Alis.Reactive.SandboxApp).
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Etc/UTC
+    labels: [dependencies]
+    open-pull-requests-limit: 5
+    groups:
+      npm-minor-and-patch:
+        patterns: ["*"]
+        update-types: [minor, patch]
+    ignore:
+      # Syncfusion is bumped deliberately, never by Dependabot: the npm and NuGet Syncfusion
+      # versions move together to the same exact version, one patch behind the newest weekly
+      # release, and every major needs a new license key. See docs/CI.md ("Changing CI").
+      - dependency-name: "@syncfusion/*"
+
+  - package-ecosystem: npm
+    directory: /docs-site
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Etc/UTC
+    labels: [dependencies]
+    open-pull-requests-limit: 5
+    groups:
+      docs-site-minor-and-patch:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Etc/UTC
+    labels: [dependencies]
+    open-pull-requests-limit: 5
+    groups:
+      nuget-minor-and-patch:
+        patterns: ["*"]
+        update-types: [minor, patch]
+    ignore:
+      # Syncfusion is bumped deliberately, never by Dependabot: Syncfusion.EJ2.AspNet.Core,
+      # Syncfusion.EJ2.MVC5 and @syncfusion/ej2 move together to the same exact version, one patch
+      # behind the newest weekly release, and every major needs a new license key.
+      - dependency-name: "Syncfusion.*"

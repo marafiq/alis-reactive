@@ -49,7 +49,7 @@ build, test, Playwright, and packaging order explicit:
 | `scripts/run.sh` | bundles → start the sandbox at `http://localhost:5220` |
 | `scripts/test.sh` | full gate: contract drift typecheck -> browser asset build -> vitest -> both-TFM build -> non-Playwright dotnet tests -> observable Playwright (`--no-e2e` skips the browser leg) |
 | `scripts/playwright.sh` | observable Playwright runner with filter support, live logs, TRX, diagnostics, active-test progress markers, stale `--no-build` detection, and stale browser asset detection |
-| `scripts/pack.sh <version>` | delivery: bundles → Release build → pack the six library NuGets to `./nupkgs` |
+| `scripts/pack.sh <version>` | delivery: bundles → Release build → pack the six library NuGets to `./nupkgs` (local; releases are cut by tag, see [docs/RELEASING.md](docs/RELEASING.md)) |
 
 Every wrapper supports `--help`. See **[docs/developer-cli.md](docs/developer-cli.md)**
 for filtered Playwright examples, first-time browser install, packaging, and the

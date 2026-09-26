@@ -2,11 +2,12 @@
 # Install this repo's git hooks. Idempotent — run after clone or hook changes:
 #   sh scripts/install-git-hooks.sh
 #
-# Why this exists: a pre-commit "branch guard" refuses commits on any branch
-# other than the configured active branch, so EVERY committer in this clone —
-# Claude, subagents, and Codex alike — stays on the one latest-and-greatest
-# branch. Documentation alone never stopped the drift; a hook does, because git
-# runs it no matter who or what invokes `git commit`.
+# Why this exists: `main` and every `release/*` branch move by pull request only
+# (docs/BRANCHING.md). A pre-commit guard refuses a direct commit on those
+# branches, so every committer in this clone — people, Claude, subagents, Codex —
+# is turned back onto a short-lived branch before the server-side ruleset would
+# reject the push. Same idea as pre-commit-hooks' `no-commit-to-branch`:
+# https://github.com/pre-commit/pre-commit-hooks#no-commit-to-branch
 set -e
 cd "$(git rev-parse --show-toplevel)"
 
@@ -21,31 +22,31 @@ if [ ! -d "$hooks" ]; then
 fi
 mkdir -p "$hooks"
 
-# Single source of truth for the active branch. Change it later with:
-#   git config alis.activeBranch <name>
-if ! git config alis.activeBranch >/dev/null 2>&1; then
-  git config alis.activeBranch "tiny-safe-but-important-refactorings"
-fi
+# The previous guard pinned one "active working branch" through git config. That
+# concept is retired (docs/BRANCHING.md, cutover): drop the setting so nothing
+# keeps reading it.
+git config --unset alis.activeBranch 2>/dev/null || true
 
 cat > "$hooks/pre-commit" <<'HOOK'
 #!/bin/sh
-# Branch guard — installed by scripts/install-git-hooks.sh (do not hand-edit;
-# re-run the installer to change it). All work on this clone belongs on the
-# configured active branch; every committer is covered (Claude, subagents,
-# Codex). Override once, rarely: ALIS_ALLOW_BRANCH=1 git commit ...
-expected="$(git config alis.activeBranch 2>/dev/null || echo tiny-safe-but-important-refactorings)"
+# Protected-branch guard — installed by scripts/install-git-hooks.sh (do not
+# hand-edit; re-run the installer to change it). `main` and `release/*` move by
+# pull request only (docs/BRANCHING.md). Override once, rarely — for example a
+# merge commit made deliberately on a release branch:
+#   ALIS_ALLOW_PROTECTED=1 git commit ...
 current="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
-if [ "$current" != "$expected" ]; then
-  echo "" >&2
-  echo "  BRANCH GUARD — refusing commit on '$current'." >&2
-  echo "  All work belongs on '$expected' (latest-and-greatest)." >&2
-  echo "  Switch:        git switch $expected" >&2
-  echo "  Override once: ALIS_ALLOW_BRANCH=1 git commit ..." >&2
-  echo "" >&2
-  [ "$ALIS_ALLOW_BRANCH" = "1" ] || exit 1
-fi
+case "$current" in
+  main|release/*)
+    echo "" >&2
+    echo "  BRANCH GUARD — refusing a direct commit on '$current'." >&2
+    echo "  '$current' moves by pull request only (docs/BRANCHING.md)." >&2
+    echo "  Start a branch:  git switch -c feature/<name>   (or a worktree: CLAUDE.md Rule 14)" >&2
+    echo "  Override once:   ALIS_ALLOW_PROTECTED=1 git commit ..." >&2
+    echo "" >&2
+    [ "$ALIS_ALLOW_PROTECTED" = "1" ] || exit 1
+    ;;
+esac
 HOOK
 chmod +x "$hooks/pre-commit"
 
-echo "installed: $hooks/pre-commit"
-echo "active branch (git config alis.activeBranch): $(git config alis.activeBranch)"
+echo "installed: $hooks/pre-commit (refuses direct commits on main and release/*)"
