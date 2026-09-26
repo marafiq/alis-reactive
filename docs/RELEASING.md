@@ -102,6 +102,40 @@ What gets rejected, in seconds, before any suite runs: a lightweight tag (`git t
 without `-a`), a non-SemVer tag (`v1.0`, `v1.0.0.0`, `vfoo`), and a tag whose commit is not
 reachable from `origin/main` or an `origin/release/*` branch.
 
+## Prove the guard
+
+`verify-tag` is `scripts/verify-release-tag.sh`, so it can be shown to bite on any clone without
+pushing anything. It reads local refs only (`refs/tags/*`, `refs/remotes/origin/main`,
+`refs/remotes/origin/release/*`) and never fetches. Exit codes: `0` fit to release, `2` usage,
+`3` tag missing, `4` lightweight, `5` not SemVer, `6` not reachable from `main` / `release/*`,
+`7` `origin/main` missing.
+
+```bash
+git fetch origin --tags
+
+# 1. A good tag: annotated and reachable from main -> exit 0 and the release summary line.
+scripts/verify-release-tag.sh v1.0.0-rc.1; echo "exit=$?"
+
+# 2. A LOCAL lightweight probe tag on a commit that is not on main -> exit 4, "lightweight tag".
+OFF="$(git rev-parse HEAD)"   # any commit not on main or release/*, e.g. your feature branch tip
+git tag v0.0.0-probe-light "$OFF" && scripts/verify-release-tag.sh v0.0.0-probe-light; echo "exit=$?"
+git tag -d v0.0.0-probe-light
+
+# 3. A LOCAL annotated probe tag on that same commit -> exit 6, "not reachable from origin/main".
+git tag -a v0.0.0-probe-annotated -m "probe" "$OFF" && scripts/verify-release-tag.sh v0.0.0-probe-annotated; echo "exit=$?"
+git tag -d v0.0.0-probe-annotated
+
+# 4. A LOCAL annotated tag with a non-SemVer name -> exit 5.
+git tag -a vprobe -m "probe" origin/main && scripts/verify-release-tag.sh vprobe; echo "exit=$?"
+git tag -d vprobe
+```
+
+Probe tags are local and deleted right after; never push one. Real tags today: `v1.0.0-rc.2` exits
+`4` (it is lightweight). `v1.0.0-rc.3` is annotated and **not** on `main`, yet exits `0` until the
+cutover, because the per-RC branch `release/1.0.0-rc3` points at the same commit and the guard
+accepts `release/*` for hotfix lines. That is one more reason the cutover deletes per-RC branches
+(`docs/BRANCHING.md`, step 4): after it, only `main` and true hotfix lines can vouch for a tag.
+
 ## Cut GA
 
 Identical to a release candidate with a stable version: `git tag -a v1.0.0 -m "AlisReactive 1.0.0"

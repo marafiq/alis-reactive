@@ -37,8 +37,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
-      package_version: ${{ steps.version.outputs.package_version }}
-      prerelease: ${{ steps.version.outputs.prerelease }}
+      package_version: ${{ steps.tag.outputs.version }}
+      prerelease: ${{ steps.tag.outputs.prerelease }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,52 +50,15 @@ jobs:
         # check below sees the tag object.
         run: git fetch --force origin "refs/tags/${GITHUB_REF_NAME}:refs/tags/${GITHUB_REF_NAME}"
 
-      - name: Require an annotated tag
-        run: |
-          kind="$(git cat-file -t "refs/tags/${GITHUB_REF_NAME}")"
-          if [ "$kind" != "tag" ]; then
-            echo "::error::'${GITHUB_REF_NAME}' is a lightweight tag (object type '${kind}'). Release tags must be annotated so they carry a tagger, a date, and a message: git tag -a ${GITHUB_REF_NAME} -m '<message>' <commit>"
-            exit 1
-          fi
-          echo "Tag ${GITHUB_REF_NAME} is annotated."
-          git for-each-ref "refs/tags/${GITHUB_REF_NAME}" --format='  tagger:  %(taggername) %(taggeremail) %(taggerdate:iso8601)%0a  message: %(contents:subject)'
-
-      - name: Derive and validate the version from the tag (SemVer)
-        id: version
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          # SemVer 2.0: MAJOR.MINOR.PATCH with an optional -prerelease label (alpha/beta/rc/...).
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
-            echo "::error::Tag '${GITHUB_REF_NAME}' is not a SemVer version. Use vMAJOR.MINOR.PATCH[-prerelease] — e.g. v1.0.0-alpha.1, v1.0.0-rc.1, or v1.0.0."
-            exit 1
-          fi
-          # NuGet flags any version with a '-' suffix as a prerelease automatically.
-          if [[ "$VERSION" == *-* ]]; then PRERELEASE=true; else PRERELEASE=false; fi
-          echo "package_version=${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "prerelease=${PRERELEASE}" >> "$GITHUB_OUTPUT"
-          echo "Version ${VERSION} (prerelease=${PRERELEASE}) from tag ${GITHUB_REF_NAME}"
-
-      - name: Require the tagged commit to be on main or a release/* branch
-        id: reachable
+      - name: Verify the tag (annotated, SemVer, reachable from main or release/*)
+        id: tag
+        # The check is a script so it can be proven to bite locally, against good and bad tags,
+        # without pushing anything (docs/RELEASING.md, "Prove the guard"). It reads local refs
+        # only, hence the fetch of the branches it compares against. It writes the outputs
+        # version, prerelease, commit and reachable_from, and the one-line release summary.
         run: |
           git fetch origin '+refs/heads/main:refs/remotes/origin/main' '+refs/heads/release/*:refs/remotes/origin/release/*'
-          commit="$(git rev-parse "refs/tags/${GITHUB_REF_NAME}^{commit}")"
-          echo "commit=${commit}" >> "$GITHUB_OUTPUT"
-          for ref in origin/main $(git for-each-ref --format='%(refname:short)' 'refs/remotes/origin/release/*'); do
-            if git merge-base --is-ancestor "$commit" "$ref"; then
-              echo "Commit ${commit} is reachable from ${ref}."
-              echo "branch=${ref#origin/}" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-          done
-          echo "::error::Commit ${commit} (tag ${GITHUB_REF_NAME}) is not reachable from origin/main or any origin/release/* branch. Releases are cut from main (or from a release/X.Y hotfix branch): merge first, then tag the merged commit. See docs/RELEASING.md."
-          exit 1
-
-      - name: Release summary
-        run: |
-          line="Release ${{ steps.version.outputs.package_version }} (prerelease=${{ steps.version.outputs.prerelease }}) from annotated tag ${GITHUB_REF_NAME} at ${{ steps.reachable.outputs.commit }}, reachable from ${{ steps.reachable.outputs.branch }}."
-          echo "::notice::${line}"
-          echo "${line}" >> "$GITHUB_STEP_SUMMARY"
+          scripts/verify-release-tag.sh "${GITHUB_REF_NAME}"
 
   gate:
     name: gate
