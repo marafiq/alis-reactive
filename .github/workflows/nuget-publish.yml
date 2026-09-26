@@ -1,89 +1,132 @@
 name: Publish NuGet packages
 
-# Publishes to NuGet.org ONLY when a version tag (v*) is pushed. The published version is
-# derived from the tag, so the tag is the single source of truth for what ships:
-#   git tag v1.0.0-rc.1 && git push origin v1.0.0-rc.1   ->  publishes 1.0.0-rc.1 (prerelease)
-#   git tag v1.0.0      && git push origin v1.0.0         ->  publishes 1.0.0 (stable / GA)
-# NuGet flags any version with a '-' suffix as prerelease automatically. Merging to main does
-# NOT publish anything (that is CI-only, in ci.yml) — releasing is a deliberate tag push.
+# Publishes to NuGet.org ONLY when an ANNOTATED version tag (v*) whose commit is on `main` (or on a
+# `release/*` stabilization branch) is pushed. The tag is the single source of truth for what ships:
+#   git tag -a v1.0.0-rc.1 -m "AlisReactive 1.0.0-rc.1" && git push origin v1.0.0-rc.1  ->  1.0.0-rc.1 (prerelease)
+#   git tag -a v1.0.0      -m "AlisReactive 1.0.0"      && git push origin v1.0.0       ->  1.0.0 (stable / GA)
+# NuGet flags any version with a '-' suffix as prerelease automatically. Merging to main does NOT
+# publish anything (that is CI-only, in ci.yml) — releasing is a deliberate tag push.
+#
+# Gates, in order:
+#   verify-tag  annotated tag, SemVer version, commit reachable from main or release/*  (seconds)
+#   gate        the shared gate (gate.yml): deterministic suite + five browser shards — BLOCKING
+#               (a red shard stops the release; re-run the failed jobs, publishing is idempotent)
+#   pack-and-publish  six packages at the tagged version -> nuget.org -> GitHub Release
+#                     (runs in the `nuget-release` environment; add a required reviewer there for
+#                      a manual approval click before anything is pushed)
+# Runbook: docs/RELEASING.md. Branch model and cutover: docs/BRANCHING.md.
 on:
   push:
     tags: ['v*']
+  # A manual run on a branch exercises the gates but never publishes: verify-tag is skipped for a
+  # non-tag ref, and pack-and-publish needs it.
   workflow_dispatch:
+
+# Least privilege by default; pack-and-publish widens to contents: write for the GitHub Release.
+permissions:
+  contents: read
 
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: package-lock.json
-
-      - name: Run non-browser verification gate
-        run: CONFIGURATION=Release scripts/test.sh --no-e2e
-
-  playwright:
-    runs-on: ubuntu-latest
-    env:
-      Syncfusion__LicenseKey: ${{ secrets.SYNCFUSION_LICENSE_KEY }}
-    # Non-blocking release signal while the license-secret fix proves itself on CI: the
-    # historical red runs were the unlicensed EJ2 trial modal intercepting interactions.
-    # Re-arm as a blocking gate (needs: [test, playwright]) after consecutive green runs.
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: package-lock.json
-
-      - name: Build app and Playwright project
-        run: scripts/build.sh
-
-      - name: Install Playwright browsers
-        run: pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
-
-      - name: Run observable Playwright tests
-        run: scripts/playwright.sh --no-build
-
-      - name: Upload Playwright report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: |
-            tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.log
-            tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.trx
-            tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.diag.log
-          retention-days: 14
-
-  pack-and-publish:
-    # Gate the publish on the DETERMINISTIC suite only. playwright runs (non-blocking) for signal.
-    needs: [test]
-    # Publish only for an actual version tag — a manual workflow_dispatch on a branch
-    # runs the gates above but will not push packages.
+  verify-tag:
+    name: Verify the release tag
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      package_version: ${{ steps.version.outputs.package_version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # the ancestry check needs the history between the tag and main
+
+      - name: Re-fetch the tag object
+        # actions/checkout fetches a tag as "+<commit-sha>:refs/tags/<tag>", which peels an annotated
+        # tag down to the commit it points at (actions/checkout#290). Fetch the real ref so the type
+        # check below sees the tag object.
+        run: git fetch --force origin "refs/tags/${GITHUB_REF_NAME}:refs/tags/${GITHUB_REF_NAME}"
+
+      - name: Require an annotated tag
+        run: |
+          kind="$(git cat-file -t "refs/tags/${GITHUB_REF_NAME}")"
+          if [ "$kind" != "tag" ]; then
+            echo "::error::'${GITHUB_REF_NAME}' is a lightweight tag (object type '${kind}'). Release tags must be annotated so they carry a tagger, a date, and a message: git tag -a ${GITHUB_REF_NAME} -m '<message>' <commit>"
+            exit 1
+          fi
+          echo "Tag ${GITHUB_REF_NAME} is annotated."
+          git for-each-ref "refs/tags/${GITHUB_REF_NAME}" --format='  tagger:  %(taggername) %(taggeremail) %(taggerdate:iso8601)%0a  message: %(contents:subject)'
+
+      - name: Derive and validate the version from the tag (SemVer)
+        id: version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          # SemVer 2.0: MAJOR.MINOR.PATCH with an optional -prerelease label (alpha/beta/rc/...).
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Tag '${GITHUB_REF_NAME}' is not a SemVer version. Use vMAJOR.MINOR.PATCH[-prerelease] — e.g. v1.0.0-alpha.1, v1.0.0-rc.1, or v1.0.0."
+            exit 1
+          fi
+          # NuGet flags any version with a '-' suffix as a prerelease automatically.
+          if [[ "$VERSION" == *-* ]]; then PRERELEASE=true; else PRERELEASE=false; fi
+          echo "package_version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "prerelease=${PRERELEASE}" >> "$GITHUB_OUTPUT"
+          echo "Version ${VERSION} (prerelease=${PRERELEASE}) from tag ${GITHUB_REF_NAME}"
+
+      - name: Require the tagged commit to be on main or a release/* branch
+        id: reachable
+        run: |
+          git fetch origin '+refs/heads/main:refs/remotes/origin/main' '+refs/heads/release/*:refs/remotes/origin/release/*'
+          commit="$(git rev-parse "refs/tags/${GITHUB_REF_NAME}^{commit}")"
+          echo "commit=${commit}" >> "$GITHUB_OUTPUT"
+          for ref in origin/main $(git for-each-ref --format='%(refname:short)' 'refs/remotes/origin/release/*'); do
+            if git merge-base --is-ancestor "$commit" "$ref"; then
+              echo "Commit ${commit} is reachable from ${ref}."
+              echo "branch=${ref#origin/}" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          done
+          echo "::error::Commit ${commit} (tag ${GITHUB_REF_NAME}) is not reachable from origin/main or any origin/release/* branch. Releases are cut from main (or from a release/X.Y hotfix branch): merge first, then tag the merged commit. See docs/RELEASING.md."
+          exit 1
+
+      - name: Release summary
+        run: |
+          line="Release ${{ steps.version.outputs.package_version }} (prerelease=${{ steps.version.outputs.prerelease }}) from annotated tag ${GITHUB_REF_NAME} at ${{ steps.reachable.outputs.commit }}, reachable from ${{ steps.reachable.outputs.branch }}."
+          echo "::notice::${line}"
+          echo "${line}" >> "$GITHUB_STEP_SUMMARY"
+
+  gate:
+    name: gate
+    needs: [verify-tag]
+    # Run after a verified tag, or on a manual branch run (verify-tag is skipped there). Never after
+    # a rejected tag: a lightweight or off-main tag fails in seconds instead of after the suites.
+    if: ${{ !cancelled() && (needs.verify-tag.result == 'success' || needs.verify-tag.result == 'skipped') }}
+    # The same gate pull requests and the nightly run use: one deterministic job plus five browser
+    # shards, each re-running its failed tests once. BLOCKING at release time — the evidence and the
+    # reasoning are in docs/CI.md ("Gating"). A red shard stops the release: read its summary and
+    # artifacts, then fix or re-run the failed jobs (gh run rerun <id> --failed). Publishing is
+    # idempotent, so a re-run never double-ships.
+    uses: ./.github/workflows/gate.yml
+    permissions:
+      contents: read
+      checks: write
+    with:
+      configuration: Release
+      playwright: true
+      retry-failed: 1
+    secrets:
+      SYNCFUSION_LICENSE_KEY: ${{ secrets.SYNCFUSION_LICENSE_KEY }}
+
+  pack-and-publish:
+    # Every gate must be green: the verified tag, the deterministic suite, and all browser shards.
+    needs: [verify-tag, gate]
+    # Only an actual version tag publishes. (needs already implies it: verify-tag is skipped on a
+    # branch, so this job is skipped too. Stated explicitly so the intent survives edits above.)
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
     environment: nuget-release
     # Serialize releases: never run two publishes at once, and never cancel an in-flight one.
     concurrency:
@@ -91,6 +134,9 @@ jobs:
       cancel-in-progress: false
     permissions:
       contents: write   # to create the GitHub Release; nuget.org publish uses the API key, not GH Packages
+    env:
+      PACKAGE_VERSION: ${{ needs.verify-tag.outputs.package_version }}
+      PRERELEASE: ${{ needs.verify-tag.outputs.prerelease }}
     steps:
       - uses: actions/checkout@v4
 
@@ -114,33 +160,17 @@ jobs:
             exit 1
           fi
 
-      - name: Derive and validate the version from the tag (SemVer)
-        id: version
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          # SemVer 2.0: MAJOR.MINOR.PATCH with an optional -prerelease label (alpha/beta/rc/...).
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
-            echo "::error::Tag '${GITHUB_REF_NAME}' is not a SemVer version. Use vMAJOR.MINOR.PATCH[-prerelease] — e.g. v1.0.0-alpha.1, v1.0.0-rc.1, or v1.0.0."
-            exit 1
-          fi
-          # NuGet flags any version with a '-' suffix as a prerelease automatically.
-          if [[ "$VERSION" == *-* ]]; then PRERELEASE=true; else PRERELEASE=false; fi
-          echo "package_version=${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "prerelease=${PRERELEASE}" >> "$GITHUB_OUTPUT"
-          echo "Releasing ${VERSION} (prerelease=${PRERELEASE}) from tag ${GITHUB_REF_NAME}"
-
       - name: Pack NuGet packages
         # pack.sh runs npm ci + npm run build:all itself, then packs all six at -p:Version.
-        run: scripts/pack.sh "${{ steps.version.outputs.package_version }}"
+        run: scripts/pack.sh "${PACKAGE_VERSION}"
 
       - name: Verify the six packages were produced at the tagged version
         run: |
-          VERSION="${{ steps.version.outputs.package_version }}"
           EXPECTED=(AlisReactive AlisReactive.Native AlisReactive.Fusion AlisReactive.FluentValidator AlisReactive.DesignSystem AlisReactive.NativeTagHelpers)
           fail=0
           for id in "${EXPECTED[@]}"; do
-            if [ ! -f "./nupkgs/${id}.${VERSION}.nupkg" ]; then
-              echo "::error::Missing expected package ./nupkgs/${id}.${VERSION}.nupkg"; fail=1
+            if [ ! -f "./nupkgs/${id}.${PACKAGE_VERSION}.nupkg" ]; then
+              echo "::error::Missing expected package ./nupkgs/${id}.${PACKAGE_VERSION}.nupkg"; fail=1
             fi
           done
           count=$(ls -1 ./nupkgs/*.nupkg 2>/dev/null | wc -l)
@@ -148,12 +178,12 @@ jobs:
             echo "::error::Expected ${#EXPECTED[@]} .nupkg files, found ${count}. (If a package was added/removed, update this check.)"; fail=1
           fi
           if [ "$fail" -ne 0 ]; then echo "Pack output:"; ls -1 ./nupkgs/ || true; exit 1; fi
-          echo "All ${#EXPECTED[@]} packages present at ${VERSION}."
+          echo "All ${#EXPECTED[@]} packages present at ${PACKAGE_VERSION}."
 
       - name: Upload NuGet artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: nuget-packages-${{ steps.version.outputs.package_version }}
+          name: nuget-packages-${{ env.PACKAGE_VERSION }}
           path: |
             ./nupkgs/*.nupkg
             ./nupkgs/*.snupkg
@@ -173,14 +203,17 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PRERELEASE_FLAG=""
-          if [[ "${{ steps.version.outputs.prerelease }}" == "true" ]]; then PRERELEASE_FLAG="--prerelease"; fi
+          if [[ "${PRERELEASE}" == "true" ]]; then PRERELEASE_FLAG="--prerelease"; fi
           if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
             echo "Release ${GITHUB_REF_NAME} already exists — refreshing its package assets."
             gh release upload "${GITHUB_REF_NAME}" ./nupkgs/*.nupkg --clobber
           else
+            # --generate-notes groups merged pull requests by label per .github/release.yml.
             gh release create "${GITHUB_REF_NAME}" \
               --title "${GITHUB_REF_NAME}" \
+              --verify-tag \
               --generate-notes \
               $PRERELEASE_FLAG \
               ./nupkgs/*.nupkg
           fi
+          echo "Published ${PACKAGE_VERSION} (prerelease=${PRERELEASE}) from ${GITHUB_REF_NAME}: https://www.nuget.org/packages/AlisReactive/${PACKAGE_VERSION}" >> "$GITHUB_STEP_SUMMARY"
