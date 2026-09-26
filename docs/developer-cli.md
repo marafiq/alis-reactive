@@ -32,7 +32,8 @@ pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 instal
 | Non-browser gate | `scripts/test.sh --no-e2e` | Same as full gate without Playwright. |
 | Full Playwright | `scripts/playwright.sh` | Use this instead of raw `dotnet test` for browser tests. |
 | Filtered Playwright | `scripts/playwright.sh --filter "FullyQualifiedName~Components.Fusion.Grid"` | Supports any VSTest filter. |
-| Pack NuGets | `scripts/pack.sh <version>` | Builds assets and Release binaries, clears old packages from `./nupkgs`, then packs the six shipped NuGets. |
+| Pack NuGets | `scripts/pack.sh <version>` | Builds assets and Release binaries, clears old packages from `./nupkgs`, then packs the six shipped NuGets. Local inspection only: publishing is tag-driven (`docs/RELEASING.md`). |
+| One CI shard of Playwright | `scripts/playwright.sh --shard fusion-m-z` | Runs the same fixed partition CI runs (`docs/CI.md`). `--print-filter` shows the VSTest filter; `--retry-failed 1` re-runs only the failures once and lists what then passed. |
 
 Every wrapper supports `--help`.
 
@@ -92,7 +93,9 @@ npm run typecheck -> npm run build:all -> npm test -> dotnet build -> non-Playwr
 ```
 
 Use `scripts/test.sh --no-e2e` only when the browser leg is intentionally out of
-scope. Before merge or release work, run the full gate.
+scope. Before merge or release work, run the full gate. Releases themselves are
+cut by pushing an annotated `v*` tag on `main`; the runbook is `docs/RELEASING.md`
+and the CI that gates it is described in `docs/CI.md`.
 
 Set `CONFIGURATION=Release` when you need the .NET build/test legs to match the
 GitHub publish gate:

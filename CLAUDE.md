@@ -1,12 +1,18 @@
 # Alis.Reactive Framework
 
-> **Active working branch — everyone, every agent, including Codex:
-> `tiny-safe-but-important-refactorings`.** All current work commits here; local
-> `main` is only a stale baseline, never a place to branch from or commit to.
-> This is enforced, not just asked: a `pre-commit` guard refuses commits on any
-> other branch (source of truth `git config alis.activeBranch`; installer
-> `scripts/install-git-hooks.sh` — re-run it after clone). Confirm
-> `git rev-parse --abbrev-ref HEAD` before working.
+> **Branches and releases.** `main` is the trunk and the release line. Work
+> happens on short-lived branches in worktrees (Rule 14) and lands by pull
+> request; a release is an annotated `vX.Y.Z[-rc.N]` tag on `main`, never a
+> branch. Model and cutover: `docs/BRANCHING.md`. Release runbook:
+> `docs/RELEASING.md`. CI design: `docs/CI.md`. A `pre-commit` guard
+> (`scripts/install-git-hooks.sh`, re-run after clone) refuses direct commits
+> on `main` and `release/*`.
+>
+> **Until PR #136 merges,** the release line is still
+> `tiny-safe-but-important-refactorings` (`v1.0.0-rc.3` was tagged there):
+> branch from it and target it with pull requests, and push no new release tag
+> before the cutover in `docs/BRANCHING.md` — the publish workflow rejects a
+> tag whose commit is not on `main`.
 
 ## Architecture
 
@@ -210,7 +216,7 @@ scripts/build.sh           # npm deps -> browser assets -> dotnet build
 scripts/run.sh             # browser assets -> sandbox at http://localhost:5220
 scripts/test.sh            # full gate, including observable Playwright
 scripts/test.sh --no-e2e   # skip only the browser leg
-scripts/pack.sh <version>  # browser assets -> Release build -> six NuGets
+scripts/pack.sh <version>  # browser assets -> Release build -> six NuGets (local; publishing is tag-driven: docs/RELEASING.md)
 ```
 
 Full gate order:
@@ -430,8 +436,12 @@ Known weaknesses are tracked in `.claude/memory/quality-principles.md`
 
 ### 14. Git Worktrees for Feature Work
 
+Branch from `origin/main` (until the cutover in `docs/BRANCHING.md`: from the
+release line named at the top of this file), work in a worktree, land by pull
+request. Prefixes: `feature/`, `fix/`, `chore/`, `docs/`.
+
 ```bash
-git worktree add .worktrees/<feature-name> -b feature/<feature-name>
+git worktree add .worktrees/<feature-name> -b feature/<feature-name> origin/main
 cd .worktrees/<feature-name>
 ```
 
