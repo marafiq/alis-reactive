@@ -1,0 +1,63 @@
+name: Nightly browser gate
+
+# The watched browser signal for main. Pull requests run the browser shards too, but that check is
+# not required to merge (docs/CI.md, "Gating"): GitHub-hosted runners are slow and occasionally
+# flaky, and a required check that flakes teaches people to ignore red. This scheduled run of the
+# full gate on main's tip is the run whose failure opens (or updates) an issue.
+# GitHub runs scheduled workflows on the default branch only, may delay them under load, and
+# disables them after 60 days without repository activity.
+on:
+  schedule:
+    - cron: '30 3 * * 1-5'   # 03:30 UTC, Monday to Friday
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    name: gate
+    uses: ./.github/workflows/gate.yml
+    permissions:
+      contents: read
+      checks: write
+    with:
+      configuration: Release
+      playwright: true
+      retry-failed: 1
+    secrets:
+      SYNCFUSION_LICENSE_KEY: ${{ secrets.SYNCFUSION_LICENSE_KEY }}
+
+  report-failure:
+    name: Open or update the nightly-failure issue
+    needs: [gate]
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Open a new issue, or comment on the one already open
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          label="ci-nightly-failure"
+          gh label create "$label" --repo "$GITHUB_REPOSITORY" --force \
+            --color B60205 --description "The scheduled browser gate on main failed"
+          body="The nightly browser gate failed on \`${GITHUB_SHA}\`: ${RUN_URL}
+
+          Read the per-shard summaries and the uploaded failure artifacts (Playwright traces, screenshots, TRX, diagnostics). A test that fails twice in a row is a regression or a quarantine candidate — the rules are in docs/CI.md (\"Flaky tests\")."
+          existing="$(gh issue list --repo "$GITHUB_REPOSITORY" --label "$label" --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "$body"
+            echo "Commented on the open issue #$existing"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --label "$label" \
+              --title "Nightly browser gate failed on main" --body "$body"
+          fi
