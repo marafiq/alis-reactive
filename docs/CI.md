@@ -6,9 +6,11 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 ## Facts this design rests on
 
 - **The local full gate is the release-grade browser proof.** `scripts/test.sh` runs typecheck,
-  assets, vitest, `dotnet build`, the non-Playwright dotnet tests, the whole Playwright suite, and
-  the behavioral-coverage gate (`scripts/test.sh:80-106`). CI runs the same scripts; it never
-  defines a second gate.
+  assets, vitest, the gate-script self-tests, `dotnet build`, the non-Playwright dotnet tests, the
+  whole Playwright suite, and the behavioral-coverage gate (0b). `scripts/test.sh --parallel` runs
+  the Playwright leg as the five CI shards side by side (each with its own sandbox) and hands every
+  shard's TRX to 0b: about 20 minutes instead of about 60 on a 12-core machine. CI runs the same
+  scripts; it never defines a second gate.
 - **CI Playwright is single-worker.** `tests/Alis.Reactive.PlaywrightTests/GlobalUsings.cs:4-5`
   declares `[assembly: Parallelizable(ParallelScope.Fixtures)]` and
   `[assembly: LevelOfParallelism(1)]`; one Kestrel sandbox per test assembly run
@@ -30,16 +32,18 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
   was red (the unlicensed EJ2 trial modal, fixed in `2d5f9562`); since then ten consecutive legs
   were green (2026-06-10 to 2026-07-11) plus the `v1.0.0-rc.2` publish leg. Green is the norm, but
   a single 80-minute job that reruns from scratch on any hiccup is the wrong shape for it.
-- **Pinned toolchain.** .NET SDK `10.0.101` (`global.json`); Node 22 in CI; `Microsoft.Playwright.NUnit`
-  1.52.0, `NUnit` 4.5.0, `NUnit3TestAdapter` 5.0.0
-  (`tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj:12-15`).
+- **Toolchain.** .NET SDK `10.0.101` or a newer 10.0 feature band (`global.json` sets
+  `rollForward: latestFeature`, so a runner that already has a newer 10.0 SDK uses it: CI builds
+  with 10.0.4xx while this repo's machines build with 10.0.101); Node 22 in CI;
+  `Microsoft.Playwright.NUnit` 1.63.0, `NUnit` 4.6.1, `NUnit3TestAdapter` 5.2.0
+  (`tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj`).
 
 ## What each workflow is for, and what gates what
 
 | Workflow | Trigger | Jobs | Gates | Publishes |
 |----------|---------|------|-------|-----------|
-| `gate.yml` (reusable, `workflow_call`) | called by the three below | `test`; `playwright (<shard>)` x5 | the one gate definition | never |
-| `ci.yml` | every pull request; pushes to `main` / `release/*` (path-filtered); manual | `gate` -> `gate / test`, `gate / playwright (...)` | PR merge (required: `gate / test`) | never |
+| `gate.yml` (reusable, `workflow_call`) | called by the three below | `test`; `playwright (<shard>)` x5; `behavioral coverage (0b)` over all shards' TRX | the one gate definition | never |
+| `ci.yml` | every pull request; pushes to `main` / `release/*` (path-filtered); manual | `gate` -> `gate / test`, `gate / playwright (...)`, `gate / behavioral coverage (0b)` | PR merge (required: `gate / test`) | never |
 | `nightly.yml` | 03:30 UTC Mon-Fri on `main`; manual | `gate`; `report-failure` | the watched browser signal: opens/updates issue `ci-nightly-failure` on red | never |
 | `nuget-publish.yml` | push of a `v*` tag; manual runs gate only | `verify-tag` -> `gate` -> `pack-and-publish` | the release: tag shape, both suites, six packages | nuget.org + GitHub Release |
 | `verify-net48.yml` | pushes and PRs to `main` / `release/*`; manual | net48 build+pack on Windows; IIS Express boot proof | PR merge (both required) | never |
@@ -58,9 +62,20 @@ uses the same action, so a toolchain bump is one edit. Every job still runs the 
 (`scripts/test.sh --no-e2e`, `scripts/build.sh`, `scripts/playwright.sh`), so local and CI stay
 one entry point.
 
-Check names on a pull request are `gate / test` and `gate / playwright (<shard>)` (GitHub names a
-reusable workflow's jobs `<caller job> / <called job>`); confirm with `gh pr checks <n>` before
-wiring required checks.
+Check names on a pull request are `gate / test`, `gate / playwright (<shard>)` and
+`gate / behavioral coverage (0b)` (GitHub names a reusable workflow's jobs
+`<caller job> / <called job>`); confirm with `gh pr checks <n>` before wiring required checks.
+
+The 0b job runs only when all five shards are green. Each shard uploads its TRX files (the first
+attempt and any `-retryN` attempt) as `trx-<shard>`; the job downloads them all and runs
+`verify-behavioral-coverage.mjs --all --trx <every file>`. For each test the highest attempt's
+outcome stands. A lost shard cannot shrink the proof: the job only starts when every shard passed
+(`needs`), each shard's upload fails when it finds no TRX (`if-no-files-found: error`), and a test
+a coverage map names but no TRX contains is reported "not found" and turns 0b red. (The gate's own
+exit 2 for a listed-but-missing file or an empty list guards local callers.) Because
+`nuget-publish.yml` needs the whole gate, a release is blocked by 0b too.
+The gate's own behavior is proven by `verify-behavioral-coverage.selftest.mjs`, which
+`scripts/test.sh` runs in every `gate / test` job.
 
 ## Playwright on GitHub-hosted runners: designed for choppiness
 
@@ -126,7 +141,7 @@ traces and screenshots `PlaywrightTestBase` saved for the failed tests. This is 
 Playwright-recommended shape (retry in CI, keep the trace of the failure:
 [playwright.dev/docs/test-retries](https://playwright.dev/docs/test-retries)) implemented at the
 runner level, because NUnit's `[Retry]` only retries assertion failures unless every exception type
-is listed in `RetryExceptions` (NUnit 4.5.0,
+is listed in `RetryExceptions` (NUnit 4.6.1,
 [RetryAttribute](https://docs.nunit.org/articles/nunit/writing-tests/attributes/retry.html)),
 and Playwright timeouts are exceptions, not assertions.
 
@@ -227,9 +242,28 @@ until proven otherwise. The convention:
   not run the gate; a required check that is path-filtered on `pull_request` would never report
   and block the merge, which is why the `pull_request` trigger has no filter. The filter lists the
   gate's own files (`gate.yml`, `.github/actions/**`) so a CI change is tested by CI.
-- **Dependabot.** `.github/dependabot.yml`: weekly, grouped minor/patch updates for GitHub Actions,
-  npm (root workspaces and `docs-site`) and NuGet; majors arrive individually; Syncfusion majors are
-  ignored on purpose (32.x pin).
+- **Dependabot.** `.github/dependabot.yml`: monthly, grouped minor/patch updates for GitHub
+  Actions, npm (root workspaces and `docs-site`) and NuGet. Details in "Dependency updates" below.
+
+## Dependency updates
+
+- **What Dependabot proposes.** One grouped PR per ecosystem per month: minor and patch for npm and
+  NuGet; for GitHub Actions every version, majors included (they track the runner's Node runtime,
+  and this PR's own CI run proves them). Never npm or NuGet majors,
+  never Syncfusion (npm and NuGet move together, deliberately, one patch behind the newest weekly
+  release, with a new license key per major), never `Microsoft.CodeAnalysis.*` (the analyzers'
+  Roslyn version is the minimum compiler every consumer needs).
+- **The secret it needs.** Workflows started by Dependabot read **Dependabot secrets**, not Actions
+  secrets. Without `SYNCFUSION_LICENSE_KEY` in that store the job log shows
+  `Syncfusion__LicenseKey:` empty and the InPlaceEditor and Drawer tests time out behind the
+  unlicensed overlay (observed on PRs #141-#152, 2026-09-26). Set it once:
+  `gh secret set SYNCFUSION_LICENSE_KEY --app dependabot`.
+- **How to land them: one batch, one proof.** Rather than merging each PR on its own CI run, branch
+  from `main`, cherry-pick the Dependabot commits worth taking, run `scripts/test.sh` locally, and
+  open one PR; Dependabot closes the PRs whose updates reached `main`. GitHub Actions bumps can only
+  be proven by CI, so that one PR's run is their proof. A major upgrade is its own PR with its own
+  proof (for test-framework majors: `scripts/playwright.sh --shard <s> --list` still sums to the full
+  suite).
 
 ## Required checks for `main` (after the cutover)
 

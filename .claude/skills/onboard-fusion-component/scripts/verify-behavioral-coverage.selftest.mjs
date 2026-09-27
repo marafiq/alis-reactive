@@ -75,6 +75,21 @@ function runGate({ root, trxPath, extra = [] }) {
   });
 }
 
+// Writes extra TRX files next to a fixture (shards, retry attempts) and returns their paths.
+function writeTrx(root, files) {
+  return Object.entries(files).map(([name, tests]) => {
+    const path = join(root, name);
+    writeFileSync(path, trx(tests));
+    return path;
+  });
+}
+
+function runGateOnDir({ root, trxDir }) {
+  return spawnSync(process.execPath, [GATE, "--component", "widget", "--root", root, "--trx-dir", trxDir], {
+    encoding: "utf8"
+  });
+}
+
 const FQN_A = "Alis.Reactive.PlaywrightTests.Components.Fusion.Widget.WhenA.behavior_a";
 const FQN_B = "Alis.Reactive.PlaywrightTests.Components.Fusion.Widget.WhenB.behavior_b";
 
@@ -183,6 +198,101 @@ try {
     const r = runGate(f);
     check("exit 1", r.status === 1, `exit=${r.status}`);
     check("requires catches", r.stdout.includes("missing \"catches\""));
+  }
+
+  const members = ["FusionWidget.Foo", "FusionWidget.Bar"];
+
+  console.log("GREEN when a sharded run's TRX files are unioned (--trx a,b):");
+  {
+    const f = build({ matrixMembers: members, map: cleanMap, trxTests: {} });
+    const shards = writeTrx(f.root, {
+      "shard-1.trx": { [FQN_A]: "Passed" },
+      "shard-2.trx": { [FQN_B]: "Passed" }
+    });
+    const r = runGate({ root: f.root, trxPath: shards.join(",") });
+    check("exit 0 when the shards together cover every member", r.status === 0, `exit=${r.status}\n${r.stdout}${r.stderr}`);
+  }
+
+  console.log("RED when a shard's TRX is left out of the list:");
+  {
+    const f = build({ matrixMembers: members, map: cleanMap, trxTests: {} });
+    const [first] = writeTrx(f.root, {
+      "shard-1.trx": { [FQN_A]: "Passed" },
+      "shard-2.trx": { [FQN_B]: "Passed" }
+    });
+    const r = runGate({ root: f.root, trxPath: first });
+    check("exit 1", r.status === 1, `exit=${r.status}`);
+    check("names the test only the missing shard ran", r.stdout.includes("not found in latest TRX") && r.stdout.includes(FQN_B));
+  }
+
+  console.log("RED (exit 2) when a listed TRX does not exist:");
+  {
+    const f = build({ matrixMembers: members, map: cleanMap, trxTests: {} });
+    const [first] = writeTrx(f.root, { "shard-1.trx": { [FQN_A]: "Passed", [FQN_B]: "Passed" } });
+    const r = runGate({ root: f.root, trxPath: `${first},${join(f.root, "shard-2.trx")}` });
+    check("exit 2", r.status === 2, `exit=${r.status}`);
+    check("names the missing file", r.stderr.includes("TRX not found") && r.stderr.includes("shard-2.trx"));
+  }
+
+  console.log("GREEN when a retry attempt passes a test that failed first (order-independent):");
+  {
+    const f = build({ matrixMembers: members, map: cleanMap, trxTests: {} });
+    const [first, retry] = writeTrx(f.root, {
+      "playwright-20260927-030032.trx": { [FQN_A]: "Passed", [FQN_B]: "Failed" },
+      "playwright-20260927-030032-retry1.trx": { [FQN_B]: "Passed" }
+    });
+    const r = runGate({ root: f.root, trxPath: `${retry},${first}` });
+    check("exit 0: the retry outcome supersedes the first attempt", r.status === 0, `exit=${r.status}\n${r.stdout}${r.stderr}`);
+  }
+
+  console.log("RED when the retry attempt fails too:");
+  {
+    const f = build({ matrixMembers: members, map: cleanMap, trxTests: {} });
+    const paths = writeTrx(f.root, {
+      "playwright-20260927-030032.trx": { [FQN_A]: "Passed", [FQN_B]: "Failed" },
+      "playwright-20260927-030032-retry1.trx": { [FQN_B]: "Failed" }
+    });
+    const r = runGate({ root: f.root, trxPath: paths.join(",") });
+    check("exit 1", r.status === 1, `exit=${r.status}`);
+    check("reports the retried test", r.stdout.includes("did not pass") && r.stdout.includes(FQN_B));
+  }
+
+  console.log("default --trx-dir reads the newest run with its retries, not an older run:");
+  {
+    const f = build({ matrixMembers: members, map: cleanMap, trxTests: {} });
+    const trxDir = join(f.root, "observable");
+    mkdirSync(trxDir);
+    writeTrx(trxDir, {
+      "playwright-20260926-100000.trx": { [FQN_A]: "Failed", [FQN_B]: "Failed" },
+      "playwright-20260927-030032.trx": { [FQN_A]: "Passed", [FQN_B]: "Failed" },
+      "playwright-20260927-030032-retry1.trx": { [FQN_B]: "Passed" }
+    });
+    const r = runGateOnDir({ root: f.root, trxDir });
+    check("exit 0: newest run, retry included, older run ignored", r.status === 0, `exit=${r.status}\n${r.stdout}${r.stderr}`);
+  }
+
+  console.log("default --trx-dir reads every shard of the newest parallel run (one stamp, shard suffixes):");
+  {
+    const f = build({ matrixMembers: members, map: cleanMap, trxTests: {} });
+    const trxDir = join(f.root, "observable");
+    mkdirSync(trxDir);
+    writeTrx(trxDir, {
+      "playwright-20260926-100000.trx": { [FQN_A]: "Failed", [FQN_B]: "Failed" },
+      "playwright-20260927-031500.fusion-a-f-and-core.trx": { [FQN_A]: "Passed" },
+      "playwright-20260927-031500.fusion-m-z.trx": { [FQN_B]: "Failed" },
+      "playwright-20260927-031500.fusion-m-z-retry1.trx": { [FQN_B]: "Passed" }
+    });
+    const r = runGateOnDir({ root: f.root, trxDir });
+    check("exit 0: both shards and the shard's retry read, older run ignored", r.status === 0, `exit=${r.status}\n${r.stdout}${r.stderr}`);
+    check("reports all three files of the run", r.stdout.includes("TRX (3)"), r.stdout.split("\n")[1]);
+  }
+
+  console.log("RED (exit 2) when --trx is given but empty (never falls back to an older run):");
+  {
+    const f = build({ matrixMembers: members, map: cleanMap, trxTests: {} });
+    const r = runGate({ root: f.root, trxPath: "" });
+    check("exit 2", r.status === 2, `exit=${r.status}`);
+    check("says the list names no file", r.stderr.includes("names no file"), r.stderr);
   }
 } finally {
   for (const root of roots) rmSync(root, { recursive: true, force: true });

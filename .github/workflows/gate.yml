@@ -4,8 +4,9 @@ name: gate
 # ci.yml on pull requests and pushes, nightly.yml on a schedule, nuget-publish.yml on a release
 # tag — so there is exactly one definition of the steps, the tool versions
 # (.github/actions/setup-toolchain), the shard partition (scripts/playwright.sh --shard) and the
-# timeouts. Locally the same gate is `scripts/test.sh`. In CI it is split into one deterministic
-# job and five browser shards so the browser leg finishes in about 20 minutes instead of about 80.
+# timeouts. Locally the same gate is `scripts/test.sh` (`--parallel` runs the same five shards). In
+# CI it is split into one deterministic job, five browser shards (about 20 minutes instead of about
+# 80), and the behavioral coverage gate (0b) over all five shards' TRX files.
 # Design rationale, the evidence behind the numbers, and the change checklist: docs/CI.md.
 on:
   workflow_call:
@@ -40,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30   # observed: about 2 minutes (docs/CI.md, "Facts")
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ./.github/actions/setup-toolchain
 
@@ -71,7 +72,7 @@ jobs:
       # the actual cause of the historical red legs (fixed in 2d5f9562).
       Syncfusion__LicenseKey: ${{ secrets.SYNCFUSION_LICENSE_KEY }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ./.github/actions/setup-toolchain
 
@@ -101,9 +102,10 @@ jobs:
 
       - name: Upload failure artifacts (logs, TRX, diagnostics, traces, screenshots)
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-${{ matrix.shard }}
+          overwrite: true   # a re-run of this job replaces the artifact instead of failing on the name
           path: |
             tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.log
             tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.trx
@@ -112,3 +114,42 @@ jobs:
             tests/Alis.Reactive.PlaywrightTests/bin/TestResults/playwright-traces/*
           retention-days: 14
           if-no-files-found: warn
+
+      - name: Hand the shard's TRX to the behavioral coverage gate
+        if: success()
+        uses: actions/upload-artifact@v7
+        with:
+          name: trx-${{ matrix.shard }}
+          overwrite: true   # a re-run of this job replaces the artifact instead of failing on the name
+          path: tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.trx
+          retention-days: 7
+          if-no-files-found: error
+
+  behavioral-coverage:
+    # 0b: every member a behaviorally-audited Fusion component claims is covered names a Playwright
+    # test, and that test must exist and pass in THIS run. It reads all five shards' TRX files (a
+    # retry attempt supersedes the attempt before it), the same gate `scripts/test.sh` runs locally.
+    # Runs only when every shard is green (the implicit success() of `needs`).
+    name: behavioral coverage (0b)
+    needs: [playwright]
+    if: ${{ inputs.playwright }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/setup-toolchain
+
+      - name: Download every shard's TRX
+        uses: actions/download-artifact@v8
+        with:
+          pattern: trx-*
+          path: trx
+
+      - name: Behavioral coverage gate (0b) over all shards
+        shell: bash   # -eo pipefail, so the gate's exit code survives the tee
+        run: |
+          files="$(find trx -name '*.trx' | sort | paste -sd, -)"
+          echo "TRX files: ${files}"
+          node .claude/skills/onboard-fusion-component/scripts/verify-behavioral-coverage.mjs --all --trx "${files}" \
+            | tee -a "${GITHUB_STEP_SUMMARY}"

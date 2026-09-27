@@ -14,6 +14,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <!-- Pinned on purpose: an analyzer built against Roslyn N only loads in compilers >= N, so this
+             version is the minimum Visual Studio / .NET SDK every consumer of the AlisReactive package
+             needs. Raise it deliberately, never through Dependabot (.github/dependabot.yml ignores it). -->
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
     </ItemGroup>
 

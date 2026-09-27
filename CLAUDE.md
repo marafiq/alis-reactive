@@ -211,6 +211,7 @@ scripts/doctor.sh          # read-only CLI preflight
 scripts/build.sh           # npm deps -> browser assets -> dotnet build
 scripts/run.sh             # browser assets -> sandbox at http://localhost:5220
 scripts/test.sh            # full gate, including observable Playwright
+scripts/test.sh --parallel # same gate, Playwright as the five CI shards side by side (~20 min)
 scripts/test.sh --no-e2e   # skip only the browser leg
 scripts/pack.sh <version>  # browser assets -> Release build -> six NuGets (local; publishing is tag-driven: docs/RELEASING.md)
 ```
@@ -218,7 +219,7 @@ scripts/pack.sh <version>  # browser assets -> Release build -> six NuGets (loca
 Full gate order:
 
 ```text
-npm run typecheck -> npm run build:all -> npm test -> dotnet build -> non-Playwright dotnet tests -> scripts/playwright.sh --no-build
+npm run typecheck -> npm run build:all -> npm test -> gate-script self-tests -> dotnet build -> non-Playwright dotnet tests -> scripts/playwright.sh --no-build -> behavioral coverage gate (0b)
 ```
 
 Playwright runs through `scripts/playwright.sh`, never raw `dotnet test`. The
