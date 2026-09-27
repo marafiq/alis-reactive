@@ -1,5 +1,10 @@
-# Weekly, grouped dependency updates for the three ecosystems this repo builds with. One PR per
-# ecosystem per week for minor/patch bumps; majors arrive as their own PR so they get a real review.
+# Monthly, grouped dependency updates: at most one PR per ecosystem per month, minor and patch only.
+# Every Dependabot PR runs the full gate (five browser shards), so fewer, bigger PRs save runner time;
+# the maintainer may also cherry-pick several of them onto one branch, prove it locally with
+# scripts/test.sh, and land them in a single PR (docs/CI.md, "Dependency updates").
+# Major versions are never proposed automatically: they are upgraded deliberately, one at a time.
+# Dependabot runs read Dependabot secrets, not Actions secrets: SYNCFUSION_LICENSE_KEY must exist in
+# both stores (gh secret set SYNCFUSION_LICENSE_KEY --app dependabot), or the browser shards fail.
 # Dependabot keeps SHA-pinned actions current as long as the pin carries a "# vX.Y.Z" comment.
 # Reference: https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference
 version: 2
@@ -7,12 +12,11 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
       time: "06:00"
       timezone: Etc/UTC
     labels: [dependencies]
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 2
     groups:
       github-actions:
         patterns: ["*"]
@@ -21,51 +25,58 @@ updates:
     # The root package-lock.json covers the npm workspaces (Alis.Reactive.Assets, Alis.Reactive.SandboxApp).
     directory: /
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
       time: "06:00"
       timezone: Etc/UTC
     labels: [dependencies]
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 2
     groups:
       npm-minor-and-patch:
         patterns: ["*"]
         update-types: [minor, patch]
     ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
       # Syncfusion is bumped deliberately, never by Dependabot: the npm and NuGet Syncfusion
       # versions move together to the same exact version, one patch behind the newest weekly
-      # release, and every major needs a new license key. See docs/CI.md ("Changing CI").
+      # release, and every major needs a new license key.
       - dependency-name: "@syncfusion/*"
 
   - package-ecosystem: npm
     directory: /docs-site
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
       time: "06:00"
       timezone: Etc/UTC
     labels: [dependencies]
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 2
     groups:
       docs-site-minor-and-patch:
         patterns: ["*"]
         update-types: [minor, patch]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: nuget
     directory: /
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
       time: "06:00"
       timezone: Etc/UTC
     labels: [dependencies]
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 2
     groups:
       nuget-minor-and-patch:
         patterns: ["*"]
         update-types: [minor, patch]
     ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
       # Syncfusion is bumped deliberately, never by Dependabot: Syncfusion.EJ2.AspNet.Core,
       # Syncfusion.EJ2.MVC5 and @syncfusion/ej2 move together to the same exact version, one patch
       # behind the newest weekly release, and every major needs a new license key.
       - dependency-name: "Syncfusion.*"
+      # The analyzers' Roslyn version is the minimum compiler every consumer needs
+      # (Alis.Reactive.Analyzers.csproj): raised deliberately, never by Dependabot.
+      - dependency-name: "Microsoft.CodeAnalysis.*"

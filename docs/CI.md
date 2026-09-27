@@ -227,9 +227,26 @@ until proven otherwise. The convention:
   not run the gate; a required check that is path-filtered on `pull_request` would never report
   and block the merge, which is why the `pull_request` trigger has no filter. The filter lists the
   gate's own files (`gate.yml`, `.github/actions/**`) so a CI change is tested by CI.
-- **Dependabot.** `.github/dependabot.yml`: weekly, grouped minor/patch updates for GitHub Actions,
-  npm (root workspaces and `docs-site`) and NuGet; majors arrive individually; Syncfusion majors are
-  ignored on purpose (32.x pin).
+- **Dependabot.** `.github/dependabot.yml`: monthly, grouped minor/patch updates for GitHub
+  Actions, npm (root workspaces and `docs-site`) and NuGet. Details in "Dependency updates" below.
+
+## Dependency updates
+
+- **What Dependabot proposes.** One grouped minor/patch PR per ecosystem per month. Never majors,
+  never Syncfusion (npm and NuGet move together, deliberately, one patch behind the newest weekly
+  release, with a new license key per major), never `Microsoft.CodeAnalysis.*` (the analyzers'
+  Roslyn version is the minimum compiler every consumer needs).
+- **The secret it needs.** Workflows started by Dependabot read **Dependabot secrets**, not Actions
+  secrets. Without `SYNCFUSION_LICENSE_KEY` in that store the job log shows
+  `Syncfusion__LicenseKey:` empty and the InPlaceEditor and Drawer tests time out behind the
+  unlicensed overlay (observed on PRs #141-#152, 2026-09-26). Set it once:
+  `gh secret set SYNCFUSION_LICENSE_KEY --app dependabot`.
+- **How to land them: one batch, one proof.** Rather than merging each PR on its own CI run, branch
+  from `main`, cherry-pick the Dependabot commits worth taking, run `scripts/test.sh` locally, and
+  open one PR; Dependabot closes the PRs whose updates reached `main`. GitHub Actions bumps can only
+  be proven by CI, so that one PR's run is their proof. A major upgrade is its own PR with its own
+  proof (for test-framework majors: `scripts/playwright.sh --shard <s> --list` still sums to the full
+  suite).
 
 ## Required checks for `main` (after the cutover)
 
