@@ -6,9 +6,11 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 ## Facts this design rests on
 
 - **The local full gate is the release-grade browser proof.** `scripts/test.sh` runs typecheck,
-  assets, vitest, `dotnet build`, the non-Playwright dotnet tests, the whole Playwright suite, and
-  the behavioral-coverage gate (`scripts/test.sh:80-106`). CI runs the same scripts; it never
-  defines a second gate.
+  assets, vitest, the gate-script self-tests, `dotnet build`, the non-Playwright dotnet tests, the
+  whole Playwright suite, and the behavioral-coverage gate (0b). `scripts/test.sh --parallel` runs
+  the Playwright leg as the five CI shards side by side (each with its own sandbox) and hands every
+  shard's TRX to 0b: about 20 minutes instead of about 60 on a 12-core machine. CI runs the same
+  scripts; it never defines a second gate.
 - **CI Playwright is single-worker.** `tests/Alis.Reactive.PlaywrightTests/GlobalUsings.cs:4-5`
   declares `[assembly: Parallelizable(ParallelScope.Fixtures)]` and
   `[assembly: LevelOfParallelism(1)]`; one Kestrel sandbox per test assembly run
@@ -38,8 +40,8 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 
 | Workflow | Trigger | Jobs | Gates | Publishes |
 |----------|---------|------|-------|-----------|
-| `gate.yml` (reusable, `workflow_call`) | called by the three below | `test`; `playwright (<shard>)` x5 | the one gate definition | never |
-| `ci.yml` | every pull request; pushes to `main` / `release/*` (path-filtered); manual | `gate` -> `gate / test`, `gate / playwright (...)` | PR merge (required: `gate / test`) | never |
+| `gate.yml` (reusable, `workflow_call`) | called by the three below | `test`; `playwright (<shard>)` x5; `behavioral coverage (0b)` over all shards' TRX | the one gate definition | never |
+| `ci.yml` | every pull request; pushes to `main` / `release/*` (path-filtered); manual | `gate` -> `gate / test`, `gate / playwright (...)`, `gate / behavioral coverage (0b)` | PR merge (required: `gate / test`) | never |
 | `nightly.yml` | 03:30 UTC Mon-Fri on `main`; manual | `gate`; `report-failure` | the watched browser signal: opens/updates issue `ci-nightly-failure` on red | never |
 | `nuget-publish.yml` | push of a `v*` tag; manual runs gate only | `verify-tag` -> `gate` -> `pack-and-publish` | the release: tag shape, both suites, six packages | nuget.org + GitHub Release |
 | `verify-net48.yml` | pushes and PRs to `main` / `release/*`; manual | net48 build+pack on Windows; IIS Express boot proof | PR merge (both required) | never |
@@ -58,9 +60,17 @@ uses the same action, so a toolchain bump is one edit. Every job still runs the 
 (`scripts/test.sh --no-e2e`, `scripts/build.sh`, `scripts/playwright.sh`), so local and CI stay
 one entry point.
 
-Check names on a pull request are `gate / test` and `gate / playwright (<shard>)` (GitHub names a
-reusable workflow's jobs `<caller job> / <called job>`); confirm with `gh pr checks <n>` before
-wiring required checks.
+Check names on a pull request are `gate / test`, `gate / playwright (<shard>)` and
+`gate / behavioral coverage (0b)` (GitHub names a reusable workflow's jobs
+`<caller job> / <called job>`); confirm with `gh pr checks <n>` before wiring required checks.
+
+The 0b job runs only when all five shards are green. Each shard uploads its TRX files (the first
+attempt and any `-retryN` attempt) as `trx-<shard>`; the job downloads them all and runs
+`verify-behavioral-coverage.mjs --all --trx <every file>`. For each test the highest attempt's
+outcome stands, and a listed file that is missing fails the job (exit 2), so a lost shard can never
+shrink the proof. Because `nuget-publish.yml` needs the whole gate, a release is blocked by 0b too.
+The gate's own behavior is proven by `verify-behavioral-coverage.selftest.mjs`, which
+`scripts/test.sh` runs in every `gate / test` job.
 
 ## Playwright on GitHub-hosted runners: designed for choppiness
 

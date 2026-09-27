@@ -83,7 +83,7 @@ gh run list --branch main --limit 6          # CI (gate) and verify-net48 green 
 git tag -a v1.0.0-rc.4 -m "AlisReactive 1.0.0-rc.4" "$(git rev-parse origin/main)"
 git push origin v1.0.0-rc.4
 
-# 2. Watch the publish run: verify-tag -> gate (test + five browser shards) -> pack-and-publish.
+# 2. Watch the publish run: verify-tag -> gate (test + five browser shards + 0b) -> pack-and-publish.
 gh run watch "$(gh run list --workflow=nuget-publish.yml --limit 1 --json databaseId -q '.[0].databaseId')"
 ```
 
@@ -169,7 +169,7 @@ git switch -c fix/forward-port-1.0.1 origin/main && git cherry-pick <fix-sha> &&
 
 | Workflow | Runs on | Gates | Publishes? |
 |----------|---------|-------|------------|
-| `ci.yml` | every pull request; pushes to `main` and `release/*` (path-filtered) | `gate / test` (typecheck, assets, vitest, dotnet build, dotnet tests) and five `gate / playwright (<shard>)` jobs | never |
+| `ci.yml` | every pull request; pushes to `main` and `release/*` (path-filtered) | `gate / test` (typecheck, assets, vitest, gate-script self-tests, dotnet build, dotnet tests), five `gate / playwright (<shard>)` jobs, then `gate / behavioral coverage (0b)` over all shards | never |
 | `verify-net48.yml` | pushes and pull requests to `main` and `release/*` | net48 build + pack on real .NET Framework 4.8 (Windows); IIS Express boot proof of the net48 sample app | never (packs a local fixture feed) |
 | `nightly.yml` | 03:30 UTC Monday to Friday on `main`; manual | the full gate; opens or updates a `ci-nightly-failure` issue when red | never |
 | `nuget-publish.yml` | push of a `v*` tag; manual runs exercise the gates only | `verify-tag` (annotated, SemVer, reachable from `main`/`release/*`) -> `gate` (test + all shards, **blocking**) -> `pack-and-publish` in the `nuget-release` environment | **only on a tag** |

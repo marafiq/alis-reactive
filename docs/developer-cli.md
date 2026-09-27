@@ -28,8 +28,9 @@ pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 instal
 | Check CLI environment | `scripts/doctor.sh` | Read-only. Reports missing tools, missing bundles, missing test DLL, and dirty git state. |
 | Build everything | `scripts/build.sh` | Installs npm deps if needed, builds all JS/CSS bundles, then runs `dotnet build`. |
 | Run sandbox | `scripts/run.sh` | Builds assets first, then starts `http://localhost:5220`. Stop with `Ctrl+C`. |
-| Full verification gate | `scripts/test.sh` | Typecheck -> assets -> vitest -> `dotnet build` -> non-Playwright dotnet tests -> observable Playwright. |
-| Non-browser gate | `scripts/test.sh --no-e2e` | Same as full gate without Playwright. |
+| Full verification gate | `scripts/test.sh` | Typecheck -> assets -> vitest -> gate-script self-tests -> `dotnet build` -> non-Playwright dotnet tests -> observable Playwright -> behavioral coverage gate (0b). |
+| Full gate, parallel browser leg | `scripts/test.sh --parallel` | Same gate; Playwright runs as the five CI shards side by side, each with its own sandbox, then 0b over every shard's TRX. About 20 minutes instead of about 60. |
+| Non-browser gate | `scripts/test.sh --no-e2e` | Same as full gate without Playwright and 0b. |
 | Full Playwright | `scripts/playwright.sh` | Use this instead of raw `dotnet test` for browser tests. |
 | Filtered Playwright | `scripts/playwright.sh --filter "FullyQualifiedName~Components.Fusion.Grid"` | Supports any VSTest filter. |
 | Pack NuGets | `scripts/pack.sh <version>` | Builds assets and Release binaries, clears old packages from `./nupkgs`, then packs the six shipped NuGets. Local inspection only: publishing is tag-driven (`docs/RELEASING.md`). |
@@ -90,8 +91,12 @@ then run the full `scripts/test.sh` before push or release work.
 Use `scripts/test.sh` before push. It runs the gates in this order:
 
 ```text
-npm run typecheck -> npm run build:all -> npm test -> dotnet build -> non-Playwright dotnet tests -> scripts/playwright.sh --no-build
+npm run typecheck -> npm run build:all -> npm test -> gate-script self-tests -> dotnet build -> non-Playwright dotnet tests -> scripts/playwright.sh --no-build -> behavioral coverage gate (0b)
 ```
+
+`scripts/test.sh --parallel` runs the same gate with the Playwright leg split into the five CI
+shards (`scripts/playwright.sh --list-shards`) running side by side; each shard's console output is
+written to `tests/Alis.Reactive.PlaywrightTests/TestResults/observable/parallel-<stamp>/<shard>.log`.
 
 Use `scripts/test.sh --no-e2e` only when the browser leg is intentionally out of
 scope. Before merge or release work, run the full gate. Releases themselves are
