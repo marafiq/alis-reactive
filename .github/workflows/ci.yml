@@ -24,6 +24,9 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'scripts/**'
+      # The behavioral coverage gate (0b) and the coverage maps it reads.
+      - '.claude/skills/onboard-fusion-component/**'
+      - 'tools/FusionOnboarding/**'
       - '.github/workflows/ci.yml'
       - '.github/workflows/gate.yml'
       - '.github/actions/**'

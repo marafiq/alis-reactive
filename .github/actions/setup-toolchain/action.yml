@@ -14,12 +14,12 @@ runs:
   using: composite
   steps:
     - name: Set up .NET (version pinned by global.json)
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v6
       with:
         global-json-file: global.json
 
     - name: Set up Node ${{ inputs.node-version }} with the npm cache
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v7
       with:
         node-version: ${{ inputs.node-version }}
         cache: npm
@@ -29,7 +29,7 @@ runs:
       # actions/setup-dotnet's own cache needs committed packages.lock.json files, which this repo
       # does not have (docs/CI.md, "Caching"). Keying on the project files gives the same effect:
       # a hit while no PackageReference changed, a fresh restore when one did.
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: ~/.nuget/packages
         key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Build.props', 'global.json') }}

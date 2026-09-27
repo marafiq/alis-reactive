@@ -64,6 +64,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: nupkgs-net48-windows
+          overwrite: true   # a re-run of this job replaces the artifact instead of failing on the name
           path: nupkgs/*.nupkg
           if-no-files-found: error
 
@@ -185,5 +186,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: net48-runtime-screenshot
+          overwrite: true   # a re-run of this job replaces the artifact instead of failing on the name
           path: examples/net48-mvc-smoke/net48-smoke.png
           if-no-files-found: warn
