@@ -270,6 +270,30 @@ try {
     const r = runGateOnDir({ root: f.root, trxDir });
     check("exit 0: newest run, retry included, older run ignored", r.status === 0, `exit=${r.status}\n${r.stdout}${r.stderr}`);
   }
+
+  console.log("default --trx-dir reads every shard of the newest parallel run (one stamp, shard suffixes):");
+  {
+    const f = build({ matrixMembers: members, map: cleanMap, trxTests: {} });
+    const trxDir = join(f.root, "observable");
+    mkdirSync(trxDir);
+    writeTrx(trxDir, {
+      "playwright-20260926-100000.trx": { [FQN_A]: "Failed", [FQN_B]: "Failed" },
+      "playwright-20260927-031500.fusion-a-f-and-core.trx": { [FQN_A]: "Passed" },
+      "playwright-20260927-031500.fusion-m-z.trx": { [FQN_B]: "Failed" },
+      "playwright-20260927-031500.fusion-m-z-retry1.trx": { [FQN_B]: "Passed" }
+    });
+    const r = runGateOnDir({ root: f.root, trxDir });
+    check("exit 0: both shards and the shard's retry read, older run ignored", r.status === 0, `exit=${r.status}\n${r.stdout}${r.stderr}`);
+    check("reports all three files of the run", r.stdout.includes("TRX (3)"), r.stdout.split("\n")[1]);
+  }
+
+  console.log("RED (exit 2) when --trx is given but empty (never falls back to an older run):");
+  {
+    const f = build({ matrixMembers: members, map: cleanMap, trxTests: {} });
+    const r = runGate({ root: f.root, trxPath: "" });
+    check("exit 2", r.status === 2, `exit=${r.status}`);
+    check("says the list names no file", r.stderr.includes("names no file"), r.stderr);
+  }
 } finally {
   for (const root of roots) rmSync(root, { recursive: true, force: true });
 }

@@ -23,15 +23,16 @@ public sealed class FusionSliderLocator
         await Handle(index).GetAttributeAsync("aria-valuenow");
 
     /// <summary>
-    /// Nudges the slider up one step the way a resident would with the keyboard: a trusted
-    /// click focuses the handle, then ArrowRight increments it by the slider's step. EJ2
-    /// fires its change/changed events only for trusted gestures, so this drives the real
-    /// event lane rather than synthesizing it.
+    /// Nudges the slider up one step the way a resident would with the keyboard: the handle
+    /// takes focus, then ArrowRight increments it by the slider's step. The key press is a
+    /// trusted gesture, so EJ2 fires its change/changed events through the real event lane.
+    /// The handle is focused, not clicked: an EJ2 mousedown sets the value from the pointer
+    /// position, and the handle slides to each new value over a 0.4s CSS transition, so a click
+    /// between nudges can land on the previous position and undo a step.
     /// </summary>
     public async Task NudgeUp(int index = 0)
     {
-        var handle = Handle(index);
-        await handle.ClickAsync();
+        await Handle(index).FocusAsync();
         await _page.Keyboard.PressAsync("ArrowRight");
     }
 }

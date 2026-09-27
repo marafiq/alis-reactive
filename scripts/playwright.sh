@@ -379,7 +379,13 @@ if [ "$list_only" -eq 1 ]; then
 fi
 
 mkdir -p "$results_dir"
-stamp="$(date +%Y%m%d-%H%M%S)"
+# The stamp names this run's log, TRX and diagnostics. scripts/test.sh --parallel hands one stamp to
+# all its shards (ALIS_PLAYWRIGHT_RUN_STAMP) so their files read as one run; each shard appends its
+# name after a dot, so concurrent shards never share a file name.
+stamp="${ALIS_PLAYWRIGHT_RUN_STAMP:-$(date +%Y%m%d-%H%M%S)}"
+if [ -n "$shard" ]; then
+  stamp="$stamp.$shard"
+fi
 
 echo "[playwright:runner] project=$project"
 echo "[playwright:runner] configuration=$configuration"

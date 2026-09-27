@@ -118,35 +118,57 @@ check_ci_shard_matrix() {
   echo "[test]   CI shard matrix matches scripts/playwright.sh ($(printf '%s\n' "$script_shards" | wc -l | tr -d ' ') shards)"
 }
 
+# An interrupt (Ctrl-C) or termination stops every running shard with its dotnet test, sandbox and
+# browser. Each shard runs in its own process group (set -m), so one signal to the group reaches all
+# of them; without this they would keep running for twenty minutes after test.sh exited.
+shard_pids=()
+stop_shards() {
+  local pid
+  if [ "${#shard_pids[@]}" -gt 0 ]; then
+    for pid in "${shard_pids[@]}"; do
+      kill -TERM -- "-$pid" 2>/dev/null || true
+    done
+  fi
+  echo "[test] interrupted: stopped the Playwright shards" >&2
+  exit 130
+}
+
 # The five CI shards side by side. Each scripts/playwright.sh run starts its own sandbox on a free
-# port and stamps its log/TRX to the second, so the starts are staggered. Every shard's console
-# output lands in one directory; the 0b gate then reads all of their TRX files (and any retries).
+# port. All shards share one run stamp (each adds its shard name to its file names), so the 0b gate
+# and the onboarding tools read the whole run as the newest one. Every shard's console output lands
+# in one directory; the 0b gate then reads all of their TRX files (and any retries).
 run_parallel_playwright() {
-  local run_dir shard status=0 code
-  local shards=() pids=() trx_files=()
-  run_dir="tests/Alis.Reactive.PlaywrightTests/TestResults/observable/parallel-$(date +%Y%m%d-%H%M%S)"
+  local run_stamp run_dir shard status=0 code
+  local shards=() trx_files=()
+  run_stamp="$(date +%Y%m%d-%H%M%S)"
+  run_dir="tests/Alis.Reactive.PlaywrightTests/TestResults/observable/parallel-$run_stamp"
   mkdir -p "$run_dir"
 
   while IFS= read -r shard; do
     shards+=("$shard")
   done < <(scripts/playwright.sh --list-shards)
 
+  set -m
+  trap stop_shards INT TERM
   for shard in "${shards[@]}"; do
-    CONFIGURATION="$configuration" scripts/playwright.sh --no-build --shard "$shard" > "$run_dir/$shard.log" 2>&1 &
-    pids+=("$!")
+    ALIS_PLAYWRIGHT_RUN_STAMP="$run_stamp" CONFIGURATION="$configuration" \
+      scripts/playwright.sh --no-build --shard "$shard" > "$run_dir/$shard.log" 2>&1 &
+    shard_pids+=("$!")
     echo "[test] shard $shard started: tail -f $run_dir/$shard.log"
-    sleep 2
+    sleep 1   # spreads the five sandbox and browser start-ups
   done
 
   for i in "${!shards[@]}"; do
     shard="${shards[$i]}"
-    if wait "${pids[$i]}"; then code=0; else code=$?; status=1; fi
+    if wait "${shard_pids[$i]}"; then code=0; else code=$?; status=1; fi
     echo "[test] shard $shard exit=$code | $(grep -aE '^(Total tests|     Passed|     Failed):' "$run_dir/$shard.log" | tr -s ' ' | tr '\n' ' ')"
     grep -aE '^\s+Failed [A-Za-z_]' "$run_dir/$shard.log" | sed "s/^/[test]   $shard: /" || true
     while IFS= read -r trx; do
       trx_files+=("$trx")
     done < <(grep -aoE '\[playwright:runner\] trx=[^ ]+' "$run_dir/$shard.log" | sed 's/.*trx=//' | sort -u)
   done
+  trap - INT TERM
+  set +m
 
   if [ "$status" -ne 0 ]; then
     echo "[test] Playwright shards failed; logs in $run_dir" >&2

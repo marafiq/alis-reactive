@@ -236,11 +236,13 @@ function isAggregateRow(name) {
 // --- TRX parsing -----------------------------------------------------------
 
 // `--trx` names one TRX or a comma-separated list: the five CI shards plus any retry attempts.
-// Every listed file must exist, so a missing shard fails loud instead of silently shrinking the
-// proof. Without `--trx`, the newest run in the TRX directory: its first attempt plus its retries.
+// Every listed file must exist and the list must not be empty, so a lost shard or an empty list
+// fails loud instead of silently shrinking the proof or falling back to an older run. Without
+// `--trx`, the newest run in the TRX directory: every shard of it, first attempts and retries.
 function resolveTrxPaths(explicit, dir) {
-  if (explicit) {
+  if (explicit !== undefined) {
     const paths = String(explicit).split(",").map(path => path.trim()).filter(Boolean).map(path => resolve(path));
+    if (paths.length === 0) fail("--trx was given but names no file");
     const missing = paths.filter(path => !existsSync(path));
     if (missing.length > 0) fail(`TRX not found: ${missing.join(", ")}`);
     return paths;
@@ -252,10 +254,12 @@ function resolveTrxPaths(explicit, dir) {
   return names.filter(name => runStem(name) === newest).map(name => resolve(join(dir, name)));
 }
 
-// scripts/playwright.sh names a run's first attempt `<stamp>.trx` and each re-run of only the
-// failed tests `<stamp>-retryN.trx`.
+// scripts/playwright.sh names a run's first attempt `playwright-<stamp>.trx`, a shard of a run
+// `playwright-<stamp>.<shard>.trx` (scripts/test.sh --parallel gives its shards one stamp), and each
+// re-run of only the failed tests `...-retryN.trx`. The stem drops the extension, the retry suffix,
+// then the shard suffix: all files of one run share it.
 function runStem(name) {
-  return basename(name).replace(/(-retry\d+)?\.trx$/, "");
+  return basename(name).replace(/\.trx$/, "").replace(/-retry\d+$/, "").replace(/\..*$/, "");
 }
 
 function retryAttempt(path) {
