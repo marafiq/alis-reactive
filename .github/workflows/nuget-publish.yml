@@ -9,7 +9,8 @@ name: Publish NuGet packages
 #
 # Gates, in order:
 #   verify-tag  annotated tag, SemVer version, commit reachable from main or release/*  (seconds)
-#   gate        the shared gate (gate.yml): deterministic suite + five browser shards — BLOCKING
+#   gate        the shared gate (gate.yml): deterministic suite + five browser shards + the
+#               behavioral coverage gate (0b) over all shards — BLOCKING
 #               (a red shard stops the release; re-run the failed jobs, publishing is idempotent)
 #   pack-and-publish  six packages at the tagged version -> nuget.org -> GitHub Release
 #                     (runs in the `nuget-release` environment; add a required reviewer there for
@@ -83,7 +84,7 @@ jobs:
       SYNCFUSION_LICENSE_KEY: ${{ secrets.SYNCFUSION_LICENSE_KEY }}
 
   pack-and-publish:
-    # Every gate must be green: the verified tag, the deterministic suite, and all browser shards.
+    # Every gate must be green: the verified tag, the deterministic suite, all browser shards, and 0b.
     needs: [verify-tag, gate]
     # Only an actual version tag publishes. (needs already implies it: verify-tag is skipped on a
     # branch, so this job is skipped too. Stated explicitly so the intent survives edits above.)
@@ -106,7 +107,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
-          global-json-file: global.json   # pin the exact SDK for a reproducible release build
+          global-json-file: global.json   # 10.0.101 or newer 10.0 (rollForward: latestFeature; docs/CI.md)
 
       - uses: actions/setup-node@v7
         with:

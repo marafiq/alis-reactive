@@ -172,7 +172,7 @@ git switch -c fix/forward-port-1.0.1 origin/main && git cherry-pick <fix-sha> &&
 | `ci.yml` | every pull request; pushes to `main` and `release/*` (path-filtered) | `gate / test` (typecheck, assets, vitest, gate-script self-tests, dotnet build, dotnet tests), five `gate / playwright (<shard>)` jobs, then `gate / behavioral coverage (0b)` over all shards | never |
 | `verify-net48.yml` | pushes and pull requests to `main` and `release/*` | net48 build + pack on real .NET Framework 4.8 (Windows); IIS Express boot proof of the net48 sample app | never (packs a local fixture feed) |
 | `nightly.yml` | 03:30 UTC Monday to Friday on `main`; manual | the full gate; opens or updates a `ci-nightly-failure` issue when red | never |
-| `nuget-publish.yml` | push of a `v*` tag; manual runs exercise the gates only | `verify-tag` (annotated, SemVer, reachable from `main`/`release/*`) -> `gate` (test + all shards, **blocking**) -> `pack-and-publish` in the `nuget-release` environment | **only on a tag** |
+| `nuget-publish.yml` | push of a `v*` tag; manual runs exercise the gates only | `verify-tag` (annotated, SemVer, reachable from `main`/`release/*`) -> `gate` (test + all shards + 0b, **blocking**) -> `pack-and-publish` in the `nuget-release` environment | **only on a tag** |
 | `deploy-docs.yml` | pushes to `main` touching the docs site or the public C# surface | docs-site build | GitHub Pages |
 
 `nuget-publish.yml`'s `pack-and-publish` job asserts that exactly the six expected packages exist at

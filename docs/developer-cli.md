@@ -97,6 +97,9 @@ npm run typecheck -> npm run build:all -> npm test -> gate-script self-tests -> 
 `scripts/test.sh --parallel` runs the same gate with the Playwright leg split into the five CI
 shards (`scripts/playwright.sh --list-shards`) running side by side; each shard's console output is
 written to `tests/Alis.Reactive.PlaywrightTests/TestResults/observable/parallel-<stamp>/<shard>.log`.
+All shards of one run share its stamp in their TRX names (`playwright-<stamp>.<shard>.trx`), so the
+onboarding tools read the whole run as the newest one. Ctrl-C stops every shard with its sandbox and
+browser.
 
 Use `scripts/test.sh --no-e2e` only when the browser leg is intentionally out of
 scope. Before merge or release work, run the full gate. Releases themselves are

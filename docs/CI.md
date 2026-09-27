@@ -32,9 +32,11 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
   was red (the unlicensed EJ2 trial modal, fixed in `2d5f9562`); since then ten consecutive legs
   were green (2026-06-10 to 2026-07-11) plus the `v1.0.0-rc.2` publish leg. Green is the norm, but
   a single 80-minute job that reruns from scratch on any hiccup is the wrong shape for it.
-- **Pinned toolchain.** .NET SDK `10.0.101` (`global.json`); Node 22 in CI; `Microsoft.Playwright.NUnit`
-  1.52.0, `NUnit` 4.5.0, `NUnit3TestAdapter` 5.0.0
-  (`tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj:12-15`).
+- **Toolchain.** .NET SDK `10.0.101` or a newer 10.0 feature band (`global.json` sets
+  `rollForward: latestFeature`, so a runner that already has a newer 10.0 SDK uses it: CI builds
+  with 10.0.4xx while this repo's machines build with 10.0.101); Node 22 in CI;
+  `Microsoft.Playwright.NUnit` 1.63.0, `NUnit` 4.6.1, `NUnit3TestAdapter` 5.2.0
+  (`tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj`).
 
 ## What each workflow is for, and what gates what
 
@@ -67,8 +69,11 @@ Check names on a pull request are `gate / test`, `gate / playwright (<shard>)` a
 The 0b job runs only when all five shards are green. Each shard uploads its TRX files (the first
 attempt and any `-retryN` attempt) as `trx-<shard>`; the job downloads them all and runs
 `verify-behavioral-coverage.mjs --all --trx <every file>`. For each test the highest attempt's
-outcome stands, and a listed file that is missing fails the job (exit 2), so a lost shard can never
-shrink the proof. Because `nuget-publish.yml` needs the whole gate, a release is blocked by 0b too.
+outcome stands. A lost shard cannot shrink the proof: the job only starts when every shard passed
+(`needs`), each shard's upload fails when it finds no TRX (`if-no-files-found: error`), and a test
+a coverage map names but no TRX contains is reported "not found" and turns 0b red. (The gate's own
+exit 2 for a listed-but-missing file or an empty list guards local callers.) Because
+`nuget-publish.yml` needs the whole gate, a release is blocked by 0b too.
 The gate's own behavior is proven by `verify-behavioral-coverage.selftest.mjs`, which
 `scripts/test.sh` runs in every `gate / test` job.
 
@@ -136,7 +141,7 @@ traces and screenshots `PlaywrightTestBase` saved for the failed tests. This is 
 Playwright-recommended shape (retry in CI, keep the trace of the failure:
 [playwright.dev/docs/test-retries](https://playwright.dev/docs/test-retries)) implemented at the
 runner level, because NUnit's `[Retry]` only retries assertion failures unless every exception type
-is listed in `RetryExceptions` (NUnit 4.5.0,
+is listed in `RetryExceptions` (NUnit 4.6.1,
 [RetryAttribute](https://docs.nunit.org/articles/nunit/writing-tests/attributes/retry.html)),
 and Playwright timeouts are exceptions, not assertions.
 
@@ -242,7 +247,9 @@ until proven otherwise. The convention:
 
 ## Dependency updates
 
-- **What Dependabot proposes.** One grouped minor/patch PR per ecosystem per month. Never majors,
+- **What Dependabot proposes.** One grouped PR per ecosystem per month: minor and patch for npm and
+  NuGet; for GitHub Actions every version, majors included (they track the runner's Node runtime,
+  and this PR's own CI run proves them). Never npm or NuGet majors,
   never Syncfusion (npm and NuGet move together, deliberately, one patch behind the newest weekly
   release, with a new license key per major), never `Microsoft.CodeAnalysis.*` (the analyzers'
   Roslyn version is the minimum compiler every consumer needs).

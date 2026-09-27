@@ -19,6 +19,7 @@ on:
       - 'Alis.Reactive.SandboxApp/**'
       - 'tests/**'
       - 'build/**'
+      - 'Alis.Reactive.slnx'
       - 'Directory.Build.props'
       - 'global.json'
       - 'package.json'
