@@ -146,6 +146,10 @@ fusion_letters() {
   printf '%s' "$expr"
 }
 
+# The CI shards, in matrix order. .github/workflows/gate.yml lists the same names (scripts/test.sh
+# fails when the two lists differ), and every name has an arm in shard_filter below.
+shards="fusion-a-f-and-core fusion-g-l-and-http fusion-m-z components-and-validation conditions-patterns-and-rest"
+
 shard_filter() {
   case "$1" in
     fusion-a-f-and-core)
@@ -164,7 +168,7 @@ shard_filter() {
       printf 'FullyQualifiedName!~.Components.&FullyQualifiedName!~.Validation.&FullyQualifiedName!~.CoreBehaviors.&FullyQualifiedName!~.HttpPipeline.'
       ;;
     *)
-      echo "Unknown shard '$1'. Known shards: fusion-a-f-and-core, fusion-g-l-and-http, fusion-m-z, components-and-validation, conditions-patterns-and-rest." >&2
+      echo "Unknown shard '$1'. Known shards: $shards." >&2
       exit 2
       ;;
   esac
@@ -202,6 +206,7 @@ Options:
                         (docs/CI.md, "Sharding"). Names: fusion-a-f-and-core,
                         fusion-g-l-and-http, fusion-m-z, components-and-validation,
                         conditions-patterns-and-rest. Cannot be combined with --filter.
+  --list-shards         Print the CI shard names, one per line, and exit.
   --print-filter        Print the resolved VSTest filter and exit without running.
   --list                Print the fully qualified names the filter or shard selects, one
                         per line, without running them: dotnet test --list-tests for the
@@ -254,6 +259,10 @@ while [ "$#" -gt 0 ]; do
     --shard=*)
       shard="${1#--shard=}"
       shift
+      ;;
+    --list-shards)
+      printf '%s\n' $shards
+      exit 0
       ;;
     --print-filter)
       print_filter=1

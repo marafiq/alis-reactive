@@ -7,8 +7,11 @@
 // POSITIVE and is the only artifact allowed to say a member is "covered":
 //
 //   every public matrix member  ->  names a Playwright test (the behavioral
-//   coverage map)  ->  that test FQN EXISTS in the latest TRX AND its
+//   coverage map)  ->  that test FQN EXISTS in the latest run's TRX AND its
 //   Outcome="Passed"  ->  variant fan-out is bounded and declared.
+//   "The latest run" is one TRX or, for a sharded run, every shard's TRX passed
+//   to `--trx` as a comma-separated list; a retry attempt's outcome supersedes
+//   the attempt before it.
 //
 // It reads run truth (the TRX), never prose. A `row-proven` string, a
 // `Status: audited` line, or a markdown link is NOT proof here and is never
@@ -28,7 +31,7 @@
 // (`catches`), then proves that named test is green in the run that just ran.
 
 import { existsSync, readFileSync, readdirSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { basename, join, resolve } from "node:path";
 
 const DEFAULT_TRX_DIR = "tests/Alis.Reactive.PlaywrightTests/TestResults/observable";
 const DEFAULT_ARTIFACT_ROOT = "tools/FusionOnboarding/wwwroot/onboarding/fusion";
@@ -38,19 +41,19 @@ function main() {
   const args = parseArgs(process.argv.slice(2));
   const artifactRoot = resolve(args.root ?? DEFAULT_ARTIFACT_ROOT);
   const maxFanout = Number(args["max-fanout"] ?? DEFAULT_MAX_FANOUT);
-  const trxPath = resolveTrxPath(args.trx, args["trx-dir"] ?? DEFAULT_TRX_DIR);
+  const trxPaths = resolveTrxPaths(args.trx, args["trx-dir"] ?? DEFAULT_TRX_DIR);
 
-  if (!trxPath) {
+  if (trxPaths.length === 0) {
     fail(`no TRX found under ${args["trx-dir"] ?? DEFAULT_TRX_DIR} (run scripts/playwright.sh first)`);
   }
 
-  const trx = parseTrxOutcomes(trxPath);
+  const trx = mergeTrxOutcomes(trxPaths);
   const scope = resolveScope(args, artifactRoot);
 
   const reports = scope.components.map(component =>
-    verifyComponent({ component, artifactRoot, trx, trxPath, maxFanout }));
+    verifyComponent({ component, artifactRoot, trx, maxFanout }));
 
-  printReports(reports, { trxPath, skipped: scope.skipped });
+  printReports(reports, { trxPaths, skipped: scope.skipped });
 
   const failed = reports.filter(report => report.problems.length > 0);
   process.exit(failed.length > 0 ? 1 : 0);
@@ -85,7 +88,7 @@ function listComponentDirs(artifactRoot) {
 
 // --- per-component verification --------------------------------------------
 
-function verifyComponent({ component, artifactRoot, trx, trxPath, maxFanout }) {
+function verifyComponent({ component, artifactRoot, trx, maxFanout }) {
   const problems = [];
   const componentRoot = join(artifactRoot, component);
   const map = loadMap(mapPath(artifactRoot, component), problems);
@@ -232,17 +235,55 @@ function isAggregateRow(name) {
 
 // --- TRX parsing -----------------------------------------------------------
 
-function resolveTrxPath(explicit, dir) {
-  if (explicit) return existsSync(explicit) ? resolve(explicit) : null;
-  if (!existsSync(dir)) return null;
-  const trx = readdirSync(dir)
-    .filter(name => name.endsWith(".trx"))
-    .sort(); // filenames are timestamped: lexical sort == chronological
-  return trx.length > 0 ? resolve(join(dir, trx[trx.length - 1])) : null;
+// `--trx` names one TRX or a comma-separated list: the five CI shards plus any retry attempts.
+// Every listed file must exist, so a missing shard fails loud instead of silently shrinking the
+// proof. Without `--trx`, the newest run in the TRX directory: its first attempt plus its retries.
+function resolveTrxPaths(explicit, dir) {
+  if (explicit) {
+    const paths = String(explicit).split(",").map(path => path.trim()).filter(Boolean).map(path => resolve(path));
+    const missing = paths.filter(path => !existsSync(path));
+    if (missing.length > 0) fail(`TRX not found: ${missing.join(", ")}`);
+    return paths;
+  }
+  if (!existsSync(dir)) return [];
+  const names = readdirSync(dir).filter(name => name.endsWith(".trx"));
+  const stems = names.map(runStem).sort(); // stems are timestamped: lexical sort == chronological
+  const newest = stems[stems.length - 1];
+  return names.filter(name => runStem(name) === newest).map(name => resolve(join(dir, name)));
 }
 
-// Builds FQN -> [outcome,...]. A test that appears more than once (retry, data
-// rows) keeps every outcome; the caller requires all of them to be Passed.
+// scripts/playwright.sh names a run's first attempt `<stamp>.trx` and each re-run of only the
+// failed tests `<stamp>-retryN.trx`.
+function runStem(name) {
+  return basename(name).replace(/(-retry\d+)?\.trx$/, "");
+}
+
+function retryAttempt(path) {
+  const retry = /-retry(\d+)\.trx$/.exec(basename(path));
+  return retry ? Number(retry[1]) : 0;
+}
+
+// Unions the given TRX files. A retry attempt re-runs only the tests that failed, so a test's
+// outcomes come from the highest attempt that ran it (flaky recoveries are reported by
+// scripts/playwright.sh, not re-judged here). Shards are disjoint, so files of one attempt add up.
+function mergeTrxOutcomes(paths) {
+  const merged = new Map();
+  for (const path of paths) {
+    const attempt = retryAttempt(path);
+    for (const [fqn, outcomes] of parseTrxOutcomes(path).byFqn) {
+      const current = merged.get(fqn);
+      if (!current || attempt > current.attempt) {
+        merged.set(fqn, { attempt, outcomes: [...outcomes] });
+      } else if (attempt === current.attempt) {
+        current.outcomes.push(...outcomes);
+      }
+    }
+  }
+  return { byFqn: new Map([...merged].map(([fqn, entry]) => [fqn, entry.outcomes])) };
+}
+
+// Builds FQN -> [outcome,...] for one TRX. A test that appears more than once in a file
+// (data rows) keeps every outcome; the caller requires all of them to be Passed.
 function parseTrxOutcomes(trxPath) {
   const xml = readFileSync(trxPath, "utf8");
   const idToFqn = new Map();
@@ -268,10 +309,10 @@ function parseTrxOutcomes(trxPath) {
 
 // --- reporting -------------------------------------------------------------
 
-function printReports(reports, { trxPath, skipped }) {
+function printReports(reports, { trxPaths, skipped }) {
   const failed = reports.filter(report => report.problems.length > 0);
   console.log(`# Behavioral coverage gate (0b)`);
-  console.log(`TRX: ${trxPath}`);
+  console.log(`TRX (${trxPaths.length}): ${trxPaths.join(", ")}`);
   console.log("");
   for (const report of reports) {
     const mark = report.problems.length === 0 ? "PASS" : "FAIL";
