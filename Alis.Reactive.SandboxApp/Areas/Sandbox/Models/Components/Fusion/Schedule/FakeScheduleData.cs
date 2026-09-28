@@ -179,11 +179,22 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             return assignment;
         }
 
+        // string.GetHashCode is randomized per process, so seeding from it gave every sandbox start
+        // a different week. A seed built from the facility's characters and the week's date gives
+        // every run, machine, and CI shard the same week.
+        private static int StableSeed(string facilityId, DateTime sunday)
+        {
+            var seed = sunday.Year * 400 + sunday.DayOfYear;
+            foreach (var c in facilityId) seed = unchecked(seed * 31 + c);
+            return seed;
+        }
+
         private static List<ShiftAssignment> GenerateWeek(string facilityId, DateTime sunday)
         {
-            var rng = new Random(facilityId.GetHashCode() ^ sunday.GetHashCode());
+            var seed = StableSeed(facilityId, sunday);
+            var rng = new Random(seed);
             var assignments = new List<ShiftAssignment>();
-            var id = Math.Abs(facilityId.GetHashCode() ^ sunday.GetHashCode()) % 10000;
+            var id = (seed & int.MaxValue) % 10000;
 
             for (var dayOffset = 0; dayOffset < 7; dayOffset++)
             {
