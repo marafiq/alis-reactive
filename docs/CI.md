@@ -135,8 +135,10 @@ complement shard, then re-run the partition proof above.
 (`scripts/trx-failed-tests.mjs` reads the failures from the TRX; the re-run filter is
 `FullyQualifiedName=<fqn>|...`). The gate passes `retry-failed: 1` on PRs, nightly and releases.
 Every attempt keeps its own log, TRX and diag file. Tests that fail and then pass are the **flaky
-list**: `[playwright:flaky]` lines, `TestResults/observable/flaky-<stamp>.txt`, and a block in the
-GitHub job summary. The `if: failure()` artifact upload carries logs, TRX, diagnostics, and the
+list**: `[playwright:flaky]` lines, `TestResults/observable/flaky-<stamp>.txt`, a block in the
+GitHub job summary, and, under GitHub Actions, one `::warning` annotation per flaky test. The
+annotation shows on the pull request's checks, so a green job can't hide a re-run. The
+`if: failure()` artifact upload carries logs, TRX, diagnostics, and the
 traces and screenshots `PlaywrightTestBase` saved for the failed tests. This is the
 Playwright-recommended shape (retry in CI, keep the trace of the failure:
 [playwright.dev/docs/test-retries](https://playwright.dev/docs/test-retries)) implemented at the
