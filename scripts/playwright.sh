@@ -494,6 +494,11 @@ if [ "${#flaky[@]}" -gt 0 ]; then
       echo "Two red runs in a row is a regression or a quarantine candidate: docs/CI.md, \"Flaky tests\"."
     } >> "$GITHUB_STEP_SUMMARY"
   fi
+  # The job stays green, and nobody opens the summary of a green job: a warning annotation puts each
+  # flaky test on the pull request's checks, so a re-run never turns a failure into silence.
+  if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+    sed 's/^/::warning title=Flaky test::/; s|$| failed, then passed on re-run (docs/CI.md, "Flaky tests")|' "$flaky_path"
+  fi
 fi
 
 exit "$status"

@@ -47,7 +47,7 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 | `nightly.yml` | 03:30 UTC Mon-Fri on `main`; manual | `gate`; `report-failure` | the watched browser signal: opens/updates issue `ci-nightly-failure` on red | never |
 | `nuget-publish.yml` | push of a `v*` tag; manual runs gate only | `verify-tag` -> `gate` -> `pack-and-publish` | the release: tag shape, both suites, six packages | nuget.org + GitHub Release |
 | `verify-net48.yml` | pushes and PRs to `main` / `release/*`; manual | net48 build+pack on Windows; IIS Express boot proof | PR merge (both required) | never |
-| `deploy-docs.yml` | pushes to `main` touching docs or public C#; manual | `build-docs`, `deploy` | Pages deployment | GitHub Pages |
+| `deploy-docs.yml` | pushes to `main` touching docs or public C#; pull requests touching the same paths (build only); manual | `build-docs`; `deploy` (skipped on pull requests) | the docs still build (PR); Pages deployment (`main`) | GitHub Pages, from `main` only |
 
 ## One gate definition
 
@@ -135,8 +135,10 @@ complement shard, then re-run the partition proof above.
 (`scripts/trx-failed-tests.mjs` reads the failures from the TRX; the re-run filter is
 `FullyQualifiedName=<fqn>|...`). The gate passes `retry-failed: 1` on PRs, nightly and releases.
 Every attempt keeps its own log, TRX and diag file. Tests that fail and then pass are the **flaky
-list**: `[playwright:flaky]` lines, `TestResults/observable/flaky-<stamp>.txt`, and a block in the
-GitHub job summary. The `if: failure()` artifact upload carries logs, TRX, diagnostics, and the
+list**: `[playwright:flaky]` lines, `TestResults/observable/flaky-<stamp>.txt`, a block in the
+GitHub job summary, and, under GitHub Actions, one `::warning` annotation per flaky test. The
+annotation shows on the pull request's checks, so a green job can't hide a re-run. The
+`if: failure()` artifact upload carries logs, TRX, diagnostics, and the
 traces and screenshots `PlaywrightTestBase` saved for the failed tests. This is the
 Playwright-recommended shape (retry in CI, keep the trace of the failure:
 [playwright.dev/docs/test-retries](https://playwright.dev/docs/test-retries)) implemented at the
@@ -263,6 +265,9 @@ until proven otherwise. The convention:
   never Syncfusion (npm and NuGet move together, deliberately, one patch behind the newest weekly
   release, with a new license key per major), never `Microsoft.CodeAnalysis.*` (the analyzers'
   Roslyn version is the minimum compiler every consumer needs).
+- **What proves a `docs-site` update.** The gate and `scripts/test.sh` never build `docs-site`. A PR
+  that touches it is proven by the `build-docs` check that `deploy-docs.yml` runs on pull requests
+  (Node 22, `npm ci`, `npm run build`), not by the gate's green.
 - **The secret it needs.** Workflows started by Dependabot read **Dependabot secrets**, not Actions
   secrets. Without `SYNCFUSION_LICENSE_KEY` in that store the job log shows
   `Syncfusion__LicenseKey:` empty and the InPlaceEditor and Drawer tests time out behind the
