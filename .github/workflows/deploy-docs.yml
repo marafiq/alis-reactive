@@ -1,8 +1,21 @@
 name: Deploy docs site to GitHub Pages
 
+# Pushes to main build and deploy. Pull requests that touch the same inputs build only, so a docs
+# change or a docs-site dependency bump (Dependabot) proves the site still builds before it merges.
+# The framework gate never builds docs-site, so without this a docs-site PR's green proved nothing.
 on:
   push:
     branches: [main]
+    paths:
+      - 'docs-site/**'
+      - 'Alis.Reactive/**'
+      - 'Alis.Reactive.Native/**'
+      - 'Alis.Reactive.DesignSystem/**'
+      - 'Alis.Reactive.Fusion/**'
+      - 'Alis.Reactive.FluentValidator/**'
+      - 'Alis.Reactive.SandboxApp/wwwroot/**'
+      - '.github/workflows/deploy-docs.yml'
+  pull_request:
     paths:
       - 'docs-site/**'
       - 'Alis.Reactive/**'
@@ -16,11 +29,10 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  # A pull request builds in its own group, so it never cancels or waits on a Pages deploy.
+  group: ${{ github.event_name == 'pull_request' && format('docs-pr-{0}', github.event.pull_request.number) || 'pages' }}
   cancel-in-progress: true
 
 jobs:
@@ -51,9 +63,13 @@ jobs:
           path: docs-site/dist
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build-docs
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
