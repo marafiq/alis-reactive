@@ -22,7 +22,7 @@ Run:
 node .claude/skills/onboard-fusion-component/scripts/inspect-syncfusion-surface.mjs \
   --class {ClassName} \
   --dts {path-to-class.d.ts} \
-  --xml ~/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/netstandard2.0/Syncfusion.EJ2.xml
+  --xml ~/.nuget/packages/syncfusion.ej2.aspnet.core/33.1.47/lib/netstandard2.0/Syncfusion.EJ2.xml
 ```
 
 Then classify each row and write the result to

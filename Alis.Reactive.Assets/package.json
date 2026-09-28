@@ -18,7 +18,7 @@
     "test:watch": "vitest"
   },
   "devDependencies": {
-    "@syncfusion/ej2": "32.2.8",
+    "@syncfusion/ej2": "33.1.47",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "22.19.21",
     "esbuild": "^0.28.2",

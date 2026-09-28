@@ -13,7 +13,8 @@ Runs the ordered verification gate:
   1. npm run typecheck
   2. npm run build:all
   3. npm test
-  4. gate-script self-tests (.claude/skills/onboard-fusion-component/scripts/*.selftest.mjs)
+  4. gate-script self-tests (.claude/skills/onboard-fusion-component/scripts/*.selftest.mjs), the CI
+     shard-matrix check, and the Syncfusion pin check (node scripts/pin-syncfusion.mjs --check)
   5. dotnet build
   6. non-Playwright dotnet test projects, if any
   7. scripts/playwright.sh --no-build (or its five CI shards at once with --parallel)
@@ -198,6 +199,9 @@ npm test
 echo "[test] gate-script self-tests"
 run_gate_selftests
 check_ci_shard_matrix
+# npm and NuGet must carry the same Syncfusion version, and every control package must be locked at
+# the version the @syncfusion/ej2 umbrella was published with (scripts/pin-syncfusion.mjs explains why).
+node scripts/pin-syncfusion.mjs --check
 
 echo "[test] compiling C# projects ($configuration)"
 dotnet build --configuration "$configuration"

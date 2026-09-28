@@ -15,6 +15,16 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
             .Not.ToHaveTextAsync("Loading...", new() { Timeout = 10000 });
     }
 
+    // Opens a shift the way a coordinator does: bring it into view, then click it. A bare click
+    // on a shift outside the visible hours scrolls and clicks in the same frame, the scroll event
+    // lands after the click, and Schedule closes QuickInfo on any content scroll, so an overnight
+    // shift at the bottom of the day would never show its actions.
+    private static async Task OpenShift(ILocator shift)
+    {
+        await shift.ScrollIntoViewIfNeededAsync();
+        await shift.ClickAsync();
+    }
+
     [Test]
     public async Task route_template_gather_reads_schedule_current_view_and_reuses_it_in_chained_request()
     {
@@ -70,7 +80,7 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await NavigateAndWaitForSchedule();
 
         // Click an assigned shift (one labelled with a staff role).
-        await Page.GetByText(new Regex(@"\((CNA|RN|LPN)\)")).First.ClickAsync();
+        await OpenShift(Page.GetByText(new Regex(@"\((CNA|RN|LPN)\)")).First);
 
         // EventClick opens the QuickInfo popup, whose custom template binds the
         // assignment: the staff phone in the content and Edit/Reassign actions in
@@ -91,7 +101,7 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await NavigateAndWaitForSchedule();
 
         // Open the QuickInfo for an assigned shift, then choose Edit.
-        await Page.GetByText(new Regex(@"\((CNA|RN|LPN)\)")).First.ClickAsync();
+        await OpenShift(Page.GetByText(new Regex(@"\((CNA|RN|LPN)\)")).First);
         await Page.GetByText("Edit", new() { Exact = true }).ClickAsync();
 
         // schedule:edit loads the EditForm partial into the drawer and opens it.
@@ -119,7 +129,7 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         Assert.That(before, Is.GreaterThan(0), "the scenario needs at least one open shift to cover");
 
         // Open an unassigned shift and choose to staff it.
-        await Page.GetByText(new Regex("UNASSIGNED")).First.ClickAsync();
+        await OpenShift(Page.GetByText(new Regex("UNASSIGNED")).First);
         await Page.GetByText("Assign Staff", new() { Exact = true }).ClickAsync();
 
         // Wait for the drawer to finish sliding in and its form to render.
@@ -149,7 +159,7 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
     {
         await NavigateAndWaitForSchedule();
 
-        await Page.GetByText(new Regex("UNASSIGNED")).First.ClickAsync();
+        await OpenShift(Page.GetByText(new Regex("UNASSIGNED")).First);
 
         // The QuickInfo template renders its unassigned branch: an Assign Staff
         // action (assigned shifts get Edit/Reassign instead). The action exists
@@ -166,7 +176,7 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
     {
         await NavigateAndWaitForSchedule();
 
-        await Page.GetByText(new Regex(@"\((CNA|RN|LPN)\)")).First.ClickAsync();
+        await OpenShift(Page.GetByText(new Regex(@"\((CNA|RN|LPN)\)")).First);
         await Page.GetByText("Reassign", new() { Exact = true }).ClickAsync();
 
         // schedule:reassign is a distinct custom-event handler from schedule:edit;

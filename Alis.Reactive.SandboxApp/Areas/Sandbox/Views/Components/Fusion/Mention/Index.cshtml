@@ -81,21 +81,32 @@
                 .PopupWidth("280px"))
                 .Reactive(evt => evt.Opened, (args, p) =>
                 {
-                    p.Component<FusionMention>("auto-hide-mention").HidePopup();
-                    p.Element("mention-hide-status").SetText("hide called");
+                    p.Element("mention-auto-hide-popup-status").SetText("opened");
                 })
                 .Reactive(evt => evt.Closed, (args, p) =>
                 {
                     p.Element("mention-auto-hide-popup-status").SetText("closed");
                 }))
 
-            @(Html.NativeButton("mention-auto-hide-btn", "Open And Hide")
-                .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionMention>("auto-hide-mention").Search("No", 96, 160);
-                    p.Element("mention-auto-hide-command-status").SetText("search called");
-                }))
+            @* HidePopup runs from its own gesture, never inside Opened: Syncfusion raises Opened before it
+               finishes opening, and from 33.1 its open sequence throws when a handler has already hidden
+               the popup (setHeight reads the detached list's parent). *@
+            <native-hstack gap="Sm">
+                @(Html.NativeButton("mention-auto-hide-btn", "Open")
+                    .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionMention>("auto-hide-mention").Search("No", 96, 160);
+                        p.Element("mention-auto-hide-command-status").SetText("search called");
+                    }))
+                @(Html.NativeButton("mention-hide-btn", "Hide")
+                    .CssClass("rounded-md border border-border px-4 py-2 text-sm font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionMention>("auto-hide-mention").HidePopup();
+                        p.Element("mention-hide-status").SetText("hide called");
+                    }))
+            </native-hstack>
 
             <native-vstack gap="Xs" class="font-mono text-sm">
                 <p>Auto-hide command: <span id="mention-auto-hide-command-status">idle</span></p>
