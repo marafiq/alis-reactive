@@ -12,6 +12,14 @@ public class WhenUsingFusionMention : PlaywrightTestBase
             .ToBeVisibleAsync(new() { Timeout = 10000 });
     }
 
+    // Puts the caret after the "No" the note starts with, the way a coordinator would: click into
+    // the note, then End. Search reads the text before the caret.
+    private async Task PlaceCaretAtEndOf(string noteId)
+    {
+        await Page.Locator($"#{noteId}").ClickAsync();
+        await Page.Keyboard.PressAsync("End");
+    }
+
     [Test]
     public async Task search_method_opens_popup_with_matching_care_team_member()
     {
@@ -56,10 +64,17 @@ public class WhenUsingFusionMention : PlaywrightTestBase
         await Expect(Page.Locator("#mention-popup-status"))
             .ToHaveTextAsync("opened", new() { Timeout = 10000 });
 
-        await Page.Locator("#auto-hide-note").EvaluateAsync("el => { el.focus(); el.setSelectionRange(2, 2); }");
+        await PlaceCaretAtEndOf("auto-hide-note");
         await Page.Locator("#mention-auto-hide-btn").ClickAsync();
         await Expect(Page.Locator("#mention-auto-hide-command-status"))
             .ToHaveTextAsync("search called", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#mention-auto-hide-popup-status"))
+            .ToHaveTextAsync("opened", new() { Timeout = 10000 });
+
+        // Hide is pressed from the keyboard on purpose: EJ2 Mention closes its popup on any mousedown
+        // outside it, so a mouse click would close the popup even if HidePopup did nothing.
+        await Page.Locator("#mention-hide-btn").FocusAsync();
+        await Page.Keyboard.PressAsync("Enter");
         await Expect(Page.Locator("#mention-hide-status"))
             .ToHaveTextAsync("hide called", new() { Timeout = 5000 });
         await Expect(Page.Locator("#mention-auto-hide-popup-status"))
