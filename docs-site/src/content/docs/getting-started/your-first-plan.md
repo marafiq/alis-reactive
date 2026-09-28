@@ -41,7 +41,7 @@ from `_Layout.cshtml`.
 <link rel="stylesheet" href="~/css/design-system.{version}.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/syncfusion.{version}.css" asp-append-version="true" />
 
-<script src="https://cdn.syncfusion.com/ej2/32.2.8/dist/ej2.min.js"></script>
+<script src="https://cdn.syncfusion.com/ej2/33.1.47/dist/ej2.min.js"></script>
 @Html.EJS().ScriptManager()
 @Html.FusionToast()
 <script src="~/scripts/alis-reactive.{version}.js" asp-append-version="true"></script>

@@ -70,7 +70,7 @@ function AUTHOR(t, round, gaps) {
 `artifact tree. Do NOT run git.\n\n` +
 `STEPS:\n` +
 `1. If discovery is missing, generate it: read the Fusion${pascal(t.component)} slice + the EJ2 d.ts it wraps, then ` +
-`   node ${SK}/write-fusion-discovery-artifacts.mjs --component ${t.component} --class <EjClass> --namespace <ej.ns> --dts <d.ts> --xml ~/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/net10.0/Syncfusion.EJ2.xml --write\n` +
+`   node ${SK}/write-fusion-discovery-artifacts.mjs --component ${t.component} --class <EjClass> --namespace <ej.ns> --dts <d.ts> --xml ~/.nuget/packages/syncfusion.ej2.aspnet.core/33.1.47/lib/net10.0/Syncfusion.EJ2.xml --write\n` +
 `2. node ${SK}/audit-primitive-coverage.mjs --component ${t.component} --fusion-type ${t.fusionType}  (must be 100% mapped)\n` +
 `3. node ${SK}/observe-plan.mjs --component ${t.component} --fusion-type ${t.fusionType}  — this is your EXACT authoring spec. ` +
 `   For EVERY member it lists, wire it into a visible outcome in the sandbox view per its primitive (Read scalar -> ` +

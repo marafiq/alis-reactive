@@ -6,7 +6,7 @@ import { join, relative } from "node:path";
 const args = parseArgs(process.argv.slice(2));
 const classQuery = requireArg(args, "class");
 const root = args.root ?? "node_modules/@syncfusion";
-const xmlPath = args.xml ?? `${process.env.HOME}/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/netstandard2.0/Syncfusion.EJ2.xml`;
+const xmlPath = args.xml ?? `${process.env.HOME}/.nuget/packages/syncfusion.ej2.aspnet.core/33.1.47/lib/netstandard2.0/Syncfusion.EJ2.xml`;
 
 if (!existsSync(root)) {
   console.error(`Syncfusion node_modules root not found: ${root}`);

@@ -259,7 +259,7 @@ exits 0; the driver loops authoring until it does or fails loud. Never claim don
 |-------|-----------|
 | C# | C# 14, compiled for BOTH `net48` and `net10.0` — every shipped package dual-targets (TagHelpers: net10-only by design). A net48 language-feature error (CS8xxx/CS90xx) means rework the feature to what PolySharp polyfills — never work around it. Host-type splits go behind `#if NET48`. |
 | TS | TypeScript + esbuild ESM bundles, Tailwind CSS v4. Versions pinned in `package.json`. |
-| Components | Syncfusion EJ2 32.x (Fusion) + Native HTML. Always through DSL: `Html.InputField(plan, m => m.Name).NativeTextBox(build: b => ...)` |
+| Components | Syncfusion EJ2 33.1.47 (Fusion; npm `@syncfusion/ej2` and NuGet `Syncfusion.EJ2.*` pinned to the same version; upgrade with `node scripts/pin-syncfusion.mjs <version>`) + Native HTML. Always through DSL: `Html.InputField(plan, m => m.Name).NativeTextBox(build: b => ...)` |
 | Validation | FluentValidation as server authority (version per target framework, pinned in the csproj); `ReactiveValidator<T>` records browser validation metadata through DI |
 | Tests | NUnit, Vitest + jsdom, Playwright. Versions pinned in the test csproj and `package.json`. |
 

@@ -343,7 +343,7 @@ mapped, named, implemented, and linked to the proof matrix.
      ```bash
      node .claude/skills/onboard-fusion-component/scripts/inspect-syncfusion-blazor-metadata.mjs \
        --package Syncfusion.Blazor.Kanban \
-       --version 32.2.8 \
+       --version 33.1.47 \
        --component Kanban \
        --decompiled /tmp/alis-syncfusion-blazor-kanban/decompiled/Syncfusion.Blazor.Kanban.SfKanban`1.decompiled.cs
      ```

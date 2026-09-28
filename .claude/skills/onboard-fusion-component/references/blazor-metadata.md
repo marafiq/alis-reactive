@@ -54,13 +54,13 @@ Install or restore the package first, then inspect XML and IL:
 
 ```bash
 dotnet new classlib -o /tmp/sf-blazor-probe
-dotnet add /tmp/sf-blazor-probe package Syncfusion.Blazor.Kanban --version 32.2.8
+dotnet add /tmp/sf-blazor-probe package Syncfusion.Blazor.Kanban --version 33.1.47
 ilspycmd -t Syncfusion.Blazor.Kanban.SfKanban`1 \
   -o /tmp/sf-blazor-kanban-decompiled \
-  ~/.nuget/packages/syncfusion.blazor.kanban/32.2.8/lib/netstandard2.0/Syncfusion.Blazor.Kanban.dll
+  ~/.nuget/packages/syncfusion.blazor.kanban/33.1.47/lib/netstandard2.0/Syncfusion.Blazor.Kanban.dll
 node .claude/skills/onboard-fusion-component/scripts/inspect-syncfusion-blazor-metadata.mjs \
   --package Syncfusion.Blazor.Kanban \
-  --version 32.2.8 \
+  --version 33.1.47 \
   --component Kanban \
   --decompiled /tmp/sf-blazor-kanban-decompiled/Syncfusion.Blazor.Kanban.SfKanban`1.decompiled.cs
 ```
@@ -71,7 +71,7 @@ cache, pass its package root directly:
 ```bash
 node .claude/skills/onboard-fusion-component/scripts/inspect-syncfusion-blazor-metadata.mjs \
   --package Syncfusion.Blazor.Kanban \
-  --version 32.2.8 \
+  --version 33.1.47 \
   --component Kanban \
   --package-root /tmp/alis-syncfusion-blazor-kanban/pkg \
   --decompiled /tmp/alis-syncfusion-blazor-kanban/decompiled/Syncfusion.Blazor.Kanban.SfKanban`1.decompiled.cs
