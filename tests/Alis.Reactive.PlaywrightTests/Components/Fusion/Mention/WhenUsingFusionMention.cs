@@ -13,11 +13,11 @@ public class WhenUsingFusionMention : PlaywrightTestBase
     }
 
     // Puts the caret after the "No" the note starts with, the way a coordinator would: click into
-    // the note, then End. Search reads the text before the caret.
+    // the note beside its text. Search reads the text before the caret. No key is pressed: Mention's
+    // keyup handler runs for every key, End included, and after it Search opens an empty list.
     private async Task PlaceCaretAtEndOf(string noteId)
     {
         await Page.Locator($"#{noteId}").ClickAsync();
-        await Page.Keyboard.PressAsync("End");
     }
 
     [Test]
@@ -25,7 +25,7 @@ public class WhenUsingFusionMention : PlaywrightTestBase
     {
         await NavigateAndWaitForMention();
 
-        await Page.Locator("#care-note").EvaluateAsync("el => { el.focus(); el.setSelectionRange(2, 2); }");
+        await PlaceCaretAtEndOf("care-note");
         await Page.Locator("#mention-search-btn").ClickAsync();
 
         await Expect(Page.Locator("#mention-command-status"))
@@ -43,7 +43,7 @@ public class WhenUsingFusionMention : PlaywrightTestBase
     {
         await NavigateAndWaitForMention();
 
-        await Page.Locator("#care-note").EvaluateAsync("el => { el.focus(); el.setSelectionRange(2, 2); }");
+        await PlaceCaretAtEndOf("care-note");
         await Page.Locator("#mention-search-btn").ClickAsync();
         await Page.Locator(".e-popup .e-list-item").Filter(new() { HasTextString = "Nora Nurse" }).ClickAsync();
 
