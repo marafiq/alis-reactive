@@ -234,6 +234,75 @@ describe("evaluateValue", () => {
     expect(evaluateValue(callMethod, runtimePlan)).toBe("Ada Lovelace");
   });
 
+  describe("a native input bound to a nullable model property", () => {
+    function nullableInputPlan(id: string, inner: Shape): PlanDocument {
+      return valueEvaluationPlan({
+        types: {
+          "native.textbox": {
+            properties: {
+              value: {
+                path: [{ kind: "property", name: "value" }],
+                shape: { kind: "nullable", inner },
+                access: "read",
+              },
+            },
+            methods: {},
+            events: {},
+          },
+        },
+        components: {
+          [id]: {
+            id,
+            vendor: "native",
+            type: "native.textbox",
+            role: { kind: "object-target" },
+            binding: { kind: "none" },
+            container: { kind: "none" },
+          },
+        },
+      });
+    }
+
+    function readInputValue(id: string): ValueExpression {
+      return {
+        kind: "read",
+        from: { kind: "component", component: id },
+        member: "value",
+        path: [],
+        shape: { kind: "none" },
+        access: { kind: "property" },
+      };
+    }
+
+    function readTypedValue(inputValue: string, inner: Shape): unknown {
+      document.body.innerHTML = `<input id="field" value="${inputValue}" />`;
+      return evaluateValue(readInputValue("field"), nullableInputPlan("field", inner));
+    }
+
+    it("reads blank text as no value rather than zero", () => {
+      expect(readTypedValue("", numberShape)).toBeNull();
+      expect(readTypedValue("   ", numberShape)).toBeNull();
+    });
+
+    it("reads blank text as no value rather than false", () => {
+      expect(readTypedValue("", { kind: "boolean" })).toBeNull();
+    });
+
+    it("reads blank text as no date", () => {
+      expect(readTypedValue("", { kind: "date" })).toBeNull();
+    });
+
+    it("keeps blank text for a value the server represents as text", () => {
+      expect(readTypedValue("", stringShape)).toBe("");
+    });
+
+    it("reads entered text as the typed value", () => {
+      expect(readTypedValue("212.50", numberShape)).toBe(212.5);
+      expect(readTypedValue("0", numberShape)).toBe(0);
+      expect(readTypedValue("false", { kind: "boolean" })).toBe(false);
+    });
+  });
+
   it("rejects declared runtime object property paths that are not present on the JS object", () => {
     document.body.innerHTML = `<div id="resident-name"></div>`;
     const objectContract: BrowserObjectContract = {

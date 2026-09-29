@@ -73,6 +73,12 @@ public sealed class PagePlan<TModel> where TModel : class
     public NativeTextBoxLocator TextBox(Expression<Func<TModel, object?>> expr)
         => new NativeTextBoxLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 
+    public NativeDropDownLocator NativeDropDown(Expression<Func<TModel, object?>> expr)
+        => new NativeDropDownLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
+
+    public NativeRadioGroupLocator NativeRadioGroup(Expression<Func<TModel, object?>> expr)
+        => new NativeRadioGroupLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
+
     public DatePickerLocator DatePicker(Expression<Func<TModel, object?>> expr)
         => new DatePickerLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 
