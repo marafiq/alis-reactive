@@ -266,6 +266,14 @@ describe("condition runtime", () => {
       expect(matches(ordered("gt", "72", 60, rawShape))).toBe(false);
     });
 
+    it("treats a blank nullable number as no value, not zero", () => {
+      const nullableNumber: Shape = { kind: "nullable", inner: numberShape };
+
+      expect(matches(unary("is-null", "", nullableNumber))).toBe(true);
+      expect(matches(equality("eq", "", 0, nullableNumber))).toBe(false);
+      expect(matches(ordered("lt", "", 100, nullableNumber))).toBe(false);
+    });
+
     it("compares value expressions on both sides of source-to-source conditions", () => {
       const left = eventPayloadValue("entered", numberShape);
       const right = eventPayloadValue("expected", numberShape);
