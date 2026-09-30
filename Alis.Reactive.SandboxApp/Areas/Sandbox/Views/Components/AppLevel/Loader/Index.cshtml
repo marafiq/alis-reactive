@@ -1,0 +1,54 @@
+@model CarePlanReviewModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.AppLevel
+@{
+    ViewData["Title"] = "Loader";
+    var plan = Html.ReactivePlan<CarePlanReviewModel>();
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Care Plan Review</native-heading>
+    <native-text color="Secondary">
+        Refresh today's census, then save the resident's care plan. The loader covers the page while the server works.
+    </native-text>
+
+    <native-card>
+    <native-card-body>
+        <form id="care-plan-form" class="mb-4">
+            @{ Html.InputField(plan, m => m.CarePlanNotes, o => o.Label("Care Plan Notes"))
+                .NativeTextArea(b => b.Rows(3).Placeholder("Goals, preferences, and follow-ups")); }
+        </form>
+        <native-hstack gap="Sm" align="Center">
+            @(Html.NativeButton("refresh-census-btn", "Refresh Census")
+                .CssClass("rounded-md border border-border px-4 py-2 text-sm font-medium")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Get(Url.SandboxRoute("Census", "Loader"))
+                     .WhileLoading(l => l.Component<NativeLoader>().SetTimeout(3000).Show())
+                     .Response(r => r.OnSuccess<CensusSummary>((json, s) =>
+                     {
+                         s.Component<NativeLoader>().Hide();
+                         s.Element("census-status").SetText(json, x => x.Summary);
+                     }));
+                }))
+            @(Html.NativeButton("save-care-plan-btn", "Save Care Plan")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post(Url.SandboxRoute("SaveCarePlan", "Loader"), g => g.IncludeAll())
+                     .WhileLoading(l => l.Component<NativeLoader>().Show())
+                     .Response(r => r.OnSuccess<CarePlanSaved>((json, s) =>
+                     {
+                         s.Component<NativeLoader>().Hide();
+                         s.Element("care-plan-status").SetText(json, x => x.Confirmation);
+                     }));
+                }))
+        </native-hstack>
+        <p id="census-status" class="mt-3 text-sm text-text-muted">Census not refreshed yet.</p>
+        <p id="care-plan-status" class="mt-1 text-sm text-text-muted">Care plan not saved yet.</p>
+    </native-card-body>
+    </native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
