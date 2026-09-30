@@ -6,6 +6,7 @@ import type { ComponentObject, BrowserObjectContract, PlanDocument, Shape, Value
 
 const stringShape: Shape = { kind: "string" };
 const numberShape: Shape = { kind: "number" };
+const booleanShape: Shape = { kind: "boolean" };
 const objectShape: Shape = { kind: "object", fields: {}, additional: true };
 const residentObjectShape: Shape = {
   kind: "object",
@@ -143,6 +144,13 @@ describe("evaluateValue", () => {
     const producer = literal("not-a-number", numberShape);
 
     expect(evaluateValue(producer, valueEvaluationPlan())).toBe("not-a-number");
+  });
+
+  it("reads a boolean as .NET writes it, whatever its case", () => {
+    expect(evaluateValue(literal("False", booleanShape), valueEvaluationPlan())).toBe(false);
+    expect(evaluateValue(literal("FALSE", booleanShape), valueEvaluationPlan())).toBe(false);
+    expect(evaluateValue(literal("false", booleanShape), valueEvaluationPlan())).toBe(false);
+    expect(evaluateValue(literal("True", booleanShape), valueEvaluationPlan())).toBe(true);
   });
 
   it("does not coerce malformed date text to NaN", () => {

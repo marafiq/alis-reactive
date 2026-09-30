@@ -249,8 +249,10 @@ function finiteNumber(value: number, source: string): ShapeConversionResult<numb
   return err(`toNumber: ${source} is not a finite number`);
 }
 
+// .NET writes a bool as "True"/"False" (a hidden field, an option value) and reads it back
+// ignoring case, so "False" is false here too.
 function textIsTruthy(value: string): boolean {
-  const textRepresentsFalse = value === "" || value === "false" || value === "0";
+  const textRepresentsFalse = value === "" || value.toLowerCase() === "false" || value === "0";
   return !textRepresentsFalse;
 }
 

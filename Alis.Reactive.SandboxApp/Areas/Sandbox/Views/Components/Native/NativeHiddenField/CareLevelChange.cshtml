@@ -1,0 +1,37 @@
+@model CareLevelChangeModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Care Level Change";
+    var plan = Html.ReactivePlan<CareLevelChangeModel>();
+    var careLevels = (List<SelectListItem>)ViewBag.CareLevels;
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Request a Care Level Change</native-heading>
+    <native-text color="Secondary">
+        Choose the new care level. Whether a physician must sign off is decided for this resident and sent with the request.
+    </native-text>
+
+    <native-card><native-card-body>
+        <form class="mb-4">
+            @Html.HiddenFieldFor(plan, m => m.ResidentId)
+            @Html.HiddenFieldFor(plan, m => m.RequiresPhysicianSignOff)
+            @{ Html.InputField(plan, m => m.RequestedCareLevel, o => o.Label("New Care Level"))
+                .NativeDropDown(b => b.Items(careLevels).Placeholder("-- Select care level --")); }
+        </form>
+        @(Html.NativeButton("request-care-level-change-btn", "Request Change")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("SubmitCareLevelChange", "NativeHiddenField"), g => g.IncludeAll())
+                 .Response(r => r.OnSuccess<CareLevelChangeConfirmation>((json, s) =>
+                 {
+                     s.Element("care-level-change-status").SetText(json, x => x.Confirmation);
+                 }));
+            }))
+        <p id="care-level-change-status" class="mt-3 text-sm text-text-muted">No change requested yet.</p>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

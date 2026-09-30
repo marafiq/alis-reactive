@@ -5,7 +5,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
 {
     [Area("Sandbox")]
     [Route("Sandbox/Components/NativeHiddenField")]
-    public class NativeHiddenFieldController : Controller
+    public partial class NativeHiddenFieldController : Controller
     {
         [HttpGet("")]
         public IActionResult Index()
