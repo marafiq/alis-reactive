@@ -81,7 +81,8 @@ namespace Alis.Reactive.Native.Extensions
 #endif
             var componentSlot = ModelBoundInputComponentSlot.For<TModel, TProp>(
                 expression,
-                bindingName);
+                bindingName,
+                html.ViewData.TemplateInfo.HtmlFieldPrefix);
             var boundField = BoundInputField<TModel, TProp>.Create(
                 plan,
                 expression,

@@ -1,0 +1,37 @@
+@model DietPlanModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Diet Plan";
+    var plan = Html.ReactivePlan<DietPlanModel>();
+    var restrictionOptions = (RadioButtonItem[])ViewBag.DietaryRestrictionOptions;
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Diet Plan: Harold Jennings</native-heading>
+    <native-text color="Secondary">
+        The dietary restrictions the kitchen follows for this resident. Update them and save.
+    </native-text>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            @Html.HiddenFieldFor(plan, m => m.ResidentId)
+            @{ Html.InputField(plan, m => m.DietaryRestrictions, o => o.Label("Dietary Restrictions"))
+                .NativeCheckList(b => b.Items(restrictionOptions)); }
+
+            @(Html.NativeButton("save-diet-plan-btn", "Save Diet Plan")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post(Url.SandboxRoute("SaveDietPlan", "NativeCheckList"), g => g.IncludeAll())
+                     .Response(r => r.OnSuccess<DietPlanSaved>((json, s) =>
+                     {
+                         s.Element("diet-plan-status").SetText(json, x => x.Confirmation);
+                     }));
+                }))
+            <p id="diet-plan-status" class="text-sm text-text-muted"></p>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

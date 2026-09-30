@@ -6,7 +6,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
 {
     [Area("Sandbox")]
     [Route("Sandbox/Components/NativeCheckList")]
-    public class NativeCheckListController : Controller
+    public partial class NativeCheckListController : Controller
     {
         [HttpGet("")]
         public IActionResult Index()

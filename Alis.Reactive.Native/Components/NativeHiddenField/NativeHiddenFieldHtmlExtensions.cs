@@ -46,7 +46,10 @@ namespace Alis.Reactive.Native.Components
             var bindingPath = html.NameFor(expression);
 #endif
             var registration = ComponentRegistrationSource.Registration;
-            var slot = ModelBoundInputComponentSlot.For<TModel, TProp>(expression, bindingPath);
+            var slot = ModelBoundInputComponentSlot.For<TModel, TProp>(
+                expression,
+                bindingPath,
+                html.ViewData.TemplateInfo.HtmlFieldPrefix);
             plan.RegisterInputComponent(slot.Register(registration));
 
             return new NativeHiddenFieldBuilder<TModel, TProp>(

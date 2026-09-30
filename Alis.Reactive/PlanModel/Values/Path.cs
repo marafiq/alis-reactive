@@ -204,6 +204,13 @@ namespace Alis.Reactive.PlanModel
             return new Path(list);
         }
 
+        internal Path Append(Path tail)
+        {
+            var list = new List<PathSegment>(Segments);
+            list.AddRange(tail.Segments);
+            return new Path(list);
+        }
+
         internal static Path Parse(string dotPath)
         {
             if (string.IsNullOrEmpty(dotPath)) return None;
@@ -233,24 +240,6 @@ namespace Alis.Reactive.PlanModel
             if (other == null) return false;
             if (ReferenceEquals(this, other)) return true;
             if (Segments.Count != other.Segments.Count) return false;
-
-            for (var segmentIndex = 0; segmentIndex < Segments.Count; segmentIndex++)
-            {
-                if (!Segments[segmentIndex].Equals(other.Segments[segmentIndex])) return false;
-            }
-
-            return true;
-        }
-
-        internal bool Overlaps(Path other)
-        {
-            if (other == null) throw new ArgumentNullException(nameof(other));
-            return IsPrefixOf(other) || other.IsPrefixOf(this);
-        }
-
-        private bool IsPrefixOf(Path other)
-        {
-            if (Segments.Count > other.Segments.Count) return false;
 
             for (var segmentIndex = 0; segmentIndex < Segments.Count; segmentIndex++)
             {

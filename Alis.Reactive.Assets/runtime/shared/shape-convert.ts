@@ -43,8 +43,38 @@ function applyArrayShape(value: unknown, shape: Extract<Shape, { kind: "array" }
 }
 
 function applyNullableShape(value: unknown, inner: Shape): unknown {
-  if (isMissingInput(value)) return null;
+  if (isAbsentNullableInput(value, inner)) return null;
   return applyShape(value, inner);
+}
+
+// A nullable shape stands for a CLR Nullable<T>. Blank text is no number, boolean, or date:
+// parsing it would invent 0 or false, while the server reads it as null (MVC binding:
+// IsNullOrWhiteSpace -> null). Text-represented values (Guid?, enum?, TimeSpan?) keep their
+// blank text, which is already empty to validation and null in a JSON body.
+function isAbsentNullableInput(value: unknown, inner: Shape): boolean {
+  if (isMissingInput(value)) return true;
+
+  const valueIsBlankText = typeof value === "string" && value.trim() === "";
+  return valueIsBlankText && innerShapeParsesText(inner);
+}
+
+function innerShapeParsesText(inner: Shape): boolean {
+  switch (inner.kind) {
+    case "number":
+    case "boolean":
+    case "date":     return true;
+    case "string":
+    case "array":
+    case "object":
+    case "nullable":
+    case "raw":
+    case "any":
+    case "none":     return false;
+    default: {
+      const _: never = inner;
+      throw new Error(`[alis] unknown shape kind: "${(_ as Shape).kind}"`);
+    }
+  }
 }
 
 function applyArrayItemShape(items: unknown[], shape: Extract<Shape, { kind: "array" }>): unknown[] {
@@ -91,7 +121,7 @@ function convertObjectShape(value: unknown, shape: Extract<Shape, { kind: "objec
 }
 
 function convertNullableShape(value: unknown, inner: Shape): ShapeConversionResult<unknown> {
-  if (isMissingInput(value)) return ok(null);
+  if (isAbsentNullableInput(value, inner)) return ok(null);
   return convertByShape(value, inner);
 }
 
@@ -219,8 +249,10 @@ function finiteNumber(value: number, source: string): ShapeConversionResult<numb
   return err(`toNumber: ${source} is not a finite number`);
 }
 
+// .NET writes a bool as "True"/"False" (a hidden field, an option value) and reads it back
+// ignoring case, so "False" is false here too.
 function textIsTruthy(value: string): boolean {
-  const textRepresentsFalse = value === "" || value === "false" || value === "0";
+  const textRepresentsFalse = value === "" || value.toLowerCase() === "false" || value === "0";
   return !textRepresentsFalse;
 }
 

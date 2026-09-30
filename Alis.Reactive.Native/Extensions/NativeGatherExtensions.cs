@@ -41,9 +41,9 @@ namespace Alis.Reactive.Native.Extensions
             where TModel : class
         {
             var elementId = IdGenerator.For(expr);
-            var propertyName = ExpressionPathHelper.ToPropertyName(expr);
+            var bodyField = ExpressionPathHelper.ToMemberBindingPath(expr);
             var shape = Shape.FromClrType(ExpressionPathHelper.ToPropertyType(expr));
-            return self.Include(elementId, DefaultComponent.Vendor, propertyName, DefaultComponent.ValueMember, shape);
+            return self.Include(elementId, DefaultComponent.Vendor, bodyField, DefaultComponent.ValueMember, shape);
         }
     }
 }

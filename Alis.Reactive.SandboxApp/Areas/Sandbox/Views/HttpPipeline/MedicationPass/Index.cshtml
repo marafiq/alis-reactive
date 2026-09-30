@@ -1,0 +1,41 @@
+@model MedicationPassModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Medication Pass";
+    var plan = Html.ReactivePlan<MedicationPassModel>();
+    var residents = (IReadOnlyDictionary<int, string>)ViewBag.Residents;
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Medication Pass</native-heading>
+    <native-text color="Secondary">
+        Tick each resident whose dose was given, then record the pass.
+    </native-text>
+
+    <native-card>
+    <native-card-body>
+        <form id="medication-pass-form" class="flex flex-col gap-3 mb-4">
+            @foreach (var resident in residents)
+            {
+                var residentId = resident.Key;
+                Html.InputField(plan, m => m.Administered[residentId], o => o.Label($"{resident.Value} (resident #{residentId})"))
+                    .NativeCheckBox(b => b.CssClass("h-4 w-4 rounded border-border text-accent"));
+            }
+        </form>
+        @(Html.NativeButton("record-medication-pass-btn", "Record Pass")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("Record", "MedicationPass"), g => g.IncludeAll())
+                 .Response(r => r.OnSuccess<MedicationPassConfirmation>((json, s) =>
+                 {
+                     s.Element("medication-pass-status").SetText(json, x => x.Confirmation);
+                 }));
+            }))
+        <p id="medication-pass-status" class="mt-3 text-sm text-text-muted">No pass recorded yet.</p>
+    </native-card-body>
+    </native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

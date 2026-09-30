@@ -81,9 +81,7 @@ namespace Alis.Reactive
                 if (renderedItem == null)
                     continue;
 
-                var renderedField = itemField.PrefixedBy(
-                    renderedItem.ItemPrefix,
-                    ClientRuleActivation.Always);
+                var renderedField = itemField.RenderedAt(renderedItem.ItemPrefix);
 
                 if (renderedItem.IsDirectField && renderedField.HasRules)
                     yield return renderedField;

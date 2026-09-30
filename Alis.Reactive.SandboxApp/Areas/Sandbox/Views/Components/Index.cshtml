@@ -81,6 +81,19 @@
             </p>
         </a>
 
+        <a asp-area="Sandbox" asp-controller="NativeCheckList" asp-action="DietPlan"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    Diet Plan
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                A checklist bound to a List&lt;string&gt; opens with the restrictions on file checked and saves them back
+            </p>
+        </a>
+
         <a asp-area="Sandbox" asp-controller="NativeDropDown" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
@@ -117,6 +130,19 @@
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
                 Invisible input that carries IDs and tokens — see it gathered into HTTP POST payloads alongside visible fields
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="NativeHiddenField" asp-action="CareLevelChange"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    Care Level Change
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                A server-decided yes/no flag carried in a hidden field ("False"/"True") reaches the server as the same answer
             </p>
         </a>
     </div>
@@ -870,6 +896,32 @@
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
                 Click to open a slide-out drawer panel, see partial HTML loaded into it via Into()
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="Drawer" asp-action="ShiftNote"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    Shift Notes
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                A confirm asked from inside the drawer: Escape backs out of the question and leaves the drawer open
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="Loader" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    Loader
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Refresh a census with a timed loader, then save a care plan: the loader stays up until the slower save answers
             </p>
         </a>
 

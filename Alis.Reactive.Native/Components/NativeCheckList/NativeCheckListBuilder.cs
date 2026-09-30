@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
 #if NET48
@@ -148,26 +150,15 @@ namespace Alis.Reactive.Native.Components
         /// <inheritdoc />
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
-            // Model binding can restore checkbox-list values as either string[] or CSV.
 #if NET48
             // System.Web.Mvc NameFor honors the active HtmlFieldPrefix; ExpressionHelper.GetExpressionText drops it.
             var rawValue = _html.ViewData.Eval(_html.NameFor(_expression).ToHtmlString());
 #else
             var rawValue = _html.ViewData.Eval(_html.NameFor(_expression));
 #endif
-            string modelValue;
-            HashSet<string> checkedValues;
-            if (rawValue is string[] selectedValues)
-            {
-                modelValue = string.Join(",", selectedValues);
-                checkedValues = new HashSet<string>(selectedValues);
-            }
-            else
-            {
-                modelValue = rawValue?.ToString() ?? "";
-                checkedValues = new HashSet<string>(
-                    modelValue.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
-            }
+            var selectedValues = SelectedValues(rawValue);
+            var modelValue = string.Join(",", selectedValues);
+            var checkedValues = new HashSet<string>(selectedValues);
 
             var encodedId = encoder.Encode(_elementId);
 
@@ -207,6 +198,19 @@ namespace Alis.Reactive.Native.Components
             // Inline initialization works on page load and partial injection without DOM scanning.
             // It keeps the container string[] value and hidden input CSV in sync.
             writer.Write($@"<script>(function(){{var c=document.getElementById(""{encodedId}"");var h=c.querySelector(""input[type=hidden]"");var init=h.value.split("","").filter(Boolean);c.value=init;c.isInteracted=false;c.addEventListener(""change"",function(e){{if(e.target.type!==""checkbox"")return;var v=[];var cbs=c.querySelectorAll(""input[type=checkbox]"");for(var i=0;i<cbs.length;i++)if(cbs[i].checked)v.push(cbs[i].value);c.value=v;h.value=v.join("","");c.isInteracted=true;}});}})();</script>");
+        }
+
+        // The property holds the checked values as a collection (string[], List<string>, ...) or, for a
+        // string property, as CSV text. Empty items check nothing, as the component's value drops them.
+        private static string[] SelectedValues(object? rawValue)
+        {
+            if (rawValue is IEnumerable values && rawValue is not string)
+                return values.Cast<object?>()
+                    .Select(value => FormattableString.Invariant($"{value}"))
+                    .Where(value => value.Length > 0)
+                    .ToArray();
+
+            return (rawValue?.ToString() ?? "").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 }

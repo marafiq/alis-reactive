@@ -1,0 +1,53 @@
+@model RespiteBookingModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Respite Booking";
+    var plan = Html.ReactivePlan<RespiteBookingModel>();
+    var communities = (List<SelectListItem>)ViewBag.Communities;
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Book a Respite Stay</native-heading>
+    <native-text color="Secondary">
+        Book a short stay for a resident. The community and daily rate are required;
+        leave the expected nights or transport unanswered while they are still open.
+    </native-text>
+
+    <native-card>
+    <native-card-body>
+        <form id="respite-booking-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident Name"))
+                .NativeTextBox(b => b.Placeholder("Full name")); }
+            @{ Html.InputField(plan, m => m.CommunityId, o => o.Required().Label("Community"))
+                .NativeDropDown(b => b
+                    .Items(communities)
+                    .Placeholder("-- Select community --")); }
+            @{ Html.InputField(plan, m => m.DailyRate, o => o.Required().Label("Daily Rate ($)"))
+                .NativeTextBox(b => b.Type("number").Placeholder("0.00")); }
+            @{ Html.InputField(plan, m => m.ExpectedNights, o => o.Label("Expected Nights"))
+                .NativeTextBox(b => b.Type("number").Placeholder("Leave blank if open-ended")); }
+            @{ Html.InputField(plan, m => m.NeedsTransport, o => o.Label("Community Transport"))
+                .NativeRadioGroup(b => b
+                    .Option("true", "Yes", "The community drives the resident in")
+                    .Option("false", "No", "The family brings the resident")); }
+        </form>
+        @(Html.NativeButton("book-respite-btn", "Book Stay")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("Book", "RespiteBooking"), g => g.IncludeAll())
+                 .Validate<RespiteBookingValidator>("respite-booking-form")
+                 .Response(r => r
+                    .OnSuccess<RespiteBookingConfirmation>((json, s) =>
+                    {
+                        s.Element("respite-booking-status").SetText(json, x => x.Confirmation);
+                    })
+                    .OnError(400, e => e.ValidationErrors("respite-booking-form")));
+            }))
+        <p id="respite-booking-status" class="mt-3 text-sm text-text-muted">No stay booked yet.</p>
+    </native-card-body>
+    </native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
