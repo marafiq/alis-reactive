@@ -1,0 +1,42 @@
+@model ShiftNoteModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    var plan = Html.ResolvePlan<ShiftNoteModel>();
+}
+
+<native-vstack gap="Base">
+    @Html.HiddenFieldFor(plan, m => m.ResidentId)
+    @{ Html.InputField(plan, m => m.Note, o => o.Label("Shift Note"))
+        .NativeTextArea(b => b.Rows(4).Placeholder("What happened this shift...")); }
+
+    <native-hstack gap="Sm" align="Center">
+        @(Html.NativeButton("save-shift-note-btn", "Save Note")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("SaveShiftNote", "Drawer"), g => g.IncludeAll())
+                 .Response(r => r.OnSuccess<ShiftNoteSaved>((json, s) =>
+                 {
+                     s.Element("shift-note-status").SetText(json, x => x.Confirmation);
+                 }));
+            }))
+        @(Html.NativeButton("discharge-resident-btn", "Discharge Resident")
+            .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Confirm("Discharge Margaret Hill from the community?")
+                 .Then(then =>
+                 {
+                     then.Post(Url.SandboxRoute("DischargeResident", "Drawer"), g => g.IncludeAll())
+                         .Response(r => r.OnSuccess<ResidentDischarged>((json, s) =>
+                         {
+                             s.Element("shift-note-status").SetText(json, x => x.Confirmation);
+                         }));
+                 });
+            }))
+    </native-hstack>
+    <p id="shift-note-status" class="text-sm text-text-muted"></p>
+</native-vstack>
+
+@Html.RenderPlan(plan)

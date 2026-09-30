@@ -1,0 +1,36 @@
+@model ShiftNotePageModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.AppLevel
+@{
+    ViewData["Title"] = "Shift Notes";
+    var plan = Html.ReactivePlan<ShiftNotePageModel>();
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Shift Notes</native-heading>
+    <native-text color="Secondary">
+        Open a resident to write a shift note or start a discharge.
+    </native-text>
+
+    <native-card><native-card-body>
+        <native-hstack justify="Between" align="Center">
+            <native-vstack gap="Sm">
+                <native-heading level="H2">Margaret Hill</native-heading>
+                <native-text color="Secondary">Room 214, Assisted Living</native-text>
+            </native-vstack>
+            @(Html.NativeButton("open-margaret-hill-btn", "Open Resident")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Element("alis-drawer-title").SetText("Margaret Hill");
+                    p.Component<NativeDrawer>().SetSize(DrawerSize.Md);
+                    p.Get(Url.SandboxRoute("ShiftNoteForm", "Drawer"))
+                     .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
+                    p.Component<NativeDrawer>().Open();
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

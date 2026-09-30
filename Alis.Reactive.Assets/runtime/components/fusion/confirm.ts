@@ -71,6 +71,12 @@ function showConfirmDialog(
   });
 }
 
+// The confirm is modal: an Escape pressed in it is its own and never reaches the page beneath, where
+// an open drawer would close on it too. The dialog still closes on it, unless another popup is open.
+function keepEscapeInConfirm(event: KeyboardEvent): void {
+  if (event.key === "Escape") event.stopPropagation();
+}
+
 export function init(): void {
   // App-level singleton rendered by @Html.FusionConfirmDialog() in Layout.
   // Not a plan component — getElementById is correct.
@@ -91,6 +97,7 @@ export function init(): void {
     target: document.body,
   });
   dialog.appendTo(dialogHostElement);
+  dialogHostElement.addEventListener("keydown", keepEscapeInConfirm);
 
   hostWindow.alis = hostWindow.alis || {};
   hostWindow.alis.confirm = function (message: string): Promise<boolean> {
