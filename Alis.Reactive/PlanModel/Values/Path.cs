@@ -249,24 +249,6 @@ namespace Alis.Reactive.PlanModel
             return true;
         }
 
-        internal bool Overlaps(Path other)
-        {
-            if (other == null) throw new ArgumentNullException(nameof(other));
-            return IsPrefixOf(other) || other.IsPrefixOf(this);
-        }
-
-        private bool IsPrefixOf(Path other)
-        {
-            if (Segments.Count > other.Segments.Count) return false;
-
-            for (var segmentIndex = 0; segmentIndex < Segments.Count; segmentIndex++)
-            {
-                if (!Segments[segmentIndex].Equals(other.Segments[segmentIndex])) return false;
-            }
-
-            return true;
-        }
-
         public override bool Equals(object? obj) => Equals(obj as Path);
 
         public override int GetHashCode()
