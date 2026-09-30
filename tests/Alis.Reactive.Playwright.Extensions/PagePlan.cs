@@ -79,6 +79,9 @@ public sealed class PagePlan<TModel> where TModel : class
     public NativeRadioGroupLocator NativeRadioGroup(Expression<Func<TModel, object?>> expr)
         => new NativeRadioGroupLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 
+    public NativeCheckBoxLocator NativeCheckBox(Expression<Func<TModel, object?>> expr)
+        => new NativeCheckBoxLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
+
     public DatePickerLocator DatePicker(Expression<Func<TModel, object?>> expr)
         => new DatePickerLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 

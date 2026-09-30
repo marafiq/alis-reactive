@@ -11,11 +11,12 @@ import type {
 export class ValidationSubject {
   private constructor(
     readonly raw: unknown,
+    private readonly fieldShape: Shape,
     private readonly textConversion: ShapeConversionResult<string>,
   ) {}
 
-  static from(raw: unknown): ValidationSubject {
-    return new ValidationSubject(raw, toString(raw));
+  static from(raw: unknown, fieldShape: Shape): ValidationSubject {
+    return new ValidationSubject(raw, fieldShape, toString(raw));
   }
 
   get text(): string {
@@ -25,11 +26,12 @@ export class ValidationSubject {
 
   get isEmpty(): boolean {
     const valueIsMissing = isMissingValidationValue(this.raw);
-    const valueIsFalse = this.raw === false;
+    // A plain bool's false is its default, which the server's NotEmpty counts as empty; a bool? false is an answer.
+    const valueIsPlainBooleanDefault = this.raw === false && this.fieldShape.kind === "boolean";
     const valueIsEmptyString = this.text === "";
     const valueIsEmptyArray = isEmptyValidationCollection(this.raw);
     const valueCannotBeConvertedToText = !this.textConversion.ok;
-    return valueIsMissing || valueIsFalse || valueIsEmptyString || valueCannotBeConvertedToText || valueIsEmptyArray;
+    return valueIsMissing || valueIsPlainBooleanDefault || valueIsEmptyString || valueCannotBeConvertedToText || valueIsEmptyArray;
   }
 
   get length(): number {

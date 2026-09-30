@@ -1,0 +1,44 @@
+@model FallRiskScreeningModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Fall Risk Screening";
+    var plan = Html.ReactivePlan<FallRiskScreeningModel>();
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Fall Risk Screening</native-heading>
+    <native-text color="Secondary">
+        Helen Park, Room 214. Answer the fall history question and confirm you watched the
+        resident walk before saving the screening.
+    </native-text>
+
+    <native-card>
+    <native-card-body>
+        <form id="fall-risk-form" class="grid grid-cols-1 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.FellInLast90Days, o => o.Required().Label("Has the resident fallen in the last 90 days?"))
+                .NativeRadioGroup(b => b
+                    .Option("true", "Yes", "Record the fall details in the incident log")
+                    .Option("false", "No", "No falls reported by staff or family")); }
+            @{ Html.InputField(plan, m => m.ObservedWalkingInPerson, o => o.Required().Label("I observed the resident walking in person"))
+                .NativeCheckBox(b => b.CssClass("h-4 w-4 rounded border-border text-accent")); }
+        </form>
+        @(Html.NativeButton("save-screening-btn", "Save Screening")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("Save", "FallRiskScreening"), g => g.IncludeAll())
+                 .Validate<FallRiskScreeningValidator>("fall-risk-form")
+                 .Response(r => r
+                    .OnSuccess<FallRiskScreeningConfirmation>((json, s) =>
+                    {
+                        s.Element("fall-risk-status").SetText(json, x => x.Confirmation);
+                    })
+                    .OnError(400, e => e.ValidationErrors("fall-risk-form")));
+            }))
+        <p id="fall-risk-status" class="mt-3 text-sm text-text-muted">Not screened yet.</p>
+    </native-card-body>
+    </native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
