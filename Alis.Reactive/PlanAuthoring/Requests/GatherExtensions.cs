@@ -27,9 +27,9 @@ namespace Alis.Reactive.Builders.Requests
         {
             var component = new TComponent();
             var elementId = IdGenerator.For<TModel, object>(expr);
-            var propertyName = ExpressionPathHelper.ToPropertyName<TModel, object>(expr);
+            var bodyField = ExpressionPathHelper.ToMemberBindingPath(expr);
             var shape = Shape.FromClrType(ExpressionPathHelper.ToPropertyType(expr));
-            self.Include(elementId, component.Vendor, propertyName, component.ValueMember, shape);
+            self.Include(elementId, component.Vendor, bodyField, component.ValueMember, shape);
             return self;
         }
 

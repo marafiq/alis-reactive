@@ -132,14 +132,19 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly Path _path;
 
-        private BindingPath(string value) : base(value, nameof(value))
+        private BindingPath(string value, Path path) : base(value, nameof(value))
         {
-            _path = Path.Parse(value);
+            _path = path ?? throw new ArgumentNullException(nameof(path));
         }
 
         public Path Path => _path;
 
-        internal static BindingPath Of(string value) => new BindingPath(value);
+        // A developer-authored field name: its body path is read from the text.
+        internal static BindingPath Of(string value) => new BindingPath(value, Path.Parse(value));
+
+        // A model member's field: the MVC name text, and the body path read from the member's types.
+        // Equality stays the name alone: one MVC name is one field.
+        internal static BindingPath ForMember(string mvcName, Path bodyPath) => new BindingPath(mvcName, bodyPath);
     }
 
     internal sealed class MemberName : PlanString

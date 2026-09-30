@@ -204,6 +204,13 @@ namespace Alis.Reactive.PlanModel
             return new Path(list);
         }
 
+        internal Path Append(Path tail)
+        {
+            var list = new List<PathSegment>(Segments);
+            list.AddRange(tail.Segments);
+            return new Path(list);
+        }
+
         internal static Path Parse(string dotPath)
         {
             if (string.IsNullOrEmpty(dotPath)) return None;

@@ -1,0 +1,49 @@
+@model MedicationOrderModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Medication Order";
+    var plan = Html.ReactivePlan<MedicationOrderModel>();
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Medication Refill Order</native-heading>
+    <native-text color="Secondary">
+        Order refills for a resident, one medication per line. Saving sends every line to the pharmacy.
+    </native-text>
+
+    <native-card>
+    <native-card-body>
+        <form id="medication-order-form" class="mb-4">
+            <div class="mb-4">
+                @{ Html.InputField(plan, m => m.ResidentName, o => o.Label("Resident"))
+                    .NativeTextBox(b => b.Placeholder("Full name")); }
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                @for (var i = 0; i < Model.Lines.Count; i++)
+                {
+                    var lineIndex = i;
+                    var lineNumber = i + 1;
+                    Html.InputField(plan, m => m.Lines[lineIndex].Sku, o => o.Label($"Medication {lineNumber} SKU"))
+                        .NativeTextBox(b => b.Placeholder("e.g. RX-100"));
+                    Html.InputField(plan, m => m.Lines[lineIndex].Quantity, o => o.Label($"Medication {lineNumber} Quantity"))
+                        .NativeTextBox(b => b.Type("number"));
+                }
+            </div>
+        </form>
+        @(Html.NativeButton("save-medication-order-btn", "Save Order")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("Save", "MedicationOrder"), g => g.IncludeAll())
+                 .Response(r => r.OnSuccess<MedicationOrderConfirmation>((json, s) =>
+                 {
+                     s.Element("medication-order-status").SetText(json, x => x.Confirmation);
+                 }));
+            }))
+        <p id="medication-order-status" class="mt-3 text-sm text-text-muted">No order saved yet.</p>
+    </native-card-body>
+    </native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
