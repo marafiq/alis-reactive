@@ -50,8 +50,7 @@ namespace Alis.Reactive.Validation
         {
             EnsureField(collection);
             foreach (var itemField in itemFields)
-                _fields[collection.Path.Value].AddItemField(
-                    itemField.PrefixedBy(ValidationFieldPath.Empty, activation));
+                _fields[collection.Path.Value].AddItemField(itemField.ScopedBy(activation));
         }
 
         internal void AddRulesFrom(
