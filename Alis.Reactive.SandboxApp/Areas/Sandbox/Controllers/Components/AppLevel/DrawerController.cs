@@ -5,7 +5,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.AppLevel
 {
     [Area("Sandbox")]
     [Route("Sandbox/Components/Drawer")]
-    public class DrawerController : Controller
+    public partial class DrawerController : Controller
     {
         [HttpGet("")]
         public IActionResult Index()
