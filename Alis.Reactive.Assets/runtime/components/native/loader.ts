@@ -3,6 +3,10 @@
 // calls still target the app-level component through native set reactions.
 export {};
 
+// The auto-hide of the Show in progress. A Hide cancels it and a later Show restarts it, so a
+// timeout never outlives the Hide of the request that set it.
+let pendingAutoHide: ReturnType<typeof setTimeout> | undefined;
+
 function handleVisible(loader: HTMLElement): void {
   const targetId = loader.dataset.target;
   if (targetId) {
@@ -13,11 +17,12 @@ function handleVisible(loader: HTMLElement): void {
     }
   }
 
+  clearTimeout(pendingAutoHide);
   const timeout = loader.dataset.timeout;
   if (timeout) {
     const ms = parseInt(timeout, 10);
     if (ms > 0) {
-      setTimeout(() => {
+      pendingAutoHide = setTimeout(() => {
         loader.classList.remove("alis-loader--visible");
         loader.setAttribute("aria-hidden", "true");
       }, ms);
@@ -26,6 +31,7 @@ function handleVisible(loader: HTMLElement): void {
 }
 
 function handleHidden(loader: HTMLElement): void {
+  clearTimeout(pendingAutoHide);
   if (loader.parentElement !== document.body) {
     document.body.appendChild(loader);
   }
