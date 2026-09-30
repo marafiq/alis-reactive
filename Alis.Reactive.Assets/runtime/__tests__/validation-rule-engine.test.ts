@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { ruleFails } from "../validation/rule-engine";
 import type {
   LengthValidationRule,
+  LiteralEqualityValidationRule,
   LiteralExpression,
   NoOperandValidationRule,
   NumericLiteralExpression,
@@ -18,6 +19,10 @@ const stringShape: Shape = { kind: "string" };
 const numberShape: Shape = { kind: "number" };
 const dateShape: Shape = { kind: "date" };
 const noneShape: Shape = { kind: "none" };
+const booleanShape: Shape = { kind: "boolean" };
+const nullableBooleanShape: Shape = { kind: "nullable", inner: booleanShape };
+const stringArrayShape: Shape = { kind: "array", item: stringShape };
+const anyShape: Shape = { kind: "any" };
 
 function literal(value: string | number | boolean | null, shape: Shape = stringShape): LiteralExpression {
   return { kind: "literal", value, shape };
@@ -106,6 +111,22 @@ function orderedRule(
   };
 }
 
+function literalEqualityRule(
+  name: LiteralEqualityValidationRule["name"],
+  value: boolean,
+): LiteralEqualityValidationRule {
+  return {
+    name,
+    message: `${name} failed`,
+    execution: {
+      kind: "constraint",
+      value: literal(value, booleanShape),
+      activation: { kind: "always" },
+      comparisonShape: booleanShape,
+    },
+  };
+}
+
 function peerEqualityRule(name: PeerEqualityValidationRule["name"]): PeerEqualityValidationRule {
   return {
     name,
@@ -133,62 +154,85 @@ function peerOrderedRule(name: PeerOrderedComparisonValidationRule["name"]): Pee
 }
 
 describe("validation rule engine", () => {
-  it("treats missing, false, empty text, and empty arrays as empty validation subjects", () => {
+  it("treats missing values, empty text, and empty arrays as empty validation subjects", () => {
     const required = noOperandRule("required");
 
-    expect(ruleFails({ rule: required, value: undefined })).toBe(true);
-    expect(ruleFails({ rule: required, value: false })).toBe(true);
-    expect(ruleFails({ rule: required, value: "" })).toBe(true);
-    expect(ruleFails({ rule: required, value: [] })).toBe(true);
-    expect(ruleFails({ rule: required, value: "Ada" })).toBe(false);
+    expect(ruleFails({ rule: required, value: undefined, fieldShape: stringShape })).toBe(true);
+    expect(ruleFails({ rule: required, value: "", fieldShape: stringShape })).toBe(true);
+    expect(ruleFails({ rule: required, value: [], fieldShape: stringArrayShape })).toBe(true);
+    expect(ruleFails({ rule: required, value: "Ada", fieldShape: stringShape })).toBe(false);
+  });
+
+  it("treats false as empty only for a plain boolean field, as the server's NotEmpty does", () => {
+    const required = noOperandRule("required");
+
+    expect(ruleFails({ rule: required, value: false, fieldShape: booleanShape })).toBe(true);
+    expect(ruleFails({ rule: required, value: true, fieldShape: booleanShape })).toBe(false);
+    expect(ruleFails({ rule: required, value: false, fieldShape: nullableBooleanShape })).toBe(false);
+    expect(ruleFails({ rule: required, value: null, fieldShape: nullableBooleanShape })).toBe(true);
+    expect(ruleFails({ rule: required, value: false, fieldShape: anyShape })).toBe(false);
+  });
+
+  it("treats a nullable boolean's false as a value the empty rule rejects, as the server's Empty does", () => {
+    const empty = noOperandRule("empty");
+
+    expect(ruleFails({ rule: empty, value: false, fieldShape: nullableBooleanShape })).toBe(true);
+    expect(ruleFails({ rule: empty, value: null, fieldShape: nullableBooleanShape })).toBe(false);
+    expect(ruleFails({ rule: empty, value: false, fieldShape: booleanShape })).toBe(false);
+  });
+
+  it("treats a nullable boolean's false as a value for atLeastOne, equalTo and notEqual, as the server does", () => {
+    expect(ruleFails({ rule: noOperandRule("atLeastOne"), value: false, fieldShape: nullableBooleanShape })).toBe(false);
+    expect(ruleFails({ rule: literalEqualityRule("equalTo", true), value: false, fieldShape: nullableBooleanShape })).toBe(true);
+    expect(ruleFails({ rule: literalEqualityRule("notEqual", false), value: false, fieldShape: nullableBooleanShape })).toBe(true);
   });
 
   it("uses peer values as the target for equalTo and notEqualTo rules", () => {
     const equalToPeer = peerEqualityRule("equalTo");
     const notEqualToPeer = peerEqualityRule("notEqualTo");
 
-    expect(ruleFails({ rule: equalToPeer, value: "West", peerValue: "West" })).toBe(false);
-    expect(ruleFails({ rule: equalToPeer, value: "West", peerValue: "East" })).toBe(true);
-    expect(ruleFails({ rule: equalToPeer, value: "West", peerValue: undefined })).toBe(true);
+    expect(ruleFails({ rule: equalToPeer, value: "West", peerValue: "West", fieldShape: stringShape })).toBe(false);
+    expect(ruleFails({ rule: equalToPeer, value: "West", peerValue: "East", fieldShape: stringShape })).toBe(true);
+    expect(ruleFails({ rule: equalToPeer, value: "West", peerValue: undefined, fieldShape: stringShape })).toBe(true);
 
-    expect(ruleFails({ rule: notEqualToPeer, value: "West", peerValue: "East" })).toBe(false);
-    expect(ruleFails({ rule: notEqualToPeer, value: "West", peerValue: "West" })).toBe(true);
+    expect(ruleFails({ rule: notEqualToPeer, value: "West", peerValue: "East", fieldShape: stringShape })).toBe(false);
+    expect(ruleFails({ rule: notEqualToPeer, value: "West", peerValue: "West", fieldShape: stringShape })).toBe(true);
   });
 
   it("compares inclusive and exclusive ranges through the declared rule shape", () => {
     const inclusiveRange = rangeRule("range", [5, 10], numberShape);
     const exclusiveRange = rangeRule("exclusiveRange", [5, 10], numberShape);
 
-    expect(ruleFails({ rule: inclusiveRange, value: "5" })).toBe(false);
-    expect(ruleFails({ rule: inclusiveRange, value: "11" })).toBe(true);
+    expect(ruleFails({ rule: inclusiveRange, value: "5", fieldShape: numberShape })).toBe(false);
+    expect(ruleFails({ rule: inclusiveRange, value: "11", fieldShape: numberShape })).toBe(true);
 
-    expect(ruleFails({ rule: exclusiveRange, value: "5" })).toBe(true);
-    expect(ruleFails({ rule: exclusiveRange, value: "6" })).toBe(false);
+    expect(ruleFails({ rule: exclusiveRange, value: "5", fieldShape: numberShape })).toBe(true);
+    expect(ruleFails({ rule: exclusiveRange, value: "6", fieldShape: numberShape })).toBe(false);
   });
 
   it("evaluates length constraints from the expected length perspective", () => {
     const minLength = lengthRule("minLength", 8);
     const maxLength = lengthRule("maxLength", 8);
 
-    expect(ruleFails({ rule: minLength, value: "abc" })).toBe(true);
-    expect(ruleFails({ rule: minLength, value: "securepass" })).toBe(false);
-    expect(ruleFails({ rule: maxLength, value: "securepass" })).toBe(true);
-    expect(ruleFails({ rule: maxLength, value: "abc" })).toBe(false);
+    expect(ruleFails({ rule: minLength, value: "abc", fieldShape: stringShape })).toBe(true);
+    expect(ruleFails({ rule: minLength, value: "securepass", fieldShape: stringShape })).toBe(false);
+    expect(ruleFails({ rule: maxLength, value: "securepass", fieldShape: stringShape })).toBe(true);
+    expect(ruleFails({ rule: maxLength, value: "abc", fieldShape: stringShape })).toBe(false);
   });
 
   it("orders date values only after the declared shape produces comparable values", () => {
     const minDate = orderedRule("min", "2026-01-01", dateShape, dateShape);
 
-    expect(ruleFails({ rule: minDate, value: "2026-01-01" })).toBe(false);
-    expect(ruleFails({ rule: minDate, value: "2025-12-31" })).toBe(true);
-    expect(ruleFails({ rule: minDate, value: "not-a-date" })).toBe(true);
+    expect(ruleFails({ rule: minDate, value: "2026-01-01", fieldShape: dateShape })).toBe(false);
+    expect(ruleFails({ rule: minDate, value: "2025-12-31", fieldShape: dateShape })).toBe(true);
+    expect(ruleFails({ rule: minDate, value: "not-a-date", fieldShape: dateShape })).toBe(true);
   });
 
   it("uses peer values as the target for ordered comparison rules", () => {
     const greaterThanPeer = peerOrderedRule("gt");
 
-    expect(ruleFails({ rule: greaterThanPeer, value: "2026-01-02", peerValue: "2026-01-01" })).toBe(false);
-    expect(ruleFails({ rule: greaterThanPeer, value: "2026-01-01", peerValue: "2026-01-01" })).toBe(true);
-    expect(ruleFails({ rule: greaterThanPeer, value: "2025-12-31", peerValue: "2026-01-01" })).toBe(true);
+    expect(ruleFails({ rule: greaterThanPeer, value: "2026-01-02", peerValue: "2026-01-01", fieldShape: dateShape })).toBe(false);
+    expect(ruleFails({ rule: greaterThanPeer, value: "2026-01-01", peerValue: "2026-01-01", fieldShape: dateShape })).toBe(true);
+    expect(ruleFails({ rule: greaterThanPeer, value: "2025-12-31", peerValue: "2026-01-01", fieldShape: dateShape })).toBe(true);
   });
 });

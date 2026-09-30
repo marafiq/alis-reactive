@@ -39,11 +39,11 @@ type OrderedRuleEvaluation =
   | { readonly rule: PeerOrderedComparisonValidationRule; readonly value: unknown; readonly peerValue: unknown };
 
 export type RuleEvaluation =
-  | { readonly rule: NonPeerValidationRule; readonly value: unknown }
-  | { readonly rule: PeerTargetValidationRule; readonly value: unknown; readonly peerValue: unknown };
+  | { readonly rule: NonPeerValidationRule; readonly value: unknown; readonly fieldShape: Shape }
+  | { readonly rule: PeerTargetValidationRule; readonly value: unknown; readonly fieldShape: Shape; readonly peerValue: unknown };
 
 export function ruleFails(evaluation: RuleEvaluation): boolean {
-  const subject = ValidationSubject.from(evaluation.value);
+  const subject = ValidationSubject.from(evaluation.value, evaluation.fieldShape);
   if ("peerValue" in evaluation) return peerTargetRuleFails(evaluation, subject);
 
   return fieldRuleFails(evaluation, subject);

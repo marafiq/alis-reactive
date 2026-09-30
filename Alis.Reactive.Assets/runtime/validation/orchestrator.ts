@@ -326,7 +326,7 @@ function evaluateRulesForField(
   for (const rule of field.componentValidation.rules) {
     if (!isRuleActive(rule.execution.activation, surface)) continue;
 
-    if (failsRule(rule, field.value, surface.planDocument)) {
+    if (failsRule(rule, field, surface.planDocument)) {
       reportRuleFailure(field, rule, surface);
       return false;
     }
@@ -387,18 +387,21 @@ function isRuleInactiveWhenFieldIsUnmounted(
 
 function failsRule(
   rule: ValidationRule,
-  value: unknown,
+  field: FieldEvaluation,
   planDocument: PlanDocument,
 ): boolean {
+  const { value } = field;
+  const fieldShape = field.componentValidation.value.shape;
   if (hasPeerTarget(rule)) {
     return ruleFails({
       rule,
       value,
+      fieldShape,
       peerValue: evaluateValue(rule.execution.value, planDocument),
     });
   }
 
-  return ruleFails({ rule, value });
+  return ruleFails({ rule, value, fieldShape });
 }
 
 type PeerTargetValidationRule = PeerEqualityValidationRule | PeerOrderedComparisonValidationRule;
