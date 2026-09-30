@@ -246,13 +246,13 @@ namespace Alis.Reactive.Builders.Requests
             var registration = _context.RequireRegistrationById(componentId, valueRead);
             var valueContract = registration.RequireValueContract(
                 valueRead.ValueMember);
-            return Include(componentId, vendor, propertyName, valueContract);
+            return Include(componentId, vendor, BindingPath.Of(propertyName), valueContract);
         }
 
         internal GatherBuilder<TModel> Include(
             string componentId,
             string vendor,
-            string propertyName,
+            BindingPath bodyField,
             string valueMember,
             Shape shape)
         {
@@ -260,19 +260,18 @@ namespace Alis.Reactive.Builders.Requests
             return Include(
                 componentId,
                 vendor,
-                propertyName,
+                bodyField,
                 InputValueContract.For(valueMember, shape));
         }
 
         private GatherBuilder<TModel> Include(
             string componentId,
             string vendor,
-            string propertyName,
+            BindingPath bodyField,
             InputValueContract valueContract)
         {
             if (valueContract == null) throw new System.ArgumentNullException(nameof(valueContract));
             var componentIdentity = RegisteredComponentIdentity.For(componentId, vendor);
-            var planBindingPath = BindingPath.Of(propertyName);
             var componentValue = ValueExpression.Read(
                 ComponentSource.Of(componentIdentity.ComponentId.Value),
                 valueContract.ValueMember,
@@ -280,10 +279,10 @@ namespace Alis.Reactive.Builders.Requests
             var planBinding = InputComponentPlanBinding.For(
                 componentIdentity.ComponentId,
                 componentIdentity.Vendor,
-                planBindingPath,
+                bodyField,
                 valueContract);
             _context.DeclareInputComponent(planBinding);
-            _draft.AddAssignment(RequestInputAssignment.Payload(planBindingPath, componentValue));
+            _draft.AddAssignment(RequestInputAssignment.Payload(bodyField, componentValue));
             return this;
         }
 

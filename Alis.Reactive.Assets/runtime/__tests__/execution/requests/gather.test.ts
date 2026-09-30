@@ -76,8 +76,16 @@ function pathSegment(part: string): PathSegment {
   return { kind: "property", name: part };
 }
 
+function indexSegment(position: number): PathSegment {
+  return { kind: "index", index: position };
+}
+
 function assignment(name: string, source: ValueExpression): RequestInputAssignment {
   return { target: target(name), source };
+}
+
+function assignmentAt(name: string, path: StructuredPath, source: ValueExpression): RequestInputAssignment {
+  return { target: { kind: "payload", name, path }, source };
 }
 
 function header(name: string, source: ValueExpression): RequestInputAssignment {
@@ -137,6 +145,26 @@ describe("resolveRequestInput", () => {
       },
       tags: ["fall-risk", "new"],
       nickname: null,
+    });
+  });
+
+  it("emits indexed body fields as JSON arrays, the shape a [FromBody] collection binds", () => {
+    const input = gatherInput([
+      assignmentAt("Lines[0].Sku", [pathSegment("Lines"), indexSegment(0), pathSegment("Sku")], literal("RX-100", stringShape)),
+      assignmentAt("Lines[0].Quantity", [pathSegment("Lines"), indexSegment(0), pathSegment("Quantity")], literal(2, rawShape)),
+      assignmentAt("Lines[1].Sku", [pathSegment("Lines"), indexSegment(1), pathSegment("Sku")], literal("RX-200", stringShape)),
+      assignmentAt(
+        "Lines[1].Deliveries[0].Room",
+        [pathSegment("Lines"), indexSegment(1), pathSegment("Deliveries"), indexSegment(0), pathSegment("Room")],
+        literal("B-12", stringShape),
+      ),
+    ]);
+
+    expect(resolveBody(input)).toEqual({
+      Lines: [
+        { Sku: "RX-100", Quantity: 2 },
+        { Sku: "RX-200", Deliveries: [{ Room: "B-12" }] },
+      ],
     });
   });
 

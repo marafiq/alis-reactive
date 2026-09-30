@@ -227,26 +227,36 @@ function jsonArrayBodyValue(items: unknown[], itemShape: RuntimeShape): unknown[
   return items.map(item => itemShape.formatForWire(item));
 }
 
+// A JSON body node is an object or an array holding the next segment of a body path.
+type JsonBodyNode = { [key: string]: unknown; [key: number]: unknown };
+
 function assignJsonBodyValue(
   body: Record<string, unknown>,
   target: RequestPayloadTarget,
   value: unknown,
 ): void {
   const segments = target.path.map(bodySegment);
-  let parent = body;
-  for (const segment of segments.slice(0, -1)) {
-    const existingChild = parent[segment];
-    const nestedObject = plainObjectRecordFrom(existingChild);
-    if (nestedObject !== undefined) {
-      parent = nestedObject;
-      continue;
-    }
-
-    parent[segment] = {};
-    parent = parent[segment] as Record<string, unknown>;
+  let parent: JsonBodyNode = body;
+  for (let position = 0; position < segments.length - 1; position++) {
+    parent = childNode(parent, segments[position]!, segments[position + 1]!);
   }
 
   parent[segments[segments.length - 1]!] = value;
+}
+
+// The next segment decides the node: an index (Lines[0] addresses a collection item) needs an
+// array, a name needs a plain object. A matching node already at the segment is reused; anything
+// else there is replaced.
+function childNode(parent: JsonBodyNode, segment: string | number, nextSegment: string | number): JsonBodyNode {
+  const existingChild = parent[segment];
+  const nextSegmentIsIndex = typeof nextSegment === "number";
+  const existingArrayHoldsIndex = nextSegmentIsIndex && Array.isArray(existingChild);
+  const existingObjectHoldsName = !nextSegmentIsIndex && plainObjectRecordFrom(existingChild) !== undefined;
+  if (existingArrayHoldsIndex || existingObjectHoldsName) return existingChild as JsonBodyNode;
+
+  const child: unknown = nextSegmentIsIndex ? [] : {};
+  parent[segment] = child;
+  return child as JsonBodyNode;
 }
 
 function bodySegment(segment: PathSegment): string | number {
