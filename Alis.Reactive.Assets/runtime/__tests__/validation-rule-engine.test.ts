@@ -95,7 +95,7 @@ function rangeRule(
 
 function orderedRule(
   name: OrderedComparisonValidationRule["name"],
-  value: string | number,
+  value: string | number | boolean,
   valueShape: Shape,
   comparisonShape: Shape,
 ): OrderedComparisonValidationRule {
@@ -107,6 +107,19 @@ function orderedRule(
       value: literal(value, valueShape),
       activation: { kind: "always" },
       comparisonShape,
+    },
+  };
+}
+
+function booleanRangeRule(name: RangeValidationRule["name"]): RangeValidationRule {
+  return {
+    name,
+    message: `${name} failed`,
+    execution: {
+      kind: "constraint",
+      value: { kind: "literal", value: [false, true], shape: { kind: "array", item: booleanShape } },
+      activation: { kind: "always" },
+      comparisonShape: booleanShape,
     },
   };
 }
@@ -136,6 +149,22 @@ function peerEqualityRule(name: PeerEqualityValidationRule["name"]): PeerEqualit
       value: componentValue("confirmPassword", stringShape),
       activation: { kind: "always" },
       comparisonShape: stringShape,
+    },
+  };
+}
+
+function booleanPeerRule(
+  name: PeerOrderedComparisonValidationRule["name"],
+  comparisonShape: Shape,
+): PeerOrderedComparisonValidationRule {
+  return {
+    name,
+    message: `${name} failed`,
+    execution: {
+      kind: "peer",
+      value: componentValue("dischargeApproved", comparisonShape),
+      activation: { kind: "always" },
+      comparisonShape,
     },
   };
 }
@@ -218,6 +247,24 @@ describe("validation rule engine", () => {
     expect(ruleFails({ rule: minLength, value: "securepass", fieldShape: stringShape })).toBe(false);
     expect(ruleFails({ rule: maxLength, value: "securepass", fieldShape: stringShape })).toBe(true);
     expect(ruleFails({ rule: maxLength, value: "abc", fieldShape: stringShape })).toBe(false);
+  });
+
+  it("orders booleans false before true in ordered, range and peer rules, as the server does", () => {
+    expect(ruleFails({ rule: orderedRule("min", true, booleanShape, booleanShape), value: true, fieldShape: booleanShape })).toBe(false);
+    expect(ruleFails({ rule: orderedRule("max", false, booleanShape, booleanShape), value: true, fieldShape: booleanShape })).toBe(true);
+    expect(ruleFails({ rule: orderedRule("gt", false, booleanShape, booleanShape), value: true, fieldShape: booleanShape })).toBe(false);
+    expect(ruleFails({ rule: orderedRule("lt", true, booleanShape, booleanShape), value: true, fieldShape: booleanShape })).toBe(true);
+    expect(ruleFails({ rule: booleanRangeRule("range"), value: true, fieldShape: booleanShape })).toBe(false);
+    expect(ruleFails({ rule: booleanRangeRule("exclusiveRange"), value: true, fieldShape: booleanShape })).toBe(true);
+
+    const atMostApproved = booleanPeerRule("max", booleanShape);
+    expect(ruleFails({ rule: atMostApproved, value: true, peerValue: false, fieldShape: booleanShape })).toBe(true);
+    expect(ruleFails({ rule: atMostApproved, value: true, peerValue: true, fieldShape: booleanShape })).toBe(false);
+
+    const moreThanApproved = booleanPeerRule("gt", nullableBooleanShape);
+    expect(ruleFails({ rule: moreThanApproved, value: true, peerValue: false, fieldShape: nullableBooleanShape })).toBe(false);
+    expect(ruleFails({ rule: moreThanApproved, value: false, peerValue: true, fieldShape: nullableBooleanShape })).toBe(true);
+    expect(ruleFails({ rule: moreThanApproved, value: true, peerValue: null, fieldShape: nullableBooleanShape })).toBe(true);
   });
 
   it("orders date values only after the declared shape produces comparable values", () => {

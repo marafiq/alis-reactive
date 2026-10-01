@@ -234,7 +234,7 @@ export function toPlainObject(value: unknown): ShapeConversionResult<Record<stri
   return err(`toObject: received ${typeof value} — expected object`);
 }
 
-function booleanAsNumber(value: boolean): number {
+export function booleanAsNumber(value: boolean): number {
   if (value) return 1;
   return 0;
 }

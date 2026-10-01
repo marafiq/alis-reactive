@@ -1,4 +1,4 @@
-import { toString } from "../shared/shape-convert";
+import { booleanAsNumber, toString } from "../shared/shape-convert";
 import type { ShapeConversionResult } from "../shared/shape-convert";
 import { RuntimeShape } from "../browser-objects/runtime-shape";
 import type {
@@ -134,6 +134,8 @@ export class ShapedComparison {
 function comparableValidationNumber(raw: unknown, shape: RuntimeShape): number | undefined {
   const converted = shape.convert(raw);
   if (!converted.ok) return undefined;
+  // The server orders booleans false before true, as .NET's Comparer<bool> does.
+  if (typeof converted.value === "boolean") return booleanAsNumber(converted.value);
   if (typeof converted.value !== "number") return undefined;
   if (!Number.isFinite(converted.value)) return undefined;
 
