@@ -1,0 +1,67 @@
+@model RoomHoldModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Room Holds";
+    var plan = Html.ReactivePlan<RoomHoldModel>();
+    const string ChooseButton = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Hold a Room</native-heading>
+    <native-text color="Secondary">
+        Maple Grove, second floor. Hold a room for a family touring the community this week.
+    </native-text>
+
+    <native-card><native-card-body>
+        <native-hstack gap="Base">
+            <native-vstack gap="Sm">
+                <native-heading level="H2">Maple 214</native-heading>
+                <native-text color="Secondary">Studio, garden view</native-text>
+                @(Html.NativeButton("choose-maple-214-btn", "Choose Maple 214")
+                    .CssClass(ChooseButton)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<NativeHiddenField>(m => m.RoomCode).SetValue("Maple 214");
+                        p.Element("selected-room").SetText("Maple 214");
+                    }))
+            </native-vstack>
+            <native-vstack gap="Sm">
+                <native-heading level="H2">Maple 216</native-heading>
+                <native-text color="Secondary">One bedroom, courtyard view</native-text>
+                @(Html.NativeButton("choose-maple-216-btn", "Choose Maple 216")
+                    .CssClass(ChooseButton)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<NativeHiddenField>(m => m.RoomCode).SetValue("Maple 216");
+                        p.Element("selected-room").SetText("Maple 216");
+                    }))
+            </native-vstack>
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <form id="room-hold-form" class="flex flex-col gap-4">
+            <p class="text-sm text-text-secondary">Room: <span id="selected-room" class="font-medium">Maple 214</span></p>
+            @Html.HiddenFieldFor(plan, m => m.RoomCode)
+            @{ Html.InputField(plan, m => m.ProspectName, o => o.Required().Label("Prospective resident"))
+                .NativeTextBox(b => b.Placeholder("Full name")); }
+        </form>
+        @(Html.NativeButton("place-hold-btn", "Place Hold")
+            .CssClass("mt-4 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("Hold", "RoomHold"), g => g.IncludeAll())
+                 .Validate<RoomHoldValidator>("room-hold-form")
+                 .Response(r => r
+                    .OnSuccess<RoomHoldConfirmation>((json, s) =>
+                    {
+                        s.Element("room-hold-status").SetText(json, x => x.Confirmation);
+                    })
+                    .OnError(400, e => e.ValidationErrors("room-hold-form")));
+            }))
+        <p id="room-hold-status" class="mt-3 text-sm text-text-muted">No room held yet.</p>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

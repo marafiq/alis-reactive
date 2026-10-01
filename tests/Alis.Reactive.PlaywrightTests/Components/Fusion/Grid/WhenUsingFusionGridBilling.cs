@@ -63,9 +63,13 @@ public class WhenUsingFusionGridBilling : PlaywrightTestBase
         await NavigateBilling();
 
         await FirstRowCell(4).DblClickAsync();
-        await Expect(Page.Locator($"#{GridId} input.e-field").First)
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Page.Locator($"#{GridId} input.e-field").First.FillAsync("5000");
+        var rateEditor = Page.Locator($"#{GridId} input.e-field").First;
+        await Expect(rateEditor).ToBeVisibleAsync(new() { Timeout = 10000 });
+        // The grid focuses its numeric editor a moment after showing it, and that focus rewrites
+        // "3,200.00" to "3200". A fill before then focuses the box itself, the rewrite drops the fill's
+        // selection, and the digits land after the number. Wait for the plain number first.
+        await Expect(rateEditor).ToHaveValueAsync("3200", new() { Timeout = 10000 });
+        await rateEditor.FillAsync("5000");
         await Page.Keyboard.PressAsync("Enter");
 
         await ClickWhenStable(Page.Locator("#billing-save-all"));

@@ -193,9 +193,13 @@ WhenFields(c =>
          .Response(r => r.OnSuccess(s => { /* success */ }));
     }))
 
-<div data-reactive-validation-summary hidden></div>
 @Html.RenderPlan(plan)
 ```
+
+For a root plan, `RenderPlan` also writes the page's validation summary. It shows the errors that have no
+message slot beside an input: a server error for a hidden field or a field not on the page, and a rule
+for a partial's field that has not loaded yet. Do not hand-write a `data-reactive-validation-summary`
+div; the page finds the summary by the id `RenderPlan` gives it.
 
 ## DO NOT
 
@@ -231,7 +235,7 @@ After adding or modifying validation rules:
 3. **Browser**: Open the form, submit invalid data, confirm rules fire client-side
 4. **Playwright**: Run `scripts/playwright.sh` — confirm the BDD tests prove the validation behavior in the browser
 
-If a rule does not fire in the browser but passes C# tests, check: (a) shape is set for numeric/date fields, (b) the form element has the correct `data-reactive-validation-summary` attribute, (c) the input was created with `Html.InputField()` not raw HTML.
+If a rule does not fire in the browser but passes C# tests, check: (a) shape is set for numeric/date fields, (b) the form id passed to `.Validate<TValidator>(...)` matches the form element, (c) the input was created with `Html.InputField()` not raw HTML.
 
 ## Full Guide
 

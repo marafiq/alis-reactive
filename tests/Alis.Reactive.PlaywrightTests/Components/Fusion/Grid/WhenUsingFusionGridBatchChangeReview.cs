@@ -15,9 +15,13 @@ public class WhenUsingFusionGridBatchChangeReview : PlaywrightTestBase
 
         // Edit Amina Patel's open-tasks cell and save it into the batch.
         await ClickWhenStable(Page.Locator("#review-edit-cell"));
-        await Expect(Page.Locator("#batch-review-edit-grid input.e-field").First)
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Page.Locator("#batch-review-edit-grid input.e-field").First.FillAsync("5");
+        var tasksEditor = Page.Locator("#batch-review-edit-grid input.e-field").First;
+        await Expect(tasksEditor).ToBeVisibleAsync(new() { Timeout = 10000 });
+        // The grid focuses its numeric editor a moment after showing it, and that focus rewrites
+        // "0.00" to "0". A fill before then focuses the box itself, the rewrite drops the fill's
+        // selection, and the digits land after the number. Wait for the plain number first.
+        await Expect(tasksEditor).ToHaveValueAsync("0", new() { Timeout = 10000 });
+        await tasksEditor.FillAsync("5");
         await ClickWhenStable(Page.Locator("#review-save-cell"));
 
         // Commit: beforeBatchSave binds the review grid from its payload's ChangedRecords array.

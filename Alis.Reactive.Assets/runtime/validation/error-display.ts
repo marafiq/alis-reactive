@@ -38,8 +38,8 @@ export function removeSummaryEntry(summaryElement: HTMLElement, name: string): v
   if (entry) entry.remove();
 }
 
-export function hasSummaryEntry(summaryElement: HTMLElement, name: string): boolean {
-  return findSummaryEntry(summaryElement, name) !== undefined;
+export function summaryHasEntries(summaryElement: HTMLElement): boolean {
+  return summaryElement.children.length > 0;
 }
 
 export function clearSummary(summaryElement: HTMLElement): void {
