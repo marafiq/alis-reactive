@@ -354,6 +354,54 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    private ILocator ValidationSummary => Page.Locator("[data-reactive-validation-summary]");
+    private const string PhoneFormat = "Phone must match format 123-456-7890.";
+
+    // A phone typed into the extra fields, which are then hidden, is reported in the page's summary:
+    // its message slot is hidden with them.
+    private async Task ReportAPhoneWhileTheExtraFieldsAreHidden()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await Input("Hidden_Name").FillAsync("Edith Collins");
+        await Input("Hidden_ShowExtras").CheckAsync();
+        await Input("Hidden_Phone").FillAsync("555");
+        await Input("Hidden_ShowExtras").UncheckAsync();
+        await Expect(Page.Locator("#hf_extras")).ToBeHiddenAsync();
+
+        await ClickWhenStable(HiddenBtn);
+
+        await Expect(ValidationSummary).ToBeVisibleAsync();
+        await Expect(ValidationSummary).ToHaveTextAsync(PhoneFormat);
+        await Input("Hidden_ShowExtras").CheckAsync();
+    }
+
+    [Test]
+    public async Task correcting_a_phone_reported_while_hidden_takes_it_out_of_the_summary()
+    {
+        await ReportAPhoneWhileTheExtraFieldsAreHidden();
+
+        await Input("Hidden_Phone").FillAsync("123-456-7890");
+        await Input("Hidden_Phone").PressAsync("Tab");
+
+        await Expect(ValidationSummary).ToBeHiddenAsync();
+        await Expect(ErrorFor("Hidden_Phone")).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_phone_error_shown_beside_the_field_leaves_no_empty_summary()
+    {
+        await ReportAPhoneWhileTheExtraFieldsAreHidden();
+
+        await Input("Hidden_Phone").FillAsync("55512");
+        await Input("Hidden_Phone").PressAsync("Tab");
+
+        await Expect(ErrorFor("Hidden_Phone")).ToHaveTextAsync(PhoneFormat);
+        await Expect(ValidationSummary).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task hidden_form_show_extras_reveals_additional_fields()
     {

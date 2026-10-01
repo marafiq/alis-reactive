@@ -16,7 +16,7 @@ import { toString } from "../shared/shape-convert";
 import { ruleFails } from "./rule-engine";
 import {
   showInline, clearInline,
-  addToSummary, removeSummaryEntry, hasSummaryEntry, clearSummary, showSummaryDiv, hideSummaryDiv, findSummaryElement,
+  addToSummary, removeSummaryEntry, summaryHasEntries, clearSummary, showSummaryDiv, hideSummaryDiv, findSummaryElement,
   showServerErrorInline,
 } from "./error-display";
 import { ExecutionContext } from "../browser-objects/execution-context";
@@ -33,28 +33,20 @@ function validationSummaryForPlan(planId: string): ValidationSummary {
   return { element: findSummaryElement(planId) };
 }
 
-function addSummaryError(summary: ValidationSummary, componentKey: string, message: string): boolean {
-  if (summary.element === null) return false;
+// The summary holds one entry per field and shows exactly while it holds any.
+function addSummaryError(summary: ValidationSummary, componentKey: string, message: string): void {
+  if (summary.element === null) return;
 
+  removeSummaryEntry(summary.element, componentKey);
   addToSummary(summary.element, componentKey, message);
-  return true;
+  showSummaryDiv(summary.element);
 }
 
 function removeSummaryError(summary: ValidationSummary, componentKey: string): void {
   if (summary.element === null) return;
 
   removeSummaryEntry(summary.element, componentKey);
-}
-
-function summaryHasError(summary: ValidationSummary, componentKey: string): boolean {
-  if (summary.element === null) return false;
-
-  return hasSummaryEntry(summary.element, componentKey);
-}
-
-function showSummaryWhen(summary: ValidationSummary, hasErrors: boolean): void {
-  if (summary.element === null) return;
-  if (hasErrors) showSummaryDiv(summary.element);
+  if (!summaryHasEntries(summary.element)) hideSummaryDiv(summary.element);
 }
 
 function clearAndHideSummary(summary: ValidationSummary): void {
@@ -128,16 +120,10 @@ export function validateContainer(
   }
 
   let containerIsValid = true;
-  let summaryReceivedErrors = false;
 
   for (const componentValidation of containerScope.validationRules) {
-    if (!evaluateComponentRules(componentValidation, surface, container)) {
-      containerIsValid = false;
-      summaryReceivedErrors = summaryReceivedErrors || summaryHasError(surface.summary, componentValidation.component);
-    }
+    if (!evaluateComponentRules(componentValidation, surface, container)) containerIsValid = false;
   }
-
-  showSummaryWhen(surface.summary, summaryReceivedErrors);
 
   log.debug("validated", { id: containerId, valid: containerIsValid });
   return containerIsValid;
@@ -167,21 +153,15 @@ export function showServerErrors(planDocument: PlanDocument, containerKey: strin
   if (errors.kind !== "field-errors") return;
   if (errors.fields.length === 0) return;
 
-  let summaryReceivedErrors = false;
+  for (const error of errors.fields) placeServerErrorOnFieldOrSummary(error, surface);
 
-  for (const error of errors.fields) {
-    const addedToSummary = placeServerErrorOnFieldOrSummary(error, surface);
-    if (addedToSummary) summaryReceivedErrors = true;
-  }
-
-  showSummaryWhen(surface.summary, summaryReceivedErrors);
   log.debug("server-errors.shown", { id: containerId, fieldCount: errors.fields.length });
 }
 
 function placeServerErrorOnFieldOrSummary(
   error: ServerValidationError,
   surface: ValidationSurface,
-): boolean {
+): void {
   const message = serverValidationErrorMessage(error.messages);
   const validation = findComponentValidationByName(surface, error.name);
   if (validation === undefined) return addSummaryError(surface.summary, error.name, message);
@@ -195,10 +175,10 @@ function placeServerErrorOnFieldOrSummary(
   const inlineMessageSlotCanRender = canRenderInlineValidationMessage(component.id);
   if (inlineMessageSlotCanRender) {
     showServerErrorInline(component.id, message, element);
-    return false;
+    return;
   }
 
-  return addSummaryError(surface.summary, error.name, message);
+  addSummaryError(surface.summary, error.name, message);
 }
 
 export function revalidateField(planDocument: PlanDocument, containerKey: string, componentKey: string): void {
@@ -214,8 +194,10 @@ export function revalidateField(planDocument: PlanDocument, containerKey: string
 
   const containerId = containerComponent.id;
 
+  const summary = validationSummaryForPlan(planDocument.planId);
   const component = runtimePlan.components.find(componentKey);
   if (component) clearInline(component.id);
+  removeSummaryError(summary, componentKey);
 
   let container: HTMLElement;
   try {
@@ -225,7 +207,6 @@ export function revalidateField(planDocument: PlanDocument, containerKey: string
     return;
   }
 
-  const summary = validationSummaryForPlan(planDocument.planId);
   const surface: ValidationSurface = {
     planDocument,
     runtimePlan,

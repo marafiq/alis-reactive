@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { AppliedPlans } from "../lifecycle/applied-plans";
-import { showServerErrors, validateContainer } from "../validation/orchestrator";
+import { revalidateField, showServerErrors, validateContainer } from "../validation/orchestrator";
 import type { ComponentObject, ComponentValidation, BrowserObjectContract, PlanDocument, ReadExpression, Shape, ValueExpression } from "../types/index";
 
 const stringShape: Shape = { kind: "string" };
@@ -335,6 +335,54 @@ describe("validation orchestrator client rules", () => {
     ]);
 
     expect(validateContainer(runtimePlan, "resident-form")).toBe(true);
+  });
+});
+
+describe("validation orchestrator summary", () => {
+  function summaryElement(): HTMLElement {
+    return document.getElementById("Runtime_ValidationServerErrors_validation_summary") as HTMLElement;
+  }
+
+  // The name field sits in a section the user then opens: its message slot was hidden at validation.
+  function reportNameWhileItsSectionIsHidden(): PlanDocument {
+    renderValidationDomWithHiddenErrorSlot();
+    const runtimePlan = validationRuntimePlan([requiredRule("resident-name-field", "Name")]);
+    validateContainer(runtimePlan, "resident-form");
+    (document.getElementById("resident-name-input")!.parentElement as HTMLElement).hidden = false;
+    return runtimePlan;
+  }
+
+  it("takes a field's error out of the summary once the field passes, and hides the empty summary", () => {
+    const runtimePlan = reportNameWhileItsSectionIsHidden();
+    expect(summaryTextFor("resident-name-field")).toBe("Name is required");
+
+    (document.getElementById("resident-name-input") as HTMLInputElement).value = "Edith Collins";
+    revalidateField(runtimePlan, "resident-form", "resident-name-field");
+
+    expect(summaryTextFor("resident-name-field")).toBeUndefined();
+    expect(summaryElement().hidden).toBe(true);
+  });
+
+  it("hides the summary when a field's error moves beside the field and no other entry remains", () => {
+    const runtimePlan = reportNameWhileItsSectionIsHidden();
+
+    revalidateField(runtimePlan, "resident-form", "resident-name-field");
+
+    expect(document.getElementById("resident-name-input_error")?.textContent).toBe("Name is required");
+    expect(summaryElement().children).toHaveLength(0);
+    expect(summaryElement().hidden).toBe(true);
+  });
+
+  it("keeps one summary entry per field when a field whose message slot is hidden fails again", () => {
+    renderValidationDomWithHiddenErrorSlot();
+    const runtimePlan = validationRuntimePlan([requiredRule("resident-name-field", "Name")]);
+    validateContainer(runtimePlan, "resident-form");
+
+    revalidateField(runtimePlan, "resident-form", "resident-name-field");
+
+    expect(summaryElement().children).toHaveLength(1);
+    expect(summaryTextFor("resident-name-field")).toBe("Name is required");
+    expect(summaryElement().hidden).toBe(false);
   });
 });
 
