@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
@@ -8,12 +9,17 @@ namespace Alis.Reactive.PlaywrightTests.Validation.FallRiskScreening;
 /// so that a resident who has not fallen is screened and saved, while an unanswered question
 /// and an unticked attestation are still asked for.
 /// </summary>
+/// <remarks>
+/// An "asks for" test then answers and saves: exactly one save request proves the first Save sent
+/// nothing, whenever a send would have happened.
+/// </remarks>
 [TestFixture]
 public class WhenNurseRecordsFallRiskScreening : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Validation/FallRiskScreening";
 
     private PagePlan<FallRiskScreeningModel> _plan = null!;
+    private ConcurrentQueue<string> _screeningsSent = null!;
 
     private ILocator ScreeningStatus => Page.Locator("#fall-risk-status");
     private ILocator SaveScreening => Page.Locator("#save-screening-btn");
@@ -22,9 +28,20 @@ public class WhenNurseRecordsFallRiskScreening : PlaywrightTestBase
 
     private async Task NavigateAndBoot()
     {
+        _screeningsSent = new ConcurrentQueue<string>();
+        Page.Request += (_, request) =>
+        {
+            if (request.Url.Contains("/Sandbox/Validation/FallRiskScreening/Save")) _screeningsSent.Enqueue(request.Url);
+        };
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
         _plan = await PagePlan<FallRiskScreeningModel>.FromPage(Page);
+    }
+
+    private void AssertTheScreeningWasSentOnce()
+    {
+        Assert.That(_screeningsSent, Has.Count.EqualTo(1), "Only the completed screening may be sent.");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -37,7 +54,7 @@ public class WhenNurseRecordsFallRiskScreening : PlaywrightTestBase
         await ClickWhenStable(SaveScreening);
 
         await Expect(ScreeningStatus).ToHaveTextAsync("Screening saved for Helen Park: no fall in the last 90 days.");
-        AssertNoConsoleErrors();
+        AssertTheScreeningWasSentOnce();
     }
 
     [Test]
@@ -50,7 +67,7 @@ public class WhenNurseRecordsFallRiskScreening : PlaywrightTestBase
         await ClickWhenStable(SaveScreening);
 
         await Expect(ScreeningStatus).ToHaveTextAsync("Screening saved for Helen Park: a fall in the last 90 days.");
-        AssertNoConsoleErrors();
+        AssertTheScreeningWasSentOnce();
     }
 
     [Test]
@@ -65,9 +82,11 @@ public class WhenNurseRecordsFallRiskScreening : PlaywrightTestBase
             .ToHaveTextAsync("Answer whether the resident fell in the last 90 days.");
         await Expect(_plan.ErrorFor(m => m.ObservedWalkingInPerson)).ToHaveTextAsync("");
         await Expect(ScreeningStatus).ToHaveTextAsync("Not screened yet.");
-        // The server's NotEmpty answers with the same message in a 400, which the browser logs as a
-        // console error before the message can show; none here means the page asked, not the server.
-        AssertNoConsoleErrors();
+
+        await FellInLast90Days.Choose("No");
+        await ClickWhenStable(SaveScreening);
+        await Expect(ScreeningStatus).ToHaveTextAsync("Screening saved for Helen Park: no fall in the last 90 days.");
+        AssertTheScreeningWasSentOnce();
     }
 
     [Test]
@@ -82,8 +101,11 @@ public class WhenNurseRecordsFallRiskScreening : PlaywrightTestBase
             .ToHaveTextAsync("Confirm you observed the resident walking in person.");
         await Expect(_plan.ErrorFor(m => m.FellInLast90Days)).ToHaveTextAsync("");
         await Expect(ScreeningStatus).ToHaveTextAsync("Not screened yet.");
-        // As above: no console error means the page asked, not the server.
-        AssertNoConsoleErrors();
+
+        await ObservedWalkingInPerson.Check();
+        await ClickWhenStable(SaveScreening);
+        await Expect(ScreeningStatus).ToHaveTextAsync("Screening saved for Helen Park: no fall in the last 90 days.");
+        AssertTheScreeningWasSentOnce();
     }
 
     [Test]

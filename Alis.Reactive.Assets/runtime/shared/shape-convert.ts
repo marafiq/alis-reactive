@@ -54,8 +54,15 @@ function applyNullableShape(value: unknown, inner: Shape): unknown {
 function isAbsentNullableInput(value: unknown, inner: Shape): boolean {
   if (isMissingInput(value)) return true;
 
-  const valueIsBlankText = typeof value === "string" && value.trim() === "";
-  return valueIsBlankText && innerShapeParsesText(inner);
+  return isBlankText(value) && innerShapeParsesText(inner);
+}
+
+// Whitespace as .NET's char.IsWhiteSpace defines it (string.IsNullOrWhiteSpace, which MVC binding and
+// FluentValidation's NotEmpty use): JavaScript's trim() differs on U+FEFF and U+0085.
+const dotNetWhitespaceOnly = /^[\t\n\v\f\r \u0085\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]*$/;
+
+export function isBlankText(value: unknown): boolean {
+  return typeof value === "string" && dotNetWhitespaceOnly.test(value);
 }
 
 function innerShapeParsesText(inner: Shape): boolean {
@@ -234,7 +241,7 @@ export function toPlainObject(value: unknown): ShapeConversionResult<Record<stri
   return err(`toObject: received ${typeof value} — expected object`);
 }
 
-function booleanAsNumber(value: boolean): number {
+export function booleanAsNumber(value: boolean): number {
   if (value) return 1;
   return 0;
 }

@@ -23,6 +23,7 @@ const booleanShape: Shape = { kind: "boolean" };
 const nullableBooleanShape: Shape = { kind: "nullable", inner: booleanShape };
 const stringArrayShape: Shape = { kind: "array", item: stringShape };
 const anyShape: Shape = { kind: "any" };
+const nullableNumberShape: Shape = { kind: "nullable", inner: numberShape };
 
 function literal(value: string | number | boolean | null, shape: Shape = stringShape): LiteralExpression {
   return { kind: "literal", value, shape };
@@ -95,7 +96,7 @@ function rangeRule(
 
 function orderedRule(
   name: OrderedComparisonValidationRule["name"],
-  value: string | number,
+  value: string | number | boolean,
   valueShape: Shape,
   comparisonShape: Shape,
 ): OrderedComparisonValidationRule {
@@ -107,6 +108,19 @@ function orderedRule(
       value: literal(value, valueShape),
       activation: { kind: "always" },
       comparisonShape,
+    },
+  };
+}
+
+function booleanRangeRule(name: RangeValidationRule["name"]): RangeValidationRule {
+  return {
+    name,
+    message: `${name} failed`,
+    execution: {
+      kind: "constraint",
+      value: { kind: "literal", value: [false, true], shape: { kind: "array", item: booleanShape } },
+      activation: { kind: "always" },
+      comparisonShape: booleanShape,
     },
   };
 }
@@ -136,6 +150,22 @@ function peerEqualityRule(name: PeerEqualityValidationRule["name"]): PeerEqualit
       value: componentValue("confirmPassword", stringShape),
       activation: { kind: "always" },
       comparisonShape: stringShape,
+    },
+  };
+}
+
+function booleanPeerRule(
+  name: PeerOrderedComparisonValidationRule["name"],
+  comparisonShape: Shape,
+): PeerOrderedComparisonValidationRule {
+  return {
+    name,
+    message: `${name} failed`,
+    execution: {
+      kind: "peer",
+      value: componentValue("dischargeApproved", comparisonShape),
+      activation: { kind: "always" },
+      comparisonShape,
     },
   };
 }
@@ -187,6 +217,38 @@ describe("validation rule engine", () => {
     expect(ruleFails({ rule: literalEqualityRule("notEqual", false), value: false, fieldShape: nullableBooleanShape })).toBe(true);
   });
 
+  it("treats text of only whitespace as blank for required and empty, as the server's NotEmpty and Empty do", () => {
+    expect(ruleFails({ rule: noOperandRule("required"), value: "   ", fieldShape: stringShape })).toBe(true);
+    expect(ruleFails({ rule: noOperandRule("required"), value: "\t \n", fieldShape: stringShape })).toBe(true);
+    expect(ruleFails({ rule: noOperandRule("required"), value: "\u0085", fieldShape: stringShape })).toBe(true);
+    expect(ruleFails({ rule: noOperandRule("required"), value: "\uFEFF", fieldShape: stringShape })).toBe(false);
+    expect(ruleFails({ rule: noOperandRule("empty"), value: "   ", fieldShape: stringShape })).toBe(false);
+  });
+
+  it("treats a plain number's 0 as blank for required and empty, and a nullable number's 0 as a value", () => {
+    expect(ruleFails({ rule: noOperandRule("required"), value: 0, fieldShape: numberShape })).toBe(true);
+    expect(ruleFails({ rule: noOperandRule("empty"), value: 0, fieldShape: numberShape })).toBe(false);
+    expect(ruleFails({ rule: noOperandRule("required"), value: 0, fieldShape: nullableNumberShape })).toBe(false);
+    expect(ruleFails({ rule: noOperandRule("empty"), value: 0, fieldShape: nullableNumberShape })).toBe(true);
+  });
+
+  it("fails atLeastOne on what the server's NotEmpty rejects: a plain boolean's false, whitespace, a plain number's 0", () => {
+    const atLeastOne = noOperandRule("atLeastOne");
+
+    expect(ruleFails({ rule: atLeastOne, value: false, fieldShape: booleanShape })).toBe(true);
+    expect(ruleFails({ rule: atLeastOne, value: "   ", fieldShape: stringShape })).toBe(true);
+    expect(ruleFails({ rule: atLeastOne, value: 0, fieldShape: numberShape })).toBe(true);
+    expect(ruleFails({ rule: atLeastOne, value: [], fieldShape: stringArrayShape })).toBe(true);
+    expect(ruleFails({ rule: atLeastOne, value: ["Gluten-free"], fieldShape: stringArrayShape })).toBe(false);
+  });
+
+  it("keeps checking whitespace, 0 and a plain boolean's false in the rules that skip only a value never entered", () => {
+    expect(ruleFails({ rule: lengthRule("minLength", 3), value: "  ", fieldShape: stringShape })).toBe(true);
+    expect(ruleFails({ rule: orderedRule("min", 1, numberShape, numberShape), value: 0, fieldShape: numberShape })).toBe(true);
+    expect(ruleFails({ rule: literalEqualityRule("equalTo", true), value: false, fieldShape: booleanShape })).toBe(true);
+    expect(ruleFails({ rule: literalEqualityRule("notEqual", false), value: false, fieldShape: booleanShape })).toBe(true);
+  });
+
   it("uses peer values as the target for equalTo and notEqualTo rules", () => {
     const equalToPeer = peerEqualityRule("equalTo");
     const notEqualToPeer = peerEqualityRule("notEqualTo");
@@ -218,6 +280,34 @@ describe("validation rule engine", () => {
     expect(ruleFails({ rule: minLength, value: "securepass", fieldShape: stringShape })).toBe(false);
     expect(ruleFails({ rule: maxLength, value: "securepass", fieldShape: stringShape })).toBe(true);
     expect(ruleFails({ rule: maxLength, value: "abc", fieldShape: stringShape })).toBe(false);
+  });
+
+  it("orders booleans false before true in ordered, range and peer rules, as the server does", () => {
+    expect(ruleFails({ rule: orderedRule("min", true, booleanShape, booleanShape), value: true, fieldShape: booleanShape })).toBe(false);
+    expect(ruleFails({ rule: orderedRule("max", false, booleanShape, booleanShape), value: true, fieldShape: booleanShape })).toBe(true);
+    expect(ruleFails({ rule: orderedRule("gt", false, booleanShape, booleanShape), value: true, fieldShape: booleanShape })).toBe(false);
+    expect(ruleFails({ rule: orderedRule("lt", true, booleanShape, booleanShape), value: true, fieldShape: booleanShape })).toBe(true);
+    expect(ruleFails({ rule: booleanRangeRule("range"), value: true, fieldShape: booleanShape })).toBe(false);
+    expect(ruleFails({ rule: booleanRangeRule("exclusiveRange"), value: true, fieldShape: booleanShape })).toBe(true);
+
+    const atMostApproved = booleanPeerRule("max", booleanShape);
+    expect(ruleFails({ rule: atMostApproved, value: true, peerValue: false, fieldShape: booleanShape })).toBe(true);
+    expect(ruleFails({ rule: atMostApproved, value: true, peerValue: true, fieldShape: booleanShape })).toBe(false);
+
+    const moreThanApproved = booleanPeerRule("gt", nullableBooleanShape);
+    expect(ruleFails({ rule: moreThanApproved, value: true, peerValue: false, fieldShape: nullableBooleanShape })).toBe(false);
+    expect(ruleFails({ rule: moreThanApproved, value: false, peerValue: true, fieldShape: nullableBooleanShape })).toBe(true);
+    expect(ruleFails({ rule: moreThanApproved, value: true, peerValue: null, fieldShape: nullableBooleanShape })).toBe(true);
+  });
+
+  it("orders a plain boolean's false too, now that it is a value rather than nothing entered", () => {
+    expect(ruleFails({ rule: orderedRule("min", true, booleanShape, booleanShape), value: false, fieldShape: booleanShape })).toBe(true);
+    expect(ruleFails({ rule: orderedRule("max", false, booleanShape, booleanShape), value: false, fieldShape: booleanShape })).toBe(false);
+    expect(ruleFails({ rule: orderedRule("gt", false, booleanShape, booleanShape), value: false, fieldShape: booleanShape })).toBe(true);
+    expect(ruleFails({ rule: orderedRule("lt", true, booleanShape, booleanShape), value: false, fieldShape: booleanShape })).toBe(false);
+    expect(ruleFails({ rule: booleanRangeRule("range"), value: false, fieldShape: booleanShape })).toBe(false);
+    expect(ruleFails({ rule: booleanPeerRule("max", booleanShape), value: false, peerValue: false, fieldShape: booleanShape })).toBe(false);
+    expect(ruleFails({ rule: booleanPeerRule("gt", booleanShape), value: false, peerValue: true, fieldShape: booleanShape })).toBe(true);
   });
 
   it("orders date values only after the declared shape produces comparable values", () => {

@@ -1,4 +1,4 @@
-import { toString } from "../shared/shape-convert";
+import { booleanAsNumber, isBlankText, toString } from "../shared/shape-convert";
 import type { ShapeConversionResult } from "../shared/shape-convert";
 import { RuntimeShape } from "../browser-objects/runtime-shape";
 import type {
@@ -24,14 +24,23 @@ export class ValidationSubject {
     return "";
   }
 
-  get isEmpty(): boolean {
+  // Nothing was entered: missing, a value whose text form is "" (an empty list included), or one with no
+  // text form. Most rules skip such a value; required, empty and atLeastOne use isBlankOrDefault instead.
+  get nothingEntered(): boolean {
     const valueIsMissing = isMissingValidationValue(this.raw);
-    // A plain bool's false is its default, which the server's NotEmpty counts as empty; a bool? false is an answer.
-    const valueIsPlainBooleanDefault = this.raw === false && this.fieldShape.kind === "boolean";
     const valueIsEmptyString = this.text === "";
     const valueIsEmptyArray = isEmptyValidationCollection(this.raw);
     const valueCannotBeConvertedToText = !this.textConversion.ok;
-    return valueIsMissing || valueIsPlainBooleanDefault || valueIsEmptyString || valueCannotBeConvertedToText || valueIsEmptyArray;
+    return valueIsMissing || valueIsEmptyString || valueCannotBeConvertedToText || valueIsEmptyArray;
+  }
+
+  // What the server's NotEmpty rejects, as far as the field's shape tells: nothing entered, text of only
+  // whitespace, false for a boolean shape, 0 for a number shape. A bool? false or an int? 0 is an answer.
+  // Guid.Empty, an enum's default and a default DateTime arrive as text or dates; only the server rejects them.
+  get isBlankOrDefault(): boolean {
+    const valueIsBooleanDefault = this.raw === false && this.fieldShape.kind === "boolean";
+    const valueIsNumberDefault = this.raw === 0 && this.fieldShape.kind === "number";
+    return this.nothingEntered || isBlankText(this.raw) || valueIsBooleanDefault || valueIsNumberDefault;
   }
 
   get length(): number {
@@ -40,7 +49,7 @@ export class ValidationSubject {
 
   failsAtLeastOne(): boolean {
     if (Array.isArray(this.raw)) return this.raw.length === 0;
-    return this.isEmpty;
+    return this.isBlankOrDefault;
   }
 
   compareTo(target: ValidationScalarTarget, shape: Shape): ShapedComparison {
@@ -134,6 +143,8 @@ export class ShapedComparison {
 function comparableValidationNumber(raw: unknown, shape: RuntimeShape): number | undefined {
   const converted = shape.convert(raw);
   if (!converted.ok) return undefined;
+  // The server orders booleans false before true, as .NET's Comparer<bool> does.
+  if (typeof converted.value === "boolean") return booleanAsNumber(converted.value);
   if (typeof converted.value !== "number") return undefined;
   if (!Number.isFinite(converted.value)) return undefined;
 

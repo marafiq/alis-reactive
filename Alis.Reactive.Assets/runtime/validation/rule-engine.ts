@@ -123,11 +123,11 @@ function rangeTarget(rule: RangeValidationRule): ValidationRangeTarget {
 }
 
 function requiredFails(subject: ValidationSubject): boolean {
-  return subject.isEmpty;
+  return subject.isBlankOrDefault;
 }
 
 function emptyFails(subject: ValidationSubject): boolean {
-  return !subject.isEmpty;
+  return !subject.isBlankOrDefault;
 }
 
 function lengthRuleFails(
@@ -135,7 +135,7 @@ function lengthRuleFails(
   subject: ValidationSubject,
   rule: LengthValidationRule,
 ): boolean {
-  if (subject.isEmpty) return false;
+  if (subject.nothingEntered) return false;
 
   const actualLength = subject.length;
   const expectedLength = lengthConstraint(rule);
@@ -145,7 +145,7 @@ function lengthRuleFails(
 }
 
 function emailFails(subject: ValidationSubject): boolean {
-  const valueWasProvided = !subject.isEmpty;
+  const valueWasProvided = !subject.nothingEntered;
   const valueLooksLikeEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(subject.text);
   return valueWasProvided && !valueLooksLikeEmail;
 }
@@ -153,20 +153,20 @@ function emailFails(subject: ValidationSubject): boolean {
 function regexFails(subject: ValidationSubject, rule: RegexValidationRule): boolean {
   const pattern = constraint(rule).textOrEmpty();
   try {
-    return !subject.isEmpty && !new RegExp(pattern).test(subject.text);
+    return !subject.nothingEntered && !new RegExp(pattern).test(subject.text);
   } catch {
     return true;
   }
 }
 
 function urlFails(subject: ValidationSubject): boolean {
-  const valueWasProvided = !subject.isEmpty;
+  const valueWasProvided = !subject.nothingEntered;
   const valueLooksLikeUrl = /^https?:\/\/.+/.test(subject.text);
   return valueWasProvided && !valueLooksLikeUrl;
 }
 
 function creditCardFails(subject: ValidationSubject): boolean {
-  const valueWasProvided = !subject.isEmpty;
+  const valueWasProvided = !subject.nothingEntered;
   const valuePassesLuhn = luhn(subject.text.replace(/\D/g, ""));
   return valueWasProvided && !valuePassesLuhn;
 }
@@ -179,26 +179,26 @@ function orderedComparisonFails(
     ? ValidationScalarTarget.available(evaluation.peerValue)
     : constraint(evaluation.rule);
   const comparison = subject.compareTo(comparisonTarget, comparisonShape(evaluation.rule));
-  const valueIsEmpty = subject.isEmpty;
+  const nothingWasEntered = subject.nothingEntered;
 
   switch (evaluation.rule.name) {
     case "min": {
       const valueIsBelowMinimum = comparison.cannotCompare || comparison.lessThanTarget;
-      return !valueIsEmpty && valueIsBelowMinimum;
+      return !nothingWasEntered && valueIsBelowMinimum;
     }
     case "max": {
       const valueIsAboveMaximum = comparison.cannotCompare || comparison.greaterThanTarget;
-      return !valueIsEmpty && valueIsAboveMaximum;
+      return !nothingWasEntered && valueIsAboveMaximum;
     }
     case "gt": {
       const valueIsNotGreaterThanTarget =
         comparison.cannotCompare || comparison.lessThanTarget || comparison.equalToTarget;
-      return valueIsEmpty || valueIsNotGreaterThanTarget;
+      return nothingWasEntered || valueIsNotGreaterThanTarget;
     }
     case "lt": {
       const valueIsNotLessThanTarget =
         comparison.cannotCompare || comparison.greaterThanTarget || comparison.equalToTarget;
-      return !valueIsEmpty && valueIsNotLessThanTarget;
+      return !nothingWasEntered && valueIsNotLessThanTarget;
     }
     default: return assertNever(evaluation.rule, "ordered validation comparison");
   }
@@ -206,7 +206,7 @@ function orderedComparisonFails(
 
 function rangeFails(ruleName: RangeRuleName, subject: ValidationSubject, rule: RangeValidationRule): boolean {
   const range = rangeTarget(rule);
-  if (subject.isEmpty) return false;
+  if (subject.nothingEntered) return false;
 
   const lowerComparison = subject.compareTo(range.lowerBound, comparisonShape(rule));
   const upperComparison = subject.compareTo(range.upperBound, comparisonShape(rule));
@@ -248,7 +248,7 @@ function equalToFails(
   target: ValidationScalarTarget,
   shape: Shape,
 ): boolean {
-  if (subject.isEmpty) return false;
+  if (subject.nothingEntered) return false;
 
   return !subject.equalsTarget(target, shape);
 }
@@ -258,7 +258,7 @@ function notEqualFails(
   target: ValidationScalarTarget,
   shape: Shape,
 ): boolean {
-  const valueWasProvided = !subject.isEmpty;
+  const valueWasProvided = !subject.nothingEntered;
   const valueEqualsForbiddenTarget = subject.equalsTarget(target, shape);
   return valueWasProvided && valueEqualsForbiddenTarget;
 }
@@ -268,7 +268,7 @@ function notEqualToFails(
   target: ValidationScalarTarget,
   shape: Shape,
 ): boolean {
-  const valueWasProvided = !subject.isEmpty;
+  const valueWasProvided = !subject.nothingEntered;
   const valueEqualsPeerTarget = subject.equalsTarget(target, shape);
   return valueWasProvided && valueEqualsPeerTarget;
 }
