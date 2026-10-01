@@ -82,6 +82,15 @@ function payloadRead(scope: PayloadScope, member: string): ValueExpression {
   };
 }
 
+function markLocal(value: string): ReactionGraph {
+  return {
+    kind: "call",
+    on: { kind: "payload", scope: "local" },
+    method: "mark",
+    args: [literal(value)],
+  };
+}
+
 function setText(component: string, value: ValueExpression): ReactionGraph {
   return {
     kind: "set",
@@ -681,6 +690,30 @@ describe("executeRequest HTTP request lane", () => {
 
     expect(document.getElementById("error")?.textContent).toBe("");
     expect(document.getElementById("complete")?.textContent).toBe("");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  // A route parameter read from a value with nothing in it (a dropdown with no choice) cannot build the
+  // URL. WhileLoading has already run, so its Finally still runs; the failure stays loud.
+  it("runs completion once when the request cannot be built after the before reactions ran", async () => {
+    const fetchMock = mockFetch([responseJson({ name: "Helen Park" })]);
+    const marks: string[] = [];
+    const openCarePlan = request({
+      method: "GET",
+      url: "/care-plans/{residentId}",
+      input: requestInput([routeParamAssignment("residentId", payloadRead("event", "residentId"))]),
+      whileLoading: [markLocal("loading")],
+      success: [{ match: { kind: "any" }, reaction: markLocal("success") }],
+      error: [{ match: { kind: "any" }, reaction: markLocal("error") }],
+      finally: [markLocal("finally")],
+    });
+
+    await expect(executeRequest(openCarePlan, nativeTextPlan([]), {
+      event: {},
+      local: { mark: (value: string) => marks.push(value) },
+    })).rejects.toThrow('route param "residentId" evaluated to null');
+
+    expect(marks).toEqual(["loading", "finally"]);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

@@ -41,7 +41,16 @@ async function runHttpRequest(
 
   await runRequestReactions(request.whileLoading, planDocument, context.asAvailable());
 
-  const preparedRequest = prepareHttpRequest(request, planDocument, context);
+  // WhileLoading has run, so a request that cannot be built (a route parameter with no value, a File in
+  // a GET) still runs its Finally, which undoes what WhileLoading did; the build error then propagates.
+  let preparedRequest: PreparedHttpRequest;
+  try {
+    preparedRequest = prepareHttpRequest(request, planDocument, context);
+  } catch (error) {
+    await runRequestReactions(request.finally, planDocument, context.asAvailable());
+    throw error;
+  }
+
   const outcome = await sendHttpRequest(request, preparedRequest.fetchRequest);
   await routeExchangeOutcome(outcome, request, planDocument, preparedRequest.context);
 }
