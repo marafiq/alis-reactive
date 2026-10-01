@@ -26,9 +26,17 @@ export class RuntimeShape {
     return this.shape.kind !== "none";
   }
 
+  // A nullable wrapping a collection (a nullable struct collection such as ImmutableArray<T>?) still
+  // describes an array.
+  get describesArray(): boolean {
+    if (this.shape.kind === "nullable") return RuntimeShape.from(this.shape.inner).describesArray;
+
+    return this.shape.kind === "array";
+  }
+
   item(): RuntimeShape {
-    const shapeDescribesArrayItems = this.shape.kind === "array";
-    if (shapeDescribesArrayItems) return RuntimeShape.from(this.shape.item);
+    if (this.shape.kind === "nullable") return RuntimeShape.from(this.shape.inner).item();
+    if (this.shape.kind === "array") return RuntimeShape.from(this.shape.item);
 
     return RuntimeShape.unshaped();
   }

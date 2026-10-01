@@ -1,0 +1,64 @@
+@model OutingRosterModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.DropDowns
+@{
+    ViewData["Title"] = "Garden Outing";
+    var plan = Html.ReactivePlan<OutingRosterModel>();
+    var aids = new List<MobilityAidOption> { new("WALKER", "Walker"), new("WHEELCHAIR", "Wheelchair"), new("CANE", "Cane"), new("SCOOTER", "Mobility scooter") };
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Garden Outing</native-heading>
+    <native-text color="Secondary">Thursday's trip to the botanical garden. Find the residents who use the chosen aids, then book the bus.</native-text>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            @{ Html.InputField(plan, m => m.MobilityAids, o => o.Label("Mobility aids"))
+                .FusionMultiSelect(b => b
+                    .DataSource(aids)
+                    .Fields<MobilityAidOption>(t => t.Name, v => v.Code)
+                    .Placeholder("All residents")
+                    .Mode(VisualMode.Box)); }
+            <native-hstack gap="Sm">
+                @(Html.NativeButton("find-residents-btn", "Find Residents")
+                    .CssClass("rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Get(Url.SandboxRoute("Residents", "OutingRoster"))
+                         .Gather(g => g.Include<FusionMultiSelect, OutingRosterModel>(m => m.MobilityAids))
+                         .Response(r => r.OnSuccess<OutingRosterAnswer>((json, s) =>
+                             s.Element("roster-residents").SetText(json, x => x.Residents)));
+                    }))
+                @(Html.NativeButton("book-bus-btn", "Book the Bus")
+                    .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Post(Url.SandboxRoute("Book", "OutingRoster"), g => g.IncludeAll())
+                         .AsFormData()
+                         .Response(r => r
+                            .OnSuccess<OutingBookingAnswer>((json, s) =>
+                            {
+                                s.Element("bus-booking").SetText(json, x => x.Confirmation);
+                                s.Element("bus-booking").RemoveClass("text-red-600");
+                            })
+                            .OnError<OutingBookingRefusal>(400, (json, e) =>
+                            {
+                                e.Element("bus-booking").SetText(json, x => x.Reason);
+                                e.Element("bus-booking").AddClass("text-red-600");
+                            }));
+                    }))
+            </native-hstack>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            <p class="text-sm">Matching residents: <span id="roster-residents" class="font-medium">Not searched yet.</span></p>
+            <p class="text-sm">Bus: <span id="bus-booking" class="font-medium">Not booked.</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

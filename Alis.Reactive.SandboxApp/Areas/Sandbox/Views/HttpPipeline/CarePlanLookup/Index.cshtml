@@ -1,0 +1,54 @@
+@model CarePlanLookupModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.AppLevel
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "Care Plan Lookup";
+    var plan = Html.ReactivePlan<CarePlanLookupModel>();
+    var residents = new List<CarePlanResidentOption> { new("1042", "Helen Park"), new("1043", "Arthur Bell"), new("1044", "Rosa Diaz") };
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Care Plan Lookup</native-heading>
+    <native-text color="Secondary">Maple Grove, second floor. Choose a resident to open their care plan.</native-text>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            @{ Html.InputField(plan, m => m.ResidentId, o => o.Label("Resident"))
+                .FusionDropDownList(b => b
+                    .DataSource(residents)
+                    .Fields<CarePlanResidentOption>(t => t.Name, v => v.Id)
+                    .Placeholder("Choose a resident")); }
+            @(Html.NativeButton("open-care-plan-btn", "Open Care Plan")
+                .CssClass("self-start rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Get(Url.SandboxRouteTemplate("CarePlan", "CarePlanLookup", "residentId"))
+                     .Gather(g => g.RouteParam("residentId", p.Component<FusionDropDownList>(m => m.ResidentId).Value()))
+                     .WhileLoading(l => l.Component<NativeLoader>().Show())
+                     .Response(r => r
+                        .OnSuccess<CarePlanSummary>((json, s) =>
+                        {
+                            s.Element("care-plan-resident").SetText(json, x => x.Resident);
+                            s.Element("care-plan-summary").SetText(json, x => x.Plan);
+                        })
+                        .OnError(404, e =>
+                        {
+                            e.Element("care-plan-resident").SetText("No care plan open.");
+                            e.Element("care-plan-summary").SetText("No care plan is on file for this resident yet.");
+                        }))
+                     .Finally(f => f.Component<NativeLoader>().Hide());
+                }))
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            <p class="text-sm">Resident: <span id="care-plan-resident" class="font-medium">No care plan open.</span></p>
+            <p id="care-plan-summary" class="text-sm text-text-secondary"></p>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

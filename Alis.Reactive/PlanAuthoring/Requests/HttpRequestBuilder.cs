@@ -77,6 +77,11 @@ namespace Alis.Reactive.Builders.Requests
         /// Does not provide response body access because the response may not
         /// exist on network failure.</para>
         /// <para>Typical use: hide a loading spinner that <see cref="WhileLoading"/> showed.</para>
+        /// <para>Finally also runs when the request cannot be built, for example when a route parameter's
+        /// source has no value; the error that stopped the request is still reported, and no response route
+        /// runs. The request is built after client validation passes and any <see cref="WhileLoading"/>
+        /// reactions have run. If client validation blocks the request, or a <see cref="WhileLoading"/>
+        /// reaction fails, the request does not start and Finally does not run.</para>
         /// </remarks>
         /// <param name="pipeline">Builds the cleanup reaction graph to run after the request settles.</param>
         public HttpRequestBuilder<TModel> Finally(Action<PipelineBuilder<TModel>> pipeline)

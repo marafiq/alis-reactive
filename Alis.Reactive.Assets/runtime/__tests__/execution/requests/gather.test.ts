@@ -116,6 +116,65 @@ function resolveBody(input: RequestInput, method: "GET" | "POST" = "POST"): Reco
   return resolveRequestInput(input, method, emptyPlan, {}).body;
 }
 
+// Components whose value member holds what was read from the page: a multi-select's chosen values
+// (null when nothing was chosen) and a text field's value.
+interface ComponentValue {
+  readonly id: string;
+  readonly shape: Shape;
+  readonly value: unknown;
+}
+
+function aids(value: string[] | null | undefined): ComponentValue {
+  return { id: "mobility-aids", shape: arrayShape(stringShape), value };
+}
+
+function residentName(value: string | null): ComponentValue {
+  return { id: "resident-name", shape: stringShape, value };
+}
+
+function aidsRead(): ValueExpression {
+  return componentValueRead("mobility-aids", arrayShape(stringShape));
+}
+
+function residentNameRead(): ValueExpression {
+  return componentValueRead("resident-name", stringShape);
+}
+
+function componentValuesPlan(values: readonly ComponentValue[]): PlanDocument {
+  document.body.innerHTML = values.map(({ id }) => `<div id="${id}"></div>`).join("");
+  const types: Record<string, BrowserObjectContract> = {};
+  const components: Record<string, ComponentObject> = {};
+  for (const { id, shape, value } of values) {
+    (document.getElementById(id) as HTMLElement & { value: unknown }).value = value;
+    types[`native.${id}`] = {
+      properties: { value: { path: [{ kind: "property", name: "value" }], shape, access: "read" } },
+      methods: {},
+      events: {},
+    };
+    components[id] = {
+      id,
+      vendor: "native",
+      type: `native.${id}`,
+      role: { kind: "object-target" },
+      binding: { kind: "none" },
+      container: { kind: "none" },
+    };
+  }
+
+  return { ...emptyPlan, types, components };
+}
+
+function componentValueRead(id: string, shape: Shape): ValueExpression {
+  return {
+    kind: "read",
+    from: { kind: "component", component: id },
+    member: "value",
+    path: [],
+    shape,
+    access: { kind: "property" },
+  };
+}
+
 afterEach(() => {
   history.replaceState({}, "", "/");
 });
@@ -253,6 +312,67 @@ describe("resolveRequestInput", () => {
       headers: {},
       body: {},
     });
+  });
+
+  // A multi-value input with nothing chosen reads null. A native form sends no entry for it; an
+  // empty entry ("aids=") binds as a collection holding one null.
+  it("sends no query parameter for a multi-value input with nothing chosen", () => {
+    const plan = componentValuesPlan([aids(null), residentName(null)]);
+    const input = gatherInput([assignment("aids", aidsRead()), assignment("residentName", residentNameRead())]);
+
+    expect(resolveRequestInput(input, "GET", plan, {}).urlParams).toEqual(["residentName="]);
+  });
+
+  it("sends no form-data entry for a multi-value input with nothing chosen", () => {
+    const plan = componentValuesPlan([aids(null), residentName(null)]);
+    const input = gatherInput([assignment("aids", aidsRead()), assignment("residentName", residentNameRead())], "form-data");
+
+    const body = resolveRequestInput(input, "POST", plan, {}).body as FormData;
+
+    expect([...body.entries()]).toEqual([["residentName", ""]]);
+  });
+
+  it("sends no query parameter or form-data entry for a multi-value value that is undefined", () => {
+    const input = gatherInput([assignment("aids", aidsRead())]);
+    const formInput = gatherInput([assignment("aids", aidsRead())], "form-data");
+
+    expect(resolveRequestInput(input, "GET", componentValuesPlan([aids(undefined)]), {}).urlParams).toEqual([]);
+    const body = resolveRequestInput(formInput, "POST", componentValuesPlan([aids(undefined)]), {}).body as FormData;
+    expect([...body.keys()]).toEqual([]);
+  });
+
+  it("sends no query parameter or form-data entry for a nullable collection with nothing chosen", () => {
+    const nullableAids = { kind: "nullable", inner: arrayShape(stringShape) } as const;
+    const plan = () => componentValuesPlan([{ id: "mobility-aids", shape: nullableAids, value: null }]);
+    const read = componentValueRead("mobility-aids", nullableAids);
+
+    expect(resolveRequestInput(gatherInput([assignment("aids", read)]), "GET", plan(), {}).urlParams).toEqual([]);
+    const body = resolveRequestInput(gatherInput([assignment("aids", read)], "form-data"), "POST", plan(), {}).body as FormData;
+    expect([...body.keys()]).toEqual([]);
+  });
+
+  it("sends each date of a nullable date collection as an ISO date", () => {
+    const nullableStay = { kind: "nullable", inner: arrayShape(dateShape) } as const;
+    const plan = componentValuesPlan([{ id: "stay-period", shape: nullableStay, value: [Date.parse(isoDate)] }]);
+    const input = gatherInput([assignment("stay", componentValueRead("stay-period", nullableStay))]);
+
+    expect(resolveRequestInput(input, "GET", plan, {}).urlParams).toEqual([`stay=${encodeURIComponent(isoDate)}`]);
+  });
+
+  it("keeps a JSON body as it was for a multi-value value that is missing: null is written, undefined left out", () => {
+    const input = gatherInput([assignment("aids", aidsRead())]);
+
+    expect(JSON.stringify(resolveRequestInput(input, "POST", componentValuesPlan([aids(null)]), {}).body))
+      .toBe('{"aids":null}');
+    expect(JSON.stringify(resolveRequestInput(input, "POST", componentValuesPlan([aids(undefined)]), {}).body))
+      .toBe("{}");
+  });
+
+  it("sends each chosen value of a multi-value input", () => {
+    const input = gatherInput([assignment("aids", aidsRead())]);
+
+    expect(resolveRequestInput(input, "GET", componentValuesPlan([aids(["walker", "cane"])]), {}).urlParams)
+      .toEqual(["aids=walker", "aids=cane"]);
   });
 
   it("resolves headers and route params through the same request input path", () => {

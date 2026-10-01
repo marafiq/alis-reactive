@@ -54,5 +54,12 @@ public sealed class MultiSelectLocator
         await _page.Locator("body").ClickAsync(new() { Position = new Position { X = 0, Y = 0 } });
     }
 
+    /// <summary>Removes a chosen item with its chip's close icon, then blurs.</summary>
+    public async Task RemoveItem(string itemText)
+    {
+        await Wrapper.Locator(".e-chips").Filter(new() { HasText = itemText }).Locator(".e-chips-close").ClickAsync();
+        await _page.Locator("body").ClickAsync(new() { Position = new Position { X = 0, Y = 0 } });
+    }
+
     public async Task Blur() => await _page.Keyboard.PressAsync("Escape");
 }
