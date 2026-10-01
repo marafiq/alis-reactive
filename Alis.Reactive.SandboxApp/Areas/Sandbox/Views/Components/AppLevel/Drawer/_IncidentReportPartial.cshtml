@@ -1,0 +1,34 @@
+@model IncidentReportModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.AppLevel
+@{
+    var plan = Html.ResolvePlan<IncidentReportModel>();
+}
+
+<form id="incident-report-form" class="flex flex-col gap-4">
+    @{ Html.InputField(plan, m => m.Summary, o => o.Label("What happened"))
+        .NativeTextArea(b => b.Rows(4).Placeholder("Where, when, and who was involved...")); }
+
+    @(Html.NativeButton("file-incident-report-btn", "File Report")
+        .CssClass("self-start rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Post(Url.SandboxRoute("FileIncidentReport", "Drawer"), g => g.IncludeAll())
+             .Validate<IncidentReportValidator>("incident-report-form")
+             .WhileLoading(l => l.Component<NativeLoader>().SetTarget("incident-report-form").Show())
+             .Response(r => r
+                .OnSuccess<IncidentReportFiled>((json, s) =>
+                {
+                    s.Component<NativeLoader>().Hide();
+                    s.Element("incident-status").SetText(json, x => x.Confirmation);
+                })
+                .OnError(400, e =>
+                {
+                    e.Component<NativeLoader>().Hide();
+                    e.ValidationErrors("incident-report-form");
+                }));
+        }))
+</form>
+
+@Html.RenderPlan(plan)

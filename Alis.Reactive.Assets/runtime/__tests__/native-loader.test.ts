@@ -72,3 +72,51 @@ describe("native loader timeout", () => {
     expect(isShown()).toBe(false);
   });
 });
+
+describe("native loader target", () => {
+  function renderDrawerForm(formId: string): HTMLElement {
+    const content = document.createElement("div");
+    content.id = "drawer-content";
+    content.innerHTML = `<form id="${formId}"></form>`;
+    document.body.appendChild(content);
+    return content;
+  }
+
+  // The removal is seen by one observer and the hide by the next, each a microtask.
+  async function settle(): Promise<void> {
+    await Promise.resolve();
+    await Promise.resolve();
+  }
+
+  it("stays on the page, hidden, when the element it covers is removed", async () => {
+    const drawerContent = renderDrawerForm("resident-form");
+    loader.setAttribute("data-target", "resident-form");
+    await show();
+    expect(loader.parentElement?.id).toBe("resident-form");
+
+    drawerContent.innerHTML = "";
+    await settle();
+
+    expect(document.getElementById("alis-loader")).toBe(loader);
+    expect(loader.parentElement).toBe(document.body);
+    expect(isShown()).toBe(false);
+    expect(loader.hasAttribute("data-target")).toBe(false);
+  });
+
+  it("covers the next target after the element it covered was removed", async () => {
+    loader.setAttribute("data-target", "resident-form");
+    const firstContent = renderDrawerForm("resident-form");
+    await show();
+    firstContent.remove();
+    await settle();
+
+    // The next Show finds the loader by id, as the DSL's Show does.
+    loader = document.getElementById("alis-loader") as HTMLElement;
+    renderDrawerForm("incident-form");
+    loader.setAttribute("data-target", "incident-form");
+    await show();
+
+    expect(loader.parentElement?.id).toBe("incident-form");
+    expect(isShown()).toBe(true);
+  });
+});
