@@ -1,0 +1,61 @@
+@model ResidentChartPageModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Resident Charts";
+    var plan = Html.ReactivePlan<ResidentChartPageModel>();
+    var residents = new[] { (Key: "helen", Name: "Helen Park"), (Key: "arthur", Name: "Arthur Bell") };
+
+    Html.On(plan, t => t.CustomEvent<ChartFlagged>("chart-flagged", (flag, p) =>
+        p.Element("review-flag").SetText(flag, x => x.MRN!)));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Resident Charts</native-heading>
+    <native-text color="Secondary">Maple Grove, second floor. Open a resident's chart summary.</native-text>
+
+    <native-card><native-card-body>
+        <native-hstack gap="Sm">
+            @foreach (var resident in residents)
+            {
+                @(Html.NativeButton($"open-{resident.Key}-chart-btn", $"Open {resident.Name}'s Chart")
+                    .CssClass("rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Get(Url.SandboxRoute("Chart", "ResidentChart", new { resident = resident.Key }))
+                         .Response(r => r.OnSuccess<ResidentChart>((json, s) =>
+                         {
+                             s.Element("chart-name").SetText(json, x => x.Name);
+                             s.Element("chart-mrn").SetText(json, x => x.MRN!);
+                             s.When(json, x => x.MRN).NotEmpty()
+                              .Then(t => t.Element("chart-record").SetText("Chart linked to the medical record."))
+                              .Else(e => e.Element("chart-record").SetText("No medical record yet: request one from admissions."));
+                         }));
+                    }))
+            }
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            <p class="text-sm">Resident: <span id="chart-name" class="font-medium">No chart open.</span></p>
+            <p class="text-sm">Medical record number: <span id="chart-mrn" class="font-medium"></span></p>
+            <p id="chart-record" class="text-sm text-text-muted"></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            <native-heading level="H2">Care team review</native-heading>
+            @(Html.NativeButton("flag-helen-chart-btn", "Flag Helen Park's Chart for Review")
+                .CssClass("self-start rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Dispatch("chart-flagged", new ChartFlagged { MRN = Model.ReviewChartMrn });
+                }))
+            <p class="text-sm">Flagged chart: <span id="review-flag" class="font-medium">None</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

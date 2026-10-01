@@ -139,7 +139,7 @@ namespace Alis.Reactive.Builders.Arrays
             // be rooted at the element and the method must be deterministic. Reuses the RuntimePath.call engine.
             if (node is MethodCallExpression call && call.Object != null && TryElementPath(call.Object, element, out var receiverPath))
             {
-                var methodName = CamelCase(call.Method.Name);
+                var methodName = LowerFirstLetter(call.Method.Name);
                 if (!PureElementMethods.Contains(methodName))
                     throw new InvalidOperationException(
                         "Element method '" + methodName + "' is not an allowed pure array DSL method. Add it to " +
@@ -191,7 +191,7 @@ namespace Alis.Reactive.Builders.Arrays
             var current = Unwrap(expression);
             while (current is MemberExpression member && member.Expression != null)
             {
-                segments.Insert(0, CamelCase(member.Member.Name));
+                segments.Insert(0, JsonMemberName.Of(member.Member.Name));
                 current = Unwrap(member.Expression);
             }
 
@@ -244,7 +244,8 @@ namespace Alis.Reactive.Builders.Arrays
             return expression;
         }
 
-        private static string CamelCase(string name) =>
+        // Element methods are JavaScript methods, named by their first letter lowered.
+        private static string LowerFirstLetter(string name) =>
             string.IsNullOrEmpty(name) ? name : char.ToLowerInvariant(name[0]) + name.Substring(1);
     }
 }

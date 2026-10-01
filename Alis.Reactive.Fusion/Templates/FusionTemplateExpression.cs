@@ -68,11 +68,8 @@ namespace Alis.Reactive.Fusion.Templates
 
             while (current != null)
             {
-                // Template data uses the same camelCase names as generated JSON.
-                var name = current.Member.Name;
-                if (name.Length > 0)
-                    name = char.ToLowerInvariant(name[0]) + name.Substring(1);
-                parts.Insert(0, name);
+                // Template data carries the same camel-case JSON names the runtime reads.
+                parts.Insert(0, JsonMemberName.Of(current.Member.Name));
                 current = current.Expression as MemberExpression;
             }
 

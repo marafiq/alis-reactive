@@ -26,6 +26,11 @@ namespace Alis.Reactive
     /// })
     /// </code>
     /// </para>
+    /// <para>
+    /// A property expression reads the member by its camel-case JSON name, the name ASP.NET Core
+    /// gives it by default (System.Text.Json): <c>r =&gt; r.MRN</c> reads <c>mrn</c>. The server
+    /// must write response bodies with that naming.
+    /// </para>
     /// </remarks>
     /// <typeparam name="TResponse">Response body contract used to author expression paths.</typeparam>
     public sealed class ResponseBody<TResponse> where TResponse : class

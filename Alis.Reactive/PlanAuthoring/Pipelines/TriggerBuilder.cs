@@ -44,7 +44,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a document <c>CustomEvent</c> trigger with a typed payload authoring scope.</summary>
-        /// <typeparam name="TPayload">Event-detail contract used to author payload path reads.</typeparam>
+        /// <typeparam name="TPayload">Event-detail contract used to author payload path reads. A member is read by its camel-case JSON name (<c>MRN</c> reads <c>mrn</c>), the name <c>Dispatch</c> writes.</typeparam>
         /// <param name="eventName">Event name, matching <c>p.Dispatch("name")</c> or host-page dispatch.</param>
         /// <param name="pipeline">Builds the reaction graph using the typed event payload scope.</param>
         public TriggerBuilder<TModel> CustomEvent<TPayload>(string eventName,
@@ -81,7 +81,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a typed SSE trigger and exposes the event data as a payload scope.</summary>
-        /// <typeparam name="TPayload">SSE data contract used to author payload path reads.</typeparam>
+        /// <typeparam name="TPayload">SSE data contract used to author payload path reads. A member is read by its camel-case JSON name (<c>MRN</c> reads <c>mrn</c>), so the server must write the event data with that naming.</typeparam>
         /// <param name="url">SSE endpoint URL.</param>
         /// <param name="eventType">SSE event type that must match before the pipeline runs.</param>
         /// <param name="pipeline">Builds the reaction graph using the typed SSE payload scope.</param>
@@ -109,7 +109,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a SignalR hub-method trigger with a typed payload authoring scope.</summary>
-        /// <typeparam name="TPayload">Hub method payload contract used to author payload path reads.</typeparam>
+        /// <typeparam name="TPayload">Hub method payload contract used to author payload path reads. A member is read by its camel-case JSON name (<c>MRN</c> reads <c>mrn</c>), the name SignalR's default protocol writes.</typeparam>
         /// <param name="hubUrl">SignalR hub URL.</param>
         /// <param name="methodName">Hub method name to listen for.</param>
         /// <param name="pipeline">Builds the reaction graph using the typed hub method payload scope.</param>
