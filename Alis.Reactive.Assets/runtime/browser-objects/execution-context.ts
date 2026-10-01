@@ -44,6 +44,10 @@ export class ExecutionContext {
     return new ExecutionContext({ ...this.asAvailable(), response });
   }
 
+  withoutResponse(): ExecutionContext {
+    return new ExecutionContext({ ...this.asAvailable(), response: undefined });
+  }
+
   withElement(elementScopeItem: unknown): ExecutionContext {
     const availableValues = this.asAvailable();
     return new ExecutionContext({

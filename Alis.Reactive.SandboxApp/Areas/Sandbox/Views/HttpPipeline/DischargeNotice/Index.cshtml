@@ -1,0 +1,54 @@
+@model DischargeNoticePageModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Discharge";
+    var plan = Html.ReactivePlan<DischargeNoticePageModel>();
+    var residents = new[]
+    {
+        (Key: "margaret", Name: "Margaret Hill", Room: "Maple 214", Channel: "text", Contact: "Family reached by text message"),
+        (Key: "arthur", Name: "Arthur Bell", Room: "Maple 216", Channel: "email", Contact: "Family reached by email"),
+    };
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Discharge a Resident</native-heading>
+    <native-text color="Secondary">
+        Maple Grove, second floor. Discharging a resident also notifies their family.
+    </native-text>
+
+    @foreach (var resident in residents)
+    {
+        <native-card><native-card-body>
+            <native-vstack gap="Base">
+                <native-heading level="H2">@resident.Name, @resident.Room</native-heading>
+                <native-text color="Secondary">@resident.Contact</native-text>
+                @(Html.NativeButton($"discharge-{resident.Key}-btn", "Discharge and Notify Family")
+                    .CssClass("self-start rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Post(Url.SandboxRoute("Discharge", "DischargeNotice", new { resident = resident.Key }))
+                         .Response(r => r
+                            .OnSuccess<DischargeResult>((json, s) =>
+                            {
+                                s.Element($"{resident.Key}-discharge-status").SetText(json, x => x.Message);
+                            })
+                            .Chained(c => c
+                                .Post(Url.SandboxRoute("NotifyFamily", "DischargeNotice"))
+                                .Gather(g => g.Static("channel", resident.Channel))
+                                .Response(notice => notice
+                                    .OnError<FamilyNoticeResult>(503, (json, e) =>
+                                    {
+                                        e.Element($"{resident.Key}-family-reason").SetText(json, x => x.Message);
+                                        e.Element($"{resident.Key}-family-status").SetText("The family was not notified.");
+                                    }))));
+                    }))
+                <p id="@(resident.Key)-discharge-status" class="text-sm text-text-muted">Not discharged yet.</p>
+                <p id="@(resident.Key)-family-status" class="text-sm text-text-muted">Family not contacted yet.</p>
+                <p id="@(resident.Key)-family-reason" class="text-sm text-text-muted"></p>
+            </native-vstack>
+        </native-card-body></native-card>
+    }
+</native-vstack>
+
+@Html.RenderPlan(plan)
