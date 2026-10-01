@@ -141,6 +141,10 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
 
         var editor = Page.Locator("#careops-gridopenTasks");
         await Expect(editor).ToBeVisibleAsync(new() { Timeout = 10000 });
+        // The grid focuses its numeric editor a moment after showing it, and that focus rewrites
+        // "0.00" to "0". A fill before then focuses the box itself, the rewrite drops the fill's
+        // selection, and the digits land after the number. Wait for the plain number first.
+        await Expect(editor).ToHaveValueAsync("0", new() { Timeout = 10000 });
         await editor.FillAsync("99");
 
         // Leaving the cell runs EJ2's native cell validation. The rule was generated
