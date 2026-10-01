@@ -10,6 +10,7 @@ const stringShape: Shape = { kind: "string" };
 const noneShape: Shape = { kind: "none" };
 const booleanShape: Shape = { kind: "boolean" };
 const rawShape: Shape = { kind: "raw" };
+const dateShape: Shape = { kind: "date" };
 const customWidgetVendor = "acme-widget";
 
 interface CustomWidgetRoot {
@@ -197,7 +198,80 @@ function customWidgetPlan(): PlanDocument {
   };
 }
 
+interface AdmissionWidgetRoot {
+  admissionDate: unknown;
+  stayDates: unknown;
+  isSlotAvailable(day: unknown): boolean;
+}
+
+function admissionWidgetPlan(): PlanDocument {
+  const type: BrowserObjectContract = {
+    properties: {
+      admissionDate: {
+        path: [{ kind: "property", name: "admissionDate" }],
+        shape: { kind: "nullable", inner: dateShape },
+        access: "readwrite",
+      },
+      stayDates: {
+        path: [{ kind: "property", name: "stayDates" }],
+        shape: { kind: "array", item: dateShape },
+        access: "readwrite",
+      },
+    },
+    methods: {
+      isSlotAvailable: {
+        path: [{ kind: "property", name: "isSlotAvailable" }],
+        arguments: { kind: "exact", shapes: [dateShape] },
+        returns: booleanShape,
+      },
+    },
+    events: {},
+  };
+
+  return {
+    version: 3,
+    planId: "Runtime.DateDelivery",
+    scope: { kind: "root" },
+    types: { "acme.admission": type },
+    components: {
+      "admission-widget": {
+        id: "admission-widget",
+        vendor: customWidgetVendor,
+        type: "acme.admission",
+        role: { kind: "object-target" },
+        binding: { kind: "none" },
+        container: { kind: "none" },
+      },
+    },
+    behaviors: [],
+  };
+}
+
 describe("executeReaction member targets", () => {
+  it("delivers date-shaped property writes and method arguments to the object as JavaScript Dates", () => {
+    document.body.innerHTML = `<div id="admission-widget"></div>`;
+    const daysAsked: unknown[] = [];
+    const widget: AdmissionWidgetRoot = {
+      admissionDate: null,
+      stayDates: null,
+      isSlotAvailable(day: unknown): boolean {
+        daysAsked.push(day);
+        return true;
+      },
+    };
+    (document.getElementById("admission-widget") as unknown as { reactiveWidget: AdmissionWidgetRoot }).reactiveWidget = widget;
+    const plan = admissionWidgetPlan();
+    const on = { kind: "component", component: "admission-widget" } as const;
+
+    executeReaction({ kind: "set", on, property: "admissionDate", value: shapedLiteral("2026-06-15", dateShape) }, plan);
+    executeReaction({ kind: "set", on, property: "stayDates", value: arrayLiteral(["2026-06-15", "2026-06-20"], dateShape) }, plan);
+    executeReaction({ kind: "call", on, method: "isSlotAvailable", args: [shapedLiteral("2026-06-15T09:30", dateShape)] }, plan);
+
+    expect(widget.admissionDate).toEqual(new Date(2026, 5, 15));
+    expect(widget.stayDates).toEqual([new Date(2026, 5, 15), new Date(2026, 5, 20)]);
+    expect(daysAsked).toEqual([new Date(2026, 5, 15, 9, 30)]);
+  });
+
   it("sets a component property through the declared JS object contract", () => {
     document.body.innerHTML = `<input id="resident-name" value="Ada" />`;
     const reaction: ReactionGraph = {
@@ -355,6 +429,85 @@ describe("executeReaction member targets", () => {
     executeReaction(reaction, textBoxPlan());
 
     expect(element.value).toBe("Katherine");
+  });
+
+  it("passes a missing value to a typed method argument as null, not as the type's zero", () => {
+    const ratesSet: unknown[] = [];
+    const pluginName = "runtimeMissingArgumentTarget";
+    const typeKey = `plugin.${pluginName}`;
+    registerPlugin(pluginName, {
+      setDailyRate(rate: unknown): void {
+        ratesSet.push(rate);
+      },
+    });
+    const type: BrowserObjectContract = {
+      properties: {},
+      methods: {
+        setDailyRate: {
+          path: [{ kind: "property", name: "setDailyRate" }],
+          arguments: { kind: "exact", shapes: [{ kind: "number" }] },
+          returns: noneShape,
+        },
+      },
+      events: {},
+    };
+    const plan: PlanDocument = {
+      version: 3,
+      planId: "Runtime.PluginMissingArgument",
+      scope: { kind: "root" },
+      types: { [typeKey]: type },
+      components: {},
+      behaviors: [],
+    };
+
+    executeReaction({
+      kind: "call",
+      on: { kind: "plugin", name: pluginName, type: typeKey },
+      method: "setDailyRate",
+      args: [shapedLiteral(null, { kind: "nullable", inner: { kind: "number" } })],
+    }, plan);
+
+    expect(ratesSet).toEqual([null]);
+  });
+
+  it("passes a date argument to a plugin method that declares it as a JavaScript Date", () => {
+    const daysAsked: unknown[] = [];
+    const pluginName = "runtimeDateArgumentTarget";
+    const typeKey = `plugin.${pluginName}`;
+    registerPlugin(pluginName, {
+      isRoomFree(day: unknown): boolean {
+        daysAsked.push(day);
+        return true;
+      },
+    });
+    const type: BrowserObjectContract = {
+      properties: {},
+      methods: {
+        isRoomFree: {
+          path: [{ kind: "property", name: "isRoomFree" }],
+          arguments: { kind: "exact", shapes: [dateShape] },
+          returns: booleanShape,
+        },
+      },
+      events: {},
+    };
+    const plan: PlanDocument = {
+      version: 3,
+      planId: "Runtime.PluginDateArgument",
+      scope: { kind: "root" },
+      types: { [typeKey]: type },
+      components: {},
+      behaviors: [],
+    };
+
+    executeReaction({
+      kind: "call",
+      on: { kind: "plugin", name: pluginName, type: typeKey },
+      method: "isRoomFree",
+      args: [shapedLiteral("2026-06-15", dateShape)],
+    }, plan);
+
+    expect(daysAsked).toEqual([new Date(2026, 5, 15)]);
   });
 
   it("calls a plugin command through the declared JS object contract", () => {
@@ -624,7 +777,7 @@ describe("executeReaction member targets", () => {
 
   it("starts every parallel request before waiting and runs completion after all settle", async () => {
     const releases: Array<() => void> = [];
-    const fetchMock = vi.fn((_url: string, _init: RequestInit) => new Promise<Response>(resolve => {
+    const fetchMock = vi.fn<(url: string, init: RequestInit) => Promise<Response>>(() => new Promise<Response>(resolve => {
       releases.push(() => resolve(responseJson({ ok: true })));
     }));
     vi.stubGlobal("fetch", fetchMock);

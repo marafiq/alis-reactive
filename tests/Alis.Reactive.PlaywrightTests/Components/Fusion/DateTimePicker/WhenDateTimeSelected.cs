@@ -1,4 +1,5 @@
 using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DateTimePicker;
 
@@ -8,10 +9,18 @@ public class WhenDateTimeSelected : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/DateTimePicker";
 
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_DateTimePickerModel";
-    private const string MedicationTimeId = GeneratedTypeScope + "__MedicationTime";
+    private static readonly string MedicationTimeId = IdGenerator.For<DateTimePickerModel>(m => m.MedicationTime);
 
     private DateTimePickerLocator MedicationTime => new(Page, MedicationTimeId);
+
+    // Runs west of UTC: on a UTC machine a date shifted by the time zone would still show the right day.
+    public override BrowserNewContextOptions ContextOptions()
+    {
+        // The NUnit base returns null when no options are configured; a zone needs an options object.
+        var options = base.ContextOptions() ?? new BrowserNewContextOptions();
+        options.TimezoneId = "America/Los_Angeles";
+        return options;
+    }
 
     private async Task NavigateAndBoot()
     {
@@ -39,15 +48,13 @@ public class WhenDateTimeSelected : PlaywrightTestBase
     }
 
     [Test]
-    public async Task domready_sets_initial_datetime_value()
+    public async Task medication_time_opens_set_to_june_15_2026_at_2_30_pm()
     {
         await NavigateAndBoot();
-        var wrapper = Page.Locator($"#{MedicationTimeId}");
-        await Expect(wrapper).ToBeVisibleAsync();
 
-        var visibleInputValue = await MedicationTime.Input.InputValueAsync();
-        Assert.That(visibleInputValue, Is.Not.Null.And.Not.Empty,
-            $"Expected FusionDateTimePicker input to have a value but got '{visibleInputValue}'");
+        await Expect(MedicationTime.Input).ToHaveValueAsync("6/15/2026 2:30 PM");
+        await ClickWhenStable(Page.Locator("#check-medication-btn"));
+        await Expect(Page.Locator("#medication-warning")).ToHaveTextAsync("medication time set");
 
         AssertNoConsoleErrors();
     }

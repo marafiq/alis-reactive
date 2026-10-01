@@ -1,4 +1,5 @@
 using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DatePicker;
 
@@ -8,12 +9,20 @@ public class WhenDateSelected : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/FusionDatePicker";
 
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_FusionDatePickerModel";
-    private const string AdmissionDateId = GeneratedTypeScope + "__AdmissionDate";
-    private const string DischargeDateId = GeneratedTypeScope + "__DischargeDate";
+    private static readonly string AdmissionDateId = IdGenerator.For<FusionDatePickerModel>(m => m.AdmissionDate);
+    private static readonly string DischargeDateId = IdGenerator.For<FusionDatePickerModel>(m => m.DischargeDate);
 
     private DatePickerLocator AdmissionDate => new(Page, AdmissionDateId);
     private DatePickerLocator DischargeDate => new(Page, DischargeDateId);
+
+    // Runs west of UTC: on a UTC machine a date shifted by the time zone would still show the right day.
+    public override BrowserNewContextOptions ContextOptions()
+    {
+        // The NUnit base returns null when no options are configured; a zone needs an options object.
+        var options = base.ContextOptions() ?? new BrowserNewContextOptions();
+        options.TimezoneId = "America/Los_Angeles";
+        return options;
+    }
 
     private async Task NavigateAndBoot()
     {
@@ -41,15 +50,14 @@ public class WhenDateSelected : PlaywrightTestBase
     }
 
     [Test]
-    public async Task domready_sets_initial_date_value()
+    public async Task admission_date_opens_set_to_june_15_2026()
     {
         await NavigateAndBoot();
-        var wrapper = Page.Locator($"#{AdmissionDateId}");
-        await Expect(wrapper).ToBeVisibleAsync();
 
-        var visibleInputValue = await AdmissionDate.Input.InputValueAsync();
-        Assert.That(visibleInputValue, Is.Not.Null.And.Not.Empty,
-            $"Expected FusionDatePicker input to have a value but got '{visibleInputValue}'");
+        await Expect(AdmissionDate.Input).ToHaveValueAsync("6/15/2026");
+        await AdmissionDate.CalendarIcon.ClickWhenStableAsync(Page);
+        await Expect(AdmissionDate.Popup.Locator("td.e-selected"))
+            .ToHaveAttributeAsync("aria-label", "Monday, June 15, 2026");
 
         AssertNoConsoleErrors();
     }

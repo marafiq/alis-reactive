@@ -118,6 +118,22 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
     }
 
     [Test]
+    public async Task clearing_the_cognitive_score_does_not_route_the_resident_to_memory_care()
+    {
+        await NavigateAndBoot();
+        await CompleteStep1("Margaret Thompson", "82", "Alzheimer's");
+        await FillAndBlur<Step2ClinicalModel>(m => m.CognitiveScore, "10");
+        await Expect(Page.Locator("#cognitive-status")).ToHaveTextAsync("Severe Impairment \u2014 Memory Care", new() { Timeout = 5000 });
+
+        await FillAndBlur<Step2ClinicalModel>(m => m.CognitiveScore, "");
+
+        // A blank score is no score: the page's own Else branch, not the Memory Care branch, now applies.
+        await Expect(Page.Locator("#cognitive-status")).ToHaveTextAsync("Mild/Normal \u2014 Standard");
+        await Expect(Input<Step2ClinicalModel>(m => m.CareUnit)).ToHaveValueAsync("Standard Assisted Living");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task step3_executes_room_setup_neuro_and_pain_alert_branches()
     {
         await NavigateAndBoot();

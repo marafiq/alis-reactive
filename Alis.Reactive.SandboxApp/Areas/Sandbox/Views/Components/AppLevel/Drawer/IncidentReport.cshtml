@@ -1,0 +1,36 @@
+@model IncidentReportPageModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.AppLevel
+@{
+    ViewData["Title"] = "Incident Reports";
+    var plan = Html.ReactivePlan<IncidentReportPageModel>();
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Incident Reports</native-heading>
+    <native-text color="Secondary">
+        Maple Grove, second floor. File an incident report for anything that happened this shift.
+    </native-text>
+
+    <native-card><native-card-body>
+        <native-hstack justify="Between" align="Center">
+            <native-vstack gap="Sm">
+                <native-heading level="H2">Today's reports</native-heading>
+                <p id="incident-status" class="text-sm text-text-muted">No report filed yet.</p>
+            </native-vstack>
+            @(Html.NativeButton("open-incident-report-btn", "File Incident Report")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Element("alis-drawer-title").SetText("New Incident Report");
+                    p.Component<NativeDrawer>().SetSize(DrawerSize.Md);
+                    p.Get(Url.SandboxRoute("IncidentReportForm", "Drawer"))
+                     .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
+                    p.Component<NativeDrawer>().Open();
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

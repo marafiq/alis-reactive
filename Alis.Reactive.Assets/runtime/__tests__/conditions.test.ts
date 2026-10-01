@@ -274,6 +274,37 @@ describe("condition runtime", () => {
       expect(matches(ordered("lt", "", 100, nullableNumber))).toBe(false);
     });
 
+    it("treats a value read as null as no value, not zero, even under a plain number shape", () => {
+      const score = eventPayloadValue("score", numberShape);
+      const threshold = eventPayloadValue("threshold", numberShape);
+      const blankScore = { event: { score: null, threshold: 15 } };
+      const bothBlank = { event: { score: null, threshold: null } };
+
+      expect(matches(orderedFromExpressions("lt", score, literal(15, numberShape), numberShape), blankScore)).toBe(false);
+      expect(matches(equalityFromExpressions("eq", score, literal(0, numberShape), numberShape), blankScore)).toBe(false);
+      expect(matches(equalityFromExpressions("neq", score, literal(0, numberShape), numberShape), blankScore)).toBe(true);
+      expect(matches(orderedFromExpressions("gte", score, threshold, numberShape), bothBlank)).toBe(false);
+      expect(matches(orderedFromExpressions("lt", literal(5, numberShape), threshold, numberShape), bothBlank)).toBe(false);
+      expect(matches(orderedFromExpressions("gt", literal(5, numberShape), threshold, numberShape), bothBlank)).toBe(false);
+    });
+
+    it("compares a null literal with a value read as null or absent the way the server does", () => {
+      const name = eventPayloadValue("preferredName", stringShape);
+      const nameIsNull = { event: { preferredName: null } };
+      const nameIsAbsent = { event: {} };
+      const inNullOrBlank = (op: MembershipCompareOp): MembershipCompareCondition => ({
+        ...membership(op, null, [null, ""], stringShape),
+        left: name,
+      });
+
+      expect(matches(equalityFromExpressions("eq", name, literal(null, stringShape), stringShape), nameIsNull)).toBe(true);
+      expect(matches(equalityFromExpressions("neq", name, literal(null, stringShape), stringShape), nameIsNull)).toBe(false);
+      expect(matches(equalityFromExpressions("eq", name, literal(null, stringShape), stringShape), nameIsAbsent)).toBe(true);
+      expect(matches(equalityFromExpressions("eq", name, literal("", stringShape), stringShape), nameIsNull)).toBe(false);
+      expect(matches(inNullOrBlank("in"), nameIsNull)).toBe(true);
+      expect(matches(inNullOrBlank("not-in"), nameIsNull)).toBe(false);
+    });
+
     it("compares value expressions on both sides of source-to-source conditions", () => {
       const left = eventPayloadValue("entered", numberShape);
       const right = eventPayloadValue("expected", numberShape);
