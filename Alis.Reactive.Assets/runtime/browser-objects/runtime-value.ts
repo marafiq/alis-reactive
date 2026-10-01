@@ -20,7 +20,7 @@ export class RuntimeValue {
   }
 }
 
-export function isMissingRuntimeValue(value: unknown): boolean {
+export function isMissingRuntimeValue(value: unknown): value is null | undefined {
   return value === null || value === undefined;
 }
 

@@ -8,6 +8,7 @@ import { scope } from "../../diagnostics/trace";
 import { assertNever } from "../../shared/assert-never";
 import { plainObjectRecordFrom } from "../../browser-objects/object-record";
 import { RuntimeShape } from "../../browser-objects/runtime-shape";
+import { isMissingRuntimeValue } from "../../browser-objects/runtime-value";
 
 const log = scope("gather");
 
@@ -25,6 +26,7 @@ export interface ResolvedRequestInput {
 interface RequestInputWriter {
   emitScalar(target: RequestPayloadTarget, value: unknown, shape: RuntimeShape): void;
   emitArray(target: RequestPayloadTarget, items: unknown[], itemShape: RuntimeShape): void;
+  emitMissingArray(target: RequestPayloadTarget, missingValue: null | undefined): void;
 }
 
 export function requestPayloadWriterFor(
@@ -79,6 +81,13 @@ export function writeRequestPayloadValue(
     return;
   }
 
+  // A multi-value input with nothing chosen (a MultiSelect never touched) reads null; an absent
+  // payload member reads undefined.
+  if (shape.describesArray && isMissingRuntimeValue(gatheredValue)) {
+    writer.emitMissingArray(target, gatheredValue);
+    return;
+  }
+
   writer.emitScalar(target, gatheredValue, shape);
 }
 
@@ -93,6 +102,9 @@ function createQueryStringWriter(urlParams: string[]): RequestInputWriter {
       if (arrayContainsFile(inputItems)) throw new Error("[alis] File objects cannot be sent via GET");
       appendArrayItemsToQueryString(target.name, inputItems, itemShape, urlParams);
     },
+    // A form sends no entry for a multi-value input with nothing chosen; an empty entry
+    // ("Aids=") would bind on the server as a collection holding one null.
+    emitMissingArray: () => {},
   };
 }
 
@@ -105,6 +117,8 @@ function createFormDataWriter(formData: FormData): RequestInputWriter {
     emitArray: (target, items, itemShape) => {
       appendArrayItemsToFormData(target.name, requestInputArrayItems(items), itemShape, formData);
     },
+    // As in a query string: no entry, never an empty one.
+    emitMissingArray: () => {},
   };
 }
 
@@ -119,6 +133,10 @@ function createJsonBodyWriter(body: Record<string, unknown>): RequestInputWriter
       if (arrayContainsFile(inputItems)) throw new Error("[alis] File objects require form-data body format");
       const wireItems = jsonArrayBodyValue(inputItems.map(requestInputArrayItemValue), itemShape);
       assignJsonBodyValue(body, target, wireItems);
+    },
+    // JSON keeps the value as it was read: null is written, undefined is left out of the body.
+    emitMissingArray: (target, missingValue) => {
+      assignJsonBodyValue(body, target, missingValue);
     },
   };
 }
