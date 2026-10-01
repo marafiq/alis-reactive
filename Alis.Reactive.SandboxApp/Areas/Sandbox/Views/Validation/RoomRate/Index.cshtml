@@ -1,0 +1,44 @@
+@model RoomRateModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Room Rates";
+    var plan = Html.ReactivePlan<RoomRateModel>();
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Add a Room to the Rate Sheet</native-heading>
+    <native-text color="Secondary">
+        Maple Grove community. Every room on the rate sheet needs a name, a monthly rate, and its
+        one-time community fee (0 if it is waived).
+    </native-text>
+
+    <native-card>
+    <native-card-body>
+        <form id="room-rate-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.RoomName, o => o.Required().Label("Room Name"))
+                .NativeTextBox(b => b.Placeholder("e.g. Maple 214")); }
+            @{ Html.InputField(plan, m => m.MonthlyRate, o => o.Required().Label("Monthly Rate ($)"))
+                .NativeTextBox(b => b.Type("number").Placeholder("0.00")); }
+            @{ Html.InputField(plan, m => m.CommunityFee, o => o.Required().Label("Community Fee ($)"))
+                .NativeTextBox(b => b.Type("number").Placeholder("0 if waived")); }
+        </form>
+        @(Html.NativeButton("add-room-btn", "Add Room")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("Add", "RoomRate"), g => g.IncludeAll())
+                 .Validate<RoomRateValidator>("room-rate-form")
+                 .Response(r => r
+                    .OnSuccess<RoomRateConfirmation>((json, s) =>
+                    {
+                        s.Element("room-rate-status").SetText(json, x => x.Confirmation);
+                    })
+                    .OnError(400, e => e.ValidationErrors("room-rate-form")));
+            }))
+        <p id="room-rate-status" class="mt-3 text-sm text-text-muted">No room added yet.</p>
+    </native-card-body>
+    </native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
