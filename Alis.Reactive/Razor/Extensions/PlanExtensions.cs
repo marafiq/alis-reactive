@@ -104,9 +104,7 @@ namespace Alis.Reactive.Native.Extensions
             if (!planRendersValidationSummary)
                 return new MvcHtmlString(planScript);
 
-            var encodedPlanId = System.Net.WebUtility.HtmlEncode(plan.PlanId);
-            return new MvcHtmlString(planScript +
-                $"<div data-reactive-validation-summary=\"{encodedPlanId}\" hidden></div>");
+            return new MvcHtmlString(planScript + ValidationSummaryFor(plan.PlanId));
         }
 #else
         public static IHtmlContent RenderPlan<TModel>(this IHtmlHelper<TModel> html,
@@ -123,16 +121,25 @@ namespace Alis.Reactive.Native.Extensions
             if (!planRendersValidationSummary)
                 return new HtmlString(planScript);
 
-            var encodedPlanId = System.Net.WebUtility.HtmlEncode(plan.PlanId);
-            return new HtmlString(planScript +
-                $"<div data-reactive-validation-summary=\"{encodedPlanId}\" hidden></div>");
+            return new HtmlString(planScript + ValidationSummaryFor(plan.PlanId));
         }
 #endif
+
+        // The runtime finds the summary by this id, the same one native-validation-summary writes.
+        private static string ValidationSummaryFor(string planId)
+        {
+            var encodedPlanId = System.Net.WebUtility.HtmlEncode(planId);
+            var encodedSummaryId = System.Net.WebUtility.HtmlEncode(PlanElementId.ValidationSummaryFor(planId));
+            return $"<div id=\"{encodedSummaryId}\" data-reactive-validation-summary=\"{encodedPlanId}\" hidden></div>";
+        }
     }
 
     internal static class PlanElementId
     {
         public static string For(string planId) =>
             planId.Replace('.', '-').Replace('+', '-');
+
+        public static string ValidationSummaryFor(string planId) =>
+            planId.Replace('.', '_').Replace('+', '_') + "_validation_summary";
     }
 }

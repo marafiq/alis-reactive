@@ -89,8 +89,6 @@
             @{ Html.InputField(plan, m => m.NewOpenTasks, o => o.Required().Label("Open tasks"))
                 .FusionNumericTextBox(b => b.Format("n0").Min(0).Max(12).Step(1).Placeholder("0")); }
         </form>
-        <div data-reactive-validation-summary hidden
-             class="mt-3 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700"></div>
         <native-hstack gap="Sm" justify="End" class="mt-5">
             @(Html.NativeButton("admit-cancel", "Cancel")
                 .CssClass(ButtonSecondary)

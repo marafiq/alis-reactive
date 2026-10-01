@@ -58,8 +58,6 @@
             @{ Html.InputField(plan, m => m.NewAddOnCharges, o => o.Required().Label("Add-on charges"))
                 .FusionNumericTextBox(b => b.Format("c0").Min(0).Max(5000).Step(25).Placeholder("0")); }
         </form>
-        <div data-reactive-validation-summary hidden
-             class="mt-3 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700"></div>
         <native-hstack gap="Sm" justify="End" class="mt-5">
             @(Html.NativeButton("add-charge-cancel", "Cancel")
                 .CssClass(ButtonSecondary)
