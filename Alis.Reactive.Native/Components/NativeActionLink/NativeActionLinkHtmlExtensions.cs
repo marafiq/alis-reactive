@@ -17,8 +17,9 @@ namespace Alis.Reactive.Native.Components
         /// Renders an anchor whose unmodified left click executes a reactive request pipeline.
         /// </summary>
         /// <remarks>
-        /// Pipeline must contain exactly one HTTP request, and that request URL must
-        /// match <paramref name="url"/>. The rendered anchor keeps the URL in
+        /// The click pipeline holds one HTTP request, and that request URL must
+        /// match <paramref name="url"/>; requests inside its response routes,
+        /// WhileLoading, or Finally are kept as written. The rendered anchor keeps the URL in
         /// <c>href</c> so modifier-clicks remain browser-owned; the runtime copies
         /// the clicked href into the serialized request before ordinary click execution.
         /// <code>
@@ -27,7 +28,7 @@ namespace Alis.Reactive.Native.Components
         /// </remarks>
         /// <param name="linkText">Anchor text.</param>
         /// <param name="url">Anchor href; must match the single request URL in <paramref name="pipeline"/>.</param>
-        /// <param name="pipeline">Single-request click pipeline; validation, parallel requests, and chained requests are rejected.</param>
+        /// <param name="pipeline">Click pipeline with one HTTP request. Validation anywhere in the pipeline, parallel requests, and chained requests are rejected, and so are route parameters and IncludeAll on that request.</param>
         /// <returns>Anchor builder for CSS classes or custom attributes.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="html"/> or <paramref name="pipeline"/> is <c>null</c>.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the pipeline violates the NativeActionLink request constraints.</exception>

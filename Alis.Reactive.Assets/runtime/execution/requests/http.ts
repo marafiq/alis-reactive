@@ -167,7 +167,7 @@ async function routeResponseUnavailable(
   context: ExecutionContext,
 ): Promise<void> {
   await routeAndComplete(request, planDocument, context, () =>
-    routeAnyResponseRoute(request.error, planDocument, context.asAvailable()));
+    routeAnyResponseRoute(request.error, planDocument, context.withoutResponse().asAvailable()));
 }
 
 async function routeAndComplete(
@@ -209,9 +209,13 @@ async function runRequestReactions(
   }
 }
 
+// A response route reads only its own response. The response that led to the request stays readable
+// in its gather, WhileLoading and Finally, but not here; this route's context is also what a chained
+// request and any request started in the route begin from, so after an answer with no body they find
+// no earlier answer either.
 function contextWithResponseBody(context: ExecutionContext, responseBody: HttpResponseBody): ExecutionContext {
   const bodyCanBeReadByReactions = responseBody.kind === "available";
-  if (!bodyCanBeReadByReactions) return context;
+  if (!bodyCanBeReadByReactions) return context.withoutResponse();
 
   return context.withResponse(responseBody.value);
 }

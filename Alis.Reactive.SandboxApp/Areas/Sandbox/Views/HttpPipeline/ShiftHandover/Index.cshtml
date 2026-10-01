@@ -1,0 +1,49 @@
+@model ShiftHandoverPageModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.AppLevel
+@{
+    ViewData["Title"] = "Shift Handover";
+    var plan = Html.ReactivePlan<ShiftHandoverPageModel>();
+    var notes = new[]
+    {
+        (Key: "helen", Name: "Helen Park", Note: "Refused dinner; offered a supplement at 7 pm."),
+        (Key: "arthur", Name: "Arthur Lee", Note: "New walker delivered; needs a fitting check."),
+    };
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Night Shift Handover</native-heading>
+    <native-text color="Secondary">
+        Maple Grove, second floor. Mark each handover note read once you have taken it in.
+    </native-text>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            @foreach (var note in notes)
+            {
+                var markReadUrl = Url.SandboxRoute("MarkRead", "ShiftHandover", new { resident = note.Key });
+                <div class="flex items-center justify-between rounded-md border border-border px-3 py-2">
+                    <div class="text-sm">
+                        <span class="font-medium text-text">@note.Name</span>
+                        <span class="text-text-secondary"> - @note.Note</span>
+                    </div>
+                    @(Html.NativeActionLink("Mark Read", markReadUrl, p => p
+                        .Post(markReadUrl)
+                        .Gather(g => g.Header("X-Shift", "Night"))
+                        .WhileLoading(l => l.Component<NativeLoader>().Show())
+                        .Response(r => r
+                            .OnSuccess<HandoverNoteRead>((json, s) => s.Element("handover-status").SetText(json, x => x.Message))
+                            .OnError<HandoverNoteRead>(400, (json, e) => e.Element("handover-status").SetText(json, x => x.Message))
+                            .OnError<HandoverNoteRead>(409, (json, e) => e.Element("handover-status").SetText(json, x => x.Message)))
+                        .Finally(f => f.Component<NativeLoader>().Hide()))
+                        .CssClass("text-sm font-medium text-accent hover:text-accent/80")
+                        .Attr("data-testid", $"mark-read-{note.Key}"))
+                </div>
+            }
+            <p id="handover-status" class="text-sm text-text-muted">No note marked read yet.</p>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

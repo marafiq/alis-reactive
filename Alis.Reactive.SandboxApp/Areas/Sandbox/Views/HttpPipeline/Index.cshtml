@@ -58,6 +58,32 @@
         </p>
     </a>
 
+    <a asp-area="Sandbox" asp-controller="ShiftHandover" asp-action="Index"
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+        <native-hstack justify="Between" align="Start">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                Shift Handover
+            </h3>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+        </native-hstack>
+        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+            A link's request keeps its header and its Finally: marking a note read names the shift, and the loader lifts afterwards
+        </p>
+    </a>
+
+    <a asp-area="Sandbox" asp-controller="DischargeNotice" asp-action="Index"
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+        <native-hstack justify="Between" align="Start">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                Discharge Notice
+            </h3>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+        </native-hstack>
+        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+            A chained request reads only its own answer: a family notice that fails with no body shows no reason, not the discharge's message, and one that fails with a reason shows it
+        </p>
+    </a>
+
     <a asp-area="Sandbox" asp-controller="RealTime" asp-action="Index"
        class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
         <native-hstack justify="Between" align="Start">

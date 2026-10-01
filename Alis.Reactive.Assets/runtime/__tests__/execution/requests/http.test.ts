@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { executeRequest } from "../../../execution/requests/http";
 import type {
   ComponentObject,
@@ -173,7 +173,7 @@ function responseJson(body: unknown, status = 200): Response {
 }
 
 function mockFetch(responses: Response[]) {
-  const fetchMock = vi.fn(async (_url: string, _init: RequestInit) => {
+  const fetchMock = vi.fn<(url: string, init: RequestInit) => Promise<Response>>(async () => {
     const response = responses.shift();
     if (response === undefined) return new Response("", { status: 204 });
 
@@ -359,6 +359,38 @@ describe("executeRequest HTTP request lane", () => {
     expect(secondUrl).toBe("/facilities/3/residents/42");
   });
 
+  it("reads no response in a request started inside a success route when its own answer has no body", async () => {
+    document.body.innerHTML = `
+      <span id="resident"></span>
+      <span id="facility">waiting</span>
+    `;
+    mockFetch([responseJson({ name: "John Doe" }), new Response(null, { status: 204 })]);
+    const loadFacility = request({
+      success: [
+        { match: { kind: "any" }, reaction: setText("facility", payloadRead("success", "name")) },
+      ],
+    });
+    const loadResident = request({
+      success: [
+        {
+          match: { kind: "any" },
+          reaction: {
+            kind: "sequence",
+            steps: [
+              setText("resident", payloadRead("success", "name")),
+              { kind: "request", request: loadFacility },
+            ],
+          },
+        },
+      ],
+    });
+
+    await executeRequest(loadResident, nativeTextPlan(["resident", "facility"]));
+
+    expect(document.getElementById("resident")?.textContent).toBe("John Doe");
+    expect(document.getElementById("facility")?.textContent).toBe("");
+  });
+
   it("lets success routes read a response before a chained request gathers route, header, and body fields from that response", async () => {
     document.body.innerHTML = `
       <span id="tier"></span>
@@ -493,6 +525,94 @@ describe("executeRequest HTTP request lane", () => {
 
     expect(document.getElementById("error")?.textContent).toBe("Validation failed");
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  describe("a chained request's routes read only its own response", () => {
+    function dischargeThenNotify(notify: RequestPlan): RequestPlan {
+      return request({
+        success: [
+          { match: { kind: "any" }, reaction: setText("status", payloadRead("success", "message")) },
+        ],
+        chain: { kind: "follow-up", next: notify },
+      });
+    }
+
+    beforeEach(() => {
+      document.body.innerHTML = `
+        <span id="status"></span>
+        <span id="notice">waiting</span>
+      `;
+    });
+
+    it("reads no response when its own success has no body", async () => {
+      mockFetch([responseJson({ message: "Resident discharged" }), new Response(null, { status: 204 })]);
+      const notifyFamily = request({
+        success: [
+          { match: { kind: "any" }, reaction: setText("notice", payloadRead("success", "message")) },
+        ],
+      });
+
+      await executeRequest(dischargeThenNotify(notifyFamily), nativeTextPlan(["status", "notice"]));
+
+      expect(document.getElementById("status")?.textContent).toBe("Resident discharged");
+      expect(document.getElementById("notice")?.textContent).toBe("");
+    });
+
+    it("reads no response when its own error has no body", async () => {
+      mockFetch([responseJson({ message: "Resident discharged" }), new Response(null, { status: 500 })]);
+      const notifyFamily = request({
+        error: [
+          { match: { kind: "any" }, reaction: setText("notice", payloadRead("error", "message")) },
+        ],
+      });
+
+      await executeRequest(dischargeThenNotify(notifyFamily), nativeTextPlan(["status", "notice"]));
+
+      expect(document.getElementById("notice")?.textContent).toBe("");
+    });
+
+    it("still reads the response that led to it in its Finally", async () => {
+      mockFetch([responseJson({ message: "Resident discharged" }), new Response(null, { status: 204 })]);
+      const notifyFamily = request({ finally: [setText("notice", payloadRead("success", "message"))] });
+
+      await executeRequest(dischargeThenNotify(notifyFamily), nativeTextPlan(["status", "notice"]));
+
+      expect(document.getElementById("notice")?.textContent).toBe("Resident discharged");
+    });
+
+    it("leaves no earlier answer to a request chained after an answer with no body", async () => {
+      const fetchMock = mockFetch([
+        responseJson({ facilityId: "7" }),
+        new Response(null, { status: 204 }),
+        responseJson({ name: "Memory Wing" }),
+      ]);
+      const recordFacility = request({
+        input: gatherInput({ facilityId: payloadRead("success", "facilityId") }),
+      });
+      const notifyFamily = request({ chain: { kind: "follow-up", next: recordFacility } });
+
+      await executeRequest(dischargeThenNotify(notifyFamily), nativeTextPlan(["status", "notice"]));
+
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+      expect(fetchMock.mock.calls[2]![1].body).toBe("{}");
+    });
+
+    it("reads no response when it fails before any response arrives", async () => {
+      const fetchMock = vi.fn(async () => {
+        if (fetchMock.mock.calls.length === 1) return responseJson({ message: "Resident discharged" });
+        throw new TypeError("Failed to fetch");
+      });
+      vi.stubGlobal("fetch", fetchMock);
+      const notifyFamily = request({
+        error: [
+          { match: { kind: "any" }, reaction: setText("notice", payloadRead("error", "message")) },
+        ],
+      });
+
+      await executeRequest(dischargeThenNotify(notifyFamily), nativeTextPlan(["status", "notice"]));
+
+      expect(document.getElementById("notice")?.textContent).toBe("");
+    });
   });
 
   it("routes an empty json response body as a successful response with no payload", async () => {

@@ -24,12 +24,13 @@ namespace Alis.Reactive.Native.Components
                 planIdentity, new RegisteredInputComponents());
             var pipelineBuilder = new PipelineBuilder<TModel>(context);
             pipeline(pipelineBuilder);
+            var reaction = pipelineBuilder.BuildReaction();
 
+            // A request registers its validation while the reaction is built, so the check follows it.
             if (context.ValidationJobs.Count > 0)
                 throw new InvalidOperationException(
                     "NativeActionLink does not support validation.");
 
-            var reaction = pipelineBuilder.BuildReaction();
             var requestCount = 0;
             var actionLinkReaction = BuildActionLinkReaction(reaction, expectedRequestUrl, ref requestCount);
             if (requestCount != 1)
@@ -95,30 +96,31 @@ namespace Alis.Reactive.Native.Components
             return RequestPlan.Create(
                 RequestEndpoint.To(HttpMethodName.From(request.Method), RequestUrl.Of(string.Empty)),
                 BuildActionLinkInput(request.Input),
-                RequestReactions.From(request.WhileLoading, Array.Empty<ReactionGraph>()),
+                RequestReactions.From(request.WhileLoading, request.Finally),
                 ResponseRouting.From(request.Success, request.Error, RequestChain.Terminal),
                 RequestValidationTarget.None);
         }
 
+        // Body fields and headers travel with the request. A route parameter would need a {placeholder} in the
+        // href, which a modifier-click opens as written; IncludeAll would gather the page's registered inputs,
+        // which the link's own plan does not see.
         private static RequestInput BuildActionLinkInput(RequestInput input)
         {
             if (input is not GatherRequestInput gather)
                 return input;
 
-            var payloadAssignments = gather.Assignments
-                .Where(assignment => assignment.Target is RequestPayloadTarget)
-                .ToList();
+            var gathersRouteParameter = gather.Assignments.Any(assignment => assignment.Target is RequestRouteParameterTarget);
+            if (gathersRouteParameter)
+                throw new InvalidOperationException(
+                    "NativeActionLink does not support route parameters: its href must be a URL a modifier-click " +
+                    "can open. Write the resolved URL into the href and the request.");
 
-            var hasNoActionLinkInput =
-                payloadAssignments.Count == 0
-                && !gather.RegisteredInputs.SelectsRegisteredInputs;
-            if (hasNoActionLinkInput)
-                return RequestInput.None;
+            if (gather.RegisteredInputs.SelectsRegisteredInputs)
+                throw new InvalidOperationException(
+                    "NativeActionLink does not support IncludeAll: the link's request does not see the page's " +
+                    "registered inputs.");
 
-            return GatherRequestInput.From(
-                payloadAssignments,
-                RequestBodyFormat.From(gather.BodyFormat),
-                gather.RegisteredInputs);
+            return input;
         }
     }
 
