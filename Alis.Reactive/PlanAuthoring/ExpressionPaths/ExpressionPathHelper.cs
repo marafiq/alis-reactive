@@ -10,49 +10,42 @@ namespace Alis.Reactive
     // Converts property expressions into the four framework path shapes:
     // Reactive Plan value paths, MVC model-binding names, MVC element IDs,
     // and JSON request-body paths.
-    // Scoped paths add an explicit prefix such as "evt" or "responseBody";
-    // event and response helpers stay scope-relative because PayloadSource
-    // already identifies the value scope.
     // Only property chains and MVC-style constant indexers are valid.
     internal static class ExpressionPathHelper
     {
-        public static string ToPath<TSource>(string prefix, Expression<Func<TSource, object?>> expression)
-        {
-            var members = ExtractMemberChain(expression.Body);
-            return prefix + "." + ToRuntimePath(members);
-        }
-
-        public static string ToPath<TSource, TProp>(string prefix, Expression<Func<TSource, TProp>> expression)
-        {
-            var members = ExtractMemberChain(expression.Body);
-            return prefix + "." + ToRuntimePath(members);
-        }
-
         public static string ToEventPath<TPayload>(Expression<Func<TPayload, object?>> expression)
         {
-            var members = ExtractMemberChain(expression.Body);
+            var members = ExtractRuntimeMemberChain(expression.Body);
             return ToRuntimePath(members);
         }
 
         public static string ToEventPath<TPayload, TProp>(Expression<Func<TPayload, TProp>> expression)
         {
-            var members = ExtractMemberChain(expression.Body);
+            var members = ExtractRuntimeMemberChain(expression.Body);
             return ToRuntimePath(members);
         }
 
         public static string ToResponsePath<TResponse>(Expression<Func<TResponse, object?>> expression)
         {
-            var members = ExtractMemberChain(expression.Body);
+            var members = ExtractRuntimeMemberChain(expression.Body);
             return ToRuntimePath(members);
         }
 
         public static string ToResponsePath<TResponse, TProp>(Expression<Func<TResponse, TProp>> expression)
         {
-            var members = ExtractMemberChain(expression.Body);
+            var members = ExtractRuntimeMemberChain(expression.Body);
             return ToRuntimePath(members);
         }
 
-        private static List<string> ExtractMemberChain(Expression expr)
+        // A runtime path reads JSON: a response body, a dispatched or pushed payload, or a component's
+        // event arguments. The framework and ASP.NET Core write members with System.Text.Json's camel-case
+        // naming ("MRN" is "mrn"), and browser and component events already name theirs in camel case.
+        private static List<string> ExtractRuntimeMemberChain(Expression expr) => ExtractMemberChain(expr, JsonMemberName.Of);
+
+        // MVC binding names and element IDs are rebuilt from these by restoring the first letter.
+        private static List<string> ExtractMemberChain(Expression expr) => ExtractMemberChain(expr, LowerFirstLetter);
+
+        private static List<string> ExtractMemberChain(Expression expr, Func<string, string> memberName)
         {
             expr = UnwrapConvert(expr);
 
@@ -61,14 +54,14 @@ namespace Alis.Reactive
 
             if (expr is MemberExpression member)
             {
-                var members = ExtractMemberChain(member.Expression!);
-                members.Add(CamelCase(member.Member.Name));
+                var members = ExtractMemberChain(member.Expression!, memberName);
+                members.Add(memberName(member.Member.Name));
                 return members;
             }
 
             if (TryIndexAccess(expr, out var collection, out var index))
             {
-                var members = ExtractMemberChain(collection);
+                var members = ExtractMemberChain(collection, memberName);
                 var suffix = "[" + index.ToString(CultureInfo.InvariantCulture) + "]";
                 if (members.Count == 0)
                     members.Add(suffix);
@@ -247,7 +240,7 @@ namespace Alis.Reactive
             return char.ToUpperInvariant(camel[0]) + camel.Substring(1);
         }
 
-        private static string CamelCase(string name)
+        private static string LowerFirstLetter(string name)
         {
             if (string.IsNullOrEmpty(name)) return name;
             return char.ToLowerInvariant(name[0]) + name.Substring(1);

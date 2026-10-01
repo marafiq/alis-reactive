@@ -32,8 +32,8 @@ namespace Alis.Reactive.Fusion.Components
         {
             return builder.Fields(new MultiSelectFieldSettings
             {
-                Text = ToCamelCase(GetMemberName(text)),
-                Value = ToCamelCase(GetMemberName(value))
+                Text = JsonMemberName.Of(GetMemberName(text)),
+                Value = JsonMemberName.Of(GetMemberName(value))
             });
         }
 
@@ -53,9 +53,9 @@ namespace Alis.Reactive.Fusion.Components
         {
             return builder.Fields(new MultiSelectFieldSettings
             {
-                Text = ToCamelCase(GetMemberName(text)),
-                Value = ToCamelCase(GetMemberName(value)),
-                GroupBy = ToCamelCase(GetMemberName(groupBy))
+                Text = JsonMemberName.Of(GetMemberName(text)),
+                Value = JsonMemberName.Of(GetMemberName(value)),
+                GroupBy = JsonMemberName.Of(GetMemberName(groupBy))
             });
         }
 
@@ -87,7 +87,5 @@ namespace Alis.Reactive.Fusion.Components
             throw new ArgumentException("Expression must be a member access (e.g., x => x.Text)");
         }
 
-        private static string ToCamelCase(string name)
-            => string.IsNullOrEmpty(name) ? name : char.ToLowerInvariant(name[0]) + name.Substring(1);
     }
 }

@@ -50,8 +50,8 @@ namespace Alis.Reactive.Fusion.Components
         {
             return builder.Fields(new MentionFieldSettings
             {
-                Text = ToCamelCase(GetMemberName(text)),
-                Value = ToCamelCase(GetMemberName(value))
+                Text = JsonMemberName.Of(GetMemberName(text)),
+                Value = JsonMemberName.Of(GetMemberName(value))
             });
         }
 
@@ -63,8 +63,6 @@ namespace Alis.Reactive.Fusion.Components
             throw new ArgumentException("Expression must be a member access.");
         }
 
-        private static string ToCamelCase(string name) =>
-            string.IsNullOrEmpty(name) ? name : char.ToLowerInvariant(name[0]) + name.Substring(1);
 
         private static string RenderBridge(string elementId, string hostId, string targetSelector)
         {
