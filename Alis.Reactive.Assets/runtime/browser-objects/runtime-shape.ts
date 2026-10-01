@@ -62,12 +62,30 @@ export class RuntimeShape {
       return RuntimeShape.from(this.shape.inner).formatForWire(value);
     }
 
-    const valueIsDateTimestamp =
-      this.shape.kind === "date"
-      && typeof value === "number"
-      && !Number.isNaN(value);
-    if (valueIsDateTimestamp) return new Date(value).toISOString();
+    if (this.isDateTimestamp(value)) return new Date(value).toISOString();
 
     return value;
+  }
+
+  // Dates are timestamps while the runtime compares them; an object member typed as a date takes a JavaScript Date.
+  formatForObject(value: unknown): unknown {
+    if (!this.isDeclared) return value;
+
+    if (this.shape.kind === "nullable") {
+      return RuntimeShape.from(this.shape.inner).formatForObject(value);
+    }
+
+    if (this.shape.kind === "array" && Array.isArray(value)) {
+      const itemShape = this.item();
+      return value.map(item => itemShape.formatForObject(item));
+    }
+
+    if (this.isDateTimestamp(value)) return new Date(value);
+
+    return value;
+  }
+
+  private isDateTimestamp(value: unknown): value is number {
+    return this.shape.kind === "date" && typeof value === "number" && !Number.isNaN(value);
   }
 }

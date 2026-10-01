@@ -22,7 +22,8 @@ export class RuntimeObject {
     const property = this.objectContract.properties[member]!;
     const label = memberLabel(this.label, member);
     const shaped = RuntimeValue.declared(value, property.shape).usingDeclaredShape();
-    RuntimePath.from(property.path).assign(this.root, shaped, label);
+    const delivered = RuntimeShape.from(property.shape).formatForObject(shaped);
+    RuntimePath.from(property.path).assign(this.root, delivered, label);
   }
 
   call(member: string, args: unknown[]): RuntimeValue {
@@ -51,6 +52,7 @@ function prepareMethodArguments(contract: MethodArgumentContract, args: unknown[
 
 function prepareExactMethodArguments(shapes: Shape[], args: unknown[]): unknown[] {
   return args.map((arg, index) => {
-    return RuntimeShape.from(shapes[index]!).apply(arg);
+    const shape = RuntimeShape.from(shapes[index]!);
+    return shape.formatForObject(shape.apply(arg));
   });
 }
