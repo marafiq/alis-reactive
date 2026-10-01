@@ -1,7 +1,7 @@
 import type { BrowserObjectContract, MethodArgumentContract, Shape } from "../types/index";
 import { assertNever } from "../shared/assert-never";
 import { RuntimePath } from "./runtime-path";
-import { RuntimeValue } from "./runtime-value";
+import { RuntimeValue, applyShapeWhenPresent } from "./runtime-value";
 import { RuntimeShape } from "./runtime-shape";
 
 export class RuntimeObject {
@@ -52,7 +52,7 @@ function prepareMethodArguments(contract: MethodArgumentContract, args: unknown[
 
 function prepareExactMethodArguments(shapes: Shape[], args: unknown[]): unknown[] {
   return args.map((arg, index) => {
-    const shape = RuntimeShape.from(shapes[index]!);
-    return shape.formatForObject(shape.apply(arg));
+    const shape = shapes[index]!;
+    return RuntimeShape.from(shape).formatForObject(applyShapeWhenPresent(arg, shape));
   });
 }

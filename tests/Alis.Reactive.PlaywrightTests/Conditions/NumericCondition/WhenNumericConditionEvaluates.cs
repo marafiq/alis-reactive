@@ -301,6 +301,23 @@ public class WhenNumericConditionEvaluates : PlaywrightTestBase
     }
 
     [Test]
+    public async Task clearing_the_threshold_does_not_flag_the_heart_rate_as_above_threshold()
+    {
+        await NavigateAndBoot();
+        await HeartRate.FillAndBlur("80");
+        await ThresholdValue.FillAndBlur("70");
+        await Page.Locator("#check-threshold-btn").ClickAsync();
+        await Expect(Page.Locator("#threshold-result")).ToHaveTextAsync("Above threshold", new() { Timeout = 5000 });
+
+        await ThresholdValue.Clear();
+        await ThresholdValue.Blur();
+        await Page.Locator("#check-threshold-btn").ClickAsync();
+
+        await Expect(Page.Locator("#threshold-result")).ToHaveTextAsync("Below threshold", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task cross_component_boundary_equal_values_is_above()
     {
         await NavigateAndBoot();

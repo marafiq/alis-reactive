@@ -24,9 +24,9 @@ import type {
 } from "../types/index";
 import { scope } from "../diagnostics/trace";
 import { assertNever } from "../shared/assert-never";
-import { applyShape, toString } from "../shared/shape-convert";
+import { toString } from "../shared/shape-convert";
 import { ExecutionContext } from "../browser-objects/execution-context";
-import { RuntimeShape } from "../browser-objects/runtime-shape";
+import { applyShapeWhenPresent } from "../browser-objects/runtime-value";
 
 const log = scope("conditions");
 
@@ -129,7 +129,7 @@ export function evaluateCompare(
       const right = resolveRightValue(condition, planDocument, context, condition.itemShape, evaluateValueExpression);
       const items = shapeCollectionItems(left.shaped, condition.itemShape);
       traceCompare(condition, left, right);
-      return items !== undefined && items.includes(right);
+      return items !== undefined && items.some(item => sameConditionValue(item, right));
     }
 
     case "contains":
@@ -159,7 +159,7 @@ function resolveComparisonLeft(
   evaluateValueExpression: ValueEvaluator,
 ): ComparisonLeft {
   const raw = evaluateValueExpression(condition.left, planDocument, context.raw);
-  const shaped = applyShape(raw, condition.shape);
+  const shaped = applyShapeWhenPresent(raw, condition.shape);
   return { raw, shaped };
 }
 
@@ -183,8 +183,20 @@ function resolveRightValue(
   shape: Shape,
   evaluateValueExpression: ValueEvaluator,
 ): unknown {
-  const raw = evaluateValueExpression(condition.right.value, planDocument, context.raw);
-  return applyShape(raw, shape);
+  const raw = operandValue(condition.right.value, planDocument, context, evaluateValueExpression);
+  return applyShapeWhenPresent(raw, shape);
+}
+
+// A literal operand is the value written in the condition. Shaping its raw value keeps a null literal null,
+// as a read keeps a missing value missing, so both sides of a comparison follow one rule.
+function operandValue(
+  producer: ValueExpression,
+  planDocument: PlanDocument,
+  context: ExecutionContext,
+  evaluateValueExpression: ValueEvaluator,
+): unknown {
+  if (producer.kind === "literal") return producer.value;
+  return evaluateValueExpression(producer, planDocument, context.raw);
 }
 
 function resolveMembershipItems(
@@ -235,7 +247,7 @@ function resolveShapedComparisonItem(
   shape: Shape,
   evaluateValueExpression: ValueEvaluator,
 ): unknown {
-  return applyShape(evaluateValueExpression(producer, planDocument, context.raw), shape);
+  return applyShapeWhenPresent(operandValue(producer, planDocument, context, evaluateValueExpression), shape);
 }
 
 function textOperand(condition: TextRightCondition): string {
@@ -265,15 +277,21 @@ function unaryMatches(op: UnaryCompareOp, left: ComparisonLeft): boolean {
   }
 }
 
+// Null and undefined are one missing value (JSON and C# have only null); a missing value equals only another.
+function sameConditionValue(left: unknown, right: unknown): boolean {
+  const bothAreMissing = isMissingValue(left) && isMissingValue(right);
+  return bothAreMissing || left === right;
+}
+
 function equalityMatches(op: EqualityCompareOp, left: ComparisonLeft, right: unknown): boolean {
-  const valuesAreEqual = left.shaped === right;
+  const valuesAreEqual = sameConditionValue(left.shaped, right);
   if (op === "eq") return valuesAreEqual;
 
   return !valuesAreEqual;
 }
 
 function membershipMatches(op: MembershipCompareOp, left: ComparisonLeft, values: readonly unknown[]): boolean {
-  const collectionContainsLeft = values.includes(left.shaped);
+  const collectionContainsLeft = values.some(value => sameConditionValue(left.shaped, value));
   if (op === "in") return collectionContainsLeft;
 
   return !collectionContainsLeft;
@@ -282,7 +300,7 @@ function membershipMatches(op: MembershipCompareOp, left: ComparisonLeft, values
 function shapeCollectionItems(value: unknown, itemShape: Shape): unknown[] | undefined {
   if (!Array.isArray(value)) return undefined;
 
-  return RuntimeShape.from(itemShape).applyEach(value);
+  return value.map(item => applyShapeWhenPresent(item, itemShape));
 }
 
 function evaluateTextComparison(

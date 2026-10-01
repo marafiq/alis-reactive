@@ -431,6 +431,45 @@ describe("executeReaction member targets", () => {
     expect(element.value).toBe("Katherine");
   });
 
+  it("passes a missing value to a typed method argument as null, not as the type's zero", () => {
+    const ratesSet: unknown[] = [];
+    const pluginName = "runtimeMissingArgumentTarget";
+    const typeKey = `plugin.${pluginName}`;
+    registerPlugin(pluginName, {
+      setDailyRate(rate: unknown): void {
+        ratesSet.push(rate);
+      },
+    });
+    const type: BrowserObjectContract = {
+      properties: {},
+      methods: {
+        setDailyRate: {
+          path: [{ kind: "property", name: "setDailyRate" }],
+          arguments: { kind: "exact", shapes: [{ kind: "number" }] },
+          returns: noneShape,
+        },
+      },
+      events: {},
+    };
+    const plan: PlanDocument = {
+      version: 3,
+      planId: "Runtime.PluginMissingArgument",
+      scope: { kind: "root" },
+      types: { [typeKey]: type },
+      components: {},
+      behaviors: [],
+    };
+
+    executeReaction({
+      kind: "call",
+      on: { kind: "plugin", name: pluginName, type: typeKey },
+      method: "setDailyRate",
+      args: [shapedLiteral(null, { kind: "nullable", inner: { kind: "number" } })],
+    }, plan);
+
+    expect(ratesSet).toEqual([null]);
+  });
+
   it("passes a date argument to a plugin method that declares it as a JavaScript Date", () => {
     const daysAsked: unknown[] = [];
     const pluginName = "runtimeDateArgumentTarget";
