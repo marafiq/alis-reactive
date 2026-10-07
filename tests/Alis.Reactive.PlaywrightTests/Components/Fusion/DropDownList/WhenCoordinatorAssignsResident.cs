@@ -44,6 +44,7 @@ public class WhenCoordinatorAssignsResident : PlaywrightTestBase
         await Expect(Resident.Input).ToHaveValueAsync("Helen Park");
         await Expect(Page.Locator("#assignment-resident")).ToHaveTextAsync("1042");
         await Expect(Backup.Input).ToHaveValueAsync("1042");
+        await Expect(Backup.SelectedOption).ToHaveTextAsync("Helen Park");
         await Expect(Page.Locator("#assignment-backup")).ToHaveTextAsync("1042");
         AssertNoConsoleErrors();
     }
@@ -102,11 +103,13 @@ public class WhenCoordinatorAssignsResident : PlaywrightTestBase
         await NavigateAndBoot();
         await Resident.Select("Helen Park");
         await Backup.Select("Arthur Bell");
+        await Expect(Backup.SelectedOption).ToHaveTextAsync("Arthur Bell");
         await Expect(Page.Locator("#assignment-backup")).ToHaveTextAsync("1043");
         using var selected = await SaveAssignment();
         Assert.That(selected.RootElement.GetProperty("BackupResidentId").GetInt32(), Is.EqualTo(1043));
 
         await Backup.Select("Choose a backup resident");
+        await Expect(Backup.SelectedOption).ToHaveTextAsync("Choose a backup resident");
         await Expect(Page.Locator("#assignment-backup")).ToHaveTextAsync("No backup assigned.");
         using var cleared = await SaveAssignment();
         Assert.That(cleared.RootElement.GetProperty("BackupResidentId").ValueKind, Is.EqualTo(JsonValueKind.Null));
@@ -121,9 +124,11 @@ public class WhenCoordinatorAssignsResident : PlaywrightTestBase
 
         await Page.Locator("#assign-backup").ClickAsync();
         await Expect(Backup.Input).ToHaveValueAsync("1043");
+        await Expect(Backup.SelectedOption).ToHaveTextAsync("Arthur Bell");
         await Expect(Page.Locator("#assignment-backup")).ToHaveTextAsync("1043");
         await Page.Locator("#clear-backup").ClickAsync();
         await Expect(Backup.Input).ToHaveValueAsync("");
+        await Expect(Backup.SelectedOption).ToHaveTextAsync("Choose a backup resident");
         await Expect(Page.Locator("#assignment-backup")).ToHaveTextAsync("No backup assigned.");
 
         using var body = await SaveAssignment();

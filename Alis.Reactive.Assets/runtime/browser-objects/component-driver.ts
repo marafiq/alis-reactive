@@ -72,9 +72,28 @@ export function registerComponentDriver(vendor: Vendor, driver: ComponentDriver)
 }
 
 const nativeComponentDriver: ComponentDriver = {
-  resolveRoot: element => element,
+  resolveRoot: nativeComponentRoot,
   wireEvent: wireNative,
 };
+
+// A select's DOMString value setter turns null into the option value "null" instead
+// of clearing to the empty option. The native driver delivers a missing typed value as the empty
+// option value; the declared nullable shape and numeric/string reads stay intact.
+function nativeComponentRoot(element: HTMLElement): HTMLElement {
+  if (!(element instanceof HTMLSelectElement)) return element;
+
+  return new Proxy(element, {
+    get(target, member) {
+      // WebIDL accessors and methods require the actual DOM element as receiver.
+      const value = Reflect.get(target, member, target);
+      return typeof value === "function" ? value.bind(target) : value;
+    },
+    set(target, member, value) {
+      const delivered = member === "value" && value === null ? "" : value;
+      return Reflect.set(target, member, delivered, target);
+    },
+  });
+}
 
 const fusionComponentDriver: ComponentDriver = {
   resolveRoot: element => {

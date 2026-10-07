@@ -19,6 +19,9 @@ public sealed class NativeDropDownLocator
 
     public ILocator Input => _page.Locator($"#{_componentId}");
 
+    /// <summary>The selected option whose label the closed dropdown displays.</summary>
+    public ILocator SelectedOption => Input.Locator("option:checked");
+
     /// <summary>Selects the option whose visible text is exactly <paramref name="text"/>.</summary>
     public async Task Select(string text) =>
         await Input.SelectOptionAsync(new SelectOptionValue { Label = text });
