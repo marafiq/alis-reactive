@@ -1,0 +1,89 @@
+@model ResidentAssignmentModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Resident Assignment";
+    var plan = Html.ReactivePlan<ResidentAssignmentModel>();
+    var residents = new List<AssignmentResident> { new(1042, "Helen Park"), new(1043, "Arthur Bell") };
+    var nativeResidents = residents.Select(r => new SelectListItem(r.Name, r.Id.ToString())).ToList();
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Resident Assignment</native-heading>
+    <native-text color="Secondary">Choose the resident and wing for today's care assignment.</native-text>
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            @{ Html.InputField(plan, m => m.ResidentId, o => o.Label("Resident"))
+                .FusionDropDownList(b => b.DataSource(residents)
+                    .Fields<AssignmentResident>(t => t.Name, v => v.Id)
+                    .ShowClearButton(true).Placeholder("Choose a resident")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        p.When(p.Component<FusionDropDownList>(m => m.ResidentId).Value<ResidentAssignmentModel, int?>()).IsNull()
+                         .Then(s => s.Element("assignment-resident").SetText("No resident assigned."))
+                         .Else(s => s.Element("assignment-resident").SetText(s.Component<FusionDropDownList>(m => m.ResidentId).Value<ResidentAssignmentModel, int?>())))); }
+            @{ Html.InputField(plan, m => m.BackupResidentId, o => o.Label("Backup resident"))
+                .NativeDropDown(b => b.Items(nativeResidents).Placeholder("Choose a backup resident")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        p.When(p.Component<NativeDropDown>(m => m.BackupResidentId).Value<ResidentAssignmentModel, int?>()).IsNull()
+                         .Then(s => s.Element("assignment-backup").SetText("No backup assigned."))
+                         .Else(s => s.Element("assignment-backup").SetText(s.Component<NativeDropDown>(m => m.BackupResidentId).Value<ResidentAssignmentModel, int?>())))); }
+            @{ Html.InputField(plan, m => m.Wing, o => o.Label("Wing"))
+                .FusionDropDownList(b => b.DataSource(new[] { "East", "West" })
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        p.Element("assignment-wing").SetText(p.Component<FusionDropDownList>(m => m.Wing).Value()))); }
+            @(Html.NativeButton("assign-helen", "Assign Helen Park")
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Component<FusionDropDownList>(m => m.ResidentId).SetValue((int?)1042)))
+            @(Html.NativeButton("clear-assignment", "Remove assignment")
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Component<FusionDropDownList>(m => m.ResidentId).SetValue((int?)null)))
+            @(Html.NativeButton("assign-backup", "Assign Arthur Bell as backup")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<NativeDropDown>(m => m.BackupResidentId).SetValue((int?)1043);
+                    p.Element("assignment-backup").SetText(p.Component<NativeDropDown>(m => m.BackupResidentId).Value<ResidentAssignmentModel, int?>());
+                }))
+            @(Html.NativeButton("clear-backup", "Remove backup")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<NativeDropDown>(m => m.BackupResidentId).SetValue((int?)null);
+                    p.When(p.Component<NativeDropDown>(m => m.BackupResidentId).Value<ResidentAssignmentModel, int?>()).IsNull()
+                     .Then(s => s.Element("assignment-backup").SetText("No backup assigned."));
+                }))
+            @(Html.NativeButton("move-west", "Move assignment to West")
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Component<FusionDropDownList>(m => m.Wing).SetValue("West")))
+            @(Html.NativeButton("save-assignment", "Save assignment")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Post("/Sandbox/Components/DropDownList/AssignResident", g => g.IncludeAll())
+                     .Response(r => r
+                        .OnSuccess<AssignmentReceipt>((json, s) => s.Element("assignment-receipt").SetText(json, x => x.Message))
+                        .OnError<AssignmentReceipt>(400, (json, e) => e.Element("assignment-receipt").SetText(json, x => x.Message)))))
+        </native-vstack>
+    </native-card-body></native-card>
+    <p>Current assignment: <span id="assignment-resident">No resident assigned.</span></p>
+    <p>Backup resident: <span id="assignment-backup">No backup assigned.</span></p>
+    <p>Assigned wing: <span id="assignment-wing">East</span></p>
+    <p id="assignment-receipt">No assignment saved.</p>
+</native-vstack>
+@{
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        if (ViewBag.Operation == "read")
+            p.When(p.Component<FusionDropDownList>(m => m.ResidentId).Value<ResidentAssignmentModel, int?>()).NotNull()
+             .Then(s => s.Element("assignment-resident").SetText(s.Component<FusionDropDownList>(m => m.ResidentId).Value<ResidentAssignmentModel, int?>()));
+        if (ViewBag.Operation == "write")
+            p.Component<FusionDropDownList>(m => m.ResidentId).SetValue((int?)1042);
+        if (ViewBag.Operation == "clear")
+            p.Component<FusionDropDownList>(m => m.ResidentId).SetValue((int?)null);
+        if (ViewBag.Operation == "read" || ViewBag.Operation == "native-read")
+            p.When(p.Component<NativeDropDown>(m => m.BackupResidentId).Value<ResidentAssignmentModel, int?>()).NotNull()
+             .Then(s => s.Element("assignment-backup").SetText(s.Component<NativeDropDown>(m => m.BackupResidentId).Value<ResidentAssignmentModel, int?>()));
+        if (ViewBag.Operation == "string-read")
+            p.Element("assignment-resident").SetText(p.Component<FusionDropDownList>(m => m.ResidentId).Value());
+        if (ViewBag.Operation == "string-write")
+            p.Component<FusionDropDownList>(m => m.ResidentId).SetValue("1042");
+        if (ViewBag.Operation == "native-string-read")
+            p.Element("assignment-backup").SetText(p.Component<NativeDropDown>(m => m.BackupResidentId).Value());
+    }));
+}
+@Html.RenderPlan(plan)

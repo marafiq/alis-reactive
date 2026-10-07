@@ -29,6 +29,14 @@ namespace Alis.Reactive.Native.Components
             return self.EmitSet(ValueProperty, ValueExpression.Literal(value));
         }
 
+        /// <summary>Writes an option value using the bound model property's type.</summary>
+        /// <remarks>Use a typed nullable value to clear a numeric binding. The model registration and value contract must agree.</remarks>
+        public static ComponentRef<NativeDropDown, TModel> SetValue<TModel, TValue>(
+            this ComponentRef<NativeDropDown, TModel> self, TValue value)
+            where TModel : class
+            => self.EmitSet(ComponentProperty<TValue>.Named("value"),
+                ValueExpression.LiteralRaw(value, Shape.FromClrType(typeof(TValue))));
+
         /// <summary>
         /// Moves keyboard focus into the dropdown.
         /// </summary>
@@ -48,5 +56,12 @@ namespace Alis.Reactive.Native.Components
         {
             return self.Read(ValueProperty);
         }
+
+        /// <summary>Reads an option value using the bound model property's type.</summary>
+        /// <remarks>Use <c>Value&lt;TModel, int?&gt;()</c> for an <c>int?</c> binding. Incompatible registrations remain authoring errors.</remarks>
+        public static TypedComponentSource<TValue> Value<TModel, TValue>(
+            this ComponentRef<NativeDropDown, TModel> self)
+            where TModel : class
+            => self.Read(ComponentProperty<TValue>.Named("value"));
     }
 }

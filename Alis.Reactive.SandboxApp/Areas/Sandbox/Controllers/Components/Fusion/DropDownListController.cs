@@ -5,7 +5,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     [Area("Sandbox")]
     [Route("Sandbox/Components/DropDownList")]
-    public class DropDownListController : Controller
+    public partial class DropDownListController : Controller
     {
         [HttpGet("")]
         public IActionResult Index()

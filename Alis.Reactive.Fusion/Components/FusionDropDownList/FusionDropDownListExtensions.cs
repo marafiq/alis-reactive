@@ -43,6 +43,18 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitSet(ValueProperty, ValueExpression.LiteralRaw(value, Shape.String));
 
+        /// <summary>Selects a value using the bound model property's type.</summary>
+        /// <remarks>
+        /// For an <c>int?</c> binding, use <c>SetValue((int?)1042)</c> or
+        /// <c>SetValue((int?)null)</c>. The model registration and value contract must agree.
+        /// A bare <c>null</c> still selects the string overload for existing string dropdowns.
+        /// </remarks>
+        public static ComponentRef<FusionDropDownList, TModel> SetValue<TModel, TValue>(
+            this ComponentRef<FusionDropDownList, TModel> self, TValue value)
+            where TModel : class
+            => self.EmitSet(ComponentProperty<TValue>.Named(Component.ValueMember),
+                ValueExpression.LiteralRaw(value, Shape.FromClrType(typeof(TValue))));
+
         /// <summary>Writes display text without changing the selected value.</summary>
         public static ComponentRef<FusionDropDownList, TModel> SetText<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self, string text)
@@ -119,5 +131,16 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
             => self.Read(ValueProperty);
+
+        /// <summary>Reads a selected value using the bound model property's type.</summary>
+        /// <remarks>
+        /// An <c>int?</c> binding is read with <c>Value&lt;TModel, int?&gt;()</c>.
+        /// Both the component contract and the returned source carry that type;
+        /// an incompatible model registration remains an authoring error.
+        /// </remarks>
+        public static TypedComponentSource<TValue> Value<TModel, TValue>(
+            this ComponentRef<FusionDropDownList, TModel> self)
+            where TModel : class
+            => self.Read(ComponentProperty<TValue>.Named(Component.ValueMember));
     }
 }
