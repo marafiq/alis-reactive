@@ -8,6 +8,7 @@ This folder now reflects the current open architecture issues against the latest
 - `006-validation-contract-still-fails-open-and-loses-fidelity.md`
 - `007-request-payload-format-is-modeled-on-the-wrong-surface.md`
 - `008-actionlink-one-request-chain-needs-an-explicit-semantic-contract.md`
+- [Pending HTTP effects after slot unload/replacement](../docs/diagnostics/remaining-framework-bugs-2026-10-07.md#pending-http-after-slot-unload): reproduced; `Finally` cancellation semantics remain unresolved. The HTTP runtime is unchanged.
 
 ## Closed Since The Earlier Review
 
