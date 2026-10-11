@@ -70,14 +70,16 @@ public sealed class WhenGatherDslBuildsRequestInput
                 pipeline.Post("/residents", gather => gather.IncludeAll());
             }));
 
+        // values = model.fill({}): every mounted input, written into the (here empty) authored record.
         using var doc = JsonDocument.Parse(plan.RenderFormatted());
-        var values = Member(SingleSentRequest(doc.RootElement), "values").GetProperty("entries").EnumerateArray().ToArray();
+        var values = Member(SingleSentRequest(doc.RootElement), "values");
 
         Assert.Multiple(() =>
         {
-            Assert.That(values, Has.Length.EqualTo(1));
-            Assert.That(values[0].GetProperty("kind").GetString(), Is.EqualTo("spread"));
-            Assert.That(values[0].GetProperty("value").GetProperty("target").GetProperty("id").GetString(), Is.EqualTo("$model"));
+            Assert.That(values.GetProperty("kind").GetString(), Is.EqualTo("call"));
+            Assert.That(values.GetProperty("target").GetProperty("id").GetString(), Is.EqualTo("$model"));
+            Assert.That(values.GetProperty("path").EnumerateArray().Select(segment => segment.GetString()), Is.EqualTo(new[] { "fill" }));
+            Assert.That(values.GetProperty("args")[0].GetProperty("entries").GetArrayLength(), Is.EqualTo(0));
         });
     }
 

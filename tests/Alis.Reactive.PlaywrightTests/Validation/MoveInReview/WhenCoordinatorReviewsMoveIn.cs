@@ -220,11 +220,13 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
 
         await ClickWhenStable(SaveReview);
 
-        await Expect(_plan.ErrorFor(m => m.ForwardingZip)).ToHaveTextAsync("Enter the forwarding ZIP as five digits.");
+        // The field has no rule the page runs, so the server's answer shows in the page's summary.
+        await Expect(ValidationSummary).ToContainTextAsync("Enter the forwarding ZIP as five digits.");
         Assert.That(_reviewsSent, Has.Count.EqualTo(1), "The pattern ends in .NET's \\z, so the server checks it.");
         await Write(m => m.ForwardingZip, "02139");
         await ClickWhenStable(SaveReview);
         await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        await Expect(ValidationSummary).ToBeHiddenAsync();
         Assert.That(_reviewsSent, Has.Count.EqualTo(2), "Five digits pass on the server, as the page let them through.");
         AssertNoConsoleErrorsExcept("400");
     }
