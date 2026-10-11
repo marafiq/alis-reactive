@@ -12,10 +12,10 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var combo = p.Component<FusionComboBox>(m => m.Resident);
-        combo.SetValue("alice").DataBind();
-        p.Element("value-echo").SetText(combo.Value());
-        p.Element("text-echo").SetText(combo.Text());
-        p.Element("index-echo").SetText(combo.Index());
+        combo.Set(c => c.Value, "alice").DataBind();
+        p.Element("value-echo").SetText(combo.Get(c => c.Value));
+        p.Element("text-echo").SetText(combo.Get(c => c.Text));
+        p.Element("index-echo").SetText(combo.Get(c => c.Index));
     }));
 }
 
@@ -31,33 +31,33 @@
                     .Fields(new ComboBoxFieldSettings { Text = "text", Value = "value" })
                     .Placeholder("Select or enter a resident")
                     .AllowCustom(true)
-                    .PopupHeight("160px")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.Element("change-value").SetText(args, x => x.Value);
-                        p.Element("change-interacted").SetText(args, x => x.IsInteracted);
-                        p.When(args, x => x.Value).Eq("alice")
-                            .Then(t => t.Element("args-condition").SetText("alice selected"))
-                            .Else(e => e.Element("args-condition").SetText("other resident"));
+                    .PopupHeight("160px"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.Element("change-value").SetText(args, x => x.Value);
+                    p.Element("change-interacted").SetText(args, x => x.IsInteracted);
+                    p.When(args, x => x.Value).Eq("alice")
+                        .Then(t => t.Element("args-condition").SetText("alice selected"))
+                        .Else(e => e.Element("args-condition").SetText("other resident"));
 
-                        var combo = p.Component<FusionComboBox>(m => m.Resident);
-                        p.Element("event-text").SetText(combo.Text());
-                        p.When(combo.Value()).NotNull()
-                            .Then(t =>
-                            {
-                                t.Element("selected-indicator").Show();
-                                t.Element("selected-indicator").SetText("selected");
-                            })
-                            .Else(e => e.Element("selected-indicator").Hide());
-                    })
-                    .Reactive(plan, evt => evt.Focus, (args, p) =>
-                    {
-                        p.Element("focus-state").SetText("focused");
-                    })
-                    .Reactive(plan, evt => evt.Blur, (args, p) =>
-                    {
-                        p.Element("blur-state").SetText("blurred");
-                    })); }
+                    var combo = p.Component<FusionComboBox>(m => m.Resident);
+                    p.Element("event-text").SetText(combo.Get(c => c.Text));
+                    p.When(combo.Get(c => c.Value)).NotNull()
+                        .Then(t =>
+                        {
+                            t.Element("selected-indicator").Show();
+                            t.Element("selected-indicator").SetText("selected");
+                        })
+                        .Else(e => e.Element("selected-indicator").Hide());
+                })
+                .Reactive(evt => evt.Focus, (args, p) =>
+                {
+                    p.Element("focus-state").SetText("focused");
+                })
+                .Reactive(evt => evt.Blur, (args, p) =>
+                {
+                    p.Element("blur-state").SetText("blurred");
+                }); }
         </native-grid>
 
         <native-hstack gap="Sm" class="mt-4 flex-wrap">
@@ -66,10 +66,10 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var combo = p.Component<FusionComboBox>(m => m.Resident);
-                    combo.SetValue("bennett").DataBind();
-                    p.Element("value-echo").SetText(combo.Value());
-                    p.Element("text-echo").SetText(combo.Text());
-                    p.Element("index-echo").SetText(combo.Index());
+                    combo.Set(c => c.Value, "bennett").DataBind();
+                    p.Element("value-echo").SetText(combo.Get(c => c.Value));
+                    p.Element("text-echo").SetText(combo.Get(c => c.Text));
+                    p.Element("index-echo").SetText(combo.Get(c => c.Index));
                     p.Element("command-state").SetText("value set");
                 }))
             @(Html.NativeButton("set-text-btn", "Set Text")
@@ -77,10 +77,10 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var combo = p.Component<FusionComboBox>(m => m.Resident);
-                    combo.SetText("Carey").DataBind();
-                    p.Element("value-echo").SetText(combo.Value());
-                    p.Element("text-echo").SetText(combo.Text());
-                    p.Element("index-echo").SetText(combo.Index());
+                    combo.Set(c => c.Text, "Carey").DataBind();
+                    p.Element("value-echo").SetText(combo.Get(c => c.Value));
+                    p.Element("text-echo").SetText(combo.Get(c => c.Text));
+                    p.Element("index-echo").SetText(combo.Get(c => c.Index));
                     p.Element("command-state").SetText("text set");
                 }))
             @(Html.NativeButton("set-index-btn", "Set Index")
@@ -88,46 +88,46 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var combo = p.Component<FusionComboBox>(m => m.Resident);
-                    combo.SetIndex(3).DataBind();
-                    p.Element("value-echo").SetText(combo.Value());
-                    p.Element("text-echo").SetText(combo.Text());
-                    p.Element("index-echo").SetText(combo.Index());
+                    combo.Set(c => c.Index, 3).DataBind();
+                    p.Element("value-echo").SetText(combo.Get(c => c.Value));
+                    p.Element("text-echo").SetText(combo.Get(c => c.Text));
+                    p.Element("index-echo").SetText(combo.Get(c => c.Index));
                     p.Element("command-state").SetText("index set");
                 }))
             @(Html.NativeButton("show-popup-btn", "Show Popup")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionComboBox>(m => m.Resident).ShowPopup();
+                    p.Component<FusionComboBox>(m => m.Resident).Call(c => c.ShowPopup);
                 }))
             @(Html.NativeButton("hide-popup-btn", "Hide Popup")
                 .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionComboBox>(m => m.Resident).HidePopup();
+                    p.Component<FusionComboBox>(m => m.Resident).Call(c => c.HidePopup);
                 }))
             @(Html.NativeButton("focus-combo-btn", "Focus")
                 .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionComboBox>(m => m.Resident).FocusIn();
+                    p.Component<FusionComboBox>(m => m.Resident).Call(c => c.FocusIn);
                 }))
             @(Html.NativeButton("blur-combo-btn", "Blur")
                 .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionComboBox>(m => m.Resident).FocusOut();
+                    p.Component<FusionComboBox>(m => m.Resident).Call(c => c.FocusOut);
                 }))
             @(Html.NativeButton("clear-combo-btn", "Clear")
                 .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var combo = p.Component<FusionComboBox>(m => m.Resident);
-                    combo.Clear().DataBind();
+                    combo.Call(c => c.Clear).DataBind();
                     p.Element("command-state").SetText("cleared");
-                    p.Element("value-echo").SetText(combo.Value());
-                    p.Element("text-echo").SetText(combo.Text());
-                    p.When(combo.Value()).NotNull()
+                    p.Element("value-echo").SetText(combo.Get(c => c.Value));
+                    p.Element("text-echo").SetText(combo.Get(c => c.Text));
+                    p.When(combo.Get(c => c.Value)).NotNull()
                         .Then(t => t.Element("selected-indicator").Show())
                         .Else(e => e.Element("selected-indicator").Hide());
                 }))
@@ -136,7 +136,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var combo = p.Component<FusionComboBox>(m => m.Resident);
-                    p.When(combo.Index()).Eq(3)
+                    p.When(combo.Get(c => c.Index)).Eq(3)
                         .Then(t => t.Element("index-condition").SetText("index three"))
                         .Else(e => e.Element("index-condition").SetText("other index"));
                 }))
@@ -153,9 +153,9 @@
                 p.Post(Url.SandboxRoute("Echo", "ComboBox"))
                     .Gather(g =>
                     {
-                        g.Include(combo.Value(), "value");
-                        g.Include(combo.Text(), "text");
-                        g.Include(combo.Index(), "index");
+                        g.Include(combo.Get(c => c.Value), "value");
+                        g.Include(combo.Get(c => c.Text), "text");
+                        g.Include(combo.Get(c => c.Index), "index");
                     })
                     .Response(r => r.OnSuccess<FusionComboBoxEchoResponse>((json, s) =>
                     {

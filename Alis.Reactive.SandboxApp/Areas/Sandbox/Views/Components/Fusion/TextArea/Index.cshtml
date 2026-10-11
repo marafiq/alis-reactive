@@ -27,33 +27,33 @@
                 .FusionTextArea(b => b
                     .Placeholder("Describe how the resident's shift went")
                     .Rows(4)
-                    .ShowClearButton(true)
-                    .Reactive(plan, evt => evt.Input, (args, p) =>
-                    {
-                        p.Element("note-draft").SetText(args, x => x.Value);
-                        p.Element("note-draft-previous").SetText(args, x => x.PreviousValue);
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.Element("note-committed").SetText(args, x => x.Value);
-                        p.Element("note-replaced").SetText(args, x => x.PreviousValue);
+                    .ShowClearButton(true))
+                .Reactive(evt => evt.Input, (args, p) =>
+                {
+                    p.Element("note-draft").SetText(args, x => x.Value);
+                    p.Element("note-draft-previous").SetText(args, x => x.PreviousValue);
+                })
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.Element("note-committed").SetText(args, x => x.Value);
+                    p.Element("note-replaced").SetText(args, x => x.PreviousValue);
 
-                        p.When(args, x => x.IsInteracted).Truthy()
-                            .Then(edited => edited.Element("note-commit-status")
-                                .SetText("Edited by you this shift — ready to save."))
-                            .Else(carried => carried.Element("note-commit-status")
-                                .SetText("Filled from last shift's note, not edited by hand."));
-                    })
-                    .Reactive(plan, evt => evt.Focus, (args, p) =>
-                    {
-                        p.Element("note-presence").SetText("You are editing this note now.");
-                        p.Element("note-focus-snapshot").SetText(args, x => x.Value);
-                    })
-                    .Reactive(plan, evt => evt.Blur, (args, p) =>
-                    {
-                        p.Element("note-presence").SetText("Autosave pending — your changes are held.");
-                        p.Element("note-blur-snapshot").SetText(args, x => x.Value);
-                    })); }
+                    p.When(args, x => x.IsInteracted).Truthy()
+                        .Then(edited => edited.Element("note-commit-status")
+                            .SetText("Edited by you this shift — ready to save."))
+                        .Else(carried => carried.Element("note-commit-status")
+                            .SetText("Filled from last shift's note, not edited by hand."));
+                })
+                .Reactive(evt => evt.Focus, (args, p) =>
+                {
+                    p.Element("note-presence").SetText("You are editing this note now.");
+                    p.Element("note-focus-snapshot").SetText(args, x => x.Value);
+                })
+                .Reactive(evt => evt.Blur, (args, p) =>
+                {
+                    p.Element("note-presence").SetText("Autosave pending — your changes are held.");
+                    p.Element("note-blur-snapshot").SetText(args, x => x.Value);
+                }); }
 
             <native-vstack gap="Xs">
                 <native-text color="Secondary">Status: <span id="note-presence" class="font-medium text-text">Open the note to start editing.</span></native-text>
@@ -67,21 +67,21 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionTextArea>(m => m.CareNote).FocusIn();
+                        p.Component<FusionTextArea>(m => m.CareNote).Call(c => c.FocusIn);
                     }))
                 @(Html.NativeButton("close-note", "Done documenting — close the note")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionTextArea>(m => m.CareNote).FocusOut();
+                        p.Component<FusionTextArea>(m => m.CareNote).Call(c => c.FocusOut);
                     }))
                 @(Html.NativeButton("restore-note", "Use last shift's note")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var note = p.Component<FusionTextArea>(m => m.CareNote);
-                        note.SetValue(lastShiftNote);
-                        p.Element("note-restored").SetText(note.Value());
+                        note.Set(c => c.Value, lastShiftNote).Call(c => c.DataBind);
+                        p.Element("note-restored").SetText(note.Get(c => c.Value));
                     }))
             </native-hstack>
         </native-vstack>
@@ -106,12 +106,12 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var note = p.Component<FusionTextArea>(m => m.CareNote);
-                    p.When(note.Value()).IsEmpty()
+                    p.When(note.Get(c => c.Value)).IsEmpty()
                         .Then(empty => empty.Element("note-save-guard")
                             .SetText("Please write a care note before saving."))
                         .Else(ready =>
                             ready.Post(Url.SandboxRoute("Echo", "TextArea"))
-                                .Gather(g => g.Include(note.Value(), "careNote"))
+                                .Gather(g => g.Include(note.Get(c => c.Value), "careNote"))
                                 .Response(r => r.OnSuccess<CareNoteEchoResponse>((json, s) =>
                                 {
                                     s.Element("note-save-guard").SetText("");

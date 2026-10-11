@@ -13,7 +13,7 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var comp = p.Component<FusionMultiSelect>(m => m.Allergies);
-        p.Element("value-echo").SetText(comp.Value());
+        p.Element("value-echo").SetText(comp.Get(c => c.Value));
     }));
 
     Html.On(plan, t => t.CustomEvent("do-gather", p =>
@@ -48,22 +48,22 @@
                     .Fields<AllergyItem>(t => t.Text, v => v.Value, g => g.Category)
                     .Placeholder("Select allergies")
                     .Mode(VisualMode.Box)
-                    .Value(new string[] { "peanuts" })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.Element("change-value").SetText(args, x => x.Value);
-                        var comp = p.Component<FusionMultiSelect>(m => m.Allergies);
-                        p.When(comp.Value()).NotNull()
-                            .Then(then =>
-                            {
-                                then.Element("selected-indicator").Show();
-                                then.Element("selected-indicator").SetText("selected");
-                            })
-                            .Else(else_ =>
-                            {
-                                else_.Element("selected-indicator").Hide();
-                            });
-                    })); }
+                    .Value(new string[] { "peanuts" }))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.Element("change-value").SetText(args, x => x.Value);
+                    var comp = p.Component<FusionMultiSelect>(m => m.Allergies);
+                    p.When(comp.Get(c => c.Value)).NotNull()
+                        .Then(then =>
+                        {
+                            then.Element("selected-indicator").Show();
+                            then.Element("selected-indicator").SetText("selected");
+                        })
+                        .Else(else_ =>
+                        {
+                            else_.Element("selected-indicator").Hide();
+                        });
+                }); }
         </native-grid>
     </section>
 
@@ -79,11 +79,11 @@
                     .DataSource(dietaryRestrictions)
                     .Fields<DietaryItem>(t => t.Text, v => v.Value)
                     .Placeholder("Select dietary restrictions")
-                    .Mode(VisualMode.Box)
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.Element("dietary-change-value").SetText(args, x => x.Value);
-                    })); }
+                    .Mode(VisualMode.Box))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.Element("dietary-change-value").SetText(args, x => x.Value);
+                }); }
         </native-grid>
     </section>
 
@@ -135,19 +135,19 @@
                     .Fields<SupplyItem>(t => t.Text, v => v.Value)
                     .Placeholder("Type to search supplies...")
                     .AllowFiltering(true)
-                    .Mode(VisualMode.Box)
-                    .Reactive(plan, evt => evt.Filtering, (args, p) =>
-                    {
-                        args.PreventDefault(p);
-                        p.Get(Url.SandboxRoute("Supplies", "MultiSelect"))
-                         .Gather(g => g.FromEvent(args, x => x.Text, "Supplies"))
-                         .Response(r => r
-                            .OnSuccess<SupplySearchResponse>((json, s) =>
-                            {
-                                args.UpdateData(s, json, j => j.Supplies);
-                                s.Element("filter-status").SetText("results loaded");
-                            }));
-                    })); }
+                    .Mode(VisualMode.Box))
+                .Reactive(evt => evt.Filtering, (args, p) =>
+                {
+                    p.Payload(args).Set(a => a.PreventDefaultAction, true);
+                    p.Get(Url.SandboxRoute("Supplies", "MultiSelect"))
+                     .Gather(g => g.FromEvent(args, x => x.Text, "Supplies"))
+                     .Response(r => r
+                        .OnSuccess<SupplySearchResponse>((json, s) =>
+                        {
+                            s.Payload(args).Call(a => a.UpdateData, json.Read(j => j.Supplies));
+                            s.Element("filter-status").SetText("results loaded");
+                        }));
+                }); }
         </native-grid>
         <native-vstack gap="Xs" class="font-mono text-sm mt-2">
             <p>Filter status: <span id="filter-status" class="text-text-muted">&mdash;</span></p>
