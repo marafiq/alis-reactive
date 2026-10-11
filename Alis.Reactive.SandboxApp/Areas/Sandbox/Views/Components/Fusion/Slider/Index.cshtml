@@ -43,7 +43,7 @@
                         .Else(cool => cool.Element("comfort-zone")
                             .SetText("That's on the cool side — we'll have a blanket ready."));
                 })
-                .Reactive(evt => evt.Change, (args, p) =>
+                .Reactive(evt => evt.Changed, (args, p) =>
                 {
                     // When the handle settles, record what it changed from and how.
                     p.Element("settle-from").SetText(args, x => x.PreviousValue);
