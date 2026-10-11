@@ -58,9 +58,9 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
     {
         await NavigateAndWaitForSchedule();
 
-        // The DomReady GET returns the week's assignments; OnSuccess SetDataSource
+        // The DomReady GET returns the week's assignments; OnSuccess sets the data source
         // binds them and the Schedule renders each as an appointment labelled with
-        // the staff member and role. If SetDataSource or the load breaks, no
+        // the staff member and role. If the data source or the load breaks, no
         // appointment renders and this fails.
         await Expect(Page.GetByText(new Regex(@"\((CNA|RN|LPN)\)")).First)
             .ToBeVisibleAsync(new() { Timeout = 10000 });

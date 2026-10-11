@@ -24,7 +24,7 @@
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("audit-load-status").SetText("loaded audit rows");
             }))));
 }
@@ -44,7 +44,7 @@
             .CssClass(ButtonPrimary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).AddRecord(new ResidentDirectoryGridItem
+                p.Component<FusionGrid>(GridId).Call(c => c.AddRecord<ResidentDirectoryGridItem>(), new ResidentDirectoryGridItem
                 {
                     ResidentId = 9100, ResidentName = "Zara Added", Age = 71, CareLevel = "Assisted Living",
                     Wing = "North", Suite = "N-120", RiskLevel = "Low", PrimaryNurse = "Nora Ellis",
@@ -56,7 +56,7 @@
             .CssClass(ButtonSecondary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).AddRecord(new ResidentDirectoryGridItem
+                p.Component<FusionGrid>(GridId).Call(c => c.AddRecord<ResidentDirectoryGridItem>(), new ResidentDirectoryGridItem
                 {
                     ResidentId = 9200, ResidentName = "Blocked Admission", Age = 80, CareLevel = "Memory Care",
                     Wing = "South", Suite = "S-120", RiskLevel = "High", PrimaryNurse = "Owen Park",
@@ -69,8 +69,8 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var grid = p.Component<FusionGrid>(GridId);
-                grid.SelectRow(0);
-                grid.DeleteSelectedRecord();
+                grid.Call(c => c.SelectRow, 0);
+                grid.Call(c => c.DeleteRecord);
                 p.Element("audit-command").SetText("discharge issued");
             }))
     </native-hstack>
@@ -112,7 +112,7 @@
                 p.When(args, x => x.Data.ResidentName).Eq("Blocked Admission")
                     .Then(t =>
                     {
-                        args.Cancel(t);
+                        t.Payload(args).Set(a => a.Cancel, true);
                         t.Element("audit-blocked").SetText("admission blocked");
                     });
             })

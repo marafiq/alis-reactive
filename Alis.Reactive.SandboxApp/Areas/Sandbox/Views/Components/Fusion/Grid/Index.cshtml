@@ -66,7 +66,7 @@
          .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
          {
              s.Component<FusionGrid>("residents-grid")
-                 .SetDataSource(json);
+                 .Set(c => c.DataSource, json.Read(x => x));
              s.Element("load-status").SetText("initial data loaded");
          }));
     }));
@@ -131,7 +131,7 @@
                          .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
                          {
                              s.Component<FusionGrid>("residents-grid")
-                                 .SetDataSource(json);
+                                 .Set(c => c.DataSource, json.Read(x => x));
                              s.Element("filter-status").SetText("filtered");
                          }));
                     }); }
@@ -185,7 +185,7 @@
                          .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
                          {
                              s.Component<FusionGrid>("residents-grid")
-                                 .SetDataSource(json);
+                                 .Set(c => c.DataSource, json.Read(x => x));
                              s.Element("action-status").SetText("data refreshed");
                          }));
                     });

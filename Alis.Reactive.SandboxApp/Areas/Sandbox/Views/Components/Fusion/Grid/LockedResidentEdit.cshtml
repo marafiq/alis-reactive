@@ -15,7 +15,7 @@
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("lock-edit-status").SetText("loaded");
             }))));
 }
@@ -32,8 +32,8 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var grid = p.Component<FusionGrid>(GridId);
-                grid.SelectRow(1);
-                grid.StartEdit();
+                grid.Call(c => c.SelectRow, 1);
+                grid.Call(c => c.StartEdit);
                 p.Element("lock-edit-status").SetText("editing 6001");
             }))
         @(Html.NativeButton("edit-6000", "Edit Resident 6000")
@@ -41,8 +41,8 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var grid = p.Component<FusionGrid>(GridId);
-                grid.SelectRow(0);
-                grid.StartEdit();
+                grid.Call(c => c.SelectRow, 0);
+                grid.Call(c => c.StartEdit);
                 p.Element("lock-edit-status").SetText("editing 6000");
             }))
     </native-hstack>
@@ -73,7 +73,7 @@
                 p.When(args, x => x.RowData.ResidentId).Eq(6001)
                     .Then(t =>
                     {
-                        args.Cancel(t);
+                        t.Payload(args).Set(a => a.Cancel, true);
                         t.Element("lock-result").SetText("edit blocked for 6001");
                     });
             }))

@@ -1,6 +1,6 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-// Roster loads once over HTTP, then client-side transforms feed SetDataSource.
+// Roster loads once over HTTP, then client-side transforms feed the data source.
 // Re-filtering reads the grid's own dataSource member with no HTTP round trip.
 [TestFixture]
 public class WhenBindingArrayToGrid : PlaywrightTestBase

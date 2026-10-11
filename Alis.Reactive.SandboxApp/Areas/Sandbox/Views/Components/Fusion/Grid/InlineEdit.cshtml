@@ -16,7 +16,7 @@
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("inline-status").SetText("loaded");
             }))));
 }
@@ -33,22 +33,22 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var grid = p.Component<FusionGrid>(GridId);
-                grid.SelectRow(0);
-                grid.StartEdit();
+                grid.Call(c => c.SelectRow, 0);
+                grid.Call(c => c.StartEdit);
                 p.Element("inline-status").SetText("startEdit called");
             }))
         @(Html.NativeButton("inline-close-edit", "Cancel Edit")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).CloseEdit();
+                p.Component<FusionGrid>(GridId).Call(c => c.CloseEdit);
                 p.Element("inline-status").SetText("closeEdit called");
             }))
         @(Html.NativeButton("inline-end-edit", "Save Edit")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).EndEdit();
+                p.Component<FusionGrid>(GridId).Call(c => c.EndEdit);
                 p.Element("inline-status").SetText("endEdit called");
             }))
     </native-hstack>

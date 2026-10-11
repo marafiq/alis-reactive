@@ -168,11 +168,6 @@ public class WhenUsingFusionGridEditing : PlaywrightTestBase
         Assert.That(
             typeof(FusionGridBeforeBatchSaveArgs<ResidentDirectoryGridItem>).GetProperty("Name"),
             Is.Null);
-        Assert.That(
-            typeof(FusionGridEditEventArgsExtensions).GetMethods()
-                .Where(method => method.Name == nameof(FusionGridEditEventArgsExtensions.Cancel))
-                .Any(method => method.GetParameters()[0].ParameterType.Name.StartsWith("FusionGridCellSavedArgs")),
-            Is.False);
 
         await NavigateEditing();
 

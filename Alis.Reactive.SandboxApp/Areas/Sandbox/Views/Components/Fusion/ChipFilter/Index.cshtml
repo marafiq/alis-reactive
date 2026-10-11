@@ -32,7 +32,7 @@
          .Gather(g => g.FromEvent(payload, x => x.Selection.Texts, "careLevels"))
          .Response(r => r.OnSuccess<CareResidentResponse>((json, s) =>
          {
-             s.Component<FusionGrid>("care-grid").SetDataSource(json, x => x.Residents);
+             s.Component<FusionGrid>("care-grid").Set(c => c.DataSource, json.Read(x => x.Residents));
              s.Element("filter-status").SetText("filtered");
          }));
     }));
@@ -41,7 +41,7 @@
         p.Get(Url.SandboxRoute("Residents", "ChipFilter"))
          .Response(r => r.OnSuccess<CareResidentResponse>((json, s) =>
          {
-             s.Component<FusionGrid>("care-grid").SetDataSource(json, x => x.Residents);
+             s.Component<FusionGrid>("care-grid").Set(c => c.DataSource, json.Read(x => x.Residents));
              s.Element("filter-status").SetText("all residents");
          }))));
 

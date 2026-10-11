@@ -6,7 +6,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     /// <summary>
     /// ArrayGrid sandbox — the array DSL routed into a component data source. A roster loads once
     /// over HTTP; a client-side <c>ReactiveArray</c> transform (filter/sort over element members)
-    /// feeds the grid via <c>SetDataSource(TypedSource&lt;T[]&gt;)</c>, and re-filtering the rows
+    /// feeds the grid via <c>Set(c =&gt; c.DataSource, source)</c>, and re-filtering the rows
     /// already on screen reads the grid's own <c>dataSource</c> member — no HTTP round-trip.
     /// URL: /Sandbox/Components/ArrayGrid.
     /// </summary>

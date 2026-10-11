@@ -15,7 +15,7 @@
         p.Get(Url.SandboxRoute("OperationRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("review-status").SetText("loaded");
             }))));
 }
@@ -33,7 +33,7 @@
             {
                 var grid = p.Component<FusionGrid>(GridId);
                 p.Post(Url.SandboxRoute("CurrentViewSummary", "Grid"))
-                    .Gather(g => g.Include(grid.CurrentViewRecords<GridOperationsModel, ResidentDirectoryGridItem>(), "records"))
+                    .Gather(g => g.Include(grid.Get(c => c.GetCurrentViewRecords<ResidentDirectoryGridItem>()), "records"))
                     .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         s.Element("view-summary").SetText(json, x => x.Summary)));
             }))
@@ -43,7 +43,7 @@
             {
                 var grid = p.Component<FusionGrid>(GridId);
                 p.Post(Url.SandboxRoute("RowIndexSummary", "Grid"))
-                    .Gather(g => g.Include(grid.RowIndexByPrimaryKey(6005), "rowIndex"))
+                    .Gather(g => g.Include(grid.Get(c => c.GetRowIndexByPrimaryKey, 6005), "rowIndex"))
                     .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         s.Element("index-summary").SetText(json, x => x.Summary)));
             }))
@@ -52,9 +52,9 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var grid = p.Component<FusionGrid>(GridId);
-                grid.SelectRowsByRange(0, 1);
+                grid.Call(c => c.SelectRowsByRange, 0, 1);
                 p.Post(Url.SandboxRoute("SelectionRecords", "Grid"))
-                    .Gather(g => g.Include(grid.SelectedRecords<GridOperationsModel, ResidentDirectoryGridItem>(), "selectedRecords"))
+                    .Gather(g => g.Include(grid.Get(c => c.GetSelectedRecords<ResidentDirectoryGridItem>()), "selectedRecords"))
                     .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         s.Element("selected-summary").SetText(json, x => x.Summary)));
             }))
@@ -63,7 +63,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var grid = p.Component<FusionGrid>(GridId);
-                grid.SelectRowsByRange(0, 1);
+                grid.Call(c => c.SelectRowsByRange, 0, 1);
                 p.Post(Url.SandboxRoute("SelectionIndexes", "Grid"))
                     .Gather(g => g.Include(grid.SelectedRowIndexes<GridOperationsModel>(), "selectedRowIndexes"))
                     .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>

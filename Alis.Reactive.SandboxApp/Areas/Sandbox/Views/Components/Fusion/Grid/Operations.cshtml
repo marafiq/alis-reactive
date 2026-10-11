@@ -5,6 +5,7 @@
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.Templates
 @using Syncfusion.EJ2.Grids
+@using Alis.Reactive
 @{
     ViewData["Title"] = "FusionGrid Operations";
 
@@ -42,7 +43,7 @@
         p.Get(Url.SandboxRoute("OperationRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("operations-load-status").SetText("loaded operations rows");
             }));
     }
@@ -102,8 +103,8 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var grid = p.Component<FusionGrid>(GridId);
-                    grid.HideColumn((ResidentDirectoryGridItem x) => x.PrimaryNurse);
-                    grid.HideColumn((ResidentDirectoryGridItem x) => x.NextReviewDate);
+                    grid.Call(c => c.HideColumn, Field.Of((ResidentDirectoryGridItem x) => x.PrimaryNurse));
+                    grid.Call(c => c.HideColumn, Field.Of((ResidentDirectoryGridItem x) => x.NextReviewDate));
                     p.Element("column-command-status").SetText("care columns hidden");
                 }))
             @(Html.NativeButton("ops-show-care-columns", "Show Care Columns")
@@ -111,8 +112,8 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var grid = p.Component<FusionGrid>(GridId);
-                    grid.ShowColumn((ResidentDirectoryGridItem x) => x.PrimaryNurse);
-                    grid.ShowColumn((ResidentDirectoryGridItem x) => x.NextReviewDate);
+                    grid.Call(c => c.ShowColumn, Field.Of((ResidentDirectoryGridItem x) => x.PrimaryNurse));
+                    grid.Call(c => c.ShowColumn, Field.Of((ResidentDirectoryGridItem x) => x.NextReviewDate));
                     p.Element("column-command-status").SetText("care columns shown");
                 }))
             @(Html.NativeButton("ops-reorder-risk", "Move Risk Before Resident")
@@ -120,9 +121,10 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Component<FusionGrid>(GridId)
-                        .ReorderColumnBefore(
-                            (ResidentDirectoryGridItem x) => x.RiskLevel,
-                            (ResidentDirectoryGridItem x) => x.ResidentName);
+                        .Call(
+                            c => c.ReorderColumns,
+                            Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel),
+                            Field.Of((ResidentDirectoryGridItem x) => x.ResidentName));
                     p.Element("column-command-status").SetText("risk column moved before resident");
                 }))
             @(Html.NativeButton("ops-select-range", "Select Review Range")
@@ -130,9 +132,9 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var grid = p.Component<FusionGrid>(GridId);
-                    grid.SelectRowsByRange(0, 2);
+                    grid.Call(c => c.SelectRowsByRange, 0, 2);
                     p.Post(Url.SandboxRoute("SelectionRecords", "Grid"))
-                        .Gather(g => g.Include(grid.SelectedRecords<GridOperationsModel, ResidentDirectoryGridItem>(), "selectedRecords"))
+                        .Gather(g => g.Include(grid.Get(c => c.GetSelectedRecords<ResidentDirectoryGridItem>()), "selectedRecords"))
                         .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         {
                             s.Element("selection-range-status").SetText(json, x => x.Summary);
@@ -144,7 +146,7 @@
                 {
                     var grid = p.Component<FusionGrid>(GridId);
                     p.Post(Url.SandboxRoute("CurrentViewSummary", "Grid"))
-                        .Gather(g => g.Include(grid.CurrentViewRecords<GridOperationsModel, ResidentDirectoryGridItem>(), "records"))
+                        .Gather(g => g.Include(grid.Get(c => c.GetCurrentViewRecords<ResidentDirectoryGridItem>()), "records"))
                         .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         {
                             s.Element("current-view-status").SetText(json, x => x.Summary);
@@ -156,7 +158,7 @@
                 {
                     var grid = p.Component<FusionGrid>(GridId);
                     p.Post(Url.SandboxRoute("RowIndexSummary", "Grid"))
-                        .Gather(g => g.Include(grid.RowIndexByPrimaryKey(6005), "rowIndex"))
+                        .Gather(g => g.Include(grid.Get(c => c.GetRowIndexByPrimaryKey, 6005), "rowIndex"))
                         .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         {
                             s.Element("row-index-status").SetText(json, x => x.Summary);
@@ -167,7 +169,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Component<FusionGrid>(GridId)
-                        .SetCellValue(6002, (ResidentDirectoryGridItem x) => x.RiskLevel, "Critical");
+                        .Call(c => c.SetCellValue<string>(), 6002, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), "Critical");
                     p.Element("keyed-update-status").SetText("resident 6002 risk flagged");
                 }))
             @(Html.NativeButton("ops-set-tasks-cell", "Set Tasks For 6003")
@@ -175,7 +177,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Component<FusionGrid>(GridId)
-                        .SetCellValue(6003, (ResidentDirectoryGridItem x) => x.OpenTasks, 7);
+                        .Call(c => c.SetCellValue<int>(), 6003, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 7);
                     p.Element("keyed-update-status").SetText("resident 6003 tasks updated");
                 }))
             @(Html.NativeButton("ops-server-patch-row", "Apply Server Patch To 6005")
@@ -189,7 +191,7 @@
                     })
                     .Response(r => r.OnSuccess<ResidentGridOperationsResponse>((json, s) =>
                     {
-                        s.Component<FusionGrid>(GridId).SetRowData(6005, json, x => x.Row);
+                        s.Component<FusionGrid>(GridId).Call(c => c.SetRowData<ResidentDirectoryGridItem>(), 6005, json.Read(x => x.Row));
                         s.Element("keyed-update-status").SetText(json, x => x.Summary);
                     }));
                 }))

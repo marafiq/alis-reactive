@@ -55,8 +55,8 @@
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(InlineGridId).SetDataSource(json);
-                s.Component<FusionGrid>(DialogGridId).SetDataSource(json);
+                s.Component<FusionGrid>(InlineGridId).Set(c => c.DataSource, json.Read(x => x));
+                s.Component<FusionGrid>(DialogGridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("edit-form-load-status").SetText("loaded edit form rows");
             }))));
 }
@@ -78,8 +78,8 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var grid = p.Component<FusionGrid>(InlineGridId);
-                    grid.SelectRow(0);
-                    grid.StartEdit();
+                    grid.Call(c => c.SelectRow, 0);
+                    grid.Call(c => c.StartEdit);
                     p.Element("inline-tpl-status").SetText("inline edit started");
                 }))
         </native-hstack>
@@ -98,8 +98,8 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var grid = p.Component<FusionGrid>(DialogGridId);
-                    grid.SelectRow(0);
-                    grid.StartEdit();
+                    grid.Call(c => c.SelectRow, 0);
+                    grid.Call(c => c.StartEdit);
                     p.Element("dialog-tpl-status").SetText("dialog edit started");
                 }))
         </native-hstack>

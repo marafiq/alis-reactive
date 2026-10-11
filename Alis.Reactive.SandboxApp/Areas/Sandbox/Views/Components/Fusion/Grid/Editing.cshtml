@@ -4,6 +4,7 @@
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
+@using Alis.Reactive
 @{
     ViewData["Title"] = "FusionGrid Editing Workflows";
 
@@ -36,9 +37,9 @@
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(InlineGridId).SetDataSource(json);
-                s.Component<FusionGrid>(BatchGridId).SetDataSource(json);
-                s.Component<FusionGrid>(DialogGridId).SetDataSource(json);
+                s.Component<FusionGrid>(InlineGridId).Set(c => c.DataSource, json.Read(x => x));
+                s.Component<FusionGrid>(BatchGridId).Set(c => c.DataSource, json.Read(x => x));
+                s.Component<FusionGrid>(DialogGridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("editing-load-status").SetText("loaded editing rows");
             }));
     }
@@ -72,35 +73,35 @@
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(InlineGridId).SelectRow(0);
+                    p.Component<FusionGrid>(InlineGridId).Call(c => c.SelectRow, 0);
                     p.Element("inline-command-status").SetText("inline row selected");
                 }))
             @(Html.NativeButton("inline-start-edit", "Start Edit")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(InlineGridId).StartEdit();
+                    p.Component<FusionGrid>(InlineGridId).Call(c => c.StartEdit);
                     p.Element("inline-command-status").SetText("startEdit called");
                 }))
             @(Html.NativeButton("inline-end-edit", "End Edit")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(InlineGridId).EndEdit();
+                    p.Component<FusionGrid>(InlineGridId).Call(c => c.EndEdit);
                     p.Element("inline-command-status").SetText("endEdit called");
                 }))
             @(Html.NativeButton("inline-close-edit", "Close Edit")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(InlineGridId).CloseEdit();
+                    p.Component<FusionGrid>(InlineGridId).Call(c => c.CloseEdit);
                     p.Element("inline-command-status").SetText("closeEdit called");
                 }))
             @(Html.NativeButton("inline-add-literal", "Add Literal Row")
                 .CssClass(ButtonAccent)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(InlineGridId).AddRecord(new ResidentDirectoryGridItem
+                    p.Component<FusionGrid>(InlineGridId).Call(c => c.AddRecord<ResidentDirectoryGridItem>(), new ResidentDirectoryGridItem
                     {
                         ResidentId = 7100,
                         ResidentName = "Zara Inline",
@@ -122,7 +123,7 @@
                     p.Post(Url.SandboxRoute("CreateEditResident", "Grid"))
                         .Response(r => r.OnSuccess<ResidentGridEditResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(InlineGridId).AddRecord(json, x => x.Row, 0);
+                            s.Component<FusionGrid>(InlineGridId).Call(c => c.AddRecordAt<ResidentDirectoryGridItem>(), json.Read(x => x.Row), 0);
                             s.Element("inline-command-status").SetText(json, x => x.Summary);
                         }));
                 }))
@@ -130,7 +131,7 @@
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(InlineGridId).UpdateRow(0, new ResidentDirectoryGridItem
+                    p.Component<FusionGrid>(InlineGridId).Call(c => c.UpdateRow<ResidentDirectoryGridItem>(), 0, new ResidentDirectoryGridItem
                     {
                         ResidentId = 6000,
                         ResidentName = "Amina Updated",
@@ -149,7 +150,7 @@
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(InlineGridId).DeleteSelectedRecord();
+                    p.Component<FusionGrid>(InlineGridId).Call(c => c.DeleteRecord);
                     p.Element("inline-command-status").SetText("deleteRecord called");
                 }))
         </native-hstack>
@@ -221,7 +222,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Component<FusionGrid>(BatchGridId)
-                        .EditCell(0, (ResidentDirectoryGridItem x) => x.OpenTasks);
+                        .Call(c => c.EditCell, 0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks));
                     p.Element("batch-command-status").SetText("editCell called");
                 }))
             @(Html.NativeButton("batch-update-cell", "Set Tasks To 6")
@@ -229,14 +230,14 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Component<FusionGrid>(BatchGridId)
-                        .UpdateCell(0, (ResidentDirectoryGridItem x) => x.OpenTasks, 6);
+                        .Call(c => c.UpdateCell<int>(), 0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 6);
                     p.Element("batch-command-status").SetText("updateCell called");
                 }))
             @(Html.NativeButton("batch-save-cell", "Save Cell")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(BatchGridId).SaveCell();
+                    p.Component<FusionGrid>(BatchGridId).Call(c => c.SaveCell);
                     p.Element("batch-command-status").SetText("saveCell called");
                 }))
             @(Html.NativeButton("batch-gather-changes", "Gather Changes")
@@ -245,7 +246,7 @@
                 {
                     var grid = p.Component<FusionGrid>(BatchGridId);
                     p.Post(Url.SandboxRoute("BatchSummary", "Grid"))
-                        .Gather(g => g.Include(grid.BatchChanges<ResidentGridEditingModel, ResidentDirectoryGridItem>(), "batchChanges"))
+                        .Gather(g => g.Include(grid.Get(c => c.GetBatchChanges<ResidentDirectoryGridItem>()), "batchChanges"))
                         .Response(r => r.OnSuccess<ResidentGridBatchSummaryResponse>((json, s) =>
                         {
                             s.Element("batch-summary").SetText(json, x => x.Summary);
@@ -255,7 +256,7 @@
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(BatchGridId).EndEdit();
+                    p.Component<FusionGrid>(BatchGridId).Call(c => c.EndEdit);
                     p.Element("batch-command-status").SetText("endEdit called");
                 }))
         </native-hstack>
@@ -281,7 +282,7 @@
                 p.When(args, x => x.Value).Eq(99)
                     .Then(t =>
                     {
-                        args.Cancel(t);
+                        t.Payload(args).Set(a => a.Cancel, true);
                         t.Element("batch-cell-save-cancelled").SetText("blocked 99");
                     });
             })
@@ -300,7 +301,7 @@
                 p.When(args, x => x.BatchChanges.ChangedRecords[0].OpenTasks).Eq(8)
                     .Then(t =>
                     {
-                        args.Cancel(t);
+                        t.Payload(args).Set(a => a.Cancel, true);
                         t.Element("batch-before-save-cancelled").SetText("blocked batch 8");
                         t.Element("batch-action-complete").SetText("waiting after cancelled batch");
                     });
@@ -338,28 +339,28 @@
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(DialogGridId).SelectRow(0);
+                    p.Component<FusionGrid>(DialogGridId).Call(c => c.SelectRow, 0);
                     p.Element("dialog-command-status").SetText("dialog row selected");
                 }))
             @(Html.NativeButton("dialog-start-edit", "Open Dialog")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(DialogGridId).StartEdit();
+                    p.Component<FusionGrid>(DialogGridId).Call(c => c.StartEdit);
                     p.Element("dialog-command-status").SetText("dialog startEdit called");
                 }))
             @(Html.NativeButton("dialog-end-edit", "Save Dialog")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(DialogGridId).EndEdit();
+                    p.Component<FusionGrid>(DialogGridId).Call(c => c.EndEdit);
                     p.Element("dialog-command-status").SetText("dialog endEdit called");
                 }))
             @(Html.NativeButton("dialog-close-edit", "Close Dialog")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(DialogGridId).CloseEdit();
+                    p.Component<FusionGrid>(DialogGridId).Call(c => c.CloseEdit);
                     p.Element("dialog-command-status").SetText("dialog closeEdit called");
                 }))
         </native-hstack>
@@ -432,8 +433,8 @@
                     .Response(r => r
                         .OnSuccess<ResidentGridEditResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(InlineGridId).UpdateRow(0, json, x => x.Row);
-                            s.Component<FusionGrid>(InlineGridId).Refresh();
+                            s.Component<FusionGrid>(InlineGridId).Call(c => c.UpdateRow<ResidentDirectoryGridItem>(), 0, json.Read(x => x.Row));
+                            s.Component<FusionGrid>(InlineGridId).Call(c => c.Refresh);
                             s.Element("validation-status").SetText(json, x => x.Summary);
                             s.Element("validation-status").RemoveClass("text-red-600");
                             s.Element("validation-status").AddClass("text-green-700");

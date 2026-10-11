@@ -9,7 +9,7 @@ public class WhenUsingFusionGridServerRoster : PlaywrightTestBase
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-        // SetDataSource [response path]: the Result array bound out of the {Result, Count} body.
+        // Data source [response path]: the Result array bound out of the {Result, Count} body.
         await Expect(Page.Locator("#server-load-status"))
             .ToHaveTextAsync("loaded via response path", new() { Timeout = 10000 });
         await Expect(Page.Locator("#server-roster-grid .e-row").First)
@@ -65,7 +65,7 @@ public class WhenUsingFusionGridServerRoster : PlaywrightTestBase
     {
         await NavigateRoster();
 
-        // SetDataSource [nested data-source property path]: bind from Page.Result of the envelope.
+        // Data source [nested data-source property path]: bind from Page.Result of the envelope.
         await ClickWhenStable(Page.Locator("#server-nested"));
 
         await Expect(Page.Locator("#server-command")).ToHaveTextAsync("loaded nested path", new() { Timeout = 10000 });

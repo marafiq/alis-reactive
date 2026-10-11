@@ -4,6 +4,7 @@
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
+@using Alis.Reactive
 @{
     ViewData["Title"] = "FusionGrid Resident Directory";
 
@@ -27,7 +28,7 @@
             })
             .Response(r => r.OnSuccess<ResidentDirectoryResponse>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("directory-summary").SetText(json, x => x.Summary);
                 s.Element("directory-status").SetText(status);
             }));
@@ -43,7 +44,7 @@
             })
             .Response(r => r.OnSuccess<ResidentDirectoryResponse>((json, s) =>
             {
-                s.Component<FusionGrid>(VirtualGridId).SetDataSource(json);
+                s.Component<FusionGrid>(VirtualGridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("virtual-status").SetText(status);
                 s.Element("virtual-summary").SetText(json, x => x.Summary);
             }));
@@ -128,7 +129,7 @@
                 .CssClass("rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).GoToPage(2);
+                    p.Component<FusionGrid>(GridId).Call(c => c.GoToPage, 2);
                     p.Element("method-status").SetText("goToPage called");
                 }))
             @(Html.NativeButton("grid-sort-risk", "Sort Risk Desc")
@@ -136,28 +137,28 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Component<FusionGrid>(GridId)
-                        .SortBy((ResidentDirectoryGridItem x) => x.RiskLevel, FusionGridSortDirection.Descending);
+                        .Call(c => c.SortColumn, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), FusionGridSortDirection.Descending, false);
                     p.Element("method-status").SetText("sortColumn called");
                 }))
             @(Html.NativeButton("grid-clear-sorting", "Clear Sorting")
                 .CssClass("rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).ClearSorting();
+                    p.Component<FusionGrid>(GridId).Call(c => c.ClearSorting);
                     p.Element("method-status").SetText("sorting cleared");
                 }))
             @(Html.NativeButton("grid-search-memory", "Search Memory")
                 .CssClass("rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).Search("Memory");
+                    p.Component<FusionGrid>(GridId).Call(c => c.Search, "Memory");
                     p.Element("method-status").SetText("search called");
                 }))
             @(Html.NativeButton("grid-clear-search", "Clear Search")
                 .CssClass("rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).ClearSearch();
+                    p.Component<FusionGrid>(GridId).Call(c => c.Search, "");
                     p.Element("method-status").SetText("search cleared");
                 }))
             @(Html.NativeButton("grid-filter-north", "Filter North Wing")
@@ -165,14 +166,14 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Component<FusionGrid>(GridId)
-                        .FilterTextBy((ResidentDirectoryGridItem x) => x.Wing, FusionGridTextFilterOperator.Equal, "North");
+                        .Call(c => c.FilterByColumn, Field.Of((ResidentDirectoryGridItem x) => x.Wing), FusionGridTextFilterOperator.Equal, "North");
                     p.Element("method-status").SetText("filterByColumn called");
                 }))
             @(Html.NativeButton("grid-clear-filters", "Clear Filters")
                 .CssClass("rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).ClearFiltering();
+                    p.Component<FusionGrid>(GridId).Call(c => c.ClearFiltering);
                     p.Element("method-status").SetText("filters cleared");
                 }))
             @(Html.NativeButton("grid-group-care", "Group Care Level")
@@ -180,7 +181,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Component<FusionGrid>(GridId)
-                        .GroupBy((ResidentDirectoryGridItem x) => x.CareLevel);
+                        .Call(c => c.GroupColumn, Field.Of((ResidentDirectoryGridItem x) => x.CareLevel));
                     p.Element("method-status").SetText("groupColumn called");
                 }))
             @(Html.NativeButton("grid-group-wing", "Group Wing")
@@ -188,7 +189,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Component<FusionGrid>(GridId)
-                        .GroupBy((ResidentDirectoryGridItem x) => x.Wing);
+                        .Call(c => c.GroupColumn, Field.Of((ResidentDirectoryGridItem x) => x.Wing));
                     p.Element("method-status").SetText("groupColumn wing called");
                 }))
             @(Html.NativeButton("grid-ungroup-care", "Ungroup Care Level")
@@ -196,28 +197,28 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Component<FusionGrid>(GridId)
-                        .UngroupBy((ResidentDirectoryGridItem x) => x.CareLevel);
+                        .Call(c => c.UngroupColumn, Field.Of((ResidentDirectoryGridItem x) => x.CareLevel));
                     p.Element("method-status").SetText("ungroupColumn called");
                 }))
             @(Html.NativeButton("grid-clear-grouping", "Clear Grouping")
                 .CssClass("rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).ClearGrouping();
+                    p.Component<FusionGrid>(GridId).Call(c => c.ClearGrouping);
                     p.Element("method-status").SetText("grouping cleared");
                 }))
             @(Html.NativeButton("grid-select-second", "Select Row 2")
                 .CssClass("rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).SelectRow(1);
+                    p.Component<FusionGrid>(GridId).Call(c => c.SelectRow, 1);
                     p.Element("method-status").SetText("selectRow called");
                 }))
             @(Html.NativeButton("grid-clear-selection", "Clear Selection")
                 .CssClass("rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).ClearSelection();
+                    p.Component<FusionGrid>(GridId).Call(c => c.ClearSelection);
                     p.Element("method-status").SetText("selection cleared");
                 }))
             @(Html.NativeButton("grid-gather-selection", "Gather Selection")
@@ -226,7 +227,7 @@
                 {
                     var grid = p.Component<FusionGrid>(GridId);
                     p.Post(Url.SandboxRoute("SelectionIndexes", "Grid"))
-                        .Gather(g => g.Include(grid.SelectedRowIndexes(), "selectedRowIndexes"))
+                        .Gather(g => g.Include(grid.Get(c => c.GetSelectedRowIndexes), "selectedRowIndexes"))
                         .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         {
                             s.Element("selection-indexes").SetText(json, x => x.Summary);
@@ -238,7 +239,7 @@
                 {
                     var grid = p.Component<FusionGrid>(GridId);
                     p.Post(Url.SandboxRoute("SelectionRecords", "Grid"))
-                        .Gather(g => g.Include(grid.SelectedRecords<ResidentDirectoryModel, ResidentDirectoryGridItem>(), "selectedRecords"))
+                        .Gather(g => g.Include(grid.Get(c => c.GetSelectedRecords<ResidentDirectoryGridItem>()), "selectedRecords"))
                         .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         {
                             s.Element("selected-records").SetText(json, x => x.Summary);
@@ -309,7 +310,7 @@
                     })
                     .Response(r => r.OnSuccess<ResidentDirectoryResponse>((json, s) =>
                     {
-                        s.Component<FusionGrid>(GridId).SetDataSource(json);
+                        s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                         s.Element("directory-summary").SetText(json, x => x.Summary);
                         s.Element("directory-status").SetText("grid state sent to server");
                     }));
@@ -399,7 +400,7 @@
                     })
                     .Response(r => r.OnSuccess<ResidentDirectoryResponse>((json, s) =>
                     {
-                        s.Component<FusionGrid>(VirtualGridId).SetDataSource(json);
+                        s.Component<FusionGrid>(VirtualGridId).Set(c => c.DataSource, json.Read(x => x));
                         s.Element("virtual-status").SetText("virtual block refreshed");
                         s.Element("virtual-summary").SetText(json, x => x.Summary);
                     }));

@@ -30,7 +30,7 @@
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("ac-load-status").SetText("loaded actionComplete rows");
             }));
     }));
@@ -59,21 +59,21 @@
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).SelectRow(0);
+                    p.Component<FusionGrid>(GridId).Call(c => c.SelectRow, 0);
                     p.Element("ac-command-status").SetText("row selected");
                 }))
             @(Html.NativeButton("ac-start-edit", "Start Edit")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).StartEdit();
+                    p.Component<FusionGrid>(GridId).Call(c => c.StartEdit);
                     p.Element("ac-command-status").SetText("startEdit called");
                 }))
             @(Html.NativeButton("ac-end-edit", "End Edit")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).EndEdit();
+                    p.Component<FusionGrid>(GridId).Call(c => c.EndEdit);
                     p.Element("ac-command-status").SetText("endEdit called");
                 }))
         </native-hstack>

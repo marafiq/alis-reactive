@@ -3,6 +3,7 @@
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
+@using Alis.Reactive
 @{
     ViewData["Title"] = "Care-Ops Batch Task Update";
 
@@ -26,7 +27,7 @@
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(BatchGridId).SetDataSource(json);
+                s.Component<FusionGrid>(BatchGridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("batch-load-status").SetText("loaded batch rows");
             }))));
 }
@@ -48,7 +49,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Component<FusionGrid>(BatchGridId)
-                    .EditCell(0, (ResidentDirectoryGridItem x) => x.OpenTasks);
+                    .Call(c => c.EditCell, 0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks));
                 p.Element("batch-command-status").SetText("editCell called");
             }))
         @(Html.NativeButton("batch-update-cell", "Set Tasks To 6")
@@ -56,14 +57,14 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Component<FusionGrid>(BatchGridId)
-                    .UpdateCell(0, (ResidentDirectoryGridItem x) => x.OpenTasks, 6);
+                    .Call(c => c.UpdateCell<int>(), 0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 6);
                 p.Element("batch-command-status").SetText("updateCell called");
             }))
         @(Html.NativeButton("batch-save-cell", "Save Cell")
             .CssClass(ButtonSecondary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(BatchGridId).SaveCell();
+                p.Component<FusionGrid>(BatchGridId).Call(c => c.SaveCell);
                 p.Element("batch-command-status").SetText("saveCell called");
             }))
         @(Html.NativeButton("batch-gather-changes", "Gather Changes")
@@ -72,7 +73,7 @@
             {
                 var grid = p.Component<FusionGrid>(BatchGridId);
                 p.Post(Url.SandboxRoute("BatchSummary", "Grid"))
-                    .Gather(g => g.Include(grid.BatchChanges<ResidentGridEditingModel, ResidentDirectoryGridItem>(), "batchChanges"))
+                    .Gather(g => g.Include(grid.Get(c => c.GetBatchChanges<ResidentDirectoryGridItem>()), "batchChanges"))
                     .Response(r => r.OnSuccess<ResidentGridBatchSummaryResponse>((json, s) =>
                     {
                         s.Element("batch-summary").SetText(json, x => x.Summary);
@@ -82,7 +83,7 @@
             .CssClass(ButtonPrimary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(BatchGridId).EndEdit();
+                p.Component<FusionGrid>(BatchGridId).Call(c => c.EndEdit);
                 p.Element("batch-command-status").SetText("endEdit called");
             }))
     </native-hstack>
@@ -109,7 +110,7 @@
                 p.When(args, x => x.Value).Eq(99)
                     .Then(t =>
                     {
-                        args.Cancel(t);
+                        t.Payload(args).Set(a => a.Cancel, true);
                         t.Element("batch-cell-save-cancelled").SetText("blocked 99");
                     });
             })
@@ -128,7 +129,7 @@
                 p.When(args, x => x.BatchChanges.ChangedRecords[0].OpenTasks).Eq(8)
                     .Then(t =>
                     {
-                        args.Cancel(t);
+                        t.Payload(args).Set(a => a.Cancel, true);
                         t.Element("batch-before-save-cancelled").SetText("blocked batch 8");
                         t.Element("batch-action-complete").SetText("waiting after cancelled batch");
                     });

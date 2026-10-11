@@ -49,9 +49,9 @@ public class WhenUsingFusionGrid : PlaywrightTestBase
         using (var plan = JsonDocument.Parse(await Page.Locator("#plan-json").TextContentAsync() ?? "{}"))
         {
             Assert.That(HasResponseBodyRead(plan.RootElement, pathMustBeEmpty: true), Is.True,
-                "SetDataSource(json) must emit the canonical whole response-body read with member=responseBody and an empty path.");
+                "Set(c => c.DataSource, json.Read(x => x)) must emit the canonical whole response-body read with member=responseBody and an empty path.");
             Assert.That(HasResponseBodyRead(plan.RootElement, pathMustBeEmpty: false), Is.False,
-                "This Grid page must not emit responseBody as a member-path read for whole-response SetDataSource(json).");
+                "This Grid page must not emit responseBody as a member-path read for a whole-response data source.");
         }
 
         var nameHeader = Page.Locator("#residents-grid .e-headercell").Filter(new() { HasText = "Name" });
@@ -263,7 +263,7 @@ public class WhenUsingFusionGrid : PlaywrightTestBase
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
 
         Assert.That(planJson, Does.Contain("\"set\""),
-            "Plan must contain set reactions for SetDataSource");
+            "Plan must contain set reactions for the data source");
         Assert.That(planJson, Does.Contain("\"dataSource\""),
             "Plan must target the dataSource property");
         Assert.That(planJson, Does.Contain("residents-grid"),

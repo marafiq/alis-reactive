@@ -3,6 +3,7 @@
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
+@using Alis.Reactive
 @{
     ViewData["Title"] = "Care-Ops Batch Risk Review";
 
@@ -15,7 +16,7 @@
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("batch-risk-status").SetText("loaded");
             }))));
 }
@@ -31,7 +32,7 @@
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).UpdateCell(0, (ResidentDirectoryGridItem x) => x.RiskLevel, "Critical");
+                p.Component<FusionGrid>(GridId).Call(c => c.UpdateCell<string>(), 0, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), "Critical");
                 p.Element("batch-risk-status").SetText("updateCell string called");
             }))
         @(Html.NativeButton("batch-risk-gather", "Gather Changes")
@@ -40,7 +41,7 @@
             {
                 var grid = p.Component<FusionGrid>(GridId);
                 p.Post(Url.SandboxRoute("BatchSummary", "Grid"))
-                    .Gather(g => g.Include(grid.BatchChanges<ResidentGridEditingModel, ResidentDirectoryGridItem>(), "batchChanges"))
+                    .Gather(g => g.Include(grid.Get(c => c.GetBatchChanges<ResidentDirectoryGridItem>()), "batchChanges"))
                     .Response(r => r.OnSuccess<ResidentGridBatchSummaryResponse>((json, s) =>
                         s.Element("batch-summary").SetText(json, x => x.Summary)));
             }))

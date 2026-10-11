@@ -16,7 +16,7 @@
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("crud-status").SetText("loaded");
             }))));
 }
@@ -32,7 +32,7 @@
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).AddRecord(new ResidentDirectoryGridItem
+                p.Component<FusionGrid>(GridId).Call(c => c.AddRecord<ResidentDirectoryGridItem>(), new ResidentDirectoryGridItem
                 {
                     ResidentId = 7100,
                     ResidentName = "Zara Inline",
@@ -51,7 +51,7 @@
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).UpdateRow(0, new ResidentDirectoryGridItem
+                p.Component<FusionGrid>(GridId).Call(c => c.UpdateRow<ResidentDirectoryGridItem>(), 0, new ResidentDirectoryGridItem
                 {
                     ResidentId = 7100,
                     ResidentName = "Amina Updated",
@@ -71,8 +71,8 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var grid = p.Component<FusionGrid>(GridId);
-                grid.SelectRow(0);
-                grid.DeleteSelectedRecord();
+                grid.Call(c => c.SelectRow, 0);
+                grid.Call(c => c.DeleteRecord);
                 p.Element("crud-status").SetText("deleteRecord called");
             }))
     </native-hstack>

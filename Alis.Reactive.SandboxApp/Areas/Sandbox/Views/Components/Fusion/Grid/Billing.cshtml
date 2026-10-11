@@ -35,7 +35,7 @@
             })
             .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("billing-summary").SetText(json, x => x.Summary);
                 s.Element("billing-status").SetText(status);
             }));
@@ -80,7 +80,7 @@
                     .Response(r => r
                         .OnSuccess<ResidentBillingResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                             s.Element("billing-summary").SetText(json, x => x.Summary);
                             s.Element("billing-status").SetText("charge added");
                             s.Element("add-charge-dialog").AddClass("hidden");
@@ -141,7 +141,7 @@
                         })
                         .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                             s.Element("billing-summary").SetText(json, x => x.Summary);
                             s.Element("billing-status").SetText("filters applied");
                         }));
@@ -159,7 +159,7 @@
                         })
                         .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                             s.Element("billing-summary").SetText(json, x => x.Summary);
                             s.Element("billing-status").SetText("showing unbilled residents");
                         }));
@@ -177,7 +177,7 @@
                         })
                         .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                             s.Element("billing-summary").SetText(json, x => x.Summary);
                             s.Element("billing-status").SetText("showing memory care residents");
                         }));
@@ -208,12 +208,12 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var grid = p.Component<FusionGrid>(GridId);
-                    grid.SaveCell();
+                    grid.Call(c => c.SaveCell);
                     p.Post(Url.SandboxRoute("BillingSave", "Grid"))
-                        .Gather(g => g.Include(grid.BatchChanges<ResidentBillingViewModel, ResidentBillingItem>(), "batchChanges"))
+                        .Gather(g => g.Include(grid.Get(c => c.GetBatchChanges<ResidentBillingItem>()), "batchChanges"))
                         .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                             s.Element("billing-summary").SetText(json, x => x.Summary);
                             s.Element("billing-status").SetText("charges saved");
                         }));
@@ -227,11 +227,11 @@
                         .Gather(g =>
                         {
                             g.Static("percent", 5);
-                            g.Include(grid.SelectedRecords<ResidentBillingViewModel, ResidentBillingItem>(), "selectedRecords");
+                            g.Include(grid.Get(c => c.GetSelectedRecords<ResidentBillingItem>()), "selectedRecords");
                         })
                         .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                             s.Element("billing-summary").SetText(json, x => x.Summary);
                             s.Element("billing-status").SetText("rate increase applied");
                         }));
@@ -242,10 +242,10 @@
                 {
                     var grid = p.Component<FusionGrid>(GridId);
                     p.Post(Url.SandboxRoute("BillingMarkBilled", "Grid"))
-                        .Gather(g => g.Include(grid.SelectedRecords<ResidentBillingViewModel, ResidentBillingItem>(), "selectedRecords"))
+                        .Gather(g => g.Include(grid.Get(c => c.GetSelectedRecords<ResidentBillingItem>()), "selectedRecords"))
                         .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                             s.Element("billing-summary").SetText(json, x => x.Summary);
                             s.Element("billing-status").SetText("residents marked billed");
                         }));
@@ -260,42 +260,42 @@
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).ExcelExport();
+                    p.Component<FusionGrid>(GridId).Call(c => c.ExcelExport);
                     p.Element("tool-status").SetText("excel export started");
                 }))
             @(Html.NativeButton("billing-export-csv", "Export CSV")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).CsvExport();
+                    p.Component<FusionGrid>(GridId).Call(c => c.CsvExport);
                     p.Element("tool-status").SetText("csv export started");
                 }))
             @(Html.NativeButton("billing-export-pdf", "Export PDF")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).PdfExport();
+                    p.Component<FusionGrid>(GridId).Call(c => c.PdfExport);
                     p.Element("tool-status").SetText("pdf export started");
                 }))
             @(Html.NativeButton("billing-print", "Print Roster")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).Print();
+                    p.Component<FusionGrid>(GridId).Call(c => c.Print);
                     p.Element("tool-status").SetText("print opened");
                 }))
             @(Html.NativeButton("billing-columns", "Choose Columns")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).ShowColumnChooser();
+                    p.Component<FusionGrid>(GridId).Call(c => c.OpenColumnChooser);
                     p.Element("tool-status").SetText("column chooser opened");
                 }))
             @(Html.NativeButton("billing-autofit", "Auto-fit Columns")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).AutoFitColumns();
+                    p.Component<FusionGrid>(GridId).Call(c => c.AutoFitColumns);
                     p.Element("tool-status").SetText("columns auto-fitted");
                 }))
         </native-hstack>
@@ -360,7 +360,7 @@
                             })
                             .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
                             {
-                                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                                 s.Element("billing-summary").SetText(json, x => x.Summary);
                                 s.Element("billing-status").SetText("grid state sent to server");
                             }));

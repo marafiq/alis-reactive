@@ -31,8 +31,8 @@
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
-                s.Component<FusionGrid>(DialogGridId).SetDataSource(json);
+                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
+                s.Component<FusionGrid>(DialogGridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("begin-edit-load-status").SetText("loaded beginEdit rows");
             }));
     }));
@@ -62,35 +62,35 @@
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).SelectRow(0);
+                    p.Component<FusionGrid>(GridId).Call(c => c.SelectRow, 0);
                     p.Element("begin-edit-command-status").SetText("normal row selected");
                 }))
             @(Html.NativeButton("begin-edit-start-normal", "Start Normal Edit")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).StartEdit();
+                    p.Component<FusionGrid>(GridId).Call(c => c.StartEdit);
                     p.Element("begin-edit-command-status").SetText("normal startEdit called");
                 }))
             @(Html.NativeButton("begin-edit-close", "Close Edit")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).CloseEdit();
+                    p.Component<FusionGrid>(GridId).Call(c => c.CloseEdit);
                     p.Element("begin-edit-command-status").SetText("closeEdit called");
                 }))
             @(Html.NativeButton("begin-edit-select-locked", "Select Locked Row")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).SelectRow(1);
+                    p.Component<FusionGrid>(GridId).Call(c => c.SelectRow, 1);
                     p.Element("begin-edit-command-status").SetText("locked row selected");
                 }))
             @(Html.NativeButton("begin-edit-start-locked", "Start Locked Edit")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).StartEdit();
+                    p.Component<FusionGrid>(GridId).Call(c => c.StartEdit);
                     p.Element("begin-edit-command-status").SetText("locked startEdit called");
                 }))
         </native-hstack>
@@ -114,7 +114,7 @@
                 p.When(args, x => x.RowData.ResidentId).Eq(6001)
                     .Then(t =>
                     {
-                        args.Cancel(t);
+                        t.Payload(args).Set(a => a.Cancel, true);
                         t.Element("begin-edit-cancelled").SetText("edit cancelled");
                     });
             }))
@@ -140,14 +140,14 @@
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(DialogGridId).SelectRow(0);
+                    p.Component<FusionGrid>(DialogGridId).Call(c => c.SelectRow, 0);
                     p.Element("begin-edit-dialog-command").SetText("dialog row selected");
                 }))
             @(Html.NativeButton("begin-edit-start-dialog", "Start Dialog Edit")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(DialogGridId).StartEdit();
+                    p.Component<FusionGrid>(DialogGridId).Call(c => c.StartEdit);
                     p.Element("begin-edit-dialog-command").SetText("dialog startEdit called");
                 }))
         </native-hstack>

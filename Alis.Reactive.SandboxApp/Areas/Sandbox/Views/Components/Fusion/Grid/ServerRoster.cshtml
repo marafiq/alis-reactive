@@ -23,18 +23,18 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        // SetDataSource [response path]: read the Result array out of the {Result, Count} body.
+        // Data source [response path]: read the Result array out of the {Result, Count} body.
         p.Post(Url.SandboxRoute("DirectoryData", "Grid"))
             .Response(r => r.OnSuccess<ResidentDirectoryResponse>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json, x => x.Result);
+                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x.Result));
                 s.Element("server-load-status").SetText("loaded via response path");
             }));
         // Keyed grid loads from the whole-array body so server update/patch can replace rows.
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(KeyedGridId).SetDataSource(json);
+                s.Component<FusionGrid>(KeyedGridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("server-keyed-load-status").SetText("keyed grid loaded");
             }));
     }));
@@ -58,7 +58,7 @@
                 p.Post(Url.SandboxRoute("CreateEditResident", "Grid"))
                     .Response(r => r.OnSuccess<ResidentGridEditResponse>((json, s) =>
                     {
-                        s.Component<FusionGrid>(GridId).AddRecord(json, x => x.Row, 0);
+                        s.Component<FusionGrid>(GridId).Call(c => c.AddRecordAt<ResidentDirectoryGridItem>(), json.Read(x => x.Row), 0);
                         s.Element("server-command").SetText("server resident admitted");
                     }));
             }))
@@ -69,7 +69,7 @@
                 p.Post(Url.SandboxRoute("UpdateFirstResidentRow", "Grid"))
                     .Response(r => r.OnSuccess<ResidentGridEditResponse>((json, s) =>
                     {
-                        s.Component<FusionGrid>(KeyedGridId).UpdateRow(0, json, x => x.Row);
+                        s.Component<FusionGrid>(KeyedGridId).Call(c => c.UpdateRow<ResidentDirectoryGridItem>(), 0, json.Read(x => x.Row));
                         s.Element("server-command").SetText("server row updated");
                     }));
             }))
@@ -80,7 +80,7 @@
                 p.Post(Url.SandboxRoute("PatchResidentRow", "Grid"))
                     .Response(r => r.OnSuccess<ResidentGridOperationsResponse>((json, s) =>
                     {
-                        s.Component<FusionGrid>(KeyedGridId).SetRowData(6005, json, x => x.Row);
+                        s.Component<FusionGrid>(KeyedGridId).Call(c => c.SetRowData<ResidentDirectoryGridItem>(), 6005, json.Read(x => x.Row));
                         s.Element("server-command").SetText("server row patched");
                     }));
             }))
@@ -88,11 +88,11 @@
             .CssClass(ButtonSecondary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                // SetDataSource [nested data-source property path]: read Page.Result out of the envelope.
+                // Data source [nested data-source property path]: read Page.Result out of the envelope.
                 p.Post(Url.SandboxRoute("NestedRoster", "Grid"))
                     .Response(r => r.OnSuccess<ResidentRosterEnvelope>((json, s) =>
                     {
-                        s.Component<FusionGrid>(KeyedGridId).SetDataSource(json, x => x.Page.Result);
+                        s.Component<FusionGrid>(KeyedGridId).Set(c => c.DataSource, json.Read(x => x.Page.Result));
                         s.Element("server-command").SetText("loaded nested path");
                     }));
             }))

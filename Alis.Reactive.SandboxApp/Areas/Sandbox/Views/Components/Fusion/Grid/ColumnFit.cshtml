@@ -3,6 +3,7 @@
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
+@using Alis.Reactive
 @{
     ViewData["Title"] = "Care-Staff Column Fit";
 
@@ -15,7 +16,7 @@
         p.Get(Url.SandboxRoute("OperationRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("fit-status").SetText("loaded");
             }))));
 }
@@ -31,14 +32,14 @@
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).AutoFitColumn((ResidentDirectoryGridItem x) => x.RiskLevel);
+                p.Component<FusionGrid>(GridId).Call(c => c.AutoFitColumn, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel));
                 p.Element("fit-status").SetText("autoFitColumn called");
             }))
         @(Html.NativeButton("fit-all", "Fit All Columns")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).AutoFitColumns();
+                p.Component<FusionGrid>(GridId).Call(c => c.AutoFitColumns);
                 p.Element("fit-status").SetText("autoFitColumns called");
             }))
     </native-hstack>

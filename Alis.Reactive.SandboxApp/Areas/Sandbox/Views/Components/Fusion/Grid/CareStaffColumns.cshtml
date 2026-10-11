@@ -3,6 +3,7 @@
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
+@using Alis.Reactive
 @{
     ViewData["Title"] = "Care-Staff Column View";
 
@@ -16,7 +17,7 @@
         p.Get(Url.SandboxRoute("OperationRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("column-status").SetText("loaded");
             }))));
 }
@@ -33,8 +34,8 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var grid = p.Component<FusionGrid>(GridId);
-                grid.HideColumn((ResidentDirectoryGridItem x) => x.PrimaryNurse);
-                grid.HideColumn((ResidentDirectoryGridItem x) => x.NextReviewDate);
+                grid.Call(c => c.HideColumn, Field.Of((ResidentDirectoryGridItem x) => x.PrimaryNurse));
+                grid.Call(c => c.HideColumn, Field.Of((ResidentDirectoryGridItem x) => x.NextReviewDate));
                 p.Element("column-status").SetText("care columns hidden");
             }))
         @(Html.NativeButton("show-care-columns", "Show Care Columns")
@@ -42,8 +43,8 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var grid = p.Component<FusionGrid>(GridId);
-                grid.ShowColumn((ResidentDirectoryGridItem x) => x.PrimaryNurse);
-                grid.ShowColumn((ResidentDirectoryGridItem x) => x.NextReviewDate);
+                grid.Call(c => c.ShowColumn, Field.Of((ResidentDirectoryGridItem x) => x.PrimaryNurse));
+                grid.Call(c => c.ShowColumn, Field.Of((ResidentDirectoryGridItem x) => x.NextReviewDate));
                 p.Element("column-status").SetText("care columns shown");
             }))
         @(Html.NativeButton("reorder-risk-first", "Move Risk Before Resident")
@@ -51,9 +52,10 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Component<FusionGrid>(GridId)
-                    .ReorderColumnBefore(
-                        (ResidentDirectoryGridItem x) => x.RiskLevel,
-                        (ResidentDirectoryGridItem x) => x.ResidentName);
+                    .Call(
+                            c => c.ReorderColumns,
+                            Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel),
+                            Field.Of((ResidentDirectoryGridItem x) => x.ResidentName));
                 p.Element("column-status").SetText("risk moved before resident");
             }))
     </native-hstack>

@@ -51,7 +51,7 @@
             .Gather(g => { g.Static("skip", 0); g.Static("take", 10); })
             .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("careops-summary").SetText(json, x => x.Summary);
                 s.Element("careops-status").SetText(status);
             }));
@@ -109,7 +109,7 @@
                     .Response(r => r
                         .OnSuccess<CareOpsResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                             s.Element("careops-summary").SetText(json, x => x.Summary);
                             s.Element("careops-status").SetText("resident admitted");
                             s.Element("admit-dialog").AddClass("hidden");
@@ -163,7 +163,7 @@
                             })
                             .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                             {
-                                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                                 s.Element("careops-summary").SetText(json, x => x.Summary);
                                 s.Element("careops-status").SetText(args, x => x.Text);
                             }));
@@ -185,7 +185,7 @@
                             })
                             .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                             {
-                                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                                 s.Element("careops-summary").SetText(json, x => x.Summary);
                                 s.Element("careops-status").SetText(args, x => x.Text);
                             }));
@@ -208,12 +208,12 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var grid = p.Component<FusionGrid>(GridId);
-                    grid.SaveCell();
+                    grid.Call(c => c.SaveCell);
                     p.Post(Url.SandboxRoute("CareOpsSave", "Grid"))
-                        .Gather(g => g.Include(grid.BatchChanges<CareOpsViewModel, ResidentCareItem>(), "batchChanges"))
+                        .Gather(g => g.Include(grid.Get(c => c.GetBatchChanges<ResidentCareItem>()), "batchChanges"))
                         .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                             s.Element("careops-summary").SetText(json, x => x.Summary);
                             s.Element("careops-status").SetText("care edits saved");
                         }));
@@ -227,11 +227,11 @@
                         .Gather(g =>
                         {
                             g.Static("nurse", "Night Float Team");
-                            g.Include(grid.SelectedRecords<CareOpsViewModel, ResidentCareItem>(), "selectedRecords");
+                            g.Include(grid.Get(c => c.GetSelectedRecords<ResidentCareItem>()), "selectedRecords");
                         })
                         .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                             s.Element("careops-summary").SetText(json, x => x.Summary);
                             s.Element("careops-status").SetText("nurse reassigned");
                         }));
@@ -245,11 +245,11 @@
                         .Gather(g =>
                         {
                             g.Static("risk", "Critical");
-                            g.Include(grid.SelectedRecords<CareOpsViewModel, ResidentCareItem>(), "selectedRecords");
+                            g.Include(grid.Get(c => c.GetSelectedRecords<ResidentCareItem>()), "selectedRecords");
                         })
                         .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                             s.Element("careops-summary").SetText(json, x => x.Summary);
                             s.Element("careops-status").SetText("residents flagged critical");
                         }));
@@ -257,10 +257,10 @@
             @(Html.NativeActionLink("Discharge Selected", Url.SandboxRoute("CareOpsDischargeSelected", "Grid"), p => p
                 .Confirm("Discharge the selected resident(s) from the active census?")
                 .Then(t2 => t2.Post(Url.SandboxRoute("CareOpsDischargeSelected", "Grid"))
-                    .Gather(g => g.Include(p.Component<FusionGrid>(GridId).SelectedRecords<CareOpsViewModel, ResidentCareItem>(), "selectedRecords"))
+                    .Gather(g => g.Include(p.Component<FusionGrid>(GridId).Get(c => c.GetSelectedRecords<ResidentCareItem>()), "selectedRecords"))
                     .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                     {
-                        s.Component<FusionGrid>(GridId).SetDataSource(json);
+                        s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                         s.Element("careops-summary").SetText(json, x => x.Summary);
                         s.Element("careops-status").SetText("resident discharged");
                     }))))
@@ -313,7 +313,7 @@
                             })
                             .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                             {
-                                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                                 s.Element("careops-summary").SetText(json, x => x.Summary);
                                 s.Element("careops-status").SetText("grid state sent to server");
                             }));

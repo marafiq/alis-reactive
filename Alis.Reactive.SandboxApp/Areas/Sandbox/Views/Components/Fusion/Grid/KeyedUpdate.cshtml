@@ -3,6 +3,7 @@
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
+@using Alis.Reactive
 @{
     ViewData["Title"] = "Care-Ops Keyed Resident Update";
 
@@ -16,7 +17,7 @@
         p.Get(Url.SandboxRoute("OperationRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
                 s.Element("keyed-status").SetText("loaded");
             }))));
 }
@@ -32,21 +33,21 @@
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).SetCellValue(6000, (ResidentDirectoryGridItem x) => x.OpenTasks, 99);
+                p.Component<FusionGrid>(GridId).Call(c => c.SetCellValue<int>(), 6000, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 99);
                 p.Element("keyed-status").SetText("setCellValue int called");
             }))
         @(Html.NativeButton("keyed-set-risk", "Quarantine Risk (6001)")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).SetCellValue(6001, (ResidentDirectoryGridItem x) => x.RiskLevel, "Quarantine");
+                p.Component<FusionGrid>(GridId).Call(c => c.SetCellValue<string>(), 6001, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), "Quarantine");
                 p.Element("keyed-status").SetText("setCellValue string called");
             }))
         @(Html.NativeButton("keyed-set-row", "Replace Row (6002)")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).SetRowData(6002, new ResidentDirectoryGridItem
+                p.Component<FusionGrid>(GridId).Call(c => c.SetRowData<ResidentDirectoryGridItem>(), 6002, new ResidentDirectoryGridItem
                 {
                     ResidentId = 6002,
                     ResidentName = "Keyed Row",
