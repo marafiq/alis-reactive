@@ -27,7 +27,8 @@ PLAN_WIRING :=
 @using Alis.Reactive.Fusion.Components       -- FusionAutoComplete, FusionDropDownList, ...
 @using Alis.Reactive.Builders.Requests       -- Gather Include<TComponent, TModel>(...) (vendor-agnostic)
 @using Alis.Reactive.Native.AppLevel         -- NativeDrawer, NativeLoader, DrawerSize
-@using Alis.Reactive.Fusion.AppLevel         -- FusionToast, FusionConfirm
+@using Alis.Reactive.Fusion.AppLevel         -- FusionToast, FusionToastTone
+@using Alis.Reactive                         -- Field.Of(...) for row and item members
 @using Syncfusion.EJ2                        -- Html.EJS()
 @using Syncfusion.EJ2.DropDowns              -- VisualMode (MultiSelect)
 ```
@@ -35,18 +36,21 @@ PLAN_WIRING :=
 ## Razor Output — `@{ }` vs `@()`
 
 ```
-RAZOR_VOID    := @{ EXPR; }            -- void methods: InputField, HiddenFieldFor, Html.On
-RAZOR_CONTENT := @(EXPR)               -- IHtmlContent:  NativeButton, NativeActionLink
+RAZOR_VOID    := @{ EXPR; }            -- InputField (writes through the view's writer), Html.On
+RAZOR_CONTENT := @(EXPR)               -- IHtmlContent: NativeButton, NativeActionLink, Html.FusionGrid, ...
 RAZOR_HELPER  := @Html.RenderPlan(plan) -- IHtmlContent helper
 
--- InputField renders inline via writer → @{ }
-@{ Html.InputField(plan, m => m.Prop, o => o.OPTIONS).COMPONENT(b => b.CHAIN); }
+-- InputField renders inline via the writer → @{ }; .Reactive hangs off the render
+@{ Html.InputField(plan, m => m.Prop, o => o.OPTIONS).COMPONENT(b => b.CHAIN).Reactive(evt => evt.EVENT, (args, p) => { PIPELINE }); }
+
+-- A non-input component renders against the plan with its explicit ID → @()
+@(Html.FusionGrid<TModel, TRow>(plan, "roster", b => b.CHAIN).Reactive(evt => evt.RowSelected<TRow>(), (args, p) => { PIPELINE }))
 
 -- NativeButton returns IHtmlContent → @()
 @(Html.NativeButton("id", "text").CssClass("...").Reactive(plan, evt => evt.Click, (args, p) => { PIPELINE }))
 
--- HiddenField is void → @{ }
-@{ Html.HiddenFieldFor(plan, m => m.Prop); }
+-- A hidden field is a hidden InputField; it writes itself and returns an empty handle
+@Html.HiddenFieldFor(plan, m => m.Prop)
 ```
 
 **Wrong context = silent render failure.** `@{ Html.NativeButton(...); }` compiles but renders nothing.
@@ -68,12 +72,15 @@ TRIGGER :=
 `TPayload` must be `class, new()`. Payload is a phantom — properties become `evt.` dot-paths.
 ServerPush and SignalR are remote triggers — the async lane.
 
-Component events use `.Reactive()` on the builder, not `Html.On`:
+Component events use `.Reactive()` on the rendered component, not `Html.On`. `evt` is the
+component's declaration; an event is a member it declares by the JavaScript event name:
 
 ```
-.Reactive(plan, evt => evt.EVENT, (args, p) => { PIPELINE })
+.Reactive(evt => evt.EVENT, (args, p) => { PIPELINE })                 -- InputField and plan-rendered components
+.Reactive(plan, evt => evt.Click, (args, p) => { PIPELINE })           -- NativeButton
 
-EVENT := Changed | Filtering | Click | Focus | Blur | Selected
+EVENT := Change | Filtering | Select | Focus | Blur | Created | ...    -- the component's own names
+       | RowSelected<TRow>() | CardClick<TCard>() | ...                 -- events typed by the app's class
 ```
 
 ## Pipeline
@@ -112,7 +119,7 @@ ACTION :=
 
   -- Text (→ ElementBuilder)
   | .SetText(bindSource)
-  | .SetText(typedSource)                              -- comp.Value()
+  | .SetText(typedSource)                              -- comp.Get(c => c.Value)
 
   -- HTML (→ PipelineBuilder)
   | .SetHtml("static")
@@ -131,50 +138,55 @@ ACTION :=
 
 ## Component Actions
 
+A component is a JavaScript object declared once (`Alis.Reactive.Fusion.Components`,
+`Alis.Reactive.Native.Components`, or the app's own assembly). Three verbs touch any declared
+member; `c` is the declaration:
+
 ```
 COMP_ACTION :=
-  -- Write
-  | .SetValue(string)                                  -- AC, DDL, TextBox, InputMask
-  | .SetValue(decimal)                                 -- NumericTextBox (coerce:number)
-  | .SetValue(DateTime)                                -- DatePicker, TimePicker
-  | .SetChecked(bool)                                  -- Switch, CheckBox (coerce:boolean)
-  | .SetDataSource(responseBody, x => x.Items)         -- DDL, AC, MS, MCCB
-  | .SetMin(decimal)                                   -- NumericTextBox
+  | .Set(c => c.PROPERTY, literal | typedSource)           -- write a property
+  | .Call(c => c.METHOD)                                   -- call a method
+  | .Call(c => c.METHOD, arg)                              -- one argument: literal or typedSource
+  | .Call(c => c.METHOD, arg1, arg2[, arg3])               -- each argument a literal or a typedSource
+  | .Get(c => c.PROPERTY)        → TypedComponentSource<T> -- read, for SetText, conditions, gather
+  | .Get(c => c.FUNCTION[, args]) → TypedComponentSource<T> -- read what a method returns
 
-  -- Method
-  | .DataBind()                                        -- after SetDataSource (cascade)
-  | .FocusIn()
-  | .FocusOut()
-  | .ShowPopup()                                       -- AC, DDL, MS
-  | .HidePopup()
-  | .Increment()                                       -- NumericTextBox
-  | .Decrement()                                       -- NumericTextBox
-  | .Enable()                                          -- AC, DDL
-  | .Disable()                                         -- AC, DDL
+typedSource := json.Read(x => x.Items)                     -- response body (x => x is the whole body)
+             | p.Payload(args).Get(a => a.Field)            -- event payload
+             | p.Component<T>(m => m.Other).Get(c => c.Value)
+             | url, plugin and array sources (the sources the DSL already has)
+```
 
-  -- Read (→ TypedComponentSource<T> for conditions/SetText)
-  | .Value()        → TypedComponentSource<string>     -- AC, DDL, TextBox, InputMask, RTE
-  | .Value()        → TypedComponentSource<string[]>   -- MS, CheckList
-  | .Value()        → TypedComponentSource<decimal>    -- NumericTextBox
-  | .Value()        → TypedComponentSource<bool>       -- Switch, CheckBox
-  | .Value()        → TypedComponentSource<DateTime>   -- DatePicker, TimePicker, DTP
-  | .StartDate()    → TypedComponentSource<DateTime>   -- DateRangePicker
-  | .EndDate()      → TypedComponentSource<DateTime>   -- DateRangePicker
+Examples, each from a sandbox view:
 
-  -- App-level (NativeDrawer)
-  | .SetSize(DrawerSize.Sm|Md|Lg)
-  | .Open()
-  | .Close()
+```
+p.Component<FusionDropDownList>(m => m.Protocol).Set(c => c.Value, "Full Clinical")
+s.Component<FusionDropDownList>(m => m.City).Set(c => c.DataSource, json.Read(j => j.Cities)).Call(c => c.DataBind)
+p.When(p.Component<FusionDropDownList>(m => m.CareLevel).Get(c => c.Value)).Eq("Memory Care")
+grid.Call(c => c.HideColumn, Field.Of((ResidentDirectoryGridItem x) => x.PrimaryNurse))
+grid.Call(c => c.SetCellValue<string>(), 6002, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), "Critical")
+g.Include(grid.Get(c => c.GetSelectedRecords<ResidentDirectoryGridItem>()), "selectedRecords")
+```
 
-  -- App-level (NativeLoader)
-  | .SetTarget("elementId")
-  | .SetTimeout(ms)
-  | .Show()
-  | .Hide()
+- A member typed by the app's class is a generic method of the declaration:
+  `c.GetSelectedRecords<TRow>()`, `c.AddRecordAt<TRow>()`, `evt.RowSelected<TRow>()`.
+- `Field.Of((TRow r) => r.Member)` names a row or item member the way the component does
+  (`"member"`); `Field<TValue>` makes a cell value match the column's type.
+- An enum literal is its member name or its `[JsonStringEnumMemberName]` text.
+- A payload with behavior: `p.Payload(args).Set(a => a.Cancel, true)`, `p.Payload(args).Call(a => a.UpdateData, json.Read(x => x.Items))`.
 
-  -- App-level (FusionToast) — fluent chain
-  | .SetTitle("t").SetContent("c").TOAST_TYPE().SetTimeout(ms)[.ShowCloseButton()][.ShowProgressBar()].Show()
-  TOAST_TYPE := .Success() | .Warning() | .Danger() | .Info()
+App-level objects are referenced without an ID and use the same verbs:
+
+```
+p.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md).Call(c => c.Open)
+p.Component<NativeDrawer>().Call(c => c.Close)
+l.Component<NativeLoader>().Set(c => c.Target, "incident-report-form").Call(c => c.Show)
+s.Component<NativeLoader>().Call(c => c.Hide)
+s.Component<FusionToast>()
+    .Set(c => c.Title, "Todo")
+    .Set(c => c.Content, "Todo saved successfully")
+    .Set(c => c.Tone, FusionToastTone.Success)
+    .Call(c => c.Show)
 ```
 
 ## InputField
@@ -183,39 +195,39 @@ COMP_ACTION :=
 INPUT_FIELD :=
   @{ Html.InputField(plan, m => m.Prop, o => o.OPTIONS).COMPONENT_TYPE(b => b.BUILDER_CHAIN); }
 
-OPTIONS := .Label("text") [.Required()]
+OPTIONS := .Label("text") [.Required()] | .Hidden()      -- Hidden: no label or message wrapper
 
 COMPONENT_TYPE :=
-  -- Fusion (b is SF builder — chain SF methods then .Reactive())
-  | .FusionAutoComplete(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])] [.Placeholder("...")] [.REACTIVE])
-  | .FusionDropDownList(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])] [.Placeholder("...")] [.REACTIVE])
-  | .FusionMultiSelect(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])] [.Placeholder("...")] [.AllowFiltering(true)] [.Mode(VisualMode.Box)] [.REACTIVE])
-  | .FusionMultiColumnComboBox(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])] [.REACTIVE])
-  | .FusionDatePicker(b => b [.REACTIVE])
-  | .FusionDateTimePicker(b => b [.REACTIVE])
-  | .FusionDateRangePicker(b => b [.REACTIVE])
-  | .FusionTimePicker(b => b [.REACTIVE])
-  | .FusionNumericTextBox(b => b [.Min(n)] [.Max(n)] [.Step(n)] [.REACTIVE])
-  | .FusionSwitch(b => b [.REACTIVE])                                -- model prop MUST be bool
-  | .FusionInputMask(b => b [.REACTIVE])
-  | .FusionRichTextEditor(b => b [.REACTIVE])
-  | .FusionFileUpload(b => b [.REACTIVE])
+  -- Fusion (b is the Syncfusion builder; .Reactive(...) follows the render call)
+  | .FusionAutoComplete(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])] [.Placeholder("...")]) [REACTIVE]
+  | .FusionDropDownList(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])] [.Placeholder("...")]) [REACTIVE]
+  | .FusionMultiSelect(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])] [.Placeholder("...")] [.AllowFiltering(true)] [.Mode(VisualMode.Box)]) [REACTIVE]
+  | .FusionMultiColumnComboBox(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])]) [REACTIVE]
+  | .FusionDatePicker(b => b) [REACTIVE]
+  | .FusionDateTimePicker(b => b) [REACTIVE]
+  | .FusionDateRangePicker(b => b) [REACTIVE]
+  | .FusionTimePicker(b => b) [REACTIVE]
+  | .FusionNumericTextBox(b => b [.Min(n)] [.Max(n)] [.Step(n)]) [REACTIVE]
+  | .FusionSwitch(b => b) [REACTIVE]                                -- model prop MUST be bool
+  | .FusionInputMask(b => b) [REACTIVE]
+  | .FusionRichTextEditor(b => b) [REACTIVE]
+  | .FusionFileUpload(b => b) [REACTIVE]
 
-  -- Native (b is framework builder — chain config then .Reactive())
-  | .NativeTextBox(b => b [.Placeholder("...")] [.Type("email")] [.CssClass("...")] [.REACTIVE])
-  | .NativeCheckBox(b => b [.CssClass("...")] [.REACTIVE])           -- model prop MUST be bool
-  | .NativeDropDown(b => b .Items(selectListItems) [.Placeholder("...")] [.CssClass("...")] [.REACTIVE])
-  | .NativeTextArea(b => b [.Rows(n)] [.Placeholder("...")] [.CssClass("...")] [.REACTIVE])
-  | .NativeCheckList(b => b .Option("val","text")... [.CssClass("...")] [.REACTIVE])
-  | .NativeRadioGroup(b => b .Option("val","text")... [.CssClass("...")] [.REACTIVE])
+  -- Native (b is the framework builder; .Reactive(...) follows the render call)
+  | .NativeTextBox(b => b [.Placeholder("...")] [.Type("email")] [.CssClass("...")]) [REACTIVE]
+  | .NativeCheckBox(b => b [.CssClass("...")]) [REACTIVE]           -- model prop MUST be bool
+  | .NativeDropDown(b => b .Items(selectListItems) [.Placeholder("...")] [.CssClass("...")]) [REACTIVE]
+  | .NativeTextArea(b => b [.Rows(n)] [.Placeholder("...")] [.CssClass("...")]) [REACTIVE]
+  | .NativeCheckList(b => b .Option("val","text")... [.CssClass("...")]) [REACTIVE]
+  | .NativeRadioGroup(b => b .Option("val","text")... [.CssClass("...")]) [REACTIVE]
 
 Fields<T> :=
   | .Fields<TItem>(t => t.TextProp, v => v.ValueProp)
   | .Fields<TItem>(t => t.TextProp, v => v.ValueProp, g => g.GroupByProp)
 
-REACTIVE :=
-  | .Reactive(plan, evt => evt.EVENT, (args, p) => { PIPELINE })
-  | .Reactive(plan, evt => evt.EVENT1, ...).Reactive(plan, evt => evt.EVENT2, ...)
+REACTIVE :=                                                   -- chained after COMPONENT_TYPE(...)
+  | .Reactive(evt => evt.EVENT, (args, p) => { PIPELINE })
+  | .Reactive(evt => evt.EVENT1, ...).Reactive(evt => evt.EVENT2, ...)
 ```
 
 ## NativeButton
@@ -229,10 +241,11 @@ BUTTON := @(Html.NativeButton("id", "text") [.CssClass("...")] [.Type("submit")]
 ## NativeHiddenField
 
 ```
-HIDDEN := @{ Html.HiddenFieldFor(plan, m => m.Prop); }
+HIDDEN := @Html.HiddenFieldFor(plan, m => m.Prop)
 ```
 
-No InputField wrapper. No Reactive. Set value via `p.Component<NativeHiddenField>(m => m.Prop).SetValue("v")`.
+A hidden InputField: no label or message wrapper, still registered for gather. Set its value with
+`p.Component<NativeHiddenField>(m => m.Prop).Set(c => c.Value, "v")`.
 
 ## Dispatch
 
@@ -242,23 +255,25 @@ DISPATCH :=
   | p.Dispatch<TPayload>("eventName", new TPayload { ... })
 ```
 
-## Event Args Extensions (Filtering)
+## Event Payloads with Behavior (Filtering)
 
+Source: `Areas/Sandbox/Views/Components/Fusion/AutoComplete/Index.cshtml`
 ```
-.Reactive(plan, evt => evt.Filtering, (args, p) =>
+.Reactive(evt => evt.Filtering, (args, p) =>
 {
-    args.PreventDefault(p);                              -- suppress SF client filter
-    p.Get("/url")
-     .Gather(g => g.FromEvent(args, x => x.Text, "q"))  -- event payload → query param
-     .Response(r => r.OnSuccess<TResp>((json, s) =>
-     {
-         args.UpdateData(s, json, j => j.Items);          -- feed data to popup
-     }));
+    p.Payload(args).Set(a => a.PreventDefaultAction, true);           -- suppress the client filter
+    p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
+     .Gather(g => g.FromEvent(args, x => x.Text, "MedicationType"))    -- event payload → query param
+     .Response(r => r
+        .OnSuccess<MedicationSearchResponse>((json, s) =>
+        {
+            s.Payload(args).Call(a => a.UpdateData, json.Read(j => j.Medications));  -- feed the popup
+        }));
 })
 ```
 
-`PreventDefault(p)` and `UpdateData(s, json, path)` need the pipeline builder because
-args is a phantom with no pipeline binding.
+A payload's fields are plain C# properties; its methods are declared on a payload that derives
+from `JsObject`. `p.Payload(args)` is the handle that writes, calls and reads them.
 
 ## Expression Path Resolution
 
@@ -272,12 +287,12 @@ args is a phantom with no pipeline binding.
 
 ## Key Rules
 
-- `@()` for NativeButton/NativeActionLink, `@{ }` for InputField/HiddenField/Html.On
+- `@()` for NativeButton/NativeActionLink and plan-rendered components, `@{ }` for InputField/Html.On
 - NumericTextBox needs SF methods (.Min/.Max/.Step) BEFORE .Reactive()
 - AllowFiltering(true) required on MultiSelect/DropDownList for Filtering event
 - Switch/NativeCheckBox model property MUST be `bool`
 - DomReady fires AFTER all custom-event listeners wired (two-phase boot)
-- `.Reactive()` stays close to its component — it is the last call inside the build callback
+- `.Reactive()` follows the render call of its component, never inside the Syncfusion build callback
 - `Html.On` is for triggers not tied to a specific component (DomReady, CustomEvent, ServerPush, SignalR)
 - Every view ends with `@Html.RenderPlan(plan)` — no exceptions
 - When adding a new sandbox view, update the section's `Index.cshtml` to link to it
@@ -286,16 +301,17 @@ args is a phantom with no pipeline binding.
 
 These patterns are extracted from 127 real sandbox views. Use exactly these forms.
 
-**Most common: .Reactive() on component (252+ uses)**
+**Most common: .Reactive() on the rendered component**
 Source: `Areas/Sandbox/Views/Components/Fusion/DropDownList/Index.cshtml`
 ```csharp
 @{ Html.InputField(plan, m => m.Category, o => o.Label("Category (SF DropDownList)"))
-   .FusionDropDownList(b => b
-       .DataSource(categories)
-       .Reactive(plan, evt => evt.Changed, (args, p) =>
-       {
-           p.Element("change-value").SetText(args, x => x.Value);
-       })); }
+    .FusionDropDownList(b => b
+        .DataSource(categories)
+        .Placeholder("Select a category"))
+    .Reactive(evt => evt.Change, (args, p) =>
+    {
+        p.Element("change-value").SetText(args, x => x.Value);
+    }); }
 ```
 
 **DomReady with HTTP (36 uses)**
@@ -330,21 +346,21 @@ Source: `Areas/Sandbox/Views/Conditions/CareLevelCascade/Index.cshtml:37-51`
 ```csharp
 var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
 
-p.Element("s1-current-level").SetText(careLevel.Value());
+p.Element("s1-current-level").SetText(careLevel.Get(c => c.Value));
 
-p.When(careLevel.Value()).Eq("Memory Care")
+p.When(careLevel.Get(c => c.Value)).Eq("Memory Care")
  .Then(then =>
  {
-     then.Component<FusionDropDownList>(m => m.Protocol).SetValue("Enhanced Monitoring");
+     then.Component<FusionDropDownList>(m => m.Protocol).Set(c => c.Value, "Enhanced Monitoring");
  })
- .ElseIf(careLevel.Value()).Eq("Skilled Nursing")
+ .ElseIf(careLevel.Get(c => c.Value)).Eq("Skilled Nursing")
  .Then(then =>
  {
-     then.Component<FusionDropDownList>(m => m.Protocol).SetValue("Full Clinical");
+     then.Component<FusionDropDownList>(m => m.Protocol).Set(c => c.Value, "Full Clinical");
  })
  .Else(else_ =>
  {
-     else_.Component<FusionDropDownList>(m => m.Protocol).SetValue("");
+     else_.Component<FusionDropDownList>(m => m.Protocol).Set(c => c.Value, "");
  });
 ```
 

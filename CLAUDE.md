@@ -46,8 +46,9 @@ typed properties, methods and events, every framework feature works for it uncha
 framework supplies more defaults so the developer types less. Steer the redesign by this vision and
 by the typed SDK that already exists (read the source; it is rich), not by old docs or plans. The
 old artifact-gated onboarding pipeline was removed on purpose; do not rebuild it. Design:
-`docs/design/bring-your-own-component.md`. Until the redesign lands, a new component is a
-C# slice with zero TypeScript runtime changes.
+`docs/design/bring-your-own-component.md`. A component, shipped or brought, is one declaration
+class (members and events by their JavaScript names) and a render helper, built on the core's
+public surface, with zero TypeScript runtime changes.
 
 ## Architecture
 

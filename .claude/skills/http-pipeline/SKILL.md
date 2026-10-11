@@ -81,7 +81,7 @@ HANDLER := (s => { PIPELINE_COMMANDS })
 
 TYPED_HANDLER := ((json, s) => {
     s.Element("x").SetText(json, x => x.Property);  -- "responseBody.property"
-    s.Component<T>(m => m.Y).SetDataSource(json, x => x.Items);
+    s.Component<T>(m => m.Y).Set(c => c.DataSource, json.Read(x => x.Items));
 })
 
 CHAINED_REQUEST := (c => c.VERB(url).CHAIN)     -- full request chain
@@ -97,7 +97,8 @@ CHAINED_REQUEST := (c => c.VERB(url).CHAIN)     -- full request chain
     // json is ResponseBody<ApiResponse> — phantom for compile-time path inference
     s.Element("name").SetText(json, x => x.Data.Name);     // → "responseBody.data.name"
     s.Element("count").SetText(json, x => x.TotalCount);   // → "responseBody.totalCount"
-    args.UpdateData(s, json, j => j.Items);                 // → "responseBody.items"
+    s.Payload(args).Call(a => a.UpdateData, json.Read(j => j.Items));  // → "responseBody.items"
+    s.Component<FusionGrid>("roster").Set(c => c.DataSource, json.Read(x => x.Rows)); // x => x is the whole body
 })
 ```
 
@@ -177,14 +178,14 @@ All branches fire concurrently. `OnAllSettled` fires after ALL complete (success
 
 **Pattern 1: Server-filtered dropdown (Filtering event)**
 ```csharp
-.Reactive(plan, evt => evt.Filtering, (args, p) =>
+.Reactive(evt => evt.Filtering, (args, p) =>
 {
-    args.PreventDefault(p);
+    p.Payload(args).Set(a => a.PreventDefaultAction, true);
     p.Get("/api/search")
      .Gather(g => g.FromEvent(args, x => x.Text, "q"))
      .Response(r => r.OnSuccess<SearchResponse>((json, s) =>
      {
-         args.UpdateData(s, json, j => j.Items);
+         s.Payload(args).Call(a => a.UpdateData, json.Read(j => j.Items));
          s.Element("status").SetText("loaded");
      }));
 })
@@ -211,14 +212,15 @@ p.Post("/api/save")
 
 **Pattern 3: Cascade (parent change populates child)**
 ```csharp
-.Reactive(plan, evt => evt.Changed, (args, p) =>
+.Reactive(evt => evt.Change, (args, p) =>
 {
     p.Get("/api/children")
      .Gather(g => g.Include<FusionDropDownList, TModel>(m => m.Parent))
      .Response(r => r.OnSuccess<ChildResponse>((json, s) =>
      {
-         s.Component<FusionDropDownList>(m => m.Child).SetDataSource(json, x => x.Items);
-         s.Component<FusionDropDownList>(m => m.Child).DataBind();
+         s.Component<FusionDropDownList>(m => m.Child)
+             .Set(c => c.DataSource, json.Read(x => x.Items))
+             .Call(c => c.DataBind);
      }));
 })
 ```
@@ -228,7 +230,7 @@ p.Post("/api/save")
 - **FromEvent for filtering** — value from event args (typed text during keystroke)
 - **Include for form fields** — value from component's current state
 - **updateData for filtering** — the ONLY correct SF API for async filtered data
-- **DataBind after SetDataSource** — needed for cascade patterns (not needed after updateData)
+- **Call DataBind after setting DataSource** — needed for cascade patterns (not needed after a payload's UpdateData)
 - **PreventDefault before async HTTP** — suppresses SF "No records found" flash
 - **WhileLoading is sequential only** — no conditions or nested HTTP
 - **OnAllSettled is sequential only** — no conditions or nested HTTP

@@ -42,38 +42,41 @@ The grammar stays small because components share one object model.
 
 ## Components Are Browser Objects
 
-Every component exposes events, properties, and methods.
+Every component is a JavaScript object with events, properties, and methods. Its
+C# class declares them by the names its own API uses, and three verbs touch any
+of them.
 
 Events start pipelines:
 
 ```csharp
-.Reactive(plan, evt => evt.Changed, (args, p) => { ... })
+.Reactive(evt => evt.Change, (args, p) => { ... })
 ```
 
 Properties can be written:
 
 ```csharp
 p.Component<FusionDropDownList>(m => m.UnitId)
- .SetValue("north-wing");
+ .Set(c => c.Value, "north-wing");
 ```
 
 Methods can be called:
 
 ```csharp
 p.Component<FusionDropDownList>(m => m.UnitId)
- .ShowPopup();
+ .Call(c => c.ShowPopup);
 ```
 
-Properties can be read as value sources:
+Properties, and methods that return a value, can be read as value sources:
 
 ```csharp
-var unit = p.Component<FusionDropDownList>(m => m.UnitId).Value();
+var unit = p.Component<FusionDropDownList>(m => m.UnitId).Get(c => c.Value);
 
 p.When(unit).Eq("memory-care")
  .Then(t => t.Element("memory-care-note").Show());
 ```
 
-That pattern is more important than any single component page.
+That pattern is more important than any single component page. A component the
+framework does not ship works the same way once its class is declared.
 
 ## Values Use One Path
 
@@ -82,7 +85,7 @@ The same value-source idea appears across the DSL.
 | Source | Example |
 | --- | --- |
 | Event payload | `p.When(args, x => x.Checked)` |
-| Component property | `p.Component<FusionDropDownList>(m => m.UnitId).Value()` |
+| Component member | `p.Component<FusionDropDownList>(m => m.UnitId).Get(c => c.Value)` |
 | URL query string | `p.FromUrl<int>("residentId")` |
 | Response body | `body.Read(x => x.Message)` |
 | Plugin return value | `p.Plugin<string>("clipboard", "readText")` |

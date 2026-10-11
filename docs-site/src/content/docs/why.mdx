@@ -27,9 +27,9 @@ browser.
 
 | Concern | Usual view-script path | Alis.Reactive path |
 | --- | --- | --- |
-| Event wiring | JavaScript selectors | `.Reactive(plan, evt => evt.Changed, ...)` |
+| Event wiring | JavaScript selectors | `.Reactive(evt => evt.Change, ...)` |
 | Payload reads | `event.detail.someValue` strings | `p.When(args, x => x.SomeValue)` |
-| Component updates | Vendor object calls in JS | `p.Component<T>(...).SetValue(...)` |
+| Component updates | Vendor object calls in JS | `p.Component<T>(...).Set(c => c.Value, ...)` |
 | HTTP payloads | Manually assembled JSON | `.Gather(g => g.IncludeAll())` |
 | Client validation | Separate client rule system | `ClientRule(...)` metadata |
 

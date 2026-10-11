@@ -19,12 +19,22 @@ Model-bound components start with `Html.InputField(...)`.
 The model expression gives the component a deterministic ID. The same expression
 targets the component later.
 
-## React
-
-Component `.Reactive(...)` attaches a typed event.
+A component that is not a form input renders against the plan with an ID you
+choose, and the same ID targets it:
 
 ```csharp
-.Reactive(plan, evt => evt.Changed, (args, p) =>
+@(Html.FusionGrid<ResidentDirectoryModel, ResidentDirectoryGridItem>(plan, "resident-directory-grid", b => b
+    .AllowSelection(true)
+    .Columns(Columns()))
+    .Reactive(evt => evt.RowSelected<ResidentDirectoryGridItem>(), (args, p) => { ... }))
+```
+
+## React
+
+Component `.Reactive(...)` attaches a typed event to the rendered component.
+
+```csharp
+.Reactive(evt => evt.Change, (args, p) =>
 {
     p.When(args, x => x.Value).Eq("memory")
      .Then(t => t.Element("memory-care-panel").Show())
@@ -41,18 +51,19 @@ Use `p.Component<TComponent>(...)` to work with the component later.
 
 ```csharp
 p.Component<FusionDropDownList>(m => m.CareLevel)
- .SetValue("assisted")
- .DataBind();
+ .Set(c => c.Value, "assisted")
+ .Call(c => c.DataBind);
 ```
 
-Each extension method maps to a real browser member.
+`Set`, `Call` and `Get` reach every member the component's class declares, by
+the name its JavaScript API uses.
 
 ## Read
 
 Readable members return typed sources.
 
 ```csharp
-var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel).Value();
+var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel).Get(c => c.Value);
 
 p.When(careLevel).Eq("memory")
  .Then(t => t.Element("memory-care-panel").Show());
@@ -79,4 +90,6 @@ p.Component<FusionToast>()
 ```
 
 Do not learn Alis.Reactive by memorizing every component. Learn the object
-model. A new component should still read as event, payload, property, method.
+model. A new component should still read as event, payload, property, method,
+and one the framework does not ship is brought the same way: declare its class,
+render it, and every verb works with it.

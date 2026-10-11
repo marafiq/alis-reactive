@@ -14,16 +14,17 @@ Use `.Reactive(...)` on a rendered component.
 
 ```csharp
 @{ Html.InputField(plan, m => m.IsUrgent, o => o.Label("Urgent"))
-    .NativeCheckBox(b => b.Reactive(plan, evt => evt.Changed, (args, p) =>
+    .NativeCheckBox(b => b.CssClass("h-4 w-4 rounded border-border text-accent"))
+    .Reactive(evt => evt.Change, (args, p) =>
     {
         p.When(args, x => x.Checked).Truthy()
          .Then(t => t.Element("due-date").Show())
          .Else(e => e.Element("due-date").Hide());
-    })); }
+    }); }
 ```
 
-`evt => evt.Changed` selects the browser event. `args` is the typed payload for
-that event.
+`evt => evt.Change` selects the component's `change` event. `args` is the typed
+payload for that event.
 
 The runtime reads the browser payload. The C# placeholder only records the path.
 
@@ -63,7 +64,7 @@ Pipelines can dispatch the same event.
 ```csharp
 p.DispatchWith<UnitChangedPayload>("unitChanged", d => d
     .Set(x => x.UnitId,
-        p.Component<FusionDropDownList>(m => m.UnitId).Value()));
+        p.Component<FusionDropDownList>(m => m.UnitId).Get(c => c.Value)));
 ```
 
 ## Element Members
@@ -79,41 +80,61 @@ p.Element("banner").AddClass("is-active");
 The element API is intentionally small: text, HTML, class changes, and hidden
 state.
 
-## Component Properties
+## Components
 
-Property writes use `Set...` methods.
-
-```csharp
-p.Component<FusionDropDownList>(m => m.UnitId)
- .SetValue("north")
- .DataBind();
-```
-
-The method name is public C#. The plan records the browser property member.
-
-## Component Methods
-
-Method calls use verbs.
+A component is a JavaScript object. Its C# class declares the properties,
+methods and events its own API has, by their JavaScript names. Three verbs
+touch any declared member, and `c` is the declaration:
 
 ```csharp
-p.Component<FusionDropDownList>(m => m.UnitId).ShowPopup();
-p.Component<FusionDropDownList>(m => m.UnitId).FocusIn();
+var unit = p.Component<FusionDropDownList>(m => m.UnitId);
+
+unit.Set(c => c.Value, "north")      // write a property
+    .Call(c => c.DataBind);          // call a method
+
+unit.Call(c => c.ShowPopup);
+unit.Call(c => c.FocusIn);
 ```
 
-Each component exposes only the calls that its C# slice declares.
+A write takes a literal or any value source: another component, an event
+payload, a response body, a URL parameter.
+
+```csharp
+s.Component<FusionDropDownList>(m => m.City)
+    .Set(c => c.DataSource, json.Read(j => j.Cities))
+    .Call(c => c.DataBind);
+```
+
+Each component offers exactly the members its class declares.
 
 ## Component Reads
 
-Readable members return typed value sources.
+`Get` reads a property, or what a method returns, as a typed value source.
 
 ```csharp
-var unitId = p.Component<FusionDropDownList>(m => m.UnitId).Value();
+var unitId = p.Component<FusionDropDownList>(m => m.UnitId).Get(c => c.Value);
 
 p.When(unitId).NotEmpty()
  .Then(t => t.Element("unit-warning").Hide());
 ```
 
 The runtime reads the browser object when the pipeline runs.
+
+## Event Payloads
+
+Payload fields are plain C# properties. When the payload also has methods, its
+class declares them, and `p.Payload(args)` writes, calls and reads them:
+
+```csharp
+.Reactive(evt => evt.Filtering, (args, p) =>
+{
+    p.Payload(args).Set(a => a.PreventDefaultAction, true);
+    p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
+     .Gather(g => g.FromEvent(args, x => x.Text, "MedicationType"))
+     .Response(r => r.OnSuccess<MedicationSearchResponse>((json, s) =>
+         s.Payload(args).Call(a => a.UpdateData, json.Read(j => j.Medications))));
+})
+```
 
 ## Value Sources
 
@@ -139,7 +160,7 @@ plan.RegisterPlugin("clipboard", plugin =>
 });
 
 p.Plugin("clipboard", "writeText")
- .Arg(p.Component<FusionDropDownList>(m => m.UnitId).Value())
+ .Arg(p.Component<FusionDropDownList>(m => m.UnitId).Get(c => c.Value))
  .Fire();
 ```
 

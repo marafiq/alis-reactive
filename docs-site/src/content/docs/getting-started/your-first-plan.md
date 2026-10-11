@@ -140,12 +140,13 @@ the end.
         .NativeTextBox(b => b.Placeholder("What needs to be done?")); }
 
     @{ Html.InputField(plan, m => m.IsUrgent, o => o.Label("Urgent"))
-        .NativeCheckBox(b => b.Reactive(plan, evt => evt.Changed, (args, p) =>
+        .NativeCheckBox()
+        .Reactive(evt => evt.Change, (args, p) =>
         {
             p.When(args, x => x.Checked).Truthy()
              .Then(t => t.Element("due-date").Show())
              .Else(e => e.Element("due-date").Hide());
-        })); }
+        }); }
 
     <div id="due-date" hidden>
         @{ Html.InputField(plan, m => m.DueDate, o => o.Label("Due Date"))

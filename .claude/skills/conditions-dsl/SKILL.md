@@ -31,9 +31,9 @@ SOURCE :=
   | args, x => x.Property                              -- TProp inferred from property type
 
   -- Component read (anywhere — pipeline, response handler, DomReady)
-  | comp.Value()                                        -- TypedComponentSource<T>
-  | comp.StartDate()                                    -- DateRangePicker only
-  | comp.EndDate()                                      -- DateRangePicker only
+  | comp.Get(c => c.Value)                              -- TypedComponentSource<T>, any declared property
+  | comp.Get(c => c.StartDate)                          -- DateRangePicker
+  | comp.Get(c => c.GetSelectedRowIndexes)              -- a method that returns, e.g. FusionGrid
 
 -- Getting a component reference:
 var comp = p.Component<FusionNumericTextBox>(m => m.Amount);
@@ -186,7 +186,7 @@ Only in user-initiated pipelines (Click). Never in DomReady.
 var left = p.Component<FusionNumericTextBox>(m => m.Rate);
 var right = p.Component<FusionNumericTextBox>(m => m.Budget);
 
-p.When(left.Value()).Gt(right.Value())
+p.When(left.Get(c => c.Value)).Gt(right.Get(c => c.Value))
  .Then(t => t.Element("warning").Show())
  .Else(e => e.Element("warning").Hide());
 ```
@@ -220,7 +220,7 @@ p.When(args, x => x.Value).Eq("smith")
  .Then(t => t.Element("name-match").Show())
  .Else(e => e.Element("name-match").Hide());
 
-p.When(comp.Value()).NotNull()
+p.When(comp.Get(c => c.Value)).NotNull()
  .Then(t => t.Element("has-value").Show())
  .Else(e => e.Element("has-value").Hide());
 ```

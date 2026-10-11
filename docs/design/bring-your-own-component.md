@@ -123,15 +123,49 @@ Vocabulary, by what the JavaScript object has:
 | JavaScript | Declared as | Used with |
 |------------|-------------|-----------|
 | property | `ComponentProperty<T>` via `Property<T>("name")` | `Set(c => c.X, value or source)`, `Get(c => c.X)` |
-| method | `ComponentMethod`, `ComponentMethod<TArg..>` via `Method("name")` | `Call(c => c.X, args...)` |
-| method that returns | `ComponentFunction<TResult>` via `Function<TResult>("name")` | `Get(c => c.X, args...)` |
+| method | `ComponentMethod`, `ComponentMethod<T1[, T2[, T3]]>` via `Method<..>("name")` | `Call(c => c.X, args...)` |
+| method that returns | `ComponentFunction<[T1, [T2,]] TResult>` via `Function<..>("name")` | `Get(c => c.X, args...)` |
 | event | `TypedEvent<TArgs>` via `Event<TArgs>("name")` | `.Reactive(evt => evt.X, (args, p) => ...)` |
 | payload field | a plain C# property | `p.When(args, x => x.F)`, `p.Payload(args).Set(a => a.F, value)` |
+| payload method | `Method("name")` on a payload that derives from `JsObject` | `p.Payload(args).Call(a => a.EndEdit)` |
 
-Names are the component's own; dotted paths reach nested members (`"eventSettings.dataSource"`).
-The C# member name keys the declaration, so two C# members can type two signatures of one
-JavaScript method. A brought vendor and its components live in the app's own assembly; nothing
-needs framework internals.
+Arguments. A one-argument call takes a literal or a source. With two or three arguments each
+position is an `Argument<T>`, which a literal or a `TypedSource<T>` converts to, so literals and
+runtime values mix: `Call(c => c.AddRecordAt<Resident>(), json.Read(x => x.Row), 0)`. An enum
+literal is its member name, or the text its `[JsonStringEnumMemberName]` gives (`"notequal"`); a
+`DateTime` is ISO text; `json.Read(x => x)` reads the whole body.
+
+Row and item members. `Field.Of((Resident r) => r.CareLevel)` is the camel-case name a
+component uses for a member (`"careLevel"`, nested `"address.city"`). `Field<TValue>` carries the
+member's type, so `Call(c => c.SetCellValue<int>(), 6001, Field.Of((Resident r) => r.OpenTasks), 4)`
+only compiles with a value of that type.
+
+Generic members. A member typed by the app's own class is a generic method of the declaration:
+`Get(c => c.GetSelectedRecords<Resident>())`, `.Reactive(evt => evt.RowSelected<Resident>(), ...)`,
+`Call(c => c.AddCard<CareCard>(), json.Read(x => x.Card), 0)`.
+
+Fixed arguments. When the JavaScript method always takes a mode after the typed arguments, the
+declaration fixes it: `Method<Field>("showColumns").Passing("field")`, so the call passes only the
+field.
+
+Names are the component's own; dotted paths reach nested members (`"eventSettings.dataSource"`,
+`"dataset.target"`). Events take their JavaScript name; where an event shares its name with a
+method, the event takes the past tense (Tooltip's `Opened` beside its `Open` method). The C#
+member name keys the declaration, and a method's key also carries its argument shapes
+(`setCellValue(number,string,number)`), so two C# members can type two signatures of one
+JavaScript method and a generic member's type arguments never conflict. A brought vendor and its
+components live in the app's own assembly; nothing needs framework internals, and the Fusion and
+Native assemblies are built the same way.
+
+Rendering. An input renders through its field, `field.Render<T>(markup)` (or a `TextWriter`
+callback); a hidden one through `Html.InputField(plan, m => m.X, o => o.Hidden())`, which drops the
+label and message wrapper. Anything else renders against the plan with the ID the developer
+chose, `plan.Render<T>(elementId, markup)`. Each returns the handle `.Reactive` hangs off.
+
+App-level objects are objects too. The drawer and loader elements carry the members their
+declarations name (`open()`, `close()`, `size`; `show()`, `hide()`, `data-target`,
+`data-timeout`), defined by their runtime modules; the toast declares Syncfusion's own members, its
+look typed as `FusionToastTone`. `p.Confirm("...")` asks through the confirm dialog's layout host.
 
 ## Deliverables
 
