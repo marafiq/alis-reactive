@@ -6,11 +6,12 @@ namespace Alis.Reactive.Fusion
     /// <remarks>
     /// Sealed subclasses (e.g. <see cref="Components.FusionDropDownList"/>,
     /// <see cref="Components.FusionDatePicker"/>) serve as type parameters in
-    /// <c>p.Component&lt;T&gt;()</c> to scope which extension methods are available.
+    /// <c>p.Component&lt;T&gt;()</c> and declare the Syncfusion object's members with the
+    /// names its JavaScript API uses.
     /// </remarks>
-    public abstract class FusionComponent : IComponent
+    public abstract class FusionComponent : Component
     {
         /// <inheritdoc />
-        public string Vendor => "fusion";
+        public sealed override string Vendor => "fusion";
     }
 }

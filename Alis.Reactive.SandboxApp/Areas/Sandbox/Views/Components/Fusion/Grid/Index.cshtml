@@ -120,7 +120,7 @@
                         .Format("n0")
                         .Min(0).Max(100)
                         .Placeholder("e.g. 80")
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        .Reactive(plan, evt => evt.Change, (args, p) =>
                         {
                             p.Element("filter-status").SetText("filtering...");
                             p.Post(Url.SandboxRoute("Data", "Grid"))

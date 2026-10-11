@@ -32,7 +32,7 @@
             <native-grid cols="C2" gap="Base" class="mb-4">
                 @{ Html.InputField(plan, m => m.CognitiveScore, o => o.Label("Cognitive Score (MMSE)"))
                     .FusionNumericTextBox(b => b.Min(0).Max(30).Step(1)
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        .Reactive(plan, evt => evt.Change, (args, p) =>
                         {
                             var comp = p.Component<FusionNumericTextBox>(m => m.CognitiveScore);
                             p.When(comp.Value()).Lt(15m)

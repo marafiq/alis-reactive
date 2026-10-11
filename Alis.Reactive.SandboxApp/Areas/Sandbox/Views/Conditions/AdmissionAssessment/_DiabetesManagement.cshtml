@@ -23,7 +23,7 @@
         @{ Html.InputField(plan, m => m.A1cLevel, o => o.Label("A1C Level (%)"))
             .FusionNumericTextBox(b => b
                 .Min(0).Max(20).Step(0.1)
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                .Reactive(plan, evt => evt.Change, (args, p) =>
                 {
                     var comp = p.Component<FusionNumericTextBox>(m => m.A1cLevel);
                     p.Element("a1c-echo").SetText(comp.Value());

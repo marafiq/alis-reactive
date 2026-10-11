@@ -28,5 +28,9 @@ namespace Alis.Reactive
             IInputComponent component,
             string componentType) =>
             new InputComponentRegistrationProfile(component, ComponentKind.Of(componentType));
+
+        internal static InputComponentRegistrationProfile For<TComponent>()
+            where TComponent : IInputComponent, new() =>
+            new InputComponentRegistrationProfile(new TComponent(), ComponentKind.Of(typeof(TComponent).Name));
     }
 }

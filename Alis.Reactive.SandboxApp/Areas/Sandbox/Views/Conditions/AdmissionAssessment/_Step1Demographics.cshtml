@@ -25,7 +25,7 @@
         @{ Html.InputField(plan, m => m.Age, o => o.Required().Label("Age"))
             .FusionNumericTextBox(b => b
                 .Min(0).Max(120).Step(1)
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                .Reactive(plan, evt => evt.Change, (args, p) =>
                 {
                     var ageComp = p.Component<FusionNumericTextBox>(m => m.Age);
                     p.Element("age-echo").SetText(ageComp.Value());

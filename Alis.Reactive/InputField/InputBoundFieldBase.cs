@@ -29,9 +29,11 @@ namespace Alis.Reactive.InputField
         /// <summary>Field wrapper options used for label and required markup.</summary>
         public InputFieldOptions Options { get; }
 
-        internal string ElementId => _componentSlot.ElementId;
+        /// <summary>The element ID the framework derives from the model expression. Render the component with it.</summary>
+        public string ElementId => _componentSlot.ElementId;
 
-        internal string BindingPath => _componentSlot.BindingName;
+        /// <summary>The binding path; render it as the component's <c>name</c> so the value posts back.</summary>
+        public string BindingPath => _componentSlot.BindingName;
 
         internal InputComponentRenderTarget RenderTarget => _componentSlot.RenderTarget;
 

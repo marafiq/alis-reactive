@@ -173,7 +173,7 @@
                 @{ Html.InputField(plan, m => m.AssessmentScore, o => o.Label("Assessment Score"))
                     .FusionNumericTextBox(b => b
                         .Min(0).Max(100).Step(1)
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        .Reactive(plan, evt => evt.Change, (args, p) =>
                         {
                             var assessment = p.Component<FusionNumericTextBox>(m => m.AssessmentScore);
                             var supervisorOverride = p.Component<FusionSwitch>(m => m.SupervisorOverride);

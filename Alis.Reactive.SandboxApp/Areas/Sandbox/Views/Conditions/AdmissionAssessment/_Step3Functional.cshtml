@@ -101,7 +101,7 @@
         @{ Html.InputField(plan, m => m.MedicationCount, o => o.Label("Medication Count"))
             .FusionNumericTextBox(b => b
                 .Min(0).Max(50).Step(1)
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                .Reactive(plan, evt => evt.Change, (args, p) =>
                 {
                     var meds = p.Component<FusionNumericTextBox>(m => m.MedicationCount);
                     p.When(meds.Value()).Gt(10m)

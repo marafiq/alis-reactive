@@ -110,7 +110,7 @@
                     .Min(0)
                     .Max(120)
                     .Placeholder("Any age")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    .Reactive(plan, evt => evt.Change, (args, p) =>
                     {
                         LoadDirectory(p, "age filter applied");
                     })); }

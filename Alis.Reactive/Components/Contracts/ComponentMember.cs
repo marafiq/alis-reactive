@@ -4,11 +4,12 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Describes a readable or writable JavaScript property on a reactive component.
-    /// Component onboarding uses these members to declare the Reactive Plan contract
-    /// that the runtime can read or update.
+    /// A readable or writable JavaScript property of a component, typed in C#.
+    /// Declare one with <c>Property&lt;T&gt;("jsName")</c> on a <see cref="Component"/>; use it with
+    /// <c>Set</c> and <c>Get</c> on a component reference.
     /// </summary>
-    internal sealed class ComponentProperty<TValue>
+    /// <typeparam name="TValue">The C# type of the property value.</typeparam>
+    public sealed class ComponentProperty<TValue>
     {
         private readonly MemberName _member;
         private readonly Path _path;
@@ -57,9 +58,10 @@ namespace Alis.Reactive
     }
 
     /// <summary>
-    /// Describes a JavaScript method on a reactive component.
+    /// A JavaScript method of a component. Declare one with <c>Method("jsName")</c> on a
+    /// <see cref="Component"/>; use it with <c>Call</c> on a component reference.
     /// </summary>
-    internal sealed class ComponentMethod
+    public sealed class ComponentMethod
     {
         private readonly MemberName _member;
         private readonly Path _path;

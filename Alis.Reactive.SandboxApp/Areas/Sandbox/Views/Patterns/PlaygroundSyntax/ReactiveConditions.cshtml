@@ -64,7 +64,7 @@
             @{ Html.InputField(plan, m => m.Amount, o => o.Required().Label("Amount"))
                .FusionNumericTextBox(b => b
                    .Min(0).Max(99999).Step(100)
-                   .Reactive(plan, evt => evt.Changed, (args, p) =>
+                   .Reactive(plan, evt => evt.Change, (args, p) =>
                    {
                        p.When(args, x => x.Value).Gte(5000m)
                            .Then(then =>

@@ -85,7 +85,7 @@
             @{ Html.InputField(plan, m => m.MonthlyRate, o => o.Required().Label("Monthly Rate ($)"))
                 .FusionNumericTextBox(b => b
                     .Min(0).Max(99999).Step(100)
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    .Reactive(plan, evt => evt.Change, (args, p) =>
                     {
                         p.Element("rate-echo").SetText(args, x => x.Value);
                     })); }

@@ -125,7 +125,7 @@
                 @{ Html.InputField(plan, m => m.RiskScore, o => o.Label("Risk Score"))
                     .FusionNumericTextBox(b => b
                         .Min(0).Max(100).Step(1)
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        .Reactive(plan, evt => evt.Change, (args, p) =>
                         {
                             p.Element("reactive-precheck").SetText("Risk evaluated");
                             p.Dispatch("supported-reactive-audited");

@@ -49,10 +49,36 @@ namespace Alis.Reactive.Native
         {
             Render(() => Writer.Write(content.ToHtmlString()));
         }
+
+        /// <summary>
+        /// Registers <typeparamref name="TComponent"/> as this field's input (value, gather, validation)
+        /// and renders its markup inside the field wrapper. Render the markup with
+        /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.ElementId"/> and
+        /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.BindingPath"/>.
+        /// </summary>
+        public void Render<TComponent>(IHtmlString content)
+            where TComponent : IInputComponent, new()
+        {
+            RegisterInputComponent(InputComponentRegistrationProfile.For<TComponent>());
+            Render(content);
+        }
 #else
         internal void Render(IHtmlContent content)
         {
             Render(() => content.WriteTo(Writer, HtmlEncoder.Default));
+        }
+
+        /// <summary>
+        /// Registers <typeparamref name="TComponent"/> as this field's input (value, gather, validation)
+        /// and renders its markup inside the field wrapper. Render the markup with
+        /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.ElementId"/> and
+        /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.BindingPath"/>.
+        /// </summary>
+        public void Render<TComponent>(IHtmlContent content)
+            where TComponent : IInputComponent, new()
+        {
+            RegisterInputComponent(InputComponentRegistrationProfile.For<TComponent>());
+            Render(content);
         }
 #endif
     }

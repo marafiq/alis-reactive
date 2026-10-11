@@ -37,7 +37,7 @@
             @{ Html.InputField(plan, m => m.Amount, o => o.Required().Label("Amount"))
                .FusionNumericTextBox(b => b
                    .Min(0).Max(10000).Step(1)
-                   .Reactive(plan, evt => evt.Changed, (args, p) =>
+                   .Reactive(plan, evt => evt.Change, (args, p) =>
                    {
                        p.Element("amount-echo").SetText("Amount changed");
                    })); }
@@ -128,7 +128,7 @@
             @{ Html.InputField(plan, m => m.Address!.PostalCode, o => o.Label("Postal Code"))
                .FusionNumericTextBox(b => b
                    .Min(10000).Max(99999).Step(1)
-                   .Reactive(plan, evt => evt.Changed, (args, p) =>
+                   .Reactive(plan, evt => evt.Change, (args, p) =>
                    {
                        p.Element("postal-echo").SetText("PostalCode changed");
                    })); }

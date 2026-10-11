@@ -28,6 +28,35 @@ namespace Alis.Reactive
             Pipeline = pipeline ?? throw new System.ArgumentNullException(nameof(pipeline));
         }
 
+        private static readonly TComponent Declaration = new TComponent();
+
+        /// <summary>Writes a value to one of the component's declared properties.</summary>
+        /// <example><c>p.Component&lt;FusionNumericTextBox&gt;(m =&gt; m.Rate).Set(c =&gt; c.Min, 0m)</c></example>
+        public ComponentRef<TComponent, TModel> Set<TValue>(
+            System.Func<TComponent, ComponentProperty<TValue>> property, TValue value)
+        {
+            if (property == null) throw new System.ArgumentNullException(nameof(property));
+            var declared = property(Declaration);
+            return EmitSet(declared, ValueExpression.LiteralFor(value, declared.Shape));
+        }
+
+        /// <summary>Calls one of the component's declared methods.</summary>
+        /// <example><c>p.Component&lt;FusionNumericTextBox&gt;(m =&gt; m.Rate).Call(c =&gt; c.Increment)</c></example>
+        public ComponentRef<TComponent, TModel> Call(System.Func<TComponent, ComponentMethod> method)
+        {
+            if (method == null) throw new System.ArgumentNullException(nameof(method));
+            return EmitCall(method(Declaration));
+        }
+
+        /// <summary>Reads one of the component's declared properties for conditions, gather or reactions.</summary>
+        /// <example><c>p.When(p.Component&lt;FusionNumericTextBox&gt;(m =&gt; m.Rate).Get(c =&gt; c.Min)).Gt(0m)</c></example>
+        public Builders.Conditions.TypedComponentSource<TValue> Get<TValue>(
+            System.Func<TComponent, ComponentProperty<TValue>> property)
+        {
+            if (property == null) throw new System.ArgumentNullException(nameof(property));
+            return Read(property(Declaration));
+        }
+
         internal ComponentRef<TComponent, TModel> EmitSet<TValue>(
             ComponentProperty<TValue> property, ValueExpression value)
         {

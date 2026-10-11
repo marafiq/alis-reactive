@@ -19,7 +19,7 @@
         @{ Html.InputField(plan, m => m.SystolicBP, o => o.Label("Systolic BP (mmHg)"))
             .FusionNumericTextBox(b => b
                 .Min(0).Max(300).Step(1)
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                .Reactive(plan, evt => evt.Change, (args, p) =>
                 {
                     var comp = p.Component<FusionNumericTextBox>(m => m.SystolicBP);
                     p.Element("bp-echo").SetText(comp.Value());

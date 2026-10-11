@@ -26,7 +26,7 @@
             @{ Html.InputField(plan, m => m.HeartRate, o => o.Label("Heart Rate (bpm)"))
                 .FusionNumericTextBox(b => b
                     .Min(0).Max(300).Step(1)
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    .Reactive(plan, evt => evt.Change, (args, p) =>
                     {
                         var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
 
@@ -74,7 +74,7 @@
             @{ Html.InputField(plan, m => m.BloodPressure, o => o.Label("Systolic BP (mmHg)"))
                 .FusionNumericTextBox(b => b
                     .Min(0).Max(300).Step(1)
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    .Reactive(plan, evt => evt.Change, (args, p) =>
                     {
                         var comp = p.Component<FusionNumericTextBox>(m => m.BloodPressure);
                         p.When(comp.Value()).Gte(60m)

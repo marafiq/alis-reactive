@@ -27,7 +27,7 @@
             @{ Html.InputField(plan, m => m.MealsPerWeek, o => o.Label("Catered meals per week"))
                 .FusionNumericTextBox(b => b
                     .Min(4).Max(21).Step(1).Value(Model.MealsPerWeek).ShowSpinButton(false)
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    .Reactive(plan, evt => evt.Change, (args, p) =>
                     {
                         p.Element("meals-summary").SetText(args, x => x.Value);
                         p.Element("meals-previous").SetText(args, x => x.PreviousValue);
