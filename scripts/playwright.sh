@@ -85,6 +85,13 @@ check_browser_assets_are_fresh() {
     Alis.Reactive.SandboxApp/package.json
 
   check_asset_output_is_fresh \
+    "sandbox components bundle" \
+    "Alis.Reactive.SandboxApp/wwwroot/js/sandbox-components.js" \
+    Alis.Reactive.SandboxApp/Scripts \
+    Alis.Reactive.SandboxApp/esbuild.config.mjs \
+    Alis.Reactive.SandboxApp/package.json
+
+  check_asset_output_is_fresh \
     "sandbox CSS" \
     "Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css" \
     Alis.Reactive.SandboxApp/Styles \

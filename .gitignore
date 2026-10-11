@@ -31,6 +31,8 @@ TestResults/
 # live in SandboxApp/wwwroot/.
 Alis.Reactive.Assets/dist/
 Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js
+Alis.Reactive.SandboxApp/wwwroot/js/sandbox-components.js
+Alis.Reactive.SandboxApp/wwwroot/js/sandbox-components.css
 Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css
 
 # The downloadable example zip is regenerated fresh on every docs deploy

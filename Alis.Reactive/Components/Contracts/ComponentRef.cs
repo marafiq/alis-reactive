@@ -63,6 +63,37 @@ namespace Alis.Reactive
             return EmitCall(method(Declaration));
         }
 
+        /// <summary>Calls one of the component's declared methods with a literal argument.</summary>
+        /// <example><c>p.Component&lt;TomSelect&gt;(m =&gt; m.Suite).Call(c =&gt; c.SetValue, "studio")</c></example>
+        public ComponentRef<TComponent, TModel> Call<TArg>(
+            System.Func<TComponent, ComponentMethod<TArg>> method, TArg argument)
+        {
+            if (method == null) throw new System.ArgumentNullException(nameof(method));
+            return EmitCall(
+                method(Declaration).Method,
+                new System.Collections.Generic.List<ValueExpression>
+                {
+                    ValueExpression.LiteralFor(argument, Shape.FromClrType(typeof(TArg))),
+                });
+        }
+
+        /// <summary>
+        /// Calls one of the component's declared methods with an argument read at runtime: another
+        /// component, an event payload, a response body, a URL parameter, a plugin or an array.
+        /// </summary>
+        /// <example><c>s.Component&lt;TomSelect&gt;(m =&gt; m.Suite).Call(c =&gt; c.SetValue, res.Read(r =&gt; r.SuiteType))</c></example>
+        public ComponentRef<TComponent, TModel> Call<TArg, TSource>(
+            System.Func<TComponent, ComponentMethod<TArg>> method,
+            Builders.Conditions.TypedSource<TSource> argument)
+            where TSource : TArg
+        {
+            if (method == null) throw new System.ArgumentNullException(nameof(method));
+            if (argument == null) throw new System.ArgumentNullException(nameof(argument));
+            return EmitCall(
+                method(Declaration).Method,
+                new System.Collections.Generic.List<ValueExpression> { argument.ToValueExpression() });
+        }
+
         /// <summary>Reads one of the component's declared properties for conditions, gather or reactions.</summary>
         /// <example><c>p.When(p.Component&lt;FusionNumericTextBox&gt;(m =&gt; m.Rate).Get(c =&gt; c.Min)).Gt(0m)</c></example>
         public Builders.Conditions.TypedComponentSource<TValue> Get<TValue>(
