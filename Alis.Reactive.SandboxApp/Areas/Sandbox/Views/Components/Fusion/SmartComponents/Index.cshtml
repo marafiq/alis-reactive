@@ -20,8 +20,8 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var note = p.Component<FusionSmartTextArea>(m => m.CareNote);
-        note.SetValue("Resident is");
-        p.Element("smart-note-value").SetText(note.Value());
+        note.Set(c => c.Value, "Resident is");
+        p.Element("smart-note-value").SetText(note.Get(c => c.Value));
     }));
 }
 
@@ -48,14 +48,14 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var note = p.Component<FusionSmartTextArea>(m => m.CareNote);
-                        note.SetValue("Resident prefers morning therapy");
-                        p.Element("smart-note-value").SetText(note.Value());
+                        note.Set(c => c.Value, "Resident prefers morning therapy");
+                        p.Element("smart-note-value").SetText(note.Get(c => c.Value));
                     }))
                 @(Html.NativeButton("focus-smart-note-btn", "Focus Note")
                     .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionSmartTextArea>(m => m.CareNote).FocusIn();
+                        p.Component<FusionSmartTextArea>(m => m.CareNote).Call(c => c.FocusIn);
                         p.Element("smart-note-focus-status").SetText("focus called");
                     }))
             </native-hstack>

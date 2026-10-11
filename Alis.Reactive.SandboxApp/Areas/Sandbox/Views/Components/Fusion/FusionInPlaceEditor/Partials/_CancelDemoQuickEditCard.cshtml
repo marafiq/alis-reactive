@@ -17,11 +17,11 @@
         .FusionInPlaceEditor(b => b
             .Type(SfInPlace.InputType.Text)
             .Mode(SfInPlace.RenderMode.Inline)
-            .EditableOn(SfInPlace.EditableType.Click)
-            .Reactive(plan, evt => evt.CancelClick, (args, p) =>
-            {
-                p.Element("card-cancel-status").SetText("User cancelled the edit");
-            })); }
+            .EditableOn(SfInPlace.EditableType.Click))
+        .Reactive(evt => evt.CancelClick, (args, p) =>
+        {
+            p.Element("card-cancel-status").SetText("User cancelled the edit");
+        }); }
 
     <p class="text-sm mt-3">Status: <span id="card-cancel-status" class="font-mono text-text-muted">(no cancel yet)</span></p>
 </section>

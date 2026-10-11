@@ -14,7 +14,6 @@ namespace Alis.Reactive
     {
         private readonly ComponentObjectTarget _target;
 
-        internal string TargetId => _target.IdForJson;
         internal PipelineBuilder<TModel> Pipeline { get; }
 
         internal ComponentRef(string targetId, PipelineBuilder<TModel> pipeline)

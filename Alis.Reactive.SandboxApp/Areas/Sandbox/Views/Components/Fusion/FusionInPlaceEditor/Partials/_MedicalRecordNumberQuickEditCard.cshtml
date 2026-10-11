@@ -20,25 +20,25 @@
             .Type(SfInPlace.InputType.Mask)
             .Mode(SfInPlace.RenderMode.Inline)
             .EditableOn(SfInPlace.EditableType.Click)
-            .Model(new { mask = "LLL-0000", placeholder = "MRN-0000" })
-            .Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
-            {
-                p.Post(updateUrl)
-                 .Gather(g => g
-                     .Include<FusionInPlaceEditor, MedicalRecordNumberQuickEdit>(m => m.Value)
-                     .Include<NativeHiddenField, MedicalRecordNumberQuickEdit>(m => m.ResidentId))
-                 .Validate<MedicalRecordNumberQuickEditValidator>("card-mrn")
-                 .Response(r => r
-                    .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
-                    {
-                        s.Element("card-mrn-display").SetText(json, x => x.DisplayValue);
-                    })
-                    .OnError(400, e => e.ValidationErrors("card-mrn"))
-                    .OnError<InPlaceEditorCommitError>((err, e) =>
-                    {
-                        e.Element("card-mrn-error").SetText(err, x => x.Message);
-                    }));
-            })); }
+            .Model(new { mask = "LLL-0000", placeholder = "MRN-0000" }))
+        .Reactive(evt => evt.ActionSuccess, (args, p) =>
+        {
+            p.Post(updateUrl)
+             .Gather(g => g
+                 .Include<FusionInPlaceEditor, MedicalRecordNumberQuickEdit>(m => m.Value)
+                 .Include<NativeHiddenField, MedicalRecordNumberQuickEdit>(m => m.ResidentId))
+             .Validate<MedicalRecordNumberQuickEditValidator>("card-mrn")
+             .Response(r => r
+                .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
+                {
+                    s.Element("card-mrn-display").SetText(json, x => x.DisplayValue);
+                })
+                .OnError(400, e => e.ValidationErrors("card-mrn"))
+                .OnError<InPlaceEditorCommitError>((err, e) =>
+                {
+                    e.Element("card-mrn-error").SetText(err, x => x.Message);
+                }));
+        }); }
 
     <p class="text-sm mt-3">Display: <span id="card-mrn-display" class="font-mono text-text-muted">unchanged</span></p>
     <p class="text-sm">Error: <span id="card-mrn-error" class="text-red-600"></span></p>

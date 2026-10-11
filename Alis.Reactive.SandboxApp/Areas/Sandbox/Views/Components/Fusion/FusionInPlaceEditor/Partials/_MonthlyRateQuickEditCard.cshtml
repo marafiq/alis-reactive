@@ -27,30 +27,30 @@
             .Type(SfInPlace.InputType.Numeric)
             .Mode(SfInPlace.RenderMode.Inline)
             .EditableOn(SfInPlace.EditableType.Click)
-            .Model(new { format = "C0", min = 0, max = 25000, step = 50 })
-            .Reactive(plan, evt => evt.BeginEdit, (args, p) =>
-            {
-                p.Component<FusionInPlaceEditor>(m => m.Value).RemoveClass("alis-editor-saved");
-            })
-            .Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
-            {
-                p.Post(updateUrl)
-                 .Gather(g => g
-                     .Include<FusionInPlaceEditor, MonthlyRateQuickEdit>(m => m.Value)
-                     .Include<NativeHiddenField, MonthlyRateQuickEdit>(m => m.ResidentId))
-                 .Validate<MonthlyRateQuickEditValidator>("card-monthly-rate")
-                 .Response(r => r
-                    .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
-                    {
-                        s.Element("card-monthly-rate-display").SetText(json, x => x.DisplayValue);
-                        s.Component<FusionInPlaceEditor>(m => m.Value).AddClass("alis-editor-saved");
-                    })
-                    .OnError(400, e => e.ValidationErrors("card-monthly-rate"))
-                    .OnError<InPlaceEditorCommitError>((err, e) =>
-                    {
-                        e.Element("card-monthly-rate-error").SetText(err, x => x.Message);
-                    }));
-            })); }
+            .Model(new { format = "C0", min = 0, max = 25000, step = 50 }))
+        .Reactive(evt => evt.BeginEdit, (args, p) =>
+        {
+            p.Component<FusionInPlaceEditor>(m => m.Value).Call(c => c.RemoveClass, "alis-editor-saved");
+        })
+        .Reactive(evt => evt.ActionSuccess, (args, p) =>
+        {
+            p.Post(updateUrl)
+             .Gather(g => g
+                 .Include<FusionInPlaceEditor, MonthlyRateQuickEdit>(m => m.Value)
+                 .Include<NativeHiddenField, MonthlyRateQuickEdit>(m => m.ResidentId))
+             .Validate<MonthlyRateQuickEditValidator>("card-monthly-rate")
+             .Response(r => r
+                .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
+                {
+                    s.Element("card-monthly-rate-display").SetText(json, x => x.DisplayValue);
+                    s.Component<FusionInPlaceEditor>(m => m.Value).Call(c => c.AddClass, "alis-editor-saved");
+                })
+                .OnError(400, e => e.ValidationErrors("card-monthly-rate"))
+                .OnError<InPlaceEditorCommitError>((err, e) =>
+                {
+                    e.Element("card-monthly-rate-error").SetText(err, x => x.Message);
+                }));
+        }); }
 
     <p class="text-sm mt-3">Display: <span id="card-monthly-rate-display" class="font-mono text-text-muted">unchanged</span></p>
     <p class="text-sm">Other error: <span id="card-monthly-rate-error" class="text-red-600"></span></p>

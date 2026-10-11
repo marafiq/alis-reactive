@@ -22,29 +22,29 @@
         .FusionInPlaceEditor(b => b
             .Type(SfInPlace.InputType.Date)
             .Mode(SfInPlace.RenderMode.Inline)
-            .EditableOn(SfInPlace.EditableType.Click)
-            .Reactive(plan, evt => evt.BeginEdit, (args, p) =>
-            {
-                p.Component<FusionInPlaceEditor>(m => m.Value).RemoveClass("alis-editor-saved");
-            })
-            .Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
-            {
-                p.Post(updateUrl)
-                 .Gather(g => g
-                     .Include<FusionInPlaceEditor, DateOfBirthQuickEdit>(m => m.Value)
-                     .Include<NativeHiddenField, DateOfBirthQuickEdit>(m => m.ResidentId))
-                 .Validate<DateOfBirthQuickEditValidator>("card-dob")
-                 .Response(r => r
-                    .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
-                    {
-                        s.Element("card-dob-display").SetText(json, x => x.DisplayValue);
-                        s.Component<FusionInPlaceEditor>(m => m.Value).AddClass("alis-editor-saved");
-                    })
-                    .OnError<InPlaceEditorCommitError>((err, e) =>
-                    {
-                        e.Element("card-dob-error").SetText(err, x => x.Message);
-                    }));
-            })); }
+            .EditableOn(SfInPlace.EditableType.Click))
+        .Reactive(evt => evt.BeginEdit, (args, p) =>
+        {
+            p.Component<FusionInPlaceEditor>(m => m.Value).Call(c => c.RemoveClass, "alis-editor-saved");
+        })
+        .Reactive(evt => evt.ActionSuccess, (args, p) =>
+        {
+            p.Post(updateUrl)
+             .Gather(g => g
+                 .Include<FusionInPlaceEditor, DateOfBirthQuickEdit>(m => m.Value)
+                 .Include<NativeHiddenField, DateOfBirthQuickEdit>(m => m.ResidentId))
+             .Validate<DateOfBirthQuickEditValidator>("card-dob")
+             .Response(r => r
+                .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
+                {
+                    s.Element("card-dob-display").SetText(json, x => x.DisplayValue);
+                    s.Component<FusionInPlaceEditor>(m => m.Value).Call(c => c.AddClass, "alis-editor-saved");
+                })
+                .OnError<InPlaceEditorCommitError>((err, e) =>
+                {
+                    e.Element("card-dob-error").SetText(err, x => x.Message);
+                }));
+        }); }
 
     <p class="text-sm mt-3">Display: <span id="card-dob-display" class="font-mono text-text-muted">unchanged</span></p>
     <p class="text-sm">Error: <span id="card-dob-error" class="text-red-600"></span></p>

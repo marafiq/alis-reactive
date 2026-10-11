@@ -12,9 +12,9 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var tree = p.Component<FusionDropDownTree>(m => m.ResidentIds);
-        tree.SetValue(new[] { "alice" }).DataBind();
-        p.Element("text-echo").SetText(tree.Text());
-        p.When(tree.Value()).NotEmpty()
+        tree.Set(c => c.Value, new[] { "alice" }).Call(c => c.DataBind);
+        p.Element("text-echo").SetText(tree.Get(c => c.Text));
+        p.When(tree.Get(c => c.Value)).NotEmpty()
             .Then(t => t.Element("value-state").SetText("has values"))
             .Else(e => e.Element("value-state").SetText("empty"));
     }));
@@ -39,27 +39,27 @@
                     })
                     .Placeholder("Select resident")
                     .ChangeOnBlur(false)
-                    .PopupHeight("180px")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.Element("change-interacted").SetText(args, x => x.IsInteracted);
-                        p.When(args, x => x.Value).NotEmpty()
-                            .Then(t => t.Element("change-value-state").SetText("has values"))
-                            .Else(e => e.Element("change-value-state").SetText("empty"));
-                        p.When(args, x => x.OldValue).NotEmpty()
-                            .Then(t => t.Element("change-old-value-state").SetText("had old values"))
-                            .Else(e => e.Element("change-old-value-state").SetText("no old values"));
+                    .PopupHeight("180px"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.Element("change-interacted").SetText(args, x => x.IsInteracted);
+                    p.When(args, x => x.Value).NotEmpty()
+                        .Then(t => t.Element("change-value-state").SetText("has values"))
+                        .Else(e => e.Element("change-value-state").SetText("empty"));
+                    p.When(args, x => x.OldValue).NotEmpty()
+                        .Then(t => t.Element("change-old-value-state").SetText("had old values"))
+                        .Else(e => e.Element("change-old-value-state").SetText("no old values"));
 
-                        var tree = p.Component<FusionDropDownTree>(m => m.ResidentIds);
-                        p.Element("event-text").SetText(tree.Text());
-                        p.When(tree.Value()).NotEmpty()
-                            .Then(t =>
-                            {
-                                t.Element("selected-indicator").Show();
-                                t.Element("selected-indicator").SetText("selected");
-                            })
-                            .Else(e => e.Element("selected-indicator").Hide());
-                    })); }
+                    var tree = p.Component<FusionDropDownTree>(m => m.ResidentIds);
+                    p.Element("event-text").SetText(tree.Get(c => c.Text));
+                    p.When(tree.Get(c => c.Value)).NotEmpty()
+                        .Then(t =>
+                        {
+                            t.Element("selected-indicator").Show();
+                            t.Element("selected-indicator").SetText("selected");
+                        })
+                        .Else(e => e.Element("selected-indicator").Hide());
+                }); }
         </native-grid>
 
         <native-hstack gap="Sm" class="mt-4 flex-wrap">
@@ -68,9 +68,9 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var tree = p.Component<FusionDropDownTree>(m => m.ResidentIds);
-                    tree.SetValue(new[] { "bennett" }).DataBind();
-                    p.Element("text-echo").SetText(tree.Text());
-                    p.When(tree.Value()).NotEmpty()
+                    tree.Set(c => c.Value, new[] { "bennett" }).Call(c => c.DataBind);
+                    p.Element("text-echo").SetText(tree.Get(c => c.Text));
+                    p.When(tree.Get(c => c.Value)).NotEmpty()
                         .Then(t => t.Element("value-state").SetText("has values"))
                         .Else(e => e.Element("value-state").SetText("empty"));
                     p.Element("command-state").SetText("value set");
@@ -80,34 +80,34 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var tree = p.Component<FusionDropDownTree>(m => m.ResidentIds);
-                    tree.SetText("Carey").DataBind();
-                    p.Element("text-echo").SetText(tree.Text());
+                    tree.Set(c => c.Text, "Carey").Call(c => c.DataBind);
+                    p.Element("text-echo").SetText(tree.Get(c => c.Text));
                     p.Element("command-state").SetText("text set");
                 }))
             @(Html.NativeButton("show-popup-btn", "Show Popup")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionDropDownTree>(m => m.ResidentIds).ShowPopup();
+                    p.Component<FusionDropDownTree>(m => m.ResidentIds).Call(c => c.ShowPopup);
                 }))
             @(Html.NativeButton("hide-popup-btn", "Hide Popup")
                 .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionDropDownTree>(m => m.ResidentIds).HidePopup();
+                    p.Component<FusionDropDownTree>(m => m.ResidentIds).Call(c => c.HidePopup);
                 }))
             @(Html.NativeButton("clear-tree-btn", "Clear")
                 .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var tree = p.Component<FusionDropDownTree>(m => m.ResidentIds);
-                    tree.Clear();
+                    tree.Call(c => c.Clear);
                     p.Element("command-state").SetText("cleared");
-                    p.Element("text-echo").SetText(tree.Text());
-                    p.When(tree.Value()).NotEmpty()
+                    p.Element("text-echo").SetText(tree.Get(c => c.Text));
+                    p.When(tree.Get(c => c.Value)).NotEmpty()
                         .Then(t => t.Element("value-state").SetText("has values"))
                         .Else(e => e.Element("value-state").SetText("empty"));
-                    p.When(tree.Value()).NotEmpty()
+                    p.When(tree.Get(c => c.Value)).NotEmpty()
                         .Then(t => t.Element("selected-indicator").Show())
                         .Else(e => e.Element("selected-indicator").Hide());
                 }))
@@ -124,8 +124,8 @@
                 p.Post(Url.SandboxRoute("Echo", "DropDownTree"))
                     .Gather(g =>
                     {
-                        g.Include(tree.Value(), "value");
-                        g.Include(tree.Text(), "text");
+                        g.Include(tree.Get(c => c.Value), "value");
+                        g.Include(tree.Get(c => c.Text), "text");
                     })
                     .Response(r => r.OnSuccess<FusionDropDownTreeEchoResponse>((json, s) =>
                     {

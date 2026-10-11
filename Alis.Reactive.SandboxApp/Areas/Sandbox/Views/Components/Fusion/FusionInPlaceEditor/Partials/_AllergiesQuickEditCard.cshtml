@@ -33,25 +33,25 @@
                 dataSource = allergies,
                 fields = new { text = "name", value = "code" },
                 placeholder = "Select allergies"
-            })
-            .Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
-            {
-                p.Post(updateUrl)
-                 .Gather(g => g
-                     .Include<FusionInPlaceEditor, AllergiesQuickEdit>(m => m.Value)
-                     .Include<NativeHiddenField, AllergiesQuickEdit>(m => m.ResidentId))
-                 .Validate<AllergiesQuickEditValidator>("card-allergies")
-                 .Response(r => r
-                    .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
-                    {
-                        s.Element("card-allergies-display").SetText(json, x => x.DisplayValue);
-                    })
-                    .OnError(400, e => e.ValidationErrors("card-allergies"))
-                    .OnError<InPlaceEditorCommitError>((err, e) =>
-                    {
-                        e.Element("card-allergies-error").SetText(err, x => x.Message);
-                    }));
-            })); }
+            }))
+        .Reactive(evt => evt.ActionSuccess, (args, p) =>
+        {
+            p.Post(updateUrl)
+             .Gather(g => g
+                 .Include<FusionInPlaceEditor, AllergiesQuickEdit>(m => m.Value)
+                 .Include<NativeHiddenField, AllergiesQuickEdit>(m => m.ResidentId))
+             .Validate<AllergiesQuickEditValidator>("card-allergies")
+             .Response(r => r
+                .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
+                {
+                    s.Element("card-allergies-display").SetText(json, x => x.DisplayValue);
+                })
+                .OnError(400, e => e.ValidationErrors("card-allergies"))
+                .OnError<InPlaceEditorCommitError>((err, e) =>
+                {
+                    e.Element("card-allergies-error").SetText(err, x => x.Message);
+                }));
+        }); }
 
     <p class="text-sm mt-3">Display: <span id="card-allergies-display" class="font-mono text-text-muted">unchanged</span></p>
     <p class="text-sm">Error: <span id="card-allergies-error" class="text-red-600"></span></p>

@@ -27,13 +27,6 @@ namespace Alis.Reactive
             _shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
 
-        private ComponentProperty(MemberName member, Path path, Shape shape)
-        {
-            _member = member ?? throw new ArgumentNullException(nameof(member));
-            _path = path ?? throw new ArgumentNullException(nameof(path));
-            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
-        }
-
         internal string Member => _member.Value;
 
         internal Shape Shape => _shape;
@@ -51,10 +44,6 @@ namespace Alis.Reactive
         /// <summary>Declares a property whose plan member maps to a different JavaScript path.</summary>
         internal static ComponentProperty<TValue> Mapped(string member, string pathExpression) =>
             new ComponentProperty<TValue>(member, pathExpression, Shape.FromClrType(typeof(TValue)));
-
-        /// <summary>Specializes the property shape when render-time registration discovered it.</summary>
-        internal ComponentProperty<TValue> WithShape(Shape shape) =>
-            new ComponentProperty<TValue>(_member, _path, shape);
     }
 
     /// <summary>

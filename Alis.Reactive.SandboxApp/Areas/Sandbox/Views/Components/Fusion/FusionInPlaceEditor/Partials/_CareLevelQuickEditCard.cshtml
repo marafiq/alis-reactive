@@ -24,24 +24,24 @@
                 dataSource = careLevels,
                 fields = new { text = "label", value = "id" },
                 placeholder = "Choose a care level"
-            })
-            .Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
-            {
-                p.Post(updateUrl)
-                 .Gather(g => g
-                     .Include<FusionInPlaceEditor, CareLevelQuickEdit>(m => m.Value)
-                     .Include<NativeHiddenField, CareLevelQuickEdit>(m => m.ResidentId))
-                 .Validate<CareLevelQuickEditValidator>("card-care-level")
-                 .Response(r => r
-                    .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
-                    {
-                        s.Element("card-care-level-display").SetText(json, x => x.DisplayValue);
-                    })
-                    .OnError<InPlaceEditorCommitError>((err, e) =>
-                    {
-                        e.Element("card-care-level-error").SetText(err, x => x.Message);
-                    }));
-            })); }
+            }))
+        .Reactive(evt => evt.ActionSuccess, (args, p) =>
+        {
+            p.Post(updateUrl)
+             .Gather(g => g
+                 .Include<FusionInPlaceEditor, CareLevelQuickEdit>(m => m.Value)
+                 .Include<NativeHiddenField, CareLevelQuickEdit>(m => m.ResidentId))
+             .Validate<CareLevelQuickEditValidator>("card-care-level")
+             .Response(r => r
+                .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
+                {
+                    s.Element("card-care-level-display").SetText(json, x => x.DisplayValue);
+                })
+                .OnError<InPlaceEditorCommitError>((err, e) =>
+                {
+                    e.Element("card-care-level-error").SetText(err, x => x.Message);
+                }));
+        }); }
 
     <p class="text-sm mt-3">Display: <span id="card-care-level-display" class="font-mono text-text-muted">unchanged</span></p>
     <p class="text-sm">Error: <span id="card-care-level-error" class="text-red-600"></span></p>

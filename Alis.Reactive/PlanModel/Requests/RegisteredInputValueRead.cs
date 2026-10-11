@@ -25,14 +25,6 @@ namespace Alis.Reactive.PlanModel
 
         internal MemberName ValueMember { get; }
 
-        internal static RegisteredInputValueRead ForFusionInPlaceEditorValueRead(string componentId) =>
-            new RegisteredInputValueRead(
-                ComponentId.Of(componentId),
-                MemberName.Of("value"),
-                "FusionInPlaceEditor",
-                "Render the editor with Html.InputField(plan, m => m.X).FusionInPlaceEditor(...)",
-                "reading .Value() in a pipeline");
-
         internal static RegisteredInputValueRead ForGatherValueRead(string componentId, string valueMember) =>
             new RegisteredInputValueRead(
                 ComponentId.Of(componentId),

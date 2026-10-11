@@ -1,18 +1,73 @@
+using System;
+using System.Collections.Generic;
+using Alis.Reactive.Native;
+using Syncfusion.EJ2;
+using Syncfusion.EJ2.Inputs;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Syncfusion Uploader configured for form-mode file selection without auto-upload.
+    /// The Syncfusion Uploader, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use as a component type in <c>p.Component&lt;FusionFileUpload&gt;(m =&gt; m.Documents)</c>
-    /// to read selected file metadata for Reactive Plan conditions or gather.
+    /// Render it with <c>Html.InputField(plan, m =&gt; m.CarePlanDocument).FusionFileUpload(b =&gt; ...)</c>; target it with
+    /// <c>p.Component&lt;FusionFileUpload&gt;(m =&gt; m.CarePlanDocument)</c>; every declared member works with <c>Set</c>,
+    /// <c>Call</c> and <c>Get</c>, for example <c>g.Include(upload.Get(c =&gt; c.FilesData), "files")</c>.
     /// </remarks>
     public sealed class FusionFileUpload : FusionComponent, IInputComponent
     {
-        internal static InputComponentRegistrationProfile Registration { get; } =
-            InputComponentRegistrationProfile.For(new FusionFileUpload(), "fileupload");
-
         /// <inheritdoc />
         public string ValueMember => "filesData";
+
+        /// <summary>The selected files, as the uploader reports them.</summary>
+        public ComponentProperty<string> FilesData => Property<string>(ValueMember);
+
+        /// <summary>Raised when the user selects files.</summary>
+        public TypedEvent<FusionFileUploadSelectedArgs> Selected =>
+            Event<FusionFileUploadSelectedArgs>("selected");
+    }
+
+    /// <summary>Payload of <see cref="FusionFileUpload.Selected"/>.</summary>
+    public class FusionFileUploadSelectedArgs
+    {
+        /// <summary>Number of files selected.</summary>
+        public int FilesCount { get; set; }
+
+        /// <summary>Whether user interaction made the selection.</summary>
+        public bool IsInteracted { get; set; }
+    }
+
+    /// <summary>
+    /// Renders the file upload component inside a bound input field.
+    /// </summary>
+    /// <remarks>
+    /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Document)</c>, then call
+    /// <c>.FusionFileUpload(b =&gt; { b.AllowedExtensions(".pdf,.docx"); })</c>.
+    /// </remarks>
+    public static class FusionFileUploadHtmlExtensions
+    {
+        /// <summary>Renders a FusionFileUpload with its defaults; see the overload that takes the configuration.</summary>
+        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionFileUpload, TModel> FusionFileUpload<TModel, TProp>(
+            this InputBoundField<TModel, TProp> setup)
+            where TModel : class
+            => setup.FusionFileUpload(_ => { });
+
+        /// <summary>
+        /// Renders the file upload component bound to the field's model property.
+        /// </summary>
+        /// <typeparam name="TProp">Model value type represented by the file upload input.</typeparam>
+        /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <param name="build">Configures initial uploader options before rendering.</param>
+        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionFileUpload, TModel> FusionFileUpload<TModel, TProp>(
+            this InputBoundField<TModel, TProp> setup,
+            Action<UploaderBuilder> build)
+            where TModel : class
+        {
+            var builder = setup.Helper.EJS().Uploader(setup.ElementId)
+                .AutoUpload(false)
+                .HtmlAttributes(new Dictionary<string, object> { ["name"] = setup.BindingPath });
+            build(builder);
+            return setup.Render<global::Alis.Reactive.Fusion.Components.FusionFileUpload>(builder.Render());
+        }
     }
 }

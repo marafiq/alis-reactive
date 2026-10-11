@@ -20,24 +20,24 @@
             .Type(SfInPlace.InputType.Text)
             .Mode(SfInPlace.RenderMode.Inline)
             .EditableOn(SfInPlace.EditableType.Click)
-            .Model(new { placeholder = "type boom to force 500" })
-            .Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
-            {
-                p.Post(updateUrl)
-                 .Gather(g => g
-                     .Include<FusionInPlaceEditor, NicknameQuickEdit>(m => m.Value)
-                     .Include<NativeHiddenField, NicknameQuickEdit>(m => m.ResidentId))
-                 .Validate<NicknameQuickEditValidator>("card-nickname-error")
-                 .Response(r => r
-                    .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
-                    {
-                        s.Element("card-nickname-display").SetText(json, x => x.DisplayValue);
-                    })
-                    .OnError<InPlaceEditorCommitError>((err, e) =>
-                    {
-                        e.Element("card-nickname-error-message").SetText(err, x => x.Message);
-                    }));
-            })); }
+            .Model(new { placeholder = "type boom to force 500" }))
+        .Reactive(evt => evt.ActionSuccess, (args, p) =>
+        {
+            p.Post(updateUrl)
+             .Gather(g => g
+                 .Include<FusionInPlaceEditor, NicknameQuickEdit>(m => m.Value)
+                 .Include<NativeHiddenField, NicknameQuickEdit>(m => m.ResidentId))
+             .Validate<NicknameQuickEditValidator>("card-nickname-error")
+             .Response(r => r
+                .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
+                {
+                    s.Element("card-nickname-display").SetText(json, x => x.DisplayValue);
+                })
+                .OnError<InPlaceEditorCommitError>((err, e) =>
+                {
+                    e.Element("card-nickname-error-message").SetText(err, x => x.Message);
+                }));
+        }); }
 
     <p class="text-sm mt-3">Display: <span id="card-nickname-display" class="font-mono text-text-muted">unchanged</span></p>
     <p class="text-sm">Error: <span id="card-nickname-error-message" class="text-red-600"></span></p>
