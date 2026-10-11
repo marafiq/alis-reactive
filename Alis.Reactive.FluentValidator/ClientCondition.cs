@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
@@ -98,6 +99,8 @@ namespace Alis.Reactive.FluentValidator
                     case ExpressionType.Call:
                         return Call((MethodCallExpression)expression);
                     default:
+                        if (IsHasValue(expression, out var nullable))
+                            return Compare(FieldOf(nullable), CompareOperator.NotNull, FieldComparisonValue.None);
                         return IsField(expression) ? Truthy(expression) : null;
                 }
             }
@@ -275,14 +278,44 @@ namespace Alis.Reactive.FluentValidator
                 call.Method.DeclaringType == typeof(string) && call.Method.Name == name
                 && call.Object == null && call.Arguments.Count == 1;
 
-            // A member chain rooted at the model: x.Name, x.Address.City.
+            // A member chain rooted at the model: x.Name, x.Address.City, x.Score.Value. A member of a
+            // value .NET defines (x.Name.Length, x.Tags.Count, x.Date.Year) is not one the page binds.
             private bool IsField(Expression expression)
             {
-                var current = StripConvert(expression);
+                var current = ModelMember(expression);
                 if (!(current is MemberExpression)) return false;
                 while (current is MemberExpression member && member.Expression != null)
+                {
+                    if (IsValueMember(member.Member)) return false;
                     current = StripConvert(member.Expression);
+                }
                 return current == _model;
+            }
+
+            private static bool IsValueMember(MemberInfo member) =>
+                member.DeclaringType?.Namespace?.StartsWith("System", StringComparison.Ordinal) == true;
+
+            // x.Score.HasValue: the nullable member has a value.
+            private bool IsHasValue(Expression expression, out Expression nullable)
+            {
+                nullable = null!;
+                if (!(expression is MemberExpression member) || member.Expression == null) return false;
+                var isHasValue = member.Member.Name == nameof(Nullable<int>.HasValue)
+                    && Nullable.GetUnderlyingType(member.Expression.Type) != null;
+                nullable = member.Expression;
+                return isHasValue && IsField(nullable);
+            }
+
+            // x.Score.Value reads x.Score: the browser's value is the number or nothing.
+            private static Expression ModelMember(Expression expression)
+            {
+                var current = StripConvert(expression);
+                return current is MemberExpression member
+                       && member.Expression != null
+                       && member.Member.Name == nameof(Nullable<int>.Value)
+                       && Nullable.GetUnderlyingType(member.Expression.Type) != null
+                    ? StripConvert(member.Expression)
+                    : current;
             }
 
             // An expression that reads nothing of the model: a constant, or a captured variable.
@@ -290,7 +323,7 @@ namespace Alis.Reactive.FluentValidator
 
             private ClientValidationFieldReference FieldOf(Expression member)
             {
-                var chain = StripConvert(member);
+                var chain = ModelMember(member);
                 return ClientValidationFieldReference.Of(
                     ValidationFieldPath.Of(ExpressionPathHelper.ToMemberName(chain)),
                     Shape.FromClrType(chain.Type));

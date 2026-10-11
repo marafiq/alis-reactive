@@ -23,7 +23,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                 .NotNull().WithMessage("Score the resident's fall risk.")
                 .InclusiveBetween(0, 10).WithMessage("Fall risk is scored 0 to 10.");
 
-            When(x => x.FallRiskScore > 7, () =>
+            // A nullable member reads as C# writes it: HasValue, then Value.
+            When(x => x.FallRiskScore.HasValue && x.FallRiskScore.Value > 7, () =>
                     RuleFor(x => x.MobilityNotes).NotEmpty().WithMessage("Describe the mobility plan for a high fall risk."))
                 .Otherwise(() =>
                     RuleFor(x => x.MobilityNotes).MaximumLength(40).WithMessage("Keep mobility notes under 40 characters."));

@@ -19,17 +19,17 @@ namespace Alis.Reactive.FluentValidator
             if (services == null) throw new ArgumentNullException(nameof(services));
             if (configure == null) throw new ArgumentNullException(nameof(configure));
 
-            services.TryAddSingleton<IClientValidationRuleSource, ClientValidationRuleSource>();
+            // Transient: the browser's rules are read from the validator the request resolves, so a
+            // scoped dependency, DateTime.Today or a captured setting is the one this request's server sees.
+            services.TryAddTransient<IClientValidationRuleSource, ClientValidationRuleSource>();
 
             var builder = new ReactiveFluentValidationBuilder(services);
             configure(builder);
             var clientMetadataTypes = builder.ClientMetadataTypes.ToArray();
             if (clientMetadataTypes.Length != 0)
             {
-                services.AddSingleton<IClientValidationMetadataProvider>(provider =>
-                    new ReactiveValidatorClientMetadataProvider(
-                        provider.GetRequiredService<IServiceScopeFactory>(),
-                        clientMetadataTypes));
+                services.AddTransient<IClientValidationMetadataProvider>(provider =>
+                    new ReactiveValidatorClientMetadataProvider(provider, clientMetadataTypes));
             }
 
             return services;
@@ -110,42 +110,32 @@ namespace Alis.Reactive.FluentValidator
 
     internal sealed class ReactiveValidatorClientMetadataProvider : IClientValidationMetadataProvider
     {
-        private readonly IReadOnlyDictionary<Type, IReadOnlyList<ClientValidationField>> _clientRules;
+        private readonly IServiceProvider _services;
+        private readonly HashSet<Type> _validationSourceTypes;
 
         public ReactiveValidatorClientMetadataProvider(
-            IServiceScopeFactory scopeFactory,
+            IServiceProvider services,
             IEnumerable<Type> validationSourceTypes)
         {
-            if (scopeFactory == null) throw new ArgumentNullException(nameof(scopeFactory));
+            _services = services ?? throw new ArgumentNullException(nameof(services));
             if (validationSourceTypes == null) throw new ArgumentNullException(nameof(validationSourceTypes));
-
-            _clientRules = BuildClientRulesBySource(
-                scopeFactory,
-                validationSourceTypes);
+            _validationSourceTypes = new HashSet<Type>(validationSourceTypes);
         }
 
+        // The rules of the validator this request resolves, read when the page renders.
         public bool TryGetClientRules(
             Type validationSourceType,
             [NotNullWhen(true)]
             out IReadOnlyList<ClientValidationField>? fields)
         {
             if (validationSourceType == null) throw new ArgumentNullException(nameof(validationSourceType));
-            return _clientRules.TryGetValue(validationSourceType, out fields);
-        }
 
-        private static IReadOnlyDictionary<Type, IReadOnlyList<ClientValidationField>> BuildClientRulesBySource(
-            IServiceScopeFactory scopeFactory,
-            IEnumerable<Type> validationSourceTypes)
-        {
-            using var scope = scopeFactory.CreateScope();
-            var rulesBySource = new Dictionary<Type, IReadOnlyList<ClientValidationField>>();
-            foreach (var validationSourceType in validationSourceTypes.Distinct())
-            {
-                var metadata = (IClientValidationMetadataSource)scope.ServiceProvider.GetRequiredService(validationSourceType);
-                rulesBySource.Add(validationSourceType, metadata.GetClientRules());
-            }
+            fields = null;
+            if (!_validationSourceTypes.Contains(validationSourceType)) return false;
 
-            return rulesBySource;
+            var validator = (IClientValidationMetadataSource)_services.GetRequiredService(validationSourceType);
+            fields = validator.GetClientRules();
+            return true;
         }
     }
 }

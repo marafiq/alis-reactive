@@ -60,7 +60,7 @@ Messages come from `.WithMessage(...)` or FluentValidation's default template, f
 (`{PropertyName}`, `{MinLength}`, `{ComparisonValue}`, ...).
 
 A peer comparison (`GreaterThan(x => x.AdmissionDate)`) must name a sibling member; FluentValidation
-keeps only the member, so a peer on another object is refused at startup. Write that rule in the
+keeps only the member, so a peer on another object is refused when the page renders. Write that rule in the
 validator of the object that owns both.
 
 ## Stays on the server
@@ -95,12 +95,13 @@ When(x => x.Tags.Contains("fall-risk"), () => { ... });
 Understood: `==`, `!=`, `<`, `<=`, `>`, `>=` between a member and a fixed value (constants and
 captured variables); a bool member alone; `== null`, `!= null`; `string.IsNullOrEmpty`;
 `Contains`, `StartsWith`, `EndsWith`, `Regex.IsMatch`; a fixed set's `Contains(member)`; a
-collection member's `Contains(value)`; `&&`, `||`, `!`. Enums compare by name. Anything else keeps
-the enclosed rules on the server.
+collection member's `Contains(value)`; a nullable member's `HasValue` and `Value`; `&&`, `||`, `!`.
+Enums compare by name. Anything else, including members of .NET's own values (`x.Name.Length`,
+`x.Tags.Count`), keeps the enclosed rules on the server.
 
-> **`DateTime.Today` / `DateTime.Now` freeze at startup.** The browser's rules are read once, when
-> the app starts. Use fixed dates for browser rules, or keep a moving bound on the server with
-> `.ServerOnly()`.
+> **Rules are read when the page renders,** from the validator the request resolves: a scoped
+> dependency, a captured setting or `DateTime.Today` is the one that request's server sees. A page
+> left open past midnight keeps the date it rendered with.
 
 ## Wiring in a view
 

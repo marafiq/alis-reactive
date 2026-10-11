@@ -722,7 +722,8 @@ proves it is named in the pull request.
   except on a collection. `Matches` carries `IgnoreCase`, `Multiline` and `Singleline` as flags; a
   pattern built from the model, or with an option JavaScript lacks, stays on the server. A message written from the model (`WithMessage(x => ...)`) keeps its
   component on the server. `.ServerOnly()` keeps a rule
-  on the server. A peer must be a sibling; any other peer is refused at startup.
+  on the server. A peer must be a sibling; any other peer is refused when the page renders. The
+  rules are read per request, from the validator that request resolves (7.1).
 
 **Decisions of section 8 applied**
 - `AddReactiveClientValidation` is gone: a browser rule always has the server rule it came from.
