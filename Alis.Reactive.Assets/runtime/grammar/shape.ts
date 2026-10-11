@@ -54,11 +54,11 @@ export function asBoolean(value: unknown): boolean | undefined {
   return undefined;
 }
 
-/** Text shape: numbers and booleans as text, dates as ISO, arrays as JavaScript's own text. */
+/** Text shape: numbers and booleans as text, dates as local calendar text, arrays as JavaScript's own text. */
 export function asText(value: unknown): string | undefined {
   if (typeof value === "string") return value;
   if (typeof value === "number" || typeof value === "boolean") return `${value}`;
-  if (value instanceof Date) return Number.isFinite(value.getTime()) ? value.toISOString() : undefined;
+  if (value instanceof Date) return Number.isFinite(value.getTime()) ? localDateText(value) : undefined;
   if (Array.isArray(value)) return toJavaScriptString(value);
   return undefined;
 }
@@ -74,6 +74,25 @@ export function asDate(value: unknown): Date | undefined {
 
   const parsed = new Date(value);
   return Number.isFinite(parsed.getTime()) ? parsed : undefined;
+}
+
+// A date as the person picked it, with no offset, the way an HTML form posts one: "YYYY-MM-DD" at
+// local midnight, else "YYYY-MM-DDTHH:mm:ss" with milliseconds when it has them. As a UTC instant a
+// day picked east of UTC would read as the day before, and a DateOnly member could not bind it.
+// asDate reads both forms back as the same local date.
+function localDateText(date: Date): string {
+  const day = `${date.getFullYear()}-${twoDigits(date.getMonth() + 1)}-${twoDigits(date.getDate())}`;
+  const isMidnight =
+    date.getHours() === 0 && date.getMinutes() === 0 && date.getSeconds() === 0 && date.getMilliseconds() === 0;
+  if (isMidnight) return day;
+
+  const time = `${twoDigits(date.getHours())}:${twoDigits(date.getMinutes())}:${twoDigits(date.getSeconds())}`;
+  const milliseconds = date.getMilliseconds() === 0 ? "" : `.${`${date.getMilliseconds()}`.padStart(3, "0")}`;
+  return `${day}T${time}${milliseconds}`;
+}
+
+function twoDigits(value: number): string {
+  return `${value}`.padStart(2, "0");
 }
 
 function localMidnight(year: number, month: number, day: number): Date | undefined {

@@ -46,19 +46,23 @@ describe("GET", () => {
     const calls = respondWith(null, null);
     await send(request({
       url: "/census?facility=3",
-      values: { wing: ["east", "west"], name: null, aids: null, admitted: new Date(Date.UTC(2026, 0, 2)) },
+      values: { wing: ["east", "west"], name: null, aids: null, admitted: new Date(2026, 0, 2), seen: new Date(2026, 0, 2, 9, 5) },
       arrays: ["aids"],
     }));
     expect(calls[0]!.url).toBe(
-      "/census?facility=3&wing=east&wing=west&name=&admitted=2026-01-02T00%3A00%3A00.000Z");
+      "/census?facility=3&wing=east&wing=west&name=&admitted=2026-01-02&seen=2026-01-02T09%3A05%3A00");
   });
 });
 
 describe("JSON", () => {
-  it("sends values as the body, with \"\" as null and dates as ISO", async () => {
+  it("sends values as the body, with \"\" as null and dates as the local day and time picked", async () => {
     const calls = respondWith(null, null);
-    await send(request({ method: "POST", values: { name: "", tags: ["", "a"], due: new Date(Date.UTC(2026, 5, 1)) } }));
-    expect(calls[0]!.init.body).toBe('{"name":null,"tags":["","a"],"due":"2026-06-01T00:00:00.000Z"}');
+    await send(request({
+      method: "POST",
+      values: { name: "", tags: ["", "a"], due: new Date(2026, 5, 1), dose: new Date(2026, 5, 1, 21, 30, 0, 250), visits: [new Date(2026, 5, 2)] },
+    }));
+    expect(calls[0]!.init.body).toBe(
+      '{"name":null,"tags":["","a"],"due":"2026-06-01","dose":"2026-06-01T21:30:00.250","visits":["2026-06-02"]}');
     expect((calls[0]!.init.headers as Record<string, string>)["Content-Type"]).toBe("application/json");
   });
 

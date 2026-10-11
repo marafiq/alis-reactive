@@ -166,9 +166,12 @@ function wireText(value: unknown, name: string): string {
 }
 
 // "" in a JSON body is a cleared field: the server binds it as null. Array items keep their text.
-// A file has no JSON form.
-function jsonValue(this: unknown, _key: string, value: unknown): unknown {
+// A date is sent as its local calendar text (asText); the holder still has the Date, which toJSON has
+// already turned into a UTC instant by the time it reaches here. A file has no JSON form.
+function jsonValue(this: unknown, key: string, value: unknown): unknown {
   if (fileOf(value) !== undefined) throw new Error("[alis] File objects require form-data body format");
+  const held = (this as Record<string, unknown>)[key];
+  if (held instanceof Date) return asText(held) ?? null;
   if (value === "" && !Array.isArray(this)) return null;
   return value;
 }

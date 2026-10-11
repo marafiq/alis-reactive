@@ -140,7 +140,7 @@ Coercion is automatic from C# type:
 string    → coerce: "string"  (null → "")
 int/long/decimal/double → coerce: "number" (NaN → 0)
 bool      → coerce: "boolean" ("false" → false)
-DateTime  → coerce: "string"  (compared as ISO string)
+DateTime  → compared by its time (a Date on both sides)
 string[]  → coerce: "raw"     (no coercion)
 ```
 

@@ -138,7 +138,7 @@ Literals are emitted already in their shape. Nothing else converts.
 | | number | false only for 0 and NaN |
 | | array | `length > 0` |
 | `text` | number or boolean | `${v}` |
-| | `Date` | ISO |
+| | `Date` | local calendar text: `YYYY-MM-DD` at midnight, else `YYYY-MM-DDTHH:mm:ss[.fff]`, no offset |
 | | array | `String(a)` |
 | | missing, when writing to an element's text | `""` |
 | `array(s)` (reading) | array | each item converted to `s` |
@@ -156,7 +156,9 @@ Literals are emitted already in their shape. Nothing else converts.
 - A value that cannot be converted is kept as it is.
 
 These are today's rules (`shape-convert.ts:45-269`), with one change: a date value is a `Date`, not
-a timestamp. So text, JSON and form data see ISO, and every comparison sees the time (2.2).
+a timestamp. So text, JSON and form data see the local day and time picked, with no offset, as
+an HTML form posts a date (a UTC instant would move a day picked east of UTC to the day before, and
+a `DateOnly` member cannot bind a time), and every comparison sees the time (2.2).
 
 **Binding reads** (deferred, section 11: model values are read with the shape conversion alone,
 as today). Where the server binds a value, the browser reads it the way MVC binds it.
@@ -428,11 +430,11 @@ imports none of them. The obligations are numbered so that tests and code can ci
   - A missing array sends no key, because `name=` binds as a collection holding one null
     (`request-payload-writer.ts:94-108`).
   - A `File` cannot be sent in a GET; it is a boundary error.
-- **H3 JSON.** `values` is the body. It is a binding read (2.1): dates serialize as ISO, and `""`
+- **H3 JSON.** `values` is the body. It is a binding read (2.1): dates serialize as their local text, and `""`
   is sent as `null` (`request-payload-writer.ts:235-240`). An empty record sends no body.
 - **H4 Form data.** One entry per key.
   - Arrays repeat the key.
-  - A `File` is appended with its name, and a date is ISO.
+  - A `File` is appended with its name, and a date is its local text.
   - A missing scalar is sent empty.
   - A missing array sends no entry (`request-payload-writer.ts:110-122`).
 - **H5 Headers.** A header whose value is missing is omitted.
