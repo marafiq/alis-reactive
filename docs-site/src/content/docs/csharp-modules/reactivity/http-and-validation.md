@@ -115,7 +115,8 @@ The browser evaluates `NotEmpty`, `NotNull` (not on a collection), `Empty`, `Min
 `EmailAddress`, `Matches`, `CreditCard`, `Url()`, `InclusiveBetween`, `ExclusiveBetween`, and
 comparisons with a value or a sibling member. `SetValidator`, `RuleForEach(...).SetValidator`,
 `Include` and `ChildRules` bring a child validator's rules along. `Must`, `Custom` and async rules stay on
-the server, and so does any rule followed by `.ServerOnly()`.
+the server, and so do a rule whose message is written from the model (`WithMessage(x => ...)`)
+and any rule followed by `.ServerOnly()`.
 
 ## Conditional Rules
 

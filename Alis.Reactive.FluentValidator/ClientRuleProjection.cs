@@ -104,7 +104,9 @@ namespace Alis.Reactive.FluentValidator
             ClientValidationFieldReference field,
             IRuleComponent component)
         {
-            var message = new ClientMessage(component.GetUnformattedErrorMessage(), () => DisplayNameOf(rule));
+            if (!TryMessageTemplateOf(component, out var template)) return Array.Empty<BrowserCheck>();
+
+            var message = new ClientMessage(template, () => DisplayNameOf(rule));
             switch (component.Validator)
             {
                 case INotEmptyValidator _:
@@ -299,6 +301,23 @@ namespace Alis.Reactive.FluentValidator
             return ClientValidationFieldReference.Of(
                 ValidationFieldPath.Of(ExpressionPathHelper.ToMemberName(rule.Expression.Body)),
                 Shape.FromClrType(ExpressionPathHelper.ToPropertyType(rule.Expression)));
+        }
+
+        // The component's message template. A message written from the model (WithMessage(x => ...))
+        // fails on the missing model when the page renders; the browser cannot say it, so the
+        // component stays on the server.
+        private static bool TryMessageTemplateOf(IRuleComponent component, out string template)
+        {
+            try
+            {
+                template = component.GetUnformattedErrorMessage();
+                return true;
+            }
+            catch (NullReferenceException)
+            {
+                template = "";
+                return false;
+            }
         }
 
         // The rule's display name, for a message template that names it. A name computed from the

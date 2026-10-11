@@ -14,6 +14,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             // FluentValidation's own message, named the way FluentValidation names the field.
             RuleFor(x => x.ResidentName).NotEmpty();
 
+            // A message written from the model can only be said by the server, so this rule runs there.
+            RuleFor(x => x.ResidentName).MaximumLength(30)
+                .WithMessage(review => $"{review.ResidentName} is longer than the 30 characters a wristband prints.");
+
             RuleFor(x => x.FallRiskScore)
                 .NotNull().WithMessage("Score the resident's fall risk.")
                 .InclusiveBetween(0, 10).WithMessage("Fall risk is scored 0 to 10.");

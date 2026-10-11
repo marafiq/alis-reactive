@@ -70,6 +70,7 @@ validator of the object that owns both.
 - rules inside a `When` written as a method group, over the validation context, or async
 - rule sets other than the default, and `DependentRules`
 - a child validator chosen per model by a factory (`SetValidator(x => ...)`) or by type (`SetInheritanceValidator`)
+- a component whose message is written from the model (`WithMessage(x => $"... {x.Name}")`): the server says it
 - any rule followed by `.ServerOnly()`: use it for a member the page does not render
 
 A browser rule on a member with no input on the page blocks the form and shows its message in the

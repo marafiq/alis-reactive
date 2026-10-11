@@ -61,6 +61,26 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
     }
 
     [Test]
+    public async Task a_name_too_long_for_the_wristband_is_refused_by_the_server_in_its_own_words()
+    {
+        const string LongName = "Margaret Elizabeth Hale-Worthington";
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, LongName);
+        await Write(m => m.FallRiskScore, "2");
+
+        await ClickWhenStable(SaveReview);
+
+        await Expect(_plan.ErrorFor(m => m.ResidentName))
+            .ToHaveTextAsync($"{LongName} is longer than the 30 characters a wristband prints.");
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1), "A message written from the model is the server's to say.");
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await ClickWhenStable(SaveReview);
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        Assert.That(_reviewsSent, Has.Count.EqualTo(2));
+        AssertNoConsoleErrorsExcept("400");
+    }
+
+    [Test]
     public async Task a_fall_risk_score_outside_zero_to_ten_is_refused()
     {
         await NavigateAndBoot();
