@@ -11,8 +11,8 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var menu = p.Component<FusionSplitButton>(menuId);
-        menu.SetContent("Ready Review");
-        p.Element("content-echo").SetText(menu.Content());
+        menu.Set(c => c.Content, "Ready Review").Call(c => c.DataBind);
+        p.Element("content-echo").SetText(menu.Get(c => c.Content));
     }));
 }
 
@@ -31,12 +31,12 @@
                     new { id = "schedule", text = "Schedule visit", disabled = false },
                     new { id = "hold", text = "Place hold", disabled = true }
                 }))
-                .Reactive(evt => evt.Clicked, (args, p) =>
+                .Reactive(evt => evt.Click, (args, p) =>
                 {
                     p.Element("primary-click-state").SetText("primary clicked");
                     p.Element("command-state").SetText("primary clicked");
                 })
-                .Reactive(evt => evt.Selected, (args, p) =>
+                .Reactive(evt => evt.Select, (args, p) =>
                 {
                     p.Element("selected-id").SetText(args, x => x.Item.Id);
                     p.Element("selected-text").SetText(args, x => x.Item.Text);
@@ -53,8 +53,8 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var menu = p.Component<FusionSplitButton>(menuId);
-                    menu.SetContent("Discharge Review");
-                    p.Element("content-echo").SetText(menu.Content());
+                    menu.Set(c => c.Content, "Discharge Review").Call(c => c.DataBind);
+                    p.Element("content-echo").SetText(menu.Get(c => c.Content));
                     p.Element("command-state").SetText("content set");
                 }))
             @(Html.NativeButton("disable-split-btn", "Disable")
@@ -62,8 +62,8 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var menu = p.Component<FusionSplitButton>(menuId);
-                    menu.SetDisabled(true);
-                    p.Element("disabled-echo").SetText(menu.Disabled());
+                    menu.Set(c => c.Disabled, true).Call(c => c.DataBind);
+                    p.Element("disabled-echo").SetText(menu.Get(c => c.Disabled));
                     p.Element("command-state").SetText("disabled");
                 }))
             @(Html.NativeButton("enable-split-btn", "Enable")
@@ -71,8 +71,8 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var menu = p.Component<FusionSplitButton>(menuId);
-                    menu.SetDisabled(false);
-                    p.Element("disabled-echo").SetText(menu.Disabled());
+                    menu.Set(c => c.Disabled, false).Call(c => c.DataBind);
+                    p.Element("disabled-echo").SetText(menu.Get(c => c.Disabled));
                     p.Element("command-state").SetText("enabled");
                 }))
             @(Html.NativeButton("set-css-btn", "Set Css")
@@ -80,36 +80,36 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var menu = p.Component<FusionSplitButton>(menuId);
-                    menu.SetCssClass("e-success extra-class");
-                    p.Element("css-echo").SetText(menu.CssClass());
+                    menu.Set(c => c.CssClass, "e-success extra-class").Call(c => c.DataBind);
+                    p.Element("css-echo").SetText(menu.Get(c => c.CssClass));
                     p.Element("command-state").SetText("css set");
                 }))
             @(Html.NativeButton("toggle-split-btn", "Toggle Menu")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionSplitButton>(menuId).Toggle();
+                    p.Component<FusionSplitButton>(menuId).Call(c => c.Toggle);
                     p.Element("toggle-state").SetText("toggle called");
                 }))
             @(Html.NativeButton("focus-split-btn", "Focus Split")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionSplitButton>(menuId).FocusIn();
+                    p.Component<FusionSplitButton>(menuId).Call(c => c.FocusIn);
                     p.Element("focus-state").SetText("focus called");
                 }))
             @(Html.NativeButton("remove-schedule-btn", "Remove Schedule")
                 .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionSplitButton>(menuId).RemoveItemsByText("Schedule visit");
+                    p.Component<FusionSplitButton>(menuId).Call(c => c.RemoveItems, new[] { "Schedule visit" }, false);
                     p.Element("remove-state").SetText("schedule removed");
                 }))
             @(Html.NativeButton("remove-hold-btn", "Remove Hold")
                 .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionSplitButton>(menuId).RemoveItemsById("hold");
+                    p.Component<FusionSplitButton>(menuId).Call(c => c.RemoveItems, new[] { "hold" }, true);
                     p.Element("remove-state").SetText("hold removed");
                 }))
             @(Html.NativeButton("check-disabled-btn", "Check Disabled")
@@ -117,7 +117,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var menu = p.Component<FusionSplitButton>(menuId);
-                    p.When(menu.Disabled()).Eq(true)
+                    p.When(menu.Get(c => c.Disabled)).Eq(true)
                         .Then(t => t.Element("disabled-state").SetText("disabled"))
                         .Else(e => e.Element("disabled-state").SetText("enabled"));
                 }))
@@ -134,9 +134,9 @@
                 p.Post(Url.SandboxRoute("Echo", "SplitButton"))
                     .Gather(g =>
                     {
-                        g.Include(menu.Content(), "content");
-                        g.Include(menu.Disabled(), "disabled");
-                        g.Include(menu.CssClass(), "cssClass");
+                        g.Include(menu.Get(c => c.Content), "content");
+                        g.Include(menu.Get(c => c.Disabled), "disabled");
+                        g.Include(menu.Get(c => c.CssClass), "cssClass");
                     })
                     .Response(r => r.OnSuccess<FusionSplitButtonEchoResponse>((json, s) =>
                     {

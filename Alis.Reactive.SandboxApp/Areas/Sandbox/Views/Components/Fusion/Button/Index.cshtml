@@ -17,9 +17,9 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var action = p.Component<FusionButton>(actionButtonId);
-        action.SetContent("Begin check-in for " + Model.ResidentName);
-        action.SetDisabled(true);
-        p.Element("action-ready").SetText(action.Content());
+        action.Set(c => c.Content, "Begin check-in for " + Model.ResidentName).Call(c => c.DataBind);
+        action.Set(c => c.Disabled, true).Call(c => c.DataBind);
+        p.Element("action-ready").SetText(action.Get(c => c.Content));
     }));
 }
 
@@ -55,14 +55,14 @@
                     .CssClass(CareControl)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionButton>(actionButtonId).SetDisabled(false);
+                        p.Component<FusionButton>(actionButtonId).Set(c => c.Disabled, false).Call(c => c.DataBind);
                         p.Element("readiness").SetText("Identity confirmed — you can begin the check-in.");
                     }))
                 @(Html.NativeButton("lock-visit", "Lock visit")
                     .CssClass(CareControl)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionButton>(actionButtonId).SetDisabled(true);
+                        p.Component<FusionButton>(actionButtonId).Set(c => c.Disabled, true).Call(c => c.DataBind);
                         p.Element("readiness").SetText("Visit locked — confirm the resident's identity to begin.");
                     }))
                 @(Html.NativeButton("check-readiness", "Check readiness")
@@ -70,7 +70,7 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var action = p.Component<FusionButton>(actionButtonId);
-                        p.When(action.Disabled()).Eq(true)
+                        p.When(action.Get(c => c.Disabled)).Eq(true)
                             .Then(locked => locked.Element("readiness")
                                 .SetText("This visit is locked. Confirm the resident's identity to begin."))
                             .Else(ready => ready.Element("readiness")
@@ -89,42 +89,42 @@
                     .CssClass(CareControl)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionButton>(actionButtonId).SetIcon("e-icons e-check", FusionButtonIconPosition.Right);
+                        p.Component<FusionButton>(actionButtonId).Set(c => c.IconCss, "e-icons e-check").Set(c => c.IconPosition, FusionButtonIconPosition.Right).Call(c => c.DataBind);
                         p.Element("priority-state").SetText("Marked complete.");
                     }))
                 @(Html.NativeButton("flag-urgent", "Flag as urgent")
                     .CssClass(CareControl)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionButton>(actionButtonId).SetCssClass("e-warning urgent-visit");
+                        p.Component<FusionButton>(actionButtonId).Set(c => c.CssClass, "e-warning urgent-visit").Call(c => c.DataBind);
                         p.Element("priority-state").SetText("Flagged urgent.");
                     }))
                 @(Html.NativeButton("recommend-action", "Make this the recommended action")
                     .CssClass(CareControl)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionButton>(actionButtonId).SetPrimary(true);
+                        p.Component<FusionButton>(actionButtonId).Set(c => c.IsPrimary, true).Call(c => c.DataBind);
                         p.Element("priority-state").SetText("Set as recommended.");
                     }))
                 @(Html.NativeButton("enable-followup", "Enable follow-up tracking")
                     .CssClass(CareControl)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionButton>(actionButtonId).SetToggle(true);
+                        p.Component<FusionButton>(actionButtonId).Set(c => c.IsToggle, true).Call(c => c.DataBind);
                         p.Element("priority-state").SetText("Follow-up tracking enabled.");
                     }))
                 @(Html.NativeButton("remind-me", "Remind me to begin")
                     .CssClass(CareControl)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionButton>(actionButtonId).Click();
+                        p.Component<FusionButton>(actionButtonId).Call(c => c.Click);
                         p.Element("priority-state").SetText("Reminder placed on the action.");
                     }))
                 @(Html.NativeButton("jump-to-action", "Jump to the action")
                     .CssClass(CareControl)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionButton>(actionButtonId).FocusIn();
+                        p.Component<FusionButton>(actionButtonId).Call(c => c.FocusIn);
                     }))
             </native-hstack>
 
@@ -142,11 +142,11 @@
                     p.Post(Url.SandboxRoute("RecordCheckIn", "Button"))
                         .Gather(g =>
                         {
-                            g.Include(action.Content(), "action");
-                            g.Include(action.Disabled(), "locked");
-                            g.Include(action.CssClass(), "priority");
-                            g.Include(action.IsPrimary(), "recommended");
-                            g.Include(action.IsToggle(), "followUp");
+                            g.Include(action.Get(c => c.Content), "action");
+                            g.Include(action.Get(c => c.Disabled), "locked");
+                            g.Include(action.Get(c => c.CssClass), "priority");
+                            g.Include(action.Get(c => c.IsPrimary), "recommended");
+                            g.Include(action.Get(c => c.IsToggle), "followUp");
                         })
                         .Response(r => r.OnSuccess<ButtonCheckInResponse>((json, s) =>
                         {

@@ -11,10 +11,10 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var button = p.Component<FusionProgressButton>(buttonId);
-        button.SetContent("Ready Save");
-        button.SetProgressEnabled(true);
-        p.Element("content-echo").SetText(button.Content());
-        p.Element("progress-enabled-echo").SetText(button.ProgressEnabled());
+        button.Set(c => c.Content, "Ready Save").Call(c => c.DataBind);
+        button.Set(c => c.EnableProgress, true).Call(c => c.DataBind);
+        p.Element("content-echo").SetText(button.Get(c => c.Content));
+        p.Element("progress-enabled-echo").SetText(button.Get(c => c.EnableProgress));
     }));
 }
 
@@ -29,7 +29,7 @@
                 .CssClass("care-progress")
                 .Duration(500)
                 .EnableProgress(false))
-                .Reactive(evt => evt.Began, (args, p) =>
+                .Reactive(evt => evt.Begin, (args, p) =>
                 {
                     p.Element("begin-percent").SetText(args, x => x.Percent);
                     p.Element("begin-duration").SetText(args, x => x.CurrentDuration);
@@ -38,7 +38,7 @@
                         .Then(t => t.Element("begin-condition").SetText("begin zero"))
                         .Else(e => e.Element("begin-condition").SetText("begin nonzero"));
                 })
-                .Reactive(evt => evt.Progressed, (args, p) =>
+                .Reactive(evt => evt.Progress, (args, p) =>
                 {
                     p.Element("progress-percent").SetText(args, x => x.Percent);
                     p.Element("progress-duration").SetText(args, x => x.CurrentDuration);
@@ -47,7 +47,7 @@
                         .Then(t => t.Element("progress-condition").SetText("at least sixty"))
                         .Else(e => e.Element("progress-condition").SetText("below sixty"));
                 })
-                .Reactive(evt => evt.Ended, (args, p) =>
+                .Reactive(evt => evt.End, (args, p) =>
                 {
                     p.Element("end-percent").SetText(args, x => x.Percent);
                     p.Element("end-duration").SetText(args, x => x.CurrentDuration);
@@ -64,8 +64,8 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var button = p.Component<FusionProgressButton>(buttonId);
-                    button.SetContent("Discharge Save");
-                    p.Element("content-echo").SetText(button.Content());
+                    button.Set(c => c.Content, "Discharge Save").Call(c => c.DataBind);
+                    p.Element("content-echo").SetText(button.Get(c => c.Content));
                     p.Element("command-state").SetText("content set");
                 }))
             @(Html.NativeButton("disable-progress-button-btn", "Disable")
@@ -73,8 +73,8 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var button = p.Component<FusionProgressButton>(buttonId);
-                    button.SetDisabled(true);
-                    p.Element("disabled-echo").SetText(button.Disabled());
+                    button.Set(c => c.Disabled, true).Call(c => c.DataBind);
+                    p.Element("disabled-echo").SetText(button.Get(c => c.Disabled));
                     p.Element("command-state").SetText("disabled");
                 }))
             @(Html.NativeButton("enable-progress-button-btn", "Enable")
@@ -82,8 +82,8 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var button = p.Component<FusionProgressButton>(buttonId);
-                    button.SetDisabled(false);
-                    p.Element("disabled-echo").SetText(button.Disabled());
+                    button.Set(c => c.Disabled, false).Call(c => c.DataBind);
+                    p.Element("disabled-echo").SetText(button.Get(c => c.Disabled));
                     p.Element("command-state").SetText("enabled");
                 }))
             @(Html.NativeButton("set-css-btn", "Set Css")
@@ -91,8 +91,8 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var button = p.Component<FusionProgressButton>(buttonId);
-                    button.SetCssClass("e-success extra-class");
-                    p.Element("css-echo").SetText(button.CssClass());
+                    button.Set(c => c.CssClass, "e-success extra-class").Call(c => c.DataBind);
+                    p.Element("css-echo").SetText(button.Get(c => c.CssClass));
                     p.Element("command-state").SetText("css set");
                 }))
             @(Html.NativeButton("enable-progress-btn", "Enable Progress")
@@ -100,8 +100,8 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var button = p.Component<FusionProgressButton>(buttonId);
-                    button.SetProgressEnabled(true);
-                    p.Element("progress-enabled-echo").SetText(button.ProgressEnabled());
+                    button.Set(c => c.EnableProgress, true).Call(c => c.DataBind);
+                    p.Element("progress-enabled-echo").SetText(button.Get(c => c.EnableProgress));
                     p.Element("command-state").SetText("progress enabled");
                 }))
             @(Html.NativeButton("disable-progress-btn", "Disable Progress")
@@ -109,36 +109,36 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var button = p.Component<FusionProgressButton>(buttonId);
-                    button.SetProgressEnabled(false);
-                    p.Element("progress-enabled-echo").SetText(button.ProgressEnabled());
+                    button.Set(c => c.EnableProgress, false).Call(c => c.DataBind);
+                    p.Element("progress-enabled-echo").SetText(button.Get(c => c.EnableProgress));
                     p.Element("command-state").SetText("progress disabled");
                 }))
             @(Html.NativeButton("start-progress-btn", "Start")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionProgressButton>(buttonId).Start();
+                    p.Component<FusionProgressButton>(buttonId).Call(c => c.Start);
                     p.Element("start-state").SetText("start called");
                 }))
             @(Html.NativeButton("start-at-progress-btn", "Start At 60")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionProgressButton>(buttonId).StartAt(60d);
+                    p.Component<FusionProgressButton>(buttonId).Call(c => c.StartAt, 60d);
                     p.Element("start-state").SetText("start at 60 called");
                 }))
             @(Html.NativeButton("complete-progress-btn", "Complete")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionProgressButton>(buttonId).ProgressComplete();
+                    p.Component<FusionProgressButton>(buttonId).Call(c => c.ProgressComplete);
                     p.Element("complete-state").SetText("complete called");
                 }))
             @(Html.NativeButton("focus-progress-btn", "Focus")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionProgressButton>(buttonId).FocusIn();
+                    p.Component<FusionProgressButton>(buttonId).Call(c => c.FocusIn);
                     p.Element("focus-state").SetText("focus called");
                 }))
             @(Html.NativeButton("check-progress-enabled-btn", "Check Progress")
@@ -146,7 +146,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var button = p.Component<FusionProgressButton>(buttonId);
-                    p.When(button.ProgressEnabled()).Truthy()
+                    p.When(button.Get(c => c.EnableProgress)).Truthy()
                         .Then(t => t.Element("progress-enabled-state").SetText("progress enabled"))
                         .Else(e => e.Element("progress-enabled-state").SetText("progress disabled"));
                 }))
@@ -163,10 +163,10 @@
                 p.Post(Url.SandboxRoute("Echo", "ProgressButton"))
                     .Gather(g =>
                     {
-                        g.Include(button.Content(), "content");
-                        g.Include(button.Disabled(), "disabled");
-                        g.Include(button.CssClass(), "cssClass");
-                        g.Include(button.ProgressEnabled(), "progressEnabled");
+                        g.Include(button.Get(c => c.Content), "content");
+                        g.Include(button.Get(c => c.Disabled), "disabled");
+                        g.Include(button.Get(c => c.CssClass), "cssClass");
+                        g.Include(button.Get(c => c.EnableProgress), "progressEnabled");
                     })
                     .Response(r => r.OnSuccess<FusionProgressButtonEchoResponse>((json, s) =>
                     {

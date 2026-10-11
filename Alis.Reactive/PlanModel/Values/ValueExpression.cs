@@ -44,11 +44,15 @@ namespace Alis.Reactive.PlanModel
         internal static ValueExpression LiteralRaw(object? value, Shape shape) =>
             new LiteralExpression(value, shape);
 
-        /// <summary>A literal written to a declared member of the given shape; dates use the plan's ISO form.</summary>
+        /// <summary>
+        /// A literal written to a declared member of the given shape; dates use the plan's ISO form and
+        /// an enum its member name, the text a JavaScript API takes for that option.
+        /// </summary>
         internal static ValueExpression LiteralFor(object? value, Shape shape)
         {
             if (value == null) return Null();
             if (value is DateTime date) return Literal(date);
+            if (value is Enum option) return LiteralRaw(option.ToString(), shape);
 
             return LiteralRaw(value, shape);
         }
