@@ -21,12 +21,12 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="expr">Model property expression for the component ID and body field.</param>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
             this GatherBuilder<TModel> self,
-            Expression<Func<TModel, object>> expr)
+            Expression<Func<TModel, object?>> expr)
             where TComponent : IComponent, IInputComponent, new()
             where TModel : class
         {
             var component = new TComponent();
-            var elementId = IdGenerator.For<TModel, object>(expr);
+            var elementId = IdGenerator.For(expr);
             var bodyField = ExpressionPathHelper.ToMemberBindingPath(expr);
             var shape = Shape.FromClrType(ExpressionPathHelper.ToPropertyType(expr));
             self.Include(elementId, component.Vendor, bodyField, component.ValueMember, shape);

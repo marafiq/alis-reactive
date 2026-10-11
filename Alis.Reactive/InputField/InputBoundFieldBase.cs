@@ -64,7 +64,7 @@ namespace Alis.Reactive.InputField
 
         /// <summary>
         /// Renders the field wrapper (label + validation error elements) around content
-        /// written by the callback. Throws if the component was not registered via
+        /// written by the callback, or the content alone for a hidden field. Throws if the component was not registered via
         /// <c>RegisterInputComponent</c>: unregistered components are invisible to validation
         /// and gather, causing silent failures.
         /// </summary>
@@ -75,6 +75,12 @@ namespace Alis.Reactive.InputField
                     $"Input field '{BindingPath}' rendered without registering an input component. " +
                     "Validation and gather depend on the registered input contract. " +
                     "Call setup.RegisterInputComponent(...) in the component HtmlExtension before rendering the component.");
+
+            if (Options.IsHidden)
+            {
+                writeContent();
+                return;
+            }
 
             var fieldMarkup = new InputFieldBuilder(Writer, BindingPath).ForInputId(ElementId);
             if (Options.LabelText != null) fieldMarkup.Label(Options.LabelText);

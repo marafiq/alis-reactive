@@ -2,7 +2,6 @@ using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Requests;
 using Alis.Reactive.Native.Components;
-using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Extensions
 {
@@ -25,8 +24,6 @@ namespace Alis.Reactive.Native.Extensions
     /// </remarks>
     public static class NativeGatherExtensions
     {
-        private static readonly NativeTextBox DefaultComponent = new NativeTextBox();
-
         /// <summary>
         /// Gathers the value of a native text input bound to <paramref name="expr"/>.
         /// </summary>
@@ -39,11 +36,6 @@ namespace Alis.Reactive.Native.Extensions
             this GatherBuilder<TModel> self,
             Expression<Func<TModel, object?>> expr)
             where TModel : class
-        {
-            var elementId = IdGenerator.For(expr);
-            var bodyField = ExpressionPathHelper.ToMemberBindingPath(expr);
-            var shape = Shape.FromClrType(ExpressionPathHelper.ToPropertyType(expr));
-            return self.Include(elementId, DefaultComponent.Vendor, bodyField, DefaultComponent.ValueMember, shape);
-        }
+            => self.Include<NativeTextBox, TModel>(expr);
     }
 }

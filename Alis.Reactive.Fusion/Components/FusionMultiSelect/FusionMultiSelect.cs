@@ -80,8 +80,8 @@ namespace Alis.Reactive.Fusion.Components
         {
             return builder.Fields(new MultiSelectFieldSettings
             {
-                Text = JsonMemberName.Of(MemberNameOf(text)),
-                Value = JsonMemberName.Of(MemberNameOf(value))
+                Text = Field.Of(text).Name,
+                Value = Field.Of(value).Name
             });
         }
 
@@ -94,9 +94,9 @@ namespace Alis.Reactive.Fusion.Components
         {
             return builder.Fields(new MultiSelectFieldSettings
             {
-                Text = JsonMemberName.Of(MemberNameOf(text)),
-                Value = JsonMemberName.Of(MemberNameOf(value)),
-                GroupBy = JsonMemberName.Of(MemberNameOf(groupBy))
+                Text = Field.Of(text).Name,
+                Value = Field.Of(value).Name,
+                GroupBy = Field.Of(groupBy).Name
             });
         }
 
@@ -120,14 +120,6 @@ namespace Alis.Reactive.Fusion.Components
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = field.ElementId, ["name"] = field.BindingPath });
             build(builder);
             return field.Render<global::Alis.Reactive.Fusion.Components.FusionMultiSelect>(builder.Render());
-        }
-
-        private static string MemberNameOf<T>(Expression<Func<T, object?>> expression)
-        {
-            var body = expression.Body;
-            if (body is UnaryExpression unary) body = unary.Operand;
-            if (body is MemberExpression member) return member.Member.Name;
-            throw new ArgumentException("Expression must be a member access, for example x => x.Text.", nameof(expression));
         }
     }
 }

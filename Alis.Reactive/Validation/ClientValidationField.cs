@@ -17,7 +17,8 @@ namespace Alis.Reactive.Validation
         private readonly ClientRuleActivation _ownerActivation;
 
         public string FieldName => _field.Path.Value;
-        internal IReadOnlyList<ClientRule> Rules { get; }
+        /// <summary>The field's client rules.</summary>
+        public IReadOnlyList<ClientRule> Rules { get; }
         internal IReadOnlyList<ClientValidationField> ItemFields { get; }
 
         internal ClientValidationField(

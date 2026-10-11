@@ -97,19 +97,10 @@ namespace Alis.Reactive.Fusion.Components
         {
             return builder.Fields(new MentionFieldSettings
             {
-                Text = JsonMemberName.Of(GetMemberName(text)),
-                Value = JsonMemberName.Of(GetMemberName(value))
+                Text = Field.Of(text).Name,
+                Value = Field.Of(value).Name
             });
         }
-
-        private static string GetMemberName<T>(Expression<Func<T, object?>> expr)
-        {
-            var body = expr.Body;
-            if (body is UnaryExpression unary) body = unary.Operand;
-            if (body is MemberExpression member) return member.Member.Name;
-            throw new ArgumentException("Expression must be a member access.");
-        }
-
 
         private static string RenderBridge(string elementId, string hostId, string targetSelector)
         {

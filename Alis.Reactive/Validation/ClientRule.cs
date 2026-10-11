@@ -7,7 +7,11 @@ namespace Alis.Reactive.Validation
     /// One client validation rule a developer records. Lowers to a plan
     /// <see cref="ValidationRuleNode"/> at render time.
     /// </summary>
-    internal sealed class ClientRule
+    /// <remarks>
+    /// Read-only to code outside the framework: a component whose own JavaScript validates (a grid's
+    /// cell editor, say) translates these rules into its native shape.
+    /// </remarks>
+    public sealed class ClientRule
     {
         private readonly RuleName _rule;
         private readonly ValidationMessage _message;
@@ -15,15 +19,22 @@ namespace Alis.Reactive.Validation
         private readonly ClientRuleActivation _activation;
         private readonly Shape _shape;
 
+        /// <summary>The message shown when the rule fails.</summary>
         public string Message => _message.Value;
-        public Shape Shape => _shape;
 
-        // Projections for a vendor emitter that translates this rule into a native
-        // component validation shape (e.g. Syncfusion EJ2 column.validationRules).
-        internal RuleName Name => _rule;
-        internal bool IsUnconditional => _activation.IsAlways;
-        internal object? LiteralOperand => _operand.LiteralValue;
-        internal object[]? RangeOperand => _operand.RangeValues;
+        internal Shape Shape => _shape;
+
+        /// <summary>The rule's name in the plan, for example <c>"required"</c>, <c>"minLength"</c> or <c>"range"</c>.</summary>
+        public string Name => _rule.Value;
+
+        /// <summary>Whether the rule always applies, rather than only when a condition holds.</summary>
+        public bool IsUnconditional => _activation.IsAlways;
+
+        /// <summary>The rule's single operand, such as a length or a bound; <see langword="null"/> when it has none.</summary>
+        public object? LiteralOperand => _operand.LiteralValue;
+
+        /// <summary>The rule's two bounds for a range; <see langword="null"/> for any other rule.</summary>
+        public object[]? RangeOperand => _operand.RangeValues;
 
         internal ClientRule(
             RuleName rule,

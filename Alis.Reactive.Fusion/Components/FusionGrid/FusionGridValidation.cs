@@ -60,16 +60,14 @@ namespace Alis.Reactive.Fusion.Components
         /// <see langword="null"/> when no declared rule maps client-side (every rule on
         /// the field is conditional, cross-field, or otherwise server-only).
         /// </summary>
-        [Alis.Reactive.Components.TypedDslExemption(
-            "EJ2 GridColumn.ValidationRules is a vendor MVC-builder slot typed as object; this " +
-            "bridges typed ReactiveValidator client rules into it. Owed refinement: a phantom " +
-            "return type (still assignable to the object slot) and inline-grid bulk-edit " +
-            "Playwright coverage of the validator, which is currently unexercised.")]
-        public object? Field<TField>(Expression<Func<TRow, TField>> field)
+        /// <remarks>
+        /// Assign it to Syncfusion's <c>GridColumn.ValidationRules</c>, which takes any object.
+        /// </remarks>
+        public IReadOnlyDictionary<string, object>? Field<TField>(Expression<Func<TRow, TField>> field)
         {
             if (field == null) throw new ArgumentNullException(nameof(field));
 
-            var path = ExpressionPathHelper.ToPropertyName(field);
+            var path = PropertyPathOf(field);
             var declared = _fields.FirstOrDefault(candidate => candidate.FieldName == path);
             if (declared == null)
                 throw new InvalidOperationException(
@@ -78,6 +76,23 @@ namespace Alis.Reactive.Fusion.Components
 
             var rules = Ej2ColumnRules.From(declared);
             return rules.Count == 0 ? null : rules;
+        }
+
+        // The validator keys a field by its property path, the C# member names joined by dots.
+        private static string PropertyPathOf<TField>(Expression<Func<TRow, TField>> field)
+        {
+            var names = new List<string>();
+            var body = field.Body is UnaryExpression conversion ? conversion.Operand : field.Body;
+            while (body is MemberExpression member)
+            {
+                names.Insert(0, member.Member.Name);
+                body = member.Expression;
+            }
+
+            if (!(body is ParameterExpression) || names.Count == 0)
+                throw new ArgumentException("Select a member of the row, for example r => r.OpenTasks.", nameof(field));
+
+            return string.Join(".", names);
         }
     }
 
@@ -101,7 +116,7 @@ namespace Alis.Reactive.Fusion.Components
 
         private static void Add(Dictionary<string, object> rules, ClientRule rule)
         {
-            var key = rule.Name.Value;
+            var key = rule.Name;
             switch (key)
             {
                 case "required":

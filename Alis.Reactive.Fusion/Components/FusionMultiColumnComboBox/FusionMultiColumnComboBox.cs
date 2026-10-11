@@ -74,8 +74,8 @@ namespace Alis.Reactive.Fusion.Components
         {
             return builder.Fields(new MultiColumnComboBoxFieldSettings
             {
-                Text = JsonMemberName.Of(GetMemberName(text)),
-                Value = JsonMemberName.Of(GetMemberName(value))
+                Text = Field.Of(text).Name,
+                Value = Field.Of(value).Name
             });
         }
 
@@ -90,9 +90,9 @@ namespace Alis.Reactive.Fusion.Components
         {
             return builder.Fields(new MultiColumnComboBoxFieldSettings
             {
-                Text = JsonMemberName.Of(GetMemberName(text)),
-                Value = JsonMemberName.Of(GetMemberName(value)),
-                GroupBy = JsonMemberName.Of(GetMemberName(groupBy))
+                Text = Field.Of(text).Name,
+                Value = Field.Of(value).Name,
+                GroupBy = Field.Of(groupBy).Name
             });
         }
 
@@ -115,14 +115,5 @@ namespace Alis.Reactive.Fusion.Components
             build(builder);
             return setup.Render<global::Alis.Reactive.Fusion.Components.FusionMultiColumnComboBox>(builder.Render());
         }
-
-        private static string GetMemberName<T>(Expression<Func<T, object?>> expr)
-        {
-            var body = expr.Body;
-            if (body is UnaryExpression unary) body = unary.Operand;
-            if (body is MemberExpression member) return member.Member.Name;
-            throw new ArgumentException("Expression must be a member access (e.g., x => x.Text)");
-        }
-
     }
 }

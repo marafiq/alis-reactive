@@ -27,7 +27,7 @@ namespace Alis.Reactive.Fusion.Components
             IEnumerable<string> options)
             where TRow : class
         {
-            var fieldName = ExpressionPathHelper.ToEventPath(field);
+            var fieldName = Field.Of(field).Name;
             return BuildSelect(fieldName, options.Select(o => (o, o)));
         }
 
@@ -41,7 +41,7 @@ namespace Alis.Reactive.Fusion.Components
             Func<TItem, string> value)
             where TRow : class
         {
-            var fieldName = ExpressionPathHelper.ToEventPath(field);
+            var fieldName = Field.Of(field).Name;
             return BuildSelect(fieldName, items.Select(i => (text(i), value(i))));
         }
 
@@ -51,7 +51,7 @@ namespace Alis.Reactive.Fusion.Components
         public static string DateInput<TRow, TField>(Expression<Func<TRow, TField>> field)
             where TRow : class
         {
-            var fieldName = ExpressionPathHelper.ToEventPath(field);
+            var fieldName = Field.Of(field).Name;
             var name = HtmlEncoder.Default.Encode(fieldName);
             // value="${field}" binds the editing row's current value through the Syncfusion
             // template engine — the built-in editor leaves native date inputs unset.
@@ -131,7 +131,7 @@ namespace Alis.Reactive.Fusion.Components
         private FusionGridDialogFormBuilder<TRow> AddField<TField>(
             Expression<Func<TRow, TField>> field, string label, Func<string, string> editor)
         {
-            var name = HtmlEncoder.Default.Encode(ExpressionPathHelper.ToEventPath(field));
+            var name = HtmlEncoder.Default.Encode(Field.Of(field).Name);
             _fields.Add(
                 "<label class=\"grid gap-1\"><span class=\"font-medium text-text\">"
                 + HtmlEncoder.Default.Encode(label) + "</span>" + editor(name) + "</label>");

@@ -1,10 +1,9 @@
 using System;
 using System.Linq.Expressions;
+using Alis.Reactive.Native.Extensions;
 #if NET48
 using System.Web.Mvc;
-using System.Web.Mvc.Html;
 #else
-using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
@@ -14,8 +13,8 @@ namespace Alis.Reactive.Native.Components
     /// Factory extension for rendering model-bound hidden fields directly in a Razor view.
     /// </summary>
     /// <remarks>
-    /// Hidden fields bypass the <c>InputField</c> wrapper because they do not render
-    /// labels or validation slots, but they still register with the Reactive Plan for gather.
+    /// A hidden field is a hidden <c>InputField</c>: it renders without the label and validation
+    /// slot, and still registers with the Reactive Plan for gather.
     /// </remarks>
     public static class NativeHiddenFieldHtmlExtensions
     {
@@ -24,9 +23,10 @@ namespace Alis.Reactive.Native.Components
         /// </summary>
         /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">Model value type registered as the hidden input value.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan that receives the hidden-field registration.</param>
         /// <param name="expression">Model property expression used for MVC binding and component registration.</param>
-        /// <returns>The rendered hidden field; the view writes it, and <c>.Reactive(...)</c> wires its events.</returns>
+        /// <returns>The rendered hidden field, ready for <c>.Reactive(...)</c>.</returns>
         public static RenderedComponent<NativeHiddenField, TModel> HiddenFieldFor<TModel, TProp>(
 #if NET48
             this HtmlHelper<TModel> html,
@@ -37,21 +37,9 @@ namespace Alis.Reactive.Native.Components
             Expression<Func<TModel, TProp>> expression)
             where TModel : class
         {
-#if NET48
-            // System.Web.Mvc NameFor honors the active HtmlFieldPrefix; ExpressionHelper.GetExpressionText drops it.
-            var bindingPath = html.NameFor(expression).ToHtmlString();
-#else
-            var bindingPath = html.NameFor(expression);
-#endif
-            var slot = ModelBoundInputComponentSlot.For<TModel, TProp>(
-                expression,
-                bindingPath,
-                html.ViewData.TemplateInfo.HtmlFieldPrefix);
-            plan.RegisterInputComponent(slot.Register(InputComponentRegistrationProfile.For<NativeHiddenField>()));
-
-            var target = slot.RenderTarget;
-            var builder = new NativeHiddenFieldBuilder<TModel, TProp>(html, expression, target.ElementId, target.BindingName);
-            return plan.Render<NativeHiddenField>(target.ElementId, builder);
+            var field = html.InputField(plan, expression, o => o.Hidden());
+            return field.Render<NativeHiddenField>(
+                new NativeHiddenFieldBuilder<TModel, TProp>(html, expression, field.ElementId, field.BindingPath));
         }
     }
 }
