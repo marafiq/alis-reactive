@@ -29,7 +29,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
             [
                 new SlotSeed("mon-16", "Mon 4:00 PM", "Monday"),
                 new SlotSeed("fri-10", "Fri 10:00 AM", "Friday"),
-                new SlotSeed("sun-11", "Sun 11:00 AM", "Sunday"),
+                new SlotSeed("sat-14", "Sat 2:00 PM", "Saturday"),
             ]),
             new ResidentSeed("ruth", "Ruth Hale", "Garden wing", 2,
             [

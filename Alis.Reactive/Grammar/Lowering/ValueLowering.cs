@@ -150,7 +150,7 @@ namespace Alis.Reactive.Grammar.Lowering
             }
 
             var property = _context.Property(contract, read.Member, owner);
-            return G.Get(target, G.PathOf(property.Path), Requested(read.Shape, property.Shape));
+            return _context.Read(target, property.Path, Requested(read.Shape, property.Shape));
         }
 
         private Expr PayloadRead(PayloadSource payload, ReadExpression read, LoweringScope scope)

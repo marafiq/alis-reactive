@@ -74,7 +74,6 @@ describe("architecture: vendor isolation", () => {
   // modules and the exceptions listed below; fixing one means deleting its line.
   const vendorBoundaries = [
     /^components\/fusion\//, // app-level Syncfusion objects (Confirm)
-    /^modules\/http\.ts$/, // an uploader's file item carries its File as rawFile, until its declaration says so
   ];
 
   it("Syncfusion knowledge stays behind the vendor boundary", () => {

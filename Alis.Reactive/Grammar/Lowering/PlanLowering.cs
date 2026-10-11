@@ -80,7 +80,7 @@ namespace Alis.Reactive.Grammar.Lowering
                 if (!(component.Binding is PlanModel.RegisteredInputBinding binding)) continue;
 
                 var property = context.Property(context.ContractOf(component.Id), binding.ValueMember, component.Id);
-                var value = G.Get(G.Obj(context.Objects.Element(component.Id)), G.PathOf(property.Path), property.Shape);
+                var value = context.Read(G.Obj(context.Objects.Element(component.Id)), property.Path, property.Shape);
                 inputs.Add(component.Id, new InputBinding(binding.BindingPath, BodyPath(binding.Path), value, property.Shape));
             }
 

@@ -1,7 +1,7 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.FileUpload;
 
 // File injection uses DataTransfer on the native input so Syncfusion populates
-// filesData[].rawFile; gather then reads filesData for FormData.
+// filesData[].rawFile; the uploader declares that path as its value, so gather sends the Files.
 [TestFixture]
 public class WhenFileUploaded : PlaywrightTestBase
 {

@@ -83,8 +83,13 @@ namespace Alis.Reactive.Grammar.Lowering
 
         internal static Statement All(IReadOnlyList<IReadOnlyList<Statement>> blocks) => new AllStatement(blocks);
 
-        internal static IReadOnlyList<string> PathOf(Path path) =>
-            path.Segments.Select(segment => segment.ToPathText()).ToList();
+        internal static IReadOnlyList<string> PathOf(Path path)
+        {
+            if (path.Segments.Any(segment => segment.IsEachItem))
+                throw new InvalidOperationException(
+                    $"'{path}' reads each item of a list; it can be read, not written, called or subscribed to.");
+            return path.Segments.Select(segment => segment.ToPathText()).ToList();
+        }
 
         internal static bool IsUnconverted(Shape shape) => shape.Kind == "none" || shape.Kind == "any";
     }

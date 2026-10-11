@@ -12,15 +12,16 @@ namespace Alis.Reactive.Fusion.Components
     /// <remarks>
     /// Render it with <c>Html.InputField(plan, m =&gt; m.CarePlanDocument).FusionFileUpload(b =&gt; ...)</c>; target it with
     /// <c>p.Component&lt;FusionFileUpload&gt;(m =&gt; m.CarePlanDocument)</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>g.Include(upload.Get(c =&gt; c.FilesData), "files")</c>.
+    /// <c>Call</c> and <c>Get</c>, for example <c>g.Include(upload.Get(c =&gt; c.Files), "files")</c>.
     /// </remarks>
     public sealed class FusionFileUpload : FusionComponent, IInputComponent
     {
         /// <inheritdoc />
-        public string ValueMember => "filesData";
+        /// <remarks>The uploader lists its files as items that each carry the browser's file as <c>rawFile</c>.</remarks>
+        public string ValueMember => "filesData[].rawFile";
 
-        /// <summary>The selected files, as the uploader reports them.</summary>
-        public ComponentProperty<string> FilesData => Property<string>(ValueMember);
+        /// <summary>The selected files, as the browser's <c>File</c> objects a form-data request sends.</summary>
+        public ComponentProperty<IReadOnlyList<object>> Files => Property<IReadOnlyList<object>>(ValueMember);
 
         /// <summary>Raised when the user selects files.</summary>
         public TypedEvent<FusionFileUploadSelectedArgs> Selected =>

@@ -43,6 +43,7 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
     private ILocator BrunchStatus => Page.Locator("#brunch-status");
     private ILocator RequestedStatus => Page.Locator("#requested-status");
     private ILocator BrunchPlanned => Page.Locator("#brunch-planned");
+    private ILocator SundayOffered => Page.Locator("#sunday-offered");
     private ILocator CheckRequested => Page.Locator("#check-requested");
     private ILocator ShareWeek => Page.Locator("#share-week");
     private ILocator ShareStatus => Page.Locator("#share-status");
@@ -98,6 +99,20 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
         await Expect(Planner.Times).ToHaveCountAsync(6);
         await Expect(ResidentName).ToHaveTextAsync("Margaret Hale");
         await Expect(OfferedCount).ToHaveTextAsync("6");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task the_page_says_when_the_week_offers_a_sunday_visit()
+    {
+        await OpenPlanner();
+
+        await ChooseMargaret();
+        await Expect(SundayOffered).ToBeVisibleAsync();
+
+        await _plan.NativeDropDown(m => m.ResidentId).Select("Harold Benson");
+        await Expect(Planner.Wing).ToHaveTextAsync("Maple wing", new() { Timeout = 5000 });
+        await Expect(SundayOffered).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 

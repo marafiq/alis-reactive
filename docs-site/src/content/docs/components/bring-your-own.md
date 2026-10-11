@@ -69,6 +69,7 @@ public class TomSelectChangeArgs
 | JavaScript | Declared as |
 | --- | --- |
 | property, including a nested one | `Property<T>("name")`, `Property<T>("labels.empty")` |
+| a field of each item of a list | `Property<IReadOnlyList<T>>("slots[].day")` (read only) |
 | method | `Method("name")`, `Method<T1, T2>("name")` |
 | method that returns a value | `Function<TResult>("name")`, `Function<TArg, TResult>("name")` |
 | method that returns a promise | `Method("name").Awaited()`, `Function<TResult>("name").Awaited()` |

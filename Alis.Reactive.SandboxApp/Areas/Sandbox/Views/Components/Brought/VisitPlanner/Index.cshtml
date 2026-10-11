@@ -69,7 +69,12 @@
             @{ Html.InputField(plan, m => m.VisitSlots, o => o.Required().Label("Visit times"))
                 .VisitPlanner(capacity: 1)
                 .Reactive(evt => evt.SlotsLoaded, (args, p) =>
-                    p.Element("offered-count").SetText(args, x => x.Count))
+                {
+                    p.Element("offered-count").SetText(args, x => x.Count);
+                    p.When(p.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.OfferedDays)).ArrayContains("Sunday")
+                        .Then(sunday => sunday.Element("sunday-offered").Show())
+                        .Else(none => none.Element("sunday-offered").Hide());
+                })
                 .Reactive(evt => evt.BeforeBook, (args, p) =>
                     p.When(args, x => x.Slot.Quiet).Truthy()
                         .Then(quiet =>
@@ -147,6 +152,7 @@
                 <native-text><span id="resident-name">No resident chosen</span> · <span id="offered-count">0</span> times offered</native-text>
                 <native-text>Planned: <span id="planned-count">0</span> · Left this week: <span id="visits-left">1</span></native-text>
                 <native-text color="Secondary"><span id="plan-empty">No visits planned yet.</span></native-text>
+                <p id="sunday-offered" class="text-sm text-text-secondary" hidden>Sunday visits are offered this week.</p>
                 <p id="quiet-hours" class="text-sm text-warning" hidden><span id="quiet-slot"></span> is during quiet hours; choose another time.</p>
                 <p id="week-full" class="text-sm text-warning" hidden>This week is full: <span id="week-full-capacity"></span> visits.</p>
                 <p id="brunch-planned" class="text-sm text-success" hidden>Sunday brunch with the family is planned.</p>

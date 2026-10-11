@@ -730,6 +730,11 @@ proves it is named in the pull request.
   that reads one is lowered as its own `if`, so else-if order and short-circuit hold. Inside an array
   operation's lambda or a validation rule such a read is refused at render.
 
+- List paths: a member path may read each item of a list, `filesData[].rawFile`, lowered to
+  `toArray(get(o, ["filesData"])).map(x => get(x, ["rawFile"]))`. The uploader declares its value
+  that way, so `alis.http` sends `File` objects and names no vendor; the architecture test's last
+  runtime vendor exception is gone. A list path can be read, not written, called or subscribed to.
+
 **Decisions of section 8 applied**
 - `AddReactiveClientValidation` is gone: a browser rule always has the server rule it came from.
 - `Include` enforces on the server as well.
@@ -752,5 +757,4 @@ proves it is named in the pull request.
   semantics (for example, `GreaterThan` fails on an empty value; email uses today's pattern).
   FluentValidation's `NotEmpty` on a collection reads as `atLeastOne`.
 - A response handle inside a nested route reads the innermost response, as today.
-- The uploader's value: `alis.http` unwraps an uploader item's `rawFile` itself, listed as a vendor
-  exception in the architecture test, until an input declaration can state a value expression.
+

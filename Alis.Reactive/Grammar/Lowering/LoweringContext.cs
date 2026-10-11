@@ -26,6 +26,21 @@ namespace Alis.Reactive.Grammar.Lowering
         /// <summary>A binding name no other binding of this plan uses.</summary>
         internal string Fresh(string stem) => stem + (++_names).ToString(System.Globalization.CultureInfo.InvariantCulture);
 
+        /// <summary>
+        /// Reads a member path from a target. Each <c>[]</c> maps the list before it, so
+        /// <c>filesData[].rawFile</c> reads <c>toArray(get(t, ["filesData"])).map(x =&gt; get(x, ["rawFile"]))</c>.
+        /// </summary>
+        internal Expr Read(Expr target, Path path, Shape shape)
+        {
+            var each = path.Segments.ToList().FindIndex(segment => segment.IsEachItem);
+            if (each < 0) return G.Get(target, G.PathOf(path), shape);
+
+            var list = G.Op(Operator.ToArray, G.Get(target, path.Segments.Take(each).Select(segment => segment.ToPathText()).ToList(), Shape.None));
+            var item = Fresh("x");
+            var itemRead = Read(G.Ref(item), Path.Of(path.Segments.Skip(each + 1)), Shape.None);
+            return G.Call(list, new[] { "map" }, new Expr[] { G.Fn(itemRead, item) }, G.NoShapes, shape);
+        }
+
         internal bool IsDeclared(string componentKey) => Document.Components.ContainsKey(componentKey);
 
         internal BrowserObjectContract ContractOf(string componentKey)

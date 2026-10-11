@@ -25,6 +25,11 @@ namespace Alis.Reactive.PlanModel
         internal static PathSegment AtIndex(int index) =>
             new PathSegment(PathSegmentBody.Index(index));
 
+        /// <summary>Each item of the list before it: <c>filesData[].rawFile</c> reads every item's file.</summary>
+        internal static PathSegment EachItem { get; } = new PathSegment(PathSegmentBody.Each);
+
+        internal bool IsEachItem => _body.SegmentKind == "each";
+
         public bool Equals(PathSegment? other) =>
             other != null
             && _body.HasSamePath(other._body);
@@ -52,6 +57,16 @@ namespace Alis.Reactive.PlanModel
 
         internal static PathSegmentBody Index(int index) =>
             new IndexPathSegmentBody(PathIndex.Of(index));
+
+        internal static PathSegmentBody Each { get; } = new EachPathSegmentBody();
+
+        private sealed class EachPathSegmentBody : PathSegmentBody
+        {
+            internal override string SegmentKind => "each";
+            internal override string PathText => "[]";
+            internal override bool HasSamePath(PathSegmentBody other) => other is EachPathSegmentBody;
+            internal override int GetPathHashCode() => SegmentKind.GetHashCode();
+        }
 
         private sealed class PropertyPathSegmentBody : PathSegmentBody
         {
@@ -143,6 +158,9 @@ namespace Alis.Reactive.PlanModel
             Segments = segments;
         }
 
+        internal static Path Of(IEnumerable<PathSegment> segments) =>
+            new Path(new List<PathSegment>(segments));
+
         internal static Path Property(string name) =>
             new Path(new[] { PathSegment.Property(name) });
 
@@ -180,10 +198,15 @@ namespace Alis.Reactive.PlanModel
                         "Use dot-separated property names without consecutive, leading, or trailing dots.",
                         nameof(dotPath));
 
-                if (int.TryParse(part, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedIndex))
+                var eachItem = part.EndsWith("[]", StringComparison.Ordinal);
+                var name = eachItem ? part.Substring(0, part.Length - 2) : part;
+                if (name.Length == 0)
+                    segments.Add(PathSegment.EachItem);
+                else if (int.TryParse(name, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedIndex))
                     segments.Add(PathSegment.AtIndex(parsedIndex));
                 else
-                    segments.Add(PathSegment.Property(part));
+                    segments.Add(PathSegment.Property(name));
+                if (eachItem && name.Length != 0) segments.Add(PathSegment.EachItem);
             }
 
             return new Path(segments);
@@ -222,7 +245,10 @@ namespace Alis.Reactive.PlanModel
 
             var parts = new List<string>(Segments.Count);
             foreach (var segment in Segments)
-                parts.Add(segment.ToPathText());
+            {
+                if (segment.IsEachItem && parts.Count > 0) parts[parts.Count - 1] += "[]";
+                else parts.Add(segment.ToPathText());
+            }
 
             return string.Join(".", parts);
         }

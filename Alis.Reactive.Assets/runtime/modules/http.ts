@@ -127,12 +127,10 @@ function queryPairs(values: Record<string, unknown>, arrays: readonly string[]):
   return pairs;
 }
 
-// A file is a File, or an uploader's file item that carries one as `rawFile` (Syncfusion's uploader
-// lists its files that way). The uploader's declaration will say so itself (grammar.md 1.1).
+// A component whose value is files declares where they are (the uploader: filesData[].rawFile), so
+// what reaches the request is the browser's File objects.
 function fileOf(value: unknown): File | undefined {
-  if (value instanceof File) return value;
-  const rawFile = typeof value === "object" && value !== null ? (value as { rawFile?: unknown }).rawFile : undefined;
-  return rawFile instanceof File ? rawFile : undefined;
+  return value instanceof File ? value : undefined;
 }
 
 function formData(values: Record<string, unknown>, arrays: readonly string[]): FormData {
