@@ -81,9 +81,8 @@ namespace Alis.Reactive.FluentValidator
 
         private void AddProperty(IValidationRule rule, ClientValidationFieldReference field, IRuleComponent[] components, ClientScope scope)
         {
-            var displayName = rule.GetDisplayName(null);
             var checks = components
-                .Select(component => (component, checks: ChecksOf(rule, field, component, displayName)))
+                .Select(component => (component, checks: ChecksOf(rule, field, component)))
                 .ToArray();
             var hasChecks = checks.Any(entry => entry.checks.Count > 0);
             var hasChildren = checks.Any(entry => entry.component.Validator is IChildValidatorAdaptor);
@@ -108,10 +107,9 @@ namespace Alis.Reactive.FluentValidator
         private static IReadOnlyList<BrowserCheck> ChecksOf(
             IValidationRule rule,
             ClientValidationFieldReference field,
-            IRuleComponent component,
-            string displayName)
+            IRuleComponent component)
         {
-            var message = new ClientMessage(component.GetUnformattedErrorMessage(), displayName);
+            var message = new ClientMessage(component.GetUnformattedErrorMessage(), () => DisplayNameOf(rule));
             switch (component.Validator)
             {
                 case INotEmptyValidator _:
@@ -274,6 +272,20 @@ namespace Alis.Reactive.FluentValidator
                 Shape.FromClrType(ExpressionPathHelper.ToPropertyType(rule.Expression)));
         }
 
+        // The rule's display name, for a message template that names it. A name computed from the
+        // model (WithName(x => ...)) has no value when the page renders: the member's name stands in.
+        private static string DisplayNameOf(IValidationRule rule)
+        {
+            try
+            {
+                return rule.GetDisplayName(null);
+            }
+            catch (NullReferenceException)
+            {
+                return SplitPascalCase(rule.PropertyName);
+            }
+        }
+
         // FluentValidation's own display-name rule: "AdmissionDate" reads "Admission Date".
         private static string SplitPascalCase(string input)
         {
@@ -318,9 +330,10 @@ namespace Alis.Reactive.FluentValidator
             private static readonly Regex RuntimeOnlySentence =
                 new Regex(@"\s*[^.]*\{(PropertyValue|TotalLength)\}[^.]*\.", RegexOptions.CultureInvariant);
 
-            internal ClientMessage(string template, string displayName)
+            internal ClientMessage(string template, Func<string> displayName)
             {
-                Text = RuntimeOnlySentence.Replace(template, "").Replace("{PropertyName}", displayName).Trim();
+                var text = RuntimeOnlySentence.Replace(template, "").Trim();
+                Text = text.Contains("{PropertyName}") ? text.Replace("{PropertyName}", displayName()) : text;
             }
 
             private ClientMessage(string text)

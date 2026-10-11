@@ -1,0 +1,48 @@
+@model MoveInReviewModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Move-in Review";
+    var plan = Html.ReactivePlan<MoveInReviewModel>();
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Move-in Review</native-heading>
+    <native-text color="Secondary">
+        Complete the review before the resident's move-in day. A high fall-risk score needs a mobility plan.
+    </native-text>
+
+    <native-card><native-card-body>
+        <form id="move-in-review-form" class="flex flex-col gap-4">
+            @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident name"))
+                .NativeTextBox(b => b.Placeholder("Full name").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.FallRiskScore, o => o.Label("Fall risk score (0 to 10)"))
+                .NativeTextBox(b => b.Type("number").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.MobilityNotes, o => o.Label("Mobility plan"))
+                .NativeTextBox(b => b.Placeholder("Walker, two-person assist, ...").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.FamilyPortalLink, o => o.Label("Family portal link"))
+                .NativeTextBox(b => b.Placeholder("https://").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.IsReturning, o => o.Label("Returning resident"))
+                .NativeCheckBox(b => b.CssClass("rounded border-border")); }
+            @{ Html.InputField(plan, m => m.PreviousRoom, o => o.Label("Previous room"))
+                .NativeTextBox(b => b.Placeholder("Maple 214").CssClass(Field)); }
+        </form>
+        @(Html.NativeButton("save-review-btn", "Save Review")
+            .CssClass("mt-4 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("Save", "MoveInReview"), g => g.IncludeAll())
+                 .Validate<MoveInReviewValidator>("move-in-review-form")
+                 .Response(r => r
+                    .OnSuccess<MoveInReviewSaved>((json, s) =>
+                    {
+                        s.Element("review-status").SetText(json, x => x.Confirmation);
+                    })
+                    .OnError(400, e => e.ValidationErrors("move-in-review-form")));
+            }))
+        <p id="review-status" class="mt-3 text-sm text-text-muted">Not saved yet.</p>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
