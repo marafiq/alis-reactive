@@ -50,9 +50,8 @@ namespace Alis.Reactive
                 return ValidationFieldBinding.ModelField(field.ToModelFieldInput(_modelType));
 
             throw new InvalidOperationException(
-                $"Validation field '{fieldPath.Value}' was referenced by a client validation rule for model '{_modelType.FullName}', " +
-                "but that field was not included in the client validation rule set. " +
-                "Declare peer fields and condition fields through the same typed client rules so their shape is known before render-time binding.");
+                $"Validation field '{fieldPath.Value}' is read by a browser rule's condition or comparison for model '{_modelType.FullName}', " +
+                "but the validator's browser rules do not name it, so its shape is unknown.");
         }
 
         private IEnumerable<ClientValidationField> ExpandRenderedItemFields(ClientValidationField collectionField)

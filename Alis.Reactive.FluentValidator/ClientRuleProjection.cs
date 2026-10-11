@@ -122,6 +122,9 @@ namespace Alis.Reactive.FluentValidator
                 case IPropertyValidator validator when validator.Name == "EmptyValidator":
                     return One(RuleName.Empty, message);
 
+                case ILengthValidator length when BoundsReadFromModel(length):
+                    return Array.Empty<BrowserCheck>();
+
                 case ILengthValidator length:
                     var lengthMessage = message.With("MinLength", length.Min).With("MaxLength", length.Max);
                     var checks = new List<BrowserCheck>();
@@ -156,6 +159,12 @@ namespace Alis.Reactive.FluentValidator
                     return Array.Empty<BrowserCheck>();
             }
         }
+
+        // Length(x => ..., x => ...) reads its bounds from the model, which does not exist when the page
+        // renders; its Min and Max are then placeholders. The bounds live in the public MinFunc and MaxFunc
+        // of FluentValidation's LengthValidator<T>, which ILengthValidator does not expose.
+        private static bool BoundsReadFromModel(ILengthValidator length) =>
+            length.GetType().GetProperty("MaxFunc")?.GetValue(length) != null;
 
         // RegexOptions with no JavaScript flag: the browser cannot read such a pattern the same way.
         private const RegexOptions NoJavaScriptForm = RegexOptions.IgnorePatternWhitespace | RegexOptions.RightToLeft;

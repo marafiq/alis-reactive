@@ -76,7 +76,9 @@ validator of the object that owns both.
 
 A browser rule on a member with no input on the page blocks the form and shows its message in the
 validation summary (the rule may belong to a partial that has not loaded). Mark it `.ServerOnly()`
-when the server owns the member.
+when the server owns the member. A peer or a `When` member with no input reads as empty, as the
+server binds a member the request does not carry; render it as a hidden field (`o.Hidden()`) when
+its value matters.
 
 ## Conditions
 
