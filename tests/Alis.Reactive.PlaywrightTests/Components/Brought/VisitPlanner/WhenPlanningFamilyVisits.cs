@@ -41,6 +41,8 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
     private ILocator QuietHours => Page.Locator("#quiet-hours");
     private ILocator WeekFull => Page.Locator("#week-full");
     private ILocator BrunchStatus => Page.Locator("#brunch-status");
+    private ILocator RequestedStatus => Page.Locator("#requested-status");
+    private ILocator CheckRequested => Page.Locator("#check-requested");
     private ILocator Confirmation => Page.Locator("#visit-confirmation");
     private ILocator CompanionPlanned => Page.Locator("#companion-planned");
     private ILocator CompanionHeld => Page.Locator("#companion-held");
@@ -180,6 +182,23 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
         await Planner.Time("Sun 11:00 AM").ClickAsync();
         await CheckBrunch.ClickAsync();
         await Expect(BrunchStatus).ToHaveTextAsync("Sunday brunch is booked.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task checking_the_time_the_family_asked_for_asks_the_planner_about_that_time()
+    {
+        await OpenPlanner();
+        await ChooseMargaret();
+        await Planner.Time("Sat 11:00 AM").ClickAsync();
+
+        await _plan.NativeDropDown(m => m.RequestedTime).Select("Sat 11:00 AM");
+        await CheckRequested.ClickAsync();
+        await Expect(RequestedStatus).ToHaveTextAsync("That time is already booked for the family.");
+
+        await _plan.NativeDropDown(m => m.RequestedTime).Select("Mon 10:00 AM");
+        await CheckRequested.ClickAsync();
+        await Expect(RequestedStatus).ToHaveTextAsync("That time is not booked yet.");
         AssertNoConsoleErrors();
     }
 

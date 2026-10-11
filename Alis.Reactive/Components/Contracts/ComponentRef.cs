@@ -146,32 +146,35 @@ namespace Alis.Reactive
             return Read<TResult>(function(Declaration).Method);
         }
 
-        /// <summary>Reads what one of the component's declared methods returns for a literal argument.</summary>
+        /// <summary>
+        /// Reads what one of the component's declared methods returns for an argument: a literal or a
+        /// value read at runtime.
+        /// </summary>
+        /// <example><c>p.When(planner.Get(c =&gt; c.IsBooked, requested.Get(c =&gt; c.Value))).Truthy()</c></example>
         public Builders.Conditions.TypedComponentSource<TResult> Get<TArg, TResult>(
-            System.Func<TComponent, ComponentFunction<TArg, TResult>> function, TArg argument)
+            System.Func<TComponent, ComponentFunction<TArg, TResult>> function, Argument<TArg> argument)
         {
             if (function == null) throw new System.ArgumentNullException(nameof(function));
+            if (argument == null) throw new System.ArgumentNullException(nameof(argument));
             return Read<TResult>(
                 function(Declaration).Method,
-                new System.Collections.Generic.List<ValueExpression>
-                {
-                    ValueExpression.LiteralFor(argument, Shape.FromClrType(typeof(TArg))),
-                });
+                new System.Collections.Generic.List<ValueExpression> { argument.Expression });
         }
 
-        /// <summary>Reads what one of the component's declared methods returns for two literal arguments.</summary>
+        /// <summary>
+        /// Reads what one of the component's declared methods returns for two arguments; each is a
+        /// literal or a value read at runtime.
+        /// </summary>
         /// <example><c>p.Component&lt;FusionBulletChart&gt;("census").Get(c =&gt; c.GetActualIndex, 2, 5)</c></example>
         public Builders.Conditions.TypedComponentSource<TResult> Get<T1, T2, TResult>(
-            System.Func<TComponent, ComponentFunction<T1, T2, TResult>> function, T1 first, T2 second)
+            System.Func<TComponent, ComponentFunction<T1, T2, TResult>> function, Argument<T1> first, Argument<T2> second)
         {
             if (function == null) throw new System.ArgumentNullException(nameof(function));
+            if (first == null) throw new System.ArgumentNullException(nameof(first));
+            if (second == null) throw new System.ArgumentNullException(nameof(second));
             return Read<TResult>(
                 function(Declaration).Method,
-                new System.Collections.Generic.List<ValueExpression>
-                {
-                    ValueExpression.LiteralFor(first, Shape.FromClrType(typeof(T1))),
-                    ValueExpression.LiteralFor(second, Shape.FromClrType(typeof(T2))),
-                });
+                new System.Collections.Generic.List<ValueExpression> { first.Expression, second.Expression });
         }
 
         internal ComponentRef<TComponent, TModel> EmitSet<TValue>(

@@ -19,6 +19,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
 
         public string? Note { get; set; }
 
+        /// <summary>A time the family asked for, checked against the planner.</summary>
+        public string? RequestedTime { get; set; }
+
         public bool LockWeek { get; set; }
     }
 

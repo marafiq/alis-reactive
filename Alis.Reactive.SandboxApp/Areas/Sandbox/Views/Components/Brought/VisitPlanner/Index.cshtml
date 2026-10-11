@@ -21,6 +21,12 @@
         new SelectListItem("Margaret Hale", "margaret"),
         new SelectListItem("Harold Benson", "harold"),
     };
+    var requestedTimes = new List<SelectListItem>
+    {
+        new SelectListItem("Mon 10:00 AM", "mon-10"),
+        new SelectListItem("Sat 11:00 AM", "sat-11"),
+        new SelectListItem("Sun 11:00 AM", "sun-11"),
+    };
 
     Html.On(plan, t => t.DomReady(p =>
         p.Component<VisitPlanner>(m => m.VisitSlots)
@@ -96,6 +102,23 @@
 
             @{ Html.InputField(plan, m => m.Note, o => o.Label("Note for the front desk"))
                 .NativeTextBox(b => b.Placeholder("Bring the photo album").CssClass(Field)); }
+
+            <native-grid cols="C2" gap="Base">
+                @{ Html.InputField(plan, m => m.RequestedTime, o => o.Label("Time the family asked for"))
+                    .NativeDropDown(b => b.Items(requestedTimes).Placeholder("-- Choose a time --").CssClass(Field)); }
+                <native-vstack gap="Xs">
+                    @(Html.NativeButton("check-requested", "Check the requested time")
+                        .CssClass(ButtonSecondary)
+                        .Reactive(plan, evt => evt.Click, (args, p) =>
+                        {
+                            var requested = p.Component<NativeDropDown>(m => m.RequestedTime);
+                            p.When(p.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.IsBooked, requested.Get(c => c.Value))).Truthy()
+                                .Then(t => t.Element("requested-status").SetText("That time is already booked for the family."))
+                                .Else(e => e.Element("requested-status").SetText("That time is not booked yet."));
+                        }))
+                    <native-text color="Secondary"><span id="requested-status"></span></native-text>
+                </native-vstack>
+            </native-grid>
 
             @{ Html.InputField(plan, m => m.LockWeek, o => o.Label("Lock this week"))
                 .NativeCheckBox(b => b.CssClass("rounded border-border"))
