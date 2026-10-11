@@ -65,7 +65,7 @@
                 var grid = p.Component<FusionGrid>(GridId);
                 grid.Call(c => c.SelectRowsByRange, 0, 1);
                 p.Post(Url.SandboxRoute("SelectionIndexes", "Grid"))
-                    .Gather(g => g.Include(grid.SelectedRowIndexes<GridOperationsModel>(), "selectedRowIndexes"))
+                    .Gather(g => g.Include(grid.Get(c => c.GetSelectedRowIndexes), "selectedRowIndexes"))
                     .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         s.Element("indexes-summary").SetText(json, x => x.Summary)));
             }))

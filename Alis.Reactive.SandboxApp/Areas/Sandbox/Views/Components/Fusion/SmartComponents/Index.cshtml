@@ -7,16 +7,6 @@
 
     var plan = Html.ReactivePlan<SmartComponentsModel>();
 
-    plan.Reactive(m => m.CareNote, evt => evt.BeforeSuggestionInsert, (args, p) =>
-    {
-        p.Element("before-suggestion").SetText(args, x => x.Text);
-    });
-
-    plan.Reactive(m => m.CareNote, evt => evt.AfterSuggestionInsert, (args, p) =>
-    {
-        p.Element("after-suggestion").SetText(args, x => x.InsertedText);
-    });
-
     Html.On(plan, t => t.DomReady(p =>
     {
         var note = p.Component<FusionSmartTextArea>(m => m.CareNote);
@@ -40,6 +30,14 @@
                     o.SuggestionMode = FusionSmartSuggestionMode.Inline;
                     o.Rows = 4;
                     o.CssClass = "w-full rounded-md border border-border p-3 text-sm";
+                })
+                .Reactive(evt => evt.BeforeSuggestionInsert, (args, p) =>
+                {
+                    p.Element("before-suggestion").SetText(args, x => x.Text);
+                })
+                .Reactive(evt => evt.AfterSuggestionInsert, (args, p) =>
+                {
+                    p.Element("after-suggestion").SetText(args, x => x.InsertedText);
                 }); }
 
             <native-hstack gap="Sm">

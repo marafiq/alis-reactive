@@ -32,7 +32,7 @@
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.AddRecord<ResidentDirectoryGridItem>(), new ResidentDirectoryGridItem
+                p.Component<FusionGrid>(GridId).Call(c => c.AddRecordAt<ResidentDirectoryGridItem>(), new ResidentDirectoryGridItem
                 {
                     ResidentId = 7100,
                     ResidentName = "Zara Inline",
