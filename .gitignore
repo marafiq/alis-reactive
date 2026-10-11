@@ -11,12 +11,8 @@ node_modules/
 .vs/
 .worktrees/
 /tools/*
-!/tools/md-viewer/
 !/tools/ApiDocGenerator/
 !/tools/PlanContractGenerator/
-tools/md-viewer/node_modules/
-tools/md-viewer/reader.db*
-tools/md-viewer-mockup.html
 
 # docs-site (Starlight)
 docs-site/node_modules/
@@ -26,10 +22,6 @@ docs-site/public/d2/
 .DS_Store
 tests/Alis.Reactive.PlaywrightTests/TestResults/
 TestResults/
-
-# SonarQube
-.sonarqube/
-.scannerwork/
 
 # Built JS/CSS bundles — produced by `npm run build:all`.
 # All three framework bundles (runtime JS, design-system CSS, Syncfusion CSS)

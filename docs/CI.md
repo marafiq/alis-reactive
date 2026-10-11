@@ -191,8 +191,8 @@ until proven otherwise. The convention:
 - **Tag releases: the browser shards block publishing.** Recommendation and the workflow agree
   (`nuget-publish.yml`: `pack-and-publish` needs `gate`, which includes all five shards). Evidence:
   (1) ten consecutive green legs since the license fix (2026-06-10 to 2026-07-11) plus the
-  `v1.0.0-rc.2` publish leg, which meets the repo's own re-arm criterion (`high-quality-bar-tasks.md`
-  T10/T14: three consecutive green runs); (2) sharding plus one in-shard re-run changes the cost of
+  `v1.0.0-rc.2` publish leg, which meets the repo's re-arm criterion (three consecutive green
+  runs); (2) sharding plus one in-shard re-run changes the cost of
   a flake from an 80-minute re-run to a 20-minute re-run of the failed shard
   (`gh run rerun <run-id> --failed`); (3) publishing is idempotent (`--skip-duplicate`), so a re-run
   after a flake never double-ships; (4) the alternative, "the local gate is the proof", leaves no
@@ -295,8 +295,7 @@ the check names.
 
 ## Open decisions (owner)
 
-- `npm run lint` as a blocking step in `gate / test` (`high-quality-bar-tasks.md` T7; the ledger
-  records lint clean on 2026-06-09).
+- `npm run lint` as a blocking step in `gate / test` (lint was clean on 2026-06-09).
 - `verify-net48.yml` packs and asserts the fixture version `1.0.0-rc.1` (`verify-net48.yml`,
   `examples/net48-mvc-smoke/Net48MvcSmoke.csproj:84`, `_Layout.cshtml:10,18`); rename to a fixture
   version such as `0.0.0-net48smoke` in a separate PR so CI logs stop reading like a release.

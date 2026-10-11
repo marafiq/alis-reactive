@@ -36,6 +36,6 @@ information; make the C# side carry it.
 ## Harness
 
 `npm run typecheck` (regenerates the plan contract first) and `npm test` (vitest +
-architecture enforcement) are fast feedback. Playwright is the proof: rebuild
-bundles, then run `scripts/playwright.sh`. `types/plan.ts` is generated from the
+architecture enforcement) are feedback while coding, not proof. Playwright is the
+only verification: rebuild bundles, then run `scripts/playwright.sh`. `types/plan.ts` is generated from the
 C# plan domain — never hand-edit it.

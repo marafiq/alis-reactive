@@ -38,21 +38,12 @@ hand-edited (hook-enforced). JSON schema is retired; this file is the only contr
    `npm run generate:plan-types -w Alis.Reactive.Assets`).
 3. `npm run typecheck` — a runtime/contract mismatch fails here.
 4. Add the runtime handler (new switch case + `assertNever` keeps the union exhaustive).
-5. Prove behavior in vitest, then Playwright.
-6. Commit C# + regenerated contract + runtime + tests together.
+5. Prove behavior with a Playwright test on a sandbox page.
+6. Commit C# + regenerated contract + runtime + test together.
 
 Why generated, not authored: a hand-maintained contract drifts from C#
 silently. Generation makes drift a typecheck failure instead of a runtime surprise.
 
-## Boundary: generated contract → runtime handler
-
-Write a failing vitest that exercises the new shape, then implement the handler.
 Typecheck proves the shapes line up, NOT that the runtime does the right thing
-with them — prove that in vitest, then Playwright. Alignment is structural, not
-semantic: a field that type-checks but means the wrong thing rides on Playwright
-to be caught.
-
-## Known gaps (honest)
-
-No C# unit harness exists for plan shape. A regression that still type-checks
-and still renders is caught by Playwright, which is the proof.
+with them. A field that type-checks but means the wrong thing is caught only by
+Playwright, which is the only verification.
