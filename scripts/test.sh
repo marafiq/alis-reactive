@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")/.."
 
 usage() {
@@ -35,6 +35,20 @@ USAGE
 
 configuration="${CONFIGURATION:-Debug}"
 run_e2e=1
+
+# Under GitHub Actions a failing step names itself as an error annotation on the pull request's
+# checks, so a red gate says which step failed without the log (docs/CI.md, "Results").
+gate_step="starting"
+gate() {
+  gate_step="$1"
+  echo "[test] $1"
+}
+annotate_failure() {
+  if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+    echo "::error title=Gate step failed::$gate_step"
+  fi
+}
+trap annotate_failure ERR
 parallel=0
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -78,8 +92,19 @@ run_dotnet_tests() {
   fi
 
   for project in "${projects[@]}"; do
-    echo "[test] running dotnet tests: $project"
-    dotnet test "$project" --configuration "$configuration" --no-build
+    gate "running dotnet tests: $project"
+    local results_dir="tests/TestResults/gate"
+    local trx_name
+    trx_name="$(basename "$project" .csproj).trx"
+    rm -f "$results_dir/$trx_name"
+    if ! dotnet test "$project" --configuration "$configuration" --no-build \
+      --logger "trx;LogFileName=$trx_name" --results-directory "$results_dir"; then
+      # Each failing test is its own annotation, with the start of its message.
+      if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+        node scripts/trx-failed-tests.mjs "$results_dir/$trx_name" annotations
+      fi
+      return 1
+    fi
   done
 }
 
@@ -154,36 +179,36 @@ run_parallel_playwright() {
   fi
 }
 
-echo "[test] ensuring npm dependencies"
+gate "ensuring npm dependencies"
 [ -d node_modules ] || npm ci
 
-echo "[test] checking generated TS contract and TypeScript"
+gate "checking generated TS contract and TypeScript"
 npm run typecheck
 
-echo "[test] building browser assets"
+gate "building browser assets"
 npm run build:all
 
-echo "[test] running vitest"
+gate "running vitest"
 npm test
 
-echo "[test] consistency checks"
+gate "consistency checks"
 check_ci_shard_matrix
 # npm and NuGet must carry the same Syncfusion version, and every control package must be locked at
 # the version the @syncfusion/ej2 umbrella was published with (scripts/pin-syncfusion.mjs explains why).
 node scripts/pin-syncfusion.mjs --check
 
-echo "[test] compiling C# projects ($configuration)"
+gate "compiling C# projects ($configuration)"
 dotnet build --configuration "$configuration"
 
 run_dotnet_tests
 
 if [ "$run_e2e" -eq 0 ]; then
-  echo "[test] skipping Playwright (--no-e2e)"
+  gate "skipping Playwright (--no-e2e)"
 elif [ "$parallel" -eq 1 ]; then
-  echo "[test] running observable Playwright as parallel shards"
+  gate "running observable Playwright as parallel shards"
   run_parallel_playwright
 else
-  echo "[test] running observable Playwright"
+  gate "running observable Playwright"
   CONFIGURATION="$configuration" scripts/playwright.sh --no-build
 fi
 

@@ -161,6 +161,9 @@ check-run annotations API, name the failures without opening the log or the arti
 Every shard also prints one `::notice` naming each fixture and how many of its tests passed on
 the first attempt (`scripts/trx-failed-tests.mjs <trx> summary`), so a green shard's check-run
 annotations say what it proved.
+The deterministic gate (`scripts/test.sh`) does the same for its own steps: a failing step prints
+`::error title=Gate step failed::<step>`, and a failing test in a non-Playwright test project
+prints the same per-test `::error` annotation from its TRX.
 
 ### Flaky tests: quarantine is temporary
 
