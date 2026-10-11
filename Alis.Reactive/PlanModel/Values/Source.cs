@@ -86,18 +86,14 @@ namespace Alis.Reactive.PlanModel
     internal sealed class PluginSource : RuntimeObjectSource
     {
         private readonly PluginName _name;
-        private readonly BrowserObjectId _type;
 
         /// <summary>JSON discriminator for plugin sources. Always <c>"plugin"</c>.</summary>
         public string Kind => "plugin";
         /// <summary>Plan-registered plugin name used for runtime object lookup.</summary>
         public string Name => _name.Value;
-        /// <summary>Plugin object contract key declared in the generated plan.</summary>
-        public string Type => _type.Value;
         private PluginSource(string name)
         {
             _name = PluginName.Of(name);
-            _type = BrowserObjectId.Plugin(_name);
         }
         internal static PluginSource Of(string name) => new PluginSource(name);
     }

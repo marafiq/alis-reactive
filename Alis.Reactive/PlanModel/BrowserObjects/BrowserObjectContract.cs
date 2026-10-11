@@ -7,11 +7,9 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly Dictionary<string, ObjectProperty> _properties = new Dictionary<string, ObjectProperty>();
         private readonly Dictionary<string, ObjectMethod> _methods = new Dictionary<string, ObjectMethod>();
-        private readonly Dictionary<string, ObjectEvent> _events = new Dictionary<string, ObjectEvent>();
 
         public IReadOnlyDictionary<string, ObjectProperty> Properties => _properties;
         public IReadOnlyDictionary<string, ObjectMethod> Methods => _methods;
-        public IReadOnlyDictionary<string, ObjectEvent> Events => _events;
 
         internal BrowserObjectContract() { }
 
@@ -40,16 +38,6 @@ namespace Alis.Reactive.PlanModel
                 _methods[contract.Name.Value] = ObjectMethod.From(contract);
 
             return _methods[contract.Name.Value];
-        }
-
-        internal BrowserObjectContract Declare(ObjectEventContract contract)
-        {
-            if (contract == null) throw new System.ArgumentNullException(nameof(contract));
-
-            if (!_events.ContainsKey(contract.Name.Value))
-                _events[contract.Name.Value] = ObjectEvent.From(contract);
-
-            return this;
         }
 
     }
@@ -88,21 +76,6 @@ namespace Alis.Reactive.PlanModel
 
         internal static ObjectMethodContract Create(MemberName name, Path path, MethodSignature signature) =>
             new ObjectMethodContract(name, path, signature);
-    }
-
-    internal sealed class ObjectEventContract
-    {
-        internal EventName Name { get; }
-        internal EventName Channel { get; }
-
-        private ObjectEventContract(EventName name, EventName channel)
-        {
-            Name = name ?? throw new System.ArgumentNullException(nameof(name));
-            Channel = channel ?? throw new System.ArgumentNullException(nameof(channel));
-        }
-
-        internal static ObjectEventContract ForComponentEvent(EventName eventName) =>
-            new ObjectEventContract(eventName, eventName);
     }
 
     internal sealed class MethodSignature
@@ -381,21 +354,6 @@ namespace Alis.Reactive.PlanModel
 
             return new ObjectMethod(Path, _signature.Merge(incoming.Name, incoming.Signature));
         }
-    }
-
-    internal sealed class ObjectEvent
-    {
-        private readonly EventName _channel;
-
-        public string Channel => _channel.Value;
-
-        private ObjectEvent(EventName channel)
-        {
-            _channel = channel ?? throw new System.ArgumentNullException(nameof(channel));
-        }
-
-        internal static ObjectEvent From(ObjectEventContract contract) =>
-            new ObjectEvent(contract.Channel);
     }
 
 }

@@ -11,11 +11,13 @@ namespace Alis.Reactive.Builders.Conditions
     public sealed class TypedPluginSource<TProp> : TypedSource<TProp>
     {
         private readonly PluginOperationId _operation;
+        private readonly MethodArgumentContract _arguments;
         private readonly List<ValueExpression> _args;
 
-        internal TypedPluginSource(PluginOperationId operation, List<ValueExpression> args)
+        internal TypedPluginSource(PluginOperationId operation, MethodArgumentContract arguments, List<ValueExpression> args)
         {
             _operation = operation ?? throw new System.ArgumentNullException(nameof(operation));
+            _arguments = arguments ?? throw new System.ArgumentNullException(nameof(arguments));
             _args = args ?? throw new System.ArgumentNullException(nameof(args));
         }
 
@@ -23,6 +25,8 @@ namespace Alis.Reactive.Builders.Conditions
             ValueExpression.Invoke(
                 PluginSource.Of(_operation.PluginNameValue),
                 _operation.PlanMethodNameValue,
+                _operation.InvocationPath,
+                _arguments,
                 Shape,
                 _args);
     }

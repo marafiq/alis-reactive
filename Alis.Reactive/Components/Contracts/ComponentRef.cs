@@ -179,11 +179,8 @@ namespace Alis.Reactive
         {
             if (property == null) throw new System.ArgumentNullException(nameof(property));
             var componentKey = _target.DeclareIn(Pipeline.Context);
-            Pipeline.Context.DeclareProperty(
-                componentKey,
-                property.ContractFor(MemberAccess.Write));
             Pipeline.AddStep(ReactionGraph.Set(
-                ComponentSource.Of(componentKey), property.Member, value));
+                ComponentSource.Of(componentKey), property.Path, property.Shape, value));
             return this;
         }
 
@@ -202,11 +199,8 @@ namespace Alis.Reactive
             if (method == null) throw new System.ArgumentNullException(nameof(method));
             if (args == null) throw new System.ArgumentNullException(nameof(args));
             var componentKey = _target.DeclareIn(Pipeline.Context);
-            Pipeline.Context.DeclareMethod(
-                componentKey,
-                method.ContractReturning(Shape.None));
-            var source = ComponentSource.Of(componentKey);
-            Pipeline.AddStep(ReactionGraph.Call(source, method.Member, method.ArgumentsWith(args)));
+            Pipeline.AddStep(ReactionGraph.Call(
+                ComponentSource.Of(componentKey), method.Path, method.Arguments, method.ArgumentsWith(args)));
             return this;
         }
 
@@ -215,12 +209,10 @@ namespace Alis.Reactive
         {
             if (property == null) throw new System.ArgumentNullException(nameof(property));
             var componentKey = _target.DeclareIn(Pipeline.Context);
-            Pipeline.Context.DeclareProperty(
-                componentKey,
-                property.ContractFor(MemberAccess.Read));
-            return new Builders.Conditions.TypedComponentSource<TValue>(
-                componentKey.Value,
-                property.Member);
+            return Builders.Conditions.TypedComponentSource<TValue>.FromProperty(
+                ComponentSource.Of(componentKey),
+                property.Member,
+                property.Path);
         }
 
         internal Builders.Conditions.TypedComponentSource<TValue> Read<TValue>(
@@ -237,15 +229,11 @@ namespace Alis.Reactive
             if (args == null) throw new System.ArgumentNullException(nameof(args));
 
             var componentKey = _target.DeclareIn(Pipeline.Context);
-            var returns = Shape.FromClrType(typeof(TValue));
-            Pipeline.Context.DeclareMethod(
-                componentKey,
-                method.ContractReturning(returns));
-            var source = ComponentSource.Of(componentKey);
             return Builders.Conditions.TypedComponentSource<TValue>.FromMethod(
-                source,
-                method.Member,
+                ComponentSource.Of(componentKey),
                 method.Name,
+                method.Path,
+                method.Arguments,
                 method.ArgumentsWith(args));
         }
 

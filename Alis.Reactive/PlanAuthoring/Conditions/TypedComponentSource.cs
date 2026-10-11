@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
@@ -7,13 +8,6 @@ namespace Alis.Reactive.Builders.Conditions
     {
         private readonly ValueExpression _value;
         private readonly string _readMember;
-
-        internal TypedComponentSource(string componentId, string valueMember)
-            : this(
-                valueMember,
-                ValueExpression.Read(PlanModel.ComponentSource.Of(componentId), valueMember, shape: Shape.FromClrType(typeof(TProp))))
-        {
-        }
 
         private TypedComponentSource(string readMember, ValueExpression value)
         {
@@ -25,23 +19,30 @@ namespace Alis.Reactive.Builders.Conditions
 
         internal string DefaultBodyFieldName => _readMember;
 
+        /// <param name="component">The component whose property is read.</param>
+        /// <param name="name">The property's own name, which a gathered body calls the read by default.</param>
+        /// <param name="path">The JavaScript path of the property on the component's object.</param>
+        internal static TypedComponentSource<TProp> FromProperty(
+            PlanModel.ComponentSource component,
+            string name,
+            Path path) =>
+            new TypedComponentSource<TProp>(
+                name,
+                ValueExpression.Read(component, name, path, Shape.FromClrType(typeof(TProp))));
+
         /// <param name="component">The component whose method is read.</param>
-        /// <param name="method">The method's plan key.</param>
         /// <param name="name">The method's own name, which a gathered body calls the read by default.</param>
+        /// <param name="path">The JavaScript path of the method on the component's object.</param>
+        /// <param name="arguments">The declared shape of each argument.</param>
         /// <param name="args">The arguments the read passes.</param>
         internal static TypedComponentSource<TProp> FromMethod(
             PlanModel.ComponentSource component,
-            string method,
             string name,
-            System.Collections.Generic.IReadOnlyList<ValueExpression> args)
-        {
-            return new TypedComponentSource<TProp>(
+            Path path,
+            MethodArgumentContract arguments,
+            IReadOnlyList<ValueExpression> args) =>
+            new TypedComponentSource<TProp>(
                 name,
-                ValueExpression.Invoke(
-                    component,
-                    method,
-                    Shape.FromClrType(typeof(TProp)),
-                    args));
-        }
+                ValueExpression.Invoke(component, name, path, arguments, Shape.FromClrType(typeof(TProp)), args));
     }
 }

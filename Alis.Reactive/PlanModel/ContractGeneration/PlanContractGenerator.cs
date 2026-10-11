@@ -29,10 +29,9 @@ namespace Alis.Reactive.PlanModel
                 "npm run generate:plan-types -w Alis.Reactive.Assets");
 
             contract.Declare(Interface("PlanDocument")
-                .Requires("version", "3")
+                .Requires("version", "4")
                 .Requires("planId", "string")
                 .Requires("scope", "PlanScope")
-                .Requires("types", "Record<string, BrowserObjectContract>")
                 .Requires("vendors", "Record<string, VendorContract>")
                 .Requires("components", "Record<string, ComponentObject>")
                 .Requires("behaviors", "Behavior[]"));
@@ -45,23 +44,6 @@ namespace Alis.Reactive.PlanModel
             contract.Declare(Interface("PartialPlanScope")
                 .Requires("kind", Literal("partial")));
 
-            contract.Declare(Interface("BrowserObjectContract")
-                .Requires("properties", "Record<string, Property>")
-                .Requires("methods", "Record<string, Method>")
-                .Requires("events", "Record<string, Event>"));
-
-            contract.Declare(Interface("Property")
-                .Requires("path", "Path")
-                .Requires("shape", "Shape")
-                .Requires("access", "MemberAccess"));
-
-            contract.Declare(LiteralUnion("MemberAccess", MemberAccess.Values));
-
-            contract.Declare(Interface("Method")
-                .Requires("path", "Path")
-                .Requires("arguments", "MethodArgumentContract")
-                .Requires("returns", "Shape"));
-
             contract.Declare(Union(
                 "MethodArgumentContract",
                 "OpenMethodArgumentContract",
@@ -71,9 +53,6 @@ namespace Alis.Reactive.PlanModel
             contract.Declare(Interface("ExactMethodArgumentContract")
                 .Requires("kind", Literal("exact"))
                 .Requires("shapes", "Shape[]"));
-
-            contract.Declare(Interface("Event")
-                .Requires("channel", "string"));
 
             contract.Declare(Alias("Vendor", "string"));
 
@@ -134,7 +113,9 @@ namespace Alis.Reactive.PlanModel
                 .Requires("kind", Literal("registered-input"))
                 .Requires("bindingPath", "string")
                 .Requires("path", "StructuredPath")
-                .Requires("valueMember", "string"));
+                .Requires("valueMember", "string")
+                .Requires("valuePath", "StructuredPath")
+                .Requires("valueShape", "Shape"));
 
             contract.Declare(Union(
                 "ValidationContainerBinding",
@@ -290,8 +271,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("PluginSource")
                 .Requires("kind", Literal("plugin"))
-                .Requires("name", "string")
-                .Requires("type", "string"));
+                .Requires("name", "string"));
 
             contract.Declare(LiteralUnion("PayloadScope", PayloadScope.Values));
 
@@ -394,13 +374,15 @@ namespace Alis.Reactive.PlanModel
             contract.Declare(Interface("SetReaction")
                 .Requires("kind", Literal("set"))
                 .Requires("on", "SetTargetSource")
-                .Requires("property", "string")
+                .Requires("path", "StructuredPath")
+                .Requires("shape", "Shape")
                 .Requires("value", "ValueExpression"));
 
             contract.Declare(Interface("CallReaction")
                 .Requires("kind", Literal("call"))
                 .Requires("on", "CallTargetSource")
-                .Requires("method", "string")
+                .Requires("path", "Path")
+                .Requires("arguments", "MethodArgumentContract")
                 .Requires("args", "ValueExpression[]"));
 
             contract.Declare(Interface("RequestReaction")
@@ -581,7 +563,7 @@ namespace Alis.Reactive.PlanModel
                 .Requires("kind", Literal("read"))
                 .Requires("from", "RuntimeObjectSource")
                 .Requires("member", "string")
-                .Requires("path", "EmptyPath")
+                .Requires("path", "StructuredPath")
                 .Requires("shape", "Shape")
                 .Requires("access", "PropertyValueReadAccess"));
 
@@ -589,7 +571,7 @@ namespace Alis.Reactive.PlanModel
                 .Requires("kind", Literal("read"))
                 .Requires("from", "RuntimeObjectSource")
                 .Requires("member", "string")
-                .Requires("path", "EmptyPath")
+                .Requires("path", "Path")
                 .Requires("shape", "Shape")
                 .Requires("access", "MethodValueReadAccess"));
 
@@ -651,7 +633,8 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("MethodValueReadAccess")
                 .Requires("kind", Literal("method"))
-                .Requires("args", "ValueExpression[]"));
+                .Requires("args", "ValueExpression[]")
+                .Requires("arguments", "MethodArgumentContract"));
 
             contract.Declare(Interface("ObjectExpression")
                 .Requires("kind", Literal("object"))
@@ -919,7 +902,6 @@ namespace Alis.Reactive.PlanModel
             Interface(name)
                 .Requires("id", "string")
                 .Requires("vendor", "Vendor")
-                .Requires("type", "string")
                 .Requires("role", role)
                 .Requires("binding", binding)
                 .Requires("container", container);

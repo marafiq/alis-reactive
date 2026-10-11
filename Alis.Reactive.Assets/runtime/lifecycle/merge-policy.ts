@@ -1,14 +1,11 @@
 // Replace-vs-append rules are shared by C# container merge and TS recompose.
-// Type contracts merge; vendors join by name; components replace by key using boot/slot join rules;
-// behaviors append in order.
+// Vendors join by name; components replace by key using boot/slot join rules; behaviors append in order.
 
 import type { PlanDocument } from "../types/index";
 import { mergeBootComponent, mergeSlotComponent } from "./component-merge";
-import { mergeObjectContracts } from "./object-contracts";
 
 export const MergePolicy = {
   composeBootPlanInto(target: PlanDocument, incoming: PlanDocument): void {
-    mergeTypeContracts(target, incoming);
     mergeVendors(target, incoming);
 
     for (const [componentKey, component] of Object.entries(incoming.components)) {
@@ -23,7 +20,6 @@ export const MergePolicy = {
     incoming: PlanDocument,
     bootPlan: PlanDocument | undefined,
   ): void {
-    mergeTypeContracts(target, incoming);
     mergeVendors(target, incoming);
 
     for (const [componentKey, component] of Object.entries(incoming.components)) {
@@ -39,12 +35,6 @@ export const MergePolicy = {
   },
 };
 
-function mergeTypeContracts(target: PlanDocument, incoming: PlanDocument): void {
-  for (const [typeKey, contract] of Object.entries(incoming.types)) {
-    target.types[typeKey] = mergeObjectContracts(target.types[typeKey], contract);
-  }
-}
-
 // A vendor name means one definition (C# refuses two vendors with one name), so joining is a union.
 function mergeVendors(target: PlanDocument, incoming: PlanDocument): void {
   Object.assign(target.vendors, incoming.vendors);
@@ -52,10 +42,9 @@ function mergeVendors(target: PlanDocument, incoming: PlanDocument): void {
 
 export function emptyPlan(planId: string): PlanDocument {
   return {
-    version: 3,
+    version: 4,
     planId,
     scope: { kind: "root" },
-    types: {},
     vendors: {},
     components: {},
     behaviors: [],
@@ -67,7 +56,6 @@ export function snapshotPlan(plan: PlanDocument): PlanDocument {
     version: plan.version,
     planId: plan.planId,
     scope: { ...plan.scope },
-    types: { ...plan.types },
     vendors: { ...plan.vendors },
     components: { ...plan.components },
     behaviors: [...plan.behaviors],

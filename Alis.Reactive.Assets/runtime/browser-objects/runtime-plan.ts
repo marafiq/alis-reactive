@@ -1,5 +1,4 @@
 import type {
-  BrowserObjectContract,
   ComponentObject,
   PlanDocument,
   RuntimeObjectSource,
@@ -46,13 +45,11 @@ export class RuntimeResolutionError extends Error {
 
 export class RuntimePlan {
   readonly components: RuntimeComponents;
-  readonly objectContracts: RuntimeObjectContracts;
   readonly plugins: RuntimePlugins;
 
   private constructor(readonly document: PlanDocument) {
-    this.objectContracts = new RuntimeObjectContracts(document);
-    this.components = new RuntimeComponents(document, this.objectContracts);
-    this.plugins = new RuntimePlugins(this.objectContracts, pluginCatalog);
+    this.components = new RuntimeComponents(document);
+    this.plugins = new RuntimePlugins(pluginCatalog);
   }
 
   static from(plan: PlanDocument): RuntimePlan {
@@ -73,7 +70,7 @@ export class RuntimePlan {
       case "component":
         return this.components.component(source.component).object();
       case "plugin":
-        return this.plugins.object(source.name, source.type);
+        return this.plugins.object(source.name);
     }
   }
 
@@ -82,29 +79,18 @@ export class RuntimePlan {
   }
 }
 
-export class RuntimeObjectContracts {
-  constructor(private readonly plan: PlanDocument) {}
-
-  contract(typeKey: string): BrowserObjectContract {
-    return this.plan.types[typeKey]!;
-  }
-}
-
 export class RuntimeComponents {
-  constructor(
-    private readonly plan: PlanDocument,
-    private readonly objectContracts: RuntimeObjectContracts,
-  ) {}
+  constructor(private readonly plan: PlanDocument) {}
 
   find(componentKey: string): RuntimeComponent | undefined {
     const component = this.plan.components[componentKey];
     if (!component) return undefined;
-    return new RuntimeComponent(componentKey, component, this.objectContracts, this.plan.vendors);
+    return new RuntimeComponent(componentKey, component, this.plan.vendors);
   }
 
   entries(): RuntimeComponent[] {
     return Object.entries(this.plan.components)
-      .map(([key, component]) => new RuntimeComponent(key, component, this.objectContracts, this.plan.vendors));
+      .map(([key, component]) => new RuntimeComponent(key, component, this.plan.vendors));
   }
 
   component(componentKey: string): RuntimeComponent {
@@ -123,7 +109,6 @@ export class RuntimeComponent {
   constructor(
     readonly key: string,
     readonly definition: ComponentObject,
-    private readonly objectContracts: RuntimeObjectContracts,
     private readonly vendors: Record<string, VendorContract>,
   ) {}
 
@@ -152,16 +137,8 @@ export class RuntimeComponent {
     return this.runtime().resolveRoot(this.element());
   }
 
-  objectContract(): BrowserObjectContract {
-    return this.objectContracts.contract(this.definition.type);
-  }
-
   object(): RuntimeObject {
-    return new RuntimeObject(
-      `component "${this.key}"`,
-      this.root(),
-      this.objectContract(),
-    );
+    return new RuntimeObject(`component "${this.key}"`, this.root());
   }
 
   runtime(): ComponentDriver {
@@ -171,21 +148,9 @@ export class RuntimeComponent {
 }
 
 export class RuntimePlugins {
-  constructor(
-    private readonly objectContracts: RuntimeObjectContracts,
-    private readonly instances: PluginCatalog,
-  ) {}
+  constructor(private readonly instances: PluginCatalog) {}
 
-  objectContract(typeKey: string): BrowserObjectContract {
-    return this.objectContracts.contract(typeKey);
-  }
-
-  object(pluginName: string, typeKey: string): RuntimeObject {
-    const objectContract = this.objectContract(typeKey);
-    return new RuntimeObject(
-      `plugin "${pluginName}"`,
-      this.instances.resolve(pluginName),
-      objectContract,
-    );
+  object(pluginName: string): RuntimeObject {
+    return new RuntimeObject(`plugin "${pluginName}"`, this.instances.resolve(pluginName));
   }
 }

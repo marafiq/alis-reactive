@@ -126,22 +126,17 @@ namespace Alis.Reactive.Builders
 
         private PipelineBuilder<TModel> Set<TValue>(ComponentProperty<TValue> property, ValueExpression value)
         {
-            _pipeline.Context.DeclareProperty(
-                _elementKey,
-                property.ContractFor(MemberAccess.Write));
             _pipeline.AddStep(ReactionGraph.Set(
-                ComponentSource.Of(_elementKey), property.Member, value));
+                ComponentSource.Of(_elementKey), property.Path, property.Shape, value));
             return _pipeline;
         }
 
         private PipelineBuilder<TModel> Call(ComponentMethod method, ValueExpression arg)
         {
-            _pipeline.Context.DeclareMethod(
-                _elementKey,
-                method.ContractReturning(Shape.None));
             _pipeline.AddStep(ReactionGraph.Call(
                 ComponentSource.Of(_elementKey),
-                method.Member,
+                method.Path,
+                method.Arguments,
                 new List<ValueExpression> { arg }));
             return _pipeline;
         }

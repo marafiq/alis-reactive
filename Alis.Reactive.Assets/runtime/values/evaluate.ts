@@ -14,7 +14,6 @@ import { assertNever } from "../shared/assert-never";
 import { RuntimeValue, applyShapeWhenPresent } from "../browser-objects/runtime-value";
 import { RuntimePath } from "../browser-objects/runtime-path";
 import { ExecutionContext } from "../browser-objects/execution-context";
-import { RuntimeObject } from "../browser-objects/runtime-object";
 import { evaluateSyncCondition } from "../conditions/compare-engine";
 import { runArrayOp } from "./array-op-engine";
 
@@ -93,21 +92,14 @@ class ValueEvaluation {
 
   private readFromRuntimeObject(expression: ObjectReadExpression, source: RuntimeObjectSource): unknown {
     const runtimeObject = this.runtimePlan.objectForSource(source);
-    const value = this.resolveRuntimeObjectRead(expression, runtimeObject);
-    return value.usingRequestedShape(expression.shape);
-  }
-
-  private resolveRuntimeObjectRead(
-    expression: ObjectReadExpression,
-    runtimeObject: RuntimeObject,
-  ): RuntimeValue {
     switch (expression.access.kind) {
       case "property":
-        return runtimeObject.read(expression.member);
+        return runtimeObject.read(expression.path, expression.shape);
 
       case "method": {
         const argumentValues = expression.access.args.map(arg => this.evaluate(arg));
-        return runtimeObject.call(expression.member, argumentValues);
+        const returned = runtimeObject.call(expression.path, expression.access.arguments, argumentValues);
+        return applyShapeWhenPresent(returned, expression.shape);
       }
 
       default:

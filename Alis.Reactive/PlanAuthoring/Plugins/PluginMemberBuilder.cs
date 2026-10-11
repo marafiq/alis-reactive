@@ -35,11 +35,13 @@ namespace Alis.Reactive.Builders
     public sealed class PluginMemberBuilder<TReturn, TModel> where TModel : class
     {
         private readonly PluginOperationId _operation;
+        private readonly MethodArgumentContract _arguments;
         private readonly PluginArgumentCollector _args;
 
         internal PluginMemberBuilder(PluginOperationId operation, MethodArgumentContract arguments)
         {
             _operation = operation ?? throw new ArgumentNullException(nameof(operation));
+            _arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
             _args = new PluginArgumentCollector(operation, arguments);
         }
 
@@ -145,6 +147,7 @@ namespace Alis.Reactive.Builders
         public static implicit operator TypedPluginSource<TReturn>(PluginMemberBuilder<TReturn, TModel> builder) =>
             new TypedPluginSource<TReturn>(
                 builder._operation,
+                builder._arguments,
                 builder._args.Complete());
     }
 
@@ -157,6 +160,7 @@ namespace Alis.Reactive.Builders
     {
         private readonly PluginOperationId _operation;
         private readonly IReactionEmitter _emitter;
+        private readonly MethodArgumentContract _arguments;
         private readonly PluginArgumentCollector _args;
 
         internal PluginCallBuilder(
@@ -166,6 +170,7 @@ namespace Alis.Reactive.Builders
         {
             _operation = operation ?? throw new ArgumentNullException(nameof(operation));
             _emitter = emitter ?? throw new ArgumentNullException(nameof(emitter));
+            _arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
             _args = new PluginArgumentCollector(operation, arguments);
         }
 
@@ -269,7 +274,9 @@ namespace Alis.Reactive.Builders
         public void Fire()
         {
             _emitter.AddStep(ReactionGraph.Call(
-                PluginSource.Of(_operation.PluginNameValue), _operation.PlanMethodNameValue,
+                PluginSource.Of(_operation.PluginNameValue),
+                _operation.InvocationPath,
+                _arguments,
                 _args.Complete()));
         }
     }

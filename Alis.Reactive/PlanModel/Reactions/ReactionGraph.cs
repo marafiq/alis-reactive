@@ -23,11 +23,15 @@ namespace Alis.Reactive.PlanModel
         internal static ReactionGraph Branch(List<BranchCase> cases) =>
             new BranchReaction(cases);
 
-        internal static ReactionGraph Set(Source on, string property, ValueExpression value) =>
-            new SetReaction(on, property, value);
+        internal static ReactionGraph Set(Source on, Path path, Shape shape, ValueExpression value) =>
+            new SetReaction(on, path, shape, value);
 
-        internal static ReactionGraph Call(Source on, string method, IReadOnlyList<ValueExpression> args) =>
-            new CallReaction(on, method, args);
+        internal static ReactionGraph Call(
+            Source on,
+            Path path,
+            MethodArgumentContract arguments,
+            IReadOnlyList<ValueExpression> args) =>
+            new CallReaction(on, path, arguments, args);
 
         internal static ReactionGraph Request(RequestPlan request) =>
             new RequestReaction(request);
@@ -252,45 +256,49 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Sets a property value on a component or DOM element.</summary>
     internal sealed class SetReaction : ReactionGraph
     {
-        private readonly MemberName _property;
-
         /// <summary>JSON discriminator for set reactions. Always <c>"set"</c>.</summary>
         public string Kind => "set";
         /// <summary>Runtime source whose property is set.</summary>
         public Source On { get; }
-        /// <summary>Property name to set on the target source.</summary>
-        public string Property => _property.Value;
+        /// <summary>JavaScript path of the property on the target, as its declaration names it.</summary>
+        public Path Path { get; }
+        /// <summary>Shape the value is formatted to before it is written; <c>none</c> writes it as evaluated.</summary>
+        public Shape Shape { get; }
         /// <summary>Value expression assigned to the target property.</summary>
         public ValueExpression Value { get; }
 
-        internal SetReaction(Source on, string property, ValueExpression value)
+        internal SetReaction(Source on, Path path, Shape shape, ValueExpression value)
         {
-            On = on;
-            _property = MemberName.Of(property);
-            Value = value;
+            On = on ?? throw new ArgumentNullException(nameof(on));
+            Path = path ?? throw new ArgumentNullException(nameof(path));
+            if (path.IsNone) throw new ArgumentException("A property write needs the property's path.", nameof(path));
+            Shape = shape ?? throw new ArgumentNullException(nameof(shape));
+            Value = value ?? throw new ArgumentNullException(nameof(value));
         }
     }
 
     /// <summary>Calls a method on a component or DOM element.</summary>
     internal sealed class CallReaction : ReactionGraph
     {
-        private readonly MemberName _method;
         private readonly IReadOnlyList<ValueExpression> _args;
 
         /// <summary>JSON discriminator for call reactions. Always <c>"call"</c>.</summary>
         public string Kind => "call";
         /// <summary>Runtime source whose method is called.</summary>
         public Source On { get; }
-        /// <summary>Method name to call on the target source.</summary>
-        public string Method => _method.Value;
+        /// <summary>JavaScript path of the method on the target; empty when the target itself is the function.</summary>
+        public Path Path { get; }
+        /// <summary>How each argument is formatted for the object: by its declared shape, or as evaluated.</summary>
+        public MethodArgumentContract Arguments { get; }
         /// <summary>Method argument expressions in call order; empty when the method takes no arguments.</summary>
         public IReadOnlyList<ValueExpression> Args => _args;
 
-        internal CallReaction(Source on, string method, IReadOnlyList<ValueExpression> args)
+        internal CallReaction(Source on, Path path, MethodArgumentContract arguments, IReadOnlyList<ValueExpression> args)
         {
-            On = on;
-            _method = MemberName.Of(method);
-            _args = OrderedArguments(args);
+            On = on ?? throw new ArgumentNullException(nameof(on));
+            Path = path ?? throw new ArgumentNullException(nameof(path));
+            Arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
+            _args = OrderedArguments(args ?? throw new ArgumentNullException(nameof(args)));
         }
 
         private static IReadOnlyList<ValueExpression> OrderedArguments(IReadOnlyList<ValueExpression> items)

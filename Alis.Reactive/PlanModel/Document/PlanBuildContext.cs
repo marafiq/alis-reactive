@@ -11,7 +11,7 @@ namespace Alis.Reactive.PlanModel
     internal sealed class PlanBuildContext
     {
         private readonly PlanIdentity _identity;
-        private readonly BrowserObjectContracts _objectContracts;
+        private readonly PluginRegistry _plugins;
         private readonly BrowserObjects _browserObjects;
         private readonly BehaviorGraph _behaviors;
         private readonly List<ValidationJob> _validationJobs = new List<ValidationJob>();
@@ -21,15 +21,14 @@ namespace Alis.Reactive.PlanModel
             RegisteredInputComponents registrations)
         {
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
-            _objectContracts = new BrowserObjectContracts();
-            _browserObjects = new BrowserObjects(_objectContracts, registrations);
-            _behaviors = new BehaviorGraph(_browserObjects);
+            _plugins = new PluginRegistry();
+            _browserObjects = new BrowserObjects(registrations);
+            _behaviors = new BehaviorGraph();
         }
 
         internal PlanDocument BuildPlan() =>
             new PlanDocument(
                 _identity,
-                _objectContracts.Snapshot(),
                 _browserObjects.VendorSnapshot(),
                 _browserObjects.Snapshot(),
                 _behaviors.Snapshot());
@@ -60,20 +59,14 @@ namespace Alis.Reactive.PlanModel
         internal ComponentKey DeclareInputComponent(InputComponentPlanBinding binding) =>
             _browserObjects.DeclareInputComponent(binding);
 
-        internal void DeclareProperty(ComponentKey componentKey, ObjectPropertyContract contract) =>
-            _browserObjects.DeclareProperty(componentKey, contract);
-
-        internal ObjectMethod DeclareMethod(ComponentKey componentKey, ObjectMethodContract contract) =>
-            _browserObjects.DeclareMethod(componentKey, contract);
-
         internal void RegisterPlugin(PluginContract contract) =>
-            _objectContracts.RegisterPlugin(contract);
+            _plugins.RegisterPlugin(contract);
 
         internal MethodSignature DeclarePluginMethod(PluginMethodRequirement requirement) =>
-            _objectContracts.DeclarePluginMethod(requirement);
+            _plugins.DeclarePluginMethod(requirement);
 
         internal void DeclarePluginProperty(PluginPropertyRequirement requirement) =>
-            _objectContracts.DeclarePluginProperty(requirement);
+            _plugins.DeclarePluginProperty(requirement);
 
         internal void RegisterInputComponents() => _browserObjects.RegisterInputComponents();
 

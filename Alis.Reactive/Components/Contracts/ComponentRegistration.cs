@@ -58,33 +58,20 @@ namespace Alis.Reactive
             return ValueContract;
         }
 
-        internal void DeclareValueContract(BrowserObjectContracts contracts, BrowserObjectId typeKey)
-        {
-            if (contracts == null) throw new System.ArgumentNullException(nameof(contracts));
-            if (typeKey == null) throw new System.ArgumentNullException(nameof(typeKey));
-
-            contracts.DeclareInputValueContract(typeKey, ValueContract);
-        }
-
-        internal BrowserObject CreateComponent(ComponentId componentId, ComponentVendor vendor, BrowserObjectId typeKey)
+        internal BrowserObject CreateComponent(ComponentId componentId, ComponentVendor vendor)
         {
             if (componentId == null) throw new System.ArgumentNullException(nameof(componentId));
             if (vendor == null) throw new System.ArgumentNullException(nameof(vendor));
-            if (typeKey == null) throw new System.ArgumentNullException(nameof(typeKey));
 
             return BrowserObject.PlanInput(
                 componentId,
                 vendor,
-                typeKey,
                 ValueContract.BindingFor(RegisteredBindingPath));
         }
 
-        internal BrowserObject AddBindingTo(BrowserObject component, BrowserObjectContract objectContract)
+        internal BrowserObject AddBindingTo(BrowserObject component)
         {
             if (component == null) throw new System.ArgumentNullException(nameof(component));
-            if (objectContract == null) throw new System.ArgumentNullException(nameof(objectContract));
-
-            ValueContract.Enrich(objectContract);
             return component.WithBindingIfAbsent(ValueContract.BindingFor(RegisteredBindingPath));
         }
 

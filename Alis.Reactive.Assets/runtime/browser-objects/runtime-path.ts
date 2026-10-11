@@ -34,6 +34,13 @@ export class RuntimePath {
     setMember(this.requirePathMember(root, label), value);
   }
 
+  // Writes the final member whether or not the owner has it yet: a field an event payload hands back,
+  // such as cancel, may be absent until a listener sets it.
+  write(root: unknown, value: unknown, label: string): void {
+    const owner = this.requireFinalOwner(root, label);
+    owner[segmentKey(this.segmentAt(this.segments.length - 1))] = value;
+  }
+
   call(root: unknown, args: unknown[], label: string): unknown {
     const pathTargetsRoot = this.segments.length === 0;
     if (pathTargetsRoot) {
@@ -44,6 +51,14 @@ export class RuntimePath {
   }
 
   private requirePathMember(root: unknown, label: string): RuntimeMember {
+    return requireMember(
+      this.requireFinalOwner(root, label),
+      segmentKey(this.segmentAt(this.segments.length - 1)),
+      label,
+    );
+  }
+
+  private requireFinalOwner(root: unknown, label: string): MemberOwner {
     const pathHasNoMember = this.segments.length === 0;
     if (pathHasNoMember) {
       throw new Error(`[alis] runtime path is empty on ${label}`);
@@ -55,16 +70,23 @@ export class RuntimePath {
       owner = requireMemberOwner(owner, `${label} segment ${segmentIndex}`)[segmentKey(this.segmentAt(segmentIndex))];
     }
 
-    return requireMember(
-      requireMemberOwner(owner, label),
-      segmentKey(this.segmentAt(finalSegmentIndex)),
-      label,
-    );
+    return requireMemberOwner(owner, label);
   }
 
   private segmentAt(index: number): PathSegment {
     return this.segments[index]!;
   }
+}
+
+// The path as JavaScript would spell it, for messages: items.0 reads as items[0].
+export function describePath(path: Path): string {
+  return path
+    .map((segment, index) => {
+      const key = segmentKey(segment);
+      if (typeof key === "number") return `[${key}]`;
+      return index === 0 ? key : `.${key}`;
+    })
+    .join("");
 }
 
 function readOptionalMember(source: unknown, key: MemberKey): unknown {

@@ -7,6 +7,10 @@ import type {
   ExecContext, PayloadSource,
 } from "../../types/index";
 import { RuntimePlan } from "../../browser-objects/runtime-plan";
+import { RuntimePath, describePath } from "../../browser-objects/runtime-path";
+import { prepareMethodArguments } from "../../browser-objects/runtime-object";
+import { RuntimeShape } from "../../browser-objects/runtime-shape";
+import { applyShapeWhenPresent } from "../../browser-objects/runtime-value";
 import { evaluateValue } from "../../values/evaluate";
 export { evaluateValue };
 import { evaluateConditionInCurrentLane } from "../../conditions/conditions";
@@ -156,14 +160,20 @@ function executeSet(reaction: SetReaction, runtimePlan: RuntimePlan, context: Ex
 
   switch (reaction.on.kind) {
     case "component":
-      log.trace("set", { target: reaction.on.component, property: reaction.property, value });
-      runtimePlan.objectForSource(reaction.on).set(reaction.property, value);
+      log.trace("set", { target: reaction.on.component, property: describePath(reaction.path), value });
+      runtimePlan.objectForSource(reaction.on).set(reaction.path, reaction.shape, value);
       return;
 
-    case "payload":
-      log.trace("set", { target: reaction.on.scope, property: reaction.property, value });
-      requireMutablePayload(reaction.on, context, "set property")[reaction.property] = value;
+    case "payload": {
+      log.trace("set", { target: reaction.on.scope, property: describePath(reaction.path), value });
+      const delivered = RuntimeShape.from(reaction.shape).formatForObject(applyShapeWhenPresent(value, reaction.shape));
+      RuntimePath.from(reaction.path).write(
+        requireMutablePayload(reaction.on, context, "set property"),
+        delivered,
+        `payload (scope: ${reaction.on.scope})`,
+      );
       return;
+    }
   }
 }
 
@@ -175,19 +185,18 @@ function executeCall(reaction: CallReaction, runtimePlan: RuntimePlan, context: 
     case "plugin":
       log.trace("call", {
         target: reaction.on.kind === "component" ? reaction.on.component : reaction.on.name,
-        method: reaction.method,
+        method: describePath(reaction.path),
         args: argumentValues,
       });
-      runtimePlan.objectForSource(reaction.on).call(reaction.method, argumentValues);
+      runtimePlan.objectForSource(reaction.on).call(reaction.path, reaction.arguments, argumentValues);
       return;
 
     case "payload":
-      log.trace("call", { target: reaction.on.scope, method: reaction.method, args: argumentValues });
-      callPayloadMethod(
+      log.trace("call", { target: reaction.on.scope, method: describePath(reaction.path), args: argumentValues });
+      RuntimePath.from(reaction.path).call(
         requireMutablePayload(reaction.on, context, "call method"),
-        reaction.on.scope,
-        reaction.method,
-        argumentValues,
+        prepareMethodArguments(reaction.arguments, argumentValues),
+        `payload (scope: ${reaction.on.scope})`,
       );
       return;
   }
@@ -254,21 +263,6 @@ function requireMutablePayload(
   }
 
   return payload;
-}
-
-function callPayloadMethod(
-  payload: Record<string, unknown>,
-  scope: string,
-  method: string,
-  args: unknown[],
-): void {
-  const member = payload[method];
-  const memberIsCallable = typeof member === "function";
-  if (!memberIsCallable) {
-    throw new Error(`[alis] "${method}" is not a function on payload (scope: ${scope})`);
-  }
-
-  member.apply(payload, args);
 }
 
 export function catchAsyncReactionFailure(

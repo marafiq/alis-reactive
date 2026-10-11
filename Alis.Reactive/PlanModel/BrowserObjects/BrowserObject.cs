@@ -4,21 +4,19 @@ using Alis.Reactive.Serialization;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// Plan-registered object target: id, vendor, contract type, role,
-    /// and, for inputs, a model binding.
+    /// Plan-registered object target: id, vendor, role, and, for inputs, a model binding. Members are not
+    /// listed here: every read, write and call carries the path and shape its declaration names.
     /// </summary>
     internal sealed class BrowserObject
     {
         private readonly ComponentId _id;
         private readonly ComponentVendor _vendor;
-        private readonly BrowserObjectId _type;
         private readonly ComponentRole _role;
         private readonly InputBinding _binding;
         private readonly ValidationContainerBinding _container;
 
         public string Id => _id.Value;
         public string Vendor => _vendor.Name;
-        public string Type => _type.Value;
         public ComponentRole Role => _role;
         public InputBinding Binding => _binding;
         public ValidationContainerBinding Container => _container;
@@ -28,33 +26,29 @@ namespace Alis.Reactive.PlanModel
         private BrowserObject(
             ComponentId id,
             ComponentVendor vendor,
-            BrowserObjectId type,
             ComponentRole role,
             InputBinding binding,
             ValidationContainerBinding container)
         {
             _id = id ?? throw new System.ArgumentNullException(nameof(id));
             _vendor = vendor ?? throw new System.ArgumentNullException(nameof(vendor));
-            _type = type ?? throw new System.ArgumentNullException(nameof(type));
             _role = role ?? throw new System.ArgumentNullException(nameof(role));
             _binding = binding ?? throw new System.ArgumentNullException(nameof(binding));
             _container = container ?? throw new System.ArgumentNullException(nameof(container));
         }
 
-        internal static BrowserObject Element(ComponentId id, ComponentVendor vendor, BrowserObjectId type) =>
+        internal static BrowserObject Element(ComponentId id, ComponentVendor vendor) =>
             new BrowserObject(
                 id,
                 vendor,
-                type,
                 ComponentRole.ObjectTarget,
                 InputBinding.None,
                 ValidationContainerBinding.None);
 
-        internal static BrowserObject LayoutObject(ComponentId id, ComponentVendor vendor, BrowserObjectId type) =>
+        internal static BrowserObject LayoutObject(ComponentId id, ComponentVendor vendor) =>
             new BrowserObject(
                 id,
                 vendor,
-                type,
                 ComponentRole.LayoutObject,
                 InputBinding.None,
                 ValidationContainerBinding.None);
@@ -62,25 +56,23 @@ namespace Alis.Reactive.PlanModel
         internal static BrowserObject PlanInput(
             ComponentId id,
             ComponentVendor vendor,
-            BrowserObjectId type,
             InputBinding binding) =>
             new BrowserObject(
                 id,
                 vendor,
-                type,
                 ComponentRole.PlanInput,
                 binding,
                 ValidationContainerBinding.None);
 
         /// <summary>Copies the object with binding info filled where currently absent (first registration wins).</summary>
         internal BrowserObject WithBindingIfAbsent(InputBinding binding) =>
-            new BrowserObject(_id, _vendor, _type, ComponentRole.PlanInput, _binding.FillIfAbsent(binding), _container);
+            new BrowserObject(_id, _vendor, ComponentRole.PlanInput, _binding.FillIfAbsent(binding), _container);
 
         internal BrowserObject WithContainer(ContainerScope container) =>
-            new BrowserObject(_id, _vendor, _type, ComponentRole.ValidationContainer, _binding, ValidationContainerBinding.Scoped(container));
+            new BrowserObject(_id, _vendor, ComponentRole.ValidationContainer, _binding, ValidationContainerBinding.Scoped(container));
 
         internal BrowserObject WithValidationRulesMerged(IReadOnlyList<ComponentValidation> validationRules) =>
-            new BrowserObject(_id, _vendor, _type, ComponentRole.ValidationContainer, _binding, _container.WithValidationRulesMerged(validationRules));
+            new BrowserObject(_id, _vendor, ComponentRole.ValidationContainer, _binding, _container.WithValidationRulesMerged(validationRules));
     }
 
     internal sealed class ComponentRole
@@ -117,10 +109,11 @@ namespace Alis.Reactive.PlanModel
 
         public abstract string Kind { get; }
 
-        internal static InputBinding RegisteredInput(BindingPath bindingPath, MemberName valueMember) =>
+        internal static InputBinding RegisteredInput(BindingPath bindingPath, MemberName valueMember, Shape valueShape) =>
             new RegisteredInputBinding(
                 bindingPath,
-                valueMember);
+                valueMember,
+                valueShape);
 
         internal abstract InputBinding FillIfAbsent(InputBinding incoming);
     }
@@ -141,16 +134,23 @@ namespace Alis.Reactive.PlanModel
         private readonly BindingPath _bindingPath;
         private readonly MemberName _valueMember;
 
-        internal RegisteredInputBinding(BindingPath bindingPath, MemberName valueMember)
+        internal RegisteredInputBinding(BindingPath bindingPath, MemberName valueMember, Shape valueShape)
         {
             _bindingPath = bindingPath ?? throw new System.ArgumentNullException(nameof(bindingPath));
             _valueMember = valueMember ?? throw new System.ArgumentNullException(nameof(valueMember));
+            ValueShape = valueShape ?? throw new System.ArgumentNullException(nameof(valueShape));
         }
 
         public override string Kind => "registered-input";
         public string BindingPath => _bindingPath.Value;
         public Path Path => _bindingPath.Path;
         public string ValueMember => _valueMember.Value;
+
+        /// <summary>The JavaScript path of the input's value on its object.</summary>
+        public Path ValuePath => Path.Parse(_valueMember.Value);
+
+        /// <summary>The shape the input's value is read as.</summary>
+        public Shape ValueShape { get; }
 
         internal override InputBinding FillIfAbsent(InputBinding incoming)
         {
@@ -184,27 +184,7 @@ namespace Alis.Reactive.PlanModel
             For(CanonicalValueMember, shape);
 
         internal InputBinding BindingFor(BindingPath bindingPath) =>
-            InputBinding.RegisteredInput(bindingPath, _valueMember);
-
-        internal void Enrich(BrowserObjectContract objectContract)
-        {
-            if (objectContract == null) throw new System.ArgumentNullException(nameof(objectContract));
-
-            var valuePath = Path.Parse(ValueMember);
-            objectContract.Declare(ObjectPropertyContract.Create(
-                _valueMember,
-                valuePath,
-                Shape,
-                MemberAccess.Read));
-
-            var valueMemberNeedsCanonicalAlias = !_valueMember.Equals(CanonicalValueMember);
-            if (valueMemberNeedsCanonicalAlias)
-                objectContract.Declare(ObjectPropertyContract.Create(
-                    CanonicalValueMember,
-                    valuePath,
-                    Shape,
-                    MemberAccess.Read));
-        }
+            InputBinding.RegisteredInput(bindingPath, _valueMember, Shape);
     }
 
     internal sealed class InputComponentPlanBinding
@@ -229,7 +209,6 @@ namespace Alis.Reactive.PlanModel
         internal ComponentId ComponentId => _componentId;
         internal ComponentVendor Vendor => _vendor;
         internal InputValueContract ValueContract => _valueContract;
-        internal BrowserObjectId BrowserObjectId => BrowserObjectId.ComponentObject(_vendor, _componentId);
 
         internal InputBinding InputBinding =>
             _valueContract.BindingFor(_bindingPath);
@@ -238,7 +217,6 @@ namespace Alis.Reactive.PlanModel
             BrowserObject.PlanInput(
                 _componentId,
                 _vendor,
-                BrowserObjectId,
                 InputBinding);
 
         internal static InputComponentPlanBinding For(

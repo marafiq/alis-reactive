@@ -213,8 +213,6 @@ namespace Alis.Reactive.PlanModel
 
         internal PluginName Name { get; }
 
-        internal BrowserObjectId BrowserObjectId => BrowserObjectId.Plugin(Name);
-
         internal static PluginContract Create(PluginName name, IEnumerable<PluginOperationContract> operations)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));

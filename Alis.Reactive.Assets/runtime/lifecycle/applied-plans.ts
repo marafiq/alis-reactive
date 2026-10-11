@@ -157,10 +157,9 @@ function composedPlanFor(activePlans: Map<PlanId, PlanDocument>, planId: PlanId)
 }
 
 function resetPlanDocument(planDocument: PlanDocument, planId: PlanId): void {
-  planDocument.version = 3;
+  planDocument.version = 4;
   planDocument.planId = planId;
   planDocument.scope = { kind: "root" };
-  planDocument.types = {};
   planDocument.vendors = {};
   planDocument.components = {};
   planDocument.behaviors = [];

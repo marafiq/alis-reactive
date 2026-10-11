@@ -31,13 +31,10 @@ namespace Alis.Reactive
 
         internal string Member => _member.Value;
 
-        internal Shape Shape => _shape;
+        /// <summary>The JavaScript path of the property on its object.</summary>
+        internal Path Path => _path;
 
-        internal ObjectPropertyContract ContractFor(MemberAccess access)
-        {
-            if (access == null) throw new ArgumentNullException(nameof(access));
-            return ObjectPropertyContract.Create(_member, _path, _shape, access);
-        }
+        internal Shape Shape => _shape;
 
         /// <summary>Declares a property whose plan member and JavaScript path are the same.</summary>
         internal static ComponentProperty<TValue> Named(string member) =>
@@ -102,14 +99,11 @@ namespace Alis.Reactive
         internal IReadOnlyList<ValueExpression> ArgumentsWith(IReadOnlyList<ValueExpression> supplied) =>
             _passed.Count == 0 ? supplied : supplied.Concat(_passed).ToList();
 
-        internal ObjectMethodContract ContractReturning(Shape returns)
-        {
-            if (returns == null) throw new ArgumentNullException(nameof(returns));
-            return ObjectMethodContract.Create(
-                MemberName.Of(Member),
-                _path,
-                MethodSignature.WithArguments(MethodArgumentContract.Exact(_argumentShapes), returns));
-        }
+        /// <summary>The JavaScript path of the method on its object.</summary>
+        internal Path Path => _path;
+
+        /// <summary>The declared shape of every argument a call passes, the fixed ones included.</summary>
+        internal MethodArgumentContract Arguments => MethodArgumentContract.Exact(_argumentShapes);
 
         /// <summary>Declares a method whose plan member and JavaScript path are the same.</summary>
         internal static ComponentMethod Named(string member) =>

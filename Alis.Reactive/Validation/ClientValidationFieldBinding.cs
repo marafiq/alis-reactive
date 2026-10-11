@@ -168,7 +168,7 @@ namespace Alis.Reactive
 
         internal FieldComparisonTarget ReadConditionTarget() =>
             FieldComparisonTarget.ForComponentValue(
-                ValueExpression.Read(ComponentSource.Of(ComponentId), _valueContract.ValueMember),
+                ValueExpression.Read(ComponentSource.Of(ComponentId), _valueContract.ValueMember, shape: ShapeForValidation),
                 ShapeForValidation);
 
         internal ComponentValidation ToComponentValidation(

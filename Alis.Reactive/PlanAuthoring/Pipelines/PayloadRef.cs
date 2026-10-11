@@ -55,7 +55,8 @@ namespace Alis.Reactive.Builders
             var declared = method(_args);
             _pipeline.AddStep(ReactionGraph.Call(
                 PayloadSource.Event(),
-                declared.JavaScriptName,
+                Path.Parse(declared.JavaScriptName),
+                MethodArgumentContract.Open,
                 declared.ArgumentsWith(new List<ValueExpression>())));
             return this;
         }
@@ -72,7 +73,8 @@ namespace Alis.Reactive.Builders
             var declared = method(_args).Method;
             _pipeline.AddStep(ReactionGraph.Call(
                 PayloadSource.Event(),
-                declared.JavaScriptName,
+                Path.Parse(declared.JavaScriptName),
+                MethodArgumentContract.Open,
                 declared.ArgumentsWith(new List<ValueExpression> { argument.ToValueExpression() })));
             return this;
         }
@@ -96,7 +98,8 @@ namespace Alis.Reactive.Builders
                     nameof(field));
             }
 
-            _pipeline.AddStep(ReactionGraph.Set(PayloadSource.Event(), member, value));
+            // A payload field is written as evaluated, the way the vendor's listener reads it back.
+            _pipeline.AddStep(ReactionGraph.Set(PayloadSource.Event(), Path.Parse(member), Shape.None, value));
             return this;
         }
     }

@@ -1,13 +1,11 @@
 import type { PlanDocument, ReactionGraph, StartsWhen } from "../../types/index";
 import { wireEvent } from "../../events/resolver";
-import { RuntimePlan } from "../../browser-objects/runtime-plan";
 import { catchAsyncReactionFailure, executeReaction } from "../reactions/execute";
 import { wireServerPush } from "../realtime/server-push";
 import { wireSignalR } from "../realtime/signalr";
 import { assertNever } from "../../shared/assert-never";
 import { scope } from "../../diagnostics/trace";
 import { ExecutionContext } from "../../browser-objects/execution-context";
-import { componentEventChannel } from "../../browser-objects/component-event-contract";
 import { toJavaScriptString } from "../../shared/javascript-string";
 
 const log = scope("trigger");
@@ -55,18 +53,11 @@ export function wireTrigger(
     }
 
     case "component-event": {
-      const component = RuntimePlan.from(planDocument).components.component(trigger.component);
-      const eventContract = componentEventChannel(component, trigger.event);
-
       const source = `component-event:${trigger.component}:${trigger.event}`;
 
-      log.debug("component-event.listening", {
-        component: trigger.component,
-        event: eventContract.eventName,
-        channel: eventContract.channel,
-      });
+      log.debug("component-event.listening", { component: trigger.component, event: trigger.event });
 
-      wireEvent(planDocument, trigger.component, eventContract.channel, (eventData) => {
+      wireEvent(planDocument, trigger.component, trigger.event, (eventData) => {
         const context = ExecutionContext.event(eventData);
         runReaction(reaction, planDocument, context, source);
       }, eventOptions);

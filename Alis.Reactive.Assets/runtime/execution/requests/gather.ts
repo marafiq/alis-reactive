@@ -164,8 +164,7 @@ function writeMountedRegisteredInput(
   const registeredInputIsMounted = component.tryElement() !== null;
   if (!registeredInputIsMounted) return;
 
-  const runtimeObject = component.object();
-  const runtimeValue = runtimeObject.read(binding.valueMember);
+  const value = component.object().read(binding.valuePath, binding.valueShape);
 
   writeRequestPayloadValue(
     {
@@ -173,8 +172,8 @@ function writeMountedRegisteredInput(
       name: binding.bindingPath,
       path: binding.path,
     },
-    runtimeValue.usingDeclaredShape(),
-    RuntimeShape.from(runtimeValue.shape),
+    value,
+    RuntimeShape.from(binding.valueShape),
     writer,
   );
 }

@@ -123,8 +123,18 @@ namespace Alis.Reactive.PlanModel
         internal static ValueExpression ReadWholeElement(Shape shape) =>
             new ReadExpression(ValueRead.WholeElement(PayloadSource.Element(), shape));
 
-        internal static ValueExpression Invoke(RuntimeObjectSource from, string method, Shape returns, IReadOnlyList<ValueExpression> args) =>
-            new ReadExpression(ValueRead.Method(from, method, returns, args));
+        /// <summary>
+        /// Calls a member of a component or plugin at the JavaScript path its declaration names, formatting
+        /// each argument by the declared argument shapes.
+        /// </summary>
+        internal static ValueExpression Invoke(
+            RuntimeObjectSource from,
+            string member,
+            Path path,
+            MethodArgumentContract arguments,
+            Shape returns,
+            IReadOnlyList<ValueExpression> args) =>
+            new ReadExpression(ValueRead.Method(from, member, path, returns, args, arguments));
 
         /// <summary>
         /// Invokes a method on the current array element. The path carries receiver
@@ -133,7 +143,8 @@ namespace Alis.Reactive.PlanModel
         internal static ValueExpression InvokeElement(string receiverPath, string method, Shape returns, IReadOnlyList<ValueExpression> args)
         {
             var fullPath = string.IsNullOrEmpty(receiverPath) ? method : receiverPath + "." + method;
-            return new ReadExpression(ValueRead.Method(PayloadSource.Element(), method, Path.Parse(fullPath), returns, args));
+            return new ReadExpression(ValueRead.Method(
+                PayloadSource.Element(), method, Path.Parse(fullPath), returns, args, MethodArgumentContract.Open));
         }
 
         internal static ObjectExpression Object(IReadOnlyDictionary<string, ValueExpression> fields)
@@ -368,17 +379,17 @@ namespace Alis.Reactive.PlanModel
                 shape,
                 ValueReadAccess.Property);
 
-        internal static ValueRead Method(RuntimeObjectSource from, string member, Shape shape, IReadOnlyList<ValueExpression> args) =>
-            new ValueRead(
-                ValueReadTarget.ForMember(from, member),
-                shape,
-                ValueReadAccess.Method(args));
-
-        internal static ValueRead Method(Source from, string member, Path path, Shape shape, IReadOnlyList<ValueExpression> args) =>
+        internal static ValueRead Method(
+            Source from,
+            string member,
+            Path path,
+            Shape shape,
+            IReadOnlyList<ValueExpression> args,
+            MethodArgumentContract arguments) =>
             new ValueRead(
                 ValueReadTarget.ForMember(from, member, path),
                 shape,
-                ValueReadAccess.Method(args));
+                ValueReadAccess.Method(args, arguments));
 
         internal static ValueRead WholePayload(PayloadSource from, Shape shape) =>
             new ValueRead(
@@ -427,14 +438,15 @@ namespace Alis.Reactive.PlanModel
 
     internal static class ValueReadPath
     {
+        // A payload, component or plugin member is read at the path its name spells; a URL parameter
+        // is looked up by name, so its read carries no path.
         internal static Path For(Source from, MemberName member)
         {
             if (from == null) throw new ArgumentNullException(nameof(from));
             if (member == null) throw new ArgumentNullException(nameof(member));
 
-            if (from is PayloadSource) return PayloadReadPath.FromMember(member);
-
-            return Path.None;
+            var memberIsAPath = from is PayloadSource || from is RuntimeObjectSource;
+            return memberIsAPath ? PayloadReadPath.FromMember(member) : Path.None;
         }
     }
 
@@ -457,8 +469,8 @@ namespace Alis.Reactive.PlanModel
         internal static ValueReadAccess Property { get; } =
             new PropertyValueReadAccess();
 
-        internal static ValueReadAccess Method(IReadOnlyList<ValueExpression> args) =>
-            new MethodValueReadAccess(args);
+        internal static ValueReadAccess Method(IReadOnlyList<ValueExpression> args, MethodArgumentContract arguments) =>
+            new MethodValueReadAccess(args, arguments);
 
         /// <summary>Wire discriminator for the read access shape.</summary>
         public abstract string Kind { get; }
@@ -476,9 +488,10 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly IReadOnlyList<ValueExpression> _args;
 
-        internal MethodValueReadAccess(IReadOnlyList<ValueExpression> args)
+        internal MethodValueReadAccess(IReadOnlyList<ValueExpression> args, MethodArgumentContract arguments)
         {
             _args = OrderedArguments(args);
+            Arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
         }
 
         /// <summary>Wire discriminator for method reads. Always <c>"method"</c>.</summary>
@@ -486,6 +499,9 @@ namespace Alis.Reactive.PlanModel
 
         /// <summary>Argument value expressions evaluated in call order before invocation.</summary>
         public IReadOnlyList<ValueExpression> Args => _args;
+
+        /// <summary>How each argument is formatted for the object: by its declared shape, or as evaluated.</summary>
+        public MethodArgumentContract Arguments { get; }
 
         private static IReadOnlyList<ValueExpression> OrderedArguments(IReadOnlyList<ValueExpression> items)
         {

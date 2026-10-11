@@ -66,8 +66,7 @@ function sameRuntimeIdentity(existing: ComponentObject | undefined, incoming: Co
   if (existing === undefined) return false;
 
   return existing.id === incoming.id
-    && existing.vendor === incoming.vendor
-    && existing.type === incoming.type;
+    && existing.vendor === incoming.vendor;
 }
 
 function replaceComponent(target: PlanDocument, componentKey: string, incoming: ComponentObject): void {
