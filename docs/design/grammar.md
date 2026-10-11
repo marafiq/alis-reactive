@@ -708,7 +708,7 @@ proves it is named in the pull request.
 **Built as specified**
 - The plan document, the two locators, the six statements and nine expressions (`Alis.Reactive/Grammar`),
   the generated contract (`tools/PlanContractGenerator`), and the interpreter with its modules
-  (`Alis.Reactive.Assets/runtime`). The runtime is 2,622 lines of TypeScript, down from 6,134.
+  (`Alis.Reactive.Assets/runtime`). The runtime is 2,641 lines of TypeScript, down from 6,134.
 - C# keeps its typed semantic model (`PlanModel`: reaction, condition, value, request and
   validation graphs) as the builders' target, and a lowering pass (`Grammar/Lowering`) compiles it
   into the grammar at render. The semantic model no longer serializes; only the grammar does.
