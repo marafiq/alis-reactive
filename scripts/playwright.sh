@@ -466,6 +466,12 @@ run_attempt() {
 
 if run_attempt "" "$filter"; then status=0; else status=$?; fi
 
+# On GitHub Actions a notice names each fixture and how many of its tests passed on the first
+# attempt, so a green shard's check says what it proved.
+if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+  node scripts/trx-failed-tests.mjs "$attempt_trx" summary
+fi
+
 # Re-run only what failed, up to --retry-failed times. Every attempt keeps its own log, TRX and
 # diagnostics; the final exit code is the last attempt's. Tests that fail and then pass are the
 # flaky list — visible in the output, in flaky-<stamp>.txt, and in the GitHub job summary.
