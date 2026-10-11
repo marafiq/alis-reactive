@@ -5,6 +5,7 @@
 
 import TomSelect from "tom-select";
 import "tom-select/dist/css/tom-select.css";
+import { VisitPlanner, visitPlannerHosts } from "./visit-planner";
 
 interface MountEventDetail {
   readonly root: HTMLElement;
@@ -25,11 +26,17 @@ document.addEventListener("alis:mount", event => {
   for (const host of tomSelectHosts(root)) {
     if (host.tomselect === undefined) new TomSelect(host, { allowEmptyOption: false, dropdownParent: "body" });
   }
+  for (const host of visitPlannerHosts(root)) {
+    if (host.visitPlanner === undefined) new VisitPlanner(host);
+  }
 });
 
 document.addEventListener("alis:unmount", event => {
   const { root } = (event as CustomEvent<MountEventDetail>).detail;
   for (const host of tomSelectHosts(root)) {
     host.tomselect?.destroy();
+  }
+  for (const host of visitPlannerHosts(root)) {
+    host.visitPlanner?.destroy();
   }
 });
