@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { evaluateValue } from "../../../values/evaluate";
 import type { PayloadSource, PlanDocument, Shape, ValidationCondition, ValueExpression } from "../../../types/index";
+import { testVendors } from "../../support/vendors";
 
 const stringShape: Shape = { kind: "string" };
 const numberShape: Shape = { kind: "number" };
@@ -15,7 +16,7 @@ const residents = [
 ];
 
 function emptyArrayPlan(): PlanDocument {
-  return { version: 3, planId: "Runtime.ArrayDsl.Ops", scope: { kind: "root" }, types: {}, components: {}, behaviors: [] };
+  return { version: 3, vendors: testVendors, planId: "Runtime.ArrayDsl.Ops", scope: { kind: "root" }, types: {}, components: {}, behaviors: [] };
 }
 
 function source(): ValueExpression {

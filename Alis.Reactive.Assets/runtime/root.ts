@@ -10,6 +10,7 @@ import { composeInitialPlans } from "./lifecycle/applied-plans";
 import type { PlanDocument } from "./types/index";
 import type { TraceLevel } from "./diagnostics/trace";
 import { registerPlugin } from "./plugins/catalog";
+import { announceMount } from "./lifecycle/mount-events";
 
 interface PendingHostPlugin {
   readonly name: string;
@@ -37,6 +38,7 @@ function startRuntime(): void {
   initConfirm();
   initNativeActionLinks();
 
+  announceMount(document.body);
   for (const activePlan of composeInitialPlans(discoverBootPlans())) {
     boot(activePlan);
   }

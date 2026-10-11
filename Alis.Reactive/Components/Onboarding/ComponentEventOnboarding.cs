@@ -13,7 +13,7 @@ namespace Alis.Reactive
         internal static void Wire<TModel, TArgs>(
             ReactivePlan<TModel> plan,
             string componentId,
-            string vendor,
+            ComponentVendor vendor,
             TypedEvent<TArgs> typedEvent,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
@@ -29,7 +29,7 @@ namespace Alis.Reactive
             pipeline(typedEvent.Args, pipelineBuilder);
             plan.Context.WireComponentEvent(
                 target.IdForJson,
-                target.Vendor.Value,
+                target.Vendor,
                 typedEvent.ObjectEvent,
                 pipelineBuilder.BuildReaction());
         }

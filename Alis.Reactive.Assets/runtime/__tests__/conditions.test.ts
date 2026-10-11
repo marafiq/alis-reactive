@@ -31,6 +31,7 @@ import type {
   ValueExpression,
   ValidationCondition,
 } from "../types/index";
+import { testVendors } from "./support/vendors";
 
 const stringShape: Shape = { kind: "string" };
 const numberShape: Shape = { kind: "number" };
@@ -47,6 +48,7 @@ type WindowWithConfirm = typeof window & {
 function emptyConditionPlan(): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId: "ConditionGraph.Runtime",
     scope: { kind: "root" },
     types: {},

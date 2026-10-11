@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { resolveRequestInput } from "../../../../execution/requests/gather";
 import { AppliedPlans } from "../../../../lifecycle/applied-plans";
 import type { ComponentObject, RequestPayloadTarget, BrowserObjectContract, PathSegment, PlanDocument, RequestInput, Shape, StructuredPath, ValueExpression } from "../../../../types/index";
+import { testVendors } from "../../../support/vendors";
 
 const stringShape: Shape = { kind: "string" };
 
@@ -104,6 +105,7 @@ const silentLifecycleHooks = {
 function rootPlan(planId: string, components: Record<string, ComponentObject>): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId,
     scope: { kind: "root" },
     types: { "native.input": nativeInputType() },
@@ -118,6 +120,7 @@ function partialPlan(
 ): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId,
     scope: { kind: "partial" },
     types: planParts.types ?? {},

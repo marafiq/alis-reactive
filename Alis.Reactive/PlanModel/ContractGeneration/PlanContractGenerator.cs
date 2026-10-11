@@ -33,6 +33,7 @@ namespace Alis.Reactive.PlanModel
                 .Requires("planId", "string")
                 .Requires("scope", "PlanScope")
                 .Requires("types", "Record<string, BrowserObjectContract>")
+                .Requires("vendors", "Record<string, VendorContract>")
                 .Requires("components", "Record<string, ComponentObject>")
                 .Requires("behaviors", "Behavior[]"));
 
@@ -75,6 +76,14 @@ namespace Alis.Reactive.PlanModel
                 .Requires("channel", "string"));
 
             contract.Declare(Alias("Vendor", "string"));
+
+            contract.Declare(Interface("VendorContract")
+                .Requires("objectPath", "Path")
+                .Requires("subscribe", "string")
+                .Requires("unsubscribe", "string")
+                .Requires("payload", "VendorEventPayload"));
+
+            contract.Declare(LiteralUnion("VendorEventPayload", VendorContract.PayloadValues));
 
             contract.Declare(Union(
                 "ComponentObject",

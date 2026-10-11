@@ -20,7 +20,7 @@ namespace Alis.Reactive
     public abstract class Component : JsObject, IComponent
     {
         /// <inheritdoc />
-        public abstract string Vendor { get; }
+        public abstract ComponentVendor Vendor { get; }
 
         /// <summary>Declares a JavaScript event by the name the component raises.</summary>
         /// <typeparam name="TArgs">The typed payload the event delivers.</typeparam>

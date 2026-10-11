@@ -41,17 +41,15 @@ namespace Alis.Reactive
             var component = new TComponent();
             return new LayoutObjectTarget(
                 ComponentId.Of(component.DefaultId),
-                ComponentVendor.From(component.Vendor));
+                component.Vendor);
         }
 
-        internal static ComponentObjectTarget For(string componentId, string vendor)
+        internal static ComponentObjectTarget For(string componentId, ComponentVendor vendor)
         {
             if (componentId == null) throw new ArgumentNullException(nameof(componentId));
             if (vendor == null) throw new ArgumentNullException(nameof(vendor));
 
-            return new ObjectTarget(
-                ComponentId.Of(componentId),
-                ComponentVendor.From(vendor));
+            return new ObjectTarget(ComponentId.Of(componentId), vendor);
         }
 
         private sealed class ObjectTarget : ComponentObjectTarget
@@ -63,7 +61,7 @@ namespace Alis.Reactive
 
             internal override ComponentKey DeclareIn(PlanBuildContext context)
             {
-                return context.DeclareObjectTarget(ComponentId.Value, Vendor.Value);
+                return context.DeclareObjectTarget(ComponentId.Value, Vendor);
             }
         }
 
@@ -76,7 +74,7 @@ namespace Alis.Reactive
 
             internal override ComponentKey DeclareIn(PlanBuildContext context)
             {
-                return context.DeclareLayoutObject(ComponentId.Value, Vendor.Value);
+                return context.DeclareLayoutObject(ComponentId.Value, Vendor);
             }
         }
     }

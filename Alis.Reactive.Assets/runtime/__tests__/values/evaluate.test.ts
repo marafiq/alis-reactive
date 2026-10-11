@@ -3,6 +3,7 @@ import { evaluateValue } from "../../values/evaluate";
 import { registerPlugin } from "../../plugins/catalog";
 import { RuntimeResolutionError } from "../../browser-objects/runtime-plan";
 import type { ComponentObject, BrowserObjectContract, PlanDocument, Shape, ValueExpression } from "../../types/index";
+import { testVendors } from "../support/vendors";
 
 const stringShape: Shape = { kind: "string" };
 const numberShape: Shape = { kind: "number" };
@@ -32,6 +33,7 @@ function valueEvaluationPlan(planParts: {
 } = {}): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId: "Runtime.ValueEvaluation",
     scope: { kind: "root" },
     types: planParts.types ?? {},

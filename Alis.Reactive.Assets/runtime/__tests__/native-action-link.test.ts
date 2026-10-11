@@ -4,9 +4,11 @@ import {
   resetNativeActionLinksForTests,
 } from "../components/native/native-action-link";
 import type { PlanDocument, ReactionGraph, RequestPlan } from "../types/index";
+import { testVendors } from "./support/vendors";
 
 const emptyPlan: PlanDocument = {
   version: 3,
+  vendors: testVendors,
   planId: "Runtime.NativeActionLink",
   scope: { kind: "root" },
   types: {},

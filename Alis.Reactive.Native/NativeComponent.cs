@@ -11,6 +11,6 @@ namespace Alis.Reactive.Native
     public abstract class NativeComponent : IComponent
     {
         /// <inheritdoc />
-        public string Vendor => "native";
+        public ComponentVendor Vendor => ComponentVendor.Native;
     }
 }

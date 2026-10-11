@@ -5,8 +5,8 @@ namespace Alis.Reactive
     /// </summary>
     public interface IComponent
     {
-        /// <summary>Vendor key used to resolve the component implementation at runtime.</summary>
-        string Vendor { get; }
+        /// <summary>Where the component's JavaScript object lives on its element and how it raises events.</summary>
+        ComponentVendor Vendor { get; }
     }
 
     /// <summary>

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { boot, loadPartialSlot, resetBootStateForTests, unloadPartialSlot } from "../../../lifecycle/boot";
 import type { BranchCase, ComponentObject, ConditionGraph, BrowserObjectContract, PlanDocument, ReactionGraph, Shape, ValueExpression } from "../../../types/index";
+import { testVendors } from "../../support/vendors";
 
 const stringShape: Shape = { kind: "string" };
 const booleanShape: Shape = { kind: "boolean" };
@@ -57,6 +58,7 @@ describe("partial behavior lifecycle", () => {
 function rootPlan(planId: string, components: Record<string, ComponentObject>): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId,
     scope: { kind: "root" },
     types: { "native.input": nativeInputType() },
@@ -71,6 +73,7 @@ function partialPlan(
 ): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId,
     scope: { kind: "partial" },
     types: planParts.types ?? {},

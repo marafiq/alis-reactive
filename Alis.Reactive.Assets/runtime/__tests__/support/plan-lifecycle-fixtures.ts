@@ -1,6 +1,7 @@
 import { vi } from "vitest";
 import type { ActivePlanWiring } from "../../lifecycle/applied-plans";
 import type { Behavior, ComponentObject, ComponentValidation, BrowserObjectContract, PathSegment, PlanDocument, Shape, StructuredPath } from "../../types/index";
+import { testVendors } from "./vendors";
 
 export function objectContract(): BrowserObjectContract {
   return {
@@ -172,6 +173,7 @@ export function behavior(): Behavior {
 export function rootPlan(planId: string): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId,
     scope: { kind: "root" },
     types: {},
@@ -190,6 +192,7 @@ export function partialPlan(
 ): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId,
     scope: { kind: "partial" },
     types: planParts.types ?? {},

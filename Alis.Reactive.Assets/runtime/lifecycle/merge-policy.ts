@@ -1,5 +1,6 @@
 // Replace-vs-append rules are shared by C# container merge and TS recompose.
-// Type contracts merge; components replace by key using boot/slot join rules; behaviors append in order.
+// Type contracts merge; vendors join by name; components replace by key using boot/slot join rules;
+// behaviors append in order.
 
 import type { PlanDocument } from "../types/index";
 import { mergeBootComponent, mergeSlotComponent } from "./component-merge";
@@ -8,6 +9,7 @@ import { mergeObjectContracts } from "./object-contracts";
 export const MergePolicy = {
   composeBootPlanInto(target: PlanDocument, incoming: PlanDocument): void {
     mergeTypeContracts(target, incoming);
+    mergeVendors(target, incoming);
 
     for (const [componentKey, component] of Object.entries(incoming.components)) {
       mergeBootComponent(target, componentKey, component);
@@ -22,6 +24,7 @@ export const MergePolicy = {
     bootPlan: PlanDocument | undefined,
   ): void {
     mergeTypeContracts(target, incoming);
+    mergeVendors(target, incoming);
 
     for (const [componentKey, component] of Object.entries(incoming.components)) {
       mergeSlotComponent(
@@ -42,12 +45,18 @@ function mergeTypeContracts(target: PlanDocument, incoming: PlanDocument): void 
   }
 }
 
+// A vendor name means one definition (C# refuses two vendors with one name), so joining is a union.
+function mergeVendors(target: PlanDocument, incoming: PlanDocument): void {
+  Object.assign(target.vendors, incoming.vendors);
+}
+
 export function emptyPlan(planId: string): PlanDocument {
   return {
     version: 3,
     planId,
     scope: { kind: "root" },
     types: {},
+    vendors: {},
     components: {},
     behaviors: [],
   };
@@ -59,6 +68,7 @@ export function snapshotPlan(plan: PlanDocument): PlanDocument {
     planId: plan.planId,
     scope: { ...plan.scope },
     types: { ...plan.types },
+    vendors: { ...plan.vendors },
     components: { ...plan.components },
     behaviors: [...plan.behaviors],
   };

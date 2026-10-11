@@ -16,10 +16,8 @@ namespace Alis.Reactive
         internal bool Matches(RegisteredComponentIdentity other) =>
             ComponentId.Equals(other.ComponentId) && Vendor.Equals(other.Vendor);
 
-        internal static RegisteredComponentIdentity For(string componentId, string vendor) =>
-            new RegisteredComponentIdentity(
-                ComponentId.Of(componentId),
-                ComponentVendor.From(vendor));
+        internal static RegisteredComponentIdentity For(string componentId, ComponentVendor vendor) =>
+            new RegisteredComponentIdentity(ComponentId.Of(componentId), vendor);
 
         internal static RegisteredComponentIdentity For(ComponentId componentId, ComponentVendor vendor) =>
             new RegisteredComponentIdentity(componentId, vendor);

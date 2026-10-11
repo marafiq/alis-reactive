@@ -3,6 +3,7 @@ import { resolveRequestInput } from "../../../execution/requests/gather";
 import { injectPartial } from "../../../execution/partials/inject";
 import { boot, getBootedPlan, resetBootStateForTests } from "../../../lifecycle/boot";
 import type { ComponentObject, BrowserObjectContract, PathSegment, PlanDocument, RequestInput, Shape, StructuredPath } from "../../../types/index";
+import { testVendors } from "../../support/vendors";
 
 const stringShape: Shape = { kind: "string" };
 
@@ -81,6 +82,7 @@ function rootPlan(
 ): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId,
     scope: { kind: "root" },
     types: planParts.types ?? {},
@@ -95,6 +97,7 @@ function partialPlan(
 ): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId,
     scope: { kind: "partial" },
     types: planParts.types ?? { "native.element.address-line": objectContract() },

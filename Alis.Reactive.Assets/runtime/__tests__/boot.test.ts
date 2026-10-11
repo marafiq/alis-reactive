@@ -4,10 +4,12 @@ import { registerPlugin, resolvePlugin } from "../plugins/catalog";
 import { executeReaction } from "../execution/reactions/execute";
 import { boot, resetBootStateForTests } from "../lifecycle/boot";
 import type { PlanDocument } from "../types/index";
+import { testVendors } from "./support/vendors";
 
 function emptyPlan(planId: string): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId,
     scope: { kind: "root" },
     types: {},

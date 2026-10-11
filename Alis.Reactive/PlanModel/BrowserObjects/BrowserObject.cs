@@ -17,11 +17,13 @@ namespace Alis.Reactive.PlanModel
         private readonly ValidationContainerBinding _container;
 
         public string Id => _id.Value;
-        public string Vendor => _vendor.Value;
+        public string Vendor => _vendor.Name;
         public string Type => _type.Value;
         public ComponentRole Role => _role;
         public InputBinding Binding => _binding;
         public ValidationContainerBinding Container => _container;
+
+        internal ComponentVendor ComponentVendor => _vendor;
 
         private BrowserObject(
             ComponentId id,

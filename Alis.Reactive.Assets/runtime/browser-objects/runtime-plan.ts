@@ -3,10 +3,11 @@ import type {
   ComponentObject,
   PlanDocument,
   RuntimeObjectSource,
+  VendorContract,
 } from "../types/index";
 import { pluginCatalog, type PluginCatalog } from "../plugins/catalog";
 import { RuntimeObject } from "./runtime-object";
-import { type ComponentDriver, requireComponentDriver } from "./component-driver";
+import { ComponentDriver } from "./component-driver";
 
 export { RuntimeComponentReadinessError } from "./component-driver";
 
@@ -98,12 +99,12 @@ export class RuntimeComponents {
   find(componentKey: string): RuntimeComponent | undefined {
     const component = this.plan.components[componentKey];
     if (!component) return undefined;
-    return new RuntimeComponent(componentKey, component, this.objectContracts);
+    return new RuntimeComponent(componentKey, component, this.objectContracts, this.plan.vendors);
   }
 
   entries(): RuntimeComponent[] {
     return Object.entries(this.plan.components)
-      .map(([key, component]) => new RuntimeComponent(key, component, this.objectContracts));
+      .map(([key, component]) => new RuntimeComponent(key, component, this.objectContracts, this.plan.vendors));
   }
 
   component(componentKey: string): RuntimeComponent {
@@ -123,6 +124,7 @@ export class RuntimeComponent {
     readonly key: string,
     readonly definition: ComponentObject,
     private readonly objectContracts: RuntimeObjectContracts,
+    private readonly vendors: Record<string, VendorContract>,
   ) {}
 
   get id(): string {
@@ -163,7 +165,8 @@ export class RuntimeComponent {
   }
 
   runtime(): ComponentDriver {
-    return requireComponentDriver(this.id, this.definition.vendor);
+    const vendorName = this.definition.vendor;
+    return new ComponentDriver(vendorName, this.vendors[vendorName]!);
   }
 }
 

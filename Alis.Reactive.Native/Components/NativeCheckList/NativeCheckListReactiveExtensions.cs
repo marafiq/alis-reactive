@@ -31,7 +31,7 @@ namespace Alis.Reactive.Native.Components
 
             // Container is the Reactive Plan-registered component; inline init syncs its value
             // before the bubbled change event reaches this trigger.
-            ComponentEventOnboarding.Wire(plan, builder.ElementId, "native", typedEvent, pipeline);
+            ComponentEventOnboarding.Wire(plan, builder.ElementId, ComponentVendor.Native, typedEvent, pipeline);
 
             return builder;
         }

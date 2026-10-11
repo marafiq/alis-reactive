@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { evaluateValue } from "../../../values/evaluate";
 import { ExecutionContext } from "../../../browser-objects/execution-context";
 import type { PayloadSource, PlanDocument, ValueExpression } from "../../../types/index";
+import { testVendors } from "../../support/vendors";
 
 const elementSource: PayloadSource = {
   kind: "payload",
@@ -11,6 +12,7 @@ const elementSource: PayloadSource = {
 function emptyArrayPlan(): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId: "Runtime.ArrayDsl.ElementScope",
     scope: { kind: "root" },
     types: {},

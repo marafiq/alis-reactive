@@ -22,7 +22,7 @@ simply the first ones.
 
 2. **A component is declared once, by its own API.** One class names the object's members with
    the JavaScript names: `Property<T>("min")`, `Method("increment")`, `Event<TArgs>("change")`,
-   and says which library it belongs to. Its event payloads are plain classes. Nothing else is
+   and says which vendor it comes from. Its event payloads are plain classes. Nothing else is
    written per component: no per-member extension methods, no events class, no reactive
    extension, no registration profile.
 
@@ -40,10 +40,11 @@ simply the first ones.
    is the binding path, errors render into `{id}_error`, app-level objects have fixed IDs, views
    carry no JavaScript.
 
-6. **The core names no library.** A library is data its package declares: where the object lives
-   on the element, how to subscribe and unsubscribe, and what an event hands the callback. An input
-   also declares how its value is read and written and which event means "changed". The plan
-   carries this; the runtime has one driver.
+6. **The core names no vendor.** A vendor is data its package declares (`ComponentVendor`): where
+   the object lives on the element, how to subscribe and unsubscribe, and what an event hands the
+   listener. The plan carries it; the runtime has one driver. An input's value is a declared
+   property path (it may be nested, such as `input.value`), and its `change` event drives live
+   validation.
 
 7. **Playwright proves it, one component at a time.** A component is brought when its journeys
    pass in a real browser.
@@ -129,7 +130,7 @@ Vocabulary, by what the JavaScript object has:
 
 Names are the component's own; dotted paths reach nested members (`"eventSettings.dataSource"`).
 The C# member name keys the declaration, so two C# members can type two signatures of one
-JavaScript method. A brought library and its components live in the app's own assembly; nothing
+JavaScript method. A brought vendor and its components live in the app's own assembly; nothing
 needs framework internals.
 
 ## Deliverables
@@ -146,11 +147,10 @@ Plan JSON keeps its shape; no runtime change. Proof: the NumericTextBox and Auto
 and every journey whose view uses them (Conditions, AdmissionAssessment, AdmissionWizard,
 VitalsAlert, EscalationRouting, PlaygroundSyntax, ComponentGather, BddExperiment).
 
-**D2. Libraries and inputs as data.** The plan carries each library (locate, subscribe,
-unsubscribe, payload) and each input's value accessor (property or getter/setter methods) and
-change event. One runtime driver replaces the per-vendor drivers and adapters; gather, validation
-and live clear read the input's declaration. `alis:mount`/`alis:unmount` are raised. Proof: the
-full suite.
+**D2. Vendors as data.** The plan carries each vendor (object path, subscribe, unsubscribe,
+payload); one runtime driver replaces the per-vendor drivers and event adapters and their
+registry. The runtime raises `alis:mount` before it wires HTML and `alis:unmount` before it removes
+it. Proof: the full suite.
 
 **D3. A brought component.** Tom Select, installed in the sandbox the way an app installs it,
 declared in the sandbox assembly, constructed on `alis:mount`. One journey across the breadth:
@@ -168,4 +168,5 @@ the core C# and the runtime name no vendor and no component. Proof: the full sui
 - Lean `CLAUDE.md`, old onboarding tooling removed, hooks fixed.
 - FusionNumericTextBox on a public declaration surface (`f0ec4f5`), full suite and net48 green.
 - Capability catalog from all 176 suites (`2c37ab5`).
-- D1 in progress.
+- D1: FusionNumericTextBox and FusionAutoComplete brought with the method (`92875d7`).
+- D2 in progress.

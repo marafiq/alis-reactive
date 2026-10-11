@@ -15,6 +15,7 @@ import type {
   StructuredPath,
   ValueExpression,
 } from "../../../types/index";
+import { testVendors } from "../../support/vendors";
 
 const stringShape: Shape = { kind: "string" };
 const booleanShape: Shape = { kind: "boolean" };
@@ -155,6 +156,7 @@ function nativeTextPlan(componentKeys: string[]): PlanDocument {
 
   return {
     version: 3,
+    vendors: testVendors,
     planId: "Runtime.HttpExecution",
     scope: { kind: "root" },
     types: { "native.text": textType },

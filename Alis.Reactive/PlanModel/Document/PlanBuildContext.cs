@@ -30,6 +30,7 @@ namespace Alis.Reactive.PlanModel
             new PlanDocument(
                 _identity,
                 _objectContracts.Snapshot(),
+                _browserObjects.VendorSnapshot(),
                 _browserObjects.Snapshot(),
                 _behaviors.Snapshot());
 
@@ -45,10 +46,10 @@ namespace Alis.Reactive.PlanModel
 
         internal ComponentKey DeclareElement(string elementId) => _browserObjects.DeclareElement(elementId);
 
-        internal ComponentKey DeclareObjectTarget(string componentId, string vendor) =>
+        internal ComponentKey DeclareObjectTarget(string componentId, ComponentVendor vendor) =>
             _browserObjects.DeclareObjectTarget(componentId, vendor);
 
-        internal ComponentKey DeclareLayoutObject(string componentId, string vendor) =>
+        internal ComponentKey DeclareLayoutObject(string componentId, ComponentVendor vendor) =>
             _browserObjects.DeclareLayoutObject(componentId, vendor);
 
         internal ComponentRegistration RequireRegistrationById(
@@ -76,7 +77,7 @@ namespace Alis.Reactive.PlanModel
 
         internal void RegisterInputComponents() => _browserObjects.RegisterInputComponents();
 
-        internal void WireComponentEvent(string componentId, string vendor, string eventName, ReactionGraph reaction)
+        internal void WireComponentEvent(string componentId, ComponentVendor vendor, string eventName, ReactionGraph reaction)
         {
             DeclareObjectTarget(componentId, vendor);
             var trigger = StartsWhen.ComponentEvent(componentId, eventName);

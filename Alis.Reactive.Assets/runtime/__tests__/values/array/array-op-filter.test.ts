@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { evaluateValue } from "../../../values/evaluate";
 import type { PayloadSource, PlanDocument, Shape, ValidationCondition, ValueExpression } from "../../../types/index";
+import { testVendors } from "../../support/vendors";
 
 const stringShape: Shape = { kind: "string" };
 const noneShape: Shape = { kind: "none" };
@@ -10,6 +11,7 @@ const elementSource: PayloadSource = { kind: "payload", scope: "element" };
 function emptyArrayPlan(): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId: "Runtime.ArrayDsl.Filter",
     scope: { kind: "root" },
     types: {},

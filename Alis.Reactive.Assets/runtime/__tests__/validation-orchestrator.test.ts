@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { AppliedPlans } from "../lifecycle/applied-plans";
 import { revalidateField, showServerErrors, validateContainer } from "../validation/orchestrator";
 import type { ComponentObject, ComponentValidation, BrowserObjectContract, PlanDocument, ReadExpression, Shape, ValueExpression } from "../types/index";
+import { testVendors } from "./support/vendors";
 
 const stringShape: Shape = { kind: "string" };
 const noneShape: Shape = { kind: "none" };
@@ -144,6 +145,7 @@ function validationRuntimePlan(
 ): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId: "Runtime.ValidationServerErrors",
     scope: { kind: "root" },
     types: { "native.input": nativeInputType() },
@@ -246,6 +248,7 @@ describe("validation orchestrator server errors", () => {
     appliedPlans.loadPartialSlot("address-slot", [
       {
         version: 3,
+        vendors: testVendors,
         planId: runtimePlan.planId,
         scope: { kind: "partial" },
         types: {},

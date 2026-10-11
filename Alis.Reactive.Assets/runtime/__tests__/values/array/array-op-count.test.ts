@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { evaluateValue } from "../../../values/evaluate";
 import type { PlanDocument, Shape, ValueExpression } from "../../../types/index";
+import { testVendors } from "../../support/vendors";
 
 const rawShape: Shape = { kind: "raw" };
 const numberShape: Shape = { kind: "number" };
@@ -8,6 +9,7 @@ const numberShape: Shape = { kind: "number" };
 function emptyArrayPlan(): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId: "Runtime.ArrayDsl.Count",
     scope: { kind: "root" },
     types: {},

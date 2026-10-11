@@ -100,14 +100,15 @@ These are the dependencies the release inverts.
 - An input's value must be one named property: `IInputComponent.ValueMember` feeds registration,
   gather, validation; unregistered fields fall back to the literal `"value"` member.
 - `RegisteredInputValueRead.ForFusionInPlaceEditorValueRead` (`RegisteredInputValueRead.cs:28`).
-- `ComponentVendor.Fusion` token (`PlanTerms.cs:243-251`); EJ2-specific projections in
-  `ClientRule.cs:21-26`.
+- ~~`ComponentVendor.Fusion` token~~: closed by D2 (`FusionComponent.FusionVendor` declares it);
+  EJ2-specific projections remain in `ClientRule.cs:21-26`.
 - `Include<TComponent>` reads `ValueMember`; `NativeGatherExtensions` assumes NativeTextBox.
 - Method contracts are keyed per component instance, so two arities of one member on one grid
   throw (`BrowserObjectContract.cs:257-268`); `Mapped` aliases dodge it.
 
 **Runtime**
-- Two hard-coded drivers (`component-driver.ts:74-90`) and two event adapters.
+- ~~Two hard-coded drivers and two event adapters~~: closed by D2; vendors are plan data and one
+  driver follows them.
 - `live-clear.ts:102` hard-codes `"change"`; `input`/`blur` go to the element; a not-ready
   Fusion object silently skips change wiring (`live-clear.ts:107-117`).
 - `inject.ts:31-35` calls `ej.base.append(nodes, container, true)`; the inline scripts in the

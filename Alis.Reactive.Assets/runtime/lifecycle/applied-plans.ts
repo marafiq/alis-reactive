@@ -161,6 +161,7 @@ function resetPlanDocument(planDocument: PlanDocument, planId: PlanId): void {
   planDocument.planId = planId;
   planDocument.scope = { kind: "root" };
   planDocument.types = {};
+  planDocument.vendors = {};
   planDocument.components = {};
   planDocument.behaviors = [];
 }

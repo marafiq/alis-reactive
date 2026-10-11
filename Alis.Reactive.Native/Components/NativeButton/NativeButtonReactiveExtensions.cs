@@ -27,7 +27,7 @@ namespace Alis.Reactive.Native.Components
         {
             var typedEvent = eventSelector(NativeButtonEvents.Instance);
 
-            ComponentEventOnboarding.Wire(plan, builder.ElementId, "native", typedEvent, pipeline);
+            ComponentEventOnboarding.Wire(plan, builder.ElementId, ComponentVendor.Native, typedEvent, pipeline);
 
             return builder;
         }

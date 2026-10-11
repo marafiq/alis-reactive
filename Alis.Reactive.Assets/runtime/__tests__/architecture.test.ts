@@ -70,13 +70,12 @@ describe("architecture: plan-driven IDs — no DOM scanning", () => {
 });
 
 describe("architecture: vendor isolation", () => {
-  // CLAUDE.md (Domain model, Vendors): Syncfusion knowledge lives in the per-vendor driver, the vendor
-  // event adapter, and vendor component modules. Every other module stays vendor-blind.
+  // CLAUDE.md (Domain model, Vendors): a vendor is data in the plan (where its object lives, how it
+  // subscribes, what a listener receives), so the runtime driver is vendor-blind. Syncfusion knowledge
+  // remains only in app-level Syncfusion object modules and the exceptions listed below.
   const vendorBoundaries = [
     /^components\/fusion\//, // vendor component modules (app-level Syncfusion objects)
-    /^events\/event-fusion\.ts$/, // vendor event adapter
-    /^browser-objects\/component-driver\.ts$/, // registers per-vendor drivers (ej2_instances root)
-    // Documented exceptions, tracked in .claude/rules/process-layers.md known gaps.
+    // Known exceptions, listed in docs/design/capability-catalog.md (section 3).
     // Fixing one means deleting its line here — the test then enforces the stricter rule.
     /^execution\/partials\/inject\.ts$/, // ej.base.append initializes injected Syncfusion HTML
     /^execution\/requests\/request-payload-writer\.ts$/, // unwraps Syncfusion rawFile uploads
@@ -87,6 +86,6 @@ describe("architecture: vendor isolation", () => {
       /Syncfusion|rawFile|ej2_instances|\bej\b/,
       file => vendorBoundaries.some(pattern => pattern.test(file)),
     );
-    expect(violations, "Syncfusion knowledge outside the vendor boundary — route it through the vendor driver or event adapter").toEqual([]);
+    expect(violations, "Syncfusion knowledge outside the vendor boundary — carry it in the vendor declaration in the plan").toEqual([]);
   });
 });

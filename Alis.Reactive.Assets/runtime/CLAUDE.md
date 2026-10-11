@@ -16,8 +16,13 @@ component/plugin lookup, malformed non-framework JSON. Fail loud at the source.
 - `getElementById` only — the plan carries every ID. Wide queries are justified
   solely for plan discovery and self-stamped cleanup; the architecture test's
   allowlist is the only registry of exceptions.
-- Vendor knowledge lives in exactly three roles: per-vendor driver, per-vendor
-  event adapter, vendor component modules. Everything else stays vendor-blind.
+- A vendor is plan data (`vendors`: object path, subscribe, unsubscribe, payload);
+  `browser-objects/component-driver.ts` follows it for every component. Vendor
+  names appear only in app-level object modules and the architecture test's
+  listed exceptions.
+- `alis:mount` / `alis:unmount` (document events, `detail.root`) are the public
+  contract with app bundles: the app constructs widgets on mount and destroys
+  them on unmount; the runtime fires both synchronously around wiring.
 - Sync reactions stay sync. Async is reserved for HTTP, remote triggers, user
   decisions, and partial injection.
 - One value path: `ValueExpression` reads every source. A second resolver is a

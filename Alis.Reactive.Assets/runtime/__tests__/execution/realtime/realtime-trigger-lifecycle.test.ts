@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { boot, loadPartialSlot, resetBootStateForTests, unloadPartialSlot } from "../../../lifecycle/boot";
 import type { ComponentObject, BrowserObjectContract, PlanDocument, ReactionGraph, Shape } from "../../../types/index";
+import { testVendors } from "../../support/vendors";
 
 const signalR = vi.hoisted(() => {
   class FakeHubConnection {
@@ -129,6 +130,7 @@ function displayComponent(id: string): ComponentObject {
 function rootPlan(planId: string): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId,
     scope: { kind: "root" },
     types: { "native.text": nativeTextType() },
@@ -143,6 +145,7 @@ function rootPlan(planId: string): PlanDocument {
 function partialPlan(planId: string, behaviors: PlanDocument["behaviors"]): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId,
     scope: { kind: "partial" },
     types: {},

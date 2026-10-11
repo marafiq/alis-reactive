@@ -240,7 +240,7 @@ namespace Alis.Reactive.Builders.Requests
         /// Includes a specific component's value in the gather.
         /// Used by vendor extension methods (Fusion, Native).
         /// </summary>
-        internal GatherBuilder<TModel> Include(string componentId, string vendor, string propertyName, string valueMember)
+        internal GatherBuilder<TModel> Include(string componentId, ComponentVendor vendor, string propertyName, string valueMember)
         {
             var valueRead = RegisteredInputValueRead.ForGatherValueRead(componentId, valueMember);
             var registration = _context.RequireRegistrationById(componentId, valueRead);
@@ -251,7 +251,7 @@ namespace Alis.Reactive.Builders.Requests
 
         internal GatherBuilder<TModel> Include(
             string componentId,
-            string vendor,
+            ComponentVendor vendor,
             BindingPath bodyField,
             string valueMember,
             Shape shape)
@@ -266,7 +266,7 @@ namespace Alis.Reactive.Builders.Requests
 
         private GatherBuilder<TModel> Include(
             string componentId,
-            string vendor,
+            ComponentVendor vendor,
             BindingPath bodyField,
             InputValueContract valueContract)
         {

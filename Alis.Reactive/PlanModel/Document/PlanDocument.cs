@@ -10,6 +10,7 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly PlanIdentity _identity;
         private readonly IReadOnlyDictionary<string, BrowserObjectContract> _types;
+        private readonly IReadOnlyDictionary<string, VendorContract> _vendors;
         private readonly IReadOnlyDictionary<string, BrowserObject> _components;
         private readonly IReadOnlyList<Behavior> _behaviors;
 
@@ -17,17 +18,20 @@ namespace Alis.Reactive.PlanModel
         public string PlanId => _identity.PlanIdForJson;
         public PlanScope Scope => _identity.ScopeForJson;
         public IReadOnlyDictionary<string, BrowserObjectContract> Types => _types;
+        public IReadOnlyDictionary<string, VendorContract> Vendors => _vendors;
         public IReadOnlyDictionary<string, BrowserObject> Components => _components;
         public IReadOnlyList<Behavior> Behaviors => _behaviors;
 
         internal PlanDocument(
             PlanIdentity identity,
             IReadOnlyDictionary<string, BrowserObjectContract> types,
+            IReadOnlyDictionary<string, VendorContract> vendors,
             IReadOnlyDictionary<string, BrowserObject> components,
             IReadOnlyList<Behavior> behaviors)
         {
             _identity = identity;
             _types = types;
+            _vendors = vendors;
             _components = components;
             _behaviors = behaviors;
         }

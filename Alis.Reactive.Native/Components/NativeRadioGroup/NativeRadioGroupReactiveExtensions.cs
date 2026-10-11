@@ -36,7 +36,7 @@ namespace Alis.Reactive.Native.Components
             for (int i = 0; i < builder.Options.Count; i++)
             {
                 var radioId = $"{builder.ElementId}_r{i}";
-                ComponentEventOnboarding.Wire(plan, radioId, "native", typedEvent, pipeline);
+                ComponentEventOnboarding.Wire(plan, radioId, ComponentVendor.Native, typedEvent, pipeline);
             }
 
             return builder;

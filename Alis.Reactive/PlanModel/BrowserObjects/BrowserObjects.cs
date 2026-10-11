@@ -21,6 +21,31 @@ namespace Alis.Reactive.PlanModel
         internal IReadOnlyDictionary<string, BrowserObject> Snapshot() =>
             new Dictionary<string, BrowserObject>(_objects);
 
+        // Every vendor a component in this plan comes from, so the runtime can find and listen to
+        // its objects. Two different vendors may not share a name: the name is the runtime's key.
+        internal IReadOnlyDictionary<string, VendorContract> VendorSnapshot()
+        {
+            var vendors = new Dictionary<string, ComponentVendor>(StringComparer.Ordinal);
+            foreach (var browserObject in _objects.Values)
+            {
+                var vendor = browserObject.ComponentVendor;
+                if (vendors.TryGetValue(vendor.Name, out var declared))
+                {
+                    if (!declared.Equals(vendor))
+                        throw new InvalidOperationException(
+                            $"Two different vendors are named '{vendor.Name}'. Give each vendor its own name.");
+                    continue;
+                }
+
+                vendors.Add(vendor.Name, vendor);
+            }
+
+            var contracts = new Dictionary<string, VendorContract>(StringComparer.Ordinal);
+            foreach (var vendor in vendors.Values)
+                contracts.Add(vendor.Name, vendor.Contract);
+            return contracts;
+        }
+
         internal BrowserObject Get(ComponentKey componentKey) =>
             _objects[componentKey.Value];
 
@@ -39,19 +64,18 @@ namespace Alis.Reactive.PlanModel
             return ComponentKey.Of(id.Value);
         }
 
-        internal ComponentKey DeclareObjectTarget(string componentId, string vendor) =>
+        internal ComponentKey DeclareObjectTarget(string componentId, ComponentVendor vendor) =>
             DeclareComponentObject(componentId, vendor, BrowserObject.Element);
 
-        internal ComponentKey DeclareLayoutObject(string componentId, string vendor) =>
+        internal ComponentKey DeclareLayoutObject(string componentId, ComponentVendor vendor) =>
             DeclareComponentObject(componentId, vendor, BrowserObject.LayoutObject);
 
         private ComponentKey DeclareComponentObject(
             string componentId,
-            string vendor,
+            ComponentVendor componentVendor,
             Func<ComponentId, ComponentVendor, BrowserObjectId, BrowserObject> createUnregisteredComponent)
         {
             var id = ComponentId.Of(componentId);
-            var componentVendor = ComponentVendor.From(vendor);
 
             if (_objects.TryGetValue(id.Value, out var existing))
             {

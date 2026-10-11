@@ -13,6 +13,7 @@ import type {
   StructuredPath,
   ValueExpression,
 } from "../../../types/index";
+import { testVendors } from "../../support/vendors";
 
 const stringShape: Shape = { kind: "string" };
 const dateShape: Shape = { kind: "date" };
@@ -22,6 +23,7 @@ const isoDate = "2026-01-02T03:04:05.000Z";
 
 const emptyPlan: PlanDocument = {
   version: 3,
+  vendors: testVendors,
   planId: "Runtime.Gather",
   scope: { kind: "root" },
   types: {},

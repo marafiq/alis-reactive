@@ -11,7 +11,18 @@ namespace Alis.Reactive.Fusion
     /// </remarks>
     public abstract class FusionComponent : Component
     {
+        /// <summary>
+        /// Syncfusion EJ2: the component object is <c>ej2_instances[0]</c> on the rendered element,
+        /// events are added with <c>addEventListener</c>, and a listener receives the event arguments.
+        /// </summary>
+        public static ComponentVendor FusionVendor { get; } = ComponentVendor.Define(
+            "fusion",
+            objectPath: "ej2_instances.0",
+            subscribe: "addEventListener",
+            unsubscribe: "removeEventListener",
+            payload: VendorEventPayload.Argument);
+
         /// <inheritdoc />
-        public sealed override string Vendor => "fusion";
+        public sealed override ComponentVendor Vendor => FusionVendor;
     }
 }

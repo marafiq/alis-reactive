@@ -8,6 +8,7 @@ import type {
   Shape,
   ValueExpression,
 } from "../types/index";
+import { testVendors } from "./support/vendors";
 
 const stringShape: Shape = { kind: "string" };
 const noneShape: Shape = { kind: "none" };
@@ -50,7 +51,7 @@ describe("live validation wiring", () => {
     fusionHost("care-date").ej2_instances = [{}];
 
     expect(() => wireLiveValidation(planWithValidationField(fusionField("care-date")), "resident-form"))
-      .toThrow(TypeError);
+      .toThrow('runtime path member "addEventListener" is missing on vendor "fusion"');
   });
 
   it("partial abort forgets only the live validation wiring owned by that signal", () => {
@@ -100,6 +101,7 @@ function eventListenerCount(
 function planWithValidationField(component: ComponentObject): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId: "Runtime.LiveValidation",
     scope: { kind: "root" },
     types: { "fusion.fake": fusionType(), "native.form": nativeType() },

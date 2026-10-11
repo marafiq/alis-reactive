@@ -223,35 +223,6 @@ namespace Alis.Reactive.PlanModel
         internal static RouteParameterName Of(string value) => new RouteParameterName(value);
     }
 
-    internal sealed class ComponentVendor : PlanString
-    {
-        private static readonly System.Text.RegularExpressions.Regex TokenPattern =
-            new System.Text.RegularExpressions.Regex(
-                @"^[a-zA-Z][a-zA-Z0-9_-]*$",
-                System.Text.RegularExpressions.RegexOptions.Compiled);
-
-        private ComponentVendor(string value) : base(value, nameof(value))
-        {
-            var tokenHasInvalidCharacters = !TokenPattern.IsMatch(value);
-            if (tokenHasInvalidCharacters)
-                throw new ArgumentException(
-                    "Component vendor token '" + value + "' contains invalid characters. " +
-                    "Vendor tokens must start with a letter and contain only ASCII letters, digits, underscore, or hyphen.",
-                    nameof(value));
-        }
-
-        internal static ComponentVendor Native { get; } = new ComponentVendor("native");
-        internal static ComponentVendor Fusion { get; } = new ComponentVendor("fusion");
-
-        internal static ComponentVendor From(string value)
-        {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-            if (Native.Value == value) return Native;
-            if (Fusion.Value == value) return Fusion;
-            return new ComponentVendor(value);
-        }
-    }
-
     internal sealed class MemberAccess : PlanString
     {
         private static readonly Dictionary<string, MemberAccess> Known =

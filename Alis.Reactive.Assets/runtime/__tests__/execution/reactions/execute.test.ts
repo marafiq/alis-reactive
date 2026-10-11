@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import { registerPlugin } from "../../../plugins/catalog";
-import { registerComponentDriver, type ComponentDriver } from "../../../browser-objects/component-driver";
 import { executeReaction } from "../../../execution/reactions/execute";
 import type {
-  ComponentObject, ConditionGraph, ExecContext, BrowserObjectContract, JsonValue, MemberAccess, PlanDocument, ReactionGraph, RequestPlan, Shape, ValueExpression,
+  ComponentObject, ConditionGraph, ExecContext, BrowserObjectContract, JsonValue, MemberAccess, PlanDocument, ReactionGraph, RequestPlan, Shape, ValueExpression, VendorContract,
 } from "../../../types/index";
+import { testVendors } from "../../support/vendors";
 
 const stringShape: Shape = { kind: "string" };
 const noneShape: Shape = { kind: "none" };
@@ -26,17 +26,19 @@ type WindowWithConfirm = typeof window & {
   alis?: { confirm?: (message: string) => boolean | Promise<boolean> };
 };
 
-const customWidgetRuntime: ComponentDriver = {
-  resolveRoot: element => {
-    const root = (element as CustomWidgetHost).reactiveWidget;
-    if (root !== undefined) return root;
-
-    throw new Error(`[test] custom widget root missing for ${element.id}`);
-  },
-  wireEvent: () => undefined,
+// A vendor the framework has never seen, declared as data: its object lives on the element as
+// reactiveWidget. Nothing is registered with the runtime.
+const customWidgetVendorContract: VendorContract = {
+  objectPath: [{ kind: "property", name: "reactiveWidget" }],
+  subscribe: "addEventListener",
+  unsubscribe: "removeEventListener",
+  payload: "argument",
 };
 
-registerComponentDriver(customWidgetVendor, customWidgetRuntime);
+const executeVendors: Record<string, VendorContract> = {
+  ...testVendors,
+  [customWidgetVendor]: customWidgetVendorContract,
+};
 
 function literal(value: string): ValueExpression {
   return { kind: "literal", value, shape: stringShape };
@@ -152,6 +154,7 @@ function textBoxPlanWithValueAccess(access: MemberAccess): PlanDocument {
 
   return {
     version: 3,
+    vendors: executeVendors,
     planId: "Runtime.ReactionExecution",
     scope: { kind: "root" },
     types: { "native.textbox": type },
@@ -181,6 +184,7 @@ function customWidgetPlan(): PlanDocument {
 
   return {
     version: 3,
+    vendors: executeVendors,
     planId: "Runtime.CustomVendorExecution",
     scope: { kind: "root" },
     types: { "acme.widget": type },
@@ -230,6 +234,7 @@ function admissionWidgetPlan(): PlanDocument {
 
   return {
     version: 3,
+    vendors: executeVendors,
     planId: "Runtime.DateDelivery",
     scope: { kind: "root" },
     types: { "acme.admission": type },
@@ -315,19 +320,6 @@ describe("executeReaction member targets", () => {
     expect(host.reactiveWidget.value).toBe("Katherine");
   });
 
-  it("fails with component context when a vendor runtime is not registered", () => {
-    document.body.innerHTML = `<div id="resident-widget"></div>`;
-    const plan = customWidgetPlan();
-    plan.components["resident-widget"]!.vendor = "missing-widget-vendor";
-
-    expect(() => executeReaction({
-      kind: "set",
-      on: { kind: "component", component: "resident-widget" },
-      property: "value",
-      value: literal("Grace"),
-    }, plan)).toThrow('component runtime not registered for component "resident-widget"');
-  });
-
   it("prepares property writes through the declared target shape", () => {
     document.body.innerHTML = `<input id="active-status" type="checkbox" />`;
     const type: BrowserObjectContract = {
@@ -343,6 +335,7 @@ describe("executeReaction member targets", () => {
     };
     const plan: PlanDocument = {
       version: 3,
+      vendors: executeVendors,
       planId: "Runtime.PropertyWriteShape",
       scope: { kind: "root" },
       types: { "native.checkbox": type },
@@ -385,6 +378,7 @@ describe("executeReaction member targets", () => {
     };
     const plan: PlanDocument = {
       version: 3,
+      vendors: executeVendors,
       planId: "Runtime.TextPropertyShape",
       scope: { kind: "root" },
       types: { "native.element.allergy-echo": type },
@@ -453,6 +447,7 @@ describe("executeReaction member targets", () => {
     };
     const plan: PlanDocument = {
       version: 3,
+      vendors: executeVendors,
       planId: "Runtime.PluginMissingArgument",
       scope: { kind: "root" },
       types: { [typeKey]: type },
@@ -493,6 +488,7 @@ describe("executeReaction member targets", () => {
     };
     const plan: PlanDocument = {
       version: 3,
+      vendors: executeVendors,
       planId: "Runtime.PluginDateArgument",
       scope: { kind: "root" },
       types: { [typeKey]: type },
@@ -533,6 +529,7 @@ describe("executeReaction member targets", () => {
     };
     const plan: PlanDocument = {
       version: 3,
+      vendors: executeVendors,
       planId: "Runtime.PluginCommandExecution",
       scope: { kind: "root" },
       types: { [typeKey]: type },

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { boot, loadPartialSlot, resetBootStateForTests, unloadPartialSlot } from "../../../lifecycle/boot";
 import type { ComponentObject, BrowserObjectContract, PlanDocument, ReactionGraph, Shape, ValueExpression } from "../../../types/index";
+import { testVendors } from "../../support/vendors";
 
 const stringShape: Shape = { kind: "string" };
 const booleanShape: Shape = { kind: "boolean" };
@@ -63,6 +64,7 @@ describe("fusion component event lifecycle", () => {
 
     boot({
       version: 3,
+      vendors: testVendors,
       planId: "Resident.SyncCallbackMutation",
       scope: { kind: "root" },
       types: {
@@ -127,6 +129,7 @@ class FakeFusionRoot {
 function rootPlan(planId: string, components: Record<string, ComponentObject>): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId,
     scope: { kind: "root" },
     types: { "native.input": nativeTextType() },
@@ -141,6 +144,7 @@ function partialPlan(
 ): PlanDocument {
   return {
     version: 3,
+    vendors: testVendors,
     planId,
     scope: { kind: "partial" },
     types: planParts.types ?? {},
