@@ -39,10 +39,11 @@ namespace Alis.Reactive.Grammar.Lowering
             var response = _context.Fresh("res");
             var routeScope = scope.WithResponse(response);
 
-            var exchange = new List<Statement>
+            // A gathered value that returns a promise settles just before the request is sent.
+            var exchange = _values.WithAwaitedReads(() => new[]
             {
                 G.Let(response, G.CallTyped(G.Obj(_context.Objects.Http()), "send", Shape.None, SendArgument(request, scope)), awaits: true),
-            };
+            }).ToList();
             exchange.AddRange(Routing(request, response, routeScope));
 
             var sentence = new List<Statement>();

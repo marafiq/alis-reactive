@@ -111,10 +111,14 @@ namespace Alis.Reactive.PlanModel
         internal MethodArgumentContract Arguments => _arguments;
         internal Shape Returns { get; }
 
-        private MethodSignature(MethodArgumentContract arguments, Shape returns)
+        /// <summary>The method returns a promise the plan waits for.</summary>
+        internal bool Awaits { get; }
+
+        private MethodSignature(MethodArgumentContract arguments, Shape returns, bool awaits = false)
         {
             _arguments = arguments ?? throw new System.ArgumentNullException(nameof(arguments));
             Returns = returns ?? throw new System.ArgumentNullException(nameof(returns));
+            Awaits = awaits;
         }
 
         internal static MethodSignature Open(Shape returns) =>
@@ -123,8 +127,8 @@ namespace Alis.Reactive.PlanModel
         internal static MethodSignature Exact(IReadOnlyList<Shape> args, Shape returns) =>
             new MethodSignature(MethodArgumentContract.Exact(args), returns);
 
-        internal static MethodSignature WithArguments(MethodArgumentContract arguments, Shape returns) =>
-            new MethodSignature(arguments, returns);
+        internal static MethodSignature WithArguments(MethodArgumentContract arguments, Shape returns, bool awaits = false) =>
+            new MethodSignature(arguments, returns, awaits);
 
         internal MethodSignature Merge(MemberName name, MethodSignature incoming)
         {
@@ -135,15 +139,20 @@ namespace Alis.Reactive.PlanModel
                     $"Method '{name.Value}' registered with return shape '{Returns.DescribeContract()}' " +
                     $"but re-registered with conflicting return shape '{incoming.Returns.DescribeContract()}'.");
 
+            if (Awaits != incoming.Awaits)
+                throw new System.InvalidOperationException(
+                    $"Method '{name.Value}' is declared both awaited and not; declare it once.");
+
             return new MethodSignature(
                 _arguments.Merge(name, incoming._arguments),
-                mergedReturn);
+                mergedReturn,
+                Awaits);
         }
 
         internal bool IsSameContract(MethodSignature other)
         {
             if (other == null) throw new System.ArgumentNullException(nameof(other));
-            if (Returns != other.Returns) return false;
+            if (Returns != other.Returns || Awaits != other.Awaits) return false;
             return _arguments.IsSameContract(other._arguments);
         }
     }

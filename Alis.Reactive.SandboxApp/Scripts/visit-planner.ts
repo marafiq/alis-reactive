@@ -3,8 +3,8 @@
 // as `visitPlanner`; BroughtComponents/VisitPlanner/VisitPlanner.cs declares it to the framework.
 //
 //   properties  value (booked slot ids), capacity, wing, readOnly, slots, labels.empty, count (read only)
-//   functions   remaining(), isBooked(id), firstOpen()
-//   methods     select(id), release(id), clear(), book(id, visitors, note), focus()
+//   functions   remaining(), isBooked(id), firstOpen(), summary() (a promise)
+//   methods     select(id), release(id), clear(), book(id, visitors, note), focus(), prepareSummary() (a promise)
 //   events      change, full, beforeBook (cancelable), slotsLoaded, through on(name, fn) / off(name, fn)
 
 import "./visit-planner.css";
@@ -37,6 +37,7 @@ export class VisitPlanner {
   private wingName = "";
   private locked = false;
   private emptyText = "No visit times yet.";
+  private prepared = "";
 
   /** Texts the planner shows; `labels.empty` is what it says before any slot is offered. */
   readonly labels: { empty: string };
@@ -169,6 +170,20 @@ export class VisitPlanner {
     this.render();
   }
 
+  /** Prepares the summary the family receives from the booked times; settles when it is ready. */
+  prepareSummary(): Promise<void> {
+    return later(300).then(() => {
+      const times = this.offered.filter(slot => this.booked.includes(slot.id)).map(slot => slot.label);
+      this.prepared = times.length === 0 ? "" : `${this.wingName}: ${times.join(", ")}`;
+    });
+  }
+
+  /** The prepared summary as it stood when asked for; "" until one is prepared. */
+  summary(): Promise<string> {
+    const text = this.prepared;
+    return later(100).then(() => text);
+  }
+
   focus(): void {
     this.host.querySelector<HTMLButtonElement>("button.vp-slot:not([disabled])")?.focus();
   }
@@ -243,6 +258,10 @@ export class VisitPlanner {
     }
     return list;
   }
+}
+
+function later(milliseconds: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
 
 function element(tag: string, className: string, text?: string): HTMLElement {

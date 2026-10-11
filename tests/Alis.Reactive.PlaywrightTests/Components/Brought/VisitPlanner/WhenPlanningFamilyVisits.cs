@@ -43,6 +43,9 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
     private ILocator BrunchStatus => Page.Locator("#brunch-status");
     private ILocator RequestedStatus => Page.Locator("#requested-status");
     private ILocator CheckRequested => Page.Locator("#check-requested");
+    private ILocator ShareWeek => Page.Locator("#share-week");
+    private ILocator ShareStatus => Page.Locator("#share-status");
+    private ILocator FamilySummary => Page.Locator("#family-summary");
     private ILocator Confirmation => Page.Locator("#visit-confirmation");
     private ILocator CompanionPlanned => Page.Locator("#companion-planned");
     private ILocator CompanionHeld => Page.Locator("#companion-held");
@@ -199,6 +202,34 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
         await _plan.NativeDropDown(m => m.RequestedTime).Select("Mon 10:00 AM");
         await CheckRequested.ClickAsync();
         await Expect(RequestedStatus).ToHaveTextAsync("That time is not booked yet.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task sharing_the_week_waits_for_the_planner_to_prepare_its_summary()
+    {
+        await OpenPlanner();
+        await ChooseMargaret();
+        await Planner.Time("Mon 10:00 AM").ClickAsync();
+        await Planner.Time("Sun 11:00 AM").ClickAsync();
+
+        await ShareWeek.ClickAsync();
+
+        await Expect(ShareStatus).ToHaveTextAsync("Summary ready to send.", new() { Timeout = 5000 });
+        await Expect(FamilySummary).ToHaveTextAsync("Garden wing: Mon 10:00 AM, Sun 11:00 AM");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task sharing_an_empty_week_asks_for_a_visit_first()
+    {
+        await OpenPlanner();
+        await ChooseMargaret();
+
+        await ShareWeek.ClickAsync();
+
+        await Expect(ShareStatus).ToHaveTextAsync("Plan a visit before sharing the week.", new() { Timeout = 5000 });
+        await Expect(FamilySummary).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 

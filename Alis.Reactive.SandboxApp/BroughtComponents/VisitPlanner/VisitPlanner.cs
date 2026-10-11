@@ -74,6 +74,12 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// <summary>Records who is coming to a booked time: its id, how many visitors, and a note.</summary>
         public ComponentMethod<string?, decimal, string?> Book => Method<string?, decimal, string?>("book");
 
+        /// <summary>Prepares the summary the family receives. Returns a promise the plan waits for.</summary>
+        public ComponentMethod PrepareSummary => Method("prepareSummary").Awaited();
+
+        /// <summary>The prepared summary, empty until one is prepared. Returns a promise the plan waits for.</summary>
+        public ComponentFunction<string> Summary => Function<string>("summary").Awaited();
+
         /// <summary>Moves focus to the first time that can be booked.</summary>
         public ComponentMethod Focus => Method("focus");
 

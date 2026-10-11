@@ -18,9 +18,60 @@ namespace Alis.Reactive.Grammar.Lowering
 
         private readonly LoweringContext _context;
 
+        // The awaited reads of the statement being lowered; null where nothing can wait for one.
+        private List<Statement>? _awaitedReads;
+
         internal ValueLowering(LoweringContext context)
         {
             _context = context;
+        }
+
+        // ── awaited reads ────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Lowers one statement. A read of a member that returns a promise becomes
+        /// <c>let r = await call(…)</c> before the statement, which reads <c>ref r</c> (grammar.md 5).
+        /// </summary>
+        internal IReadOnlyList<Statement> WithAwaitedReads(Func<IReadOnlyList<Statement>> lower)
+        {
+            var outer = _awaitedReads;
+            var awaited = new List<Statement>();
+            _awaitedReads = awaited;
+            try
+            {
+                var statements = lower();
+                return awaited.Count == 0 ? statements : awaited.Concat(statements).ToList();
+            }
+            finally
+            {
+                _awaitedReads = outer;
+            }
+        }
+
+        private T WithoutAwaiting<T>(Func<T> lower)
+        {
+            var outer = _awaitedReads;
+            _awaitedReads = null;
+            try
+            {
+                return lower();
+            }
+            finally
+            {
+                _awaitedReads = outer;
+            }
+        }
+
+        private Expr Awaited(Expr call, string member)
+        {
+            if (_awaitedReads == null)
+                throw new InvalidOperationException(
+                    $"Plan '{_context.PlanId}' reads '{member}', which returns a promise, inside an array operation or a " +
+                    "validation rule, where nothing waits for it. Read it in a reaction step instead.");
+
+            var settled = _context.Fresh("r");
+            _awaitedReads.Add(G.Let(settled, call, awaits: true));
+            return G.Ref(settled);
         }
 
         internal Expr Value(ValueExpression value, LoweringScope scope)
@@ -94,7 +145,8 @@ namespace Alis.Reactive.Grammar.Lowering
             {
                 var declared = _context.Method(contract, read.Member, owner);
                 var path = read.Member == RootCallMember ? G.NoPath : G.PathOf(declared.Path);
-                return G.Call(target, path, Arguments(method.Args, scope), ArgumentShapes(declared), Requested(read.Shape, declared.Returns));
+                var call = G.Call(target, path, Arguments(method.Args, scope), ArgumentShapes(declared), Requested(read.Shape, declared.Returns));
+                return declared.Signature.Awaits ? Awaited(call, read.Member) : call;
             }
 
             var property = _context.Property(contract, read.Member, owner);
@@ -144,9 +196,15 @@ namespace Alis.Reactive.Grammar.Lowering
 
         // ── arrays ───────────────────────────────────────────────────────────────
 
+        // The source may be awaited; a lambda body runs once per item, where nothing waits.
         private Expr ArrayOperation(ArrayOperationExpression operation, LoweringScope scope)
         {
             var items = G.Op(Operator.ToArray, Value(operation.Source, scope));
+            return WithoutAwaiting(() => ArrayOperation(operation, items, scope));
+        }
+
+        private Expr ArrayOperation(ArrayOperationExpression operation, Expr items, LoweringScope scope)
+        {
             switch (operation.Op)
             {
                 case "count":
@@ -247,7 +305,11 @@ namespace Alis.Reactive.Grammar.Lowering
             }
         }
 
-        internal static bool IsSynchronous(ConditionGraph condition)
+        /// <summary>
+        /// A condition that is one boolean expression: no user decision and no read that returns a
+        /// promise, so it never waits and an `if` can evaluate it in place.
+        /// </summary>
+        internal bool IsSynchronous(ConditionGraph condition)
         {
             switch (condition)
             {
@@ -259,10 +321,37 @@ namespace Alis.Reactive.Grammar.Lowering
                     return any.Terms.All(IsSynchronous);
                 case NotCondition not:
                     return IsSynchronous(not.Term);
+                case CompareCondition compare:
+                    return !ReadsAwaited(compare.Left)
+                        && !(compare.RightOperand is PresentComparisonRightOperand right && ReadsAwaited(right.Value));
                 default:
                     return true;
             }
         }
+
+        private bool ReadsAwaited(ValueExpression value)
+        {
+            switch (value)
+            {
+                case ReadExpression read:
+                    var arguments = read.Access is MethodValueReadAccess method ? method.Args : Array.Empty<ValueExpression>();
+                    return IsAwaitedRead(read) || arguments.Any(ReadsAwaited);
+                case ObjectExpression record:
+                    return record.Fields.Values.Any(ReadsAwaited);
+                case ArrayExpression array:
+                    return array.Items.Any(ReadsAwaited);
+                case ArrayOperationExpression operation:
+                    return ReadsAwaited(operation.Source);
+                default:
+                    return false;
+            }
+        }
+
+        private bool IsAwaitedRead(ReadExpression read) =>
+            read.From is ComponentSource component
+            && read.Access is MethodValueReadAccess
+            && _context.IsDeclared(component.Component)
+            && _context.Method(_context.ContractOf(component.Component), read.Member, component.Component).Signature.Awaits;
 
         // The left value is read, then converted to the condition's shape; a literal on the right is
         // written in that shape. A missing value stays missing on both sides (grammar.md 2.2).

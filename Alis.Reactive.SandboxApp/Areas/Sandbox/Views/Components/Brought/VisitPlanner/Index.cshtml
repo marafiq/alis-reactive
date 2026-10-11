@@ -154,6 +154,21 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                         p.Component<VisitPlanner>(m => m.VisitSlots).Call(c => c.Clear)))
+                @(Html.NativeButton("share-week", "Share the week with the family")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
+                        p.Element("share-status").SetText("Preparing the summary...");
+                        planner.Call(c => c.PrepareSummary);
+                        p.When(planner.Get(c => c.Summary)).NotEmpty()
+                            .Then(ready =>
+                            {
+                                ready.Element("family-summary").SetText(planner.Get(c => c.Summary));
+                                ready.Element("share-status").SetText("Summary ready to send.");
+                            })
+                            .Else(empty => empty.Element("share-status").SetText("Plan a visit before sharing the week."));
+                    }))
                 @(Html.NativeButton("save-visits", "Save visits")
                     .CssClass(ButtonSubmit)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -168,6 +183,7 @@
             </native-hstack>
 
             <native-text color="Secondary"><span id="brunch-status"></span></native-text>
+            <native-text><span id="share-status"></span> <span id="family-summary"></span></native-text>
             <native-text><span id="visit-confirmation"></span></native-text>
         </native-vstack>
     </native-card-body></native-card>

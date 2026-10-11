@@ -43,19 +43,19 @@ namespace Alis.Reactive.Grammar.Lowering
                     foreach (var step in sequence.Steps) Append(step, scope, block);
                     return;
                 case SetReaction set:
-                    block.Add(Set(set, scope));
+                    block.AddRange(_values.WithAwaitedReads(() => new[] { Set(set, scope) }));
                     return;
                 case CallReaction call:
-                    block.Add(G.Do(Call(call, scope)));
+                    block.AddRange(_values.WithAwaitedReads(() => new[] { Call(call, scope) }));
                     return;
                 case DispatchReaction dispatch:
-                    block.Add(G.Do(Dispatch(dispatch, scope)));
+                    block.AddRange(_values.WithAwaitedReads(() => new[] { G.Do(Dispatch(dispatch, scope)) }));
                     return;
                 case InjectReaction inject:
-                    block.Add(G.Do(G.Call(
-                        G.Obj(_context.Objects.Slot(inject.Slot)),
-                        "load",
-                        _values.Value(inject.Value, scope))));
+                    block.AddRange(_values.WithAwaitedReads(() => new[]
+                    {
+                        G.Do(G.Call(G.Obj(_context.Objects.Slot(inject.Slot)), "load", _values.Value(inject.Value, scope))),
+                    }));
                     return;
                 case ShowValidationErrorsReaction show:
                     block.Add(G.Do(ShowValidationErrors(show, scope)));
@@ -94,21 +94,23 @@ namespace Alis.Reactive.Grammar.Lowering
             }
         }
 
-        private Expr Call(CallReaction call, LoweringScope scope)
+        // A component method declared Awaited is waited for before the next step runs.
+        private Statement Call(CallReaction call, LoweringScope scope)
         {
             var args = _values.Arguments(call.Args, scope);
             switch (call.On)
             {
                 case ComponentSource component:
                     var method = _context.Method(_context.ContractOf(component.Component), call.Method, component.Component);
-                    return G.Call(G.Obj(_context.Objects.Element(component.Component)), G.PathOf(method.Path), args, ValueLowering.ArgumentShapes(method), Shape.None);
+                    var invocation = G.Call(G.Obj(_context.Objects.Element(component.Component)), G.PathOf(method.Path), args, ValueLowering.ArgumentShapes(method), Shape.None);
+                    return G.Do(invocation, awaits: method.Signature.Awaits);
                 case PluginSource plugin:
                     var declared = _context.Method(_context.PluginContractOf(plugin.Name), call.Method, "plugin " + plugin.Name);
                     var pluginPath = call.Method == "$call" ? G.NoPath : G.PathOf(declared.Path);
-                    return G.Call(G.Obj(_context.Objects.Plugin(plugin.Name)), pluginPath, args, ValueLowering.ArgumentShapes(declared), Shape.None);
+                    return G.Do(G.Call(G.Obj(_context.Objects.Plugin(plugin.Name)), pluginPath, args, ValueLowering.ArgumentShapes(declared), Shape.None));
                 case PayloadSource payload:
                     var (root, path) = _values.PayloadRoot(payload, scope);
-                    return G.Call(root, path.Concat(new[] { call.Method }).ToList(), args, G.NoShapes, Shape.None);
+                    return G.Do(G.Call(root, path.Concat(new[] { call.Method }).ToList(), args, G.NoShapes, Shape.None));
                 default:
                     throw new InvalidOperationException("A call cannot target " + call.On.GetType().Name + ".");
             }
@@ -144,7 +146,7 @@ namespace Alis.Reactive.Grammar.Lowering
             var index = start;
             while (index < cases.Count
                    && cases[index].Guard.TryGetCondition(out var condition)
-                   && ValueLowering.IsSynchronous(condition))
+                   && _values.IsSynchronous(condition))
             {
                 arms.Add(new Arm(_values.Condition(condition, scope), Block(cases[index].Reaction, scope)));
                 index++;
@@ -171,7 +173,7 @@ namespace Alis.Reactive.Grammar.Lowering
             IReadOnlyList<Statement> otherwise,
             LoweringScope scope)
         {
-            if (ValueLowering.IsSynchronous(condition))
+            if (_values.IsSynchronous(condition))
                 return new[] { G.If(_values.Condition(condition, scope), then, otherwise) };
 
             switch (condition)
@@ -189,6 +191,9 @@ namespace Alis.Reactive.Grammar.Lowering
                     return AnyOf(any.Terms, 0, then, otherwise, scope);
                 case NotCondition not:
                     return Guarded(not.Term, otherwise, then, scope);
+                case CompareCondition _:
+                    // A comparison that reads a promise: its awaited reads settle, then the `if` runs.
+                    return _values.WithAwaitedReads(() => new[] { G.If(_values.Condition(condition, scope), then, otherwise) });
                 default:
                     throw new InvalidOperationException("No lowering for condition " + condition.GetType().Name + ".");
             }
@@ -198,7 +203,7 @@ namespace Alis.Reactive.Grammar.Lowering
             IReadOnlyList<ConditionGraph> terms, int start, IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, LoweringScope scope)
         {
             if (start >= terms.Count) return then;
-            var synchronous = terms.Skip(start).TakeWhile(ValueLowering.IsSynchronous).ToList();
+            var synchronous = terms.Skip(start).TakeWhile(_values.IsSynchronous).ToList();
             if (synchronous.Count > 0)
             {
                 var guard = G.And(synchronous.Select(term => _values.Condition(term, scope)).ToList());
@@ -212,7 +217,7 @@ namespace Alis.Reactive.Grammar.Lowering
             IReadOnlyList<ConditionGraph> terms, int start, IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, LoweringScope scope)
         {
             if (start >= terms.Count) return otherwise;
-            var synchronous = terms.Skip(start).TakeWhile(ValueLowering.IsSynchronous).ToList();
+            var synchronous = terms.Skip(start).TakeWhile(_values.IsSynchronous).ToList();
             if (synchronous.Count > 0)
             {
                 var guard = G.Or(synchronous.Select(term => _values.Condition(term, scope)).ToList());

@@ -59,12 +59,14 @@ namespace Alis.Reactive
         private readonly Path _path;
         private readonly IReadOnlyList<Shape> _argumentShapes;
         private readonly IReadOnlyList<ValueExpression> _passed;
+        private readonly bool _awaits;
 
         private ComponentMethod(
             string name,
             string pathExpression,
             IReadOnlyList<Shape> argumentShapes,
-            IReadOnlyList<ValueExpression> passed)
+            IReadOnlyList<ValueExpression> passed,
+            bool awaits = false)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -81,6 +83,7 @@ namespace Alis.Reactive
             _path = Path.Parse(pathExpression);
             _argumentShapes = argumentShapes;
             _passed = passed;
+            _awaits = awaits;
         }
 
         /// <summary>
@@ -108,8 +111,16 @@ namespace Alis.Reactive
             return ObjectMethodContract.Create(
                 MemberName.Of(Member),
                 _path,
-                MethodSignature.WithArguments(MethodArgumentContract.Exact(_argumentShapes), returns));
+                MethodSignature.WithArguments(MethodArgumentContract.Exact(_argumentShapes), returns, _awaits));
         }
+
+        /// <summary>
+        /// Declares that the JavaScript method returns a promise: a call waits for it to settle before
+        /// the steps after it run, and a read of it is the value it settles with.
+        /// </summary>
+        /// <example><c>public ComponentMethod SaveDraft =&gt; Method("saveDraft").Awaited();</c></example>
+        public ComponentMethod Awaited() =>
+            new ComponentMethod(_name, _pathExpression, _argumentShapes, _passed, awaits: true);
 
         /// <summary>Declares a method whose plan member and JavaScript path are the same.</summary>
         internal static ComponentMethod Named(string member) =>
@@ -140,11 +151,11 @@ namespace Alis.Reactive
                 passed.Add(ValueExpression.LiteralFor(value, shape));
             }
 
-            return new ComponentMethod(_name, _pathExpression, shapes, passed);
+            return new ComponentMethod(_name, _pathExpression, shapes, passed, _awaits);
         }
 
         private ComponentMethod WithArgs(params Shape[] args) =>
-            new ComponentMethod(_name, _pathExpression, args, Array.Empty<ValueExpression>());
+            new ComponentMethod(_name, _pathExpression, args, Array.Empty<ValueExpression>(), _awaits);
     }
 
     /// <summary>
@@ -160,6 +171,12 @@ namespace Alis.Reactive
         }
 
         internal ComponentMethod Method { get; }
+
+        /// <summary>
+        /// Declares that the JavaScript method returns a promise: a call waits for it to settle before
+        /// the steps after it run.
+        /// </summary>
+        public ComponentMethod<TArg> Awaited() => new ComponentMethod<TArg>(Method.Awaited());
 
         /// <summary>
         /// Fixes arguments the JavaScript method always takes after the typed one, such as the kind of
@@ -190,6 +207,12 @@ namespace Alis.Reactive
         }
 
         internal ComponentMethod Method { get; }
+
+        /// <summary>
+        /// Declares that the JavaScript method returns a promise: a call waits for it to settle before
+        /// the steps after it run.
+        /// </summary>
+        public ComponentMethod<T1, T2> Awaited() => new ComponentMethod<T1, T2>(Method.Awaited());
     }
 
     /// <summary>
@@ -207,6 +230,12 @@ namespace Alis.Reactive
         }
 
         internal ComponentMethod Method { get; }
+
+        /// <summary>
+        /// Declares that the JavaScript method returns a promise: a call waits for it to settle before
+        /// the steps after it run.
+        /// </summary>
+        public ComponentMethod<T1, T2, T3> Awaited() => new ComponentMethod<T1, T2, T3>(Method.Awaited());
     }
 
     /// <summary>
@@ -222,6 +251,12 @@ namespace Alis.Reactive
         }
 
         internal ComponentMethod Method { get; }
+
+        /// <summary>
+        /// Declares that the JavaScript method returns a promise: a call waits for it to settle before
+        /// the steps after it run, and a read of it is the value it settles with.
+        /// </summary>
+        public ComponentFunction<TResult> Awaited() => new ComponentFunction<TResult>(Method.Awaited());
     }
 
     /// <summary>
@@ -238,6 +273,12 @@ namespace Alis.Reactive
         }
 
         internal ComponentMethod Method { get; }
+
+        /// <summary>
+        /// Declares that the JavaScript method returns a promise: a call waits for it to settle before
+        /// the steps after it run, and a read of it is the value it settles with.
+        /// </summary>
+        public ComponentFunction<TArg, TResult> Awaited() => new ComponentFunction<TArg, TResult>(Method.Awaited());
     }
 
     /// <summary>
@@ -255,6 +296,12 @@ namespace Alis.Reactive
         }
 
         internal ComponentMethod Method { get; }
+
+        /// <summary>
+        /// Declares that the JavaScript method returns a promise: a call waits for it to settle before
+        /// the steps after it run, and a read of it is the value it settles with.
+        /// </summary>
+        public ComponentFunction<T1, T2, TResult> Awaited() => new ComponentFunction<T1, T2, TResult>(Method.Awaited());
     }
 
     /// <summary>
