@@ -75,22 +75,22 @@ public sealed class WhenComplexArrayItemRulesApply : PlaywrightTestBase
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
         using var plan = JsonDocument.Parse(planJson!);
         var validations = plan.RootElement
-            .GetProperty("components")
-            .GetProperty("order-lines-form")
-            .GetProperty("container")
-            .GetProperty("validationRules")
+            .GetProperty("objects")
+            .GetProperty("$form:order-lines-form")
+            .GetProperty("data")
+            .GetProperty("fields")
             .EnumerateArray()
-            .Where(rule => rule.GetProperty("serverFieldName").GetString() is
+            .Where(rule => rule.GetProperty("name").GetString() is
                 "Lines[0].Sku" or "Lines[0].ConfirmSku" or "Lines[0].GiftNote" or
                 "Lines[0].Deliveries[0].LocationCode" or "Lines[0].Deliveries[0].AccessCode" or
                 "Lines[1].Sku" or "Lines[1].ConfirmSku" or "Lines[1].GiftNote" or
                 "Lines[1].Deliveries[0].LocationCode" or "Lines[1].Deliveries[0].AccessCode")
-            .OrderBy(rule => rule.GetProperty("serverFieldName").GetString())
+            .OrderBy(rule => rule.GetProperty("name").GetString())
             .ToArray();
 
         Assert.Multiple(() =>
         {
-            Assert.That(validations.Select(rule => rule.GetProperty("serverFieldName").GetString()), Is.EqualTo(new[]
+            Assert.That(validations.Select(rule => rule.GetProperty("name").GetString()), Is.EqualTo(new[]
             {
                 "Lines[0].ConfirmSku",
                 "Lines[0].Deliveries[0].AccessCode",
@@ -103,7 +103,7 @@ public sealed class WhenComplexArrayItemRulesApply : PlaywrightTestBase
                 "Lines[1].GiftNote",
                 "Lines[1].Sku"
             }));
-            Assert.That(validations.Select(rule => rule.GetProperty("component").GetString()), Is.EqualTo(new[]
+            Assert.That(validations.Select(rule => rule.GetProperty("id").GetString()), Is.EqualTo(new[]
             {
                 $"{ModelScope}Lines_0__ConfirmSku",
                 $"{ModelScope}Lines_0__Deliveries_0__AccessCode",
@@ -116,7 +116,7 @@ public sealed class WhenComplexArrayItemRulesApply : PlaywrightTestBase
                 $"{ModelScope}Lines_1__GiftNote",
                 $"{ModelScope}Lines_1__Sku"
             }));
-            Assert.That(validations.Select(rule => rule.GetProperty("rules")[0].GetProperty("name").GetString()), Is.EqualTo(new[]
+            Assert.That(validations.Select(rule => rule.GetProperty("tests")[0].GetProperty("rule").GetString()), Is.EqualTo(new[]
             {
                 "equalTo",
                 "required",
@@ -130,11 +130,17 @@ public sealed class WhenComplexArrayItemRulesApply : PlaywrightTestBase
                 "required"
             }));
             Assert.That(validations
-                    .Where(rule => rule.GetProperty("serverFieldName").GetString()!.EndsWith("GiftNote", StringComparison.Ordinal) ||
-                        rule.GetProperty("serverFieldName").GetString()!.EndsWith("AccessCode", StringComparison.Ordinal))
-                    .Select(rule => rule.GetProperty("rules")[0].GetProperty("execution").GetProperty("activation").GetProperty("kind").GetString()),
+                    .Where(rule => rule.GetProperty("name").GetString()!.EndsWith("GiftNote", StringComparison.Ordinal) ||
+                        rule.GetProperty("name").GetString()!.EndsWith("AccessCode", StringComparison.Ordinal))
+                    .Select(rule => ActivationKind(rule.GetProperty("tests")[0].GetProperty("when"))),
                 Is.EqualTo(new[] { "when", "when", "when", "when" }));
         });
         AssertNoConsoleErrors();
     }
+
+    // A test that always applies has the condition `true`; a conditional one reads the page.
+    private static string ActivationKind(JsonElement when) =>
+        when.GetProperty("kind").GetString() == "lit" && when.GetProperty("value").ValueKind == JsonValueKind.True
+            ? "always"
+            : "when";
 }

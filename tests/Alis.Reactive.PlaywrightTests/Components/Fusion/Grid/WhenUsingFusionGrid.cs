@@ -274,16 +274,20 @@ public class WhenUsingFusionGrid : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // A whole response-body read is get(res, ["body"]); a member-path read of a member named
+    // responseBody would be get(res, ["body", "responseBody", …]).
     private static bool HasResponseBodyRead(JsonElement element, bool pathMustBeEmpty)
     {
         if (element.ValueKind == JsonValueKind.Object)
         {
-            if (element.TryGetProperty("member", out var member) &&
-                member.ValueKind == JsonValueKind.String &&
-                member.GetString() == "responseBody" &&
-                element.TryGetProperty("path", out var path) &&
-                path.ValueKind == JsonValueKind.Array &&
-                (path.GetArrayLength() == 0) == pathMustBeEmpty)
+            if (element.TryGetProperty("kind", out var kind) && kind.GetString() == "get" &&
+                element.GetProperty("target").TryGetProperty("name", out var binding) &&
+                binding.GetString()!.StartsWith("res", StringComparison.Ordinal) &&
+                element.GetProperty("path") is var path &&
+                path.GetArrayLength() >= 1 && path[0].GetString() == "body" &&
+                (pathMustBeEmpty
+                    ? path.GetArrayLength() == 1
+                    : path.GetArrayLength() > 1 && path[1].GetString() == "responseBody"))
             {
                 return true;
             }

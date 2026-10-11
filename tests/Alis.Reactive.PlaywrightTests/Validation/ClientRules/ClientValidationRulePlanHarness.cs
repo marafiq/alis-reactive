@@ -34,48 +34,76 @@ internal static class ClientValidationRulePlanHarness
         return JsonDocument.Parse(plan.RenderFormatted(services));
     }
 
+    /// <summary>The tests the form runs on the field the server reports errors under this name.</summary>
     internal static JsonElement[] RulesFor(JsonElement root, string serverFieldName) =>
-        ValidationFor(root, serverFieldName)
-            .GetProperty("rules")
+        Fields(root)
+            .Single(field => field.GetProperty("name").GetString() == serverFieldName)
+            .GetProperty("tests")
+            .EnumerateArray()
+            .ToArray();
+
+    internal static JsonElement[] Fields(JsonElement root) =>
+        root.GetProperty("objects")
+            .GetProperty("$form:" + FormId)
+            .GetProperty("data")
+            .GetProperty("fields")
             .EnumerateArray()
             .ToArray();
 
     internal static string[] RuleNames(JsonElement[] rules) =>
-        rules.Select(rule => rule.GetProperty("name").GetString()!).ToArray();
+        rules.Select(rule => rule.GetProperty("rule").GetString()!).ToArray();
 
+    /// <summary>The other field each test's check reads: its peer.</summary>
     internal static string[] PeerComponents(JsonElement[] rules) =>
-        rules.Select(rule => rule
-                .GetProperty("execution")
-                .GetProperty("value")
-                .GetProperty("from")
-                .GetProperty("component")
-                .GetString()!)
+        rules.Select(rule => ComponentsReadBy(rule.GetProperty("check")).First()).ToArray();
+
+    /// <summary>The field each term of a composed condition reads, in order.</summary>
+    internal static string[] ConditionLeftComponents(JsonElement condition) =>
+        condition.GetProperty("args")
+            .EnumerateArray()
+            .Select(term => ComponentsReadBy(term).First())
             .ToArray();
 
-    internal static string[] ConditionLeftComponents(JsonElement condition)
+    /// <summary>
+    /// The components an expression reads: a located element, or a field another plan renders, which
+    /// it reads through the model by its id.
+    /// </summary>
+    internal static List<string> ComponentsReadBy(JsonElement expression)
     {
-        var terms = condition.GetProperty("terms").EnumerateArray();
-        return terms
-            .Select(term => term
-                .GetProperty("left")
-                .GetProperty("from")
-                .GetProperty("component")
-                .GetString()!)
-            .ToArray();
+        var components = new List<string>();
+        Collect(expression, components);
+        return components;
     }
 
-    private static JsonElement ValidationFor(JsonElement root, string serverFieldName)
+    private static void Collect(JsonElement element, List<string> components)
     {
-        var rules = root
-            .GetProperty("components")
-            .GetProperty(FormId)
-            .GetProperty("container")
-            .GetProperty("validationRules")
-            .EnumerateArray()
-            .ToArray();
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.Object:
+                var kind = element.TryGetProperty("kind", out var kindProperty) ? kindProperty.GetString() : null;
+                if (kind == "obj")
+                {
+                    var id = element.GetProperty("id").GetString()!;
+                    if (!id.StartsWith("$", StringComparison.Ordinal)) components.Add(id);
+                }
 
-        return rules.Single(rule =>
-            rule.GetProperty("serverFieldName").GetString() == serverFieldName);
+                var readsModel = kind == "call"
+                    && element.GetProperty("target").TryGetProperty("id", out var target) && target.GetString() == "$model";
+                if (readsModel)
+                {
+                    components.Add(element.GetProperty("args")[0].GetProperty("value").GetString()!);
+                    return;
+                }
+
+                foreach (var property in element.EnumerateObject())
+                    Collect(property.Value, components);
+                return;
+
+            case JsonValueKind.Array:
+                foreach (var item in element.EnumerateArray())
+                    Collect(item, components);
+                return;
+        }
     }
 
     private static IServiceProvider BuildServices() =>

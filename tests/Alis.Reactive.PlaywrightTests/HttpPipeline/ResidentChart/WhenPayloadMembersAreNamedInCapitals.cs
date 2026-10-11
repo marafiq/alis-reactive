@@ -176,21 +176,35 @@ public sealed class WhenPayloadMembersAreNamedInCapitals
         return members.ToArray();
     }
 
-    // Every payload read in the plan names its member; the trigger's own event name is not one of them.
+    // Every payload read in the plan names its member: a read off the handler's event (e), a response
+    // (res…, whose body holds the members) or an array item (x…). An empty path only converts a value.
     private static void Collect(JsonElement element, List<string> members)
     {
         if (element.ValueKind == JsonValueKind.Object)
         {
-            var isPayloadRead = element.TryGetProperty("from", out var from)
-                && from.ValueKind == JsonValueKind.Object
-                && from.TryGetProperty("kind", out var kind) && kind.GetString() == "payload"
-                && element.TryGetProperty("member", out _);
-            if (isPayloadRead) members.Add(from.GetProperty("scope").GetString() + ":" + element.GetProperty("member").GetString());
+            if (IsPayloadRead(element, out var member)) members.Add(member);
             foreach (var property in element.EnumerateObject()) Collect(property.Value, members);
         }
         else if (element.ValueKind == JsonValueKind.Array)
         {
             foreach (var item in element.EnumerateArray()) Collect(item, members);
         }
+    }
+
+    private static bool IsPayloadRead(JsonElement node, out string member)
+    {
+        member = "";
+        var isRead = node.TryGetProperty("kind", out var kind) && kind.GetString() == "get"
+            && node.GetProperty("target").TryGetProperty("kind", out var targetKind) && targetKind.GetString() == "ref";
+        if (!isRead) return false;
+
+        var path = node.GetProperty("path").EnumerateArray().Select(segment => segment.GetString()!).ToArray();
+        var binding = node.GetProperty("target").GetProperty("name").GetString()!;
+        var scope = binding == "e" ? "event" : binding.StartsWith("res", StringComparison.Ordinal) ? "success" : "element";
+        var members = scope == "success" ? path.Skip(1).ToArray() : path;
+        if (members.Length == 0) return false;
+
+        member = scope + ":" + string.Join(".", members);
+        return true;
     }
 }

@@ -111,7 +111,7 @@ function evaluateField(entry: Entry, container: HTMLElement, summary: HTMLElemen
     if (!evaluateWhen(entry, test)) continue;
     if (checkPasses(entry, test, value)) continue;
 
-    log.trace("rule.failed", { field: field.id, value, message: test.message });
+    log.trace("rule.failed", { field: field.id, rule: test.rule, value, message: test.message });
     if (inlineHidden) {
       addSummaryError(summary, field.id, test.message);
     } else {

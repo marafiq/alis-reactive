@@ -34,10 +34,10 @@ public class WhenPlanBoots : PlaywrightTestBase
         var text = await planJson.TextContentAsync();
         Assert.That(text, Is.Not.Null.And.Not.Empty, "Plan JSON must not be empty");
 
-        Assert.That(text, Does.Contain("\"behaviors\""), "Plan must have behaviors array");
-        Assert.That(text, Does.Contain("\"page-ready\""), "Plan must contain page-ready trigger");
-        Assert.That(text, Does.Contain("\"document-event\""), "Plan must contain document-event triggers");
-        Assert.That(text, Does.Contain("\"dispatch\""), "Plan must contain dispatch reactions");
+        Assert.That(text, Does.Contain("\"handlers\""), "Plan must have handlers array");
+        Assert.That(text, Does.Contain("\"ready\""), "Plan must contain a ready handler");
+        Assert.That(text, Does.Contain("\"$document\""), "Plan must contain document-event handlers");
+        Assert.That(text, Does.Contain("\"raise\""), "Plan must contain dispatch reactions");
         Assert.That(text, Does.Contain("\"set\""), "Plan must contain set reactions");
 
         AssertNoConsoleErrors();
@@ -74,9 +74,9 @@ public class WhenPlanBoots : PlaywrightTestBase
         Assert.That(text, Is.Not.Null.And.Not.Empty, "Plan JSON must not be empty");
 
         var doc = System.Text.Json.JsonDocument.Parse(text!);
-        var entries = doc.RootElement.GetProperty("behaviors");
+        var entries = doc.RootElement.GetProperty("handlers");
         Assert.That(entries.GetArrayLength(), Is.EqualTo(ExpectedEventsViewBehaviorCount),
-            $"Plan must have exactly {ExpectedEventsViewBehaviorCount} behaviors (1 page-ready + 3 document-event)");
+            $"Plan must have exactly {ExpectedEventsViewBehaviorCount} handlers (1 ready + 3 document-event)");
 
         AssertNoConsoleErrors();
     }

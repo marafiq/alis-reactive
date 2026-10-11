@@ -37,43 +37,30 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
             }));
 
         using var doc = JsonDocument.Parse(plan.RenderFormatted());
-        var reaction = doc.RootElement
-            .GetProperty("behaviors")[0]
-            .GetProperty("reaction");
-        var steps = reaction.GetProperty("steps")
+        var statements = doc.RootElement
+            .GetProperty("handlers")[0]
+            .GetProperty("do")
             .EnumerateArray()
             .ToArray();
 
         Assert.Multiple(() =>
         {
-            Assert.That(reaction.GetProperty("kind").GetString(), Is.EqualTo("sequence"));
-            Assert.That(steps.Select(ReactionKind), Is.EqualTo(new[]
+            Assert.That(statements.Select(StatementKind), Is.EqualTo(new[]
             {
-                "sequence",
-                "branch",
-                "request",
-                "branch",
-                "sequence"
+                "set",
+                "if",
+                "let",
+                "if",
+                "set"
             }));
 
-            Assert.That(BranchGuardKinds(steps[1]), Is.EqualTo(new[]
-            {
-                "when",
-                "when",
-                "default"
-            }));
+            Assert.That(ArmCount(statements[1]), Is.EqualTo(2));
+            Assert.That(statements[1].GetProperty("else").GetArrayLength(), Is.GreaterThan(0));
 
-            Assert.That(BranchGuardKinds(steps[3]), Is.EqualTo(new[]
-            {
-                "when",
-                "default"
-            }));
+            Assert.That(ArmCount(statements[3]), Is.EqualTo(1));
+            Assert.That(statements[3].GetProperty("else").GetArrayLength(), Is.GreaterThan(0));
 
-            Assert.That(steps[2]
-                .GetProperty("request")
-                .GetProperty("input")
-                .GetProperty("assignments")
-                .GetArrayLength(), Is.EqualTo(1));
+            Assert.That(SentValueNames(statements[2]), Is.EqualTo(new[] { "score" }));
         });
     }
 
@@ -113,9 +100,7 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
             }));
 
         using var doc = JsonDocument.Parse(plan.RenderFormatted());
-        var comparisons = AllCompareConditions(doc.RootElement)
-            .Select(ConditionComparison.From)
-            .ToArray();
+        var comparisons = AllComparisons(doc.RootElement).ToArray();
 
         Assert.Multiple(() =>
         {
@@ -162,46 +147,46 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
         });
     }
 
-    private static string ReactionKind(JsonElement reaction) =>
-        reaction.GetProperty("kind").GetString()!;
+    private static string StatementKind(JsonElement statement) =>
+        statement.GetProperty("kind").GetString()!;
 
-    private static string[] BranchGuardKinds(JsonElement branch)
-    {
-        return branch
-            .GetProperty("cases")
-            .EnumerateArray()
-            .Select(branchCase => branchCase
-                .GetProperty("guard")
-                .GetProperty("kind")
-                .GetString()!)
+    private static int ArmCount(JsonElement ifStatement) =>
+        ifStatement.GetProperty("arms").GetArrayLength();
+
+    // let res = await http.send({ ..., values: { … } }): the names the request sends.
+    private static string[] SentValueNames(JsonElement letStatement) =>
+        letStatement.GetProperty("expr").GetProperty("args")[0]
+            .GetProperty("entries").EnumerateArray()
+            .Single(entry => entry.GetProperty("name").GetString() == "values")
+            .GetProperty("value").GetProperty("entries").EnumerateArray()
+            .Select(entry => entry.GetProperty("name").GetString()!)
             .ToArray();
-    }
 
-    private static List<JsonElement> AllCompareConditions(JsonElement root)
+    private static readonly string[] ComparisonOperators = { "eq", "neq", "lt", "lte", "gt", "gte" };
+
+    // Every comparison in the plan: an ordering or equality operator, or a test for emptiness.
+    private static List<ConditionComparison> AllComparisons(JsonElement root)
     {
-        var comparisons = new List<JsonElement>();
-        CollectCompareConditions(root, comparisons);
+        var comparisons = new List<ConditionComparison>();
+        CollectComparisons(root, comparisons);
         return comparisons;
     }
 
-    private static void CollectCompareConditions(JsonElement element, List<JsonElement> comparisons)
+    private static void CollectComparisons(JsonElement element, List<ConditionComparison> comparisons)
     {
         switch (element.ValueKind)
         {
             case JsonValueKind.Object:
-                if (element.TryGetProperty("kind", out var kind)
-                    && kind.GetString() == "compare")
-                {
-                    comparisons.Add(element);
-                }
+                if (ConditionComparison.TryFrom(element, out var comparison))
+                    comparisons.Add(comparison);
 
                 foreach (var property in element.EnumerateObject())
-                    CollectCompareConditions(property.Value, comparisons);
+                    CollectComparisons(property.Value, comparisons);
                 return;
 
             case JsonValueKind.Array:
                 foreach (var item in element.EnumerateArray())
-                    CollectCompareConditions(item, comparisons);
+                    CollectComparisons(item, comparisons);
                 return;
         }
     }
@@ -215,45 +200,70 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
         string? RightMember,
         string? RightAccess)
     {
-        internal static ConditionComparison From(JsonElement condition)
+        internal static bool TryFrom(JsonElement node, out ConditionComparison comparison)
         {
-            var left = condition.GetProperty("left");
-            var right = RightReadOrNull(condition);
+            comparison = null!;
+            if (!IsOp(node, out var op)) return false;
 
-            return new ConditionComparison(
-                condition.GetProperty("op").GetString()!,
-                SourceLabel(left),
-                left.GetProperty("member").GetString()!,
-                AccessLabel(left),
-                right.HasValue ? SourceLabel(right.Value) : null,
-                right.HasValue ? right.Value.GetProperty("member").GetString() : null,
-                right.HasValue ? AccessLabel(right.Value) : null);
+            if (op == "not" && IsOp(node.GetProperty("args")[0], out var inner) && inner == "empty")
+                return TryUnary("not-empty", node.GetProperty("args")[0].GetProperty("args")[0], out comparison);
+            if (op == "empty")
+                return TryUnary("is-empty", node.GetProperty("args")[0], out comparison);
+            if (!ComparisonOperators.Contains(op)) return false;
+
+            var left = Read.From(node.GetProperty("args")[0]);
+            var right = Read.From(node.GetProperty("args")[1]);
+            if (left == null) return false;
+            comparison = new ConditionComparison(op, left.Source, left.Member, left.Access, right?.Source, right?.Member, right?.Access);
+            return true;
         }
 
-        private static JsonElement? RightReadOrNull(JsonElement condition)
+        private static bool TryUnary(string op, JsonElement operand, out ConditionComparison comparison)
         {
-            var right = condition.GetProperty("right");
-            if (right.GetProperty("kind").GetString() != "value")
-                return null;
-
-            var value = right.GetProperty("value");
-            if (!value.TryGetProperty("kind", out var kind) || kind.GetString() != "read")
-                return null;
-
-            return value;
+            comparison = null!;
+            var read = Read.From(operand);
+            if (read == null) return false;
+            comparison = new ConditionComparison(op, read.Source, read.Member, read.Access, null, null, null);
+            return true;
         }
 
-        private static string SourceLabel(JsonElement read)
+        private static bool IsOp(JsonElement node, out string op)
         {
-            var source = read.GetProperty("from");
-            var kind = source.GetProperty("kind").GetString();
-            if (kind != "payload") return kind!;
+            op = "";
+            if (node.ValueKind != JsonValueKind.Object || !node.TryGetProperty("kind", out var kind) || kind.GetString() != "op")
+                return false;
+            op = node.GetProperty("op").GetString()!;
+            return true;
+        }
+    }
 
-            return "payload:" + source.GetProperty("scope").GetString();
+    // A read in the grammar: a get or call on a binding or a located object; a literal is no read.
+    private sealed record Read(string Source, string Member, string Access)
+    {
+        internal static Read? From(JsonElement node)
+        {
+            var kind = node.GetProperty("kind").GetString();
+            if (kind != "get" && kind != "call") return null;
+
+            var path = node.GetProperty("path").EnumerateArray().Select(segment => segment.GetString()!).ToArray();
+            var target = node.GetProperty("target");
+            if (path.Length == 0) return From(target);
+
+            var access = kind == "call" ? "method" : "property";
+            return new Read(SourceOf(target, path), path[^1], access);
         }
 
-        private static string AccessLabel(JsonElement read) =>
-            read.GetProperty("access").GetProperty("kind").GetString()!;
+        private static string SourceOf(JsonElement target, string[] path)
+        {
+            var kind = target.GetProperty("kind").GetString();
+            if (kind == "ref")
+                return path[0] == "body" ? "payload:success" : "payload:event";
+            if (kind == "get" && target.GetProperty("path")[0].GetString() == "query")
+                return "url";
+
+            var id = target.GetProperty("id").GetString()!;
+            return id.StartsWith("$plugin:", StringComparison.Ordinal) ? "plugin" : "component";
+        }
     }
 
     private sealed class ConditionBehaviorModel

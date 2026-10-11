@@ -8,7 +8,8 @@ feature; every feature is a module. Load `solid-ts-audit` for structural work.
 ## Layout and import directions
 
 - `grammar/` evaluates expressions (`evaluate.ts`, operators, shapes, paths) and executes
-  statements (`execute.ts`). It imports nothing outside `grammar/`, `types/` and `shared/`.
+  statements (`execute.ts`). It imports nothing outside `grammar/`, `types/`, `shared/` and
+  `diagnostics/` (traces). The architecture test enforces every layer's import direction.
 - `objects/` locates objects (element locators through a vendor's data, plugin locators through a
   registered module), and holds owners (the page, a slot) with their disposers.
 - `plans/` discovers plan scripts, starts an owner (contribute module data, subscribe handlers,

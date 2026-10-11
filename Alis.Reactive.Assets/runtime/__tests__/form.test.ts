@@ -25,7 +25,7 @@ function requiredField(id: string, name: string, message: string, when = e.lit(t
     name,
     value: e.get(e.obj(id), ["value"], s.string),
     committed: "change",
-    tests: [{ check: e.fn(["v"], e.op("not", e.op("empty", e.ref("v")))) as never, when, message }],
+    tests: [{ rule: "required", check: e.fn(["v"], e.op("not", e.op("empty", e.ref("v")))) as never, when, message }],
   };
 }
 

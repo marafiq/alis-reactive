@@ -142,6 +142,7 @@ export interface RefExpr {
 }
 
 export interface FormTest {
+  rule: string;
   check: FnExpr;
   when: Expr;
   message: string;

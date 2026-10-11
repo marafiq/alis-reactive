@@ -86,7 +86,7 @@ function prepare(request: HttpRequest): { url: string; init: RequestInit } {
     init.body = formData(request.values, request.arrays);
   } else if (Object.keys(request.values).length > 0) {
     headers["Content-Type"] = "application/json";
-    init.body = JSON.stringify(request.values, emptyTextAsNull);
+    init.body = JSON.stringify(request.values, jsonValue);
   }
   if (Object.keys(headers).length > 0) init.headers = headers;
   return { url: routed, init };
@@ -112,28 +112,34 @@ function headersOf(source: Record<string, unknown>): Record<string, string> {
 function queryPairs(values: Record<string, unknown>, arrays: readonly string[]): string[] {
   const pairs: string[] = [];
   const pair = (name: string, value: unknown): void => {
+    if (fileOf(value) !== undefined) throw new Error("[alis] File objects cannot be sent via GET");
     pairs.push(`${encodeURIComponent(name)}=${encodeURIComponent(wireText(value, name))}`);
   };
   for (const [name, value] of Object.entries(values)) {
     const items = itemsOf(value);
     if (items !== undefined) {
-      for (const item of items) {
-        if (item instanceof File) throw new Error("[alis] File objects cannot be sent via GET");
-        pair(name, item);
-      }
+      for (const item of items) pair(name, item);
       continue;
     }
     if (isMissing(value) && arrays.includes(name)) continue;
-    if (value instanceof File) throw new Error("[alis] File objects cannot be sent via GET");
     pair(name, value);
   }
   return pairs;
 }
 
+// A file is a File, or an uploader's file item that carries one as `rawFile` (Syncfusion's uploader
+// lists its files that way). The uploader's declaration will say so itself (grammar.md 1.1).
+function fileOf(value: unknown): File | undefined {
+  if (value instanceof File) return value;
+  const rawFile = typeof value === "object" && value !== null ? (value as { rawFile?: unknown }).rawFile : undefined;
+  return rawFile instanceof File ? rawFile : undefined;
+}
+
 function formData(values: Record<string, unknown>, arrays: readonly string[]): FormData {
   const data = new FormData();
   const append = (name: string, value: unknown): void => {
-    if (value instanceof File) data.append(name, value, value.name);
+    const file = fileOf(value);
+    if (file !== undefined) data.append(name, file, file.name);
     else data.append(name, wireText(value, name));
   };
   for (const [name, value] of Object.entries(values)) {
@@ -162,7 +168,9 @@ function wireText(value: unknown, name: string): string {
 }
 
 // "" in a JSON body is a cleared field: the server binds it as null. Array items keep their text.
-function emptyTextAsNull(this: unknown, _key: string, value: unknown): unknown {
+// A file has no JSON form.
+function jsonValue(this: unknown, _key: string, value: unknown): unknown {
+  if (fileOf(value) !== undefined) throw new Error("[alis] File objects require form-data body format");
   if (value === "" && !Array.isArray(this)) return null;
   return value;
 }

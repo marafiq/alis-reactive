@@ -32,7 +32,7 @@ namespace Alis.Reactive.Grammar.Lowering
         {
             var fieldShape = validation.Value.OutputShape;
             var tests = validation.Rules
-                .Select(rule => new FormTest(Check(rule, fieldShape), When(rule.Execution.Activation), rule.Message))
+                .Select(rule => new FormTest(rule.Name, Check(rule, fieldShape), When(rule.Execution.Activation), rule.Message))
                 .ToList();
             return new FormField(validation.Component, validation.ServerFieldName, _values.Value(validation.Value, _scope), "change", tests);
         }

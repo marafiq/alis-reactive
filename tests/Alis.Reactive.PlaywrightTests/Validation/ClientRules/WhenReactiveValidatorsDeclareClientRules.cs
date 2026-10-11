@@ -55,18 +55,13 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
         var rule = ClientValidationRulePlanHarness
             .RulesFor(doc.RootElement, nameof(ConfirmEmailModel.ConfirmEmail))
             .Single();
-        var execution = rule.GetProperty("execution");
 
         Assert.Multiple(() =>
         {
-            Assert.That(rule.GetProperty("name").GetString(), Is.EqualTo("equalTo"));
+            Assert.That(rule.GetProperty("rule").GetString(), Is.EqualTo("equalTo"));
             Assert.That(rule.GetProperty("message").GetString(), Is.EqualTo("Emails must match."));
-            Assert.That(execution.GetProperty("kind").GetString(), Is.EqualTo("peer"));
-            Assert.That(execution
-                .GetProperty("value")
-                .GetProperty("from")
-                .GetProperty("component")
-                .GetString(), Is.EqualTo(IdGenerator.For(typeof(ConfirmEmailModel), nameof(ConfirmEmailModel.Email))));
+            Assert.That(ClientValidationRulePlanHarness.ComponentsReadBy(rule.GetProperty("check")),
+                Is.EqualTo(new[] { IdGenerator.For(typeof(ConfirmEmailModel), nameof(ConfirmEmailModel.Email)) }));
         });
     }
 
@@ -110,18 +105,14 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
         var rule = ClientValidationRulePlanHarness
             .RulesFor(doc.RootElement, nameof(AssessmentModel.Score))
             .Single();
-        var activation = rule.GetProperty("execution").GetProperty("activation");
-        var condition = activation.GetProperty("condition");
+        var condition = rule.GetProperty("when");
 
         Assert.Multiple(() =>
         {
-            Assert.That(activation.GetProperty("kind").GetString(), Is.EqualTo("when"));
-            Assert.That(condition.GetProperty("kind").GetString(), Is.EqualTo("compare"));
-            Assert.That(condition
-                .GetProperty("left")
-                .GetProperty("from")
-                .GetProperty("component")
-                .GetString(), Is.EqualTo(IdGenerator.For(typeof(AssessmentModel), nameof(AssessmentModel.IsVeteran))));
+            Assert.That(condition.GetProperty("kind").GetString(), Is.EqualTo("op"));
+            Assert.That(condition.GetProperty("op").GetString(), Is.EqualTo("truthy"));
+            Assert.That(ClientValidationRulePlanHarness.ComponentsReadBy(condition),
+                Is.EqualTo(new[] { IdGenerator.For(typeof(AssessmentModel), nameof(AssessmentModel.IsVeteran)) }));
         });
     }
 
@@ -133,13 +124,11 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
         var rule = ClientValidationRulePlanHarness
             .RulesFor(doc.RootElement, nameof(AssessmentModel.Notes))
             .Single();
-        var condition = rule.GetProperty("execution")
-            .GetProperty("activation")
-            .GetProperty("condition");
+        var condition = rule.GetProperty("when");
 
         Assert.Multiple(() =>
         {
-            Assert.That(condition.GetProperty("kind").GetString(), Is.EqualTo("all"));
+            Assert.That(condition.GetProperty("op").GetString(), Is.EqualTo("and"));
             Assert.That(ClientValidationRulePlanHarness.ConditionLeftComponents(condition), Is.EqualTo(new[]
             {
                 IdGenerator.For(typeof(AssessmentModel), nameof(AssessmentModel.IsVeteran)),
@@ -156,26 +145,23 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
         var rule = ClientValidationRulePlanHarness
             .RulesFor(doc.RootElement, nameof(TaggedAssessmentModel.ReviewNote))
             .Single();
-        var condition = rule.GetProperty("execution")
-            .GetProperty("activation")
-            .GetProperty("condition");
+        // (tags => truthy(tags.some(tag => tag == "fall-risk")))(the Tags input's value, as a string array).
+        var condition = rule.GetProperty("when");
+        var body = condition.GetProperty("target").GetProperty("body");
+        var someTag = body.GetProperty("args")[0];
+        var match = someTag.GetProperty("args")[0].GetProperty("body").GetProperty("args");
+        var collection = condition.GetProperty("args")[0];
 
         Assert.Multiple(() =>
         {
-            Assert.That(condition.GetProperty("kind").GetString(), Is.EqualTo("compare"));
-            Assert.That(condition.GetProperty("op").GetString(), Is.EqualTo("array-contains"));
-            Assert.That(condition
-                .GetProperty("left")
-                .GetProperty("from")
-                .GetProperty("component")
-                .GetString(), Is.EqualTo(IdGenerator.For(typeof(TaggedAssessmentModel), nameof(TaggedAssessmentModel.Tags))));
-            Assert.That(condition.GetProperty("shape").GetProperty("kind").GetString(), Is.EqualTo("array"));
-            Assert.That(condition.GetProperty("itemShape").GetProperty("kind").GetString(), Is.EqualTo("string"));
-            Assert.That(condition
-                .GetProperty("right")
-                .GetProperty("value")
-                .GetProperty("value")
-                .GetString(), Is.EqualTo("fall-risk"));
+            Assert.That(condition.GetProperty("kind").GetString(), Is.EqualTo("call"));
+            Assert.That(body.GetProperty("op").GetString(), Is.EqualTo("truthy"));
+            Assert.That(someTag.GetProperty("path")[0].GetString(), Is.EqualTo("some"));
+            Assert.That(ClientValidationRulePlanHarness.ComponentsReadBy(collection),
+                Is.EqualTo(new[] { IdGenerator.For(typeof(TaggedAssessmentModel), nameof(TaggedAssessmentModel.Tags)) }));
+            Assert.That(collection.GetProperty("shape").GetProperty("kind").GetString(), Is.EqualTo("array"));
+            Assert.That(match[0].GetProperty("shape").GetProperty("kind").GetString(), Is.EqualTo("string"));
+            Assert.That(match[1].GetProperty("value").GetString(), Is.EqualTo("fall-risk"));
         });
     }
 
@@ -236,7 +222,7 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
 
         Assert.Multiple(() =>
         {
-            Assert.That(rule.GetProperty("name").GetString(), Is.EqualTo("required"));
+            Assert.That(rule.GetProperty("rule").GetString(), Is.EqualTo("required"));
             Assert.That(rule.GetProperty("message").GetString(), Is.EqualTo("Client name is required."));
             Assert.That(AssemblyScanServerOnlyValidator.InstanceCount, Is.Zero);
         });
@@ -245,15 +231,8 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
         Assert.That(AssemblyScanServerOnlyValidator.InstanceCount, Is.EqualTo(1));
     }
 
-    private static int ValidationRuleCount(System.Text.Json.JsonElement root)
-    {
-        return root
-            .GetProperty("components")
-            .GetProperty("validation-form")
-            .GetProperty("container")
-            .GetProperty("validationRules")
-            .GetArrayLength();
-    }
+    private static int ValidationRuleCount(System.Text.Json.JsonElement root) =>
+        ClientValidationRulePlanHarness.Fields(root).Length;
 }
 
 internal sealed class AssemblyScanMessages(string requiredNameMessage)

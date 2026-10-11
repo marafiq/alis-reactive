@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.ShiftHandover;
 
 /// <summary>
-/// The request a NativeActionLink serializes into its anchor keeps what the link's pipeline declares, and
+/// The request a NativeActionLink's own plan sends keeps what the link's pipeline declares, and
 /// what the link cannot carry is refused when the view renders instead of being dropped.
 /// </summary>
 [TestFixture]
@@ -31,21 +31,18 @@ public sealed class WhenNativeActionLinkBuildsItsRequest
             .WhileLoading(l => l.Component<NativeLoader>().Call(c => c.Show))
             .Finally(f => f.Component<NativeLoader>().Call(c => c.Hide)));
 
-        using var payload = PayloadOf(link);
-        var request = FirstRequestIn(payload.RootElement.GetProperty("reaction"));
-        var input = request.GetProperty("input");
-        Assert.That(input.TryGetProperty("assignments", out var gathered), Is.True,
-            $"The link's request lost its gather: {input.GetRawText()}");
-        var assignments = gathered.EnumerateArray()
-            .Select(assignment => assignment.GetProperty("target"))
-            .Select(target => (Kind: target.GetProperty("kind").GetString(), Name: target.GetProperty("name").GetString()))
+        using var plan = PlanOf(link);
+        var request = SentRequestIn(plan.RootElement);
+        var headers = Member(request, "headers").GetProperty("entries").EnumerateArray()
+            .Select(entry => entry.GetProperty("name").GetString())
             .ToArray();
+        var cleanup = FinallyIn(plan.RootElement);
 
         Assert.Multiple(() =>
         {
-            Assert.That(assignments, Is.EqualTo(new[] { (Kind: (string?)"header", Name: (string?)"X-Shift") }));
-            Assert.That(request.GetProperty("finally").GetArrayLength(), Is.GreaterThan(0));
-            Assert.That(request.GetProperty("finally").GetRawText(),
+            Assert.That(headers, Is.EqualTo(new[] { "X-Shift" }), $"The link's request lost its gather: {request.GetRawText()}");
+            Assert.That(cleanup.GetArrayLength(), Is.GreaterThan(0));
+            Assert.That(cleanup.GetRawText(),
                 Is.EqualTo(FinallyOf(p => p.Component<NativeLoader>().Call(c => c.Hide))));
         });
     }
@@ -90,26 +87,52 @@ public sealed class WhenNativeActionLinkBuildsItsRequest
     private static string FinallyOf(Action<PipelineBuilder<ShiftHandoverPageModel>> finallyPipeline)
     {
         var link = Html().NativeActionLink("Mark Read", MarkReadUrl, p => p.Post(MarkReadUrl).Finally(finallyPipeline));
-        using var payload = PayloadOf(link);
-        return FirstRequestIn(payload.RootElement.GetProperty("reaction")).GetProperty("finally").GetRawText();
+        using var plan = PlanOf(link);
+        return FinallyIn(plan.RootElement).GetRawText();
     }
 
     private static IHtmlHelper<ShiftHandoverPageModel> Html() =>
         DispatchProxy.Create<IHtmlHelper<ShiftHandoverPageModel>, ViewContextOnlyHtmlHelper>();
 
-    private static JsonDocument PayloadOf(NativeActionLinkBuilder<ShiftHandoverPageModel> link)
+    // The link renders its anchor, then its own plan script.
+    private static JsonDocument PlanOf(NativeActionLinkBuilder<ShiftHandoverPageModel> link)
     {
         using var writer = new StringWriter();
         link.WriteTo(writer, HtmlEncoder.Default);
-        var encodedPayload = Regex.Match(writer.ToString(), "data-reactive-link=\"([^\"]*)\"").Groups[1].Value;
-        return JsonDocument.Parse(WebUtility.HtmlDecode(encodedPayload));
+        var planJson = Regex.Match(writer.ToString(), "<script type=\"application/json\" data-reactive-plan>(.*)</script>").Groups[1].Value;
+        return JsonDocument.Parse(planJson);
     }
 
-    private static JsonElement FirstRequestIn(JsonElement reaction)
-    {
-        if (reaction.GetProperty("kind").GetString() == "request") return reaction.GetProperty("request");
+    // The record the link's request hands alis.http: { method, url, route, values, arrays, headers, format }.
+    private static JsonElement SentRequestIn(JsonElement plan) =>
+        Nodes(plan).First(node => node.TryGetProperty("kind", out var kind) && kind.GetString() == "call"
+                && node.GetProperty("target").TryGetProperty("id", out var id) && id.GetString() == "$http")
+            .GetProperty("args")[0];
 
-        return reaction.GetProperty("steps").EnumerateArray().Select(FirstRequestIn).First();
+    private static JsonElement FinallyIn(JsonElement plan) =>
+        Nodes(plan).First(node => node.TryGetProperty("kind", out var kind) && kind.GetString() == "try")
+            .GetProperty("finally");
+
+    private static JsonElement Member(JsonElement record, string name) =>
+        record.GetProperty("entries").EnumerateArray()
+            .Single(entry => entry.GetProperty("name").GetString() == name)
+            .GetProperty("value");
+
+    private static IEnumerable<JsonElement> Nodes(JsonElement element)
+    {
+        if (element.ValueKind == JsonValueKind.Object)
+        {
+            yield return element;
+            foreach (var property in element.EnumerateObject())
+                foreach (var node in Nodes(property.Value))
+                    yield return node;
+        }
+        else if (element.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var item in element.EnumerateArray())
+                foreach (var node in Nodes(item))
+                    yield return node;
+        }
     }
 }
 

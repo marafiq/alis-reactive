@@ -197,16 +197,22 @@ namespace Alis.Reactive.Grammar
         public IReadOnlyList<FormTest> Tests { get; }
     }
 
-    /// <summary>A test of a field: the check its value must pass while the condition holds.</summary>
+    /// <summary>
+    /// A test of a field: the check its value must pass while the condition holds. The rule names
+    /// the declaration it came from, for traces; the check alone decides.
+    /// </summary>
     internal sealed class FormTest
     {
-        internal FormTest(FnExpr check, Expr when, string message)
+        internal FormTest(string rule, FnExpr check, Expr when, string message)
         {
+            if (string.IsNullOrEmpty(rule)) throw new ArgumentException("Rule name required.", nameof(rule));
+            Rule = rule;
             Check = check ?? throw new ArgumentNullException(nameof(check));
             When = when ?? throw new ArgumentNullException(nameof(when));
             Message = message ?? throw new ArgumentNullException(nameof(message));
         }
 
+        public string Rule { get; }
         public FnExpr Check { get; }
         public Expr When { get; }
         public string Message { get; }

@@ -36,44 +36,25 @@ public sealed class WhenGatherDslBuildsRequestInput
             }));
 
         using var doc = JsonDocument.Parse(plan.RenderFormatted());
-        var input = SingleGatherInput(doc.RootElement);
-        var assignments = input
-            .GetProperty("assignments")
-            .EnumerateArray()
-            .Select(GatherAssignment.From)
-            .ToArray();
+        var request = SingleSentRequest(doc.RootElement);
 
         Assert.Multiple(() =>
         {
-            Assert.That(assignments.Select(x => x.TargetKind), Is.EqualTo(new[]
+            Assert.That(Gathered(request, "headers"), Is.EqualTo(new[]
             {
-                "header",
-                "payload",
-                "route-param",
-                "route-param",
-                "payload",
-                "payload",
-                "payload"
+                new GatherAssignment("X-Trace", "url"),
             }));
-            Assert.That(assignments.Select(x => x.TargetName), Is.EqualTo(new[]
+            Assert.That(Gathered(request, "route"), Is.EqualTo(new[]
             {
-                "X-Trace",
-                "literal",
-                "residentId",
-                "facilityId",
-                "filter",
-                "facility",
-                "count"
+                new GatherAssignment("residentId", "payload:event"),
+                new GatherAssignment("facilityId", "url"),
             }));
-            Assert.That(assignments.Select(x => x.SourceKind), Is.EqualTo(new[]
+            Assert.That(Gathered(request, "values"), Is.EqualTo(new[]
             {
-                "url",
-                "literal",
-                "payload:event",
-                "url",
-                "payload:event",
-                "url",
-                "plugin"
+                new GatherAssignment("literal", "literal"),
+                new GatherAssignment("filter", "payload:event"),
+                new GatherAssignment("facility", "url"),
+                new GatherAssignment("count", "plugin"),
             }));
         });
     }
@@ -90,13 +71,13 @@ public sealed class WhenGatherDslBuildsRequestInput
             }));
 
         using var doc = JsonDocument.Parse(plan.RenderFormatted());
-        var input = SingleGatherInput(doc.RootElement);
-        var registeredInputs = input.GetProperty("registeredInputs");
+        var values = Member(SingleSentRequest(doc.RootElement), "values").GetProperty("entries").EnumerateArray().ToArray();
 
         Assert.Multiple(() =>
         {
-            Assert.That(registeredInputs.GetProperty("kind").GetString(), Is.EqualTo("all-registered-inputs"));
-            Assert.That(input.GetProperty("assignments").EnumerateArray().ToArray(), Is.Empty);
+            Assert.That(values, Has.Length.EqualTo(1));
+            Assert.That(values[0].GetProperty("kind").GetString(), Is.EqualTo("spread"));
+            Assert.That(values[0].GetProperty("value").GetProperty("target").GetProperty("id").GetString(), Is.EqualTo("$model"));
         });
     }
 
@@ -115,38 +96,25 @@ public sealed class WhenGatherDslBuildsRequestInput
             }));
 
         using var doc = JsonDocument.Parse(plan.RenderFormatted());
-        var input = SingleGatherInput(doc.RootElement);
-        var assignments = input
-            .GetProperty("assignments")
-            .EnumerateArray()
-            .ToArray();
-        var propertySource = assignments[0].GetProperty("source");
-        var methodSource = assignments[1].GetProperty("source");
-        var type = doc.RootElement
-            .GetProperty("types")
-            .GetProperty("fusion.component.shift-schedule");
-        var property = type
-            .GetProperty("properties")
-            .GetProperty("currentView");
-        var method = type
-            .GetProperty("methods")
-            .GetProperty("getEvents");
+        var values = Member(SingleSentRequest(doc.RootElement), "values").GetProperty("entries").EnumerateArray().ToArray();
+        var propertySource = values[0].GetProperty("value");
+        var methodSource = values[1].GetProperty("value");
 
         Assert.Multiple(() =>
         {
-            Assert.That(assignments.Select(x => x.GetProperty("target").GetProperty("name").GetString()), Is.EqualTo(new[]
+            Assert.That(values.Select(x => x.GetProperty("name").GetString()), Is.EqualTo(new[]
             {
                 "currentView",
                 "getEvents"
             }));
-            Assert.That(propertySource.GetProperty("from").GetProperty("kind").GetString(), Is.EqualTo("component"));
-            Assert.That(propertySource.GetProperty("member").GetString(), Is.EqualTo("currentView"));
-            Assert.That(propertySource.GetProperty("access").GetProperty("kind").GetString(), Is.EqualTo("property"));
-            Assert.That(methodSource.GetProperty("from").GetProperty("kind").GetString(), Is.EqualTo("component"));
-            Assert.That(methodSource.GetProperty("member").GetString(), Is.EqualTo("getEvents"));
-            Assert.That(methodSource.GetProperty("access").GetProperty("kind").GetString(), Is.EqualTo("method"));
-            Assert.That(property.GetProperty("shape").GetProperty("kind").GetString(), Is.EqualTo("string"));
-            Assert.That(method.GetProperty("returns").GetProperty("kind").GetString(), Is.EqualTo("array"));
+            Assert.That(SourceKindFor(propertySource), Is.EqualTo("component"));
+            Assert.That(LastSegment(propertySource), Is.EqualTo("currentView"));
+            Assert.That(propertySource.GetProperty("kind").GetString(), Is.EqualTo("get"));
+            Assert.That(SourceKindFor(methodSource), Is.EqualTo("component"));
+            Assert.That(LastSegment(methodSource), Is.EqualTo("getEvents"));
+            Assert.That(methodSource.GetProperty("kind").GetString(), Is.EqualTo("call"));
+            Assert.That(propertySource.GetProperty("shape").GetProperty("kind").GetString(), Is.EqualTo("string"));
+            Assert.That(methodSource.GetProperty("shape").GetProperty("kind").GetString(), Is.EqualTo("array"));
         });
     }
 
@@ -170,30 +138,15 @@ public sealed class WhenGatherDslBuildsRequestInput
             }));
 
         using var doc = JsonDocument.Parse(plan.RenderFormatted());
-        var inputs = AllGatherInputs(doc.RootElement);
-        var followUpAssignments = inputs[1]
-            .GetProperty("assignments")
-            .EnumerateArray()
-            .Select(GatherAssignment.From)
-            .ToArray();
+        var requests = AllSentRequests(doc.RootElement);
 
         Assert.Multiple(() =>
         {
-            Assert.That(inputs, Has.Count.EqualTo(2));
-            Assert.That(followUpAssignments.Select(x => x.TargetKind), Is.EqualTo(new[]
+            Assert.That(requests, Has.Count.EqualTo(2));
+            Assert.That(Gathered(requests[1], "route"), Is.EqualTo(new[]
             {
-                "route-param",
-                "route-param"
-            }));
-            Assert.That(followUpAssignments.Select(x => x.TargetName), Is.EqualTo(new[]
-            {
-                "facilityId",
-                "residentId"
-            }));
-            Assert.That(followUpAssignments.Select(x => x.SourceKind), Is.EqualTo(new[]
-            {
-                "literal",
-                "payload:success"
+                new GatherAssignment("facilityId", "literal"),
+                new GatherAssignment("residentId", "payload:success"),
             }));
         });
     }
@@ -222,126 +175,103 @@ public sealed class WhenGatherDslBuildsRequestInput
             }));
 
         using var doc = JsonDocument.Parse(plan.RenderFormatted());
-        var pluginType = doc.RootElement
-            .GetProperty("types")
-            .GetProperty("plugin.gatherRequestInput");
-        var dispatchSourceKinds = AllValueSources(doc.RootElement)
-            .Select(SourceKindFor)
-            .Where(x => x == "plugin")
+        var pluginMembers = AllMemberReads(doc.RootElement)
+            .Where(read => SourceKindFor(read) == "plugin")
+            .Select(LastSegment)
             .ToArray();
 
         Assert.Multiple(() =>
         {
-            Assert.That(pluginType.GetProperty("properties").TryGetProperty("token", out _), Is.True);
-            Assert.That(pluginType.GetProperty("methods").TryGetProperty("slugify", out _), Is.True);
-            Assert.That(pluginType.GetProperty("methods").TryGetProperty("track", out _), Is.True);
-            Assert.That(dispatchSourceKinds, Has.Length.GreaterThanOrEqualTo(3));
+            Assert.That(doc.RootElement.GetProperty("objects").TryGetProperty("$plugin:gatherRequestInput", out _), Is.True);
+            Assert.That(pluginMembers, Does.Contain("token"));
+            Assert.That(pluginMembers, Does.Contain("slugify"));
+            Assert.That(pluginMembers, Does.Contain("track"));
+            Assert.That(pluginMembers, Has.Length.GreaterThanOrEqualTo(3));
         });
     }
 
-    private static JsonElement SingleGatherInput(JsonElement root)
+    // The record a request hands alis.http: { method, url, route, values, arrays, headers, format }.
+    private static JsonElement SingleSentRequest(JsonElement root)
     {
-        var inputs = AllGatherInputs(root);
+        var requests = AllSentRequests(root);
 
-        Assert.That(inputs, Has.Count.EqualTo(1));
-        return inputs[0];
+        Assert.That(requests, Has.Count.EqualTo(1));
+        return requests[0];
     }
 
-    private static List<JsonElement> AllGatherInputs(JsonElement root)
+    private static List<JsonElement> AllSentRequests(JsonElement root) =>
+        AllNodes(root)
+            .Where(node => node.TryGetProperty("kind", out var kind) && kind.GetString() == "call"
+                && node.GetProperty("target").TryGetProperty("id", out var id) && id.GetString() == "$http")
+            .Select(send => send.GetProperty("args")[0])
+            .ToList();
+
+    private static JsonElement Member(JsonElement record, string name) =>
+        record.GetProperty("entries").EnumerateArray()
+            .Single(entry => entry.GetProperty("name").GetString() == name)
+            .GetProperty("value");
+
+    private static GatherAssignment[] Gathered(JsonElement request, string target) =>
+        Member(request, target).GetProperty("entries").EnumerateArray()
+            .Select(entry => new GatherAssignment(entry.GetProperty("name").GetString()!, SourceKindFor(entry.GetProperty("value"))))
+            .ToArray();
+
+    private static List<JsonElement> AllMemberReads(JsonElement root) =>
+        AllNodes(root)
+            .Where(node => node.TryGetProperty("kind", out var kind) && (kind.GetString() == "get" || kind.GetString() == "call"))
+            .Where(node => node.GetProperty("path").GetArrayLength() > 0)
+            .ToList();
+
+    private static List<JsonElement> AllNodes(JsonElement root)
     {
-        var inputs = new List<JsonElement>();
-        CollectGatherInputs(root, inputs);
-        return inputs;
+        var nodes = new List<JsonElement>();
+        CollectNodes(root, nodes);
+        return nodes;
     }
 
-    private static void CollectGatherInputs(JsonElement element, List<JsonElement> inputs)
-    {
-        switch (element.ValueKind)
-        {
-            case JsonValueKind.Object:
-                if (element.TryGetProperty("input", out var input)
-                    && input.TryGetProperty("kind", out var kind)
-                    && kind.GetString() == "gather")
-                {
-                    inputs.Add(input);
-                }
-
-                foreach (var property in element.EnumerateObject())
-                    CollectGatherInputs(property.Value, inputs);
-                return;
-
-            case JsonValueKind.Array:
-                foreach (var item in element.EnumerateArray())
-                    CollectGatherInputs(item, inputs);
-                return;
-        }
-    }
-
-    private static List<JsonElement> AllValueSources(JsonElement root)
-    {
-        var sources = new List<JsonElement>();
-        CollectValueSources(root, sources);
-        return sources;
-    }
-
-    private static void CollectValueSources(JsonElement element, List<JsonElement> sources)
+    private static void CollectNodes(JsonElement element, List<JsonElement> nodes)
     {
         switch (element.ValueKind)
         {
             case JsonValueKind.Object:
-                if (element.TryGetProperty("kind", out var kind)
-                    && kind.GetString() == "read"
-                    && element.TryGetProperty("from", out var source))
-                {
-                    sources.Add(source);
-                }
-
+                nodes.Add(element);
                 foreach (var property in element.EnumerateObject())
-                    CollectValueSources(property.Value, sources);
+                    CollectNodes(property.Value, nodes);
                 return;
 
             case JsonValueKind.Array:
                 foreach (var item in element.EnumerateArray())
-                    CollectValueSources(item, sources);
+                    CollectNodes(item, nodes);
                 return;
         }
     }
 
-    private static string SourceKindFor(JsonElement source)
+    private static string LastSegment(JsonElement read)
     {
-        var kind = source.GetProperty("kind").GetString();
-        if (kind != "payload") return kind!;
-
-        return "payload:" + source.GetProperty("scope").GetString();
+        var path = read.GetProperty("path");
+        return path[path.GetArrayLength() - 1].GetString()!;
     }
 
-    private sealed record GatherAssignment(
-        string TargetKind,
-        string TargetName,
-        string SourceKind)
+    // Where a value comes from: a literal, the event payload, a response, the URL, a plugin or a component.
+    private static string SourceKindFor(JsonElement value)
     {
-        internal static GatherAssignment From(JsonElement assignment)
-        {
-            var target = assignment.GetProperty("target");
-            var source = assignment.GetProperty("source");
-            return new GatherAssignment(
-                target.GetProperty("kind").GetString()!,
-                target.GetProperty("name").GetString()!,
-                SourceKindFor(source));
-        }
+        var kind = value.GetProperty("kind").GetString();
+        if (kind == "lit") return "literal";
+        if (kind == "ref") return value.GetProperty("name").GetString() == "e" ? "payload:event" : "payload:success";
 
-        private static string SourceKindFor(JsonElement source)
-        {
-            var kind = source.GetProperty("kind").GetString();
-            if (kind == "literal") return "literal";
+        var path = value.GetProperty("path");
+        var target = value.GetProperty("target");
+        var targetKind = target.GetProperty("kind").GetString();
+        if (targetKind == "ref")
+            return path.GetArrayLength() > 0 && path[0].GetString() == "body" ? "payload:success" : "payload:event";
+        if (targetKind == "get" && target.GetProperty("path")[0].GetString() == "query") return "url";
+        if (targetKind != "obj") return SourceKindFor(target);
 
-            var from = source.GetProperty("from");
-            var fromKind = from.GetProperty("kind").GetString();
-            if (fromKind != "payload") return fromKind!;
-
-            return "payload:" + from.GetProperty("scope").GetString();
-        }
+        var id = target.GetProperty("id").GetString()!;
+        return id.StartsWith("$plugin:", StringComparison.Ordinal) ? "plugin" : "component";
     }
+
+    private sealed record GatherAssignment(string TargetName, string SourceKind);
 
     private sealed class GatherRequestInputModel
     {
