@@ -210,8 +210,8 @@ the core C# and the runtime name no vendor and no component. Proof: the full sui
   (`49f3bec`, `fc8b4d2`); Fusion and Native compile on the core's public surface, with
   `InternalsVisibleTo` for both removed (`c597a3a`). The core names no component; the runtime names
   a vendor only in its app-level object modules, as the architecture test enforces.
-- Evidence on `fc8b4d2`: `gate / test` green, four of five Playwright shards green,
-  `verify-net48` green (net48 build, pack, IIS Express boot). The fifth shard's one failure was
-  the Tom Select test's key, fixed in `71eecfd`; the head commit's run is the final proof.
+- Proof on `615a49b`: CI run 38124316949 green, `gate / test` and all five Playwright shards,
+  with no failed or flaky-test annotations; `verify-net48` green (net48 build and pack without
+  `InternalsVisibleTo`, IIS Express boot).
 - The method grew, as the slices needed it: arguments that mix literals and sources,
   `Field`, generic members, `Passing`, signature keys, `plan.Render`, hidden fields.
