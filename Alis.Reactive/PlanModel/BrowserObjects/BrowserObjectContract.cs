@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
@@ -149,14 +148,10 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    [System.Text.Json.Serialization.JsonConverter(typeof(PlanNodeDiscriminator<MethodArgumentContract>))]
     internal abstract class MethodArgumentContract
     {
         internal static MethodArgumentContract Open { get; } =
             new OpenMethodArgumentContract();
-
-        internal static MethodArgumentContract NoArguments { get; } =
-            new ExactMethodArgumentContract(System.Array.Empty<Shape>());
 
         internal static MethodArgumentContract Exact(IReadOnlyList<Shape> shapes)
         {
@@ -183,7 +178,6 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class OpenMethodArgumentContract : MethodArgumentContract
     {
-        public string Kind => "open";
 
         internal override MethodArgumentContract Merge(MemberName name, MethodArgumentContract incoming)
         {
@@ -238,7 +232,6 @@ namespace Alis.Reactive.PlanModel
             _shapes = snapshot;
         }
 
-        public string Kind => "exact";
         public IReadOnlyList<Shape> Shapes => _shapes;
 
         internal override MethodArgumentContract Merge(MemberName name, MethodArgumentContract incoming)

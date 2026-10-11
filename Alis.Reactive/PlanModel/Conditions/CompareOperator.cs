@@ -114,7 +114,5 @@ namespace Alis.Reactive.PlanModel
 
         internal static IReadOnlyCollection<string> Values => Known.Keys;
 
-        internal bool RequiresRightOperand => Array.IndexOf(UnaryValues, Value) < 0;
-
     }
 }

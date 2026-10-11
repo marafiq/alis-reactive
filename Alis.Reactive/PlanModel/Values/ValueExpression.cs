@@ -9,7 +9,6 @@ namespace Alis.Reactive.PlanModel
     /// <summary>
     /// Wire base for Reactive Plan value nodes authored through DSL value expressions.
     /// </summary>
-    [JsonConverter(typeof(PlanNodeDiscriminator<ValueExpression>))]
     internal abstract class ValueExpression
     {
         private protected ValueExpression() { }
@@ -291,10 +290,7 @@ namespace Alis.Reactive.PlanModel
     /// </remarks>
     internal sealed class LiteralExpression : ValueExpression
     {
-        /// <summary>Wire discriminator for literal value nodes. Always <c>"literal"</c>.</summary>
-        public string Kind => "literal";
         /// <summary>Serialized literal payload; may be <see langword="null"/> for explicit null values.</summary>
-        [JsonInclude]
         public object? Value { get; }
         /// <summary>Output shape declared by the authoring layer, or <see cref="PlanModel.Shape.None"/> when unspecified.</summary>
         public Shape Shape { get; }
@@ -316,8 +312,6 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly ValueRead _read;
 
-        /// <summary>Wire discriminator for value read nodes. Always <c>"read"</c>.</summary>
-        public string Kind => "read";
         /// <summary>
         /// Source object or payload scope for this read, such as a component, plugin, or event payload.
         /// </summary>
@@ -449,7 +443,6 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Base wire contract for how a value read accesses its target member.</summary>
-    [JsonConverter(typeof(PlanNodeDiscriminator<ValueReadAccess>))]
     internal abstract class ValueReadAccess
     {
         private protected ValueReadAccess() { }
@@ -460,15 +453,11 @@ namespace Alis.Reactive.PlanModel
         internal static ValueReadAccess Method(IReadOnlyList<ValueExpression> args) =>
             new MethodValueReadAccess(args);
 
-        /// <summary>Wire discriminator for the read access shape.</summary>
-        public abstract string Kind { get; }
     }
 
     /// <summary>Access contract for reading a source member as a property.</summary>
     internal sealed class PropertyValueReadAccess : ValueReadAccess
     {
-        /// <summary>Wire discriminator for property reads. Always <c>"property"</c>.</summary>
-        public override string Kind => "property";
     }
 
     /// <summary>Access contract for invoking a source member as a method.</summary>
@@ -481,8 +470,6 @@ namespace Alis.Reactive.PlanModel
             _args = OrderedArguments(args);
         }
 
-        /// <summary>Wire discriminator for method reads. Always <c>"method"</c>.</summary>
-        public override string Kind => "method";
 
         /// <summary>Argument value expressions evaluated in call order before invocation.</summary>
         public IReadOnlyList<ValueExpression> Args => _args;
@@ -511,8 +498,6 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly IReadOnlyDictionary<string, ValueExpression> _fields;
 
-        /// <summary>Wire discriminator for object value nodes. Always <c>"object"</c>.</summary>
-        public string Kind => "object";
         /// <summary>Field map evaluated by name when the runtime builds the object value.</summary>
         public IReadOnlyDictionary<string, ValueExpression> Fields => _fields;
         /// <summary>Output shape declared by the authoring layer, or <see cref="PlanModel.Shape.None"/> when unspecified.</summary>
@@ -532,8 +517,6 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly IReadOnlyList<ValueExpression> _items;
 
-        /// <summary>Wire discriminator for array value nodes. Always <c>"array"</c>.</summary>
-        public string Kind => "array";
         /// <summary>Item expressions evaluated in order when the runtime builds the array value.</summary>
         public IReadOnlyList<ValueExpression> Items => _items;
         /// <summary>Output shape declared by the authoring layer, or <see cref="PlanModel.Shape.None"/> when unspecified.</summary>
@@ -557,8 +540,6 @@ namespace Alis.Reactive.PlanModel
     /// </remarks>
     internal sealed class ArrayOperationExpression : ValueExpression
     {
-        /// <summary>Wire discriminator for array operation nodes. Always <c>"array-op"</c>.</summary>
-        public string Kind => "array-op";
         /// <summary>Operation name dispatched by the runtime, such as <c>count</c> or <c>filter</c>.</summary>
         public string Op { get; }
         /// <summary>Value expression evaluated before the runtime normalizes the source to an array.</summary>
@@ -573,7 +554,6 @@ namespace Alis.Reactive.PlanModel
         /// condition subset, never confirm, so per-element evaluation stays on
         /// the immediate lane.
         /// </remarks>
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ConditionGraph? Predicate { get; }
         /// <summary>Per-element projection, or <see langword="null"/> when the operation does not use one.</summary>
         /// <remarks>
@@ -581,7 +561,6 @@ namespace Alis.Reactive.PlanModel
         /// sum, and ordering require a selector; find includes one only for field
         /// projection. It is evaluated against the element scope.
         /// </remarks>
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ValueExpression? Projection { get; }
         /// <summary>Element shape expected from the source array.</summary>
         public Shape ItemShape { get; }

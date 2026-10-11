@@ -1,25 +1,21 @@
 using System.Collections.Generic;
-using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// Plan-registered object target: id, vendor, contract type, role,
-    /// and, for inputs, a model binding.
+    /// Plan-registered object target: id, vendor, contract type and, for inputs, a model binding.
     /// </summary>
     internal sealed class BrowserObject
     {
         private readonly ComponentId _id;
         private readonly ComponentVendor _vendor;
         private readonly BrowserObjectId _type;
-        private readonly ComponentRole _role;
         private readonly InputBinding _binding;
         private readonly ValidationContainerBinding _container;
 
         public string Id => _id.Value;
         public string Vendor => _vendor.Name;
         public string Type => _type.Value;
-        public ComponentRole Role => _role;
         public InputBinding Binding => _binding;
         public ValidationContainerBinding Container => _container;
 
@@ -29,14 +25,12 @@ namespace Alis.Reactive.PlanModel
             ComponentId id,
             ComponentVendor vendor,
             BrowserObjectId type,
-            ComponentRole role,
             InputBinding binding,
             ValidationContainerBinding container)
         {
             _id = id ?? throw new System.ArgumentNullException(nameof(id));
             _vendor = vendor ?? throw new System.ArgumentNullException(nameof(vendor));
             _type = type ?? throw new System.ArgumentNullException(nameof(type));
-            _role = role ?? throw new System.ArgumentNullException(nameof(role));
             _binding = binding ?? throw new System.ArgumentNullException(nameof(binding));
             _container = container ?? throw new System.ArgumentNullException(nameof(container));
         }
@@ -46,16 +40,6 @@ namespace Alis.Reactive.PlanModel
                 id,
                 vendor,
                 type,
-                ComponentRole.ObjectTarget,
-                InputBinding.None,
-                ValidationContainerBinding.None);
-
-        internal static BrowserObject LayoutObject(ComponentId id, ComponentVendor vendor, BrowserObjectId type) =>
-            new BrowserObject(
-                id,
-                vendor,
-                type,
-                ComponentRole.LayoutObject,
                 InputBinding.None,
                 ValidationContainerBinding.None);
 
@@ -68,46 +52,17 @@ namespace Alis.Reactive.PlanModel
                 id,
                 vendor,
                 type,
-                ComponentRole.PlanInput,
                 binding,
                 ValidationContainerBinding.None);
 
         /// <summary>Copies the object with binding info filled where currently absent (first registration wins).</summary>
         internal BrowserObject WithBindingIfAbsent(InputBinding binding) =>
-            new BrowserObject(_id, _vendor, _type, ComponentRole.PlanInput, _binding.FillIfAbsent(binding), _container);
-
-        internal BrowserObject WithContainer(ContainerScope container) =>
-            new BrowserObject(_id, _vendor, _type, ComponentRole.ValidationContainer, _binding, ValidationContainerBinding.Scoped(container));
+            new BrowserObject(_id, _vendor, _type, _binding.FillIfAbsent(binding), _container);
 
         internal BrowserObject WithValidationRulesMerged(IReadOnlyList<ComponentValidation> validationRules) =>
-            new BrowserObject(_id, _vendor, _type, ComponentRole.ValidationContainer, _binding, _container.WithValidationRulesMerged(validationRules));
+            new BrowserObject(_id, _vendor, _type, _binding, _container.WithValidationRulesMerged(validationRules));
     }
 
-    internal sealed class ComponentRole
-    {
-        private readonly string _kind;
-
-        private ComponentRole(string kind)
-        {
-            _kind = kind ?? throw new System.ArgumentNullException(nameof(kind));
-        }
-
-        internal static ComponentRole ObjectTarget { get; } =
-            new ComponentRole("object-target");
-
-        internal static ComponentRole PlanInput { get; } =
-            new ComponentRole("plan-input");
-
-        internal static ComponentRole ValidationContainer { get; } =
-            new ComponentRole("validation-container");
-
-        internal static ComponentRole LayoutObject { get; } =
-            new ComponentRole("layout-object");
-
-        public string Kind => _kind;
-    }
-
-    [System.Text.Json.Serialization.JsonConverter(typeof(PlanNodeDiscriminator<InputBinding>))]
     internal abstract class InputBinding
     {
         private protected InputBinding() { }
@@ -115,7 +70,6 @@ namespace Alis.Reactive.PlanModel
         internal static InputBinding None { get; } =
             new NoInputBinding();
 
-        public abstract string Kind { get; }
 
         internal static InputBinding RegisteredInput(BindingPath bindingPath, MemberName valueMember) =>
             new RegisteredInputBinding(
@@ -127,7 +81,6 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class NoInputBinding : InputBinding
     {
-        public override string Kind => "none";
 
         internal override InputBinding FillIfAbsent(InputBinding incoming)
         {
@@ -147,7 +100,6 @@ namespace Alis.Reactive.PlanModel
             _valueMember = valueMember ?? throw new System.ArgumentNullException(nameof(valueMember));
         }
 
-        public override string Kind => "registered-input";
         public string BindingPath => _bindingPath.Value;
         public Path Path => _bindingPath.Path;
         public string ValueMember => _valueMember.Value;

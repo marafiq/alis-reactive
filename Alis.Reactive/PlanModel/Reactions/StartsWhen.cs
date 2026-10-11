@@ -1,10 +1,7 @@
 using System;
-using System.Text.Json.Serialization;
-using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
-    [JsonConverter(typeof(PlanNodeDiscriminator<StartsWhen>))]
     internal abstract class StartsWhen
     {
         private protected StartsWhen() { }
@@ -28,14 +25,12 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class PageReadyTrigger : StartsWhen
     {
-        public string Kind => "page-ready";
     }
 
     internal sealed class DocumentEventTrigger : StartsWhen
     {
         private readonly EventName _event;
 
-        public string Kind => "document-event";
         public string Event => _event.Value;
 
         internal DocumentEventTrigger(string eventName)
@@ -49,7 +44,6 @@ namespace Alis.Reactive.PlanModel
         private readonly ComponentKey _component;
         private readonly EventName _event;
 
-        public string Kind => "component-event";
         public string Component => _component.Value;
         public string Event => _event.Value;
         internal ComponentKey ComponentKey => _component;
@@ -67,7 +61,6 @@ namespace Alis.Reactive.PlanModel
         private readonly RequestUrl _url;
         private readonly ServerPushEventFilter _filter;
 
-        public string Kind => "server-push";
         public string Url => _url.Value;
         public ServerPushEventFilter EventFilter => _filter;
 
@@ -83,7 +76,6 @@ namespace Alis.Reactive.PlanModel
         private readonly RequestUrl _hubUrl;
         private readonly MemberName _method;
 
-        public string Kind => "signalr";
         public string HubUrl => _hubUrl.Value;
         public string Method => _method.Value;
 
@@ -94,12 +86,10 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    [JsonConverter(typeof(PlanNodeDiscriminator<ServerPushEventFilter>))]
     internal abstract class ServerPushEventFilter
     {
         private protected ServerPushEventFilter() { }
 
-        public abstract string Kind { get; }
 
         internal static ServerPushEventFilter AnyEvent() =>
             new AnyServerPushEvent();
@@ -112,7 +102,6 @@ namespace Alis.Reactive.PlanModel
     {
         internal AnyServerPushEvent() { }
 
-        public override string Kind => "any";
     }
 
     internal sealed class NamedServerPushEvent : ServerPushEventFilter
@@ -124,7 +113,6 @@ namespace Alis.Reactive.PlanModel
             _event = EventName.Of(eventName);
         }
 
-        public override string Kind => "named";
         public string Event => _event.Value;
     }
 }

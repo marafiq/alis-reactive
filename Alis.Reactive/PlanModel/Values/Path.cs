@@ -1,46 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
-    /// <summary>
-    /// Serializes Path as a bare JSON array of PathSegments.
-    /// Plan wire format: [{ "kind": "property", "name": "value" }]
-    /// </summary>
-    internal sealed class PathJsonConverter : JsonConverter<Path>
-    {
-        public override void Write(Utf8JsonWriter writer, Path value, JsonSerializerOptions options)
-        {
-            writer.WriteStartArray();
-            foreach (var segment in value.Segments)
-                segment.WriteJson(writer);
-            writer.WriteEndArray();
-        }
 
-        public override Path Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            => throw new NotSupportedException("Plan types are write-only.");
-    }
-
-    internal sealed class PathSegmentJsonConverter : JsonConverter<PathSegment>
-    {
-        public override void Write(Utf8JsonWriter writer, PathSegment value, JsonSerializerOptions options)
-            => value.WriteJson(writer);
-
-        public override PathSegment Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            => throw new NotSupportedException("Plan types are write-only.");
-    }
 
     /// <summary>Property navigation segment: a property name or array index.</summary>
-    [JsonConverter(typeof(PathSegmentJsonConverter))]
     internal sealed class PathSegment : IEquatable<PathSegment>
     {
         private readonly PathSegmentBody _body;
 
         /// <summary>JSON discriminator for path segments: <c>property</c> or <c>index</c>.</summary>
-        public string Kind => _body.KindForJson;
+        public string Kind => _body.SegmentKind;
 
         private PathSegment(PathSegmentBody body)
         {
@@ -62,7 +34,6 @@ namespace Alis.Reactive.PlanModel
         public override int GetHashCode()
             => _body.GetPathHashCode();
 
-        internal void WriteJson(Utf8JsonWriter writer) => _body.WriteJson(writer);
 
         internal string ToPathText() => _body.PathText;
     }
@@ -71,11 +42,10 @@ namespace Alis.Reactive.PlanModel
     {
         private protected PathSegmentBody() { }
 
-        internal abstract string KindForJson { get; }
+        internal abstract string SegmentKind { get; }
         internal abstract string PathText { get; }
         internal abstract bool HasSamePath(PathSegmentBody other);
         internal abstract int GetPathHashCode();
-        internal abstract void WriteJson(Utf8JsonWriter writer);
 
         internal static PathSegmentBody Property(string name) =>
             new PropertyPathSegmentBody(MemberName.Of(name));
@@ -92,7 +62,7 @@ namespace Alis.Reactive.PlanModel
                 _name = name ?? throw new ArgumentNullException(nameof(name));
             }
 
-            internal override string KindForJson => "property";
+            internal override string SegmentKind => "property";
             internal override string PathText => _name.Value;
             internal override bool HasSamePath(PathSegmentBody other) =>
                 other is PropertyPathSegmentBody property && _name.Equals(property._name);
@@ -100,15 +70,8 @@ namespace Alis.Reactive.PlanModel
             {
                 unchecked
                 {
-                    return (KindForJson.GetHashCode() * 397) ^ _name.GetHashCode();
+                    return (SegmentKind.GetHashCode() * 397) ^ _name.GetHashCode();
                 }
-            }
-            internal override void WriteJson(Utf8JsonWriter writer)
-            {
-                writer.WriteStartObject();
-                writer.WriteString("kind", KindForJson);
-                writer.WriteString("name", _name.Value);
-                writer.WriteEndObject();
             }
         }
 
@@ -121,7 +84,7 @@ namespace Alis.Reactive.PlanModel
                 _index = index;
             }
 
-            internal override string KindForJson => "index";
+            internal override string SegmentKind => "index";
             internal override string PathText => _index.Text;
             internal override bool HasSamePath(PathSegmentBody other) =>
                 other is IndexPathSegmentBody index && _index == index._index;
@@ -129,15 +92,8 @@ namespace Alis.Reactive.PlanModel
             {
                 unchecked
                 {
-                    return (KindForJson.GetHashCode() * 397) ^ _index.GetHashCode();
+                    return (SegmentKind.GetHashCode() * 397) ^ _index.GetHashCode();
                 }
-            }
-            internal override void WriteJson(Utf8JsonWriter writer)
-            {
-                writer.WriteStartObject();
-                writer.WriteString("kind", KindForJson);
-                writer.WriteNumber("index", _index.Value);
-                writer.WriteEndObject();
             }
         }
     }
@@ -173,13 +129,11 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Ordered path segments for navigating nested properties on a value.</summary>
-    [JsonConverter(typeof(PathJsonConverter))]
     internal sealed class Path : IEquatable<Path>
     {
         internal static readonly Path None = new Path(Array.Empty<PathSegment>());
 
         /// <summary>Ordered path segments used by runtime path traversal.</summary>
-        [JsonIgnore]
         public IReadOnlyList<PathSegment> Segments { get; }
 
         internal bool IsNone => Segments.Count == 0;

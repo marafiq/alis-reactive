@@ -1,10 +1,8 @@
 using System.Collections.Generic;
-using Alis.Reactive.Serialization;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.PlanModel
 {
-    [System.Text.Json.Serialization.JsonConverter(typeof(PlanNodeDiscriminator<ValidationContainerBinding>))]
     internal abstract class ValidationContainerBinding
     {
         private protected ValidationContainerBinding() { }
@@ -15,14 +13,12 @@ namespace Alis.Reactive.PlanModel
         internal static ValidationContainerBinding Scoped(ContainerScope scope) =>
             new ScopedValidationContainer(scope);
 
-        public abstract string Kind { get; }
 
         internal abstract ValidationContainerBinding WithValidationRulesMerged(IReadOnlyList<ComponentValidation> incoming);
     }
 
     internal sealed class NoValidationContainer : ValidationContainerBinding
     {
-        public override string Kind => "none";
 
         internal override ValidationContainerBinding WithValidationRulesMerged(IReadOnlyList<ComponentValidation> incoming) =>
             Scoped(ContainerScope.Empty.WithValidationRulesMerged(incoming));
@@ -37,7 +33,6 @@ namespace Alis.Reactive.PlanModel
             _scope = scope ?? throw new System.ArgumentNullException(nameof(scope));
         }
 
-        public override string Kind => "validation-container";
         public IReadOnlyList<ComponentValidation> ValidationRules => _scope.ValidationRules;
 
         internal override ValidationContainerBinding WithValidationRulesMerged(IReadOnlyList<ComponentValidation> incoming) =>
@@ -53,7 +48,7 @@ namespace Alis.Reactive.PlanModel
             _validations = validations ?? throw new System.ArgumentNullException(nameof(validations));
         }
 
-        public IReadOnlyList<ComponentValidation> ValidationRules => _validations.ForJson;
+        public IReadOnlyList<ComponentValidation> ValidationRules => _validations.Items;
 
         internal static ContainerScope Empty { get; } =
             new ContainerScope(ContainerValidations.Empty);
@@ -79,7 +74,7 @@ namespace Alis.Reactive.PlanModel
             _validations = validations;
         }
 
-        internal IReadOnlyList<ComponentValidation> ForJson => _validations;
+        internal IReadOnlyList<ComponentValidation> Items => _validations;
 
         private bool IsEmpty => _validations.Count == 0;
 
@@ -148,7 +143,7 @@ namespace Alis.Reactive.PlanModel
         public string Component => _component.Value;
         /// <summary>Value expression evaluated before client validation runs.</summary>
         public ValueExpression Value { get; }
-        public IReadOnlyList<ValidationRuleNode> Rules => _rules.ForJson;
+        public IReadOnlyList<ValidationRuleNode> Rules => _rules.Items;
 
         [System.Text.Json.Serialization.JsonInclude]
         internal string ServerFieldName => _serverFieldName.Value;
@@ -186,7 +181,7 @@ namespace Alis.Reactive.PlanModel
             _rules = rules;
         }
 
-        internal IReadOnlyList<ValidationRuleNode> ForJson => _rules;
+        internal IReadOnlyList<ValidationRuleNode> Items => _rules;
 
         internal static ComponentValidationRules From(IEnumerable<ValidationRuleNode> rules)
         {

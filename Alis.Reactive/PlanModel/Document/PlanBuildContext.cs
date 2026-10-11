@@ -49,9 +49,6 @@ namespace Alis.Reactive.PlanModel
         internal ComponentKey DeclareObjectTarget(string componentId, ComponentVendor vendor) =>
             _browserObjects.DeclareObjectTarget(componentId, vendor);
 
-        internal ComponentKey DeclareLayoutObject(string componentId, ComponentVendor vendor) =>
-            _browserObjects.DeclareLayoutObject(componentId, vendor);
-
         internal ComponentRegistration RequireRegistrationById(
             string componentId,
             RegisteredInputValueRead valueRead) =>

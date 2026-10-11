@@ -116,7 +116,7 @@ namespace Alis.Reactive.Grammar.Lowering
 
         private Expr Dispatch(DispatchReaction dispatch, LoweringScope scope)
         {
-            var detail = dispatch.PayloadForJson is PresentDispatchPayload present
+            var detail = dispatch.Payload is PresentDispatchPayload present
                 ? _values.Value(present.Data, scope)
                 : G.Record();
             return G.Call(G.Obj(_context.Objects.Document()), "raise", G.Lit(dispatch.Event), detail);

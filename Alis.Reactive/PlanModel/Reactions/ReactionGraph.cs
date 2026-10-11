@@ -1,15 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
     /// Wire base for Reactive Plan reactions authored through pipeline builders.
     /// </summary>
-    [JsonConverter(typeof(PlanNodeDiscriminator<ReactionGraph>))]
     internal abstract class ReactionGraph
     {
         private protected ReactionGraph() { }
@@ -58,8 +54,6 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly IReadOnlyList<ReactionGraph> _steps;
 
-        /// <summary>JSON discriminator for ordered reaction sequences. Always <c>"sequence"</c>.</summary>
-        public string Kind => "sequence";
         /// <summary>Reactions executed in declaration order.</summary>
         public IReadOnlyList<ReactionGraph> Steps => _steps;
 
@@ -75,8 +69,6 @@ namespace Alis.Reactive.PlanModel
         private readonly IReadOnlyList<ReactionGraph> _steps;
         private readonly ParallelCompletion _completion;
 
-        /// <summary>JSON discriminator for concurrent reaction groups. Always <c>"parallel"</c>.</summary>
-        public string Kind => "parallel";
         /// <summary>Reactions started concurrently.</summary>
         public IReadOnlyList<ReactionGraph> Steps => _steps;
         /// <summary>Completion behavior to run after all steps settle.</summary>
@@ -90,15 +82,12 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Wire base for parallel completion behavior authored by request/parallel builders.</summary>
-    [JsonConverter(typeof(PlanNodeDiscriminator<ParallelCompletion>))]
     internal abstract class ParallelCompletion
     {
         private protected ParallelCompletion() { }
 
         internal static ParallelCompletion None { get; } = new NoParallelCompletion();
 
-        /// <summary>JSON discriminator for parallel completion behavior.</summary>
-        public abstract string Kind { get; }
 
         internal static ParallelCompletion OnSettled(ReactionGraph reaction)
         {
@@ -109,8 +98,6 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Represents a parallel reaction with no completion reaction.</summary>
     internal sealed class NoParallelCompletion : ParallelCompletion
     {
-        /// <summary>JSON discriminator for no completion reaction. Always <c>"none"</c>.</summary>
-        public override string Kind => "none";
     }
 
     /// <summary>Runs a reaction after every parallel branch has settled.</summary>
@@ -123,8 +110,6 @@ namespace Alis.Reactive.PlanModel
             _reaction = reaction;
         }
 
-        /// <summary>JSON discriminator for settled completion reactions. Always <c>"on-settled"</c>.</summary>
-        public override string Kind => "on-settled";
 
         /// <summary>Reaction to run after all parallel branches settle.</summary>
         public ReactionGraph Reaction => _reaction;
@@ -135,8 +120,6 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly IReadOnlyList<BranchCase> _cases;
 
-        /// <summary>JSON discriminator for branch reactions. Always <c>"branch"</c>.</summary>
-        public string Kind => "branch";
         /// <summary>Branch cases evaluated in declaration order.</summary>
         public IReadOnlyList<BranchCase> Cases => _cases;
 
@@ -152,7 +135,6 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Pairs an explicit guard with a reaction to execute. A default guard is the else case.</summary>
-    [JsonConverter(typeof(BranchCaseJsonConverter))]
     internal sealed class BranchCase
     {
         /// <summary>Guard that decides whether this case runs.</summary>
@@ -172,28 +154,9 @@ namespace Alis.Reactive.PlanModel
         internal static BranchCase Default(ReactionGraph reaction) =>
             new BranchCase(BranchGuard.Else, reaction);
 
-        internal BranchCase WithReaction(ReactionGraph reaction) =>
-            new BranchCase(Guard, reaction);
     }
 
-    internal sealed class BranchCaseJsonConverter : JsonConverter<BranchCase>
-    {
-        public override void Write(Utf8JsonWriter writer, BranchCase value, JsonSerializerOptions options)
-        {
-            writer.WriteStartObject();
-            PlanJsonWriter.WriteProperty(writer, options, "guard", value.Guard);
-            PlanJsonWriter.WriteProperty(writer, options, "reaction", value.Reaction);
-            writer.WriteEndObject();
-        }
 
-        public override BranchCase Read(
-            ref Utf8JsonReader reader,
-            Type typeToConvert,
-            JsonSerializerOptions options) =>
-            throw new NotSupportedException("Plan types are write-only.");
-    }
-
-    [JsonConverter(typeof(BranchGuardJsonConverter))]
     internal abstract class BranchGuard
     {
         private protected BranchGuard() { }
@@ -201,8 +164,6 @@ namespace Alis.Reactive.PlanModel
         internal static BranchGuard Else { get; } =
             new DefaultBranchGuard();
 
-        public abstract string Kind { get; }
-        internal abstract void WriteGuardPayload(Utf8JsonWriter writer, JsonSerializerOptions options);
 
         /// <summary>The guard's condition; the default guard has none and always matches.</summary>
         internal abstract bool TryGetCondition(out ConditionGraph condition);
@@ -212,11 +173,7 @@ namespace Alis.Reactive.PlanModel
 
         private sealed class DefaultBranchGuard : BranchGuard
         {
-            public override string Kind => "default";
 
-            internal override void WriteGuardPayload(Utf8JsonWriter writer, JsonSerializerOptions options)
-            {
-            }
 
             internal override bool TryGetCondition(out ConditionGraph condition)
             {
@@ -234,10 +191,7 @@ namespace Alis.Reactive.PlanModel
                 _condition = condition;
             }
 
-            public override string Kind => "when";
 
-            internal override void WriteGuardPayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
-                PlanJsonWriter.WriteProperty(writer, options, "condition", _condition);
 
             internal override bool TryGetCondition(out ConditionGraph condition)
             {
@@ -247,30 +201,12 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class BranchGuardJsonConverter : JsonConverter<BranchGuard>
-    {
-        public override void Write(Utf8JsonWriter writer, BranchGuard value, JsonSerializerOptions options)
-        {
-            writer.WriteStartObject();
-            writer.WriteString("kind", value.Kind);
-            value.WriteGuardPayload(writer, options);
-            writer.WriteEndObject();
-        }
-
-        public override BranchGuard Read(
-            ref Utf8JsonReader reader,
-            Type typeToConvert,
-            JsonSerializerOptions options) =>
-            throw new NotSupportedException("Plan types are write-only.");
-    }
 
     /// <summary>Sets a property value on a component or DOM element.</summary>
     internal sealed class SetReaction : ReactionGraph
     {
         private readonly MemberName _property;
 
-        /// <summary>JSON discriminator for set reactions. Always <c>"set"</c>.</summary>
-        public string Kind => "set";
         /// <summary>Runtime source whose property is set.</summary>
         public Source On { get; }
         /// <summary>Property name to set on the target source.</summary>
@@ -292,8 +228,6 @@ namespace Alis.Reactive.PlanModel
         private readonly MemberName _method;
         private readonly IReadOnlyList<ValueExpression> _args;
 
-        /// <summary>JSON discriminator for call reactions. Always <c>"call"</c>.</summary>
-        public string Kind => "call";
         /// <summary>Runtime source whose method is called.</summary>
         public Source On { get; }
         /// <summary>Method name to call on the target source.</summary>
@@ -320,8 +254,6 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Sends an HTTP request as defined by the enclosed <see cref="RequestPlan"/>.</summary>
     internal sealed class RequestReaction : ReactionGraph
     {
-        /// <summary>JSON discriminator for HTTP request reactions. Always <c>"request"</c>.</summary>
-        public string Kind => "request";
         /// <summary>HTTP request definition to execute in the async lane.</summary>
         public new RequestPlan Request { get; }
 
@@ -329,18 +261,15 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Dispatches a <c>CustomEvent</c>.</summary>
-    [JsonConverter(typeof(DispatchReactionJsonConverter))]
     internal sealed class DispatchReaction : ReactionGraph
     {
         private readonly EventName _event;
         private readonly DispatchPayload _payload;
 
-        /// <summary>JSON discriminator for custom event dispatch reactions. Always <c>"dispatch"</c>.</summary>
-        public string Kind => "dispatch";
         /// <summary>Custom event name to dispatch.</summary>
         public string Event => _event.Value;
 
-        internal DispatchPayload PayloadForJson => _payload;
+        internal DispatchPayload Payload => _payload;
 
         internal DispatchReaction(string eventName, DispatchPayload payload)
         {
@@ -349,25 +278,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class DispatchReactionJsonConverter : JsonConverter<DispatchReaction>
-    {
-        public override void Write(Utf8JsonWriter writer, DispatchReaction value, JsonSerializerOptions options)
-        {
-            writer.WriteStartObject();
-            writer.WriteString("kind", value.Kind);
-            writer.WriteString("event", value.Event);
-            PlanJsonWriter.WriteProperty(writer, options, "payload", value.PayloadForJson);
-            writer.WriteEndObject();
-        }
 
-        public override DispatchReaction Read(
-            ref Utf8JsonReader reader,
-            Type typeToConvert,
-            JsonSerializerOptions options) =>
-            throw new NotSupportedException("Plan types are write-only.");
-    }
-
-    [JsonConverter(typeof(DispatchPayloadJsonConverter))]
     internal abstract class DispatchPayload
     {
         private protected DispatchPayload() { }
@@ -375,9 +286,7 @@ namespace Alis.Reactive.PlanModel
         internal static DispatchPayload None { get; } =
             new NoDispatchPayload();
 
-        public abstract string Kind { get; }
 
-        internal abstract void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options);
 
         internal static DispatchPayload Of(ValueExpression data) =>
             new PresentDispatchPayload(data);
@@ -385,11 +294,7 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class NoDispatchPayload : DispatchPayload
     {
-        public override string Kind => "none";
 
-        internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options)
-        {
-        }
     }
 
     internal sealed class PresentDispatchPayload : DispatchPayload
@@ -403,38 +308,15 @@ namespace Alis.Reactive.PlanModel
 
         internal ValueExpression Data => _data;
 
-        public override string Kind => "value";
 
-        internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options)
-        {
-            PlanJsonWriter.WriteProperty(writer, options, "data", _data);
-        }
     }
 
-    internal sealed class DispatchPayloadJsonConverter : JsonConverter<DispatchPayload>
-    {
-        public override void Write(Utf8JsonWriter writer, DispatchPayload value, JsonSerializerOptions options)
-        {
-            writer.WriteStartObject();
-            writer.WriteString("kind", value.Kind);
-            value.WritePayload(writer, options);
-            writer.WriteEndObject();
-        }
-
-        public override DispatchPayload Read(
-            ref Utf8JsonReader reader,
-            Type typeToConvert,
-            JsonSerializerOptions options) =>
-            throw new NotSupportedException("Plan types are write-only.");
-    }
 
     /// <summary>Injects HTML into a partial slot.</summary>
     internal sealed class InjectReaction : ReactionGraph
     {
         private readonly ComponentKey _slot;
 
-        /// <summary>JSON discriminator for partial-slot injection reactions. Always <c>"inject"</c>.</summary>
-        public string Kind => "inject";
         /// <summary>Partial slot that receives injected HTML.</summary>
         public string Slot => _slot.Value;
         /// <summary>Value expression that resolves to the HTML to inject.</summary>
@@ -452,8 +334,6 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly ComponentId _container;
 
-        /// <summary>JSON discriminator for validation error display reactions. Always <c>"show-validation-errors"</c>.</summary>
-        public string Kind => "show-validation-errors";
         /// <summary>Element ID of the validation error container.</summary>
         public string Container => _container.Value;
 

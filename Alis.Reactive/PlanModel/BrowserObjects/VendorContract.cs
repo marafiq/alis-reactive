@@ -12,8 +12,6 @@ namespace Alis.Reactive.PlanModel
         private const string ArgumentPayload = "argument";
         private const string DomEventPayload = "dom-event";
 
-        internal static IReadOnlyCollection<string> PayloadValues { get; } = new[] { ArgumentPayload, DomEventPayload };
-
         internal VendorContract(Path objectPath, string subscribe, string unsubscribe, string payload)
         {
             ObjectPath = objectPath ?? throw new ArgumentNullException(nameof(objectPath));

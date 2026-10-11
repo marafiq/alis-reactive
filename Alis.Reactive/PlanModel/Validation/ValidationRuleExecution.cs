@@ -1,4 +1,3 @@
-using System.Text.Json;
 
 namespace Alis.Reactive.PlanModel
 {
@@ -16,19 +15,8 @@ namespace Alis.Reactive.PlanModel
 
         public ValidationRuleActivation Activation => _activation;
         public Shape ComparisonShape { get; }
-        public abstract string Kind { get; }
 
-        internal void WriteTo(Utf8JsonWriter writer, JsonSerializerOptions options)
-        {
-            writer.WriteStartObject();
-            writer.WriteString("kind", Kind);
-            WriteOperand(writer, options);
-            PlanJsonWriter.WriteProperty(writer, options, "activation", Activation);
-            PlanJsonWriter.WriteProperty(writer, options, "comparisonShape", ComparisonShape);
-            writer.WriteEndObject();
-        }
 
-        internal abstract void WriteOperand(Utf8JsonWriter writer, JsonSerializerOptions options);
 
         /// <summary>The literal the rule compares with, for a constraint rule.</summary>
         internal virtual bool TryGetConstraint(out LiteralExpression constraint)
@@ -81,7 +69,6 @@ namespace Alis.Reactive.PlanModel
 
         private sealed class NoOperandValidationRuleExecution : ValidationRuleExecution
         {
-            public override string Kind => "none";
 
             internal NoOperandValidationRuleExecution(
                 ValidationRuleActivation activation,
@@ -90,9 +77,6 @@ namespace Alis.Reactive.PlanModel
             {
             }
 
-            internal override void WriteOperand(Utf8JsonWriter writer, JsonSerializerOptions options)
-            {
-            }
         }
 
         private sealed class ConstraintValidationRuleExecution : ValidationRuleExecution
@@ -108,7 +92,6 @@ namespace Alis.Reactive.PlanModel
                 _value = value ?? throw new System.ArgumentNullException(nameof(value));
             }
 
-            public override string Kind => "constraint";
             public LiteralExpression Value => _value;
 
             internal override bool TryGetConstraint(out LiteralExpression constraint)
@@ -117,8 +100,6 @@ namespace Alis.Reactive.PlanModel
                 return true;
             }
 
-            internal override void WriteOperand(Utf8JsonWriter writer, JsonSerializerOptions options) =>
-                PlanJsonWriter.WriteProperty(writer, options, "value", _value);
         }
 
         private sealed class PeerValidationRuleExecution : ValidationRuleExecution
@@ -134,7 +115,6 @@ namespace Alis.Reactive.PlanModel
                 _value = value ?? throw new System.ArgumentNullException(nameof(value));
             }
 
-            public override string Kind => "peer";
             public ReadExpression Value => _value;
 
             internal override bool TryGetPeer(out ValueExpression peer)
@@ -143,8 +123,6 @@ namespace Alis.Reactive.PlanModel
                 return true;
             }
 
-            internal override void WriteOperand(Utf8JsonWriter writer, JsonSerializerOptions options) =>
-                PlanJsonWriter.WriteProperty(writer, options, "value", _value);
         }
     }
 }

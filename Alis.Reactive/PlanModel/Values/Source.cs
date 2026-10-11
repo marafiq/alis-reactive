@@ -1,12 +1,10 @@
 using System;
-using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
     /// Wire base for value source identifiers authored through DSL value reads.
     /// </summary>
-    [System.Text.Json.Serialization.JsonConverter(typeof(PlanNodeDiscriminator<Source>))]
     internal abstract class Source
     {
         private protected Source() { }
@@ -23,8 +21,6 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly ComponentKey _component;
 
-        /// <summary>JSON discriminator for component sources. Always <c>"component"</c>.</summary>
-        public string Kind => "component";
         /// <summary>Plan-registered component key used for runtime object lookup.</summary>
         public string Component => _component.Value;
 
@@ -47,8 +43,6 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly PayloadScope _scope;
 
-        /// <summary>JSON discriminator for payload sources. Always <c>"payload"</c>.</summary>
-        public string Kind => "payload";
         /// <summary>Payload scope wire term, for example event or success.</summary>
         public string Scope => _scope.Value;
 
@@ -88,8 +82,6 @@ namespace Alis.Reactive.PlanModel
         private readonly PluginName _name;
         private readonly BrowserObjectId _type;
 
-        /// <summary>JSON discriminator for plugin sources. Always <c>"plugin"</c>.</summary>
-        public string Kind => "plugin";
         /// <summary>Plan-registered plugin name used for runtime object lookup.</summary>
         public string Name => _name.Value;
         /// <summary>Plugin object contract key declared in the generated plan.</summary>
@@ -105,8 +97,6 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Reads from the browser <c>window.location</c> query string.</summary>
     internal sealed class UrlSource : Source
     {
-        /// <summary>JSON discriminator for URL query sources. Always <c>"url"</c>.</summary>
-        public string Kind => "url";
         private UrlSource() { }
         internal static UrlSource Instance { get; } = new UrlSource();
     }
@@ -121,8 +111,6 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly string _element;
 
-        /// <summary>JSON discriminator for direct DOM sources. Always <c>"dom"</c>.</summary>
-        public string Kind => "dom";
         /// <summary>Element ID resolved via <c>getElementById</c>.</summary>
         public string Element => _element;
 

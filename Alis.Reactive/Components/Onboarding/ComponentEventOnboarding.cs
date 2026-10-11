@@ -28,7 +28,7 @@ namespace Alis.Reactive
             var pipelineBuilder = new PipelineBuilder<TModel>(plan.Context);
             pipeline(typedEvent.Args, pipelineBuilder);
             plan.Context.WireComponentEvent(
-                target.IdForJson,
+                target.ComponentId.Value,
                 target.Vendor,
                 typedEvent.ObjectEvent,
                 pipelineBuilder.BuildReaction());

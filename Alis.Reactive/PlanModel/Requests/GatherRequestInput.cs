@@ -1,13 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
-using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
     internal sealed class GatherRequestInput : RequestInput
     {
-        public string Kind => "gather";
         public IReadOnlyList<RequestInputAssignment> Assignments { get; }
         public string BodyFormat => RequestBodyFormat.Value;
         public RegisteredInputSelection RegisteredInputs { get; }
@@ -36,19 +33,17 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class RegisteredInputSelection
     {
-        private RegisteredInputSelection(string kind, bool selectsRegisteredInputs)
+        private RegisteredInputSelection(bool selectsRegisteredInputs)
         {
-            Kind = kind;
             SelectsRegisteredInputs = selectsRegisteredInputs;
         }
 
         internal static RegisteredInputSelection ExplicitAssignments { get; } =
-            new RegisteredInputSelection("explicit", false);
+            new RegisteredInputSelection(false);
 
         internal static RegisteredInputSelection AllRegisteredInputs { get; } =
-            new RegisteredInputSelection("all-registered-inputs", true);
+            new RegisteredInputSelection(true);
 
-        public string Kind { get; }
         internal bool SelectsRegisteredInputs { get; }
     }
 
@@ -73,12 +68,10 @@ namespace Alis.Reactive.PlanModel
             => new RequestInputAssignment(RequestRouteParameterTarget.For(name), source);
     }
 
-    [JsonConverter(typeof(PlanNodeDiscriminator<RequestInputTarget>))]
     internal abstract class RequestInputTarget
     {
         private protected RequestInputTarget() { }
 
-        public abstract string Kind { get; }
     }
 
     internal sealed class RequestPayloadTarget : RequestInputTarget
@@ -90,7 +83,6 @@ namespace Alis.Reactive.PlanModel
             _path = path;
         }
 
-        public override string Kind => "payload";
         public string Name => _path.Value;
         public Path Path => _path.Path;
 
@@ -107,7 +99,6 @@ namespace Alis.Reactive.PlanModel
             _name = name;
         }
 
-        public override string Kind => "header";
         public string Name => _name.Value;
 
         internal static RequestHeaderTarget For(HeaderName name) =>
@@ -123,7 +114,6 @@ namespace Alis.Reactive.PlanModel
             _name = name;
         }
 
-        public override string Kind => "route-param";
         public string Name => _name.Value;
 
         internal static RequestRouteParameterTarget For(RouteParameterName name) =>

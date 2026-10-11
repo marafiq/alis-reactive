@@ -15,8 +15,8 @@ namespace Alis.Reactive.PlanModel
         private readonly IReadOnlyList<Behavior> _behaviors;
 
         public int Version => 3;
-        public string PlanId => _identity.PlanIdForJson;
-        public PlanScope Scope => _identity.ScopeForJson;
+        public string PlanId => _identity.PlanId;
+        public PlanScope Scope => _identity.Scope;
         public IReadOnlyDictionary<string, BrowserObjectContract> Types => _types;
         public IReadOnlyDictionary<string, VendorContract> Vendors => _vendors;
         public IReadOnlyDictionary<string, BrowserObject> Components => _components;

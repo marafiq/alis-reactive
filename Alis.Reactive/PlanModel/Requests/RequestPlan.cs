@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
@@ -127,15 +125,12 @@ namespace Alis.Reactive.PlanModel
             new RequestEndpoint(method, url);
     }
 
-    [JsonConverter(typeof(PlanNodeDiscriminator<RequestChain>))]
     internal abstract class RequestChain
     {
         private protected RequestChain() { }
 
         internal static RequestChain Terminal { get; } = new TerminalRequestChain();
 
-        /// <summary>JSON discriminator for request chain behavior.</summary>
-        public abstract string Kind { get; }
         internal abstract bool HasFollowUp { get; }
 
         internal static RequestChain ContinueWith(RequestPlan next) =>
@@ -145,8 +140,6 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Represents a request with no chained follow-up request.</summary>
     internal sealed class TerminalRequestChain : RequestChain
     {
-        /// <summary>JSON discriminator for terminal request chains. Always <c>"terminal"</c>.</summary>
-        public override string Kind => "terminal";
         internal override bool HasFollowUp => false;
     }
 
@@ -160,8 +153,6 @@ namespace Alis.Reactive.PlanModel
             _next = next;
         }
 
-        /// <summary>JSON discriminator for follow-up request chains. Always <c>"follow-up"</c>.</summary>
-        public override string Kind => "follow-up";
         internal override bool HasFollowUp => true;
 
         /// <summary>Request to run after the current request succeeds.</summary>
@@ -169,7 +160,6 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Wire base for request validation targets authored through request builders.</summary>
-    [JsonConverter(typeof(PlanNodeDiscriminator<RequestValidationTarget>))]
     internal abstract class RequestValidationTarget
     {
         private protected RequestValidationTarget() { }
@@ -177,8 +167,6 @@ namespace Alis.Reactive.PlanModel
         internal static RequestValidationTarget None { get; } =
             new NoRequestValidationTarget();
 
-        /// <summary>JSON discriminator for request validation targets.</summary>
-        public abstract string Kind { get; }
 
         internal static RequestValidationTarget DisplayIn(ComponentId container)
         {
@@ -189,8 +177,6 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Represents a request that does not run client validation before sending.</summary>
     internal sealed class NoRequestValidationTarget : RequestValidationTarget
     {
-        /// <summary>JSON discriminator for requests without client validation. Always <c>"none"</c>.</summary>
-        public override string Kind => "none";
     }
 
     /// <summary>Represents a request that validates a component container before sending.</summary>
@@ -203,8 +189,6 @@ namespace Alis.Reactive.PlanModel
             _container = container;
         }
 
-        /// <summary>JSON discriminator for container validation targets. Always <c>"container"</c>.</summary>
-        public override string Kind => "container";
 
         /// <summary>Component container ID to validate before sending the request.</summary>
         public string Container => _container.Value;
@@ -234,7 +218,6 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Wire base for HTTP response status matches authored through response routes.</summary>
-    [JsonConverter(typeof(PlanNodeDiscriminator<ResponseStatusMatch>))]
     internal abstract class ResponseStatusMatch
     {
         private protected ResponseStatusMatch() { }
@@ -242,8 +225,6 @@ namespace Alis.Reactive.PlanModel
         internal static ResponseStatusMatch Any { get; } =
             new AnyResponseStatusMatch();
 
-        /// <summary>JSON discriminator for HTTP response status matching.</summary>
-        public abstract string Kind { get; }
 
         internal static ResponseStatusMatch Exact(HttpResponseStatusCode statusCode) =>
             new ExactResponseStatusMatch(statusCode);
@@ -252,8 +233,6 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Matches any HTTP response status in the current success or error group.</summary>
     internal sealed class AnyResponseStatusMatch : ResponseStatusMatch
     {
-        /// <summary>JSON discriminator for any-status matches. Always <c>"any"</c>.</summary>
-        public override string Kind => "any";
     }
 
     /// <summary>Matches one exact HTTP response status code.</summary>
@@ -266,8 +245,6 @@ namespace Alis.Reactive.PlanModel
             _statusCode = statusCode;
         }
 
-        /// <summary>JSON discriminator for exact-status matches. Always <c>"status"</c>.</summary>
-        public override string Kind => "status";
 
         /// <summary>HTTP status code that selects this route.</summary>
         public int Status => _statusCode.Value;

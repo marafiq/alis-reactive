@@ -8,11 +8,9 @@ namespace Alis.Reactive
     /// Target owns the component id and vendor before any property, method, or event
     /// contract is declared against the runtime object.
     /// </summary>
-    internal abstract class ComponentObjectTarget
+    internal sealed class ComponentObjectTarget
     {
-        private protected ComponentObjectTarget(
-            ComponentId componentId,
-            ComponentVendor vendor)
+        private ComponentObjectTarget(ComponentId componentId, ComponentVendor vendor)
         {
             ComponentId = componentId ?? throw new ArgumentNullException(nameof(componentId));
             Vendor = vendor ?? throw new ArgumentNullException(nameof(vendor));
@@ -22,9 +20,8 @@ namespace Alis.Reactive
 
         internal ComponentVendor Vendor { get; }
 
-        internal string IdForJson => ComponentId.Value;
-
-        internal abstract ComponentKey DeclareIn(PlanBuildContext context);
+        internal ComponentKey DeclareIn(PlanBuildContext context) =>
+            context.DeclareObjectTarget(ComponentId.Value, Vendor);
 
         internal static ComponentObjectTarget For<TComponent>(string componentId)
             where TComponent : IComponent, new()
@@ -35,13 +32,12 @@ namespace Alis.Reactive
             return For(componentId, component.Vendor);
         }
 
+        /// <summary>An app-level object at its fixed id.</summary>
         internal static ComponentObjectTarget ForLayout<TComponent>()
             where TComponent : IAppLevelComponent, new()
         {
             var component = new TComponent();
-            return new LayoutObjectTarget(
-                ComponentId.Of(component.DefaultId),
-                component.Vendor);
+            return new ComponentObjectTarget(ComponentId.Of(component.DefaultId), component.Vendor);
         }
 
         internal static ComponentObjectTarget For(string componentId, ComponentVendor vendor)
@@ -49,33 +45,7 @@ namespace Alis.Reactive
             if (componentId == null) throw new ArgumentNullException(nameof(componentId));
             if (vendor == null) throw new ArgumentNullException(nameof(vendor));
 
-            return new ObjectTarget(ComponentId.Of(componentId), vendor);
-        }
-
-        private sealed class ObjectTarget : ComponentObjectTarget
-        {
-            internal ObjectTarget(ComponentId componentId, ComponentVendor vendor)
-                : base(componentId, vendor)
-            {
-            }
-
-            internal override ComponentKey DeclareIn(PlanBuildContext context)
-            {
-                return context.DeclareObjectTarget(ComponentId.Value, Vendor);
-            }
-        }
-
-        private sealed class LayoutObjectTarget : ComponentObjectTarget
-        {
-            internal LayoutObjectTarget(ComponentId componentId, ComponentVendor vendor)
-                : base(componentId, vendor)
-            {
-            }
-
-            internal override ComponentKey DeclareIn(PlanBuildContext context)
-            {
-                return context.DeclareLayoutObject(ComponentId.Value, Vendor);
-            }
+            return new ComponentObjectTarget(ComponentId.Of(componentId), vendor);
         }
     }
 }

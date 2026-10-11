@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
@@ -71,9 +69,9 @@ namespace Alis.Reactive.PlanModel
             _scope = scope ?? throw new ArgumentNullException(nameof(scope));
         }
 
-        internal string PlanIdForJson => _planId.Value;
+        internal string PlanId => _planId.Value;
 
-        internal PlanScope ScopeForJson => _scope;
+        internal PlanScope Scope => _scope;
 
         internal static PlanIdentity Root(PlanId planId) =>
             new PlanIdentity(planId, PlanScope.Root);
@@ -83,7 +81,6 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Wire base for plan merge scope emitted by root and partial plans.</summary>
-    [JsonConverter(typeof(PlanNodeDiscriminator<PlanScope>))]
     internal abstract class PlanScope
     {
         private protected PlanScope() { }
@@ -92,8 +89,6 @@ namespace Alis.Reactive.PlanModel
 
         internal static PlanScope Partial { get; } = new PartialPlanScope();
 
-        /// <summary>JSON discriminator for plan merge scope.</summary>
-        public abstract string Kind { get; }
     }
 
     /// <summary>Plan scope for the root view plan.</summary>
@@ -101,8 +96,6 @@ namespace Alis.Reactive.PlanModel
     {
         internal RootPlanScope() { }
 
-        /// <summary>JSON discriminator for root view plans. Always <c>"root"</c>.</summary>
-        public override string Kind => "root";
     }
 
     /// <summary>Plan scope for a partial plan that can be loaded into a DOM slot.</summary>
@@ -110,8 +103,6 @@ namespace Alis.Reactive.PlanModel
     {
         internal PartialPlanScope() { }
 
-        /// <summary>JSON discriminator for partial plans. Always <c>"partial"</c>.</summary>
-        public override string Kind => "partial";
     }
 
     internal sealed class ComponentId : PlanString
