@@ -128,13 +128,16 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         public int Remaining { get; set; }
     }
 
-    /// <summary>Payload of <see cref="VisitPlanner.Full"/>.</summary>
-    public class VisitPlannerFullArgs
+    /// <summary>Payload of <see cref="VisitPlanner.Full"/>; it carries a method as well as data.</summary>
+    public class VisitPlannerFullArgs : JsObject
     {
         public int Capacity { get; set; }
 
         /// <summary>The time that could not be booked.</summary>
         public string Attempted { get; set; } = "";
+
+        /// <summary>Puts the time that could not be booked on the waitlist; the planner shows it.</summary>
+        public ComponentMethod Waitlist => Method("waitlist");
     }
 
     /// <summary>Payload of <see cref="VisitPlanner.BeforeBook"/>; the planner reads <see cref="Cancel"/> back.</summary>

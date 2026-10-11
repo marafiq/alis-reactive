@@ -5,7 +5,8 @@
 //   properties  value (booked slot ids), capacity, wing, readOnly, slots, labels.empty, count (read only)
 //   functions   remaining(), isBooked(id), firstOpen(), firstBooked(), summary() (a promise)
 //   methods     select(id), release(id), clear(), book(id, visitors, note), focus(), prepareSummary() (a promise)
-//   events      change, full, beforeBook (cancelable), slotsLoaded, through on(name, fn) / off(name, fn)
+//   events      change, full (its payload can waitlist the time), beforeBook (cancelable), slotsLoaded,
+//               through on(name, fn) / off(name, fn)
 
 import "./visit-planner.css";
 
@@ -31,6 +32,7 @@ export class VisitPlanner {
   private readonly host: VisitPlannerHost;
   private readonly listeners = new Map<string, Set<Listener>>();
   private readonly notes = new Map<string, BookingNote>();
+  private readonly waitlisted = new Set<string>();
   private booked: string[] = [];
   private offered: VisitSlot[] = [];
   private weeklyCapacity: number;
@@ -143,11 +145,16 @@ export class VisitPlanner {
     if (request.cancel) return;
 
     if (this.booked.length >= this.weeklyCapacity) {
-      this.emit("full", { capacity: this.weeklyCapacity, attempted: id });
+      const waitlist = (): void => {
+        this.waitlisted.add(id);
+        this.render();
+      };
+      this.emit("full", { capacity: this.weeklyCapacity, attempted: id, waitlist });
       return;
     }
 
     this.booked = this.inOfferedOrder([...this.booked, id]);
+    this.waitlisted.delete(id);
     this.render();
     this.emitChange(id, null);
   }
@@ -164,6 +171,7 @@ export class VisitPlanner {
     if (this.booked.length === 0) return;
     this.booked = [];
     this.notes.clear();
+    this.waitlisted.clear();
     this.render();
     this.emitChange(null, null);
   }
@@ -259,6 +267,7 @@ export class VisitPlanner {
       item.append(button);
       const note = this.notes.get(slot.id);
       if (booked && note !== undefined) item.append(element("span", "vp-note", noteText(note)));
+      if (this.waitlisted.has(slot.id)) item.append(element("span", "vp-waitlist", "On the waitlist"));
       list.append(item);
     }
     return list;

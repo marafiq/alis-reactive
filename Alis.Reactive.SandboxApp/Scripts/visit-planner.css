@@ -67,3 +67,9 @@
   font-size: 0.75rem;
   color: #52525b;
 }
+
+.visit-planner .vp-waitlist {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: #b45309;
+}

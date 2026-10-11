@@ -42,6 +42,7 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
     private ILocator WeekFull => Page.Locator("#week-full");
     private ILocator BrunchStatus => Page.Locator("#brunch-status");
     private ILocator RequestedStatus => Page.Locator("#requested-status");
+    private ILocator BrunchPlanned => Page.Locator("#brunch-planned");
     private ILocator CheckRequested => Page.Locator("#check-requested");
     private ILocator ShareWeek => Page.Locator("#share-week");
     private ILocator ShareStatus => Page.Locator("#share-status");
@@ -150,6 +151,7 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
 
         await Expect(WeekFull).ToHaveTextAsync("This week is full: 3 visits.");
         await Expect(Planner.Time("Sun 11:00 AM")).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(Planner.WaitlistUnder("Sun 11:00 AM")).ToHaveTextAsync("On the waitlist");
 
         await Planner.Time("Tue 3:00 PM").ClickAsync();
         await Expect(WeekFull).ToBeHiddenAsync();
@@ -205,6 +207,10 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
         await Planner.Time("Sun 11:00 AM").ClickAsync();
         await CheckBrunch.ClickAsync();
         await Expect(BrunchStatus).ToHaveTextAsync("Sunday brunch is booked.");
+        await Expect(BrunchPlanned).ToBeVisibleAsync();
+
+        await Planner.Time("Sun 11:00 AM").ClickAsync();
+        await Expect(BrunchPlanned).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
@@ -378,10 +384,13 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
         internal ILocator Time(string label) =>
             _root.GetByRole(AriaRole.Button, new() { Name = label, Exact = true });
 
+        internal ILocator NoteUnder(string label) => ItemOf(label).Locator(".vp-note");
+
+        internal ILocator WaitlistUnder(string label) => ItemOf(label).Locator(".vp-waitlist");
+
         // A filter's inner locator is matched inside each item, so it starts from the page, not the root.
-        internal ILocator NoteUnder(string label) =>
+        private ILocator ItemOf(string label) =>
             _root.Locator("li.vp-item")
-                .Filter(new() { Has = _root.Page.GetByRole(AriaRole.Button, new() { Name = label, Exact = true }) })
-                .Locator(".vp-note");
+                .Filter(new() { Has = _root.Page.GetByRole(AriaRole.Button, new() { Name = label, Exact = true }) });
     }
 }

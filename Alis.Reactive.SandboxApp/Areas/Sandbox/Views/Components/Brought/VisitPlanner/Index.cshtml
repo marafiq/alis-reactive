@@ -91,6 +91,7 @@
                         })
                         .Else(refuse =>
                         {
+                            refuse.Payload(args).Call(a => a.Waitlist);
                             refuse.Element("week-full-capacity").SetText(args, x => x.Capacity);
                             refuse.Element("week-full").Show();
                         }))
@@ -108,6 +109,9 @@
                     p.When(planner.Get(c => c.Count)).Gt(0)
                         .Then(some => some.Element("plan-empty").Hide())
                         .Else(none => none.Element("plan-empty").Show());
+                    p.When(args, x => x.Value).ArrayContains("sun-11")
+                        .Then(brunch => brunch.Element("brunch-planned").Show())
+                        .Else(none => none.Element("brunch-planned").Hide());
                 }); }
 
             @{ Html.InputField(plan, m => m.Note, o => o.Label("Note for the front desk"))
@@ -145,6 +149,7 @@
                 <native-text color="Secondary"><span id="plan-empty">No visits planned yet.</span></native-text>
                 <p id="quiet-hours" class="text-sm text-warning" hidden><span id="quiet-slot"></span> is during quiet hours; choose another time.</p>
                 <p id="week-full" class="text-sm text-warning" hidden>This week is full: <span id="week-full-capacity"></span> visits.</p>
+                <p id="brunch-planned" class="text-sm text-success" hidden>Sunday brunch with the family is planned.</p>
             </native-vstack>
 
             <native-hstack gap="Sm" class="flex-wrap">
