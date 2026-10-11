@@ -34,5 +34,12 @@ namespace Alis.Reactive
         /// <param name="member">The JavaScript method name, for example <c>"updateData"</c>.</param>
         protected static ComponentMethod<TArg> Method<TArg>(string member) =>
             new ComponentMethod<TArg>(ComponentMethod.Named(member).WithArgs<TArg>());
+
+        /// <summary>Declares a JavaScript method that takes two arguments.</summary>
+        /// <typeparam name="T1">The C# type of the first argument.</typeparam>
+        /// <typeparam name="T2">The C# type of the second argument.</typeparam>
+        /// <param name="member">The JavaScript method name, for example <c>"addIcon"</c>.</param>
+        protected static ComponentMethod<T1, T2> Method<T1, T2>(string member) =>
+            new ComponentMethod<T1, T2>(ComponentMethod.Named(member).WithArgs<T1, T2>());
     }
 }

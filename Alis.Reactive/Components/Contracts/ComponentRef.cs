@@ -77,6 +77,21 @@ namespace Alis.Reactive
                 });
         }
 
+        /// <summary>Calls one of the component's declared two-argument methods with literal arguments.</summary>
+        /// <example><c>p.Component&lt;FusionTextBox&gt;(m =&gt; m.Name).Call(c =&gt; c.AddIcon, "append", "e-icons e-search")</c></example>
+        public ComponentRef<TComponent, TModel> Call<T1, T2>(
+            System.Func<TComponent, ComponentMethod<T1, T2>> method, T1 first, T2 second)
+        {
+            if (method == null) throw new System.ArgumentNullException(nameof(method));
+            return EmitCall(
+                method(Declaration).Method,
+                new System.Collections.Generic.List<ValueExpression>
+                {
+                    ValueExpression.LiteralFor(first, Shape.FromClrType(typeof(T1))),
+                    ValueExpression.LiteralFor(second, Shape.FromClrType(typeof(T2))),
+                });
+        }
+
         /// <summary>
         /// Calls one of the component's declared methods with an argument read at runtime: another
         /// component, an event payload, a response body, a URL parameter, a plugin or an array.

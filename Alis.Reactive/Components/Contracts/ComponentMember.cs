@@ -134,6 +134,22 @@ namespace Alis.Reactive
     }
 
     /// <summary>
+    /// A JavaScript method that takes two typed arguments. Declare one with
+    /// <c>Method&lt;T1, T2&gt;("jsName")</c> on a <see cref="JsObject"/>; use it with <c>Call</c>.
+    /// </summary>
+    /// <typeparam name="T1">The C# type of the first argument.</typeparam>
+    /// <typeparam name="T2">The C# type of the second argument.</typeparam>
+    public sealed class ComponentMethod<T1, T2>
+    {
+        internal ComponentMethod(ComponentMethod method)
+        {
+            Method = method ?? throw new ArgumentNullException(nameof(method));
+        }
+
+        internal ComponentMethod Method { get; }
+    }
+
+    /// <summary>
     /// DOM element contract used by <c>p.Element(...)</c>.
     /// Native DOM onboarding stays explicit without changing the public DSL.
     /// </summary>

@@ -80,11 +80,11 @@
             @{ Html.InputField(plan, m => m.ResidentSearch, o => o.Label("Resident name"))
                 .FusionTextBox(b => b
                     .Placeholder("Search by name")
-                    .ShowClearButton(true)
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        LoadDirectory(p, "name filter applied");
-                    })); }
+                    .ShowClearButton(true))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    LoadDirectory(p, "name filter applied");
+                }); }
 
             @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care level"))
                 .FusionDropDownList(b => b
