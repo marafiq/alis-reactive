@@ -88,7 +88,7 @@
                     .OnSuccess<SaveStepResponse>((json, s) =>
                     {
                         s.Component<NativeHiddenField>(m => m.ScreeningId)
-                            .SetValue(json, x => x.ScreeningId);
+                            .Set(c => c.Value, json.Read(x => x.ScreeningId));
                     })
                     .OnError(400, e => e.ValidationErrors("step1-form"))
                     .Chained(c => c

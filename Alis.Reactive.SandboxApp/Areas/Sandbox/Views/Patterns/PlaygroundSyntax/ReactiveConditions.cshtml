@@ -27,39 +27,39 @@
         <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.Status, o => o.Required().Label("Status"))
                .NativeDropDown(b => b
-                   .Items(statusItems)
-                   .Reactive(plan, evt => evt.Changed, (args, p) =>
-                   {
-                       p.When(args, x => x.Value).Eq("active")
-                           .Then(then =>
-                           {
-                               then.Component<FusionNumericTextBox>(m => m.Amount).Set(c => c.Value, 100);
-                               then.Component<NativeDropDown>(m => m.Address!.City).SetValue("seattle");
-                               then.Element("status-result").SetText("Active: Amount=100, City=Seattle");
-                               then.Element("status-result").AddClass("text-emerald-700");
-                               then.Element("status-result").RemoveClass("text-amber-600");
-                               then.Element("status-result").RemoveClass("text-slate-500");
-                               then.Element("address-section").Show();
-                           })
-                           .ElseIf(args, x => x.Value).Eq("inactive")
-                           .Then(then =>
-                           {
-                               then.Component<FusionNumericTextBox>(m => m.Amount).Set(c => c.Value, 0);
-                               then.Element("status-result").SetText("Inactive: Amount=0, address hidden");
-                               then.Element("status-result").AddClass("text-amber-600");
-                               then.Element("status-result").RemoveClass("text-emerald-700");
-                               then.Element("status-result").RemoveClass("text-slate-500");
-                               then.Element("address-section").Hide();
-                           })
-                           .Else(else_ =>
-                           {
-                               else_.Element("status-result").SetText("Pending or empty");
-                               else_.Element("status-result").AddClass("text-slate-500");
-                               else_.Element("status-result").RemoveClass("text-emerald-700");
-                               else_.Element("status-result").RemoveClass("text-amber-600");
-                               else_.Element("address-section").Show();
-                           });
-                   })); }
+                   .Items(statusItems))
+               .Reactive(evt => evt.Change, (args, p) =>
+               {
+                   p.When(args, x => x.Value).Eq("active")
+                       .Then(then =>
+                       {
+                           then.Component<FusionNumericTextBox>(m => m.Amount).Set(c => c.Value, 100);
+                           then.Component<NativeDropDown>(m => m.Address!.City).Set(c => c.Value, "seattle");
+                           then.Element("status-result").SetText("Active: Amount=100, City=Seattle");
+                           then.Element("status-result").AddClass("text-emerald-700");
+                           then.Element("status-result").RemoveClass("text-amber-600");
+                           then.Element("status-result").RemoveClass("text-slate-500");
+                           then.Element("address-section").Show();
+                       })
+                       .ElseIf(args, x => x.Value).Eq("inactive")
+                       .Then(then =>
+                       {
+                           then.Component<FusionNumericTextBox>(m => m.Amount).Set(c => c.Value, 0);
+                           then.Element("status-result").SetText("Inactive: Amount=0, address hidden");
+                           then.Element("status-result").AddClass("text-amber-600");
+                           then.Element("status-result").RemoveClass("text-emerald-700");
+                           then.Element("status-result").RemoveClass("text-slate-500");
+                           then.Element("address-section").Hide();
+                       })
+                       .Else(else_ =>
+                       {
+                           else_.Element("status-result").SetText("Pending or empty");
+                           else_.Element("status-result").AddClass("text-slate-500");
+                           else_.Element("status-result").RemoveClass("text-emerald-700");
+                           else_.Element("status-result").RemoveClass("text-amber-600");
+                           else_.Element("address-section").Show();
+                       });
+               }); }
 
             @{ Html.InputField(plan, m => m.Amount, o => o.Required().Label("Amount"))
                .FusionNumericTextBox(b => b
@@ -96,37 +96,37 @@
 
             @{ Html.InputField(plan, m => m.Address!.City, o => o.Label("City"))
                .NativeDropDown(b => b
-                   .Items(cityItems)
-                   .Reactive(plan, evt => evt.Changed, (args, p) =>
-                   {
-                       p.When(args, x => x.Value).Eq("seattle")
-                           .Then(then =>
-                           {
-                               then.Component<NativeDropDown>(m => m.Address!.State).SetValue("WA");
-                               then.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).Set(c => c.Value, 98101);
-                               then.Element("city-auto").SetText("Auto-filled: WA, 98101");
-                           })
-                           .ElseIf(args, x => x.Value).Eq("portland")
-                           .Then(then =>
-                           {
-                               then.Component<NativeDropDown>(m => m.Address!.State).SetValue("OR");
-                               then.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).Set(c => c.Value, 97201);
-                               then.Element("city-auto").SetText("Auto-filled: OR, 97201");
-                           })
-                           .ElseIf(args, x => x.Value).Eq("denver")
-                           .Then(then =>
-                           {
-                               then.Component<NativeDropDown>(m => m.Address!.State).SetValue("CO");
-                               then.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).Set(c => c.Value, 80201);
-                               then.Element("city-auto").SetText("Auto-filled: CO, 80201");
-                           })
-                           .Else(else_ =>
-                           {
-                               else_.Component<NativeDropDown>(m => m.Address!.State).SetValue("");
-                               else_.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).Set(c => c.Value, 0);
-                               else_.Element("city-auto").SetText("Select a city");
-                           });
-                   })); }
+                   .Items(cityItems))
+               .Reactive(evt => evt.Change, (args, p) =>
+               {
+                   p.When(args, x => x.Value).Eq("seattle")
+                       .Then(then =>
+                       {
+                           then.Component<NativeDropDown>(m => m.Address!.State).Set(c => c.Value, "WA");
+                           then.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).Set(c => c.Value, 98101);
+                           then.Element("city-auto").SetText("Auto-filled: WA, 98101");
+                       })
+                       .ElseIf(args, x => x.Value).Eq("portland")
+                       .Then(then =>
+                       {
+                           then.Component<NativeDropDown>(m => m.Address!.State).Set(c => c.Value, "OR");
+                           then.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).Set(c => c.Value, 97201);
+                           then.Element("city-auto").SetText("Auto-filled: OR, 97201");
+                       })
+                       .ElseIf(args, x => x.Value).Eq("denver")
+                       .Then(then =>
+                       {
+                           then.Component<NativeDropDown>(m => m.Address!.State).Set(c => c.Value, "CO");
+                           then.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).Set(c => c.Value, 80201);
+                           then.Element("city-auto").SetText("Auto-filled: CO, 80201");
+                       })
+                       .Else(else_ =>
+                       {
+                           else_.Component<NativeDropDown>(m => m.Address!.State).Set(c => c.Value, "");
+                           else_.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).Set(c => c.Value, 0);
+                           else_.Element("city-auto").SetText("Select a city");
+                       });
+               }); }
 
             @{ Html.InputField(plan, m => m.Address!.State, o => o.Label("State"))
                .NativeDropDown(b => b

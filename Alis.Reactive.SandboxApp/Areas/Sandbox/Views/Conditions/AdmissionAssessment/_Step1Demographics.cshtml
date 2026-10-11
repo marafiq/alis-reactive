@@ -66,7 +66,7 @@
 
                 // Shared Active Plan hidden field feeds Step 2 conditions.
                 p.Component<NativeHiddenField, Step2ClinicalModel>(m => m.PrimaryDiagnosis)
-                    .SetValue(diag.Get(c => c.Value));
+                    .Set(c => c.Value, diag.Get(c => c.Value));
 
                 p.When(diag.Get(c => c.Value)).In("Alzheimer's", "Parkinson's")
                     .Then(t => t.Element("cognitive-section").Show())
@@ -145,11 +145,11 @@
                     {
                         // Later-step saves use the Step 1 draft key from the Active Plan.
                         s.Component<NativeHiddenField, Step2ClinicalModel>(m => m.ScreeningId)
-                            .SetValue(json, x => x.ScreeningId);
+                            .Set(c => c.Value, json.Read(x => x.ScreeningId));
                         s.Component<NativeHiddenField, Step3FunctionalModel>(m => m.ScreeningId)
-                            .SetValue(json, x => x.ScreeningId);
+                            .Set(c => c.Value, json.Read(x => x.ScreeningId));
                         s.Component<NativeHiddenField, Step4ReviewModel>(m => m.ScreeningId)
-                            .SetValue(json, x => x.ScreeningId);
+                            .Set(c => c.Value, json.Read(x => x.ScreeningId));
 
                         s.Element("step-1").Hide();
                         s.Element("step-2").Show();

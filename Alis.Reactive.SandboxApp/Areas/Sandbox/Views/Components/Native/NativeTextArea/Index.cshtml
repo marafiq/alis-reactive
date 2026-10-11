@@ -8,13 +8,13 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<NativeTextArea>(m => m.CareNotes).SetValue("Resident stable. Vitals within normal range.");
+        p.Component<NativeTextArea>(m => m.CareNotes).Set(c => c.Value, "Resident stable. Vitals within normal range.");
     }));
 
     Html.On(plan, t => t.DomReady(p =>
     {
         var comp = p.Component<NativeTextArea>(m => m.CareNotes);
-        p.Element("value-echo").SetText(comp.Value());
+        p.Element("value-echo").SetText(comp.Get(c => c.Value));
     }));
 }
 
@@ -56,30 +56,30 @@
             .NativeTextArea(b => b
                 .Rows(4)
                 .Placeholder("Describe the incident")
-                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    p.When(args, x => x.Value).IsEmpty()
-                        .Then(t =>
-                        {
-                            t.Element("incident-status").SetText("no incident");
-                            t.Element("incident-status").AddClass("text-red-600");
-                            t.Element("incident-status").RemoveClass("text-green-600");
-                        })
-                        .Else(e =>
-                        {
-                            e.Element("incident-status").SetText("incident logged");
-                            e.Element("incident-status").AddClass("text-green-600");
-                            e.Element("incident-status").RemoveClass("text-red-600");
-                        });
-                })); }
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full"))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                p.When(args, x => x.Value).IsEmpty()
+                    .Then(t =>
+                    {
+                        t.Element("incident-status").SetText("no incident");
+                        t.Element("incident-status").AddClass("text-red-600");
+                        t.Element("incident-status").RemoveClass("text-green-600");
+                    })
+                    .Else(e =>
+                    {
+                        e.Element("incident-status").SetText("incident logged");
+                        e.Element("incident-status").AddClass("text-green-600");
+                        e.Element("incident-status").RemoveClass("text-red-600");
+                    });
+            }); }
         <p class="font-mono text-sm mt-2">Status: <span id="incident-status" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            Button reads care notes via <code>When(comp.Value()).IsEmpty()</code>
+            Button reads care notes via <code>When(comp.Get(c =&gt; c.Value)).IsEmpty()</code>
             and shows a warning or confirmation.
         </p>
         @(Html.NativeButton("check-notes-btn", "Check Care Notes")
@@ -87,7 +87,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var comp = p.Component<NativeTextArea>(m => m.CareNotes);
-                p.When(comp.Value()).IsEmpty()
+                p.When(comp.Get(c => c.Value)).IsEmpty()
                     .Then(t => t.Element("notes-warning").SetText("notes required"))
                     .Else(e => e.Element("notes-warning").SetText("notes recorded"));
             }))

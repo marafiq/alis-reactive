@@ -136,13 +136,13 @@
                    .Placeholder("Required")); }
             @{ Html.InputField(plan, m => m.Hidden!.ShowExtras, o => o.Label("Show Extra Fields"))
                .NativeCheckBox(b => b
-                   .CssClass("h-4 w-4 rounded border-border text-accent")
-                   .Reactive(plan, evt => evt.Changed, (args, p) =>
-                   {
-                       p.When(args, a => a.Checked).Truthy()
-                        .Then(t => t.Element("hf_extras").Show())
-                        .Else(e => e.Element("hf_extras").Hide());
-                   })); }
+                   .CssClass("h-4 w-4 rounded border-border text-accent"))
+               .Reactive(evt => evt.Change, (args, p) =>
+               {
+                   p.When(args, a => a.Checked).Truthy()
+                    .Then(t => t.Element("hf_extras").Show())
+                    .Else(e => e.Element("hf_extras").Hide());
+               }); }
             <div id="hf_extras" hidden class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 @{ Html.InputField(plan, m => m.Hidden!.Phone, o => o.Label("Phone (hidden)"))
                    .NativeTextBox(b => b

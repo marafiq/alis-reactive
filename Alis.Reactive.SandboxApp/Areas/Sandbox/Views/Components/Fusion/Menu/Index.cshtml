@@ -157,7 +157,7 @@
                     e.Element("before-open-parent").SetText(args, x => x.ParentItem!.Text);
                 });
 
-            p.When(p.Component<NativeCheckBox>(m => m.BlockOpen).Value()).Truthy()
+            p.When(p.Component<NativeCheckBox>(m => m.BlockOpen).Get(c => c.Checked)).Truthy()
                 .Then(t =>
                 {
                     t.Element("before-open-cancel").SetText("cancelled");
@@ -193,7 +193,7 @@
                 .Else(e => e.Element("before-close-parent").SetText(args, x => x.ParentItem!.Text));
             p.Element("before-close-cancel-value").SetText(args, x => x.Cancel);
 
-            p.When(p.Component<NativeCheckBox>(m => m.BlockClose).Value()).Truthy()
+            p.When(p.Component<NativeCheckBox>(m => m.BlockClose).Get(c => c.Checked)).Truthy()
                 .Then(t =>
                 {
                     t.Element("before-close-cancel").SetText("cancelled");

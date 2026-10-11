@@ -61,12 +61,12 @@
 
         @{ Html.InputField(plan, m => m.SelectedActivities, o => o.Label("Activities"))
             .NativeCheckList(b => b
-                .Items(activityItems)
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var count = p.From(args, e => e.Value).Count();
-                    p.Element("selected-count").SetText(count);
-                })); }
+                .Items(activityItems))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var count = p.From(args, e => e.Value).Count();
+                p.Element("selected-count").SetText(count);
+            }); }
 
         <p class="font-mono text-sm mt-2">Selected count: <span id="selected-count">&mdash;</span></p>
     </native-card-body></native-card>

@@ -8,13 +8,13 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<NativeTextBox>(m => m.ResidentName).SetValue("Jane Doe");
+        p.Component<NativeTextBox>(m => m.ResidentName).Set(c => c.Value, "Jane Doe");
     }));
 
     Html.On(plan, t => t.DomReady(p =>
     {
         var comp = p.Component<NativeTextBox>(m => m.ResidentName);
-        p.Element("value-echo").SetText(comp.Value());
+        p.Element("value-echo").SetText(comp.Get(c => c.Value));
     }));
 }
 
@@ -54,30 +54,30 @@
         @{ Html.InputField(plan, m => m.EmergencyContact, o => o.Label("Emergency Contact"))
             .NativeTextBox(b => b
                 .Placeholder("Enter emergency contact")
-                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    p.When(args, x => x.Value).IsEmpty()
-                        .Then(t =>
-                        {
-                            t.Element("contact-status").SetText("contact required");
-                            t.Element("contact-status").AddClass("text-red-600");
-                            t.Element("contact-status").RemoveClass("text-green-600");
-                        })
-                        .Else(e =>
-                        {
-                            e.Element("contact-status").SetText("contact provided");
-                            e.Element("contact-status").AddClass("text-green-600");
-                            e.Element("contact-status").RemoveClass("text-red-600");
-                        });
-                })); }
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm"))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                p.When(args, x => x.Value).IsEmpty()
+                    .Then(t =>
+                    {
+                        t.Element("contact-status").SetText("contact required");
+                        t.Element("contact-status").AddClass("text-red-600");
+                        t.Element("contact-status").RemoveClass("text-green-600");
+                    })
+                    .Else(e =>
+                    {
+                        e.Element("contact-status").SetText("contact provided");
+                        e.Element("contact-status").AddClass("text-green-600");
+                        e.Element("contact-status").RemoveClass("text-red-600");
+                    });
+            }); }
         <p class="font-mono text-sm mt-2">Status: <span id="contact-status" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            Button reads resident name via <code>When(comp.Value()).IsEmpty()</code>
+            Button reads resident name via <code>When(comp.Get(c =&gt; c.Value)).IsEmpty()</code>
             and shows a warning or confirmation.
         </p>
         @(Html.NativeButton("check-name-btn", "Check Resident Name")
@@ -85,7 +85,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var comp = p.Component<NativeTextBox>(m => m.ResidentName);
-                p.When(comp.Value()).IsEmpty()
+                p.When(comp.Get(c => c.Value)).IsEmpty()
                     .Then(t => t.Element("name-warning").SetText("name is required"))
                     .Else(e => e.Element("name-warning").SetText("name set"));
             }))

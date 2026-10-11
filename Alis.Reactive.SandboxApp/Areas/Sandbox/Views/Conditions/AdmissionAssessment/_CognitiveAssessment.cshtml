@@ -27,18 +27,18 @@
                 p.When(comp.Get(c => c.Value)).Lt(15m)
                     .Then(t =>
                     {
-                        t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Memory Care");
+                        t.Component<NativeHiddenField>(m => m.CareUnit).Set(c => c.Value, "Memory Care");
                         t.Element("cognitive-status").SetText("Severe Impairment — Memory Care");
                     })
                     .ElseIf(comp.Get(c => c.Value)).Lt(25m)
                     .Then(t =>
                     {
-                        t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Assisted Living with Memory Support");
+                        t.Component<NativeHiddenField>(m => m.CareUnit).Set(c => c.Value, "Assisted Living with Memory Support");
                         t.Element("cognitive-status").SetText("Moderate Impairment — Assisted Living + Memory");
                     })
                     .Else(e =>
                     {
-                        e.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Standard Assisted Living");
+                        e.Component<NativeHiddenField>(m => m.CareUnit).Set(c => c.Value, "Standard Assisted Living");
                         e.Element("cognitive-status").SetText("Mild/Normal — Standard");
                     });
 

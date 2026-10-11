@@ -150,13 +150,13 @@
                 @{ Html.InputField(plan, m => m.RequiresMedicationManagement,
                     o => o.Label("Requires Medication Management"))
                     .NativeCheckBox(b => b
-                        .CssClass("h-4 w-4 rounded border-border text-accent")
-                        .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
-                        {
-                            pipeline.When(args, a => a.Checked).Truthy()
-                                .Then(t => t.Element("physician-section").Show())
-                                .Else(e => e.Element("physician-section").Hide());
-                        })); }
+                        .CssClass("h-4 w-4 rounded border-border text-accent"))
+                    .Reactive(evt => evt.Change, (args, pipeline) =>
+                    {
+                        pipeline.When(args, a => a.Checked).Truthy()
+                            .Then(t => t.Element("physician-section").Show())
+                            .Else(e => e.Element("physician-section").Hide());
+                    }); }
             </div>
 
             <div id="physician-section" class="col-span-full" hidden>

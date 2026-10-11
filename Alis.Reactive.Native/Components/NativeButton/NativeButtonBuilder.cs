@@ -1,5 +1,7 @@
+using System;
 using System.IO;
 using System.Text.Encodings.Web;
+using Alis.Reactive.Builders;
 #if NET48
 using System.Web;
 #else
@@ -33,7 +35,21 @@ namespace Alis.Reactive.Native.Components
             _text = text;
         }
 
-        internal string ElementId => _elementId;
+        /// <summary>Runs <paramref name="pipeline"/> whenever the selected event fires on this button.</summary>
+        /// <typeparam name="TArgs">The event's typed payload.</typeparam>
+        /// <param name="plan">The plan the behavior belongs to.</param>
+        /// <param name="eventSelector">Selects a declared event, for example <c>evt =&gt; evt.Click</c>.</param>
+        /// <param name="pipeline">The reaction, given the typed payload and the pipeline.</param>
+        /// <returns>This builder, so configuration and further events can follow.</returns>
+        public NativeButtonBuilder<TModel> Reactive<TArgs>(
+            ReactivePlan<TModel> plan,
+            Func<NativeButton, TypedEvent<TArgs>> eventSelector,
+            Action<TArgs, PipelineBuilder<TModel>> pipeline)
+        {
+            if (plan == null) throw new ArgumentNullException(nameof(plan));
+            plan.Render<NativeButton>(_elementId, this).Reactive(eventSelector, pipeline);
+            return this;
+        }
 
         /// <summary>
         /// Selects the button <c>type</c> attribute.

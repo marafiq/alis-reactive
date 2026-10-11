@@ -51,26 +51,21 @@ namespace Alis.Reactive.Native.Components
         internal NativeCheckListBuilder(
             HtmlHelper<TModel> html,
             Expression<Func<TModel, TProp>> expression,
-            InputComponentRenderTarget target)
+            string elementId,
+            string bindingPath)
 #else
         internal NativeCheckListBuilder(
             IHtmlHelper<TModel> html,
             Expression<Func<TModel, TProp>> expression,
-            InputComponentRenderTarget target)
+            string elementId,
+            string bindingPath)
 #endif
         {
             _html = html;
             _expression = expression;
-            if (target == null) throw new ArgumentNullException(nameof(target));
-            _elementId = target.ElementId;
-            _bindingPath = target.BindingName;
+            _elementId = elementId;
+            _bindingPath = bindingPath;
         }
-
-        internal string ElementId => _elementId;
-
-        internal string BindingPath => _bindingPath;
-
-        internal IReadOnlyList<RadioButtonItem> Options => _options;
 
         /// <summary>
         /// Adds checkbox options supplied outside the fluent builder, such as

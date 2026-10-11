@@ -65,7 +65,7 @@
         })
         .Reactive(evt => evt.StepChanging, (args, p) =>
         {
-            var maxUnlockedStep = p.Component<NativeHiddenField>(m => m.MaxUnlockedStep).Value();
+            var maxUnlockedStep = p.Component<NativeHiddenField>(m => m.MaxUnlockedStep).Get(c => c.Value);
 
             p.When(args, x => x.ActiveStep).Eq(1)
                 .And(maxUnlockedStep).Eq("0")

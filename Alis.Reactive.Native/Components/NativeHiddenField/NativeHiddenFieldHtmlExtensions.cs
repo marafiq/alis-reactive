@@ -8,8 +8,6 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-using ComponentRegistrationSource = Alis.Reactive.Native.Components.NativeHiddenField;
-
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
@@ -28,8 +26,8 @@ namespace Alis.Reactive.Native.Components
         /// <typeparam name="TProp">Model value type registered as the hidden input value.</typeparam>
         /// <param name="plan">Reactive Plan that receives the hidden-field registration.</param>
         /// <param name="expression">Model property expression used for MVC binding and component registration.</param>
-        /// <returns>Hidden input builder for inline rendering.</returns>
-        public static NativeHiddenFieldBuilder<TModel, TProp> HiddenFieldFor<TModel, TProp>(
+        /// <returns>The rendered hidden field; the view writes it, and <c>.Reactive(...)</c> wires its events.</returns>
+        public static RenderedComponent<NativeHiddenField, TModel> HiddenFieldFor<TModel, TProp>(
 #if NET48
             this HtmlHelper<TModel> html,
 #else
@@ -45,17 +43,15 @@ namespace Alis.Reactive.Native.Components
 #else
             var bindingPath = html.NameFor(expression);
 #endif
-            var registration = ComponentRegistrationSource.Registration;
             var slot = ModelBoundInputComponentSlot.For<TModel, TProp>(
                 expression,
                 bindingPath,
                 html.ViewData.TemplateInfo.HtmlFieldPrefix);
-            plan.RegisterInputComponent(slot.Register(registration));
+            plan.RegisterInputComponent(slot.Register(InputComponentRegistrationProfile.For<NativeHiddenField>()));
 
-            return new NativeHiddenFieldBuilder<TModel, TProp>(
-                html,
-                expression,
-                slot.RenderTarget);
+            var target = slot.RenderTarget;
+            var builder = new NativeHiddenFieldBuilder<TModel, TProp>(html, expression, target.ElementId, target.BindingName);
+            return plan.Render<NativeHiddenField>(target.ElementId, builder);
         }
     }
 }

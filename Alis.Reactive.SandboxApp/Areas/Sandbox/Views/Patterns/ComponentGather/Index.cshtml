@@ -51,7 +51,7 @@
 
             <native-grid cols="C2" gap="Base">
                 @{ Html.InputField(plan, m => m.HasAllergies, o => o.Label("Has Allergies"))
-                    .NativeCheckBox(b => { }); }
+                    .NativeCheckBox(); }
 
                 @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care Level"))
                     .NativeRadioGroup(b => b

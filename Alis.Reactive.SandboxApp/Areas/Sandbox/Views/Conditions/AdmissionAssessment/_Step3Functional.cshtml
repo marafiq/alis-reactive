@@ -56,7 +56,7 @@
                 p.When(fallRisk.Get(c => c.Value)).Gte(7m).And(age.Get(c => c.Value)).Gte(80m)
                     .Then(t =>
                     {
-                        t.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Continuous");
+                        t.Component<NativeHiddenField>(m => m.MonitoringLevel).Set(c => c.Value, "Continuous");
                         t.Element("fallrisk-result").SetText("Continuous monitoring required");
                         t.Element("fallrisk-result").Show();
                     })
@@ -128,8 +128,8 @@
             {
                 var bt = p.Component<FusionSwitch>(m => m.TakesBloodThinners);
                 p.When(bt.Get(c => c.Checked)).Truthy()
-                    .Then(t => t.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Enhanced"))
-                    .Else(e => e.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Standard"));
+                    .Then(t => t.Component<NativeHiddenField>(m => m.MonitoringLevel).Set(c => c.Value, "Enhanced"))
+                    .Else(e => e.Component<NativeHiddenField>(m => m.MonitoringLevel).Set(c => c.Value, "Standard"));
             }); }
 
         @{ Html.InputField(plan, m => m.TakesPainMedication, o => o.Label("Takes Pain Medication"))

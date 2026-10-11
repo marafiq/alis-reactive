@@ -26,11 +26,11 @@
                 .Option("Standard", "Standard")
                 .Option("Vegetarian", "Vegetarian")
                 .Option("Diabetic", "Diabetic")
-                .Option("Kosher", "Kosher")
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    p.Element("meal-echo").SetText(args, a => a.Value);
-                })); }
+                .Option("Kosher", "Kosher"))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                p.Element("meal-echo").SetText(args, a => a.Value);
+            }); }
 
         <p class="font-mono text-sm">Selected: <span id="meal-echo" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
@@ -46,23 +46,23 @@
                 .Option("Assisted Living", "Assisted Living", "Daily assistance with meals, bathing, and medication management")
                 .Option("Memory Care", "Memory Care", "Specialized care for Alzheimer's and other cognitive conditions")
                 .Option("Independent Living", "Independent Living", "Self-sufficient lifestyle with optional community services")
-                .Option("Skilled Nursing", "Skilled Nursing", "24/7 medical supervision with licensed nursing staff")
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    p.When(args, x => x.Value).Eq("Memory Care")
-                        .Then(t =>
-                        {
-                            t.Element("care-notice").SetText("Memory Care selected — assessment score required");
-                            t.Element("care-notice").RemoveClass("text-text-muted");
-                            t.Element("care-notice").AddClass("text-amber-600");
-                        })
-                        .Else(e =>
-                        {
-                            e.Element("care-notice").SetText("Standard admission process");
-                            e.Element("care-notice").RemoveClass("text-amber-600");
-                            e.Element("care-notice").AddClass("text-text-muted");
-                        });
-                })); }
+                .Option("Skilled Nursing", "Skilled Nursing", "24/7 medical supervision with licensed nursing staff"))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                p.When(args, x => x.Value).Eq("Memory Care")
+                    .Then(t =>
+                    {
+                        t.Element("care-notice").SetText("Memory Care selected — assessment score required");
+                        t.Element("care-notice").RemoveClass("text-text-muted");
+                        t.Element("care-notice").AddClass("text-amber-600");
+                    })
+                    .Else(e =>
+                    {
+                        e.Element("care-notice").SetText("Standard admission process");
+                        e.Element("care-notice").RemoveClass("text-amber-600");
+                        e.Element("care-notice").AddClass("text-text-muted");
+                    });
+            }); }
 
         <p class="font-mono text-sm">Notice: <span id="care-notice" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
@@ -104,7 +104,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <native-text color="Secondary">
-            Button reads care level via <code>When(comp.Value()).NotEmpty()</code>.
+            Button reads care level via <code>When(comp.Get(c =&gt; c.Value)).NotEmpty()</code>.
         </native-text>
 
         @(Html.NativeButton("check-care-btn", "Check Care Level")
@@ -112,7 +112,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var comp = p.Component<NativeRadioGroup>(m => m.CareLevel);
-                p.When(comp.Value()).NotEmpty()
+                p.When(comp.Get(c => c.Value)).NotEmpty()
                     .Then(t => t.Element("care-confirmation").SetText("care level confirmed"))
                     .Else(e => e.Element("care-confirmation").SetText("care level is required"));
             }))

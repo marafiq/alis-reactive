@@ -44,17 +44,14 @@ namespace Alis.Reactive.Native.Components
             IHtmlHelper<TModel> html,
 #endif
             Expression<Func<TModel, TProp>> expression,
-            InputComponentRenderTarget target)
+            string elementId,
+            string bindingPath)
         {
             _html = html;
             _expression = expression;
-            if (target == null) throw new ArgumentNullException(nameof(target));
-            _elementId = target.ElementId;
-            _bindingPath = target.BindingName;
+            _elementId = elementId;
+            _bindingPath = bindingPath;
         }
-
-        internal string ElementId => _elementId;
-        internal string BindingPath => _bindingPath;
 
 #if NET48
         /// <inheritdoc />

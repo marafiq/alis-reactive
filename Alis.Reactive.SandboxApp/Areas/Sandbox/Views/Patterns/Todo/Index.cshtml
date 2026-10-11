@@ -24,13 +24,13 @@
 
             @{ Html.InputField(plan, m => m.IsUrgent, o => o.Label("Urgent"))
                 .NativeCheckBox(b => b
-                    .CssClass("h-4 w-4 rounded border-border text-accent")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.When(args, a => a.Checked).Truthy()
-                            .Then(t => t.Element("due-date-section").Show())
-                            .Else(e => e.Element("due-date-section").Hide());
-                    })); }
+                    .CssClass("h-4 w-4 rounded border-border text-accent"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.When(args, a => a.Checked).Truthy()
+                        .Then(t => t.Element("due-date-section").Show())
+                        .Else(e => e.Element("due-date-section").Hide());
+                }); }
 
             <div id="due-date-section" hidden>
                 @{ Html.InputField(plan, m => m.DueDate, o => o.Label("Due Date"))

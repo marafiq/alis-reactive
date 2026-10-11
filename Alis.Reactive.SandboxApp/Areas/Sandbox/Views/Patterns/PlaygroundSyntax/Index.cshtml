@@ -15,7 +15,7 @@
     Html.On(plan, t => t.CustomEvent("reset-all", p =>
     {
         p.Component<FusionNumericTextBox>(m => m.Amount).Set(c => c.Value, 0);
-        p.Component<NativeDropDown>(m => m.Status).SetValue("");
+        p.Component<NativeDropDown>(m => m.Status).Set(c => c.Value, "");
         p.Element("status-echo").SetText("All fields reset");
     }));
 }
@@ -58,11 +58,11 @@
         <native-grid cols="C2" gap="Base">
             @{ Html.InputField(plan, m => m.Status, o => o.Required().Label("Status"))
                .NativeDropDown(b => b
-                   .Items(statusItems)
-                   .Reactive(plan, evt => evt.Changed, (args, p) =>
-                   {
-                       p.Element("status-echo").SetText("Status changed");
-                   })); }
+                   .Items(statusItems))
+               .Reactive(evt => evt.Change, (args, p) =>
+               {
+                   p.Element("status-echo").SetText("Status changed");
+               }); }
             @{ Html.InputField(plan, m => m.Category, o => o.Label("Category"))
                .NativeDropDown(b => b
                    .Items(categoryItems)
@@ -120,11 +120,11 @@
         <native-grid cols="C2" gap="Base">
             @{ Html.InputField(plan, m => m.Address!.City, o => o.Label("City"))
                .NativeDropDown(b => b
-                   .Items(cityItems)
-                   .Reactive(plan, evt => evt.Changed, (args, p) =>
-                   {
-                       p.Element("city-echo").SetText("City changed");
-                   })); }
+                   .Items(cityItems))
+               .Reactive(evt => evt.Change, (args, p) =>
+               {
+                   p.Element("city-echo").SetText("City changed");
+               }); }
             @{ Html.InputField(plan, m => m.Address!.PostalCode, o => o.Label("Postal Code"))
                .FusionNumericTextBox(b => b
                    .Min(10000).Max(99999).Step(1))

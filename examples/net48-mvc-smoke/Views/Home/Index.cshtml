@@ -12,12 +12,13 @@
 
 <div style="margin-top: 1rem;">
     @{ Html.InputField(plan, m => m.ShowDetails, o => o.Label("Show the proof"))
-        .NativeCheckBox(b => b.Reactive(plan, evt => evt.Changed, (args, pipeline) =>
+        .NativeCheckBox()
+        .Reactive(evt => evt.Change, (args, pipeline) =>
         {
             pipeline.When(args, a => a.Checked).Truthy()
                 .Then(t => t.Element("reactive-proof").Show())
                 .Else(e => e.Element("reactive-proof").Hide());
-        })); }
+        }); }
 </div>
 
 <div id="reactive-proof" hidden style="margin-top: 1rem; padding: 1rem; border: 2px solid green; border-radius: 8px;">

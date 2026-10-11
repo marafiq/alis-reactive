@@ -22,14 +22,14 @@
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.EmergencyContact, o => o.Required().Label("Emergency Contact"))
             .NativeTextBox(b => b
-                .Placeholder("Full name and phone number")
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var contact = p.Component<NativeTextBox>(m => m.EmergencyContact);
-                    p.When(contact.Value()).IsEmpty()
-                        .Then(t => t.Element("contact-warning").Show())
-                        .Else(e => e.Element("contact-warning").Hide());
-                })); }
+                .Placeholder("Full name and phone number"))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var contact = p.Component<NativeTextBox>(m => m.EmergencyContact);
+                p.When(contact.Get(c => c.Value)).IsEmpty()
+                    .Then(t => t.Element("contact-warning").Show())
+                    .Else(e => e.Element("contact-warning").Hide());
+            }); }
     </native-grid>
 
     <div id="contact-warning" hidden class="rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-700 mb-4">

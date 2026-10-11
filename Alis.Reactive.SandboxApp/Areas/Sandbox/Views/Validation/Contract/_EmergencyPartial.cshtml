@@ -18,11 +18,11 @@
     @{ Html.InputField(plan, m => m.EmergencyPhone, o => o.Label("Emergency Phone"))
        .NativeTextBox(b => b
            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-           .Placeholder("555-0123")
-           .Reactive(plan, evt => evt.Changed, (args, p) =>
-           {
-               p.Element("phone-format-status").SetText("Phone updated");
-           })); }
+           .Placeholder("555-0123"))
+       .Reactive(evt => evt.Change, (args, p) =>
+       {
+           p.Element("phone-format-status").SetText("Phone updated");
+       }); }
 
     @{ Html.InputField(plan, m => m.ReasonForNoContact, o => o.Label("Reason for No Contact"))
        .NativeTextBox(b => b

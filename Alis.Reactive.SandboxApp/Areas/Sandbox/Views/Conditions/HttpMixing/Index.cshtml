@@ -631,21 +631,21 @@
             @{
                 Html.InputField(plan, m => m.ReactiveResidentName, o => o.Label("Resident Name"))
                     .NativeTextBox(b => b
-                        .Placeholder("Type VIP Alice or Bob")
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
-                        {
-                            p.Element("s9-pre").SetText("saving");
-                            p.Post(saveUrl, g => g
-                                .FromEvent(args, x => x.Value!, "name"))
-                             .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
-                             {
-                                 s.Element("s9-http-result").SetText(json, x => x.ReceivedName);
-                             }));
-                            p.When(args, x => x.Value!).Contains("VIP")
-                                .Then(then => then.Element("s9-badge").Show())
-                                .Else(else_ => else_.Element("s9-badge").Hide());
-                            p.Element("s9-tail").SetText("complete");
-                        }));
+                        .Placeholder("Type VIP Alice or Bob"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.Element("s9-pre").SetText("saving");
+                        p.Post(saveUrl, g => g
+                            .FromEvent(args, x => x.Value!, "name"))
+                         .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
+                         {
+                             s.Element("s9-http-result").SetText(json, x => x.ReceivedName);
+                         }));
+                        p.When(args, x => x.Value!).Contains("VIP")
+                            .Then(then => then.Element("s9-badge").Show())
+                            .Else(else_ => else_.Element("s9-badge").Hide());
+                        p.Element("s9-tail").SetText("complete");
+                    });
             }
         </native-grid>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
@@ -668,21 +668,21 @@
             @{
                 Html.InputField(plan, m => m.ReactiveFollowUpName, o => o.Label("Follow-up Label"))
                     .NativeTextBox(b => b
-                        .Placeholder("Type a long or short label")
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
-                        {
-                            p.Element("s10-pre").SetText("loading");
-                            p.Post(saveUrl, g => g
-                                .FromEvent(args, x => x.Value!, "name"))
-                             .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
-                             {
-                                 s.Element("s10-http-result").SetText(json, x => x.ReceivedName);
-                                 s.When(args, x => x.Value!).MinLength(5)
-                                     .Then(then => then.Element("s10-classification").SetText("long name"))
-                                     .Else(else_ => else_.Element("s10-classification").SetText("short name"));
-                                 s.Element("s10-tail").SetText("success complete");
-                             }));
-                        }));
+                        .Placeholder("Type a long or short label"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.Element("s10-pre").SetText("loading");
+                        p.Post(saveUrl, g => g
+                            .FromEvent(args, x => x.Value!, "name"))
+                         .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
+                         {
+                             s.Element("s10-http-result").SetText(json, x => x.ReceivedName);
+                             s.When(args, x => x.Value!).MinLength(5)
+                                 .Then(then => then.Element("s10-classification").SetText("long name"))
+                                 .Else(else_ => else_.Element("s10-classification").SetText("short name"));
+                             s.Element("s10-tail").SetText("success complete");
+                         }));
+                    });
             }
         </native-grid>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
@@ -705,22 +705,22 @@
             @{
                 Html.InputField(plan, m => m.ReactiveErrorCategory, o => o.Label("Error Category"))
                     .NativeTextBox(b => b
-                        .Placeholder("Type required or format")
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
-                        {
-                            p.Element("s11-pre").SetText("validating");
-                            p.Post(failValidationUrl)
-                             .Response(r => r
-                                 .OnSuccess(s => s.Element("s11-status").SetText("should not happen"))
-                                 .OnError(400, e =>
-                                 {
-                                     e.Element("s11-status").SetText("failed");
-                                     e.When(args, x => x.Value!).Eq("required")
-                                         .Then(then => then.Element("s11-error-msg").SetText("missing required fields"))
-                                         .Else(else_ => else_.Element("s11-error-msg").SetText("validation error"));
-                                     e.Element("s11-tail").SetText("error complete");
-                                 }));
-                        }));
+                        .Placeholder("Type required or format"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.Element("s11-pre").SetText("validating");
+                        p.Post(failValidationUrl)
+                         .Response(r => r
+                             .OnSuccess(s => s.Element("s11-status").SetText("should not happen"))
+                             .OnError(400, e =>
+                             {
+                                 e.Element("s11-status").SetText("failed");
+                                 e.When(args, x => x.Value!).Eq("required")
+                                     .Then(then => then.Element("s11-error-msg").SetText("missing required fields"))
+                                     .Else(else_ => else_.Element("s11-error-msg").SetText("validation error"));
+                                 e.Element("s11-tail").SetText("error complete");
+                             }));
+                    });
             }
         </native-grid>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">

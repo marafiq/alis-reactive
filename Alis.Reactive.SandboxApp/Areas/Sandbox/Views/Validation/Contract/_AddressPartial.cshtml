@@ -19,11 +19,11 @@
     @{ Html.InputField(plan, m => m.Address.ZipCode, o => o.Required().Label("Zip Code"))
        .NativeTextBox(b => b
            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-           .Placeholder("12345")
-           .Reactive(plan, evt => evt.Changed, (args, p) =>
-           {
-               p.Dispatch<NativeTextBoxChangeArgs>("zipcode-validated", args);
-           })); }
+           .Placeholder("12345"))
+       .Reactive(evt => evt.Change, (args, p) =>
+       {
+           p.Dispatch<NativeTextBoxChangeArgs>("zipcode-validated", args);
+       }); }
 </native-grid>
 
 <div class="mt-2">

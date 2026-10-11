@@ -9,9 +9,9 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Element("resident-id-echo").SetText(
-            p.Component<NativeHiddenField>(m => m.ResidentId).Value());
+            p.Component<NativeHiddenField>(m => m.ResidentId).Get(c => c.Value));
         p.Element("form-token-echo").SetText(
-            p.Component<NativeHiddenField>(m => m.FormToken).Value());
+            p.Component<NativeHiddenField>(m => m.FormToken).Get(c => c.Value));
     }));
 }
 

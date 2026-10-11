@@ -1,20 +1,59 @@
+using System;
+
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Native checkbox-list component with <c>string[]</c> value semantics.
+    /// A native list of checkboxes whose value is the checked values, declared by the names its element uses.
     /// </summary>
     /// <remarks>
-    /// Use with <see cref="InputBoundField{TModel,TProp}"/> via the
-    /// <c>.NativeCheckList()</c> factory to create a model-bound checkbox list with
-    /// label, validation, and Reactive Plan event support. The container element holds
-    /// the selected values as a <c>string[]</c>.
+    /// The container element carries the element ID and holds the checked values as a <c>string[]</c>.
+    /// Render it with <c>Html.InputField(plan, m =&gt; m.Diets).NativeCheckList(b =&gt; ...)</c>.
     /// </remarks>
     public sealed class NativeCheckList : NativeComponent, IInputComponent
     {
-        internal static InputComponentRegistrationProfile Registration { get; } =
-            InputComponentRegistrationProfile.For(new NativeCheckList(), "checklist");
-
         /// <inheritdoc />
         public string ValueMember => "value";
+
+        /// <summary>The checked values.</summary>
+        public ComponentProperty<string[]> Value => Property<string[]>(ValueMember);
+
+        /// <summary>Moves focus to the element.</summary>
+        public ComponentMethod Focus => Method("focus");
+
+        /// <summary>Raised when the user checks or clears a box.</summary>
+        public TypedEvent<NativeCheckListChangeArgs> Change =>
+            Event<NativeCheckListChangeArgs>("change");
+    }
+
+    /// <summary>Payload of <see cref="NativeCheckList.Change"/>, read from the container.</summary>
+    public class NativeCheckListChangeArgs
+    {
+        /// <summary>The checked values after the change.</summary>
+        public string[]? Value { get; set; }
+    }
+
+    /// <summary>Renders a <see cref="NativeCheckList"/> for a model-bound field.</summary>
+    public static class NativeCheckListHtmlExtensions
+    {
+        /// <summary>Renders a NativeCheckList with its defaults; see the overload that takes <c>build</c>.</summary>
+        public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeCheckList, TModel> NativeCheckList<TModel, TProp>(
+            this InputBoundField<TModel, TProp> field)
+            where TModel : class
+            => field.NativeCheckList(_ => { });
+
+        /// <summary>
+        /// Renders a NativeCheckList bound to the field's model property, with the framework's element ID and
+        /// binding name.
+        /// </summary>
+        /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
+        public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeCheckList, TModel> NativeCheckList<TModel, TProp>(
+            this InputBoundField<TModel, TProp> field,
+            Action<NativeCheckListBuilder<TModel, TProp>> build)
+            where TModel : class
+        {
+            var builder = new NativeCheckListBuilder<TModel, TProp>(field.Helper, field.Expression, field.ElementId, field.BindingPath);
+            build(builder);
+            return field.Render<global::Alis.Reactive.Native.Components.NativeCheckList>(builder);
+        }
     }
 }

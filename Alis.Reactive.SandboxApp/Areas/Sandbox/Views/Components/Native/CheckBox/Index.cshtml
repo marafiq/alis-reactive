@@ -8,13 +8,13 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<NativeCheckBox>(m => m.ReceivesMedication).SetChecked(false);
+        p.Component<NativeCheckBox>(m => m.ReceivesMedication).Set(c => c.Checked, false);
     }));
 
     Html.On(plan, t => t.DomReady(p =>
     {
         var comp = p.Component<NativeCheckBox>(m => m.AllowsVisitors);
-        p.Element("value-echo").SetText(comp.Value());
+        p.Element("value-echo").SetText(comp.Get(c => c.Checked));
     }));
 }
 
@@ -53,24 +53,24 @@
         </p>
         @{ Html.InputField(plan, m => m.HasDietaryRestrictions, o => o.Label("Has Dietary Restrictions"))
             .NativeCheckBox(b => b
-                .CssClass("h-4 w-4 rounded border-border text-accent")
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    p.When(args, a => a.Checked).Truthy()
-                        .Then(t =>
-                        {
-                            t.Element("restrictions-panel").Show();
-                            t.Element("restrictions-status").SetText("checked");
-                            t.Element("restrictions-status").AddClass("text-green-600");
-                            t.Element("restrictions-status").RemoveClass("text-text-muted");
-                        })
-                        .Else(e =>
-                        {
-                            e.Element("restrictions-panel").Hide();
-                            e.Element("restrictions-status").SetText("unchecked");
-                            e.Element("restrictions-status").RemoveClass("text-green-600");
-                        });
-                })); }
+                .CssClass("h-4 w-4 rounded border-border text-accent"))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                p.When(args, a => a.Checked).Truthy()
+                    .Then(t =>
+                    {
+                        t.Element("restrictions-panel").Show();
+                        t.Element("restrictions-status").SetText("checked");
+                        t.Element("restrictions-status").AddClass("text-green-600");
+                        t.Element("restrictions-status").RemoveClass("text-text-muted");
+                    })
+                    .Else(e =>
+                    {
+                        e.Element("restrictions-panel").Hide();
+                        e.Element("restrictions-status").SetText("unchecked");
+                        e.Element("restrictions-status").RemoveClass("text-green-600");
+                    });
+            }); }
         <p class="font-mono text-sm mt-2">Status: <span id="restrictions-status" class="text-text-muted">&mdash;</span></p>
         <div id="restrictions-panel" hidden class="rounded-md bg-slate-100 p-4 text-sm mt-2">
             Resident has dietary restrictions on file. Review care plan.
@@ -80,7 +80,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            Button reads medication checkbox via <code>When(comp.Value()).Truthy()</code>
+            Button reads medication checkbox via <code>When(comp.Get(c =&gt; c.Checked)).Truthy()</code>
             and shows a confirmation or warning.
         </p>
         @(Html.NativeButton("check-medication-btn", "Check Medication Status")
@@ -88,7 +88,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var comp = p.Component<NativeCheckBox>(m => m.ReceivesMedication);
-                p.When(comp.Value()).Truthy()
+                p.When(comp.Get(c => c.Checked)).Truthy()
                     .Then(t => t.Element("medication-warning").SetText("resident receives medication"))
                     .Else(e => e.Element("medication-warning").SetText("no medication on record"));
             }))

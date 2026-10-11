@@ -8,7 +8,7 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<NativeButton>("btn-admit-text").SetText("Admit Resident");
+        p.Component<NativeButton>("btn-admit-text").Set(c => c.TextContent, "Admit Resident");
     }));
 
     Html.On(plan, t => t.CustomEvent("resident-transferred", p =>
@@ -62,7 +62,7 @@
                 .CssClass("rounded-md bg-slate-600 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<NativeButton>("btn-discharge").FocusIn();
+                    p.Component<NativeButton>("btn-discharge").Call(c => c.Focus);
                 }))
             @(Html.NativeButton("btn-discharge", "Discharge Resident")
                 .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors focus:ring-2 focus:ring-rose-400 focus:ring-offset-2"))

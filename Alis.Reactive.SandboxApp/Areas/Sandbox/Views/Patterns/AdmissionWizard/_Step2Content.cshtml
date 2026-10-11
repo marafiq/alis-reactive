@@ -36,10 +36,10 @@
                     {
                         var comp = p.Component<FusionNumericTextBox>(m => m.CognitiveScore);
                         p.When(comp.Get(c => c.Value)).Lt(15m)
-                            .Then(t => { t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Memory Care"); t.Element("cog-status").SetText("Severe — Memory Care"); })
+                            .Then(t => { t.Component<NativeHiddenField>(m => m.CareUnit).Set(c => c.Value, "Memory Care"); t.Element("cog-status").SetText("Severe — Memory Care"); })
                             .ElseIf(comp.Get(c => c.Value)).Lt(25m)
-                            .Then(t => { t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Assisted Living + Memory"); t.Element("cog-status").SetText("Moderate — Assisted Living"); })
-                            .Else(e => { e.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Standard"); e.Element("cog-status").SetText("Mild/Normal"); });
+                            .Then(t => { t.Component<NativeHiddenField>(m => m.CareUnit).Set(c => c.Value, "Assisted Living + Memory"); t.Element("cog-status").SetText("Moderate — Assisted Living"); })
+                            .Else(e => { e.Component<NativeHiddenField>(m => m.CareUnit).Set(c => c.Value, "Standard"); e.Element("cog-status").SetText("Mild/Normal"); });
                     }); }
                 @{ Html.InputField(plan, m => m.Wanders, o => o.Label("Wanders"))
                     .FusionSwitch()
@@ -142,7 +142,7 @@
                     .OnSuccess<SaveStepResponse>((json, s) =>
                     {
                         s.Component<NativeHiddenField>(m => m.ScreeningId)
-                            .SetValue(json, x => x.ScreeningId);
+                            .Set(c => c.Value, json.Read(x => x.ScreeningId));
                     })
                     .OnError(400, e => e.ValidationErrors("step2-form"))
                     .Chained(c => c

@@ -45,16 +45,16 @@
            .NativeDropDown(b => b
                .Items(addressTypes)
                .Placeholder("-- Select Address Type --")
-               .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-               .Reactive(plan, evt => evt.Changed, (args, p) =>
-               {
-                   p.When(args, a => a.Value).Eq("Custom Address")
-                       .Then(t =>
-                           t.Get(Url.SandboxRoute("AddressPartial", "ValidationContract"))
-                            .Response(r => r.OnSuccess(s => s.Into("address-container"))))
-                       .Else(e =>
-                           e.Element("address-container").SetHtml(""));
-               })); }
+               .CssClass("rounded-md border border-border px-3 py-1.5 text-sm"))
+           .Reactive(evt => evt.Change, (args, p) =>
+           {
+               p.When(args, a => a.Value).Eq("Custom Address")
+                   .Then(t =>
+                       t.Get(Url.SandboxRoute("AddressPartial", "ValidationContract"))
+                        .Response(r => r.OnSuccess(s => s.Into("address-container"))))
+                   .Else(e =>
+                       e.Element("address-container").SetHtml(""));
+           }); }
 
         <div id="address-container" class="mt-4"></div>
 

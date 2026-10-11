@@ -57,8 +57,8 @@
             {
                 var comp = p.Component<FusionSwitch>(m => m.TakesBloodThinners);
                 p.When(comp.Get(c => c.Checked)).Truthy()
-                    .Then(t => t.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Enhanced"))
-                    .Else(e => e.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Standard"));
+                    .Then(t => t.Component<NativeHiddenField>(m => m.MonitoringLevel).Set(c => c.Value, "Enhanced"))
+                    .Else(e => e.Component<NativeHiddenField>(m => m.MonitoringLevel).Set(c => c.Value, "Standard"));
             }); }
         @{ Html.InputField(plan, m => m.TakesPainMedication, o => o.Label("Takes Pain Medication"))
             .FusionSwitch()
@@ -123,7 +123,7 @@
                     .OnSuccess<SaveStepResponse>((json, s) =>
                     {
                         s.Component<NativeHiddenField>(m => m.ScreeningId)
-                            .SetValue(json, x => x.ScreeningId);
+                            .Set(c => c.Value, json.Read(x => x.ScreeningId));
                     })
                     .OnError(400, e => e.ValidationErrors("step3-form"))
                     .Chained(c => c

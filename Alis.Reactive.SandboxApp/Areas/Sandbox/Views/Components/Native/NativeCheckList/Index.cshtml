@@ -25,11 +25,11 @@
 
         @{ Html.InputField(plan, m => m.Allergies, o => o.Label("Allergies"))
             .NativeCheckList(b => b
-                .Items(allergyItems)
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    p.Element("allergy-echo").SetText(args, a => a.Value);
-                })); }
+                .Items(allergyItems))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                p.Element("allergy-echo").SetText(args, a => a.Value);
+            }); }
 
         <p class="font-mono text-sm">Selected: <span id="allergy-echo" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
@@ -81,7 +81,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <native-text color="Secondary">
-            Button reads allergies via <code>When(comp.Value()).NotEmpty()</code>.
+            Button reads allergies via <code>When(comp.Get(c =&gt; c.Value)).NotEmpty()</code>.
         </native-text>
 
         @(Html.NativeButton("check-allergy-btn", "Check Allergies")
@@ -89,7 +89,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var comp = p.Component<NativeCheckList>(m => m.Allergies);
-                p.When(comp.Value()).NotEmpty()
+                p.When(comp.Get(c => c.Value)).NotEmpty()
                     .Then(t => t.Element("allergy-confirmation").SetText("allergies recorded"))
                     .Else(e => e.Element("allergy-confirmation").SetText("no allergies selected"));
             }))
