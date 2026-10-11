@@ -89,14 +89,14 @@
                     .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
                         var menu = p.Component<FusionMenu>(MenuId);
-                        menu.Open();
+                        menu.Call(c => c.Open);
                     }))
                 @(Html.NativeButton("close-menu-btn", "Close menu")
                     .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
                     .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
                         var menu = p.Component<FusionMenu>(MenuId);
-                        menu.Close();
+                        menu.Call(c => c.Close);
                     }))
             </native-hstack>
         </native-vstack>
@@ -161,12 +161,12 @@
                 .Then(t =>
                 {
                     t.Element("before-open-cancel").SetText("cancelled");
-                    args.PreventOpen(t);
+                    t.Payload(args).Set(a => a.Cancel, true);
                     t.Element("before-open-cancel-value").SetText(args, x => x.Cancel);
                 })
                 .Else(e => e.Element("before-open-cancel").SetText("allowed"));
         })
-        .Reactive(evt => evt.Opened, (args, p) =>
+        .Reactive(evt => evt.OnOpen, (args, p) =>
         {
             p.When(args, x => x.ParentItem).IsNull()
                 .Then(t =>
@@ -197,12 +197,12 @@
                 .Then(t =>
                 {
                     t.Element("before-close-cancel").SetText("cancelled");
-                    args.PreventClose(t);
+                    t.Payload(args).Set(a => a.Cancel, true);
                     t.Element("before-close-cancel-value").SetText(args, x => x.Cancel);
                 })
                 .Else(e => e.Element("before-close-cancel").SetText("allowed"));
         })
-        .Reactive(evt => evt.Closed, (args, p) =>
+        .Reactive(evt => evt.OnClose, (args, p) =>
         {
             p.Element("close-state").SetText("closed");
             p.Element("close-first-item").SetText(args, x => x.Items[0].Text);

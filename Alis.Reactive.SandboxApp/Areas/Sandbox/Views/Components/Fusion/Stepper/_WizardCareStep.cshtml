@@ -66,7 +66,7 @@
             .CssClass("rounded-md bg-surface px-5 py-2 text-sm font-medium text-text hover:bg-surface-2 transition-colors")
             .Reactive(plan, evt => evt.Click, (_, p) =>
             {
-                p.Component<FusionStepper>(StepperId).SetActiveStep(0);
+                p.Component<FusionStepper>(StepperId).Set(c => c.ActiveStep, 0);
                 p.Element("stepper-wizard-status").SetText("returned to intake");
             }))
 
@@ -81,7 +81,7 @@
                         {
                             s.Component<NativeHiddenField>(m => m.WizardId).SetValue(json, x => x.WizardId);
                             s.Component<NativeHiddenField, FusionStepperWizardShellModel>(m => m.MaxUnlockedStep).SetValue("2");
-                            s.Component<FusionStepper>(StepperId).SetActiveStep(2);
+                            s.Component<FusionStepper>(StepperId).Set(c => c.ActiveStep, 2);
                             s.Element("stepper-wizard-status").SetText(json, x => x.Message);
                         })
                         .OnError(400, e => e.ValidationErrors(FormId)));

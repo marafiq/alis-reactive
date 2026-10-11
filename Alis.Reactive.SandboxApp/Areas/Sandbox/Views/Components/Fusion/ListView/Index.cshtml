@@ -27,7 +27,7 @@
             @(Html.FusionListView(plan, ResidentListId, b => b
                 .DataSource(residents)
                 .Height("210px"))
-                .Reactive(evt => evt.Selected, (args, p) =>
+                .Reactive(evt => evt.Select, (args, p) =>
                 {
                     p.Element("selected-text").SetText(args, x => x.Text);
                     p.Element("selected-index").SetText(args, x => x.Index);
@@ -38,7 +38,7 @@
                     p.When(args, x => x.Text).Eq("Carey")
                         .Then(t =>
                         {
-                            args.CancelSelection(t);
+                            t.Payload(args).Set(a => a.Cancel, true);
                             t.Element("cancel-state").SetText("cancelled");
                         })
                         .Else(e => e.Element("cancel-state").SetText("allowed"));
@@ -51,7 +51,7 @@
                 .DataSource(tasks)
                 .ShowCheckBox(true)
                 .Height("210px"))
-                .Reactive(evt => evt.Selected, (args, p) =>
+                .Reactive(evt => evt.Select, (args, p) =>
                 {
                     p.Element("task-selected-text").SetText(args, x => x.Text);
                     p.Element("task-checked").SetText(args, x => x.IsChecked);
@@ -69,28 +69,28 @@
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionListView>(ResidentListId).SelectText("Bennett");
+                    p.Component<FusionListView>(ResidentListId).Call(c => c.SelectItem, "Bennett");
                     p.Element("command-state").SetText("selected Bennett");
                 }))
             @(Html.NativeButton("unselect-bennett-btn", "Unselect Bennett")
                 .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionListView>(ResidentListId).UnselectText("Bennett");
+                    p.Component<FusionListView>(ResidentListId).Call(c => c.UnselectItem, "Bennett");
                     p.Element("command-state").SetText("unselected Bennett");
                 }))
             @(Html.NativeButton("check-all-btn", "Check All")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionListView>(TaskListId).CheckAllItems();
+                    p.Component<FusionListView>(TaskListId).Call(c => c.CheckAllItems);
                     p.Element("task-command-state").SetText("checked all");
                 }))
             @(Html.NativeButton("uncheck-all-btn", "Uncheck All")
                 .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionListView>(TaskListId).UncheckAllItems();
+                    p.Component<FusionListView>(TaskListId).Call(c => c.UncheckAllItems);
                     p.Element("task-command-state").SetText("unchecked all");
                 }))
         </native-hstack>

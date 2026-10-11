@@ -92,6 +92,22 @@ namespace Alis.Reactive
                 });
         }
 
+        /// <summary>Calls one of the component's declared three-argument methods with literal arguments.</summary>
+        /// <example><c>p.Component&lt;FusionListBox&gt;("wings").Call(c =&gt; c.SelectItems, new[] { "east" }, true, false)</c></example>
+        public ComponentRef<TComponent, TModel> Call<T1, T2, T3>(
+            System.Func<TComponent, ComponentMethod<T1, T2, T3>> method, T1 first, T2 second, T3 third)
+        {
+            if (method == null) throw new System.ArgumentNullException(nameof(method));
+            return EmitCall(
+                method(Declaration).Method,
+                new System.Collections.Generic.List<ValueExpression>
+                {
+                    ValueExpression.LiteralFor(first, Shape.FromClrType(typeof(T1))),
+                    ValueExpression.LiteralFor(second, Shape.FromClrType(typeof(T2))),
+                    ValueExpression.LiteralFor(third, Shape.FromClrType(typeof(T3))),
+                });
+        }
+
         /// <summary>
         /// Calls one of the component's declared methods with an argument read at runtime: another
         /// component, an event payload, a response body, a URL parameter, a plugin or an array.
@@ -116,6 +132,43 @@ namespace Alis.Reactive
         {
             if (property == null) throw new System.ArgumentNullException(nameof(property));
             return Read(property(Declaration));
+        }
+
+        /// <summary>Reads what one of the component's declared methods returns.</summary>
+        /// <example><c>p.When(p.Component&lt;FusionGrid&gt;("roster").Get(c =&gt; c.GetSelectedRecords)).NotEmpty()</c></example>
+        public Builders.Conditions.TypedComponentSource<TResult> Get<TResult>(
+            System.Func<TComponent, ComponentFunction<TResult>> function)
+        {
+            if (function == null) throw new System.ArgumentNullException(nameof(function));
+            return Read<TResult>(function(Declaration).Method);
+        }
+
+        /// <summary>Reads what one of the component's declared methods returns for a literal argument.</summary>
+        public Builders.Conditions.TypedComponentSource<TResult> Get<TArg, TResult>(
+            System.Func<TComponent, ComponentFunction<TArg, TResult>> function, TArg argument)
+        {
+            if (function == null) throw new System.ArgumentNullException(nameof(function));
+            return Read<TResult>(
+                function(Declaration).Method,
+                new System.Collections.Generic.List<ValueExpression>
+                {
+                    ValueExpression.LiteralFor(argument, Shape.FromClrType(typeof(TArg))),
+                });
+        }
+
+        /// <summary>Reads what one of the component's declared methods returns for two literal arguments.</summary>
+        /// <example><c>p.Component&lt;FusionBulletChart&gt;("census").Get(c =&gt; c.GetActualIndex, 2, 5)</c></example>
+        public Builders.Conditions.TypedComponentSource<TResult> Get<T1, T2, TResult>(
+            System.Func<TComponent, ComponentFunction<T1, T2, TResult>> function, T1 first, T2 second)
+        {
+            if (function == null) throw new System.ArgumentNullException(nameof(function));
+            return Read<TResult>(
+                function(Declaration).Method,
+                new System.Collections.Generic.List<ValueExpression>
+                {
+                    ValueExpression.LiteralFor(first, Shape.FromClrType(typeof(T1))),
+                    ValueExpression.LiteralFor(second, Shape.FromClrType(typeof(T2))),
+                });
         }
 
         internal ComponentRef<TComponent, TModel> EmitSet<TValue>(

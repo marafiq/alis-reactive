@@ -39,8 +39,8 @@
         p.Element("mouse-click-target").SetText("pending");
         p.Element("mouse-click-x").SetText("pending");
         p.Element("mouse-click-y").SetText("pending");
-        p.Element("actual-index-negative").SetText(chart.GetActualIndex(-1, 3));
-        p.Element("actual-index-overflow").SetText(chart.GetActualIndex(3, 3));
+        p.Element("actual-index-negative").SetText(chart.Get(c => c.GetActualIndex, -1, 3));
+        p.Element("actual-index-overflow").SetText(chart.Get(c => c.GetActualIndex, 3, 3));
     }));
 }
 
@@ -84,7 +84,7 @@
             p.When(args, x => x.Template).NotEmpty()
                 .Then(t => t.Element("tooltip-template").SetText(args, x => x.Template))
                 .Else(e => e.Element("tooltip-template").SetText("none"));
-            args.SetText(p, "Bullet tooltip rewritten");
+            p.Payload(args).Set(a => a.Text, "Bullet tooltip rewritten");
             p.Element("tooltip-text").SetText(args, x => x.Text);
         })
         .Reactive(evt => evt.BulletChartMouseClick, (args, p) =>

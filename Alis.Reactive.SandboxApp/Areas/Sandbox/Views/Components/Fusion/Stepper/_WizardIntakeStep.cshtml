@@ -43,7 +43,7 @@
                         {
                             s.Component<NativeHiddenField>(m => m.WizardId).SetValue(json, x => x.WizardId);
                             s.Component<NativeHiddenField, FusionStepperWizardShellModel>(m => m.MaxUnlockedStep).SetValue("1");
-                            s.Component<FusionStepper>(StepperId).SetActiveStep(1);
+                            s.Component<FusionStepper>(StepperId).Set(c => c.ActiveStep, 1);
                             s.Element("stepper-wizard-status").SetText(json, x => x.Message);
                         })
                         .OnError(400, e => e.ValidationErrors(FormId)));

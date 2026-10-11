@@ -29,7 +29,7 @@
                 .Static("step", 1))
             .Response(r => r.OnSuccess(s => s.Into(StepContainerId)));
 
-        p.Element("stepper-wizard-current").SetText(p.Component<FusionStepper>(StepperId).ActiveStep());
+        p.Element("stepper-wizard-current").SetText(p.Component<FusionStepper>(StepperId).Get(c => c.ActiveStep));
         p.Element("stepper-wizard-status").SetText("loaded intake");
     }));
 }
@@ -71,21 +71,21 @@
                 .And(maxUnlockedStep).Eq("0")
                 .Then(t =>
                 {
-                    args.PreventDefault(t);
+                    t.Payload(args).Set(a => a.Cancel, true);
                     t.Element("stepper-wizard-status").SetText("complete intake before opening care");
                 })
                 .ElseIf(args, x => x.ActiveStep).Eq(2)
                 .And(maxUnlockedStep).In("0", "1")
                 .Then(t =>
                 {
-                    args.PreventDefault(t);
+                    t.Payload(args).Set(a => a.Cancel, true);
                     t.Element("stepper-wizard-status").SetText("complete care before opening contacts");
                 })
                 .ElseIf(args, x => x.ActiveStep).Eq(3)
                 .And(maxUnlockedStep).In("0", "1", "2")
                 .Then(t =>
                 {
-                    args.PreventDefault(t);
+                    t.Payload(args).Set(a => a.Cancel, true);
                     t.Element("stepper-wizard-status").SetText("complete contacts before review");
                 });
         })

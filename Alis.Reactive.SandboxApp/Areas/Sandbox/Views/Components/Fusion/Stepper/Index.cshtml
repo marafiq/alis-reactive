@@ -21,8 +21,8 @@
     {
         var stepper = p.Component<FusionStepper>(StepperId);
         var validationStepper = p.Component<FusionStepper>(ValidationStepperId);
-        p.Element("active-step-echo").SetText(stepper.ActiveStep());
-        p.Element("current-step").SetText(stepper.ActiveStep());
+        p.Element("active-step-echo").SetText(stepper.Get(c => c.ActiveStep));
+        p.Element("current-step").SetText(stepper.Get(c => c.ActiveStep));
         p.Element("step-changing-state").SetText("pending");
         p.Element("step-changing-active").SetText("pending");
         p.Element("step-changing-previous").SetText("pending");
@@ -43,8 +43,8 @@
         p.Element("validation-step-click-state").SetText("pending");
         p.Element("validation-step-click-active").SetText("pending");
         p.Element("validation-step-click-previous").SetText("pending");
-        p.Element("validation-active-echo").SetText(validationStepper.ActiveStep());
-        p.Element("validation-current-step").SetText(validationStepper.ActiveStep());
+        p.Element("validation-active-echo").SetText(validationStepper.Get(c => c.ActiveStep));
+        p.Element("validation-current-step").SetText(validationStepper.Get(c => c.ActiveStep));
     }));
 
     var validationSteps = new List<Step>
@@ -98,7 +98,7 @@
                         .Else(blocked =>
                         {
                             blocked.Element("step-changing-guard").SetText("blocked");
-                            args.PreventDefault(blocked);
+                            blocked.Payload(args).Set(a => a.Cancel, true);
                             blocked.Element("step-changing-cancel").SetText(args, x => x.Cancel);
                         });
                 })
@@ -106,7 +106,7 @@
         })
         .Reactive(evt => evt.StepClick, (args, p) =>
         {
-            p.Element("active-step-echo").SetText(p.Component<FusionStepper>(StepperId).ActiveStep());
+            p.Element("active-step-echo").SetText(p.Component<FusionStepper>(StepperId).Get(c => c.ActiveStep));
             p.Element("step-click-state").SetText("clicked");
             p.Element("step-click-active").SetText(args, x => x.ActiveStep);
             p.Element("step-click-previous").SetText(args, x => x.PreviousStep);
@@ -114,7 +114,7 @@
         .Reactive(evt => evt.StepChanged, (args, p) =>
         {
             var stepper = p.Component<FusionStepper>(StepperId);
-            p.Element("active-step-echo").SetText(stepper.ActiveStep());
+            p.Element("active-step-echo").SetText(stepper.Get(c => c.ActiveStep));
             p.Element("current-step").SetText(args, x => x.ActiveStep);
             p.Element("step-changed-state").SetText("changed");
             p.Element("step-changed-active").SetText(args, x => x.ActiveStep);
@@ -130,49 +130,49 @@
                 .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionStepper>(StepperId).SetActiveStep(1);
+                    p.Component<FusionStepper>(StepperId).Set(c => c.ActiveStep, 1);
                     p.Element("command-state").SetText("set review");
                 }))
             @(Html.NativeButton("set-complete-step-btn", "Set Complete")
                 .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionStepper>(StepperId).SetActiveStep(2);
+                    p.Component<FusionStepper>(StepperId).Set(c => c.ActiveStep, 2);
                     p.Element("command-state").SetText("set complete");
                 }))
             @(Html.NativeButton("set-intake-step-btn", "Set Intake")
                 .CssClass("rounded-md bg-surface px-4 py-2 text-sm font-medium text-text hover:bg-surface-2 transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionStepper>(StepperId).SetActiveStep(0);
+                    p.Component<FusionStepper>(StepperId).Set(c => c.ActiveStep, 0);
                     p.Element("command-state").SetText("set intake");
                 }))
             @(Html.NativeButton("next-step-btn", "Next")
                 .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionStepper>(StepperId).NextStep();
+                    p.Component<FusionStepper>(StepperId).Call(c => c.NextStep);
                     p.Element("command-state").SetText("next");
                 }))
             @(Html.NativeButton("previous-step-btn", "Previous")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionStepper>(StepperId).PreviousStep();
+                    p.Component<FusionStepper>(StepperId).Call(c => c.PreviousStep);
                     p.Element("command-state").SetText("previous");
                 }))
             @(Html.NativeButton("reset-step-btn", "Reset")
                 .CssClass("rounded-md bg-surface px-4 py-2 text-sm font-medium text-text hover:bg-surface-2 transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionStepper>(StepperId).Reset();
+                    p.Component<FusionStepper>(StepperId).Call(c => c.Reset);
                     p.Element("command-state").SetText("reset");
                 }))
             @(Html.NativeButton("refresh-step-btn", "Refresh")
                 .CssClass("rounded-md bg-surface px-4 py-2 text-sm font-medium text-text hover:bg-surface-2 transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionStepper>(StepperId).RefreshProgressbar();
+                    p.Component<FusionStepper>(StepperId).Call(c => c.RefreshProgressbar);
                     p.Element("progress-state").SetText("refreshed");
                     p.Element("command-state").SetText("refresh");
                 }))
@@ -233,7 +233,7 @@
         .Reactive(evt => evt.StepChanged, (args, p) =>
         {
             var stepper = p.Component<FusionStepper>(ValidationStepperId);
-            p.Element("validation-active-echo").SetText(stepper.ActiveStep());
+            p.Element("validation-active-echo").SetText(stepper.Get(c => c.ActiveStep));
             p.Element("validation-current-step").SetText(args, x => x.ActiveStep);
         }))
 

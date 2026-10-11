@@ -64,29 +64,32 @@ namespace Alis.Reactive
     public sealed class ComponentMethod
     {
         private readonly MemberName _member;
+        private readonly string _pathExpression;
         private readonly Path _path;
         private readonly MethodArgumentContract _arguments;
 
         private ComponentMethod(string member, string pathExpression, MethodArgumentContract arguments)
+            : this(MemberName.Of(member), pathExpression, arguments)
         {
-            _member = MemberName.Of(member);
+        }
+
+        private ComponentMethod(MemberName member, string pathExpression, MethodArgumentContract arguments)
+        {
+            _member = member ?? throw new ArgumentNullException(nameof(member));
             if (string.IsNullOrWhiteSpace(pathExpression))
             {
                 throw new ArgumentException("Method path required.", nameof(pathExpression));
             }
 
+            _pathExpression = pathExpression;
             _path = Path.Parse(pathExpression);
             _arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
         }
 
-        private ComponentMethod(MemberName member, Path path, MethodArgumentContract arguments)
-        {
-            _member = member ?? throw new ArgumentNullException(nameof(member));
-            _path = path ?? throw new ArgumentNullException(nameof(path));
-            _arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
-        }
-
         internal string Member => _member.Value;
+
+        /// <summary>The JavaScript name the method has on its object, which an event payload is called by.</summary>
+        internal string JavaScriptName => _pathExpression;
 
         internal ObjectMethodContract ContractReturning(Shape returns)
         {
@@ -115,7 +118,7 @@ namespace Alis.Reactive
             WithArgs(Shape.FromClrType(typeof(T1)), Shape.FromClrType(typeof(T2)), Shape.FromClrType(typeof(T3)));
 
         private ComponentMethod WithArgs(params Shape[] args) =>
-            new ComponentMethod(_member, _path, MethodArgumentContract.Exact(args));
+            new ComponentMethod(_member, _pathExpression, MethodArgumentContract.Exact(args));
     }
 
     /// <summary>
@@ -142,6 +145,71 @@ namespace Alis.Reactive
     public sealed class ComponentMethod<T1, T2>
     {
         internal ComponentMethod(ComponentMethod method)
+        {
+            Method = method ?? throw new ArgumentNullException(nameof(method));
+        }
+
+        internal ComponentMethod Method { get; }
+    }
+
+    /// <summary>
+    /// A JavaScript method that takes three typed arguments. Declare one with
+    /// <c>Method&lt;T1, T2, T3&gt;("jsName")</c> on a <see cref="JsObject"/>; use it with <c>Call</c>.
+    /// </summary>
+    /// <typeparam name="T1">The C# type of the first argument.</typeparam>
+    /// <typeparam name="T2">The C# type of the second argument.</typeparam>
+    /// <typeparam name="T3">The C# type of the third argument.</typeparam>
+    public sealed class ComponentMethod<T1, T2, T3>
+    {
+        internal ComponentMethod(ComponentMethod method)
+        {
+            Method = method ?? throw new ArgumentNullException(nameof(method));
+        }
+
+        internal ComponentMethod Method { get; }
+    }
+
+    /// <summary>
+    /// A JavaScript method that returns a value. Declare one with <c>Function&lt;TResult&gt;("jsName")</c>
+    /// on a <see cref="JsObject"/>; read it with <c>Get(c =&gt; c.Name)</c> wherever the DSL takes a source.
+    /// </summary>
+    /// <typeparam name="TResult">The C# type of the returned value.</typeparam>
+    public sealed class ComponentFunction<TResult>
+    {
+        internal ComponentFunction(ComponentMethod method)
+        {
+            Method = method ?? throw new ArgumentNullException(nameof(method));
+        }
+
+        internal ComponentMethod Method { get; }
+    }
+
+    /// <summary>
+    /// A JavaScript method that takes one typed argument and returns a value. Declare one with
+    /// <c>Function&lt;TArg, TResult&gt;("jsName")</c>; read it with <c>Get(c =&gt; c.Name, argument)</c>.
+    /// </summary>
+    /// <typeparam name="TArg">The C# type of the argument.</typeparam>
+    /// <typeparam name="TResult">The C# type of the returned value.</typeparam>
+    public sealed class ComponentFunction<TArg, TResult>
+    {
+        internal ComponentFunction(ComponentMethod method)
+        {
+            Method = method ?? throw new ArgumentNullException(nameof(method));
+        }
+
+        internal ComponentMethod Method { get; }
+    }
+
+    /// <summary>
+    /// A JavaScript method that takes two typed arguments and returns a value. Declare one with
+    /// <c>Function&lt;T1, T2, TResult&gt;("jsName")</c>; read it with <c>Get(c =&gt; c.Name, first, second)</c>.
+    /// </summary>
+    /// <typeparam name="T1">The C# type of the first argument.</typeparam>
+    /// <typeparam name="T2">The C# type of the second argument.</typeparam>
+    /// <typeparam name="TResult">The C# type of the returned value.</typeparam>
+    public sealed class ComponentFunction<T1, T2, TResult>
+    {
+        internal ComponentFunction(ComponentMethod method)
         {
             Method = method ?? throw new ArgumentNullException(nameof(method));
         }

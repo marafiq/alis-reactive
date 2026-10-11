@@ -57,7 +57,7 @@ namespace Alis.Reactive.Builders
 
             _pipeline.AddStep(ReactionGraph.Call(
                 PayloadSource.Event(),
-                method(_args).Method.Member,
+                method(_args).Method.JavaScriptName,
                 new List<ValueExpression> { argument.ToValueExpression() }));
             return this;
         }
