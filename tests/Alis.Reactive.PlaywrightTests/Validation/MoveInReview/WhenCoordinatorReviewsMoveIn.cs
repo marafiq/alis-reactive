@@ -48,6 +48,33 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         await Page.Keyboard.PressAsync("Tab");
     }
 
+    // TEMPORARY diagnostics for a CI-only failure ("Clicking the checkbox did not change its state").
+    private async Task CheckWithDiagnostics()
+    {
+        var box = _plan.NativeCheckBox(m => m.IsReturning).Input;
+        try
+        {
+            await box.CheckAsync(new() { Timeout = 10000 });
+        }
+        catch (PlaywrightException failure)
+        {
+            var focused = await Page.Locator("*:focus").First.GetAttributeAsync("id", new() { Timeout = 1000 }).ContinueWith(t => t.IsFaulted ? "(none)" : t.Result);
+            var errors = string.Join(" | ", (await Page.Locator("[data-valmsg-for]").AllTextContentsAsync()).Where(text => text.Length > 0));
+            var boxBounds = await box.BoundingBoxAsync();
+            var label = await Page.Locator($"label[for='{await box.GetAttributeAsync("id")}']").BoundingBoxAsync();
+            var summaryVisible = await ValidationSummary.IsVisibleAsync();
+            var viewport = Page.ViewportSize;
+            var checkedAfter = await box.IsCheckedAsync();
+            await box.ClickAsync(new() { Force = true });
+            var checkedAfterSecond = await box.IsCheckedAsync();
+            var console = string.Join(" || ", _consoleMessages.Where(m => !m.Contains("[alis:") || m.Contains("validation") || m.Contains("change")).TakeLast(12));
+            throw new AssertionException(
+                $"DIAG focused={focused} errors=[{errors}] box={boxBounds?.X},{boxBounds?.Y},{boxBounds?.Width}x{boxBounds?.Height} " +
+                $"label={label?.X},{label?.Y},{label?.Width}x{label?.Height} viewport={viewport?.Width}x{viewport?.Height} " +
+                $"summaryVisible={summaryVisible} checkedAfter={checkedAfter} checkedAfterForcedClick={checkedAfterSecond} console={console} :: {failure.Message.Split('\n')[0]}");
+        }
+    }
+
     [Test]
     public async Task an_empty_review_asks_for_the_resident_and_the_score_before_anything_is_sent()
     {
@@ -252,7 +279,7 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         await NavigateAndBoot();
         await Write(m => m.ResidentName, "Margaret Hale");
         await Write(m => m.FallRiskScore, "2");
-        await _plan.NativeCheckBox(m => m.IsReturning).Check();
+        await CheckWithDiagnostics();
 
         await ClickWhenStable(SaveReview);
 
