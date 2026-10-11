@@ -4,8 +4,7 @@
 // tests that passed instead. Skipped (NotExecuted) and Inconclusive tests are neither.
 //
 // Used by scripts/playwright.sh --retry-failed to re-run only what failed and to report which
-// tests then passed (the flaky list). The TRX regexes mirror the repo's proven parser in
-// .claude/skills/onboard-fusion-component/scripts/verify-behavioral-coverage.mjs.
+// tests then passed (the flaky list).
 //
 //   node scripts/trx-failed-tests.mjs <file.trx> [failed|passed]
 //

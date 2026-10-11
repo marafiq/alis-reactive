@@ -13,19 +13,17 @@ Runs the ordered verification gate:
   1. npm run typecheck
   2. npm run build:all
   3. npm test
-  4. gate-script self-tests (.claude/skills/onboard-fusion-component/scripts/*.selftest.mjs), the CI
-     shard-matrix check, and the Syncfusion pin check (node scripts/pin-syncfusion.mjs --check)
+  4. the CI shard-matrix check and the Syncfusion pin check (node scripts/pin-syncfusion.mjs --check)
   5. dotnet build
   6. non-Playwright dotnet test projects, if any
   7. scripts/playwright.sh --no-build (or its five CI shards at once with --parallel)
-  8. behavioral coverage gate (0b) over behaviorally-audited Fusion components
 
 Options:
   --parallel  Run the Playwright leg as the five CI shards (scripts/playwright.sh
-              --list-shards), side by side, each with its own sandbox; the 0b gate
-              then reads every shard's TRX. About 20 minutes instead of about 60.
+              --list-shards), side by side, each with its own sandbox. About 20
+              minutes instead of about 60.
   --no-e2e    Skip the Playwright browser leg after typecheck, assets, vitest,
-              self-tests, dotnet build, and non-Playwright dotnet tests have passed.
+              consistency checks, dotnet build, and non-Playwright dotnet tests have passed.
   -h, --help  Show this help.
 
 Playwright starts its own sandbox on a random free port. Do not pre-start the
@@ -60,8 +58,6 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-behavioral_gate="node .claude/skills/onboard-fusion-component/scripts/verify-behavioral-coverage.mjs --all"
-
 run_dotnet_tests() {
   local projects=()
   local project
@@ -84,21 +80,6 @@ run_dotnet_tests() {
   for project in "${projects[@]}"; do
     echo "[test] running dotnet tests: $project"
     dotnet test "$project" --configuration "$configuration" --no-build
-  done
-}
-
-# The 0b gate and the parity tool only mean something if they bite: their self-tests prove each
-# failure mode turns them red and a clean input keeps them green.
-run_gate_selftests() {
-  local selftest output
-  for selftest in .claude/skills/onboard-fusion-component/scripts/*.selftest.mjs; do
-    if output="$(node "$selftest" 2>&1)"; then
-      echo "[test]   $(printf '%s\n' "$output" | tail -1)"
-    else
-      printf '%s\n' "$output"
-      echo "[test] self-test failed: $selftest" >&2
-      return 1
-    fi
   done
 }
 
@@ -135,12 +116,11 @@ stop_shards() {
 }
 
 # The five CI shards side by side. Each scripts/playwright.sh run starts its own sandbox on a free
-# port. All shards share one run stamp (each adds its shard name to its file names), so the 0b gate
-# and the onboarding tools read the whole run as the newest one. Every shard's console output lands
-# in one directory; the 0b gate then reads all of their TRX files (and any retries).
+# port. All shards share one run stamp (each adds its shard name to its file names), and every
+# shard's console output lands in one directory.
 run_parallel_playwright() {
   local run_stamp run_dir shard status=0 code
-  local shards=() trx_files=()
+  local shards=()
   run_stamp="$(date +%Y%m%d-%H%M%S)"
   run_dir="tests/Alis.Reactive.PlaywrightTests/TestResults/observable/parallel-$run_stamp"
   mkdir -p "$run_dir"
@@ -164,9 +144,6 @@ run_parallel_playwright() {
     if wait "${shard_pids[$i]}"; then code=0; else code=$?; status=1; fi
     echo "[test] shard $shard exit=$code | $(grep -aE '^(Total tests|     Passed|     Failed):' "$run_dir/$shard.log" | tr -s ' ' | tr '\n' ' ')"
     grep -aE '^\s+Failed [A-Za-z_]' "$run_dir/$shard.log" | sed "s/^/[test]   $shard: /" || true
-    while IFS= read -r trx; do
-      trx_files+=("$trx")
-    done < <(grep -aoE '\[playwright:runner\] trx=[^ ]+' "$run_dir/$shard.log" | sed 's/.*trx=//' | sort -u)
   done
   trap - INT TERM
   set +m
@@ -175,13 +152,6 @@ run_parallel_playwright() {
     echo "[test] Playwright shards failed; logs in $run_dir" >&2
     return 1
   fi
-  if [ "${#trx_files[@]}" -eq 0 ]; then
-    echo "[test] no shard reported a TRX file; logs in $run_dir" >&2
-    return 1
-  fi
-
-  echo "[test] behavioral coverage gate (0b) over ${#trx_files[@]} shard TRX file(s)"
-  $behavioral_gate --trx "$(IFS=,; printf '%s' "${trx_files[*]}")"
 }
 
 echo "[test] ensuring npm dependencies"
@@ -196,8 +166,7 @@ npm run build:all
 echo "[test] running vitest"
 npm test
 
-echo "[test] gate-script self-tests"
-run_gate_selftests
+echo "[test] consistency checks"
 check_ci_shard_matrix
 # npm and NuGet must carry the same Syncfusion version, and every control package must be locked at
 # the version the @syncfusion/ej2 umbrella was published with (scripts/pin-syncfusion.mjs explains why).
@@ -209,20 +178,13 @@ dotnet build --configuration "$configuration"
 run_dotnet_tests
 
 if [ "$run_e2e" -eq 0 ]; then
-  echo "[test] skipping Playwright and behavioral coverage gate (--no-e2e)"
+  echo "[test] skipping Playwright (--no-e2e)"
 elif [ "$parallel" -eq 1 ]; then
   echo "[test] running observable Playwright as parallel shards"
   run_parallel_playwright
 else
   echo "[test] running observable Playwright"
   CONFIGURATION="$configuration" scripts/playwright.sh --no-build
-  # 0b behavioral coverage gate: the fresh TRX from the run above is the truth
-  # source. For every component that claims behavioral coverage
-  # (proof/behavioral-coverage.json), this confirms each mapped member's test
-  # exists in that TRX and passed. Components without a map are below bar, not a
-  # failure. Skipped under --no-e2e: no fresh TRX means no behavioral proof.
-  echo "[test] behavioral coverage gate (0b)"
-  $behavioral_gate
 fi
 
 echo "All gates green."

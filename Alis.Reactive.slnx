@@ -23,9 +23,6 @@
   <Folder Name="/.claude/skills/conditions-dsl/">
     <File Path=".claude/skills/conditions-dsl/SKILL.md" />
   </Folder>
-  <Folder Name="/.claude/skills/onboard-fusion-component/">
-    <File Path=".claude/skills/onboard-fusion-component/SKILL.md" />
-  </Folder>
   <Folder Name="/.claude/skills/solid-ts-audit/">
     <File Path=".claude/skills/solid-ts-audit/SKILL.md" />
   </Folder>
@@ -61,7 +58,6 @@
     <File Path="docs-site/src/content/docs/architecture/descriptors-and-plan.mdx" />
     <File Path="docs-site/src/content/docs/architecture/error-behavior.mdx" />
     <File Path="docs-site/src/content/docs/architecture/fluent-builders.mdx" />
-    <File Path="docs-site/src/content/docs/architecture/onboarding-component.md" />
     <File Path="docs-site/src/content/docs/architecture/plan-composition.mdx" />
     <File Path="docs-site/src/content/docs/architecture/runtime.mdx" />
     <File Path="docs-site/src/content/docs/architecture/sandbox-demo.md" />
@@ -118,7 +114,6 @@
   <Folder Name="/tools/">
     <Project Path="tools/ApiDocGenerator/ApiDocGenerator.csproj" />
     <Project Path="tools/PlanContractGenerator/PlanContractGenerator.csproj" />
-    <Project Path="tools/FusionCoverage/FusionCoverage.csproj" />
   </Folder>
   <Folder Name="/examples/">
     <Project Path="examples/resident-intake/ResidentIntake.csproj" />
