@@ -1,0 +1,695 @@
+# The grammar: specification
+
+This is the specification the code is written from. [`architecture.md`](architecture.md) section 0
+introduces the grammar and says why; this file says exactly what it is, what it means, and what each
+object in the vocabulary must do. Where the two differ, this file governs.
+
+It was checked against all 531 inventoried use cases, then reviewed adversarially against the code
+(section 9). Every decision that changes something a user can see today is listed in section 8,
+with its rows.
+
+**The rule behind every decision:** the browser computes what the C# the developer wrote would
+compute. Types, operators, evaluation order, scoping and empty values follow C#, and the server's
+model binding and FluentValidation where those apply. Where JavaScript would answer differently,
+the grammar says so explicitly instead of inheriting JavaScript's answer.
+
+## 1. Syntax
+
+### 1.1 The plan document
+
+```
+plan      := { version, planId, vendors, objects, handlers }
+vendor    := name -> { objectPath, subscribe, unsubscribe, payload: argument | element | event }
+object    := id -> locator
+locator   := element(id, vendor)            found on an element, through its vendor's data
+           | plugin(name, key, data)        made by the module a bundle registered under `name`
+handler   := { on: object, event, param, do: block }
+```
+
+That is the whole document. The grammar names no feature.
+
+- **Plugins.** A module is registered by name by a JavaScript bundle:
+  - the framework's own bundle registers `alis.document`, `alis.http`, `alis.model`, `alis.form` and
+    `alis.slot`;
+  - the realtime package registers `alis.stream` and `alis.hub`;
+  - an app registers its own plugins.
+
+  `key` picks one object of the module (empty for a singleton): a form's container ID, a slot's
+  container ID, a stream's URL. The framework's features use the same extension point an app does.
+- **Plugin data.** `data` is JSON the module defines, and it may contain expressions. Each plan
+  contributes its data under its owner, and the module joins the contributions per key. The C#
+  declaration of each module states its data type, so the generated contract types it too.
+- **Inputs and forms are module data.**
+  - The inputs of a view are `alis.model` data: `{ id: { name, value: fn(self) expr, committed } }`.
+    An input's `value` is an expression of the input object, so a value that is not a single member
+    can say so: the uploader's value is `self.filesData.map(f => f.rawFile)`.
+  - A form's tests are `alis.form` data: `{ tests: [{ field, check: fn(value, model), when: fn(model), message }] }`.
+    An input does not name its form; membership is decided by containment (6.4), because a partial
+    cannot know which form will contain it.
+- **No owner field.** The owner of a plan is whoever discovered it: the page at boot, or a slot when
+  it loads.
+
+### 1.2 Statements and expressions
+
+```
+block   := stmt*
+stmt    := set(target: expr, path, shape, value: expr)
+         | do(expr, await)
+         | let(name, expr, await)
+         | if(arm+, else: block)            arm := (expr, block)
+         | all(block+)
+         | try(block, finally: block)
+
+expr    := lit(json, shape)
+         | obj(id)
+         | ref(name)
+         | get(expr, path, shape)
+         | call(expr, path, args: expr*, argShapes: shape*, shape)
+         | fn(param+, expr)
+         | record(entry*)                    entry := (name, expr) | spread(expr)
+         | list(expr*)
+         | op(operator, expr+)
+```
+
+Six statements, nine expressions. JSON names each node by `kind` with exactly these names.
+
+### 1.3 Paths
+
+A path is a list of segments: a member name or an array index. The C# side never mixes the two
+kinds of segment in one node:
+- **member segments** come from declarations (`grid.DataSource`, `schedule.EventSettings.DataSource`);
+- **data segments** come from `Get(x => x.A.B)` over a data type.
+
+A member read followed by a data read is two nested `get` nodes.
+
+- **Member paths rooted at `obj(id)` are checked.** Every segment must exist, and an absent one is a
+  boundary error that names the object, its ID and the path. A vendor version without a declared
+  member fails loudly instead of reading `undefined`.
+- **Every other path is optional.** This covers paths off a handler's payload, a response, a record,
+  a module's data (`document.query`, `model.values`) or a returned object. A missing link reads as
+  missing, and a call on a missing receiver returns missing. This is JavaScript's `?.`.
+- **Writes.**
+  - A `set` rooted at `obj(id)` needs every segment, the final member included, so a write to a
+    member the vendor does not have fails loudly instead of creating a property.
+  - Any other `set` needs the owner of its final member, and creates that member when absent, so a
+    payload's `cancel` can always be written.
+
+Where a path is rooted decides how it is read; the runtime decides nothing else.
+
+### 1.4 Shapes
+
+A shape is the C# type's view of a JavaScript value:
+
+`text`, `number`, `boolean`, `date`, `enum`, `file`, `array(shape)`, `record`, `object`,
+`nullable(shape)`, `none`.
+
+- `object` is a live JavaScript object and is never converted.
+- `record` is JSON-shaped data.
+- `enum` values are their names, which is how MVC binds them.
+- `date` values are JavaScript `Date` objects.
+
+## 2. Values
+
+### 2.1 Conversion happens at the boundary, by shape
+
+A value changes type in exactly two places, and only by the declared shape:
+- **Reading:** a `get` or `call` result is converted to the node's shape.
+- **Writing:** a `set` value and each `call` argument are converted to the target member's shape.
+
+Literals are emitted already in their shape. Nothing else converts.
+
+| Shape | From | Result |
+|---|---|---|
+| `number` | number | itself |
+| | boolean | 1 or 0 |
+| | text | `Number(t)` if finite. `""` and whitespace give 0, as MVC binds a non-nullable number. |
+| | `Date` | its time |
+| | otherwise | kept |
+| `date` | `Date` | itself |
+| | number | `new Date(n)` |
+| | `YYYY-MM-DD` text | local midnight |
+| | other text | `new Date(t)` when valid, else kept |
+| `boolean` | text | false only for `""`, `"false"` in any case, and `"0"` |
+| | number | false only for 0 and NaN |
+| | array | `length > 0` |
+| `text` | number or boolean | `${v}` |
+| | `Date` | ISO |
+| | array | `String(a)` |
+| | missing, when writing to an element's text | `""` |
+| `array(s)` (reading) | array | each item converted to `s` |
+| | `""` | `[]` |
+| | another scalar | `[v]` |
+| | missing | stays missing |
+| `nullable(s)` | missing, or text that is empty or whitespace | `null` |
+| | otherwise | converted to `s` |
+| `enum` | any | as `text` |
+| `file` | `File` | itself |
+| | `FileList` | `Array.from` |
+
+- A missing value (`null` or `undefined`) passes through unchanged, except for `nullable`, where it
+  becomes `null`.
+- A value that cannot be converted is kept as it is.
+
+These are today's rules (`shape-convert.ts:45-269`), with one change: a date value is a `Date`, not
+a timestamp. So text, JSON and form data see ISO, and every comparison sees the time (2.2).
+
+**Binding reads.** Where the server binds a value, the browser reads it the way MVC binds it.
+- **Where:** the `alis.model` values that tests and `Form()` read, and JSON request bodies.
+- **What:** text that is empty or only whitespace is `null`, as MVC's `ConvertEmptyStringToNull`
+  makes it; a non-nullable number that is empty is 0, and a nullable one is `null`.
+- **Elsewhere** a text read keeps `""`, so `p.When(name.Value).IsEmpty()` sees what today's condition
+  sees.
+
+### 2.2 Operators
+
+The operator set is closed. Each operator gives the answer C# would give for the developer's
+expression over the converted values.
+
+| Operator | Meaning |
+|---|---|
+| `==`, `!=` | Both missing are equal; one missing is unequal; two `Date`s compare by time; otherwise `===`. This is C#'s lifted equality. |
+| `<`, `<=`, `>`, `>=` | Defined for two finite numbers, two `Date`s by time, two texts by code unit, or two booleans. Every other pair is false, including missing, NaN and mixed kinds. This is C#'s lifted comparison. |
+| `&&`, `\|\|`, `!` | Short-circuit, left to right. |
+| `+ - * / %` | C# arithmetic over numbers; `+` over texts concatenates. |
+| `??`, `?:` | As in C#. |
+| `truthy` | JavaScript's truthiness, applied after conversion. It is used by `Truthy()` and `Falsy()`. |
+| `empty` | True for `""`, missing, and an empty array. Nothing is trimmed. It is used by `IsEmpty()` and `NotEmpty()` in conditions. |
+| `matches(a, pattern, flags)` | False when `a` is missing; otherwise `new RegExp(pattern, flags).test(text(a))`. |
+| `toNumber`, `toDate`, `toBoolean`, `toText` | Explicit C# casts. They use the 2.1 table. |
+| `toArray` | The receiver of a LINQ method. Missing gives `[]`; text or a number gives `[v]`; an iterable gives `Array.from`; anything else is a boundary error. |
+| `finite` | `Number(v)` if finite, else 0. `Sum` uses it, so that text never concatenates. |
+| `order(a, b)` | The `OrderBy` comparator. Finite numbers order by difference, with non-finite values last; everything else orders by `String(v)` in code-unit order. It is stable. |
+
+- **An `if` arm** is taken when its condition is truthy. A missing value is false.
+- **FluentValidation's `NotEmpty`** is not `empty`. It projects to a check chosen by the property's
+  type (section 7.3).
+
+### 2.3 Lambdas, arrays and text
+
+The C# expression compiler turns a lambda into `fn`. Inside it:
+- a parameter of a data type reads by path (`get`);
+- a parameter of a declared object type (an element in `Children`, say) exposes the members its
+  declaration names;
+- the members below map to JavaScript.
+
+The table below is the complete member table. A member that is not in it is an analyzer error at
+compile time, and the compiler fails at render as a backstop. A new member is one row, with no
+runtime change.
+
+| C# | JavaScript |
+|---|---|
+| `Where(p)`, `Select(f)` | `toArray(r).filter(fn)`, `.map(fn)` |
+| `OrderBy(k)`, `OrderByDescending(k)` | `.toSorted((a, b) => order(k(a), k(b)))`, negated for descending |
+| `Count()`, `Count(p)` | `.length`, `.filter(fn).length` |
+| `Any()`, `Any(p)`, `All(p)` | `.length > 0`, `.some(fn)`, `.every(fn)` |
+| `Sum(f)` | `.reduce((s, x) => s + finite(f(x)), 0)` |
+| `Find(p)`, `Find(p, f)` | `.find(fn) ?? null`, then `f` when found |
+| `Enumerable.Contains(constant array, x)` | `[..].includes(x)` |
+| `string.Contains`, `StartsWith`, `EndsWith` | `includes`, `startsWith`, `endsWith`; a missing receiver gives false |
+| `string.Length`, `Trim()`, `ToUpper()`, `ToLower()` | `length`, `trim()`, `toUpperCase()`, `toLowerCase()` |
+| `string.IsNullOrEmpty(s)` | `s == null \|\| s === ""` |
+| `Regex.IsMatch(s, constant)` | `matches(s, pattern, flags)` |
+| `DateTime.DayOfWeek`, `.Month`, `.Year`, `.Day`, `.Hour`, `.Minute`, `.Second` | `getDay()`, `getMonth() + 1`, `getFullYear()`, `getDate()`, `getHours()`, `getMinutes()`, `getSeconds()` |
+| a declared element's `GetAttribute(n)`, `HasAttribute(n)` | `getAttribute(n)`, `hasAttribute(n)` |
+| operators, `??`, `?:`, casts | the operators of 2.2 |
+
+These are today's members (`ReactiveArray.cs:28-121`, `ElementExpressionCompiler.cs:20-25,
+219-230`) plus those the validation `When` conditions need. Today's allow-list names JavaScript's
+date methods directly (`getDay`, `getTime`) on any C# method of that name, and no view calls one;
+here they are reached from `DateTime`'s own members. Members architecture.md once listed and
+nothing uses yet (`First`, `Distinct`, `Skip`, `Take`, `SelectMany`, `Min`, `Max`, `Average`,
+`ThenBy`, `Concat`) are added the same way, each with a journey that proves it.
+
+## 3. Evaluation and execution
+
+### 3.1 Bindings
+
+A block runs in an environment of names:
+- a handler binds its `param`;
+- `let` binds a name for the rest of its block;
+- `fn` binds its parameters for its body.
+
+A `try` body's top-level bindings stay in scope after the `try`. Code after a `try` runs only when
+the body completed, so each of them was bound.
+
+A name is visible only where C# could see the variable that produced it. The builder enforces this
+at render: a handle used outside the block that binds it throws, and names the handle.
+
+### 3.2 Statements
+
+| Statement | Behavior |
+|---|---|
+| `set` | Evaluates the target, converts the value to the target's shape, and writes it (1.3). |
+| `do` | Evaluates the call for its effect. |
+| `let` | Binds the value. |
+| `if` | Takes the first arm whose condition is truthy, else the `else` block. |
+| `all` | Starts every block, waits until all have settled, and logs each failure without rethrowing. |
+| `try` | Runs the body, then the `finally` block on every exit; an error from the body propagates after the `finally` block. |
+
+### 3.3 Await
+
+- `do` and `let` carry `await` only when their call is to an async member.
+- A block runs synchronously until its first awaited statement, then continues when that settles.
+  A handler with no awaited statement never returns a promise.
+- Expressions never await, so there is one synchronous evaluator.
+
+**A sync value is read where it is used.** A `Value<T>` from a property or a returning method is a
+read, like a property getter, so each use reads the current value. `var before = rate.Value;`
+then `rate.Value.Set(5)` makes `before` read 5. To keep the value as it is now, bind it:
+`var before = p.Let(rate.Value);` emits `let`, and `before` reads the binding.
+
+**Plan order is C# evaluation order.** An async member emits its `let … await` where it is called,
+in the active scope, and returns a value that names the result:
+- the value is read, never invoked again, however often it is used;
+- an async call written as an argument runs before the statement it feeds, as C# evaluates arguments
+  first.
+
+The fluent builders that take callbacks (`p.Confirm`, groups, `ElseIf`) build their conditions in
+short-circuit order. A Confirm inside a group or an `ElseIf` is asked only when it is reached: the
+builder nests the `if`s, repeating the shared branch, the way the C# compiler lowers an `await`
+inside `&&`.
+
+### 3.4 Errors
+
+The runtime raises errors only at real boundaries, and each error names the object, the path and
+the plan. The boundaries are:
+- object lookup;
+- a checked path (1.3);
+- an unknown plugin;
+- a browser API;
+- the network;
+- JSON the framework did not produce.
+
+A failing handler is logged and stops no other handler.
+
+### 3.5 Boot and lifetime
+
+1. **Owners.** An owner is the page, or a slot. It holds disposers: its handler subscriptions, its
+   plugin data contributions, and the connection subscriptions those plugins made for it. It knows
+   nothing about what they are.
+2. **Starting an owner.** For the page at boot, or a slot at load:
+   1. discover the plan scripts and compose the ones that share a `planId`;
+   2. locate the objects;
+   3. pass each plugin its data contribution under the owner;
+   4. subscribe every handler;
+   5. start the owner, which runs the handlers waiting for this owner's start (`document`'s `ready`,
+      D1).
+
+   So a ready handler can raise custom events other handlers already hear. Loading a slot starts
+   only the slot's handlers, so a ready handler that loads a slot does not run again.
+3. **Booted marks.** After the page starts, the root element gets `data-alis-booted="true"`,
+   `window.__alisReactiveBoot` is set to `{ booted, planId }`, and the document raises `alis:booted`
+   with `detail.planId`, as today (`boot.ts:137-144`). The Playwright tests wait on these.
+4. **Unloading a slot** runs its owner's disposers, and the boot-owned ones stay. A block that is
+   already running finishes, as it does today; nothing aborts it.
+5. **Mount events.** The app hears `alis:unmount` and `alis:mount` on the document, with
+   `detail.root`, around every change of content. This is the public contract with app bundles
+   that construct and destroy their own widgets.
+
+## 4. Static checks: what makes a malformed sentence impossible
+
+| Rule | Enforced by |
+|---|---|
+| `set` targets a writable member | C# type: `ReadOnly<T>` has no `Set` |
+| Members, arguments and payload types exist and match | C# type |
+| Ordering applies only to comparable types; text operators apply only to text | C# type: generic constraints |
+| An event's payload type matches the callback | C# type |
+| A member call that returns a value is not discarded | analyzer: a discarded `Value<T>` is an error |
+| Every handle is used inside an active block, within its binding's scope | builder at render, naming the handle |
+| A lambda uses only members the compiler maps | analyzer at compile time; render as a backstop |
+| Every route placeholder is filled from the request | render |
+| A regular expression is in JavaScript's dialect | render |
+| Input IDs come from `IdGenerator`; other IDs are explicit; no ID repeats in a plan | render |
+| A validation rule reaches the browser only when the page can evaluate it (7.4) | render |
+| Enum literals are emitted as names, the same text the input reads | construction |
+| A member path and a data path are never one node (1.3) | construction |
+| A validation peer is a sibling of the validated property (7.3) | render, naming the rule |
+| Exact-status routes match before catch-alls; only the first `OnSuccess` route runs; error routes sit behind `!res.ok` | construction: the request builder orders them |
+
+## 5. Lowering: each fluent method, as productions
+
+The owner's fluent API keeps its shape. Every method lowers to fixed productions.
+
+| Fluent API | Lowers to |
+|---|---|
+| `.Reactive(c => c.E, (a, p) => …)`, `t.On(o, x => x.E, (a, p) => …)` | `on(o, "e", a) { … }` |
+| `t.DomReady(p => …)` | `on(document, "ready", _)` |
+| `t.On(AppEvent, (e, p) => …)` | `on(document, name, e)`; the payload is `detail`, or the event when it has none |
+| `o.P.Set(v)` | `set(o, ["p"], shape, v)` |
+| `o.M(a, b)`, a void member | `do(call(o, ["m"], [a, b]))` |
+| `o.F(a)`, returning a value | `call(o, ["f"], [a], shape)` |
+| an async member | `let t = await call(…)` where it is called; the value is `ref t` |
+| `p.Let(v)` | `let t = v`; the value is `ref t` |
+| `v.Get(x => x.A.B)` | `get(v, ["a", "b"], shape)` |
+| `p.Element(id).Text.Set(v)`, `SetText(v)` | `set(el, ["textContent"], text, v)` |
+| `SetHtml(v)` | `set(el, ["innerHTML"], text, v)` |
+| `Show()`, `Hide()` | `set(el, ["hidden"], boolean, false)` and `true` |
+| `AddClass`, `RemoveClass`, `ToggleClass` | `do(call(el, ["classList", "add"], [..]))`, and so on |
+| `p.Dispatch(evt, e => e.Set(..))` | `do(call(document, ["raise"], [lit name, record]))` |
+| `p.When(v).Op(x)…Then(..).ElseIf(..).Else(..)` | `if(op(..), …)`; `And`/`Or` become `&&`/`\|\|`; `Not(g)` becomes `!` |
+| `p.Confirm(m).Then(t).Else(e)` | `let ok = await confirm.ask(m); if (ok) t else e` |
+| `p.Get/Post/Put/Delete(url)` | see 5.1 |
+| `.Into(slotId)` | `do(call(slot, ["load"], [ref res.body]))` |
+| `p.ValidationErrors(container)` | in a response route: `do(call(form, ["showErrors"], [ref res.body]))`; elsewhere: `do(call(form, ["validate"]))` |
+| `p.Parallel(a, b).OnAllSettled(c)` | `all(a, b); c` |
+| `p.Url<T>().Get(q => q.X)` | `get(get(document, ["query"]), ["x"], shape)`: a member read, then an optional data read |
+| `tools.Count(items, "status")`, a plugin member | `call(plugin, ["count"], [..], shape)` |
+| `Html.NativeActionLink(id, text, url, link => …)` | the anchor plus its own plan script: `on(link, "click", e) { if (!modified(e)) { e.preventDefault(); … } }` |
+
+### 5.1 A request
+
+```js
+if (form.validate()) {                            // .Validate<V>(container); outermost
+  …WhileLoading…
+  try {
+    const req = record(…Gather…);                 // the request snapshot
+    const res = await http.send({ method, url, route, values: req, headers, format });
+    if (res.ok) { …OnSuccess by status, exact first… }
+    else if (res.status === 409) { …OnError(409)… }
+    else { …untyped OnError… }                    // also reached by status 0
+  } finally { …Finally… }                         // emitted only when Finally exists
+  if (res.ok) { …Chained((res, p) => …)… }
+}
+```
+
+- **Gather.** `Gather<T>` is decided in C# at render. The members whose names match a `{placeholder}`
+  (case-insensitive, as MVC route values are) go to `route`, keyed exactly as the template spells
+  them. The rest go to `values`. A value needed in both the path and the body is two members.
+- **Keys.** `values` is a nested record for JSON. For form data it is flat, keyed by MVC binding
+  names (`Address.City`, `Lines[0].Sku`), because only C# knows a dictionary from an object.
+- **`Form()`** spreads `model.values` for JSON, or `model.fields` for form data.
+
+### 5.2 Templates
+
+A button inside a vendor template (`FusionTemplate.EventButton`) renders `data-alis-raise="name"`
+and its detail as attributes, not an inline `onclick`. The document module raises the event when it
+is clicked (6.1), and handlers hear it with `on(document, name)`.
+
+## 6. The vocabulary: built-in objects and what each must do
+
+Each built-in object is a plugin, declared in C# through the object contract like any component,
+with its data type, and implemented once as a module of its package's bundle. The interpreter
+imports none of them. The obligations are numbered so that tests and code can cite them.
+
+### 6.1 `document` (`plugin("alis.document")`)
+
+- **D1 `ready`.** An event of the owner being started. A `ready` handler runs when its own owner
+  starts, after every handler of that owner has subscribed (3.5), and never again.
+- **D2 `raise(name, detail)`.** Synchronous. It dispatches a non-bubbling `CustomEvent` with detail
+  `{}` when none is given. A listener's payload is `detail`, or the event itself when the detail is
+  missing (`trigger.ts:95-100`).
+- **D3 `query`.** The query string as a record, read the way MVC binds `[FromQuery]`:
+  - keys match case-insensitively;
+  - an array member reads every value;
+  - a scalar member reads the first value;
+  - an absent key reads as missing.
+- **D4 Markup-raised events.** A click on an element carrying `data-alis-raise` raises that event
+  with the element's detail. The listener is delegated, and it reads only attributes the framework
+  stamped.
+
+### 6.2 `http` (`plugin("alis.http")`)
+
+`send({ method, url, route, values, headers, format })` is async and resolves to
+`{ status, ok, body }`.
+
+- **H1 Route.** Each `{name}` is filled from `route[name]` with `encodeURIComponent`. A missing
+  route value throws before anything is sent.
+- **H2 GET.** `values` become the query string, joined with `&` when the URL already has a `?`.
+  - An array becomes repeated keys.
+  - A missing scalar is sent empty (`name=`).
+  - A missing array sends no key, because `name=` binds as a collection holding one null
+    (`request-payload-writer.ts:94-108`).
+  - A `File` cannot be sent in a GET; it is a boundary error.
+- **H3 JSON.** `values` is the body. It is a binding read (2.1): dates serialize as ISO, and `""`
+  is sent as `null` (`request-payload-writer.ts:235-240`). An empty record sends no body.
+- **H4 Form data.** One entry per key.
+  - Arrays repeat the key.
+  - A `File` is appended with its name, and a date is ISO.
+  - A missing scalar is sent empty.
+  - A missing array sends no entry (`request-payload-writer.ts:110-122`).
+- **H5 Headers.** A header whose value is missing is omitted.
+- **H6 Body.** The body is read by Content-Type: JSON is parsed, text and HTML stay text, and an
+  empty or other body is missing.
+- **H7 Status 0.** Status 0 means no usable response: the network failed, or a JSON body could not
+  be parsed. `ok` is false, and no exact-status route matches it.
+
+### 6.3 `model` (`plugin("alis.model", planId)`)
+
+- **M1 `values`.** Every mounted input of the composed plan, read through each input's `value`
+  expression as a binding read (2.1), and nested by binding name. An unmounted input is skipped.
+- **M2 `fields`.** The same inputs, flat, keyed by MVC binding name.
+
+### 6.4 `form` (`plugin("alis.form", containerId)`)
+
+`validate()` returns a bool; `showErrors(problem)`; tests come from the plan's `forms[containerId]`.
+
+- **F1 Scope.** A test applies only when its field's element is inside the container element. A
+  missing container fails validation when the form has tests.
+- **F2 Model.** A test's `model` is `model.values` of the composed plan, read fresh at every
+  evaluation.
+- **F3 First failure wins.** For each field, tests whose `when` is false are skipped, and the first
+  failing `check` decides.
+- **F4 Validate.** First clear every inline message and the summary, then evaluate every field,
+  then return the AND.
+- **F5 Unmounted field.** A field with no element is skipped when all its `when`s are false.
+  Otherwise the form is invalid, and the summary gets the message of the field's first test.
+- **F6 Display.** A message goes inline into `{id}_error` when that slot is renderable: it has a
+  parent, and no ancestor has `hidden` or `display: none`. Then the field gets `alis-has-error`.
+  Otherwise the message goes to the summary, `{planId with . and + as _}_validation_summary`, one
+  entry per key, replaced and never duplicated.
+- **F7 Live.** At creation (boot or slot load):
+  - the DOM `input` event on a field clears its inline message;
+  - DOM `blur`, and the input's declared `Committed` event, revalidate that one field.
+- **F8 Server errors.** `showErrors(problem)` clears first.
+  - When `problem` is a record with `errors`, it joins each field's messages with `", "` and matches
+    a test field by its exact binding name. Anything else goes to the summary.
+  - When `problem` is not a record (an empty or non-JSON body), it runs `validate()` instead
+    (`execute.ts:215-228`).
+- **F9 Composition.** Tests from plans that share a `planId` are joined per owner. A slot's load or
+  unload removes exactly its own tests and subscriptions, then clears and hides the summary of the
+  plans it touched (`boot.ts:70-94`).
+
+### 6.5 `slot` (`plugin("alis.slot", containerId)`)
+
+`load(html)` is synchronous; `unload()`.
+
+- **S1 Load order.** `load` works in this order:
+  1. take the plan scripts out of the HTML;
+  2. raise `alis:unmount` on the old content;
+  3. replace the content;
+  4. re-create the inserted `<script>` nodes in document order, so that vendor scripts run (this
+     replaces `ej.base.append`);
+  5. raise `alis:mount`;
+  6. unload the previous owner;
+  7. start a new owner for the slot with the plans it found (3.5).
+
+  HTML with no plan only unloads.
+- **S2 Unload.** `unload` releases the slot's owner (3.5).
+- **S3 Element.** The container is found with `getElementById` at every call, so a slot can sit
+  inside content that appears after boot.
+
+### 6.6 `stream` (`plugin("alis.stream", url)`, realtime package)
+
+- **R1 One connection.** One `EventSource` per URL, counted by subscriptions, and closed when the
+  last one is released.
+- **R2 Events.** A named event subscribes by its name, and unnamed messages arrive as `message`. The
+  payload is `JSON.parse(data)`.
+- **R3 Retry.** A permanent close adds a marker to `#alis-realtime-connection-retry-container`. One
+  click retries every dropped connection, and the retried subscriptions keep their owners.
+
+### 6.7 `hub` (`plugin("alis.hub", url)`, realtime package)
+
+- **B1 One connection.** One `HubConnection` per URL, counted by subscriptions, with credentials and
+  automatic reconnect.
+- **B2 Start.** Starting retries at 0, 2, 10 and 30 seconds, then shows the retry indicator (R3).
+- **B3 Messages.** Client methods are events, matched without regard to case. The payload is the
+  method's single argument.
+- **B4 Members.** `invoke(method, …args)` is async and returns a value; `send(method, …args)` is
+  async; `state` and `connectionId` are properties; `reconnecting`, `reconnected` and `close` are
+  events.
+
+### 6.8 App objects (each its package's runtime module, element-located)
+
+- **Confirm** (Fusion):
+  - C1: `ask(message)` is async and resolves true on OK, and false on Cancel, close or Escape.
+  - C2: Asks queue first in, first out.
+  - C3: Escape inside the dialog never reaches the document.
+  - C4: A missing dialog is a boundary error that names `FusionConfirmDialog`.
+- **Loader** (Native):
+  - L1: `show(target?, timeout?)` moves the loader into the target and starts the auto-hide timer.
+  - L2: `hide()` cancels the timer and returns the loader to `<body>`, hidden. It also returns there
+    when its target leaves the page.
+- **Drawer** (Native):
+  - W1: Closing empties its content element without unloading the slot loaded into it, as today.
+- **Toast** (Fusion): its declared members, and no obligation beyond them.
+- **Native CheckList and RadioGroup:** the native module defines `value` and `isInteracted` on the
+  element, replacing today's inline view scripts.
+
+### 6.9 Elements and vendor objects
+
+- **E1 Lookup.** An element or vendor object is looked up with `getElementById` at each use and is
+  never cached. Absent is a boundary error.
+- **E2 Payload.** The vendor's `payload` decides what a handler's parameter is:
+  - `argument`: the vendor's listener argument (Syncfusion);
+  - `element`: the element itself, for native inputs whose values are read after an `await`;
+  - `event`: the DOM `Event`, for `element(id, dom)`. The link reads the button, the modifier keys
+    and `preventDefault` from it.
+- **E3 Writes.** A write converts by the member's shape: a date member receives a `Date`.
+
+## 7. Validation projection
+
+### 7.1 One statement per rule
+
+`ReactiveValidator<T>` is a FluentValidation `AbstractValidator<T>`. Its rules serve the server
+unchanged, and the browser gets the projection of the same instance the server uses for that
+request.
+
+### 7.2 Conditions
+
+- `ReactiveValidator<T>` declares `When(Expression<Func<T, bool>>, Action)` and `Unless(…)`. They
+  record the expression and pass its compiled delegate to FluentValidation.
+- C# prefers the derived overload for a lambda, so lambdas are recorded.
+- A method group or delegate variable binds to FluentValidation's own `When` and stays server-only.
+- `Otherwise(…)` records the negation of its `When`.
+- The recorded conditions are AND-ed onto each rule added inside them (`OnRuleAdded`).
+
+### 7.3 What projects, and to what
+
+The descriptors are read in this order. The first type a component matches decides.
+
+| FluentValidation component | Browser check `(v, m)` |
+|---|---|
+| `IChildValidatorAdaptor`, `IIncludeRule` | recurse into the validator resolved from the request's services, prefixing paths and AND-ing the enclosing conditions |
+| `INotNullValidator` | `v != null` |
+| `INotEmptyValidator` | by the property's type: text `v != null && v.trim() !== ""`; number `v != null && v !== 0`; collection `v != null && v.length > 0`; otherwise `v != null && v != default` |
+| `EmptyValidator<,>` | the negation of the row above |
+| `ILengthValidator` | `v == null` or the length is within bounds |
+| `IEmailValidator` | `v == null` or FluentValidation's own rule: exactly one `@`, neither first nor last |
+| `IRegularExpressionValidator` | `v == null` or `matches(v, expression, flags)`, with flags from `RegexOptions` |
+| `ICreditCardValidator` | `v == null` or FluentValidation's rule: digits, dashes and spaces only, then Luhn, written with `call` and `fn` |
+| `IComparisonValidator`, literal | ordered: `v == null` or `v op literal`; equality: `v op literal`, with no null skip, as FluentValidation |
+| `IComparisonValidator`, peer | the peer read is the rule's prefix plus `MemberToCompare.Name`; ordered: `v == null` or (peer present and `v op peer`); equality: `v op peer`. The peer must be a sibling: FluentValidation keeps only the leaf member, so `x => x.Stay.AdmitDate` cannot be located and is a render error naming the rule. Written in the child validator, the peer is a sibling. |
+| `IInclusiveBetweenValidator`, `ExclusiveBetweenValidator<,>` | `v == null` or within the bounds |
+| `IBrowserRule<T>` (the framework's `Url()`) | its own expression |
+| anything else (`Must`, `Custom`, async rules, components with their own conditions) | not projected: server-only |
+
+- **Empty values** follow model binding: `v` and `model` are binding reads (2.1). A non-nullable
+  number reads an empty input as 0, a nullable one as `null`, and text that is empty or only
+  whitespace as `null`. So `MinimumLength`, `Matches` and `EmailAddress` pass on an empty optional
+  field and `NotNull` fails on one, as on the server.
+- **Messages** come from `GetUnformattedErrorMessage()`, formatted at render with what is known
+  there (property name, comparison value). `.WithMessage` keeps today's text.
+- **Collections.** `RuleForEach(x => x.Lines).SetValidator(V)` emits V's tests once per rendered item
+  index; the index is literal in the field ID and in every model path.
+
+### 7.4 Which rules reach the browser
+
+A rule reaches the browser when the page can evaluate it:
+- its property is bound to an input on the page;
+- every member its condition or peer reads is bound to an input or is a closure literal;
+- its condition was recorded as an expression.
+
+Every other rule stays server-only, with no extra code: `ServerFlag` has no input, and a collection
+of complex items has none. The decision is made at render and is deterministic.
+
+### 7.5 Grid column rules
+
+The Fusion grid maps the same typed projection model to Syncfusion's column rules (`required`,
+`email`, `url`, `minLength`, `maxLength`, `regex`, `min`, `max`, `range`). It reads the projection,
+not the plan.
+
+## 8. Decisions that change what a user can see
+
+Each change is deliberate and named here, so that nothing changes silently. The rows are in
+`use-cases/`. A frozen fixture that fails on one of these comes to the owner; it is not edited.
+
+| Change | Rows | Why |
+|---|---|---|
+| Empty values follow the server: `ExclusiveBetween` on a non-nullable number fails on empty; `GreaterThan(date)` on `DateTime?` passes on empty; `Equal`/`NotEqual` no longer skip empty; `When(x => x.Age < 18)` on `int` fires on empty | validation 22, 28, 33, 34, 37, 39, 48 | Today the browser accepts what the server rejects, or rejects what it accepts. Written once means one answer. |
+| Email and credit-card checks follow FluentValidation | validation rows using them | Same reason. Today the browser requires a dot that the server does not, and strips letters that the server rejects. |
+| `NotEmpty` on a collection of complex items is server-only | validation 74 | It has no input. Today it always blocks, which is a defect. |
+| `Include` enforces on the server as well | validation 76 | Today `ClientRulesFrom` is browser-only. |
+| `AddReactiveClientValidation` is replaced by FluentValidation validators registered through DI | validation 77 | A browser rule always has a server rule behind it. |
+| `p.Url<T>()` matches keys case-insensitively, and array members read every value | conditions 14-16, 68, 138; http 26, 38, 42-50 | It is typed by the class the action binds, so it reads the way MVC binds. Today it is case-sensitive and reads the first value. This widens matching only. |
+| A response handle reads the response it names | http (ambiguity 9) | Today a handle reads whichever response is current, so an outer handle inside a nested route reads the inner response. No view relies on that. |
+| A link is an element with an ID the view chooses, and it carries its own plan script | components 117; http 113-121 | It replaces the delegated listener, the plan in `data-reactive-link`, and the runtime rewriting the request URL. The fixtures locate links by `data-testid`. |
+| Template buttons raise events through `data-alis-raise` | components (ambiguity 9) | Views and templates carry no JavaScript. |
+| A stream retry keeps each subscription's owner | http 105, 106 | Today a retried slot subscription is never released. |
+| Enum literals are names | conditions (ambiguity 13) | Today `Eq(enum)` emits the number while the input reads the name, so it can never match. |
+| The Pivot audit view sends the current view as two members, route and body | `Components/Fusion/PivotView/Index.cshtml:59-61` | A placeholder member fills only the path. |
+| `p.Request` is deleted | none | No builder exposes it (`Source.cs:73` has no caller). |
+| A plugin method's date arguments arrive as `Date` objects | conditions 152 | Every plugin member is declared with typed arguments. Today an open-argument plugin call receives a date literal as a number (`evaluate.ts:46`). |
+| A validation peer must be a sibling | none in the sandbox | FluentValidation does not expose a nested peer's path. Today's `ClientRule` peers could reach one. |
+| Three fixtures that parse plan JSON or call deleted APIs are rewritten to assert behavior in step 0, before the assertions freeze | `WhenComplexArrayItemRulesApply.cs:76-82`, `WhenReactiveValidatorsDeclareClientRules.cs:166-185`, `WhenAGridColumnGeneratesNativeValidationFromClientRules.cs:17-25` | A test of plan shape is not a test of behavior. |
+
+## 9. Coverage
+
+All 531 use cases were lowered into this grammar at `195d3a1`. Each table gives, for every row, the
+vocabulary used, the sentence, and a verdict:
+[`use-cases/lowering-components.md`](use-cases/lowering-components.md),
+[`use-cases/lowering-http.md`](use-cases/lowering-http.md),
+[`use-cases/lowering-conditions.md`](use-cases/lowering-conditions.md),
+[`use-cases/lowering-validation.md`](use-cases/lowering-validation.md).
+
+| Area | Rows | Expressed | Needs a named obligation | Render only | Gap at first lowering | Gaps left |
+|---|---|---|---|---|---|---|
+| Components | 128 | 104 | 13 | 10 | 1 | 0: the uploader's value is an expression (1.1) |
+| HTTP, URL, realtime, partials, links | 121 | 74 | 44 | 3 | 0 | 0 |
+| Conditions, arrays, dispatch, elements, plugins | 165 | 37 | 124 | 3 | 1 | 0: declared object members inside lambdas (2.3) |
+| Validation | 117 | 47 | 51 | 8 | 11 | 0: rows 68 and 115 resolved by 7.4 and F7; the other 9 are decisions in section 8 |
+| **Total** | **531** | **262** | **232** | **24** | **13** | **0** |
+
+- **"Needs a named obligation"** means the sentence is in the grammar, and the behavior depends on a
+  rule section 2 or 6 now states exactly.
+- **Where the obligations land.** Most of the conditions rows depend on the operator table (2.2),
+  which states today's comparison semantics instead of borrowing JavaScript's.
+- **How the tables were made.** Each table was produced by one reader per area against the code, and
+  spot-checked. They record the verdicts before this file's decisions; the last two columns above
+  apply the decisions.
+- **Review.** An independent reviewer checked this file against the code. The verdict was "accept
+  with fixes": 23 findings raised, 12 confirmed and 11 dropped by the reviewer, each confirmed
+  citation re-opened here. All 12 are applied:
+  - paths split into member and data reads (1.3);
+  - binding reads (2.1);
+  - today's wire rules for GET, JSON and form data (H2-H4);
+  - `ValidationErrors` without a body validates (F8);
+  - `ready` belongs to the owner being started (D1);
+  - the complete member table (2.3);
+  - modules as plugins, so the grammar names no feature (1.1);
+  - sibling peers and `Otherwise` (7.2, 7.3);
+  - booted marks and summary clearing (3.5, F9);
+  - sync values read at use, with `p.Let` (3.3);
+  - the document-event payload and plugin date arguments (D2, section 8).
+
+## 10. Where the code goes
+
+**C#**
+- `Alis.Reactive/Grammar`: one sealed, immutable class per production in 1.1 and 1.2, with internal
+  constructors, invariants checked in the constructor, and one-to-one serialization. This is the
+  plan contract, and the generator reads these classes.
+- `Alis.Reactive/Objects`: the object contract and the built-in declarations.
+  - `JsObject`, `Prop<T>`, `ReadOnly<T>`, `Value<T>`, `Arg<T>`, `Event`, `Event<T>`, `Message<T>`;
+  - `Document`, `Http`, `Model<T>`, `Form`, `Slot`, `EventStream`, `HubConnection`, `HtmlElement`
+    and the DOM event payloads.
+- `Alis.Reactive/Authoring`:
+  - the plan, the block stack and binding scopes;
+  - the fluent API of section 5: handlers, conditions, requests, dispatch, parallel and URL.
+- `Alis.Reactive/Compiler`: lambdas to `fn`, through the one member table (2.3).
+- `Alis.Reactive.FluentValidator`: the projection (section 7) and its typed model.
+- `Alis.Reactive.Fusion`, `Alis.Reactive.Native`: vendors, declarations, render helpers, Confirm,
+  Toast, Drawer, Loader, and the grid's column rules.
+
+**TypeScript runtime**
+- `runtime/grammar`: `evaluate` (the nine expressions, the operators, the shapes), `execute` (the six
+  statements, await) and `environment`. It imports nothing below.
+- `runtime/objects`: the two locators, the vendor driver, the plugin modules registered by name, and
+  owners.
+- `runtime/plans`: discovery, composition, boot and mount events.
+- `runtime/modules`: `alis.document`, `alis.http`, `alis.model`, `alis.form`, `alis.slot`. They are
+  registered by the framework bundle, receive the evaluator, and do not import the executor.
+- The realtime package's bundle: `alis.stream`, `alis.hub` and the retry indicator, so a page
+  without realtime loads no SignalR client.
+- `runtime/components/fusion`, `runtime/components/native`: Confirm, Toast, Drawer, Loader,
+  CheckList, RadioGroup.
+
+The architecture test enforces the import directions and that only vendor modules name a vendor.

@@ -1,7 +1,9 @@
 # Architecture: one grammar, one object model, a lean runtime
 
 Proposal (v6) on `feature/component-redesign`. Section 0 is the spine; every later section is
-vocabulary on it. What is already built is described in
+vocabulary on it. The exact specification (syntax, value semantics, operators, static checks,
+lowering, and what each built-in object must do) is [`grammar.md`](grammar.md), checked against all
+531 use cases; where the two differ, `grammar.md` governs. What is already built is described in
 [`bring-your-own-component.md`](bring-your-own-component.md).
 
 The constraints:
@@ -62,8 +64,10 @@ unions and 65 kinds:
 plan     := object* handler*
 object   := id -> locator
 locator  := element(id, vendor)          found on an element, through its vendor's data
-          | plugin(name)                 found by name in the app's bundle
-          | builtin(module, key)         made by a framework module: document, http, form, stream, hub
+          | plugin(name, key, data)      made by the module a bundle registered under name:
+                                         the framework's alis.document, alis.http, alis.model,
+                                         alis.form, alis.slot; the realtime package's alis.stream,
+                                         alis.hub; an app's own plugins
 handler  := on(object, event, param) block
 
 block    := stmt*
@@ -87,16 +91,18 @@ expr     := lit(json, shape)             42, "east", [1, 2]
 entry    := name: expr | ...expr
 ```
 
-One handler form, six statements, nine expressions, three locators. The operator set is C#'s own
+One handler form, six statements, nine expressions, two locators. The operator set is C#'s own
 (comparison, logical, arithmetic, `??`, `?:`) plus conversions, `empty` and `matches` (a regular
 expression test, since the grammar constructs no objects). It is closed because C#'s is.
 
 ### 0.3 Four laws
 
-1. **Only statements await.** Expressions are synchronous. An async member (an HTTP send, Confirm,
-   a hub `invoke`, an async plugin method) is awaited where it is written: the C# call emits
-   `let … await` (or `do … await`) into the active scope and returns a value naming the result, the
-   way the C# compiler spills an `await`.
+1. **Only statements await, and plan order is C# evaluation order.** Expressions are synchronous.
+   An async member (an HTTP send, Confirm, a hub `invoke`, an async plugin method) is awaited where
+   it is called: the C# call emits `let … await` (or `do … await`) into the active scope and returns
+   a value naming the result, so the value is read, never invoked twice. Builders that take
+   callbacks (`p.Confirm`, groups, `ElseIf`) build in short-circuit order, so a Confirm inside a
+   group is asked only when reached, the way the C# compiler lowers `await` inside `&&`.
    - The runtime has one synchronous evaluator.
    - Every statement before the first `await` runs synchronously, so a payload's `cancel` lands
      before the vendor reads it.
@@ -111,9 +117,9 @@ expression test, since the grammar constructs no objects). It is closed because 
 3. **A node carries what it needs.** `get`, `set` and `call` carry the JavaScript path and the shape
    that the C# declaration knows where it is used. The runtime looks nothing up by member name, so
    there is no declarations section, no member key and no contract merging.
-4. **Lifetime belongs to the owner.** The page or a slot owns each handler and each connection it
-   located. Unloading a slot unsubscribes its handlers, stops its in-flight blocks at their next
-   `await`, and releases its connections. The last owner closes a connection.
+4. **Lifetime belongs to the owner.** The page or a slot owns each handler, input, test and
+   connection subscription it brought. Unloading a slot releases exactly those; the last
+   subscription closes a connection. A block already running finishes, as it does today.
 
 ### 0.4 Every feature is a sentence
 
@@ -124,8 +130,8 @@ expression test, since the grammar constructs no objects). It is closed because 
 | A component event and its payload | the component: `element(id, vendor)` | `on` |
 | Page ready | the document's `ready` event | `on` |
 | Custom events | `document.raise(name, detail)` and the event itself | `do`; `on` |
-| Server-sent events | `builtin(stream, url)` and its message events | `on` |
-| SignalR | `builtin(hub, url)`: client methods as events, `invoke` with a result, `send` | `on`; `let await`; `do await` |
+| Server-sent events | `plugin("alis.stream", url)` and its message events | `on` |
+| SignalR | `plugin("alis.hub", url)`: client methods as events, `invoke` with a result, `send` | `on`; `let await`; `do await` |
 | Payload write (`cancel`); payload method after an async gap | the payload object | `set` or `do` on the handler's parameter |
 | When, ElseIf, Else, And, Or, Not, groups | none | `if`, `op` |
 | Confirm | `confirm.ask(message)`: async, returns a bool | `let await`, then `if` |
@@ -135,17 +141,17 @@ expression test, since the grammar constructs no objects). It is closed because 
 | Element text, HTML, classes, visibility | the element's own DOM members | `set`, `do`, `get` |
 | Plugins | the plugin's members; a root function is a call with an empty path | `do`, `call`, `get` |
 | Get, Post, Put, Delete | `http.send(request)`: async; resolves to `{ status, ok, body }`; status 0 when no response came | `let await` |
-| Gather | the request record; `Form()` spreads `form.values` | `record` |
+| Gather | the request record, split into route and values in C# at render; `Form()` spreads `model.values` | `record` |
 | Response routes by status | the response's `ok` and `status` | `if` |
 | Request snapshot | the gathered record | `let`, `ref` |
 | WhileLoading, Finally | for example `loader.show()`, `loader.hide()` | statements before a `try`; its `finally` |
 | Validate before sending | `form.validate()` returns a bool | `if` |
 | Chained | none | `if (res.ok)` after the `try` |
 | Parallel, with completion | none | `all`, then statements |
-| Into, partial injection | `slot.load(html)`, `slot.unload()` | `do` |
+| Into, partial injection | `plugin("alis.slot", id)`: `load(html)` (synchronous), `unload()` | `do` |
 | Server validation errors | `form.showErrors(problem)` | `do` |
 | Validation rules | the form's tests `{ field, check, when, message }` | `fn`, `op`, `get` |
-| Live clearing, revalidation | inside the form: each input's input event and its declared `Committed` event | none |
+| Live clearing, revalidation | inside the form: each input's DOM `input` event clears; DOM `blur` and the declared `Committed` event revalidate | none |
 | Action link | the anchor: `click`, `href`; the payload's `preventDefault` and modifier keys | `on`, `if`, `do`, `get` |
 | Toast, Drawer, Loader | their members | `set`, `do` |
 
@@ -363,19 +369,23 @@ Payload kinds:
 ### 4.0.1 Objects differ only in where they live
 
 What differs between objects is the **locator**: how the object comes to exist and how long it
-lives. The grammar has three (section 0.2).
+lives. The grammar has two (section 0.2): an element found through its vendor's data, and a plugin
+made by a module that a bundle registered by name. The framework's own built-ins are plugins, so
+they use the same extension point an app does.
 
 | Object | Locator | Lifetime | Events subscribe with |
 |---|---|---|---|
 | Component (Fusion, Native, brought) | `element(id, vendor)`: the vendor's `objectPath` on the element | the element's: page or slot | the vendor's subscribe and unsubscribe methods |
-| App object (Drawer, Loader, Toast, Confirm, a slot) | `element(id, vendor)` with a fixed ID; the framework's own modules define their members on the element | page, or the slot's | the vendor's |
+| App object (Drawer, Loader, Toast, Confirm) | `element(id, vendor)` with a fixed ID; the package's own runtime module defines its members on the element | page | the vendor's |
+| Partial slot | `plugin("alis.slot", containerId)`: `load(html)`, `unload()`; the container is looked up at each call | its own owner | none |
+| Model | `plugin("alis.model", planId)`: `values` (nested by binding name), `fields` (flat MVC names): every mounted input of the composed plan | the plan's | none |
 | DOM element | `element(id, dom)` | the element's | `addEventListener` |
-| Plugin | `plugin(name)`, from the app bundle | page | none |
-| Document | `builtin(document)`: `ready`, `raise`, `query` | page | `addEventListener`: `ready`, custom events (payload `detail`) |
-| HTTP | `builtin(http)`: `send` | page | none |
-| Form | `builtin(form, id)`: `validate`, `showErrors`, `values`; built from the plan's inputs and tests | its owners' | none |
-| **Server-sent event stream** | `builtin(stream, url)` | shared per URL, counted per owner (page or slot), closed by the last owner | `addEventListener`; payload `JSON.parse(event.data)` |
-| **SignalR hub connection** | `builtin(hub, url)` | shared per URL, counted per owner, automatic reconnect | `on` / `off`; payload is the single argument |
+| App plugin | `plugin(name)`, registered by the app's bundle | page | none |
+| Document | `plugin("alis.document")`: `ready`, `raise`, `query` | page | `ready`: the start of the handler's own owner; custom events: `addEventListener` (payload `detail`) |
+| HTTP | `plugin("alis.http")`: `send` | page | none |
+| Form | `plugin("alis.form", containerId)`: `validate`, `showErrors`; its tests apply to fields inside the container | its owners' | none |
+| **Server-sent event stream** | `plugin("alis.stream", url)` | shared per URL, counted per owner (page or slot), closed by the last owner | `addEventListener`; payload `JSON.parse(event.data)` |
+| **SignalR hub connection** | `plugin("alis.hub", url)` | shared per URL, counted per owner, automatic reconnect | `on` / `off`; payload is the single argument |
 | Event payload | not located: the handler's parameter | the handler, across every `await` in it | none |
 | Response, request snapshot | not located: a `let` | its block | none |
 | Returned object, nested object | not located: an object-valued expression | the expression | none |
@@ -495,19 +505,13 @@ The uploader declares its value as its files. That removes the special case for 
   | a response | `(res, s) => res.Get(x => x.Rows)` |
   | a push message | `(msg, p) => msg.Get(..)` |
   | a dispatched event's payload | `(e, p) => e.Get(..)` |
-  | the request snapshot | `p.Request` |
   | a literal | implicit |
-- **Arrays.** `IValue<IEnumerable<T>>` carries the full LINQ set:
-  - `Where`, `Select`, `SelectMany`;
-  - `OrderBy`, `OrderByDescending`, `ThenBy`;
-  - `Any`, `All`, `Count`;
-  - `Sum`, `Min`, `Max`, `Average`;
-  - `First`, `FirstOrDefault`, `Contains`;
-  - `Distinct`, `Skip`, `Take`, `Concat`.
-
-  Each one lowers to JavaScript's own array method with a compiled lambda (section 6).
-- **Text.** `IValue<string>` has `Length`, `Contains`, `StartsWith`, `EndsWith`, `Trim`, `ToUpper`
-  and `ToLower`.
+- **Arrays and text.** `IValue<IEnumerable<T>>` and `IValue<string>` carry the members of the one
+  member table (`grammar.md` section 2.3): today's `Where`, `Select`, `OrderBy`,
+  `OrderByDescending`, `Count`, `Any`, `All`, `Sum`, `Find`, and the text members. Each lowers to
+  JavaScript's own method with a compiled lambda. `First`, `Distinct`, `Skip`, `Take`,
+  `SelectMany`, `Min`, `Max`, `Average`, `ThenBy` and `Concat` are added as table rows, each with a
+  journey that proves it.
 
 ### 4.4 Scopes and the active-scope invariant
 
@@ -574,7 +578,9 @@ p.Post(url)
 
 - **Gather has three members:** `Set`, `Form` and `Header`.
   - `Set(target, source)` builds the request object.
-  - `Form()`, or `Form(m => m.A, m => m.B)`, includes model fields by binding name.
+  - `Form()`, or `Form(m => m.A, m => m.B)`, includes every mounted input of the composed plan
+    by binding name, as `IncludeAll` does today: `model.values` for JSON, `model.fields` for form
+    data.
   - `Header(name, source)`.
 
   They replace 20 overloads: `Include` ×4, `IncludeAll`, `FromEvent`, `RouteParam` ×5, `FromUrl`
@@ -685,16 +691,19 @@ These are all declarations, used the same way as components.
   The name is the plugin's only string. `RegisterPlugin`, `PluginTypeBuilder`,
   `PluginMemberBuilder` and `PluginContract.cs` are deleted. Each use carries its path and shape,
   as it does for components. A root function is `Invoke<T>(.., name: "")`.
-- **Built-ins.** The document, HTTP and forms are declarations too, located by `builtin(..)`:
+- **Built-ins.** The document, HTTP, the model, forms and slots are declarations too, located as
+  plugins of the framework's bundle (`plugin("alis.document")` and so on):
   - the document's `Ready` event, `Raise(event, detail)` and `Query`;
   - HTTP's `Send(request)`;
-  - a form's `Validate()`, `ShowErrors(problem)` and `Values`.
+  - the model's `Values` and `Fields`;
+  - a form's `Validate()` and `ShowErrors(problem)`;
+  - a slot's `Load(html)` and `Unload()`.
 
   The fluent request, dispatch and URL APIs are sugar over these members.
 - **App objects.**
   - `p.Component<NativeDrawer>()`, `p.Component<FusionToast>()` and `p.Component<Confirm>()`.
-  - Confirm's `Ask` is an async member. The app's dialog module defines it on the confirm element,
-    so the `window.alis.confirm` global (`confirm.ts:103`) goes.
+  - Confirm's `Ask` is an async member. The Fusion package's confirm module defines it on the dialog
+    element, so the `window.alis.confirm` global (`confirm.ts:103`) goes.
 
 ### 4.9 Validation: FluentValidation's grammar, projected to the browser
 
@@ -751,7 +760,7 @@ public sealed class AdmissionValidator : ReactiveValidator<Admission>
   - Dates compare as timestamps.
   - Regex patterns are checked at render against JavaScript's dialect, so a .NET-only construct
     fails in C#.
-- **The form is an object.** `builtin(form, id)` holds the projected tests and the inputs bound to
+- **The form is an object.** `plugin("alis.form", id)` holds the projected tests and the inputs bound to
   it. `Validate()`, `ShowErrors(problem)` and `Values` are its members, and live clearing and
   revalidation happen inside it. Each test is `{ field, check, when, message }`, where `check` and
   `when` are expressions (section 0.5).
@@ -810,15 +819,11 @@ How it works:
   - Parameter-rooted subtrees become runtime reads.
   - Closure-rooted subtrees are evaluated at render into literals, as EF Core does with its
     parameter extraction. `row.ResidentId` inside a Razor loop is a literal.
-- **Operators.** C#'s operators map one-to-one: comparison, `&& || !`, arithmetic, `??`, `?:`.
-  Conversions are explicit nodes (`toNumber`, `toTime`), chosen from the C# types.
-- **Members of `string` and `IEnumerable<T>`** map through one table to JavaScript built-ins:
-  - `Where`→`filter`, `Select`→`map`, `Any`→`some`, `All`→`every`, `First`→`find`;
-  - `OrderBy`→`toSorted` with a comparator lambda the compiler builds;
-  - `Sum`→`reduce`, `Distinct`→`filter` by first index, `Skip`/`Take`→`slice`;
-  - `StartsWith`→`startsWith`, and so on.
-
-  A new member is one table entry and no runtime change.
+- **Operators.** C#'s operators map one-to-one onto the closed operator table (`grammar.md`
+  section 2.2), which gives each one the answer C# gives. Values are converted by shape where they
+  are read and written (section 2.1); explicit C# casts become conversion operators.
+- **Members** of `string`, `DateTime`, `IEnumerable<T>` and declared objects map through the one
+  member table (`grammar.md` section 2.3). A new member is one table row and no runtime change.
 - **Anything else** fails at render, naming the construct. An analyzer reports it at compile time.
 
 ## 7. Component onboarding, inverted
@@ -850,18 +855,18 @@ The core and the runtime carry no knowledge of any component. These leftovers go
 to the core or the runtime. The architecture test fails if the core or runtime names a vendor or a
 component.
 
-## 8. The runtime: an interpreter and its built-in objects
+## 8. The runtime: an interpreter and its modules
 
 | Part | What it does | What it knows |
 |---|---|---|
 | Interpreter | evaluates the nine expressions synchronously, executes the six statements (waiting only where the plan says `await`), registers handlers | the grammar and nothing else |
-| Locators | `element` follows the vendor's data; `plugin` looks the name up in the app bundle; `builtin` asks the framework module for its object | the three locator kinds |
-| Owners | the page and each slot: their subscriptions, connections and in-flight blocks | lifetime |
+| Locators | `element` follows the vendor's data; `plugin` asks the module registered under the name for the object with that key, and hands it the plan's data under the owner | the two locator kinds |
+| Owners | the page and each slot: disposers for their subscriptions and plugin contributions | lifetime, nothing about features |
 | Plans | discovery, composition by `planId`, slot load and unload | plan scripts |
-| Built-in objects | `document`, `http`, `form`, `stream` and `hub`, plus the element modules for slots, Drawer, Loader and Confirm | each its own members |
+| Modules | the framework bundle's `alis.document`, `alis.http`, `alis.model`, `alis.form`, `alis.slot`; the realtime bundle's `alis.stream`, `alis.hub`; the packages' element modules for Drawer, Loader and Confirm | each its own members and data |
 
-- **Dependency rule.** The interpreter imports no built-in object and no vendor. A built-in object
-  that evaluates expressions (the form, for its tests) is handed the evaluator. The architecture
+- **Dependency rule.** The interpreter imports no module and no vendor. A module that evaluates
+  expressions (the form, for its tests) is handed the evaluator. The architecture
   test enforces both directions.
 - **Deleted outright:** about 1,800 of today's 6,200 lines.
   - `compare-engine.ts` (426), `rule-engine.ts` (296), `rule-operands.ts` (198), `array-op-engine.ts`
@@ -873,8 +878,8 @@ component.
   - `execution-context.ts` (94): lexical bindings replace the event, response and request context.
   - `http.ts` keeps sending and reading the body; its routing becomes `if` and `try`.
 - **The async lane is decided in C#.** Only `do … await` and `let … await` wait: HTTP, Confirm,
-  async plugin and hub methods, and slot loading. A stream or hub message starts its handler
-  synchronously, like any other event.
+  and async plugin and hub methods. Slot loading is synchronous, as today. A stream or hub message
+  starts its handler synchronously, like any other event.
 
 ## 9. The plan document
 
@@ -885,15 +890,12 @@ component.
   "objects": {
     "roster":            { "kind": "element", "id": "roster", "vendor": "fusion" },
     "Ns_Admission__Age": { "kind": "element", "id": "Ns_Admission__Age", "vendor": "fusion" },
-    "http":              { "kind": "builtin", "module": "http", "key": "" },
-    "admission-form":    { "kind": "builtin", "module": "form", "key": "admission-form" },
-    "residents":         { "kind": "builtin", "module": "hub", "key": "/hubs/resident" }
-  },
-  "inputs": {
-    "Ns_Admission__Age": { "form": "admission-form", "name": "Age", "value": { "path": ["value"], "shape": "number" }, "committed": "change" }
-  },
-  "forms": {
-    "admission-form": { "tests": [ { "field": "Ns_Admission__Age", "check": { "kind": "fn", "…": "…" }, "when": { "kind": "lit", "value": true }, "message": "Enter the resident's age." } ] }
+    "http":              { "kind": "plugin", "name": "alis.http", "key": "", "data": {} },
+    "model":             { "kind": "plugin", "name": "alis.model", "key": "…", "data": { "inputs": {
+      "Ns_Admission__Age": { "name": "Age", "value": { "kind": "fn", "params": ["self"], "body": { "kind": "get", "target": { "kind": "ref", "name": "self" }, "path": ["value"], "shape": "number" } }, "committed": "change" } } } },
+    "admission-form":    { "kind": "plugin", "name": "alis.form", "key": "admission-form", "data": { "tests": [
+      { "field": "Ns_Admission__Age", "check": { "kind": "fn", "…": "…" }, "when": { "kind": "lit", "value": true }, "message": "Enter the resident's age." } ] } },
+    "residents":         { "kind": "plugin", "name": "alis.hub", "key": "/hubs/resident", "data": {} }
   },
   "handlers": [
     { "on": "roster", "event": "actionBegin", "param": "args",
@@ -902,9 +904,9 @@ component.
 }
 ```
 
-- **Where things come from, and what happens.** `objects` say where each object comes from.
-  `inputs` and `forms` are the data the form module needs. `handlers` are the behavior. Nothing
-  else is in a plan.
+- **Where things come from, and what happens.** `objects` say where each object comes from, and a
+  plugin object carries the data its module needs (the model's inputs, a form's tests). `handlers`
+  are the behavior. Nothing else is in a plan, and nothing in it names a feature.
 - **What goes:**
   - the per-element `types`, member keys and signature keys, and contract merging across partials
     (`merge-policy.ts`);
@@ -915,7 +917,7 @@ component.
 - **Composition.** Plans with one `planId` join their maps and handlers. A slot owns the plans it
   loaded.
 - **Today versus target.** Today's contract has 136 interfaces, 60 unions and 65 kinds. The grammar
-  needs about 25 node types: six statements, nine expressions, three locators, and the handler,
+  needs about 25 node types: six statements, nine expressions, two locators, and the handler,
   plan, input, form, test, shape and path. The real count is measured when the generator runs.
 
 **Diagrams and traces:** the design review page "Alis.Reactive Object Model"
