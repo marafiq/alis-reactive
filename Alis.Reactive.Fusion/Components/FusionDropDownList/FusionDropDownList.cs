@@ -28,7 +28,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>The items the list offers.</summary>
         /// <remarks>Call <see cref="DataBind"/> after writing it so the list renders the new items.</remarks>
-        public ComponentProperty<IEnumerable<object>> DataSource => Property<IEnumerable<object>>("dataSource");
+        public ComponentProperty<IEnumerable<object>?> DataSource => Property<IEnumerable<object>?>("dataSource");
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
         public ComponentMethod DataBind => Method("dataBind");

@@ -24,7 +24,7 @@ namespace Alis.Reactive.Fusion.Components
         public ComponentProperty<string[]> Value => Property<string[]>(ValueMember);
 
         /// <summary>The items the list offers. Call <see cref="DataBind"/> after writing it outside a filtering event.</summary>
-        public ComponentProperty<IEnumerable<object>> DataSource => Property<IEnumerable<object>>("dataSource");
+        public ComponentProperty<IEnumerable<object>?> DataSource => Property<IEnumerable<object>?>("dataSource");
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
         public ComponentMethod DataBind => Method("dataBind");

@@ -28,7 +28,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>The items the popup suggests from.</summary>
         /// <remarks>Call <see cref="DataBind"/> after writing it outside a filtering event.</remarks>
-        public ComponentProperty<IEnumerable<object>> DataSource => Property<IEnumerable<object>>("dataSource");
+        public ComponentProperty<IEnumerable<object>?> DataSource => Property<IEnumerable<object>?>("dataSource");
 
         /// <summary>Whether the input accepts interaction.</summary>
         public ComponentProperty<bool> Enabled => Property<bool>("enabled");
