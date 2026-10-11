@@ -43,6 +43,7 @@ public sealed class AdmissionValidator : ReactiveValidator<Admission>
 | FluentValidation | Browser rule | Empty value |
 |---|---|---|
 | `NotEmpty()` | `required` (`atLeastOne` on a collection) | fails |
+| `NotNull()`, not on a collection (a cleared input is sent as null) | `required` | fails |
 | `Empty()` | `empty` | passes |
 | `MinimumLength(n)`, `MaximumLength(n)`, `Length(a, b)` | `minLength`, `maxLength` | skipped |
 | `EmailAddress()` | `email` | skipped |
@@ -126,7 +127,9 @@ and a rule for a partial's field that has not loaded yet.
 ## Verification
 
 Playwright is the proof: open the form, submit invalid data, see the message; then pin it with a
-BDD test through `scripts/playwright.sh`. If a rule does not run in the browser, check: it is one
+BDD test through `scripts/playwright.sh`. The worked example is `/Sandbox/Validation/MoveInReview`:
+one validator with a default message, `When`/`Otherwise`, `Unless`, a method-group condition and
+`.ServerOnly()`, pinned by `WhenCoordinatorReviewsMoveIn`. If a rule does not run in the browser, check: it is one
 the table lists; its condition is a lambda the browser understands; the form id passed to
 `.Validate<TValidator>(...)` matches the form element; the input was created with
 `Html.InputField()`.

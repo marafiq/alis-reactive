@@ -47,13 +47,14 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
     }
 
     [Test]
-    public async Task an_empty_review_asks_for_the_resident_by_name_before_anything_is_sent()
+    public async Task an_empty_review_asks_for_the_resident_and_the_score_before_anything_is_sent()
     {
         await NavigateAndBoot();
 
         await ClickWhenStable(SaveReview);
 
         await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync("'Resident Name' must not be empty.");
+        await Expect(_plan.ErrorFor(m => m.FallRiskScore)).ToHaveTextAsync("Score the resident's fall risk.");
         await Expect(ReviewStatus).ToHaveTextAsync("Not saved yet.");
         Assert.That(_reviewsSent, Is.Empty, "A review the page can see is incomplete is not sent.");
         AssertNoConsoleErrors();
@@ -119,6 +120,7 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
     {
         await NavigateAndBoot();
         await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "2");
         await Write(m => m.FamilyPortalLink, "ftp://portal");
 
         await ClickWhenStable(SaveReview);
@@ -137,6 +139,7 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
     {
         await NavigateAndBoot();
         await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "2");
         await _plan.NativeCheckBox(m => m.IsReturning).Check();
 
         await ClickWhenStable(SaveReview);

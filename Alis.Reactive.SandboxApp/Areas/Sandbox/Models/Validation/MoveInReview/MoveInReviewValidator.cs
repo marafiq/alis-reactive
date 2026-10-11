@@ -14,7 +14,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             // FluentValidation's own message, named the way FluentValidation names the field.
             RuleFor(x => x.ResidentName).NotEmpty();
 
-            RuleFor(x => x.FallRiskScore).InclusiveBetween(0, 10).WithMessage("Fall risk is scored 0 to 10.");
+            RuleFor(x => x.FallRiskScore)
+                .NotNull().WithMessage("Score the resident's fall risk.")
+                .InclusiveBetween(0, 10).WithMessage("Fall risk is scored 0 to 10.");
 
             When(x => x.FallRiskScore > 7, () =>
                     RuleFor(x => x.MobilityNotes).NotEmpty().WithMessage("Describe the mobility plan for a high fall risk."))

@@ -116,6 +116,12 @@ namespace Alis.Reactive.FluentValidator
                     var isCollection = field.Shape.Kind == "array";
                     return One(isCollection ? RuleName.AtLeastOne : RuleName.Required, message);
 
+                // A cleared input reaches the server as null (a JSON "" is sent as null; form data binds
+                // "" as null), so NotNull fails exactly when the input is empty. An empty collection is
+                // not null, so NotNull on a collection stays on the server.
+                case INotNullValidator _ when field.Shape.Kind != "array":
+                    return One(RuleName.Required, message);
+
                 case IPropertyValidator validator when validator.Name == "EmptyValidator":
                     return One(RuleName.Empty, message);
 
