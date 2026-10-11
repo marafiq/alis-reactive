@@ -508,4 +508,10 @@ if [ "${#flaky[@]}" -gt 0 ]; then
   fi
 fi
 
+# A red run names each test that still fails, with the start of its message, as an error
+# annotation on the pull request's checks: the failure is readable without opening the log.
+if [ "$status" -ne 0 ] && [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+  node scripts/trx-failed-tests.mjs "$attempt_trx" annotations
+fi
+
 exit "$status"

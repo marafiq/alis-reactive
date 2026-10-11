@@ -154,7 +154,10 @@ commit of `v3.0.0`, `reporter: dotnet-trx`, `use-actions-summary: true`, `fail-o
 because the test step already carries the verdict). The job needs `checks: write`
 ([job summaries](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#adding-a-job-summary),
 [dorny/test-reporter](https://github.com/dorny/test-reporter)). The wrapper appends the flaky list
-to the same summary.
+to the same summary. When the last attempt is still red, the wrapper also prints one
+`::error title=Failed test::` annotation per failing test with the start of its failure message
+(`scripts/trx-failed-tests.mjs <trx> annotations`), so the pull request's checks, and the
+check-run annotations API, name the failures without opening the log or the artifact.
 
 ### Flaky tests: quarantine is temporary
 
