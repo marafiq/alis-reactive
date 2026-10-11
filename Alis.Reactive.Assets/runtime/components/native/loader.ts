@@ -1,7 +1,20 @@
-// Native loader markup is a layout singleton rendered by @Html.NativeLoader().
-// Side-effect module uses its well-known DOM IDs directly; DSL show/hide
-// calls still target the app-level component through native set reactions.
+// Native loader markup is a layout singleton rendered by @Html.NativeLoader(). This module gives the
+// element the show() and hide() members the C# NativeLoader declares; its target and timeout are the
+// element's data-target and data-timeout. A class observer then positions the loader over its target,
+// runs the timeout, and puts it back on the page when it hides.
 export {};
+
+const VISIBLE = "alis-loader--visible";
+
+function show(loader: HTMLElement): void {
+  loader.classList.add(VISIBLE);
+  loader.removeAttribute("aria-hidden");
+}
+
+function hide(loader: HTMLElement): void {
+  loader.classList.remove(VISIBLE);
+  loader.setAttribute("aria-hidden", "true");
+}
 
 // The auto-hide of the Show in progress. A Hide cancels it and a later Show restarts it, so a
 // timeout never outlives the Hide of the request that set it.
@@ -17,8 +30,7 @@ function watchTargetRemoval(loader: HTMLElement): void {
   targetRemovalWatch = new MutationObserver(() => {
     if (loader.isConnected) return;
     document.body.appendChild(loader);
-    loader.classList.remove("alis-loader--visible");
-    loader.setAttribute("aria-hidden", "true");
+    hide(loader);
   });
   targetRemovalWatch.observe(document.body, { childList: true, subtree: true });
 }
@@ -39,10 +51,7 @@ function handleVisible(loader: HTMLElement): void {
   if (timeout) {
     const ms = parseInt(timeout, 10);
     if (ms > 0) {
-      pendingAutoHide = setTimeout(() => {
-        loader.classList.remove("alis-loader--visible");
-        loader.setAttribute("aria-hidden", "true");
-      }, ms);
+      pendingAutoHide = setTimeout(() => hide(loader), ms);
     }
   }
 }
@@ -63,8 +72,13 @@ function init(): void {
   const loader = document.getElementById("alis-loader");
   if (!loader) return;
 
+  Object.assign(loader, {
+    show: () => show(loader),
+    hide: () => hide(loader),
+  });
+
   const observer = new MutationObserver(() => {
-    const visible = loader.classList.contains("alis-loader--visible");
+    const visible = loader.classList.contains(VISIBLE);
     if (visible) {
       handleVisible(loader);
     } else {

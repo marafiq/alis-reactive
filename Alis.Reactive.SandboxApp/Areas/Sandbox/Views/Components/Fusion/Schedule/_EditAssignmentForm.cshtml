@@ -38,7 +38,7 @@
                      .OnSuccess(s =>
                      {
                          s.Element("edit-status").SetText("Saved successfully");
-                         s.Component<NativeDrawer>().Close();
+                         s.Component<NativeDrawer>().Call(c => c.Close);
                          // Parent plan listens for this event and refreshes the schedule after the save.
                          s.Dispatch("schedule:assignment-saved");
                      })
@@ -49,7 +49,7 @@
             .CssClass("px-4 py-2 rounded-md border border-border text-sm font-medium hover:bg-slate-50")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<NativeDrawer>().Close();
+                p.Component<NativeDrawer>().Call(c => c.Close);
             }))
     </native-hstack>
 

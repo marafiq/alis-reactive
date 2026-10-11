@@ -28,8 +28,8 @@ public sealed class WhenNativeActionLinkBuildsItsRequest
         var link = Html().NativeActionLink("Mark Read", MarkReadUrl, p => p
             .Post(MarkReadUrl)
             .Gather(g => g.Header("X-Shift", "Night"))
-            .WhileLoading(l => l.Component<NativeLoader>().Show())
-            .Finally(f => f.Component<NativeLoader>().Hide()));
+            .WhileLoading(l => l.Component<NativeLoader>().Call(c => c.Show))
+            .Finally(f => f.Component<NativeLoader>().Call(c => c.Hide)));
 
         using var payload = PayloadOf(link);
         var request = FirstRequestIn(payload.RootElement.GetProperty("reaction"));
@@ -46,7 +46,7 @@ public sealed class WhenNativeActionLinkBuildsItsRequest
             Assert.That(assignments, Is.EqualTo(new[] { (Kind: (string?)"header", Name: (string?)"X-Shift") }));
             Assert.That(request.GetProperty("finally").GetArrayLength(), Is.GreaterThan(0));
             Assert.That(request.GetProperty("finally").GetRawText(),
-                Is.EqualTo(FinallyOf(p => p.Component<NativeLoader>().Hide())));
+                Is.EqualTo(FinallyOf(p => p.Component<NativeLoader>().Call(c => c.Hide))));
         });
     }
 

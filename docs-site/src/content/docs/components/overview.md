@@ -73,9 +73,9 @@ App-level components are targeted without a model expression:
 
 ```csharp
 p.Component<FusionToast>()
- .SetContent("Saved")
- .Success()
- .Show();
+ .Set(c => c.Content, "Saved")
+ .Set(c => c.Tone, FusionToastTone.Success)
+ .Call(c => c.Show);
 ```
 
 Do not learn Alis.Reactive by memorizing every component. Learn the object

@@ -48,10 +48,10 @@
                     .OnSuccess(s =>
                     {
                         s.Component<FusionToast>()
-                            .SetTitle("Todo")
-                            .SetContent("Todo saved successfully")
-                            .Success()
-                            .Show();
+                            .Set(c => c.Title, "Todo")
+                            .Set(c => c.Content, "Todo saved successfully")
+                            .Set(c => c.Tone, FusionToastTone.Success)
+                            .Call(c => c.Show);
                     })
                     .OnError(400, e => e.ValidationErrors("todo-form")));
             }))

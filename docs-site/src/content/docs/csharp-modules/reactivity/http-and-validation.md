@@ -44,8 +44,8 @@ Use `WhileLoading(...)` for the in-flight state and `Finally(...)` for cleanup.
 
 ```csharp
 p.Post("/Todo/Save", g => g.IncludeAll())
- .WhileLoading(l => l.Component<NativeLoader>().Show())
- .Finally(f => f.Component<NativeLoader>().Hide());
+ .WhileLoading(l => l.Component<NativeLoader>().Call(c => c.Show))
+ .Finally(f => f.Component<NativeLoader>().Call(c => c.Hide));
 ```
 
 `Finally(...)` runs after success, error, or network failure.

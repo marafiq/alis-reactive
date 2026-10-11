@@ -53,21 +53,21 @@
     Html.On(plan, t => t.CustomEvent<ScheduleActionPayload>("schedule:edit", (payload, p) =>
     {
         p.Element("alis-drawer-title").SetText("Edit Shift Assignment");
-        p.Component<NativeDrawer>().SetSize(DrawerSize.Md);
+        p.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md);
         p.Get(Url.SandboxRoute("EditForm", "Schedule"))
          .Gather(g => g.FromEvent(payload, x => x.Id, "assignmentId"))
          .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
-        p.Component<NativeDrawer>().Open();
+        p.Component<NativeDrawer>().Call(c => c.Open);
     }));
 
     Html.On(plan, t => t.CustomEvent<ScheduleActionPayload>("schedule:reassign", (payload, p) =>
     {
         p.Element("alis-drawer-title").SetText("Reassign Shift");
-        p.Component<NativeDrawer>().SetSize(DrawerSize.Md);
+        p.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md);
         p.Get(Url.SandboxRoute("EditForm", "Schedule"))
          .Gather(g => g.FromEvent(payload, x => x.Id, "assignmentId"))
          .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
-        p.Component<NativeDrawer>().Open();
+        p.Component<NativeDrawer>().Call(c => c.Open);
     }));
 
     Html.On(plan, t => t.DomReady(p =>
@@ -237,11 +237,11 @@
                  {
                      t.Payload(args).Set(a => a.Cancel, true);
                      t.Element("alis-drawer-title").SetText("Edit Shift Assignment");
-                     t.Component<NativeDrawer>().SetSize(DrawerSize.Md);
+                     t.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md);
                      t.Get(Url.SandboxRoute("EditForm", "Schedule"))
                       .Gather(g => g.FromEvent(args, x => x.Data.Id, "assignmentId"))
                       .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
-                     t.Component<NativeDrawer>().Open();
+                     t.Component<NativeDrawer>().Call(c => c.Open);
                  })
                  .Else(e =>
                  {

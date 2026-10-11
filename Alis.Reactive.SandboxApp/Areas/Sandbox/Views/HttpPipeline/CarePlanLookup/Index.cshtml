@@ -26,7 +26,7 @@
                 {
                     p.Get(Url.SandboxRouteTemplate("CarePlan", "CarePlanLookup", "residentId"))
                      .Gather(g => g.RouteParam("residentId", p.Component<FusionDropDownList>(m => m.ResidentId).Get(c => c.Value)))
-                     .WhileLoading(l => l.Component<NativeLoader>().Show())
+                     .WhileLoading(l => l.Component<NativeLoader>().Call(c => c.Show))
                      .Response(r => r
                         .OnSuccess<CarePlanSummary>((json, s) =>
                         {
@@ -38,7 +38,7 @@
                             e.Element("care-plan-resident").SetText("No care plan open.");
                             e.Element("care-plan-summary").SetText("No care plan is on file for this resident yet.");
                         }))
-                     .Finally(f => f.Component<NativeLoader>().Hide());
+                     .Finally(f => f.Component<NativeLoader>().Call(c => c.Hide));
                 }))
         </native-vstack>
     </native-card-body></native-card>

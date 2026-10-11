@@ -161,10 +161,10 @@ the end.
                 .OnSuccess(s =>
                 {
                     s.Component<FusionToast>()
-                     .SetTitle("Todo")
-                     .SetContent("Todo saved.")
-                     .Success()
-                     .Show();
+                     .Set(c => c.Title, "Todo")
+                     .Set(c => c.Content, "Todo saved.")
+                     .Set(c => c.Tone, FusionToastTone.Success)
+                     .Call(c => c.Show);
                 })
                 .OnError(400, e => e.ValidationErrors("todo-form")));
         }))

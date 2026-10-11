@@ -24,10 +24,10 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Element("alis-drawer-title").SetText("Margaret Hill");
-                    p.Component<NativeDrawer>().SetSize(DrawerSize.Md);
+                    p.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md);
                     p.Get(Url.SandboxRoute("ShiftNoteForm", "Drawer"))
                      .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
-                    p.Component<NativeDrawer>().Open();
+                    p.Component<NativeDrawer>().Call(c => c.Open);
                 }))
         </native-hstack>
     </native-card-body></native-card>

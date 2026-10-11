@@ -1,14 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // The loader module wires itself to #alis-loader when imported, so each test renders the layout
-// element first and imports a fresh module. The helpers below make the same DOM calls the DSL
-// emits for SetTimeout, Show, and Hide (NativeLoaderExtensions).
-let loader: HTMLElement;
+// element first and imports a fresh module. The helpers below make the same calls the DSL emits for
+// the members NativeLoader declares: Timeout (data-timeout), Target (data-target), Show and Hide.
+interface LoaderElement extends HTMLElement {
+  show(): void;
+  hide(): void;
+}
+
+let loader: LoaderElement;
 
 beforeEach(async () => {
   vi.useFakeTimers();
   document.body.innerHTML = `<div id="alis-loader" aria-hidden="true"><span id="alis-loader-message"></span></div>`;
-  loader = document.getElementById("alis-loader") as HTMLElement;
+  loader = document.getElementById("alis-loader") as LoaderElement;
   vi.resetModules();
   await import("../components/native/loader");
 });
@@ -20,15 +25,13 @@ afterEach(() => {
 
 // Mutation observers run as microtasks.
 async function show(timeoutMs?: number): Promise<void> {
-  if (timeoutMs !== undefined) loader.setAttribute("data-timeout", `${timeoutMs}`);
-  loader.classList.add("alis-loader--visible");
-  loader.removeAttribute("aria-hidden");
+  if (timeoutMs !== undefined) loader.dataset.timeout = `${timeoutMs}`;
+  loader.show();
   await Promise.resolve();
 }
 
 async function hide(): Promise<void> {
-  loader.classList.remove("alis-loader--visible");
-  loader.setAttribute("aria-hidden", "true");
+  loader.hide();
   await Promise.resolve();
 }
 
@@ -90,7 +93,7 @@ describe("native loader target", () => {
 
   it("stays on the page, hidden, when the element it covers is removed", async () => {
     const drawerContent = renderDrawerForm("resident-form");
-    loader.setAttribute("data-target", "resident-form");
+    loader.dataset.target = "resident-form";
     await show();
     expect(loader.parentElement?.id).toBe("resident-form");
 
@@ -104,16 +107,16 @@ describe("native loader target", () => {
   });
 
   it("covers the next target after the element it covered was removed", async () => {
-    loader.setAttribute("data-target", "resident-form");
+    loader.dataset.target = "resident-form";
     const firstContent = renderDrawerForm("resident-form");
     await show();
     firstContent.remove();
     await settle();
 
     // The next Show finds the loader by id, as the DSL's Show does.
-    loader = document.getElementById("alis-loader") as HTMLElement;
+    loader = document.getElementById("alis-loader") as LoaderElement;
     renderDrawerForm("incident-form");
-    loader.setAttribute("data-target", "incident-form");
+    loader.dataset.target = "incident-form";
     await show();
 
     expect(loader.parentElement?.id).toBe("incident-form");

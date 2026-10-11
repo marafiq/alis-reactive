@@ -37,8 +37,8 @@
                 s.Into("alis-drawer-content");
             }));
         pipeline.Element("alis-drawer-title").SetText("Intake Summary");
-        pipeline.Component<NativeDrawer>().SetSize(DrawerSize.Md);
-        pipeline.Component<NativeDrawer>().Open();
+        pipeline.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md);
+        pipeline.Component<NativeDrawer>().Call(c => c.Open);
     }));
 }
 
@@ -197,23 +197,23 @@
                              .Validate<IntakeValidator>("intake-form")
                              .WhileLoading(l =>
                              {
-                                 l.Component<NativeLoader>().Show();
+                                 l.Component<NativeLoader>().Call(c => c.Show);
                              })
                              .Response(r => r
                                 .OnSuccess(s =>
                                 {
-                                    s.Component<NativeLoader>().Hide();
+                                    s.Component<NativeLoader>().Call(c => c.Hide);
                                     s.Component<FusionToast>()
-                                        .SetTitle("Resident Intake")
-                                        .SetContent("Intake submitted successfully")
-                                        .Success()
-                                        .Show();
+                                        .Set(c => c.Title, "Resident Intake")
+                                        .Set(c => c.Content, "Intake submitted successfully")
+                                        .Set(c => c.Tone, FusionToastTone.Success)
+                                        .Call(c => c.Show);
                                     s.Element("post-save-section").Show();
                                     s.Element("submit-intake").Hide();
                                 })
                                 .OnError(400, e =>
                                 {
-                                    e.Component<NativeLoader>().Hide();
+                                    e.Component<NativeLoader>().Call(c => c.Hide);
                                     e.ValidationErrors("intake-form");
                                 })
                                 .Chained(c => c

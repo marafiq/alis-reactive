@@ -31,12 +31,12 @@
                     @(Html.NativeActionLink("Mark Read", markReadUrl, p => p
                         .Post(markReadUrl)
                         .Gather(g => g.Header("X-Shift", "Night"))
-                        .WhileLoading(l => l.Component<NativeLoader>().Show())
+                        .WhileLoading(l => l.Component<NativeLoader>().Call(c => c.Show))
                         .Response(r => r
                             .OnSuccess<HandoverNoteRead>((json, s) => s.Element("handover-status").SetText(json, x => x.Message))
                             .OnError<HandoverNoteRead>(400, (json, e) => e.Element("handover-status").SetText(json, x => x.Message))
                             .OnError<HandoverNoteRead>(409, (json, e) => e.Element("handover-status").SetText(json, x => x.Message)))
-                        .Finally(f => f.Component<NativeLoader>().Hide()))
+                        .Finally(f => f.Component<NativeLoader>().Call(c => c.Hide)))
                         .CssClass("text-sm font-medium text-accent hover:text-accent/80")
                         .Attr("data-testid", $"mark-read-{note.Key}"))
                 </div>
