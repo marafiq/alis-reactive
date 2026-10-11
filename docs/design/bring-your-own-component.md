@@ -200,7 +200,18 @@ the core C# and the runtime name no vendor and no component. Proof: the full sui
 ## Status
 
 - Lean `CLAUDE.md`, old onboarding tooling removed, hooks fixed.
-- FusionNumericTextBox on a public declaration surface (`f0ec4f5`), full suite and net48 green.
 - Capability catalog from all 176 suites (`2c37ab5`).
-- D1: FusionNumericTextBox and FusionAutoComplete brought with the method (`92875d7`).
-- D2 in progress.
+- **D1 done:** FusionNumericTextBox and FusionAutoComplete brought with the method (`92875d7`).
+- **D2 done:** vendors are plan data, one runtime driver, `alis:mount`/`alis:unmount` (`4a8ac1c`).
+- **D3 done:** Tom Select brought in the sandbox assembly (`714e96e`); its reservation test now
+  asserts the binding name include-all posts (`71eecfd`).
+- **D4 done:** all 51 Fusion slices and the 8 Native slices are one declaration each
+  (`7698bda` through `e48f207`); the drawer, loader and toast are objects with declared members
+  (`49f3bec`, `fc8b4d2`); Fusion and Native compile on the core's public surface, with
+  `InternalsVisibleTo` for both removed (`c597a3a`). The core names no component; the runtime names
+  a vendor only in its app-level object modules, as the architecture test enforces.
+- Evidence on `fc8b4d2`: `gate / test` green, four of five Playwright shards green,
+  `verify-net48` green (net48 build, pack, IIS Express boot). The fifth shard's one failure was
+  the Tom Select test's key, fixed in `71eecfd`; the head commit's run is the final proof.
+- The method grew, as the slices needed it: arguments that mix literals and sources,
+  `Field`, generic members, `Passing`, signature keys, `plan.Render`, hidden fields.
