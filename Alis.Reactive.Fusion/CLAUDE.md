@@ -1,45 +1,24 @@
-# Alis.Reactive.Fusion — Syncfusion Vertical Slices
+# Alis.Reactive.Fusion — Syncfusion Slices
 
-Root `../CLAUDE.md` is authoritative. This file adds only what is specific to
-working inside a Fusion component slice.
+Root `../CLAUDE.md` is authoritative. This file adds only what is specific to a Fusion slice.
 
-## What this project is
+One self-contained slice per Syncfusion EJ2 component: the component class, its builder, HTML and
+reactive extensions, and typed events with typed payloads. Duplication between slices is
+intentional; there are no shared behavior base classes.
 
-One self-contained vertical slice per Syncfusion component. Duplication between
-slices is intentional — no shared behavior base classes. A slice is the C# typed
-surface for one EJ2 component: the component class, its builder, HTML and
-reactive extensions, and typed event definitions with typed payloads.
+## When editing here
 
-## Invariants when editing here
+- Zero changes in `Alis.Reactive.Assets/runtime/`. If a runtime change seems needed, the plan is
+  missing information; make the C# slice carry it.
+- New typed surface (members, events, builder methods) stays inside the slice. Changing anything
+  shared risks every slice, so trace downstream use first. Why: one shared-surface change once
+  cascaded across 170+ files.
+- Member and event payload names come from the EJ2 source, not from memory or vendor docs alone. A
+  payload property like `cancel` is behavior to prove, not a string to copy.
+- Input IDs derive from the model expression; every other ID is the developer's explicit choice.
+- Typed members only (ALIS009). Strings stop at the plugin boundary.
 
-- The core DSL is frozen during the component lifecycle goal. New typed surface
-  (events, members, builder methods) lands only inside a component slice and
-  must be expressible through the authoritative primitive map — a member the
-  map cannot express is a stop condition, not a license to extend the core.
-- Zero TypeScript runtime changes. Onboarding, auditing, or upgrading a
-  component must not touch `Alis.Reactive.Assets/runtime/`. If a runtime change
-  seems needed, the plan is missing information — fix the C# descriptor so the
-  plan carries it.
-- API surface is frozen: internal constructors, internal setters, builder-only
-  authoring. Changing anything shared outside your slice risks every existing
-  slice — trace downstream usage first.
-  Why: one shared-surface change without downstream analysis once cascaded
-  across 170+ files.
-- Event and payload member names come from the EJ2 source of record captured in
-  the onboarding artifacts — never from memory or vendor docs alone. A payload
-  property like `cancel` is behavior to prove, not a string to copy.
-- Input component IDs derive from the model expression; every non-input ID is
-  the developer's explicit choice. No fallback IDs.
-- Stringly APIs stop at the plugin boundary. Component members are typed.
+## Proof
 
-## A slice row is not done until
-
-Discovery artifacts, primitive map, slice code, sandbox exercise page, and
-behavior proof exist for the row being closed. The onboarding skill
-(`.claude/skills/onboard-fusion-component`) owns the gate chain and the
-artifact tree under `tools/FusionOnboarding/`. Trust its verifier, not memory.
-
-## Harness
-
-`dotnet build` proves shape only. Behavior is proven exclusively by the
-Playwright suite driving a sandbox page through the public DSL.
+`dotnet build` proves shape only. A slice member is supported when a Playwright test drives it on a
+sandbox page and fails if it breaks.

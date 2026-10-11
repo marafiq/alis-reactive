@@ -10,9 +10,9 @@ paths:
 
 # Plan Contract Boundary — C# Plan Domain → Generated TS → Runtime Handler
 
-Loads when plan-domain, serialization, or contract files are touched. The
-canonical 9-step new-primitive checklist is root `CLAUDE.md` Rule 3; this rule
-carries the boundary rituals and per-layer checks.
+Loads when plan-domain, serialization, or contract files are touched. Root
+`CLAUDE.md` (Architecture) is authoritative; this rule carries the boundary
+steps and per-layer checks.
 
 ## Before writing plan-domain code, verify
 
@@ -54,6 +54,5 @@ to be caught.
 
 ## Known gaps (honest)
 
-No separate C# unit harness exists for plan shape beyond domain behavior tests —
-a regression that still type-checks and still renders rides on Playwright to be
-caught.
+No C# unit harness exists for plan shape. A regression that still type-checks
+and still renders is caught by Playwright, which is the proof.

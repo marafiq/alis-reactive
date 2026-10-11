@@ -27,14 +27,15 @@ component/plugin lookup, malformed non-framework JSON. Fail loud at the source.
   switch case + `assertNever`), LSP (no vendor checks downstream), ISP (narrow
   exports), DIP (depend inward).
 
-## Component lifecycle tripwire
+## Component tripwire
 
-Onboarding, auditing, or upgrading a Syncfusion component requires ZERO changes
-in this directory. If you find yourself editing here during component work,
-stop — the plan is missing information; fix the C# descriptor.
+Adding or changing a component requires ZERO changes in this directory. If you
+find yourself editing here during component work, stop — the plan is missing
+information; make the C# side carry it.
 
 ## Harness
 
-`npm run typecheck` (regenerates the plan contract first), `npm test` (vitest +
-architecture enforcement). Rebuild bundles before any Playwright run.
-`types/plan.ts` is generated from the C# plan domain — never hand-edit it.
+`npm run typecheck` (regenerates the plan contract first) and `npm test` (vitest +
+architecture enforcement) are fast feedback. Playwright is the proof: rebuild
+bundles, then run `scripts/playwright.sh`. `types/plan.ts` is generated from the
+C# plan domain — never hand-edit it.

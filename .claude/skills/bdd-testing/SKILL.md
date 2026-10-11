@@ -54,7 +54,7 @@ Never one view or one fixture for everything.
 
 - The model belongs to the journey and speaks domain language: residents,
   care levels, wings, monthly rates. Similar shapes across journeys stay
-  separate types (root Rule 4: duplication over abstraction).
+  separate types (root CLAUDE.md: duplication over abstraction).
 - The view is the journey's own page. Dialog and drawer flows on a page
   belong to that page's journey.
 - The data is the journey's own, seeded per browser context; no shared

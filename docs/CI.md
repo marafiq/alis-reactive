@@ -162,7 +162,7 @@ A test that fails and passes on re-run is flaky. A test that fails twice in a ro
 until proven otherwise. The convention:
 
 1. Open an issue with the trace, name the root cause hypothesis, and fix the wait strategy or the
-   test. Widening a timeout is not a fix (CLAUDE.md Rule 9).
+   test. Widening a timeout is not a fix (CLAUDE.md, Rules: root cause, not patch).
 2. If it cannot be fixed within the PR, quarantine it: add `[Category("Quarantine")]`
    ([NUnit Category](https://docs.nunit.org/articles/nunit/writing-tests/attributes/category.html)),
    add the shard exclusion `&TestCategory!=Quarantine` to every `shard_filter()` case and a sixth,
@@ -196,8 +196,8 @@ until proven otherwise. The convention:
   a flake from an 80-minute re-run to a 20-minute re-run of the failed shard
   (`gh run rerun <run-id> --failed`); (3) publishing is idempotent (`--skip-duplicate`), so a re-run
   after a flake never double-ships; (4) the alternative, "the local gate is the proof", leaves no
-  recorded evidence next to the GitHub Release, which the Definition of Done
-  (`.claude/rules/definition-of-done.md`) does not accept. What would justify going back to
+  recorded evidence next to the GitHub Release, which `CLAUDE.md` ("Playwright is the proof") does
+  not accept. What would justify going back to
   non-blocking: a shard that fails on two consecutive releases with no test at fault and a
   documented runner-side cause. Until then, red means stop.
 

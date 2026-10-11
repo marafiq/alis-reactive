@@ -70,7 +70,7 @@ describe("architecture: plan-driven IDs — no DOM scanning", () => {
 });
 
 describe("architecture: vendor isolation", () => {
-  // CLAUDE.md Rule 5: Syncfusion knowledge lives in the per-vendor driver, the vendor
+  // CLAUDE.md (Domain model, Vendors): Syncfusion knowledge lives in the per-vendor driver, the vendor
   // event adapter, and vendor component modules. Every other module stays vendor-blind.
   const vendorBoundaries = [
     /^components\/fusion\//, // vendor component modules (app-level Syncfusion objects)

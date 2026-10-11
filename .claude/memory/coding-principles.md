@@ -11,7 +11,7 @@ type: reference
 The public API surface does not change without explicit user approval and full downstream
 analysis. A single parameter rename cascaded across 170+ files in 6 commits.
 
-- No live hook blocks API surface edits (hookify templates are disabled) — review manually.
+- No hook blocks API surface edits — review manually.
 - Before any change: grep all call sites, read every affected file, present evidence.
 - `internal` to `public` is strictly forbidden. Internal members protect the surface deliberately.
 - Fusion HtmlExtension methods use the `Fusion` prefix (e.g., `.FusionDropDownList()`).
@@ -128,7 +128,8 @@ These patterns are forbidden. Each was learned the hard way.
 
 ## Code Hygiene — Worked Examples
 
-Root CLAUDE.md Rule 11 states the principles; these are the worked examples.
+Revealing names, variables close to use, no nesting, no dead code, small single-purpose methods.
+These are the worked examples.
 
 **Revealing names over complex conditions.** Extract boolean expressions into named
 variables that explain intent. The name is the documentation.

@@ -115,8 +115,7 @@ Every review agent prompt opens with:
 - what the scope is not — HIPAA, PHI, healthcare compliance
 - what standard applies — every finding carries file:line and its consequence
 
-The template lives in `agent-dispatch.md` Template 3 — quote it, do not
-paraphrase it. Rewrite prohibitions as standards.
+Rewrite prohibitions as standards.
 
 ### Rank by Value, Not Fixed Caps
 
@@ -140,7 +139,7 @@ boundary -- it is never one flat flow.
 
 ### Layer 1: C# Descriptors and Builders
 
-- **Skills:** modern-csharp (TDD principles are in bdd-testing skill). XML doc quality is reviewed manually (`hookify.xml-docs-quality.local.md` is a disabled template).
+- **Skills:** modern-csharp (TDD principles are in bdd-testing skill). XML doc quality is reviewed manually.
 - **Thinking:** Value Objects, Encapsulation, SOLID, impact on the generated TS plan contract
 - **Tests:** Prove DSL intent end-to-end through the Playwright suite (no C# unit/snapshot harness exists)
 - **Harness:** Playwright behavior + `npm run typecheck` (the generated `runtime/types/plan.ts` must match C#)
@@ -224,7 +223,7 @@ writing code. Think in LAYERS, not in flat task types.
 
 ## 7. Quality Aspirations Ledger
 
-Known weaknesses tracked for improvement (root CLAUDE.md Rule 13 points here):
+Known weaknesses tracked for improvement:
 
 - **DDD depth**: Domain model uses `null` where Value Objects with constructor invariants
   must enforce valid state. Association and aggregation boundaries are implicit.
