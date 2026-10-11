@@ -12,13 +12,15 @@ namespace Alis.Reactive.PlaywrightTests.Validation.MoveInReview;
 /// <remarks>
 /// The rules are written once in FluentValidation. The page checks every rule it can; a rule whose
 /// condition only the server can decide (a returning resident's previous room) is answered by the
-/// server, in the page's validation summary.
+/// server, in the page's validation summary. The page sends every field it renders and, beside the
+/// pharmacy phone, the pharmacy network the community contracts.
 /// </remarks>
 [TestFixture]
 public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Validation/MoveInReview";
     private const string Saved = "Move-in review saved for Margaret Hale.";
+    private const string SavedWithPharmacy = Saved + " Prescriptions go to Riverside Health at 555-0100.";
 
     private PagePlan<MoveInReviewModel> _plan = null!;
     private ConcurrentQueue<string> _reviewsSent = null!;
@@ -189,7 +191,22 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         await Write(m => m.Pharmacy.Phone, "555-0100");
         await Expect(_plan.ErrorFor(m => m.Pharmacy.Phone)).ToBeHiddenAsync();
         await ClickWhenStable(SaveReview);
-        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        await Expect(ReviewStatus).ToHaveTextAsync(SavedWithPharmacy);
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task the_pharmacy_phone_reaches_the_server_beside_the_communitys_pharmacy_network()
+    {
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "2");
+        await Write(m => m.Pharmacy.Phone, "555-0100");
+
+        await ClickWhenStable(SaveReview);
+
+        await Expect(ReviewStatus).ToHaveTextAsync(SavedWithPharmacy);
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1));
         AssertNoConsoleErrors();
     }
 

@@ -105,8 +105,13 @@ namespace Alis.Reactive.Grammar.Lowering
 
             var payload = assignments.Where(a => a.Target is RequestPayloadTarget).ToList();
             var values = nested ? NestedValues(payload, scope) : FlatValues(payload, scope);
-            if (includesAll)
-                values.Add(new SpreadEntry(G.Get(G.Obj(_context.Objects.Model()), new[] { nested ? "values" : "fields" }, Shape.None)));
+            Expr body = G.Record(values);
+            // IncludeAll writes each input at its own key: nested, leaf by leaf into the authored record
+            // (model.fill), so an authored value beside an input survives; flat, by binding name.
+            if (includesAll && nested)
+                body = G.Call(G.Obj(_context.Objects.Model()), new[] { "fill" }, new[] { body }, G.NoShapes, Shape.None);
+            else if (includesAll)
+                body = G.Record(values.Append(new SpreadEntry(G.Get(G.Obj(_context.Objects.Model()), new[] { "fields" }, Shape.None))));
 
             Expr arrays = G.List(payload
                 .Where(a => DescribesArray(a.Source.OutputShape))
@@ -118,7 +123,7 @@ namespace Alis.Reactive.Grammar.Lowering
                 ("method", G.Lit(request.Method)),
                 ("url", G.Lit(request.Url)),
                 ("route", Named<RequestRouteParameterTarget>(assignments, target => target.Name, scope)),
-                ("values", G.Record(values)),
+                ("values", body),
                 ("arrays", arrays),
                 ("headers", Named<RequestHeaderTarget>(assignments, target => target.Name, scope)),
                 ("format", G.Lit(format)));

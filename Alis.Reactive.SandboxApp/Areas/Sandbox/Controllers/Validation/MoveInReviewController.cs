@@ -30,7 +30,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
                 return BadRequest(new { errors });
             }
 
-            return Ok(new MoveInReviewSaved($"Move-in review saved for {review.ResidentName}."));
+            var prescriptions = string.IsNullOrEmpty(review.Pharmacy.Phone)
+                ? ""
+                : $" Prescriptions go to {review.Pharmacy.Network} at {review.Pharmacy.Phone}.";
+            return Ok(new MoveInReviewSaved($"Move-in review saved for {review.ResidentName}.{prescriptions}"));
         }
     }
 }

@@ -38,7 +38,7 @@
             .CssClass("mt-4 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("Save", "MoveInReview"), g => g.IncludeAll())
+                p.Post(Url.SandboxRoute("Save", "MoveInReview"), g => g.IncludeAll().Static("Pharmacy.Network", "Riverside Health"))
                  .Validate<MoveInReviewValidator>("move-in-review-form")
                  .Response(r => r
                     .OnSuccess<MoveInReviewSaved>((json, s) =>

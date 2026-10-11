@@ -19,7 +19,9 @@ p.Post("/Todo/Save", g => g.IncludeAll())
 ```
 
 `IncludeAll()` gathers every registered input component that is currently
-mounted.
+mounted. A value you gather yourself beside it keeps its place: an input fills
+only its own member, so `.Static("Pharmacy.Network", "Riverside Health")` still
+arrives next to an input bound to `Pharmacy.Phone`.
 
 ## Gather Specific Values
 

@@ -383,7 +383,9 @@ if (form.validate()) {                            // .Validate<V>(container); ou
   them. The rest go to `values`. A value needed in both the path and the body is two members.
 - **Keys.** `values` is a nested record for JSON. For form data it is flat, keyed by MVC binding
   names (`Address.City`, `Lines[0].Sku`), because only C# knows a dictionary from an object.
-- **`Form()`** spreads `model.values` for JSON, or `model.fields` for form data.
+- **`IncludeAll()`** writes every input into the authored JSON record leaf by leaf with
+  `model.fill(record)`, so an authored value beside an input (`Address.Verified` next to
+  `Address.City`) is kept and an input wins only its own leaf. Form data spreads `model.fields`.
 
 ### 5.2 Templates
 
@@ -444,6 +446,8 @@ imports none of them. The obligations are numbered so that tests and code can ci
 - **M1 `values`.** Every mounted input of the composed plan, read through each input's `value`
   expression as a binding read (2.1), and nested by binding name. An unmounted input is skipped.
 - **M2 `fields`.** The same inputs, flat, keyed by MVC binding name.
+- **M3 `fill(record)`.** Writes the inputs of M1 into `record` at their body paths and returns it.
+  A node already on the path keeps its other members; it is copied before it is written.
 
 ### 6.4 `form` (`plugin("alis.form", containerId)`)
 

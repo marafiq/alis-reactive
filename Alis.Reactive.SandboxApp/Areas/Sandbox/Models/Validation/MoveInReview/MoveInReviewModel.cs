@@ -30,6 +30,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     public class PharmacyContact
     {
         public string? Phone { get; set; }
+
+        /// <summary>The network the community contracts; the page sends it with every review, beside the phone.</summary>
+        public string? Network { get; set; }
     }
 
     /// <summary>What the server returns once the review is saved.</summary>

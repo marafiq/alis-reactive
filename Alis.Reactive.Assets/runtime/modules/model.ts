@@ -3,6 +3,8 @@
 // owner, and a slot's unload removes exactly its own.
 // M1 `values`: every mounted input of the composed plan, read through its value expression and
 //    converted to its shape, nested by its JSON body path. Unmounted inputs are skipped.
+//    `fill(record)` writes the same values into a record a request authored, leaf by leaf, so an
+//    authored value beside them (Address.Verified next to Address.City) is kept.
 // M2 `fields`: the same inputs, flat, keyed by MVC binding name; `arrays` names those holding arrays.
 // M3 `valueOf(id)`: one input's value, for a plan that reads a field another plan rendered; missing
 //    when no plan of the composition rendered it.
@@ -22,6 +24,8 @@ export interface ModelInput {
 
 export interface ModelObject {
   readonly values: Record<string, unknown>;
+  /** Writes every mounted input into the record at its JSON body path; returns the record. */
+  fill(record: Record<string, unknown>): Record<string, unknown>;
   readonly fields: Record<string, unknown>;
   readonly arrays: string[];
   /** Every input currently contributed, mounted or not. */
@@ -62,12 +66,15 @@ function describesArray(shape: Shape): boolean {
 
 function modelObject(planId: string): ModelObject {
   const mounted = (): ModelInput[] => [...inputsOf(planId).values()].filter(isMounted);
+  const fill = (record: Record<string, unknown>): Record<string, unknown> => {
+    for (const input of mounted()) assignAt(record, input.binding.body, readInput(input));
+    return record;
+  };
   return {
     get values() {
-      const values: Record<string, unknown> = {};
-      for (const input of mounted()) assignAt(values, input.binding.body, readInput(input));
-      return values;
+      return fill({});
     },
+    fill,
     get fields() {
       const fields: Record<string, unknown> = {};
       for (const input of mounted()) fields[input.binding.name] = readInput(input);
@@ -90,7 +97,8 @@ function modelObject(planId: string): ModelObject {
 }
 
 // A JSON body path: an index segment (Lines[0]) needs an array, a name needs an object. A matching
-// node already there is reused; anything else is replaced.
+// node already there keeps its other members, copied first so an object the request read from a
+// component is never written into; anything else is replaced.
 function assignAt(root: Record<string, unknown>, path: readonly (string | number)[], value: unknown): void {
   if (path.length === 0) return;
   let parent: Record<string | number, unknown> = root;
@@ -98,13 +106,15 @@ function assignAt(root: Record<string, unknown>, path: readonly (string | number
     const segment = path[index]!;
     const nextIsIndex = typeof path[index + 1] === "number";
     const existing = parent[segment];
-    const reusable = nextIsIndex
-      ? Array.isArray(existing)
-      : typeof existing === "object" && existing !== null && !Array.isArray(existing);
-    if (!reusable) parent[segment] = nextIsIndex ? [] : {};
+    if (nextIsIndex) parent[segment] = Array.isArray(existing) ? [...existing] : [];
+    else parent[segment] = isPlainRecord(existing) ? { ...existing } : {};
     parent = parent[segment] as Record<string | number, unknown>;
   }
   parent[path[path.length - 1]!] = value;
+}
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 export const modelModule: Module = {
