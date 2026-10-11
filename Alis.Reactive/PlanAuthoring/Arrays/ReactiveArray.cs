@@ -114,8 +114,8 @@ namespace Alis.Reactive.Builders.Arrays
 
         /// <summary>
         /// Exposes the composed array as a typed source so the transformed array can bind to a
-        /// component data source wherever a <see cref="TypedSource{T}"/> is accepted, such as a
-        /// <c>SetDataSource(TypedSource&lt;T[]&gt;)</c> overload, without an HTTP round-trip. The
+        /// component data source wherever a <see cref="TypedSource{T}"/> is accepted, such as
+        /// <c>Set(c =&gt; c.DataSource, rows.AsSource())</c>, without an HTTP round-trip. The
         /// underlying value is the same array-op expression the runtime already evaluates.
         /// </summary>
         public TypedSource<TElement[]> AsSource() => new ReactiveArraySource<TElement>(_source);

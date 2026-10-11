@@ -237,8 +237,8 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Includes a specific component's value in the gather.
-        /// Used by vendor extension methods (Fusion, Native).
+        /// Includes a specific component's value in the gather, for the public
+        /// <c>Include&lt;TComponent, TModel&gt;(...)</c> extensions.
         /// </summary>
         internal GatherBuilder<TModel> Include(string componentId, ComponentVendor vendor, string propertyName, string valueMember)
         {

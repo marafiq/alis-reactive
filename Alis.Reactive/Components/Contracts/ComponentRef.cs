@@ -4,9 +4,8 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Authoring handle for a plan-registered component target. Native and Fusion
-    /// extension methods consume it to declare component property sets, method calls,
-    /// and value reads in the Reactive Plan.
+    /// Authoring handle for a component the plan targets: <c>Set</c>, <c>Call</c> and <c>Get</c>
+    /// reach every member its declaration names.
     /// </summary>
     public class ComponentRef<TComponent, TModel>
         where TComponent : IComponent, new()
@@ -139,7 +138,7 @@ namespace Alis.Reactive
         }
 
         /// <summary>Reads what one of the component's declared methods returns.</summary>
-        /// <example><c>p.When(p.Component&lt;FusionGrid&gt;("roster").Get(c =&gt; c.GetSelectedRecords)).NotEmpty()</c></example>
+        /// <example><c>p.When(p.Component&lt;FusionGrid&gt;("roster").Get(c =&gt; c.GetSelectedRowIndexes)).NotEmpty()</c></example>
         public Builders.Conditions.TypedComponentSource<TResult> Get<TResult>(
             System.Func<TComponent, ComponentFunction<TResult>> function)
         {

@@ -10,7 +10,7 @@ namespace Alis.Reactive.Builders
     {
         /// <summary>
         /// Begins a typed array transform over a component/method array source, e.g.
-        /// <c>p.From(p.Component&lt;FusionMultiSelect&gt;(m =&gt; m.Tags).Value())</c>.
+        /// <c>p.From(p.Component&lt;FusionMultiSelect&gt;(m =&gt; m.Tags).Get(c =&gt; c.Value))</c>.
         /// </summary>
         /// <typeparam name="TElement">Array element type carried through the transform chain.</typeparam>
         /// <param name="source">Typed value source that produces the array value.</param>
