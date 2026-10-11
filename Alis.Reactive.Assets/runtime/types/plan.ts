@@ -3,10 +3,9 @@
 // Do not edit by hand. Run `npm run generate:plan-types -w Alis.Reactive.Assets`.
 
 export interface PlanDocument {
-  version: 3;
+  version: 4;
   planId: string;
   scope: PlanScope;
-  types: Record<string, BrowserObjectContract>;
   vendors: Record<string, VendorContract>;
   components: Record<string, ComponentObject>;
   behaviors: Behavior[];
@@ -24,29 +23,6 @@ export interface PartialPlanScope {
   kind: "partial";
 }
 
-export interface BrowserObjectContract {
-  properties: Record<string, Property>;
-  methods: Record<string, Method>;
-  events: Record<string, Event>;
-}
-
-export interface Property {
-  path: Path;
-  shape: Shape;
-  access: MemberAccess;
-}
-
-export type MemberAccess =
-  | "read"
-  | "write"
-  | "readwrite";
-
-export interface Method {
-  path: Path;
-  arguments: MethodArgumentContract;
-  returns: Shape;
-}
-
 export type MethodArgumentContract =
   | OpenMethodArgumentContract
   | ExactMethodArgumentContract;
@@ -58,10 +34,6 @@ export interface OpenMethodArgumentContract {
 export interface ExactMethodArgumentContract {
   kind: "exact";
   shapes: Shape[];
-}
-
-export interface Event {
-  channel: string;
 }
 
 export type Vendor = string;
@@ -86,7 +58,6 @@ export type ComponentObject =
 export interface ObjectTargetComponent {
   id: string;
   vendor: Vendor;
-  type: string;
   role: ObjectTargetComponentRole;
   binding: NoInputBinding;
   container: NoValidationContainer;
@@ -95,7 +66,6 @@ export interface ObjectTargetComponent {
 export interface PlanInputComponent {
   id: string;
   vendor: Vendor;
-  type: string;
   role: PlanInputComponentRole;
   binding: RegisteredInputBinding;
   container: NoValidationContainer;
@@ -104,7 +74,6 @@ export interface PlanInputComponent {
 export interface ValidationContainerComponentDefinition {
   id: string;
   vendor: Vendor;
-  type: string;
   role: ValidationContainerComponentRole;
   binding: InputBinding;
   container: ValidationContainerScope;
@@ -113,7 +82,6 @@ export interface ValidationContainerComponentDefinition {
 export interface LayoutObjectComponent {
   id: string;
   vendor: Vendor;
-  type: string;
   role: LayoutObjectComponentRole;
   binding: NoInputBinding;
   container: NoValidationContainer;
@@ -154,6 +122,8 @@ export interface RegisteredInputBinding {
   bindingPath: string;
   path: StructuredPath;
   valueMember: string;
+  valuePath: StructuredPath;
+  valueShape: Shape;
 }
 
 export type ValidationContainerBinding =
@@ -392,7 +362,6 @@ export interface DomSource {
 export interface PluginSource {
   kind: "plugin";
   name: string;
-  type: string;
 }
 
 export type PayloadScope =
@@ -521,14 +490,16 @@ export interface ConditionalBranchGuard {
 export interface SetReaction {
   kind: "set";
   on: SetTargetSource;
-  property: string;
+  path: StructuredPath;
+  shape: Shape;
   value: ValueExpression;
 }
 
 export interface CallReaction {
   kind: "call";
   on: CallTargetSource;
-  method: string;
+  path: Path;
+  arguments: MethodArgumentContract;
   args: ValueExpression[];
 }
 
@@ -739,7 +710,7 @@ export interface ObjectPropertyReadExpression {
   kind: "read";
   from: RuntimeObjectSource;
   member: string;
-  path: EmptyPath;
+  path: StructuredPath;
   shape: Shape;
   access: PropertyValueReadAccess;
 }
@@ -748,7 +719,7 @@ export interface ObjectMethodReadExpression {
   kind: "read";
   from: RuntimeObjectSource;
   member: string;
-  path: EmptyPath;
+  path: Path;
   shape: Shape;
   access: MethodValueReadAccess;
 }
@@ -818,6 +789,7 @@ export interface PropertyValueReadAccess {
 export interface MethodValueReadAccess {
   kind: "method";
   args: ValueExpression[];
+  arguments: MethodArgumentContract;
 }
 
 export interface ObjectExpression {
