@@ -50,21 +50,21 @@
                         .Placeholder("Select facility")
                         .DataSource(KanbanSeedData.Facilities)
                         .Fields<KanbanFacility>(t => t.Name, v => v.Id)
-                        .Value("AL")
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
-                        {
-                            p.Element("kanban-status").SetText("loading");
-                            p.Get("/api/kanban/board")
-                             .Gather(g => g.Include<FusionDropDownList, KanbanModel>(m => m.SelectedFacilityId))
-                             .Response(r => r.OnSuccess<KanbanBoardResponse>((json, s) =>
-                             {
-                                 s.Component<FusionKanban>("care-kanban").SetDataSource(json, x => x.Cards);
-                                 s.Element("kanban-status").SetText(json, x => x.Message);
-                                 s.Element("kanban-open-count").SetText(json, x => x.OpenCount);
-                                 s.Element("kanban-review-count").SetText(json, x => x.ReviewCount);
-                                 s.Element("kanban-al-count").SetText(json, x => x.AssistedLivingCount);
-                             }));
-                        })); }
+                        .Value("AL"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.Element("kanban-status").SetText("loading");
+                        p.Get("/api/kanban/board")
+                         .Gather(g => g.Include<FusionDropDownList, KanbanModel>(m => m.SelectedFacilityId))
+                         .Response(r => r.OnSuccess<KanbanBoardResponse>((json, s) =>
+                         {
+                             s.Component<FusionKanban>("care-kanban").SetDataSource(json, x => x.Cards);
+                             s.Element("kanban-status").SetText(json, x => x.Message);
+                             s.Element("kanban-open-count").SetText(json, x => x.OpenCount);
+                             s.Element("kanban-review-count").SetText(json, x => x.ReviewCount);
+                             s.Element("kanban-al-count").SetText(json, x => x.AssistedLivingCount);
+                         }));
+                    }); }
 
             <native-hstack gap="Sm" class="ml-auto text-sm">
                 <span>Status: <span id="kanban-status" class="font-medium">booting</span></span>

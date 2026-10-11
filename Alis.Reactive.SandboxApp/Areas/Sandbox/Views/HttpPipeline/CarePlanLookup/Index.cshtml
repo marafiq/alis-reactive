@@ -25,7 +25,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Get(Url.SandboxRouteTemplate("CarePlan", "CarePlanLookup", "residentId"))
-                     .Gather(g => g.RouteParam("residentId", p.Component<FusionDropDownList>(m => m.ResidentId).Value()))
+                     .Gather(g => g.RouteParam("residentId", p.Component<FusionDropDownList>(m => m.ResidentId).Get(c => c.Value)))
                      .WhileLoading(l => l.Component<NativeLoader>().Show())
                      .Response(r => r
                         .OnSuccess<CarePlanSummary>((json, s) =>

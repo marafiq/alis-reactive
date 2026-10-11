@@ -81,32 +81,32 @@
             @{ Html.InputField(plan, m => m.FacilityId, o => o.Required().Label("Facility"))
                 .FusionDropDownList(b => b
                     .Placeholder("Select facility")
-                    .Fields<LookupItem>(t => t.Name, v => v.Id)
-                    .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
-                    {
-                        pipeline.Parallel(
-                            a => a.Get("/Intake/Units")
-                                .Gather(g => g
-                                    .Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
-                                .Response(r => r
-                                    .OnSuccess<UnitsResponse>((json, s) =>
-                                    {
-                                        s.Component<FusionDropDownList>(m => m.UnitId)
-                                            .SetDataSource(json, j => j.Units)
-                                            .DataBind();
-                                    })),
-                            b => b.Get("/Intake/FacilityInfo")
-                                .Gather(g => g
-                                    .Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
-                                .Response(r => r
-                                    .OnSuccess(s => s.Into("facility-info"))),
-                            c => c.Get("/Intake/FacilityRequirements")
-                                .Gather(g => g
-                                    .Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
-                                .Response(r => r
-                                    .OnSuccess(s => s.Into("facility-requirements")))
-                        );
-                    })); }
+                    .Fields<LookupItem>(t => t.Name, v => v.Id))
+                .Reactive(evt => evt.Change, (args, pipeline) =>
+                {
+                    pipeline.Parallel(
+                        a => a.Get("/Intake/Units")
+                            .Gather(g => g
+                                .Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
+                            .Response(r => r
+                                .OnSuccess<UnitsResponse>((json, s) =>
+                                {
+                                    s.Component<FusionDropDownList>(m => m.UnitId)
+                                        .SetDataSource(json, j => j.Units)
+                                        .DataBind();
+                                })),
+                        b => b.Get("/Intake/FacilityInfo")
+                            .Gather(g => g
+                                .Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
+                            .Response(r => r
+                                .OnSuccess(s => s.Into("facility-info"))),
+                        c => c.Get("/Intake/FacilityRequirements")
+                            .Gather(g => g
+                                .Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
+                            .Response(r => r
+                                .OnSuccess(s => s.Into("facility-requirements")))
+                    );
+                }); }
 
             <div id="facility-info" class="col-span-full"></div>
             <div id="facility-requirements" class="col-span-full"></div>
@@ -119,13 +119,13 @@
             @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care Level"))
                 .FusionDropDownList(b => b
                     .Placeholder("Select care level")
-                    .Fields<LookupItem>(t => t.Name, v => v.Id)
-                    .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
-                    {
-                        pipeline.When(args, a => a.Value).Eq("memory-care")
-                            .Then(t => t.Element("cognitive-section").Show())
-                            .Else(e => e.Element("cognitive-section").Hide());
-                    })); }
+                    .Fields<LookupItem>(t => t.Name, v => v.Id))
+                .Reactive(evt => evt.Change, (args, pipeline) =>
+                {
+                    pipeline.When(args, a => a.Value).Eq("memory-care")
+                        .Then(t => t.Element("cognitive-section").Show())
+                        .Else(e => e.Element("cognitive-section").Hide());
+                }); }
 
             @{ Html.InputField(plan, m => m.AdmissionDate, o => o.Required().Label("Admission Date"))
                 .FusionDatePicker(b => b

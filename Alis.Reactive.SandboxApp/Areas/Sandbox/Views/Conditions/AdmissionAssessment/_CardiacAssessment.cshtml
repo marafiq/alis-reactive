@@ -46,14 +46,14 @@
             }); }
 
         @{ Html.InputField(plan, m => m.HasPacemaker, o => o.Label("Has Pacemaker"))
-            .FusionSwitch(b => b
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var pm = p.Component<FusionSwitch>(m => m.HasPacemaker);
-                    p.When(pm.Value()).Truthy()
-                        .Then(t => t.Element("pacemaker-details").Show())
-                        .Else(e => e.Element("pacemaker-details").Hide());
-                })); }
+            .FusionSwitch()
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var pm = p.Component<FusionSwitch>(m => m.HasPacemaker);
+                p.When(pm.Get(c => c.Checked)).Truthy()
+                    .Then(t => t.Element("pacemaker-details").Show())
+                    .Else(e => e.Element("pacemaker-details").Hide());
+            }); }
     </native-grid>
 
     <native-vstack gap="Xs" class="font-mono text-sm mb-4">

@@ -31,21 +31,21 @@
         @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care Level"))
             .FusionDropDownList(b => b
                 .DataSource(careLevels)
-                .Placeholder("Select care level")
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    p.When(args, x => x.Value).Eq("Memory Care")
-                        .Then(t =>
-                        {
-                            t.Element("memory-assessment-panel").Show();
-                            t.Element("stepper-wizard-status").SetText("memory assessment required");
-                        })
-                        .Else(e =>
-                        {
-                            e.Element("memory-assessment-panel").Hide();
-                            e.Element("stepper-wizard-status").SetText("standard care path");
-                        });
-                })); }
+                .Placeholder("Select care level"))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                p.When(args, x => x.Value).Eq("Memory Care")
+                    .Then(t =>
+                    {
+                        t.Element("memory-assessment-panel").Show();
+                        t.Element("stepper-wizard-status").SetText("memory assessment required");
+                    })
+                    .Else(e =>
+                    {
+                        e.Element("memory-assessment-panel").Hide();
+                        e.Element("stepper-wizard-status").SetText("standard care path");
+                    });
+            }); }
 
         @{ Html.InputField(plan, m => m.PrimaryDiagnosis, o => o.Required().Label("Primary Diagnosis"))
             .FusionDropDownList(b => b.DataSource(diagnoses).Placeholder("Select diagnosis")); }

@@ -33,20 +33,20 @@
                 p.When(ageComp.Get(c => c.Value)).Gte(85m)
                     .Then(t =>
                     {
-                        t.Component<FusionDropDownList>(m => m.RiskTier).SetValue("High");
+                        t.Component<FusionDropDownList>(m => m.RiskTier).Set(c => c.Value, "High");
                         t.Element("risk-badge").SetText("High Risk");
                         t.Element("risk-badge").Show();
                     })
                     .ElseIf(ageComp.Get(c => c.Value)).Gte(65m)
                     .Then(t =>
                     {
-                        t.Component<FusionDropDownList>(m => m.RiskTier).SetValue("Standard");
+                        t.Component<FusionDropDownList>(m => m.RiskTier).Set(c => c.Value, "Standard");
                         t.Element("risk-badge").SetText("Standard Risk");
                         t.Element("risk-badge").Show();
                     })
                     .Else(e =>
                     {
-                        e.Component<FusionDropDownList>(m => m.RiskTier).SetValue("Low");
+                        e.Component<FusionDropDownList>(m => m.RiskTier).Set(c => c.Value, "Low");
                         e.Element("risk-badge").SetText("Low Risk");
                         e.Element("risk-badge").Show();
                     });
@@ -59,27 +59,27 @@
         @{ Html.InputField(plan, m => m.PrimaryDiagnosis, o => o.Required().Label("Primary Diagnosis"))
             .FusionDropDownList(b => b
                 .DataSource(diagnoses)
-                .Placeholder("Select diagnosis")
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var diag = p.Component<FusionDropDownList>(m => m.PrimaryDiagnosis);
+                .Placeholder("Select diagnosis"))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var diag = p.Component<FusionDropDownList>(m => m.PrimaryDiagnosis);
 
-                    // Shared Active Plan hidden field feeds Step 2 conditions.
-                    p.Component<NativeHiddenField, Step2ClinicalModel>(m => m.PrimaryDiagnosis)
-                        .SetValue(diag.Value());
+                // Shared Active Plan hidden field feeds Step 2 conditions.
+                p.Component<NativeHiddenField, Step2ClinicalModel>(m => m.PrimaryDiagnosis)
+                    .SetValue(diag.Get(c => c.Value));
 
-                    p.When(diag.Value()).In("Alzheimer's", "Parkinson's")
-                        .Then(t => t.Element("cognitive-section").Show())
-                        .Else(e => e.Element("cognitive-section").Hide());
+                p.When(diag.Get(c => c.Value)).In("Alzheimer's", "Parkinson's")
+                    .Then(t => t.Element("cognitive-section").Show())
+                    .Else(e => e.Element("cognitive-section").Hide());
 
-                    p.When(diag.Value()).Eq("Heart Disease")
-                        .Then(t => t.Element("cardiac-section").Show())
-                        .Else(e => e.Element("cardiac-section").Hide());
+                p.When(diag.Get(c => c.Value)).Eq("Heart Disease")
+                    .Then(t => t.Element("cardiac-section").Show())
+                    .Else(e => e.Element("cardiac-section").Hide());
 
-                    p.When(diag.Value()).Eq("Diabetes")
-                        .Then(t => t.Element("diabetes-section").Show())
-                        .Else(e => e.Element("diabetes-section").Hide());
-                })); }
+                p.When(diag.Get(c => c.Value)).Eq("Diabetes")
+                    .Then(t => t.Element("diabetes-section").Show())
+                    .Else(e => e.Element("diabetes-section").Hide());
+            }); }
 
         @{ Html.InputField(plan, m => m.AttendingPhysician, o => o.Label("Attending Physician"))
             .FusionAutoComplete(b => b
@@ -104,14 +104,14 @@
                 .Placeholder("Set by age")); }
 
         @{ Html.InputField(plan, m => m.IsVeteran, o => o.Label("Is Veteran"))
-            .FusionSwitch(b => b
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var sw = p.Component<FusionSwitch>(m => m.IsVeteran);
-                    p.When(sw.Value()).Truthy()
-                        .Then(t => t.Element("veteran-section").Show())
-                        .Else(e => e.Element("veteran-section").Hide());
-                })); }
+            .FusionSwitch()
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var sw = p.Component<FusionSwitch>(m => m.IsVeteran);
+                p.When(sw.Get(c => c.Checked)).Truthy()
+                    .Then(t => t.Element("veteran-section").Show())
+                    .Else(e => e.Element("veteran-section").Hide());
+            }); }
     </native-grid>
 
     <native-vstack gap="Xs" class="font-mono text-sm mb-4">

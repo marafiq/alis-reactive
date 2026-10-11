@@ -76,11 +76,11 @@
                 .FusionDropDownList(b => b
                     .DataSource(careLevels)
                     .Fields<CareLevelOption>(t => t.Text, v => v.Value)
-                    .Placeholder("Select care level")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.Element("care-echo").SetText(args, x => x.Value);
-                    })); }
+                    .Placeholder("Select care level"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.Element("care-echo").SetText(args, x => x.Value);
+                }); }
 
             @{ Html.InputField(plan, m => m.MonthlyRate, o => o.Required().Label("Monthly Rate ($)"))
                 .FusionNumericTextBox(b => b
@@ -91,11 +91,11 @@
                 }); }
 
             @{ Html.InputField(plan, m => m.IsActive, o => o.Label("Active Status"))
-                .FusionSwitch(b => b
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.Element("active-echo").SetText(args, x => x.Checked);
-                    })); }
+                .FusionSwitch()
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.Element("active-echo").SetText(args, x => x.Checked);
+                }); }
 
             @{ Html.InputField(plan, m => m.Notes, o => o.Label("Notes"))
                 .NativeTextBox(b => b

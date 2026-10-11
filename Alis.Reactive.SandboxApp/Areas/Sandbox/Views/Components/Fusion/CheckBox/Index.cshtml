@@ -14,8 +14,8 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var housekeeping = p.Component<FusionCheckBox>(m => m.WeeklyHousekeeping);
-        housekeeping.SetDisabled(true);
-        p.When(housekeeping.Disabled()).Truthy()
+        housekeeping.Set(c => c.Disabled, true).Call(c => c.DataBind);
+        p.When(housekeeping.Get(c => c.Disabled)).Truthy()
             .Then(locked => locked.Element("housekeeping-status")
                 .SetText("Locked until you accept the residency agreement."))
             .Else(open => open.Element("housekeeping-status")
@@ -36,33 +36,33 @@
             <native-heading level="H2">Residency agreement</native-heading>
             @{ Html.InputField(plan, m => m.AgreementAccepted, o => o.Label("Residency agreement"))
                 .FusionCheckBox(b => b
-                    .Label("I accept the Residency Agreement")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        var housekeeping = p.Component<FusionCheckBox>(m => m.WeeklyHousekeeping);
+                    .Label("I accept the Residency Agreement"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    var housekeeping = p.Component<FusionCheckBox>(m => m.WeeklyHousekeeping);
 
-                        p.When(args, x => x.Checked).Truthy()
-                            .Then(accepted =>
-                            {
-                                accepted.Element("agreement-status")
-                                    .SetText("Thank you. Your residency agreement is accepted.");
-                                var housekeepingNow = accepted.Component<FusionCheckBox>(m => m.WeeklyHousekeeping);
-                                housekeepingNow.SetDisabled(false);
-                                accepted.When(housekeepingNow.Disabled()).Falsy()
-                                    .Then(open => open.Element("housekeeping-status")
-                                        .SetText("You can now add weekly housekeeping to your move-in services."))
-                                    .Else(stillLocked => stillLocked.Element("housekeeping-status")
-                                        .SetText("Weekly housekeeping is still locked."));
-                            })
-                            .Else(declined =>
-                            {
-                                declined.Element("agreement-status")
-                                    .SetText("Please accept the residency agreement to continue.");
-                                declined.Component<FusionCheckBox>(m => m.WeeklyHousekeeping).SetDisabled(true);
-                                declined.Element("housekeeping-status")
-                                    .SetText("Locked until you accept the residency agreement.");
-                            });
-                    })); }
+                    p.When(args, x => x.Checked).Truthy()
+                        .Then(accepted =>
+                        {
+                            accepted.Element("agreement-status")
+                                .SetText("Thank you. Your residency agreement is accepted.");
+                            var housekeepingNow = accepted.Component<FusionCheckBox>(m => m.WeeklyHousekeeping);
+                            housekeepingNow.Set(c => c.Disabled, false).Call(c => c.DataBind);
+                            accepted.When(housekeepingNow.Get(c => c.Disabled)).Falsy()
+                                .Then(open => open.Element("housekeeping-status")
+                                    .SetText("You can now add weekly housekeeping to your move-in services."))
+                                .Else(stillLocked => stillLocked.Element("housekeeping-status")
+                                    .SetText("Weekly housekeeping is still locked."));
+                        })
+                        .Else(declined =>
+                        {
+                            declined.Element("agreement-status")
+                                .SetText("Please accept the residency agreement to continue.");
+                            declined.Component<FusionCheckBox>(m => m.WeeklyHousekeeping).Set(c => c.Disabled, true).Call(c => c.DataBind);
+                            declined.Element("housekeeping-status")
+                                .SetText("Locked until you accept the residency agreement.");
+                        });
+                }); }
             <native-text color="Secondary"><span id="agreement-status">Your residency agreement is not yet accepted.</span></native-text>
         </native-vstack>
     </native-card-body></native-card>
@@ -72,15 +72,15 @@
             <native-heading level="H2">Optional services</native-heading>
             @{ Html.InputField(plan, m => m.WeeklyHousekeeping, o => o.Label("Weekly housekeeping"))
                 .FusionCheckBox(b => b
-                    .Label("Add weekly housekeeping")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.When(args, x => x.Checked).Truthy()
-                            .Then(added => added.Element("housekeeping-status")
-                                .SetText("Weekly housekeeping will be included in your move-in services."))
-                            .Else(removed => removed.Element("housekeeping-status")
-                                .SetText("Weekly housekeeping is not part of your move-in services."));
-                    })); }
+                    .Label("Add weekly housekeeping"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.When(args, x => x.Checked).Truthy()
+                        .Then(added => added.Element("housekeeping-status")
+                            .SetText("Weekly housekeeping will be included in your move-in services."))
+                        .Else(removed => removed.Element("housekeeping-status")
+                            .SetText("Weekly housekeeping is not part of your move-in services."));
+                }); }
             <native-text color="Secondary"><span id="housekeeping-status">You can add weekly housekeeping to your move-in services.</span></native-text>
 
             <native-hstack gap="Sm" class="flex-wrap">
@@ -88,7 +88,7 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionCheckBox>(m => m.WeeklyHousekeeping).SetChecked(true);
+                        p.Component<FusionCheckBox>(m => m.WeeklyHousekeeping).Set(c => c.Checked, true).Call(c => c.DataBind);
                         p.Element("housekeeping-status")
                             .SetText("Weekly housekeeping will be included in your move-in services.");
                     }))
@@ -97,8 +97,8 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var housekeeping = p.Component<FusionCheckBox>(m => m.WeeklyHousekeeping);
-                        housekeeping.SetIndeterminate(true);
-                        p.When(housekeeping.Indeterminate()).Truthy()
+                        housekeeping.Set(c => c.Indeterminate, true).Call(c => c.DataBind);
+                        p.When(housekeeping.Get(c => c.Indeterminate)).Truthy()
                             .Then(flagged => flagged.Element("housekeeping-status")
                                 .SetText("A coordinator will follow up with you about weekly housekeeping."))
                             .Else(decided => decided.Element("housekeeping-status")
@@ -108,13 +108,13 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionCheckBox>(m => m.WeeklyHousekeeping).Click();
+                        p.Component<FusionCheckBox>(m => m.WeeklyHousekeeping).Call(c => c.Click);
                     }))
                 @(Html.NativeButton("jump-to-agreement", "Take me back to the agreement")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionCheckBox>(m => m.AgreementAccepted).FocusIn();
+                        p.Component<FusionCheckBox>(m => m.AgreementAccepted).Call(c => c.FocusIn);
                     }))
             </native-hstack>
         </native-vstack>
@@ -131,9 +131,9 @@
                     p.Post(Url.SandboxRoute("SaveAgreement", "FusionCheckBox"))
                         .Gather(g =>
                         {
-                            g.Include(agreement.Checked(), "agreementAccepted");
-                            g.Include(housekeeping.Checked(), "weeklyHousekeeping");
-                            g.Include(housekeeping.Indeterminate(), "housekeepingNeedsFollowUp");
+                            g.Include(agreement.Get(c => c.Checked), "agreementAccepted");
+                            g.Include(housekeeping.Get(c => c.Checked), "weeklyHousekeeping");
+                            g.Include(housekeeping.Get(c => c.Indeterminate), "housekeepingNeedsFollowUp");
                         })
                         .Response(r => r.OnSuccess<MoveInAgreementResponse>((json, s) =>
                         {

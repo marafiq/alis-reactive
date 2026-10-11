@@ -97,23 +97,23 @@
                         .Placeholder("Select facility")
                         .DataSource(FakeScheduleData.Facilities)
                         .Fields<Facility>(t => t.Name, v => v.Id)
-                        .Value("mystery-manor")
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
-                        {
-                            p.Element("status").SetText("Loading...");
-                            p.Get("/api/schedule/assignments")
-                             .Gather(g => g
-                                 .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
-                                 .Include(p.Component<FusionSchedule>("shift-schedule").CurrentView())
-                                 .Include(p.Component<FusionSchedule>("shift-schedule").SelectedDate(), "currentDate"))
-                             .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
-                             {
-                                 s.Component<FusionSchedule>("shift-schedule")
-                                     .SetDataSource(json, j => j.Assignments);
-                                 s.Element("status").SetText("Facility changed");
-                                 s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
-                             }));
-                        })); }
+                        .Value("mystery-manor"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.Element("status").SetText("Loading...");
+                        p.Get("/api/schedule/assignments")
+                         .Gather(g => g
+                             .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
+                             .Include(p.Component<FusionSchedule>("shift-schedule").CurrentView())
+                             .Include(p.Component<FusionSchedule>("shift-schedule").SelectedDate(), "currentDate"))
+                         .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
+                         {
+                             s.Component<FusionSchedule>("shift-schedule")
+                                 .SetDataSource(json, j => j.Assignments);
+                             s.Element("status").SetText("Facility changed");
+                             s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
+                         }));
+                    }); }
             <native-hstack gap="Sm" class="ml-auto text-sm">
                 <span class="text-text-secondary">Unassigned:</span>
                 <span id="unassigned-count" class="font-bold text-red-600">--</span>

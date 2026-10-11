@@ -42,12 +42,13 @@
                             .Else(e => { e.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Standard"); e.Element("cog-status").SetText("Mild/Normal"); });
                     }); }
                 @{ Html.InputField(plan, m => m.Wanders, o => o.Label("Wanders"))
-                    .FusionSwitch(b => b.Reactive(plan, evt => evt.Changed, (args, p) =>
+                    .FusionSwitch()
+                    .Reactive(evt => evt.Change, (args, p) =>
                     {
-                        p.When(p.Component<FusionSwitch>(m => m.Wanders).Value()).Truthy()
+                        p.When(p.Component<FusionSwitch>(m => m.Wanders).Get(c => c.Checked)).Truthy()
                             .Then(t => t.Element("wander-details").Show())
                             .Else(e => e.Element("wander-details").Hide());
-                    })); }
+                    }); }
             </native-grid>
             <p class="font-mono text-sm">Status: <span id="cog-status" class="text-text-muted">&mdash;</span></p>
             <div id="wander-details" @(Model.Wanders ? "" : "hidden")>
@@ -67,12 +68,13 @@
                 @{ Html.InputField(plan, m => m.SystolicBP, o => o.Label("Systolic BP (mmHg)"))
                     .FusionNumericTextBox(b => b.Min(0).Max(300).Step(1)); }
                 @{ Html.InputField(plan, m => m.HasPacemaker, o => o.Label("Has Pacemaker"))
-                    .FusionSwitch(b => b.Reactive(plan, evt => evt.Changed, (args, p) =>
+                    .FusionSwitch()
+                    .Reactive(evt => evt.Change, (args, p) =>
                     {
-                        p.When(p.Component<FusionSwitch>(m => m.HasPacemaker).Value()).Truthy()
+                        p.When(p.Component<FusionSwitch>(m => m.HasPacemaker).Get(c => c.Checked)).Truthy()
                             .Then(t => t.Element("pacemaker-details").Show())
                             .Else(e => e.Element("pacemaker-details").Hide());
-                    })); }
+                    }); }
             </native-grid>
             <div id="pacemaker-details" @(Model.HasPacemaker ? "" : "hidden")>
                 <native-grid cols="C2" gap="Base">
@@ -97,12 +99,13 @@
             </native-grid>
             <native-grid cols="C2" gap="Base" class="mb-4">
                 @{ Html.InputField(plan, m => m.InsulinDependent, o => o.Label("Insulin Dependent"))
-                    .FusionSwitch(b => b.Reactive(plan, evt => evt.Changed, (args, p) =>
+                    .FusionSwitch()
+                    .Reactive(evt => evt.Change, (args, p) =>
                     {
-                        p.When(p.Component<FusionSwitch>(m => m.InsulinDependent).Value()).Truthy()
+                        p.When(p.Component<FusionSwitch>(m => m.InsulinDependent).Get(c => c.Checked)).Truthy()
                             .Then(t => t.Element("insulin-details").Show())
                             .Else(e => e.Element("insulin-details").Hide());
-                    })); }
+                    }); }
             </native-grid>
             <div id="insulin-details" @(Model.InsulinDependent ? "" : "hidden")>
                 <native-grid cols="C2" gap="Base">

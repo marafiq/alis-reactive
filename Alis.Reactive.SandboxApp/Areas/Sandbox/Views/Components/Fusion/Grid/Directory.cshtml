@@ -89,20 +89,20 @@
             @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care level"))
                 .FusionDropDownList(b => b
                     .DataSource(careLevels)
-                    .Placeholder("All care levels")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        LoadDirectory(p, "care level filter applied");
-                    })); }
+                    .Placeholder("All care levels"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    LoadDirectory(p, "care level filter applied");
+                }); }
 
             @{ Html.InputField(plan, m => m.RiskLevel, o => o.Label("Risk level"))
                 .FusionDropDownList(b => b
                     .DataSource(riskLevels)
-                    .Placeholder("All risk levels")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        LoadDirectory(p, "risk filter applied");
-                    })); }
+                    .Placeholder("All risk levels"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    LoadDirectory(p, "risk filter applied");
+                }); }
 
             @{ Html.InputField(plan, m => m.MinimumAge, o => o.Label("Minimum age"))
                 .FusionNumericTextBox(b => b

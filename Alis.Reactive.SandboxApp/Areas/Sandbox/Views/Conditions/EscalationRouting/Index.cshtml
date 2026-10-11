@@ -181,14 +181,14 @@
 
                         p.Element("component-precheck").SetText("Escalation evaluated");
                         p.When(assessment.Get(c => c.Value)).Gte(85m)
-                            .And(cs => cs.When(supervisorOverride.Value()).Truthy()
-                                .Or(careTrack.Value()).Eq("memory"))
+                            .And(cs => cs.When(supervisorOverride.Get(c => c.Checked)).Truthy()
+                                .Or(careTrack.Get(c => c.Value)).Eq("memory"))
                             .Then(then =>
                             {
                                 then.Dispatch("component-route-isolation");
                             })
                             .ElseIf(assessment.Get(c => c.Value)).Gte(60m)
-                            .And(cs => cs.When(supervisorOverride.Value()).Truthy().Not())
+                            .And(cs => cs.When(supervisorOverride.Get(c => c.Checked)).Truthy().Not())
                             .Then(then =>
                             {
                                 then.Dispatch("component-route-monitor");
@@ -201,21 +201,21 @@
                     }); }
 
                 @{ Html.InputField(plan, m => m.SupervisorOverride, o => o.Label("Supervisor Override"))
-                    .FusionSwitch(b => b
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
-                        {
-                            p.Dispatch("refresh-component-routing");
-                        })); }
+                    .FusionSwitch()
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.Dispatch("refresh-component-routing");
+                    }); }
 
                 @{ Html.InputField(plan, m => m.CareTrack, o => o.Label("Care Track"))
                     .FusionDropDownList(b => b
                         .DataSource(careTracks)
                         .Fields<EscalationRoutingCareTrackOption>(t => t.Text, v => v.Value)
-                        .Placeholder("Select care track")
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
-                        {
-                            p.Dispatch("refresh-component-routing");
-                        })); }
+                        .Placeholder("Select care track"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.Dispatch("refresh-component-routing");
+                    }); }
             </native-grid>
 
             @{
@@ -227,14 +227,14 @@
 
                     p.Element("component-precheck").SetText("Escalation evaluated");
                     p.When(assessment.Get(c => c.Value)).Gte(85m)
-                        .And(cs => cs.When(supervisorOverride.Value()).Truthy()
-                            .Or(careTrack.Value()).Eq("memory"))
+                        .And(cs => cs.When(supervisorOverride.Get(c => c.Checked)).Truthy()
+                            .Or(careTrack.Get(c => c.Value)).Eq("memory"))
                         .Then(then =>
                         {
                             then.Dispatch("component-route-isolation");
                         })
                         .ElseIf(assessment.Get(c => c.Value)).Gte(60m)
-                        .And(cs => cs.When(supervisorOverride.Value()).Truthy().Not())
+                        .And(cs => cs.When(supervisorOverride.Get(c => c.Checked)).Truthy().Not())
                         .Then(then =>
                         {
                             then.Dispatch("component-route-monitor");

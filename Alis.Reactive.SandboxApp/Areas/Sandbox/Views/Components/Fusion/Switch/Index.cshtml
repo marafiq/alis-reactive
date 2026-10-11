@@ -26,15 +26,15 @@
             @{ Html.InputField(plan, m => m.ReceiveCareAlerts, o => o.Label("Receive care alerts"))
                 .FusionSwitch(b => b
                     .OnLabel("On")
-                    .OffLabel("Off")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.When(args, x => x.Checked).Truthy()
-                            .Then(on => on.Element("alerts-status")
-                                .SetText("Care alerts are on. Choose how we should reach you below."))
-                            .Else(off => off.Element("alerts-status")
-                                .SetText("Care alerts are paused. We will not send reminders until you turn them back on."));
-                    })); }
+                    .OffLabel("Off"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.When(args, x => x.Checked).Truthy()
+                        .Then(on => on.Element("alerts-status")
+                            .SetText("Care alerts are on. Choose how we should reach you below."))
+                        .Else(off => off.Element("alerts-status")
+                            .SetText("Care alerts are paused. We will not send reminders until you turn them back on."));
+                }); }
 
             <native-text color="Secondary"><span id="alerts-status">Care alerts are on. Choose how we should reach you below.</span></native-text>
 
@@ -42,7 +42,7 @@
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionSwitch>(m => m.ReceiveCareAlerts).SetChecked(false);
+                    p.Component<FusionSwitch>(m => m.ReceiveCareAlerts).Set(c => c.Checked, false);
                     p.Element("alerts-status")
                         .SetText("Care alerts are paused. We will not send reminders until you turn them back on.");
                 }))
@@ -65,7 +65,7 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var email = p.Component<FusionSwitch>(m => m.EmailReminders);
-                        p.When(email.Value()).Truthy()
+                        p.When(email.Get(c => c.Checked)).Truthy()
                             .Then(on => on.Element("email-review").SetText("Email reminders are on."))
                             .Else(off => off.Element("email-review").SetText("Email reminders are off."));
                     }))
@@ -74,7 +74,7 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var text = p.Component<FusionSwitch>(m => m.TextMessageAlerts);
-                        p.When(text.Value()).Truthy()
+                        p.When(text.Get(c => c.Checked)).Truthy()
                             .Then(on => on.Element("text-review").SetText("Text-message alerts are on."))
                             .Else(off => off.Element("text-review").SetText("Text-message alerts are off."));
                     }))
@@ -98,9 +98,9 @@
                     var text = p.Component<FusionSwitch>(m => m.TextMessageAlerts);
                     p.Post(Url.SandboxRoute("Save", "Switch"))
                         .Gather(g => g
-                            .Include(receive.Value(), "receiveCareAlerts")
-                            .Include(email.Value(), "emailReminders")
-                            .Include(text.Value(), "textMessageAlerts"))
+                            .Include(receive.Get(c => c.Checked), "receiveCareAlerts")
+                            .Include(email.Get(c => c.Checked), "emailReminders")
+                            .Include(text.Get(c => c.Checked), "textMessageAlerts"))
                         .Response(r => r.OnSuccess<CareAlertPreferencesResponse>((json, s) =>
                         {
                             s.Element("save-confirmation").SetText(json, x => x.Summary);

@@ -28,30 +28,30 @@
             @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care Level"))
                 .FusionDropDownList(b => b
                     .DataSource(careLevels)
-                    .Placeholder("Select care level")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
+                    .Placeholder("Select care level"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
 
-                        p.Element("s1-current-level").SetText(careLevel.Value());
+                    p.Element("s1-current-level").SetText(careLevel.Get(c => c.Value));
 
-                        p.When(careLevel.Value()).Eq("Memory Care")
-                            .Then(then =>
-                            {
-                                then.Component<FusionDropDownList>(m => m.Protocol).SetValue("Enhanced Monitoring");
-                            })
-                            .ElseIf(careLevel.Value()).Eq("Skilled Nursing")
-                            .Then(then =>
-                            {
-                                then.Component<FusionDropDownList>(m => m.Protocol).SetValue("Full Clinical");
-                            })
-                            .Else(else_ =>
-                            {
-                                else_.Component<FusionDropDownList>(m => m.Protocol).SetValue("");
-                            });
+                    p.When(careLevel.Get(c => c.Value)).Eq("Memory Care")
+                        .Then(then =>
+                        {
+                            then.Component<FusionDropDownList>(m => m.Protocol).Set(c => c.Value, "Enhanced Monitoring");
+                        })
+                        .ElseIf(careLevel.Get(c => c.Value)).Eq("Skilled Nursing")
+                        .Then(then =>
+                        {
+                            then.Component<FusionDropDownList>(m => m.Protocol).Set(c => c.Value, "Full Clinical");
+                        })
+                        .Else(else_ =>
+                        {
+                            else_.Component<FusionDropDownList>(m => m.Protocol).Set(c => c.Value, "");
+                        });
 
-                        p.Element("s1-action-status").SetText("cascade-complete");
-                    })); }
+                    p.Element("s1-action-status").SetText("cascade-complete");
+                }); }
 
             @{ Html.InputField(plan, m => m.Protocol, o => o.Label("Protocol (auto-set by care level)"))
                 .FusionDropDownList(b => b
@@ -74,7 +74,7 @@
         </p>
         <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.RequiresEscort, o => o.Label("Requires Escort"))
-                .FusionSwitch(b => { }); }
+                .FusionSwitch(); }
         </native-grid>
         <native-hstack gap="None" class="mt-3">
             @(Html.NativeButton("s2-apply-btn", "Apply Escort Policy")
@@ -83,17 +83,17 @@
                 {
                     var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
 
-                    p.Element("s2-checking").SetText(careLevel.Value());
+                    p.Element("s2-checking").SetText(careLevel.Get(c => c.Value));
 
-                    p.When(careLevel.Value()).In("Memory Care", "Skilled Nursing")
+                    p.When(careLevel.Get(c => c.Value)).In("Memory Care", "Skilled Nursing")
                         .Then(then =>
                         {
-                            then.Component<FusionSwitch>(m => m.RequiresEscort).SetChecked(true);
+                            then.Component<FusionSwitch>(m => m.RequiresEscort).Set(c => c.Checked, true);
                             then.Element("s2-result").SetText("escort required");
                         })
                         .Else(else_ =>
                         {
-                            else_.Component<FusionSwitch>(m => m.RequiresEscort).SetChecked(false);
+                            else_.Component<FusionSwitch>(m => m.RequiresEscort).Set(c => c.Checked, false);
                             else_.Element("s2-result").SetText("no escort needed");
                         });
 

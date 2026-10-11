@@ -30,10 +30,10 @@
             {
                 var ageComp = p.Component<FusionNumericTextBox>(m => m.Age);
                 p.When(ageComp.Get(c => c.Value)).Gte(85m)
-                    .Then(t => { t.Component<FusionDropDownList>(m => m.RiskTier).SetValue("High"); t.Element("risk-badge").SetText("High Risk"); t.Element("risk-badge").Show(); })
+                    .Then(t => { t.Component<FusionDropDownList>(m => m.RiskTier).Set(c => c.Value, "High"); t.Element("risk-badge").SetText("High Risk"); t.Element("risk-badge").Show(); })
                     .ElseIf(ageComp.Get(c => c.Value)).Gte(65m)
-                    .Then(t => { t.Component<FusionDropDownList>(m => m.RiskTier).SetValue("Standard"); t.Element("risk-badge").SetText("Standard Risk"); t.Element("risk-badge").Show(); })
-                    .Else(e => { e.Component<FusionDropDownList>(m => m.RiskTier).SetValue("Low"); e.Element("risk-badge").SetText("Low Risk"); e.Element("risk-badge").Show(); });
+                    .Then(t => { t.Component<FusionDropDownList>(m => m.RiskTier).Set(c => c.Value, "Standard"); t.Element("risk-badge").SetText("Standard Risk"); t.Element("risk-badge").Show(); })
+                    .Else(e => { e.Component<FusionDropDownList>(m => m.RiskTier).Set(c => c.Value, "Low"); e.Element("risk-badge").SetText("Low Risk"); e.Element("risk-badge").Show(); });
             }); }
     </native-grid>
 
@@ -55,13 +55,14 @@
         @{ Html.InputField(plan, m => m.RiskTier, o => o.Label("Risk Tier (auto)"))
             .FusionDropDownList(b => b.DataSource(new[] { "", "Low", "Standard", "High" }).Placeholder("Set by age")); }
         @{ Html.InputField(plan, m => m.IsVeteran, o => o.Label("Is Veteran"))
-            .FusionSwitch(b => b.Reactive(plan, evt => evt.Changed, (args, p) =>
+            .FusionSwitch()
+            .Reactive(evt => evt.Change, (args, p) =>
             {
                 var sw = p.Component<FusionSwitch>(m => m.IsVeteran);
-                p.When(sw.Value()).Truthy()
+                p.When(sw.Get(c => c.Checked)).Truthy()
                     .Then(t => t.Element("veteran-section").Show())
                     .Else(e => e.Element("veteran-section").Hide());
-            })); }
+            }); }
     </native-grid>
 
     <p class="font-mono text-sm">Risk: <span id="risk-badge" @(string.IsNullOrEmpty(Model.RiskTier) ? "hidden" : "") class="font-semibold text-accent">@(Model.RiskTier ?? "")</span></p>

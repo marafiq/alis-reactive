@@ -16,14 +16,14 @@
 
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.CausedInjury, o => o.Label("Caused Injury"))
-            .FusionSwitch(b => b
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var sw = p.Component<FusionSwitch>(m => m.CausedInjury);
-                    p.When(sw.Value()).Truthy()
-                        .Then(t => t.Element("injury-details").Show())
-                        .Else(e => e.Element("injury-details").Hide());
-                })); }
+            .FusionSwitch()
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var sw = p.Component<FusionSwitch>(m => m.CausedInjury);
+                p.When(sw.Get(c => c.Checked)).Truthy()
+                    .Then(t => t.Element("injury-details").Show())
+                    .Else(e => e.Element("injury-details").Hide());
+            }); }
     </native-grid>
 
     <div id="injury-details" hidden>
@@ -31,30 +31,30 @@
             @{ Html.InputField(plan, m => m.InjuryType, o => o.Label("Injury Type"))
                 .FusionDropDownList(b => b
                     .DataSource(new[] { "Bruise", "Fracture", "Laceration", "Head Injury", "Other" })
-                    .Placeholder("Select injury type")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        var inj = p.Component<FusionDropDownList>(m => m.InjuryType);
-                        p.When(inj.Value()).Eq("Head Injury")
-                            .Then(then =>
-                            {
-                                then.Element("neuro-spinner").Show();
-                                then.Post(alertNeuroUrl,
-                                    g => g.Include<FusionDropDownList, Step3FunctionalModel>(m => m.InjuryType)
-                                          .Include<NativeHiddenField, Step3FunctionalModel>(m => m.ResidentName))
-                                 .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
-                                 {
-                                     s.Element("neuro-result").SetText(json, x => x.Message);
-                                     s.Element("neuro-result").Show();
-                                     s.Element("neuro-spinner").Hide();
-                                 }));
-                            })
-                            .Else(e =>
-                            {
-                                e.Element("neuro-result").SetText("Noted");
-                                e.Element("neuro-result").Show();
-                            });
-                    })); }
+                    .Placeholder("Select injury type"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    var inj = p.Component<FusionDropDownList>(m => m.InjuryType);
+                    p.When(inj.Get(c => c.Value)).Eq("Head Injury")
+                        .Then(then =>
+                        {
+                            then.Element("neuro-spinner").Show();
+                            then.Post(alertNeuroUrl,
+                                g => g.Include<FusionDropDownList, Step3FunctionalModel>(m => m.InjuryType)
+                                      .Include<NativeHiddenField, Step3FunctionalModel>(m => m.ResidentName))
+                             .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
+                             {
+                                 s.Element("neuro-result").SetText(json, x => x.Message);
+                                 s.Element("neuro-result").Show();
+                                 s.Element("neuro-spinner").Hide();
+                             }));
+                        })
+                        .Else(e =>
+                        {
+                            e.Element("neuro-result").SetText("Noted");
+                            e.Element("neuro-result").Show();
+                        });
+                }); }
         </native-grid>
 
         <native-vstack gap="Xs" class="font-mono text-sm">

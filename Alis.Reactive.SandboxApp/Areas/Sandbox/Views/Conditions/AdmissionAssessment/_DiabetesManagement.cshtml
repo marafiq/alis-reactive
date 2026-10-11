@@ -52,14 +52,14 @@
 
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.InsulinDependent, o => o.Label("Insulin Dependent"))
-            .FusionSwitch(b => b
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var sw = p.Component<FusionSwitch>(m => m.InsulinDependent);
-                    p.When(sw.Value()).Truthy()
-                        .Then(t => t.Element("insulin-details").Show())
-                        .Else(e => e.Element("insulin-details").Hide());
-                })); }
+            .FusionSwitch()
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var sw = p.Component<FusionSwitch>(m => m.InsulinDependent);
+                p.When(sw.Get(c => c.Checked)).Truthy()
+                    .Then(t => t.Element("insulin-details").Show())
+                    .Else(e => e.Element("insulin-details").Hide());
+            }); }
     </native-grid>
 
     <native-vstack gap="Xs" class="font-mono text-sm mb-4">
