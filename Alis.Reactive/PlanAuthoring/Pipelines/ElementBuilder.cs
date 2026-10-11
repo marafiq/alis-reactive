@@ -58,9 +58,9 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
         /// <param name="source">Trigger payload placeholder.</param>
         /// <param name="path">Expression selecting the event payload property to display.</param>
-        public PipelineBuilder<TModel> SetText<TPayload>(TPayload source, Expression<Func<TPayload, object>> path)
+        public PipelineBuilder<TModel> SetText<TPayload>(TPayload source, Expression<Func<TPayload, object?>> path)
         {
-            var payloadPath = ExpressionPathHelper.ToEventPath<TPayload, object>(path);
+            var payloadPath = ExpressionPathHelper.ToEventPath<TPayload, object?>(path);
             return Set(BrowserElementMembers.Text, ValueExpression.ReadPayload(PayloadSource.Event(), payloadPath));
         }
 
@@ -68,10 +68,10 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TResponse">Response body contract for the active response route.</typeparam>
         /// <param name="source">Typed response body scope from <c>OnSuccess</c> or <c>OnError</c>.</param>
         /// <param name="path">Expression selecting the response body property to display.</param>
-        public PipelineBuilder<TModel> SetText<TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, object>> path)
+        public PipelineBuilder<TModel> SetText<TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
             where TResponse : class
         {
-            var responsePath = ExpressionPathHelper.ToResponsePath<TResponse, object>(path);
+            var responsePath = ExpressionPathHelper.ToResponsePath<TResponse, object?>(path);
             return Set(BrowserElementMembers.Text, ValueExpression.ReadPayload(source.Scope, responsePath));
         }
 
@@ -96,9 +96,9 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
         /// <param name="source">Trigger payload placeholder.</param>
         /// <param name="path">Expression selecting the event payload property containing HTML.</param>
-        public PipelineBuilder<TModel> SetHtml<TPayload>(TPayload source, Expression<Func<TPayload, object>> path)
+        public PipelineBuilder<TModel> SetHtml<TPayload>(TPayload source, Expression<Func<TPayload, object?>> path)
         {
-            var payloadPath = ExpressionPathHelper.ToEventPath<TPayload, object>(path);
+            var payloadPath = ExpressionPathHelper.ToEventPath<TPayload, object?>(path);
             return Set(BrowserElementMembers.Html, ValueExpression.ReadPayload(PayloadSource.Event(), payloadPath));
         }
 

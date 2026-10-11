@@ -57,7 +57,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         public ComponentFunction<int> Remaining => Function<int>("remaining");
 
         /// <summary>Whether a time is booked.</summary>
-        public ComponentFunction<string, bool> IsBooked => Function<string, bool>("isBooked");
+        public ComponentFunction<string?, bool> IsBooked => Function<string?, bool>("isBooked");
 
         /// <summary>The first time that is neither booked nor in quiet hours; empty when there is none.</summary>
         public ComponentFunction<string> FirstOpen => Function<string>("firstOpen");

@@ -116,8 +116,8 @@ export class VisitPlanner {
     return Math.max(this.weeklyCapacity - this.booked.length, 0);
   }
 
-  isBooked(id: string): boolean {
-    return this.booked.includes(id);
+  isBooked(id: string | null): boolean {
+    return id !== null && this.booked.includes(id);
   }
 
   /** The first offered time that is neither booked nor in quiet hours; "" when there is none. */

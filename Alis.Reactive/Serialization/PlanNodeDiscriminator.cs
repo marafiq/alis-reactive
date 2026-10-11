@@ -10,7 +10,7 @@ namespace Alis.Reactive.Serialization
     /// mechanism for every plan node family; reading is unsupported because plans are write-only.
     /// </summary>
     /// <typeparam name="T">Abstract plan-node base, for example <c>ReactionGraph</c>.</typeparam>
-    public sealed class PlanNodeDiscriminator<T> : JsonConverter<T>
+    internal sealed class PlanNodeDiscriminator<T> : JsonConverter<T>
     {
         /// <inheritdoc/>
         public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
