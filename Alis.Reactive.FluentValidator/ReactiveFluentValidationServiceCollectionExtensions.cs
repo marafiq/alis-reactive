@@ -142,7 +142,7 @@ namespace Alis.Reactive.FluentValidator
             foreach (var validationSourceType in validationSourceTypes.Distinct())
             {
                 var metadata = (IClientValidationMetadataSource)scope.ServiceProvider.GetRequiredService(validationSourceType);
-                rulesBySource.Add(validationSourceType, metadata.GetClientRules(scope.ServiceProvider));
+                rulesBySource.Add(validationSourceType, metadata.GetClientRules());
             }
 
             return rulesBySource;

@@ -13,9 +13,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? FamilyPortalLink { get; set; }
         public bool IsReturning { get; set; }
         public string? PreviousRoom { get; set; }
+        public PharmacyContact Pharmacy { get; set; } = new PharmacyContact();
 
         /// <summary>The coordinator on duty; the server fills it in, so the page never renders it.</summary>
         public string? ReviewedBy { get; set; }
+    }
+
+    /// <summary>The pharmacy that fills the resident's prescriptions.</summary>
+    public class PharmacyContact
+    {
+        public string? Phone { get; set; }
     }
 
     /// <summary>What the server returns once the review is saved.</summary>

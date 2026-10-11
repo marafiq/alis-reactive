@@ -26,6 +26,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             Unless(x => string.IsNullOrEmpty(x.FamilyPortalLink), () =>
                 RuleFor(x => x.FamilyPortalLink).Url().WithMessage("The family portal link must be a web address."));
 
+            // Rules for a nested object, written inline.
+            RuleFor(x => x.Pharmacy).ChildRules(pharmacy =>
+                pharmacy.RuleFor(x => x.Phone).Matches(@"^\d{3}-\d{4}$").WithMessage("Enter the pharmacy phone as 555-0100."));
+
             // A condition written as a method: the server decides it, so the browser does not run the rule.
             When(IsReturningResident, () =>
                 RuleFor(x => x.PreviousRoom).NotEmpty().WithMessage("A returning resident's previous room is required."));

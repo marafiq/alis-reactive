@@ -11,7 +11,6 @@ using Alis.Reactive.Validation;
 using FluentValidation;
 using FluentValidation.Internal;
 using FluentValidation.Validators;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Alis.Reactive.FluentValidator
 {
@@ -24,24 +23,20 @@ namespace Alis.Reactive.FluentValidator
     {
         private readonly ClientValidationRuleSet _rules = new ClientValidationRuleSet();
         private readonly Func<IValidationRule, ClientScope> _scopeOf;
-        private readonly IServiceProvider _services;
 
-        private ClientRuleProjection(Func<IValidationRule, ClientScope> scopeOf, IServiceProvider services)
+        private ClientRuleProjection(Func<IValidationRule, ClientScope> scopeOf)
         {
             _scopeOf = scopeOf;
-            _services = services;
         }
 
         internal static IReadOnlyList<ClientValidationField> Project(
             IEnumerable<IValidationRule> rules,
-            Func<IValidationRule, ClientScope> scopeOf,
-            IServiceProvider services)
+            Func<IValidationRule, ClientScope> scopeOf)
         {
             if (rules == null) throw new ArgumentNullException(nameof(rules));
             if (scopeOf == null) throw new ArgumentNullException(nameof(scopeOf));
-            if (services == null) throw new ArgumentNullException(nameof(services));
 
-            var projection = new ClientRuleProjection(scopeOf, services);
+            var projection = new ClientRuleProjection(scopeOf);
             foreach (var rule in rules)
                 projection.Add(rule);
             return projection._rules.ToFields();
@@ -226,16 +221,44 @@ namespace Alis.Reactive.FluentValidator
             _ => RuleName.Max,
         };
 
-        // The fields of a child validator, resolved from the request's services as its rules were written.
-        private IReadOnlyList<ClientValidationField> ChildFields(IChildValidatorAdaptor child)
+        // The fields of the child validator FluentValidation runs. SetValidator(validator), Include(validator)
+        // and ChildRules hold that validator, and it is read as written. A validator a factory chooses per
+        // model (SetValidator(x => ...)) or by the value's type (SetInheritanceValidator) has not been
+        // chosen when the page renders, so its rules stay on the server.
+        private static IReadOnlyList<ClientValidationField> ChildFields(IChildValidatorAdaptor child)
         {
-            var validator = ActivatorUtilities.GetServiceOrCreateInstance(_services, child.ValidatorType);
-            return validator switch
+            return ChildValidatorOf(child) switch
             {
-                IClientValidationMetadataSource reactive => reactive.GetClientRules(_services),
-                IEnumerable<IValidationRule> rules => Project(rules, _ => ClientScope.Unconditional, _services),
-                _ => throw new InvalidOperationException($"'{child.ValidatorType.Name}' is not a FluentValidation validator."),
+                IClientValidationMetadataSource reactive => reactive.GetClientRules(),
+                IEnumerable<IValidationRule> rules => Project(rules, _ => ClientScope.Unconditional),
+                _ => Array.Empty<ClientValidationField>(),
             };
+        }
+
+        private static readonly MethodInfo ChildValidatorMethod =
+            typeof(ClientRuleProjection).GetMethod(nameof(ChildValidator), BindingFlags.NonPublic | BindingFlags.Static)!;
+
+        // The adaptor is generic over the parent model and the property; FluentValidation asks for both.
+        private static IValidator? ChildValidatorOf(IChildValidatorAdaptor child)
+        {
+            var adaptorType = child.GetType();
+            while (!(adaptorType.IsGenericType && adaptorType.GetGenericTypeDefinition() == typeof(ChildValidatorAdaptor<,>)))
+                adaptorType = adaptorType.BaseType!;
+            return (IValidator?)ChildValidatorMethod.MakeGenericMethod(adaptorType.GetGenericArguments()).Invoke(null, new object[] { child });
+        }
+
+        // No model exists at render: a held validator is returned as is; a factory that reads the model
+        // fails on the missing model, and a validator chosen by the value's type finds no value.
+        private static IValidator? ChildValidator<TModel, TProperty>(ChildValidatorAdaptor<TModel, TProperty> adaptor)
+        {
+            try
+            {
+                return adaptor.GetValidator(new ValidationContext<TModel>(default!), default!);
+            }
+            catch (NullReferenceException)
+            {
+                return null;
+            }
         }
 
         // A rule the browser can run: in the default rule set, and under no condition but a recorded

@@ -54,7 +54,7 @@ public sealed class AdmissionValidator : ReactiveValidator<Admission>
 | `GreaterThanOrEqualTo`, `LessThanOrEqualTo`, `LessThan` (value or sibling) | `min`, `max`, `lt` | skipped |
 | `GreaterThan` (value or sibling) | `gt` | **fails** (today's behavior) |
 | `Equal`, `NotEqual` (value or sibling) | `equalTo`, `notEqual` / `notEqualTo` | skipped |
-| `SetValidator(child)`, `RuleForEach(...).SetValidator(child)`, `Include(v)` | the child's rules, prefixed | |
+| `SetValidator(child)`, `RuleForEach(...).SetValidator(child)`, `Include(v)`, `ChildRules(...)` | the child's rules, prefixed | |
 
 Messages come from `.WithMessage(...)` or FluentValidation's default template, formatted at render
 (`{PropertyName}`, `{MinLength}`, `{ComparisonValue}`, ...).
@@ -69,6 +69,7 @@ validator of the object that owns both.
 - a rule's own `.When(...)` / `.Unless(...)` chained on the rule (analyzer ALIS006)
 - rules inside a `When` written as a method group, over the validation context, or async
 - rule sets other than the default, and `DependentRules`
+- a child validator chosen per model by a factory (`SetValidator(x => ...)`) or by type (`SetInheritanceValidator`)
 - any rule followed by `.ServerOnly()`: use it for a member the page does not render
 
 A browser rule on a member with no input on the page blocks the form and shows its message in the

@@ -565,7 +565,7 @@ The descriptors are read in this order. The first type a component matches decid
 
 | FluentValidation component | Browser check `(v, m)` |
 |---|---|
-| `IChildValidatorAdaptor`, `IIncludeRule` | recurse into the validator resolved from the request's services, prefixing paths and AND-ing the enclosing conditions |
+| `IChildValidatorAdaptor`, `IIncludeRule` | recurse into the validator instance the rule holds (`SetValidator(v)`, `Include(v)`, `ChildRules`), prefixing paths and AND-ing the enclosing conditions; a validator chosen per model by a factory or by the value's type is server-only |
 | `INotNullValidator` | `v != null` |
 | `INotEmptyValidator` | by the property's type: text `v != null && v.trim() !== ""`; number `v != null && v !== 0`; collection `v != null && v.length > 0`; otherwise `v != null && v != default` |
 | `EmptyValidator<,>` | the negation of the row above |
@@ -716,8 +716,10 @@ proves it is named in the pull request.
   `ReactiveValidator<T>` and read from FluentValidation's descriptors (`ClientRuleProjection`).
   `When`/`Unless`/`Otherwise` lambdas are recorded (`ClientCondition`); FluentValidation's own
   condition overloads sit on `RecordingValidator<T>`, so a method group or a context condition keeps
-  its rules on the server even when nested. `SetValidator`, `RuleForEach(...).SetValidator` and
-  `Include` resolve the child validator from the request's services. `.ServerOnly()` keeps a rule
+  its rules on the server even when nested. `SetValidator`, `RuleForEach(...).SetValidator`,
+  `Include` and `ChildRules` read the child validator instance the rule holds; one a factory chooses
+  per model, or `SetInheritanceValidator` by type, stays on the server. `NotNull` reads as required
+  except on a collection. `.ServerOnly()` keeps a rule
   on the server. A peer must be a sibling; any other peer is refused at startup.
 
 **Decisions of section 8 applied**

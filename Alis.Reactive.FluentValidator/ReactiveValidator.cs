@@ -45,8 +45,8 @@ namespace Alis.Reactive.FluentValidator
     public abstract class ReactiveValidator<T> : RecordingValidator<T>, IClientValidationMetadataSource
         where T : class
     {
-        IReadOnlyList<ClientValidationField> IClientValidationMetadataSource.GetClientRules(IServiceProvider services) =>
-            ClientRuleProjection.Project(this, ScopeOf, services);
+        IReadOnlyList<ClientValidationField> IClientValidationMetadataSource.GetClientRules() =>
+            ClientRuleProjection.Project(this, ScopeOf);
 
         /// <summary>
         /// Applies the rules <paramref name="action"/> declares only when <paramref name="predicate"/>

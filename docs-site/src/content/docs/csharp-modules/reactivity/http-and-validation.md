@@ -113,8 +113,8 @@ public sealed class TodoValidator : ReactiveValidator<TodoModel>
 
 The browser evaluates `NotEmpty`, `NotNull` (not on a collection), `Empty`, `MinimumLength`, `MaximumLength`, `Length`,
 `EmailAddress`, `Matches`, `CreditCard`, `Url()`, `InclusiveBetween`, `ExclusiveBetween`, and
-comparisons with a value or a sibling member. `SetValidator`, `RuleForEach(...).SetValidator`
-and `Include` bring a child validator's rules along. `Must`, `Custom` and async rules stay on
+comparisons with a value or a sibling member. `SetValidator`, `RuleForEach(...).SetValidator`,
+`Include` and `ChildRules` bring a child validator's rules along. `Must`, `Custom` and async rules stay on
 the server, and so does any rule followed by `.ServerOnly()`.
 
 ## Conditional Rules

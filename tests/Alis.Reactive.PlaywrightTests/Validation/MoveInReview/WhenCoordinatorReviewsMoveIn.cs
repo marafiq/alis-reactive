@@ -135,6 +135,25 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
     }
 
     [Test]
+    public async Task the_pharmacy_phone_is_asked_for_in_the_house_format()
+    {
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "2");
+        await Write(m => m.Pharmacy.Phone, "5550100");
+
+        await ClickWhenStable(SaveReview);
+
+        await Expect(_plan.ErrorFor(m => m.Pharmacy.Phone)).ToHaveTextAsync("Enter the pharmacy phone as 555-0100.");
+        Assert.That(_reviewsSent, Is.Empty, "The nested object's rule runs in the page.");
+        await Write(m => m.Pharmacy.Phone, "555-0100");
+        await Expect(_plan.ErrorFor(m => m.Pharmacy.Phone)).ToBeHiddenAsync();
+        await ClickWhenStable(SaveReview);
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task the_server_asks_for_a_returning_residents_previous_room()
     {
         await NavigateAndBoot();
