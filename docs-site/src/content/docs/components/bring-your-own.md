@@ -68,10 +68,17 @@ public class TomSelectChangeArgs
 
 | JavaScript | Declared as |
 | --- | --- |
-| property | `Property<T>("name")` |
+| property, including a nested one | `Property<T>("name")`, `Property<T>("labels.empty")` |
 | method | `Method("name")`, `Method<T1, T2>("name")` |
-| method that returns a value | `Function<TResult>("name")` |
+| method that returns a value | `Function<TResult>("name")`, `Function<TArg, TResult>("name")` |
+| method that returns a promise | `Method("name").Awaited()`, `Function<TResult>("name").Awaited()` |
 | event | `Event<TArgs>("name")` |
+
+An awaited method holds the steps after its call until its promise settles, and a
+read of an awaited function is the value it settles with. An event payload is a
+plain class; a handler can write a field back (`p.Payload(args).Set(a => a.Cancel, true)`),
+and the component reads it once the handler returns, as long as nothing in the
+handler waited before the write.
 
 ## 3. Render It
 
@@ -120,5 +127,17 @@ Every view now has the whole DSL for it, with no further code:
 s.Component<TomSelect>(m => m.SuiteType).Call(c => c.SetValue, recommendation.Read(x => x.SuiteType));
 ```
 
+Arguments are literals or anything the DSL can read, and a function's result is
+itself a source:
+
+```csharp
+var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
+planner.Call(c => c.Select, planner.Get(c => c.FirstOpen));
+p.When(planner.Get(c => c.IsBooked, requested.Get(c => c.Value))).Truthy()
+    .Then(t => t.Element("requested-status").SetText("That time is already booked."));
+planner.Call(c => c.Book, p.Payload(args).Get(x => x.Added), visitors.Get(c => c.Value), note.Get(c => c.Value));
+```
+
 The Syncfusion and native components that ship with Alis.Reactive are declared
-exactly this way, against the same public surface.
+exactly this way, against the same public surface. The sandbox's Family Visits
+page brings a visit planner it wrote itself, with every kind of member above.

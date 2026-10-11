@@ -126,7 +126,8 @@ Vocabulary, by what the JavaScript object has:
 |------------|-------------|-----------|
 | property | `ComponentProperty<T>` via `Property<T>("name")` | `Set(c => c.X, value or source)`, `Get(c => c.X)` |
 | method | `ComponentMethod`, `ComponentMethod<T1[, T2[, T3]]>` via `Method<..>("name")` | `Call(c => c.X, args...)` |
-| method that returns | `ComponentFunction<[T1, [T2,]] TResult>` via `Function<..>("name")` | `Get(c => c.X, args...)` |
+| method that returns | `ComponentFunction<[T1, [T2,]] TResult>` via `Function<..>("name")` | `Get(c => c.X, args...)`; each argument a literal or a source |
+| method that returns a promise | `Method(..).Awaited()`, `Function<..>(..).Awaited()` | `Call` waits for it; `Get` is the settled value |
 | event | `TypedEvent<TArgs>` via `Event<TArgs>("name")` | `.Reactive(evt => evt.X, (args, p) => ...)` |
 | payload field | a plain C# property | `p.When(args, x => x.F)`, `p.Payload(args).Set(a => a.F, value)` |
 | payload method | `Method("name")` on a payload that derives from `JsObject` | `p.Payload(args).Call(a => a.EndEdit)` |
@@ -217,3 +218,8 @@ the core C# and the runtime name no vendor and no component. Proof: the full sui
   `InternalsVisibleTo`, IIS Express boot).
 - The method grew, as the slices needed it: arguments that mix literals and sources,
   `Field`, generic members, `Passing`, signature keys, `plan.Render`, hidden fields.
+- **A widget the sandbox wrote itself** (`532b2fa` onward): the visit planner
+  (`Scripts/visit-planner.ts`, `BroughtComponents/VisitPlanner`) has properties of every shape, functions,
+  methods of zero to three arguments, awaited members, and events with nested and cancelable payloads.
+  Its Family Visits journey drives each through the generic grammar. It added two capabilities to the
+  method, both generic: function reads take source arguments, and `.Awaited()` members.

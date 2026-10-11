@@ -725,6 +725,11 @@ proves it is named in the pull request.
   on the server. A peer must be a sibling; any other peer is refused when the page renders. The
   rules are read per request, from the validator that request resolves (7.1).
 
+- Awaited members (section 5): `Method(..).Awaited()` lowers a call to `do await call(…)`, and a read of
+  `Function(..).Awaited()` to `let r = await call(…)` before the statement that reads it. A comparison
+  that reads one is lowered as its own `if`, so else-if order and short-circuit hold. Inside an array
+  operation's lambda or a validation rule such a read is refused at render.
+
 **Decisions of section 8 applied**
 - `AddReactiveClientValidation` is gone: a browser rule always has the server rule it came from.
 - `Include` enforces on the server as well.
