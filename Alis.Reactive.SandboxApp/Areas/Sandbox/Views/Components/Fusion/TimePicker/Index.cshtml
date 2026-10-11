@@ -28,28 +28,25 @@
             @{ Html.InputField(plan, m => m.MedicationTime, o => o.Label("Morning medication time"))
                 .FusionTimePicker(b => b
                     .Placeholder("Select the medication time")
-                    @* 24-hour display so the picker round-trips the HH:mm value that
-                       FusionTimePicker.SetValue emits; a 12h format leaves a programmatic
-                       SetValue unparsed (ej2.value stays null). *@
-                    .Format("HH:mm")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.When(args, x => x.Value).NotNull()
-                            .Then(scheduled => scheduled.Element("medication-status")
-                                .SetText("This medication time is ready to confirm."))
-                            .Else(cleared => cleared.Element("medication-status")
-                                .SetText("No medication time is set. Please choose one to continue."));
+                    .Format("HH:mm"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.When(args, x => x.Value).NotNull()
+                        .Then(scheduled => scheduled.Element("medication-status")
+                            .SetText("This medication time is ready to confirm."))
+                        .Else(cleared => cleared.Element("medication-status")
+                            .SetText("No medication time is set. Please choose one to continue."));
 
-                        p.When(args, x => x.IsInteracted).Truthy()
-                            .Then(chosen => chosen.Element("medication-origin")
-                                .SetText("You set this medication time."))
-                            .Else(applied => applied.Element("medication-origin")
-                                .SetText("We applied the community's standard morning round for you."));
+                    p.When(args, x => x.IsInteracted).Truthy()
+                        .Then(chosen => chosen.Element("medication-origin")
+                            .SetText("You set this medication time."))
+                        .Else(applied => applied.Element("medication-origin")
+                            .SetText("We applied the community's standard morning round for you."));
 
-                        // Once a time is chosen, release the field so the time list
-                        // closes and the coordinator can move on to confirming.
-                        p.Component<FusionTimePicker>(m => m.MedicationTime).FocusOut();
-                    })); }
+                    // Once a time is chosen, release the field so the time list
+                    // closes and the coordinator can move on to confirming.
+                    p.Component<FusionTimePicker>(m => m.MedicationTime).Call(c => c.FocusOut);
+                }); }
 
             <native-text color="Secondary"><span id="medication-origin">This is the medication time currently on the record.</span></native-text>
 
@@ -58,13 +55,13 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionTimePicker>(m => m.MedicationTime).SetValue(standardMorningRound);
+                        p.Component<FusionTimePicker>(m => m.MedicationTime).Set(c => c.Value, standardMorningRound);
                     }))
                 @(Html.NativeButton("adjust-medication-time", "Adjust the time")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionTimePicker>(m => m.MedicationTime).FocusIn();
+                        p.Component<FusionTimePicker>(m => m.MedicationTime).Call(c => c.FocusIn);
                     }))
             </native-hstack>
         </native-vstack>
@@ -80,7 +77,7 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var medication = p.Component<FusionTimePicker>(m => m.MedicationTime);
-                        p.When(medication.Value()).IsEmpty()
+                        p.When(medication.Get(c => c.Value)).IsEmpty()
                             .Then(empty => empty.Element("confirm-result")
                                 .SetText("A medication time is required before scheduling."))
                             .Else(set => set.Element("confirm-result")
@@ -92,7 +89,7 @@
                     {
                         var medication = p.Component<FusionTimePicker>(m => m.MedicationTime);
                         p.Post(Url.SandboxRoute("Schedule", "TimePicker"))
-                            .Gather(g => g.Include(medication.Value(), "medicationTime"))
+                            .Gather(g => g.Include(medication.Get(c => c.Value), "medicationTime"))
                             .Response(r => r.OnSuccess<MedicationScheduleResponse>((json, s) =>
                             {
                                 s.Element("schedule-confirmation").SetText(json, x => x.Confirmation);
