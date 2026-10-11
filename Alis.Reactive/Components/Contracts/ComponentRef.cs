@@ -76,35 +76,40 @@ namespace Alis.Reactive
                 });
         }
 
-        /// <summary>Calls one of the component's declared two-argument methods with literal arguments.</summary>
+        /// <summary>
+        /// Calls one of the component's declared two-argument methods; each argument is a literal or a
+        /// value read at runtime.
+        /// </summary>
         /// <example><c>p.Component&lt;FusionTextBox&gt;(m =&gt; m.Name).Call(c =&gt; c.AddIcon, "append", "e-icons e-search")</c></example>
         public ComponentRef<TComponent, TModel> Call<T1, T2>(
-            System.Func<TComponent, ComponentMethod<T1, T2>> method, T1 first, T2 second)
+            System.Func<TComponent, ComponentMethod<T1, T2>> method, Argument<T1> first, Argument<T2> second)
         {
             if (method == null) throw new System.ArgumentNullException(nameof(method));
+            if (first == null) throw new System.ArgumentNullException(nameof(first));
+            if (second == null) throw new System.ArgumentNullException(nameof(second));
             return EmitCall(
                 method(Declaration).Method,
-                new System.Collections.Generic.List<ValueExpression>
-                {
-                    ValueExpression.LiteralFor(first, Shape.FromClrType(typeof(T1))),
-                    ValueExpression.LiteralFor(second, Shape.FromClrType(typeof(T2))),
-                });
+                new System.Collections.Generic.List<ValueExpression> { first.Expression, second.Expression });
         }
 
-        /// <summary>Calls one of the component's declared three-argument methods with literal arguments.</summary>
+        /// <summary>
+        /// Calls one of the component's declared three-argument methods; each argument is a literal or a
+        /// value read at runtime.
+        /// </summary>
         /// <example><c>p.Component&lt;FusionListBox&gt;("wings").Call(c =&gt; c.SelectItems, new[] { "east" }, true, false)</c></example>
         public ComponentRef<TComponent, TModel> Call<T1, T2, T3>(
-            System.Func<TComponent, ComponentMethod<T1, T2, T3>> method, T1 first, T2 second, T3 third)
+            System.Func<TComponent, ComponentMethod<T1, T2, T3>> method,
+            Argument<T1> first,
+            Argument<T2> second,
+            Argument<T3> third)
         {
             if (method == null) throw new System.ArgumentNullException(nameof(method));
+            if (first == null) throw new System.ArgumentNullException(nameof(first));
+            if (second == null) throw new System.ArgumentNullException(nameof(second));
+            if (third == null) throw new System.ArgumentNullException(nameof(third));
             return EmitCall(
                 method(Declaration).Method,
-                new System.Collections.Generic.List<ValueExpression>
-                {
-                    ValueExpression.LiteralFor(first, Shape.FromClrType(typeof(T1))),
-                    ValueExpression.LiteralFor(second, Shape.FromClrType(typeof(T2))),
-                    ValueExpression.LiteralFor(third, Shape.FromClrType(typeof(T3))),
-                });
+                new System.Collections.Generic.List<ValueExpression> { first.Expression, second.Expression, third.Expression });
         }
 
         /// <summary>

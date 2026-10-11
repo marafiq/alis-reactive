@@ -31,7 +31,7 @@
          .Gather(g => g.Static("selectedFacilityId", "AL"))
          .Response(r => r.OnSuccess<KanbanBoardResponse>((json, s) =>
          {
-             s.Component<FusionKanban>("care-kanban").SetDataSource(json, x => x.Cards);
+             s.Component<FusionKanban>("care-kanban").Set(c => c.DataSource, json.Read(x => x.Cards)).Call(c => c.DataBind);
              s.Element("kanban-status").SetText(json, x => x.Message);
              s.Element("kanban-open-count").SetText(json, x => x.OpenCount);
              s.Element("kanban-review-count").SetText(json, x => x.ReviewCount);
@@ -58,7 +58,7 @@
                          .Gather(g => g.Include<FusionDropDownList, KanbanModel>(m => m.SelectedFacilityId))
                          .Response(r => r.OnSuccess<KanbanBoardResponse>((json, s) =>
                          {
-                             s.Component<FusionKanban>("care-kanban").SetDataSource(json, x => x.Cards);
+                             s.Component<FusionKanban>("care-kanban").Set(c => c.DataSource, json.Read(x => x.Cards)).Call(c => c.DataBind);
                              s.Element("kanban-status").SetText(json, x => x.Message);
                              s.Element("kanban-open-count").SetText(json, x => x.OpenCount);
                              s.Element("kanban-review-count").SetText(json, x => x.ReviewCount);
@@ -84,7 +84,7 @@
                     p.Post("/api/kanban/cards")
                      .Response(r => r.OnSuccess<KanbanCardMutationResponse>((json, s) =>
                      {
-                         s.Component<FusionKanban>("care-kanban").AddCard(json, x => x.Card, 0);
+                         s.Component<FusionKanban>("care-kanban").Call(c => c.AddCard<KanbanTaskCard>(), json.Read(x => x.Card), 0);
                          s.Element("kanban-command-status").SetText(json, x => x.Message);
                      }));
                 }))
@@ -95,7 +95,7 @@
                     p.Put("/api/kanban/cards/102", g => g.Static("source", "button"))
                      .Response(r => r.OnSuccess<KanbanCardMutationResponse>((json, s) =>
                      {
-                         s.Component<FusionKanban>("care-kanban").UpdateCard(json, x => x.Card);
+                         s.Component<FusionKanban>("care-kanban").Call(c => c.UpdateCard, json.Read(x => x.Card));
                          s.Element("kanban-command-status").SetText(json, x => x.Message);
                      }));
                 }))
@@ -106,7 +106,7 @@
                     p.Delete("/api/kanban/cards/101")
                      .Response(r => r.OnSuccess<KanbanCardMutationResponse>((json, s) =>
                      {
-                         s.Component<FusionKanban>("care-kanban").DeleteCard(json, x => x.CardId);
+                         s.Component<FusionKanban>("care-kanban").Call(c => c.DeleteCard, json.Read(x => x.CardId));
                          s.Element("kanban-command-status").SetText(json, x => x.Message);
                      }));
                 }))
@@ -114,21 +114,21 @@
                 .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionKanban>("care-kanban").HideColumn("Done");
+                    p.Component<FusionKanban>("care-kanban").Call(c => c.HideColumn, "Done");
                     p.Element("kanban-column-status").SetText("done hidden");
                 }))
             @(Html.NativeButton("kanban-show-done-btn", "Show Done")
                 .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionKanban>("care-kanban").ShowColumn("Done");
+                    p.Component<FusionKanban>("care-kanban").Call(c => c.ShowColumn, "Done");
                     p.Element("kanban-column-status").SetText("done shown");
                 }))
             @(Html.NativeButton("kanban-add-column-btn", "Add Blocked")
                 .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionKanban>("care-kanban").AddColumn(
+                    p.Component<FusionKanban>("care-kanban").Call(c => c.AddColumn,
                         new FusionKanbanColumn { HeaderText = "Blocked", KeyField = "Blocked" },
                         2);
                     p.Element("kanban-column-status").SetText("blocked added");
@@ -137,35 +137,35 @@
                 .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionKanban>("care-kanban").DeleteColumn(2);
+                    p.Component<FusionKanban>("care-kanban").Call(c => c.DeleteColumn, 2);
                     p.Element("kanban-column-status").SetText("blocked deleted");
                 }))
             @(Html.NativeButton("kanban-spinner-btn", "Spinner")
                 .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionKanban>("care-kanban").ShowSpinner();
-                    p.Component<FusionKanban>("care-kanban").HideSpinner();
+                    p.Component<FusionKanban>("care-kanban").Call(c => c.ShowSpinner);
+                    p.Component<FusionKanban>("care-kanban").Call(c => c.HideSpinner);
                     p.Element("kanban-spinner-status").SetText("spinner toggled");
                 }))
             @(Html.NativeButton("kanban-open-dialog-btn", "Open Dialog")
                 .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionKanban>("care-kanban").OpenAddDialog(KanbanSeedData.NewCard(950, "AL"));
+                    p.Component<FusionKanban>("care-kanban").Call(c => c.OpenDialog<KanbanTaskCard>(), "Add", KanbanSeedData.NewCard(950, "AL"));
                 }))
             @(Html.NativeButton("kanban-open-edit-dialog-btn", "Open Edit Dialog")
                 .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionKanban>("care-kanban").OpenEditDialog(KanbanSeedData.UpdatedCard());
+                    p.Component<FusionKanban>("care-kanban").Call(c => c.OpenDialog<KanbanTaskCard>(), "Edit", KanbanSeedData.UpdatedCard());
                 }))
             @(Html.NativeButton("kanban-open-close-dialog-btn", "Open + Close Dialog")
                 .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionKanban>("care-kanban").OpenAddDialog(KanbanSeedData.NewCard(951, "AL"));
-                    p.Component<FusionKanban>("care-kanban").CloseDialog();
+                    p.Component<FusionKanban>("care-kanban").Call(c => c.OpenDialog<KanbanTaskCard>(), "Add", KanbanSeedData.NewCard(951, "AL"));
+                    p.Component<FusionKanban>("care-kanban").Call(c => c.CloseDialog);
                     p.Element("kanban-dialog-status").SetText("open close requested");
                 }))
             @(Html.NativeButton("kanban-audit-btn", "Audit Board")
@@ -175,9 +175,9 @@
                     var board = p.Component<FusionKanban>("care-kanban");
                     p.Post("/api/kanban/audit")
                      .Gather(g => g
-                         .Include(board.Cards<KanbanModel, KanbanTaskCard>(), "cards")
-                         .Include(board.ColumnData<KanbanModel, KanbanTaskCard>("Open"), "openCards")
-                         .Include(board.SwimlaneData<KanbanModel, KanbanTaskCard>("AL"), "assistedLivingCards"))
+                         .Include(board.Get(c => c.Cards<KanbanTaskCard>()), "cards")
+                         .Include(board.Get(c => c.GetColumnData<KanbanTaskCard>(), "Open"), "openCards")
+                         .Include(board.Get(c => c.GetSwimlaneData<KanbanTaskCard>(), "AL"), "assistedLivingCards"))
                      .Response(r => r.OnSuccess<KanbanAuditResponse>((json, s) =>
                      {
                          s.Element("kanban-audit-summary").SetText(json, x => x.Summary);
@@ -302,7 +302,7 @@
                      .FromEvent(args, x => x.DeletedRecords, "deletedRecords"))
                  .Response(r => r.OnSuccess<KanbanCommitResponse>((json, s) =>
                  {
-                     args.EndEdit(s);
+                     s.Payload(args).Call(a => a.EndEdit);
                      s.Element("kanban-commit-status").SetText(json, x => x.Message);
                  }));
             })
@@ -313,7 +313,7 @@
                      .FromEvent(args, x => x.DropIndex, "dropIndex"))
                  .Response(r => r.OnSuccess<KanbanMoveResponse>((json, s) =>
                  {
-                     s.Component<FusionKanban>("care-kanban").UpdateCard(json, x => x.Card);
+                     s.Component<FusionKanban>("care-kanban").Call(c => c.UpdateCard, json.Read(x => x.Card));
                      s.Element("kanban-move-status").SetText(json, x => x.Message);
                  }));
             })

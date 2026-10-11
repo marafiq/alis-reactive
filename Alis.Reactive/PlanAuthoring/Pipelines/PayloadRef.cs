@@ -46,6 +46,19 @@ namespace Alis.Reactive.Builders
             return EmitSet(field, source.ToValueExpression());
         }
 
+        /// <summary>Calls a method the payload declares that takes no arguments.</summary>
+        /// <example><c>s.Payload(args).Call(a =&gt; a.EndEdit)</c></example>
+        public PayloadRef<TArgs, TModel> Call(Func<TArgs, ComponentMethod> method)
+        {
+            if (method == null) throw new ArgumentNullException(nameof(method));
+
+            _pipeline.AddStep(ReactionGraph.Call(
+                PayloadSource.Event(),
+                method(_args).JavaScriptName,
+                new List<ValueExpression>()));
+            return this;
+        }
+
         /// <summary>Calls a method the payload declares, passing a value read at runtime.</summary>
         public PayloadRef<TArgs, TModel> Call<TArg, TSource>(
             Func<TArgs, ComponentMethod<TArg>> method,
