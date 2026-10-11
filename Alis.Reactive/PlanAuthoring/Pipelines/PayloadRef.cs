@@ -52,10 +52,11 @@ namespace Alis.Reactive.Builders
         {
             if (method == null) throw new ArgumentNullException(nameof(method));
 
+            var declared = method(_args);
             _pipeline.AddStep(ReactionGraph.Call(
                 PayloadSource.Event(),
-                method(_args).JavaScriptName,
-                new List<ValueExpression>()));
+                declared.JavaScriptName,
+                declared.ArgumentsWith(new List<ValueExpression>())));
             return this;
         }
 
@@ -68,10 +69,11 @@ namespace Alis.Reactive.Builders
             if (method == null) throw new ArgumentNullException(nameof(method));
             if (argument == null) throw new ArgumentNullException(nameof(argument));
 
+            var declared = method(_args).Method;
             _pipeline.AddStep(ReactionGraph.Call(
                 PayloadSource.Event(),
-                method(_args).Method.JavaScriptName,
-                new List<ValueExpression> { argument.ToValueExpression() }));
+                declared.JavaScriptName,
+                declared.ArgumentsWith(new List<ValueExpression> { argument.ToValueExpression() })));
             return this;
         }
 

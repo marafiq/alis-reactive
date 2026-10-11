@@ -16,7 +16,7 @@ namespace Alis.Reactive.Fusion.Components
     /// Render it with <c>Html.FusionChipList(plan, "diet-chips", b =&gt; ...)</c> and target it with
     /// <c>p.Component&lt;FusionChipList&gt;("diet-chips")</c>; every declared member works with <c>Set</c>,
     /// <c>Call</c> and <c>Get</c>. The JavaScript <c>select</c> and <c>remove</c> take several argument types; each is its own
-    /// member: <c>.Call(c =&gt; c.SelectByIndexes, new[] { 0, 2 })</c>, <c>.Call(c =&gt; c.SelectByText, new[] { "Diabetic" }, "text")</c>.
+    /// member: <c>.Call(c =&gt; c.SelectByIndexes, new[] { 0, 2 })</c>, <c>.Call(c =&gt; c.SelectByText, new[] { "Diabetic" })</c>.
     /// </remarks>
     public sealed class FusionChipList : FusionComponent
     {
@@ -29,8 +29,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Selects the chips at these zero-based indexes.</summary>
         public ComponentMethod<int[]> SelectByIndexes => Method<int[]>("select");
 
-        /// <summary>Selects the chips with these texts; pass <c>"text"</c> as the selection type.</summary>
-        public ComponentMethod<string[], string> SelectByText => Method<string[], string>("select");
+        /// <summary>Selects the chips with these texts.</summary>
+        public ComponentMethod<string[]> SelectByText => Method<string[]>("select").Passing("text");
 
         /// <summary>Removes the chip at a zero-based index.</summary>
         public ComponentMethod<int> RemoveByIndex => Method<int>("remove");

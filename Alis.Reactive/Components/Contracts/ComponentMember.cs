@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive
@@ -52,50 +54,70 @@ namespace Alis.Reactive
     /// </summary>
     public sealed class ComponentMethod
     {
-        private readonly MemberName _member;
+        private readonly string _name;
         private readonly string _pathExpression;
         private readonly Path _path;
-        private readonly MethodArgumentContract _arguments;
+        private readonly IReadOnlyList<Shape> _argumentShapes;
+        private readonly IReadOnlyList<ValueExpression> _passed;
 
-        private ComponentMethod(string member, string pathExpression, MethodArgumentContract arguments)
-            : this(MemberName.Of(member), pathExpression, arguments)
+        private ComponentMethod(
+            string name,
+            string pathExpression,
+            IReadOnlyList<Shape> argumentShapes,
+            IReadOnlyList<ValueExpression> passed)
         {
-        }
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Method name required.", nameof(name));
+            }
 
-        private ComponentMethod(MemberName member, string pathExpression, MethodArgumentContract arguments)
-        {
-            _member = member ?? throw new ArgumentNullException(nameof(member));
             if (string.IsNullOrWhiteSpace(pathExpression))
             {
                 throw new ArgumentException("Method path required.", nameof(pathExpression));
             }
 
+            _name = name;
             _pathExpression = pathExpression;
             _path = Path.Parse(pathExpression);
-            _arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
+            _argumentShapes = argumentShapes;
+            _passed = passed;
         }
 
-        internal string Member => _member.Value;
+        /// <summary>
+        /// The plan key: the member's name, followed by its argument shapes when it takes any. Each
+        /// signature of one JavaScript method is its own member, so a generic member called with two
+        /// type arguments, or two members typing one method, never conflict.
+        /// </summary>
+        internal string Member => _argumentShapes.Count == 0
+            ? _name
+            : _name + "(" + string.Join(",", _argumentShapes.Select(shape => shape.DescribeContract())) + ")";
+
+        /// <summary>The member's own name: what a read of it is called in a gathered body.</summary>
+        internal string Name => _name;
 
         /// <summary>The JavaScript name the method has on its object, which an event payload is called by.</summary>
         internal string JavaScriptName => _pathExpression;
+
+        /// <summary>The arguments a call passes: the ones the call supplies, then the ones the declaration fixes.</summary>
+        internal IReadOnlyList<ValueExpression> ArgumentsWith(IReadOnlyList<ValueExpression> supplied) =>
+            _passed.Count == 0 ? supplied : supplied.Concat(_passed).ToList();
 
         internal ObjectMethodContract ContractReturning(Shape returns)
         {
             if (returns == null) throw new ArgumentNullException(nameof(returns));
             return ObjectMethodContract.Create(
-                _member,
+                MemberName.Of(Member),
                 _path,
-                MethodSignature.WithArguments(_arguments, returns));
+                MethodSignature.WithArguments(MethodArgumentContract.Exact(_argumentShapes), returns));
         }
 
         /// <summary>Declares a method whose plan member and JavaScript path are the same.</summary>
         internal static ComponentMethod Named(string member) =>
-            new ComponentMethod(member, member, MethodArgumentContract.NoArguments);
+            Mapped(member, member);
 
         /// <summary>Declares a method whose plan member maps to a different JavaScript path.</summary>
         internal static ComponentMethod Mapped(string member, string pathExpression) =>
-            new ComponentMethod(member, pathExpression, MethodArgumentContract.NoArguments);
+            new ComponentMethod(member, pathExpression, Array.Empty<Shape>(), Array.Empty<ValueExpression>());
 
         internal ComponentMethod WithArgs<T1>() =>
             WithArgs(Shape.FromClrType(typeof(T1)));
@@ -106,8 +128,23 @@ namespace Alis.Reactive
         internal ComponentMethod WithArgs<T1, T2, T3>() =>
             WithArgs(Shape.FromClrType(typeof(T1)), Shape.FromClrType(typeof(T2)), Shape.FromClrType(typeof(T3)));
 
+        /// <summary>Fixes literal arguments the JavaScript method always takes after the supplied ones.</summary>
+        internal ComponentMethod Passing(IReadOnlyList<object> trailing)
+        {
+            var shapes = new List<Shape>(_argumentShapes);
+            var passed = new List<ValueExpression>(_passed);
+            foreach (var value in trailing)
+            {
+                var shape = Shape.FromValue(value);
+                shapes.Add(shape);
+                passed.Add(ValueExpression.LiteralFor(value, shape));
+            }
+
+            return new ComponentMethod(_name, _pathExpression, shapes, passed);
+        }
+
         private ComponentMethod WithArgs(params Shape[] args) =>
-            new ComponentMethod(_member, _pathExpression, MethodArgumentContract.Exact(args));
+            new ComponentMethod(_name, _pathExpression, args, Array.Empty<ValueExpression>());
     }
 
     /// <summary>
@@ -123,6 +160,20 @@ namespace Alis.Reactive
         }
 
         internal ComponentMethod Method { get; }
+
+        /// <summary>
+        /// Fixes arguments the JavaScript method always takes after the typed one, such as the kind of
+        /// key it is given, so a call passes only the typed argument.
+        /// </summary>
+        /// <example>
+        /// <c>public ComponentMethod&lt;Field&gt; ShowColumn =&gt; Method&lt;Field&gt;("showColumns").Passing("field");</c>
+        /// </example>
+        /// <param name="trailing">Literal arguments, in the order the method takes them.</param>
+        public ComponentMethod<TArg> Passing(params object[] trailing)
+        {
+            if (trailing == null) throw new ArgumentNullException(nameof(trailing));
+            return new ComponentMethod<TArg>(Method.Passing(trailing));
+        }
     }
 
     /// <summary>

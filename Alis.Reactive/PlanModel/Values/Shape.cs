@@ -111,7 +111,7 @@ namespace Alis.Reactive.PlanModel
                type == typeof(float) || type == typeof(double) || type == typeof(decimal);
 
         private static bool IsStringSerializedType(Type type)
-            => type == typeof(Guid) || type == typeof(TimeSpan)
+            => type == typeof(Guid) || type == typeof(TimeSpan) || typeof(Field).IsAssignableFrom(type)
 #if NET6_0_OR_GREATER
                || type == typeof(TimeOnly)
 #endif

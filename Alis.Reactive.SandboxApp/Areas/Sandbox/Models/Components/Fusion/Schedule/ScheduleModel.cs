@@ -83,7 +83,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
     public class ScheduleEventsAuditRequest
     {
-        public List<FusionScheduleEventData> Events { get; set; } = new();
+        public List<ShiftAssignment> Events { get; set; } = new();
     }
 
     public class ScheduleEventsAuditResponse

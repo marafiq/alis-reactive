@@ -63,7 +63,7 @@
                     {
                         var tagList = p.Component<FusionChipList>("care-tags");
                         tagList.Call(c => c.Add, "Wound Care");
-                        tagList.Call(c => c.SelectByText, new[] { "Hydration", "Wound Care" }, "text");
+                        tagList.Call(c => c.SelectByText, new[] { "Hydration", "Wound Care" });
                         p.DispatchWith<ChipSelectionPayload>("chip-selection-read", payload =>
                         {
                             payload.Set(x => x.Selection, tagList.Get(c => c.GetSelectedChips));
@@ -83,7 +83,7 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var tagList = p.Component<FusionChipList>("care-tags");
-                        tagList.Call(c => c.SelectByText, new[] { "Hydration", "Medication Review" }, "text");
+                        tagList.Call(c => c.SelectByText, new[] { "Hydration", "Medication Review" });
                         p.Element("selected-chip-values").SetText(tagList.Get(c => c.SelectedChipValues));
                         p.Element("chip-command-status").SetText("selected values read");
                     }))

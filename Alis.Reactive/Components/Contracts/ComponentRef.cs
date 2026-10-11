@@ -207,7 +207,7 @@ namespace Alis.Reactive
                 componentKey,
                 method.ContractReturning(Shape.None));
             var source = ComponentSource.Of(componentKey);
-            Pipeline.AddStep(ReactionGraph.Call(source, method.Member, args));
+            Pipeline.AddStep(ReactionGraph.Call(source, method.Member, method.ArgumentsWith(args)));
             return this;
         }
 
@@ -246,7 +246,8 @@ namespace Alis.Reactive
             return Builders.Conditions.TypedComponentSource<TValue>.FromMethod(
                 source,
                 method.Member,
-                args);
+                method.Name,
+                method.ArgumentsWith(args));
         }
 
         internal string Vendor => _target.Vendor.Value;

@@ -45,16 +45,30 @@ namespace Alis.Reactive.PlanModel
             new LiteralExpression(value, shape);
 
         /// <summary>
-        /// A literal written to a declared member of the given shape; dates use the plan's ISO form and
-        /// an enum its member name, the text a JavaScript API takes for that option.
+        /// A literal written to a declared member of the given shape; dates use the plan's ISO form, a
+        /// <see cref="Field"/> its name, and an enum the text a JavaScript API takes for that option.
         /// </summary>
         internal static ValueExpression LiteralFor(object? value, Shape shape)
         {
             if (value == null) return Null();
             if (value is DateTime date) return Literal(date);
-            if (value is Enum option) return LiteralRaw(option.ToString(), shape);
+            if (value is Field field) return Literal(field.Name);
+            if (value is Enum option) return LiteralRaw(JavaScriptTextOf(option), shape);
 
             return LiteralRaw(value, shape);
+        }
+
+        // An option is its member name ("Descending"), unless the enum names the JavaScript text the
+        // way System.Text.Json does: [JsonStringEnumMemberName("notequal")] NotEqual. The attribute is
+        // optional by design, so a member without one keeps its own name.
+        private static string JavaScriptTextOf(Enum option)
+        {
+            var memberName = option.ToString();
+            var member = option.GetType().GetField(memberName);
+            var declared = member == null
+                ? null
+                : (JsonStringEnumMemberNameAttribute?)Attribute.GetCustomAttribute(member, typeof(JsonStringEnumMemberNameAttribute));
+            return declared == null ? memberName : declared.Name;
         }
 
         internal static ValueExpression LiteralFromValue(object? value)
