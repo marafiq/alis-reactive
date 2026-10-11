@@ -38,12 +38,12 @@
         p.Get("/api/schedule/assignments")
          .Gather(g => g
              .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
-             .Include(p.Component<FusionSchedule>("shift-schedule").CurrentView())
-             .Include(p.Component<FusionSchedule>("shift-schedule").SelectedDate(), "currentDate"))
+             .Include(p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView))
+             .Include(p.Component<FusionSchedule>("shift-schedule").Get(c => c.SelectedDate), "currentDate"))
          .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
          {
              s.Component<FusionSchedule>("shift-schedule")
-                 .SetDataSource(json, j => j.Assignments);
+                 .Set(c => c.EventDataSource, json.Read(j => j.Assignments)).Call(c => c.DataBind);
              s.Element("status").SetText("Refreshed after assignment");
              s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
          }));
@@ -76,7 +76,7 @@
          .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
          {
              s.Component<FusionSchedule>("shift-schedule")
-                 .SetDataSource(json, j => j.Assignments);
+                 .Set(c => c.EventDataSource, json.Read(j => j.Assignments)).Call(c => c.DataBind);
              s.Element("status").SetText("Schedule loaded");
              s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
          }));
@@ -104,12 +104,12 @@
                         p.Get("/api/schedule/assignments")
                          .Gather(g => g
                              .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
-                             .Include(p.Component<FusionSchedule>("shift-schedule").CurrentView())
-                             .Include(p.Component<FusionSchedule>("shift-schedule").SelectedDate(), "currentDate"))
+                             .Include(p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView))
+                             .Include(p.Component<FusionSchedule>("shift-schedule").Get(c => c.SelectedDate), "currentDate"))
                          .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                          {
                              s.Component<FusionSchedule>("shift-schedule")
-                                 .SetDataSource(json, j => j.Assignments);
+                                 .Set(c => c.EventDataSource, json.Read(j => j.Assignments)).Call(c => c.DataBind);
                              s.Element("status").SetText("Facility changed");
                              s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
                          }));
@@ -125,7 +125,7 @@
                 .CssClass("px-4 py-2 rounded-md border border-border text-sm font-medium hover:bg-slate-50")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionSchedule>("shift-schedule").Print();
+                    p.Component<FusionSchedule>("shift-schedule").Call(c => c.Print);
                 }))
             @(Html.NativeButton("route-template-schedule-btn", "Audit View Route")
                 .CssClass("px-4 py-2 rounded-md border border-border text-sm font-medium hover:bg-slate-50")
@@ -134,7 +134,7 @@
                     p.Get("/api/schedule/view/{currentView}/echo")
                      .Gather(g => g.RouteParam(
                          "currentView",
-                         p.Component<FusionSchedule>("shift-schedule").CurrentView()))
+                         p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView)))
                      .Response(r => r.OnSuccess<ScheduleViewRouteResponse>((json, s) =>
                      {
                          s.Element("route-view").SetText(json, x => x.CurrentView);
@@ -143,7 +143,7 @@
                          .Get("/api/schedule/view/{currentView}/summary")
                          .Gather(g => g.RouteParam(
                              "currentView",
-                             p.Component<FusionSchedule>("shift-schedule").CurrentView()))
+                             p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView)))
                          .Response(r2 => r2.OnSuccess<ScheduleViewRouteResponse>((json, s) =>
                          {
                              s.Element("route-view-summary").SetText(json, x => x.Summary);
@@ -155,7 +155,7 @@
                 {
                     p.Post("/api/schedule/events/audit")
                      .Gather(g => g.Include(
-                         p.Component<FusionSchedule>("shift-schedule").GetEvents(),
+                         p.Component<FusionSchedule>("shift-schedule").Get(c => c.GetEvents<ShiftAssignment>()),
                          "events"))
                      .Response(r => r.OnSuccess<ScheduleEventsAuditResponse>((json, s) =>
                      {
@@ -210,7 +210,7 @@
                 b.TimeScale(new ScheduleTimeScale { Enable = true, Interval = 60, SlotCount = 1 });
                 b.ShowHeaderBar(true); b.ShowTimeIndicator(true); b.AllowDragAndDrop(true);
             })
-            .Reactive(evt => evt.CellClicked, (args, p) =>
+            .Reactive(evt => evt.CellClick, (args, p) =>
             {
                 p.Element("event-trace").SetText(args, x => x.StartTime);
                 p.Element("event-shift").SetText(args, x => x.GroupIndex);
@@ -229,13 +229,13 @@
                 // Syncfusion opens QuickInfo for empty cells too; cancel only those so event QuickInfo keeps the custom template.
                 p.When(args, x => x.Type).Eq("QuickInfo")
                  .And(args, x => x.Data.Id).Eq(0)
-                 .Then(t => { args.PreventDefault(t); });
+                 .Then(t => { t.Payload(args).Set(a => a.Cancel, true); });
 
                 // Replace Syncfusion's built-in editor with the app-level drawer.
                 p.When(args, x => x.Type).Eq("Editor")
                  .Then(t =>
                  {
-                     args.PreventDefault(t);
+                     t.Payload(args).Set(a => a.Cancel, true);
                      t.Element("alis-drawer-title").SetText("Edit Shift Assignment");
                      t.Component<NativeDrawer>().SetSize(DrawerSize.Md);
                      t.Get(Url.SandboxRoute("EditForm", "Schedule"))
@@ -266,12 +266,12 @@
                      t.Get("/api/schedule/assignments")
                       .Gather(g => g
                           .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
-                          .Include(p.Component<FusionSchedule>("shift-schedule").CurrentView())
-                          .Include(p.Component<FusionSchedule>("shift-schedule").SelectedDate(), "currentDate"))
+                          .Include(p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView))
+                          .Include(p.Component<FusionSchedule>("shift-schedule").Get(c => c.SelectedDate), "currentDate"))
                       .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                       {
                           s.Component<FusionSchedule>("shift-schedule")
-                              .SetDataSource(json, j => j.Assignments);
+                              .Set(c => c.EventDataSource, json.Read(j => j.Assignments)).Call(c => c.DataBind);
                           s.Element("status").SetText("Refreshed after save");
                           s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
                       }));
@@ -293,7 +293,7 @@
                       .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                       {
                           s.Component<FusionSchedule>("shift-schedule")
-                              .SetDataSource(json, j => j.Assignments);
+                              .Set(c => c.EventDataSource, json.Read(j => j.Assignments)).Call(c => c.DataBind);
                           s.Element("status").SetText("View loaded");
                           s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
                       }));
@@ -305,11 +305,11 @@
                       .Gather(g => g
                           .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
                           .FromEvent(args, x => x.CurrentDate, "currentDate")
-                          .Include(p.Component<FusionSchedule>("shift-schedule").CurrentView()))
+                          .Include(p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView)))
                       .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                       {
                           s.Component<FusionSchedule>("shift-schedule")
-                              .SetDataSource(json, j => j.Assignments);
+                              .Set(c => c.EventDataSource, json.Read(j => j.Assignments)).Call(c => c.DataBind);
                           s.Element("status").SetText("Date loaded");
                           s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
                       }));

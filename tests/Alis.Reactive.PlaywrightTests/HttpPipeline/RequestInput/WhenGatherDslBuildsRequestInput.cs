@@ -110,8 +110,8 @@ public sealed class WhenGatherDslBuildsRequestInput
             {
                 var schedule = pipeline.Component<FusionSchedule>("shift-schedule");
                 pipeline.Post("/schedule/events", gather => gather
-                    .Include(schedule.CurrentView())
-                    .Include(schedule.GetEvents()));
+                    .Include(schedule.Get(c => c.CurrentView))
+                    .Include(schedule.Get(c => c.GetEvents<object>())));
             }));
 
         using var doc = JsonDocument.Parse(plan.RenderFormatted());

@@ -93,9 +93,9 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
                 var expectedStatus = pipeline.Plugin(plugin.ExpectedStatus);
 
                 pipeline.When(args, x => x.Score).Gte(pipeline.FromUrl<int>("minScore"))
-                    .And(schedule.CurrentView()).Eq("Week")
+                    .And(schedule.Get(c => c.CurrentView)).Eq("Week")
                     .And(inner => inner
-                        .When(schedule.GetEvents()).NotEmpty()
+                        .When(schedule.Get(c => c.GetEvents<object>())).NotEmpty()
                         .Or(normalizedStatus).Eq(expectedStatus))
                     .Then(hit => hit.Element("event-branch").SetText("accepted"))
                     .ElseIf(args, x => x.Status).Eq("manual")
