@@ -378,7 +378,10 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
         internal ILocator Time(string label) =>
             _root.GetByRole(AriaRole.Button, new() { Name = label, Exact = true });
 
+        // A filter's inner locator is matched inside each item, so it starts from the page, not the root.
         internal ILocator NoteUnder(string label) =>
-            _root.Locator("li.vp-item").Filter(new() { Has = Time(label) }).Locator(".vp-note");
+            _root.Locator("li.vp-item")
+                .Filter(new() { Has = _root.Page.GetByRole(AriaRole.Button, new() { Name = label, Exact = true }) })
+                .Locator(".vp-note");
     }
 }
