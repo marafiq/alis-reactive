@@ -23,6 +23,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
         public string? RequestedTime { get; set; }
 
         public bool LockWeek { get; set; }
+
+        /// <summary>When the week is full, a new time replaces the earliest one.</summary>
+        public bool SwapWhenFull { get; set; }
     }
 
     // A companion moving in with the resident plans their own visits in a panel loaded on request.

@@ -80,10 +80,20 @@
                         })
                         .Else(open => open.Element("quiet-hours").Hide()))
                 .Reactive(evt => evt.Full, (args, p) =>
-                {
-                    p.Element("week-full-capacity").SetText(args, x => x.Capacity);
-                    p.Element("week-full").Show();
-                })
+                    // Swapping releases and books from inside the planner's own full event: each
+                    // raises change, whose handler runs before this one goes on.
+                    p.When(p.Component<NativeCheckBox>(m => m.SwapWhenFull).Get(c => c.Checked)).Truthy()
+                        .Then(swap =>
+                        {
+                            var planner = swap.Component<VisitPlanner>(m => m.VisitSlots);
+                            planner.Call(c => c.Release, planner.Get(c => c.FirstBooked));
+                            planner.Call(c => c.Select, swap.Payload(args).Get(x => x.Attempted));
+                        })
+                        .Else(refuse =>
+                        {
+                            refuse.Element("week-full-capacity").SetText(args, x => x.Capacity);
+                            refuse.Element("week-full").Show();
+                        }))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
                     var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
@@ -119,6 +129,9 @@
                     <native-text color="Secondary"><span id="requested-status"></span></native-text>
                 </native-vstack>
             </native-grid>
+
+            @{ Html.InputField(plan, m => m.SwapWhenFull, o => o.Label("When the week is full, replace the earliest visit"))
+                .NativeCheckBox(b => b.CssClass("rounded border-border")); }
 
             @{ Html.InputField(plan, m => m.LockWeek, o => o.Label("Lock this week"))
                 .NativeCheckBox(b => b.CssClass("rounded border-border"))

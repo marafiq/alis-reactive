@@ -62,6 +62,9 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// <summary>The first time that is neither booked nor in quiet hours; empty when there is none.</summary>
         public ComponentFunction<string> FirstOpen => Function<string>("firstOpen");
 
+        /// <summary>The earliest booked time; empty when none is booked.</summary>
+        public ComponentFunction<string> FirstBooked => Function<string>("firstBooked");
+
         /// <summary>Books a time: raises <see cref="BeforeBook"/>, then <see cref="Change"/>, or <see cref="Full"/>.</summary>
         public ComponentMethod<string> Select => Method<string>("select");
 

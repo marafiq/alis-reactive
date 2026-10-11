@@ -3,7 +3,7 @@
 // as `visitPlanner`; BroughtComponents/VisitPlanner/VisitPlanner.cs declares it to the framework.
 //
 //   properties  value (booked slot ids), capacity, wing, readOnly, slots, labels.empty, count (read only)
-//   functions   remaining(), isBooked(id), firstOpen(), summary() (a promise)
+//   functions   remaining(), isBooked(id), firstOpen(), firstBooked(), summary() (a promise)
 //   methods     select(id), release(id), clear(), book(id, visitors, note), focus(), prepareSummary() (a promise)
 //   events      change, full, beforeBook (cancelable), slotsLoaded, through on(name, fn) / off(name, fn)
 
@@ -123,6 +123,11 @@ export class VisitPlanner {
   /** The first offered time that is neither booked nor in quiet hours; "" when there is none. */
   firstOpen(): string {
     return this.offered.find(slot => !slot.quiet && !this.booked.includes(slot.id))?.id ?? "";
+  }
+
+  /** The earliest booked time; "" when none is booked. */
+  firstBooked(): string {
+    return this.booked[0] ?? "";
   }
 
   /**

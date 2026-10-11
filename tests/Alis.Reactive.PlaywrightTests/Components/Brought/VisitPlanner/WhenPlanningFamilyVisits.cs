@@ -159,6 +159,26 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
     }
 
     [Test]
+    public async Task a_full_week_can_replace_its_earliest_visit_instead()
+    {
+        await OpenPlanner();
+        await ChooseMargaret();
+        await _plan.NativeCheckBox(m => m.SwapWhenFull).Check();
+        await Planner.Time("Mon 10:00 AM").ClickAsync();
+        await Planner.Time("Tue 3:00 PM").ClickAsync();
+        await Planner.Time("Sat 11:00 AM").ClickAsync();
+
+        await Planner.Time("Sun 11:00 AM").ClickAsync();
+
+        await Expect(Planner.Time("Sun 11:00 AM")).ToHaveAttributeAsync("aria-pressed", "true");
+        await Expect(Planner.Time("Mon 10:00 AM")).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(Planner.Booked).ToHaveCountAsync(3);
+        await Expect(PlannedCount).ToHaveTextAsync("3");
+        await Expect(WeekFull).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task booking_the_first_open_time_takes_the_planners_suggestion_each_time()
     {
         await OpenPlanner();
