@@ -40,6 +40,21 @@ namespace Alis.Reactive
             return EmitSet(declared, ValueExpression.LiteralFor(value, declared.Shape));
         }
 
+        /// <summary>
+        /// Writes a value read at runtime to one of the component's declared properties: another
+        /// component, an event payload, a response body, a URL parameter, a plugin or an array.
+        /// </summary>
+        /// <example><c>s.Component&lt;FusionNumericTextBox&gt;(m =&gt; m.Rate).Set(c =&gt; c.Min, res.Read(r =&gt; r.Floor))</c></example>
+        public ComponentRef<TComponent, TModel> Set<TValue, TSource>(
+            System.Func<TComponent, ComponentProperty<TValue>> property,
+            Builders.Conditions.TypedSource<TSource> source)
+            where TSource : TValue
+        {
+            if (property == null) throw new System.ArgumentNullException(nameof(property));
+            if (source == null) throw new System.ArgumentNullException(nameof(source));
+            return EmitSet(property(Declaration), source.ToValueExpression());
+        }
+
         /// <summary>Calls one of the component's declared methods.</summary>
         /// <example><c>p.Component&lt;FusionNumericTextBox&gt;(m =&gt; m.Rate).Call(c =&gt; c.Increment)</c></example>
         public ComponentRef<TComponent, TModel> Call(System.Func<TComponent, ComponentMethod> method)

@@ -124,32 +124,32 @@
             <native-grid cols="C2" gap="Base" class="mb-4">
                 @{ Html.InputField(plan, m => m.RiskScore, o => o.Label("Risk Score"))
                     .FusionNumericTextBox(b => b
-                        .Min(0).Max(100).Step(1)
-                        .Reactive(plan, evt => evt.Change, (args, p) =>
-                        {
-                            p.Element("reactive-precheck").SetText("Risk evaluated");
-                            p.Dispatch("supported-reactive-audited");
-                            p.When(args, x => x.Value).Gte(90m)
-                                .Then(then =>
-                                {
-                                    then.Element("reactive-result").SetText("Urgent follow-up");
-                                    then.Element("reactive-badge").SetText("Urgent");
-                                    then.Element("reactive-badge").Show();
-                                })
-                                .ElseIf(args, x => x.Value).Gte(60m)
-                                .Then(then =>
-                                {
-                                    then.Element("reactive-result").SetText("Standard follow-up");
-                                    then.Element("reactive-badge").SetText("Standard");
-                                    then.Element("reactive-badge").Show();
-                                })
-                                .Else(else_ =>
-                                {
-                                    else_.Element("reactive-result").SetText("Routine follow-up");
-                                    else_.Element("reactive-badge").Hide();
-                                });
-                            p.Element("reactive-summary").SetText("Assessment complete");
-                        })); }
+                        .Min(0).Max(100).Step(1))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.Element("reactive-precheck").SetText("Risk evaluated");
+                        p.Dispatch("supported-reactive-audited");
+                        p.When(args, x => x.Value).Gte(90m)
+                            .Then(then =>
+                            {
+                                then.Element("reactive-result").SetText("Urgent follow-up");
+                                then.Element("reactive-badge").SetText("Urgent");
+                                then.Element("reactive-badge").Show();
+                            })
+                            .ElseIf(args, x => x.Value).Gte(60m)
+                            .Then(then =>
+                            {
+                                then.Element("reactive-result").SetText("Standard follow-up");
+                                then.Element("reactive-badge").SetText("Standard");
+                                then.Element("reactive-badge").Show();
+                            })
+                            .Else(else_ =>
+                            {
+                                else_.Element("reactive-result").SetText("Routine follow-up");
+                                else_.Element("reactive-badge").Hide();
+                            });
+                        p.Element("reactive-summary").SetText("Assessment complete");
+                    }); }
             </native-grid>
 
             <native-vstack gap="Sm" class="text-xs font-mono">

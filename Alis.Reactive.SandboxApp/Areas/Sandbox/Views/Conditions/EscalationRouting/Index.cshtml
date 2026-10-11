@@ -172,33 +172,33 @@
             <native-grid cols="C3" gap="Base" class="mb-4">
                 @{ Html.InputField(plan, m => m.AssessmentScore, o => o.Label("Assessment Score"))
                     .FusionNumericTextBox(b => b
-                        .Min(0).Max(100).Step(1)
-                        .Reactive(plan, evt => evt.Change, (args, p) =>
-                        {
-                            var assessment = p.Component<FusionNumericTextBox>(m => m.AssessmentScore);
-                            var supervisorOverride = p.Component<FusionSwitch>(m => m.SupervisorOverride);
-                            var careTrack = p.Component<FusionDropDownList>(m => m.CareTrack);
+                        .Min(0).Max(100).Step(1))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        var assessment = p.Component<FusionNumericTextBox>(m => m.AssessmentScore);
+                        var supervisorOverride = p.Component<FusionSwitch>(m => m.SupervisorOverride);
+                        var careTrack = p.Component<FusionDropDownList>(m => m.CareTrack);
 
-                            p.Element("component-precheck").SetText("Escalation evaluated");
-                            p.When(assessment.Value()).Gte(85m)
-                                .And(cs => cs.When(supervisorOverride.Value()).Truthy()
-                                    .Or(careTrack.Value()).Eq("memory"))
-                                .Then(then =>
-                                {
-                                    then.Dispatch("component-route-isolation");
-                                })
-                                .ElseIf(assessment.Value()).Gte(60m)
-                                .And(cs => cs.When(supervisorOverride.Value()).Truthy().Not())
-                                .Then(then =>
-                                {
-                                    then.Dispatch("component-route-monitor");
-                                })
-                                .Else(else_ =>
-                                {
-                                    else_.Dispatch("component-route-routine");
-                                });
-                            p.Element("component-summary").SetText("Escalation decision complete");
-                        })); }
+                        p.Element("component-precheck").SetText("Escalation evaluated");
+                        p.When(assessment.Get(c => c.Value)).Gte(85m)
+                            .And(cs => cs.When(supervisorOverride.Value()).Truthy()
+                                .Or(careTrack.Value()).Eq("memory"))
+                            .Then(then =>
+                            {
+                                then.Dispatch("component-route-isolation");
+                            })
+                            .ElseIf(assessment.Get(c => c.Value)).Gte(60m)
+                            .And(cs => cs.When(supervisorOverride.Value()).Truthy().Not())
+                            .Then(then =>
+                            {
+                                then.Dispatch("component-route-monitor");
+                            })
+                            .Else(else_ =>
+                            {
+                                else_.Dispatch("component-route-routine");
+                            });
+                        p.Element("component-summary").SetText("Escalation decision complete");
+                    }); }
 
                 @{ Html.InputField(plan, m => m.SupervisorOverride, o => o.Label("Supervisor Override"))
                     .FusionSwitch(b => b
@@ -226,14 +226,14 @@
                     var careTrack = p.Component<FusionDropDownList>(m => m.CareTrack);
 
                     p.Element("component-precheck").SetText("Escalation evaluated");
-                    p.When(assessment.Value()).Gte(85m)
+                    p.When(assessment.Get(c => c.Value)).Gte(85m)
                         .And(cs => cs.When(supervisorOverride.Value()).Truthy()
                             .Or(careTrack.Value()).Eq("memory"))
                         .Then(then =>
                         {
                             then.Dispatch("component-route-isolation");
                         })
-                        .ElseIf(assessment.Value()).Gte(60m)
+                        .ElseIf(assessment.Get(c => c.Value)).Gte(60m)
                         .And(cs => cs.When(supervisorOverride.Value()).Truthy().Not())
                         .Then(then =>
                         {

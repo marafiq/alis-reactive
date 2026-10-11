@@ -56,11 +56,13 @@ namespace Alis.Reactive.Native
         /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.ElementId"/> and
         /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.BindingPath"/>.
         /// </summary>
-        public void Render<TComponent>(IHtmlString content)
+        /// <returns>The rendered component, ready for <c>.Reactive(...)</c>.</returns>
+        public RenderedComponent<TComponent, TModel> Render<TComponent>(IHtmlString content)
             where TComponent : IInputComponent, new()
         {
             RegisterInputComponent(InputComponentRegistrationProfile.For<TComponent>());
             Render(content);
+            return new RenderedComponent<TComponent, TModel>(Plan, ElementId);
         }
 #else
         internal void Render(IHtmlContent content)
@@ -74,11 +76,13 @@ namespace Alis.Reactive.Native
         /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.ElementId"/> and
         /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.BindingPath"/>.
         /// </summary>
-        public void Render<TComponent>(IHtmlContent content)
+        /// <returns>The rendered component, ready for <c>.Reactive(...)</c>.</returns>
+        public RenderedComponent<TComponent, TModel> Render<TComponent>(IHtmlContent content)
             where TComponent : IInputComponent, new()
         {
             RegisterInputComponent(InputComponentRegistrationProfile.For<TComponent>());
             Render(content);
+            return new RenderedComponent<TComponent, TModel>(Plan, ElementId);
         }
 #endif
     }

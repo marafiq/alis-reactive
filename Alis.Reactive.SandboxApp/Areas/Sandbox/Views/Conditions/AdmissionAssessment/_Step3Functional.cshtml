@@ -53,7 +53,7 @@
                 var fallRisk = p.Component<FusionNumericTextBox>(m => m.FallRiskScore);
                 var age = p.Component<FusionNumericTextBox>(m => m.Age);
 
-                p.When(fallRisk.Value()).Gte(7m).And(age.Value()).Gte(80m)
+                p.When(fallRisk.Get(c => c.Value)).Gte(7m).And(age.Get(c => c.Value)).Gte(80m)
                     .Then(t =>
                     {
                         t.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Continuous");
@@ -100,14 +100,14 @@
 
         @{ Html.InputField(plan, m => m.MedicationCount, o => o.Label("Medication Count"))
             .FusionNumericTextBox(b => b
-                .Min(0).Max(50).Step(1)
-                .Reactive(plan, evt => evt.Change, (args, p) =>
-                {
-                    var meds = p.Component<FusionNumericTextBox>(m => m.MedicationCount);
-                    p.When(meds.Value()).Gt(10m)
-                        .Then(t => t.Element("polypharmacy-warning").Show())
-                        .Else(e => e.Element("polypharmacy-warning").Hide());
-                })); }
+                .Min(0).Max(50).Step(1))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var meds = p.Component<FusionNumericTextBox>(m => m.MedicationCount);
+                p.When(meds.Get(c => c.Value)).Gt(10m)
+                    .Then(t => t.Element("polypharmacy-warning").Show())
+                    .Else(e => e.Element("polypharmacy-warning").Hide());
+            }); }
     </native-grid>
 
     <native-vstack gap="Xs" class="font-mono text-sm mb-4">

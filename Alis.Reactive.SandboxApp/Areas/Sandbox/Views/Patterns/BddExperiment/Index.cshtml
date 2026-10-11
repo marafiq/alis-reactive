@@ -66,11 +66,11 @@
                 .FusionAutoComplete(b => b
                     .DataSource(physicians)
                     .Fields<PhysicianOption>(t => t.Text, v => v.Value)
-                    .Placeholder("Search physician...")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.Element("physician-echo").SetText(args, x => x.Value);
-                    })); }
+                    .Placeholder("Search physician..."))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.Element("physician-echo").SetText(args, x => x.Value);
+                }); }
 
             @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care Level"))
                 .FusionDropDownList(b => b
@@ -84,11 +84,11 @@
 
             @{ Html.InputField(plan, m => m.MonthlyRate, o => o.Required().Label("Monthly Rate ($)"))
                 .FusionNumericTextBox(b => b
-                    .Min(0).Max(99999).Step(100)
-                    .Reactive(plan, evt => evt.Change, (args, p) =>
-                    {
-                        p.Element("rate-echo").SetText(args, x => x.Value);
-                    })); }
+                    .Min(0).Max(99999).Step(100))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.Element("rate-echo").SetText(args, x => x.Value);
+                }); }
 
             @{ Html.InputField(plan, m => m.IsActive, o => o.Label("Active Status"))
                 .FusionSwitch(b => b

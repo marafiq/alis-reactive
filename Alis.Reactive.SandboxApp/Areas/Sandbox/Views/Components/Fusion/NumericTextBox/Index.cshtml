@@ -26,18 +26,18 @@
 
             @{ Html.InputField(plan, m => m.MealsPerWeek, o => o.Label("Catered meals per week"))
                 .FusionNumericTextBox(b => b
-                    .Min(4).Max(21).Step(1).Value(Model.MealsPerWeek).ShowSpinButton(false)
-                    .Reactive(plan, evt => evt.Change, (args, p) =>
-                    {
-                        p.Element("meals-summary").SetText(args, x => x.Value);
-                        p.Element("meals-previous").SetText(args, x => x.PreviousValue);
+                    .Min(4).Max(21).Step(1).Value(Model.MealsPerWeek).ShowSpinButton(false))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.Element("meals-summary").SetText(args, x => x.Value);
+                    p.Element("meals-previous").SetText(args, x => x.PreviousValue);
 
-                        p.When(args, x => x.IsInteracted).Truthy()
-                            .Then(chosen => chosen.Element("meals-source")
-                                .SetText("You entered this number of meals."))
-                            .Else(applied => applied.Element("meals-source")
-                                .SetText("This number of meals was applied from a plan template."));
-                    })); }
+                    p.When(args, x => x.IsInteracted).Truthy()
+                        .Then(chosen => chosen.Element("meals-source")
+                            .SetText("You entered this number of meals."))
+                        .Else(applied => applied.Element("meals-source")
+                            .SetText("This number of meals was applied from a plan template."));
+                }); }
 
             <native-vstack gap="Xs">
                 <native-text>
@@ -52,25 +52,25 @@
                     .CssClass(ButtonStepper)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Increment();
+                        p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Call(c => c.Increment);
                     }))
                 @(Html.NativeButton("meals-remove", "Remove a meal")
                     .CssClass(ButtonStepper)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Decrement();
+                        p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Call(c => c.Decrement);
                     }))
                 @(Html.NativeButton("meals-standard-plan", "Apply the standard plan (14 meals)")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).SetValue(14);
+                        p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Set(c => c.Value, 14);
                     }))
                 @(Html.NativeButton("meals-reduced-diet", "Allow a reduced-diet plan (fewer meals)")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).SetMin(2);
+                        p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Set(c => c.Min, 2);
                         p.Element("meals-floor-note").SetText("A reduced-diet plan is now allowed — you can enter as few as 2 meals.");
                     }))
             </native-hstack>
@@ -84,15 +84,15 @@
 
             @{ Html.InputField(plan, m => m.WellnessChecksPerWeek, o => o.Label("Wellness check-ins per week"))
                 .FusionNumericTextBox(b => b
-                    .Min(0).Max(14).Step(1).Value(Model.WellnessChecksPerWeek).ShowSpinButton(false)
-                    .Reactive(plan, evt => evt.Focus, (args, p) =>
-                    {
-                        p.Element("wellness-hint").SetText("A nurse visits for each wellness check-in. Most residents have 2 to 5 per week.");
-                    })
-                    .Reactive(plan, evt => evt.Blur, (args, p) =>
-                    {
-                        p.Element("wellness-hint").SetText("Wellness check-ins saved with the plan below.");
-                    })); }
+                    .Min(0).Max(14).Step(1).Value(Model.WellnessChecksPerWeek).ShowSpinButton(false))
+                .Reactive(evt => evt.Focus, (args, p) =>
+                {
+                    p.Element("wellness-hint").SetText("A nurse visits for each wellness check-in. Most residents have 2 to 5 per week.");
+                })
+                .Reactive(evt => evt.Blur, (args, p) =>
+                {
+                    p.Element("wellness-hint").SetText("Wellness check-ins saved with the plan below.");
+                }); }
 
             <native-text color="Secondary"><span id="wellness-hint">Select the field to see guidance on wellness check-ins.</span></native-text>
 
@@ -101,13 +101,13 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionNumericTextBox>(m => m.WellnessChecksPerWeek).FocusIn();
+                        p.Component<FusionNumericTextBox>(m => m.WellnessChecksPerWeek).Call(c => c.FocusIn);
                     }))
                 @(Html.NativeButton("wellness-done", "Done with wellness check-ins")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionNumericTextBox>(m => m.WellnessChecksPerWeek).FocusOut();
+                        p.Component<FusionNumericTextBox>(m => m.WellnessChecksPerWeek).Call(c => c.FocusOut);
                     }))
             </native-hstack>
         </native-vstack>
@@ -121,7 +121,7 @@
                 {
                     var meals = p.Component<FusionNumericTextBox>(m => m.MealsPerWeek);
                     p.Post(Url.SandboxRoute("Save", "NumericTextBox"))
-                        .Gather(g => g.Include(meals.Value(), "mealsPerWeek"))
+                        .Gather(g => g.Include(meals.Get(c => c.Value), "mealsPerWeek"))
                         .Response(r => r.OnSuccess<ServicePlanResponse>((json, s) =>
                         {
                             s.Element("plan-confirmation").SetText(json, x => x.Summary);

@@ -109,11 +109,11 @@
                     .Format("n0")
                     .Min(0)
                     .Max(120)
-                    .Placeholder("Any age")
-                    .Reactive(plan, evt => evt.Change, (args, p) =>
-                    {
-                        LoadDirectory(p, "age filter applied");
-                    })); }
+                    .Placeholder("Any age"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    LoadDirectory(p, "age filter applied");
+                }); }
         </native-grid>
         <native-vstack gap="Xs" class="mt-4 font-mono text-sm">
             <p>Status: <span id="directory-status" class="text-text-muted">waiting</span></p>

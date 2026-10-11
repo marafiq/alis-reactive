@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive.Builders;
-using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Native;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Inputs;
@@ -13,7 +11,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Use as the type in <c>p.Component&lt;FusionNumericTextBox&gt;(m =&gt; m.Amount)</c>; every
-    /// declared member works with <c>Set</c>, <c>Call</c> and <c>Get</c>.
+    /// declared member works with <c>Set</c>, <c>Call</c> and <c>Get</c>, for example
+    /// <c>.Set(c =&gt; c.Value, 14)</c>, <c>.Call(c =&gt; c.Increment)</c>, <c>.Get(c =&gt; c.Value)</c>.
     /// </remarks>
     public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
     {
@@ -82,7 +81,8 @@ namespace Alis.Reactive.Fusion.Components
         /// Renders a FusionNumericTextBox bound to the field's model property, with the framework's
         /// element ID and binding name.
         /// </summary>
-        public static void FusionNumericTextBox<TModel, TProp>(
+        /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
+        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionNumericTextBox, TModel> FusionNumericTextBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,
             Action<NumericTextBoxBuilder> build)
             where TModel : class
@@ -90,59 +90,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = field.Helper.EJS().NumericTextBoxFor(field.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = field.ElementId, ["name"] = field.BindingPath });
             build(builder);
-            field.Render<global::Alis.Reactive.Fusion.Components.FusionNumericTextBox>(builder.Render());
+            return field.Render<global::Alis.Reactive.Fusion.Components.FusionNumericTextBox>(builder.Render());
         }
-    }
-
-    /// <summary>Wires events and reads or updates a <see cref="FusionNumericTextBox"/> from a plan.</summary>
-    public static class FusionNumericTextBoxExtensions
-    {
-        /// <summary>Runs a reaction when the selected event fires, for example <c>c =&gt; c.Change</c>.</summary>
-        public static NumericTextBoxBuilder Reactive<TModel, TArgs>(
-            this NumericTextBoxBuilder builder,
-            ReactivePlan<TModel> plan,
-            Func<FusionNumericTextBox, TypedEvent<TArgs>> eventSelector,
-            Action<TArgs, PipelineBuilder<TModel>> pipeline)
-            where TModel : class
-        {
-            var componentId = (string)((IDictionary<string, object>)builder.model.HtmlAttributes)["id"];
-            ComponentEvents.Wire(plan, componentId, eventSelector, pipeline);
-            return builder;
-        }
-
-        /// <summary>Sets the numeric value.</summary>
-        public static ComponentRef<FusionNumericTextBox, TModel> SetValue<TModel>(
-            this ComponentRef<FusionNumericTextBox, TModel> self, decimal value)
-            where TModel : class => self.Set(c => c.Value, value);
-
-        /// <summary>Sets the minimum allowed value.</summary>
-        public static ComponentRef<FusionNumericTextBox, TModel> SetMin<TModel>(
-            this ComponentRef<FusionNumericTextBox, TModel> self, decimal min)
-            where TModel : class => self.Set(c => c.Min, min);
-
-        /// <summary>Moves focus into the input.</summary>
-        public static ComponentRef<FusionNumericTextBox, TModel> FocusIn<TModel>(
-            this ComponentRef<FusionNumericTextBox, TModel> self)
-            where TModel : class => self.Call(c => c.FocusIn);
-
-        /// <summary>Removes focus from the input.</summary>
-        public static ComponentRef<FusionNumericTextBox, TModel> FocusOut<TModel>(
-            this ComponentRef<FusionNumericTextBox, TModel> self)
-            where TModel : class => self.Call(c => c.FocusOut);
-
-        /// <summary>Increments the value by one step.</summary>
-        public static ComponentRef<FusionNumericTextBox, TModel> Increment<TModel>(
-            this ComponentRef<FusionNumericTextBox, TModel> self)
-            where TModel : class => self.Call(c => c.Increment);
-
-        /// <summary>Decrements the value by one step.</summary>
-        public static ComponentRef<FusionNumericTextBox, TModel> Decrement<TModel>(
-            this ComponentRef<FusionNumericTextBox, TModel> self)
-            where TModel : class => self.Call(c => c.Decrement);
-
-        /// <summary>Reads the numeric value for conditions or gather.</summary>
-        public static TypedComponentSource<decimal> Value<TModel>(
-            this ComponentRef<FusionNumericTextBox, TModel> self)
-            where TModel : class => self.Get(c => c.Value);
     }
 }

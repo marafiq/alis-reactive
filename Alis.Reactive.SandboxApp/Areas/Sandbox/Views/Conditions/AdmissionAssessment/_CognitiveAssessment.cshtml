@@ -18,32 +18,32 @@
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.CognitiveScore, o => o.Label("Cognitive Score (MMSE)"))
             .FusionNumericTextBox(b => b
-                .Min(0).Max(30).Step(1)
-                .Reactive(plan, evt => evt.Change, (args, p) =>
-                {
-                    var comp = p.Component<FusionNumericTextBox>(m => m.CognitiveScore);
-                    p.Element("score-echo").SetText(comp.Value());
+                .Min(0).Max(30).Step(1))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var comp = p.Component<FusionNumericTextBox>(m => m.CognitiveScore);
+                p.Element("score-echo").SetText(comp.Get(c => c.Value));
 
-                    p.When(comp.Value()).Lt(15m)
-                        .Then(t =>
-                        {
-                            t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Memory Care");
-                            t.Element("cognitive-status").SetText("Severe Impairment — Memory Care");
-                        })
-                        .ElseIf(comp.Value()).Lt(25m)
-                        .Then(t =>
-                        {
-                            t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Assisted Living with Memory Support");
-                            t.Element("cognitive-status").SetText("Moderate Impairment — Assisted Living + Memory");
-                        })
-                        .Else(e =>
-                        {
-                            e.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Standard Assisted Living");
-                            e.Element("cognitive-status").SetText("Mild/Normal — Standard");
-                        });
+                p.When(comp.Get(c => c.Value)).Lt(15m)
+                    .Then(t =>
+                    {
+                        t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Memory Care");
+                        t.Element("cognitive-status").SetText("Severe Impairment — Memory Care");
+                    })
+                    .ElseIf(comp.Get(c => c.Value)).Lt(25m)
+                    .Then(t =>
+                    {
+                        t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Assisted Living with Memory Support");
+                        t.Element("cognitive-status").SetText("Moderate Impairment — Assisted Living + Memory");
+                    })
+                    .Else(e =>
+                    {
+                        e.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Standard Assisted Living");
+                        e.Element("cognitive-status").SetText("Mild/Normal — Standard");
+                    });
 
-                    p.Element("cognitive-scored").SetText("scored");
-                })); }
+                p.Element("cognitive-scored").SetText("scored");
+            }); }
 
         @{ Html.InputField(plan, m => m.Wanders, o => o.Label("Wanders"))
             .FusionSwitch(b => b

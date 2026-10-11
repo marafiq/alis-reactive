@@ -32,32 +32,32 @@
         <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.HeartRate, o => o.Label("Heart Rate (bpm)"))
                 .FusionNumericTextBox(b => b
-                    .Min(0).Max(300).Step(1)
-                    .Reactive(plan, evt => evt.Change, (args, p) =>
-                    {
-                        var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
+                    .Min(0).Max(300).Step(1))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
 
-                        p.Element("s1-last-reading").SetText(comp.Value());
+                    p.Element("s1-last-reading").SetText(comp.Get(c => c.Value));
 
-                        p.When(comp.Value()).Gt(140m)
-                            .Then(then =>
-                            {
-                                then.Post(alertUrl,
-                                        g => g.Include<FusionNumericTextBox, VitalsAlertModel>(m => m.HeartRate))
-                                    .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
-                                    {
-                                        s.Element("s1-alert-status").SetText(json, x => x.Message);
-                                        s.Element("s1-alert-time").SetText(json, x => x.Timestamp);
-                                    }));
-                            })
-                            .Else(else_ =>
-                            {
-                                else_.Element("s1-alert-status").SetText("Vitals normal");
-                                else_.Element("s1-alert-time").SetText("");
-                            });
+                    p.When(comp.Get(c => c.Value)).Gt(140m)
+                        .Then(then =>
+                        {
+                            then.Post(alertUrl,
+                                    g => g.Include<FusionNumericTextBox, VitalsAlertModel>(m => m.HeartRate))
+                                .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
+                                {
+                                    s.Element("s1-alert-status").SetText(json, x => x.Message);
+                                    s.Element("s1-alert-time").SetText(json, x => x.Timestamp);
+                                }));
+                        })
+                        .Else(else_ =>
+                        {
+                            else_.Element("s1-alert-status").SetText("Vitals normal");
+                            else_.Element("s1-alert-time").SetText("");
+                        });
 
-                        p.Element("s1-check-status").SetText("checked");
-                    })); }
+                    p.Element("s1-check-status").SetText("checked");
+                }); }
         </native-grid>
         <native-vstack gap="Xs" class="font-mono text-sm">
             <p>Last reading: <span id="s1-last-reading" class="text-text-muted">&mdash;</span></p>
@@ -81,7 +81,7 @@
                 {
                     var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
 
-                    p.When(comp.Value()).Gte(180m)
+                    p.When(comp.Get(c => c.Value)).Gte(180m)
                         .Then(then =>
                         {
                             then.Post(criticalUrl,
@@ -92,7 +92,7 @@
                                     s.Element("s2-tier-level").SetText(json, x => x.Level);
                                 }));
                         })
-                        .ElseIf(comp.Value()).Gte(140m)
+                        .ElseIf(comp.Get(c => c.Value)).Gte(140m)
                         .Then(then =>
                         {
                             then.Post(warningUrl,
@@ -131,9 +131,9 @@
                     var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
 
                     p.Element("s3-before").SetText("before-ran");
-                    p.Element("s3-reading").SetText(comp.Value());
+                    p.Element("s3-reading").SetText(comp.Get(c => c.Value));
 
-                    p.When(comp.Value()).Gt(140m)
+                    p.When(comp.Get(c => c.Value)).Gt(140m)
                         .Then(then =>
                         {
                             then.Post(alertUrl,

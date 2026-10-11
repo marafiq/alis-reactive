@@ -17,33 +17,33 @@
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.PainLevel, o => o.Label("Pain Level (0-10)"))
             .FusionNumericTextBox(b => b
-                .Min(0).Max(10).Step(1)
-                .Reactive(plan, evt => evt.Change, (args, p) =>
-                {
-                    var comp = p.Component<FusionNumericTextBox>(m => m.PainLevel);
-                    p.Element("pain-echo").SetText(comp.Value());
+                .Min(0).Max(10).Step(1))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var comp = p.Component<FusionNumericTextBox>(m => m.PainLevel);
+                p.Element("pain-echo").SetText(comp.Get(c => c.Value));
 
-                    p.When(comp.Value()).Gt(7m)
-                        .Then(then =>
-                        {
-                            then.Element("pain-spinner").Show();
-                            then.Element("location-required").Show();
-                            then.Post(alertPainUrl,
-                                g => g.Include<FusionNumericTextBox, Step3FunctionalModel>(m => m.PainLevel)
-                                      .Include<NativeTextBox, Step3FunctionalModel>(m => m.PainLocation))
-                             .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
-                             {
-                                 s.Element("pain-result").SetText(json, x => x.Message);
-                                 s.Element("pain-result").Show();
-                                 s.Element("pain-spinner").Hide();
-                             }));
-                        })
-                        .Else(e =>
-                        {
-                            e.Element("location-required").Hide();
-                            e.Element("pain-result").Hide();
-                        });
-                })); }
+                p.When(comp.Get(c => c.Value)).Gt(7m)
+                    .Then(then =>
+                    {
+                        then.Element("pain-spinner").Show();
+                        then.Element("location-required").Show();
+                        then.Post(alertPainUrl,
+                            g => g.Include<FusionNumericTextBox, Step3FunctionalModel>(m => m.PainLevel)
+                                  .Include<NativeTextBox, Step3FunctionalModel>(m => m.PainLocation))
+                         .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
+                         {
+                             s.Element("pain-result").SetText(json, x => x.Message);
+                             s.Element("pain-result").Show();
+                             s.Element("pain-spinner").Hide();
+                         }));
+                    })
+                    .Else(e =>
+                    {
+                        e.Element("location-required").Hide();
+                        e.Element("pain-result").Hide();
+                    });
+            }); }
 
         @{ Html.InputField(plan, m => m.PainLocation, o => o.Label("Pain Location"))
             .NativeTextBox(b => b.Placeholder("e.g. Lower back, left knee")); }

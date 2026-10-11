@@ -22,32 +22,32 @@
 
         @{ Html.InputField(plan, m => m.A1cLevel, o => o.Label("A1C Level (%)"))
             .FusionNumericTextBox(b => b
-                .Min(0).Max(20).Step(0.1)
-                .Reactive(plan, evt => evt.Change, (args, p) =>
-                {
-                    var comp = p.Component<FusionNumericTextBox>(m => m.A1cLevel);
-                    p.Element("a1c-echo").SetText(comp.Value());
+                .Min(0).Max(20).Step(0.1))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var comp = p.Component<FusionNumericTextBox>(m => m.A1cLevel);
+                p.Element("a1c-echo").SetText(comp.Get(c => c.Value));
 
-                    p.When(comp.Value()).Gt(9m)
-                        .Then(then =>
-                        {
-                            then.Element("uncontrolled-spinner").Show();
-                            then.Post(alertUncontrolledUrl,
-                                g => g.Include<FusionNumericTextBox, Step2ClinicalModel>(m => m.A1cLevel)
-                                      .Include<FusionDropDownList, Step2ClinicalModel>(m => m.DiabetesType))
-                             .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
-                             {
-                                 s.Element("uncontrolled-result").SetText(json, x => x.Message);
-                                 s.Element("uncontrolled-result").Show();
-                                 s.Element("uncontrolled-spinner").Hide();
-                             }));
-                        })
-                        .Else(e =>
-                        {
-                            e.Element("uncontrolled-result").SetText("Controlled");
-                            e.Element("uncontrolled-result").Show();
-                        });
-                })); }
+                p.When(comp.Get(c => c.Value)).Gt(9m)
+                    .Then(then =>
+                    {
+                        then.Element("uncontrolled-spinner").Show();
+                        then.Post(alertUncontrolledUrl,
+                            g => g.Include<FusionNumericTextBox, Step2ClinicalModel>(m => m.A1cLevel)
+                                  .Include<FusionDropDownList, Step2ClinicalModel>(m => m.DiabetesType))
+                         .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
+                         {
+                             s.Element("uncontrolled-result").SetText(json, x => x.Message);
+                             s.Element("uncontrolled-result").Show();
+                             s.Element("uncontrolled-spinner").Hide();
+                         }));
+                    })
+                    .Else(e =>
+                    {
+                        e.Element("uncontrolled-result").SetText("Controlled");
+                        e.Element("uncontrolled-result").Show();
+                    });
+            }); }
     </native-grid>
 
     <native-grid cols="C2" gap="Base" class="mb-4">

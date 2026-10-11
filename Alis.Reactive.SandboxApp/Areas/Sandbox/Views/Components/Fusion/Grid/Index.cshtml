@@ -119,22 +119,22 @@
                     .FusionNumericTextBox(b => b
                         .Format("n0")
                         .Min(0).Max(100)
-                        .Placeholder("e.g. 80")
-                        .Reactive(plan, evt => evt.Change, (args, p) =>
-                        {
-                            p.Element("filter-status").SetText("filtering...");
-                            p.Post(Url.SandboxRoute("Data", "Grid"))
-                             .Gather(g => g
-                                 .Static("skip", 0)
-                                 .Static("take", 10)
-                                 .Include<FusionNumericTextBox, GridModel>(m => m.MinAge))
-                             .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
-                             {
-                                 s.Component<FusionGrid>("residents-grid")
-                                     .SetDataSource(json);
-                                 s.Element("filter-status").SetText("filtered");
-                             }));
-                        })); }
+                        .Placeholder("e.g. 80"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.Element("filter-status").SetText("filtering...");
+                        p.Post(Url.SandboxRoute("Data", "Grid"))
+                         .Gather(g => g
+                             .Static("skip", 0)
+                             .Static("take", 10)
+                             .Include<FusionNumericTextBox, GridModel>(m => m.MinAge))
+                         .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
+                         {
+                             s.Component<FusionGrid>("residents-grid")
+                                 .SetDataSource(json);
+                             s.Element("filter-status").SetText("filtered");
+                         }));
+                    }); }
             </native-grid>
         </div>
 

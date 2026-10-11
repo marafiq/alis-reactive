@@ -18,32 +18,32 @@
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.SystolicBP, o => o.Label("Systolic BP (mmHg)"))
             .FusionNumericTextBox(b => b
-                .Min(0).Max(300).Step(1)
-                .Reactive(plan, evt => evt.Change, (args, p) =>
-                {
-                    var comp = p.Component<FusionNumericTextBox>(m => m.SystolicBP);
-                    p.Element("bp-echo").SetText(comp.Value());
+                .Min(0).Max(300).Step(1))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var comp = p.Component<FusionNumericTextBox>(m => m.SystolicBP);
+                p.Element("bp-echo").SetText(comp.Get(c => c.Value));
 
-                    p.When(comp.Value()).Gt(140m)
-                        .Then(then =>
-                        {
-                            then.Element("hypertension-spinner").Show();
-                            then.Post(alertHypertensionUrl,
-                                g => g.Include<FusionNumericTextBox, Step2ClinicalModel>(m => m.SystolicBP)
-                                      .Include<NativeHiddenField, Step2ClinicalModel>(m => m.ResidentName))
-                             .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
-                             {
-                                 s.Element("hypertension-result").SetText(json, x => x.Message);
-                                 s.Element("hypertension-result").Show();
-                                 s.Element("hypertension-spinner").Hide();
-                             }));
-                        })
-                        .Else(e =>
-                        {
-                            e.Element("hypertension-result").SetText("Normal");
-                            e.Element("hypertension-result").Show();
-                        });
-                })); }
+                p.When(comp.Get(c => c.Value)).Gt(140m)
+                    .Then(then =>
+                    {
+                        then.Element("hypertension-spinner").Show();
+                        then.Post(alertHypertensionUrl,
+                            g => g.Include<FusionNumericTextBox, Step2ClinicalModel>(m => m.SystolicBP)
+                                  .Include<NativeHiddenField, Step2ClinicalModel>(m => m.ResidentName))
+                         .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
+                         {
+                             s.Element("hypertension-result").SetText(json, x => x.Message);
+                             s.Element("hypertension-result").Show();
+                             s.Element("hypertension-spinner").Hide();
+                         }));
+                    })
+                    .Else(e =>
+                    {
+                        e.Element("hypertension-result").SetText("Normal");
+                        e.Element("hypertension-result").Show();
+                    });
+            }); }
 
         @{ Html.InputField(plan, m => m.HasPacemaker, o => o.Label("Has Pacemaker"))
             .FusionSwitch(b => b

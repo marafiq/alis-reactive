@@ -141,6 +141,15 @@ namespace Alis.Reactive.Builders
                 this);
         }
 
+        /// <summary>Targets the JavaScript object the triggering event handed its callback.</summary>
+        /// <typeparam name="TArgs">The event's payload type.</typeparam>
+        /// <param name="args">The typed payload the reaction received, for example <c>(args, p) =&gt; p.Payload(args)</c>.</param>
+        /// <returns>An authoring handle that writes the payload's fields and calls its methods.</returns>
+        public PayloadRef<TArgs, TModel> Payload<TArgs>(TArgs args)
+        {
+            return new PayloadRef<TArgs, TModel>(args, this);
+        }
+
         /// <summary>Reads a string value from the current URL query string at runtime.</summary>
         /// <param name="paramName">Query parameter name read at runtime.</param>
         /// <returns>URL value source for conditions, reactions, or gather.</returns>
