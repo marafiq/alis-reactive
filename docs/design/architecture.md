@@ -106,18 +106,91 @@ grid.GetSelectedRecords();
 
 ## 4. The core domain (C#)
 
+### 4.0 The object contract: one shape for every JavaScript object
+
+A JavaScript object has properties, methods and events.
+- Some properties are readable, some writable, some both.
+- Some methods take arguments and some don't; some return a value and some don't; some are
+  asynchronous.
+- Some events carry a payload and some don't, and a payload can itself be a JavaScript object with
+  members.
+
+That is the whole objective. Each combination has one C# form, so anything JavaScript does not allow
+fails to compile:
+
+| JavaScript | Declared as | Used in a view | Plan node |
+|---|---|---|---|
+| read-write property | `public Prop<decimal> Min => Prop<decimal>();` | `rate.Min` is a value; `rate.Min.Set(0m)` | `read`, `set` |
+| read-only property | `public ReadOnly<int> ReadyState => ReadOnly<int>();` | a value; `.Set` does not exist | `read` |
+| write-only property | `public WriteOnly<string> Target => WriteOnly<string>();` | `.Set(..)` only | `set` |
+| method: no arguments, no return | `public void Refresh() => Call();` | `grid.Refresh();` | `call` |
+| method: arguments, no return | `public void SelectRow(Arg<int> index) => Call(index);` | `grid.SelectRow(2);` | `call` |
+| method: returns a value | `public Value<TRow[]> GetSelectedRecords() => Invoke<TRow[]>();` | a value: in conditions, sets, gather, arrays | `call` used as an expression |
+| method: arguments and a return | `public Value<int> GetActualIndex(Arg<int> a, Arg<int> b) => Invoke<int>(a, b);` | a value | `call` as an expression |
+| method: returns an object | `public FusionGridColumn GetColumnByField(..) => InvokeObject<FusionGridColumn>(..);` | `grid.GetColumnByField(c => c.Status).Visible.Set(false)` | `call` as a set's target |
+| async method with a value | `public Value<int> GetCensus(Arg<string> wing) => InvokeAsync<int>(wing);` | a value; the step waits | `call` with `await` |
+| async method without a value | `public void Start() => CallAsync();` | `hub.Start();`; the step waits | `call` with `await` |
+| event, no payload | `public Event Ready => Event();` | `(p) => ..` | `event` |
+| event, data payload | `public Message<CensusUpdate> Census => Message<CensusUpdate>();` | `(msg, p) => msg.Get(x => x.Occupied)` | `event`; the payload is a value |
+| event, object payload | `public Event<FusionGridActionBegin<TRow>> ActionBegin => Event<FusionGridActionBegin<TRow>>();` | `(args, p) => { args.Cancel.Set(true); args.Data.Get(r => r.Id); }` | `event`; the payload is an object |
+
+Payload kinds:
+- **An object payload** (`Event<T>`, where `T : JsObject`) has members of its own. Syncfusion's
+  event args are objects: `cancel` and `preventDefaultAction` are writable, and `updateData` and
+  `endEdit` are methods.
+- **A data payload** (`Message<T>`) is JSON-shaped data typed by a plain class. It can be the
+  server's own DTO, so the hub and the page share one type. Stream messages, hub methods and custom
+  event `detail` are data.
+
+### 4.0.1 Objects differ only in where they live
+
+What differs between objects is the **locator**: how the object is found and how long it lives.
+
+| Object | Locator | Lifetime | Events subscribe with |
+|---|---|---|---|
+| Component (Fusion, Native, brought) | element ID plus the vendor's `objectPath` | the element's: page or slot | the vendor's subscribe and unsubscribe methods |
+| App object (Drawer, Loader, Toast, Confirm) | fixed ID | page | the vendor's |
+| DOM element | ID | the element's | `addEventListener` |
+| Plugin | name, from the app bundle | page | — |
+| Document | — | page | `addEventListener`: `ready`, custom events (payload `detail`) |
+| Location | — | page | — |
+| Event payload | the event being handled | the handler; kept across an async gap | — |
+| **Server-sent event stream** | URL | shared per URL, counted per owner (page or slot), closed by the last owner | `addEventListener`; payload `JSON.parse(event.data)` |
+| **SignalR hub connection** | hub URL | shared per URL, counted per owner, automatic reconnect | `on` / `off`; payload is the single argument |
+| Returned object | the result of a call | the expression | — |
+
+Server-sent event streams and hub connections are therefore two more vendors and two more locators,
+not trigger kinds of their own.
+- The connection policy the runtime has today stays, and it belongs to their locators:
+  - one connection per URL;
+  - connections shared across slots;
+  - start retries;
+  - the retry indicator: one marker per dropped connection, and one click retries all of them.
+- Their members become typed for free: `readyState`, `close()`, `state`, `connectionId`,
+  `invoke()` returning a value, `send()`, and the `reconnecting`, `reconnected` and `close` events.
+
 ### 4.1 Objects
 
 ```csharp
 public abstract class JsObject                          // a live JavaScript object
 {
-    protected Prop<T> Prop<T>([CallerMemberName] string name = "");
+    // properties
+    protected Prop<T> Prop<T>([CallerMemberName] string name = "");                 // read and write
+    protected ReadOnly<T> ReadOnly<T>([CallerMemberName] string name = "");         // read
+    protected WriteOnly<T> WriteOnly<T>([CallerMemberName] string name = "");       // write
     protected TObject Object<TObject>([CallerMemberName] string name = "") where TObject : JsObject, new();
-    protected void Call(IArg a1, /* ... a5 */ [CallerMemberName] string name = "");
-    protected Value<TResult> Invoke<TResult>(IArg a1, /* ... */ [CallerMemberName] string name = "");
-    protected Value<TResult> InvokeAsync<TResult>(IArg a1, /* ... */ [CallerMemberName] string name = "");
-    protected TObject InvokeObject<TObject>(IArg a1, /* ... */ [CallerMemberName] string name = "") where TObject : JsObject, new();
-    protected Event<TPayload> Event<TPayload>([CallerMemberName] string name = "") where TPayload : JsObject, new();
+
+    // methods: 0 to 5 arguments each (IArg a1 ... a5), then the name
+    protected void Call(/* args */ [CallerMemberName] string name = "");
+    protected void CallAsync(/* args */ [CallerMemberName] string name = "");
+    protected Value<TResult> Invoke<TResult>(/* args */ [CallerMemberName] string name = "");
+    protected Value<TResult> InvokeAsync<TResult>(/* args */ [CallerMemberName] string name = "");
+    protected TObject InvokeObject<TObject>(/* args */ [CallerMemberName] string name = "") where TObject : JsObject, new();
+
+    // events
+    protected Event Event([CallerMemberName] string name = "");                                          // no payload
+    protected Event<TPayload> Event<TPayload>([CallerMemberName] string name = "") where TPayload : JsObject, new(); // object payload
+    protected Message<TData> Message<TData>([CallerMemberName] string name = "");                       // data payload
 }
 ```
 
@@ -304,24 +377,62 @@ p.Post(url)
     the render-time checks go.
   - Modifier-clicks stay with the browser.
 
-### 4.7 Events, dispatch and realtime
+### 4.7 Events on any object: components, the document, streams and hubs
+
+Every trigger has one form: **an object, its event, a callback.** A rendered component uses
+`.Reactive(c => c.Change, (args, p) => ..)`, where the object is the one just rendered. Every other
+object uses `t.On(object, o => o.Event, (payload, p) => ..)`.
 
 ```csharp
+// A server-sent event stream: an EventSource at a URL.
+public sealed class CensusStream : EventStream
+{
+    public Message<CensusUpdate> Census => Message<CensusUpdate>();          // the named SSE event "census"
+    public Message<CensusUpdate> Unnamed => Message<CensusUpdate>("message"); // messages sent without an event name
+}
+
+// A SignalR hub: a HubConnection at a URL. Server-to-client methods are its events.
+public sealed class ResidentHub : HubConnection
+{
+    public Message<ResidentStatus> StatusChanged => Message<ResidentStatus>(nameof(IResidentClient.StatusChanged));
+    public Event Reconnected => Event();
+    public ReadOnly<string> ConnectionId => ReadOnly<string>();
+    public Value<int> GetCensus(Arg<string> wing) => InvokeAsync<int>(wing);   // client to server; returns a value
+    public void Acknowledge(Arg<int> alertId) => Send(alertId);                // client to server; returns nothing
+}
+
 public static class CareEvents { public static readonly AppEvent<ResidentFlagged> Flagged = new("resident-flagged"); }
 
-p.Dispatch(CareEvents.Flagged, e => e.Set(x => x.ResidentId, row.Get(r => r.Id)));
+var census = p.Stream<CensusStream>(Url.Action("Census", "Live"));
+var residents = p.Hub<ResidentHub>("/hubs/resident");
+
 Html.On(plan, t => t
-    .DomReady(p => ..)
-    .On(CareEvents.Flagged, (e, p) => ..)
-    .ServerPush<CensusUpdate>(pushUrl, "census", (msg, p) => ..)
-    .SignalR<ResidentFlagged>(hubUrl, nameof(IResidentClient.Flagged), (msg, p) => ..));
+    .DomReady(p => ..)                                             // document.ready
+    .On(CareEvents.Flagged, (e, p) => ..)                          // a document custom event
+    .On(census, s => s.Census, (msg, p) => occupancy.Value.Set(msg.Get(x => x.Occupied)))
+    .On(residents, h => h.StatusChanged, (msg, p) =>
+        p.When(msg.Get(x => x.Status)).Eq("Critical").Then(t => residents.Acknowledge(msg.Get(x => x.AlertId))))
+    .On(residents, h => h.Reconnected, (e, p) => ..));
+p.Dispatch(CareEvents.Flagged, e => e.Set(x => x.ResidentId, row.Get(r => r.Id)));
 ```
 
-- **One declared value for a custom event.** The dispatcher and the listener share it, so they
-  cannot disagree on the name or the payload type.
-- **SignalR.** The method name comes from the hub's typed client interface, as with ASP.NET Core's
-  strongly typed hubs.
-- **Component events** keep `.Reactive(c => c.Change, (args, p) => ..)` on the rendered handle.
+- **One trigger kind.** Triggers are events on objects. `ServerPush` and `SignalR` stop being
+  separate trigger kinds, and their URL, event-type and method-name strings move into
+  declarations.
+  - The SSE event name is the member name.
+  - The hub method name comes from the hub's typed client interface, as with ASP.NET Core's
+    strongly typed hubs.
+- **Payloads.** A message payload is data typed by the declaration. The runtime's existing rules
+  stay: SSE data is JSON-parsed, and a hub method takes a single object argument.
+- **Ownership.** An `On` inside an injected partial is owned by its slot. Unloading the slot
+  releases the subscription, and the connection closes when its last owner is gone. This is
+  today's reference counting, now a property of the locator.
+- **Custom events.** A custom event is one declared value that the dispatcher and the listener
+  share, so they cannot disagree on its name or its payload type.
+- **What realtime gains.** Calls from client to server (`invoke`, `send`), the connection's own
+  events (`Reconnecting`, `Reconnected`, `Closed`) and its properties (`State`, `ReadyState`) come
+  from the same model, with no realtime-specific grammar. No view uses them yet, so each one ships
+  with a journey that proves it.
 
 ### 4.8 Elements, plugins and app objects
 
@@ -499,11 +610,11 @@ Its whole vocabulary:
 
 | Concept | Kinds |
 |---|---|
-| Object | located by `element+vendor`, `fixed id`, `plugin name`, `payload`, `document`, `location`, or `the result of an expression`; members are names |
+| Object | located by `element+vendor`, `fixed id`, `plugin name`, `payload`, `document`, `location`, `stream(url)`, `hub(url)`, or `the result of an expression`; members are names. A stream or hub locator owns its connection: shared per URL, counted per owner, retried, shown in the retry indicator |
 | Expression | `literal`, `read(source, path)`, `call(target, member, args, await)`, `lambda(params, body)`, `object`, `array`, `op`, `convert` |
 | Op | C#'s operator set (comparison, logical, arithmetic, `??`, `?:`) plus `empty`. It is closed, because C#'s operators are |
 | Reaction | `sequence`, `set`, `call`, `branch`, `request`, `parallel`, `dispatch`, `inject`, `show-errors` |
-| Trigger | `ready`, `event(object, name)`, `push(url, type)`, `hub(url, method)` |
+| Trigger | one kind: `event(object, name)`. Ready is the document's event; custom events, stream messages and hub methods are events of their objects, subscribed through the object's vendor data |
 | Form | field tests `{field, value, test, message, when}`; error display; live wiring (input clears; blur and the declared committed event revalidate); server errors by name |
 | Slot | load, unload |
 
@@ -515,8 +626,10 @@ Its whole vocabulary:
   - four null helpers;
   - all vendor knowledge.
 - **The async lane is decided in C#.** A `call` is awaited only when its member was declared async,
-  and the plan says so. HTTP, Confirm, async plugins, push and injection are async; everything else
-  stays sync.
+  and the plan says so.
+  - Async: HTTP, Confirm, async plugin and hub methods, injection, and the delivery of stream and
+    hub events.
+  - Everything else stays sync.
 
 ## 9. The plan document
 
@@ -555,6 +668,21 @@ mapped to the Playwright test that fails if it breaks. The lists are in
 | Validation | 117 | 72 | 7 | 9 | 29 |
 | **Total** | **531** | **369** | **51** | **21** | **90** |
 
+Realtime is part of step 0. Its gaps, from `use-cases/http.md`:
+
+| Status | Rows | What is missing |
+|---|---|---|
+| No test | 103 | a stream ignoring other event types |
+| No test | 104 | unnamed stream messages |
+| No test | 105 | one `EventSource` per URL |
+| No test | 108 | the untyped hub overload |
+| Weak | 109 | one hub connection shared with a partial, proven only by a console trace |
+| Weak | 110 | two hubs delivering independently |
+| Weak | 111 | repeated pushes updating the page |
+
+Each one gets a visible-outcome test before the stream and hub locators replace today's trigger
+kinds.
+
 1. **Step 0, before any redesign.**
    - Every weak, plan-only and missing row gets a Playwright test that fails when the behavior
      breaks: 162 rows in all.
@@ -577,6 +705,10 @@ mapped to the Playwright test that fails if it breaks. The lists are in
   events cannot appear in expression trees.
 - **Recording proxies over interfaces** (`DispatchProxy`). These need `Reflection.Emit` on net48 and
   have the same `T`-parameter problem.
+- **Realtime as trigger kinds of its own** (`ServerPush`, `SignalR`, and the previous draft). These leave `EventSource` and
+  `HubConnection` outside the object model, so their properties, their methods (`close`, `invoke`,
+  `send`) and their connection events have no typed access, and the runtime keeps two extra trigger
+  kinds.
 - **Lambdas instead of the fluent conditions** (`p.When(m => m.Age > 65)`). They would replace the
   owner's grammar and give branch conditions a second way to be written; the fluent grammar keeps
   its shape and gets types.
