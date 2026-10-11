@@ -2,7 +2,9 @@
 
 Branch `feature/component-redesign` (PR #177). Greenfield: no backward compatibility is kept.
 Verification is Playwright only. What the framework must keep doing:
-[`capability-catalog.md`](capability-catalog.md).
+[`capability-catalog.md`](capability-catalog.md). The next design, which connects components,
+conditions, validation, arrays, plugins and gather through one core:
+[`redesign-decisions.md`](redesign-decisions.md).
 
 ## Goal
 
