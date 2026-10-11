@@ -102,14 +102,14 @@
                     .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionSmartPasteButton>("smart-paste").Click();
+                        p.Component<FusionSmartPasteButton>("smart-paste").Call(c => c.Click);
                         p.Element("paste-command-status").SetText("click called");
                     }))
                 @(Html.NativeButton("focus-smart-paste-btn", "Focus Paste")
                     .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionSmartPasteButton>("smart-paste").FocusIn();
+                        p.Component<FusionSmartPasteButton>("smart-paste").Call(c => c.FocusIn);
                         p.Element("paste-focus-status").SetText("focus called");
                     }))
                 @(Html.NativeButton("disable-smart-paste-btn", "Disable Paste")
@@ -117,8 +117,8 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var paste = p.Component<FusionSmartPasteButton>("smart-paste");
-                        paste.SetDisabled(true);
-                        p.Element("paste-disabled-value").SetText(paste.Disabled());
+                        paste.Set(c => c.Disabled, true);
+                        p.Element("paste-disabled-value").SetText(paste.Get(c => c.Disabled));
                     }))
             </native-hstack>
 

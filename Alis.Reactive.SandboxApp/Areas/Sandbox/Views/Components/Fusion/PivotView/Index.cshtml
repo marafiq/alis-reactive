@@ -24,8 +24,8 @@
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
                     var pivot = p.Component<FusionPivotView>("care-pivot");
-                    p.Element("current-view").SetText(pivot.CurrentView());
-                    p.Element("layout-json").SetText(pivot.PersistedLayout());
+                    p.Element("current-view").SetText(pivot.Get(c => c.CurrentView));
+                    p.Element("layout-json").SetText(pivot.Get(c => c.GetPersistData, true));
                 }))
 
             @(Html.NativeButton("load-march-btn", "Load March Census")
@@ -37,7 +37,7 @@
                      .Response(r => r.OnSuccess<PivotCensusResponse>((json, s) =>
                      {
                          s.Component<FusionPivotView>("care-pivot")
-                             .SetDataSource(json, x => x.Rows);
+                             .Set(c => c.DataSource, json.Read(x => x.Rows)).Call(c => c.Refresh);
                          s.Element("data-status").SetText(json, x => x.Message);
                      }));
                 }))
@@ -46,7 +46,7 @@
                 .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionPivotView>("care-pivot").Refresh();
+                    p.Component<FusionPivotView>("care-pivot").Call(c => c.Refresh);
                     p.Element("refresh-status").SetText("refresh called");
                 }))
 
@@ -57,10 +57,10 @@
                     var pivot = p.Component<FusionPivotView>("care-pivot");
                     p.Post("/api/pivot/{currentView}/audit")
                      .Gather(g => g
-                         .RouteParam("currentView", pivot.CurrentView())
+                         .RouteParam("currentView", pivot.Get(c => c.CurrentView))
                          .FromUrl("facilityId")
-                         .Include(pivot.CurrentView(), "currentView")
-                         .Include(pivot.PersistedLayout(), "layout"))
+                         .Include(pivot.Get(c => c.CurrentView), "currentView")
+                         .Include(pivot.Get(c => c.GetPersistData, true), "layout"))
                      .Response(r => r.OnSuccess<PivotAuditResponse>((json, s) =>
                      {
                          s.Element("audit-summary").SetText(json, x => x.Summary);
@@ -74,11 +74,11 @@
                 {
                     var pivot = p.Component<FusionPivotView>("care-pivot");
                     p.Post("/api/pivot/layout/echo")
-                     .Gather(g => g.Include(pivot.PersistedLayout(), "layout"))
+                     .Gather(g => g.Include(pivot.Get(c => c.GetPersistData, true), "layout"))
                      .Response(r => r.OnSuccess<PivotLayoutResponse>((json, s) =>
                      {
                          s.Component<FusionPivotView>("care-pivot")
-                             .LoadPersistedLayout(json, x => x.Layout);
+                             .Call(c => c.LoadPersistData, json.Read(x => x.Layout));
                          s.Element("layout-status").SetText(json, x => x.Message);
                      }));
                 }))
@@ -87,7 +87,7 @@
                 .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionPivotView>("care-pivot").ShowConditionalFormattingDialog();
+                    p.Component<FusionPivotView>("care-pivot").Call(c => c.ShowConditionalFormattingDialog);
                     p.Element("dialog-status").SetText("conditional formatting opened");
                 }))
 
@@ -95,7 +95,7 @@
                 .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionPivotView>("care-pivot").CreateCalculatedFieldDialog();
+                    p.Component<FusionPivotView>("care-pivot").Call(c => c.CreateCalculatedFieldDialog);
                     p.Element("dialog-status").SetText("calculated field opened");
                 }))
         </native-hstack>

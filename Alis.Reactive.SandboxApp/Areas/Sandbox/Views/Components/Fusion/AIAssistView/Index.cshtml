@@ -23,7 +23,7 @@
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
                     p.Component<FusionAIAssistView>("care-ai")
-                        .ExecutePrompt("Summarize the medication changes");
+                        .Call(c => c.ExecutePrompt, "Summarize the medication changes");
                     p.Element("command-status").SetText("executePrompt called");
                 }))
 
@@ -32,10 +32,7 @@
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
                     p.Component<FusionAIAssistView>("care-ai")
-                        .AddPromptResponse(
-                            "Care plan follow up",
-                            "Schedule hydration checks and confirm the updated medication list with the nurse.",
-                            true);
+                        .Call(c => c.AddPromptResponseModel, new FusionAIAssistViewPromptModel { Prompt = "Care plan follow up", Response = "Schedule hydration checks and confirm the updated medication list with the nurse." }, true);
                     p.Element("object-response-status").SetText("object response added");
                 }))
 
@@ -44,8 +41,8 @@
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
                     var assist = p.Component<FusionAIAssistView>("care-ai");
-                    assist.SetPrompt("Prepare discharge summary");
-                    p.Element("current-prompt").SetText(assist.Prompt());
+                    assist.Set(c => c.Prompt, "Prepare discharge summary");
+                    p.Element("current-prompt").SetText(assist.Get(c => c.Prompt));
                 }))
 
             @(Html.NativeButton("read-active-view-btn", "Read Active View")
@@ -53,14 +50,14 @@
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
                     p.Element("active-view").SetText(
-                        p.Component<FusionAIAssistView>("care-ai").ActiveView());
+                        p.Component<FusionAIAssistView>("care-ai").Get(c => c.ActiveView));
                 }))
 
             @(Html.NativeButton("scroll-bottom-btn", "Scroll Bottom")
                 .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionAIAssistView>("care-ai").ScrollToBottom();
+                    p.Component<FusionAIAssistView>("care-ai").Call(c => c.ScrollToBottom);
                     p.Element("scroll-status").SetText("scrollToBottom called");
                 }))
         </native-hstack>
@@ -100,7 +97,7 @@
             p.Element("request-prompt").SetText(args, x => x.Prompt);
             p.Element("request-status").SetText("promptRequest fired");
             p.Component<FusionAIAssistView>("care-ai")
-                .AddPromptResponse("Reactive response added from promptRequest.", true);
+                .Call(c => c.AddPromptResponse, "Reactive response added from promptRequest.", true);
         })
         .Reactive(evt => evt.StopRespondingClick, (args, p) =>
         {

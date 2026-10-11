@@ -32,7 +32,7 @@
                     .Name("roomChoice")
                     .Value("Studio Apartment")
                     .Label("Studio apartment"))
-                    .Reactive(evt => evt.Changed, (args, p) =>
+                    .Reactive(evt => evt.Change, (args, p) =>
                     {
                         p.Element("chosen-room").SetText(args, x => x.Value);
                         p.Element("room-detail").SetText("A studio suits a resident who wants a compact, easy-to-navigate space.");
@@ -43,7 +43,7 @@
                     .Name("roomChoice")
                     .Value("One-Bedroom Apartment")
                     .Label("One-bedroom apartment"))
-                    .Reactive(evt => evt.Changed, (args, p) =>
+                    .Reactive(evt => evt.Change, (args, p) =>
                     {
                         p.Element("chosen-room").SetText(args, x => x.Value);
                         p.Element("room-detail").SetText("A one-bedroom gives a separate living area for visiting family.");
@@ -54,7 +54,7 @@
                     .Name("roomChoice")
                     .Value("Shared Companion Suite")
                     .Label("Shared companion suite"))
-                    .Reactive(evt => evt.Changed, (args, p) =>
+                    .Reactive(evt => evt.Change, (args, p) =>
                     {
                         p.Element("chosen-room").SetText(args, x => x.Value);
 
@@ -85,10 +85,10 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var companion = p.Component<FusionRadioButton>(companionId);
-                        companion.SetChecked(true);
-                        p.Element("chosen-room").SetText(companion.SelectedValue());
+                        companion.Set(c => c.Checked, true).Call(c => c.DataBind);
+                        p.Element("chosen-room").SetText(companion.Get(c => c.GetSelectedValue));
 
-                        p.When(companion.SelectedValue()).Eq("Shared Companion Suite")
+                        p.When(companion.Get(c => c.GetSelectedValue)).Eq("Shared Companion Suite")
                             .Then(t => t.Element("room-detail")
                                 .SetText("Her last assessment recommended the shared companion suite."))
                             .Else(e => e.Element("room-detail")
@@ -100,8 +100,8 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var studio = p.Component<FusionRadioButton>(studioId);
-                        studio.Click();
-                        studio.FocusIn();
+                        studio.Call(c => c.Click);
+                        studio.Call(c => c.FocusIn);
                     }))
             </native-hstack>
         </native-vstack>
@@ -119,9 +119,9 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var companion = p.Component<FusionRadioButton>(companionId);
-                        companion.SetDisabled(true);
+                        companion.Set(c => c.Disabled, true).Call(c => c.DataBind);
 
-                        p.When(companion.Disabled()).Truthy()
+                        p.When(companion.Get(c => c.Disabled)).Truthy()
                             .Then(t => t.Element("companion-availability")
                                 .SetText("The companion suite is full this month and can't be chosen."))
                             .Else(e => e.Element("companion-availability")
@@ -133,9 +133,9 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var companion = p.Component<FusionRadioButton>(companionId);
-                        companion.SetDisabled(false);
+                        companion.Set(c => c.Disabled, false).Call(c => c.DataBind);
 
-                        p.When(companion.Disabled()).Truthy()
+                        p.When(companion.Get(c => c.Disabled)).Truthy()
                             .Then(t => t.Element("companion-availability")
                                 .SetText("The companion suite is full this month and can't be chosen."))
                             .Else(e => e.Element("companion-availability")
@@ -155,9 +155,9 @@
                     p.Post(Url.SandboxRoute("ConfirmPlan", "RadioButton"))
                         .Gather(g =>
                         {
-                            g.Include(companion.SelectedValue(), "room");
-                            g.Include(companion.Checked(), "companionSuiteChosen");
-                            g.Include(companion.Disabled(), "companionSuiteUnavailable");
+                            g.Include(companion.Get(c => c.GetSelectedValue), "room");
+                            g.Include(companion.Get(c => c.Checked), "companionSuiteChosen");
+                            g.Include(companion.Get(c => c.Disabled), "companionSuiteUnavailable");
                         })
                         .Response(r => r.OnSuccess<RoomPlanResponse>((json, s) =>
                         {
