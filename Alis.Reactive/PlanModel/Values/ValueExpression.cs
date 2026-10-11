@@ -110,17 +110,17 @@ namespace Alis.Reactive.PlanModel
             Read(from, path, Path.Parse(path), shape);
 
         internal static ValueExpression ReadWholePayload(PayloadSource from) =>
-            new ReadExpression(ValueRead.WholePayload(from, Shape.None));
+            new ReadExpression(ValueRead.Whole(from, Shape.None));
 
         internal static ValueExpression ReadWholePayload(PayloadSource from, Shape shape) =>
-            new ReadExpression(ValueRead.WholePayload(from, shape));
+            new ReadExpression(ValueRead.Whole(from, shape));
 
         /// <summary>Reads the current array element itself (identity, <c>x =&gt; x</c>) for primitive-element arrays.</summary>
         internal static ValueExpression ReadWholeElement() =>
-            new ReadExpression(ValueRead.WholeElement(PayloadSource.Element(), Shape.None));
+            new ReadExpression(ValueRead.Whole(PayloadSource.Element(), Shape.None));
 
         internal static ValueExpression ReadWholeElement(Shape shape) =>
-            new ReadExpression(ValueRead.WholeElement(PayloadSource.Element(), shape));
+            new ReadExpression(ValueRead.Whole(PayloadSource.Element(), shape));
 
         internal static ValueExpression Invoke(RuntimeObjectSource from, string method, Shape returns, IReadOnlyList<ValueExpression> args) =>
             new ReadExpression(ValueRead.Method(from, method, returns, args));
@@ -374,23 +374,18 @@ namespace Alis.Reactive.PlanModel
                 shape,
                 ValueReadAccess.Method(args));
 
-        internal static ValueRead WholePayload(PayloadSource from, Shape shape) =>
+        // The payload itself: a response body, an event payload or an array element, read with no path.
+        internal static ValueRead Whole(PayloadSource from, Shape shape) =>
             new ValueRead(
-                ValueReadTarget.ForWholePayload(from),
-                shape,
-                ValueReadAccess.Property);
-
-        internal static ValueRead WholeElement(PayloadSource from, Shape shape) =>
-            new ValueRead(
-                ValueReadTarget.ForWholeElement(from),
+                ValueReadTarget.ForWhole(from),
                 shape,
                 ValueReadAccess.Property);
     }
 
     internal sealed class ValueReadTarget
     {
-        private const string WholePayloadMember = "responseBody";
-        private const string WholeElementMember = "elementValue";
+        // Names the whole-payload read in diagnostics; no member of a payload is written this way.
+        private const string WholeLabel = "(whole payload)";
 
         private ValueReadTarget(Source from, MemberName member, Path path)
         {
@@ -409,11 +404,8 @@ namespace Alis.Reactive.PlanModel
         internal static ValueReadTarget ForMember(Source from, string member, Path path) =>
             new ValueReadTarget(from, MemberName.Of(member), path);
 
-        internal static ValueReadTarget ForWholePayload(PayloadSource from) =>
-            new ValueReadTarget(from, MemberName.Of(WholePayloadMember), Path.None);
-
-        internal static ValueReadTarget ForWholeElement(PayloadSource from) =>
-            new ValueReadTarget(from, MemberName.Of(WholeElementMember), Path.None);
+        internal static ValueReadTarget ForWhole(PayloadSource from) =>
+            new ValueReadTarget(from, MemberName.Of(WholeLabel), Path.None);
 
         private static ValueReadTarget ForMember(Source from, MemberName member) =>
             new ValueReadTarget(from, member, ValueReadPath.For(from, member));

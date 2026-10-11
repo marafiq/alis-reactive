@@ -1,0 +1,52 @@
+@model PharmacyConnectionModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Pharmacy Connection";
+    var plan = Html.ReactivePlan<PharmacyConnectionModel>();
+    var testOrderUrl = Url.SandboxRouteTemplate("TestOrder", "PharmacyConnection", "pharmacyId");
+    var pharmacies = new List<SelectListItem>
+    {
+        new SelectListItem("Riverside Pharmacy", "riverside"),
+        new SelectListItem("Northgate Pharmacy", "northgate"),
+    };
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Pharmacy Connection</native-heading>
+    <native-text color="Secondary">
+        Send a test order to a partner pharmacy before medication orders go to it. The pharmacy's own reply is shown as it sent it.
+    </native-text>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            @{ Html.InputField(plan, m => m.PharmacyId, o => o.Label("Pharmacy"))
+                .NativeDropDown(b => b.Items(pharmacies).Placeholder("-- Choose a pharmacy --")
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
+            @(Html.NativeButton("send-test-order-btn", "Send Test Order")
+                .CssClass("self-start rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Get(testOrderUrl)
+                     .Gather(g => g.RouteParam("pharmacyId", p.Component<NativeDropDown>(m => m.PharmacyId).Get(c => c.Value)))
+                     .Response(r => r.OnSuccess<PharmacyHandshake>((reply, s) =>
+                     {
+                         s.Element("pharmacy-reply").SetText(reply, x => x.ResponseBody);
+                         s.When(reply, x => x.StatusCode).Eq(200)
+                          .Then(connected => connected.Element("pharmacy-status").SetText("Connected"))
+                          .Else(down => down.Element("pharmacy-status").SetText("Not connected"));
+                     }));
+                }))
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            <p class="text-sm">Status: <span id="pharmacy-status" class="font-medium">Not tested</span></p>
+            <p class="text-sm text-text-secondary">Pharmacy replied: <span id="pharmacy-reply"></span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

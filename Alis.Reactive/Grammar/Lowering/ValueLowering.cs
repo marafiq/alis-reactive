@@ -12,8 +12,6 @@ namespace Alis.Reactive.Grammar.Lowering
     /// </summary>
     internal sealed class ValueLowering
     {
-        private const string WholePayloadMember = "responseBody";
-        private const string WholeElementMember = "elementValue";
         private const string RootCallMember = "$call";
 
         private readonly LoweringContext _context;
@@ -155,8 +153,7 @@ namespace Alis.Reactive.Grammar.Lowering
 
         private Expr PayloadRead(PayloadSource payload, ReadExpression read, LoweringScope scope)
         {
-            var whole = read.Member == WholePayloadMember || read.Member == WholeElementMember;
-            var path = whole ? G.NoPath : G.PathOf(read.Path);
+            var path = G.PathOf(read.Path);
             var (root, rootPath) = PayloadRoot(payload, scope);
 
             if (read.Access is MethodValueReadAccess method)
