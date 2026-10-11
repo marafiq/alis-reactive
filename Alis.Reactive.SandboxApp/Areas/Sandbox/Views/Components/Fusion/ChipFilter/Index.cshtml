@@ -48,7 +48,7 @@
     Html.NativeButton("apply-filters-btn", "Apply Filters")
         .Reactive(plan, evt => evt.Click, (args, p) =>
             p.DispatchWith<ChipFilterPayload>("filters-applied", b =>
-                b.Set(x => x.Selection, p.Component<FusionChipList>("care-filters").SelectedChips())));
+                b.Set(x => x.Selection, p.Component<FusionChipList>("care-filters").Get(c => c.GetSelectedChips))));
 }
 
 <native-vstack gap="Lg">

@@ -33,7 +33,7 @@
                 .Chips(chips)
                 .Selection(Selection.Multiple)
                 .EnableDelete(true))
-                .Reactive(evt => evt.Clicked, (args, p) =>
+                .Reactive(evt => evt.Click, (args, p) =>
                 {
                     p.Element("chip-clicked").SetText(args, x => x.Text);
                 })
@@ -47,14 +47,14 @@
                     .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionChipList>("care-tags").Add("Wound Care");
+                        p.Component<FusionChipList>("care-tags").Call(c => c.Add, "Wound Care");
                         p.Element("chip-command-status").SetText("add called");
                     }))
                 @(Html.NativeButton("select-index-chip-btn", "Select Index")
                     .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionChipList>("care-tags").SelectByIndex(1);
+                        p.Component<FusionChipList>("care-tags").Call(c => c.SelectByIndex, 1);
                         p.Element("chip-command-status").SetText("select index called");
                     }))
                 @(Html.NativeButton("select-text-chip-btn", "Select Text")
@@ -62,12 +62,12 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var tagList = p.Component<FusionChipList>("care-tags");
-                        tagList.Add("Wound Care");
-                        tagList.SelectByText("Hydration", "Wound Care");
+                        tagList.Call(c => c.Add, "Wound Care");
+                        tagList.Call(c => c.SelectByText, new[] { "Hydration", "Wound Care" }, "text");
                         p.DispatchWith<ChipSelectionPayload>("chip-selection-read", payload =>
                         {
-                            payload.Set(x => x.Selection, tagList.SelectedChips());
-                            payload.Set(x => x.Found, tagList.Find(1));
+                            payload.Set(x => x.Selection, tagList.Get(c => c.GetSelectedChips));
+                            payload.Set(x => x.Found, tagList.Get(c => c.Find, 1));
                         });
                         p.Element("chip-command-status").SetText("select text called");
                     }))
@@ -75,7 +75,7 @@
                     .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionChipList>("care-tags").RemoveByIndex(0);
+                        p.Component<FusionChipList>("care-tags").Call(c => c.RemoveByIndex, 0);
                         p.Element("chip-command-status").SetText("remove called");
                     }))
                 @(Html.NativeButton("read-selected-values-btn", "Read Selected Values")
@@ -83,8 +83,8 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var tagList = p.Component<FusionChipList>("care-tags");
-                        tagList.SelectByText("Hydration", "Medication Review");
-                        p.Element("selected-chip-values").SetText(tagList.SelectedChipValues());
+                        tagList.Call(c => c.SelectByText, new[] { "Hydration", "Medication Review" }, "text");
+                        p.Element("selected-chip-values").SetText(tagList.Get(c => c.SelectedChipValues));
                         p.Element("chip-command-status").SetText("selected values read");
                     }))
                 @(Html.NativeButton("apply-chip-filters-btn", "Apply Filters")
@@ -93,7 +93,7 @@
                     {
                         var tagList = p.Component<FusionChipList>("care-tags");
                         p.Post(Url.SandboxRoute("QuickFilter", "ChipList"))
-                         .Gather(g => g.Include(tagList.SelectedChipValues(), "filters"))
+                         .Gather(g => g.Include(tagList.Get(c => c.SelectedChipValues), "filters"))
                          .Response(r => r.OnSuccess<ChipQuickFilterResponse>((json, s) =>
                          {
                              s.Element("quick-filter-values").SetText(json, x => x.Filters);
@@ -129,7 +129,7 @@
                     .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionChipList>("index-tags").SelectByIndexes(0, 2);
+                        p.Component<FusionChipList>("index-tags").Call(c => c.SelectByIndexes, new[] { 0, 2 });
                         p.Element("index-chip-command-status").SetText("select indexes called");
                     }))
                 @(Html.NativeButton("set-selected-indexes-btn", "Set Selected Indexes")
@@ -137,15 +137,15 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var tagList = p.Component<FusionChipList>("index-tags");
-                        tagList.SetSelectedChipIndexes(0, 2);
-                        p.Element("selected-chip-indexes").SetText(tagList.SelectedChipIndexes());
+                        tagList.Set(c => c.SelectedChipIndexes, new[] { 0, 2 }).Call(c => c.DataBind);
+                        p.Element("selected-chip-indexes").SetText(tagList.Get(c => c.SelectedChipIndexes));
                         p.Element("index-chip-command-status").SetText("selected indexes set");
                     }))
                 @(Html.NativeButton("remove-indexes-chip-btn", "Remove Indexes")
                     .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionChipList>("index-tags").RemoveByIndexes(0, 2);
+                        p.Component<FusionChipList>("index-tags").Call(c => c.RemoveByIndexes, new[] { 0, 2 });
                         p.Element("index-chip-command-status").SetText("remove indexes called");
                     }))
             </native-hstack>

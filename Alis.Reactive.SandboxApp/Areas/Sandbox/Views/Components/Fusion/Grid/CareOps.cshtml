@@ -152,7 +152,7 @@
                 @(Html.FusionChipList(plan, "careops-risk-chips", b => b
                     .Chips(riskChips)
                     .Selection(Selection.Single))
-                    .Reactive(evt => evt.Clicked, (args, p) =>
+                    .Reactive(evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("CareOpsData", "Grid"))
                             .Gather(g =>
@@ -174,7 +174,7 @@
                 @(Html.FusionChipList(plan, "careops-care-chips", b => b
                     .Chips(careChips)
                     .Selection(Selection.Single))
-                    .Reactive(evt => evt.Clicked, (args, p) =>
+                    .Reactive(evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("CareOpsData", "Grid"))
                             .Gather(g =>
