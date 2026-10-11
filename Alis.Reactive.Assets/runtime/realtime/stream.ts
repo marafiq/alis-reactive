@@ -93,7 +93,7 @@ export const streamModule: Module = {
       try {
         payload = JSON.parse(message.data);
       } catch (error) {
-        log.error("message.unreadable", { url, event, error: toJavaScriptString(error) });
+        log.error("message.unreadable", { error: toJavaScriptString(error), url, event });
         return;
       }
       listener(payload);

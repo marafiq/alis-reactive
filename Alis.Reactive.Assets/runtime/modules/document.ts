@@ -24,7 +24,7 @@ export interface DocumentObject {
 }
 
 export function raise(name: string, detail?: unknown): void {
-  executeLog.debug("dispatch", { event: name });
+  executeLog.debug("dispatch", { event: name, detail });
   document.dispatchEvent(new CustomEvent(name, { detail: detail ?? {} }));
 }
 

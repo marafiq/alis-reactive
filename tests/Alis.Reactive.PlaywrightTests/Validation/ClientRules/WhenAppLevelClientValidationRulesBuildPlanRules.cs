@@ -39,13 +39,11 @@ public sealed class WhenAppLevelClientValidationRulesBuildPlanRules
         var rule = ClientValidationRulePlanHarness
             .RulesFor(doc.RootElement, nameof(ResidentAssessment.MemoryAssessmentScore))
             .Single();
-        var activation = rule.GetProperty("execution").GetProperty("activation");
-        var condition = activation.GetProperty("condition");
+        var condition = rule.GetProperty("when");
 
         Assert.Multiple(() =>
         {
-            Assert.That(activation.GetProperty("kind").GetString(), Is.EqualTo("when"));
-            Assert.That(condition.GetProperty("kind").GetString(), Is.EqualTo("all"));
+            Assert.That(condition.GetProperty("op").GetString(), Is.EqualTo("and"));
             Assert.That(ClientValidationRulePlanHarness.ConditionLeftComponents(condition), Is.EqualTo(new[]
             {
                 IdGenerator.For(typeof(ResidentAssessment), nameof(ResidentAssessment.IsVeteran)),

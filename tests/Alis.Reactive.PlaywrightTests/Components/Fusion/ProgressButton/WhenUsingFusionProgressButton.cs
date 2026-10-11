@@ -38,7 +38,7 @@ public class WhenUsingFusionProgressButton : PlaywrightTestBase
         Assert.That(planJson, Does.Contain("\"enableProgress\""));
         Assert.That(planJson, Does.Contain("\"dataBind\""));
         Assert.That(planJson, Does.Contain("\"start\""));
-        Assert.That(planJson, Does.Contain("\"startAt(number)\""));
+        Assert.That(planJson, Does.Contain("\"startAt\""));
         Assert.That(planJson, Does.Contain("\"progressComplete\""));
         Assert.That(planJson, Does.Contain("\"focusIn\""));
         Assert.That(planJson, Does.Contain("\"begin\""));

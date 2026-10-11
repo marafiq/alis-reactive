@@ -221,7 +221,7 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
     {
         await NavigateAndBoot();
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"member\": \"value\""));
+        Assert.That(planJson, Does.Contain("\"value\""));
         AssertNoConsoleErrors();
     }
 

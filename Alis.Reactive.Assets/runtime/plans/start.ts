@@ -37,7 +37,7 @@ function subscribeHandlers(world: PlanWorld, owner: Owner): void {
     try {
       world.subscribe(handler.on, handler.event, payload => runHandler(handler, payload, world), owner);
     } catch (error) {
-      log.error("handler.subscribe-failed", { on: handler.on, event: handler.event, error: toJavaScriptString(error) });
+      log.error("handler.subscribe-failed", { error: toJavaScriptString(error), on: handler.on, event: handler.event });
     }
   }
 }
@@ -50,9 +50,9 @@ export function runHandler(handler: Handler, payload: unknown, world: PlanWorld)
   try {
     const completion = executeBlock(handler.do, { env, world });
     if (isPromise(completion)) {
-      completion.catch(error => log.error("handler.failed", { source, error: toJavaScriptString(error) }));
+      completion.catch(error => log.error("handler.failed", { error: toJavaScriptString(error), source }));
     }
   } catch (error) {
-    log.error("handler.failed", { source, error: toJavaScriptString(error) });
+    log.error("handler.failed", { error: toJavaScriptString(error), source });
   }
 }

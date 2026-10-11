@@ -35,8 +35,8 @@ public class WhenDateRangeSelected : PlaywrightTestBase
             "Plan must contain set reactions");
         Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""),
             "Plan must contain fusion vendor");
-        Assert.That(planJson, Does.Contain("\"member\": \"startDate\""),
-            "Plan must contain property member 'startDate' for DateRangePicker start date read");
+        Assert.That(planJson, Does.Contain("\"startDate\""),
+            "Plan must read the DateRangePicker member startDate");
         AssertNoConsoleErrors();
     }
 

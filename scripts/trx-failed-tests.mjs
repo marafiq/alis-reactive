@@ -46,6 +46,12 @@ while ((match = result.exec(xml)) !== null) {
 }
 
 const fqns = [...selected.keys()].sort();
+// GitHub shows ten error annotations per step, so a shard with more failures leads with one that
+// names them all; the detailed ones that follow are cut at ten.
+const annotationsShownPerStep = 10;
+if (mode === "annotations" && fqns.length > annotationsShownPerStep) {
+  console.log(`::error title=${fqns.length} failed tests::${fqns.join("%0A")}`);
+}
 for (const fqn of fqns) {
   console.log(mode === "annotations" ? annotation(fqn, selected.get(fqn)) : fqn);
 }

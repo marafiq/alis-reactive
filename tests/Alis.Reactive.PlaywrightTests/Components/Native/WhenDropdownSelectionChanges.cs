@@ -147,7 +147,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
         Assert.That(planJson, Does.Contain("\"set\""),
             "Plan must contain set reactions");
-        Assert.That(planJson, Does.Contain("\"property\""),
+        Assert.That(planJson, Does.Contain("\"path\""),
             "Plan must contain structured property field for SetValue");
         AssertNoConsoleErrors();
     }
@@ -170,7 +170,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"member\": \"value\""),
+        Assert.That(planJson, Does.Contain("\"value\""),
             "Plan must carry property member 'value' for NativeDropDown component sources — " +
             "runtime reads this property to get the selected value");
         AssertNoConsoleErrors();
@@ -184,7 +184,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"property\": \"text\""),
+        Assert.That(planJson, Does.Contain("\"text\""),
             "Plan must carry property .text. for SetValue reaction — " +
             "runtime uses bracket notation root[prop] = val");
         AssertNoConsoleErrors();

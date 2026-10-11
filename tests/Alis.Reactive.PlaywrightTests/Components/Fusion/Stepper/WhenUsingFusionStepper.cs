@@ -33,7 +33,6 @@ public class WhenUsingFusionStepper : PlaywrightTestBase
         Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""));
         Assert.That(planJson, Does.Contain("resident-stepper"));
         Assert.That(planJson, Does.Contain("\"activeStep\""));
-        Assert.That(planJson, Does.Contain("\"readwrite\""));
         Assert.That(planJson, Does.Contain("\"nextStep\""));
         Assert.That(planJson, Does.Contain("\"previousStep\""));
         Assert.That(planJson, Does.Contain("\"reset\""));

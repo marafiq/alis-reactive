@@ -50,7 +50,7 @@ export async function send(request: HttpRequest): Promise<HttpResponse> {
     response = await fetch(url, init);
   } catch (error) {
     const event = error instanceof TypeError ? "fetch.network-error" : "fetch.client-error";
-    log.error(event, { method: request.method, url, error: toJavaScriptString(error) });
+    log.error(event, { error: toJavaScriptString(error), method: request.method, url });
     return { status: 0, ok: false, body: undefined };
   }
 
@@ -65,7 +65,7 @@ export async function send(request: HttpRequest): Promise<HttpResponse> {
     const body = await readBody(response);
     return { status: response.status, ok: response.ok, body };
   } catch (error) {
-    log.error("fetch.body-unreadable", { method: request.method, url, error: toJavaScriptString(error) });
+    log.error("fetch.body-unreadable", { error: toJavaScriptString(error), method: request.method, url });
     return { status: 0, ok: false, body: undefined };
   }
 }

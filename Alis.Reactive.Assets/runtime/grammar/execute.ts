@@ -40,14 +40,21 @@ function execute(statement: Statement, scope: Scope): Completion {
 function set(statement: SetStatement, scope: Scope): void {
   const target = evaluate(statement.target, scope);
   const value = shaped(evaluate(statement.value, scope), statement.shape);
+  log.trace("set", { target: traceName(statement.target), path: statement.path, value });
   write(target, statement.path, value, modeOf(statement.target), labelOf(statement.target));
 }
 
 function perform(expr: Expr, awaits: boolean, scope: Scope): Completion {
+  if (expr.kind === "call") log.trace("call", { target: traceName(expr.target), path: expr.path });
   const result = evaluate(expr, scope);
   if (!isPromise(result)) return;
   if (awaits) return result.then(() => undefined);
   result.catch(error => log.error("call.rejected", { error: toJavaScriptString(error) }));
+}
+
+// A trace names a located object by its id, the way the view named it.
+function traceName(target: Expr): string {
+  return target.kind === "obj" ? target.id : labelOf(target);
 }
 
 function bind(name: string, expr: Expr, awaits: boolean, scope: Scope): Completion {

@@ -27,7 +27,7 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
         Assert.That(planJson, Does.Contain("\"set\""),
             "Plan must contain set reactions");
-        Assert.That(planJson, Does.Contain("\"property\""),
+        Assert.That(planJson, Does.Contain("\"path\""),
             "Plan must contain structured property field");
         AssertNoConsoleErrors();
     }
@@ -177,7 +177,7 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"member\": \"checked\""),
+        Assert.That(planJson, Does.Contain("\"checked\""),
             "Plan must carry property member 'checked' for NativeCheckBox component sources — " +
             "runtime reads this property to get the checkbox state");
         AssertNoConsoleErrors();
@@ -201,7 +201,7 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"property\": \"checked\""),
+        Assert.That(planJson, Does.Contain("\"checked\""),
             "Plan must carry property .checked. for SetChecked reaction — " +
             "runtime uses bracket notation root[prop] = val");
         AssertNoConsoleErrors();

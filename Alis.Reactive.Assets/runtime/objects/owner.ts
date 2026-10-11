@@ -47,7 +47,7 @@ export class Owner {
       try {
         hook();
       } catch (error) {
-        log.error("start.hook-failed", { owner: this.name, error: toJavaScriptString(error) });
+        log.error("start.hook-failed", { error: toJavaScriptString(error), owner: this.name });
       }
     }
   }
@@ -59,7 +59,7 @@ export class Owner {
       try {
         disposer();
       } catch (error) {
-        log.error("dispose.failed", { owner: this.name, error: toJavaScriptString(error) });
+        log.error("dispose.failed", { error: toJavaScriptString(error), owner: this.name });
       }
     }
   }
