@@ -14,6 +14,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? FamilyPortalLink { get; set; }
         public bool IsReturning { get; set; }
         public string? PreviousRoom { get; set; }
+
+        /// <summary>Where the resident's mail is forwarded from: a five-digit ZIP code.</summary>
+        public string? ForwardingZip { get; set; }
+
+        /// <summary>The care team writes the care plan summary on its own page; this review never renders it.</summary>
+        public string? CarePlanSummary { get; set; }
         public PharmacyContact Pharmacy { get; set; } = new PharmacyContact();
 
         /// <summary>The coordinator on duty; the server fills it in, so the page never renders it.</summary>

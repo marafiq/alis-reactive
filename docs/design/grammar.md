@@ -457,8 +457,9 @@ imports none of them. The obligations are numbered so that tests and code can ci
   failing `check` decides.
 - **F4 Validate.** First clear every inline message and the summary, then evaluate every field,
   then return the AND.
-- **F5 Unmounted field.** A field with no element is skipped when all its `when`s are false.
-  Otherwise the form is invalid, and the summary gets the message of the field's first test.
+- **F5 Unmounted field.** A field with no element posts no value, so each active test checks
+  nothing, as the server checks a missing member: a required test fails, a length or a pattern
+  passes. The first failing test's message goes to the summary.
 - **F6 Display.** A message goes inline into `{id}_error` when that slot is renderable: it has a
   parent, and no ancestor has `hidden` or `display: none`. Then the field gets `alis-has-error`.
   Otherwise the message goes to the summary, `{planId with . and + as _}_validation_summary`, one
@@ -720,9 +721,10 @@ proves it is named in the pull request.
   `Include` and `ChildRules` read the child validator instance the rule holds; one a factory chooses
   per model, or `SetInheritanceValidator` by type, stays on the server. `NotNull` reads as required
   except on a collection. `Matches` carries `IgnoreCase`, `Multiline` and `Singleline` as flags; a
-  pattern built from the model, or with an option JavaScript lacks, stays on the server. A message written from the model (`WithMessage(x => ...)`) keeps its
-  component on the server. `.ServerOnly()` keeps a rule
-  on the server. A peer must be a sibling; any other peer is refused when the page renders. The
+  pattern built from the model, with an option JavaScript lacks, or with syntax JavaScript reads
+  differently (`\A`, `\z`, `\G`, inline `(?i)`, atomic and comment groups, `\p{..}`, class
+  subtraction) stays on the server. A message written from the model (`WithMessage(x => ...)`)
+  keeps its component on the server. `.ServerOnly()` keeps a rule on the server. A peer must be a sibling; any other peer is refused when the page renders. The
   rules are read per request, from the validator that request resolves (7.1).
 
 - Awaited members (section 5): `Method(..).Awaited()` lowers a call to `do await call(…)`, and a read of

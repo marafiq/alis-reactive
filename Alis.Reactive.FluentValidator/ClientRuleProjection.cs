@@ -169,16 +169,25 @@ namespace Alis.Reactive.FluentValidator
         // RegexOptions with no JavaScript flag: the browser cannot read such a pattern the same way.
         private const RegexOptions NoJavaScriptForm = RegexOptions.IgnorePatternWhitespace | RegexOptions.RightToLeft;
 
+        // Syntax .NET reads one way and JavaScript another, or not at all: \A \Z \z \G anchors, inline
+        // options (?i) and (?i:...), atomic (?>...) and comment (?#...) groups, (?'name') groups, Unicode
+        // classes \p{..} (literal "p" without JavaScript's u flag) and class subtraction [a-z-[aeiou]],
+        // a "-[" inside a class (a hyphen before a class, as in \d{3}-[A-Z], is the same in both).
+        private static readonly Regex DotNetOnlySyntax = new Regex(
+            @"\\[AZzG]|\(\?[imnsx-]+[:)]|\(\?>|\(\?#|\(\?'|\\[pP]\{|\[[^\]]*-\[",
+            RegexOptions.CultureInvariant);
+
         // The regex FluentValidation tests with, as a JavaScript pattern and flags. A pattern built from
-        // the model (Matches(x => ...)) has no text until a model exists, and an option JavaScript lacks
-        // would read the text differently: both stay on the server.
+        // the model (Matches(x => ...)) has no text until a model exists, and an option or syntax
+        // JavaScript lacks would read the text differently: those stay on the server.
         private static IReadOnlyList<BrowserCheck> PatternCheck(IRegularExpressionValidator validator, ClientMessage message)
         {
             var builtFromModel = validator.Expression == null;
             if (builtFromModel) return Array.Empty<BrowserCheck>();
 
             var regex = FixedRegexOf(validator);
-            if ((regex.Options & NoJavaScriptForm) != 0) return Array.Empty<BrowserCheck>();
+            var readsDifferently = (regex.Options & NoJavaScriptForm) != 0 || DotNetOnlySyntax.IsMatch(regex.ToString());
+            if (readsDifferently) return Array.Empty<BrowserCheck>();
 
             var flags = (regex.Options.HasFlag(RegexOptions.IgnoreCase) ? "i" : "")
                 + (regex.Options.HasFlag(RegexOptions.Multiline) ? "m" : "")
@@ -294,14 +303,14 @@ namespace Alis.Reactive.FluentValidator
         }
 
         // No model exists at render: a held validator is returned as is; a factory that reads the model
-        // fails on the missing model, and a validator chosen by the value's type finds no value.
+        // fails without one, whatever it throws, and a validator chosen by the value's type finds no value.
         private static IValidator? ChildValidator<TModel, TProperty>(ChildValidatorAdaptor<TModel, TProperty> adaptor)
         {
             try
             {
                 return adaptor.GetValidator(new ValidationContext<TModel>(default!), default!);
             }
-            catch (NullReferenceException)
+            catch (Exception)
             {
                 return null;
             }
@@ -348,8 +357,8 @@ namespace Alis.Reactive.FluentValidator
         }
 
         // The component's message template. A message written from the model (WithMessage(x => ...))
-        // fails on the missing model when the page renders; the browser cannot say it, so the
-        // component stays on the server.
+        // fails without a model when the page renders, whatever it throws; the browser cannot say it,
+        // so the component stays on the server.
         private static bool TryMessageTemplateOf(IRuleComponent component, out string template)
         {
             try
@@ -357,7 +366,7 @@ namespace Alis.Reactive.FluentValidator
                 template = component.GetUnformattedErrorMessage();
                 return true;
             }
-            catch (NullReferenceException)
+            catch (Exception)
             {
                 template = "";
                 return false;
@@ -372,7 +381,7 @@ namespace Alis.Reactive.FluentValidator
             {
                 return rule.GetDisplayName(null);
             }
-            catch (NullReferenceException)
+            catch (Exception)
             {
                 return SplitPascalCase(rule.PropertyName);
             }

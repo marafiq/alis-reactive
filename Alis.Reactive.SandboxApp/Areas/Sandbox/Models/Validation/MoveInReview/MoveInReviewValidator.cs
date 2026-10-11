@@ -40,6 +40,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.Pharmacy).ChildRules(pharmacy =>
                 pharmacy.RuleFor(x => x.Phone).Matches(@"^\d{3}-\d{4}$").WithMessage("Enter the pharmacy phone as 555-0100."));
 
+            // \z is .NET's end of input; JavaScript reads it as a letter z, so the server checks this pattern.
+            RuleFor(x => x.ForwardingZip)
+                .Matches(@"^\d{5}\z").WithMessage("Enter the forwarding ZIP as five digits.");
+
+            // A field another page edits: this page sends no summary, which is under 500 characters.
+            RuleFor(x => x.CarePlanSummary).MaximumLength(500).WithMessage("Keep the care plan summary under 500 characters.");
+
             // A condition written as a method: the server decides it, so the browser does not run the rule.
             When(IsReturningResident, () =>
                 RuleFor(x => x.PreviousRoom).NotEmpty().WithMessage("A returning resident's previous room is required."));

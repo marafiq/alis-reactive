@@ -31,6 +31,8 @@
                 .NativeCheckBox(b => b.CssClass("rounded border-border")); }
             @{ Html.InputField(plan, m => m.PreviousRoom, o => o.Label("Previous room"))
                 .NativeTextBox(b => b.Placeholder("Maple 214").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.ForwardingZip, o => o.Label("Mail forwarding ZIP"))
+                .NativeTextBox(b => b.Placeholder("02139").CssClass(Field)); }
         </form>
         @(Html.NativeButton("save-review-btn", "Save Review")
             .CssClass("mt-4 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")

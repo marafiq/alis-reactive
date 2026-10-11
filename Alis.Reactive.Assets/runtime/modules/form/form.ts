@@ -129,14 +129,19 @@ function evaluateField(entry: Entry, container: HTMLElement, summary: HTMLElemen
   return true;
 }
 
+// A field the page does not render posts no value, so its active tests run against nothing, as the
+// server's run against a missing member: a required test fails, a length or a pattern passes. A
+// failure has no message slot on the page and goes to the summary.
 function unmountedField(entry: Entry, summary: HTMLElement | null): boolean {
   const { field } = entry;
-  log.trace("validation-field.inactive", { field: field.id });
-  const allInactive = field.tests.every(test => testIsInactive(entry, test));
-  if (allInactive) return true;
-  const first = field.tests[0];
-  if (first) addSummaryError(summary, field.id, first.message);
-  return false;
+  log.trace("validation-field.unmounted", { field: field.id });
+  for (const test of field.tests) {
+    if (testIsInactive(entry, test)) continue;
+    if (checkPasses(entry, test, undefined)) continue;
+    addSummaryError(summary, field.id, test.message);
+    return false;
+  }
+  return true;
 }
 
 function validate(containerId: string): boolean {

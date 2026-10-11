@@ -71,12 +71,13 @@ validator of the object that owns both.
 - rule sets other than the default, and `DependentRules`
 - a child validator chosen per model by a factory (`SetValidator(x => ...)`) or by type (`SetInheritanceValidator`)
 - a component whose message is written from the model (`WithMessage(x => $"... {x.Name}")`): the server says it
-- `Matches(x => ...)` (a pattern built from the model) and patterns with `IgnorePatternWhitespace` or `RightToLeft`
+- `Matches(x => ...)` (a pattern built from the model), patterns with `IgnorePatternWhitespace` or `RightToLeft`, and patterns with syntax JavaScript reads differently (`\A`, `\z`, `\G`, inline `(?i)`, `(?>...)`, `(?#...)`, `\p{..}`, class subtraction)
 - any rule followed by `.ServerOnly()`: use it for a member the page does not render
 
-A browser rule on a member with no input on the page blocks the form and shows its message in the
-validation summary (the rule may belong to a partial that has not loaded). Mark it `.ServerOnly()`
-when the server owns the member. A peer or a `When` member with no input reads as empty, as the
+A browser rule on a member with no input on the page checks a missing value, as the server does
+when the request does not carry the member: a required rule blocks the form and shows its message
+in the validation summary (the rule may belong to a partial that has not loaded); a length or a
+pattern passes. Mark a required rule `.ServerOnly()` when the server fills the member in. A peer or a `When` member with no input reads as empty, as the
 server binds a member the request does not carry; render it as a hidden field (`o.Hidden()`) when
 its value matters.
 

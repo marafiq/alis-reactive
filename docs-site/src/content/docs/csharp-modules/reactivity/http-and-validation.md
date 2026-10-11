@@ -115,7 +115,8 @@ The browser evaluates `NotEmpty`, `NotNull` (not on a collection), `Empty`, `Min
 `EmailAddress`, `Matches`, `CreditCard`, `Url()`, `InclusiveBetween`, `ExclusiveBetween`, and
 comparisons with a value or a sibling member. `SetValidator`, `RuleForEach(...).SetValidator`,
 `Include` and `ChildRules` bring a child validator's rules along. `Must`, `Custom` and async rules stay on
-the server, and so do a rule whose message is written from the model (`WithMessage(x => ...)`)
+the server, and so do a rule whose message is written from the model (`WithMessage(x => ...)`),
+a `Matches` pattern that JavaScript reads differently from .NET (`^\d{5}\z`, `(?i)...`),
 and any rule followed by `.ServerOnly()`.
 
 ## Conditional Rules

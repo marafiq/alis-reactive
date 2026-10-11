@@ -194,6 +194,40 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
     }
 
     [Test]
+    public async Task a_forwarding_zip_is_checked_the_way_the_server_checks_it()
+    {
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "2");
+        await Write(m => m.ForwardingZip, "0213");
+
+        await ClickWhenStable(SaveReview);
+
+        await Expect(_plan.ErrorFor(m => m.ForwardingZip)).ToHaveTextAsync("Enter the forwarding ZIP as five digits.");
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1), "The pattern ends in .NET's \\z, so the server checks it.");
+        await Write(m => m.ForwardingZip, "02139");
+        await ClickWhenStable(SaveReview);
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        Assert.That(_reviewsSent, Has.Count.EqualTo(2), "Five digits pass on the server, as the page let them through.");
+        AssertNoConsoleErrorsExcept("400");
+    }
+
+    [Test]
+    public async Task a_rule_for_the_care_plan_summary_another_page_edits_does_not_hold_up_the_review()
+    {
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "2");
+
+        await ClickWhenStable(SaveReview);
+
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        await Expect(ValidationSummary).ToBeHiddenAsync();
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1), "This page sends no care plan summary, which the length rule lets pass.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task the_server_asks_for_a_returning_residents_previous_room()
     {
         await NavigateAndBoot();
