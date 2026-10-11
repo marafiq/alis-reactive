@@ -32,6 +32,7 @@ export default defineConfig({
 						{ label: 'Events, Payloads, Members', slug: 'csharp-modules/reactivity/events-members-values' },
 						{ label: 'HTTP and Validation', slug: 'csharp-modules/reactivity/http-and-validation' },
 						{ label: 'Components', slug: 'components/overview' },
+						{ label: 'Bring Your Own Component', slug: 'components/bring-your-own' },
 					],
 				},
 				{
