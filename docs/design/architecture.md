@@ -1,7 +1,7 @@
-# Architecture: one object model, one value model, a lean runtime
+# Architecture: one grammar, one object model, a lean runtime
 
-Proposal on `feature/component-redesign` at `0452a4e`. It supersedes the proposal in the earlier
-`redesign-decisions.md`. What is already built is described in
+Proposal (v6) on `feature/component-redesign`. Section 0 is the spine; every later section is
+vocabulary on it. What is already built is described in
 [`bring-your-own-component.md`](bring-your-own-component.md).
 
 The constraints:
@@ -9,6 +9,225 @@ The constraints:
 - every feature is preserved;
 - the runtime stays a dumb executor of what the C# domain decides;
 - greenfield otherwise.
+
+## 0. The grammar
+
+What does a behavior in this framework say? Exactly what a developer would otherwise write by hand
+in a JavaScript event handler:
+
+```js
+link.addEventListener("click", async e => {
+  if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  e.preventDefault();
+  loader.show();
+  try {
+    const res = await http.send({ method: "POST", url: link.href, headers: { "X-Shift": "Night" } });
+    if (res.ok) status.textContent = res.body.message;
+    else if (res.status === 409) status.textContent = res.body.message;
+  } finally {
+    loader.hide();
+  }
+});
+```
+
+That handler uses objects and their members, expressions that produce values, and statements that
+cause effects. JavaScript needs nothing more, and neither does the framework. **The plan's grammar
+is JavaScript's own core, typed by C#.**
+
+### 0.1 Grammar and vocabulary
+
+- **Grammar** is the closed set of productions in 0.2. The runtime interprets them. It is as small
+  as JavaScript's core and it never grows.
+- **Vocabulary** is the open set of objects: components, elements, the document, plugins, streams,
+  hubs, and the framework's own features (HTTP, forms, slots, Confirm, Toast, Drawer, Loader). Each
+  object is declared through the one object contract (section 4.0), in the package that owns it.
+
+A new component or a new feature adds vocabulary, never grammar. This is the inversion applied to
+the framework itself: when HTTP, validation, partials and realtime are ordinary declarations, any
+component can do what they do.
+
+Today each feature brings a grammar of its own, and the generated contract has 136 interfaces, 60
+unions and 65 kinds:
+- gather has six verbs (`Include`, `IncludeAll`, `FromEvent`, `RouteParam`, `FromUrl`, `Static`);
+- requests have their own routing (`RequestPlan`, `ResponseRoute`, `RequestChain`);
+- conditions, validation rules and validation conditions are three boolean grammars with two
+  evaluators;
+- five trigger kinds each have their own shape;
+- dispatch, inject and show-errors are reaction kinds;
+- eight read kinds and five source kinds say "a value from somewhere".
+
+### 0.2 The productions
+
+```
+plan     := object* handler*
+object   := id -> locator
+locator  := element(id, vendor)          found on an element, through its vendor's data
+          | plugin(name)                 found by name in the app's bundle
+          | builtin(module, key)         made by a framework module: document, http, form, stream, hub
+handler  := on(object, event, param) block
+
+block    := stmt*
+stmt     := set(expr, path, expr)        o.a.b = v
+          | do(expr)           [await]   o.m(a);            await hub.start();
+          | let(name, expr)    [await]   const n = o.m(a);  const r = await http.send(q);
+          | if(arm+, block)              if (..) {..} else if (..) {..} else {..}
+          | all(block+)                  await Promise.allSettled([..])
+          | try(block, block)            try {..} finally {..}
+arm      := (expr, block)
+
+expr     := lit(json, shape)             42, "east", [1, 2]
+          | obj(id)                      a located object
+          | ref(name)                    a handler parameter, a let, a lambda parameter
+          | get(expr, path, shape)       o.a.b[0]
+          | call(expr, path, expr*, shape)  o.m(a), rows.filter(r => r.active)
+          | fn(name+, expr)              r => r.active
+          | record(entry*)               { a: v, ...o }
+          | list(expr*)                  [a, b]
+          | op(operator, expr+)          a > b, a && b, a ?? b, c ? a : b, toNumber(a), empty(a)
+entry    := name: expr | ...expr
+```
+
+One handler form, six statements, nine expressions, three locators. The operator set is C#'s own
+(comparison, logical, arithmetic, `??`, `?:`) plus conversions, `empty` and `matches` (a regular
+expression test, since the grammar constructs no objects). It is closed because C#'s is.
+
+### 0.3 Four laws
+
+1. **Only statements await.** Expressions are synchronous. An async member (an HTTP send, Confirm,
+   a hub `invoke`, an async plugin method) is awaited where it is written: the C# call emits
+   `let … await` (or `do … await`) into the active scope and returns a value naming the result, the
+   way the C# compiler spills an `await`.
+   - The runtime has one synchronous evaluator.
+   - Every statement before the first `await` runs synchronously, so a payload's `cancel` lands
+     before the vendor reads it.
+   - The async lane is decided in C#. A handler without `await` never becomes asynchronous.
+2. **Bindings are lexical.** A handler's payload, a `let` and a lambda parameter are names in
+   scope.
+   - A payload method called after an `await` still reaches its payload.
+   - A response is readable where it is bound, and a chained request reads it there.
+   - The request snapshot is the `let` that holds the gathered record.
+   - A `try` body's top-level bindings stay in scope after the `try`. Code after a `try` runs only
+     when its body completed, so each of them was bound.
+3. **A node carries what it needs.** `get`, `set` and `call` carry the JavaScript path and the shape
+   that the C# declaration knows where it is used. The runtime looks nothing up by member name, so
+   there is no declarations section, no member key and no contract merging.
+4. **Lifetime belongs to the owner.** The page or a slot owns each handler and each connection it
+   located. Unloading a slot unsubscribes its handlers, stops its in-flight blocks at their next
+   `await`, and releases its connections. The last owner closes a connection.
+
+### 0.4 Every feature is a sentence
+
+| Feature | Vocabulary | Grammar |
+|---|---|---|
+| Write a property, call a method | the object's members | `set`, `do` |
+| A returning method as a value | the object's members | `call` |
+| A component event and its payload | the component: `element(id, vendor)` | `on` |
+| Page ready | the document's `ready` event | `on` |
+| Custom events | `document.raise(name, detail)` and the event itself | `do`; `on` |
+| Server-sent events | `builtin(stream, url)` and its message events | `on` |
+| SignalR | `builtin(hub, url)`: client methods as events, `invoke` with a result, `send` | `on`; `let await`; `do await` |
+| Payload write (`cancel`); payload method after an async gap | the payload object | `set` or `do` on the handler's parameter |
+| When, ElseIf, Else, And, Or, Not, groups | none | `if`, `op` |
+| Confirm | `confirm.ask(message)`: async, returns a bool | `let await`, then `if` |
+| Arrays: Where, Select, OrderBy, Sum, Any … | JavaScript's array methods | `call` with `fn` |
+| Text: Contains, StartsWith, Length … | JavaScript's string members | `call`, `get` |
+| URL query | `document.query`: keys match case-insensitively; a repeated key reads as an array | `get` |
+| Element text, HTML, classes, visibility | the element's own DOM members | `set`, `do`, `get` |
+| Plugins | the plugin's members; a root function is a call with an empty path | `do`, `call`, `get` |
+| Get, Post, Put, Delete | `http.send(request)`: async; resolves to `{ status, ok, body }`; status 0 when no response came | `let await` |
+| Gather | the request record; `Form()` spreads `form.values` | `record` |
+| Response routes by status | the response's `ok` and `status` | `if` |
+| Request snapshot | the gathered record | `let`, `ref` |
+| WhileLoading, Finally | for example `loader.show()`, `loader.hide()` | statements before a `try`; its `finally` |
+| Validate before sending | `form.validate()` returns a bool | `if` |
+| Chained | none | `if (res.ok)` after the `try` |
+| Parallel, with completion | none | `all`, then statements |
+| Into, partial injection | `slot.load(html)`, `slot.unload()` | `do` |
+| Server validation errors | `form.showErrors(problem)` | `do` |
+| Validation rules | the form's tests `{ field, check, when, message }` | `fn`, `op`, `get` |
+| Live clearing, revalidation | inside the form: each input's input event and its declared `Committed` event | none |
+| Action link | the anchor: `click`, `href`; the payload's `preventDefault` and modifier keys | `on`, `if`, `do`, `get` |
+| Toast, Drawer, Loader | their members | `set`, `do` |
+
+### 0.5 One sentence, lowered
+
+The owner's fluent API keeps its shape. Each fluent method lowers to fixed productions, so the plan
+says exactly what runs. The `ShiftHandover` link (`V/HttpPipeline/ShiftHandover/Index.cshtml:30-39`),
+written with object handles:
+
+```csharp
+Html.NativeActionLink($"mark-read-{note.Key}", "Mark Read", markReadUrl, link => link
+    .Post()
+    .Gather(g => g.Header("X-Shift", "Night"))
+    .WhileLoading(l => loader.Show())
+    .Response(r => r
+        .OnSuccess<HandoverNoteRead>((json, s) => status.Text.Set(json.Get(x => x.Message)))
+        .OnError<HandoverNoteRead>(400, (json, e) => status.Text.Set(json.Get(x => x.Message)))
+        .OnError<HandoverNoteRead>(409, (json, e) => status.Text.Set(json.Get(x => x.Message))))
+    .Finally(f => loader.Hide()));
+```
+
+The plan it renders, written as JavaScript for reading (the JSON is the same tree). `link`,
+`loader`, `status` and `http` stand for `obj(id)` nodes:
+
+```js
+on(link, "click", e) {
+  if (!(e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) {
+    e.preventDefault();
+    loader.show();                                          // WhileLoading
+    try {
+      const req = {};                                       // the gathered record: the request snapshot
+      const res = await http.send({ method: "POST", url: link.href, values: req,
+                                    headers: { "X-Shift": "Night" }, format: "json" });
+      if (res.ok) status.textContent = res.body.message;    // OnSuccess
+      else if (res.status === 400) status.textContent = res.body.message;
+      else if (res.status === 409) status.textContent = res.body.message;
+    } finally {
+      loader.hide();                                        // Finally
+    }
+  }
+}
+```
+
+The inventoried rows (`use-cases/`) fall out of the shape instead of special code:
+
+| Rows | Behavior | Why the sentence does it |
+|---|---|---|
+| http 41 | A route parameter with no value: nothing is sent, Finally runs, the error is reported | `http.send` throws before sending; `finally` runs; the error propagates |
+| http 63 | An unmatched status runs no route, and Finally still runs | no arm matches |
+| http 64, 80 | A network failure reaches no status route, and Finally runs | status 0 matches no status; an untyped `OnError` would be the final `else` |
+| http 68, 69, 70, 81 | Chained runs only after success, after the parent's Finally, and reads the response | `if (res.ok) { … }` follows the `try` and reads `res` |
+| conditions 76, 77, 78 | Confirm OK runs Then; Cancel runs Else; Cancel stops a gated request | `const ok = await confirm.ask(..)`, then `if (ok)` |
+| conditions 69 | Confirm inside a grouped condition | the builder nests the `if`, repeating the shared branch, so the question is asked only when reached |
+
+A validation rule lowers the same way. `RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmitDate)`
+inside `When(x => x.Status == Status.Discharged, ..)` becomes one test of the form:
+
+```js
+{ field: "Ns_Admission__DischargeDate",
+  check: (value, model) => toTime(value) > toTime(model.admitDate),
+  when:  model => model.status === "Discharged",
+  message: "…" }
+```
+
+The check and the condition are expressions, so the browser evaluates them with the same evaluator
+as conditions and arrays. There is no rule engine.
+
+### 0.6 What the grammar removes
+
+| Today | Becomes |
+|---|---|
+| Five trigger kinds | `on` |
+| Nine reaction kinds | six statements; `request`, `dispatch`, `inject` and `show-validation-errors` are calls on vocabulary |
+| `RequestPlan`, `ResponseRoute`, `ResponseStatusMatch`, `RequestChain`, `RequestInput`, three gather targets, `RegisteredInputSelection`, `ParallelCompletion` | `let`, `if`, `try`, `record`, `all` |
+| `ConditionGraph`, `ValidationCondition`, `ValidationRule` with its executions and activations | `op` and `fn` |
+| Eight read kinds, five source kinds, four literal kinds | `obj`, `ref`, `get`, `call`, `lit` |
+| Per-element `types`, member contracts, contract merging | nothing: nodes carry their path and shape |
+| The runtime's comparison engine, array engine, rule engine, rule operands and condition evaluator | one evaluator |
+
+**C#.** The plan domain is the grammar: one sealed, immutable class per production, with its
+invariants in its constructor, serialized one to one. Builders and vocabulary declarations are its
+only producers, so a malformed sentence cannot be built.
 
 ## 1. What must survive
 
@@ -120,18 +339,18 @@ fails to compile:
 
 | JavaScript | Declared as | Used in a view | Plan node |
 |---|---|---|---|
-| read-write property | `public Prop<decimal> Min => Prop<decimal>();` | `rate.Min` is a value; `rate.Min.Set(0m)` | `read`, `set` |
-| read-only property | `public ReadOnly<int> ReadyState => ReadOnly<int>();` | a value; `.Set` does not exist | `read` |
-| method: no arguments, no return | `public void Refresh() => Call();` | `grid.Refresh();` | `call` |
-| method: arguments, no return | `public void SelectRow(Arg<int> index) => Call(index);` | `grid.SelectRow(2);` | `call` |
-| method: returns a value | `public Value<TRow[]> GetSelectedRecords() => Invoke<TRow[]>();` | a value: in conditions, sets, gather, arrays | `call` used as an expression |
-| method: arguments and a return | `public Value<int> GetActualIndex(Arg<int> a, Arg<int> b) => Invoke<int>(a, b);` | a value | `call` as an expression |
-| method: returns an object | `public FusionGridColumn GetColumnByField(..) => InvokeObject<FusionGridColumn>(..);` | `grid.GetColumnByField(c => c.Status).Visible.Set(false)` | `call` as a set's target |
-| async method with a value | `public Value<int> GetCensus(Arg<string> wing) => InvokeAsync<int>(wing);` | a value; the step waits | `call` with `await` |
-| async method without a value | `public void Start() => CallAsync();` | `hub.Start();`; the step waits | `call` with `await` |
-| event, no payload | `public Event Ready => Event();` | `(p) => ..` | `event` |
-| event, data payload | `public Message<CensusUpdate> Census => Message<CensusUpdate>();` | `(msg, p) => msg.Get(x => x.Occupied)` | `event`; the payload is a value |
-| event, object payload | `public Event<FusionGridActionBegin<TRow>> ActionBegin => Event<FusionGridActionBegin<TRow>>();` | `(args, p) => { args.Cancel.Set(true); args.Data.Get(r => r.Id); }` | `event`; the payload is an object |
+| read-write property | `public Prop<decimal> Min => Prop<decimal>();` | `rate.Min` is a value; `rate.Min.Set(0m)` | `get`, `set` |
+| read-only property | `public ReadOnly<int> ReadyState => ReadOnly<int>();` | a value; `.Set` does not exist | `get` |
+| method: no arguments, no return | `public void Refresh() => Call();` | `grid.Refresh();` | `do(call)` |
+| method: arguments, no return | `public void SelectRow(Arg<int> index) => Call(index);` | `grid.SelectRow(2);` | `do(call)` |
+| method: returns a value | `public Value<TRow[]> GetSelectedRecords() => Invoke<TRow[]>();` | a value: in conditions, sets, gather, arrays | `call` |
+| method: arguments and a return | `public Value<int> GetActualIndex(Arg<int> a, Arg<int> b) => Invoke<int>(a, b);` | a value | `call` |
+| method: returns an object | `public FusionGridColumn GetColumnByField(..) => InvokeObject<FusionGridColumn>(..);` | `grid.GetColumnByField(c => c.Status).Visible.Set(false)` | `call` as a `set`'s target |
+| async method with a value | `public Value<int> GetCensus(Arg<string> wing) => InvokeAsync<int>(wing);` | a value, awaited where it is written | `let await` |
+| async method without a value | `public void Start() => CallAsync();` | `hub.Start();`, awaited where it is written | `do await` |
+| event, no payload | `public Event Ready => Event();` | `(p) => ..` | `on` |
+| event, data payload | `public Message<CensusUpdate> Census => Message<CensusUpdate>();` | `(msg, p) => msg.Get(x => x.Occupied)` | `on`; the payload is data |
+| event, object payload | `public Event<FusionGridActionBegin<TRow>> ActionBegin => Event<FusionGridActionBegin<TRow>>();` | `(args, p) => { args.Cancel.Set(true); args.Data.Get(r => r.Id); }` | `on`; the payload is an object |
 
 Payload kinds:
 - **An object payload** (`Event<T>`, where `T : JsObject`) has members of its own. Syncfusion's
@@ -143,24 +362,26 @@ Payload kinds:
 
 ### 4.0.1 Objects differ only in where they live
 
-What differs between objects is the **locator**: how the object is found and how long it lives.
+What differs between objects is the **locator**: how the object comes to exist and how long it
+lives. The grammar has three (section 0.2).
 
 | Object | Locator | Lifetime | Events subscribe with |
 |---|---|---|---|
-| Component (Fusion, Native, brought) | element ID plus the vendor's `objectPath` | the element's: page or slot | the vendor's subscribe and unsubscribe methods |
-| App object (Drawer, Loader, Toast, Confirm) | an element locator with a fixed ID | page | the vendor's |
-| DOM element | ID | the element's | `addEventListener` |
-| Plugin | name, from the app bundle | page | — |
-| Document | — | page | `addEventListener`: `ready`, custom events (payload `detail`) |
-| Location (query string) | not an object: the `url` context, read as data typed by the query class | page | — |
-| Event payload | not located: the `event` context | the handler; kept across an async gap | — |
-| **Server-sent event stream** | URL | shared per URL, counted per owner (page or slot), closed by the last owner | `addEventListener`; payload `JSON.parse(event.data)` |
-| **SignalR hub connection** | hub URL | shared per URL, counted per owner, automatic reconnect | `on` / `off`; payload is the single argument |
-| Returned object, nested object | not located: an object-valued expression | the expression | — |
+| Component (Fusion, Native, brought) | `element(id, vendor)`: the vendor's `objectPath` on the element | the element's: page or slot | the vendor's subscribe and unsubscribe methods |
+| App object (Drawer, Loader, Toast, Confirm, a slot) | `element(id, vendor)` with a fixed ID; the framework's own modules define their members on the element | page, or the slot's | the vendor's |
+| DOM element | `element(id, dom)` | the element's | `addEventListener` |
+| Plugin | `plugin(name)`, from the app bundle | page | none |
+| Document | `builtin(document)`: `ready`, `raise`, `query` | page | `addEventListener`: `ready`, custom events (payload `detail`) |
+| HTTP | `builtin(http)`: `send` | page | none |
+| Form | `builtin(form, id)`: `validate`, `showErrors`, `values`; built from the plan's inputs and tests | its owners' | none |
+| **Server-sent event stream** | `builtin(stream, url)` | shared per URL, counted per owner (page or slot), closed by the last owner | `addEventListener`; payload `JSON.parse(event.data)` |
+| **SignalR hub connection** | `builtin(hub, url)` | shared per URL, counted per owner, automatic reconnect | `on` / `off`; payload is the single argument |
+| Event payload | not located: the handler's parameter | the handler, across every `await` in it | none |
+| Response, request snapshot | not located: a `let` | its block | none |
+| Returned object, nested object | not located: an object-valued expression | the expression | none |
 
-Server-sent event streams and hub connections are therefore two more vendors and two more locators,
-not trigger kinds of their own.
-- The connection policy the runtime has today stays, and it belongs to their locators:
+Streams and hub connections are therefore vocabulary, not trigger kinds of their own.
+- The connection policy the runtime has today stays, and it belongs to their modules:
   - one connection per URL;
   - connections shared across slots;
   - start retries;
@@ -199,8 +420,8 @@ public abstract class JsObject                          // a live JavaScript obj
   - C# cannot define a conversion to an interface, so a fixed literal inside a declaration is
     written `Fixed("field")`.
   - `Column(field)` turns a row expression into the column's camel-case name.
-- **Member keys.** A member's plan key is its name plus its argument shapes, as today, so overloads
-  and generic instantiations never collide.
+- **Paths, not keys.** Every node that uses a member carries its JavaScript path and shape
+  (section 0.3), so overloads and generic instantiations need no plan key.
 
 ```csharp
 public sealed class FusionGrid<TRow> : FusionComponent
@@ -303,7 +524,7 @@ The uploader declares its value as its files. That removes the special case for 
 - **Why this is safe.** Plan building is synchronous and single-threaded. The stack lives on the
   plan's build context, not in thread-static state.
 
-### 4.5 Conditions: the owner's fluent grammar with the defects removed
+### 4.5 Conditions: the owner's fluent API with the defects removed
 
 ```csharp
 p.When(args.Value).Gt(100m).Then(t => ceiling.Value.Set(100m))
@@ -369,11 +590,19 @@ p.Post(url)
 - **URL reads.**
   - `p.Url<TQuery>()` matches keys case-insensitively, as ASP.NET binding does.
   - Array members read every value of a key.
-- **Links.** `Html.NativeActionLink("Discharge", url, link => link.Confirm("..").Post(r => ..))`:
+- **How a request runs.** It lowers to `let`, `if` and `try` around `http.send` (section 0.5). The
+  builder owns that shape. The runtime's `http` module only fills the URL and the query or body by
+  MVC's route-value rule, sends, and reads the body.
+- **Links.** `Html.NativeActionLink(id, "Discharge", url, link => link.Confirm("..").Post()..)`:
+  - The link is an element object with an ID the developer chooses; links in a loop use the row's
+    key. Its behavior is an ordinary `on(link, "click")` handler (section 0.5), so the delegated
+    document listener, the plan carried in `data-reactive-link`, and the runtime's rewriting of
+    the request URL (`native-action-link.ts:65`) go.
   - The request takes the link's `href`, so the URL is written once.
   - The single-request rule is a type: the link offers exactly one request. Analyzer `ALIS002` and
     the render-time checks go.
-  - Modifier-clicks stay with the browser.
+  - Modifier-clicks stay with the browser: the handler's first `if` reads the payload's modifier
+    keys.
 
 ### 4.7 Events on any object: components, the document, streams and hubs
 
@@ -454,8 +683,14 @@ These are all declarations, used the same way as components.
   ```
 
   The name is the plugin's only string. `RegisterPlugin`, `PluginTypeBuilder`,
-  `PluginMemberBuilder` and `PluginContract.cs` are deleted. The plan declares a contract when a
-  member is used, as it does for components. A root function is `Invoke<T>(.., name: "")`.
+  `PluginMemberBuilder` and `PluginContract.cs` are deleted. Each use carries its path and shape,
+  as it does for components. A root function is `Invoke<T>(.., name: "")`.
+- **Built-ins.** The document, HTTP and forms are declarations too, located by `builtin(..)`:
+  - the document's `Ready` event, `Raise(event, detail)` and `Query`;
+  - HTTP's `Send(request)`;
+  - a form's `Validate()`, `ShowErrors(problem)` and `Values`.
+
+  The fluent request, dispatch and URL APIs are sugar over these members.
 - **App objects.**
   - `p.Component<NativeDrawer>()`, `p.Component<FusionToast>()` and `p.Component<Confirm>()`.
   - Confirm's `Ask` is an async member. The app's dialog module defines it on the confirm element,
@@ -516,11 +751,15 @@ public sealed class AdmissionValidator : ReactiveValidator<Admission>
   - Dates compare as timestamps.
   - Regex patterns are checked at render against JavaScript's dialect, so a .NET-only construct
     fails in C#.
+- **The form is an object.** `builtin(form, id)` holds the projected tests and the inputs bound to
+  it. `Validate()`, `ShowErrors(problem)` and `Values` are its members, and live clearing and
+  revalidation happen inside it. Each test is `{ field, check, when, message }`, where `check` and
+  `when` are expressions (section 0.5).
 - **Deleted:** `ClientRule` and its builders, the 18 `WhenField*` methods and `WhenFields`, the
   field-condition builders, the operand and activation types, three interfaces,
   `AddReactiveClientValidation`, and the whole runtime rule engine.
 
-## 5. Grammar rules: one parameter order everywhere
+## 5. Authoring rules: one parameter order everywhere
 
 Six rules, for developers and for agents:
 
@@ -611,69 +850,77 @@ The core and the runtime carry no knowledge of any component. These leftovers go
 to the core or the runtime. The architecture test fails if the core or runtime names a vendor or a
 component.
 
-## 8. The runtime: a lean, dumb executor
+## 8. The runtime: an interpreter and its built-in objects
 
-Its whole vocabulary:
+| Part | What it does | What it knows |
+|---|---|---|
+| Interpreter | evaluates the nine expressions synchronously, executes the six statements (waiting only where the plan says `await`), registers handlers | the grammar and nothing else |
+| Locators | `element` follows the vendor's data; `plugin` looks the name up in the app bundle; `builtin` asks the framework module for its object | the three locator kinds |
+| Owners | the page and each slot: their subscriptions, connections and in-flight blocks | lifetime |
+| Plans | discovery, composition by `planId`, slot load and unload | plan scripts |
+| Built-in objects | `document`, `http`, `form`, `stream` and `hub`, plus the element modules for slots, Drawer, Loader and Confirm | each its own members |
 
-| Concept | Kinds |
-|---|---|
-| Object | five locators: `element` (with its vendor), `plugin`, `document`, `stream(url)`, `hub(url)`. App objects are elements with fixed IDs. A stream or hub locator owns its connection: shared per URL, counted per owner, retried, shown in the retry indicator. Payloads, nested objects and returned objects are expressions, not locators |
-| Expression | ten kinds: `lit`, `ref`, `ctx` (event, response, request, url), `param`, `read(from, path, as)`, `call(target, path, args, as, await)`, `lambda`, `record`, `list`, `op`. Every node carries its own path and shape, so the runtime looks nothing up |
-| Op | C#'s operator set (comparison, logical, arithmetic, `??`, `?:`) plus `empty`. It is closed, because C#'s operators are |
-| Reaction | `steps`, `set`, `call`, `branch`, `request`, `parallel`, `dispatch`, `inject`, `show-errors` |
-| Trigger | one kind: `event(object, name)`. Ready is the document's event; custom events, stream messages and hub methods are events of their objects, subscribed through the object's vendor data |
-| Form | tests `{field, check, when, message}`; error display; live wiring (input clears; blur and the declared committed event revalidate); server errors by name |
-| Slot | load, unload |
-
-- **Deleted from the runtime:**
-  - the comparison engine's 21 cases;
-  - the array-operation engine;
-  - the validation rule engine;
-  - the duplicate all/any/not evaluator;
-  - four null helpers;
-  - all vendor knowledge.
-- **The async lane is decided in C#.** A `call` is awaited only when its member was declared async,
-  and the plan says so.
-  - Async: HTTP, Confirm, async plugin and hub methods, injection, and the delivery of stream and
-    hub events.
-  - Everything else stays sync.
+- **Dependency rule.** The interpreter imports no built-in object and no vendor. A built-in object
+  that evaluates expressions (the form, for its tests) is handed the evaluator. The architecture
+  test enforces both directions.
+- **Deleted outright:** about 1,800 of today's 6,200 lines.
+  - `compare-engine.ts` (426), `rule-engine.ts` (296), `rule-operands.ts` (198), `array-op-engine.ts`
+    (135) and `conditions.ts` (129): one evaluator replaces them.
+  - `gather.ts` (180): `record`.
+  - `object-contracts.ts` (160), `merge-policy.ts` (75) and `component-event-contract.ts` (14):
+    nodes carry their path and shape.
+  - `native-action-link.ts` (107): the link is an ordinary handler.
+  - `execution-context.ts` (94): lexical bindings replace the event, response and request context.
+  - `http.ts` keeps sending and reading the body; its routing becomes `if` and `try`.
+- **The async lane is decided in C#.** Only `do … await` and `let … await` wait: HTTP, Confirm,
+  async plugin and hub methods, and slot loading. A stream or hub message starts its handler
+  synchronously, like any other event.
 
 ## 9. The plan document
 
 ```json
 {
-  "planId": "…", "scope": {},
-  "vendors":   { "fusion": { "objectPath": "…", "subscribe": "…", "unsubscribe": "…", "payload": "argument" } },
+  "version": 4, "planId": "…", "owner": { "kind": "page" },
+  "vendors": { "fusion": { "objectPath": ["ej2_instances", 0], "subscribe": "addEventListener", "unsubscribe": "removeEventListener", "payload": "argument" } },
   "objects": {
-    "Ns_Admission__Age": { "type": "FusionNumericTextBox", "locator": { "kind": "element", "id": "Ns_Admission__Age", "vendor": "fusion" } },
-    "roster":            { "type": "FusionGrid",           "locator": { "kind": "element", "id": "roster", "vendor": "fusion" } },
-    "hub:/hubs/resident": { "type": "ResidentStatusHub",   "locator": { "kind": "hub", "url": "/hubs/resident" } }
+    "roster":            { "kind": "element", "id": "roster", "vendor": "fusion" },
+    "Ns_Admission__Age": { "kind": "element", "id": "Ns_Admission__Age", "vendor": "fusion" },
+    "http":              { "kind": "builtin", "module": "http", "key": "" },
+    "admission-form":    { "kind": "builtin", "module": "form", "key": "admission-form" },
+    "residents":         { "kind": "builtin", "module": "hub", "key": "/hubs/resident" }
   },
-  "inputs":    { "Ns_Admission__Age": { "name": "Age", "value": { "path": ["value"], "as": "number" }, "committed": "change" } },
-  "forms":     { "admission-form": { "tests": [ { "field": "Ns_Admission__Age", "check": {}, "when": { "kind": "lit", "value": true }, "message": "…" } ] } },
-  "behaviors": [ { "on": { "object": "roster", "event": "rowSelected" }, "do": { "kind": "steps", "steps": [] } } ]
+  "inputs": {
+    "Ns_Admission__Age": { "form": "admission-form", "name": "Age", "value": { "path": ["value"], "shape": "number" }, "committed": "change" }
+  },
+  "forms": {
+    "admission-form": { "tests": [ { "field": "Ns_Admission__Age", "check": { "kind": "fn", "…": "…" }, "when": { "kind": "lit", "value": true }, "message": "Enter the resident's age." } ] }
+  },
+  "handlers": [
+    { "on": "roster", "event": "actionBegin", "param": "args",
+      "do": [ { "kind": "set", "target": { "kind": "ref", "name": "args" }, "path": ["cancel"], "value": { "kind": "lit", "value": true, "shape": "boolean" } } ] }
+  ]
 }
 ```
 
-- **Self-describing nodes.** Every `read`, `set` and `call` carries the JavaScript path and the
-  shape that the C# declaration knows at the point of use.
-- **What that removes:**
-  - The runtime uses today's per-element `types` (`fusion.component.<id>`, `BrowserObjectId.cs:13`)
-    only to look up a path and a shape. So the declarations section, member keys, signature keys
-    and contract merging across partials (`merge-policy.ts`) all go.
-  - The plan-side registries `DeclareProperty` and `DeclareMethod` go too.
-- **The C# domain is the JSON.** Each plan-domain type is one immutable node, with its invariants
-  in its constructor, and serializes 1:1. No translation layer (`ToPlanRule`, `ToPlanCondition`)
-  remains.
-- **No placeholders.** Inputs and forms are their own maps, so `binding:{kind:"none"}` and
-  `container:{kind:"none"}` (`plan.ts:86-120,148`) go.
-- **Today versus target.** Today's generated contract has 136 interfaces, 60 unions and 65 kinds.
-  The target is ten `Expr` kinds, nine reaction kinds and five locators. The real count is
-  measured when the generator runs.
+- **Where things come from, and what happens.** `objects` say where each object comes from.
+  `inputs` and `forms` are the data the form module needs. `handlers` are the behavior. Nothing
+  else is in a plan.
+- **What goes:**
+  - the per-element `types`, member keys and signature keys, and contract merging across partials
+    (`merge-policy.ts`);
+  - `components` with roles and `none` placeholders (`binding: {kind:"none"}`,
+    `container: {kind:"none"}`, `plan.ts:80-170`);
+  - the plan-side registries `DeclareProperty` and `DeclareMethod`;
+  - every translation layer (`ToPlanRule`, `ToPlanCondition`): the C# domain is the JSON.
+- **Composition.** Plans with one `planId` join their maps and handlers. A slot owns the plans it
+  loaded.
+- **Today versus target.** Today's contract has 136 interfaces, 60 unions and 65 kinds. The grammar
+  needs about 25 node types: six statements, nine expressions, three locators, and the handler,
+  plan, input, form, test, shape and path. The real count is measured when the generator runs.
 
 **Diagrams and traces:** the design review page "Alis.Reactive Object Model"
-(https://claude.ai/artifact/MhD8NHsoMNBKmuNXABsdbu). It traces eight existing behaviors through
-this design.
+(https://claude.ai/artifact/MhD8NHsoMNBKmuNXABsdbu). It draws the grammar and lowers real views
+through it.
 
 ## 10. Proof that nothing is lost
 
@@ -731,37 +978,46 @@ kinds.
   `send`) and their connection events have no typed access, and the runtime keeps two extra trigger
   kinds.
 - **Lambdas instead of the fluent conditions** (`p.When(m => m.Age > 65)`). They would replace the
-  owner's grammar and give branch conditions a second way to be written; the fluent grammar keeps
-  its shape and gets types.
+  owner's fluent API and give branch conditions a second way to be written; the fluent API keeps
+  its shape, gets types, and lowers to `op`.
 - **Operators on values** (`rate > 100m`). These need `==` overloaded on a class, cannot restrict
   ordering by `T`, and arrays would still need lambdas.
 - **Freezing arrays and pushing the rest to plugins.** It contradicts array-driven components.
 - **A source generator.** The owner rejected it.
+- **Feature nodes in the plan** (`request`, `dispatch`, `inject`, `show-validation-errors`, a
+  `confirm` condition, one trigger kind per source). Each feature brings a sub-grammar, the runtime
+  must know every feature, and a brought component can never do what a built-in feature does.
+- **`await` inside expressions.** The evaluator would become asynchronous everywhere, and a
+  payload write could land after the vendor reads it. Spilling into `let` keeps one synchronous
+  evaluator and keeps the async lane visible in the plan.
+- **Blocks as values** (`http.send(request, onSuccess, onError)`). The plan would become a general
+  programming language and hide control flow inside objects. `if`, `try` and `all` express every
+  lifecycle the DSL has.
 
 ## 12. Order of work
 
+Grammar first, then the object model, then views area by area. While areas move, the runtime boots
+each plan by its `version`: grammar plans go to the interpreter and today's plans to today's
+executor. The switch is deleted with today's executor when the last area has moved.
+
 0. **Step 0 proof gaps.** The 162 rows, closed on the current code.
-1. **Value model and scopes.**
-   - `IValue<T>`, `Arg<T>`, data `Get`.
-   - The active-scope stack.
-   - `p.Field`, `p.Url<T>`.
-2. **Object model C.**
-   - `JsObject` members.
-   - The 66 declarations and 128 payloads.
-   - Identity.
-   - Views move to the handles.
-   - `ComponentRef`'s verbs are deleted.
-3. **Compiler and lean expressions.**
-   - Arrays and text.
-   - Typed conditions.
-   - Runtime: `lambda`, `call` on values, `op`, `convert`.
-   - The comparison and array engines are deleted.
-4. **Requests and events.**
-   - `Gather<T>`.
-   - The link inherits its `href`.
-   - Typed `AppEvent`, push and hub triggers.
-5. **Validation on FluentValidation descriptors.** The rule engine and the `ClientRule` grammar are
-   deleted.
-6. **Onboarding leftovers.** The committed event, vendor-neutral scripts, uploader files, Confirm,
-   and the native modules.
-7. **Plan document names.**
+1. **The grammar.** One C# node per production and the generated contract; the interpreter,
+   locators, owners, discovery and composition.
+2. **The object model on it.** `JsObject` members, `Value<T>`, `Arg<T>`, the active-scope stack,
+   `p.Field`, and the expression compiler (data paths, arrays, text).
+3. **Areas, each moved whole (a view and its partials) and green in CI before the next.** Each area
+   brings the vocabulary it first needs, declared in C# and implemented in the runtime once:
+
+   | Order | Area | Vocabulary it brings |
+   |---|---|---|
+   | 1 | HTTP pipeline | `http`, elements, Loader, the action link, the request API |
+   | 2 | Conditions, arrays, dispatch, plugins | the fluent conditions, Confirm, the document, plugins |
+   | 3 | Fusion Grid journeys | the Fusion vendor, Grid and its payloads, slots and `Into` |
+   | 4 | Validation | `form`, the FluentValidation projection, inputs and `Committed` events |
+   | 5 | Realtime | `stream`, `hub` |
+   | 6 | Patterns and every remaining component page | the rest of the 66 declarations, Native, Tom Select |
+
+4. **Delete today's executor, plan domain, builders and the version switch.**
+
+The fixtures stay frozen throughout (section 10), so each green area proves that its use cases
+behave as before.
