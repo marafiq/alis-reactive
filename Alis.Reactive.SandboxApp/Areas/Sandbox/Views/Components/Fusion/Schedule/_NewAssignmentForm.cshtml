@@ -58,7 +58,7 @@
                      .Response(r => r
                          .OnSuccess(s =>
                          {
-                             s.Component<FusionDialog>("new-assignment-dialog").Hide();
+                             s.Component<FusionDialog>("new-assignment-dialog").Call(c => c.Hide);
                              s.Dispatch("schedule:assignment-saved");
                          })
                          .OnError(400, e => e.ValidationErrors("new-assignment-form")));
@@ -68,7 +68,7 @@
                 .CssClass("px-4 py-2 rounded-md border border-border text-sm font-medium hover:bg-slate-50")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionDialog>("new-assignment-dialog").Hide();
+                    p.Component<FusionDialog>("new-assignment-dialog").Call(c => c.Hide);
                 }))
         </native-hstack>
 

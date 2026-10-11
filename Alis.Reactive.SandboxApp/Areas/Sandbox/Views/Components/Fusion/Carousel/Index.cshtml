@@ -25,9 +25,9 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var review = p.Component<FusionCarousel>(CarouselId);
-        p.When(review.SelectedIndex()).Eq(0)
+        p.When(review.Get(c => c.SelectedIndex)).Eq(0)
             .Then(s => s.Element("review-position").SetText("Section 1 of 3: Medications"))
-            .ElseIf(review.SelectedIndex()).Eq(1)
+            .ElseIf(review.Get(c => c.SelectedIndex)).Eq(1)
             .Then(s => s.Element("review-position").SetText("Section 2 of 3: Therapy Goals"))
             .Else(s => s.Element("review-position").SetText("Section 3 of 3: Discharge Steps"));
     }));
@@ -67,7 +67,7 @@
                 p.When(args, x => x.NextIndex).Eq(0)
                     .Then(blocked =>
                     {
-                        args.PreventTransition(blocked);
+                        blocked.Payload(args).Set(a => a.Cancel, true);
                         blocked.Element("gate-notice").SetText("The medications sign-off is locked. Continue forward through the care plan.");
                         blocked.Element("gate-notice-panel").RemoveClass("hidden");
 
@@ -93,9 +93,9 @@
                 var review = p.Component<FusionCarousel>(CarouselId);
 
                 // Where the resident is now, read from the carousel after the move.
-                p.When(review.SelectedIndex()).Eq(0)
+                p.When(review.Get(c => c.SelectedIndex)).Eq(0)
                     .Then(s => s.Element("review-position").SetText("Section 1 of 3: Medications"))
-                    .ElseIf(review.SelectedIndex()).Eq(1)
+                    .ElseIf(review.Get(c => c.SelectedIndex)).Eq(1)
                     .Then(s => s.Element("review-position").SetText("Section 2 of 3: Therapy Goals"))
                     .Else(s => s.Element("review-position").SetText("Section 3 of 3: Discharge Steps"));
 
@@ -142,13 +142,13 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
-                        p.Component<FusionCarousel>(CarouselId).Previous();
+                        p.Component<FusionCarousel>(CarouselId).Call(c => c.Prev);
                     }))
                 @(Html.NativeButton("review-next", "Next section")
                     .CssClass(ButtonPrimary)
                     .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
-                        p.Component<FusionCarousel>(CarouselId).Next();
+                        p.Component<FusionCarousel>(CarouselId).Call(c => c.Next);
                     }))
             </native-hstack>
         </native-vstack>

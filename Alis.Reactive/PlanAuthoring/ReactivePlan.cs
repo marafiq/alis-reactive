@@ -82,6 +82,38 @@ namespace Alis.Reactive
             return plugin;
         }
 
+        /// <summary>
+        /// Joins the markup a component helper rendered for <paramref name="elementId"/> to this plan,
+        /// so behavior can hang off it with <c>.Reactive(...)</c>; the view writes the returned
+        /// component where the markup belongs. Inputs render into their field instead:
+        /// <c>field.Render&lt;TComponent&gt;(markup)</c>.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// var builder = html.EJS().Dialog(elementId);
+        /// build(builder);
+        /// return plan.Render&lt;FusionDialog&gt;(elementId, builder.Render());
+        /// </code>
+        /// </example>
+        /// <typeparam name="TComponent">The component declaration the markup renders.</typeparam>
+        /// <param name="elementId">The ID the markup gives the component's element.</param>
+        /// <param name="markup">The component's markup.</param>
+        /// <returns>The rendered component, ready for <c>.Reactive(...)</c>.</returns>
+        public RenderedComponent<TComponent, TModel> Render<TComponent>(
+            string elementId,
+#if NET48
+            System.Web.IHtmlString markup)
+#else
+            Microsoft.AspNetCore.Html.IHtmlContent markup)
+#endif
+            where TComponent : IComponent, new()
+        {
+            if (string.IsNullOrWhiteSpace(elementId))
+                throw new ArgumentException("Element ID required.", nameof(elementId));
+            if (markup == null) throw new ArgumentNullException(nameof(markup));
+            return new RenderedComponent<TComponent, TModel>(this, elementId, markup);
+        }
+
         internal void RegisterInputComponent(ComponentRegistration registration)
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));

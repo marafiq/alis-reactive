@@ -26,7 +26,7 @@
             .CssClass(ButtonPrimary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionAccordion>("care-plan").ExpandItem(true, 0);
+                p.Component<FusionAccordion>("care-plan").Call(c => c.ExpandItem, true, 0);
             }))
         <native-text color="Secondary">
             Currently open: <span id="open-section" class="font-semibold text-text">No section open</span>
@@ -92,7 +92,7 @@
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionAccordion>("care-plan").EnableItem(2, true);
+                    p.Component<FusionAccordion>("care-plan").Call(c => c.EnableItem, 2, true);
                     p.Element("agreement-status")
                         .SetText("Care agreement confirmed. Your care agreement section is now available.");
                 }))

@@ -28,7 +28,7 @@
     {
         var trailComponent = p.Component<FusionBreadcrumb>(TrailId);
 
-        p.When(trailComponent.ActiveItem()).Eq(carePlanUrl)
+        p.When(trailComponent.Get(c => c.ActiveItem)).Eq(carePlanUrl)
             .Then(open => open.Element("viewing-now")
                 .SetText("You are in this resident's Care Plan. Use the trail to step back up the record."))
             .Else(other => other.Element("viewing-now")
@@ -79,7 +79,7 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
-                        p.Component<FusionBreadcrumb>(TrailId).SetActiveItem(residentUrl);
+                        p.Component<FusionBreadcrumb>(TrailId).Set(c => c.ActiveItem, residentUrl).Call(c => c.DataBind);
                     }))
             </native-hstack>
         </native-vstack>

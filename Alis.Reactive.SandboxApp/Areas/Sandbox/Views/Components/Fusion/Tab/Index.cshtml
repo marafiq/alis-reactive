@@ -115,26 +115,26 @@
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionTab>(Workspace).SetSelectedItem(1);
+                    p.Component<FusionTab>(Workspace).Set(c => c.SelectedItem, 1);
                 }))
             @(Html.NativeButton("log-incident", "Log an incident now")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionTab>(Workspace).Select(2);
+                    p.Component<FusionTab>(Workspace).Call(c => c.Select, 2);
                 }))
             @(Html.NativeButton("hide-billing", "Hide billing from this view")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionTab>(Workspace).HideTab(3, true);
+                    p.Component<FusionTab>(Workspace).Call(c => c.HideTab, 3, true);
                     p.Element("billing-access").SetText("Billing is hidden from this workspace.");
                 }))
             @(Html.NativeButton("show-billing", "Restore billing tab")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionTab>(Workspace).HideTab(3, false);
+                    p.Component<FusionTab>(Workspace).Call(c => c.HideTab, 3, false);
                     p.Element("billing-access").SetText("Billing is visible to coordinators.");
                 }))
         </div>

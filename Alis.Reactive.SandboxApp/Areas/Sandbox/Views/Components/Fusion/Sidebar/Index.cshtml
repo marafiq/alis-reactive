@@ -35,13 +35,13 @@
                     .CssClass(MenuButton)
                     .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
-                        p.Component<FusionSidebar>(SidebarId).Show();
+                        p.Component<FusionSidebar>(SidebarId).Call(c => c.Show);
                     }))
                 @(Html.NativeButton("toggle-menu", "Care-services menu")
                     .CssClass(MenuButton)
                     .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
-                        p.Component<FusionSidebar>(SidebarId).Toggle();
+                        p.Component<FusionSidebar>(SidebarId).Call(c => c.Toggle);
                     }))
             </native-hstack>
 
@@ -80,16 +80,16 @@
                     .CssClass(LinkButton)
                     .Reactive(plan, evt => evt.Click, (_, pp) =>
                     {
-                        pp.Component<FusionSidebar>(SidebarId).Toggle();
+                        pp.Component<FusionSidebar>(SidebarId).Call(c => c.Toggle);
                     }))
                 @(Html.NativeButton("close-menu", "Close menu")
                     .CssClass(LinkButton)
                     .Reactive(plan, evt => evt.Click, (_, pp) =>
                     {
                         var panel = pp.Component<FusionSidebar>(SidebarId);
-                        panel.Hide();
+                        panel.Call(c => c.Hide);
                         pp.Post(closeActivityUrl)
-                            .Gather(g => g.Include(panel.IsOpen(), "isOpen"))
+                            .Gather(g => g.Include(panel.Get(c => c.IsOpen), "isOpen"))
                             .Response(r => r.OnSuccess<FusionSidebarCloseResponse>((json, s) =>
                             {
                                 s.Element("activity-note").SetText(json, x => x.ActivityNote);
@@ -98,7 +98,7 @@
             </div>
         </text>);
     })
-    .Reactive(evt => evt.Opened, (args, p) =>
+    .Reactive(evt => evt.Open, (args, p) =>
     {
         p.Element("menu-state").SetText("Care-services menu is open.");
         p.Post(openPanelUrl)
@@ -109,7 +109,7 @@
                 s.Element("activity-note").SetText(json, x => x.OpenedNote);
             }));
     })
-    .Reactive(evt => evt.Closed, (args, p) =>
+    .Reactive(evt => evt.Close, (args, p) =>
     {
         p.When(args, x => x.IsInteracted).Truthy()
             .Then(byUser => byUser.Element("menu-state")

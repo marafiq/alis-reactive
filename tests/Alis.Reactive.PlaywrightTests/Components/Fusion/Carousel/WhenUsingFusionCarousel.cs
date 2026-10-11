@@ -102,7 +102,7 @@ public class WhenUsingFusionCarousel : PlaywrightTestBase
     }
 
     // SlideChanging guards the move before it happens: a step back onto the medications
-    // section (NextIndex 0) is cancelled by PreventTransition (the payload Cancel write),
+    // section (NextIndex 0) is cancelled by the payload write Set(a => a.Cancel, true),
     // so the carousel stays put; SlideChanging.SlideDirection and IsSwiped explain the block.
     [Test]
     public async Task the_medications_signoff_stays_locked_when_stepping_back_to_it()
@@ -114,7 +114,7 @@ public class WhenUsingFusionCarousel : PlaywrightTestBase
 
         await PreviousButton.ClickAsync();             // Therapy Goals -> (would be) Medications: blocked
 
-        // PreventTransition cancelled the move: the carousel never left Therapy Goals.
+        // The payload Cancel write cancelled the move: the carousel never left Therapy Goals.
         await Expect(Review.ActiveSectionTitle).ToHaveTextAsync("Therapy Goals");
         await Expect(Position).ToHaveTextAsync("Section 2 of 3: Therapy Goals");
         // The nurse is told the medications sign-off is locked, and why the move was rejected.

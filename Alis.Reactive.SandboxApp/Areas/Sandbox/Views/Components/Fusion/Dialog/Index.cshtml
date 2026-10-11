@@ -25,7 +25,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (_, p) =>
             {
-                p.Component<FusionDialog>("discharge-dialog").Show();
+                p.Component<FusionDialog>("discharge-dialog").Call(c => c.Show);
             }))
     </native-card-body></native-card>
 
@@ -50,7 +50,7 @@
         {
             p.Element("dialog-before-open").SetText("beforeOpen fired");
         })
-        .Reactive(evt => evt.Opened, (_, p) =>
+        .Reactive(evt => evt.Open, (_, p) =>
         {
             p.Element("dialog-opened").SetText("opened");
         })
@@ -58,14 +58,14 @@
         {
             p.Element("dialog-before-close").SetText("beforeClose fired");
         })
-        .Reactive(evt => evt.Closed, (_, p) =>
+        .Reactive(evt => evt.Close, (_, p) =>
         {
             p.Element("dialog-closed").SetText("closed");
         })
         .Reactive(evt => evt.OverlayClick, (_, p) =>
         {
             p.Element("dialog-overlay-click").SetText("overlay clicked");
-            p.Component<FusionDialog>("discharge-dialog").Hide();
+            p.Component<FusionDialog>("discharge-dialog").Call(c => c.Hide);
         }))
     </native-card-body></native-card>
 
@@ -79,7 +79,7 @@
             .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
             .Reactive(plan, evt => evt.Click, (_, p) =>
             {
-                p.Component<FusionDialog>("discharge-dialog").Hide();
+                p.Component<FusionDialog>("discharge-dialog").Call(c => c.Hide);
             }))
     </native-card-body></native-card>
 

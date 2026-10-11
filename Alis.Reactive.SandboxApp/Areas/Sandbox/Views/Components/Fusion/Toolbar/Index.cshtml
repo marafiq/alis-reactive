@@ -41,7 +41,7 @@
                 p.When(args, x => x.Item.Id).Eq("pay-balance")
                     .Then(pay =>
                     {
-                        pay.Component<FusionToolbar>(ToolbarId).Disable(true);
+                        pay.Component<FusionToolbar>(ToolbarId).Call(c => c.Disable, true);
                         pay.Element("account-status").SetText("Processing your payment. The command bar is locked until it completes.");
                         pay.Element("payment-panel").AddClass("hidden");
 
@@ -78,7 +78,7 @@
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionToolbar>(ToolbarId).Disable(false);
+                    p.Component<FusionToolbar>(ToolbarId).Call(c => c.Disable, false);
                     p.Element("account-status").SetText("Your payment is complete. The command bar is ready again.");
                     p.Element("account-status-panel").RemoveClass("hidden");
                 }))
