@@ -122,7 +122,6 @@ fails to compile:
 |---|---|---|---|
 | read-write property | `public Prop<decimal> Min => Prop<decimal>();` | `rate.Min` is a value; `rate.Min.Set(0m)` | `read`, `set` |
 | read-only property | `public ReadOnly<int> ReadyState => ReadOnly<int>();` | a value; `.Set` does not exist | `read` |
-| write-only property | `public WriteOnly<string> Target => WriteOnly<string>();` | `.Set(..)` only | `set` |
 | method: no arguments, no return | `public void Refresh() => Call();` | `grid.Refresh();` | `call` |
 | method: arguments, no return | `public void SelectRow(Arg<int> index) => Call(index);` | `grid.SelectRow(2);` | `call` |
 | method: returns a value | `public Value<TRow[]> GetSelectedRecords() => Invoke<TRow[]>();` | a value: in conditions, sets, gather, arrays | `call` used as an expression |
@@ -149,15 +148,15 @@ What differs between objects is the **locator**: how the object is found and how
 | Object | Locator | Lifetime | Events subscribe with |
 |---|---|---|---|
 | Component (Fusion, Native, brought) | element ID plus the vendor's `objectPath` | the element's: page or slot | the vendor's subscribe and unsubscribe methods |
-| App object (Drawer, Loader, Toast, Confirm) | fixed ID | page | the vendor's |
+| App object (Drawer, Loader, Toast, Confirm) | an element locator with a fixed ID | page | the vendor's |
 | DOM element | ID | the element's | `addEventListener` |
 | Plugin | name, from the app bundle | page | — |
 | Document | — | page | `addEventListener`: `ready`, custom events (payload `detail`) |
-| Location | — | page | — |
-| Event payload | the event being handled | the handler; kept across an async gap | — |
+| Location (query string) | not an object: the `url` context, read as data typed by the query class | page | — |
+| Event payload | not located: the `event` context | the handler; kept across an async gap | — |
 | **Server-sent event stream** | URL | shared per URL, counted per owner (page or slot), closed by the last owner | `addEventListener`; payload `JSON.parse(event.data)` |
 | **SignalR hub connection** | hub URL | shared per URL, counted per owner, automatic reconnect | `on` / `off`; payload is the single argument |
-| Returned object | the result of a call | the expression | — |
+| Returned object, nested object | not located: an object-valued expression | the expression | — |
 
 Server-sent event streams and hub connections are therefore two more vendors and two more locators,
 not trigger kinds of their own.
@@ -177,7 +176,6 @@ public abstract class JsObject                          // a live JavaScript obj
     // properties
     protected Prop<T> Prop<T>([CallerMemberName] string name = "");                 // read and write
     protected ReadOnly<T> ReadOnly<T>([CallerMemberName] string name = "");         // read
-    protected WriteOnly<T> WriteOnly<T>([CallerMemberName] string name = "");       // write
     protected TObject Object<TObject>([CallerMemberName] string name = "") where TObject : JsObject, new();
 
     // methods: 0 to 5 arguments each (IArg a1 ... a5), then the name
@@ -505,7 +503,16 @@ public sealed class AdmissionValidator : ReactiveValidator<Admission>
 - **Semantics decided in C#:**
   - `NotEmpty` means FluentValidation's empty: null, blank text, an empty collection, or the
     type's default value.
-  - A rule other than "required" passes on an empty value.
+  - Empty input follows the property's CLR type, as model binding and FluentValidation do on the
+    server. A non-nullable number reads an empty input as its default, so `GreaterThan(0)` fails on
+    empty. A nullable property's comparison passes on empty.
+    - Today the browser fails `gt` on empty but passes `min`, `max`, `lt` and ranges
+      (`rule-engine.ts:185-215`).
+    - A frozen journey that depended on that difference fails at the validation step and comes to
+      the owner for a decision; it is not edited.
+  - Messages keep today's browser text through `.WithMessage`, because FluentValidation's defaults
+    differ. For example, its default `'Age' must be greater than '0'.` differs from today's
+    `'Age' must be greater than 0.`.
   - Dates compare as timestamps.
   - Regex patterns are checked at render against JavaScript's dialect, so a .NET-only construct
     fails in C#.
@@ -610,12 +617,12 @@ Its whole vocabulary:
 
 | Concept | Kinds |
 |---|---|
-| Object | located by `element+vendor`, `fixed id`, `plugin name`, `payload`, `document`, `location`, `stream(url)`, `hub(url)`, or `the result of an expression`; members are names. A stream or hub locator owns its connection: shared per URL, counted per owner, retried, shown in the retry indicator |
-| Expression | `literal`, `read(source, path)`, `call(target, member, args, await)`, `lambda(params, body)`, `object`, `array`, `op`, `convert` |
+| Object | five locators: `element` (with its vendor), `plugin`, `document`, `stream(url)`, `hub(url)`. App objects are elements with fixed IDs. A stream or hub locator owns its connection: shared per URL, counted per owner, retried, shown in the retry indicator. Payloads, nested objects and returned objects are expressions, not locators |
+| Expression | ten kinds: `lit`, `ref`, `ctx` (event, response, request, url), `param`, `read(from, path, as)`, `call(target, path, args, as, await)`, `lambda`, `record`, `list`, `op`. Every node carries its own path and shape, so the runtime looks nothing up |
 | Op | C#'s operator set (comparison, logical, arithmetic, `??`, `?:`) plus `empty`. It is closed, because C#'s operators are |
-| Reaction | `sequence`, `set`, `call`, `branch`, `request`, `parallel`, `dispatch`, `inject`, `show-errors` |
+| Reaction | `steps`, `set`, `call`, `branch`, `request`, `parallel`, `dispatch`, `inject`, `show-errors` |
 | Trigger | one kind: `event(object, name)`. Ready is the document's event; custom events, stream messages and hub methods are events of their objects, subscribed through the object's vendor data |
-| Form | field tests `{field, value, test, message, when}`; error display; live wiring (input clears; blur and the declared committed event revalidate); server errors by name |
+| Form | tests `{field, check, when, message}`; error display; live wiring (input clears; blur and the declared committed event revalidate); server errors by name |
 | Slot | load, unload |
 
 - **Deleted from the runtime:**
@@ -636,23 +643,37 @@ Its whole vocabulary:
 ```json
 {
   "planId": "…", "scope": {},
-  "vendors":      { "fusion": {} },
-  "declarations": { "FusionGrid": { "vendor": "fusion", "members": {} } },
+  "vendors":   { "fusion": { "objectPath": "…", "subscribe": "…", "unsubscribe": "…", "payload": "argument" } },
   "objects": {
-    "Ns_Admission__Age": { "kind": "input", "declaration": "FusionNumericTextBox", "name": "Age", "value": "value", "committed": "change" },
-    "roster":            { "kind": "component", "declaration": "FusionGrid" },
-    "addressLookup":     { "kind": "plugin", "declaration": "AddressLookup" },
-    "admission-form":    { "kind": "form", "tests": [] }
+    "Ns_Admission__Age": { "type": "FusionNumericTextBox", "locator": { "kind": "element", "id": "Ns_Admission__Age", "vendor": "fusion" } },
+    "roster":            { "type": "FusionGrid",           "locator": { "kind": "element", "id": "roster", "vendor": "fusion" } },
+    "hub:/hubs/resident": { "type": "ResidentStatusHub",   "locator": { "kind": "hub", "url": "/hubs/resident" } }
   },
-  "behaviors": [ { "trigger": {}, "reaction": {} } ]
+  "inputs":    { "Ns_Admission__Age": { "name": "Age", "value": { "path": ["value"], "as": "number" }, "committed": "change" } },
+  "forms":     { "admission-form": { "tests": [ { "field": "Ns_Admission__Age", "check": {}, "when": { "kind": "lit", "value": true }, "message": "…" } ] } },
+  "behaviors": [ { "on": { "object": "roster", "event": "rowSelected" }, "do": { "kind": "steps", "steps": [] } } ]
 }
 ```
 
-- **One entry per declaration class.** Today the types repeat per element:
-  `fusion.component.<id>` (`BrowserObjectId.cs:13`).
-- **No placeholders.** Each object kind carries only its own fields. `binding:{kind:"none"}` and
+- **Self-describing nodes.** Every `read`, `set` and `call` carries the JavaScript path and the
+  shape that the C# declaration knows at the point of use.
+- **What that removes:**
+  - The runtime uses today's per-element `types` (`fusion.component.<id>`, `BrowserObjectId.cs:13`)
+    only to look up a path and a shape. So the declarations section, member keys, signature keys
+    and contract merging across partials (`merge-policy.ts`) all go.
+  - The plan-side registries `DeclareProperty` and `DeclareMethod` go too.
+- **The C# domain is the JSON.** Each plan-domain type is one immutable node, with its invariants
+  in its constructor, and serializes 1:1. No translation layer (`ToPlanRule`, `ToPlanCondition`)
+  remains.
+- **No placeholders.** Inputs and forms are their own maps, so `binding:{kind:"none"}` and
   `container:{kind:"none"}` (`plan.ts:86-120,148`) go.
-- **One expression union** serves values, conditions, lambdas and validation tests.
+- **Today versus target.** Today's generated contract has 136 interfaces, 60 unions and 65 kinds.
+  The target is ten `Expr` kinds, nine reaction kinds and five locators. The real count is
+  measured when the generator runs.
+
+**Diagrams and traces:** the design review page "Alis.Reactive Object Model"
+(https://claude.ai/artifact/MhD8NHsoMNBKmuNXABsdbu). It traces eight existing behaviors through
+this design.
 
 ## 10. Proof that nothing is lost
 
