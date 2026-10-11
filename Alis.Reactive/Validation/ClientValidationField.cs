@@ -12,7 +12,7 @@ namespace Alis.Reactive.Validation
     {
         private readonly ClientValidationFieldReference _field;
 
-        // For a collection item field: the condition declared around ClientRuleEach, relative to the
+        // For a collection item field: the condition declared around its RuleForEach, relative to the
         // collection's owner. Relocating the owner prefixes it; the rendered item prefix never does.
         private readonly ClientRuleActivation _ownerActivation;
 
@@ -61,7 +61,7 @@ namespace Alis.Reactive.Validation
         internal ClientValidationField RenderedAt(ValidationFieldPath itemPrefix) =>
             PrefixedBy(itemPrefix, _ownerActivation);
 
-        // An item field whose owner declared it under a condition (WhenField around ClientRuleEach).
+        // An item field whose owner declared it under a condition (When around RuleForEach).
         internal ClientValidationField ScopedBy(ClientRuleActivation activation) =>
             new ClientValidationField(_field, Rules, ItemFields, activation.Combine(_ownerActivation));
 

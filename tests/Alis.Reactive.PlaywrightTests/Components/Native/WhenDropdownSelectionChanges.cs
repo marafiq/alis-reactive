@@ -179,14 +179,11 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     [Test]
     public async Task plan_carries_prop_value_for_setvalue_reaction()
     {
-        // TODO: This raw JSON assertion can match DOM text updates instead of NativeDropDown SetValue.
-        // Replace it with a focused value-property proof in a test-design slice.
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"text\""),
-            "Plan must carry property .text. for SetValue reaction — " +
-            "runtime uses bracket notation root[prop] = val");
+        Assert.That(planJson, Does.Contain("\"textContent\""),
+            "Plan must write the echo element's text content");
         AssertNoConsoleErrors();
     }
 

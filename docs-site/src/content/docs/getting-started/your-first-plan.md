@@ -62,31 +62,31 @@ public sealed class TodoModel
 
 ## Create the Validator
 
-`ClientRule(...)` records metadata for browser validation and also adds the
-server-side FluentValidation rule.
+Write the rules once, in FluentValidation's grammar. The server runs them, and the browser runs
+every rule it can evaluate, under the same conditions.
 
 ```csharp
 using Alis.Reactive.FluentValidator;
+using FluentValidation;
 
 public sealed class TodoValidator : ReactiveValidator<TodoModel>
 {
     public TodoValidator()
     {
-        ClientRule(x => x.Title)
-            .Required("'Title' is required.")
-            .MaxLength(200, "'Title' must be at most 200 characters.");
+        RuleFor(x => x.Title)
+            .NotEmpty().WithMessage("'Title' is required.")
+            .MaximumLength(200).WithMessage("'Title' must be at most 200 characters.");
 
-        WhenField(x => x.IsUrgent, () =>
+        When(x => x.IsUrgent, () =>
         {
-            ClientRule(x => x.DueDate)
-                .Required("Urgent todos need a due date.");
+            RuleFor(x => x.DueDate).NotEmpty().WithMessage("Urgent todos need a due date.");
         });
     }
 }
 ```
 
-Plain `RuleFor(...)` is server-only. Use `ClientRule(...)` for rules that must
-be in the Reactive Plan.
+`Must`, `Custom` and async rules stay on the server, and so does a rule followed by
+`.ServerOnly()`.
 
 ## Add the Endpoint
 

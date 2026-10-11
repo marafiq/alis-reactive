@@ -1,4 +1,5 @@
 using Alis.Reactive.FluentValidator;
+using FluentValidation;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
@@ -6,9 +7,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public RoomRateValidator()
         {
-            ClientRule(x => x.RoomName).Required("Enter the room name.");
-            ClientRule(x => x.MonthlyRate).Required("Enter the monthly rate.");
-            ClientRule(x => x.CommunityFee).Required("Enter the community fee, or 0 if it is waived.");
+            RuleFor(x => x.RoomName).NotEmpty().WithMessage("Enter the room name.");
+            RuleFor(x => x.MonthlyRate).NotEmpty().WithMessage("Enter the monthly rate.");
+            RuleFor(x => x.CommunityFee).NotEmpty().WithMessage("Enter the community fee, or 0 if it is waived.");
         }
     }
 }

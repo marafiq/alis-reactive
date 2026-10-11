@@ -17,7 +17,7 @@ namespace Alis.Reactive.Fusion.Components
     /// Only the single-field rules that map directly to EJ2 FormValidator are emitted
     /// (<c>required</c>, <c>minLength</c>, <c>maxLength</c>, <c>email</c>, <c>url</c>,
     /// <c>regex</c>, <c>min</c>, <c>max</c>, numeric <c>range</c>). Conditional
-    /// (<c>WhenField</c>), cross-field, and exotic rules carry no EJ2 equivalent and stay
+    /// (under <c>When</c>), cross-field, and exotic rules carry no EJ2 equivalent and stay
     /// server-authoritative on save.
     /// <code>
     /// @inject Alis.Reactive.Validation.IClientValidationRuleSource ClientRules
@@ -72,7 +72,7 @@ namespace Alis.Reactive.Fusion.Components
             if (declared == null)
                 throw new InvalidOperationException(
                     $"No client validation rules are declared for '{path}'. " +
-                    "Add a ClientRule for it on the validator, or remove the ValidationRules emit for this column.");
+                    "Add a rule for it on the validator, or remove the ValidationRules emit for this column.");
 
             var rules = Ej2ColumnRules.From(declared);
             return rules.Count == 0 ? null : rules;

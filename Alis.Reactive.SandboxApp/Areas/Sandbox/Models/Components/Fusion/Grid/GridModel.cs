@@ -111,24 +111,19 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public ResidentGridEditingValidator()
         {
-            ClientRule(x => x.ResidentName)
-                .Required("Resident name is required.");
+            RuleFor(x => x.ResidentName).NotEmpty().WithMessage("Resident name is required.");
 
-            ClientRule(x => x.ResidentName)
-                .MinLength(3, "Resident name must be at least 3 characters.");
+            RuleFor(x => x.ResidentName).MinimumLength(3).WithMessage("Resident name must be at least 3 characters.");
 
-            ClientRule(x => x.RiskLevel)
-                .Required("Risk level is required.");
+            RuleFor(x => x.RiskLevel).NotEmpty().WithMessage("Risk level is required.");
 
             RuleFor(x => x.RiskLevel)
                 .Must(value => value is "Low" or "Moderate" or "High")
                 .WithMessage("Risk level must be Low, Moderate, or High.");
 
-            ClientRule(x => x.OpenTasks)
-                .Required("Open tasks is required.");
+            RuleFor(x => x.OpenTasks).NotEmpty().WithMessage("Open tasks is required.");
 
-            ClientRule(x => x.OpenTasks)
-                .Range(0m, 7m, "Open tasks must be between 0 and 7.");
+            RuleFor(x => x.OpenTasks).InclusiveBetween(0m, 7m).WithMessage("Open tasks must be between 0 and 7.");
         }
     }
 }

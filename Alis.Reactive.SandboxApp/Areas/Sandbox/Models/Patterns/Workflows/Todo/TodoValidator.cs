@@ -7,15 +7,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public TodoValidator()
         {
-            RuleFor(x => x.Title).NotEmpty().MaximumLength(200);
-            ClientRule(x => x.Title)
-                .Required("'Title' is required.")
-                .MaxLength(200, "'Title' must be at most 200 characters.");
+            RuleFor(x => x.Title)
+                .NotEmpty().WithMessage("'Title' is required.")
+                .MaximumLength(200).WithMessage("'Title' must be at most 200 characters.");
 
-            WhenField(x => x.IsUrgent, () =>
+            When(x => x.IsUrgent, () =>
             {
                 RuleFor(x => x.DueDate).NotEmpty().WithMessage("Urgent todos need a due date");
-                ClientRule(x => x.DueDate).Required("Urgent todos need a due date");
             });
         }
     }

@@ -1,4 +1,5 @@
 using Alis.Reactive.FluentValidator;
+using FluentValidation;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
@@ -6,7 +7,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public EmergencyContactValidator()
         {
-            ClientRule(x => x.Phone).Required("Phone is required.");
+            RuleFor(x => x.Phone).NotEmpty().WithMessage("Phone is required.");
         }
     }
 
@@ -14,10 +15,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public EmergencyContactsValidator()
         {
-            ClientRule(x => x.ResidentName).Required("Resident name is required.");
+            RuleFor(x => x.ResidentName).NotEmpty().WithMessage("Resident name is required.");
 
-            WhenField(x => x.HasContacts, () =>
-                ClientRuleEach(x => x.Contacts).SetValidator(new EmergencyContactValidator()));
+            When(x => x.HasContacts, () =>
+                RuleForEach(x => x.Contacts).SetValidator(new EmergencyContactValidator()));
         }
     }
 }

@@ -8,7 +8,8 @@
 // F5 A field with no element is skipped when all its `when`s are false; otherwise the form is invalid
 //    and the summary gets the message of the field's first test.
 // F6 A message goes inline into {id}_error when that slot can render, else into the summary.
-// F7 At creation: DOM `input` clears a field's message; DOM `blur` and its committed event revalidate it.
+// F7 At creation, and whenever HTML mounts (a field a partial loads): DOM `input` clears a field's
+//    message; DOM `blur` and its committed event revalidate it. Each element is wired once.
 // F8 showErrors(problem) places server errors by exact binding name; without a record body it validates.
 // F9 A slot's load or unload removes exactly its own fields, then clears and hides the summary.
 
@@ -20,6 +21,7 @@ import { Environment } from "../../grammar/environment";
 import { evaluate } from "../../grammar/evaluate";
 import { asText } from "../../grammar/shape";
 import { scope } from "../../diagnostics/trace";
+import { MOUNT_EVENT } from "../../plans/mount-events";
 import {
   addToSummary, canRenderInline, clearInline, clearSummary, hideSummaryDiv, removeSummaryEntry,
   showInline, showServerErrorInline, showSummaryDiv, summaryHasEntries,
@@ -31,6 +33,7 @@ interface Entry {
   readonly field: FormField;
   readonly world: PlanWorld;
   readonly summary: string;
+  readonly owner: Owner;
 }
 
 export interface FormObject {
@@ -39,7 +42,10 @@ export interface FormObject {
 }
 
 const formsByContainer = new Map<string, Entry[]>();
-const liveWiredElements = new Set<string>();
+// The elements wired for live validation. A partial that reloads brings new elements under the same
+// ids, so wiring is remembered per element, not per id.
+let liveWiredElements = new WeakSet<HTMLElement>();
+let mountListened = false;
 
 function entriesOf(containerId: string): Entry[] {
   let entries = formsByContainer.get(containerId);
@@ -202,21 +208,20 @@ function showErrors(containerId: string, problem: unknown): void {
 
 // ── live wiring ────────────────────────────────────────────────────────────
 
-function wireLive(containerId: string, entry: Entry, owner: Owner): void {
-  const { field } = entry;
-  if (liveWiredElements.has(field.id)) return;
+function wireLive(containerId: string, entry: Entry): void {
+  const { field, owner } = entry;
   const element = document.getElementById(field.id);
-  if (element === null) return;
+  if (element === null || liveWiredElements.has(element)) return;
 
   const clear = (): void => clearInline(field.id);
   const recheck = (): void => revalidate(containerId, field.id);
   element.addEventListener("input", clear);
   element.addEventListener("blur", recheck);
-  liveWiredElements.add(field.id);
+  liveWiredElements.add(element);
   owner.onDispose(() => {
     element.removeEventListener("input", clear);
     element.removeEventListener("blur", recheck);
-    liveWiredElements.delete(field.id);
+    liveWiredElements.delete(element);
   });
 
   try {
@@ -227,6 +232,19 @@ function wireLive(containerId: string, entry: Entry, owner: Owner): void {
   }
 }
 
+// Fields a partial renders appear after their form was contributed: wire them when they mount.
+function wireMountedFields(): void {
+  for (const [containerId, entries] of formsByContainer) {
+    for (const entry of entries) wireLive(containerId, entry);
+  }
+}
+
+function listenForMounts(): void {
+  if (mountListened) return;
+  mountListened = true;
+  document.addEventListener(MOUNT_EVENT, wireMountedFields);
+}
+
 export const formModule: Module = {
   object: (containerId): FormObject => ({
     validate: () => validate(containerId),
@@ -235,10 +253,11 @@ export const formModule: Module = {
   contribute({ key, data, owner, world }: Contribution) {
     if (data.kind !== "form") return;
     const entries = entriesOf(key);
-    const added = data.fields.map(field => ({ field, world, summary: data.summary }));
+    const added = data.fields.map(field => ({ field, world, summary: data.summary, owner }));
     entries.push(...added);
     if (owner.isSlot) clearAndHide(document.getElementById(data.summary));
-    for (const entry of added) wireLive(key, entry, owner);
+    for (const entry of added) wireLive(key, entry);
+    listenForMounts();
 
     owner.onDispose(() => {
       const remaining = entriesOf(key).filter(entry => !added.includes(entry));
@@ -250,5 +269,5 @@ export const formModule: Module = {
 
 export function resetFormsForTests(): void {
   formsByContainer.clear();
-  liveWiredElements.clear();
+  liveWiredElements = new WeakSet<HTMLElement>();
 }

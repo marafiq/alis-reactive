@@ -111,27 +111,6 @@ internal static class ClientValidationRulePlanHarness
 
     private static ServiceCollection BuildServices(ServiceCollection services)
     {
-        services.AddReactiveClientValidation(rules =>
-        {
-            rules.Add<StayWindowClientValidation, StayWindow>(rules =>
-            {
-                rules.Field(x => x.DischargeDate)
-                    .GreaterThan(x => x.AdmissionDate, "Discharge must be after admission.")
-                    .GreaterThanOrEqualTo(x => x.AdmissionDate, "Discharge must not be before admission.")
-                    .LessThan(x => x.ReviewDate, "Discharge must be before review.")
-                    .LessThanOrEqualTo(x => x.ReviewDate, "Discharge must not be after review.");
-            });
-
-            rules.Add<ResidentAssessmentClientValidation, ResidentAssessment>(rules =>
-            {
-                rules.When(
-                    fields => fields.Field(x => x.IsVeteran).Truthy()
-                        .And(fields.Field(x => x.CareLevel).In("Memory Care", "Skilled Nursing")),
-                    rules => rules.Field(x => x.MemoryAssessmentScore)
-                        .Required("Memory assessment score is required."));
-            });
-        });
-
         services.AddReactiveFluentValidation(rules =>
         {
             rules.Add<AsyncOnlyValidator>();
@@ -141,6 +120,7 @@ internal static class ClientValidationRulePlanHarness
             rules.Add<ReactiveAssessmentValidator>();
             rules.Add<ComposedAssessmentValidator>();
             rules.Add<MixedConditionValidator>();
+            rules.Add<ServerOnlyRuleValidator>();
             rules.Add<TaggedAssessmentValidator>();
         });
 
@@ -148,22 +128,11 @@ internal static class ClientValidationRulePlanHarness
     }
 }
 
-internal sealed class StayWindowClientValidation { }
-
-internal sealed class ResidentAssessmentClientValidation { }
-
 internal sealed class StayWindow
 {
     public DateTime AdmissionDate { get; set; }
     public DateTime DischargeDate { get; set; }
     public DateTime ReviewDate { get; set; }
-}
-
-internal sealed class ResidentAssessment
-{
-    public bool IsVeteran { get; set; }
-    public string? CareLevel { get; set; }
-    public int? MemoryAssessmentScore { get; set; }
 }
 
 internal sealed class AsyncOnlyValidator : ReactiveValidator<AsyncOnlyModel>
@@ -185,30 +154,27 @@ internal sealed class BuiltInClientRulesValidator : ReactiveValidator<BuiltInCli
 {
     public BuiltInClientRulesValidator()
     {
-        ClientRule(model => model.Name)
-            .Required("'Name' is required.")
-            .MinLength(2, "'Name' must be at least 2 characters.")
-            .MaxLength(10, "'Name' must be at most 10 characters.")
-            .Regex("^[A-Z]+$", "'Name' format is invalid.");
+        RuleFor(model => model.Name)
+            .NotEmpty().WithMessage("'Name' is required.")
+            .MinimumLength(2).WithMessage("'Name' must be at least 2 characters.")
+            .MaximumLength(10).WithMessage("'Name' must be at most 10 characters.")
+            .Matches("^[A-Z]+$").WithMessage("'Name' format is invalid.");
 
-        ClientRule(model => model.Email)
-            .Email("'Email' must be a valid email address.");
+        RuleFor(model => model.Email).EmailAddress().WithMessage("'Email' must be a valid email address.");
 
-        ClientRule(model => model.Card)
-            .CreditCard("'Card' must be a valid credit card number.");
+        RuleFor(model => model.Card).CreditCard().WithMessage("'Card' must be a valid credit card number.");
 
-        ClientRule(model => model.EmptyCode)
-            .Empty("'Empty Code' must be empty.");
+        RuleFor(model => model.EmptyCode).Empty().WithMessage("'Empty Code' must be empty.");
 
-        ClientRule(model => model.Score)
-            .Range(1, 5, "'Score' must be between 1 and 5.")
-            .ExclusiveRange(0, 10, "'Score' must be between 0 and 10 (exclusive).")
-            .GreaterThanOrEqualTo(2, "'Score' must be at least 2.")
-            .LessThanOrEqualTo(8, "'Score' must be at most 8.")
-            .GreaterThan(1, "'Score' must be greater than 1.")
-            .LessThan(9, "'Score' must be less than 9.")
-            .EqualTo(5, "'Score' must equal 5.")
-            .NotEqual(3, "'Score' must not equal 3.");
+        RuleFor(model => model.Score)
+            .InclusiveBetween(1, 5).WithMessage("'Score' must be between 1 and 5.")
+            .ExclusiveBetween(0, 10).WithMessage("'Score' must be between 0 and 10 (exclusive).")
+            .GreaterThanOrEqualTo(2).WithMessage("'Score' must be at least 2.")
+            .LessThanOrEqualTo(8).WithMessage("'Score' must be at most 8.")
+            .GreaterThan(1).WithMessage("'Score' must be greater than 1.")
+            .LessThan(9).WithMessage("'Score' must be less than 9.")
+            .Equal(5).WithMessage("'Score' must equal 5.")
+            .NotEqual(3).WithMessage("'Score' must not equal 3.");
     }
 }
 
@@ -225,13 +191,13 @@ internal sealed class BuiltInPeerComparisonValidator : ReactiveValidator<StayWin
 {
     public BuiltInPeerComparisonValidator()
     {
-        ClientRule(model => model.DischargeDate)
-            .GreaterThan(model => model.AdmissionDate, "Discharge must be after admission.")
-            .GreaterThanOrEqualTo(model => model.AdmissionDate, "Discharge must not be before admission.")
-            .LessThan(model => model.ReviewDate, "Discharge must be before review.")
-            .LessThanOrEqualTo(model => model.ReviewDate, "Discharge must not be after review.")
-            .EqualTo(model => model.AdmissionDate, "Discharge must match admission.")
-            .NotEqualTo(model => model.ReviewDate, "Discharge must differ from review.");
+        RuleFor(model => model.DischargeDate)
+            .GreaterThan(model => model.AdmissionDate).WithMessage("Discharge must be after admission.")
+            .GreaterThanOrEqualTo(model => model.AdmissionDate).WithMessage("Discharge must not be before admission.")
+            .LessThan(model => model.ReviewDate).WithMessage("Discharge must be before review.")
+            .LessThanOrEqualTo(model => model.ReviewDate).WithMessage("Discharge must not be after review.")
+            .Equal(model => model.AdmissionDate).WithMessage("Discharge must match admission.")
+            .NotEqual(model => model.ReviewDate).WithMessage("Discharge must differ from review.");
     }
 }
 
@@ -239,8 +205,7 @@ internal sealed class ConfirmEmailValidator : ReactiveValidator<ConfirmEmailMode
 {
     public ConfirmEmailValidator()
     {
-        ClientRule(model => model.ConfirmEmail)
-            .EqualTo(model => model.Email, "Emails must match.");
+        RuleFor(model => model.ConfirmEmail).Equal(model => model.Email).WithMessage("Emails must match.");
     }
 }
 
@@ -254,10 +219,9 @@ internal sealed class ReactiveAssessmentValidator : ReactiveValidator<Assessment
 {
     public ReactiveAssessmentValidator()
     {
-        WhenField(model => model.IsVeteran, () =>
+        When(model => model.IsVeteran, () =>
         {
-            ClientRule(model => model.Score)
-                .Required("Score required for veterans.");
+            RuleFor(model => model.Score).NotEmpty().WithMessage("Score required for veterans.");
         });
     }
 }
@@ -266,12 +230,9 @@ internal sealed class ComposedAssessmentValidator : ReactiveValidator<Assessment
 {
     public ComposedAssessmentValidator()
     {
-        WhenFields(fields => fields
-            .Field(model => model.IsVeteran).Truthy()
-            .And(fields.Field(model => model.Score).Gt(7)), () =>
+        When(model => model.IsVeteran && model.Score > 7, () =>
             {
-                ClientRule(model => model.Notes)
-                    .Required("Notes required for high scoring veterans.");
+                RuleFor(model => model.Notes).NotEmpty().WithMessage("Notes required for high scoring veterans.");
             });
     }
 }
@@ -280,14 +241,26 @@ internal sealed class MixedConditionValidator : ReactiveValidator<AssessmentMode
 {
     public MixedConditionValidator()
     {
-        WhenField(model => model.IsVeteran, () =>
+        When(model => model.IsVeteran, () =>
         {
-            When(model => model.ServerFlag, () =>
+            When(IsServerFlagged, () =>
             {
                 RuleFor(model => model.Score).NotEmpty()
                     .WithMessage("Score required by server condition.");
             });
         });
+    }
+
+    // A method group is a C# predicate FluentValidation runs; the browser has no form of it.
+    private static bool IsServerFlagged(AssessmentModel model) => model.ServerFlag;
+}
+
+internal sealed class ServerOnlyRuleValidator : ReactiveValidator<AssessmentModel>
+{
+    public ServerOnlyRuleValidator()
+    {
+        RuleFor(model => model.Notes).NotEmpty().WithMessage("Notes are recorded by the server.").ServerOnly();
+        RuleFor(model => model.Score).NotEmpty().WithMessage("Score is required.");
     }
 }
 
@@ -303,10 +276,9 @@ internal sealed class TaggedAssessmentValidator : ReactiveValidator<TaggedAssess
 {
     public TaggedAssessmentValidator()
     {
-        WhenFieldArrayContains(model => model.Tags, "fall-risk", () =>
+        When(model => model.Tags.Contains("fall-risk"), () =>
         {
-            ClientRule(model => model.ReviewNote)
-                .Required("Review note is required for fall-risk residents.");
+            RuleFor(model => model.ReviewNote).NotEmpty().WithMessage("Review note is required for fall-risk residents.");
         });
     }
 }

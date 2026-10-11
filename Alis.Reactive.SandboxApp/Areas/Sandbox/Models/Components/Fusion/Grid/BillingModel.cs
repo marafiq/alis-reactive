@@ -1,4 +1,5 @@
 using Alis.Reactive.FluentValidator;
+using FluentValidation;
 using Alis.Reactive.Fusion.Components;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion;
 
@@ -78,26 +79,19 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public ResidentBillingAddValidator()
         {
-            ClientRule(x => x.NewResidentName)
-                .Required("Resident name is required.");
+            RuleFor(x => x.NewResidentName).NotEmpty().WithMessage("Resident name is required.");
 
-            ClientRule(x => x.NewResidentName)
-                .MinLength(3, "Resident name must be at least 3 characters.");
+            RuleFor(x => x.NewResidentName).MinimumLength(3).WithMessage("Resident name must be at least 3 characters.");
 
-            ClientRule(x => x.NewCareLevel)
-                .Required("Care level is required.");
+            RuleFor(x => x.NewCareLevel).NotEmpty().WithMessage("Care level is required.");
 
-            ClientRule(x => x.NewMonthlyRate)
-                .Required("Monthly rate is required.");
+            RuleFor(x => x.NewMonthlyRate).NotEmpty().WithMessage("Monthly rate is required.");
 
-            ClientRule(x => x.NewMonthlyRate)
-                .Range(0m, 20000m, "Monthly rate must be between 0 and 20,000.");
+            RuleFor(x => x.NewMonthlyRate).InclusiveBetween(0m, 20000m).WithMessage("Monthly rate must be between 0 and 20,000.");
 
-            ClientRule(x => x.NewAddOnCharges)
-                .Required("Add-on charges are required.");
+            RuleFor(x => x.NewAddOnCharges).NotEmpty().WithMessage("Add-on charges are required.");
 
-            ClientRule(x => x.NewAddOnCharges)
-                .Range(0m, 5000m, "Add-on charges must be between 0 and 5,000.");
+            RuleFor(x => x.NewAddOnCharges).InclusiveBetween(0m, 5000m).WithMessage("Add-on charges must be between 0 and 5,000.");
         }
     }
 }

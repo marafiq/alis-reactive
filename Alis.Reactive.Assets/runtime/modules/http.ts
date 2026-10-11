@@ -95,7 +95,7 @@ function prepare(request: HttpRequest): { url: string; init: RequestInit } {
 function fillRoute(template: string, route: Record<string, unknown>): string {
   return template.replace(ROUTE_PLACEHOLDER, (_match, name: string) => {
     const value = route[name];
-    if (isMissing(value)) throw new Error(`[alis] route param "${name}" evaluated to null; cannot build ${template}`);
+    if (isMissing(value)) throw new Error(`[alis] route param "${name}" evaluated to null; cannot build URL`);
     return encodeURIComponent(wireText(value, name));
   });
 }

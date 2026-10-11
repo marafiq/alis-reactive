@@ -83,11 +83,11 @@ public class WhenAGridColumnGeneratesNativeValidationFromClientRules
     }
 
     [Test]
-    public void conditional_when_field_rules_are_never_emitted_as_always_on_column_rules()
+    public void conditional_rules_are_never_emitted_as_always_on_column_rules()
     {
         var validation = ValidationFor<ReactiveAssessmentValidator, AssessmentModel>();
 
-        // Score's only rule is Required under WhenField(IsVeteran): conditional, so skipped.
+        // Score's only rule is NotEmpty under When(x => x.IsVeteran): conditional, so skipped.
         Assert.That(validation.Field(m => m.Score), Is.Null);
     }
 }

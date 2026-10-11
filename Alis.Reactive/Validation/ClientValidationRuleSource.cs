@@ -33,31 +33,7 @@ namespace Alis.Reactive.Validation
 
             throw new InvalidOperationException(
                 $"No Reactive Plan client validation metadata is registered for validation source '{validationSourceType.FullName}'. " +
-                "Register FluentValidation metadata with services.AddReactiveFluentValidation(...), " +
-                "or app-level rules with services.AddReactiveClientValidation(...).");
-        }
-    }
-
-    internal sealed class ConfiguredClientValidationMetadataProvider : IClientValidationMetadataProvider
-    {
-        private readonly IReadOnlyDictionary<Type, IReadOnlyList<ClientValidationField>> _fieldsBySource;
-
-        internal ConfiguredClientValidationMetadataProvider(
-            IReadOnlyDictionary<Type, IReadOnlyList<ClientValidationField>> fieldsBySource)
-        {
-            if (fieldsBySource == null) throw new ArgumentNullException(nameof(fieldsBySource));
-
-            // net48 has no Dictionary(IEnumerable<KeyValuePair>) ctor; project explicitly.
-            _fieldsBySource = fieldsBySource.ToDictionary(pair => pair.Key, pair => pair.Value);
-        }
-
-        public bool TryGetClientRules(
-            Type validationSourceType,
-            [NotNullWhen(true)]
-            out IReadOnlyList<ClientValidationField>? fields)
-        {
-            if (validationSourceType == null) throw new ArgumentNullException(nameof(validationSourceType));
-            return _fieldsBySource.TryGetValue(validationSourceType, out fields);
+                "Register its validator with services.AddReactiveFluentValidation(rules => rules.Add<TValidator>()).");
         }
     }
 }

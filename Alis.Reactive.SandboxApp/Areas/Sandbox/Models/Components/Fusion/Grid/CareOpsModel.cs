@@ -1,4 +1,5 @@
 using Alis.Reactive.FluentValidator;
+using FluentValidation;
 using Alis.Reactive.Fusion.Components;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion;
 
@@ -64,40 +65,32 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public CareOpsAdmitValidator()
         {
-            ClientRule(x => x.NewResidentName)
-                .Required("Resident name is required.");
+            RuleFor(x => x.NewResidentName).NotEmpty().WithMessage("Resident name is required.");
 
-            ClientRule(x => x.NewResidentName)
-                .MinLength(3, "Resident name must be at least 3 characters.");
+            RuleFor(x => x.NewResidentName).MinimumLength(3).WithMessage("Resident name must be at least 3 characters.");
 
-            ClientRule(x => x.NewWing)
-                .Required("Wing is required.");
+            RuleFor(x => x.NewWing).NotEmpty().WithMessage("Wing is required.");
 
-            ClientRule(x => x.NewCareLevel)
-                .Required("Care level is required.");
+            RuleFor(x => x.NewCareLevel).NotEmpty().WithMessage("Care level is required.");
 
-            ClientRule(x => x.NewRiskLevel)
-                .Required("Risk level is required.");
+            RuleFor(x => x.NewRiskLevel).NotEmpty().WithMessage("Risk level is required.");
 
-            ClientRule(x => x.NewOpenTasks)
-                .Required("Open tasks is required.");
+            RuleFor(x => x.NewOpenTasks).NotEmpty().WithMessage("Open tasks is required.");
 
-            ClientRule(x => x.NewOpenTasks)
-                .Range(0m, 12m, "Open tasks must be between 0 and 12.");
+            RuleFor(x => x.NewOpenTasks).InclusiveBetween(0m, 12m).WithMessage("Open tasks must be between 0 and 12.");
         }
     }
 
     /// <summary>
     /// Client and server validation for an in-cell care row edit. The same
-    /// <c>ClientRule</c> metadata drives EJ2-native column validation in the grid
+    /// FluentValidation rules drive EJ2-native column validation in the grid
     /// (via <c>FusionGridValidation</c>) and a full server check on save.
     /// </summary>
     public class ResidentCareItemValidator : ReactiveValidator<ResidentCareItem>
     {
         public ResidentCareItemValidator()
         {
-            ClientRule(r => r.OpenTasks)
-                .Range(0, 7, "Open tasks must be between 0 and 7.");
+            RuleFor(r => r.OpenTasks).InclusiveBetween(0, 7).WithMessage("Open tasks must be between 0 and 7.");
         }
     }
 }

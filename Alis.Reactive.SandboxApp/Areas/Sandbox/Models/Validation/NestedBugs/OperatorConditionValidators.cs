@@ -1,4 +1,5 @@
 using Alis.Reactive.FluentValidator;
+using FluentValidation;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
 {
@@ -6,34 +7,29 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
     {
         public OperatorConditionValidator()
         {
-            WhenFieldGte(x => x.Age, 18, () =>
+            When(x => x.Age >= 18, () =>
             {
-                ClientRule(x => x.JobTitle)
-                    .Required("Adults must provide job title.");
+                RuleFor(x => x.JobTitle).NotEmpty().WithMessage("Adults must provide job title.");
             });
 
-            WhenFieldLt(x => x.Age, 18, () =>
+            When(x => x.Age < 18, () =>
             {
-                ClientRule(x => x.Name)
-                    .Required("Guardian name required for minors.");
+                RuleFor(x => x.Name).NotEmpty().WithMessage("Guardian name required for minors.");
             });
 
-            WhenFieldIn(x => x.CareLevel, new[] { "memory-care", "skilled-nursing" }, () =>
+            When(x => new[] { "memory-care", "skilled-nursing" }.Contains(x.CareLevel), () =>
             {
-                ClientRule(x => x.Notes)
-                    .Required("Notes required for high-acuity care.");
+                RuleFor(x => x.Notes).NotEmpty().WithMessage("Notes required for high-acuity care.");
             });
 
-            WhenFieldContains(x => x.Notes, "urgent", () =>
+            When(x => x.Notes != null && x.Notes.Contains("urgent"), () =>
             {
-                ClientRule(x => x.Phone)
-                    .Required("Phone required for urgent cases.");
+                RuleFor(x => x.Phone).NotEmpty().WithMessage("Phone required for urgent cases.");
             });
 
-            WhenFieldNotEmpty(x => x.Email, () =>
+            When(x => !string.IsNullOrEmpty(x.Email), () =>
             {
-                ClientRule(x => x.Name)
-                    .Required("Name required when email provided.");
+                RuleFor(x => x.Name).NotEmpty().WithMessage("Name required when email provided.");
             });
         }
     }

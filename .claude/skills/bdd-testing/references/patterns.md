@@ -147,13 +147,15 @@ public class ServerPartialValidator : ReactiveValidator<ResidentModel>
 {
     public ServerPartialValidator()
     {
-        ClientRule(x => x.Name).Required("Name is required.");
-        ClientRule(x => x.Email).Required("Email is required.").Email("Enter a valid email.");
-        WhenField(x => x.IsVeteran, () =>
+        RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required.");
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage("Email is required.")
+            .EmailAddress().WithMessage("Enter a valid email.");
+        When(x => x.IsVeteran, () =>
         {
-            ClientRule(x => x.VeteranId).Required("Veteran ID is required.");
+            RuleFor(x => x.VeteranId).NotEmpty().WithMessage("Veteran ID is required.");
         });
-        ClientRule(x => x.Address, new ResidentAddressValidator());
+        RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator());
     }
 }
 
@@ -161,23 +163,18 @@ public class ServerPartialValidator : ReactiveValidator<ResidentModel>
 .Validate<ResidentValidator>("partial-form")
 ```
 
-Nested properties must use ClientRule(field, validator) — it wraps SetValidator and merges the child client metadata:
+Nested properties take the child's validator, whose rules reach the browser with the prefix:
 
 ```csharp
-// CORRECT
-ClientRule(x => x.Address, new ResidentAddressValidator());
-
-// WRONG — plain RuleFor is server-only; no client metadata
-RuleFor(x => x.Address.Street).NotEmpty();
+RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator());
 ```
 
-Conditional AJAX rules use WhenField:
+Conditional rules are a `When` lambda over the model; the browser applies the same condition:
 
 ```csharp
-// CORRECT
-WhenField(x => x.AddressType, "Custom Address", () =>
+When(x => x.AddressType == "Custom Address", () =>
 {
-    ClientRule(x => x.Address, new ResidentAddressValidator());
+    RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator());
 });
 ```
 
@@ -231,7 +228,7 @@ expect(summaryDiv().textContent).toContain("Hidden required");  // IN summary
 | Symptom | Wrong Fix | Right Fix |
 |---------|-----------|-----------|
 | Phantom summary errors | Revert unenriched→summary | Fix validator scope (too wide) |
-| Address rules missing client-side | Direct `RuleFor(x.Address.Street)` | Use `ClientRule(x => x.Address, new AddressValidator())` |
+| Address rules missing client-side | Rules under a method-group `When` | Write the condition as a lambda: `When(x => ..., () => ...)` |
 | Condition fires on empty dropdown | Revert fail-closed | Fix eq/neq to return false on empty source |
 | Hidden field error silently passes | Remove hidden field validation | Move `valid = false` outside `if (summaryEl)` |
 

@@ -17,8 +17,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
     {
         public SuiteAssignmentValidator()
         {
-            RuleFor(x => x.SuiteType).NotEmpty();
-            ClientRule(x => x.SuiteType).Required("Choose a suite type.");
+            RuleFor(x => x.SuiteType).NotEmpty().WithMessage("Choose a suite type.");
         }
     }
 

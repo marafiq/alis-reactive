@@ -39,7 +39,7 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
     }
 
     [Test]
-    public void async_rules_are_server_only_even_when_a_client_rule_is_declared()
+    public void asynchronous_rules_stay_on_the_server()
     {
         using var doc = ClientValidationRulePlanHarness
             .RenderPlan<AsyncOnlyModel, AsyncOnlyValidator>();
@@ -98,7 +98,7 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
     }
 
     [Test]
-    public void whenfield_declares_client_activation_and_guard_fields()
+    public void a_when_lambda_becomes_the_browser_condition()
     {
         using var doc = ClientValidationRulePlanHarness
             .RenderPlan<AssessmentModel, ReactiveAssessmentValidator>();
@@ -117,7 +117,7 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
     }
 
     [Test]
-    public void whenfields_declares_composed_client_activation()
+    public void a_composed_when_lambda_becomes_a_composed_browser_condition()
     {
         using var doc = ClientValidationRulePlanHarness
             .RenderPlan<AssessmentModel, ComposedAssessmentValidator>();
@@ -138,7 +138,7 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
     }
 
     [Test]
-    public void whenfield_array_contains_declares_collection_item_activation()
+    public void a_collection_contains_condition_reads_the_collection_input()
     {
         using var doc = ClientValidationRulePlanHarness
             .RenderPlan<TaggedAssessmentModel, TaggedAssessmentValidator>();
@@ -166,12 +166,23 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
     }
 
     [Test]
-    public void rules_under_regular_fluentvalidation_conditions_stay_server_only()
+    public void rules_under_a_method_group_condition_stay_on_the_server()
     {
         using var doc = ClientValidationRulePlanHarness
             .RenderPlan<AssessmentModel, MixedConditionValidator>();
 
         Assert.That(ValidationRuleCount(doc.RootElement), Is.Zero);
+    }
+
+    [Test]
+    public void rules_marked_server_only_stay_on_the_server()
+    {
+        using var doc = ClientValidationRulePlanHarness
+            .RenderPlan<AssessmentModel, ServerOnlyRuleValidator>();
+
+        Assert.That(
+            ClientValidationRulePlanHarness.Fields(doc.RootElement).Select(field => field.GetProperty("name").GetString()),
+            Is.EqualTo(new[] { nameof(AssessmentModel.Score) }));
     }
 
     [Test]
@@ -249,8 +260,7 @@ internal sealed class AssemblyScanClientValidator : ReactiveValidator<AssemblySc
 {
     public AssemblyScanClientValidator(AssemblyScanMessages messages)
     {
-        ClientRule(model => model.Name)
-            .Required(messages.RequiredNameMessage);
+        RuleFor(model => model.Name).NotEmpty().WithMessage(messages.RequiredNameMessage);
     }
 }
 

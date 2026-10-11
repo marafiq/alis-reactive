@@ -75,7 +75,7 @@ function unescapeXml(text) {
 // GitHub Actions workflow commands escape %, CR and LF in the message; the start of the failure
 // message is enough to name the defect, and the artifact carries the rest.
 function annotation(fqn, message) {
-  const text = `${fqn}${message ? ` — ${message.slice(0, 900)}` : ""}`;
+  const text = `${fqn}${message ? ` — ${message.slice(0, 4000)}` : ""}`;
   const escaped = text.replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
   return `::error title=Failed test::${escaped}`;
 }

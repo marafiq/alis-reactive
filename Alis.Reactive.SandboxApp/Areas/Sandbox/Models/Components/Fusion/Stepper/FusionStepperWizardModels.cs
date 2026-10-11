@@ -71,20 +71,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Steppe
     {
         public FusionStepperWizardIntakeValidator()
         {
-            RuleFor(x => x.ResidentName).NotEmpty().MinimumLength(2);
-            ClientRule(x => x.ResidentName)
-                .Required("'Resident Name' is required.")
-                .MinLength(2, "'Resident Name' must have a minimum length of 2.");
+            RuleFor(x => x.ResidentName)
+                .NotEmpty().WithMessage("'Resident Name' is required.")
+                .MinimumLength(2).WithMessage("'Resident Name' must have a minimum length of 2.");
 
-            RuleFor(x => x.Age).NotNull().InclusiveBetween(55m, 120m);
-            ClientRule(x => x.Age)
-                .Required("'Age' is required.")
-                .GreaterThanOrEqualTo(55m, "'Age' must be at least 55.")
-                .LessThanOrEqualTo(120m, "'Age' must be at most 120.");
+            RuleFor(x => x.Age)
+                .NotEmpty().WithMessage("'Age' is required.")
+                .GreaterThanOrEqualTo(55m).WithMessage("'Age' must be at least 55.")
+                .LessThanOrEqualTo(120m).WithMessage("'Age' must be at most 120.");
 
-            RuleFor(x => x.AdmissionType).NotEmpty();
-            ClientRule(x => x.AdmissionType)
-                .Required("'Admission Type' is required.");
+            RuleFor(x => x.AdmissionType).NotEmpty().WithMessage("'Admission Type' is required.");
         }
     }
 
@@ -92,29 +88,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Steppe
     {
         public FusionStepperWizardCareValidator()
         {
-            RuleFor(x => x.CareLevel).NotEmpty();
-            ClientRule(x => x.CareLevel)
-                .Required("'Care Level' is required.");
+            RuleFor(x => x.CareLevel).NotEmpty().WithMessage("'Care Level' is required.");
 
-            RuleFor(x => x.PrimaryDiagnosis).NotEmpty();
-            ClientRule(x => x.PrimaryDiagnosis)
-                .Required("'Primary Diagnosis' is required.");
+            RuleFor(x => x.PrimaryDiagnosis).NotEmpty().WithMessage("'Primary Diagnosis' is required.");
 
-            RuleFor(x => x.FallRiskScore).NotNull().InclusiveBetween(0m, 10m);
-            ClientRule(x => x.FallRiskScore)
-                .Required("'Fall Risk Score' is required.")
-                .GreaterThanOrEqualTo(0m, "'Fall Risk Score' must be at least 0.")
-                .LessThanOrEqualTo(10m, "'Fall Risk Score' must be at most 10.");
+            RuleFor(x => x.FallRiskScore)
+                .NotEmpty().WithMessage("'Fall Risk Score' is required.")
+                .GreaterThanOrEqualTo(0m).WithMessage("'Fall Risk Score' must be at least 0.")
+                .LessThanOrEqualTo(10m).WithMessage("'Fall Risk Score' must be at most 10.");
 
             When(x => x.CareLevel == "Memory Care", () =>
             {
-                RuleFor(x => x.MemoryAssessment).NotEmpty();
-            });
-
-            WhenField(x => x.CareLevel, "Memory Care", () =>
-            {
-                ClientRule(x => x.MemoryAssessment)
-                    .Required("'Memory Assessment' is required for Memory Care.");
+                RuleFor(x => x.MemoryAssessment).NotEmpty().WithMessage("'Memory Assessment' is required for Memory Care.");
             });
         }
     }
@@ -123,20 +108,17 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Steppe
     {
         public FusionStepperWizardContactValidator()
         {
-            RuleFor(x => x.ResponsibleParty).NotEmpty().MinimumLength(2);
-            ClientRule(x => x.ResponsibleParty)
-                .Required("'Responsible Party' is required.")
-                .MinLength(2, "'Responsible Party' must have a minimum length of 2.");
+            RuleFor(x => x.ResponsibleParty)
+                .NotEmpty().WithMessage("'Responsible Party' is required.")
+                .MinimumLength(2).WithMessage("'Responsible Party' must have a minimum length of 2.");
 
-            RuleFor(x => x.Phone).NotEmpty().Matches(@"^\d{3}-\d{3}-\d{4}$");
-            ClientRule(x => x.Phone)
-                .Required("'Phone' is required.")
-                .Regex(@"^\d{3}-\d{3}-\d{4}$", "'Phone' must match 123-456-7890.");
+            RuleFor(x => x.Phone)
+                .NotEmpty().WithMessage("'Phone' is required.")
+                .Matches(@"^\d{3}-\d{3}-\d{4}$").WithMessage("'Phone' must match 123-456-7890.");
 
-            RuleFor(x => x.Email).NotEmpty().EmailAddress();
-            ClientRule(x => x.Email)
-                .Required("'Email' is required.")
-                .Email("'Email' must be a valid email address.");
+            RuleFor(x => x.Email)
+                .NotEmpty().WithMessage("'Email' is required.")
+                .EmailAddress().WithMessage("'Email' must be a valid email address.");
         }
     }
 
@@ -144,10 +126,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Steppe
     {
         public FusionStepperWizardReviewValidator()
         {
-            RuleFor(x => x.AdmissionCoordinator).NotEmpty().MinimumLength(2);
-            ClientRule(x => x.AdmissionCoordinator)
-                .Required("'Admission Coordinator' is required.")
-                .MinLength(2, "'Admission Coordinator' must have a minimum length of 2.");
+            RuleFor(x => x.AdmissionCoordinator)
+                .NotEmpty().WithMessage("'Admission Coordinator' is required.")
+                .MinimumLength(2).WithMessage("'Admission Coordinator' must have a minimum length of 2.");
         }
     }
 }

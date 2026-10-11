@@ -133,10 +133,9 @@ public class WhenUsingFusionAIAssistView : PlaywrightTestBase
         Assert.That(planJson, Does.Contain("care-ai"));
         Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""));
         Assert.That(planJson, Does.Contain("executePrompt"));
-        // Two C# members type two signatures of the JavaScript addPromptResponse method; each
-        // member's plan key is its name and its argument shapes.
-        Assert.That(planJson, Does.Contain("addPromptResponse(string,boolean)"));
-        Assert.That(planJson, Does.Contain("addPromptResponseModel(any,boolean)"));
+        // Two C# members type two signatures of the JavaScript addPromptResponse method; both call
+        // the one JavaScript member, each with its own argument shapes.
+        Assert.That(planJson, Does.Contain("\"addPromptResponse\""));
         Assert.That(planJson, Does.Contain("scrollToBottom"));
         Assert.That(planJson, Does.Contain("prompt"));
         Assert.That(planJson, Does.Contain("activeView"));

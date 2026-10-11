@@ -7,31 +7,21 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public ResidentProfileValidator()
         {
-            RuleFor(x => x.Name).NotEmpty().MaximumLength(80);
-            ClientRule(x => x.Name)
-                .Required("'Name' is required.")
-                .MaxLength(80, "'Name' must be at most 80 characters.");
-            RuleFor(x => x.CareLevelId).NotEmpty();
-            ClientRule(x => x.CareLevelId)
-                .Required("'Care Level' is required.");
-            RuleFor(x => x.AdmissionDate).NotNull().LessThanOrEqualTo(DateTime.Today);
-            ClientRule(x => x.AdmissionDate)
-                .Required("'Admission Date' is required.")
-                .LessThanOrEqualTo(DateTime.Today, "'Admission Date' must be at most today.");
-            RuleFor(x => x.MonthlyRate).GreaterThan(0m).LessThanOrEqualTo(25000m);
-            ClientRule(x => x.MonthlyRate)
-                .GreaterThan(0m, "'Monthly Rate' must be greater than 0.")
-                .LessThanOrEqualTo(25000m, "'Monthly Rate' must be at most 25000.");
-            RuleFor(x => x.Nickname).MaximumLength(50);
-            ClientRule(x => x.Nickname)
-                .MaxLength(50, "'Nickname' must be at most 50 characters.");
-            RuleFor(x => x.DateOfBirth).NotNull().LessThan(DateTime.Today);
-            ClientRule(x => x.DateOfBirth)
-                .Required("'Date of Birth' is required.")
-                .LessThan(DateTime.Today, "'Date of Birth' must be before today.");
-            RuleFor(x => x.Allergies).MaximumLength(200);
-            ClientRule(x => x.Allergies)
-                .MaxLength(200, "'Allergies' must be at most 200 characters.");
+            RuleFor(x => x.Name)
+                .NotEmpty().WithMessage("'Name' is required.")
+                .MaximumLength(80).WithMessage("'Name' must be at most 80 characters.");
+            RuleFor(x => x.CareLevelId).NotEmpty().WithMessage("'Care Level' is required.");
+            RuleFor(x => x.AdmissionDate)
+                .NotEmpty().WithMessage("'Admission Date' is required.")
+                .LessThanOrEqualTo(DateTime.Today).WithMessage("'Admission Date' must be at most today.");
+            RuleFor(x => x.MonthlyRate)
+                .GreaterThan(0m).WithMessage("'Monthly Rate' must be greater than 0.")
+                .LessThanOrEqualTo(25000m).WithMessage("'Monthly Rate' must be at most 25000.");
+            RuleFor(x => x.Nickname).MaximumLength(50).WithMessage("'Nickname' must be at most 50 characters.");
+            RuleFor(x => x.DateOfBirth)
+                .NotEmpty().WithMessage("'Date of Birth' is required.")
+                .LessThan(DateTime.Today).WithMessage("'Date of Birth' must be before today.");
+            RuleFor(x => x.Allergies).MaximumLength(200).WithMessage("'Allergies' must be at most 200 characters.");
         }
     }
 
@@ -39,10 +29,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public DateOfBirthQuickEditValidator()
         {
-            RuleFor(x => x.Value).NotNull().LessThan(DateTime.Today);
-            ClientRule(x => x.Value)
-                .Required("'Value' is required.")
-                .LessThan(DateTime.Today, "'Value' must be before today.");
+            RuleFor(x => x.Value)
+                .NotEmpty().WithMessage("'Value' is required.")
+                .LessThan(DateTime.Today).WithMessage("'Value' must be before today.");
         }
     }
 
@@ -50,10 +39,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public CareLevelQuickEditValidator()
         {
-            RuleFor(x => x.Value).NotEmpty().MaximumLength(40);
-            ClientRule(x => x.Value)
-                .Required("'Value' is required.")
-                .MaxLength(40, "'Value' must be at most 40 characters.");
+            RuleFor(x => x.Value)
+                .NotEmpty().WithMessage("'Value' is required.")
+                .MaximumLength(40).WithMessage("'Value' must be at most 40 characters.");
         }
     }
 
@@ -61,10 +49,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public MonthlyRateQuickEditValidator()
         {
-            RuleFor(x => x.Value).GreaterThan(0m).LessThanOrEqualTo(25000m);
-            ClientRule(x => x.Value)
-                .GreaterThan(0m, "'Value' must be greater than 0.")
-                .LessThanOrEqualTo(25000m, "'Value' must be at most 25000.");
+            RuleFor(x => x.Value)
+                .GreaterThan(0m).WithMessage("'Value' must be greater than 0.")
+                .LessThanOrEqualTo(25000m).WithMessage("'Value' must be at most 25000.");
 
             RuleFor(x => x.Value)
                 .Must(rate => !IsAssignedToAnotherResidentInDemoStore(rate))
@@ -78,10 +65,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public NicknameQuickEditValidator()
         {
-            RuleFor(x => x.Value).NotEmpty().MaximumLength(50);
-            ClientRule(x => x.Value)
-                .Required("'Value' is required.")
-                .MaxLength(50, "'Value' must be at most 50 characters.");
+            RuleFor(x => x.Value)
+                .NotEmpty().WithMessage("'Value' is required.")
+                .MaximumLength(50).WithMessage("'Value' must be at most 50 characters.");
         }
     }
 
@@ -89,9 +75,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public AllergiesQuickEditValidator()
         {
-            RuleFor(x => x.Value).NotNull();
-            ClientRule(x => x.Value)
-                .AtLeastOne("Select at least one allergy.");
+            RuleFor(x => x.Value).NotEmpty().WithMessage("Select at least one allergy.");
         }
     }
 
@@ -99,10 +83,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public LastAdmissionQuickEditValidator()
         {
-            RuleFor(x => x.Value).NotNull().LessThanOrEqualTo(DateTime.UtcNow);
-            ClientRule(x => x.Value)
-                .Required("'Value' is required.")
-                .LessThanOrEqualTo(DateTime.UtcNow, "'Value' must be at most now.");
+            RuleFor(x => x.Value)
+                .NotEmpty().WithMessage("'Value' is required.")
+                .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("'Value' must be at most now.");
         }
     }
 
@@ -110,10 +93,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public MedicalRecordNumberQuickEditValidator()
         {
-            RuleFor(x => x.Value).NotEmpty().Matches(@"^[A-Z]{3}\d{4}$");
-            ClientRule(x => x.Value)
-                .Required("'Value' is required.")
-                .Regex(@"^[A-Z]{3}\d{4}$", "'Value' format is invalid.");
+            RuleFor(x => x.Value)
+                .NotEmpty().WithMessage("'Value' is required.")
+                .Matches(@"^[A-Z]{3}\d{4}$").WithMessage("'Value' format is invalid.");
         }
     }
 }

@@ -3,11 +3,11 @@
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
 @{
-    ViewData["Title"] = "Nested Bug — Claim 4: Include inside WhenField";
+    ViewData["Title"] = "Nested Bug — Claim 4: Include inside When";
     var plan = Html.ReactivePlan<IncludeModel>();
 }
 
-<h1>Claim 4 — Include inside WhenField</h1>
+<h1>Claim 4 — Include inside When</h1>
 
 <form id="include-form" class="space-y-4 p-4">
     @{ Html.InputField(plan, m => m.IsEmployed, o => o.Label("Is Employed"))

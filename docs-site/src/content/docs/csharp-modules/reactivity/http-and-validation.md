@@ -97,37 +97,41 @@ p.Post("/Todo/Save", g => g.IncludeAll())
     .OnError(400, e => e.ValidationErrors("todo-form")));
 ```
 
-The validator must expose client metadata through `ReactiveValidator<T>`.
+The validator is a FluentValidation validator that derives from `ReactiveValidator<T>`.
+Rules are written once, in FluentValidation's grammar; the server runs them all, and the
+browser runs every rule it can evaluate.
 
 ```csharp
 public sealed class TodoValidator : ReactiveValidator<TodoModel>
 {
     public TodoValidator()
     {
-        ClientRule(x => x.Title)
-            .Required("'Title' is required.");
+        RuleFor(x => x.Title).NotEmpty().WithMessage("'Title' is required.");
     }
 }
 ```
 
-`ClientRule(...)` is the browser metadata path. Plain `RuleFor(...)` remains a
-server-only FluentValidation rule.
+The browser evaluates `NotEmpty`, `Empty`, `MinimumLength`, `MaximumLength`, `Length`,
+`EmailAddress`, `Matches`, `CreditCard`, `Url()`, `InclusiveBetween`, `ExclusiveBetween`, and
+comparisons with a value or a sibling member. `SetValidator`, `RuleForEach(...).SetValidator`
+and `Include` bring a child validator's rules along. `Must`, `Custom` and async rules stay on
+the server, and so does any rule followed by `.ServerOnly()`.
 
-## Conditional Client Rules
+## Conditional Rules
 
-Use `WhenField(...)` when a condition must exist in both server and client
-validation.
+Write the condition as a lambda over the model. The browser applies the same condition.
 
 ```csharp
-WhenField(x => x.IsUrgent, () =>
+When(x => x.IsUrgent, () =>
 {
-    ClientRule(x => x.DueDate)
-        .Required("Urgent todos need a due date.");
+    RuleFor(x => x.DueDate).NotEmpty().WithMessage("Urgent todos need a due date.");
 });
 ```
 
-Use normal FluentValidation `When(...)`, `Unless(...)`, and async rules for
-server-only validation.
+The browser understands comparisons of model members with values, `string.IsNullOrEmpty`,
+`Contains`, `StartsWith`, `EndsWith`, `Regex.IsMatch` and membership in a fixed set, joined by
+`&&`, `||` and `!`. `Otherwise` and `Unless` work the same way. A condition written as a method
+group, over the validation context, or async keeps its rules on the server.
 
 ## Parallel Requests
 

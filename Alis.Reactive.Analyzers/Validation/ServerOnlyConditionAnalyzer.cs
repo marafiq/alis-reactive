@@ -18,14 +18,14 @@ namespace Alis.Reactive.Analyzers.Validation
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
-            title: "FV condition is server-only in ReactiveValidator",
-            messageFormat: "FV .{0}() is server-only in ReactiveValidator \u2014 use WhenField() for client-side conditional validation",
+            title: "A rule's own condition is server-only in ReactiveValidator",
+            messageFormat: "A rule's own .{0}() is server-only in ReactiveValidator \u2014 wrap the rules in When(x => ..., () => ...) for a browser condition",
             category: "Alis.Reactive.Validation",
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "FluentValidation's .When()/.Unless() conditions contain arbitrary C# predicates that cannot be " +
-                         "serialized for client-side execution. Use ReactiveValidator.WhenField() instead \u2014 it constrains " +
-                         "conditions to simple field comparisons (truthy, falsy, eq, neq) that the client runtime can evaluate.",
+            description: "A .When()/.Unless() chained on a rule is a compiled C# predicate, so the rules it conditions stay on " +
+                         "the server. ReactiveValidator records the lambda of a When(x => ..., () => ...) block instead, and the " +
+                         "browser applies the same condition when it compares model members with fixed values.",
             helpLinkUri: null);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>

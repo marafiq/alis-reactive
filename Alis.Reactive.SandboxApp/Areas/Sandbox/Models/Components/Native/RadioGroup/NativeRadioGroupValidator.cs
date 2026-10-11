@@ -11,20 +11,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public NativeRadioGroupValidator()
         {
             RuleFor(x => x.ResidentName).NotEmpty().WithMessage("'Resident Name' is required.");
-            ClientRule(x => x.ResidentName).Required("'Resident Name' is required.");
             RuleFor(x => x.CareLevel).NotEmpty().WithMessage("'Care Level' is required.");
-            ClientRule(x => x.CareLevel).Required("'Care Level' is required.");
             RuleFor(x => x.RoomType).NotEmpty().WithMessage("'Room Type' is required.");
-            ClientRule(x => x.RoomType).Required("'Room Type' is required.");
             RuleFor(x => x.MealPlan).NotEmpty().WithMessage("'Meal Plan' is required.");
-            ClientRule(x => x.MealPlan).Required("'Meal Plan' is required.");
 
-            WhenField(x => x.CareLevel, "Memory Care", () =>
+            When(x => x.CareLevel == "Memory Care", () =>
             {
-                RuleFor(x => x.ResidentName).MinimumLength(3)
-                    .WithMessage("'Resident Name' must be at least 3 characters for Memory Care records.");
-                ClientRule(x => x.ResidentName)
-                    .MinLength(3, "'Resident Name' must be at least 3 characters for Memory Care records.");
+                RuleFor(x => x.ResidentName).MinimumLength(3).WithMessage("'Resident Name' must be at least 3 characters for Memory Care records.");
             });
         }
     }
@@ -38,9 +31,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public NativeRadioGroupFormValidator()
         {
             RuleFor(x => x.ResidentName).NotEmpty().WithMessage("'Resident Name' is required.");
-            ClientRule(x => x.ResidentName).Required("'Resident Name' is required.");
             RuleFor(x => x.RoomType).NotEmpty().WithMessage("'Room Type' is required.");
-            ClientRule(x => x.RoomType).Required("'Room Type' is required.");
         }
     }
 }

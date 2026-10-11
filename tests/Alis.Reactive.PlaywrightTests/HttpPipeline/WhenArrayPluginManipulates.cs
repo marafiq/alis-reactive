@@ -79,8 +79,8 @@ public class WhenArrayPluginManipulates : PlaywrightTestBase
         await NavigateAndWaitForDomReady();
         var planJson = Page.Locator("#plan-json");
         await Expect(planJson).ToBeVisibleAsync();
-        await Expect(planJson).ToContainTextAsync("plugin.array");
-        await Expect(planJson).ToContainTextAsync("plugin.analytics");
+        await Expect(planJson).ToContainTextAsync("$plugin:array");
+        await Expect(planJson).ToContainTextAsync("$plugin:analytics");
         AssertNoConsoleErrors();
     }
 

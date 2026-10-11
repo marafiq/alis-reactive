@@ -24,11 +24,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public BddExperimentValidator()
         {
             RuleFor(x => x.ResidentName).NotEmpty().WithMessage("Resident name is required.");
-            ClientRule(x => x.ResidentName).Required("Resident name is required.");
             RuleFor(x => x.Physician).NotEmpty().WithMessage("Physician is required.");
-            ClientRule(x => x.Physician).Required("Physician is required.");
-            RuleFor(x => x.MonthlyRate).NotNull().WithMessage("Monthly rate is required.");
-            ClientRule(x => x.MonthlyRate).Required("Monthly rate is required.");
+            RuleFor(x => x.MonthlyRate).NotEmpty().WithMessage("Monthly rate is required.");
         }
     }
 

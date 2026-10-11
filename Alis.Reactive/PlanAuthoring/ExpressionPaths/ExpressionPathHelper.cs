@@ -132,6 +132,23 @@ namespace Alis.Reactive
             return string.Join(".", members.ConvertAll(PascalRestore));
         }
 
+        // A member chain rooted at the model parameter (a rule's lambda body, or part of a condition),
+        // named the way MVC binds it: "Address.City", "Lines[0].Sku".
+        internal static string ToMemberName(Expression memberChain)
+        {
+            if (memberChain == null) throw new ArgumentNullException(nameof(memberChain));
+            return string.Join(".", ExtractMemberChain(memberChain).ConvertAll(PascalRestore));
+        }
+
+        // True when the expression is a member chain rooted at a parameter: what ToMemberName names.
+        internal static bool IsMemberChain(Expression expression)
+        {
+            expression = UnwrapConvert(expression);
+            while (expression is MemberExpression member && member.Expression != null)
+                expression = UnwrapConvert(member.Expression);
+            return expression is ParameterExpression;
+        }
+
         internal static Type ToPropertyType(LambdaExpression expression)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));

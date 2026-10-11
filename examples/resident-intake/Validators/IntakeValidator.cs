@@ -1,4 +1,5 @@
 using Alis.Reactive.FluentValidator;
+using FluentValidation;
 using ResidentIntake.Models;
 
 namespace ResidentIntake.Validators;
@@ -7,49 +8,42 @@ public class IntakeValidator : ReactiveValidator<ResidentIntakeModel>
 {
     public IntakeValidator()
     {
-        ClientRule(x => x.FirstName)
-            .Required("'First Name' is required.")
-            .MaxLength(100, "'First Name' must be at most 100 characters.");
-        ClientRule(x => x.LastName)
-            .Required("'Last Name' is required.")
-            .MaxLength(100, "'Last Name' must be at most 100 characters.");
-        ClientRule(x => x.DateOfBirth)
-            .Required("'Date of Birth' is required.");
+        RuleFor(x => x.FirstName)
+            .NotEmpty().WithMessage("'First Name' is required.")
+            .MaximumLength(100).WithMessage("'First Name' must be at most 100 characters.");
+        RuleFor(x => x.LastName)
+            .NotEmpty().WithMessage("'Last Name' is required.")
+            .MaximumLength(100).WithMessage("'Last Name' must be at most 100 characters.");
+        RuleFor(x => x.DateOfBirth).NotEmpty().WithMessage("'Date of Birth' is required.");
 
-        ClientRule(x => x.FacilityId)
-            .Required("Please select a facility");
-        ClientRule(x => x.CareLevel)
-            .Required("Please select a care level");
-        ClientRule(x => x.AdmissionDate)
-            .Required("'Admission Date' is required.");
-        ClientRule(x => x.MonthlyRate)
-            .Required("'Monthly Rate' is required.")
-            .GreaterThan(0, "Monthly rate must be greater than zero");
+        RuleFor(x => x.FacilityId).NotEmpty().WithMessage("Please select a facility");
+        RuleFor(x => x.CareLevel).NotEmpty().WithMessage("Please select a care level");
+        RuleFor(x => x.AdmissionDate).NotEmpty().WithMessage("'Admission Date' is required.");
+        RuleFor(x => x.MonthlyRate)
+            .NotEmpty().WithMessage("'Monthly Rate' is required.")
+            .GreaterThan(0).WithMessage("Monthly rate must be greater than zero");
 
-        ClientRule(x => x.EmergencyContactName)
-            .Required("'Emergency Contact Name' is required.")
-            .MaxLength(100, "'Emergency Contact Name' must be at most 100 characters.");
-        ClientRule(x => x.EmergencyContactPhone)
-            .Required("'Emergency Contact Phone' is required.")
-            .MaxLength(20, "'Emergency Contact Phone' must be at most 20 characters.");
+        RuleFor(x => x.EmergencyContactName)
+            .NotEmpty().WithMessage("'Emergency Contact Name' is required.")
+            .MaximumLength(100).WithMessage("'Emergency Contact Name' must be at most 100 characters.");
+        RuleFor(x => x.EmergencyContactPhone)
+            .NotEmpty().WithMessage("'Emergency Contact Phone' is required.")
+            .MaximumLength(20).WithMessage("'Emergency Contact Phone' must be at most 20 characters.");
 
-        WhenField(x => x.RequiresMedicationManagement, () =>
+        When(x => x.RequiresMedicationManagement, () =>
         {
-            ClientRule(x => x.PrimaryPhysician)
-                .Required("Physician is required when medication management is needed");
+            RuleFor(x => x.PrimaryPhysician).NotEmpty().WithMessage("Physician is required when medication management is needed");
         });
 
-        WhenField(x => x.CareLevel, "memory-care", () =>
+        When(x => x.CareLevel == "memory-care", () =>
         {
-            ClientRule(x => x.CognitiveAssessmentDate)
-                .Required("Cognitive assessment date is required for memory care residents");
+            RuleFor(x => x.CognitiveAssessmentDate).NotEmpty().WithMessage("Cognitive assessment date is required for memory care residents");
         });
 
         // Rendered by the facility requirements partial after ResolvePlan joins it to the Active Plan.
-        ClientRule(x => x.RoomPreference)
-            .Required("Room preference is required for this facility")
-            .MaxLength(200, "'Room Preference' must be at most 200 characters.");
-        ClientRule(x => x.DepositAmount)
-            .Required("Move-in deposit is required");
+        RuleFor(x => x.RoomPreference)
+            .NotEmpty().WithMessage("Room preference is required for this facility")
+            .MaximumLength(200).WithMessage("'Room Preference' must be at most 200 characters.");
+        RuleFor(x => x.DepositAmount).NotEmpty().WithMessage("Move-in deposit is required");
     }
 }

@@ -9,7 +9,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
         public RoomHoldValidator()
         {
-            ClientRule(x => x.ProspectName).Required("Enter the prospective resident's name.");
+            RuleFor(x => x.ProspectName).NotEmpty().WithMessage("Enter the prospective resident's name.");
 
             // Only the server knows which rooms are held, so this rule has no browser half.
             RuleFor(x => x.RoomCode)
