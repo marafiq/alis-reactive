@@ -1,15 +1,24 @@
 # Bring your own component
 
-Status: proposal on `feature/component-redesign`. Verification: Playwright only.
+Status: design on `feature/component-redesign`. Verification: Playwright only.
 
 ## Goal
 
 A developer takes a dependency on Alis.Reactive and onboards any component that already works in
 the browser without us: a Syncfusion control we never wrapped, a vanilla JS widget, their own. They
-install and bundle the library; we bring the types. One C# declaration describes the component's JS
-object (properties, methods, events with payloads) using the names its own JS or MVC API uses. From
-then on every framework feature works for it through the same fluent API, and the framework supplies
-defaults so the declaration stays short. We work one component, one vertical slice at a time.
+install, bundle and construct the library; we locate its object and bring the types. One C#
+declaration describes the component's JS object (properties, methods, events with payloads) using
+the names its own JS or MVC API uses. From then on every framework feature works for it through the
+same fluent API, and the framework supplies defaults so the declaration stays short. We work one
+component, one vertical slice at a time.
+
+## Decisions (owner)
+
+1. **The app constructs; we locate.** The app's bundle creates the widget on the element the
+   framework rendered. The framework only finds the object from that element and talks to it.
+2. **Syncfusion keeps the `Fusion` prefix** (`FusionNumericTextBox`). A brought component uses the
+   library's own name (`TomSelect`). Members and events use the names the component's JS or MVC API
+   uses (`Change`, not `Changed`).
 
 ## Rules every component obeys
 
@@ -18,12 +27,13 @@ The framework dictates these; a brought component cannot opt out.
 - Input IDs come from `IdGenerator`; `name` is the binding path; other IDs are the developer's
   explicit choice. The runtime resolves by `getElementById` only.
 - `InputField` renders the inline error element `{id}_error` (`InputFieldBuilder.cs:56`).
-- Views carry no JavaScript. Library code lives in the app's bundle; behavior lives in the plan.
+- Views carry no JavaScript. Library code, including construction, lives in the app's bundle, which
+  loads before the runtime boots; behavior lives in the plan.
 - Strings appear only at the declaration boundary (member names as the library spells them).
   Everything authored after that is typed.
-- The runtime trusts framework-generated plans. Errors only at boundaries: library not
-  registered, object not found, member missing.
-- Sync reactions stay sync. Construction and member access are sync.
+- The runtime trusts framework-generated plans. Errors only at boundaries: object not found on its
+  element, member missing.
+- Sync reactions stay sync. Member access is sync.
 
 ## What already exists (CURRENT, verified in source)
 
@@ -38,8 +48,6 @@ The framework dictates these; a brought component cannot opt out.
   (`ComponentEventOnboarding.cs:13-35`).
 - **Payload names already follow JS.** C# `Value` becomes `value` through the standard
   `JsonNamingPolicy.CamelCase` (`JsonMemberName.cs:9`).
-- **Developer JS already has an entry point.** An app bundle pushes onto `window.__alisPlugins`
-  before boot and the runtime registers it (`sandbox-plugins.ts`, `plugins/catalog.ts:32`).
 
 ## What blocks it (CURRENT)
 
@@ -52,16 +60,14 @@ The framework dictates these; a brought component cannot opt out.
    `Reactive(...)` event extension is copied into every slice.
 3. **Vendors are code, not data.** Two drivers are hard-coded: Syncfusion finds `ej2_instances[0]`
    and subscribes with `addEventListener`; native uses the element and DOM events
-   (`component-driver.ts:74-90`, `event-fusion.ts`, `event-native.ts`). Nothing else can be found or
-   subscribed to.
+   (`component-driver.ts:74-90`, `event-fusion.ts`, `event-native.ts`). No other object can be
+   found or subscribed to.
 4. **An input's value must be a property.** Gather reads `properties[valueMember]`
    (`gather.ts:168`, `plan.ts:140-145`). Many libraries expose value only through methods
    (`getValue()`, `setValue()`).
 5. **Live validation assumes an event named `change`** (`live-clear.ts:99-106`).
-6. **Nothing constructs a library component.** Syncfusion's MVC helper constructs its own; any other
-   library has no way in without JS in the view.
 
-## Design (PROPOSED)
+## Design
 
 ### 1. One declaration per component, public, in the component's own words
 
@@ -70,9 +76,8 @@ The framework dictates these; a brought component cannot opt out.
 public sealed class TomSelect : InputComponent<TomSelect, string>
 {
     protected override ComponentVendor Vendor => ComponentVendor.Named("tom-select")
-        .CreatedBy("TomSelect", CreateStyle.New)  // new TomSelect(element, options)
-        .EventsVia("on", "off")                   // instance.on(name, handler)
-        .DestroyWith("destroy");
+        .FoundAt("tomselect")       // the app ran new TomSelect(element); it sits on element.tomselect
+        .EventsVia("on", "off");    // instance.on(name, handler), instance.off(name, handler)
 
     protected override InputValue<string> Value => InputValue.ByMethods<string>("getValue", "setValue");
 
@@ -82,13 +87,6 @@ public sealed class TomSelect : InputComponent<TomSelect, string>
     public ComponentMethod<TomSelectOption> AddOption => Method<TomSelectOption>("addOption");
     public TypedEvent<string> Change => Event<string>("change");   // payload: the new value
     public TypedEvent<string> Type => Event<string>("type");       // payload: the typed text
-
-    public sealed class Options                   // standard System.Text.Json, camelCase
-    {
-        public int? MaxItems { get; set; }
-        public string Placeholder { get; set; }
-        public bool Create { get; set; }
-    }
 }
 ```
 
@@ -99,11 +97,13 @@ factories (`Property<T>`, `Method`, `Event<T>`) and the defaults. Strings stop h
 
 ```cshtml
 @Html.InputField(plan, m => m.Facility, o => o.Required().Text("Facility"))
-     .Component<TomSelect>(new TomSelect.Options { MaxItems = 1, Placeholder = "Pick a facility" },
-         on => on.Event(c => c.Change, (value, p) =>
-             p.When(value).Eq("north")
-              .Then(t => t.Component<FusionNumericTextBox>(m => m.Rate).SetValue(10m))))
+     .Component<TomSelect>(on => on.Event(c => c.Change, (value, p) =>
+         p.When(value).Eq("north")
+          .Then(t => t.Component<FusionNumericTextBox>(m => m.Rate).SetValue(10m))))
 ```
+
+The framework renders the host element with the framework's ID and name; the app's bundle turns it
+into the widget before the runtime boots.
 
 ```csharp
 p.Component<TomSelect>(m => m.Facility).Call(c => c.Clear);
@@ -124,29 +124,25 @@ methods (`.Increment()`) remain possible as one-line sugar, never required.
                               "payload": "first-argument" } },
   "native":     { "root": { "kind": "element" },
                   "events": { "subscribe": "addEventListener", "payload": "dom-event" } },
-  "tom-select": { "root": { "kind": "created" },
-                  "create": { "style": "new", "plugin": "TomSelect" },
-                  "events": { "subscribe": "on", "unsubscribe": "off", "payload": "first-argument" },
-                  "destroy": "destroy" }
+  "tom-select": { "root": { "kind": "element-path", "path": "tomselect" },
+                  "events": { "subscribe": "on", "unsubscribe": "off", "payload": "first-argument" } }
 },
 "components": {
-  "Intake_Facility": { "vendor": "tom-select", "create": { "options": { "maxItems": 1 } },
+  "Intake_Facility": { "vendor": "tom-select",
     "binding": { "kind": "registered-input", "bindingPath": "Facility",
                  "value": { "read": "getValue", "write": "setValue" }, "changeEvent": "change" } }
 }
 ```
 
 Syncfusion and native stop being special: the Fusion and Native packages declare their vendor once,
-the same way a developer declares theirs.
+the same way a developer declares theirs. If a library does not leave its instance on the element,
+the app's construction code puts it there (`element.choices = new Choices(element)`).
 
 ### 4. The runtime gets smaller, once
 
-- One generic driver interprets the vendor contract: find the root (element, element path, or the
-  instance it created), subscribe and unsubscribe by the declared method names, shape the payload.
-  The two hard-coded drivers and both event adapters fold into it.
-- At boot (and on slot load), a component whose vendor declares `create` is constructed from the
-  constructor the app registered on `__alisPlugins`, with the typed options from the plan. Slot
-  unload calls the declared `destroy`.
+- One generic driver interprets the vendor contract: find the root (the element or a path from it),
+  subscribe and unsubscribe by the declared method names, shape the payload. The two hard-coded
+  drivers and both event adapters fold into it.
 - Input value reads and writes go through the declared member, property or method.
 - Live validation listens to `binding.changeEvent`.
 
@@ -167,14 +163,15 @@ After this, bringing a component never touches the runtime again.
 
 Each slice is one component, proven by Playwright, run targeted while working.
 
-1. **NumericTextBox on the public surface.** One declaration file replaces the 8-file slice. No
-   plan or runtime change. Proof: the existing 16 tests stay green unchanged
+1. **FusionNumericTextBox on the public surface.** One declaration file replaces the 8-file slice;
+   event names follow Syncfusion (`Change`, `Focus`, `Blur`). No plan or runtime change. Proof: the
+   existing 16 tests stay green unchanged
    (`scripts/playwright.sh --filter "FullyQualifiedName~NumericTextBox|FullyQualifiedName~InPlaceEditor"`).
-2. **Tom Select, brought the way a developer would.** `npm install tom-select` in the sandbox,
-   registered in `sandbox-plugins.ts`, declared in one file. Adds vendors-as-data, construction,
-   method-backed value and the declared change event. Proof, one journey: picking a facility
-   updates the rate field; submitting empty shows the required message in `{id}_error`; picking
-   clears it; submitting posts the picked value.
+2. **Tom Select, brought the way a developer would.** `npm install tom-select` in the sandbox, the
+   sandbox bundle constructs it on the framework-rendered element, one declaration file. Adds
+   vendors-as-data, method-backed value and the declared change event. Proof, one journey: picking
+   a facility updates the rate field; submitting empty shows the required message in `{id}_error`;
+   picking clears it; submitting posts the picked value.
 3. **The remaining Fusion and Native slices**, one at a time, each proven by its existing tests.
 4. **Remove `InternalsVisibleTo` for Fusion and Native.** The compiler then proves the public
    surface is enough.
@@ -187,16 +184,13 @@ Each slice is one component, proven by Playwright, run targeted while working.
   (`coding-principles.md`, Fail-Fast).
 - Static abstract interface members: need the .NET 7 runtime; net48 cannot load them.
 - Per-member extension methods as the only API: that ceremony is why one slice costs 8 files.
-- Looking constructors up on `window`: implicit; the plugin queue is the explicit path that exists.
+- The framework constructing brought components: the app owns construction (decision 1).
 
-## Open questions for the owner, most design-changing first
+## Open questions
 
-1. **Construction.** Should the framework construct brought components from typed options
-   (proposed: keeps views JS-free and options typed), or should the app bundle construct them and
-   we only locate the object?
-2. **Class names.** Following the component's own name makes `NumericTextBox`, which collides with
-   Syncfusion's `Syncfusion.EJ2.Inputs.NumericTextBox` builder in views. Keep `Fusion` for
-   Syncfusion only, or rename and use a namespace alias?
-3. **Vocabulary.** Keep `vendor` in the plan, or rename it `library` now that it is data?
-4. **Multi-argument payloads** (for example noUiSlider passes values, then handle): first argument
+1. **Partial slots.** A brought component inside an injected partial needs the app to construct it
+   after injection. Should the runtime raise a document event after a slot loads so the app's
+   bundle can construct what arrived?
+2. **Vocabulary.** Keep `vendor` in the plan, or rename it `library` now that it is data?
+3. **Multi-argument payloads** (for example noUiSlider passes values, then handle): first argument
    only for now, or a typed positional payload?
