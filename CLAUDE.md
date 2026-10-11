@@ -45,7 +45,8 @@ inverts that: a developer brings any component through framework abstractions by
 typed properties, methods and events, every framework feature works for it unchanged, and the
 framework supplies more defaults so the developer types less. Steer the redesign by this vision and
 by the typed SDK that already exists (read the source; it is rich), not by old docs or plans. The
-old artifact-gated onboarding pipeline was removed on purpose; do not rebuild it. Until the redesign lands, a new component is a
+old artifact-gated onboarding pipeline was removed on purpose; do not rebuild it. Design:
+`docs/design/bring-your-own-component.md`. Until the redesign lands, a new component is a
 C# slice with zero TypeScript runtime changes.
 
 ## Architecture
