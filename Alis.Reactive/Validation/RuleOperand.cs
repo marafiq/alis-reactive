@@ -16,6 +16,9 @@ namespace Alis.Reactive.Validation
         internal static RuleOperand Range(ValidationRangeBounds bounds) =>
             new RangeRuleOperand(bounds);
 
+        internal static RuleOperand Pattern(string pattern, string flags) =>
+            new PatternRuleOperand(pattern, flags);
+
         internal static RuleOperand PeerField(ValidationFieldPath fieldPath, Shape shape)
         {
             return new PeerFieldRuleOperand(ClientValidationFieldReference.Of(fieldPath, shape));
@@ -89,6 +92,43 @@ namespace Alis.Reactive.Validation
         {
             return ValidationRuleExecution.WithConstraint(
                 ValueExpression.LiteralRaw(_value, _shape),
+                activation,
+                comparisonShape);
+        }
+    }
+
+    // A JavaScript pattern and its flags (i, m, s), carried to the browser as [pattern, flags].
+    internal sealed class PatternRuleOperand : RuleOperand
+    {
+        private readonly string _pattern;
+        private readonly string _flags;
+
+        internal PatternRuleOperand(string pattern, string flags)
+        {
+            _pattern = pattern;
+            _flags = flags;
+        }
+
+        // A native-component emitter takes a bare pattern; a pattern with flags has none to give it.
+        internal override object? LiteralValue => _flags.Length == 0 ? _pattern : null;
+
+        internal override IEnumerable<ClientValidationFieldReference> PeerFieldReferences
+        {
+            get { yield break; }
+        }
+
+        internal override RuleOperand PrefixedBy(ValidationFieldPath prefix)
+        {
+            return this;
+        }
+
+        internal override ValidationRuleExecution ToPlanExecution(
+            ValidationRuleActivation activation,
+            ValidationPlanBinding binding,
+            Shape comparisonShape)
+        {
+            return ValidationRuleExecution.WithConstraint(
+                ValueExpression.LiteralRaw(new object[] { _pattern, _flags }, Shape.ArrayOf(Shape.String)),
                 activation,
                 comparisonShape);
         }

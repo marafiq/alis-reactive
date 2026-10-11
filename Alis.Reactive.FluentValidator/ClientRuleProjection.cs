@@ -135,7 +135,7 @@ namespace Alis.Reactive.FluentValidator
                     return One(RuleName.Email, message);
 
                 case IRegularExpressionValidator pattern:
-                    return new[] { new BrowserCheck(RuleName.Regex, message, RuleOperand.Literal(pattern.Expression, Shape.None), Shape.None) };
+                    return PatternCheck(pattern, message);
 
                 case ICreditCardValidator _:
                     return One(RuleName.CreditCard, message);
@@ -155,6 +155,40 @@ namespace Alis.Reactive.FluentValidator
                 default:
                     return Array.Empty<BrowserCheck>();
             }
+        }
+
+        // RegexOptions with no JavaScript flag: the browser cannot read such a pattern the same way.
+        private const RegexOptions NoJavaScriptForm = RegexOptions.IgnorePatternWhitespace | RegexOptions.RightToLeft;
+
+        // The regex FluentValidation tests with, as a JavaScript pattern and flags. A pattern built from
+        // the model (Matches(x => ...)) has no text until a model exists, and an option JavaScript lacks
+        // would read the text differently: both stay on the server.
+        private static IReadOnlyList<BrowserCheck> PatternCheck(IRegularExpressionValidator validator, ClientMessage message)
+        {
+            var builtFromModel = validator.Expression == null;
+            if (builtFromModel) return Array.Empty<BrowserCheck>();
+
+            var regex = FixedRegexOf(validator);
+            if ((regex.Options & NoJavaScriptForm) != 0) return Array.Empty<BrowserCheck>();
+
+            var flags = (regex.Options.HasFlag(RegexOptions.IgnoreCase) ? "i" : "")
+                + (regex.Options.HasFlag(RegexOptions.Multiline) ? "m" : "")
+                + (regex.Options.HasFlag(RegexOptions.Singleline) ? "s" : "");
+            return new[] { new BrowserCheck(RuleName.Regex, message, RuleOperand.Pattern(regex.ToString(), flags), Shape.None) };
+        }
+
+        // The interface exposes the pattern's text, not its options. The validator keeps the regex in
+        // its one Func<T, Regex> field, which ignores the model when the pattern is fixed.
+        private static Regex FixedRegexOf(IRegularExpressionValidator validator)
+        {
+            var regexOf = validator.GetType()
+                .GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
+                .Select(field => field.GetValue(validator))
+                .OfType<Delegate>()
+                .SingleOrDefault(candidate => candidate.Method.ReturnType == typeof(Regex))
+                ?? throw new InvalidOperationException(
+                    $"'{validator.GetType().Name}' keeps no Func<T, Regex>; Alis.Reactive cannot read this FluentValidation version's patterns.");
+            return (Regex)regexOf.DynamicInvoke(new object?[] { null })!;
         }
 
         private static IReadOnlyList<BrowserCheck> One(RuleName name, ClientMessage message) =>
@@ -199,7 +233,8 @@ namespace Alis.Reactive.FluentValidator
             if (!isSibling)
                 throw new InvalidOperationException(
                     $"The rule on '{field.Path.Value}' compares it with '{peer.Name}', which is not a member of the same object. " +
-                    "A browser rule compares a member with a sibling; declare the rule in the validator of the object that owns both.");
+                    "A browser rule compares a member with a sibling; declare the rule in the validator of the object that owns both, " +
+                    "or end it with .ServerOnly() to run it on the server alone.");
 
             var segments = field.Path.Value.Split('.');
             var siblingPath = string.Join(".", segments.Take(segments.Length - 1).Concat(new[] { peer.Name }));

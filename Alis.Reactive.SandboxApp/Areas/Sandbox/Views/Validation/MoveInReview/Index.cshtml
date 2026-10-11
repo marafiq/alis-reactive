@@ -21,6 +21,8 @@
                 .NativeTextBox(b => b.Type("number").CssClass(Field)); }
             @{ Html.InputField(plan, m => m.MobilityNotes, o => o.Label("Mobility plan"))
                 .NativeTextBox(b => b.Placeholder("Walker, two-person assist, ...").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.AssignedRoom, o => o.Label("Assigned room"))
+                .NativeTextBox(b => b.Placeholder("MA-214").CssClass(Field)); }
             @{ Html.InputField(plan, m => m.FamilyPortalLink, o => o.Label("Family portal link"))
                 .NativeTextBox(b => b.Placeholder("https://").CssClass(Field)); }
             @{ Html.InputField(plan, m => m.Pharmacy.Phone, o => o.Label("Pharmacy phone"))

@@ -155,6 +155,26 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
     }
 
     [Test]
+    public async Task an_assigned_room_reads_the_same_in_any_case()
+    {
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "2");
+        await Write(m => m.AssignedRoom, "maple 214");
+
+        await ClickWhenStable(SaveReview);
+
+        await Expect(_plan.ErrorFor(m => m.AssignedRoom)).ToHaveTextAsync("Enter the room as wing and number, like MA-214.");
+        Assert.That(_reviewsSent, Is.Empty);
+        await Write(m => m.AssignedRoom, "ma-214");
+        await Expect(_plan.ErrorFor(m => m.AssignedRoom)).ToBeHiddenAsync();
+        await ClickWhenStable(SaveReview);
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1), "The page and the server both ignore case.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task the_pharmacy_phone_is_asked_for_in_the_house_format()
     {
         await NavigateAndBoot();

@@ -10,6 +10,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? ResidentName { get; set; }
         public int? FallRiskScore { get; set; }
         public string? MobilityNotes { get; set; }
+        public string? AssignedRoom { get; set; }
         public string? FamilyPortalLink { get; set; }
         public bool IsReturning { get; set; }
         public string? PreviousRoom { get; set; }

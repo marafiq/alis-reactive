@@ -719,7 +719,8 @@ proves it is named in the pull request.
   its rules on the server even when nested. `SetValidator`, `RuleForEach(...).SetValidator`,
   `Include` and `ChildRules` read the child validator instance the rule holds; one a factory chooses
   per model, or `SetInheritanceValidator` by type, stays on the server. `NotNull` reads as required
-  except on a collection. A message written from the model (`WithMessage(x => ...)`) keeps its
+  except on a collection. `Matches` carries `IgnoreCase`, `Multiline` and `Singleline` as flags; a
+  pattern built from the model, or with an option JavaScript lacks, stays on the server. A message written from the model (`WithMessage(x => ...)`) keeps its
   component on the server. `.ServerOnly()` keeps a rule
   on the server. A peer must be a sibling; any other peer is refused at startup.
 

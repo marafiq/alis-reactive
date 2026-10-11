@@ -55,7 +55,7 @@ namespace Alis.Reactive.Grammar.Lowering
                 case "minLength": passes = G.Or(NothingEntered(v), G.Op(Operator.Gte, TextLength(v), G.Lit(Constraint(execution)))); break;
                 case "maxLength": passes = G.Or(NothingEntered(v), G.Op(Operator.Lte, TextLength(v), G.Lit(Constraint(execution)))); break;
                 case "email": passes = G.Or(NothingEntered(v), Matches(v, "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")); break;
-                case "regex": passes = G.Or(NothingEntered(v), Matches(v, (string)Constraint(execution))); break;
+                case "regex": passes = G.Or(NothingEntered(v), Pattern(v, execution)); break;
                 case "url": passes = G.Or(NothingEntered(v), Matches(v, "^https?:\\/\\/.+")); break;
                 case "creditCard": passes = G.Or(NothingEntered(v), Luhn(v)); break;
                 case "min": passes = Ordered(v, Target(execution), comparison, Operator.Gte, skipsEmpty: true); break;
@@ -106,6 +106,12 @@ namespace Alis.Reactive.Grammar.Lowering
         }
 
         private static Expr Matches(Expr v, string pattern) => G.Op(Operator.Matches, v, G.Lit(pattern), G.Lit(""));
+
+        private static Expr Pattern(Expr v, ValidationRuleExecution execution)
+        {
+            var patternAndFlags = (object[])Constraint(execution);
+            return G.Op(Operator.Matches, v, G.Lit(patternAndFlags[0]), G.Lit(patternAndFlags[1]));
+        }
 
         private static Expr TextLength(Expr v) => G.Get(G.Op(Operator.ToText, v), new[] { "length" }, Shape.None);
 

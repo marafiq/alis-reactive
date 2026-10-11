@@ -47,7 +47,7 @@ public sealed class AdmissionValidator : ReactiveValidator<Admission>
 | `Empty()` | `empty` | passes |
 | `MinimumLength(n)`, `MaximumLength(n)`, `Length(a, b)` | `minLength`, `maxLength` | skipped |
 | `EmailAddress()` | `email` | skipped |
-| `Matches(pattern)` | `regex` | skipped |
+| `Matches(pattern)`, `Matches(pattern, options)` (`IgnoreCase`, `Multiline`, `Singleline` become flags; the browser runs it as a JavaScript `RegExp`, where `\w` is ASCII) | `regex` | skipped |
 | `CreditCard()` | `creditCard` | skipped |
 | `Url()` (this framework, `ReactiveRuleBuilderExtensions`) | `url` | skipped |
 | `InclusiveBetween(a, b)`, `ExclusiveBetween(a, b)` | `range`, `exclusiveRange` | skipped |
@@ -71,6 +71,7 @@ validator of the object that owns both.
 - rule sets other than the default, and `DependentRules`
 - a child validator chosen per model by a factory (`SetValidator(x => ...)`) or by type (`SetInheritanceValidator`)
 - a component whose message is written from the model (`WithMessage(x => $"... {x.Name}")`): the server says it
+- `Matches(x => ...)` (a pattern built from the model) and patterns with `IgnorePatternWhitespace` or `RightToLeft`
 - any rule followed by `.ServerOnly()`: use it for a member the page does not render
 
 A browser rule on a member with no input on the page blocks the form and shows its message in the

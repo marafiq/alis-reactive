@@ -1,4 +1,5 @@
 using Alis.Reactive.FluentValidator;
+using System.Text.RegularExpressions;
 using FluentValidation;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
@@ -26,6 +27,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                     RuleFor(x => x.MobilityNotes).NotEmpty().WithMessage("Describe the mobility plan for a high fall risk."))
                 .Otherwise(() =>
                     RuleFor(x => x.MobilityNotes).MaximumLength(40).WithMessage("Keep mobility notes under 40 characters."));
+
+            // RegexOptions travel with the pattern: "ma-214" and "MA-214" are the same room.
+            RuleFor(x => x.AssignedRoom)
+                .Matches(@"^[a-z]{2}-\d{3}$", RegexOptions.IgnoreCase).WithMessage("Enter the room as wing and number, like MA-214.");
 
             Unless(x => string.IsNullOrEmpty(x.FamilyPortalLink), () =>
                 RuleFor(x => x.FamilyPortalLink).Url().WithMessage("The family portal link must be a web address."));
