@@ -8,6 +8,9 @@ It was checked against all 531 inventoried use cases, then reviewed adversariall
 (section 9). Every decision that changes something a user can see today is listed in section 8,
 with its rows.
 
+**What is built** is recorded in section 11: which parts run as specified, which decisions are
+applied, and which are deferred with today's behavior kept.
+
 **The rule behind every decision:** the browser computes what the C# the developer wrote would
 compute. Types, operators, evaluation order, scoping and empty values follow C#, and the server's
 model binding and FluentValidation where those apply. Where JavaScript would answer differently,
@@ -40,12 +43,14 @@ That is the whole document. The grammar names no feature.
   contributes its data under its owner, and the module joins the contributions per key. The C#
   declaration of each module states its data type, so the generated contract types it too.
 - **Inputs and forms are module data.**
-  - The inputs of a view are `alis.model` data: `{ id: { name, value: fn(self) expr, committed } }`.
-    An input's `value` is an expression of the input object, so a value that is not a single member
-    can say so: the uploader's value is `self.filesData.map(f => f.rawFile)`.
-  - A form's tests are `alis.form` data: `{ tests: [{ field, check: fn(value, model), when: fn(model), message }] }`.
-    An input does not name its form; membership is decided by containment (6.4), because a partial
-    cannot know which form will contain it.
+  - The inputs of a view are `alis.model` data: `{ inputs: { id: { name, body, value, shape } } }`:
+    the MVC binding name, the JSON body path, the value as an expression of the located object, and
+    the shape it reads as.
+  - A form's fields are `alis.form` data: `{ summary, fields: [{ id, name, value, committed,
+    tests: [{ rule, check: fn(v), when, message }] }] }`. `committed` is the input's event that
+    revalidates the field; `rule` names the declaration a test came from, for traces only. An input
+    does not name its form; membership is decided by containment (6.4), because a partial cannot
+    know which form will contain it.
 - **No owner field.** The owner of a plan is whoever discovered it: the page at boot, or a slot when
   it loads.
 
@@ -153,7 +158,8 @@ Literals are emitted already in their shape. Nothing else converts.
 These are today's rules (`shape-convert.ts:45-269`), with one change: a date value is a `Date`, not
 a timestamp. So text, JSON and form data see ISO, and every comparison sees the time (2.2).
 
-**Binding reads.** Where the server binds a value, the browser reads it the way MVC binds it.
+**Binding reads** (deferred, section 11: model values are read with the shape conversion alone,
+as today). Where the server binds a value, the browser reads it the way MVC binds it.
 - **Where:** the `alis.model` values that tests and `Form()` read, and JSON request bodies.
 - **What:** text that is empty or only whitespace is `null`, as MVC's `ConvertEmptyStringToNull`
   makes it; a non-nullable number that is empty is 0, and a nullable one is `null`.
@@ -693,3 +699,48 @@ vocabulary used, the sentence, and a verdict:
   CheckList, RadioGroup.
 
 The architecture test enforces the import directions and that only vendor modules name a vendor.
+
+## 11. Implementation status
+
+As built on `feature/component-redesign`. Playwright is the proof of each line; the CI run that
+proves it is named in the pull request.
+
+**Built as specified**
+- The plan document, the two locators, the six statements and nine expressions (`Alis.Reactive/Grammar`),
+  the generated contract (`tools/PlanContractGenerator`), and the interpreter with its modules
+  (`Alis.Reactive.Assets/runtime`). The runtime is 2,622 lines of TypeScript, down from 6,134.
+- C# keeps its typed semantic model (`PlanModel`: reaction, condition, value, request and
+  validation graphs) as the builders' target, and a lowering pass (`Grammar/Lowering`) compiles it
+  into the grammar at render. The semantic model no longer serializes; only the grammar does.
+- Validation projection (section 7): rules are written once in FluentValidation's grammar on
+  `ReactiveValidator<T>` and read from FluentValidation's descriptors (`ClientRuleProjection`).
+  `When`/`Unless`/`Otherwise` lambdas are recorded (`ClientCondition`); FluentValidation's own
+  condition overloads sit on `RecordingValidator<T>`, so a method group or a context condition keeps
+  its rules on the server even when nested. `SetValidator`, `RuleForEach(...).SetValidator` and
+  `Include` resolve the child validator from the request's services. `.ServerOnly()` keeps a rule
+  on the server. A peer must be a sibling; any other peer is refused at startup.
+
+**Decisions of section 8 applied**
+- `AddReactiveClientValidation` is gone: a browser rule always has the server rule it came from.
+- `Include` enforces on the server as well.
+- `p.Url<T>()` keys match case-insensitively, and array members read every value (D3).
+- A link is an element with a view-chosen id carrying its own plan script.
+- Template buttons raise events through `data-alis-raise`.
+- A stream retry keeps each subscription's owner.
+- Enum literals in validation conditions are names.
+- The three fixtures that parsed plan JSON were rewritten; so were the other fixtures that read the
+  retired plan JSON: plan boots, behavior graph, gather input, capital members, grid, native action
+  link, client rules (harness and two fixtures, the app-level one deleted with its API), array item
+  rules, and the plan-JSON assertions of nine pages (AI assist view, date range picker, progress
+  button, stepper, native checkbox, checklist, dropdown, radio group, array plugin). Each now reads
+  the grammar plan; none asserts less than before except an overload key (`startAt(number)`,
+  `addPromptResponse(string,boolean)`) and an access mode (`readwrite`) the grammar does not carry.
+  Five client-rule tests were renamed from the retired `WhenField` vocabulary.
+
+**Deferred, with today's behavior kept**
+- Binding reads (2.1) and the empty-value changes of section 8: browser checks keep today's
+  semantics (for example, `GreaterThan` fails on an empty value; email uses today's pattern).
+  FluentValidation's `NotEmpty` on a collection reads as `atLeastOne`.
+- A response handle inside a nested route reads the innermost response, as today.
+- The uploader's value: `alis.http` unwraps an uploader item's `rawFile` itself, listed as a vendor
+  exception in the architecture test, until an input declaration can state a value expression.
