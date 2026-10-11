@@ -163,8 +163,8 @@ label and message wrapper. Anything else renders against the plan with the ID th
 chose, `plan.Render<T>(elementId, markup)`. Each returns the handle `.Reactive` hangs off.
 
 App-level objects are objects too. The drawer and loader elements carry the members their
-declarations name (`open()`, `close()`, `size`; `show()`, `hide()`, `data-target`,
-`data-timeout`), defined by their runtime modules; the toast declares Syncfusion's own members, its
+declarations name (`open()`, `close()`, `size`; `show()`, `hide()`, `target`, `timeout`),
+defined by their runtime modules; the toast declares Syncfusion's own members, its
 look typed as `FusionToastTone`. `p.Confirm("...")` asks through the confirm dialog's layout host.
 
 ## Deliverables

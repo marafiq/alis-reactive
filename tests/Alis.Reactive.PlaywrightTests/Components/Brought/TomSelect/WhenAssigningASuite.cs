@@ -125,7 +125,9 @@ public class WhenAssigningASuite : PlaywrightTestBase
 
         using (var body = JsonDocument.Parse(reservation.PostData ?? "{}"))
         {
-            Assert.That(body.RootElement.GetProperty("suiteType").GetString(), Is.EqualTo("companion"));
+            Assert.That(body.RootElement.TryGetProperty("suiteType", out var suiteType), Is.True,
+                $"The reservation posted no suiteType: {reservation.PostData}");
+            Assert.That(suiteType.GetString(), Is.EqualTo("companion"));
         }
 
         await Expect(Confirmation).ToHaveTextAsync("Companion Suite reserved at $3,600 a month.", new() { Timeout = 5000 });

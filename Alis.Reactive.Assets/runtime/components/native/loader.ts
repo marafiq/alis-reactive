@@ -1,7 +1,7 @@
 // Native loader markup is a layout singleton rendered by @Html.NativeLoader(). This module gives the
-// element the show() and hide() members the C# NativeLoader declares; its target and timeout are the
-// element's data-target and data-timeout. A class observer then positions the loader over its target,
-// runs the timeout, and puts it back on the page when it hides.
+// element the members the C# NativeLoader declares: show(), hide(), and the target and timeout of the
+// next show, kept in data-target and data-timeout. A class observer then positions the loader over
+// its target, runs the timeout, and puts it back on the page when it hides.
 export {};
 
 const VISIBLE = "alis-loader--visible";
@@ -75,6 +75,19 @@ function init(): void {
   Object.assign(loader, {
     show: () => show(loader),
     hide: () => hide(loader),
+  });
+  // No target covers the viewport; a timeout of 0 never hides on its own.
+  Object.defineProperties(loader, {
+    target: {
+      get: () => loader.dataset.target ?? "",
+      set: (elementId: string) => { loader.dataset.target = elementId; },
+      configurable: true,
+    },
+    timeout: {
+      get: () => Number(loader.dataset.timeout ?? 0),
+      set: (ms: number) => { loader.dataset.timeout = `${ms}`; },
+      configurable: true,
+    },
   });
 
   const observer = new MutationObserver(() => {

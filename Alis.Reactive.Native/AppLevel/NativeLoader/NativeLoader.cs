@@ -26,10 +26,10 @@ namespace Alis.Reactive.Native.AppLevel
         public string DefaultId => ElementId;
 
         /// <summary>The ID of the element the loader covers on its next show; hiding clears it.</summary>
-        public ComponentProperty<string> Target => Property<string>("dataset.target");
+        public ComponentProperty<string> Target => Property<string>("target");
 
         /// <summary>Milliseconds after which the next show hides itself; hiding clears it.</summary>
-        public ComponentProperty<int> Timeout => Property<int>("dataset.timeout");
+        public ComponentProperty<int> Timeout => Property<int>("timeout");
 
         /// <summary>Shows the loader.</summary>
         public ComponentMethod Show => Method("show");

@@ -2,8 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // The loader module wires itself to #alis-loader when imported, so each test renders the layout
 // element first and imports a fresh module. The helpers below make the same calls the DSL emits for
-// the members NativeLoader declares: Timeout (data-timeout), Target (data-target), Show and Hide.
+// the members NativeLoader declares: Timeout, Target, Show and Hide.
 interface LoaderElement extends HTMLElement {
+  target: string;
+  timeout: number;
   show(): void;
   hide(): void;
 }
@@ -25,7 +27,7 @@ afterEach(() => {
 
 // Mutation observers run as microtasks.
 async function show(timeoutMs?: number): Promise<void> {
-  if (timeoutMs !== undefined) loader.dataset.timeout = `${timeoutMs}`;
+  if (timeoutMs !== undefined) loader.timeout = timeoutMs;
   loader.show();
   await Promise.resolve();
 }
@@ -93,7 +95,7 @@ describe("native loader target", () => {
 
   it("stays on the page, hidden, when the element it covers is removed", async () => {
     const drawerContent = renderDrawerForm("resident-form");
-    loader.dataset.target = "resident-form";
+    loader.target = "resident-form";
     await show();
     expect(loader.parentElement?.id).toBe("resident-form");
 
@@ -107,7 +109,7 @@ describe("native loader target", () => {
   });
 
   it("covers the next target after the element it covered was removed", async () => {
-    loader.dataset.target = "resident-form";
+    loader.target = "resident-form";
     const firstContent = renderDrawerForm("resident-form");
     await show();
     firstContent.remove();
@@ -116,7 +118,7 @@ describe("native loader target", () => {
     // The next Show finds the loader by id, as the DSL's Show does.
     loader = document.getElementById("alis-loader") as LoaderElement;
     renderDrawerForm("incident-form");
-    loader.dataset.target = "incident-form";
+    loader.target = "incident-form";
     await show();
 
     expect(loader.parentElement?.id).toBe("incident-form");
