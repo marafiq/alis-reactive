@@ -7,6 +7,7 @@ export interface PlanDocument {
   planId: string;
   scope: PlanScope;
   types: Record<string, BrowserObjectContract>;
+  vendors: Record<string, VendorContract>;
   components: Record<string, ComponentObject>;
   behaviors: Behavior[];
 }
@@ -64,6 +65,17 @@ export interface Event {
 }
 
 export type Vendor = string;
+
+export interface VendorContract {
+  objectPath: Path;
+  subscribe: string;
+  unsubscribe: string;
+  payload: VendorEventPayload;
+}
+
+export type VendorEventPayload =
+  | "argument"
+  | "dom-event";
 
 export type ComponentObject =
   | ObjectTargetComponent
