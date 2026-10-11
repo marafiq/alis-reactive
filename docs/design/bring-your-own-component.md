@@ -1,179 +1,171 @@
-# Bring your own component: release plan
+# Bring your own component
 
-Status: release plan on `feature/component-redesign` (PR #177). Verification: Playwright only.
-Behavior contract: [`capability-catalog.md`](capability-catalog.md).
+Branch `feature/component-redesign` (PR #177). Greenfield: no backward compatibility is kept.
+Verification is Playwright only. What the framework must keep doing:
+[`capability-catalog.md`](capability-catalog.md).
 
 ## Goal
 
-A developer takes a dependency on Alis.Reactive and onboards any component that already works in
-the browser. They install, bundle and construct it; the framework locates its JS object and brings
-typed access to its properties, methods and events, through the same fluent API every framework
-feature already speaks. The framework becomes simpler and more stable by inverting the dependency:
-today the core knows specific components and vendors and our slices reach into core internals;
-after this release the core defines the abstractions and every component (Fusion, Native,
-app-level, brought) depends only on its public surface.
+A developer takes a dependency on Alis.Reactive and brings any component that already works in the
+browser. They install, bundle and construct it. The framework locates its JavaScript object and
+gives typed access to its properties, methods and events through the same fluent API every
+framework feature speaks. Syncfusion and native components are brought the same way; they are
+simply the first ones.
 
-## Decisions
+## Principles
 
-Owner:
-1. The app constructs and destroys its widgets; the framework only locates the object.
-2. Syncfusion keeps the `Fusion` prefix; members and events use the component's own JS/MVC names.
-3. Playwright is the only verification; one component, one vertical slice at a time.
+1. **The app owns the widget, the framework owns the plan.** The app installs, bundles,
+   constructs and destroys its widgets. The framework renders the element with its ID and name,
+   locates the object on it, and runs the plan against it. The runtime raises `alis:mount` before
+   it wires a piece of HTML and `alis:unmount` before it removes one, so the app constructs and
+   destroys at the right moment, including inside partials.
 
-Taken for this release (reversible):
-4. No break to the public authoring API consumers use today. Per-member methods (`.SetValue()`,
-   `.Increment()`, `evt => evt.Changed` where it exists) stay as one-line delegates over the new
-   surface; removing them is a separate, later release.
-5. When an object is not on its element, the runtime logs one error naming the element and the
-   library, skips that behavior, and keeps wiring the rest. No silent deferral.
-6. `alis:mount` and `alis:unmount` events and the `data-alis-component` marker are the public
-   contract between the runtime and app bundles.
-7. `vendor` becomes `library` in the plan and in C#.
+2. **A component is declared once, by its own API.** One class names the object's members with
+   the JavaScript names: `Property<T>("min")`, `Method("increment")`, `Event<TArgs>("change")`,
+   and says which library it belongs to. Its event payloads are plain classes. Nothing else is
+   written per component: no per-member extension methods, no events class, no reactive
+   extension, no registration profile.
 
-## The model
+3. **Behavior hangs off `.Reactive`, where the component is rendered.** The render call returns a
+   handle that knows the plan and the ID, so one core `.Reactive(evt => evt.Change, (args, p) =>
+   ...)` serves every component, Fusion, Native or brought.
 
-The unit is a typed JS object. The plan and runtime already work this way (components and plugins
-resolve to `RuntimeObject` through the same contracts); the release makes C# authoring match.
+4. **Three verbs touch any JavaScript object.** `Set`, `Call` and `Get` over declared members.
+   Every value is a literal or any typed source the DSL already has: another component, a payload
+   read, a response read, a URL parameter, a plugin, an array. A payload is a JavaScript object
+   too: `p.Payload(args).Set(a => a.PreventDefaultAction, true)`. Payload fields stay plain C#
+   properties, read as today with `p.When(args, x => x.Text)`.
 
-- **One declaration vocabulary.** `JsObject` owns protected factories: `Property<T>("name")`,
-  `Method("name")` and `Method<TArg..>`, `Function<TReturn>("name")` and
-  `Function<TArg.., TReturn>`, `Event<TPayload>("name")`. Names are the JS API's; paths may nest
-  (`event.setProp`). Member types: `JsProperty<T>`, `JsMethod`, `JsFunction<..>`, `JsEvent<T>`.
-- **Where the object lives is the only difference.** `Component : JsObject` is found from its
-  framework-rendered element through its library (Fusion: `ej2_instances.0`; Native: the element;
-  a brought library: its own path). `InputComponent<TValue> : Component` adds a value (property or
-  getter/setter methods, default `value`) and a change event (default `change`). A payload object
-  is the event's argument. A plugin is found by name in the catalog.
-- **One verb set on every handle.** `Set(m, literal | TypedSource<T>)`, `Call(m, args…)` where each
-  argument is a literal or a `TypedSource`, and `Get(m)` for properties and functions returning
-  `TypedSource<T>`. Every existing source flows in: another component, a payload read, a response
-  read (`res.Read(r => r.Items)`), URL, plugin, an array result.
-- **Payloads.** Data stays plain C# properties read with today's grammar (`p.When(args, x => x.Text)`,
-  `FromEvent(args, x => x.Text)`); behavior is declared members used through
-  `p.Payload(args).Set(a => a.Cancel, true)` and `.Call(a => a.UpdateData, res.Read(r => r.Items))`.
-  Reactions stay synchronous so writes land before the vendor reads them.
-- **Libraries are data.** A library declares how to find its object from the element, how to
-  subscribe and unsubscribe, and how each event's payload is read. The plan carries `libraries`;
-  the runtime has one generic driver and no vendor code.
-- **The framework dictates** IDs (`IdGenerator`, explicit ids, fixed app-level ids), `name` as the
-  binding path, the `{id}_error` element, no JavaScript in views, and the trusted-plan rule.
+5. **The framework dictates identity.** Input IDs from `IdGenerator`, other IDs explicit, `name`
+   is the binding path, errors render into `{id}_error`, app-level objects have fixed IDs, views
+   carry no JavaScript.
 
-## Phases
+6. **The core names no library.** A library is data its package declares: where the object lives
+   on the element, how to subscribe and unsubscribe, and what an event hands the callback. An input
+   also declares how its value is read and written and which event means "changed". The plan
+   carries this; the runtime has one driver.
 
-Each phase lands as one or more PRs, each slice proven by its Playwright suites (targeted while
-working, full suite before merge), and leaves `main` releasable.
+7. **Playwright proves it, one component at a time.** A component is brought when its journeys
+   pass in a real browser.
 
-### Phase 0: make the proof trustworthy
+## The method
 
-The release's only verification has holes (catalog §4); refactoring on false greens is the largest
-risk, so this comes first and changes no framework code.
-1. Fix false greens: HttpMixing else-path tests use real gestures and camelCase payloads; the
-   ArrayManager send test gathers the real array; `FromEvent` tests assert the query value;
-   ColorPicker toggle asserts the popup; the 422 summary is read from the response.
-2. Turn plan-only fixtures into browser journeys where they pin user-visible behavior
-   (component-method sources in gather and conditions, URL and plugin sources in conditions,
-   event-payload gather, capitalised members read from responses); delete the pure plan-shape pins.
-3. Add browser proofs for what the release touches and nothing proves: Fusion live revalidation on
-   change (NumericTextBox, DatePicker), InPlaceEditor BeginEdit cancel, rules removed when a slot
-   unloads, two partials merging into one plan, a Grid returning method into arrays and a condition.
+What a developer writes to bring a component. Syncfusion's NumericTextBox, as it now ships:
 
-Proof: every fixed or added test is seen red once with its capability broken, then green.
+```csharp
+public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
+{
+    public string ValueMember => "value";
 
-### Phase 1: one public SDK for JS objects
+    public ComponentProperty<decimal> Value => Property<decimal>(ValueMember);
+    public ComponentProperty<decimal> Min => Property<decimal>("min");
+    public ComponentMethod Increment => Method("increment");
+    public TypedEvent<FusionNumericTextBoxChangeArgs> Change =>
+        Event<FusionNumericTextBoxChangeArgs>("change");
+}
 
-C# only; plan JSON and runtime unchanged.
-- Introduce the vocabulary and verbs above; rename slice 1's `ComponentProperty`/`ComponentMethod`
-  into it.
-- Move slices onto it, payload-heavy first because they prove payload writes and calls:
-  AutoComplete and MultiSelect filtering, Grid editing events, Kanban; then inputs; Grid's
-  remaining surface; Native.
-- Remove `InternalsVisibleTo` for Fusion and Native.
+public class FusionNumericTextBoxChangeArgs
+{
+    public decimal Value { get; set; }
+    public decimal PreviousValue { get; set; }
+    public bool IsInteracted { get; set; }
+}
 
-Proof: each slice's suites; full suite at the end. Exit: no slice references `ReactionGraph`,
-`PayloadSource`, `EmitSet`, `EmitCall` or `Read`; Fusion and Native compile without
-`InternalsVisibleTo`.
+// Render: the framework supplies the ID and name; the markup is the component's own.
+public static RenderedComponent<FusionNumericTextBox, TModel> FusionNumericTextBox<TModel, TProp>(
+    this InputBoundField<TModel, TProp> field, Action<NumericTextBoxBuilder> build)
+    where TModel : class
+{
+    var builder = field.Helper.EJS().NumericTextBoxFor(field.Expression)
+        .HtmlAttributes(new Dictionary<string, object> { ["id"] = field.ElementId, ["name"] = field.BindingPath });
+    build(builder);
+    return field.Render<FusionNumericTextBox>(builder.Render());
+}
+```
 
-### Phase 2: inputs come from their declaration
+What every view then has, with no further code from the component author:
 
-- The input binding carries the value accessor (property or methods) and the change event; gather
-  (`IncludeAll`, `Include<T>`), validation reads and live clear use them; `live-clear.ts` loses the
-  hard-coded `"change"`.
-- Delete `RegisteredInputValueRead.ForFusionInPlaceEditorValueRead`, the registration profiles and
-  kind tokens, and the `"value"` fallback alias; `NativeGatherExtensions` stops assuming NativeTextBox.
+```csharp
+Html.InputField(plan, m => m.Rate)
+    .FusionNumericTextBox(b => b.Min(0))
+    .Reactive(evt => evt.Change, (args, p) =>
+    {
+        p.When(args, x => x.Value).Gt(100m)
+            .Then(t => t.Component<FusionNumericTextBox>(m => m.Ceiling).Set(c => c.Value, 100m));
+        p.Get("/rates").Gather(g => g.Include<FusionNumericTextBox, RateModel>(m => m.Rate))
+            .Response(r => r.OnSuccess<RateResponse>((res, s) =>
+                s.Component<FusionNumericTextBox>(m => m.Ceiling).Set(c => c.Min, res.Read(x => x.Floor))));
+    });
+```
 
-Proof: Validation (Contract, RoomRate, FallRiskScreening, Rules), HttpPipeline (OutingRoster,
-MedicationOrder, MedicationPass, CarePlanLookup), InPlaceEditor suites, Phase 0 Fusion live
-revalidation; `plan.ts` regenerated.
+A payload with behavior declares its methods the same way:
 
-### Phase 3: libraries as data
+```csharp
+public class FusionAutoCompleteFilteringArgs : JsObject
+{
+    public string Text { get; set; } = "";
+    public bool PreventDefaultAction { get; set; }
+    public ComponentMethod<IEnumerable<object>> UpdateData => Method<IEnumerable<object>>("updateData");
+}
 
-- Plan `libraries` map; one generic driver: locate by path from the element, subscribe and
-  unsubscribe by declared method names, payload selector per event (Fusion: first argument, `{}`
-  when absent; Native: `currentTarget`, or `detail` for a CustomEvent).
-- Delete both drivers, both event adapters, `resolver.ts` and the silent readiness deferral
-  (decision 5).
+.Reactive(evt => evt.Filtering, (args, p) =>
+{
+    p.Payload(args).Set(a => a.PreventDefaultAction, true);
+    p.Get("/physicians").Gather(g => g.FromEvent(args, x => x.Text, "q"))
+        .Response(r => r.OnSuccess<PhysicianList>((res, s) =>
+            s.Payload(args).Call(a => a.UpdateData, res.Read(x => x.Items))));
+})
+```
 
-Proof: full suite on CI's five shards.
+Vocabulary, by what the JavaScript object has:
 
-### Phase 4: lifecycle and partials
+| JavaScript | Declared as | Used with |
+|------------|-------------|-----------|
+| property | `ComponentProperty<T>` via `Property<T>("name")` | `Set(c => c.X, value or source)`, `Get(c => c.X)` |
+| method | `ComponentMethod`, `ComponentMethod<TArg..>` via `Method("name")` | `Call(c => c.X, args...)` |
+| method that returns | `ComponentFunction<TResult>` via `Function<TResult>("name")` | `Get(c => c.X, args...)` |
+| event | `TypedEvent<TArgs>` via `Event<TArgs>("name")` | `.Reactive(evt => evt.X, (args, p) => ...)` |
+| payload field | a plain C# property | `p.When(args, x => x.F)`, `p.Payload(args).Set(a => a.F, value)` |
 
-- The runtime raises `alis:mount {root}` before wiring, at boot and after each injection, and
-  `alis:unmount {root}` before a slot is replaced or closed.
-- Injection re-activates inline scripts itself instead of calling `ej.base.append`; first prove
-  what Syncfusion's partial scripts need (the Schedule drawer uses `ScriptManager`).
-- The Native RadioGroup and CheckList scripts move into Native's shipped module run on mount, so
-  views carry no JavaScript and `SetValue` syncs the boxes.
-- Closing the drawer unloads its slot.
+Names are the component's own; dotted paths reach nested members (`"eventSettings.dataSource"`).
+The C# member name keys the declaration, so two C# members can type two signatures of one
+JavaScript method. A brought library and its components live in the app's own assembly; nothing
+needs framework internals.
 
-Proof: Drawer suites (exact request counts), Contract partial suites, Stepper wizard, Schedule
-drawer, AdmissionWizard, RealTime panel, ContentType injection with interactive inputs, Phase 0
-slot-unload proof.
+## Deliverables
 
-### Phase 5: remaining leaks
+Each lands on this branch, proven by the Playwright suites named, and leaves CI green
+(`gate / test`, five Playwright shards, `verify-net48`).
 
-- FileUpload declares its file value, so `rawFile` leaves the payload writer.
-- Confirm becomes an app-level object reached through the plan; conditions stop reading
-  `window.alis.confirm`; app-level modules leave `root.ts`.
-- Method contracts are keyed per declaration with overloads by arity (fixes the latent
-  `addRecord` conflict).
+**D1. The method, in C#.** `JsObject`, `Component`, the member types the two components below
+use, `Set`/`Call`/`Get` with literals and sources, `p.Payload(args)`, the render handle with the
+core `.Reactive`.
+FusionNumericTextBox and FusionAutoComplete are brought with it: one file each, their per-member
+extensions, events classes and reactive extensions deleted, their views moved to the verbs.
+Plan JSON keeps its shape; no runtime change. Proof: the NumericTextBox and AutoComplete suites
+and every journey whose view uses them (Conditions, AdmissionAssessment, AdmissionWizard,
+VitalsAlert, EscalationRouting, PlaygroundSyntax, ComponentGather, BddExperiment).
 
-Proof: FileUpload, Guards Confirm, ShiftNote confirm-in-drawer, Grid and AppLevel suites. Exit:
-core C# and runtime name no vendor or component.
+**D2. Libraries and inputs as data.** The plan carries each library (locate, subscribe,
+unsubscribe, payload) and each input's value accessor (property or getter/setter methods) and
+change event. One runtime driver replaces the per-vendor drivers and adapters; gather, validation
+and live clear read the input's declaration. `alis:mount`/`alis:unmount` are raised. Proof: the
+full suite.
 
-### Phase 6: brought components
+**D3. A brought component.** Tom Select, installed in the sandbox the way an app installs it,
+declared in the sandbox assembly, constructed on `alis:mount`. One journey across the breadth:
+value from a model expression and from a response, a payload read, chained and parallel requests,
+required validation into `{id}_error` cleared on change, gather on submit, loaded in a partial and
+unloaded without leaking. Proof: that journey.
 
-Tom Select and FullCalendar are installed in the sandbox the way an app would install them,
-declared in the sandbox assembly (no `InternalsVisibleTo`) and constructed on `alis:mount`.
+**D4. Every component brought the same way.** All Fusion and Native slices move to the method,
+which grows the members they need as each one lands (methods with typed arguments, returning
+methods, member-name keys for overloads). `InternalsVisibleTo` for Fusion and Native is removed;
+the core C# and the runtime name no vendor and no component. Proof: the full suite.
 
-Proof: one Activities planner journey.
-- Clicking an activity reads `event.id` from the payload and calls `event.setProp('title', …)`
-  with a value from the response.
-- A GET by route param from the payload sets a FusionNumericTextBox (model expression) and Tom
-  Select (method-backed value); a chained GET and parallel GETs follow; when all settle a Toast
-  (app-level) shows; `getEvents()` feeds a count.
-- Tom Select is required: the error shows in `{id}_error` and clears on its change; submitting
-  posts both values.
-- The form loads as a partial; unloading leaves no orphan dropdown.
+## Status
 
-## Release exit criteria
-
-- CI green on the release commit: `gate / test`, five Playwright shards, `verify-net48`.
-- Fusion and Native build without `InternalsVisibleTo`.
-- Core C# and runtime name no vendor or component.
-- The brought-component journey is green.
-- Consumer authoring API unchanged: `examples/resident-intake` builds and its views are untouched.
-
-## Risks
-
-- Changing every plan in Phase 3: the full suite is the gate; land Phase 3 alone.
-- `ej.base.append` may be what runs Syncfusion and Native scripts in partials: prove before removing.
-- Payload writes depend on the synchronous lane: the generic driver keeps listeners synchronous.
-- Fusion objects that are not ready at wiring time are skipped silently today; decision 5 makes
-  them loud, which can surface latent ordering bugs; the partial suites are the gate.
-
-## Done so far
-
-- Lean `CLAUDE.md`, onboarding tooling and stale files removed, hooks fixed.
-- Slice 1: FusionNumericTextBox on a public declaration surface (`f0ec4f5`); full suite and net48
-  green on CI.
+- Lean `CLAUDE.md`, old onboarding tooling removed, hooks fixed.
+- FusionNumericTextBox on a public declaration surface (`f0ec4f5`), full suite and net48 green.
 - Capability catalog from all 176 suites (`2c37ab5`).
+- D1 in progress.
