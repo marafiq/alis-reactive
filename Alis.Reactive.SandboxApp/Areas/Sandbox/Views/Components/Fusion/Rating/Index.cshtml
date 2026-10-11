@@ -27,28 +27,28 @@
                     .Min(0)
                     .ItemsCount(5)
                     .AllowReset(true)
-                    .ShowLabel(true)
-                    .Reactive(plan, evt => evt.ValueChanged, (args, p) =>
-                    {
-                        p.Element("survey-rating").SetText(args, x => x.Value);
+                    .ShowLabel(true))
+                .Reactive(evt => evt.ValueChanged, (args, p) =>
+                {
+                    p.Element("survey-rating").SetText(args, x => x.Value);
 
-                        p.When(args, x => x.Value).Gte(4d)
-                            .Then(high => high.Element("survey-sentiment")
-                                .SetText("We're so glad your care is meeting your expectations."))
-                            .ElseIf(args, x => x.Value).Gte(1d)
-                            .Then(mid => mid.Element("survey-sentiment")
-                                .SetText("Thank you. A care manager will follow up to see how we can improve."))
-                            .Else(none => none.Element("survey-sentiment")
-                                .SetText("Please choose a rating to tell us how your care has been."));
+                    p.When(args, x => x.Value).Gte(4d)
+                        .Then(high => high.Element("survey-sentiment")
+                            .SetText("We're so glad your care is meeting your expectations."))
+                        .ElseIf(args, x => x.Value).Gte(1d)
+                        .Then(mid => mid.Element("survey-sentiment")
+                            .SetText("Thank you. A care manager will follow up to see how we can improve."))
+                        .Else(none => none.Element("survey-sentiment")
+                            .SetText("Please choose a rating to tell us how your care has been."));
 
-                        p.Element("survey-change-note").SetText(args, x => x.PreviousValue);
+                    p.Element("survey-change-note").SetText(args, x => x.PreviousValue);
 
-                        p.When(args, x => x.IsInteracted).Truthy()
-                            .Then(ready => ready.Element("survey-readiness")
-                                .SetText("Thank you for rating your care yourself — your rating is ready to submit."))
-                            .Else(cleared => cleared.Element("survey-readiness")
-                                .SetText("Your rating was cleared. Please rate your care to continue."));
-                    })); }
+                    p.When(args, x => x.IsInteracted).Truthy()
+                        .Then(ready => ready.Element("survey-readiness")
+                            .SetText("Thank you for rating your care yourself — your rating is ready to submit."))
+                        .Else(cleared => cleared.Element("survey-readiness")
+                            .SetText("Your rating was cleared. Please rate your care to continue."));
+                }); }
 
             <native-vstack gap="Xs">
                 <native-text>
@@ -63,15 +63,15 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionRating>(m => m.SatisfactionScore).SetValue(Model.SatisfactionScore);
-                        p.Element("survey-rating").SetText(p.Component<FusionRating>(m => m.SatisfactionScore).Value());
+                        p.Component<FusionRating>(m => m.SatisfactionScore).Set(c => c.Value, Model.SatisfactionScore).Call(c => c.DataBind);
+                        p.Element("survey-rating").SetText(p.Component<FusionRating>(m => m.SatisfactionScore).Get(c => c.Value));
                         p.Element("survey-sentiment").SetText("Restored the rating you submitted last month.");
                     }))
                 @(Html.NativeButton("clear-rating", "Clear my rating")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionRating>(m => m.SatisfactionScore).Reset();
+                        p.Component<FusionRating>(m => m.SatisfactionScore).Call(c => c.Reset);
                     }))
             </native-hstack>
         </native-vstack>
@@ -86,7 +86,7 @@
                 {
                     var rating = p.Component<FusionRating>(m => m.SatisfactionScore);
                     p.Post(Url.SandboxRoute("Echo", "Rating"))
-                        .Gather(g => g.Include(rating.Value(), "satisfactionScore"))
+                        .Gather(g => g.Include(rating.Get(c => c.Value), "satisfactionScore"))
                         .Response(r => r.OnSuccess<RatingEchoResponse>((json, s) =>
                         {
                             s.Element("survey-confirmation").SetText(json, x => x.Summary);

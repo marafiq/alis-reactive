@@ -85,5 +85,21 @@ namespace Alis.Reactive.Native
             return new RenderedComponent<TComponent, TModel>(Plan, ElementId);
         }
 #endif
+
+        /// <summary>
+        /// Registers <typeparamref name="TComponent"/> as this field's input (value, gather, validation)
+        /// and renders its markup inside the field wrapper, for a vendor helper that writes its markup to
+        /// a <see cref="TextWriter"/> instead of returning it.
+        /// </summary>
+        /// <param name="write">Writes the component markup to the writer it receives.</param>
+        /// <returns>The rendered component, ready for <c>.Reactive(...)</c>.</returns>
+        public RenderedComponent<TComponent, TModel> Render<TComponent>(System.Action<TextWriter> write)
+            where TComponent : IInputComponent, new()
+        {
+            if (write == null) throw new System.ArgumentNullException(nameof(write));
+            RegisterInputComponent(InputComponentRegistrationProfile.For<TComponent>());
+            Render(() => write(Writer));
+            return new RenderedComponent<TComponent, TModel>(Plan, ElementId);
+        }
     }
 }

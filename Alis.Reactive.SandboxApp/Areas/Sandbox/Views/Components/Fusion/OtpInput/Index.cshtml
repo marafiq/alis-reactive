@@ -11,8 +11,8 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var passcode = p.Component<FusionOtpInput>(m => m.Passcode);
-        passcode.SetValue("1357");
-        p.Element("value-echo").SetText(passcode.Value());
+        passcode.Set(c => c.Value, "1357").Call(c => c.DataBind);
+        p.Element("value-echo").SetText(passcode.Get(c => c.Value));
     }));
 }
 
@@ -27,36 +27,36 @@
                     .Length(4)
                     .Value("1234")
                     .Type(OtpInputType.Text)
-                    .Placeholder("0000")
-                    .Reactive(plan, evt => evt.Input, (args, p) =>
-                    {
-                        p.Element("input-value").SetText(args, x => x.Value);
-                        p.Element("input-previous").SetText(args, x => x.PreviousValue);
-                        p.Element("input-index").SetText(args, x => x.Index);
-                    })
-                    .Reactive(plan, evt => evt.ValueChanged, (args, p) =>
-                    {
-                        p.Element("changed-value").SetText(args, x => x.Value);
-                        p.Element("changed-previous").SetText(args, x => x.PreviousValue);
-                        p.Element("changed-interacted").SetText(args, x => x.IsInteracted);
-                        p.When(args, x => x.Value).Eq("2468")
-                            .Then(t => t.Element("args-condition").SetText("complete"))
-                            .Else(e => e.Element("args-condition").SetText("changed"));
-                    })
-                    .Reactive(plan, evt => evt.Focus, (args, p) =>
-                    {
-                        p.Element("focus-state").SetText("focused");
-                        p.Element("focus-value").SetText(args, x => x.Value);
-                        p.Element("focus-index").SetText(args, x => x.Index);
-                        p.Element("focus-interacted").SetText(args, x => x.IsInteracted);
-                    })
-                    .Reactive(plan, evt => evt.Blur, (args, p) =>
-                    {
-                        p.Element("focus-state").SetText("blurred");
-                        p.Element("blur-value").SetText(args, x => x.Value);
-                        p.Element("blur-index").SetText(args, x => x.Index);
-                        p.Element("blur-interacted").SetText(args, x => x.IsInteracted);
-                    })); }
+                    .Placeholder("0000"))
+                .Reactive(evt => evt.Input, (args, p) =>
+                {
+                    p.Element("input-value").SetText(args, x => x.Value);
+                    p.Element("input-previous").SetText(args, x => x.PreviousValue);
+                    p.Element("input-index").SetText(args, x => x.Index);
+                })
+                .Reactive(evt => evt.ValueChanged, (args, p) =>
+                {
+                    p.Element("changed-value").SetText(args, x => x.Value);
+                    p.Element("changed-previous").SetText(args, x => x.PreviousValue);
+                    p.Element("changed-interacted").SetText(args, x => x.IsInteracted);
+                    p.When(args, x => x.Value).Eq("2468")
+                        .Then(t => t.Element("args-condition").SetText("complete"))
+                        .Else(e => e.Element("args-condition").SetText("changed"));
+                })
+                .Reactive(evt => evt.Focus, (args, p) =>
+                {
+                    p.Element("focus-state").SetText("focused");
+                    p.Element("focus-value").SetText(args, x => x.Value);
+                    p.Element("focus-index").SetText(args, x => x.Index);
+                    p.Element("focus-interacted").SetText(args, x => x.IsInteracted);
+                })
+                .Reactive(evt => evt.Blur, (args, p) =>
+                {
+                    p.Element("focus-state").SetText("blurred");
+                    p.Element("blur-value").SetText(args, x => x.Value);
+                    p.Element("blur-index").SetText(args, x => x.Index);
+                    p.Element("blur-interacted").SetText(args, x => x.IsInteracted);
+                }); }
         </native-grid>
 
         <native-hstack gap="Sm" class="mt-4">
@@ -65,8 +65,8 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var passcode = p.Component<FusionOtpInput>(m => m.Passcode);
-                    passcode.SetValue("9876");
-                    p.Element("value-echo").SetText(passcode.Value());
+                    passcode.Set(c => c.Value, "9876").Call(c => c.DataBind);
+                    p.Element("value-echo").SetText(passcode.Get(c => c.Value));
                     p.Element("command-state").SetText("code set");
                 }))
             @(Html.NativeButton("clear-code-btn", "Clear Code")
@@ -74,15 +74,15 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var passcode = p.Component<FusionOtpInput>(m => m.Passcode);
-                    passcode.SetValue("");
-                    p.Element("value-echo").SetText(passcode.Value());
+                    passcode.Set(c => c.Value, "").Call(c => c.DataBind);
+                    p.Element("value-echo").SetText(passcode.Get(c => c.Value));
                     p.Element("command-state").SetText("code cleared");
                 }))
             @(Html.NativeButton("focus-code-btn", "Focus Code")
                 .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionOtpInput>(m => m.Passcode).FocusIn();
+                    p.Component<FusionOtpInput>(m => m.Passcode).Call(c => c.FocusIn);
                     p.Element("command-state").SetText("focus called");
                 }))
             @(Html.NativeButton("check-code-btn", "Check Code")
@@ -90,7 +90,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var passcode = p.Component<FusionOtpInput>(m => m.Passcode);
-                    p.When(passcode.Value()).Eq("9876")
+                    p.When(passcode.Get(c => c.Value)).Eq("9876")
                         .Then(t => t.Element("code-state").SetText("verified"))
                         .Else(e => e.Element("code-state").SetText("pending"));
                 }))
@@ -103,16 +103,16 @@
             @{ Html.InputField(plan, m => m.AutoBlurCode, o => o.Label("Auto Blur Code"))
                 .FusionOtpInput(b => b
                     .Length(4)
-                    .Type(OtpInputType.Text)
-                    .Reactive(plan, evt => evt.Focus, (args, p) =>
-                    {
-                        p.Component<FusionOtpInput>(m => m.AutoBlurCode).FocusOut();
-                        p.Element("focusout-method-state").SetText("focusout called");
-                    })
-                    .Reactive(plan, evt => evt.Blur, (args, p) =>
-                    {
-                        p.Element("autoblur-state").SetText("blurred");
-                    })); }
+                    .Type(OtpInputType.Text))
+                .Reactive(evt => evt.Focus, (args, p) =>
+                {
+                    p.Component<FusionOtpInput>(m => m.AutoBlurCode).Call(c => c.FocusOut);
+                    p.Element("focusout-method-state").SetText("focusout called");
+                })
+                .Reactive(evt => evt.Blur, (args, p) =>
+                {
+                    p.Element("autoblur-state").SetText("blurred");
+                }); }
         </native-grid>
     </native-card-body></native-card>
 
@@ -124,7 +124,7 @@
             {
                 var passcode = p.Component<FusionOtpInput>(m => m.Passcode);
                 p.Post(Url.SandboxRoute("Echo", "OtpInput"))
-                    .Gather(g => g.Include(passcode.Value(), "passcode"))
+                    .Gather(g => g.Include(passcode.Get(c => c.Value), "passcode"))
                     .Response(r => r.OnSuccess<OtpInputEchoResponse>((json, s) =>
                     {
                         s.Element("gather-code").SetText(json, x => x.Passcode);
