@@ -83,8 +83,8 @@ describe("operators answer as C#'s lifted operators do", () => {
   });
 
   it("tests a pattern on text and never on a missing value", () => {
-    expect(value(e.op("matches", e.lit("A-12"), e.lit("^[A-Z]-\\d+$")))).toBe(true);
-    expect(value(e.op("matches", e.lit(undefined), e.lit(".*")))).toBe(false);
+    expect(value(e.op("matches", e.lit("A-12"), e.lit("^[A-Z]-\\d+$"), e.lit("")))).toBe(true);
+    expect(value(e.op("matches", e.lit(undefined), e.lit(".*"), e.lit("")))).toBe(false);
   });
 
   it("sums with text that is not a number as 0, never concatenating", () => {

@@ -24,16 +24,16 @@ namespace Alis.Reactive.Native.Components
         private readonly string _elementId;
         private readonly string _text;
         private readonly string _href;
-        private readonly string _payloadJson;
+        private readonly string _planJson;
         private readonly Dictionary<string, string> _attributes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         private string? _cssClass;
 
-        internal NativeActionLinkBuilder(string elementId, string text, string href, string payloadJson)
+        internal NativeActionLinkBuilder(string elementId, string text, string href, string planJson)
         {
             _elementId = elementId ?? throw new ArgumentNullException(nameof(elementId));
             _text = text ?? throw new ArgumentNullException(nameof(text));
             _href = href ?? throw new ArgumentNullException(nameof(href));
-            _payloadJson = payloadJson ?? throw new ArgumentNullException(nameof(payloadJson));
+            _planJson = planJson ?? throw new ArgumentNullException(nameof(planJson));
         }
 
         /// <summary>
@@ -52,8 +52,8 @@ namespace Alis.Reactive.Native.Components
         /// </summary>
         /// <remarks>
         /// Use <c>Attr("class", value)</c> or <see cref="CssClass"/> for CSS classes.
-        /// Generated <c>id</c>, <c>href</c>, and <c>data-reactive-link</c> attributes
-        /// are reserved because they bind the anchor to the reactive runtime.
+        /// The generated <c>id</c> and <c>href</c> are reserved: the link's plan finds the anchor by
+        /// its id, and its request goes to its href.
         /// </remarks>
         /// <param name="name">Attribute name.</param>
         /// <param name="value">Attribute value encoded into the rendered anchor.</param>
@@ -98,9 +98,6 @@ namespace Alis.Reactive.Native.Components
             writer.Write(" href=\"");
             writer.Write(encoder.Encode(_href));
             writer.Write("\"");
-            writer.Write(" data-reactive-link=\"");
-            writer.Write(encoder.Encode(_payloadJson));
-            writer.Write("\"");
 
             if (HasCssClass(out var cssClass))
             {
@@ -121,13 +118,17 @@ namespace Alis.Reactive.Native.Components
             writer.Write(">");
             writer.Write(encoder.Encode(_text));
             writer.Write("</a>");
+
+            // The link's own plan: the JSON escapes '<', so it cannot close the script early.
+            writer.Write("<script type=\"application/json\" data-reactive-plan>");
+            writer.Write(_planJson);
+            writer.Write("</script>");
         }
 
         private static bool IsReservedAttribute(string name)
         {
             return string.Equals(name, "id", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(name, "href", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(name, "data-reactive-link", StringComparison.OrdinalIgnoreCase);
+                || string.Equals(name, "href", StringComparison.OrdinalIgnoreCase);
         }
 
         private bool HasCssClass(out string cssClass)

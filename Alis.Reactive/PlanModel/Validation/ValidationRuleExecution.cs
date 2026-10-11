@@ -30,6 +30,20 @@ namespace Alis.Reactive.PlanModel
 
         internal abstract void WriteOperand(Utf8JsonWriter writer, JsonSerializerOptions options);
 
+        /// <summary>The literal the rule compares with, for a constraint rule.</summary>
+        internal virtual bool TryGetConstraint(out LiteralExpression constraint)
+        {
+            constraint = null!;
+            return false;
+        }
+
+        /// <summary>The other field's value the rule compares with, for a peer rule.</summary>
+        internal virtual bool TryGetPeer(out ValueExpression peer)
+        {
+            peer = null!;
+            return false;
+        }
+
         internal static ValidationRuleExecution WithoutTarget(
             ValidationRuleActivation activation,
             Shape comparisonShape) =>
@@ -97,6 +111,12 @@ namespace Alis.Reactive.PlanModel
             public override string Kind => "constraint";
             public LiteralExpression Value => _value;
 
+            internal override bool TryGetConstraint(out LiteralExpression constraint)
+            {
+                constraint = _value;
+                return true;
+            }
+
             internal override void WriteOperand(Utf8JsonWriter writer, JsonSerializerOptions options) =>
                 PlanJsonWriter.WriteProperty(writer, options, "value", _value);
         }
@@ -116,6 +136,12 @@ namespace Alis.Reactive.PlanModel
 
             public override string Kind => "peer";
             public ReadExpression Value => _value;
+
+            internal override bool TryGetPeer(out ValueExpression peer)
+            {
+                peer = _value;
+                return true;
+            }
 
             internal override void WriteOperand(Utf8JsonWriter writer, JsonSerializerOptions options) =>
                 PlanJsonWriter.WriteProperty(writer, options, "value", _value);

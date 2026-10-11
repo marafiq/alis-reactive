@@ -1,27 +1,28 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using Alis.Reactive.Builders;
+using Alis.Reactive.Grammar;
+using Alis.Reactive.Grammar.Lowering;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Components
 {
+    /// <summary>
+    /// Builds the plan a NativeActionLink carries in its own plan script: a handler of the anchor's
+    /// click that leaves a modified click (a new tab, a download) to the browser and otherwise
+    /// prevents the navigation and runs the link's pipeline. The href is the request's URL.
+    /// </summary>
     internal static class NativeActionLinkSerializer
     {
-        private static readonly JsonSerializerOptions CompactOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
-
-        internal static NativeActionLinkContract CreateContract<TModel>(
+        internal static string CreatePlanJson<TModel>(
+            string elementId,
             string expectedRequestUrl,
             Action<PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var planIdentity = PlanIdentity.Root(PlanId.Of("action-link"));
             var context = new PlanBuildContext(
-                planIdentity, new RegisteredInputComponents());
+                PlanIdentity.Root(PlanId.Of(elementId)), new RegisteredInputComponents());
             var pipelineBuilder = new PipelineBuilder<TModel>(context);
             pipeline(pipelineBuilder);
             var reaction = pipelineBuilder.BuildReaction();
@@ -32,40 +33,49 @@ namespace Alis.Reactive.Native.Components
                     "NativeActionLink does not support validation.");
 
             var requestCount = 0;
-            var actionLinkReaction = BuildActionLinkReaction(reaction, expectedRequestUrl, ref requestCount);
+            RequireOneLinkRequest(reaction, expectedRequestUrl, ref requestCount);
             if (requestCount != 1)
             {
                 throw new InvalidOperationException(
                     "NativeActionLink supports exactly one request in its click reaction tree.");
             }
 
-            // Carry the full plan context so the runtime can resolve
-            // all component references in the reaction tree.
-            var payloadJson = JsonSerializer.Serialize(
-                new NativeActionLinkPayload(context.BuildPlan(), actionLinkReaction),
-                CompactOptions);
-
-            return new NativeActionLinkContract(payloadJson);
+            var plan = PlanLowering.LowerHandler(
+                context.BuildPlan(),
+                lowering => lowering.Objects.DomElement(elementId),
+                "click",
+                (lowering, reactions, scope) => new[]
+                {
+                    G.If(UnmodifiedLeftClick(scope.EventParam), ClickBody(reactions.Block(reaction, scope), scope.EventParam), G.NoStatements),
+                });
+            return GrammarSerializer.Serialize(plan);
         }
 
-        private static ReactionGraph BuildActionLinkReaction(
-            ReactionGraph reaction,
-            string expectedRequestUrl,
-            ref int requestCount)
+        // An unmodified left click the page has not already handled; anything else stays the browser's.
+        private static Expr UnmodifiedLeftClick(string click)
+        {
+            Expr Member(string name) => G.Get(G.Ref(click), new[] { name }, Shape.None);
+            return G.And(
+                G.Eq(Member("button"), G.Lit(0)),
+                G.Not(G.Or(Member("defaultPrevented"), Member("metaKey"), Member("ctrlKey"), Member("shiftKey"), Member("altKey"))));
+        }
+
+        private static IReadOnlyList<Statement> ClickBody(IReadOnlyList<Statement> pipeline, string click) =>
+            new[] { G.Do(G.Call(G.Ref(click), "preventDefault")) }.Concat(pipeline).ToList();
+
+        private static void RequireOneLinkRequest(ReactionGraph reaction, string expectedRequestUrl, ref int requestCount)
         {
             switch (reaction)
             {
                 case SequenceReaction sequential:
-                    var actionLinkSteps = new List<ReactionGraph>();
                     foreach (var step in sequential.Steps)
-                        actionLinkSteps.Add(BuildActionLinkReaction(step, expectedRequestUrl, ref requestCount));
-                    return ReactionGraph.Sequence(actionLinkSteps);
+                        RequireOneLinkRequest(step, expectedRequestUrl, ref requestCount);
+                    return;
 
                 case BranchReaction conditional:
-                    var actionLinkCases = new List<BranchCase>();
                     foreach (var branchCase in conditional.Cases)
-                        actionLinkCases.Add(branchCase.WithReaction(BuildActionLinkReaction(branchCase.Reaction, expectedRequestUrl, ref requestCount)));
-                    return ReactionGraph.Branch(actionLinkCases);
+                        RequireOneLinkRequest(branchCase.Reaction, expectedRequestUrl, ref requestCount);
+                    return;
 
                 case RequestReaction requestReaction:
                     requestCount++;
@@ -75,39 +85,26 @@ namespace Alis.Reactive.Native.Components
                     if (!string.Equals(expectedRequestUrl, requestReaction.Request.Url, StringComparison.Ordinal))
                         throw new InvalidOperationException(
                             "NativeActionLink href must match the request URL.");
-                    return ReactionGraph.Request(BuildActionLinkRequest(requestReaction.Request));
+                    RequireLinkRequest(requestReaction.Request);
+                    return;
 
                 case ParallelReaction _:
                     throw new InvalidOperationException(
                         "NativeActionLink does not support Parallel.");
-
-                default:
-                    return reaction;
             }
-        }
-
-        private static RequestPlan BuildActionLinkRequest(RequestPlan request)
-        {
-            var requestHasFollowUp = request.Chain.HasFollowUp;
-            if (requestHasFollowUp)
-                throw new InvalidOperationException(
-                    "NativeActionLink does not support chained requests.");
-
-            return RequestPlan.Create(
-                RequestEndpoint.To(HttpMethodName.From(request.Method), RequestUrl.Of(string.Empty)),
-                BuildActionLinkInput(request.Input),
-                RequestReactions.From(request.WhileLoading, request.Finally),
-                ResponseRouting.From(request.Success, request.Error, RequestChain.Terminal),
-                RequestValidationTarget.None);
         }
 
         // Body fields and headers travel with the request. A route parameter would need a {placeholder} in the
         // href, which a modifier-click opens as written; IncludeAll would gather the page's registered inputs,
         // which the link's own plan does not see.
-        private static RequestInput BuildActionLinkInput(RequestInput input)
+        private static void RequireLinkRequest(RequestPlan request)
         {
-            if (input is not GatherRequestInput gather)
-                return input;
+            if (request.Chain.HasFollowUp)
+                throw new InvalidOperationException(
+                    "NativeActionLink does not support chained requests.");
+
+            if (!(request.Input is GatherRequestInput gather))
+                return;
 
             var gathersRouteParameter = gather.Assignments.Any(assignment => assignment.Target is RequestRouteParameterTarget);
             if (gathersRouteParameter)
@@ -119,25 +116,6 @@ namespace Alis.Reactive.Native.Components
                 throw new InvalidOperationException(
                     "NativeActionLink does not support IncludeAll: the link's request does not see the page's " +
                     "registered inputs.");
-
-            return input;
         }
-    }
-
-    internal sealed class NativeActionLinkContract
-    {
-        internal NativeActionLinkContract(string payloadJson) { PayloadJson = payloadJson; }
-        internal string PayloadJson { get; }
-    }
-
-    internal sealed class NativeActionLinkPayload
-    {
-        public NativeActionLinkPayload(PlanDocument plan, ReactionGraph reaction)
-        {
-            Plan = plan;
-            Reaction = reaction;
-        }
-        public PlanDocument Plan { get; }
-        public ReactionGraph Reaction { get; }
     }
 }

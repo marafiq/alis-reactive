@@ -20,8 +20,8 @@ namespace Alis.Reactive.Native.Components
         /// The click pipeline holds one HTTP request, and that request URL must
         /// match <paramref name="url"/>; requests inside its response routes,
         /// WhileLoading, or Finally are kept as written. The rendered anchor keeps the URL in
-        /// <c>href</c> so modifier-clicks remain browser-owned; the runtime copies
-        /// the clicked href into the serialized request before ordinary click execution.
+        /// <c>href</c> so modifier-clicks remain browser-owned, and carries its own plan script,
+        /// so a link inside a loaded partial works without re-wiring.
         /// <code>
         /// @Html.NativeActionLink("Delete", "/residents/42/delete", p =&gt; p.Post("/residents/42/delete"))
         /// </code>
@@ -46,9 +46,9 @@ namespace Alis.Reactive.Native.Components
             if (html == null) throw new ArgumentNullException(nameof(html));
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
 
-            var contract = NativeActionLinkSerializer.CreateContract(url, pipeline);
             var elementId = NativeActionLinkIdGenerator.Next<TModel>(html.ViewContext);
-            return new NativeActionLinkBuilder<TModel>(elementId, linkText, url, contract.PayloadJson);
+            var planJson = NativeActionLinkSerializer.CreatePlanJson(elementId, url, pipeline);
+            return new NativeActionLinkBuilder<TModel>(elementId, linkText, url, planJson);
         }
     }
 }

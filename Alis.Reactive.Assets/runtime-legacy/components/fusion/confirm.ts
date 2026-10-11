@@ -1,12 +1,4 @@
-// alis.confirm: the app-level confirmation the core's p.Confirm(..) asks (grammar.md 6.8). The Fusion
-// package implements it with a Syncfusion Dialog rendered by @Html.FusionConfirmDialog().
-// C1 ask(message) resolves true on OK, false on Cancel, close or Escape.
-// C2 Asks queue first in, first out.
-// C3 Escape inside the dialog never reaches the document.
-// C4 A missing dialog is a boundary error naming FusionConfirmDialog.
-
 import { scope } from "../../diagnostics/trace";
-import { registerModule } from "../../objects/modules";
 
 const log = scope("confirm");
 const ELEMENT_ID = "alisConfirmDialog";
@@ -50,6 +42,12 @@ interface SyncfusionWindow extends Window {
   };
 }
 
+interface AlisWindow extends Window {
+  alis?: {
+    confirm?: (message: string) => Promise<boolean>;
+  };
+}
+
 function showConfirmDialog(
   dialog: SyncfusionDialog,
   message: string,
@@ -79,14 +77,16 @@ function keepEscapeInConfirm(event: KeyboardEvent): void {
   if (event.key === "Escape") event.stopPropagation();
 }
 
-let ask: ((message: string) => Promise<boolean>) | undefined;
-
-function createDialog(): ((message: string) => Promise<boolean>) | undefined {
-  // App-level singleton rendered by @Html.FusionConfirmDialog() in the layout; fixed id.
+export function init(): void {
+  // App-level singleton rendered by @Html.FusionConfirmDialog() in Layout.
+  // Not a plan component — getElementById is correct.
   const dialogHostElement = document.getElementById(ELEMENT_ID);
-  if (!dialogHostElement) return undefined;
+  if (!dialogHostElement) {
+    log.warn("element.not-found", { id: ELEMENT_ID });
+    return;
+  }
 
-  const hostWindow = window as unknown as SyncfusionWindow;
+  const hostWindow = window as unknown as SyncfusionWindow & AlisWindow;
   const dialog = new hostWindow.ej.popups.Dialog({
     isModal: true,
     visible: false,
@@ -98,23 +98,13 @@ function createDialog(): ((message: string) => Promise<boolean>) | undefined {
   });
   dialog.appendTo(dialogHostElement);
   dialogHostElement.addEventListener("keydown", keepEscapeInConfirm);
+
+  hostWindow.alis = hostWindow.alis || {};
+  hostWindow.alis.confirm = function (message: string): Promise<boolean> {
+    return new Promise<boolean>((outerResolve) => {
+      queue = queue.then(() => showConfirmDialog(dialog, message, outerResolve));
+    });
+  };
+
   log.info("initialized", { id: ELEMENT_ID });
-
-  return (message: string) => new Promise<boolean>(outerResolve => {
-    queue = queue.then(() => showConfirmDialog(dialog, message, outerResolve));
-  });
 }
-
-export function initConfirm(): void {
-  ask = createDialog();
-  if (!ask) log.debug("element.not-found", { id: ELEMENT_ID });
-}
-
-registerModule("alis.confirm", {
-  object: () => ({
-    ask(message: string): Promise<boolean> {
-      if (!ask) throw new Error("[alis] confirm condition requires @Html.FusionConfirmDialog() in layout");
-      return ask(message);
-    },
-  }),
-});

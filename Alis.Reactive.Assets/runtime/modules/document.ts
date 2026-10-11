@@ -63,6 +63,7 @@ const documentObject: DocumentObject = {
 
 let markupRaiseWired = false;
 
+// Captured at the document, so a vendor that stops a click inside its own template cannot swallow it.
 function wireMarkupRaise(): void {
   if (markupRaiseWired) return;
   markupRaiseWired = true;
@@ -73,7 +74,7 @@ function wireMarkupRaise(): void {
     if (!name) return;
     const detailText = source.getAttribute(RAISE_DETAIL_ATTRIBUTE);
     raise(name, detailText ? JSON.parse(detailText) : {});
-  });
+  }, true);
 }
 
 export const documentModule: Module = {

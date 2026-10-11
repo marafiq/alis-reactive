@@ -125,14 +125,3 @@ const dotNetWhitespaceOnly = /^[\t\n\v\f\r \u0085\u00A0\u1680\u2000-\u200A\u2028
 export function isBlankText(value: unknown): value is string {
   return typeof value === "string" && dotNetWhitespaceOnly.test(value);
 }
-
-/**
- * A binding read: the value MVC would bind on the server (grammar.md 2.1). Blank text is null; a
- * non-nullable number that is blank is 0; everything else is the ordinary shaped value.
- */
-export function bound(value: unknown, shape: Shape): unknown {
-  if (shape.kind === "string" && isBlankText(value)) return null;
-  if (shape.kind === "nullable" && shape.inner.kind === "string" && isBlankText(value)) return null;
-  if (shape.kind === "number" && (isMissing(value) || isBlankText(value))) return isMissing(value) ? value : 0;
-  return shaped(value, shape);
-}

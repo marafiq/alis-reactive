@@ -204,6 +204,9 @@ namespace Alis.Reactive.PlanModel
         public abstract string Kind { get; }
         internal abstract void WriteGuardPayload(Utf8JsonWriter writer, JsonSerializerOptions options);
 
+        /// <summary>The guard's condition; the default guard has none and always matches.</summary>
+        internal abstract bool TryGetCondition(out ConditionGraph condition);
+
         internal static BranchGuard When(ConditionGraph condition) =>
             new ConditionalBranchGuard(condition);
 
@@ -213,6 +216,12 @@ namespace Alis.Reactive.PlanModel
 
             internal override void WriteGuardPayload(Utf8JsonWriter writer, JsonSerializerOptions options)
             {
+            }
+
+            internal override bool TryGetCondition(out ConditionGraph condition)
+            {
+                condition = null!;
+                return false;
             }
         }
 
@@ -229,6 +238,12 @@ namespace Alis.Reactive.PlanModel
 
             internal override void WriteGuardPayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
                 PlanJsonWriter.WriteProperty(writer, options, "condition", _condition);
+
+            internal override bool TryGetCondition(out ConditionGraph condition)
+            {
+                condition = _condition;
+                return true;
+            }
         }
     }
 
@@ -385,6 +400,8 @@ namespace Alis.Reactive.PlanModel
         {
             _data = data;
         }
+
+        internal ValueExpression Data => _data;
 
         public override string Kind => "value";
 

@@ -92,14 +92,11 @@ function operate(expr: OpExpr, scope: Scope): unknown {
   const at = (index: number): unknown => evaluate(args[index]!, scope);
 
   switch (expr.op) {
-    case "and":      return ops.truthy(at(0)) && ops.truthy(at(1));
-    case "or":       return ops.truthy(at(0)) || ops.truthy(at(1));
+    case "and":      return args.every((_, index) => ops.truthy(at(index)));
+    case "or":       return args.some((_, index) => ops.truthy(at(index)));
     case "not":      return !ops.truthy(at(0));
     case "cond":     return ops.truthy(at(0)) ? at(1) : at(2);
-    case "coalesce": {
-      const left = at(0);
-      return left === null || left === undefined ? at(1) : left;
-    }
+    case "coalesce": return coalesce(args.length, at);
     case "eq":       return ops.equal(at(0), at(1));
     case "neq":      return !ops.equal(at(0), at(1));
     case "lt":       return ops.lessThan(at(0), at(1));
@@ -114,7 +111,7 @@ function operate(expr: OpExpr, scope: Scope): unknown {
     case "neg":      return ops.negate(at(0));
     case "truthy":   return ops.truthy(at(0));
     case "empty":    return ops.empty(at(0));
-    case "matches":  return ops.matches(at(0), at(1), args.length > 2 ? at(2) : "");
+    case "matches":  return ops.matches(at(0), at(1), at(2));
     case "toNumber": return ops.toNumber(at(0));
     case "toDate":   return ops.toDate(at(0));
     case "toBoolean":return ops.toBoolean(at(0));
@@ -124,6 +121,15 @@ function operate(expr: OpExpr, scope: Scope): unknown {
     case "order":    return ops.order(at(0), at(1));
     default:         return assertNever(expr.op, "operator");
   }
+}
+
+// The first operand that is not missing, evaluated left to right; the last one otherwise.
+function coalesce(count: number, at: (index: number) => unknown): unknown {
+  for (let index = 0; index < count - 1; index++) {
+    const value = at(index);
+    if (value !== null && value !== undefined) return value;
+  }
+  return at(count - 1);
 }
 
 export function isPromise(value: unknown): value is Promise<unknown> {

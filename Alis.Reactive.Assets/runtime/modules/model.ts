@@ -1,16 +1,18 @@
 // alis.model (grammar.md 6.3): the inputs of a view, keyed by its planId. Plans that share a planId
 // (a view and its partials, including partials loaded into slots) contribute their inputs under their
 // owner, and a slot's unload removes exactly its own.
-// M1 `values`: every mounted input of the composed plan, read through its value expression as a
-//    binding read (the value MVC would bind), nested by its JSON body path. Unmounted inputs are skipped.
+// M1 `values`: every mounted input of the composed plan, read through its value expression and
+//    converted to its shape, nested by its JSON body path. Unmounted inputs are skipped.
 // M2 `fields`: the same inputs, flat, keyed by MVC binding name; `arrays` names those holding arrays.
+// M3 `valueOf(id)`: one input's value, for a plan that reads a field another plan rendered; missing
+//    when no plan of the composition rendered it.
 
 import type { InputBinding, Shape } from "../types/index";
 import type { Contribution, Module } from "../objects/modules";
 import type { PlanWorld } from "../objects/world";
 import { Environment } from "../grammar/environment";
 import { evaluate } from "../grammar/evaluate";
-import { bound } from "../grammar/shape";
+import { shaped } from "../grammar/shape";
 
 export interface ModelInput {
   readonly id: string;
@@ -28,8 +30,10 @@ export interface ModelObject {
   input(id: string): ModelInput | undefined;
   /** Whether the input's element is on the page. */
   isMounted(input: ModelInput): boolean;
-  /** The input's current value, as MVC would bind it. */
+  /** The input's current value, converted to its shape. */
   read(input: ModelInput): unknown;
+  /** The value of the input registered under an element id; missing when none is. */
+  valueOf(id: string): unknown;
 }
 
 const inputsByPlan = new Map<string, Map<string, ModelInput>>();
@@ -44,9 +48,7 @@ function inputsOf(planId: string): Map<string, ModelInput> {
 }
 
 export function readInput(input: ModelInput): unknown {
-  const env = Environment.root();
-  env.bind(input.binding.value.params[0] ?? "self", input.world.object(input.id));
-  return bound(evaluate(input.binding.value.body, { env, world: input.world }), input.binding.shape);
+  return shaped(evaluate(input.binding.value, { env: Environment.root(), world: input.world }), input.binding.shape);
 }
 
 function isMounted(input: ModelInput): boolean {
@@ -80,6 +82,10 @@ function modelObject(planId: string): ModelObject {
     input: id => inputsOf(planId).get(id),
     isMounted,
     read: readInput,
+    valueOf(id: string) {
+      const input = inputsOf(planId).get(id);
+      return input === undefined || !isMounted(input) ? undefined : readInput(input);
+    },
   };
 }
 

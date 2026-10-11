@@ -39,14 +39,15 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Renders a button that dispatches a CustomEvent with the bound <c>detail.id</c> value.
-        /// Uses <c>&amp;quot;</c> for event name quoting to survive Syncfusion template engine
-        /// single-to-double quote conversion.
+        /// Renders a button whose click raises a document event with the bound <c>detail.id</c> value.
+        /// The template carries no script: the runtime raises the event named by <c>data-alis-raise</c>
+        /// with the JSON in <c>data-alis-detail</c>. The detail's quotes are <c>&amp;quot;</c> so they
+        /// survive the Syncfusion template engine's quote conversion.
         /// </summary>
         internal static string EventButton(string text, string eventName, string idBinding, TemplateCss css)
         {
-            var onClick = $"document.dispatchEvent(new CustomEvent(&quot;{eventName}&quot;,{{detail:{{id:{idBinding}}}}}))";
-            return $"<button class=\"{css.AppendTo("e-btn")}\" onclick=\"{onClick}\">{text}</button>";
+            var detail = $"{{&quot;id&quot;:{idBinding}}}";
+            return $"<button class=\"{css.AppendTo("e-btn")}\" data-alis-raise=\"{eventName}\" data-alis-detail=\"{detail}\">{text}</button>";
         }
     }
 

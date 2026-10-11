@@ -14,6 +14,9 @@ namespace Alis.Reactive.PlanModel
         public abstract string Kind { get; }
         internal abstract void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options);
 
+        /// <summary>The condition the rule waits for; an always-active rule has none.</summary>
+        internal abstract bool TryGetCondition(out ConditionGraph condition);
+
         internal static ValidationRuleActivation When(ConditionGraph condition) =>
             new ConditionallyActiveValidationRule(condition);
 
@@ -23,6 +26,12 @@ namespace Alis.Reactive.PlanModel
 
             internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options)
             {
+            }
+
+            internal override bool TryGetCondition(out ConditionGraph condition)
+            {
+                condition = null!;
+                return false;
             }
         }
 
@@ -38,6 +47,12 @@ namespace Alis.Reactive.PlanModel
             public override string Kind => "when";
             internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
                 PlanJsonWriter.WriteProperty(writer, options, "condition", _condition);
+
+            internal override bool TryGetCondition(out ConditionGraph condition)
+            {
+                condition = _condition;
+                return true;
+            }
         }
     }
 

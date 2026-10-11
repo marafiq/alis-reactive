@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Alis.Reactive.Grammar;
+using Alis.Reactive.Grammar.Lowering;
 using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
@@ -128,7 +130,7 @@ namespace Alis.Reactive
         public string Render()
         {
             ResolveAll(_services);
-            return PlanSerializer.Serialize(_context.BuildPlan());
+            return GrammarSerializer.Serialize(PlanLowering.Lower(_context.BuildPlan()));
         }
 
         /// <summary>Registers components, resolves validation with the supplied services, and serializes the Reactive Plan as compact JSON.</summary>
@@ -137,7 +139,7 @@ namespace Alis.Reactive
         public string Render(IServiceProvider services)
         {
             ResolveAll(services);
-            return PlanSerializer.Serialize(_context.BuildPlan());
+            return GrammarSerializer.Serialize(PlanLowering.Lower(_context.BuildPlan()));
         }
 
         /// <summary>Registers components, resolves validation, and serializes the Reactive Plan as indented JSON for debugging.</summary>
@@ -145,7 +147,7 @@ namespace Alis.Reactive
         public string RenderFormatted()
         {
             ResolveAll(_services);
-            return PlanSerializer.SerializeFormatted(_context.BuildPlan());
+            return GrammarSerializer.SerializeFormatted(PlanLowering.Lower(_context.BuildPlan()));
         }
 
         /// <summary>Registers components, resolves validation with the supplied services, and serializes the Reactive Plan as indented JSON.</summary>
@@ -154,7 +156,7 @@ namespace Alis.Reactive
         public string RenderFormatted(IServiceProvider services)
         {
             ResolveAll(services);
-            return PlanSerializer.SerializeFormatted(_context.BuildPlan());
+            return GrammarSerializer.SerializeFormatted(PlanLowering.Lower(_context.BuildPlan()));
         }
 
         private void ResolveAll(IServiceProvider? services)
