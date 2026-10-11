@@ -19,8 +19,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <inheritdoc />
         public string ValueMember => "value";
 
-        /// <summary>The value without the mask's literal characters.</summary>
-        public ComponentProperty<string> Value => Property<string>(ValueMember);
+        /// <summary>The value without the mask's literal characters; <see langword="null"/> when empty.</summary>
+        public ComponentProperty<string?> Value => Property<string?>(ValueMember);
 
         /// <summary>Moves focus into the input.</summary>
         public ComponentMethod FocusIn => Method("focusIn");

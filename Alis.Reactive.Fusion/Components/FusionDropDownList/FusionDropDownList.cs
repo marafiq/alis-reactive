@@ -20,11 +20,11 @@ namespace Alis.Reactive.Fusion.Components
         /// <inheritdoc />
         public string ValueMember => "value";
 
-        /// <summary>The selected value.</summary>
-        public ComponentProperty<string> Value => Property<string>(ValueMember);
+        /// <summary>The selected value; <see langword="null"/> when empty.</summary>
+        public ComponentProperty<string?> Value => Property<string?>(ValueMember);
 
         /// <summary>The text shown for the selection, without changing the selected value.</summary>
-        public ComponentProperty<string> Text => Property<string>("text");
+        public ComponentProperty<string?> Text => Property<string?>("text");
 
         /// <summary>The items the list offers.</summary>
         /// <remarks>Call <see cref="DataBind"/> after writing it so the list renders the new items.</remarks>

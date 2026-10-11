@@ -12,7 +12,7 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var combo = p.Component<FusionComboBox>(m => m.Resident);
-        combo.Set(c => c.Value, "alice").DataBind();
+        combo.Set(c => c.Value, "alice").Call(c => c.DataBind);
         p.Element("value-echo").SetText(combo.Get(c => c.Value));
         p.Element("text-echo").SetText(combo.Get(c => c.Text));
         p.Element("index-echo").SetText(combo.Get(c => c.Index));
@@ -66,7 +66,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var combo = p.Component<FusionComboBox>(m => m.Resident);
-                    combo.Set(c => c.Value, "bennett").DataBind();
+                    combo.Set(c => c.Value, "bennett").Call(c => c.DataBind);
                     p.Element("value-echo").SetText(combo.Get(c => c.Value));
                     p.Element("text-echo").SetText(combo.Get(c => c.Text));
                     p.Element("index-echo").SetText(combo.Get(c => c.Index));
@@ -77,7 +77,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var combo = p.Component<FusionComboBox>(m => m.Resident);
-                    combo.Set(c => c.Text, "Carey").DataBind();
+                    combo.Set(c => c.Text, "Carey").Call(c => c.DataBind);
                     p.Element("value-echo").SetText(combo.Get(c => c.Value));
                     p.Element("text-echo").SetText(combo.Get(c => c.Text));
                     p.Element("index-echo").SetText(combo.Get(c => c.Index));
@@ -88,7 +88,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var combo = p.Component<FusionComboBox>(m => m.Resident);
-                    combo.Set(c => c.Index, 3).DataBind();
+                    combo.Set(c => c.Index, 3).Call(c => c.DataBind);
                     p.Element("value-echo").SetText(combo.Get(c => c.Value));
                     p.Element("text-echo").SetText(combo.Get(c => c.Text));
                     p.Element("index-echo").SetText(combo.Get(c => c.Index));
@@ -123,7 +123,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var combo = p.Component<FusionComboBox>(m => m.Resident);
-                    combo.Call(c => c.Clear).DataBind();
+                    combo.Call(c => c.Clear).Call(c => c.DataBind);
                     p.Element("command-state").SetText("cleared");
                     p.Element("value-echo").SetText(combo.Get(c => c.Value));
                     p.Element("text-echo").SetText(combo.Get(c => c.Text));

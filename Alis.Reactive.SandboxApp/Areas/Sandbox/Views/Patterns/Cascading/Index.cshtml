@@ -29,7 +29,7 @@
     <native-heading level="H1">Cascading DropDownList</native-heading>
     <native-text color="Secondary">
         Demonstrates cascading dropdowns: Country selection triggers HTTP GET to load cities.
-        Uses SetDataSource + DataBind to update the child dropdown with response data.
+        Sets the child dropdown's DataSource from the response and calls DataBind.
         Senior living domain: facility location selection.
     </native-text>
 
@@ -52,8 +52,8 @@
                    .OnSuccess<CityLookupResponse>((json, s) =>
                    {
                        s.Component<FusionDropDownList>(m => m.City)
-                           .SetDataSource(json, j => j.Cities)
-                           .DataBind();
+                           .Set(c => c.DataSource, json.Read(j => j.Cities))
+                           .Call(c => c.DataBind);
                        s.Element("cascade-status").SetText("cities loaded");
                        s.Element("cascade-status").AddClass("text-green-600");
                        s.Element("cascade-status").RemoveClass("text-text-muted");
@@ -66,7 +66,7 @@
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">2. City (Child — HTTP DataSource via Cascade)</h2>
         <p class="text-sm text-text-secondary mb-4">
-            Starts empty. Populated by SetDataSource + DataBind after country change.
+            Starts empty. Its DataSource is set from the response, then DataBind, after the country changes.
         </p>
         @{ Html.InputField(plan, m => m.City, o => o.Label("City"))
            .FusionDropDownList(b => b

@@ -19,8 +19,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <inheritdoc />
         public string ValueMember => "value";
 
-        /// <summary>The content as HTML.</summary>
-        public ComponentProperty<string> Value => Property<string>(ValueMember);
+        /// <summary>The content as HTML; <see langword="null"/> when empty.</summary>
+        public ComponentProperty<string?> Value => Property<string?>(ValueMember);
 
         /// <summary>Moves focus into the editor.</summary>
         public ComponentMethod FocusIn => Method("focusIn");

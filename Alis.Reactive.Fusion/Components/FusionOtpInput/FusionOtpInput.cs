@@ -20,8 +20,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <inheritdoc />
         public string ValueMember => "value";
 
-        /// <summary>The passcode.</summary>
-        public ComponentProperty<string> Value => Property<string>(ValueMember);
+        /// <summary>The passcode; <see langword="null"/> when empty.</summary>
+        public ComponentProperty<string?> Value => Property<string?>(ValueMember);
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
         public ComponentMethod DataBind => Method("dataBind");
