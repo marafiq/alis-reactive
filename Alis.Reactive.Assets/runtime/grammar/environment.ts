@@ -21,9 +21,8 @@ export class Environment {
   }
 
   lookup(name: string): unknown {
-    for (let scope: Environment | undefined = this; scope; scope = scope.parent) {
-      if (scope.names.has(name)) return scope.names.get(name);
-    }
+    if (this.names.has(name)) return this.names.get(name);
+    if (this.parent) return this.parent.lookup(name);
     throw new Error(`[alis] "${name}" is not bound here`);
   }
 }

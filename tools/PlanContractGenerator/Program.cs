@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Alis.Reactive.Grammar;
 
 namespace Alis.Reactive.ContractGeneration
 {

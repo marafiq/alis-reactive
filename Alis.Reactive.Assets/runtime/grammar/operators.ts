@@ -4,6 +4,7 @@
 // The lazy operators (and, or, cond, coalesce) are evaluated in evaluate.ts.
 
 import { asBoolean, asDate, asNumber, asText, isMissing } from "./shape";
+import { toJavaScriptString } from "../shared/javascript-string";
 
 export function equal(left: unknown, right: unknown): boolean {
   if (isMissing(left) || isMissing(right)) return isMissing(left) && isMissing(right);
@@ -94,7 +95,7 @@ export function matches(value: unknown, pattern: unknown, flags: unknown): boole
   if (isMissing(value)) return false;
   const text = asText(value);
   if (text === undefined) return false;
-  return new RegExp(String(pattern), typeof flags === "string" ? flags : "").test(text);
+  return new RegExp(pattern as string, flags as string).test(text);
 }
 
 export function toNumber(value: unknown): unknown {
@@ -150,8 +151,8 @@ export function order(left: unknown, right: unknown): number {
     if (aIsFinite !== bIsFinite) return aIsFinite ? -1 : 1;
     return 0;
   }
-  const aText = String(a);
-  const bText = String(b);
+  const aText = toJavaScriptString(a);
+  const bText = toJavaScriptString(b);
   return aText === bText ? 0 : aText > bText ? 1 : -1;
 }
 

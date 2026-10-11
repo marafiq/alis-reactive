@@ -5,6 +5,7 @@
 
 import type { Shape } from "../types/index";
 import { assertNever } from "../shared/assert-never";
+import { toJavaScriptString } from "../shared/javascript-string";
 
 export function isMissing(value: unknown): value is null | undefined {
   return value === null || value === undefined;
@@ -58,7 +59,7 @@ export function asText(value: unknown): string | undefined {
   if (typeof value === "string") return value;
   if (typeof value === "number" || typeof value === "boolean") return `${value}`;
   if (value instanceof Date) return Number.isFinite(value.getTime()) ? value.toISOString() : undefined;
-  if (Array.isArray(value)) return String(value);
+  if (Array.isArray(value)) return toJavaScriptString(value);
   return undefined;
 }
 
