@@ -194,3 +194,29 @@ Each slice is one component, proven by Playwright, run targeted while working.
 2. **Vocabulary.** Keep `vendor` in the plan, or rename it `library` now that it is data?
 3. **Multi-argument payloads** (for example noUiSlider passes values, then handle): first argument
    only for now, or a typed positional payload?
+
+## Breadth check (2026-10-11, source at f0ec4f5)
+
+The first model was component-shaped; the framework is JS-object-shaped.
+
+- Four kinds of typed JS objects exist: components (`ComponentProperty`, `ComponentMethod`), event
+  payloads (typed args classes for reads; writes such as `cancel` and calls such as
+  `updateData(response)` hand-written with internal `ReactionGraph` in 24 slice files), plugins (a
+  second vocabulary, `PluginTypeBuilder`: properties, functions, commands, typed arguments) and
+  array elements (method reads in the arrays module).
+- Values reach members from every source: of about 98 component property sets, 58 are literals and
+  the rest read event payloads, response bodies or other typed sources; 50 method calls pass
+  arguments; returning methods are sources (Grid `getSelectedRecords()` gives `TRow[]` to `Where`
+  and `Sum`).
+- Other components are reached four ways: model expression, another view model's expression,
+  explicit id, and app-level objects by fixed id.
+- The plan and runtime already unify components and plugins: both resolve to `RuntimeObject`
+  through the same `types` contracts (`runtime-plan.ts:70-76`). Only C# authoring is split.
+
+Where the slice-1 model broke: it treated "component" as the unit; `Set` took only literals and
+`Get` only properties; `Include<TComponent>` gather reads the value member as a string.
+
+Revised direction: one declaration vocabulary for any JS object (properties, methods, functions,
+events by JS name), one verb set (`Set`, `Call`, `Get`) on any object handle (component, payload,
+plugin) taking a literal or any typed source; only the locator differs (element, plugin name,
+event). Next: a full read of the Playwright suites as the behavior contract, then a release plan.
