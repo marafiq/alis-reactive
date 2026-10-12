@@ -54,6 +54,7 @@ that value. "Nothing bound" below is null: blank text, or an empty nullable inpu
 | `Matches(pattern)`, `Matches(pattern, options)` (`IgnoreCase`, `Multiline`, `Singleline` become flags; the browser runs it as a JavaScript `RegExp`, where `\w` is ASCII) | `regex` | passes |
 | `CreditCard()`: dashes and spaces dropped, digits only, Luhn | `creditCard` | passes |
 | `Url()` (this framework, `ReactiveRuleBuilderExtensions`) | `url` | passes |
+| An app's own validator that implements `IBrowserRule` (`Browser => BrowserRule.Pattern(..)`, `.Url`, `.Email`, `.CreditCard`, `.Length(min, max)`) | the check it names | passes |
 | `InclusiveBetween(a, b)`, `ExclusiveBetween(a, b)` | `range`, `exclusiveRange` | passes |
 | `GreaterThan`, `GreaterThanOrEqualTo`, `LessThan`, `LessThanOrEqualTo` (value or sibling; a sibling with nothing bound fails) | `gt`, `min`, `lt`, `max` | passes |
 | `Equal`, `NotEqual` (value or sibling) | `equalTo`, `notEqual` / `notEqualTo` | compared, not skipped |
@@ -64,6 +65,26 @@ a `decimal` fail when it is left empty, as on the server.
 
 Messages come from `.WithMessage(...)` or FluentValidation's default template, formatted at render
 (`{PropertyName}`, `{MinLength}`, `{ComparisonValue}`, ...).
+
+An app's own validator reaches the browser when it names the browser check that decides what its
+`IsValid` decides (MoveInReviewValidator.cs, `WristbandCodeValidator`):
+
+```csharp
+public sealed class WristbandCodeValidator<T> : PropertyValidator<T, string?>, IBrowserRule
+{
+    private const string Code = @"^WB-\d{6}$";
+    public override string Name => "WristbandCodeValidator";
+    public BrowserRule Browser => BrowserRule.Pattern(Code);
+    public override bool IsValid(ValidationContext<T> context, string? value) =>
+        string.IsNullOrEmpty(value) || Regex.IsMatch(value, Code);
+    protected override string GetDefaultMessageTemplate(string errorCode) =>
+        "Enter the wristband code as WB- and six digits, like WB-104233.";
+}
+
+RuleFor(x => x.WristbandCode).SetValidator(new WristbandCodeValidator<MoveInReviewModel>());
+```
+
+A validator without `IBrowserRule` stays on the server.
 
 A peer comparison (`GreaterThan(x => x.AdmissionDate)`) must name a sibling member; FluentValidation
 keeps only the member, so a peer on another object is refused when the page renders. Write that rule in the

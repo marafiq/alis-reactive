@@ -1,6 +1,7 @@
 using Alis.Reactive.FluentValidator;
 using System.Text.RegularExpressions;
 using FluentValidation;
+using FluentValidation.Validators;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
@@ -36,6 +37,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             Unless(x => string.IsNullOrEmpty(x.FamilyPortalLink), () =>
                 RuleFor(x => x.FamilyPortalLink).Url().WithMessage("The family portal link must be a web address."));
 
+            // The community's own validator: it names the browser check that decides what it decides.
+            RuleFor(x => x.WristbandCode).WristbandCode();
+
             // Rules for a nested object, written inline.
             RuleFor(x => x.Pharmacy).ChildRules(pharmacy =>
                 pharmacy.RuleFor(x => x.Phone).Matches(@"^\d{3}-\d{4}$").WithMessage("Enter the pharmacy phone as 555-0100."));
@@ -56,5 +60,28 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         }
 
         private static bool IsReturningResident(MoveInReviewModel review) => review.IsReturning;
+    }
+
+    /// <summary>The community's wristband rule, declared in the app: the framework ships no such check.</summary>
+    public static class WristbandRules
+    {
+        public static IRuleBuilderOptions<T, string?> WristbandCode<T>(this IRuleBuilder<T, string?> rule) =>
+            rule.SetValidator(new WristbandCodeValidator<T>());
+    }
+
+    /// <summary>The wristband printer reads WB- and six digits; the browser checks the same pattern.</summary>
+    public sealed class WristbandCodeValidator<T> : PropertyValidator<T, string?>, IBrowserRule
+    {
+        private const string Code = @"^WB-\d{6}$";
+
+        public override string Name => "WristbandCodeValidator";
+
+        public BrowserRule Browser => BrowserRule.Pattern(Code);
+
+        public override bool IsValid(ValidationContext<T> context, string? value) =>
+            string.IsNullOrEmpty(value) || Regex.IsMatch(value, Code);
+
+        protected override string GetDefaultMessageTemplate(string errorCode) =>
+            "Enter the wristband code as WB- and six digits, like WB-104233.";
     }
 }

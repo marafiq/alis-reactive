@@ -32,14 +32,12 @@ namespace Alis.Reactive.FluentValidator
         }
     }
 
-    /// <summary>Marks the URL rule so the browser receives it.</summary>
-    internal interface IHttpUrlValidator
-    {
-    }
-
-    internal sealed class HttpUrlValidator<T> : PropertyValidator<T, string?>, IHttpUrlValidator
+    // The browser checks a URL the way IsValid does, so the rule reaches it like any custom one.
+    internal sealed class HttpUrlValidator<T> : PropertyValidator<T, string?>, IBrowserRule
     {
         public override string Name => "HttpUrlValidator";
+
+        public BrowserRule Browser => BrowserRule.Url;
 
         public override bool IsValid(ValidationContext<T> context, string? value)
         {

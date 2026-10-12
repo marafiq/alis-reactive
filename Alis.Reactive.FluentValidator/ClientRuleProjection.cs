@@ -143,8 +143,8 @@ namespace Alis.Reactive.FluentValidator
                 case ICreditCardValidator _:
                     return One(RuleName.CreditCard, message);
 
-                case IHttpUrlValidator _:
-                    return One(RuleName.Url, message);
+                case IBrowserRule custom:
+                    return custom.Browser.Checks.Select(check => new BrowserCheck(check.Name, message, check.Operand, Shape.None)).ToList();
 
                 case IComparisonValidator comparison:
                     return Comparison(rule, field, comparison, message);

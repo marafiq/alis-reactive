@@ -1083,3 +1083,7 @@ built and what is not.
     `Get()`, `Post()`, `Put()` and `Delete()` to the href, `Confirm(..).Then(..)` before it, and
     `Component<T>(id)` for a value it sends; a second request, or none, throws at render. ALIS002
     keeps only what the link's own plan cannot have (`Validate`, `Form()`).
+  - custom validators reach the browser (section 4.9): `IBrowserRule` names the browser check that
+    decides what a validator's `IsValid` decides (`BrowserRule.Pattern(..)`, `Url`, `Email`,
+    `CreditCard`, `Length(min, max)`); the framework's own `Url()` uses it, and the move-in review's
+    app-declared `WristbandCodeValidator` proves it in the browser.

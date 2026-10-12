@@ -12,6 +12,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? MobilityNotes { get; set; }
         public string? AssignedRoom { get; set; }
         public string? FamilyPortalLink { get; set; }
+
+        /// <summary>The code the community's wristband printer prints: WB- and six digits.</summary>
+        public string? WristbandCode { get; set; }
         public bool IsReturning { get; set; }
         public string? PreviousRoom { get; set; }
 

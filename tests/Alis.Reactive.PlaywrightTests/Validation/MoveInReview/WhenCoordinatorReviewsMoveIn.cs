@@ -157,6 +157,27 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
     }
 
     [Test]
+    public async Task a_wristband_code_is_checked_the_way_the_communitys_printer_reads_it()
+    {
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "2");
+        await Write(m => m.WristbandCode, "104233");
+
+        await ClickWhenStable(SaveReview);
+
+        await Expect(_plan.ErrorFor(m => m.WristbandCode))
+            .ToHaveTextAsync("Enter the wristband code as WB- and six digits, like WB-104233.");
+        Assert.That(_reviewsSent, Is.Empty);
+        await Write(m => m.WristbandCode, "WB-104233");
+        await Expect(_plan.ErrorFor(m => m.WristbandCode)).ToBeHiddenAsync();
+        await ClickWhenStable(SaveReview);
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1));
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task an_assigned_room_reads_the_same_in_any_case()
     {
         await NavigateAndBoot();

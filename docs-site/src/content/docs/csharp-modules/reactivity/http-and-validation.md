@@ -204,6 +204,29 @@ the server, and so do a rule whose message is written from the model (`WithMessa
 a `Matches` pattern that JavaScript reads differently from .NET (`^\d{5}\z`, `(?i)...`),
 and any rule followed by `.ServerOnly()`.
 
+Your own validator reaches the browser when it implements `IBrowserRule` and names the browser
+check that decides what its `IsValid` decides. From the move-in review page:
+
+```csharp
+public sealed class WristbandCodeValidator<T> : PropertyValidator<T, string?>, IBrowserRule
+{
+    private const string Code = @"^WB-\d{6}$";
+
+    public override string Name => "WristbandCodeValidator";
+
+    public BrowserRule Browser => BrowserRule.Pattern(Code);
+
+    public override bool IsValid(ValidationContext<T> context, string? value) =>
+        string.IsNullOrEmpty(value) || Regex.IsMatch(value, Code);
+
+    protected override string GetDefaultMessageTemplate(string errorCode) =>
+        "Enter the wristband code as WB- and six digits, like WB-104233.";
+}
+```
+
+`BrowserRule` offers `Pattern(..)`, `Url`, `Email`, `CreditCard` and `Length(min, max)`. A validator
+without `IBrowserRule` runs on the server only.
+
 The browser gives each rule the answer the server gives. It reads a field the way MVC binds it, so
 blank text is null and an empty `decimal` is 0: `ExclusiveBetween(0, 100)` on an empty `decimal`
 fails in both places, and `GreaterThan` on an empty `DateTime?` passes in both. `EmailAddress` and
