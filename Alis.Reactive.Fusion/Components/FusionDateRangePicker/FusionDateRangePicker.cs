@@ -16,9 +16,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionDateRangePicker : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The first day of the selected range.</summary>
         public ComponentProperty<DateTime> StartDate => Property<DateTime>("startDate");
 
@@ -26,11 +23,14 @@ namespace Alis.Reactive.Fusion.Components
         public ComponentProperty<DateTime> EndDate => Property<DateTime>("endDate");
 
         /// <summary>The selected range as its start and end dates.</summary>
-        public ComponentProperty<DateTime[]> Value => Property<DateTime[]>(ValueMember);
+        public ComponentProperty<DateTime[]> Value => Property<DateTime[]>("value");
 
         /// <summary>Raised when the selected range changes.</summary>
         public TypedEvent<FusionDateRangePickerChangeArgs> Change =>
             Event<FusionDateRangePickerChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 
     /// <summary>Payload of <see cref="FusionDateRangePicker.Change"/>.</summary>

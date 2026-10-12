@@ -17,11 +17,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionCheckBox : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "checked";
-
         /// <summary>Whether the box is checked.</summary>
-        public ComponentProperty<bool> Checked => Property<bool>(ValueMember);
+        public ComponentProperty<bool> Checked => Property<bool>("checked");
 
         /// <summary>Whether the box shows the indeterminate state.</summary>
         public ComponentProperty<bool> Indeterminate => Property<bool>("indeterminate");
@@ -40,6 +37,9 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the box is checked or cleared.</summary>
         public TypedEvent<FusionCheckBoxChangeArgs> Change => Event<FusionCheckBoxChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Checked, committedBy: Change);
     }
 
     /// <summary>Payload of <see cref="FusionCheckBox.Change"/>.</summary>

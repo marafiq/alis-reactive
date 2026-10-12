@@ -100,7 +100,7 @@
                             refuse.Element("week-full-capacity").SetText(args, x => x.Capacity);
                             refuse.Element("week-full").Show();
                         }))
-                .Reactive(evt => evt.Change, (args, p) =>
+                .Reactive(evt => evt.WeekChanged, (args, p) =>
                 {
                     var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
                     p.Element("week-full").Hide();

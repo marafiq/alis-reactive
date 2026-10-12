@@ -136,16 +136,21 @@ namespace Alis.Reactive.Grammar
         public IReadOnlyDictionary<string, InputBinding> Inputs { get; }
     }
 
-    /// <summary>An input bound to the model: its MVC name, its JSON body path, and how its value reads.</summary>
+    /// <summary>
+    /// An input bound to the model: its MVC name, its JSON body path, how its value reads, and the
+    /// event its component raises when a value is committed.
+    /// </summary>
     internal sealed class InputBinding
     {
-        internal InputBinding(string name, IReadOnlyList<object> body, Expr value, Shape shape)
+        internal InputBinding(string name, IReadOnlyList<object> body, Expr value, Shape shape, string committed)
         {
             if (string.IsNullOrEmpty(name)) throw new ArgumentException("Binding name required.", nameof(name));
+            if (string.IsNullOrEmpty(committed)) throw new ArgumentException("Commit event required.", nameof(committed));
             Name = name;
             Body = body ?? throw new ArgumentNullException(nameof(body));
             Value = value ?? throw new ArgumentNullException(nameof(value));
             Shape = shape ?? throw new ArgumentNullException(nameof(shape));
+            Committed = committed;
         }
 
         public string Name { get; }
@@ -155,6 +160,9 @@ namespace Alis.Reactive.Grammar
 
         public Expr Value { get; }
         public Shape Shape { get; }
+
+        /// <summary>The component's event that commits a value; the model re-raises it as <c>alis:commit</c>.</summary>
+        public string Committed { get; }
     }
 
     /// <summary><c>alis.form</c> data: the fields a validation container checks (grammar.md 6.4).</summary>
@@ -177,23 +185,18 @@ namespace Alis.Reactive.Grammar
     /// <summary>A field of a form: its element, the name the server reports errors under, its value and tests.</summary>
     internal sealed class FormField
     {
-        internal FormField(string id, string name, Expr value, string committed, IReadOnlyList<FormTest> tests)
+        internal FormField(string id, string name, Expr value, IReadOnlyList<FormTest> tests)
         {
             if (string.IsNullOrEmpty(id)) throw new ArgumentException("Field id required.", nameof(id));
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Value = value ?? throw new ArgumentNullException(nameof(value));
-            Committed = committed ?? throw new ArgumentNullException(nameof(committed));
             Tests = tests ?? throw new ArgumentNullException(nameof(tests));
         }
 
         public string Id { get; }
         public string Name { get; }
         public Expr Value { get; }
-
-        /// <summary>The input's event that commits a value; it revalidates the field.</summary>
-        public string Committed { get; }
-
         public IReadOnlyList<FormTest> Tests { get; }
     }
 

@@ -17,11 +17,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionMultiSelect : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The selected values.</summary>
-        public ComponentProperty<string[]> Value => Property<string[]>(ValueMember);
+        public ComponentProperty<string[]> Value => Property<string[]>("value");
 
         /// <summary>The items the list offers. Call <see cref="DataBind"/> after writing it outside a filtering event.</summary>
         public ComponentProperty<IEnumerable<object>?> DataSource => Property<IEnumerable<object>?>("dataSource");
@@ -38,6 +35,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Raised when the selection changes.</summary>
         public TypedEvent<FusionMultiSelectChangeArgs> Change =>
             Event<FusionMultiSelectChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised as the user types, before the popup filters its items.</summary>
         public TypedEvent<FusionMultiSelectFilteringArgs> Filtering =>

@@ -19,7 +19,7 @@
         </native-text>
     </div>
 
-    <native-card><native-card-body>
+    <native-card><native-card-body id="survey-form">
         <native-vstack gap="Base">
             @{ Html.InputField(plan, m => m.SatisfactionScore, o => o.Label("Overall satisfaction with your care this month"))
                 .FusionRating(b => b
@@ -87,11 +87,14 @@
                     var rating = p.Component<FusionRating>(m => m.SatisfactionScore);
                     p.Post(Url.SandboxRoute("Echo", "Rating"))
                         .Gather(g => g.Include(rating.Get(c => c.Value), "satisfactionScore"))
-                        .Response(r => r.OnSuccess<RatingEchoResponse>((json, s) =>
-                        {
-                            s.Element("survey-confirmation").SetText(json, x => x.Summary);
-                            s.Element("survey-confirmation-panel").RemoveClass("hidden");
-                        }));
+                        .Validate<RatingSurveyValidator>("survey-form")
+                        .Response(r => r
+                            .OnSuccess<RatingEchoResponse>((json, s) =>
+                            {
+                                s.Element("survey-confirmation").SetText(json, x => x.Summary);
+                                s.Element("survey-confirmation-panel").RemoveClass("hidden");
+                            })
+                            .OnError(400, e => e.ValidationErrors("survey-form")));
                 }))
             <div id="survey-confirmation-panel" class="hidden rounded-md border border-green-300 bg-green-50 p-4">
                 <native-text><span id="survey-confirmation" class="font-medium text-green-800"></span></native-text>

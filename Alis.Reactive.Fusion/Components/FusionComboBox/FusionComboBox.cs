@@ -16,11 +16,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionComboBox : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The selected value.</summary>
-        public ComponentProperty<string?> Value => Property<string?>(ValueMember);
+        public ComponentProperty<string?> Value => Property<string?>("value");
 
         /// <summary>The text shown in the input.</summary>
         public ComponentProperty<string?> Text => Property<string?>("text");
@@ -49,6 +46,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Raised when the selected value changes.</summary>
         public TypedEvent<FusionComboBoxChangeArgs> Change =>
             Event<FusionComboBoxChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the input receives focus.</summary>
         public TypedEvent<FusionComboBoxFocusArgs> Focus =>

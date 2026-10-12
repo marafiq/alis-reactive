@@ -71,7 +71,8 @@ namespace Alis.Reactive.Grammar.Lowering
             }
         }
 
-        // Each input this plan rendered: its MVC name, its JSON body path, and its value member read.
+        // Each input this plan rendered: its MVC name, its JSON body path, its value read and the event
+        // its component commits a value with.
         private static IReadOnlyDictionary<string, InputBinding> ModelInputs(LoweringContext context)
         {
             var inputs = new Dictionary<string, InputBinding>(StringComparer.Ordinal);
@@ -81,7 +82,7 @@ namespace Alis.Reactive.Grammar.Lowering
 
                 var property = context.Property(context.ContractOf(component.Id), binding.ValueMember, component.Id);
                 var value = context.Read(G.Obj(context.Objects.Element(component.Id)), property.Path, property.Shape);
-                inputs.Add(component.Id, new InputBinding(binding.BindingPath, BodyPath(binding.Path), value, property.Shape));
+                inputs.Add(component.Id, new InputBinding(binding.BindingPath, BodyPath(binding.Path), value, property.Shape, binding.CommittedBy));
             }
 
             return inputs;

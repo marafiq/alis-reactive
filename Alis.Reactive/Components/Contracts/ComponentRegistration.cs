@@ -23,7 +23,7 @@ namespace Alis.Reactive
         public string BindingPath => _binding.BindingPath.Value;
 
         /// <summary>Component-object member read for the registered input value, such as <c>value</c> or <c>checked</c>.</summary>
-        public string ValueMember => _binding.ValueMember.Value;
+        public string ValueMember => _binding.Input.ValueMember.Value;
 
         /// <summary>Component kind recorded for duplicate-registration diagnostics and component-specific metadata.</summary>
         public string ComponentType => _componentType.Value;
@@ -35,7 +35,7 @@ namespace Alis.Reactive
         public Shape Shape { get; }
 
         internal InputValueContract ValueContract =>
-            InputValueContract.For(_binding.ValueMember, Shape);
+            InputValueContract.For(_binding.Input, Shape);
 
         internal BindingPath RegisteredBindingPath => _binding.BindingPath;
 
@@ -49,10 +49,10 @@ namespace Alis.Reactive
         internal InputValueContract RequireValueContract(MemberName expectedValueMember)
         {
             if (expectedValueMember == null) throw new System.ArgumentNullException(nameof(expectedValueMember));
-            if (!_binding.ValueMember.Equals(expectedValueMember))
+            if (!_binding.Input.ValueMember.Equals(expectedValueMember))
                 throw new System.InvalidOperationException(
                     $"Component '{ComponentId}' is registered for binding path '{BindingPath}' " +
-                    $"with value member '{_binding.ValueMember.Value}', but this usage requested " +
+                    $"with value member '{_binding.Input.ValueMember.Value}', but this usage requested " +
                     $"'{expectedValueMember.Value}'. Use the component type that matches the rendered input.");
 
             return ValueContract;
@@ -89,7 +89,7 @@ namespace Alis.Reactive
         }
 
         internal string DescribeContract() =>
-            $"[{_identity.ComponentId.Value}, {_identity.Vendor.Value}, {_binding.ValueMember.Value}, {_componentType.Value}, {Shape.DescribeContract()}]";
+            $"[{_identity.ComponentId.Value}, {_identity.Vendor.Value}, {_binding.Input.Describe()}, {_componentType.Value}, {Shape.DescribeContract()}]";
 
         internal bool HasSameContractAs(ComponentRegistration other)
         {

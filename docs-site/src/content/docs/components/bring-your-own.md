@@ -52,13 +52,14 @@ public sealed class TomSelect : Component, IInputComponent
 
     public override ComponentVendor Vendor => TomSelectVendor;
 
-    // The value a form posts, gather reads and validation checks.
-    public string ValueMember => "input.value";
-
-    public ComponentProperty<string> Value => Property<string>(ValueMember);
+    public ComponentProperty<string> Value => Property<string>("input.value");
     public ComponentMethod<string> SetValue => Method<string>("setValue");
     public ComponentMethod Clear => Method("clear");
     public TypedEvent<TomSelectChangeArgs> Change => Event<TomSelectChangeArgs>("change");
+
+    // What makes it an input: the value a form posts, gather reads and validation checks,
+    // and the event that commits it. A form checks the field again whenever that event fires.
+    ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 }
 
 public class TomSelectChangeArgs
@@ -74,6 +75,11 @@ public class TomSelectChangeArgs
 | method that returns a value | `Function<TResult>("name")`, `Function<TArg, TResult>("name")` |
 | method that returns a promise | `Method("name").Awaited()`, `Function<TResult>("name").Awaited()` |
 | event | `Event<TArgs>("name")` |
+| an input's value and commit event | `ComponentInput.Of(Value, committedBy: ValueChanged)` |
+
+The commit event is whatever the component raises when a value is settled:
+`change` for most, `valueChanged` for a rating, `selected` for an uploader, or a
+name of your own. The framework never assumes one.
 
 An awaited method holds the steps after its call until its promise settles, and a
 read of an awaited function is the value it settles with. An event payload is a

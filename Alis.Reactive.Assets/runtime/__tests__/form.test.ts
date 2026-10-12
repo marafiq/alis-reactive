@@ -1,20 +1,23 @@
 // alis.form (grammar.md 6.4): validation messages, scope, unmounted fields, server errors, live wiring.
 
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
-import type { FormField, FormPluginData } from "../types/index";
+import type { FormField, FormPluginData, ModelPluginData } from "../types/index";
 import { registerModule, resetModulesForTests } from "../objects/modules";
 import { Owner } from "../objects/owner";
 import { startOwner } from "../plans/start";
 import { formModule, resetFormsForTests, type FormObject } from "../modules/form/form";
-import { e, element, plan, plugin, s } from "./support/plan";
+import { modelModule, resetModelForTests } from "../modules/model";
+import { e, element, fakeWidget, plan, plugin, s } from "./support/plan";
 
 beforeAll(() => {
   resetModulesForTests();
   registerModule("alis.form", formModule);
+  registerModule("alis.model", modelModule);
 });
 
 afterEach(() => {
   resetFormsForTests();
+  resetModelForTests();
   document.body.innerHTML = "";
 });
 
@@ -24,7 +27,6 @@ function requiredField(id: string, name: string, message: string, when = e.lit(t
     id,
     name,
     value: e.get(e.obj(id), ["value"], s.string),
-    committed: "change",
     tests: [{ rule: "required", check: e.fn(["v"], e.op("not", e.op("empty", e.ref("v")))) as never, when, message }],
   };
 }
@@ -131,12 +133,32 @@ describe("live", () => {
     expect(errorText("Name")).toBe("Enter the resident's name.");
   });
 
-  it("revalidates on the input's committed event", () => {
-    render(`<form id="admission">${field("Name", "x")}</form>`);
-    startForm([requiredField("Name", "Name", "Enter the resident's name.")]);
-    const input = document.getElementById("Name") as HTMLInputElement;
-    input.value = "";
-    input.dispatchEvent(new Event("change"));
-    expect(errorText("Name")).toBe("Enter the resident's name.");
+  it("revalidates when the input commits, by whatever name its component raises the commit", () => {
+    render(`<form id="admission"></form>`);
+    const rating = fakeWidget("Rating", { value: 4 });
+    document.getElementById("admission")!.append(rating, Object.assign(document.createElement("span"), { id: "Rating_error" }));
+    const scored: FormField = {
+      id: "Rating",
+      name: "Rating",
+      value: e.get(e.obj("Rating"), ["value"], s.number),
+      tests: [{ rule: "min", check: e.fn(["v"], e.op("gte", e.ref("v"), e.lit(1))) as never, when: e.lit(true), message: "Rate the visit." }],
+    };
+    const model: ModelPluginData = {
+      kind: "model",
+      inputs: { Rating: { name: "Rating", body: ["Rating"], value: scored.value, shape: s.number, committed: "valueChanged" } },
+    };
+    const form: FormPluginData = { kind: "form", summary: "Test_Plan_validation_summary", fields: [scored] };
+    startOwner(Owner.page(), [plan({
+      Rating: element("Rating", "fake"),
+      model: plugin("alis.model", "Test.Plan", model),
+      form: plugin("alis.form", "admission", form),
+    }, [])]);
+
+    rating.widget.value = 0;
+    rating.widget.trigger("change", {});
+    expect(errorText("Rating")).toBe("");
+
+    rating.widget.trigger("valueChanged", { value: 0 });
+    expect(errorText("Rating")).toBe("Rate the visit.");
   });
 });

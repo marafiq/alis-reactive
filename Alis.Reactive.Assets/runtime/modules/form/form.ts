@@ -9,7 +9,8 @@
 //    that fails puts its message in the summary.
 // F6 A message goes inline into {id}_error when that slot can render, else into the summary.
 // F7 At creation, and whenever HTML mounts (a field a partial loads): DOM `input` clears a field's
-//    message; DOM `blur` and its committed event revalidate it. Each element is wired once.
+//    message; DOM `blur` and alis:commit (the model re-raises each input's own commit event as it)
+//    revalidate it. Each element is wired once.
 // F8 showErrors(problem) places server errors by exact binding name; without a record body it validates.
 // F9 A slot's load or unload removes exactly its own fields, then clears and hides the summary.
 
@@ -21,7 +22,7 @@ import { Environment } from "../../grammar/environment";
 import { evaluate } from "../../grammar/evaluate";
 import { asText } from "../../grammar/shape";
 import { scope } from "../../diagnostics/trace";
-import { MOUNT_EVENT } from "../../plans/mount-events";
+import { COMMIT_EVENT, MOUNT_EVENT } from "../../plans/mount-events";
 import {
   addToSummary, canRenderInline, clearInline, clearSummary, hideSummaryDiv, removeSummaryEntry,
   showInline, showServerErrorInline, showSummaryDiv, summaryHasEntries,
@@ -222,19 +223,14 @@ function wireLive(containerId: string, entry: Entry): void {
   const recheck = (): void => revalidate(containerId, field.id);
   element.addEventListener("input", clear);
   element.addEventListener("blur", recheck);
+  element.addEventListener(COMMIT_EVENT, recheck);
   liveWiredElements.add(element);
   owner.onDispose(() => {
     element.removeEventListener("input", clear);
     element.removeEventListener("blur", recheck);
+    element.removeEventListener(COMMIT_EVENT, recheck);
     liveWiredElements.delete(element);
   });
-
-  try {
-    entry.world.subscribe(field.id, field.committed, recheck, owner);
-  } catch {
-    // The widget is not constructed yet: the committed event is not wired, as today.
-    log.trace("committed.deferred", { field: field.id });
-  }
 }
 
 // Fields a partial renders appear after their form was contributed: wire them when they mount.

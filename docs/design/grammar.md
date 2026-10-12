@@ -450,6 +450,10 @@ imports none of them. The obligations are numbered so that tests and code can ci
 - **M2 `fields`.** The same inputs, flat, keyed by MVC binding name.
 - **M3 `fill(record)`.** Writes the inputs of M1 into `record` at their body paths and returns it.
   A node already on the path keeps its other members; it is copied before it is written.
+- **M4 Commit.** Each input carries `committed`, the event its component declares as the one that
+  commits a value (`ComponentInput.Of(Value, committedBy: ...)`). When the plan that renders the
+  input starts, the model subscribes it and re-raises it on the input's element as the bubbling DOM
+  event `alis:commit`, once per element and for as long as the owner lives.
 
 ### 6.4 `form` (`plugin("alis.form", containerId)`)
 
@@ -472,7 +476,8 @@ imports none of them. The obligations are numbered so that tests and code can ci
   entry per key, replaced and never duplicated.
 - **F7 Live.** At creation (boot or slot load):
   - the DOM `input` event on a field clears its inline message;
-  - DOM `blur`, and the input's declared `Committed` event, revalidate that one field.
+  - DOM `blur` and `alis:commit` (M4) revalidate that one field. The form never names a
+    component's event, so the order in which the form and the input's plan start does not matter.
 - **F8 Server errors.** `showErrors(problem)` clears first.
   - When `problem` is a record with `errors`, it joins each field's messages with `", "` and matches
     a test field by its exact binding name. Anything else goes to the summary.

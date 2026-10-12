@@ -16,16 +16,16 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionFileUpload : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        /// <remarks>The uploader lists its files as items that each carry the browser's file as <c>rawFile</c>.</remarks>
-        public string ValueMember => "filesData[].rawFile";
-
         /// <summary>The selected files, as the browser's <c>File</c> objects a form-data request sends.</summary>
-        public ComponentProperty<IReadOnlyList<object>> Files => Property<IReadOnlyList<object>>(ValueMember);
+        /// <remarks>The uploader lists its files as items that each carry the browser's file as <c>rawFile</c>.</remarks>
+        public ComponentProperty<IReadOnlyList<object>> Files => Property<IReadOnlyList<object>>("filesData[].rawFile");
 
         /// <summary>Raised when the user selects files.</summary>
         public TypedEvent<FusionFileUploadSelectedArgs> Selected =>
             Event<FusionFileUploadSelectedArgs>("selected");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Files, committedBy: Selected);
     }
 
     /// <summary>Payload of <see cref="FusionFileUpload.Selected"/>.</summary>

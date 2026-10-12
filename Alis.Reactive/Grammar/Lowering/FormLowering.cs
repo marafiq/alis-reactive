@@ -34,7 +34,7 @@ namespace Alis.Reactive.Grammar.Lowering
             var tests = validation.Rules
                 .Select(rule => new FormTest(rule.Name, Check(rule, fieldShape), When(rule.Execution.Activation), rule.Message))
                 .ToList();
-            return new FormField(validation.Component, validation.ServerFieldName, _values.Value(validation.Value, _scope), "change", tests);
+            return new FormField(validation.Component, validation.ServerFieldName, _values.Value(validation.Value, _scope), tests);
         }
 
         private Expr When(ValidationRuleActivation activation) =>

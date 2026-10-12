@@ -253,7 +253,7 @@ namespace Alis.Reactive.Builders.Requests
             string componentId,
             ComponentVendor vendor,
             BindingPath bodyField,
-            string valueMember,
+            ComponentInput input,
             Shape shape)
         {
             if (shape == null) throw new System.ArgumentNullException(nameof(shape));
@@ -261,7 +261,7 @@ namespace Alis.Reactive.Builders.Requests
                 componentId,
                 vendor,
                 bodyField,
-                InputValueContract.For(valueMember, shape));
+                InputValueContract.For(input, shape));
         }
 
         private GatherBuilder<TModel> Include(

@@ -11,11 +11,8 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public sealed class NativeRadioGroup : NativeComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The chosen option value; empty text when none is chosen.</summary>
-        public ComponentProperty<string?> Value => Property<string?>(ValueMember);
+        public ComponentProperty<string?> Value => Property<string?>("value");
 
         /// <summary>Moves focus to the element.</summary>
         public ComponentMethod Focus => Method("focus");
@@ -23,6 +20,9 @@ namespace Alis.Reactive.Native.Components
         /// <summary>Raised when the user chooses an option.</summary>
         public TypedEvent<NativeRadioGroupChangeArgs> Change =>
             Event<NativeRadioGroupChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 
     /// <summary>Payload of <see cref="NativeRadioGroup.Change"/>, read from the hidden input.</summary>

@@ -16,11 +16,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The numeric value.</summary>
-        public ComponentProperty<decimal> Value => Property<decimal>(ValueMember);
+        public ComponentProperty<decimal> Value => Property<decimal>("value");
 
         /// <summary>The minimum allowed value.</summary>
         public ComponentProperty<decimal> Min => Property<decimal>("min");
@@ -40,6 +37,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Raised when the value changes.</summary>
         public TypedEvent<FusionNumericTextBoxChangeArgs> Change =>
             Event<FusionNumericTextBoxChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the input receives focus.</summary>
         public TypedEvent<FusionNumericTextBoxFocusArgs> Focus =>

@@ -480,6 +480,9 @@ This replaces two things:
 - the string `IInputComponent.ValueMember`;
 - the runtime's hard-coded `"change"` (`live-clear.ts:102`).
 
+As built: `IInputComponent.Input` returns `ComponentInput.Of(Value, committedBy: SomeEvent)`; the
+model carries each input's commit event and re-raises it as `alis:commit`.
+
 The uploader declares its value as its files. That removes the special case for Syncfusion's
 `rawFile` (`request-payload-writer.ts:163`).
 

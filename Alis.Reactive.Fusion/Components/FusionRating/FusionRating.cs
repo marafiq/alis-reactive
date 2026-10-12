@@ -17,11 +17,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionRating : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The rating.</summary>
-        public ComponentProperty<double> Value => Property<double>(ValueMember);
+        public ComponentProperty<double> Value => Property<double>("value");
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
         public ComponentMethod DataBind => Method("dataBind");
@@ -32,6 +29,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Raised when the rating changes.</summary>
         public TypedEvent<FusionRatingValueChangedArgs> ValueChanged =>
             Event<FusionRatingValueChangedArgs>("valueChanged");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: ValueChanged);
     }
 
     /// <summary>Payload of <see cref="FusionRating.ValueChanged"/>.</summary>

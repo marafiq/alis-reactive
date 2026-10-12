@@ -17,11 +17,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionDropDownList : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The selected value; <see langword="null"/> when empty.</summary>
-        public ComponentProperty<string?> Value => Property<string?>(ValueMember);
+        public ComponentProperty<string?> Value => Property<string?>("value");
 
         /// <summary>The text shown for the selection, without changing the selected value.</summary>
         public ComponentProperty<string?> Text => Property<string?>("text");
@@ -48,6 +45,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Raised when the selected value changes.</summary>
         public TypedEvent<FusionDropDownListChangeArgs> Change =>
             Event<FusionDropDownListChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the list receives focus.</summary>
         public TypedEvent<FusionDropDownListFocusArgs> Focus =>

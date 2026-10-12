@@ -16,14 +16,14 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionSwitch : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "checked";
-
         /// <summary>Whether the switch is on.</summary>
-        public ComponentProperty<bool> Checked => Property<bool>(ValueMember);
+        public ComponentProperty<bool> Checked => Property<bool>("checked");
 
         /// <summary>Raised when the switch is turned on or off.</summary>
         public TypedEvent<FusionSwitchChangeArgs> Change => Event<FusionSwitchChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Checked, committedBy: Change);
     }
 
     /// <summary>Payload of <see cref="FusionSwitch.Change"/>.</summary>

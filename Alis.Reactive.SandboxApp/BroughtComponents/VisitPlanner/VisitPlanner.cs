@@ -28,12 +28,8 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
 
         /// <inheritdoc />
         public override ComponentVendor Vendor => VisitPlannerVendor;
-
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The booked time ids, in the week's order. Setting it raises no event.</summary>
-        public ComponentProperty<IReadOnlyList<string>> Value => Property<IReadOnlyList<string>>(ValueMember);
+        public ComponentProperty<IReadOnlyList<string>> Value => Property<IReadOnlyList<string>>("value");
 
         /// <summary>How many visits the resident's week allows.</summary>
         public ComponentProperty<int> Capacity => Property<int>("capacity");
@@ -89,8 +85,14 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// <summary>Moves focus to the first time that can be booked.</summary>
         public ComponentMethod Focus => Method("focus");
 
-        /// <summary>Raised when the booked times change, by the user or by a method.</summary>
-        public TypedEvent<VisitPlannerChangeArgs> Change => Event<VisitPlannerChangeArgs>("change");
+        /// <summary>
+        /// Raised when the booked times change, by the user or by a method. The planner names it its own
+        /// way; as its input's commit event it is the event a form checks the field again on.
+        /// </summary>
+        public TypedEvent<VisitPlannerWeekChangedArgs> WeekChanged => Event<VisitPlannerWeekChangedArgs>("weekChanged");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: WeekChanged);
 
         /// <summary>Raised instead of booking when the week is full.</summary>
         public TypedEvent<VisitPlannerFullArgs> Full => Event<VisitPlannerFullArgs>("full");
@@ -115,8 +117,8 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         public bool Quiet { get; set; }
     }
 
-    /// <summary>Payload of <see cref="VisitPlanner.Change"/>.</summary>
-    public class VisitPlannerChangeArgs
+    /// <summary>Payload of <see cref="VisitPlanner.WeekChanged"/>.</summary>
+    public class VisitPlannerWeekChangedArgs
     {
         public List<string> Value { get; set; } = new List<string>();
 

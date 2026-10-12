@@ -5,8 +5,9 @@
 //   properties  value (booked slot ids), capacity, wing, readOnly, slots, labels.empty, count (read only)
 //   functions   remaining(), isBooked(id), firstOpen(), firstBooked(), summary() (a promise)
 //   methods     select(id), release(id), clear(), book(id, visitors, note), focus(), prepareSummary() (a promise)
-//   events      change, full (its payload can waitlist the time), beforeBook (cancelable), slotsLoaded,
-//               through on(name, fn) / off(name, fn)
+//   events      weekChanged, full (its payload can waitlist the time), beforeBook (cancelable),
+//               slotsLoaded, through on(name, fn) / off(name, fn). Its commit event is weekChanged,
+//               not "change": a form learns it from the declaration, not from a convention.
 
 import "./visit-planner.css";
 
@@ -65,7 +66,7 @@ export class VisitPlanner {
     return [...this.booked];
   }
 
-  /** Replaces the booked times without raising change, as a form field's value would. */
+  /** Replaces the booked times without raising weekChanged, as a form field's value would. */
   set value(ids: string[]) {
     this.booked = this.inOfferedOrder(ids ?? []);
     this.render();
@@ -134,7 +135,7 @@ export class VisitPlanner {
 
   /**
    * Books a time. beforeBook listeners may cancel it; a full week raises full instead. A booking
-   * raises change.
+   * raises weekChanged.
    */
   select(id: string): void {
     const slot = this.offered.find(candidate => candidate.id === id);
@@ -230,7 +231,7 @@ export class VisitPlanner {
   };
 
   private emitChange(added: string | null, removed: string | null): void {
-    this.emit("change", { value: this.value, added, removed, count: this.count, remaining: this.remaining() });
+    this.emit("weekChanged", { value: this.value, added, removed, count: this.count, remaining: this.remaining() });
   }
 
   private emit(name: string, payload: unknown): void {

@@ -97,12 +97,13 @@ These are the dependencies the release inverts.
 **C# core**
 - Declaration APIs are internal; Fusion and Native reach them through `InternalsVisibleTo`
   (`Alis.Reactive.csproj:69`); 24 slice files hand-write payload members with `ReactionGraph`.
-- An input's value must be one named property: `IInputComponent.ValueMember` feeds registration,
-  gather, validation; unregistered fields fall back to the literal `"value"` member.
+- ~~An input's value must be one named property: `IInputComponent.ValueMember` feeds registration,
+  gather, validation~~: closed. An input declares `ComponentInput` (its value property and the
+  event that commits it); fields another plan renders still read the literal `"value"` member.
 - `RegisteredInputValueRead.ForFusionInPlaceEditorValueRead` (`RegisteredInputValueRead.cs:28`).
 - ~~`ComponentVendor.Fusion` token~~: closed by D2 (`FusionComponent.FusionVendor` declares it);
   EJ2-specific projections remain in `ClientRule.cs:21-26`.
-- `Include<TComponent>` reads `ValueMember`; `NativeGatherExtensions` assumes NativeTextBox.
+- `Include<TComponent>` reads the input's declared value; `NativeGatherExtensions` assumes NativeTextBox.
 - Method contracts are keyed per component instance, so two arities of one member on one grid
   throw (`BrowserObjectContract.cs:257-268`); `Mapped` aliases dodge it.
 

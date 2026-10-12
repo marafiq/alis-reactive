@@ -15,9 +15,11 @@ namespace Alis.Reactive
     public interface IInputComponent : IComponent
     {
         /// <summary>
-        /// Component member read by gather and validation for model-bound inputs.
+        /// The property that holds the input's value and the event that commits it. Implement it
+        /// explicitly, so it stays off the members a page reads and calls:
+        /// <c>ComponentInput IInputComponent.Input =&gt; ComponentInput.Of(Value, committedBy: Change);</c>
         /// </summary>
-        string ValueMember { get; }
+        ComponentInput Input { get; }
     }
 
     /// <summary>

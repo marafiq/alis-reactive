@@ -21,14 +21,18 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionSmartTextArea : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The text; <see langword="null"/> when empty.</summary>
-        public ComponentProperty<string?> Value => Property<string?>(ValueMember);
+        public ComponentProperty<string?> Value => Property<string?>("value");
 
         /// <summary>Moves focus into the text area.</summary>
         public ComponentMethod FocusIn => Method("focusIn");
+
+        /// <summary>Raised when the text is committed (on blur after an edit), as the EJ2 TextArea it extends.</summary>
+        public TypedEvent<FusionSmartTextAreaChangeArgs> Change =>
+            Event<FusionSmartTextAreaChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised before a suggestion is inserted.</summary>
         public TypedEvent<FusionSmartTextAreaBeforeSuggestionInsertArgs> BeforeSuggestionInsert =>
@@ -37,6 +41,19 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Raised after a suggestion is inserted.</summary>
         public TypedEvent<FusionSmartTextAreaAfterSuggestionInsertArgs> AfterSuggestionInsert =>
             Event<FusionSmartTextAreaAfterSuggestionInsertArgs>("afterSuggestionInsert");
+    }
+
+    /// <summary>Payload of <see cref="FusionSmartTextArea.Change"/>.</summary>
+    public class FusionSmartTextAreaChangeArgs
+    {
+        /// <summary>Text after the change.</summary>
+        public string? Value { get; set; }
+
+        /// <summary>Previously committed text.</summary>
+        public string? PreviousValue { get; set; }
+
+        /// <summary>Whether user interaction triggered the change.</summary>
+        public bool IsInteracted { get; set; }
     }
 
     /// <summary>Payload of <see cref="FusionSmartTextArea.BeforeSuggestionInsert"/>.</summary>

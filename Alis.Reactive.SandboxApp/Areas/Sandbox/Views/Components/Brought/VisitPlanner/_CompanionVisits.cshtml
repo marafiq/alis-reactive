@@ -20,7 +20,7 @@
 <native-vstack gap="Sm">
     @{ Html.InputField(plan, m => m.VisitSlots, o => o.Label("Companion's visit times"))
         .VisitPlanner(capacity: 1)
-        .Reactive(evt => evt.Change, (args, p) =>
+        .Reactive(evt => evt.WeekChanged, (args, p) =>
         {
             p.Element("companion-planned").SetText(args, x => x.Count);
             p.Post(Url.SandboxRoute("CompanionHold", "VisitPlanner"), g => g.IncludeAll())

@@ -57,7 +57,6 @@ export interface FormField {
   id: string;
   name: string;
   value: Expr;
-  committed: string;
   tests: FormTest[];
 }
 
@@ -158,6 +157,7 @@ export interface InputBinding {
   body: (string | number)[];
   value: Expr;
   shape: Shape;
+  committed: string;
 }
 
 export interface NoPluginData {

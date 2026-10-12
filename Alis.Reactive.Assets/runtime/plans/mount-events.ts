@@ -4,6 +4,9 @@
 //   alis:unmount — wired HTML is about to be removed; destroy widgets inside detail.root.
 // Both fire synchronously, so a widget constructed in an alis:mount listener exists when the
 // runtime locates it.
+//
+//   alis:commit  — an input committed a value. Raised on the input's element (bubbling) whatever the
+//   component calls its own event (change, valueChanged, selected…), so a form hears one event.
 
 export interface MountEventDetail {
   readonly root: HTMLElement;
@@ -11,6 +14,7 @@ export interface MountEventDetail {
 
 export const MOUNT_EVENT = "alis:mount";
 export const UNMOUNT_EVENT = "alis:unmount";
+export const COMMIT_EVENT = "alis:commit";
 
 export function announceMount(root: HTMLElement): void {
   announce(MOUNT_EVENT, root);

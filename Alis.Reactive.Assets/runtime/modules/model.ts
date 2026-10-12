@@ -8,6 +8,9 @@
 // M2 `fields`: the same inputs, flat, keyed by MVC binding name; `arrays` names those holding arrays.
 // M3 `valueOf(id)`: one input's value, for a plan that reads a field another plan rendered; missing
 //    when no plan of the composition rendered it.
+// M4 Each input's `committed` event is re-raised on its element as alis:commit, once per element and
+//    for as long as its owner lives. The plan that renders an input contributes it, so the widget
+//    exists by then, whenever the form that validates it was wired.
 
 import type { InputBinding, Shape } from "../types/index";
 import type { Contribution, Module } from "../objects/modules";
@@ -15,6 +18,12 @@ import type { PlanWorld } from "../objects/world";
 import { Environment } from "../grammar/environment";
 import { evaluate } from "../grammar/evaluate";
 import { shaped } from "../grammar/shape";
+import type { Owner } from "../objects/owner";
+import { COMMIT_EVENT } from "../plans/mount-events";
+import { scope } from "../diagnostics/trace";
+import { toJavaScriptString } from "../shared/javascript-string";
+
+const log = scope("model");
 
 export interface ModelInput {
   readonly id: string;
@@ -127,6 +136,7 @@ export const modelModule: Module = {
       const input: ModelInput = { id, binding, world };
       inputs.set(id, input);
       added.push(input);
+      announceCommits(input, owner);
     }
     owner.onDispose(() => {
       for (const input of added) {
@@ -135,6 +145,26 @@ export const modelModule: Module = {
     });
   },
 };
+
+// Elements whose commit event is already re-raised: a view and its partial may both declare an input.
+const announcing = new WeakSet<HTMLElement>();
+
+function announceCommits(input: ModelInput, owner: Owner): void {
+  const element = input.world.element(input.id);
+  if (element === null || announcing.has(element)) return;
+
+  const announce = (): void => {
+    element.dispatchEvent(new CustomEvent(COMMIT_EVENT, { bubbles: true }));
+  };
+  try {
+    input.world.subscribe(input.id, input.binding.committed, announce, owner);
+  } catch (error) {
+    log.error("input.commit-unwired", { input: input.id, event: input.binding.committed, error: toJavaScriptString(error) });
+    return;
+  }
+  announcing.add(element);
+  owner.onDispose(() => announcing.delete(element));
+}
 
 export function modelFor(planId: string): ModelObject {
   return modelObject(planId);

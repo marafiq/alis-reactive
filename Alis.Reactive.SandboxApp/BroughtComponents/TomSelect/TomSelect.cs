@@ -28,12 +28,9 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// <inheritdoc />
         public override ComponentVendor Vendor => TomSelectVendor;
 
-        /// <inheritdoc />
-        /// <remarks>Tom Select keeps the original select in sync; its value is what a form posts.</remarks>
-        public string ValueMember => "input.value";
-
         /// <summary>The selected value, read from the original select. Change it with <see cref="SetValue"/>.</summary>
-        public ComponentProperty<string> Value => Property<string>(ValueMember);
+        /// <remarks>Tom Select keeps the original select in sync; its value is what a form posts.</remarks>
+        public ComponentProperty<string> Value => Property<string>("input.value");
 
         /// <summary>Selects an option by its value and raises <see cref="Change"/>.</summary>
         public ComponentMethod<string> SetValue => Method<string>("setValue");
@@ -43,6 +40,9 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
 
         /// <summary>Raised when the selection changes, by the user or by <see cref="SetValue"/>.</summary>
         public TypedEvent<TomSelectChangeArgs> Change => Event<TomSelectChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 
     /// <summary>

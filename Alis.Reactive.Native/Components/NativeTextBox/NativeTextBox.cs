@@ -12,11 +12,8 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public sealed class NativeTextBox : NativeComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The input value; empty text when nothing is entered.</summary>
-        public ComponentProperty<string?> Value => Property<string?>(ValueMember);
+        public ComponentProperty<string?> Value => Property<string?>("value");
 
         /// <summary>Moves focus to the element.</summary>
         public ComponentMethod Focus => Method("focus");
@@ -24,6 +21,9 @@ namespace Alis.Reactive.Native.Components
         /// <summary>Raised when the value changes and the element loses focus.</summary>
         public TypedEvent<NativeTextBoxChangeArgs> Change =>
             Event<NativeTextBoxChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 
     /// <summary>Payload of <see cref="NativeTextBox.Change"/>, read from the element.</summary>

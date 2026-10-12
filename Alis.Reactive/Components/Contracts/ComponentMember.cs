@@ -31,6 +31,8 @@ namespace Alis.Reactive
 
         internal string Member => _member.Value;
 
+        internal Path Path => _path;
+
         internal Shape Shape => _shape;
 
         internal ObjectPropertyContract ContractFor(MemberAccess access)

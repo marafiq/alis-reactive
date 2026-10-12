@@ -16,11 +16,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionDropDownTree : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The selected node values; <see langword="null"/> clears them.</summary>
-        public ComponentProperty<string[]?> Value => Property<string[]?>(ValueMember);
+        public ComponentProperty<string[]?> Value => Property<string[]?>("value");
 
         /// <summary>The text shown for the selection.</summary>
         public ComponentProperty<string?> Text => Property<string?>("text");
@@ -40,6 +37,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Raised when the selection changes.</summary>
         public TypedEvent<FusionDropDownTreeChangeArgs> Change =>
             Event<FusionDropDownTreeChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 
     /// <summary>Payload of <see cref="FusionDropDownTree.Change"/>.</summary>

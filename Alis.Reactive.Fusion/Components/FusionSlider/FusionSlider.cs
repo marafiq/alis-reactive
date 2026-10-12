@@ -17,11 +17,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionSlider : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The value of a single-handle slider.</summary>
-        public ComponentProperty<double> Value => Property<double>(ValueMember);
+        public ComponentProperty<double> Value => Property<double>("value");
 
         /// <summary>The start and end of a range slider.</summary>
         public ComponentProperty<double[]> RangeValue => Property<double[]>("value");
@@ -36,6 +33,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Raised when the handle comes to rest.</summary>
         public TypedEvent<FusionSliderChangeArgs> Changed =>
             Event<FusionSliderChangeArgs>("changed");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Changed);
     }
 
     /// <summary>Payload of <see cref="FusionSlider.Change"/> and <see cref="FusionSlider.Changed"/>.</summary>

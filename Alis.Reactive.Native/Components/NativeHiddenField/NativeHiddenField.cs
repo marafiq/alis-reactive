@@ -19,15 +19,15 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public sealed class NativeHiddenField : NativeComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The hidden value.</summary>
-        public ComponentProperty<string?> Value => Property<string?>(ValueMember);
+        public ComponentProperty<string?> Value => Property<string?>("value");
 
         /// <summary>Raised when a script changes the value and raises <c>change</c>.</summary>
         public TypedEvent<NativeHiddenFieldChangeArgs> Change =>
             Event<NativeHiddenFieldChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 
     /// <summary>Payload of <see cref="NativeHiddenField.Change"/>, read from the element.</summary>

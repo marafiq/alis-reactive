@@ -71,10 +71,11 @@ namespace Alis.Reactive.PlanModel
             new NoInputBinding();
 
 
-        internal static InputBinding RegisteredInput(BindingPath bindingPath, MemberName valueMember) =>
+        internal static InputBinding RegisteredInput(BindingPath bindingPath, MemberName valueMember, EventName committedBy) =>
             new RegisteredInputBinding(
                 bindingPath,
-                valueMember);
+                valueMember,
+                committedBy);
 
         internal abstract InputBinding FillIfAbsent(InputBinding incoming);
     }
@@ -93,16 +94,21 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly BindingPath _bindingPath;
         private readonly MemberName _valueMember;
+        private readonly EventName _committedBy;
 
-        internal RegisteredInputBinding(BindingPath bindingPath, MemberName valueMember)
+        internal RegisteredInputBinding(BindingPath bindingPath, MemberName valueMember, EventName committedBy)
         {
             _bindingPath = bindingPath ?? throw new System.ArgumentNullException(nameof(bindingPath));
             _valueMember = valueMember ?? throw new System.ArgumentNullException(nameof(valueMember));
+            _committedBy = committedBy ?? throw new System.ArgumentNullException(nameof(committedBy));
         }
 
         public string BindingPath => _bindingPath.Value;
         public Path Path => _bindingPath.Path;
         public string ValueMember => _valueMember.Value;
+
+        /// <summary>The event the input raises when a value is committed.</summary>
+        public string CommittedBy => _committedBy.Value;
 
         internal override InputBinding FillIfAbsent(InputBinding incoming)
         {
@@ -111,49 +117,44 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
+    // An input as its component declares it (ComponentInput): the property that holds the value,
+    // read in the model's shape, and the event that commits it.
     internal sealed class InputValueContract
     {
-        private static readonly MemberName CanonicalValueMember = MemberName.Of("value");
-        private readonly MemberName _valueMember;
+        internal static readonly MemberName CanonicalValueMember = MemberName.Of("value");
+        private readonly ComponentInput _input;
 
-        private InputValueContract(MemberName valueMember, Shape shape)
+        private InputValueContract(ComponentInput input, Shape shape)
         {
-            _valueMember = valueMember ?? throw new System.ArgumentNullException(nameof(valueMember));
+            _input = input ?? throw new System.ArgumentNullException(nameof(input));
             Shape = shape ?? throw new System.ArgumentNullException(nameof(shape));
         }
 
-        internal string ValueMember => _valueMember.Value;
+        internal string ValueMember => _input.ValueMember.Value;
 
         internal Shape Shape { get; }
 
-        internal static InputValueContract For(string valueMember, Shape shape) =>
-            For(MemberName.Of(valueMember), shape);
-
-        internal static InputValueContract For(MemberName valueMember, Shape shape) =>
-            new InputValueContract(valueMember, shape);
-
-        internal static InputValueContract ForCanonicalValue(Shape shape) =>
-            For(CanonicalValueMember, shape);
+        internal static InputValueContract For(ComponentInput input, Shape shape) =>
+            new InputValueContract(input, shape);
 
         internal InputBinding BindingFor(BindingPath bindingPath) =>
-            InputBinding.RegisteredInput(bindingPath, _valueMember);
+            InputBinding.RegisteredInput(bindingPath, _input.ValueMember, _input.CommittedBy);
 
         internal void Enrich(BrowserObjectContract objectContract)
         {
             if (objectContract == null) throw new System.ArgumentNullException(nameof(objectContract));
 
-            var valuePath = Path.Parse(ValueMember);
             objectContract.Declare(ObjectPropertyContract.Create(
-                _valueMember,
-                valuePath,
+                _input.ValueMember,
+                _input.ValuePath,
                 Shape,
                 MemberAccess.Read));
 
-            var valueMemberNeedsCanonicalAlias = !_valueMember.Equals(CanonicalValueMember);
+            var valueMemberNeedsCanonicalAlias = !_input.ValueMember.Equals(CanonicalValueMember);
             if (valueMemberNeedsCanonicalAlias)
                 objectContract.Declare(ObjectPropertyContract.Create(
                     CanonicalValueMember,
-                    valuePath,
+                    _input.ValuePath,
                     Shape,
                     MemberAccess.Read));
         }

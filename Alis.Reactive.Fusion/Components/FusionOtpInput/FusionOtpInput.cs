@@ -17,11 +17,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionOtpInput : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The passcode; <see langword="null"/> when empty.</summary>
-        public ComponentProperty<string?> Value => Property<string?>(ValueMember);
+        public ComponentProperty<string?> Value => Property<string?>("value");
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
         public ComponentMethod DataBind => Method("dataBind");
@@ -39,6 +36,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Raised when the complete passcode changes.</summary>
         public TypedEvent<FusionOtpInputValueChangedArgs> ValueChanged =>
             Event<FusionOtpInputValueChangedArgs>("valueChanged");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: ValueChanged);
 
         /// <summary>Raised when a field receives focus.</summary>
         public TypedEvent<FusionOtpInputFocusArgs> Focus =>

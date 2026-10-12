@@ -17,11 +17,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionTimePicker : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The selected time; the picker keeps the time of day.</summary>
-        public ComponentProperty<DateTime> Value => Property<DateTime>(ValueMember);
+        public ComponentProperty<DateTime> Value => Property<DateTime>("value");
 
         /// <summary>Moves focus into the input.</summary>
         public ComponentMethod FocusIn => Method("focusIn");
@@ -32,6 +29,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Raised when the selected time changes.</summary>
         public TypedEvent<FusionTimePickerChangeArgs> Change =>
             Event<FusionTimePickerChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 
     /// <summary>Payload of <see cref="FusionTimePicker.Change"/>.</summary>

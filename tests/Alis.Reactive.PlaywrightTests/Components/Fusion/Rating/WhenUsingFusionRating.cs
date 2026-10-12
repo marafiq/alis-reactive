@@ -21,6 +21,7 @@ public class WhenUsingFusionRating : PlaywrightTestBase
     private ILocator RestoreButton => Page.Locator("#restore-rating");
     private ILocator ClearButton => Page.Locator("#clear-rating");
     private ILocator SubmitButton => Page.Locator("#survey-submit");
+    private ILocator RatingError => Page.Locator($"#{SatisfactionScoreId}_error");
 
     private async Task OpenSurvey()
     {
@@ -91,6 +92,36 @@ public class WhenUsingFusionRating : PlaywrightTestBase
         await Expect(ReadinessText)
             .ToHaveTextAsync("Your rating was cleared. Please rate your care to continue.");
 
+        AssertNoConsoleErrors();
+    }
+
+    // VALIDATES and LIVE-CLEARS — the rating commits with valueChanged, the event its declaration names.
+    // A cleared rating is checked again at once, and choosing a star clears the request, with no blur
+    // and no second submit.
+    [Test]
+    public async Task an_unrated_survey_asks_for_a_star_and_choosing_one_clears_the_request()
+    {
+        var surveysSent = 0;
+        Page.Request += (_, request) =>
+        {
+            if (request.Url.Contains("/Sandbox/Components/Rating/Echo")) surveysSent++;
+        };
+        await OpenSurvey();
+
+        await ClearButton.ClickAsync();
+        await Expect(RatingError).ToHaveTextAsync("Choose at least one star to rate your care.");
+
+        await SubmitButton.ClickAsync();
+        await Expect(RatingError).ToHaveTextAsync("Choose at least one star to rate your care.");
+        await Expect(Confirmation).ToHaveTextAsync("");
+        Assert.That(surveysSent, Is.EqualTo(0), "An unrated survey is not sent.");
+
+        await SatisfactionRating.RateStars(4);
+        await Expect(RatingError).ToBeHiddenAsync();
+
+        await SubmitButton.ClickAsync();
+        await Expect(Confirmation)
+            .ToHaveTextAsync("Thank you. We recorded your satisfaction rating of 4 of 5 stars.", new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
 

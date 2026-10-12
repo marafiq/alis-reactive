@@ -17,11 +17,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionAutoComplete : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The selected value; <see langword="null"/> when empty.</summary>
-        public ComponentProperty<string?> Value => Property<string?>(ValueMember);
+        public ComponentProperty<string?> Value => Property<string?>("value");
 
         /// <summary>The text shown in the input, without changing the selected value.</summary>
         public ComponentProperty<string?> Text => Property<string?>("text");
@@ -51,6 +48,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Raised when the selected value changes.</summary>
         public TypedEvent<FusionAutoCompleteChangeArgs> Change =>
             Event<FusionAutoCompleteChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised as the user types, before the popup filters its items.</summary>
         public TypedEvent<FusionAutoCompleteFilteringArgs> Filtering =>

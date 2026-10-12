@@ -16,11 +16,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionInPlaceEditor : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The edited value.</summary>
-        public ComponentProperty<string?> Value => Property<string?>(ValueMember);
+        public ComponentProperty<string?> Value => Property<string?>("value");
 
         /// <summary>Disables (<see langword="true"/>) or enables the editor.</summary>
         public ComponentMethod<bool> Disable => Method<bool>("disable");
@@ -48,6 +45,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Raised when the value changes.</summary>
         public TypedEvent<FusionInPlaceEditorChangeArgs> Change =>
             Event<FusionInPlaceEditorChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised before the value is submitted.</summary>
         public TypedEvent<FusionInPlaceEditorActionBeginArgs> ActionBegin =>

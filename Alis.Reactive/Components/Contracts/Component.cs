@@ -9,11 +9,12 @@ namespace Alis.Reactive
     /// <code>
     /// public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
     /// {
-    ///     public string ValueMember => "value";
+    ///     public ComponentProperty&lt;decimal&gt; Value => Property&lt;decimal&gt;("value");
     ///     public ComponentProperty&lt;decimal&gt; Min => Property&lt;decimal&gt;("min");
     ///     public ComponentMethod Increment => Method("increment");
     ///     public TypedEvent&lt;FusionNumericTextBoxChangeArgs&gt; Change =>
     ///         Event&lt;FusionNumericTextBoxChangeArgs&gt;("change");
+    ///     ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     /// }
     /// </code>
     /// </example>

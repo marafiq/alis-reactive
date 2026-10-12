@@ -17,11 +17,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionMultiColumnComboBox : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The selected value; <see langword="null"/> when empty.</summary>
-        public ComponentProperty<string?> Value => Property<string?>(ValueMember);
+        public ComponentProperty<string?> Value => Property<string?>("value");
 
         /// <summary>The text shown for the selection.</summary>
         public ComponentProperty<string?> Text => Property<string?>("text");
@@ -47,6 +44,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Raised when the selection changes.</summary>
         public TypedEvent<FusionMultiColumnComboBoxChangeArgs> Change =>
             Event<FusionMultiColumnComboBoxChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 
     /// <summary>Payload of <see cref="FusionMultiColumnComboBox.Change"/>.</summary>

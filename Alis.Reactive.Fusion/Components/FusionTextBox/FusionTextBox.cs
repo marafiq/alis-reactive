@@ -17,11 +17,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionTextBox : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The text; <see langword="null"/> when empty.</summary>
-        public ComponentProperty<string?> Value => Property<string?>(ValueMember);
+        public ComponentProperty<string?> Value => Property<string?>("value");
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
         public ComponentMethod DataBind => Method("dataBind");
@@ -42,6 +39,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Raised when the text changes and focus leaves the input.</summary>
         public TypedEvent<FusionTextBoxChangeArgs> Change =>
             Event<FusionTextBoxChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the input receives focus.</summary>
         public TypedEvent<FusionTextBoxFocusArgs> Focus =>

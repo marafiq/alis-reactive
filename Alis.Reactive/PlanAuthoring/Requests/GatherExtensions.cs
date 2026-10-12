@@ -15,7 +15,7 @@ namespace Alis.Reactive.Builders.Requests
         /// </summary>
         /// <remarks>
         /// Model expression supplies both the generated component ID and the request
-        /// body field name. The component contract supplies the value member read at runtime.
+        /// body field name. The component's input declaration supplies the value it reads.
         /// </remarks>
         /// <typeparam name="TComponent">Input component contract to read.</typeparam>
         /// <param name="expr">Model property expression for the component ID and body field.</param>
@@ -29,7 +29,7 @@ namespace Alis.Reactive.Builders.Requests
             var elementId = IdGenerator.For(expr);
             var bodyField = ExpressionPathHelper.ToMemberBindingPath(expr);
             var shape = Shape.FromClrType(ExpressionPathHelper.ToPropertyType(expr));
-            self.Include(elementId, component.Vendor, bodyField, component.ValueMember, shape);
+            self.Include(elementId, component.Vendor, bodyField, component.Input, shape);
             return self;
         }
 
@@ -37,8 +37,8 @@ namespace Alis.Reactive.Builders.Requests
         /// Adds a component value to the request body by explicit component ID.
         /// </summary>
         /// <remarks>
-        /// Input components read their configured value member. Components without an
-        /// input-value contract read the member named by <paramref name="name"/>.
+        /// Input components read the value they declare. Components that are not inputs read
+        /// the member named by <paramref name="name"/>.
         /// </remarks>
         /// <typeparam name="TComponent">Component contract to read.</typeparam>
         /// <param name="refId">Explicit controlled component ID rendered in markup.</param>
@@ -53,7 +53,7 @@ namespace Alis.Reactive.Builders.Requests
             var component = new TComponent();
             var valueMember = name;
             if (component is IInputComponent input)
-                valueMember = input.ValueMember;
+                valueMember = input.Input.ValueMember.Value;
 
             self.Include(refId, component.Vendor, name, valueMember);
             return self;

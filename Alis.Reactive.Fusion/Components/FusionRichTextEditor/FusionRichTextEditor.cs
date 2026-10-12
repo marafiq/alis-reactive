@@ -16,11 +16,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionRichTextEditor : FusionComponent, IInputComponent
     {
-        /// <inheritdoc />
-        public string ValueMember => "value";
-
         /// <summary>The content as HTML; <see langword="null"/> when empty.</summary>
-        public ComponentProperty<string?> Value => Property<string?>(ValueMember);
+        public ComponentProperty<string?> Value => Property<string?>("value");
 
         /// <summary>Moves focus into the editor.</summary>
         public ComponentMethod FocusIn => Method("focusIn");
@@ -28,6 +25,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Raised when the content changes and focus leaves the editor.</summary>
         public TypedEvent<FusionRichTextEditorChangeArgs> Change =>
             Event<FusionRichTextEditorChangeArgs>("change");
+
+        /// <inheritdoc />
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 
     /// <summary>Payload of <see cref="FusionRichTextEditor.Change"/>.</summary>

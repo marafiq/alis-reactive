@@ -44,9 +44,10 @@ simply the first ones.
 
 6. **The core names no vendor.** A vendor is data its package declares (`ComponentVendor`): where
    the object lives on the element, how to subscribe and unsubscribe, and what an event hands the
-   listener. The plan carries it; the runtime has one driver. An input's value is a declared
-   property path (it may be nested, such as `input.value`), and its `change` event drives live
-   validation.
+   listener. The plan carries it; the runtime has one driver. An input declares its value (a
+   property, which may be nested, such as `input.value`) and the event that commits it
+   (`ComponentInput.Of(Value, committedBy: ...)`). The model re-raises that event as `alis:commit`
+   on the input's element, and a form re-checks the field on it; no event name is assumed.
 
 7. **Playwright proves it, one component at a time.** A component is brought when its journeys
    pass in a real browser.
@@ -58,13 +59,13 @@ What a developer writes to bring a component. Syncfusion's NumericTextBox, as it
 ```csharp
 public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
 {
-    public string ValueMember => "value";
-
-    public ComponentProperty<decimal> Value => Property<decimal>(ValueMember);
+    public ComponentProperty<decimal> Value => Property<decimal>("value");
     public ComponentProperty<decimal> Min => Property<decimal>("min");
     public ComponentMethod Increment => Method("increment");
     public TypedEvent<FusionNumericTextBoxChangeArgs> Change =>
         Event<FusionNumericTextBoxChangeArgs>("change");
+
+    ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 }
 
 public class FusionNumericTextBoxChangeArgs
