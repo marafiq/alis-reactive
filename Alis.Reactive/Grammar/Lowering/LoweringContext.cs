@@ -216,13 +216,7 @@ namespace Alis.Reactive.Grammar.Lowering
         /// routes it is nested in; the innermost for <see cref="ResponseHandle.Innermost"/>. None when
         /// the read is outside that request's routes.
         /// </summary>
-        internal string? ResponseOf(ResponseHandle handle)
-        {
-            if (handle == ResponseHandle.Innermost) return Response;
-            for (var frame = _responses; frame != null; frame = frame.Outer)
-                if (frame.Handle == handle) return frame.Binding;
-            return null;
-        }
+        internal string? ResponseOf(ResponseHandle handle) => Response;
 
         internal LoweringScope WithResponse(ResponseHandle handle, string binding) =>
             new LoweringScope(EventParam, new ResponseFrame(handle, binding, _responses), _element, ReadsInputsAsBound);
