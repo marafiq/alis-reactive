@@ -35,10 +35,13 @@ namespace Alis.Reactive.Builders.Requests
             return RequireShape<TProp>("route param", name.Value);
         }
 
+        // A query key may repeat, and MVC binds an array from every value; a scalar takes the first.
         internal static Shape UrlQueryParameter<TProp>(UrlParameterName name)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return RequireShape<TProp>("URL param", name.Value);
+            var shape = Shape.FromClrType(typeof(TProp));
+            var isArrayOfScalars = shape.TryGetArrayItemShape(out var item) && item.IsScalar;
+            return isArrayOfScalars ? shape : RequireShape<TProp>("URL param", name.Value);
         }
 
         private static Shape RequireShape<TProp>(string label, string name)
@@ -47,7 +50,7 @@ namespace Alis.Reactive.Builders.Requests
             if (!shape.IsScalar)
                 throw new InvalidOperationException(
                     $"{label} '{name}' requires a scalar type, but got shape '{shape.DescribeContract()}'. " +
-                    "Use string, int, bool, DateTime, or their nullable variants.");
+                    "Use string, int, bool, DateTime, or their nullable variants" + (label == "URL param" ? ", or an array of them." : "."));
 
             return shape;
         }
