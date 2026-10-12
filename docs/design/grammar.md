@@ -373,7 +373,7 @@ The owner's fluent API keeps its shape. Every method lowers to fixed productions
 | `.Into(slotId)` | `do(call(slot, ["load"], [ref res.body]))` |
 | `p.ValidationErrors(container)` | in a response route: `do(call(form, ["showErrors"], [ref res.body]))`; elsewhere: `do(call(form, ["validate"]))` |
 | `p.Parallel(a, b).OnAllSettled(c)` | `all(a, b); c` |
-| `p.Url<T>().Get(q => q.X)` | `get(get(document, ["query"]), ["x"], shape)`: a member read, then an optional data read |
+| `p.FromUrl<T>("x")` | `get(get(document, ["query"]), ["x"], shape)`; an array `T` reads `queryAll` |
 | `tools.Count(items, "status")`, a plugin member | `call(plugin, ["count"], [..], shape)` |
 | `Html.NativeActionLink(id, text, url, link => …)` | the anchor plus its own plan script: `on(link, "click", e) { if (!modified(e)) { e.preventDefault(); … } }` |
 
@@ -393,9 +393,10 @@ if (form.validate()) {                            // .Validate<V>(container); ou
 }
 ```
 
-- **Gather.** `Gather<T>` is decided in C# at render. The members whose names match a `{placeholder}`
-  (case-insensitive, as MVC route values are) go to `route`, keyed exactly as the template spells
-  them. The rest go to `values`. A value needed in both the path and the body is two members.
+- **Gather.** Each gathered value names its target in C#, decided at render: `RouteParam` fills a
+  `{placeholder}` of the URL (`route`), `Header` a header, and `Include`, `Static`, `FromUrl`,
+  `FromEvent` and `IncludeAll` the body (`values`). A value needed in both the path and the body is
+  gathered twice.
 - **Keys.** `values` is a nested record for JSON. For form data it is flat, keyed by MVC binding
   names (`Address.City`, `Lines[0].Sku`), because only C# knows a dictionary from an object.
 - **`IncludeAll()`** writes every input into the authored JSON record leaf by leaf with
@@ -645,7 +646,7 @@ Each change is deliberate and named here, so that nothing changes silently. The 
 | `NotEmpty` on a collection of complex items is server-only | validation 74 | It has no input. Today it always blocks, which is a defect. |
 | `Include` enforces on the server as well | validation 76 | Today `ClientRulesFrom` is browser-only. |
 | `AddReactiveClientValidation` is replaced by FluentValidation validators registered through DI | validation 77 | A browser rule always has a server rule behind it. |
-| `p.Url<T>()` matches keys case-insensitively, and array members read every value | conditions 14-16, 68, 138; http 26, 38, 42-50 | It is typed by the class the action binds, so it reads the way MVC binds. Today it is case-sensitive and reads the first value. This widens matching only. |
+| `p.FromUrl(..)` matches keys case-insensitively, and an array reads every value | conditions 14-16, 68, 138; http 26, 38, 42-50 | It reads the query the way MVC binds it. Today it is case-sensitive and reads the first value. This widens matching only. |
 | A response handle reads the response it names | http (ambiguity 9) | Today a handle reads whichever response is current, so an outer handle inside a nested route reads the inner response. No view relies on that. |
 | A link is an element with an ID the view chooses, and it carries its own plan script | components 117; http 113-121 | It replaces the delegated listener, the plan in `data-reactive-link`, and the runtime rewriting the request URL. The fixtures locate links by `data-testid`. |
 | Template buttons raise events through `data-alis-raise` | components (ambiguity 9) | Views and templates carry no JavaScript. |
@@ -773,7 +774,8 @@ proves it is named in the pull request.
 **Decisions of section 8 applied**
 - `AddReactiveClientValidation` is gone: a browser rule always has the server rule it came from.
 - `Include` enforces on the server as well.
-- `p.Url<T>()` keys match case-insensitively, and array members read every value (D3).
+- `p.FromUrl(..)` keys match case-insensitively, and an array (`FromUrl<string[]>`) reads every
+  value of its key (D3).
 - A link is an element with a view-chosen id carrying its own plan script.
 - Template buttons raise events through `data-alis-raise`.
 - A stream retry keeps each subscription's owner.

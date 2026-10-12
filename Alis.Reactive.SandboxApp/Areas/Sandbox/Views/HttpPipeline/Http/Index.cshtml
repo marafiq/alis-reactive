@@ -41,6 +41,7 @@
     {
         p.Element("url-display-tab").SetText(p.FromUrl("tab"));
         p.Element("url-display-facility").SetText(p.FromUrl("facilityId"));
+        p.Element("url-display-wings").SetText(p.FromUrl<string[]>("wing"));
     }));
 
 }
@@ -454,10 +455,11 @@
     <native-card>
     <native-card-body>
         <native-heading level="H2">21. FromUrl in SetText &rarr; Display URL Params</native-heading>
-        <p class="text-sm text-text-secondary mb-3">Displays ?tab and ?facilityId values directly in the DOM on page load.</p>
+        <p class="text-sm text-text-secondary mb-3">Displays ?tab and ?facilityId values directly in the DOM on page load, and every ?wing value, matched by name in any case.</p>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Tab: <span id="url-display-tab"></span></p>
             <p>Facility: <span id="url-display-facility"></span></p>
+            <p>Wings: <span id="url-display-wings"></span></p>
         </native-vstack>
     </native-card-body>
     </native-card>

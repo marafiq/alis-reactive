@@ -80,6 +80,18 @@ public class WhenUrlParamsRead : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // An array is read the way MVC binds one from the query: every value of the key, in any case.
+    [Test]
+    public async Task an_array_url_param_reads_every_value_of_its_key_in_any_case()
+    {
+        await NavigateTo("/Sandbox/HttpPipeline/Http?wing=garden&tab=medications&WING=maple&Wing=courtyard");
+        await WaitForTraceMessage("booted", 10000);
+
+        await Expect(Page.Locator("#url-display-wings"))
+            .ToHaveTextAsync("garden,maple,courtyard", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task url_param_composes_route_param_resolves()
     {

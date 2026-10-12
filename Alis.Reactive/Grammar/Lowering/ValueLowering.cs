@@ -105,7 +105,9 @@ namespace Alis.Reactive.Grammar.Lowering
                         read,
                         scope);
                 case UrlSource _:
-                    return G.Get(G.Get(G.Obj(_context.Objects.Document()), new[] { "query" }, Shape.None), new[] { read.Member }, read.Shape);
+                    // MVC binds a scalar from a key's first value and an array from all of them.
+                    var values = DescribesArray(read.Shape) ? "queryAll" : "query";
+                    return G.Get(G.Get(G.Obj(_context.Objects.Document()), new[] { values }, Shape.None), new[] { read.Member }, read.Shape);
                 case PayloadSource payload:
                     return PayloadRead(payload, read, scope);
                 case DomSource dom:
@@ -191,6 +193,9 @@ namespace Alis.Reactive.Grammar.Lowering
             method.Arguments is ExactMethodArgumentContract exact ? exact.Shapes : G.NoShapes;
 
         internal static Shape Requested(Shape requested, Shape declared) => requested.IsNone ? declared : requested;
+
+        private static bool DescribesArray(Shape shape) =>
+            shape.TryGetNullableInnerShape(out var inner) ? DescribesArray(inner) : shape.Kind == "array";
 
         // ── arrays ───────────────────────────────────────────────────────────────
 
