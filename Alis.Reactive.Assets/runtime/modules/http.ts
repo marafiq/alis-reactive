@@ -153,7 +153,7 @@ function formData(values: Record<string, unknown>, arrays: readonly string[]): F
 }
 
 function itemsOf(value: unknown): unknown[] | undefined {
-  if (Array.isArray(value)) return value;
+  if (Array.isArray(value)) return [value.join(",")];
   if (typeof FileList !== "undefined" && value instanceof FileList) return Array.from(value);
   return undefined;
 }
