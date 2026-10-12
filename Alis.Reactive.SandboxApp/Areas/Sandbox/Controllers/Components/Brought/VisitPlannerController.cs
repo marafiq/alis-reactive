@@ -9,7 +9,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
 {
     [Area("Sandbox")]
     [Route("Sandbox/Components/VisitPlanner")]
-    public class VisitPlannerController : Controller
+    public partial class VisitPlannerController : Controller
     {
         private const string ViewBase = "~/Areas/Sandbox/Views/Components/Brought/VisitPlanner/";
 
