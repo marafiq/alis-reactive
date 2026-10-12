@@ -105,13 +105,14 @@ Where a path is rooted decides how it is read; the runtime decides nothing else.
 
 A shape is the C# type's view of a JavaScript value:
 
-`text`, `number`, `boolean`, `date`, `enum`, `file`, `array(shape)`, `record`, `object`,
-`nullable(shape)`, `none`.
+`text`, `number`, `boolean`, `date`, `instant`, `enum`, `file`, `array(shape)`, `record`,
+`object`, `nullable(shape)`, `none`.
 
 - `object` is a live JavaScript object and is never converted.
 - `record` is JSON-shaped data.
 - `enum` values are their names, which is how MVC binds them.
-- `date` values are JavaScript `Date` objects.
+- `date` values are JavaScript `Date` objects. `DateTime` and `DateOnly` are `date`.
+- `instant` values are `Date` objects too, for a `DateTimeOffset`: a moment, not a calendar day.
 
 ## 2. Values
 
@@ -134,11 +135,13 @@ Literals are emitted already in their shape. Nothing else converts.
 | | number | `new Date(n)` |
 | | `YYYY-MM-DD` text | local midnight |
 | | other text | `new Date(t)` when valid, else kept |
+| `instant` | as `date` | the same moment, as an instant |
 | `boolean` | text | false only for `""`, `"false"` in any case, and `"0"` |
 | | number | false only for 0 and NaN |
 | | array | `length > 0` |
 | `text` | number or boolean | `${v}` |
-| | `Date` | local calendar text: `YYYY-MM-DD` at midnight, else `YYYY-MM-DDTHH:mm:ss[.fff]`, no offset |
+| | instant | the moment in UTC: `YYYY-MM-DDTHH:mm:ss.fffZ` |
+| | other `Date` | local calendar text: `YYYY-MM-DD` at midnight, else `YYYY-MM-DDTHH:mm:ss[.fff]`, no offset |
 | | array | `String(a)` |
 | | missing, when writing to an element's text | `""` |
 | `array(s)` (reading) | array | each item converted to `s` |
@@ -158,7 +161,9 @@ Literals are emitted already in their shape. Nothing else converts.
 These are today's rules (`shape-convert.ts:45-269`), with one change: a date value is a `Date`, not
 a timestamp. So text, JSON and form data see the local day and time picked, with no offset, as
 an HTML form posts a date (a UTC instant would move a day picked east of UTC to the day before, and
-a `DateOnly` member cannot bind a time), and every comparison sees the time (2.2).
+a `DateOnly` member cannot bind a time), and every comparison sees the time (2.2). An instant is
+the exception: a `DateTimeOffset` names a moment, so it is sent as that moment in UTC, which binds
+exactly whatever the zone of the browser or the server.
 
 **Binding reads** (deferred, section 11: model values are read with the shape conversion alone,
 as today). Where the server binds a value, the browser reads it the way MVC binds it.

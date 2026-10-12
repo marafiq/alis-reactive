@@ -10,7 +10,8 @@
 <native-vstack gap="Lg">
     <native-heading level="H1">Move-in Booking</native-heading>
     <native-text color="Secondary">
-        Book the day the resident moves in and, if the family wants one, the day of their welcome visit.
+        Book the day the resident moves in, the day of the family's welcome visit if they want one, and
+        when the moving truck arrives.
     </native-text>
 
     <native-card><native-card-body>
@@ -19,6 +20,8 @@
                 .FusionDatePicker(b => b.Placeholder("Choose the move-in day")); }
             @{ Html.InputField(plan, m => m.WelcomeVisit, o => o.Label("Welcome visit"))
                 .FusionDatePicker(b => b.Placeholder("Choose the visit day")); }
+            @{ Html.InputField(plan, m => m.TruckArrives, o => o.Label("Moving truck arrives"))
+                .FusionDateTimePicker(b => b.Placeholder("Choose when the truck arrives")); }
         </native-grid>
         @(Html.NativeButton("book-move-in-btn", "Book Move-in")
             .CssClass("mt-4 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")

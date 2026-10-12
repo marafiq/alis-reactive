@@ -54,7 +54,7 @@ namespace Alis.Reactive.Builders.Arrays
             // String(value) order, where every object becomes "[object Object]".
             // Reject it where it is authored rather than emit a silently wrong runtime sort.
             var keyKind = Shape.FromClrType(typeof(TKey)).Kind;
-            var keyIsSortableScalar = keyKind is "string" or "number" or "boolean" or "date" or "nullable";
+            var keyIsSortableScalar = keyKind is "string" or "number" or "boolean" or "date" or "instant" or "nullable";
             if (!keyIsSortableScalar)
                 throw new InvalidOperationException(
                     "OrderBy key must project to a scalar (string, number, date, bool, enum), not '" +

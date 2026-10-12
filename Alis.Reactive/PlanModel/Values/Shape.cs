@@ -33,6 +33,8 @@ namespace Alis.Reactive.PlanModel
         internal static readonly Shape Number = Scalar("number");
         internal static readonly Shape Boolean = Scalar("boolean");
         internal static readonly Shape Date = Scalar("date");
+        /// <summary>A moment in time with its offset (<see cref="DateTimeOffset"/>), sent as the exact instant.</summary>
+        internal static readonly Shape Instant = Scalar("instant");
         internal static readonly Shape Raw = Scalar("raw");
         internal static readonly Shape Any = Scalar("any");
         internal static readonly Shape None = Scalar("none");
@@ -77,6 +79,7 @@ namespace Alis.Reactive.PlanModel
 
             if (type == typeof(string)) return String;
             if (type == typeof(bool)) return Boolean;
+            if (type == typeof(DateTimeOffset)) return Instant;
             if (IsDateType(type)) return Date;
             if (IsNumericType(type)) return Number;
             if (IsStringSerializedType(type)) return String;
@@ -97,7 +100,7 @@ namespace Alis.Reactive.PlanModel
             value == null ? None : FromClrType(value.GetType());
 
         private static bool IsDateType(Type type)
-            => type == typeof(DateTime) || type == typeof(DateTimeOffset)
+            => type == typeof(DateTime)
 #if NET6_0_OR_GREATER
                || type == typeof(DateOnly)
 #endif
@@ -225,7 +228,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>
         /// True when this shape represents a value that can be meaningfully serialized
         /// to a single string. Suitable for HTTP headers, route params, and query strings.
-        /// Scalars: string, number, boolean, date. Nullable wrapping a scalar is also scalar.
+        /// Scalars: string, number, boolean, date, instant. Nullable wrapping a scalar is also scalar.
         /// Non-scalars: array, object, raw, any, none.
         /// </summary>
         internal bool IsScalar
@@ -238,6 +241,7 @@ namespace Alis.Reactive.PlanModel
                     case "number":
                     case "boolean":
                     case "date":
+                    case "instant":
                         return true;
                     default:
                         return _structure.IsScalar;

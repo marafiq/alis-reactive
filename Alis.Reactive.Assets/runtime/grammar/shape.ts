@@ -23,6 +23,7 @@ function convert(value: unknown, shape: Shape): unknown {
     case "number":   return asNumber(value) ?? value;
     case "boolean":  return asBoolean(value) ?? value;
     case "date":     return asDate(value) ?? value;
+    case "instant":  return asInstant(value) ?? value;
     case "array":    return asArrayOf(value, shape.item);
     case "object":   return asObjectOf(value, shape);
     case "nullable": return asNullable(value, shape.inner);
@@ -54,11 +55,16 @@ export function asBoolean(value: unknown): boolean | undefined {
   return undefined;
 }
 
-/** Text shape: numbers and booleans as text, dates as local calendar text, arrays as JavaScript's own text. */
+/**
+ * Text shape: numbers and booleans as text, an instant as its UTC instant, other dates as local
+ * calendar text, arrays as JavaScript's own text.
+ */
 export function asText(value: unknown): string | undefined {
   if (typeof value === "string") return value;
   if (typeof value === "number" || typeof value === "boolean") return `${value}`;
-  if (value instanceof Date) return Number.isFinite(value.getTime()) ? localDateText(value) : undefined;
+  if (value instanceof Date && !Number.isFinite(value.getTime())) return undefined;
+  if (value instanceof Instant) return value.toISOString();
+  if (value instanceof Date) return localDateText(value);
   if (Array.isArray(value)) return toJavaScriptString(value);
   return undefined;
 }
@@ -74,6 +80,23 @@ export function asDate(value: unknown): Date | undefined {
 
   const parsed = new Date(value);
   return Number.isFinite(parsed.getTime()) ? parsed : undefined;
+}
+
+/**
+ * A moment in time, read under the instant shape (a DateTimeOffset): a Date whose text is the exact
+ * instant in UTC, so the server binds the same moment whatever the zone of the browser or the server.
+ */
+export class Instant extends Date {
+  override toJSON(): string {
+    return this.toISOString();
+  }
+}
+
+/** Instant shape: what the date shape reads, as an Instant. */
+export function asInstant(value: unknown): Instant | undefined {
+  if (value instanceof Instant) return value;
+  const date = asDate(value);
+  return date === undefined ? undefined : new Instant(date.getTime());
 }
 
 // A date as the person picked it, with no offset, the way an HTML form posts one: "YYYY-MM-DD" at
@@ -135,7 +158,7 @@ function asNullable(value: unknown, inner: Shape): unknown {
 }
 
 function innerParsesText(inner: Shape): boolean {
-  return inner.kind === "number" || inner.kind === "boolean" || inner.kind === "date";
+  return inner.kind === "number" || inner.kind === "boolean" || inner.kind === "date" || inner.kind === "instant";
 }
 
 // Whitespace as .NET's char.IsWhiteSpace defines it (string.IsNullOrWhiteSpace, which MVC binding

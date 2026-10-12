@@ -9,6 +9,7 @@ namespace Alis.Reactive.Validation
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
             if (shape == null) throw new ArgumentNullException(nameof(shape));
+            if (shape == Shape.Instant && value is DateTimeOffset instant) return instant.ToString("O");
             if (shape != Shape.Date) return value;
 
             return FromDateValue(value);
@@ -23,15 +24,6 @@ namespace Alis.Reactive.Validation
                     return dateTime.ToString("yyyy-MM-dd");
 
                 return dateTime.ToString("s");
-            }
-
-            if (value is DateTimeOffset dateTimeOffset)
-            {
-                var dateHasNoTimeComponent = dateTimeOffset.TimeOfDay == TimeSpan.Zero;
-                if (dateHasNoTimeComponent)
-                    return dateTimeOffset.ToString("yyyy-MM-dd");
-
-                return dateTimeOffset.ToString("s");
             }
 
 #if NET6_0_OR_GREATER

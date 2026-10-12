@@ -42,6 +42,13 @@ describe("values convert at the boundary, by shape", () => {
     expect([date.getFullYear(), date.getMonth(), date.getDate(), date.getHours()]).toEqual([2026, 5, 1, 0]);
   });
 
+  it("reads an instant as the exact moment its text names, and writes it back in UTC", () => {
+    const arrives = value(e.lit("2026-10-11T10:30:00+05:00", s.instant)) as Date;
+    expect(arrives.toISOString()).toBe("2026-10-11T05:30:00.000Z");
+    expect(value(e.op("toText", e.lit("2026-10-11T10:30:00+05:00", s.instant)))).toBe("2026-10-11T05:30:00.000Z");
+    expect(value(e.op("eq", e.lit("2026-10-11T05:30:00Z", s.instant), e.lit(Date.UTC(2026, 9, 11, 5, 30), s.date)))).toBe(true);
+  });
+
   it("keeps a missing value missing", () => {
     expect(value(e.lit(null, s.number))).toBeNull();
     expect(value(e.lit(undefined, s.string))).toBeUndefined();

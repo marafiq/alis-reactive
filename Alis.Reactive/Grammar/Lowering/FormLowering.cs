@@ -183,7 +183,7 @@ namespace Alis.Reactive.Grammar.Lowering
             if (shape.TryGetNullableInnerShape(out var inner))
             {
                 var absent = G.Eq(value, G.Null);
-                if (inner.Kind == "number" || inner.Kind == "boolean" || inner.Kind == "date")
+                if (inner.Kind == "number" || inner.Kind == "boolean" || inner.Kind == "date" || inner.Kind == "instant")
                     absent = G.Or(absent, Matches(value, "^[" + NetWhitespace + "]*$"));
                 return G.Op(Operator.Cond, absent, G.Null, Comparable(value, inner));
             }
@@ -193,6 +193,7 @@ namespace Alis.Reactive.Grammar.Lowering
                 case "number":
                     return G.Op(Operator.Cond, G.Eq(value, G.Null), G.Lit(0), G.Op(Operator.ToNumber, value));
                 case "date":
+                case "instant":
                     return G.Call(G.Op(Operator.ToDate, value), "getTime");
                 case "boolean":
                     return G.Op(Operator.Cond, G.Op(Operator.ToBoolean, value), G.Lit(1), G.Lit(0));
@@ -211,7 +212,7 @@ namespace Alis.Reactive.Grammar.Lowering
             if (shape.TryGetNullableInnerShape(out var inner))
             {
                 var absent = G.Eq(value, G.Null);
-                if (inner.Kind == "number" || inner.Kind == "boolean" || inner.Kind == "date")
+                if (inner.Kind == "number" || inner.Kind == "boolean" || inner.Kind == "date" || inner.Kind == "instant")
                     absent = G.Or(absent, Matches(value, "^[" + NetWhitespace + "]*$"));
                 return G.Op(Operator.Cond, absent, G.Null, Canonical(value, inner));
             }
@@ -225,6 +226,7 @@ namespace Alis.Reactive.Grammar.Lowering
                 case "boolean":
                     return G.Op(Operator.Cond, G.Eq(value, G.Null), G.False, G.Op(Operator.ToBoolean, value));
                 case "date":
+                case "instant":
                     return G.Call(G.Op(Operator.ToDate, value), "getTime");
                 case "none":
                     return G.Op(Operator.Coalesce, G.Op(Operator.ToText, value), G.Lit(""));

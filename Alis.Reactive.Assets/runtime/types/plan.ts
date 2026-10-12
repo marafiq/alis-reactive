@@ -261,6 +261,7 @@ export type Shape =
   | ArrayShape
   | BooleanShape
   | DateShape
+  | InstantShape
   | NoneShape
   | NullableShape
   | NumberShape
@@ -282,6 +283,10 @@ export interface BooleanShape {
 
 export interface DateShape {
   kind: "date";
+}
+
+export interface InstantShape {
+  kind: "instant";
 }
 
 export interface NoneShape {

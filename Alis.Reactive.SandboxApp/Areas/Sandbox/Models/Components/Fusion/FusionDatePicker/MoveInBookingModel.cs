@@ -12,6 +12,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
         /// <summary>A day held as a <see cref="DateTime"/>, as most existing models hold dates.</summary>
         public DateTime? WelcomeVisit { get; set; }
+
+        /// <summary>
+        /// When the moving truck arrives: a moment the regional office reads in UTC, so the server binds
+        /// it as a <see cref="DateTimeOffset"/>.
+        /// </summary>
+        public DateTimeOffset? TruckArrives { get; set; }
     }
 
     /// <summary>What the server books.</summary>

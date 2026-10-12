@@ -2,6 +2,7 @@
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { send, type HttpRequest } from "../modules/http";
+import { shaped } from "../grammar/shape";
 
 interface Captured {
   url: string;
@@ -64,6 +65,15 @@ describe("JSON", () => {
     expect(calls[0]!.init.body).toBe(
       '{"name":null,"tags":["","a"],"due":"2026-06-01","dose":"2026-06-01T21:30:00.250","visits":["2026-06-02"]}');
     expect((calls[0]!.init.headers as Record<string, string>)["Content-Type"]).toBe("application/json");
+  });
+
+  it("sends an instant (a DateTimeOffset) as the exact moment, in JSON and as text", async () => {
+    const calls = respondWith(null, null);
+    const arrives = shaped(new Date(Date.UTC(2026, 9, 11, 5, 30)), { kind: "instant" });
+    await send(request({ method: "POST", values: { arrives, visits: [arrives] } }));
+    await send(request({ method: "GET", values: { arrives } }));
+    expect(calls[0]!.init.body).toBe('{"arrives":"2026-10-11T05:30:00.000Z","visits":["2026-10-11T05:30:00.000Z"]}');
+    expect(calls[1]!.url).toContain("arrives=2026-10-11T05%3A30%3A00.000Z");
   });
 
   it("sends no body for an empty record", async () => {

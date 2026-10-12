@@ -19,6 +19,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             var confirmation = $"Move-in booked for {Spelled(booking.MoveInDay.Value.ToDateTime(TimeOnly.MinValue))}.";
             if (booking.WelcomeVisit.HasValue)
                 confirmation += $" Welcome visit on {Spelled(booking.WelcomeVisit.Value)}.";
+            if (booking.TruckArrives.HasValue)
+                confirmation += $" The truck arrives at {booking.TruckArrives.Value.ToUniversalTime().ToString("HH:mm", CultureInfo.InvariantCulture)} UTC.";
             return Ok(new MoveInBooked(confirmation));
         }
 

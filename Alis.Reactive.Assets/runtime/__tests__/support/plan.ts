@@ -9,6 +9,7 @@ export const s = {
   number: { kind: "number" } as Shape,
   boolean: { kind: "boolean" } as Shape,
   date: { kind: "date" } as Shape,
+  instant: { kind: "instant" } as Shape,
   any: { kind: "any" } as Shape,
   none: { kind: "none" } as Shape,
   array: (item: Shape): Shape => ({ kind: "array", item }),

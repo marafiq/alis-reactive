@@ -85,7 +85,7 @@ namespace Alis.Reactive.ContractGeneration
 
             internal void DeclareShapes()
             {
-                var kinds = new[] { "any", "array", "boolean", "date", "none", "nullable", "number", "object", "string" };
+                var kinds = new[] { "any", "array", "boolean", "date", "instant", "none", "nullable", "number", "object", "string" };
                 Declare("Shape", "export type Shape =\n" +
                     string.Join("\n", kinds.Select(k => "  | " + ShapeName(k))) + ";");
                 foreach (var kind in kinds)
