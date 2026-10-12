@@ -95,8 +95,8 @@ Everything else stays sync.
 - Read the DSL source before shared plan or runtime edits; the source is the requirement. Old
   tests, docs and plans are history. Before editing, name the row: DSL call → domain
   term → runtime behavior → Playwright proof.
-- Typed APIs only. Strings stop at the plugin boundary; analyzer ALIS009 enforces this on component
-  slices.
+- Typed APIs only. Strings stop at the plugin boundary; analyzer ALIS009 enforces this on every
+  component, shipped or brought: its declaration class and its render helpers.
 - Plan model classes are sealed with `internal` constructors and `internal set`. Developers author
   through builders (`Html.On`, `Html.InputField`, `p.Get`, `p.When`).
 - Component slices are self-contained. Duplication between slices beats a shared base class.

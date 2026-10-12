@@ -218,6 +218,9 @@ the core C# and the runtime name no vendor and no component. Proof: the full sui
   element the component's id; `field.Render<T>` and `plan.Render<T>` refuse it otherwise, naming
   the component and the id. A vendor builder's own output is written as it is: a first version that
   re-wrote Syncfusion's output to check it broke those pages in CI and was reverted.
+- **ALIS009 covers brought components.** The typed-API analyzer applies to any `Component` or
+  `JsObject` declaration and any helper that returns `RenderedComponent<,>` or extends
+  `InputBoundField<,>`, wherever it is declared, not only the shipped slices' namespaces.
 - **Shipped components construct like brought ones.** The framework's own component code lives in
   `Alis.Reactive.Assets/components/`, beside the runtime, and reaches it only through `alis:mount`,
   `alis:unmount` and `window.__alisPlugins`: CheckList, RadioGroup, Drawer, Loader, Confirm (a
