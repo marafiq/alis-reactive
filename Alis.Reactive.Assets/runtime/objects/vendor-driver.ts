@@ -44,6 +44,6 @@ function payloadOf(vendor: Vendor, first: unknown): unknown {
 // carries its detail.
 function elementPayload(first: unknown): unknown {
   if (first instanceof CustomEvent) return isMissing(first.detail) ? {} : first.detail;
-  if (first instanceof Event) return first.currentTarget ?? first.target ?? first;
+  if (first instanceof Event) return first;
   return isMissing(first) ? {} : first;
 }
