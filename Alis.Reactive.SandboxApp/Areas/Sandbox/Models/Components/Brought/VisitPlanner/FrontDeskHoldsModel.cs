@@ -55,4 +55,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
     {
         public string Message { get; set; } = "";
     }
+
+    /// <summary>The card the greeter reads when a family arrives for a held visit.</summary>
+    public sealed class ArrivalCard
+    {
+        public string Time { get; set; } = "";
+
+        public string Room { get; set; } = "";
+
+        public string Greeter { get; set; } = "";
+    }
 }

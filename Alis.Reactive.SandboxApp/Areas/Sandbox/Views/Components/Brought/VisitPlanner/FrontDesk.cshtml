@@ -1,6 +1,7 @@
 @model FrontDeskHoldsModel
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.AppLevel
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.AppLevel
 @using Alis.Reactive.SandboxApp.BroughtComponents
@@ -15,6 +16,8 @@
     var holdsUrl = Url.SandboxRouteTemplate("FrontDeskHolds", "VisitPlanner", "residentId");
     var holdUrl = Url.SandboxRouteTemplate("HoldVisit", "VisitPlanner", "slotId");
     var releaseEveryUrl = Url.SandboxRouteTemplate("ReleaseEveryHold", "VisitPlanner", "residentId");
+    var badgeUrl = Url.SandboxRouteTemplate("PrintBadge", "VisitPlanner", "slotId");
+    var arrivalUrl = Url.SandboxRouteTemplate("Arrival", "VisitPlanner", "slotId");
 
     // The link names the resident and the family: ?resident=margaret&family=hale. The week comes
     // first; the family's holds follow it, asked for under the family's name in a header.
@@ -60,6 +63,7 @@
         </native-text>
     </div>
 
+    <div id="desk-card">
     <native-card><native-card-body>
         <native-vstack gap="Base">
             <native-text>
@@ -144,8 +148,38 @@
                             })))
                         .Else(keep => keep.Element("desk-status").SetText("Every hold was kept."));
                 }))
+
+            @(Html.NativeButton("prepare-arrival", "Prepare arrival")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    // The earliest held visit: its badge prints at the greeter's desk while its arrival
+                    // card loads, side by side, with the desk covered; the drawer opens once both are done.
+                    var earliestTime = p.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.FirstBooked);
+                    p.When(earliestTime).NotEmpty()
+                        .Then(arrival =>
+                        {
+                            arrival.Component<NativeLoader>().Set(c => c.Target, "desk-card").Call(c => c.Show);
+                            arrival.Parallel(
+                                    badge => badge.Post(badgeUrl)
+                                        .Gather(g => g.RouteParam("slotId", earliestTime).FromUrl("family"))
+                                        .Response(r => r.OnSuccess<DeskMessage>((printed, s) =>
+                                            s.Element("desk-status").SetText(printed, x => x.Message))),
+                                    card => card.Get(arrivalUrl)
+                                        .Gather(g => g.RouteParam("slotId", earliestTime))
+                                        .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content"))))
+                                .OnAllSettled(done =>
+                                {
+                                    done.Component<NativeLoader>().Call(c => c.Hide);
+                                    done.Element("alis-drawer-title").SetText("Arrival");
+                                    done.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md).Call(c => c.Open);
+                                });
+                        })
+                        .Else(none => none.Element("desk-status").SetText("Hold a time first; an arrival is prepared from a hold."));
+                }))
         </native-vstack>
     </native-card-body></native-card>
+    </div>
 </native-vstack>
 
 @Html.RenderPlan(plan)

@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought;
 
@@ -32,6 +33,15 @@ public class WhenHoldingVisitsAtTheFrontDesk : PlaywrightTestBase
     private ILocator Toast => Page.Locator(".e-toast").First;
     private ILocator ReleaseEveryHold => Page.Locator("#release-every-hold");
     private ILocator ConfirmDialog => Page.Locator("#alisConfirmDialog");
+    private ILocator PrepareArrival => Page.Locator("#prepare-arrival");
+    private ILocator Drawer => Page.Locator("#alis-drawer");
+    private ILocator DrawerTitle => Page.Locator("#alis-drawer-title");
+    private ILocator ArrivalTime => Page.Locator("#arrival-time");
+    private ILocator ArrivalRoom => Page.Locator("#arrival-room");
+    private ILocator LoaderOverDesk => Page.Locator("#desk-card #alis-loader");
+
+    // The drawer drops this class the moment it starts closing, so whether it is open is read from it.
+    private static readonly Regex DrawerOpen = new("alis-drawer--visible");
 
     private async Task OpenDesk(string link = FamilyLink)
     {
@@ -188,6 +198,59 @@ public class WhenHoldingVisitsAtTheFrontDesk : PlaywrightTestBase
         await Expect(Status).ToHaveTextAsync("Released every hold for Margaret Hale.");
         await Expect(Planner.Booked).ToHaveCountAsync(0);
         await Expect(Held).ToHaveTextAsync("0");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task preparing_an_arrival_prints_the_badge_and_opens_the_arrival_card()
+    {
+        await OpenDeskForTheHales();
+
+        await ClickWhenStable(PrepareArrival);
+
+        await Expect(Drawer).ToHaveClassAsync(DrawerOpen);
+        await Expect(DrawerTitle).ToHaveTextAsync("Arrival");
+        await Expect(ArrivalTime).ToHaveTextAsync("Wed 2:00 PM");
+        await Expect(ArrivalRoom).ToHaveTextAsync("Meet in the garden lounge.");
+        await Expect(Status).ToHaveTextAsync("Badge printed for the Hale family, Wed 2:00 PM.");
+        AssertNoConsoleErrors();
+    }
+
+    // The badge and the card are asked for side by side; the drawer waits for both, with the desk covered.
+    [Test]
+    public async Task the_arrival_card_waits_for_the_badge_with_the_desk_covered()
+    {
+        var badgeReleased = new SemaphoreSlim(0);
+        await Page.RouteAsync("**/Sandbox/Components/VisitPlanner/FrontDesk/Badge/*", async route =>
+        {
+            await badgeReleased.WaitAsync(TimeSpan.FromSeconds(30));
+            await route.ContinueAsync();
+        });
+        await OpenDeskForTheHales();
+
+        await ClickWhenStable(PrepareArrival);
+
+        await Expect(LoaderOverDesk).ToBeVisibleAsync();
+        await Expect(ArrivalRoom).ToHaveTextAsync("Meet in the garden lounge.");
+        await Expect(Drawer).Not.ToHaveClassAsync(DrawerOpen);
+        badgeReleased.Release();
+        await Expect(Drawer).ToHaveClassAsync(DrawerOpen);
+        await Expect(LoaderOverDesk).ToBeHiddenAsync();
+        await Expect(Status).ToHaveTextAsync("Badge printed for the Hale family, Wed 2:00 PM.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task with_no_time_held_the_desk_asks_for_a_hold_before_an_arrival()
+    {
+        await OpenDeskForTheHales();
+        await Planner.Time("Wed 2:00 PM").ClickAsync();
+        await Expect(Status).ToHaveTextAsync("Released Wed 2:00 PM.");
+
+        await ClickWhenStable(PrepareArrival);
+
+        await Expect(Status).ToHaveTextAsync("Hold a time first; an arrival is prepared from a hold.");
+        await Expect(Drawer).Not.ToHaveClassAsync(DrawerOpen);
         AssertNoConsoleErrors();
     }
 

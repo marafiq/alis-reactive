@@ -7,7 +7,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
 {
     // The front desk's system, answering by the time asked for: Monday 10:00 is held, Tuesday 3:00 is
     // held until the family confirms, Saturday 11:00 was taken by another family, and on Sunday the
-    // desk does not answer. The Hale family already holds Wednesday 2:00.
+    // desk does not answer. The Hale family already holds Wednesday 2:00. An arrival prints the
+    // family's badge and gives the visit's arrival card: weekday visits meet in the garden lounge,
+    // weekend visits in the sun room.
     public partial class VisitPlannerController
     {
         [HttpGet("FrontDesk")]
@@ -69,6 +71,21 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
         [HttpDelete("FrontDesk/Holds/{residentId}")]
         public IActionResult ReleaseEveryHold(string residentId) =>
             Ok(new DeskMessage { Message = $"Released every hold for {Find(residentId)?.Name ?? residentId}." });
+
+        [HttpPost("FrontDesk/Badge/{slotId}")]
+        public IActionResult PrintBadge(string slotId, [FromBody] HoldRequest? badge) =>
+            Ok(new DeskMessage { Message = $"Badge printed for the {Capitalized(badge?.Family ?? "")} family, {LabelOf(slotId)}." });
+
+        [HttpGet("FrontDesk/Arrival/{slotId}")]
+        public IActionResult Arrival(string slotId) =>
+            PartialView(ViewBase + "_ArrivalCard.cshtml", new ArrivalCard
+            {
+                Time = LabelOf(slotId),
+                Room = slotId.StartsWith("sat", StringComparison.Ordinal) || slotId.StartsWith("sun", StringComparison.Ordinal)
+                    ? "the sun room"
+                    : "the garden lounge",
+                Greeter = "Dana",
+            });
 
         private static string LabelOf(string slotId)
         {
