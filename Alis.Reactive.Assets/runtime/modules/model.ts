@@ -156,11 +156,6 @@ export const modelModule: Module = {
       added.push(input);
       announceCommits(input, owner);
     }
-    owner.onDispose(() => {
-      for (const input of added) {
-        if (inputs.get(input.id) === input) inputs.delete(input.id);
-      }
-    });
   },
 };
 
