@@ -759,9 +759,10 @@ proves it is named in the pull request.
   operation's lambda or a validation rule such a read is refused at render.
 
 - List paths: a member path may read each item of a list, `filesData[].rawFile`, lowered to
-  `toArray(get(o, ["filesData"])).map(x => get(x, ["rawFile"]))`. The uploader declares its value
-  that way, so `alis.http` sends `File` objects and names no vendor; the architecture test's last
-  runtime vendor exception is gone. A list path can be read, not written, called or subscribed to.
+  `get(o, ["filesData", "[]", "rawFile"])`; the runtime reads the rest of the path on each item, in
+  the path's own mode (1.3). The uploader declares its value that way, so `alis.http` sends `File`
+  objects and names no vendor. A list path can be read, not written, called or subscribed to, and
+  reads at most one list.
 
 **Decisions of section 8 applied**
 - `AddReactiveClientValidation` is gone: a browser rule always has the server rule it came from.
