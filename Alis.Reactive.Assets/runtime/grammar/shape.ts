@@ -89,7 +89,7 @@ export function asText(value: unknown): string | undefined {
   if (typeof value === "string") return value;
   if (typeof value === "number" || typeof value === "boolean") return `${value}`;
   if (value instanceof Date && !Number.isFinite(value.getTime())) return undefined;
-  if (value instanceof Instant) return value.toISOString();
+  if (value instanceof Instant) return localDateText(value);
   if (value instanceof Date) return localDateText(value);
   if (Array.isArray(value)) return toJavaScriptString(value);
   return undefined;
