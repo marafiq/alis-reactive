@@ -6,7 +6,7 @@ import type { Expr, SetStatement, Statement } from "../types/index";
 import { assertNever } from "../shared/assert-never";
 import { scope as logScope } from "../diagnostics/trace";
 import { toJavaScriptString } from "../shared/javascript-string";
-import { childScope, evaluate, isPromise, labelOf, modeOf, type Scope } from "./evaluate";
+import { childScope, evaluate, evaluateStatement, isPromise, labelOf, modeOf, type Scope } from "./evaluate";
 import { write } from "./paths";
 import { shaped } from "./shape";
 
@@ -46,7 +46,7 @@ function set(statement: SetStatement, scope: Scope): void {
 
 function perform(expr: Expr, awaits: boolean, scope: Scope): Completion {
   if (expr.kind === "call") log.trace("call", { target: traceName(expr.target), path: expr.path });
-  const result = evaluate(expr, scope);
+  const result = evaluateStatement(expr, scope);
   if (!isPromise(result)) return;
   if (awaits) return result.then(() => undefined);
   result.catch(error => log.error("call.rejected", { error: toJavaScriptString(error) }));
@@ -58,7 +58,7 @@ function traceName(target: Expr): string {
 }
 
 function bind(name: string, expr: Expr, awaits: boolean, scope: Scope): Completion {
-  const value = evaluate(expr, scope);
+  const value = awaits ? evaluateStatement(expr, scope) : evaluate(expr, scope);
   if (awaits && isPromise(value)) return value.then(settled => scope.env.bind(name, settled));
   scope.env.bind(name, value);
 }

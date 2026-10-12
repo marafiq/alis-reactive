@@ -259,7 +259,9 @@ at render: a handle used outside the block that binds it throws, and names the h
 - `do` and `let` carry `await` only when their call is to an async member.
 - A block runs synchronously until its first awaited statement, then continues when that settles.
   A handler with no awaited statement never returns a promise.
-- Expressions never await, so there is one synchronous evaluator.
+- Expressions never await, so there is one synchronous evaluator. Only the call at the top of a `do`
+  or `let` may return a promise: an awaiting statement settles it, a `do` without `await` lets it
+  run. A promise anywhere else comes from a member declared sync, and the call fails (3.4).
 
 **A sync value is read where it is used.** A `Value<T>` from a property or a returning method is a
 read, like a property getter, so each use reads the current value. `var before = rate.Value;`
@@ -283,6 +285,7 @@ The runtime raises errors only at real boundaries, and each error names the obje
 the plan. The boundaries are:
 - object lookup;
 - a checked path (1.3);
+- a member declared sync that returns a promise (3.3);
 - an unknown plugin;
 - a browser API;
 - the network;

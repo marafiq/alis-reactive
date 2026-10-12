@@ -1,8 +1,9 @@
 // The one evaluator. Expressions are synchronous (grammar.md 3.3): only statements await, so a value
-// is computed here without ever waiting. An async member's call returns its promise, which the
-// awaiting statement settles; the result is shaped when it arrives.
+// is computed here without ever waiting. Only the call at the top of a `do` or `let` may return a
+// promise, which that statement settles or lets run; the result is shaped when it arrives. A promise
+// anywhere else is a member the plan reads as sync, so the call fails at the object (3.4).
 
-import type { Expr, OpExpr, RecordExpr, Shape } from "../types/index";
+import type { CallExpr, Expr, OpExpr, RecordExpr, Shape } from "../types/index";
 import { assertNever } from "../shared/assert-never";
 import { Environment } from "./environment";
 import { call, read, type PathMode } from "./paths";
@@ -29,7 +30,7 @@ export function evaluate(expr: Expr, scope: Scope): unknown {
     case "obj":    return scope.world.object(expr.id);
     case "ref":    return scope.env.lookup(expr.name);
     case "get":    return shaped(read(evaluate(expr.target, scope), expr.path, modeOf(expr.target), labelOf(expr.target)), expr.shape);
-    case "call":   return invoke(expr.target, expr.path, expr.args, expr.argShapes, expr.shape, scope);
+    case "call":   return invoke(expr, scope, false);
     case "fn":     return closure(expr.params, expr.body, scope);
     case "record": return record(expr, scope);
     case "list":   return expr.items.map(item => evaluate(item, scope));
@@ -47,19 +48,24 @@ export function labelOf(target: Expr): string {
   return target.kind === "obj" ? `#${target.id}` : target.kind === "ref" ? target.name : `(${target.kind})`;
 }
 
-function invoke(
-  target: Expr,
-  path: readonly string[],
-  argExprs: readonly Expr[],
-  argShapes: readonly Shape[],
-  shape: Shape,
-  scope: Scope,
-): unknown {
-  const receiver = evaluate(target, scope);
-  const args = argExprs.map((arg, index) => shapeArgument(evaluate(arg, scope), argShapes[index]));
-  const result = call(receiver, path, args, modeOf(target), labelOf(target));
-  if (isPromise(result)) return result.then(value => shaped(value, shape));
-  return shaped(result, shape);
+/** A statement's expression: a call at its top may return a promise for the statement to settle. */
+export function evaluateStatement(expr: Expr, scope: Scope): unknown {
+  return expr.kind === "call" ? invoke(expr, scope, true) : evaluate(expr, scope);
+}
+
+function invoke(expr: CallExpr, scope: Scope, mayReturnPromise: boolean): unknown {
+  const receiver = evaluate(expr.target, scope);
+  const args = expr.args.map((arg, index) => shapeArgument(evaluate(arg, scope), expr.argShapes[index]));
+  const label = labelOf(expr.target);
+  const result = call(receiver, expr.path, args, modeOf(expr.target), label);
+  if (!isPromise(result)) return shaped(result, expr.shape);
+  if (!mayReturnPromise) throw unawaitedPromise(label, expr.path);
+  return result.then(value => shaped(value, expr.shape));
+}
+
+function unawaitedPromise(label: string, path: readonly string[]): Error {
+  const member = path.length === 0 ? label : `${label}.${path.join(".")}`;
+  return new Error(`[alis] ${member} returned a promise where the plan reads a value; declare the member Awaited`);
 }
 
 function shapeArgument(value: unknown, shape: Shape | undefined): unknown {

@@ -227,4 +227,21 @@ describe("statements", () => {
     ], scope);
     expect(seen).toEqual([12]);
   });
+
+  it("refuses a promise from a member the plan reads as a value, naming the member", () => {
+    const planner = { isBooked: () => Promise.resolve(false), status: "" };
+    const scope = scopeWith({ planner });
+    const isBooked = e.call(e.obj("planner"), ["isBooked"], [e.lit("sat-11")]);
+
+    expect(() => executeBlock([st.if([[isBooked, [st.set(e.obj("planner"), ["status"], e.lit("booked"))]]])], scope))
+      .toThrow("[alis] #planner.isBooked returned a promise where the plan reads a value; declare the member Awaited");
+    expect(() => executeBlock([st.set(e.obj("planner"), ["status"], isBooked)], scope)).toThrow("declare the member Awaited");
+    expect(() => executeBlock([st.let("booked", isBooked)], scope)).toThrow("declare the member Awaited");
+    expect(planner.status).toBe("");
+  });
+
+  it("lets a statement call a member that returns a promise without waiting for it", () => {
+    const scope = scopeWith({ grid: { refresh: () => Promise.resolve() } });
+    expect(executeBlock([st.do(e.call(e.obj("grid"), ["refresh"], []))], scope)).toBeUndefined();
+  });
 });
