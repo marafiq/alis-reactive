@@ -193,7 +193,7 @@ function showErrors(containerId: string, problem: unknown): void {
 
   for (const [name, messages] of Object.entries(errors as Record<string, unknown>)) {
     const message = Array.isArray(messages) ? messages.join(", ") : asText(messages) ?? "";
-    const entry = entries.find(candidate => candidate.field.name === name);
+    const entry = entries.find(candidate => candidate.field.name === name.slice(name.lastIndexOf(".") + 1));
     const element = entry ? document.getElementById(entry.field.id) : null;
     if (entry && element && canRenderInline(entry.field.id)) {
       showServerErrorInline(entry.field.id, message, element);
