@@ -1,6 +1,5 @@
 @model ArrayManagerModel
 @using Alis.Reactive
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Builders.Conditions
 @{
@@ -49,9 +48,9 @@
         {
             TypedPluginSource<int> countForGather = p.Plugin(array.Count).Arg("items");
             p.Get(Url.SandboxRoute("PluginEcho", "ArrayManager"))
-             .Gather(g => g
+             .Gather<PluginEchoQuery>(g => g
                  .Header("X-Array-Count", countForGather)
-                 .Plugin(countForGather, "count"))
+                 .Set(x => x.Count, countForGather))
              .Response(r => r
                 .OnSuccess<PluginArrayEchoResponse>((json, s) =>
                 {

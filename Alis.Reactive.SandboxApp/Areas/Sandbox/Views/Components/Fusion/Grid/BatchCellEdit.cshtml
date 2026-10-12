@@ -1,6 +1,5 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @using Alis.Reactive
@@ -73,7 +72,7 @@
             {
                 var grid = p.Component<FusionGrid>(BatchGridId);
                 p.Post(Url.SandboxRoute("BatchSummary", "Grid"))
-                    .Gather(g => g.Include(grid.Get(c => c.GetBatchChanges<ResidentDirectoryGridItem>()), "batchChanges"))
+                    .Gather<ResidentGridBatchSummaryRequest>(g => g.Set(x => x.BatchChanges, grid.Get(c => c.GetBatchChanges<ResidentDirectoryGridItem>())))
                     .Response(r => r.OnSuccess<ResidentGridBatchSummaryResponse>((json, s) =>
                     {
                         s.Element("batch-summary").SetText(json, x => x.Summary);

@@ -37,6 +37,24 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public int AssistedLivingCount { get; init; }
     }
 
+    /// <summary>The query of <c>GET api/kanban/board</c>: the facility whose cards load.</summary>
+    public sealed class KanbanBoardQuery
+    {
+        public string? SelectedFacilityId { get; init; }
+    }
+
+    /// <summary>A request for one card's summary, <c>GET api/kanban/card/{cardId}/summary</c>: the card in the path.</summary>
+    public sealed class KanbanCardSummaryQuery
+    {
+        public int CardId { get; init; }
+    }
+
+    /// <summary>The body the page sends with <c>PUT api/kanban/cards/{cardId}</c>: where the update came from; the endpoint does not read it.</summary>
+    public sealed class KanbanCardUpdateRequest
+    {
+        public string Source { get; init; } = "";
+    }
+
     public sealed class KanbanAuditRequest
     {
         public List<KanbanTaskCard> Cards { get; init; } = new List<KanbanTaskCard>();

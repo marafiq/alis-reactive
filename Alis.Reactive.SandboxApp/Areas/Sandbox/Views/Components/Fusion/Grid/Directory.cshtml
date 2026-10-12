@@ -1,7 +1,6 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentDirectoryModel
 @using Alis.Reactive.Builders
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @using Alis.Reactive
@@ -17,15 +16,10 @@
     void LoadDirectory(PipelineBuilder<ResidentDirectoryModel> p, string status)
     {
         p.Post(Url.SandboxRoute("DirectoryData", "Grid"))
-            .Gather(g =>
-            {
-                g.Static("skip", 0);
-                g.Static("take", 8);
-                g.Include<FusionTextBox, ResidentDirectoryModel>(m => m.ResidentSearch);
-                g.Include<FusionDropDownList, ResidentDirectoryModel>(m => m.CareLevel);
-                g.Include<FusionDropDownList, ResidentDirectoryModel>(m => m.RiskLevel);
-                g.Include<FusionNumericTextBox, ResidentDirectoryModel>(m => m.MinimumAge);
-            })
+            .Gather<ResidentDirectoryRequest>(g => g
+                .Set(x => x.Skip, 0)
+                .Set(x => x.Take, 8)
+                .Form(m => m.ResidentSearch, m => m.CareLevel, m => m.RiskLevel, m => m.MinimumAge))
             .Response(r => r.OnSuccess<ResidentDirectoryResponse>((json, s) =>
             {
                 s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
@@ -37,11 +31,9 @@
     void LoadVirtualDirectory(PipelineBuilder<ResidentDirectoryModel> p, string status)
     {
         p.Post(Url.SandboxRoute("DirectoryData", "Grid"))
-            .Gather(g =>
-            {
-                g.Static("skip", 0);
-                g.Static("take", 24);
-            })
+            .Gather<ResidentDirectoryRequest>(g => g
+                .Set(x => x.Skip, 0)
+                .Set(x => x.Take, 24))
             .Response(r => r.OnSuccess<ResidentDirectoryResponse>((json, s) =>
             {
                 s.Component<FusionGrid>(VirtualGridId).Set(c => c.DataSource, json.Read(x => x));
@@ -227,7 +219,7 @@
                 {
                     var grid = p.Component<FusionGrid>(GridId);
                     p.Post(Url.SandboxRoute("SelectionIndexes", "Grid"))
-                        .Gather(g => g.Include(grid.Get(c => c.GetSelectedRowIndexes), "selectedRowIndexes"))
+                        .Gather<ResidentSelectionIndexesRequest>(g => g.Set(x => x.SelectedRowIndexes, grid.Get(c => c.GetSelectedRowIndexes)))
                         .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         {
                             s.Element("selection-indexes").SetText(json, x => x.Summary);
@@ -239,7 +231,7 @@
                 {
                     var grid = p.Component<FusionGrid>(GridId);
                     p.Post(Url.SandboxRoute("SelectionRecords", "Grid"))
-                        .Gather(g => g.Include(grid.Get(c => c.GetSelectedRecords<ResidentDirectoryGridItem>()), "selectedRecords"))
+                        .Gather<ResidentSelectionRecordsRequest>(g => g.Set(x => x.SelectedRecords, grid.Get(c => c.GetSelectedRecords<ResidentDirectoryGridItem>())))
                         .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         {
                             s.Element("selected-records").SetText(json, x => x.Summary);
@@ -294,20 +286,16 @@
                 p.Element("grid-action-cancel").SetText(args, x => x.Action.Cancel);
                 p.Element("grid-column").SetText(args, x => x.Action.ColumnName);
                 p.Element("grid-direction").SetText(args, x => x.Action.Direction);
+                var dataState = p.Payload(args);
                 p.Post(Url.SandboxRoute("DirectoryData", "Grid"))
-                    .Gather(g =>
-                    {
-                        g.FromEvent(args, x => x.Skip, "skip");
-                        g.FromEvent(args, x => x.Take, "take");
-                        g.FromEvent(args, x => x.Sorted, "sorted");
-                        g.FromEvent(args, x => x.Group, "group");
-                        g.FromEvent(args, x => x.Where, "where");
-                        g.FromEvent(args, x => x.Search, "search");
-                        g.Include<FusionTextBox, ResidentDirectoryModel>(m => m.ResidentSearch);
-                        g.Include<FusionDropDownList, ResidentDirectoryModel>(m => m.CareLevel);
-                        g.Include<FusionDropDownList, ResidentDirectoryModel>(m => m.RiskLevel);
-                        g.Include<FusionNumericTextBox, ResidentDirectoryModel>(m => m.MinimumAge);
-                    })
+                    .Gather<ResidentDirectoryRequest>(g => g
+                        .Set(x => x.Skip, dataState.Get(a => a.Skip))
+                        .Set(x => x.Take, dataState.Get(a => a.Take))
+                        .Set(x => x.Sorted, dataState.Get(a => a.Sorted))
+                        .Set(x => x.Group, dataState.Get(a => a.Group))
+                        .Set(x => x.Where, dataState.Get(a => a.Where))
+                        .Set(x => x.Search, dataState.Get(a => a.Search))
+                        .Form(m => m.ResidentSearch, m => m.CareLevel, m => m.RiskLevel, m => m.MinimumAge))
                     .Response(r => r.OnSuccess<ResidentDirectoryResponse>((json, s) =>
                     {
                         s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
@@ -329,12 +317,11 @@
                 p.Element("selected-previous-row-index").SetText(args, x => x.PreviousRowIndex);
                 p.Element("selected-interacted").SetText(args, x => x.IsInteracted);
                 p.Element("selected-event").SetText(args, x => x.Name);
+                var selected = p.Payload(args);
                 p.Post(Url.SandboxRoute("SelectResident", "Grid"))
-                    .Gather(g =>
-                    {
-                        g.FromEvent(args, x => x.Data.ResidentId, "residentId");
-                        g.FromEvent(args, x => x.RowIndex, "rowIndex");
-                    })
+                    .Gather<ResidentSelectionRequest>(g => g
+                        .Set(x => x.ResidentId, selected.Get(a => a.Data.ResidentId))
+                        .Set(x => x.RowIndex, selected.Get(a => a.RowIndex)))
                     .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                     {
                         s.Element("selected-resident").SetText(json, x => x.ResidentName);
@@ -391,13 +378,12 @@
                 p.Element("virtual-action").SetText(args, x => x.Action.RequestType);
                 p.Element("virtual-skip").SetText(args, x => x.Skip);
                 p.Element("virtual-take").SetText(args, x => x.Take);
+                var dataState = p.Payload(args);
                 p.Post(Url.SandboxRoute("DirectoryData", "Grid"))
-                    .Gather(g =>
-                    {
-                        g.FromEvent(args, x => x.Skip, "skip");
-                        g.FromEvent(args, x => x.Take, "take");
-                        g.FromEvent(args, x => x.Sorted, "sorted");
-                    })
+                    .Gather<ResidentDirectoryRequest>(g => g
+                        .Set(x => x.Skip, dataState.Get(a => a.Skip))
+                        .Set(x => x.Take, dataState.Get(a => a.Take))
+                        .Set(x => x.Sorted, dataState.Get(a => a.Sorted)))
                     .Response(r => r.OnSuccess<ResidentDirectoryResponse>((json, s) =>
                     {
                         s.Component<FusionGrid>(VirtualGridId).Set(c => c.DataSource, json.Read(x => x));

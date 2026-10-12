@@ -1,5 +1,4 @@
 @model RoomRateModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "Room Rates";
@@ -27,7 +26,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("Add", "RoomRate"), g => g.IncludeAll())
+                p.Post(Url.SandboxRoute("Add", "RoomRate")).Gather(g => g.Form())
                  .Validate<RoomRateValidator>("room-rate-form")
                  .Response(r => r
                     .OnSuccess<RoomRateConfirmation>((json, s) =>

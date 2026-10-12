@@ -278,7 +278,7 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"mealsPerWeek\":12"),
+        Assert.That(body, Does.Contain("\"MealsPerWeek\":12"),
             "the gather pipeline must carry the meals Value() source under its declared key");
 
         AssertNoConsoleErrors();

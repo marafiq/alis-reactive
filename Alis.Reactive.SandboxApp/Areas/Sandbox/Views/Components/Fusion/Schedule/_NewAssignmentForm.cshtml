@@ -1,5 +1,4 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.NewAssignmentModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -47,13 +46,9 @@
                 .CssClass("px-4 py-2 rounded-md bg-accent text-white text-sm font-medium hover:bg-accent/90")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post("/api/schedule/create-assignment", g => g
-                         .Include<NativeHiddenField, NewAssignmentModel>(m => m.StartTime)
-                         .Include<NativeHiddenField, NewAssignmentModel>(m => m.EndTime)
-                         .Include<NativeHiddenField, NewAssignmentModel>(m => m.ShiftId)
-                         .Include<NativeHiddenField, NewAssignmentModel>(m => m.FacilityId)
-                         .Include<FusionDropDownList, NewAssignmentModel>(m => m.StaffId)
-                         .Include<NativeTextArea, NewAssignmentModel>(m => m.Notes))
+                    p.Post("/api/schedule/create-assignment")
+                     .Gather(g => g.Form(
+                         m => m.StartTime, m => m.EndTime, m => m.ShiftId, m => m.FacilityId, m => m.StaffId, m => m.Notes))
                      .Validate<NewAssignmentValidator>("new-assignment-form")
                      .Response(r => r
                          .OnSuccess(s =>

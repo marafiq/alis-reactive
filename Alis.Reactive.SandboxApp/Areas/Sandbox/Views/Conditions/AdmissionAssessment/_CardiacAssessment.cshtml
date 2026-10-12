@@ -1,5 +1,4 @@
 @model Step2ClinicalModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -28,9 +27,8 @@
                     .Then(then =>
                     {
                         then.Element("hypertension-spinner").Show();
-                        then.Post(alertHypertensionUrl,
-                            g => g.Include<FusionNumericTextBox, Step2ClinicalModel>(m => m.SystolicBP)
-                                  .Include<NativeHiddenField, Step2ClinicalModel>(m => m.ResidentName))
+                        then.Post(alertHypertensionUrl)
+                         .Gather<AlertHypertensionRequest>(g => g.Form(m => m.SystolicBP, m => m.ResidentName))
                          .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
                          {
                              s.Element("hypertension-result").SetText(json, x => x.Message);

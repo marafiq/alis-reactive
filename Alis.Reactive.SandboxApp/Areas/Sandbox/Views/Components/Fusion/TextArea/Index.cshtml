@@ -1,5 +1,4 @@
 @model TextAreaModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -111,7 +110,7 @@
                             .SetText("Please write a care note before saving."))
                         .Else(ready =>
                             ready.Post(Url.SandboxRoute("Echo", "TextArea"))
-                                .Gather(g => g.Include(note.Get(c => c.Value), "careNote"))
+                                .Gather<CareNoteEchoRequest>(g => g.Set(x => x.CareNote, note.Get(c => c.Value)))
                                 .Response(r => r.OnSuccess<CareNoteEchoResponse>((json, s) =>
                                 {
                                     s.Element("note-save-guard").SetText("");

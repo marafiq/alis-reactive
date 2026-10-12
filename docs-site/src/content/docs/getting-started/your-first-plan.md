@@ -156,7 +156,7 @@ the end.
     @(Html.NativeButton("save-btn", "Save")
         .Reactive(plan, evt => evt.Click, (_, p) =>
         {
-            p.Post("/Todo/Save", g => g.IncludeAll())
+            p.Post("/Todo/Save").Gather(g => g.Form())
              .Validate<TodoValidator>("todo-form")
              .Response(r => r
                 .OnSuccess(s =>
@@ -178,13 +178,14 @@ the end.
 
 `Html.ReactivePlan<TModel>()` creates the plan for this view.
 
-`Html.InputField(...)` registers each model-bound input. The runtime later uses
-those registrations for gather and validation.
+`Html.InputField(...)` registers each model-bound input. Those inputs are what
+`Form()` sends and what validation checks.
 
 `.Reactive(...)` wires a typed component event. The checkbox payload exposes
 `Checked`, so the condition reads `args.Checked`.
 
-`p.Post(...).Gather(...)` sends values read from registered inputs. The
+`p.Post(...).Gather(g => g.Form())` sends every input of the form under its
+binding name, so `Save([FromBody] TodoModel model)` receives each one. The
 `Validate<TValidator>(...)` call runs client validation before the request.
 
 `Response(...)` routes success and error outcomes. The success path writes to

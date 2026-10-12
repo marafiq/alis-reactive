@@ -5,6 +5,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public IReadOnlyList<PivotCensusRow> InitialRows { get; init; } = PivotCensusData.InitialRows;
     }
 
+    /// <summary>The pivot page's link: <c>?facilityId=evergreen</c>.</summary>
+    public sealed class PivotViewQuery
+    {
+        public string? FacilityId { get; init; }
+    }
+
+    /// <summary>The query of <c>GET api/pivot/census</c>: the facility whose census loads.</summary>
+    public sealed class PivotCensusQuery
+    {
+        public string? FacilityId { get; init; }
+    }
+
     public sealed class PivotCensusRow
     {
         public string Wing { get; init; } = "";
@@ -20,11 +32,17 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public IReadOnlyList<PivotCensusRow> Rows { get; init; } = new List<PivotCensusRow>();
     }
 
-    public sealed class PivotAuditRequest
+    /// <summary>The body of <c>POST api/pivot/{currentView}/audit</c>.</summary>
+    public class PivotAuditRequest
     {
-        public string CurrentView { get; init; } = "";
         public string FacilityId { get; init; } = "";
         public string Layout { get; init; } = "";
+    }
+
+    /// <summary>The audit as the page sends it: the view in the path, the facility and layout in the body.</summary>
+    public sealed class PivotAuditVisit : PivotAuditRequest
+    {
+        public string CurrentView { get; init; } = "";
     }
 
     public sealed class PivotAuditResponse

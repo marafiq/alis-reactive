@@ -182,9 +182,9 @@ public class WhenUsingFusionSlider : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"roomTemperature\":68"),
+        Assert.That(body, Does.Contain("\"RoomTemperature\":68"),
             "the gather pipeline must carry the Value() source under its declared key");
-        Assert.That(body, Does.Contain("\"quietHours\":[13,15]"),
+        Assert.That(body, Does.Contain("\"QuietHours\":[13,15]"),
             "the gather pipeline must carry the RangeValue() source under its declared key");
 
         AssertNoConsoleErrors();

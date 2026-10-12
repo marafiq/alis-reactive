@@ -1,5 +1,4 @@
 @model ValidationShowcaseModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "Validation";
@@ -79,7 +78,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("Save", "Validation"), g => g.Include(m => m.Server!.Name).Include(m => m.Server!.Email))
+                p.Post(Url.SandboxRoute("Save", "Validation")).Gather(g => g.Form(m => m.Server.Name, m => m.Server.Email))
                  .Validate<ServerFormValidator>("server-form")
                  .Response(r => r
                     .OnSuccess(s =>
@@ -171,10 +170,8 @@
             .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("SaveProfile", "Validation"), g => g
-                    .Include(m => m.Hidden!.Name)
-                    .Include(m => m.Hidden!.Phone)
-                    .Include(m => m.Hidden!.Salary))
+                p.Post(Url.SandboxRoute("SaveProfile", "Validation"))
+                 .Gather(g => g.Form(m => m.Hidden.Name, m => m.Hidden.Phone, m => m.Hidden.Salary))
                  .Validate<HiddenFieldsFormValidator>("hidden-fields-form")
                  .Response(r => r
                     .OnSuccess(s =>
@@ -210,7 +207,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("SaveWithDbCheck", "Validation"), g => g.Include(m => m.Db!.Name).Include(m => m.Db!.Email))
+                p.Post(Url.SandboxRoute("SaveWithDbCheck", "Validation")).Gather(g => g.Form(m => m.Db.Name, m => m.Db.Email))
                  .Validate<DbFormValidator>("db-form")
                  .Response(r => r
                     .OnSuccess(s =>

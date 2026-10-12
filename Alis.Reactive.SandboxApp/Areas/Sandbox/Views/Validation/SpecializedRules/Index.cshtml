@@ -1,5 +1,4 @@
 @model NewRuleTypesModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "New Rule Types";
@@ -63,7 +62,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Post(Url.SandboxRoute("ValidateClient", "NewRuleTypes"))
-                 .Gather(g => g.IncludeAll())
+                 .Gather(g => g.Form())
                  .Validate<NewRuleTypesValidator>("new-rules-form")
                  .Response(r => r
                      .OnSuccess(s =>

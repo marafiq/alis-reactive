@@ -1,5 +1,4 @@
 @model NativeHiddenFieldModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "NativeHiddenField";
@@ -20,7 +19,7 @@
     <native-text color="Secondary">
         Exercises NativeHiddenField vertical slice: hidden inputs that carry values
         (resident IDs, form tokens) invisibly. They register as input components
-        so IncludeAll gathers them, and they support property reads.
+        so <code>Form()</code> gathers them, and they support property reads.
     </native-text>
 
     <native-card><native-card-body>
@@ -53,7 +52,7 @@
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">3. POST Gather (IncludeAll)</native-heading>
+        <native-heading level="H2">3. POST Gather (Form)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Clicks "Submit" to POST all gathered fields (including hidden inputs) to the server.
             Server echoes back what it received, proving hidden values are gathered.
@@ -62,7 +61,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("Echo", "NativeHiddenField"), g => g.IncludeAll())
+                p.Post(Url.SandboxRoute("Echo", "NativeHiddenField")).Gather(g => g.Form())
                  .Response(r => r
                     .OnSuccess<NativeHiddenFieldEchoResponse>((json, s) =>
                     {

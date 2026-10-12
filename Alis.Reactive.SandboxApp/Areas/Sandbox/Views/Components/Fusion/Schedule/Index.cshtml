@@ -1,5 +1,4 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.PointInTimeScheduleModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.AppLevel
 @using Alis.Reactive.Fusion.Components
@@ -36,10 +35,10 @@
     {
         p.Element("status").SetText("Refreshing after save...");
         p.Get("/api/schedule/assignments")
-         .Gather(g => g
-             .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
-             .Include(p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView))
-             .Include(p.Component<FusionSchedule>("shift-schedule").Get(c => c.SelectedDate), "currentDate"))
+         .Gather<ScheduleAssignmentsQuery>(g => g
+             .Form(m => m.SelectedFacilityId)
+             .Set(x => x.CurrentView, p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView))
+             .Set(x => x.CurrentDate, p.Component<FusionSchedule>("shift-schedule").Get(c => c.SelectedDate)))
          .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
          {
              s.Component<FusionSchedule>("shift-schedule")
@@ -55,7 +54,7 @@
         p.Element("alis-drawer-title").SetText("Edit Shift Assignment");
         p.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md);
         p.Get(Url.SandboxRoute("EditForm", "Schedule"))
-         .Gather(g => g.FromEvent(payload, x => x.Id, "assignmentId"))
+         .Gather<EditAssignmentQuery>(g => g.Set(x => x.AssignmentId, p.Payload(payload).Get(a => a.Id)))
          .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
         p.Component<NativeDrawer>().Call(c => c.Open);
     }));
@@ -65,7 +64,7 @@
         p.Element("alis-drawer-title").SetText("Reassign Shift");
         p.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md);
         p.Get(Url.SandboxRoute("EditForm", "Schedule"))
-         .Gather(g => g.FromEvent(payload, x => x.Id, "assignmentId"))
+         .Gather<EditAssignmentQuery>(g => g.Set(x => x.AssignmentId, p.Payload(payload).Get(a => a.Id)))
          .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
         p.Component<NativeDrawer>().Call(c => c.Open);
     }));
@@ -102,10 +101,10 @@
                     {
                         p.Element("status").SetText("Loading...");
                         p.Get("/api/schedule/assignments")
-                         .Gather(g => g
-                             .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
-                             .Include(p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView))
-                             .Include(p.Component<FusionSchedule>("shift-schedule").Get(c => c.SelectedDate), "currentDate"))
+                         .Gather<ScheduleAssignmentsQuery>(g => g
+                             .Form(m => m.SelectedFacilityId)
+                             .Set(x => x.CurrentView, p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView))
+                             .Set(x => x.CurrentDate, p.Component<FusionSchedule>("shift-schedule").Get(c => c.SelectedDate)))
                          .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                          {
                              s.Component<FusionSchedule>("shift-schedule")
@@ -132,8 +131,8 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Get("/api/schedule/view/{currentView}/echo")
-                     .Gather(g => g.RouteParam(
-                         "currentView",
+                     .Gather<ScheduleViewRequest>(g => g.Set(
+                         x => x.CurrentView,
                          p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView)))
                      .Response(r => r.OnSuccess<ScheduleViewRouteResponse>((json, s) =>
                      {
@@ -141,8 +140,8 @@
                      })
                      .Chained(c => c
                          .Get("/api/schedule/view/{currentView}/summary")
-                         .Gather(g => g.RouteParam(
-                             "currentView",
+                         .Gather<ScheduleViewRequest>(g => g.Set(
+                             x => x.CurrentView,
                              p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView)))
                          .Response(r2 => r2.OnSuccess<ScheduleViewRouteResponse>((json, s) =>
                          {
@@ -154,9 +153,9 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Post("/api/schedule/events/audit")
-                     .Gather(g => g.Include(
-                         p.Component<FusionSchedule>("shift-schedule").Get(c => c.GetEvents<ShiftAssignment>()),
-                         "events"))
+                     .Gather<ScheduleEventsAuditRequest>(g => g.Set(
+                         x => x.Events,
+                         p.Component<FusionSchedule>("shift-schedule").Get(c => c.GetEvents<ShiftAssignment>())))
                      .Response(r => r.OnSuccess<ScheduleEventsAuditResponse>((json, s) =>
                      {
                          s.Element("schedule-events-count").SetText(json, x => x.Count);
@@ -216,11 +215,11 @@
                 p.Element("event-shift").SetText(args, x => x.GroupIndex);
 
                 p.Get(Url.SandboxRoute("NewAssignmentForm", "Schedule"))
-                 .Gather(g => g
-                     .FromEvent(args, x => x.StartTime, "startTime")
-                     .FromEvent(args, x => x.EndTime, "endTime")
-                     .FromEvent(args, x => x.GroupIndex, "shiftId")
-                     .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId))
+                 .Gather<NewAssignmentQuery>(g => g
+                     .Set(x => x.StartTime, p.Payload(args).Get(a => a.StartTime))
+                     .Set(x => x.EndTime, p.Payload(args).Get(a => a.EndTime))
+                     .Set(x => x.ShiftId, p.Payload(args).Get(a => a.GroupIndex))
+                     .Form(m => m.SelectedFacilityId))
                  .Response(r => r.OnSuccess(s => s.Into("new-assignment-content")));
                 p.Component<FusionDialog>("new-assignment-dialog").Call(c => c.Show);
             })
@@ -239,7 +238,7 @@
                      t.Element("alis-drawer-title").SetText("Edit Shift Assignment");
                      t.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md);
                      t.Get(Url.SandboxRoute("EditForm", "Schedule"))
-                      .Gather(g => g.FromEvent(args, x => x.Data.Id, "assignmentId"))
+                      .Gather<EditAssignmentQuery>(g => g.Set(x => x.AssignmentId, t.Payload(args).Get(a => a.Data.Id)))
                       .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
                      t.Component<NativeDrawer>().Call(c => c.Open);
                  })
@@ -264,10 +263,10 @@
                  {
                      t.Element("status").SetText("Saved — reloading...");
                      t.Get("/api/schedule/assignments")
-                      .Gather(g => g
-                          .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
-                          .Include(p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView))
-                          .Include(p.Component<FusionSchedule>("shift-schedule").Get(c => c.SelectedDate), "currentDate"))
+                      .Gather<ScheduleAssignmentsQuery>(g => g
+                          .Form(m => m.SelectedFacilityId)
+                          .Set(x => x.CurrentView, p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView))
+                          .Set(x => x.CurrentDate, p.Component<FusionSchedule>("shift-schedule").Get(c => c.SelectedDate)))
                       .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                       {
                           s.Component<FusionSchedule>("shift-schedule")
@@ -286,10 +285,10 @@
                  .Then(t =>
                  {
                      t.Get("/api/schedule/assignments")
-                      .Gather(g => g
-                          .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
-                          .FromEvent(args, x => x.CurrentDate, "currentDate")
-                          .FromEvent(args, x => x.CurrentView, "currentView"))
+                      .Gather<ScheduleNavigationQuery>(g => g
+                          .Form(m => m.SelectedFacilityId)
+                          .Set(x => x.CurrentDate, t.Payload(args).Get(a => a.CurrentDate))
+                          .Set(x => x.CurrentView, t.Payload(args).Get(a => a.CurrentView)))
                       .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                       {
                           s.Component<FusionSchedule>("shift-schedule")
@@ -302,10 +301,10 @@
                  .Else(e =>
                  {
                      e.Get("/api/schedule/assignments")
-                      .Gather(g => g
-                          .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
-                          .FromEvent(args, x => x.CurrentDate, "currentDate")
-                          .Include(p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView)))
+                      .Gather<ScheduleNavigationQuery>(g => g
+                          .Form(m => m.SelectedFacilityId)
+                          .Set(x => x.CurrentDate, e.Payload(args).Get(a => a.CurrentDate))
+                          .Set(x => x.CurrentView, e.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView)))
                       .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                       {
                           s.Component<FusionSchedule>("shift-schedule")

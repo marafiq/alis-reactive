@@ -1,5 +1,4 @@
 @model RoomHoldModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "Room Holds";
@@ -51,7 +50,7 @@
             .CssClass("mt-4 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("Hold", "RoomHold"), g => g.IncludeAll())
+                p.Post(Url.SandboxRoute("Hold", "RoomHold")).Gather(g => g.Form())
                  .Validate<RoomHoldValidator>("room-hold-form")
                  .Response(r => r
                     .OnSuccess<RoomHoldConfirmation>((json, s) =>

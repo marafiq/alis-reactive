@@ -28,7 +28,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         [HttpGet("Medications")]
-        public IActionResult Medications([FromQuery] string? MedicationType)
+        public IActionResult Medications([FromQuery] MedicationSearchQuery query)
         {
             var all = new List<MedicationTypeItem>
             {
@@ -43,7 +43,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             };
 
             // Filtering gather can serialize an empty selection as "null"; treat it like no search text.
-            var search = MedicationType == "null" ? null : MedicationType;
+            var search = query.MedicationType == "null" ? null : query.MedicationType;
             var filtered = string.IsNullOrEmpty(search)
                 ? all
                 : all.Where(m => m.Text.Contains(search, StringComparison.OrdinalIgnoreCase)

@@ -1,7 +1,6 @@
 using Alis.Reactive.FluentValidator;
 using FluentValidation;
 using Alis.Reactive.Fusion.Components;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
@@ -53,7 +52,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public int Skip { get; set; }
         public int Take { get; set; }
-        public List<GridSortRequest>? Sorted { get; set; }
+        public List<FusionGridSortColumn>? Sorted { get; set; }
         public List<string>? Group { get; set; }
         public string? FilterCareLevel { get; set; }
         public string? FilterWing { get; set; }

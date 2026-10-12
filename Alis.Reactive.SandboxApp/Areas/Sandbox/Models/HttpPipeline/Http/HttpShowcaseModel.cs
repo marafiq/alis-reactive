@@ -10,6 +10,62 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public IReadOnlyList<HttpActionLinkRow> ActionRows { get; set; } = Array.Empty<HttpActionLinkRow>();
     }
 
+    /// <summary>The HTTP page's own query string: <c>?tab=medications&amp;facilityId=7&amp;page=3&amp;residentId=42&amp;wing=garden</c>.</summary>
+    public sealed class HttpShowcaseQuery
+    {
+        public string? Tab { get; set; }
+        public int FacilityId { get; set; }
+        public int Page { get; set; }
+        public int ResidentId { get; set; }
+        public string[] Wing { get; set; } = Array.Empty<string>();
+    }
+
+    /// <summary>The query <c>Search?q=</c> binds: the text a resident's name contains.</summary>
+    public sealed class ResidentSearchQuery
+    {
+        public string Q { get; set; } = "";
+    }
+
+    /// <summary>The query <c>UrlParamEcho</c> binds and echoes back.</summary>
+    public sealed class UrlParamEchoQuery
+    {
+        public string? Tab { get; set; }
+        public int FacilityId { get; set; }
+        public string? Page { get; set; }
+    }
+
+    /// <summary>The request <c>ComposeEcho/{id}?facility=</c> binds: the resident in the path, the facility in the query.</summary>
+    public sealed class ComposeEchoQuery
+    {
+        public int Id { get; set; }
+        public int Facility { get; set; }
+    }
+
+    /// <summary>The lookup <c>Residents/{id}</c> binds: the resident in the path.</summary>
+    public sealed class ResidentLookup
+    {
+        public int Id { get; set; }
+    }
+
+    /// <summary>The lookup <c>Facilities/{facilityId}/Residents/{residentId}</c> binds: both in the path.</summary>
+    public sealed class FacilityResidentLookup
+    {
+        public int FacilityId { get; set; }
+        public int ResidentId { get; set; }
+    }
+
+    /// <summary>The lookup <c>ResidentByName/{name}</c> binds: the name in the path.</summary>
+    public sealed class ResidentNameLookup
+    {
+        public string Name { get; set; } = "";
+    }
+
+    /// <summary>The body the <c>EchoHeaders</c> POST accepts; it answers with the headers only.</summary>
+    public sealed class EchoHeadersBody
+    {
+        public string Payload { get; set; } = "";
+    }
+
     public sealed class HttpActionLinkRow
     {
         public int Id { get; set; }

@@ -1,7 +1,6 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper.FusionStepperWizardCareModel
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper
 @{
     const string StepperId = "stepper-wizard";
@@ -74,7 +73,7 @@
             .CssClass("rounded-md bg-accent px-5 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (_, p) =>
             {
-                p.Post(saveUrl, g => g.IncludeAll())
+                p.Post(saveUrl).Gather(g => g.Form())
                     .Validate<FusionStepperWizardCareValidator>(FormId)
                     .Response(r => r
                         .OnSuccess<FusionStepperWizardSaveResponse>((json, s) =>

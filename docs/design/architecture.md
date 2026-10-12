@@ -599,6 +599,22 @@ p.Post(url)
 - **URL reads.**
   - `p.Url<TQuery>()` matches keys case-insensitively, as ASP.NET binding does.
   - Array members read every value of a key.
+- **As built (typed gather).**
+  - `Gather<TRequest>(g => g.Set(x => x.M, v).Form(..).Header(name, v))`; `.Gather(g => ..)` takes the
+    view model as the request. `Set` takes any value source or a literal. A source's type must be the
+    member's type or derive from it, so an `int?` value cannot fill an `int` member; a `T[]` fills `T[]`,
+    `List<T>` or `IEnumerable<T>`; a nullable member is left empty with a typed null.
+  - An event payload member is read with `p.Payload(args).Get(a => a.M)`, since the handle model of
+    section 3 is not built (section 13).
+  - Rendering checks that every placeholder is filled, that a member is set once, and that a
+    `Form(m => m.X)` field is a member of `TRequest` of a type its value binds to.
+  - In ASP.NET Core an action that binds a JSON body takes its route values as parameters beside the
+    `[FromBody]` class (`Hold(string slotId, [FromBody] HoldRequest hold)`). The page's request class
+    is then the body class plus the route members (`HoldVisitRequest : HoldRequest { SlotId }`).
+  - Keys are binding names: `{"Address":{"City":..}}` in JSON, `Address.City` in a query or form data.
+  - The deleted surface: every `Include` form, `IncludeAll`, `FromEvent`, `RouteParam`, `FromUrl`
+    (gather and `p.FromUrl`), `Static`, `GatherBuilder.Plugin`, `p.Post(url, g => ..)` and
+    `p.Put(url, g => ..)`, and the namespace `Alis.Reactive.Native.Extensions`.
 - **How a request runs.** It lowers to `let`, `if` and `try` around `http.send` (section 0.5). The
   builder owns that shape. The runtime's `http` module only fills the URL and the query or body by
   MVC's route-value rule, sends, and reads the body.
@@ -1026,3 +1042,18 @@ executor. The switch is deleted with today's executor when the last area has mov
 
 The fixtures stay frozen throughout (section 10), so each green area proves that its use cases
 behave as before.
+
+## 13. Decisions after the audit of October 2026
+
+An audit of every claim above against the code found the grammar, the plan document and the runtime
+built as written, and the C# object model of step 2 not built. These decisions settle what of it is
+built and what is not.
+
+- **The handle model (sections 3, 4.0, 4.1, 4.3 values, rules 3, 4 and 6 of section 5) is not built.**
+  The owner keeps the typed fluent API of descriptors and verbs (`p.Component<T>(..).Set(c => c.X, v)`,
+  `.Get(c => c.X)`, `p.Payload(args).Get(a => a.X)`, the `(source, x => x.Path)` pairs). It reaches
+  every member of every object, shipped or brought, with the compiler checking each one; the handle
+  model would rewrite 70 declarations and about 2,000 call sites for the same reach. Approach A of
+  section 11 is therefore what ships, with its defects removed (below).
+- **Built from the audit:**
+  - typed gather and `p.Url<TQuery>()` (section 4.6, as built).

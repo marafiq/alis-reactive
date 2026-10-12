@@ -5,47 +5,130 @@ description: How requests, gather, responses, loading state, and ReactiveValidat
 
 HTTP is an async reaction in the pipeline.
 
-The request reads values through `Gather`. The response routes success and error
-outcomes back into normal pipelines.
+`Gather` builds the request your action binds. The response routes success and
+error outcomes back into normal pipelines.
 
-## Send a Request
+## How do I send the form?
+
+When the action binds the view model, gather the form:
 
 ```csharp
-p.Post("/Todo/Save", g => g.IncludeAll())
+p.Post("/Todo/Save").Gather(g => g.Form())
  .Response(r => r.OnSuccess(s =>
  {
      s.Element("status").SetText("Saved");
  }));
 ```
 
-`IncludeAll()` gathers every registered input component that is currently
-mounted. A value you gather yourself beside it keeps its place: an input fills
-only its own member, so `.Static("Pharmacy.Network", "Riverside Health")` still
-arrives next to an input bound to `Pharmacy.Phone`.
+`Form()` sends every input the view rendered through `Html.InputField` (and the
+partials composed with it), while the input is on the page. Each input goes under
+its binding name, the name MVC binds, so `Save([FromBody] TodoModel model)`
+receives it.
 
-## Gather Specific Values
+`Form(m => m.Country, m => m.City)` sends only the inputs you name.
 
-Gather can read literals, URL parameters, headers, event payloads, plugin values,
-and component values.
+## How do I add a value the form does not carry?
+
+`Set` the member beside the form:
 
 ```csharp
-p.Post("/Residents/{residentId}/notes", g => g
-    .RouteParam("residentId", p.FromUrl<int>("residentId"))
-    .Header("X-Requested-With", "Alis.Reactive")
-    .IncludeAll());
+p.Post(Url.SandboxRoute("Save", "MoveInReview")).Gather(g => g.Form().Set(x => x.Pharmacy.Network, "Riverside Health"))
 ```
 
-For `GET`, gathered payload values become query string values. For `POST`,
-`PUT`, and `DELETE`, gathered payload values become the request body.
+An input fills only its own member, so `Pharmacy.Network` still arrives next to
+the form's `Pharmacy.Phone` input. When an input is bound to the same name as a
+member you set, the input wins.
 
-`AsJson()` is the default. Use `AsFormData()` when the request includes files.
+## What if the action binds another class?
+
+Name that class with `Gather<TRequest>`. Each member is a typed lambda over
+`TRequest`, so there is no parameter name to misspell:
+
+```csharp
+p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
+ .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, p.Payload(args).Get(a => a.Text)))
+```
+
+`Form(m => ..)` works here too. Each input you name must also be a member of
+`TRequest`, of a type the input's value binds to; otherwise the view fails when
+it renders:
+
+```csharp
+then.Post(alertHypertensionUrl)
+ .Gather<AlertHypertensionRequest>(g => g.Form(m => m.SystolicBP, m => m.ResidentName))
+```
+
+## How do I fill a route value?
+
+Set the member named like the URL's `{placeholder}`; case does not matter:
+
+```csharp
+var rateUrl = Url.SandboxRouteTemplate("Rate", "TomSelect", "suiteType");
+
+quote.Get(rateUrl)
+    .Gather<SuiteQuery>(g => g.Set(x => x.SuiteType, suite.Get(x => x.Value)))
+```
+
+Every placeholder must be filled. A placeholder no member fills fails when the
+view renders, and the message names it.
+
+In ASP.NET Core, an action that binds a JSON body takes its route values as
+their own parameters:
+
+```csharp
+[HttpPost("FrontDesk/Hold/{slotId}")]
+public IActionResult HoldVisit(string slotId, [FromBody] HoldRequest? hold)
+```
+
+The page's request class is the body class plus the route members:
+
+```csharp
+public sealed class HoldVisitRequest : HoldRequest
+{
+    public string SlotId { get; set; } = "";
+}
+```
+
+```csharp
+added.Post(holdUrl)
+    .Gather<HoldVisitRequest>(g => g
+        .Set(x => x.SlotId, p.Payload(args).Get(a => a.Added))
+        .Set(x => x.VisitsThisWeek, added.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.Count))
+        .Set(x => x.Family, p.Url<FrontDeskQuery>().Get(q => q.Family))
+        .Set(x => x.Source, "front-desk")
+        .Header("X-Wing", added.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.Wing)))
+```
+
+`SlotId` fills `{slotId}` in the path, the other members are the JSON body, and
+`X-Wing` is a header.
+
+## What can a member be set from?
+
+A literal, or any value: a component member, the event's payload
+(`p.Payload(args).Get(..)`), the page's URL query (`p.Url<TQuery>().Get(..)`),
+a success body (in a request nested in `OnSuccess`), a plugin, or an array
+value. `Header(name, value)` takes a literal or a value too.
+
+The compiler keeps the types honest: an `int?` value cannot fill an `int`
+member, and an array fills an array, `List<T>` or `IEnumerable<T>` member.
+
+## Where does each value go?
+
+- A member named like a `{placeholder}` fills the path.
+- For `GET`, the other members become the query string.
+- For `POST`, `PUT`, and `DELETE`, they become the request body. JSON is the
+  default; `AsFormData()` sends form data, which a request with files needs.
+- Each key is the member's binding name (`SlotId`, `Pharmacy.Network`). MVC
+  binds it ignoring case.
+
+Setting the same member twice fails when the view renders.
 
 ## Loading and Cleanup
 
 Use `WhileLoading(...)` for the in-flight state and `Finally(...)` for cleanup.
 
 ```csharp
-p.Post("/Todo/Save", g => g.IncludeAll())
+p.Post("/Todo/Save").Gather(g => g.Form())
  .WhileLoading(l => l.Component<NativeLoader>().Call(c => c.Show))
  .Finally(f => f.Component<NativeLoader>().Call(c => c.Hide));
 ```
@@ -64,7 +147,7 @@ public sealed class SaveResponse
 ```
 
 ```csharp
-p.Post("/Todo/Save", g => g.IncludeAll())
+p.Post("/Todo/Save").Gather(g => g.Form())
  .Response(r => r.OnSuccess<SaveResponse>((body, s) =>
  {
      s.Element("status").SetText(body, x => x.Message);
@@ -79,7 +162,7 @@ value-consuming primitive.
 Use exact status routes when a status has a known meaning.
 
 ```csharp
-p.Post("/Todo/Save", g => g.IncludeAll())
+p.Post("/Todo/Save").Gather(g => g.Form())
  .Response(r => r
     .OnError(400, e => e.ValidationErrors("todo-form"))
     .OnError(e => e.Element("status").SetText("Save failed.")));
@@ -92,7 +175,7 @@ Exact status routes run before general error routes.
 `Validate<TValidator>(formId)` runs client validation before the HTTP request.
 
 ```csharp
-p.Post("/Todo/Save", g => g.IncludeAll())
+p.Post("/Todo/Save").Gather(g => g.Form())
  .Validate<TodoValidator>("todo-form")
  .Response(r => r
     .OnSuccess(s => s.Element("status").SetText("Saved"))

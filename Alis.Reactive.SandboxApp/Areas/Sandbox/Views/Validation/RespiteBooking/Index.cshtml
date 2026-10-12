@@ -1,5 +1,4 @@
 @model RespiteBookingModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "Respite Booking";
@@ -36,7 +35,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("Book", "RespiteBooking"), g => g.IncludeAll())
+                p.Post(Url.SandboxRoute("Book", "RespiteBooking")).Gather(g => g.Form())
                  .Validate<RespiteBookingValidator>("respite-booking-form")
                  .Response(r => r
                     .OnSuccess<RespiteBookingConfirmation>((json, s) =>

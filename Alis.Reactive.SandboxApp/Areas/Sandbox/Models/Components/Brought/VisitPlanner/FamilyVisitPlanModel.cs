@@ -34,6 +34,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
         public List<string> VisitSlots { get; set; } = new List<string>();
     }
 
+    /// <summary>A request for one resident's week of visit times from the Week endpoint: <c>{residentId}</c> in the path.</summary>
+    public sealed class ResidentWeekRequest
+    {
+        public string ResidentId { get; set; } = "";
+    }
+
     public sealed class ResidentWeekResponse
     {
         public string ResidentName { get; set; } = "";

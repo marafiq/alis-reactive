@@ -1,5 +1,6 @@
 @model IReadOnlyList<HttpActionLinkRow>
 @using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 
 <native-vstack gap="Base">
     @foreach (var row in Model)
@@ -12,7 +13,8 @@
             @(Html.NativeActionLink("Delete", Url.SandboxRoute("ActionLinkDelete", "Http", new { id = row.Id }), p => p
                 .Confirm($"Delete resident #{row.Id}?")
                 .Then(t => t
-                    .Post(Url.SandboxRoute("ActionLinkDelete", "Http", new { id = row.Id }), g => g.Static("id", row.Id))
+                    .Post(Url.SandboxRoute("ActionLinkDelete", "Http", new { id = row.Id }))
+                    .Gather<HttpController.ActionLinkDeleteRequest>(g => g.Set(x => x.Id, row.Id))
                     .WhileLoading(x => x.Element("native-action-link-status").SetText($"Deleting resident #{row.Id}..."))
                     .Response(r => r
                         .OnSuccess(x =>

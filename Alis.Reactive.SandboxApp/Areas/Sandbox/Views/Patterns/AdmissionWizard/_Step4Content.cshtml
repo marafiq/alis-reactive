@@ -1,5 +1,4 @@
 @model Step4ReviewModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     var plan = Html.ReactivePlan<Step4ReviewModel>();
@@ -65,17 +64,18 @@
             .CssClass("rounded-md border border-border px-6 py-2 text-sm font-medium text-text-primary hover:bg-slate-50 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(loadStepUrl,
-                    g => g.Include<NativeHiddenField, Step4ReviewModel>(m => m.ScreeningId)
-                          .Static("step", 3))
+                p.Post(loadStepUrl)
+                 .Gather<LoadStepRequest>(g => g
+                    .Form(m => m.ScreeningId)
+                    .Set(x => x.Step, 3))
                  .Response(r => r.OnSuccess(s => s.Into("step-container")));
             }))
         @(Html.NativeButton("submit-btn", "Submit Assessment")
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(submitUrl,
-                    g => g.IncludeAll())
+                p.Post(submitUrl)
+                 .Gather(g => g.Form())
                  .Validate<Step4Validator>("screening-form")
                  .Response(r => r
                     .OnSuccess<SubmitScreeningResponse>((json, s) =>

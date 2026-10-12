@@ -1,5 +1,4 @@
 @model MedicationPassModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "Medication Pass";
@@ -27,7 +26,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("Record", "MedicationPass"), g => g.IncludeAll())
+                p.Post(Url.SandboxRoute("Record", "MedicationPass")).Gather(g => g.Form())
                  .Response(r => r.OnSuccess<MedicationPassConfirmation>((pass, s) =>
                  {
                      s.Element("medication-pass-status").SetText(pass, x => x.Confirmation);

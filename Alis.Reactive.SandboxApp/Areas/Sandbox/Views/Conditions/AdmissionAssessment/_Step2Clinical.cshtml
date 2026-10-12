@@ -1,5 +1,4 @@
 @model Step2ClinicalModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     var plan = Html.ReactivePlan<Step2ClinicalModel>();
@@ -49,8 +48,8 @@
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(saveStep2Url,
-                    g => g.IncludeAll())
+                p.Post(saveStep2Url)
+                 .Gather(g => g.Form())
                  .Validate<Step2Validator>("step2-form")
                  .Response(r => r
                     .OnSuccess<SaveStepResponse>((json, s) =>

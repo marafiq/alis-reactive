@@ -86,7 +86,7 @@ The same value-source idea appears across the DSL.
 | --- | --- |
 | Event payload | `p.When(args, x => x.Checked)` |
 | Component member | `p.Component<FusionDropDownList>(m => m.UnitId).Get(c => c.Value)` |
-| URL query string | `p.FromUrl<int>("residentId")` |
+| URL query string | `p.Url<HttpShowcaseQuery>().Get(q => q.ResidentId)` |
 | Response body | `body.Read(x => x.Message)` |
 | Plugin return value | `p.Plugin<string>("clipboard", "readText")` |
 

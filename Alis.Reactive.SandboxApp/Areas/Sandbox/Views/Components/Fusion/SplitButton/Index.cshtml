@@ -1,5 +1,4 @@
 @model FusionSplitButtonModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -132,12 +131,10 @@
             {
                 var menu = p.Component<FusionSplitButton>(menuId);
                 p.Post(Url.SandboxRoute("Echo", "SplitButton"))
-                    .Gather(g =>
-                    {
-                        g.Include(menu.Get(c => c.Content), "content");
-                        g.Include(menu.Get(c => c.Disabled), "disabled");
-                        g.Include(menu.Get(c => c.CssClass), "cssClass");
-                    })
+                    .Gather<FusionSplitButtonEchoRequest>(g => g
+                        .Set(x => x.Content, menu.Get(c => c.Content))
+                        .Set(x => x.Disabled, menu.Get(c => c.Disabled))
+                        .Set(x => x.CssClass, menu.Get(c => c.CssClass)))
                     .Response(r => r.OnSuccess<FusionSplitButtonEchoResponse>((json, s) =>
                     {
                         s.Element("gather-content").SetText(json, x => x.Content);

@@ -21,22 +21,12 @@ namespace Alis.Reactive.Builders
             return _draft.BeginHttp(Context).Post(url);
         }
 
-        /// <summary>Appends an async HTTP POST reaction and configures gathered input inline.</summary>
+        /// <summary>Appends an async HTTP PUT reaction to this Reactive Plan pipeline.</summary>
         /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        /// <param name="gather">Collects request body, header, or route-template values before the request is sent.</param>
-        /// <returns>HTTP request builder for configuring validation and response routing.</returns>
-        public HttpRequestBuilder<TModel> Post(string url, Action<GatherBuilder<TModel>> gather)
+        /// <returns>Request builder for gathered input, validation, loading/finally reactions, and response routing.</returns>
+        public HttpRequestBuilder<TModel> Put(string url)
         {
-            return _draft.BeginHttp(Context).Post(url).Gather(gather);
-        }
-
-        /// <summary>Appends an async HTTP PUT reaction and configures gathered input inline.</summary>
-        /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        /// <param name="gather">Collects request body, header, or route-template values before the request is sent.</param>
-        /// <returns>HTTP request builder for configuring validation and response routing.</returns>
-        public HttpRequestBuilder<TModel> Put(string url, Action<GatherBuilder<TModel>> gather)
-        {
-            return _draft.BeginHttp(Context).Put(url).Gather(gather);
+            return _draft.BeginHttp(Context).Put(url);
         }
 
         /// <summary>Appends an async HTTP DELETE reaction to this Reactive Plan pipeline.</summary>

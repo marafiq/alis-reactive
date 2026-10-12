@@ -1,5 +1,4 @@
 @model FusionCheckBoxModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -129,12 +128,10 @@
                     var agreement = p.Component<FusionCheckBox>(m => m.AgreementAccepted);
                     var housekeeping = p.Component<FusionCheckBox>(m => m.WeeklyHousekeeping);
                     p.Post(Url.SandboxRoute("SaveAgreement", "FusionCheckBox"))
-                        .Gather(g =>
-                        {
-                            g.Include(agreement.Get(c => c.Checked), "agreementAccepted");
-                            g.Include(housekeeping.Get(c => c.Checked), "weeklyHousekeeping");
-                            g.Include(housekeeping.Get(c => c.Indeterminate), "housekeepingNeedsFollowUp");
-                        })
+                        .Gather<MoveInAgreementRequest>(g => g
+                            .Set(x => x.AgreementAccepted, agreement.Get(c => c.Checked))
+                            .Set(x => x.WeeklyHousekeeping, housekeeping.Get(c => c.Checked))
+                            .Set(x => x.HousekeepingNeedsFollowUp, housekeeping.Get(c => c.Indeterminate)))
                         .Response(r => r.OnSuccess<MoveInAgreementResponse>((json, s) =>
                         {
                             s.Element("save-confirmation").SetText(json, x => x.Summary);

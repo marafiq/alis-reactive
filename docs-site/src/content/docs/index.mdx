@@ -35,7 +35,7 @@ The last step is always explicit: render the plan once with
 @(Html.NativeButton("save-btn", "Save")
     .Reactive(plan, evt => evt.Click, (_, p) =>
     {
-        p.Post("/Todo/Save", g => g.IncludeAll())
+        p.Post("/Todo/Save").Gather(g => g.Form())
          .Validate<TodoValidator>("todo-form")
          .Response(r => r.OnSuccess(s =>
              s.Component<FusionToast>()

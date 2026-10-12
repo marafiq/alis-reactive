@@ -1,7 +1,7 @@
 @model RealTimeModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.SandboxApp.Hubs
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 @{
     ViewData["Title"] = "Real-Time Triggers";
 
@@ -78,7 +78,7 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("BreakFacilityStream", "RealTime"))
-                         .Gather(g => g.Static("drillId", drillId))
+                         .Gather<RealTimeController.OutageDrillRequest>(g => g.Set(x => x.DrillId, drillId))
                          .Response(r => r.OnSuccess(s => { }));
                     }))
                 @(Html.NativeButton("btn-restore-stream", "Restore Endpoint")
@@ -86,7 +86,7 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("RestoreFacilityStream", "RealTime"))
-                         .Gather(g => g.Static("drillId", drillId))
+                         .Gather<RealTimeController.OutageDrillRequest>(g => g.Set(x => x.DrillId, drillId))
                          .Response(r => r.OnSuccess(s => { }));
                     }))
             </native-hstack>
@@ -118,10 +118,10 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("PushNotification", "RealTime"))
-                         .Gather(g => g
-                             .Static("count", 99)
-                             .Static("message", "Manual push at " + DateTime.Now.ToString("HH:mm:ss"))
-                             .Static("priority", "high"))
+                         .Gather<NotificationPayload>(g => g
+                             .Set(x => x.Count, 99)
+                             .Set(x => x.Message, "Manual push at " + DateTime.Now.ToString("HH:mm:ss"))
+                             .Set(x => x.Priority, "high"))
                          .Response(r => r.OnSuccess(s => { }));
                     }))
             </native-hstack>
@@ -159,7 +159,7 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("BreakResidentHub", "RealTime"))
-                         .Gather(g => g.Static("drillId", drillId))
+                         .Gather<RealTimeController.OutageDrillRequest>(g => g.Set(x => x.DrillId, drillId))
                          .Response(r => r.OnSuccess(s => { }));
                     }))
                 @(Html.NativeButton("btn-restore-hub", "Restore Hub")
@@ -167,7 +167,7 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("RestoreResidentHub", "RealTime"))
-                         .Gather(g => g.Static("drillId", drillId))
+                         .Gather<RealTimeController.OutageDrillRequest>(g => g.Set(x => x.DrillId, drillId))
                          .Response(r => r.OnSuccess(s => { }));
                     }))
                 @(Html.NativeButton("btn-push-status", "Push Manual Status")
@@ -175,11 +175,11 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("PushResidentStatus", "RealTime"))
-                         .Gather(g => g
-                             .Static("residentName", "Helen Martinez (Manual)")
-                             .Static("status", "Under Review")
-                             .Static("careLevel", "Memory Care")
-                             .Static("updatedAt", DateTime.UtcNow.ToString("O")))
+                         .Gather<ResidentStatusPayload>(g => g
+                             .Set(x => x.ResidentName, "Helen Martinez (Manual)")
+                             .Set(x => x.Status, "Under Review")
+                             .Set(x => x.CareLevel, "Memory Care")
+                             .Set(x => x.UpdatedAt, DateTime.UtcNow))
                          .Response(r => r.OnSuccess(s => { }));
                     }))
             </native-hstack>

@@ -31,7 +31,9 @@
     Html.On(plan, t => t.CustomEvent(IntakeEvents.IntakeSaved, pipeline =>
     {
         pipeline.Get("/Intake/Summary")
-            .Gather(g => g.IncludeAll())
+            .Gather(g => g.Form(
+                m => m.FirstName, m => m.LastName, m => m.FacilityId,
+                m => m.CareLevel, m => m.AdmissionDate, m => m.MonthlyRate))
             .Response(r => r.OnSuccess(s =>
             {
                 s.Into("alis-drawer-content");
@@ -86,8 +88,7 @@
                 {
                     pipeline.Parallel(
                         a => a.Get("/Intake/Units")
-                            .Gather(g => g
-                                .Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
+                            .Gather(g => g.Form(m => m.FacilityId))
                             .Response(r => r
                                 .OnSuccess<UnitsResponse>((json, s) =>
                                 {
@@ -96,13 +97,11 @@
                                         .Call(c => c.DataBind);
                                 })),
                         b => b.Get("/Intake/FacilityInfo")
-                            .Gather(g => g
-                                .Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
+                            .Gather(g => g.Form(m => m.FacilityId))
                             .Response(r => r
                                 .OnSuccess(s => s.Into("facility-info"))),
                         c => c.Get("/Intake/FacilityRequirements")
-                            .Gather(g => g
-                                .Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
+                            .Gather(g => g.Form(m => m.FacilityId))
                             .Response(r => r
                                 .OnSuccess(s => s.Into("facility-requirements")))
                     );
@@ -193,7 +192,7 @@
                     pipeline.Confirm("Submit this resident intake? Please verify all information is correct.")
                         .Then(t =>
                         {
-                            t.Post("/Intake/Save", g => g.IncludeAll())
+                            t.Post("/Intake/Save").Gather(g => g.Form())
                              .Validate<IntakeValidator>("intake-form")
                              .WhileLoading(l =>
                              {

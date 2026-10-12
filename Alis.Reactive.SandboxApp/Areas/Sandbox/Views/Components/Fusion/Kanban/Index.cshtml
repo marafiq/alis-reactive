@@ -2,7 +2,6 @@
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.Templates
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Syncfusion.EJ2.Kanban
 @{
     ViewData["Title"] = "Kanban";
@@ -28,7 +27,7 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Get("/api/kanban/board")
-         .Gather(g => g.Static("selectedFacilityId", "AL"))
+         .Gather<KanbanBoardQuery>(g => g.Set(x => x.SelectedFacilityId, "AL"))
          .Response(r => r.OnSuccess<KanbanBoardResponse>((json, s) =>
          {
              s.Component<FusionKanban>("care-kanban").Set(c => c.DataSource, json.Read(x => x.Cards)).Call(c => c.DataBind);
@@ -55,7 +54,7 @@
                     {
                         p.Element("kanban-status").SetText("loading");
                         p.Get("/api/kanban/board")
-                         .Gather(g => g.Include<FusionDropDownList, KanbanModel>(m => m.SelectedFacilityId))
+                         .Gather<KanbanBoardQuery>(g => g.Form(m => m.SelectedFacilityId))
                          .Response(r => r.OnSuccess<KanbanBoardResponse>((json, s) =>
                          {
                              s.Component<FusionKanban>("care-kanban").Set(c => c.DataSource, json.Read(x => x.Cards)).Call(c => c.DataBind);
@@ -92,7 +91,8 @@
                 .CssClass("rounded-md bg-secondary px-3 py-2 text-sm font-medium text-white")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Put("/api/kanban/cards/102", g => g.Static("source", "button"))
+                    p.Put("/api/kanban/cards/102")
+                     .Gather<KanbanCardUpdateRequest>(g => g.Set(x => x.Source, "button"))
                      .Response(r => r.OnSuccess<KanbanCardMutationResponse>((json, s) =>
                      {
                          s.Component<FusionKanban>("care-kanban").Call(c => c.UpdateCard, json.Read(x => x.Card));
@@ -174,10 +174,10 @@
                 {
                     var board = p.Component<FusionKanban>("care-kanban");
                     p.Post("/api/kanban/audit")
-                     .Gather(g => g
-                         .Include(board.Get(c => c.Cards<KanbanTaskCard>()), "cards")
-                         .Include(board.Get(c => c.GetColumnData<KanbanTaskCard>(), "Open"), "openCards")
-                         .Include(board.Get(c => c.GetSwimlaneData<KanbanTaskCard>(), "AL"), "assistedLivingCards"))
+                     .Gather<KanbanAuditRequest>(g => g
+                         .Set(x => x.Cards, board.Get(c => c.Cards<KanbanTaskCard>()))
+                         .Set(x => x.OpenCards, board.Get(c => c.GetColumnData<KanbanTaskCard>(), "Open"))
+                         .Set(x => x.AssistedLivingCards, board.Get(c => c.GetSwimlaneData<KanbanTaskCard>(), "AL")))
                      .Response(r => r.OnSuccess<KanbanAuditResponse>((json, s) =>
                      {
                          s.Element("kanban-audit-summary").SetText(json, x => x.Summary);
@@ -258,7 +258,7 @@
             {
                 p.Element("kanban-clicked-summary").SetText(args, x => x.Data.Summary);
                 p.Get("/api/kanban/card/{cardId}/summary")
-                 .Gather(g => g.RouteParam("cardId", args, x => x.Data.Id))
+                 .Gather<KanbanCardSummaryQuery>(g => g.Set(x => x.CardId, p.Payload(args).Get(a => a.Data.Id)))
                  .Response(r => r.OnSuccess<KanbanCardSummaryResponse>((json, s) =>
                  {
                      s.Element("kanban-route-summary").SetText(json, x => x.Summary);
@@ -295,11 +295,11 @@
             .Reactive(evt => evt.DataSourceChanged<KanbanTaskCard>(), (args, p) =>
             {
                 p.Post("/api/kanban/cards/commit")
-                 .Gather(g => g
-                     .FromEvent(args, x => x.RequestType, "requestType")
-                     .FromEvent(args, x => x.AddedRecords, "addedRecords")
-                     .FromEvent(args, x => x.ChangedRecords, "changedRecords")
-                     .FromEvent(args, x => x.DeletedRecords, "deletedRecords"))
+                 .Gather<KanbanCommitRequest>(g => g
+                     .Set(x => x.RequestType, p.Payload(args).Get(a => a.RequestType))
+                     .Set(x => x.AddedRecords, p.Payload(args).Get(a => a.AddedRecords))
+                     .Set(x => x.ChangedRecords, p.Payload(args).Get(a => a.ChangedRecords))
+                     .Set(x => x.DeletedRecords, p.Payload(args).Get(a => a.DeletedRecords)))
                  .Response(r => r.OnSuccess<KanbanCommitResponse>((json, s) =>
                  {
                      s.Payload(args).Call(a => a.EndEdit);
@@ -308,9 +308,10 @@
             })
             .Reactive(evt => evt.DragStop<KanbanTaskCard>(), (args, p) =>
             {
-                p.Put("/api/kanban/cards/move", g => g
-                     .FromEvent(args, x => x.Data, "cards")
-                     .FromEvent(args, x => x.DropIndex, "dropIndex"))
+                p.Put("/api/kanban/cards/move")
+                 .Gather<KanbanMoveRequest>(g => g
+                     .Set(x => x.Cards, p.Payload(args).Get(a => a.Data))
+                     .Set(x => x.DropIndex, p.Payload(args).Get(a => a.DropIndex)))
                  .Response(r => r.OnSuccess<KanbanMoveResponse>((json, s) =>
                  {
                      s.Component<FusionKanban>("care-kanban").Call(c => c.UpdateCard, json.Read(x => x.Card));

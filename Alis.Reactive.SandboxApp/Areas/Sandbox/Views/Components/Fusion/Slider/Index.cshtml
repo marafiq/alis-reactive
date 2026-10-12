@@ -1,5 +1,4 @@
 @model SliderModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Inputs
@@ -127,9 +126,9 @@
                     var temp = p.Component<FusionSlider>(m => m.RoomTemperature);
                     var rest = p.Component<FusionSlider>(m => m.QuietHours);
                     p.Post(Url.SandboxRoute("Save", "Slider"))
-                        .Gather(g => g
-                            .Include(temp.Get(c => c.Value), "roomTemperature")
-                            .Include(rest.Get(c => c.RangeValue), "quietHours"))
+                        .Gather<ComfortPreferencesRequest>(g => g
+                            .Set(x => x.RoomTemperature, temp.Get(c => c.Value))
+                            .Set(x => x.QuietHours, rest.Get(c => c.RangeValue)))
                         .Response(r => r.OnSuccess<ComfortPreferencesResponse>((json, s) =>
                         {
                             s.Element("save-confirmation").SetText(json, x => x.Summary);

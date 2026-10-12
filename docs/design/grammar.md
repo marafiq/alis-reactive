@@ -170,7 +170,8 @@ exactly whatever the zone of the browser or the server.
 
 **Binding reads.** Where the server binds a value, the browser reads it the way MVC binds it.
 - **Where:** the `alis.model` values a request body carries (`values`, `fill`, `fields`, so
-  `IncludeAll()` sends them), and every input a validation rule reads: its field, a peer, and each
+  `Form()` sends them; `Form(m => m.X)` reads one input with `model.boundValueOf(id)`), and every
+  input a validation rule reads: its field, a peer, and each
   member its condition reads, through `model.boundValueOf(id)`.
 - **What:** text that is empty or only whitespace is `null`, as MVC's `ConvertEmptyStringToNull`
   makes it; a non-nullable number, boolean or date left empty is its type's default (0, `false`,
@@ -373,7 +374,7 @@ The owner's fluent API keeps its shape. Every method lowers to fixed productions
 | `.Into(elementId)` | `do(call(slot, ["load"], [ref res.body]))`, for the response of the request it follows |
 | `p.ValidationErrors(container)` | in a response route: `do(call(form, ["showErrors"], [ref res.body]))`; elsewhere: `do(call(form, ["validate"]))` |
 | `p.Parallel(a, b).OnAllSettled(c)` | `all(a, b); c` |
-| `p.FromUrl<T>("x")` | `get(get(document, ["query"]), ["x"], shape)`; an array `T` reads `queryAll` |
+| `p.Url<TQuery>().Get(q => q.X)` | `get(get(document, ["query"]), ["X"], shape)`, keyed by the member's binding name; an array member reads `queryAll` |
 | `p.Plugin(tools.Count).Arg(items).Arg("status")`, a plugin member | `call(plugin, ["count"], [..], shape)` |
 | `Html.NativeActionLink(text, url, p => p.Post(url)…)` | the anchor plus its own plan script: `on(link, "click", e) { if (!modified(e)) { e.preventDefault(); … } }` |
 
@@ -393,15 +394,21 @@ if (form.validate()) {                            // .Validate<V>(container); ou
 }
 ```
 
-- **Gather.** Each gathered value names its target in C#, decided at render: `RouteParam` fills a
-  `{placeholder}` of the URL (`route`), `Header` a header, and `Include`, `Static`, `FromUrl`,
-  `FromEvent` and `IncludeAll` the body (`values`). A value needed in both the path and the body is
-  gathered twice.
-- **Keys.** `values` is a nested record for JSON. For form data it is flat, keyed by MVC binding
-  names (`Address.City`, `Lines[0].Sku`), because only C# knows a dictionary from an object.
-- **`IncludeAll()`** writes every input into the authored JSON record leaf by leaf with
+- **Gather.** `Gather<TRequest>(g => ..)` builds the request the endpoint binds: `Set(x => x.M, v)`
+  sets a member, `Form()` sends every input of the composed form, `Form(m => m.A, ..)` named inputs,
+  and `Header(name, v)` a header. `.Gather(g => ..)` takes the view model as the request. Where a
+  member goes is decided in C# when the request is built, by MVC's rule for route values: a top-level
+  member named like a `{placeholder}` (ignoring case) fills the path (`route`, keyed by the
+  placeholder's own spelling); every other member goes to `values`, which is the query string for GET
+  and the body otherwise. Every placeholder must be filled, a member is set once, and a `Form` field
+  must be a member of `TRequest` of a type its value binds to; each is checked at render.
+- **Keys.** A member's key is its MVC binding name. `values` is a nested record for JSON
+  (`{"Address":{"City":..}}`). For a query string or form data it is flat (`Address.City`,
+  `Lines[0].Sku`), because only C# knows a dictionary from an object.
+- **`Form()`** writes every input into the authored JSON record leaf by leaf with
   `model.fill(record)`, so an authored value beside an input (`Address.Verified` next to
-  `Address.City`) is kept and an input wins only its own leaf. Form data spreads `model.fields`.
+  `Address.City`) is kept and an input wins only its own leaf. A query string or form data spreads
+  `model.fields`.
 
 ### 5.2 Templates
 
@@ -646,7 +653,7 @@ Each change is deliberate and named here, so that nothing changes silently. The 
 | `NotEmpty` on a collection of complex items is server-only | validation 74 | It has no input. Today it always blocks, which is a defect. |
 | `Include` enforces on the server as well | validation 76 | Today `ClientRulesFrom` is browser-only. |
 | `AddReactiveClientValidation` is replaced by FluentValidation validators registered through DI | validation 77 | A browser rule always has a server rule behind it. |
-| `p.FromUrl(..)` matches keys case-insensitively, and an array reads every value | conditions 14-16, 68, 138; http 26, 38, 42-50 | It reads the query the way MVC binds it. Today it is case-sensitive and reads the first value. This widens matching only. |
+| A URL query read (`p.Url<TQuery>()`) matches keys case-insensitively, and an array reads every value | conditions 14-16, 68, 138; http 26, 38, 42-50 | It reads the query the way MVC binds it. Today it is case-sensitive and reads the first value. This widens matching only. |
 | A response handle reads the response it names | http (ambiguity 9) | Today a handle reads whichever response is current, so an outer handle inside a nested route reads the inner response. No view relies on that. |
 | A link is an element with an ID the view chooses, and it carries its own plan script | components 117; http 113-121 | It replaces the delegated listener, the plan in `data-reactive-link`, and the runtime rewriting the request URL. The fixtures locate links by `data-testid`. |
 | Template buttons raise events through `data-alis-raise` | components (ambiguity 9) | Views and templates carry no JavaScript. |
@@ -773,7 +780,7 @@ proves it is named in the pull request.
 **Decisions of section 8 applied**
 - `AddReactiveClientValidation` is gone: a browser rule always has the server rule it came from.
 - `Include` enforces on the server as well.
-- `p.FromUrl(..)` keys match case-insensitively, and an array (`FromUrl<string[]>`) reads every
+- URL query keys (`p.Url<TQuery>()`) match case-insensitively, and an array member reads every
   value of its key (D3).
 - A link is an element with a view-chosen id carrying its own plan script.
 - Template buttons raise events through `data-alis-raise`.

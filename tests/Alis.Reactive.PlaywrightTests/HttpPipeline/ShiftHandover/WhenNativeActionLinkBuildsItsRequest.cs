@@ -14,8 +14,8 @@ namespace Alis.Reactive.PlaywrightTests.HttpPipeline.ShiftHandover;
 
 /// <summary>
 /// The request a NativeActionLink's own plan sends keeps what the link's pipeline declares. What a
-/// link cannot carry (route parameters, IncludeAll, validation, more than one request) is refused in
-/// the view by analyzer ALIS002.
+/// link cannot carry (the form's inputs, validation, more than one request) is refused in the view by
+/// analyzer ALIS002.
 /// </summary>
 [TestFixture]
 public sealed class WhenNativeActionLinkBuildsItsRequest

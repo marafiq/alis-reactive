@@ -2,7 +2,6 @@ using System.Text.Json;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Builders.Requests;
 using Alis.Reactive.Fusion.Components;
-using Alis.Reactive.Native.Extensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.RequestInput;
@@ -28,14 +27,16 @@ public sealed class WhenGatherDslBuildsRequestInput
                     pipeline.Plugin<int>("metrics", "count")
                         .Arg(args, x => x.Filter);
 
-                pipeline.Post("/residents/{residentId}/facilities/{facilityId}/notes", gather => gather
-                    .Header("X-Trace", pipeline.FromUrl("trace"))
-                    .Static("literal", "yes")
-                    .RouteParam("residentId", args, x => x.ResidentId)
-                    .RouteParam("facilityId", pipeline.FromUrl<int>("facilityId"))
-                    .FromEvent(args, x => x.Filter, "filter")
-                    .FromUrl<int>("facilityId", "facility")
-                    .Plugin(count, "count"));
+                var link = pipeline.Url<GatherRequestInputQuery>();
+                pipeline.Post("/residents/{residentId}/facilities/{facilityId}/notes")
+                    .Gather<GatherRequestInputNote>(gather => gather
+                        .Header("X-Trace", link.Get(q => q.Trace))
+                        .Set(x => x.Literal, "yes")
+                        .Set(x => x.ResidentId, pipeline.Payload(args).Get(a => a.ResidentId))
+                        .Set(x => x.FacilityId, link.Get(q => q.FacilityId))
+                        .Set(x => x.Filter, pipeline.Payload(args).Get(a => a.Filter))
+                        .Set(x => x.Facility, link.Get(q => q.FacilityId))
+                        .Set(x => x.Count, count));
             }));
 
         using var doc = JsonDocument.Parse(plan.RenderFormatted());
@@ -54,23 +55,23 @@ public sealed class WhenGatherDslBuildsRequestInput
             }));
             Assert.That(Gathered(request, "values"), Is.EqualTo(new[]
             {
-                new GatherAssignment("literal", "literal"),
-                new GatherAssignment("filter", "payload:event"),
-                new GatherAssignment("facility", "url"),
-                new GatherAssignment("count", "plugin"),
+                new GatherAssignment("Literal", "literal"),
+                new GatherAssignment("Filter", "payload:event"),
+                new GatherAssignment("Facility", "url"),
+                new GatherAssignment("Count", "plugin"),
             }));
         });
     }
 
     [Test]
-    public void include_all_selects_all_registered_inputs()
+    public void form_selects_all_registered_inputs()
     {
         var plan = PlanExtensions.ReactivePlan(Html);
 
         HtmlExtensions.On(Html, plan, trigger =>
             trigger.DomReady(pipeline =>
             {
-                pipeline.Post("/residents", gather => gather.IncludeAll());
+                pipeline.Post("/residents").Gather(gather => gather.Form());
             }));
 
         // values = model.fill({}): every mounted input, written into the (here empty) authored record.
@@ -95,9 +96,10 @@ public sealed class WhenGatherDslBuildsRequestInput
             trigger.DomReady(pipeline =>
             {
                 var schedule = pipeline.Component<FusionSchedule>("shift-schedule");
-                pipeline.Post("/schedule/events", gather => gather
-                    .Include(schedule.Get(c => c.CurrentView))
-                    .Include(schedule.Get(c => c.GetEvents<object>())));
+                pipeline.Post("/schedule/events")
+                    .Gather<GatherRequestInputSchedule>(gather => gather
+                        .Set(x => x.CurrentView, schedule.Get(c => c.CurrentView))
+                        .Set(x => x.Events, schedule.Get(c => c.GetEvents<object>())));
             }));
 
         using var doc = JsonDocument.Parse(plan.RenderFormatted());
@@ -109,8 +111,8 @@ public sealed class WhenGatherDslBuildsRequestInput
         {
             Assert.That(values.Select(x => x.GetProperty("name").GetString()), Is.EqualTo(new[]
             {
-                "currentView",
-                "getEvents"
+                "CurrentView",
+                "Events"
             }));
             Assert.That(SourceKindFor(propertySource), Is.EqualTo("component"));
             Assert.That(LastSegment(propertySource), Is.EqualTo("currentView"));
@@ -132,13 +134,13 @@ public sealed class WhenGatherDslBuildsRequestInput
             trigger.DomReady(pipeline =>
             {
                 pipeline.Get("/residents/{residentId}")
-                    .Gather(gather => gather.RouteParam("residentId", 42))
+                    .Gather<GatherRequestInputResident>(gather => gather.Set(x => x.ResidentId, 42))
                     .Response(response => response.OnSuccess<GatherRequestInputResidentResponse>((json, success) =>
                     {
                         success.Get("/facilities/{facilityId}/residents/{residentId}")
-                            .Gather(gather => gather
-                                .RouteParam("facilityId", 3)
-                                .RouteParam("residentId", json.Read(x => x.ResidentId)));
+                            .Gather<GatherRequestInputFacilityResident>(gather => gather
+                                .Set(x => x.FacilityId, 3)
+                                .Set(x => x.ResidentId, json.Read(x => x.ResidentId)));
                     }));
             }));
 
@@ -290,6 +292,39 @@ public sealed class WhenGatherDslBuildsRequestInput
 
     private sealed class GatherRequestInputResidentResponse
     {
+        public int ResidentId { get; set; }
+    }
+
+    private sealed class GatherRequestInputQuery
+    {
+        public string Trace { get; set; } = "";
+        public int FacilityId { get; set; }
+    }
+
+    private sealed class GatherRequestInputNote
+    {
+        public int ResidentId { get; set; }
+        public int FacilityId { get; set; }
+        public string Literal { get; set; } = "";
+        public string Filter { get; set; } = "";
+        public int Facility { get; set; }
+        public int Count { get; set; }
+    }
+
+    private sealed class GatherRequestInputSchedule
+    {
+        public string CurrentView { get; set; } = "";
+        public object[] Events { get; set; } = Array.Empty<object>();
+    }
+
+    private sealed class GatherRequestInputResident
+    {
+        public int ResidentId { get; set; }
+    }
+
+    private sealed class GatherRequestInputFacilityResident
+    {
+        public int FacilityId { get; set; }
         public int ResidentId { get; set; }
     }
 

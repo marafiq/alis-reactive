@@ -27,6 +27,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
         public string? CompanionSuiteType { get; set; }
     }
 
+    /// <summary>A question about one suite type to the Rate and Availability endpoints: <c>{suiteType}</c> in the path.</summary>
+    public sealed class SuiteQuery
+    {
+        public string SuiteType { get; set; } = string.Empty;
+    }
+
     public sealed class SuiteRateResponse
     {
         public string SuiteType { get; set; } = string.Empty;

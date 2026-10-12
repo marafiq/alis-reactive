@@ -1,5 +1,4 @@
 @model FusionDropDownButtonModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -127,12 +126,10 @@
             {
                 var menu = p.Component<FusionDropDownButton>(menuId);
                 p.Post(Url.SandboxRoute("Echo", "DropDownButton"))
-                    .Gather(g =>
-                    {
-                        g.Include(menu.Get(c => c.Content), "content");
-                        g.Include(menu.Get(c => c.Disabled), "disabled");
-                        g.Include(menu.Get(c => c.CssClass), "cssClass");
-                    })
+                    .Gather<FusionDropDownButtonEchoRequest>(g => g
+                        .Set(x => x.Content, menu.Get(c => c.Content))
+                        .Set(x => x.Disabled, menu.Get(c => c.Disabled))
+                        .Set(x => x.CssClass, menu.Get(c => c.CssClass)))
                     .Response(r => r.OnSuccess<FusionDropDownButtonEchoResponse>((json, s) =>
                     {
                         s.Element("gather-content").SetText(json, x => x.Content);

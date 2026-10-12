@@ -25,7 +25,7 @@ PLAN_WIRING :=
 @using Alis.Reactive                         -- Html.On, ReactivePlan, RenderPlan, InputField, Field.Of(...)
 @using Alis.Reactive.Native.Components       -- NativeTextBox, NativeButton, NativeCheckBox, ...
 @using Alis.Reactive.Fusion.Components       -- FusionAutoComplete, FusionDropDownList, ...
-@using Alis.Reactive.Builders.Requests       -- Gather Include<TComponent, TModel>(...) (vendor-agnostic)
+@using Alis.Reactive.Builders.Requests       -- HttpRequestBuilder, GatherBuilder<TRequest, TModel>, ResponseBuilder
 @using Alis.Reactive.Native.AppLevel         -- NativeDrawer, NativeLoader, DrawerSize
 @using Alis.Reactive.Fusion.AppLevel         -- FusionToast, FusionToastTone
 @using Syncfusion.EJ2                        -- Html.EJS()
@@ -170,7 +170,8 @@ COMP_ACTION :=
 typedSource := json.Read(x => x.Items)                     -- response body (x => x is the whole body)
              | p.Payload(args).Get(a => a.Field)            -- event payload
              | p.Component<T>(m => m.Other).Get(c => c.Value)
-             | url, plugin and array sources (the sources the DSL already has)
+             | p.Url<TQuery>().Get(q => q.Member)           -- the page's URL query string
+             | plugin and array sources
 ```
 
 Examples, each from a sandbox view:
@@ -181,7 +182,7 @@ s.Component<FusionDropDownList>(m => m.City).Set(c => c.DataSource, json.Read(j 
 p.When(p.Component<FusionDropDownList>(m => m.CareLevel).Get(c => c.Value)).Eq("Memory Care")
 grid.Call(c => c.HideColumn, Field.Of((ResidentDirectoryGridItem x) => x.PrimaryNurse))
 grid.Call(c => c.SetCellValue<string>(), 6002, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), "Critical")
-g.Include(grid.Get(c => c.GetSelectedRecords<ResidentDirectoryGridItem>()), "selectedRecords")
+.Gather<ResidentSelectionRecordsRequest>(g => g.Set(x => x.SelectedRecords, grid.Get(c => c.GetSelectedRecords<ResidentDirectoryGridItem>())))
 ```
 
 - A member typed by the app's class is a generic method of the declaration:
@@ -280,7 +281,7 @@ Source: `Areas/Sandbox/Views/Components/Fusion/AutoComplete/Index.cshtml`
 {
     p.Payload(args).Set(a => a.PreventDefaultAction, true);           -- suppress the client filter
     p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
-     .Gather(g => g.FromEvent(args, x => x.Text, "MedicationType"))    -- event payload → query param
+     .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, p.Payload(args).Get(a => a.Text)))    -- event payload → query member
      .Response(r => r
         .OnSuccess<MedicationSearchResponse>((json, s) =>
         {
@@ -350,7 +351,7 @@ Source: `Areas/Sandbox/Views/Validation/Contract/Index.cshtml`
 @(Html.NativeButton("submit-btn", "Submit")
     .Reactive(plan, evt => evt.Click, (args, p) =>
     {
-        p.Post("/Sandbox/Validation/Contract/Submit", g => g.IncludeAll())
+        p.Post(Url.SandboxRoute("Submit", "ValidationContract")).Gather(g => g.Form())
          .Validate<ResidentValidator>("resident-form")
          .Response(r => r
             .OnSuccess(s => s.Element("result").SetText("Saved"))

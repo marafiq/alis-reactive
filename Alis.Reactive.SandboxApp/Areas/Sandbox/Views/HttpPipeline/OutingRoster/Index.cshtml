@@ -1,5 +1,4 @@
 @model OutingRosterModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.DropDowns
@@ -27,7 +26,7 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Get(Url.SandboxRoute("Residents", "OutingRoster"))
-                         .Gather(g => g.Include<FusionMultiSelect, OutingRosterModel>(m => m.MobilityAids))
+                         .Gather(g => g.Form(m => m.MobilityAids))
                          .Response(r => r.OnSuccess<OutingRosterAnswer>((json, s) =>
                              s.Element("roster-residents").SetText(json, x => x.Residents)));
                     }))
@@ -35,7 +34,7 @@
                     .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Post(Url.SandboxRoute("Book", "OutingRoster"), g => g.IncludeAll())
+                        p.Post(Url.SandboxRoute("Book", "OutingRoster")).Gather(g => g.Form())
                          .AsFormData()
                          .Response(r => r
                             .OnSuccess<OutingBookingAnswer>((json, s) =>

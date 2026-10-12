@@ -219,9 +219,9 @@ public class WhenUsingFusionTextBox : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"preferredName\":\"Margie\""),
+        Assert.That(body, Does.Contain("\"PreferredName\":\"Margie\""),
             "the gather pipeline must carry the preferred-name Value() source under its declared key");
-        Assert.That(body, Does.Contain("\"dietaryNote\":\"Low sodium, no shellfish\""),
+        Assert.That(body, Does.Contain("\"DietaryNote\":\"Low sodium, no shellfish\""),
             "the gather pipeline must carry the dietary-note Value() source under its declared key");
 
         AssertNoConsoleErrors();

@@ -1,5 +1,4 @@
 @model MultiColumnComboBoxModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -17,8 +16,8 @@
 
     Html.On(plan, t => t.CustomEvent(MultiColumnComboBoxEvents.DoGather, p =>
     {
-        p.Post(Url.SandboxRoute("Echo", "MultiColumnComboBox"), g =>
-            g.Include<FusionMultiColumnComboBox, MultiColumnComboBoxModel>(m => m.Facility))
+        p.Post(Url.SandboxRoute("Echo", "MultiColumnComboBox"))
+         .Gather<MultiColumnComboBoxEchoRequest>(g => g.Form(m => m.Facility))
          .Response(r => r
             .OnSuccess(s =>
             {

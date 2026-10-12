@@ -1,5 +1,4 @@
 @model Step3FunctionalModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -28,9 +27,8 @@
                     {
                         then.Element("pain-spinner").Show();
                         then.Element("location-required").Show();
-                        then.Post(alertPainUrl,
-                            g => g.Include<FusionNumericTextBox, Step3FunctionalModel>(m => m.PainLevel)
-                                  .Include<NativeTextBox, Step3FunctionalModel>(m => m.PainLocation))
+                        then.Post(alertPainUrl)
+                         .Gather<AlertPainRequest>(g => g.Form(m => m.PainLevel, m => m.PainLocation))
                          .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
                          {
                              s.Element("pain-result").SetText(json, x => x.Message);

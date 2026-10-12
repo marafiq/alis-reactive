@@ -1,5 +1,4 @@
 @model Step3FunctionalModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -39,9 +38,8 @@
                         .Then(then =>
                         {
                             then.Element("neuro-spinner").Show();
-                            then.Post(alertNeuroUrl,
-                                g => g.Include<FusionDropDownList, Step3FunctionalModel>(m => m.InjuryType)
-                                      .Include<NativeHiddenField, Step3FunctionalModel>(m => m.ResidentName))
+                            then.Post(alertNeuroUrl)
+                             .Gather<AlertNeuroRequest>(g => g.Form(m => m.InjuryType, m => m.ResidentName))
                              .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
                              {
                                  s.Element("neuro-result").SetText(json, x => x.Message);

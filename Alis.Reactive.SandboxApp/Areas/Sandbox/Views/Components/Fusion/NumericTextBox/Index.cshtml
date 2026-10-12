@@ -1,5 +1,4 @@
 @model NumericTextBoxModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -121,7 +120,7 @@
                 {
                     var meals = p.Component<FusionNumericTextBox>(m => m.MealsPerWeek);
                     p.Post(Url.SandboxRoute("Save", "NumericTextBox"))
-                        .Gather(g => g.Include(meals.Get(c => c.Value), "mealsPerWeek"))
+                        .Gather<ServicePlanRequest>(g => g.Set(x => x.MealsPerWeek, meals.Get(c => c.Value)))
                         .Response(r => r.OnSuccess<ServicePlanResponse>((json, s) =>
                         {
                             s.Element("plan-confirmation").SetText(json, x => x.Summary);

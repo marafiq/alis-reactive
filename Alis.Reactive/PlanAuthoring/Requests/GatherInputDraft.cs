@@ -1,66 +1,65 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
 {
+    // The members a gather sets, by binding name, and its headers. Where a member goes is decided when the
+    // request is built, because only then is the URL known: MVC's route-value rule sends a member named like
+    // a {placeholder} to the path, and every other member to the query or body.
     internal sealed class GatherInputDraft
     {
-        private readonly List<RequestInputAssignment> _assignments = new List<RequestInputAssignment>();
+        private readonly List<(BindingPath Member, ValueExpression Value)> _members = new List<(BindingPath, ValueExpression)>();
+        private readonly List<RequestInputAssignment> _headers = new List<RequestInputAssignment>();
+        private bool _includesForm;
 
-        internal RegisteredInputSelection RegisteredInputs { get; private set; } =
-            RegisteredInputSelection.ExplicitAssignments;
-
-        internal RequestInput BuildRequestInput(RequestBodyFormat bodyFormat, RequestUrl url)
+        internal void Add(BindingPath member, ValueExpression value)
         {
-            RequestRouteTemplate
-                .For(url)
-                .RequireRouteParameters(RouteParameterNames());
+            var setTwice = _members.Any(existing => string.Equals(existing.Member.Value, member.Value, StringComparison.OrdinalIgnoreCase));
+            if (setTwice)
+                throw new InvalidOperationException($"The request member '{member.Value}' is gathered twice; set each member once.");
 
-            var hasGatheredInput =
-                _assignments.Count > 0
-                || RegisteredInputs.SelectsRegisteredInputs;
-            if (!hasGatheredInput)
-                return RequestInput.None;
-
-            return GatherRequestInput.From(
-                _assignments,
-                bodyFormat,
-                RegisteredInputs);
-        }
-
-        internal void IncludeAllRegisteredInputs()
-        {
-            RegisteredInputs = RegisteredInputSelection.AllRegisteredInputs;
-        }
-
-        internal void AddAssignment(RequestInputAssignment assignment)
-        {
-            _assignments.Add(assignment);
-        }
-
-        internal void AddPayload(BindingPath path, ValueExpression value)
-        {
-            _assignments.Add(RequestInputAssignment.Payload(path, value));
+            _members.Add((member, value));
         }
 
         internal void AddHeader(HeaderName name, ValueExpression value)
         {
-            _assignments.Add(RequestInputAssignment.Header(name, value));
+            _headers.Add(RequestInputAssignment.Header(name, value));
         }
 
-        internal void AddRouteParameter(RouteParameterName name, ValueExpression value)
+        internal void IncludeForm()
         {
-            _assignments.Add(RequestInputAssignment.RouteParameter(name, value));
+            _includesForm = true;
         }
 
-        private IEnumerable<string> RouteParameterNames()
+        internal RequestInput BuildRequestInput(RequestBodyFormat bodyFormat, RequestUrl url)
         {
-            foreach (var assignment in _assignments)
+            var template = RequestRouteTemplate.For(url);
+            var assignments = new List<RequestInputAssignment>();
+            var filled = new List<string>();
+
+            foreach (var (member, value) in _members)
             {
-                if (assignment.Target is RequestRouteParameterTarget routeParameter)
-                    yield return routeParameter.Name;
-            }
-        }
+                var placeholder = template.PlaceholderFor(member);
+                if (placeholder == null)
+                {
+                    assignments.Add(RequestInputAssignment.Payload(member, value));
+                    continue;
+                }
 
+                RequestScalarTarget.RouteParameter(placeholder, value.OutputShape);
+                assignments.Add(RequestInputAssignment.RouteParameter(RouteParameterName.Of(placeholder), value));
+                filled.Add(placeholder);
+            }
+
+            template.RequireEveryPlaceholderFilled(filled);
+            assignments.AddRange(_headers);
+
+            if (assignments.Count == 0 && !_includesForm)
+                return RequestInput.None;
+
+            return GatherRequestInput.From(assignments, bodyFormat, _includesForm);
+        }
     }
 }

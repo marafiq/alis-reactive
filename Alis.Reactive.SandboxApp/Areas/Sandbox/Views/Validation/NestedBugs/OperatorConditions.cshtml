@@ -1,5 +1,4 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs.OperatorConditionModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
 @{
@@ -48,7 +47,7 @@
     @(Html.NativeButton("submit-btn", "Submit")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {
-            p.Post(Url.SandboxRoute("SubmitOperatorConditions", "NestedBugs"), g => g.IncludeAll())
+            p.Post(Url.SandboxRoute("SubmitOperatorConditions", "NestedBugs")).Gather(g => g.Form())
              .Validate<OperatorConditionValidator>("op-form")
              .Response(r => r
                 .OnSuccess(s => s.Element("result").SetText("Saved"))

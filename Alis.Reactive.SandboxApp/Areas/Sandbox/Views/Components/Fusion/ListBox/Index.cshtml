@@ -1,6 +1,5 @@
 @model FusionListBoxModel
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.DropDowns
 @{
@@ -125,10 +124,7 @@
             {
                 var listBox = p.Component<FusionListBox>(ListBoxId);
                 p.Post(Url.SandboxRoute("Echo", "ListBox"))
-                    .Gather(g =>
-                    {
-                        g.Include(listBox.Get(c => c.Value), "value");
-                    })
+                    .Gather<FusionListBoxEchoRequest>(g => g.Set(x => x.Value, listBox.Get(c => c.Value)))
                     .Response(r => r.OnSuccess<FusionListBoxEchoResponse>((json, s) =>
                     {
                         s.Element("gather-value").SetText(json, x => x.ValueSummary);

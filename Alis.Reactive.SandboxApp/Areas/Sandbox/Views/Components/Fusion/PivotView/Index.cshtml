@@ -1,5 +1,4 @@
 @model PivotViewModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.PivotView
@@ -33,7 +32,7 @@
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
                     p.Get("/api/pivot/census")
-                     .Gather(g => g.FromUrl("facilityId"))
+                     .Gather<PivotCensusQuery>(g => g.Set(x => x.FacilityId, p.Url<PivotViewQuery>().Get(q => q.FacilityId)))
                      .Response(r => r.OnSuccess<PivotCensusResponse>((json, s) =>
                      {
                          s.Component<FusionPivotView>("care-pivot")
@@ -56,11 +55,10 @@
                 {
                     var pivot = p.Component<FusionPivotView>("care-pivot");
                     p.Post("/api/pivot/{currentView}/audit")
-                     .Gather(g => g
-                         .RouteParam("currentView", pivot.Get(c => c.CurrentView))
-                         .FromUrl("facilityId")
-                         .Include(pivot.Get(c => c.CurrentView), "currentView")
-                         .Include(pivot.Get(c => c.GetPersistData, true), "layout"))
+                     .Gather<PivotAuditVisit>(g => g
+                         .Set(x => x.CurrentView, pivot.Get(c => c.CurrentView))
+                         .Set(x => x.FacilityId, p.Url<PivotViewQuery>().Get(q => q.FacilityId))
+                         .Set(x => x.Layout, pivot.Get(c => c.GetPersistData, true)))
                      .Response(r => r.OnSuccess<PivotAuditResponse>((json, s) =>
                      {
                          s.Element("audit-summary").SetText(json, x => x.Summary);
@@ -74,7 +72,7 @@
                 {
                     var pivot = p.Component<FusionPivotView>("care-pivot");
                     p.Post("/api/pivot/layout/echo")
-                     .Gather(g => g.Include(pivot.Get(c => c.GetPersistData, true), "layout"))
+                     .Gather<PivotLayoutRequest>(g => g.Set(x => x.Layout, pivot.Get(c => c.GetPersistData, true)))
                      .Response(r => r.OnSuccess<PivotLayoutResponse>((json, s) =>
                      {
                          s.Component<FusionPivotView>("care-pivot")

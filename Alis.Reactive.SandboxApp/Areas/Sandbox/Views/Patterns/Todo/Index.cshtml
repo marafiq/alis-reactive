@@ -1,5 +1,4 @@
 @model TodoModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.AppLevel
@@ -42,7 +41,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("Save", "Todo"), g => g.IncludeAll())
+                p.Post(Url.SandboxRoute("Save", "Todo")).Gather(g => g.Form())
                  .Validate<TodoValidator>("todo-form")
                  .Response(r => r
                     .OnSuccess(s =>

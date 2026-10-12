@@ -6,6 +6,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? Resident { get; set; }
     }
 
+    /// <summary>The facility the page sends to <c>POST MultiColumnComboBox/Echo</c>, which echoes its body back.</summary>
+    public sealed class MultiColumnComboBoxEchoRequest
+    {
+        public string? Facility { get; set; }
+    }
+
     /// <summary>
     /// Typed DataSource item for the facility multi-column combo box.
     /// PascalCase C# -> camelCase JSON via global JsonConvert.DefaultSettings in Program.cs.

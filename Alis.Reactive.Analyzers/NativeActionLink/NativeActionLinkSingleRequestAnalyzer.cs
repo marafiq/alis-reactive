@@ -15,7 +15,7 @@ namespace Alis.Reactive.Analyzers.NativeActionLink
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             title: "NativeActionLink must stay a single request chain",
-            messageFormat: "NativeActionLink supports exactly one bounded request chain, to its own href. Parallel, Chained, nested HTTP, route parameters, IncludeAll, and validation are not allowed.",
+            messageFormat: "NativeActionLink supports exactly one bounded request chain, to its own href. Parallel, Chained, nested HTTP, the form's inputs, and validation are not allowed.",
             category: "Alis.Reactive",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Analyzers.NativeActionLink
                     actionLinkExtType,
                     pipelineBuilderType,
                     compilationCtx.Compilation.GetTypeByMetadataName("Alis.Reactive.Builders.Requests.ResponseBuilder`1"),
-                    compilationCtx.Compilation.GetTypeByMetadataName("Alis.Reactive.Builders.Requests.GatherBuilder`1"),
+                    compilationCtx.Compilation.GetTypeByMetadataName("Alis.Reactive.Builders.Requests.GatherBuilder`2"),
                     compilationCtx.Compilation.GetTypeByMetadataName("Alis.Reactive.Builders.Requests.HttpRequestBuilder`1"));
 
                 compilationCtx.RegisterSyntaxNodeAction(
@@ -124,8 +124,7 @@ namespace Alis.Reactive.Analyzers.NativeActionLink
                 case "Chained":
                     return types.ResponseBuilderType != null
                         && SymbolEqualityComparer.Default.Equals(containingType, types.ResponseBuilderType);
-                case "IncludeAll":
-                case "RouteParam":
+                case "Form":
                     return types.GatherBuilderType != null
                         && SymbolEqualityComparer.Default.Equals(containingType, types.GatherBuilderType);
                 case "Validate":

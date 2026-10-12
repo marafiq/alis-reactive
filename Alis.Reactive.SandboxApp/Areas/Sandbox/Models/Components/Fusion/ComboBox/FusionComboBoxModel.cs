@@ -20,7 +20,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
         public string? Text { get; set; }
 
-        public int Index { get; set; }
+        /// <summary>The combo box's selected index, as it reads it: none when nothing is selected.</summary>
+        public int? Index { get; set; }
     }
 
     public sealed class FusionComboBoxEchoResponse
@@ -29,7 +30,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
         public string? Text { get; set; }
 
-        public int Index { get; set; }
+        public int? Index { get; set; }
 
         public string Summary { get; set; } = string.Empty;
     }

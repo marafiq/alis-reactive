@@ -1,4 +1,6 @@
 > Lowering of `components.md` into the grammar, read at `195d3a1`. The verdicts were recorded before [`../grammar.md`](../grammar.md) settled the gaps and ambiguities; that file's sections 8 and 9 give the decisions and the final counts. Each table was produced by one reader against the code and spot-checked.
+>
+> The gather rows name the typed request that replaced the old gather calls (`Form()`, `Form(m => ..)`, `Set`); every `file:line` and verdict is still as read at `195d3a1`.
 
 # Components inventory lowered into the v6 grammar
 
@@ -132,8 +134,8 @@ Paths are relative to the repo root.
 | 122 | Declare a vendor and render through `field.Render<TomSelect>` | plan `vendors` + `objects` | `vendors.tomselect = {objectPath:["tomselect"], subscribe:"on", unsubscribe:"off", payload:"argument"}`; `objects.suite = element("…SuiteAssignmentModel__SuiteType","tomselect")` | RENDER: TomSelect.cs `ComponentVendor.Define` + render helper |
 | 123 | Brought value validated (required); error clears on its change event | `form.validate`; form-internal live clearing | `if (form.validate()) { … }`; inside the form: on `suite` committed event `change` (through `suite.on`) revalidate the field | OBLIGATION form: subscribe the declared `Committed` event through the vendor, deferred until the app constructs the object on `alis:mount` (validation/live-clear.ts:91-117); read the value at `input.value` |
 | 124 | Brought value gathered under its MVC binding name | `form.values` | `http.send({method:"POST",url,values:{...form.values}})` → `{SuiteType: suite.input.value, MonthlyRate: rate.value}` | OBLIGATION form: `values` reads each input's declared value path, keyed by binding name |
-| 125 | `IncludeAll()` gathers every registered input (Fusion, Native, hidden) | `form.values` | `values:{...form.values}` (20 fields) | OBLIGATION form: `values` = every mounted bound input of the composed plan, nested by binding path; unmounted inputs skipped (execution/requests/gather.ts:147-178) |
-| 126 | `Include<TComponent,TModel>(m => ..)` gathers one input | `record`, input `value` | `values:{ ResidentName: residentName.value }` | EXPRESSED |
+| 125 | `Form()` gathers every registered input (Fusion, Native, hidden) | `form.values` | `values:{...form.values}` (20 fields) | OBLIGATION form: `values` = every mounted bound input of the composed plan, nested by binding path; unmounted inputs skipped (execution/requests/gather.ts:147-178) |
+| 126 | `Form(m => ..)` gathers one input | `record`, input `value` | `values:{ ResidentName: residentName.value }` | EXPRESSED |
 | 127 | FileUpload files into multipart form-data | `form.values`, `http.send` format `form-data` | `http.send({method:"POST",url,values:{...form.values}, format:"form-data"})`, where `Documents` must be `upload.filesData.map(f => f.rawFile)` | GAP: `Input.Value` is a `Prop` path (architecture.md:464; `inputs.value = {path, shape}` :893) and no EJ2 uploader path yields `File[]`; the files exist only as `filesData[i].rawFile` (Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:20; execution/requests/request-payload-writer.ts:160-169). Needs `Value` as an expression or keeping the `rawFile` unwrap that 4.2 deletes |
 | 128 | Row field names keep JSON camel-case of acronym members (`MRN` → `mrn`) | none | none (`Column(field)` / `Fields<TRow>` literals) | RENDER: C# naming in the expression compiler / `Column(field)` |
 

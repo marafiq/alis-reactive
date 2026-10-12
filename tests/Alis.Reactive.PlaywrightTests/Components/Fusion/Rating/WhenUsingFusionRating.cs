@@ -178,7 +178,7 @@ public class WhenUsingFusionRating : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"satisfactionScore\":5"),
+        Assert.That(body, Does.Contain("\"SatisfactionScore\":5"),
             "the gather pipeline must carry the rating Value() source under its declared key");
 
         AssertNoConsoleErrors();

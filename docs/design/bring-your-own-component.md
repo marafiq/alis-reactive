@@ -96,7 +96,7 @@ Html.InputField(plan, m => m.Rate)
     {
         p.When(args, x => x.Value).Gt(100m)
             .Then(t => t.Component<FusionNumericTextBox>(m => m.Ceiling).Set(c => c.Value, 100m));
-        p.Get("/rates").Gather(g => g.Include<FusionNumericTextBox, RateModel>(m => m.Rate))
+        p.Get("/rates").Gather(g => g.Form(m => m.Rate))
             .Response(r => r.OnSuccess<RateResponse>((res, s) =>
                 s.Component<FusionNumericTextBox>(m => m.Ceiling).Set(c => c.Min, res.Read(x => x.Floor))));
     });
@@ -115,9 +115,10 @@ public class FusionAutoCompleteFilteringArgs : JsObject
 .Reactive(evt => evt.Filtering, (args, p) =>
 {
     p.Payload(args).Set(a => a.PreventDefaultAction, true);
-    p.Get("/physicians").Gather(g => g.FromEvent(args, x => x.Text, "q"))
-        .Response(r => r.OnSuccess<PhysicianList>((res, s) =>
-            s.Payload(args).Call(a => a.UpdateData, res.Read(x => x.Items))));
+    p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
+     .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, p.Payload(args).Get(a => a.Text)))
+     .Response(r => r.OnSuccess<MedicationSearchResponse>((json, s) =>
+         s.Payload(args).Call(a => a.UpdateData, json.Read(j => j.Medications))));
 })
 ```
 
@@ -223,7 +224,7 @@ the core C# and the runtime name no vendor and no component. Proof: the full sui
 - **The core names no component.** `NativeActionLink` moved to the Native package, built on the
   public surface: a declaration whose vendor hands a click handler the DOM event, and
   `Html.ElementPlan(id)`, a plan of its own for one element so it works wherever its HTML lands.
-  What a link cannot carry (another URL, route parameters, IncludeAll, validation, more or fewer
+  What a link cannot carry (another URL, the form's inputs (`Form`), validation, more or fewer
   than one request) is refused in the view by ALIS002 instead of at render.
 - **ALIS009 covers brought components.** The typed-API analyzer applies to any `Component` or
   `JsObject` declaration and any helper that returns `RenderedComponent<,>` or extends

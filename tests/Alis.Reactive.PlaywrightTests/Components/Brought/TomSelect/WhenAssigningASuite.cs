@@ -125,7 +125,7 @@ public class WhenAssigningASuite : PlaywrightTestBase
 
         using (var body = JsonDocument.Parse(reservation.PostData ?? "{}"))
         {
-            // IncludeAll posts each input under its MVC binding name, the name the model binder reads.
+            // Form() posts each input under its MVC binding name, the name the model binder reads.
             Assert.That(body.RootElement.TryGetProperty("SuiteType", out var suiteType), Is.True,
                 $"The reservation posted no SuiteType: {reservation.PostData}");
             Assert.That(suiteType.GetString(), Is.EqualTo("companion"));

@@ -1,5 +1,4 @@
 @model ResidentProfile
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using SfInPlace = Syncfusion.EJ2.InPlaceEditor
@@ -72,7 +71,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Post(updateProfileUrl)
-                     .Gather(g => g.IncludeAll())
+                     .Gather(g => g.Form())
                      .Validate<ResidentProfileValidator>("resident-form")
                      .Response(r => r
                         .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>

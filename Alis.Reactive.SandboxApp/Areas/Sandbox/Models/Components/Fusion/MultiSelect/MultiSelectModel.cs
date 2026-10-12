@@ -28,6 +28,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string Category { get; set; } = "";
     }
 
+    /// <summary>The allergies the page sends to <c>POST MultiSelect/Echo</c>, which echoes its body back.</summary>
+    public sealed class MultiSelectEchoRequest
+    {
+        public string[]? Allergies { get; set; }
+    }
+
+    /// <summary>The query of <c>GET MultiSelect/Supplies</c>: the text typed in the supplies box.</summary>
+    public sealed class SupplySearchQuery
+    {
+        public string? Supplies { get; set; }
+    }
+
     public class SupplySearchResponse
     {
         public List<SupplyItem> Supplies { get; set; } = new();

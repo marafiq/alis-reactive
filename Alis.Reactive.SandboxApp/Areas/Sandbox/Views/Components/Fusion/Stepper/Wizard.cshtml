@@ -1,7 +1,6 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper.FusionStepperWizardShellModel
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper
 @using Syncfusion.EJ2.Navigations
 @{
@@ -24,9 +23,10 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Post(loadStepUrl, g => g
-                .Static("wizardId", wizardId)
-                .Static("step", 1))
+        p.Post(loadStepUrl)
+            .Gather<FusionStepperWizardLoadStepRequest>(g => g
+                .Set(x => x.WizardId, wizardId)
+                .Set(x => x.Step, 1))
             .Response(r => r.OnSuccess(s => s.Into(StepContainerId)));
 
         p.Element("stepper-wizard-current").SetText(p.Component<FusionStepper>(StepperId).Get(c => c.ActiveStep));
@@ -97,36 +97,36 @@
                 .Then(t =>
                 {
                     t.Post(loadStepUrl)
-                        .Gather(g => g
-                            .Include<NativeHiddenField, FusionStepperWizardShellModel>(m => m.WizardId)
-                            .Static("step", 1))
+                        .Gather<FusionStepperWizardLoadStepRequest>(g => g
+                            .Form(m => m.WizardId)
+                            .Set(x => x.Step, 1))
                         .Response(r => r.OnSuccess(s => s.Into(StepContainerId)));
                 })
                 .ElseIf(args, x => x.ActiveStep).Eq(1)
                 .Then(t =>
                 {
                     t.Post(loadStepUrl)
-                        .Gather(g => g
-                            .Include<NativeHiddenField, FusionStepperWizardShellModel>(m => m.WizardId)
-                            .Static("step", 2))
+                        .Gather<FusionStepperWizardLoadStepRequest>(g => g
+                            .Form(m => m.WizardId)
+                            .Set(x => x.Step, 2))
                         .Response(r => r.OnSuccess(s => s.Into(StepContainerId)));
                 })
                 .ElseIf(args, x => x.ActiveStep).Eq(2)
                 .Then(t =>
                 {
                     t.Post(loadStepUrl)
-                        .Gather(g => g
-                            .Include<NativeHiddenField, FusionStepperWizardShellModel>(m => m.WizardId)
-                            .Static("step", 3))
+                        .Gather<FusionStepperWizardLoadStepRequest>(g => g
+                            .Form(m => m.WizardId)
+                            .Set(x => x.Step, 3))
                         .Response(r => r.OnSuccess(s => s.Into(StepContainerId)));
                 })
                 .ElseIf(args, x => x.ActiveStep).Eq(3)
                 .Then(t =>
                 {
                     t.Post(loadStepUrl)
-                        .Gather(g => g
-                            .Include<NativeHiddenField, FusionStepperWizardShellModel>(m => m.WizardId)
-                            .Static("step", 4))
+                        .Gather<FusionStepperWizardLoadStepRequest>(g => g
+                            .Form(m => m.WizardId)
+                            .Set(x => x.Step, 4))
                         .Response(r => r.OnSuccess(s => s.Into(StepContainerId)));
                 });
         }))

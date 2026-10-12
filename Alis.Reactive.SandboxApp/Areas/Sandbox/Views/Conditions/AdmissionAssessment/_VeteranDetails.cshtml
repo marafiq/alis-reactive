@@ -1,5 +1,4 @@
 @model Step1DemographicsModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -31,9 +30,8 @@
             {
                 p.Element("va-spinner").Show();
                 p.Element("verify-va-btn-text").Hide();
-                p.Post(verifyVeteranUrl,
-                    g => g.Include<NativeTextBox, Step1DemographicsModel>(m => m.VaId)
-                          .Include<FusionDropDownList, Step1DemographicsModel>(m => m.ServiceBranch))
+                p.Post(verifyVeteranUrl)
+                 .Gather<VerifyVeteranRequest>(g => g.Form(m => m.VaId, m => m.ServiceBranch))
                  .Response(r => r.OnSuccess<VerifyVaResponse>((json, s) =>
                  {
                      s.Element("va-result").SetText(json, x => x.Message);

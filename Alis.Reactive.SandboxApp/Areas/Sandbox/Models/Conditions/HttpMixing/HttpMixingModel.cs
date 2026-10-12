@@ -37,6 +37,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.HttpMixing
         public string HeaderCategory { get; set; } = "";
     }
 
+    /// <summary>The request <c>Resident/{residentId}/AuditTrail/{categorySlug}</c> binds: both in the path.</summary>
+    public sealed class ResidentAuditTrail
+    {
+        public int ResidentId { get; set; }
+        public string CategorySlug { get; set; } = "";
+    }
+
     public class HttpMixingAuditTrailResponse
     {
         public int ResidentId { get; set; }
@@ -53,7 +60,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.HttpMixing
         public static readonly AppEvent S13Dispatched = AppEvent.Named("s13-dispatched");
         public static readonly AppEvent<HttpMixingPayload> S13OrderedParallelMix = AppEvent.Named<HttpMixingPayload>("s13-ordered-parallel-mix");
         public static readonly AppEvent S14Dispatched = AppEvent.Named("s14-dispatched");
-        public static readonly AppEvent<HttpMixingPayload> S14RouteTemplateFromEvent = AppEvent.Named<HttpMixingPayload>("s14-route-template-from-event");
+        public static readonly AppEvent<HttpMixingPayload> S14RouteTemplateFromPayload = AppEvent.Named<HttpMixingPayload>("s14-route-template-from-payload");
         public static readonly AppEvent<HttpMixingPayload> S2ConditionHttpCondition = AppEvent.Named<HttpMixingPayload>("s2-condition-http-condition");
         public static readonly AppEvent<HttpMixingPayload> S3FullInterleave = AppEvent.Named<HttpMixingPayload>("s3-full-interleave");
         public static readonly AppEvent<HttpMixingPayload> S4ConditionInsideSuccess = AppEvent.Named<HttpMixingPayload>("s4-condition-inside-success");

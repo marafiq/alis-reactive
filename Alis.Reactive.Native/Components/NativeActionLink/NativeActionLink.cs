@@ -75,7 +75,7 @@ namespace Alis.Reactive.Native.Components
         /// The click pipeline holds one HTTP request to <paramref name="url"/>; requests inside its
         /// response routes, WhileLoading or Finally are kept as written. Analyzer ALIS002 refuses, in
         /// the view, a pipeline with no request or more than one, a request to another URL, parallel
-        /// or chained requests, route parameters, IncludeAll and validation: the link's href must be
+        /// or chained requests, the form's inputs (<c>Form</c>) and validation: the link's href must be
         /// a URL a modified click can open, and its plan sees no page inputs.
         /// <code>
         /// @Html.NativeActionLink("Delete", "/residents/42/delete", p =&gt; p.Post("/residents/42/delete"))

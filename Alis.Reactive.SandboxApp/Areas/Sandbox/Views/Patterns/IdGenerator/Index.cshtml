@@ -1,6 +1,5 @@
 @model IdGeneratorModel
 @using Alis.Reactive
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -31,7 +30,7 @@
     </native-text>
 
     <section>
-        <h2 class="text-sm font-semibold mb-2">1. JSON POST — Include (gathers by name)</h2>
+        <h2 class="text-sm font-semibold mb-2">1. JSON POST — Form (gathers by name)</h2>
         <form id="json-form" class="grid grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
                 .NativeTextBox(b => b.CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
@@ -56,12 +55,13 @@
             .CssClass("px-4 py-2 bg-blue-600 text-white rounded text-sm")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("SaveJson", "IdGenerator"), g => g
-                    .Include(m => m.Name)
-                    .Include<FusionNumericTextBox, IdGeneratorModel>(m => m.Amount)
-                    .Include(m => m.Status)
-                    .Include(m => m.Address!.City)
-                    .Include<FusionNumericTextBox, IdGeneratorModel>(m => m.Address!.PostalCode))
+                p.Post(Url.SandboxRoute("SaveJson", "IdGenerator"))
+                 .Gather(g => g.Form(
+                    m => m.Name,
+                    m => m.Amount,
+                    m => m.Status,
+                    m => m.Address!.City,
+                    m => m.Address!.PostalCode))
                  .Response(r => r
                     .OnSuccess<IdGeneratorJsonResponse>((json, s) =>
                     {
@@ -74,7 +74,7 @@
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-2">2. FormData POST — Include (gathers by name)</h2>
+        <h2 class="text-sm font-semibold mb-2">2. FormData POST — Form (gathers by name)</h2>
         <form id="form-form" class="grid grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
                 .NativeTextBox(b => b.CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
@@ -91,10 +91,8 @@
             .CssClass("px-4 py-2 bg-blue-600 text-white rounded text-sm")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("SaveForm", "IdGenerator"), g => g
-                    .Include(m => m.Name)
-                    .Include<FusionNumericTextBox, IdGeneratorModel>(m => m.Amount)
-                    .Include(m => m.Status))
+                p.Post(Url.SandboxRoute("SaveForm", "IdGenerator"))
+                 .Gather(g => g.Form(m => m.Name, m => m.Amount, m => m.Status))
                  .AsFormData()
                  .Response(r => r
                     .OnSuccess<IdGeneratorJsonResponse>((json, s) =>

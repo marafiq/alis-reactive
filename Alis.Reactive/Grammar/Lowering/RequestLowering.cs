@@ -99,24 +99,24 @@ namespace Alis.Reactive.Grammar.Lowering
         {
             var gather = request.Input as GatherRequestInput;
             var assignments = gather?.Assignments ?? (IReadOnlyList<RequestInputAssignment>)Array.Empty<RequestInputAssignment>();
-            var includesAll = gather != null && gather.RegisteredInputs.SelectsRegisteredInputs;
+            var includesForm = gather != null && gather.IncludesForm;
             var format = gather?.BodyFormat ?? "json";
             var nested = request.Method != "GET" && format == "json";
 
             var payload = assignments.Where(a => a.Target is RequestPayloadTarget).ToList();
             var values = nested ? NestedValues(payload, scope) : FlatValues(payload, scope);
             Expr body = G.Record(values);
-            // IncludeAll writes each input at its own key: nested, leaf by leaf into the authored record
+            // Form() writes each input at its own key: nested, leaf by leaf into the authored record
             // (model.fill), so an authored value beside an input survives; flat, by binding name.
-            if (includesAll && nested)
+            if (includesForm && nested)
                 body = G.Call(G.Obj(_context.Objects.Model()), new[] { "fill" }, new[] { body }, G.NoShapes, Shape.None);
-            else if (includesAll)
+            else if (includesForm)
                 body = G.Record(values.Append(new SpreadEntry(G.Get(G.Obj(_context.Objects.Model()), new[] { "fields" }, Shape.None))));
 
             Expr arrays = G.List(payload
                 .Where(a => DescribesArray(a.Source.OutputShape))
                 .Select(a => (Expr)G.Lit(((RequestPayloadTarget)a.Target).Name)));
-            if (includesAll)
+            if (includesForm)
                 arrays = G.Call(arrays, "concat", G.Get(G.Obj(_context.Objects.Model()), new[] { "arrays" }, Shape.None));
 
             return G.Record(

@@ -1,5 +1,4 @@
 @model BddExperimentModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -23,7 +22,7 @@
 
     Html.On(plan, t => t.CustomEvent(BddExperimentEvents.DoSubmit, p =>
     {
-        p.Post(Url.SandboxRoute("Submit", "BddExperiment"), g => g.IncludeAll())
+        p.Post(Url.SandboxRoute("Submit", "BddExperiment")).Gather(g => g.Form())
          .Validate<BddExperimentValidator>("admission-form")
          .WhileLoading(l =>
          {

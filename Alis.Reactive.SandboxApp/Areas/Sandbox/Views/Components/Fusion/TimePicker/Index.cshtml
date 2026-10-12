@@ -1,5 +1,4 @@
 @model TimePickerModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -89,7 +88,7 @@
                     {
                         var medication = p.Component<FusionTimePicker>(m => m.MedicationTime);
                         p.Post(Url.SandboxRoute("Schedule", "TimePicker"))
-                            .Gather(g => g.Include(medication.Get(c => c.Value), "medicationTime"))
+                            .Gather<MedicationScheduleRequest>(g => g.Set(x => x.MedicationTime, medication.Get(c => c.Value)))
                             .Response(r => r.OnSuccess<MedicationScheduleResponse>((json, s) =>
                             {
                                 s.Element("schedule-confirmation").SetText(json, x => x.Confirmation);

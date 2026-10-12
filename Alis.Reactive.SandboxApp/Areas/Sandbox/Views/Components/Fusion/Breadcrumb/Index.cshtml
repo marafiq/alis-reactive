@@ -1,7 +1,6 @@
 @model FusionBreadcrumbModel
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Syncfusion.EJ2.Navigations
 @{
     ViewData["Title"] = "Resident Care Record";
@@ -58,12 +57,13 @@
                 p.Element("open-section-heading").SetText(args, x => x.Item.Text);
                 p.Element("open-section-icon").SetText(args, x => x.Item.IconCss);
 
+                var clicked = p.Payload(args);
                 p.Post(openUrl)
-                    .Gather(g => g
-                        .FromEvent(args, x => x.Item.Text, "text")
-                        .FromEvent(args, x => x.Item.Id, "id")
-                        .FromEvent(args, x => x.Item.Url, "url")
-                        .FromEvent(args, x => x.Item.Disabled, "disabled"))
+                    .Gather<OpenCareSectionRequest>(g => g
+                        .Set(x => x.Text, clicked.Get(a => a.Item.Text))
+                        .Set(x => x.Id, clicked.Get(a => a.Item.Id))
+                        .Set(x => x.Url, clicked.Get(a => a.Item.Url))
+                        .Set(x => x.Disabled, clicked.Get(a => a.Item.Disabled)))
                     .Response(r => r.OnSuccess<OpenCareSectionResponse>((json, s) =>
                     {
                         s.Element("open-section-summary").SetText(json, x => x.Summary);

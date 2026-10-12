@@ -1,5 +1,4 @@
 @model CascadingModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -10,11 +9,8 @@
 
     Html.On(plan, t => t.CustomEvent(CascadingEvents.DoSave, p =>
     {
-        p.Post(Url.SandboxRoute("Save", "Cascading"), g =>
-        {
-            g.Include<FusionDropDownList, CascadingModel>(m => m.Country);
-            g.Include<FusionDropDownList, CascadingModel>(m => m.City);
-        })
+        p.Post(Url.SandboxRoute("Save", "Cascading"))
+        .Gather(g => g.Form(m => m.Country, m => m.City))
         .Response(r => r
             .OnSuccess<CascadingSaveResponse>((json, s) =>
             {
@@ -47,7 +43,7 @@
            .Reactive(evt => evt.Change, (args, p) =>
            {
                p.Get(Url.SandboxRoute("Cities", "Cascading"))
-                .Gather(g => g.Include<FusionDropDownList, CascadingModel>(m => m.Country))
+                .Gather<CityLookupQuery>(g => g.Form(m => m.Country))
                 .Response(r => r
                    .OnSuccess<CityLookupResponse>((json, s) =>
                    {

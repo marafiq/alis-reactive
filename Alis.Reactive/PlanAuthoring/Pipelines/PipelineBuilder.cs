@@ -164,22 +164,13 @@ namespace Alis.Reactive.Builders
             return new PayloadRef<TArgs, TModel>(args, this);
         }
 
-        /// <summary>Reads a string value from the current URL query string at runtime.</summary>
-        /// <param name="paramName">Query parameter name read at runtime.</param>
-        /// <returns>URL value source for conditions, reactions, or gather.</returns>
-        public Conditions.TypedUrlSource<string> FromUrl(string paramName)
-        {
-            return new Conditions.TypedUrlSource<string>(paramName);
-        }
-
-        /// <summary>Reads a typed value from the current URL query string at runtime.</summary>
-        /// <typeparam name="T">Value type expected by downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="paramName">Query parameter name read at runtime.</param>
-        /// <returns>URL value source for conditions, reactions, or gather.</returns>
-        public Conditions.TypedUrlSource<T> FromUrl<T>(string paramName)
-        {
-            return new Conditions.TypedUrlSource<T>(paramName);
-        }
+        /// <summary>
+        /// Reads the page's URL query string through <typeparamref name="TQuery"/>, the class the page's action
+        /// binds with <c>[FromQuery]</c>: <c>p.Url&lt;CensusQuery&gt;().Get(q =&gt; q.FacilityId)</c>.
+        /// </summary>
+        /// <typeparam name="TQuery">The query class.</typeparam>
+        /// <returns>The query, whose members are value sources.</returns>
+        public UrlQuery<TQuery> Url<TQuery>() where TQuery : class => new UrlQuery<TQuery>();
 
         /// <summary>Reads the return value from a named function member on a plan-registered plugin.</summary>
         /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>

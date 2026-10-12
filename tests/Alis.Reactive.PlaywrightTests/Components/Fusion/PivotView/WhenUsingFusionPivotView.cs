@@ -109,7 +109,7 @@ public class WhenUsingFusionPivotView : PlaywrightTestBase
         await Page.Locator("#audit-pivot-btn").ClickAsync();
 
         await Expect(Page.Locator("#audit-summary"))
-            .ToHaveTextAsync("Table:evergreen:Table", new() { Timeout = 10000 });
+            .ToHaveTextAsync("Table:evergreen", new() { Timeout = 10000 });
         await Expect(Page.Locator("#layout-length"))
             .ToHaveTextAsync(new Regex("^[1-9][0-9]+$"), new() { Timeout = 10000 });
 

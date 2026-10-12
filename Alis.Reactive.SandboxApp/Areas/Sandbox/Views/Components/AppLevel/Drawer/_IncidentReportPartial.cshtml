@@ -1,5 +1,4 @@
 @model IncidentReportModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.AppLevel
 @{
@@ -14,7 +13,7 @@
         .CssClass("self-start rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {
-            p.Post(Url.SandboxRoute("FileIncidentReport", "Drawer"), g => g.IncludeAll())
+            p.Post(Url.SandboxRoute("FileIncidentReport", "Drawer")).Gather(g => g.Form())
              .Validate<IncidentReportValidator>("incident-report-form")
              .WhileLoading(l => l.Component<NativeLoader>().Set(c => c.Target, "incident-report-form").Call(c => c.Show))
              .Response(r => r

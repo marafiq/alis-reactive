@@ -1,5 +1,4 @@
 @model Step1DemographicsModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -89,7 +88,7 @@
             {
                 p.Payload(args).Set(a => a.PreventDefaultAction, true);
                 p.Get(searchPhysiciansUrl)
-                 .Gather(g => g.FromEvent(args, x => x.Text, "q"))
+                 .Gather<PhysicianSearchQuery>(g => g.Set(x => x.Q, p.Payload(args).Get(a => a.Text)))
                  .Response(r => r.OnSuccess<PhysicianSearchResponse>((json, s) =>
                  {
                      s.Payload(args).Call(a => a.UpdateData, json.Read(j => j.Physicians));
@@ -137,8 +136,8 @@
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(saveStep1Url,
-                    g => g.IncludeAll())
+                p.Post(saveStep1Url)
+                 .Gather(g => g.Form())
                  .Validate<Step1Validator>("step1-form")
                  .Response(r => r
                     .OnSuccess<SaveStepResponse>((json, s) =>

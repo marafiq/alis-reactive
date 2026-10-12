@@ -84,6 +84,10 @@ namespace Alis.Reactive.PlanModel
         internal static ValueExpression ReadUrl(string paramName, Shape shape) =>
             Read(UrlSource.Instance, paramName, shape);
 
+        /// <summary>Reads a form input as MVC binds it, by its element id.</summary>
+        internal static ValueExpression ReadFormField(string inputId, Shape shape) =>
+            Read(FormFieldSource.Of(inputId), inputId, shape);
+
         /// <summary>
         /// Reads a DOM member by element ID. The path is carried so <c>RuntimePath</c>
         /// can traverse without a component contract.

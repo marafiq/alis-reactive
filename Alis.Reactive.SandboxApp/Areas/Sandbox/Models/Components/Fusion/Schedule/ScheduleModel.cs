@@ -75,6 +75,46 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public int UnassignedCount { get; set; }
     }
 
+    /// <summary>The query of <c>GET api/schedule/assignments</c>: the facility, and the date and view the schedule shows.</summary>
+    public sealed class ScheduleAssignmentsQuery
+    {
+        public string? SelectedFacilityId { get; set; }
+        public DateTime? CurrentDate { get; set; }
+        public string? CurrentView { get; set; }
+    }
+
+    /// <summary>
+    /// The query of <c>GET api/schedule/assignments</c> as the schedule navigates, whose navigating event
+    /// hands the new date as text.
+    /// </summary>
+    public sealed class ScheduleNavigationQuery
+    {
+        public string? SelectedFacilityId { get; set; }
+        public string? CurrentDate { get; set; }
+        public string? CurrentView { get; set; }
+    }
+
+    /// <summary>A request about one schedule view: <c>{currentView}</c> in the path of <c>api/schedule/view/{currentView}/echo</c> and <c>/summary</c>.</summary>
+    public sealed class ScheduleViewRequest
+    {
+        public string CurrentView { get; set; } = "";
+    }
+
+    /// <summary>The query of <c>GET Schedule/EditForm</c>: the assignment whose edit form loads.</summary>
+    public sealed class EditAssignmentQuery
+    {
+        public int AssignmentId { get; set; }
+    }
+
+    /// <summary>The query of <c>GET Schedule/NewAssignmentForm</c>: the clicked cell's times and shift, and the facility.</summary>
+    public sealed class NewAssignmentQuery
+    {
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public int ShiftId { get; set; }
+        public string? SelectedFacilityId { get; set; }
+    }
+
     public class ScheduleViewRouteResponse
     {
         public string CurrentView { get; set; } = "";

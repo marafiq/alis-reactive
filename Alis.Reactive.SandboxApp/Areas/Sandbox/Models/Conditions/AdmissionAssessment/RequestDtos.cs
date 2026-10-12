@@ -1,5 +1,11 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionAssessment;
 
+/// <summary>The query <c>SearchPhysicians?q=</c> binds: the text a physician's name contains.</summary>
+public sealed class PhysicianSearchQuery
+{
+    public string Q { get; set; } = "";
+}
+
 public class VerifyVeteranRequest
 {
     public string VaId { get; set; } = "";

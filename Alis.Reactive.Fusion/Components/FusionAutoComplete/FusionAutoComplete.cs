@@ -73,9 +73,10 @@ namespace Alis.Reactive.Fusion.Components
     /// popup.
     /// <code>
     /// p.Payload(args).Set(a =&gt; a.PreventDefaultAction, true);
-    /// p.Get(url).Gather(g =&gt; g.FromEvent(args, x =&gt; x.Text, "q"))
-    ///  .Response(r =&gt; r.OnSuccess&lt;Matches&gt;((res, s) =&gt;
-    ///      s.Payload(args).Call(a =&gt; a.UpdateData, res.Read(m =&gt; m.Items))));
+    /// p.Get(url)
+    ///  .Gather&lt;MedicationSearchQuery&gt;(g =&gt; g.Set(x =&gt; x.MedicationType, p.Payload(args).Get(a =&gt; a.Text)))
+    ///  .Response(r =&gt; r.OnSuccess&lt;MedicationSearchResponse&gt;((json, s) =&gt;
+    ///      s.Payload(args).Call(a =&gt; a.UpdateData, json.Read(j =&gt; j.Medications))));
     /// </code>
     /// </remarks>
     public class FusionAutoCompleteFilteringArgs : JsObject

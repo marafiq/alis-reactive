@@ -79,6 +79,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions
             public string? Action { get; set; }
         }
 
+        /// <summary>A resident audit as the page sends it: the resident in the path, the action in the body.</summary>
+        public sealed class ResidentAuditRequest : AuditRequest
+        {
+            public int ResidentId { get; set; }
+        }
+
         public class ClassifyRequest
         {
             public int Count { get; set; }

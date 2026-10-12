@@ -1,5 +1,4 @@
 @model Step2ClinicalModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @{
     var plan = Html.ResolvePlan<Step2ClinicalModel>();
@@ -32,9 +31,8 @@
                     .Then(then =>
                     {
                         then.Element("uncontrolled-spinner").Show();
-                        then.Post(alertUncontrolledUrl,
-                            g => g.Include<FusionNumericTextBox, Step2ClinicalModel>(m => m.A1cLevel)
-                                  .Include<FusionDropDownList, Step2ClinicalModel>(m => m.DiabetesType))
+                        then.Post(alertUncontrolledUrl)
+                         .Gather<AlertUncontrolledRequest>(g => g.Form(m => m.A1cLevel, m => m.DiabetesType))
                          .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
                          {
                              s.Element("uncontrolled-result").SetText(json, x => x.Message);

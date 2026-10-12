@@ -20,6 +20,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string Category { get; set; } = "";
     }
 
+    /// <summary>The search text the medication AutoComplete sends to <c>GET AutoComplete/Medications</c>.</summary>
+    public sealed class MedicationSearchQuery
+    {
+        public string MedicationType { get; set; } = "";
+    }
+
     public class MedicationSearchResponse
     {
         public List<MedicationTypeItem> Medications { get; set; } = new();

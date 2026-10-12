@@ -1,5 +1,4 @@
 @model Step3FunctionalModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -86,9 +85,8 @@
                     .Then(then =>
                     {
                         then.Element("room-spinner").Show();
-                        then.Post(requestRoomSetupUrl,
-                            g => g.Include<FusionDropDownList, Step3FunctionalModel>(m => m.MobilityAid)
-                                  .Include<NativeHiddenField, Step3FunctionalModel>(m => m.ResidentName))
+                        then.Post(requestRoomSetupUrl)
+                         .Gather<RequestRoomSetupRequest>(g => g.Form(m => m.MobilityAid, m => m.ResidentName))
                          .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
                          {
                              s.Element("room-result").SetText(json, x => x.Message);
@@ -167,8 +165,8 @@
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(saveStep3Url,
-                    g => g.IncludeAll())
+                p.Post(saveStep3Url)
+                 .Gather(g => g.Form())
                  .Validate<Step3Validator>("step3-form")
                  .Response(r => r
                     .OnSuccess<SaveStepResponse>((json, s) =>

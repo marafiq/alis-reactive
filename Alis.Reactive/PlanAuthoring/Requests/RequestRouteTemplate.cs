@@ -8,13 +8,11 @@ namespace Alis.Reactive.Builders.Requests
     {
         private readonly RequestUrl _url;
         private readonly IReadOnlyList<string> _placeholders;
-        private readonly HashSet<string> _placeholderLookup;
 
         private RequestRouteTemplate(RequestUrl url, IReadOnlyList<string> placeholders)
         {
             _url = url ?? throw new ArgumentNullException(nameof(url));
             _placeholders = placeholders ?? throw new ArgumentNullException(nameof(placeholders));
-            _placeholderLookup = new HashSet<string>(_placeholders, StringComparer.Ordinal);
         }
 
         internal static RequestRouteTemplate For(RequestUrl url) =>
@@ -22,36 +20,32 @@ namespace Alis.Reactive.Builders.Requests
                 url ?? throw new ArgumentNullException(nameof(url)),
                 ReadPlaceholders(url));
 
-        internal void RequireRouteParameters(IEnumerable<string> routeParameterNames)
+        // A top-level request member fills the placeholder of its name, matched as MVC matches route
+        // values: ignoring case. The placeholder keeps the URL's own spelling.
+        internal string? PlaceholderFor(BindingPath member)
         {
-            if (routeParameterNames == null) throw new ArgumentNullException(nameof(routeParameterNames));
+            var isTopLevel = member.Value.IndexOfAny(new[] { '.', '[' }) < 0;
+            if (!isTopLevel) return null;
 
-            var suppliedNames = new HashSet<string>(routeParameterNames, StringComparer.Ordinal);
-            EnsureEveryRouteParameterHasPlaceholder(suppliedNames);
-            EnsureEveryPlaceholderHasRouteParameter(suppliedNames);
-        }
-
-        private void EnsureEveryRouteParameterHasPlaceholder(ISet<string> routeParameterNames)
-        {
-            foreach (var paramName in routeParameterNames)
-            {
-                if (_placeholderLookup.Contains(paramName)) continue;
-
-                throw new InvalidOperationException(
-                    $"Route param '{paramName}' does not match any placeholder in URL '{_url.Value}'. " +
-                    $"Expected '{{{paramName}}}' in the URL template.");
-            }
-        }
-
-        private void EnsureEveryPlaceholderHasRouteParameter(ISet<string> routeParameterNames)
-        {
             foreach (var placeholder in _placeholders)
             {
-                if (routeParameterNames.Contains(placeholder)) continue;
+                if (string.Equals(placeholder, member.Value, StringComparison.OrdinalIgnoreCase))
+                    return placeholder;
+            }
+
+            return null;
+        }
+
+        internal void RequireEveryPlaceholderFilled(IEnumerable<string> filled)
+        {
+            var filledNames = new HashSet<string>(filled, StringComparer.Ordinal);
+            foreach (var placeholder in _placeholders)
+            {
+                if (filledNames.Contains(placeholder)) continue;
 
                 throw new InvalidOperationException(
-                    $"URL template '{_url.Value}' has placeholder '{{{placeholder}}}' " +
-                    $"but no matching .RouteParam(\"{placeholder}\", ...) was provided.");
+                    $"URL template '{_url.Value}' has placeholder '{{{placeholder}}}', but the gathered request sets " +
+                    $"no member named '{placeholder}'. Gather<TRequest>(g => g.Set(x => x.{char.ToUpperInvariant(placeholder[0])}{placeholder.Substring(1)}, ..)) fills it.");
             }
         }
 

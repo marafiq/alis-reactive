@@ -56,8 +56,11 @@ through the same `types` contracts (`runtime-plan.ts:70-76`). Event payloads are
 
 **HTTP**
 - GET/POST/PUT/DELETE; JSON default, form data with files; GET writes gather to the query string.
-- Gather: `IncludeAll`, `Include<TComponent, TModel>(m => ..)`, component source, `FromEvent`,
-  URL, headers, route params (literal, URL, component, previous response), static, plugin.
+- Gather builds the typed request the endpoint binds (`Gather<TRequest>`, or `Gather(..)` for the view
+  model): `Form()` and `Form(m => ..)` send the form's inputs by binding name; `Set(x => x.Member, ..)`
+  takes a literal or any source (component member, event payload `p.Payload(args).Get(..)`, URL query
+  `p.Url<TQuery>().Get(..)`, previous response, plugin, array value); `Header(name, ..)`. A member
+  named like a `{placeholder}` fills the route.
 - Typed success and error by exact status, then any status; network failure only reaches
   status-less error routes; content-type sniffing.
 - Chained (one follow-up, success only) and nested requests gathering from the previous response;
@@ -103,7 +106,8 @@ These are the dependencies the release inverts.
 - `RegisteredInputValueRead.ForFusionInPlaceEditorValueRead` (`RegisteredInputValueRead.cs:28`).
 - ~~`ComponentVendor.Fusion` token~~: closed by D2 (`FusionComponent.FusionVendor` declares it);
   EJ2-specific projections remain in `ClientRule.cs:21-26`.
-- `Include<TComponent>` reads the input's declared value; `NativeGatherExtensions` assumes NativeTextBox.
+- ~~`Include<TComponent>` reads the input's declared value; `NativeGatherExtensions` assumes NativeTextBox~~:
+  closed; both were deleted with the typed request, and `Form(m => ..)` sends an input by its binding name.
 - Method contracts are keyed per component instance, so two arities of one member on one grid
   throw (`BrowserObjectContract.cs:257-268`); `Mapped` aliases dodge it.
 
@@ -130,7 +134,8 @@ sync the boxes.
   is missing and the test would pass with true values too.
 - ArrayManager send test gathers `p.Plugin(array.Count).Arg("items")`: the count of the string
   `"items"` (5) happens to equal the resident count (`ArrayManager/Index.cshtml:50`).
-- AutoComplete/MultiSelect `FromEvent` tests assert only the endpoint name in the URL.
+- AutoComplete/MultiSelect filtering tests (payload text set on the request) assert only the endpoint
+  name in the URL.
 - The 422 summary text is hard-coded in the view; ColorPicker toggle asserts only echo text.
 - Plan-only fixtures: RequestInput, CapitalsNaming, NativeActionLink serialization, BehaviorGraph,
   ClientRules. Component-method sources in gather and conditions, URL and plugin sources in

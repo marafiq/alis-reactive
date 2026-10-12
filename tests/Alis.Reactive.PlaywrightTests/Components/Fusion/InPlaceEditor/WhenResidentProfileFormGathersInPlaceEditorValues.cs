@@ -1,6 +1,6 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
-// InPlaceEditor fields must participate in IncludeAll gather with the other registered Fusion inputs.
+// InPlaceEditor fields must participate in the Form() gather with the other registered Fusion inputs.
 [TestFixture]
 public class WhenResidentProfileFormGathersInPlaceEditorValues : PlaywrightTestBase
 {

@@ -1,7 +1,7 @@
 @model VitalsAlertModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions
 @{
     ViewData["Title"] = "Vitals Alert";
 
@@ -42,8 +42,8 @@
                     p.When(comp.Get(c => c.Value)).Gt(140m)
                         .Then(then =>
                         {
-                            then.Post(alertUrl,
-                                    g => g.Include<FusionNumericTextBox, VitalsAlertModel>(m => m.HeartRate))
+                            then.Post(alertUrl)
+                                .Gather<VitalsAlertController.AlertRequest>(g => g.Form(m => m.HeartRate))
                                 .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
                                 {
                                     s.Element("s1-alert-status").SetText(json, x => x.Message);
@@ -84,8 +84,8 @@
                     p.When(comp.Get(c => c.Value)).Gte(180m)
                         .Then(then =>
                         {
-                            then.Post(criticalUrl,
-                                    g => g.Include<FusionNumericTextBox, VitalsAlertModel>(m => m.HeartRate))
+                            then.Post(criticalUrl)
+                                .Gather<VitalsAlertController.AlertRequest>(g => g.Form(m => m.HeartRate))
                                 .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
                                 {
                                     s.Element("s2-tier-status").SetText(json, x => x.Message);
@@ -95,8 +95,8 @@
                         .ElseIf(comp.Get(c => c.Value)).Gte(140m)
                         .Then(then =>
                         {
-                            then.Post(warningUrl,
-                                    g => g.Include<FusionNumericTextBox, VitalsAlertModel>(m => m.HeartRate))
+                            then.Post(warningUrl)
+                                .Gather<VitalsAlertController.AlertRequest>(g => g.Form(m => m.HeartRate))
                                 .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
                                 {
                                     s.Element("s2-tier-status").SetText(json, x => x.Message);
@@ -136,8 +136,8 @@
                     p.When(comp.Get(c => c.Value)).Gt(140m)
                         .Then(then =>
                         {
-                            then.Post(alertUrl,
-                                    g => g.Include<FusionNumericTextBox, VitalsAlertModel>(m => m.HeartRate))
+                            then.Post(alertUrl)
+                                .Gather<VitalsAlertController.AlertRequest>(g => g.Form(m => m.HeartRate))
                                 .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
                                 {
                                     s.Element("s3-branch").SetText(json, x => x.Message);

@@ -125,12 +125,15 @@ Every view now has the whole DSL for it, with no further code:
         var suite = p.Component<TomSelect>(m => m.SuiteType);
         p.When(suite.Get(x => x.Value)).NotEmpty()
             .Then(quote => quote.Get(rateUrl)
-                .Gather(g => g.RouteParam("suiteType", suite.Get(x => x.Value)))
+                .Gather<SuiteQuery>(g => g.Set(x => x.SuiteType, suite.Get(x => x.Value)))
                 .Response(r => r.OnSuccess<SuiteRateResponse>((rate, s) =>
                     s.Component<FusionNumericTextBox>(m => m.MonthlyRate)
                         .Set(x => x.Value, rate.Read(x => x.MonthlyRate)))));
     }); }
 ```
+
+`rateUrl` holds a `{suiteType}` placeholder, and `SuiteQuery.SuiteType` fills it
+with the brought component's value.
 
 ```csharp
 s.Component<TomSelect>(m => m.SuiteType).Call(c => c.SetValue, recommendation.Read(x => x.SuiteType));

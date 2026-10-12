@@ -1,5 +1,4 @@
 @model FrontDeskHoldsModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.AppLevel
 @using Alis.Reactive.Fusion.Components
@@ -23,8 +22,9 @@
     // first; the family's holds follow it, asked for under the family's name in a header.
     Html.On(plan, t => t.DomReady(p =>
     {
+        var link = p.Url<FrontDeskQuery>();
         p.Get(weekUrl)
-            .Gather(g => g.RouteParam("residentId", p.FromUrl("resident")))
+            .Gather<FrontDeskResident>(g => g.Set(x => x.ResidentId, link.Get(q => q.Resident)))
             .WhileLoading(l => l.Element("desk-loading").Show())
             .Response(r => r
                 .OnSuccess<ResidentWeekResponse>((week, s) =>
@@ -41,9 +41,9 @@
                     e.Element("desk-resident").SetText("Unknown resident");
                 })
                 .Chained(holds => holds.Get(holdsUrl)
-                    .Gather(g => g
-                        .RouteParam("residentId", p.FromUrl("resident"))
-                        .Header("X-Family", p.FromUrl("family")))
+                    .Gather<FrontDeskResident>(g => g
+                        .Set(x => x.ResidentId, link.Get(q => q.Resident))
+                        .Header("X-Family", link.Get(q => q.Family)))
                     .Response(answer => answer.OnSuccess<FamilyHoldsResponse>((held, s) =>
                     {
                         var planner = s.Component<VisitPlanner>(m => m.VisitSlots);
@@ -78,12 +78,12 @@
                     // A time booked: hold it, under the wing's desk and for the family in the link.
                     p.When(args, x => x.Added).NotEmpty()
                         .Then(added => added.Post(holdUrl)
-                            .Gather(g => g
-                                .RouteParam("slotId", args, x => x.Added)
-                                .Header("X-Wing", added.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.Wing))
-                                .Include(added.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.Count), "visitsThisWeek")
-                                .FromUrl("family")
-                                .Static("source", "front-desk"))
+                            .Gather<HoldVisitRequest>(g => g
+                                .Set(x => x.SlotId, p.Payload(args).Get(a => a.Added))
+                                .Set(x => x.VisitsThisWeek, added.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.Count))
+                                .Set(x => x.Family, p.Url<FrontDeskQuery>().Get(q => q.Family))
+                                .Set(x => x.Source, "front-desk")
+                                .Header("X-Wing", added.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.Wing)))
                             .Response(r => r
                                 .OnSuccess<DeskHoldResponse>((hold, s) =>
                                 {
@@ -109,7 +109,7 @@
                     // A time unbooked: release it at the desk.
                     p.When(args, x => x.Removed).NotEmpty()
                         .Then(removed => removed.Delete(holdUrl)
-                            .Gather(g => g.RouteParam("slotId", args, x => x.Removed))
+                            .Gather<FrontDeskSlot>(g => g.Set(x => x.SlotId, p.Payload(args).Get(a => a.Removed)))
                             .Response(r => r.OnSuccess<DeskMessage>((released, s) =>
                                 s.Element("desk-status").SetText(released, x => x.Message))));
 
@@ -122,9 +122,10 @@
                 {
                     var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
                     p.When(planner.Get(c => c.FirstBooked)).NotEmpty()
-                        .Then(earliest => earliest.Put(holdUrl, g => g
-                                .RouteParam("slotId", earliest.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.FirstBooked))
-                                .Include(earliest.Component<FusionNumericTextBox>(m => m.Visitors).Get(c => c.Value), "visitors"))
+                        .Then(earliest => earliest.Put(holdUrl)
+                            .Gather<ChangeVisitorsRequest>(g => g
+                                .Set(x => x.SlotId, earliest.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.FirstBooked))
+                                .Set(x => x.Visitors, earliest.Component<FusionNumericTextBox>(m => m.Visitors).Get(c => c.Value)))
                             .Response(r => r.OnSuccess<DeskMessage>((changed, s) =>
                                 s.Element("desk-status").SetText(changed, x => x.Message))));
                 }); }
@@ -140,7 +141,7 @@
                 {
                     p.Confirm("Release every hold for this week?")
                         .Then(release => release.Delete(releaseEveryUrl)
-                            .Gather(g => g.RouteParam("residentId", release.FromUrl("resident")))
+                            .Gather<FrontDeskResident>(g => g.Set(x => x.ResidentId, release.Url<FrontDeskQuery>().Get(q => q.Resident)))
                             .Response(r => r.OnSuccess<DeskMessage>((released, s) =>
                             {
                                 s.Component<VisitPlanner>(m => m.VisitSlots).Call(c => c.Clear);
@@ -162,11 +163,13 @@
                             arrival.Component<NativeLoader>().Set(c => c.Target, "desk-card").Call(c => c.Show);
                             arrival.Parallel(
                                     badge => badge.Post(badgeUrl)
-                                        .Gather(g => g.RouteParam("slotId", earliestTime).FromUrl("family"))
+                                        .Gather<HoldVisitRequest>(g => g
+                                            .Set(x => x.SlotId, earliestTime)
+                                            .Set(x => x.Family, arrival.Url<FrontDeskQuery>().Get(q => q.Family)))
                                         .Response(r => r.OnSuccess<DeskMessage>((printed, s) =>
                                             s.Element("desk-status").SetText(printed, x => x.Message))),
                                     card => card.Get(arrivalUrl)
-                                        .Gather(g => g.RouteParam("slotId", earliestTime))
+                                        .Gather<FrontDeskSlot>(g => g.Set(x => x.SlotId, earliestTime))
                                         .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content"))))
                                 .OnAllSettled(done =>
                                 {

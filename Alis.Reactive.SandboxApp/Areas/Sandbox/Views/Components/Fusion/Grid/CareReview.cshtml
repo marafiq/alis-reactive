@@ -1,6 +1,5 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.GridOperationsModel
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @{
@@ -33,7 +32,7 @@
             {
                 var grid = p.Component<FusionGrid>(GridId);
                 p.Post(Url.SandboxRoute("CurrentViewSummary", "Grid"))
-                    .Gather(g => g.Include(grid.Get(c => c.GetCurrentViewRecords<ResidentDirectoryGridItem>()), "records"))
+                    .Gather<ResidentCurrentViewRequest>(g => g.Set(x => x.Records, grid.Get(c => c.GetCurrentViewRecords<ResidentDirectoryGridItem>())))
                     .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         s.Element("view-summary").SetText(json, x => x.Summary)));
             }))
@@ -43,7 +42,7 @@
             {
                 var grid = p.Component<FusionGrid>(GridId);
                 p.Post(Url.SandboxRoute("RowIndexSummary", "Grid"))
-                    .Gather(g => g.Include(grid.Get(c => c.GetRowIndexByPrimaryKey, 6005), "rowIndex"))
+                    .Gather<ResidentRowIndexRequest>(g => g.Set(x => x.RowIndex, grid.Get(c => c.GetRowIndexByPrimaryKey, 6005)))
                     .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         s.Element("index-summary").SetText(json, x => x.Summary)));
             }))
@@ -54,7 +53,7 @@
                 var grid = p.Component<FusionGrid>(GridId);
                 grid.Call(c => c.SelectRowsByRange, 0, 1);
                 p.Post(Url.SandboxRoute("SelectionRecords", "Grid"))
-                    .Gather(g => g.Include(grid.Get(c => c.GetSelectedRecords<ResidentDirectoryGridItem>()), "selectedRecords"))
+                    .Gather<ResidentSelectionRecordsRequest>(g => g.Set(x => x.SelectedRecords, grid.Get(c => c.GetSelectedRecords<ResidentDirectoryGridItem>())))
                     .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         s.Element("selected-summary").SetText(json, x => x.Summary)));
             }))
@@ -65,7 +64,7 @@
                 var grid = p.Component<FusionGrid>(GridId);
                 grid.Call(c => c.SelectRowsByRange, 0, 1);
                 p.Post(Url.SandboxRoute("SelectionIndexes", "Grid"))
-                    .Gather(g => g.Include(grid.Get(c => c.GetSelectedRowIndexes), "selectedRowIndexes"))
+                    .Gather<ResidentSelectionIndexesRequest>(g => g.Set(x => x.SelectedRowIndexes, grid.Get(c => c.GetSelectedRowIndexes)))
                     .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
                         s.Element("indexes-summary").SetText(json, x => x.Summary)));
             }))

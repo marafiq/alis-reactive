@@ -1,5 +1,4 @@
 @model EmergencyContactsModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "Emergency Contacts";
@@ -37,7 +36,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("Save", "EmergencyContacts"), g => g.IncludeAll())
+                p.Post(Url.SandboxRoute("Save", "EmergencyContacts")).Gather(g => g.Form())
                  .Validate<EmergencyContactsValidator>("emergency-contacts-form")
                  .Response(r => r
                     .OnSuccess<EmergencyContactsConfirmation>((json, s) =>

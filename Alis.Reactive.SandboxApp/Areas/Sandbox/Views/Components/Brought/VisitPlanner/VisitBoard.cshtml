@@ -1,6 +1,5 @@
 @model VisitBoardModel
 @using Alis.Reactive.Builders.Conditions
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.SandboxApp.BroughtComponents
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
@@ -20,7 +19,7 @@
     // code through a plugin, and the quiet times through an array over the planner's slots.
     Html.On(plan, t => t.DomReady(p =>
         p.Get(weekUrl)
-            .Gather(g => g.RouteParam("residentId", p.FromUrl("resident")))
+            .Gather<FrontDeskResident>(g => g.Set(x => x.ResidentId, p.Url<VisitBoardQuery>().Get(q => q.Resident)))
             .Response(r => r.OnSuccess<ResidentWeekResponse>((week, s) =>
             {
                 var planner = s.Component<VisitPlanner>(m => m.VisitSlots);
@@ -109,9 +108,10 @@
                         });
 
                     p.When(args, x => x.Added).NotEmpty()
-                        .Then(added => added.Post(takeUrl, g => g
-                                .RouteParam("slotId", args, x => x.Added)
-                                .FromUrl("family"))
+                        .Then(added => added.Post(takeUrl)
+                            .Gather<TakeVisitRequest>(g => g
+                                .Set(x => x.SlotId, added.Payload(args).Get(a => a.Added))
+                                .Set(x => x.Family, added.Url<VisitBoardQuery>().Get(q => q.Family)))
                             .Response(r => r.OnSuccess<DeskMessage>((held, s) =>
                                 s.Element("board-status").SetText(held, x => x.Message))));
                 }); }

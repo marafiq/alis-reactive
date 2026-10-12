@@ -1,5 +1,4 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.EditAssignmentModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.AppLevel
 @using Alis.Reactive.Fusion.Components
@@ -30,9 +29,8 @@
             .CssClass("px-4 py-2 rounded-md bg-accent text-white text-sm font-medium hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/api/schedule/assign", g => g
-                     .Include<NativeHiddenField, EditAssignmentModel>(m => m.AssignmentId)
-                     .Include<NativeRadioGroup, EditAssignmentModel>(m => m.StaffId))
+                p.Post("/api/schedule/assign")
+                 .Gather<AssignStaffRequest>(g => g.Form(m => m.AssignmentId, m => m.StaffId))
                  .Validate<EditAssignmentValidator>("assignment-form")
                  .Response(r => r
                      .OnSuccess(s =>

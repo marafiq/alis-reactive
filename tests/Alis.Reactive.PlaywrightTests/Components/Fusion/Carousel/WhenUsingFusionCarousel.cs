@@ -143,13 +143,13 @@ public class WhenUsingFusionCarousel : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"sectionIndex\":1"),
+        Assert.That(body, Does.Contain("\"SectionIndex\":1"),
             "the gather pipeline must carry SlideChanged.CurrentIndex under its declared key");
-        Assert.That(body, Does.Contain("\"cameFromIndex\":0"),
+        Assert.That(body, Does.Contain("\"CameFromIndex\":0"),
             "the gather pipeline must carry SlideChanged.PreviousIndex under its declared key");
-        Assert.That(body, Does.Contain("\"direction\":\"Next\""),
+        Assert.That(body, Does.Contain("\"Direction\":\"Next\""),
             "the gather pipeline must carry SlideChanged.SlideDirection under its declared key");
-        Assert.That(body, Does.Contain("\"bySwipe\":false"),
+        Assert.That(body, Does.Contain("\"BySwipe\":false"),
             "the gather pipeline must carry SlideChanged.IsSwiped under its declared key");
 
         AssertNoConsoleErrors();

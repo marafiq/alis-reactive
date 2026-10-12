@@ -110,6 +110,8 @@ namespace Alis.Reactive.Grammar.Lowering
                     return G.Get(G.Get(G.Obj(_context.Objects.Document()), new[] { values }, Shape.None), new[] { read.Member }, read.Shape);
                 case PayloadSource payload:
                     return PayloadRead(payload, read, scope);
+                case FormFieldSource field:
+                    return G.Call(G.Obj(_context.Objects.Model()), new[] { "boundValueOf" }, new Expr[] { G.Lit(field.Input) }, G.NoShapes, read.Shape);
                 case DomSource dom:
                     return G.Get(G.Obj(_context.Objects.Element(dom.Element)), G.PathOf(read.Path), read.Shape);
                 default:

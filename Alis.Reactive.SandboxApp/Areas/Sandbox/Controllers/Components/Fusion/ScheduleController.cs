@@ -21,8 +21,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         /// <summary>
         /// Loads the Schedule data source for the selected facility and visible range.
-        /// Parameter names match the model property and event arg names used by
-        /// Include and FromEvent gather in the Reactive Plan.
+        /// Parameter names match the members of <see cref="ScheduleAssignmentsQuery"/> and
+        /// <see cref="ScheduleNavigationQuery"/>, which the Reactive Plan gathers.
         /// </summary>
         [HttpGet("~/api/schedule/assignments")]
         public IActionResult GetAssignments(string? selectedFacilityId, string? currentDate, string? currentView)

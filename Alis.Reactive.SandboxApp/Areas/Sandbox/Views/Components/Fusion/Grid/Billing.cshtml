@@ -1,7 +1,6 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentBillingViewModel
 @using Alis.Reactive.Builders
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.Templates
 @using Syncfusion.EJ2.Grids
@@ -28,11 +27,9 @@
     void LoadBilling(PipelineBuilder<ResidentBillingViewModel> p, string status)
     {
         p.Post(Url.SandboxRoute("BillingData", "Grid"))
-            .Gather(g =>
-            {
-                g.Static("skip", 0);
-                g.Static("take", 12);
-            })
+            .Gather<BillingDataRequest>(g => g
+                .Set(x => x.Skip, 0)
+                .Set(x => x.Take, 12))
             .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
             {
                 s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
@@ -69,13 +66,8 @@
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post(Url.SandboxRoute("BillingAddCharge", "Grid"), g =>
-                    {
-                        g.Include<FusionTextBox, ResidentBillingViewModel>(m => m.NewResidentName);
-                        g.Include<FusionDropDownList, ResidentBillingViewModel>(m => m.NewCareLevel);
-                        g.Include<FusionNumericTextBox, ResidentBillingViewModel>(m => m.NewMonthlyRate);
-                        g.Include<FusionNumericTextBox, ResidentBillingViewModel>(m => m.NewAddOnCharges);
-                    })
+                    p.Post(Url.SandboxRoute("BillingAddCharge", "Grid"))
+                    .Gather(g => g.Form(m => m.NewResidentName, m => m.NewCareLevel, m => m.NewMonthlyRate, m => m.NewAddOnCharges))
                     .Validate<ResidentBillingAddValidator>(AddFormId)
                     .Response(r => r
                         .OnSuccess<ResidentBillingResponse>((json, s) =>
@@ -131,14 +123,10 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Post(Url.SandboxRoute("BillingData", "Grid"))
-                        .Gather(g =>
-                        {
-                            g.Static("skip", 0);
-                            g.Static("take", 12);
-                            g.Include<FusionDropDownList, ResidentBillingViewModel>(m => m.FilterCareLevel);
-                            g.Include<FusionDropDownList, ResidentBillingViewModel>(m => m.FilterWing);
-                            g.Include<FusionDropDownList, ResidentBillingViewModel>(m => m.FilterStatus);
-                        })
+                        .Gather<BillingDataRequest>(g => g
+                            .Set(x => x.Skip, 0)
+                            .Set(x => x.Take, 12)
+                            .Form(m => m.FilterCareLevel, m => m.FilterWing, m => m.FilterStatus))
                         .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
                         {
                             s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
@@ -151,12 +139,10 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Post(Url.SandboxRoute("BillingData", "Grid"))
-                        .Gather(g =>
-                        {
-                            g.Static("skip", 0);
-                            g.Static("take", 12);
-                            g.Static("filterStatus", "Pending");
-                        })
+                        .Gather<BillingDataRequest>(g => g
+                            .Set(x => x.Skip, 0)
+                            .Set(x => x.Take, 12)
+                            .Set(x => x.FilterStatus, "Pending"))
                         .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
                         {
                             s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
@@ -169,12 +155,10 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Post(Url.SandboxRoute("BillingData", "Grid"))
-                        .Gather(g =>
-                        {
-                            g.Static("skip", 0);
-                            g.Static("take", 12);
-                            g.Static("filterCareLevel", "Memory Care");
-                        })
+                        .Gather<BillingDataRequest>(g => g
+                            .Set(x => x.Skip, 0)
+                            .Set(x => x.Take, 12)
+                            .Set(x => x.FilterCareLevel, "Memory Care"))
                         .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
                         {
                             s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
@@ -210,7 +194,7 @@
                     var grid = p.Component<FusionGrid>(GridId);
                     grid.Call(c => c.SaveCell);
                     p.Post(Url.SandboxRoute("BillingSave", "Grid"))
-                        .Gather(g => g.Include(grid.Get(c => c.GetBatchChanges<ResidentBillingItem>()), "batchChanges"))
+                        .Gather<BillingSaveRequest>(g => g.Set(x => x.BatchChanges, grid.Get(c => c.GetBatchChanges<ResidentBillingItem>())))
                         .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
                         {
                             s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
@@ -224,11 +208,9 @@
                 {
                     var grid = p.Component<FusionGrid>(GridId);
                     p.Post(Url.SandboxRoute("BillingBulkIncrease", "Grid"))
-                        .Gather(g =>
-                        {
-                            g.Static("percent", 5);
-                            g.Include(grid.Get(c => c.GetSelectedRecords<ResidentBillingItem>()), "selectedRecords");
-                        })
+                        .Gather<BillingBulkRequest>(g => g
+                            .Set(x => x.Percent, 5m)
+                            .Set(x => x.SelectedRecords, grid.Get(c => c.GetSelectedRecords<ResidentBillingItem>())))
                         .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
                         {
                             s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
@@ -242,7 +224,7 @@
                 {
                     var grid = p.Component<FusionGrid>(GridId);
                     p.Post(Url.SandboxRoute("BillingMarkBilled", "Grid"))
-                        .Gather(g => g.Include(grid.Get(c => c.GetSelectedRecords<ResidentBillingItem>()), "selectedRecords"))
+                        .Gather<BillingBulkRequest>(g => g.Set(x => x.SelectedRecords, grid.Get(c => c.GetSelectedRecords<ResidentBillingItem>())))
                         .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
                         {
                             s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
@@ -348,16 +330,13 @@
                 p.When(args, x => x.Action.RequestType).NotEq(FusionGridAction.Refresh)
                     .Then(t =>
                     {
+                        var dataState = t.Payload(args);
                         t.Post(Url.SandboxRoute("BillingData", "Grid"))
-                            .Gather(g =>
-                            {
-                                g.FromEvent(args, x => x.Skip, "skip");
-                                g.FromEvent(args, x => x.Take, "take");
-                                g.FromEvent(args, x => x.Sorted, "sorted");
-                                g.Include<FusionDropDownList, ResidentBillingViewModel>(m => m.FilterCareLevel);
-                                g.Include<FusionDropDownList, ResidentBillingViewModel>(m => m.FilterWing);
-                                g.Include<FusionDropDownList, ResidentBillingViewModel>(m => m.FilterStatus);
-                            })
+                            .Gather<BillingDataRequest>(g => g
+                                .Set(x => x.Skip, dataState.Get(a => a.Skip))
+                                .Set(x => x.Take, dataState.Get(a => a.Take))
+                                .Set(x => x.Sorted, dataState.Get(a => a.Sorted))
+                                .Form(m => m.FilterCareLevel, m => m.FilterWing, m => m.FilterStatus))
                             .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
                             {
                                 s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));

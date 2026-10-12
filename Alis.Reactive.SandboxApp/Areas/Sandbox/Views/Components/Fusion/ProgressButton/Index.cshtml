@@ -1,5 +1,4 @@
 @model FusionProgressButtonModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -161,13 +160,11 @@
             {
                 var button = p.Component<FusionProgressButton>(buttonId);
                 p.Post(Url.SandboxRoute("Echo", "ProgressButton"))
-                    .Gather(g =>
-                    {
-                        g.Include(button.Get(c => c.Content), "content");
-                        g.Include(button.Get(c => c.Disabled), "disabled");
-                        g.Include(button.Get(c => c.CssClass), "cssClass");
-                        g.Include(button.Get(c => c.EnableProgress), "progressEnabled");
-                    })
+                    .Gather<FusionProgressButtonEchoRequest>(g => g
+                        .Set(x => x.Content, button.Get(c => c.Content))
+                        .Set(x => x.Disabled, button.Get(c => c.Disabled))
+                        .Set(x => x.CssClass, button.Get(c => c.CssClass))
+                        .Set(x => x.ProgressEnabled, button.Get(c => c.EnableProgress)))
                     .Response(r => r.OnSuccess<FusionProgressButtonEchoResponse>((json, s) =>
                     {
                         s.Element("gather-content").SetText(json, x => x.Content);

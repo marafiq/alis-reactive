@@ -7,44 +7,27 @@ namespace Alis.Reactive.PlanModel
     {
         public IReadOnlyList<RequestInputAssignment> Assignments { get; }
         public string BodyFormat => RequestBodyFormat.Value;
-        public RegisteredInputSelection RegisteredInputs { get; }
+
+        /// <summary>Whether every input of the form is sent beside the assignments, by its binding name.</summary>
+        public bool IncludesForm { get; }
 
         private RequestBodyFormat RequestBodyFormat { get; }
 
         private GatherRequestInput(
             IReadOnlyList<RequestInputAssignment> assignments,
             RequestBodyFormat bodyFormat,
-            RegisteredInputSelection registeredInputs)
+            bool includesForm)
         {
             Assignments = assignments;
             RequestBodyFormat = bodyFormat;
-            RegisteredInputs = registeredInputs;
+            IncludesForm = includesForm;
         }
 
         internal static GatherRequestInput From(
             IEnumerable<RequestInputAssignment> assignments,
             RequestBodyFormat bodyFormat,
-            RegisteredInputSelection registeredInputs) =>
-            new GatherRequestInput(
-                assignments.ToList(),
-                bodyFormat,
-                registeredInputs);
-    }
-
-    internal sealed class RegisteredInputSelection
-    {
-        private RegisteredInputSelection(bool selectsRegisteredInputs)
-        {
-            SelectsRegisteredInputs = selectsRegisteredInputs;
-        }
-
-        internal static RegisteredInputSelection ExplicitAssignments { get; } =
-            new RegisteredInputSelection(false);
-
-        internal static RegisteredInputSelection AllRegisteredInputs { get; } =
-            new RegisteredInputSelection(true);
-
-        internal bool SelectsRegisteredInputs { get; }
+            bool includesForm) =>
+            new GatherRequestInput(assignments.ToList(), bodyFormat, includesForm);
     }
 
     internal sealed class RequestInputAssignment

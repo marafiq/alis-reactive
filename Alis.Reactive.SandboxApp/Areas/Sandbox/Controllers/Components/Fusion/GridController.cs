@@ -606,7 +606,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         private static IEnumerable<ResidentDirectoryRecord> ApplyGridSearch(
             IEnumerable<ResidentDirectoryRecord> source,
-            List<ResidentDirectorySearchRequest>? search)
+            List<FusionGridSearchDescriptor>? search)
         {
             var active = search?.FirstOrDefault(s => !string.IsNullOrWhiteSpace(s.Key));
             if (active == null)
@@ -674,7 +674,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         private static IEnumerable<ResidentDirectoryRecord> ApplyGridSorting(
             IEnumerable<ResidentDirectoryRecord> source,
-            List<GridSortRequest>? sorted)
+            List<FusionGridSortColumn>? sorted)
         {
             if (sorted == null || sorted.Count == 0)
                 return source.OrderBy(r => r.ResidentName);
@@ -834,73 +834,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             error = ValidationError(errors);
             return false;
         }
-    }
-
-    public class GridDataRequest
-    {
-        public int Skip { get; set; }
-        public int Take { get; set; }
-        public List<GridSortRequest>? Sorted { get; set; }
-        public decimal? MinAge { get; set; }
-    }
-
-    public class GridSortRequest
-    {
-        public string Name { get; set; } = "";
-        public string Direction { get; set; } = "";
-    }
-
-    public class ResidentDirectoryRequest
-    {
-        public int Skip { get; set; }
-        public int Take { get; set; }
-        public List<GridSortRequest>? Sorted { get; set; }
-        public List<string>? Group { get; set; }
-        public List<FusionGridTextFilterCriterion>? Where { get; set; }
-        public List<ResidentDirectorySearchRequest>? Search { get; set; }
-        public string? ResidentSearch { get; set; }
-        public string? CareLevel { get; set; }
-        public string? RiskLevel { get; set; }
-        public decimal? MinimumAge { get; set; }
-    }
-
-    public class ResidentDirectorySearchRequest
-    {
-        public List<string>? Fields { get; set; }
-        public string? Key { get; set; }
-        public string? Operator { get; set; }
-        public bool IgnoreCase { get; set; }
-    }
-
-    public class ResidentSelectionRequest
-    {
-        public int ResidentId { get; set; }
-        public int RowIndex { get; set; }
-    }
-
-    public class ResidentSelectionIndexesRequest
-    {
-        public List<int>? SelectedRowIndexes { get; set; }
-    }
-
-    public class ResidentSelectionRecordsRequest
-    {
-        public List<ResidentDirectoryGridItem>? SelectedRecords { get; set; }
-    }
-
-    public class ResidentCurrentViewRequest
-    {
-        public List<ResidentDirectoryGridItem>? Records { get; set; }
-    }
-
-    public class ResidentRowIndexRequest
-    {
-        public int RowIndex { get; set; }
-    }
-
-    public class ResidentGridBatchSummaryRequest
-    {
-        public FusionGridBatchChanges<ResidentDirectoryGridItem>? BatchChanges { get; set; }
     }
 
     public sealed record ResidentDirectoryRecord(

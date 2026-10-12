@@ -142,7 +142,7 @@ public class WhenUsingFusionSidebar : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"isOpen\":false"),
+        Assert.That(body, Does.Contain("\"IsOpen\":false"),
             "the gather pipeline must carry the sidebar IsOpen() source under its declared key");
 
         AssertNoConsoleErrors();

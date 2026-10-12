@@ -1,5 +1,4 @@
 @model Step2ClinicalModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -75,9 +74,8 @@
                         .Then(then =>
                         {
                             then.Element("elopement-spinner").Show();
-                            then.Post(alertElopementUrl,
-                                g => g.Include<FusionDropDownList, Step2ClinicalModel>(m => m.WanderFrequency)
-                                      .Include<NativeHiddenField, Step2ClinicalModel>(m => m.ResidentName))
+                            then.Post(alertElopementUrl)
+                             .Gather<AlertElopementRequest>(g => g.Form(m => m.WanderFrequency, m => m.ResidentName))
                              .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
                              {
                                  s.Element("elopement-result").SetText(json, x => x.Message);

@@ -1,5 +1,4 @@
 @model MultiSelectModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.DropDowns
@@ -18,8 +17,8 @@
 
     Html.On(plan, t => t.CustomEvent(MultiSelectEvents.DoGather, p =>
     {
-        p.Post(Url.SandboxRoute("Echo", "MultiSelect"), g =>
-            g.Include<FusionMultiSelect, MultiSelectModel>(m => m.Allergies))
+        p.Post(Url.SandboxRoute("Echo", "MultiSelect"))
+         .Gather<MultiSelectEchoRequest>(g => g.Form(m => m.Allergies))
          .Response(r => r
             .OnSuccess(s =>
             {
@@ -140,7 +139,7 @@
                 {
                     p.Payload(args).Set(a => a.PreventDefaultAction, true);
                     p.Get(Url.SandboxRoute("Supplies", "MultiSelect"))
-                     .Gather(g => g.FromEvent(args, x => x.Text, "Supplies"))
+                     .Gather<SupplySearchQuery>(g => g.Set(x => x.Supplies, p.Payload(args).Get(a => a.Text)))
                      .Response(r => r
                         .OnSuccess<SupplySearchResponse>((json, s) =>
                         {

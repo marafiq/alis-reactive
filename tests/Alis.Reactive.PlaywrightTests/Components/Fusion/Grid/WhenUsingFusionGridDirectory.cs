@@ -89,16 +89,16 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
         using var json = JsonDocument.Parse(requestBody);
         var root = json.RootElement;
 
-        Assert.That(root.GetProperty("skip").GetInt32(), Is.EqualTo(0));
-        Assert.That(root.GetProperty("take").GetInt32(), Is.EqualTo(8));
-        Assert.That(root.TryGetProperty("where", out _), Is.False);
-        Assert.That(root.TryGetProperty("search", out _), Is.False);
-        Assert.That(root.TryGetProperty("group", out _), Is.False);
+        Assert.That(root.GetProperty("Skip").GetInt32(), Is.EqualTo(0));
+        Assert.That(root.GetProperty("Take").GetInt32(), Is.EqualTo(8));
+        Assert.That(root.TryGetProperty("Where", out _), Is.False);
+        Assert.That(root.TryGetProperty("Search", out _), Is.False);
+        Assert.That(root.TryGetProperty("Group", out _), Is.False);
         Assert.That(root.TryGetProperty("aggregates", out _), Is.False);
         Assert.That(root.TryGetProperty("action", out _), Is.False);
         Assert.That(root.TryGetProperty("actionTarget", out _), Is.False);
 
-        var sorted = root.GetProperty("sorted");
+        var sorted = root.GetProperty("Sorted");
         Assert.That(sorted.GetArrayLength(), Is.EqualTo(1));
         Assert.That(sorted[0].GetProperty("name").GetString(), Is.EqualTo("riskLevel"));
         Assert.That(sorted[0].GetProperty("direction").GetString(), Is.EqualTo("descending"));
@@ -153,12 +153,12 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
         using var json = JsonDocument.Parse(requestBody);
         var root = json.RootElement;
 
-        Assert.That(root.GetProperty("skip").GetInt32(), Is.EqualTo(0));
-        Assert.That(root.GetProperty("take").GetInt32(), Is.EqualTo(8));
-        Assert.That(root.TryGetProperty("sorted", out _), Is.False);
-        Assert.That(root.TryGetProperty("where", out _), Is.False);
-        Assert.That(root.TryGetProperty("search", out _), Is.False);
-        Assert.That(root.TryGetProperty("group", out _), Is.False);
+        Assert.That(root.GetProperty("Skip").GetInt32(), Is.EqualTo(0));
+        Assert.That(root.GetProperty("Take").GetInt32(), Is.EqualTo(8));
+        Assert.That(root.TryGetProperty("Sorted", out _), Is.False);
+        Assert.That(root.TryGetProperty("Where", out _), Is.False);
+        Assert.That(root.TryGetProperty("Search", out _), Is.False);
+        Assert.That(root.TryGetProperty("Group", out _), Is.False);
         Assert.That(root.TryGetProperty("aggregates", out _), Is.False);
         Assert.That(root.TryGetProperty("action", out _), Is.False);
         Assert.That(root.TryGetProperty("actionColumnName", out _), Is.False);
@@ -202,15 +202,15 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
         Assert.That(root.TryGetProperty("action", out _), Is.False);
         Assert.That(root.TryGetProperty("aggregates", out _), Is.False);
         Assert.That(root.TryGetProperty("dataSource", out _), Is.False);
-        Assert.That(root.TryGetProperty("search", out _), Is.False);
-        Assert.That(root.TryGetProperty("group", out _), Is.False);
+        Assert.That(root.TryGetProperty("Search", out _), Is.False);
+        Assert.That(root.TryGetProperty("Group", out _), Is.False);
         Assert.That(root.TryGetProperty("isLazyLoad", out _), Is.False);
         Assert.That(root.TryGetProperty("onDemandGroupInfo", out _), Is.False);
         Assert.That(root.TryGetProperty("select", out _), Is.False);
-        Assert.That(root.TryGetProperty("sorted", out _), Is.False);
+        Assert.That(root.TryGetProperty("Sorted", out _), Is.False);
         Assert.That(root.TryGetProperty("table", out _), Is.False);
 
-        var where = root.GetProperty("where");
+        var where = root.GetProperty("Where");
         Assert.That(where.GetArrayLength(), Is.EqualTo(1));
         var complex = where[0];
         Assert.That(complex.GetProperty("condition").GetString(), Is.EqualTo("and"));
@@ -280,12 +280,12 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
         using var json = JsonDocument.Parse(requestBody);
         var root = json.RootElement;
 
-        Assert.That(root.GetProperty("skip").GetInt32(), Is.EqualTo(0));
-        Assert.That(root.GetProperty("take").GetInt32(), Is.EqualTo(8));
-        Assert.That(root.TryGetProperty("where", out _), Is.False);
-        Assert.That(root.TryGetProperty("search", out _), Is.False);
-        Assert.That(root.TryGetProperty("group", out _), Is.False);
-        Assert.That(root.TryGetProperty("sorted", out _), Is.False);
+        Assert.That(root.GetProperty("Skip").GetInt32(), Is.EqualTo(0));
+        Assert.That(root.GetProperty("Take").GetInt32(), Is.EqualTo(8));
+        Assert.That(root.TryGetProperty("Where", out _), Is.False);
+        Assert.That(root.TryGetProperty("Search", out _), Is.False);
+        Assert.That(root.TryGetProperty("Group", out _), Is.False);
+        Assert.That(root.TryGetProperty("Sorted", out _), Is.False);
         Assert.That(root.TryGetProperty("action", out _), Is.False);
         Assert.That(root.TryGetProperty("actionAction", out _), Is.False);
         Assert.That(root.TryGetProperty("actionCancel", out _), Is.False);
@@ -330,15 +330,15 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
         Assert.That(root.TryGetProperty("action", out _), Is.False);
         Assert.That(root.TryGetProperty("aggregates", out _), Is.False);
         Assert.That(root.TryGetProperty("dataSource", out _), Is.False);
-        Assert.That(root.TryGetProperty("search", out _), Is.False);
-        Assert.That(root.TryGetProperty("group", out _), Is.False);
+        Assert.That(root.TryGetProperty("Search", out _), Is.False);
+        Assert.That(root.TryGetProperty("Group", out _), Is.False);
         Assert.That(root.TryGetProperty("isLazyLoad", out _), Is.False);
         Assert.That(root.TryGetProperty("onDemandGroupInfo", out _), Is.False);
         Assert.That(root.TryGetProperty("select", out _), Is.False);
-        Assert.That(root.TryGetProperty("sorted", out _), Is.False);
+        Assert.That(root.TryGetProperty("Sorted", out _), Is.False);
         Assert.That(root.TryGetProperty("table", out _), Is.False);
 
-        var where = root.GetProperty("where");
+        var where = root.GetProperty("Where");
         Assert.That(where.GetArrayLength(), Is.EqualTo(1));
         var complex = where[0];
         Assert.That(complex.GetProperty("condition").GetString(), Is.EqualTo("and"));
@@ -393,7 +393,7 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
             var requestBody = observed.PostData ?? "";
             using var json = JsonDocument.Parse(requestBody);
             var root = json.RootElement;
-            if (!root.TryGetProperty("where", out var where) || where.ValueKind != JsonValueKind.Array || where.GetArrayLength() != 1)
+            if (!root.TryGetProperty("Where", out var where) || where.ValueKind != JsonValueKind.Array || where.GetArrayLength() != 1)
             {
                 return false;
             }
@@ -443,14 +443,14 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
             var requestBody = observed.PostData ?? "";
             using var json = JsonDocument.Parse(requestBody);
             var root = json.RootElement;
-            return root.TryGetProperty("skip", out var skip)
+            return root.TryGetProperty("Skip", out var skip)
                 && skip.GetInt32() == 0
-                && root.TryGetProperty("take", out var take)
+                && root.TryGetProperty("Take", out var take)
                 && take.GetInt32() == 8
-                && !root.TryGetProperty("where", out _)
-                && !root.TryGetProperty("search", out _)
-                && !root.TryGetProperty("group", out _)
-                && !root.TryGetProperty("sorted", out _);
+                && !root.TryGetProperty("Where", out _)
+                && !root.TryGetProperty("Search", out _)
+                && !root.TryGetProperty("Group", out _)
+                && !root.TryGetProperty("Sorted", out _);
         }
         catch (JsonException)
         {
@@ -481,11 +481,11 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
 
         Assert.That(root.TryGetProperty("actionSearchString", out _), Is.False);
         Assert.That(root.TryGetProperty("actionCancel", out _), Is.False);
-        Assert.That(root.TryGetProperty("where", out _), Is.False);
-        Assert.That(root.TryGetProperty("group", out _), Is.False);
-        Assert.That(root.TryGetProperty("sorted", out _), Is.False);
+        Assert.That(root.TryGetProperty("Where", out _), Is.False);
+        Assert.That(root.TryGetProperty("Group", out _), Is.False);
+        Assert.That(root.TryGetProperty("Sorted", out _), Is.False);
 
-        var search = root.GetProperty("search");
+        var search = root.GetProperty("Search");
         Assert.That(search.GetArrayLength(), Is.EqualTo(1));
         var descriptor = search[0];
         Assert.That(descriptor.GetProperty("key").GetString(), Is.EqualTo("Memory"));
@@ -548,12 +548,12 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
         using var json = JsonDocument.Parse(requestBody);
         var root = json.RootElement;
 
-        Assert.That(root.GetProperty("skip").GetInt32(), Is.EqualTo(0));
-        Assert.That(root.GetProperty("take").GetInt32(), Is.EqualTo(8));
-        Assert.That(root.TryGetProperty("search", out _), Is.False);
-        Assert.That(root.TryGetProperty("where", out _), Is.False);
-        Assert.That(root.TryGetProperty("group", out _), Is.False);
-        Assert.That(root.TryGetProperty("sorted", out _), Is.False);
+        Assert.That(root.GetProperty("Skip").GetInt32(), Is.EqualTo(0));
+        Assert.That(root.GetProperty("Take").GetInt32(), Is.EqualTo(8));
+        Assert.That(root.TryGetProperty("Search", out _), Is.False);
+        Assert.That(root.TryGetProperty("Where", out _), Is.False);
+        Assert.That(root.TryGetProperty("Group", out _), Is.False);
+        Assert.That(root.TryGetProperty("Sorted", out _), Is.False);
         Assert.That(root.TryGetProperty("action", out _), Is.False);
         Assert.That(root.TryGetProperty("actionSearchString", out _), Is.False);
         Assert.That(root.TryGetProperty("actionCancel", out _), Is.False);
@@ -593,19 +593,19 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
         using var json = System.Text.Json.JsonDocument.Parse(requestBody);
         var root = json.RootElement;
 
-        var group = root.GetProperty("group");
+        var group = root.GetProperty("Group");
         Assert.That(group.GetArrayLength(), Is.EqualTo(1));
         Assert.That(group[0].GetString(), Is.EqualTo("careLevel"));
         Assert.That(root.TryGetProperty("groups", out _), Is.False);
         Assert.That(root.TryGetProperty("preventFocusOnGroup", out _), Is.False);
         Assert.That(root.TryGetProperty("actionPreventFocusOnGroup", out _), Is.False);
         Assert.That(root.TryGetProperty("actionCancel", out _), Is.False);
-        Assert.That(root.TryGetProperty("where", out _), Is.False);
-        Assert.That(root.TryGetProperty("search", out _), Is.False);
+        Assert.That(root.TryGetProperty("Where", out _), Is.False);
+        Assert.That(root.TryGetProperty("Search", out _), Is.False);
         Assert.That(root.TryGetProperty("aggregates", out _), Is.False);
         Assert.That(root.TryGetProperty("action", out _), Is.False);
 
-        var sorted = root.GetProperty("sorted");
+        var sorted = root.GetProperty("Sorted");
         Assert.That(sorted.GetArrayLength(), Is.EqualTo(1));
         Assert.That(sorted[0].GetProperty("name").GetString(), Is.EqualTo("careLevel"));
         Assert.That(sorted[0].GetProperty("direction").GetString(), Is.EqualTo("ascending"));
@@ -664,14 +664,14 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
         using var json = JsonDocument.Parse(requestBody);
         var root = json.RootElement;
 
-        Assert.That(root.GetProperty("skip").GetInt32(), Is.EqualTo(0));
-        Assert.That(root.GetProperty("take").GetInt32(), Is.EqualTo(8));
+        Assert.That(root.GetProperty("Skip").GetInt32(), Is.EqualTo(0));
+        Assert.That(root.GetProperty("Take").GetInt32(), Is.EqualTo(8));
         Assert.That(root.TryGetProperty("requiresCounts", out _), Is.False);
-        Assert.That(root.TryGetProperty("group", out _), Is.False);
+        Assert.That(root.TryGetProperty("Group", out _), Is.False);
         Assert.That(root.TryGetProperty("groups", out _), Is.False);
-        Assert.That(root.TryGetProperty("sorted", out _), Is.False);
-        Assert.That(root.TryGetProperty("where", out _), Is.False);
-        Assert.That(root.TryGetProperty("search", out _), Is.False);
+        Assert.That(root.TryGetProperty("Sorted", out _), Is.False);
+        Assert.That(root.TryGetProperty("Where", out _), Is.False);
+        Assert.That(root.TryGetProperty("Search", out _), Is.False);
         Assert.That(root.TryGetProperty("aggregates", out _), Is.False);
         Assert.That(root.TryGetProperty("action", out _), Is.False);
         Assert.That(root.TryGetProperty("actionCancel", out _), Is.False);
@@ -734,14 +734,14 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
         using var json = JsonDocument.Parse(requestBody);
         var root = json.RootElement;
 
-        Assert.That(root.GetProperty("skip").GetInt32(), Is.EqualTo(0));
-        Assert.That(root.GetProperty("take").GetInt32(), Is.EqualTo(8));
+        Assert.That(root.GetProperty("Skip").GetInt32(), Is.EqualTo(0));
+        Assert.That(root.GetProperty("Take").GetInt32(), Is.EqualTo(8));
         Assert.That(root.TryGetProperty("requiresCounts", out _), Is.False);
-        Assert.That(root.TryGetProperty("group", out _), Is.False);
+        Assert.That(root.TryGetProperty("Group", out _), Is.False);
         Assert.That(root.TryGetProperty("groups", out _), Is.False);
-        Assert.That(root.TryGetProperty("sorted", out _), Is.False);
-        Assert.That(root.TryGetProperty("where", out _), Is.False);
-        Assert.That(root.TryGetProperty("search", out _), Is.False);
+        Assert.That(root.TryGetProperty("Sorted", out _), Is.False);
+        Assert.That(root.TryGetProperty("Where", out _), Is.False);
+        Assert.That(root.TryGetProperty("Search", out _), Is.False);
         Assert.That(root.TryGetProperty("aggregates", out _), Is.False);
         Assert.That(root.TryGetProperty("action", out _), Is.False);
         Assert.That(root.TryGetProperty("actionCancel", out _), Is.False);
@@ -813,8 +813,8 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
         var requestBody = request.PostData ?? "";
         using var json = System.Text.Json.JsonDocument.Parse(requestBody);
         var root = json.RootElement;
-        Assert.That(root.GetProperty("residentId").GetInt32(), Is.EqualTo(int.Parse(expectedId)));
-        Assert.That(root.GetProperty("rowIndex").GetInt32(), Is.EqualTo(1));
+        Assert.That(root.GetProperty("ResidentId").GetInt32(), Is.EqualTo(int.Parse(expectedId)));
+        Assert.That(root.GetProperty("RowIndex").GetInt32(), Is.EqualTo(1));
 
         await Expect(Page.Locator("#selected-resident-local"))
             .ToHaveTextAsync(expectedResident, new() { Timeout = 10000 });

@@ -1,5 +1,4 @@
 @model CareLevelChangeModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "Care Level Change";
@@ -24,7 +23,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("SubmitCareLevelChange", "NativeHiddenField"), g => g.IncludeAll())
+                p.Post(Url.SandboxRoute("SubmitCareLevelChange", "NativeHiddenField")).Gather(g => g.Form())
                  .Response(r => r.OnSuccess<CareLevelChangeConfirmation>((json, s) =>
                  {
                      s.Element("care-level-change-status").SetText(json, x => x.Confirmation);

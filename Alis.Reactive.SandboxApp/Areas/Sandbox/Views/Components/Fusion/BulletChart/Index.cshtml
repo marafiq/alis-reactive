@@ -1,6 +1,5 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.BulletChart.FusionBulletChartModel
 @using Alis.Reactive.Fusion.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.BulletChart
 @using Syncfusion.EJ2.Charts
 @using BulletRange = Syncfusion.EJ2.Charts.Range
@@ -93,11 +92,12 @@
             p.Element("mouse-click-target").SetText(args, x => x.Target);
             p.Element("mouse-click-x").SetText(args, x => x.X);
             p.Element("mouse-click-y").SetText(args, x => x.Y);
+            var click = p.Payload(args);
             p.Post(clickAuditUrl)
-                .Gather(g => g
-                    .FromEvent(args, x => x.Target, "target")
-                    .FromEvent(args, x => x.X, "x")
-                    .FromEvent(args, x => x.Y, "y"))
+                .Gather<FusionBulletChartClickAuditRequest>(g => g
+                    .Set(x => x.Target, click.Get(a => a.Target))
+                    .Set(x => x.X, click.Get(a => a.X))
+                    .Set(x => x.Y, click.Get(a => a.Y)))
                 .Response(r => r.OnSuccess<FusionBulletChartClickAuditResponse>((json, s) =>
                 {
                     s.Element("click-audit-message").SetText(json, x => x.Message);

@@ -1,5 +1,4 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs.ParentChildModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
 @{
@@ -24,7 +23,7 @@
     @(Html.NativeButton("submit-btn", "Submit")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {
-            p.Post(Url.SandboxRoute("SubmitParentChild", "NestedBugs"), g => g.IncludeAll())
+            p.Post(Url.SandboxRoute("SubmitParentChild", "NestedBugs")).Gather(g => g.Form())
              .Validate<ParentChildBugValidator>("parent-child-form")
              .Response(r => r
                 .OnSuccess(s => s.Element("result").SetText("Saved"))

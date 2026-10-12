@@ -32,7 +32,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         {
             return Ok(new PivotAuditResponse
             {
-                Summary = $"{currentView}:{request.FacilityId}:{request.CurrentView}",
+                Summary = $"{currentView}:{request.FacilityId}",
                 LayoutLength = request.Layout.Length
             });
         }

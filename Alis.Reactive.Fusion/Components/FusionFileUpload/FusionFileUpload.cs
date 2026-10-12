@@ -11,7 +11,8 @@ namespace Alis.Reactive.Fusion.Components
     /// <remarks>
     /// Render it with <c>Html.InputField(plan, m =&gt; m.CarePlanDocument).FusionFileUpload(b =&gt; ...)</c>; target it with
     /// <c>p.Component&lt;FusionFileUpload&gt;(m =&gt; m.CarePlanDocument)</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>g.Include(upload.Get(c =&gt; c.Files), "files")</c>.
+    /// <c>Call</c> and <c>Get</c>. A form-data request sends the selected files with the form's other inputs:
+    /// <c>p.Post(url).Gather(g =&gt; g.Form()).AsFormData()</c>.
     /// </remarks>
     public sealed class FusionFileUpload : FusionComponent, IInputComponent
     {

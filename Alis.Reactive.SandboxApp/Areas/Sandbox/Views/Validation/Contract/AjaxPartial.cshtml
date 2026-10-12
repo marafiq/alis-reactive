@@ -1,5 +1,4 @@
 @model ResidentModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "Validation Contract — Scenario 3b: AJAX Partials";
@@ -63,7 +62,7 @@
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post(Url.SandboxRoute("SubmitAjaxPartial", "ValidationContract"), g => g.IncludeAll())
+                    p.Post(Url.SandboxRoute("SubmitAjaxPartial", "ValidationContract")).Gather(g => g.Form())
                      .Validate<AjaxPartialValidator>("resident-form")
                      .Response(r => r
                         .OnSuccess(s => s.Element("result").SetText("Admission saved"))

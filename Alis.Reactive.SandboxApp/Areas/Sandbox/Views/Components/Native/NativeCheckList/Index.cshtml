@@ -1,5 +1,4 @@
 @model NativeCheckListModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "NativeCheckList";
@@ -47,7 +46,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">3. Form — JSON POST + FluentValidation</native-heading>
         <native-text color="Secondary">
-            All fields gathered via <code>IncludeAll()</code>, validated client-side by
+            All fields gathered via <code>Form()</code>, validated client-side by
             <code>NativeCheckListFormValidator</code>, then POST as JSON. Server validates and returns errors.
         </native-text>
 
@@ -63,7 +62,7 @@
                     .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Post(Url.SandboxRoute("Submit", "NativeCheckList"), g => g.IncludeAll())
+                        p.Post(Url.SandboxRoute("Submit", "NativeCheckList")).Gather(g => g.Form())
                          .Validate<NativeCheckListFormValidator>("checklist-form")
                          .Response(r => r
                             .OnSuccess(s => s.Element("result").SetText("Preferences saved"))

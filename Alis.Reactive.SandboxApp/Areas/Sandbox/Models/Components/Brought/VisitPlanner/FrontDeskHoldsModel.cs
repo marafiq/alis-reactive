@@ -21,7 +21,28 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
         public List<string> Held { get; set; } = new List<string>();
     }
 
-    public sealed class HoldRequest
+    /// <summary>The desk page's link: <c>?resident=margaret&amp;family=hale</c>.</summary>
+    public sealed class FrontDeskQuery
+    {
+        public string Resident { get; set; } = "";
+
+        public string? Family { get; set; }
+    }
+
+    /// <summary>A request about one resident's week at the desk: <c>{residentId}</c> in the path.</summary>
+    public sealed class FrontDeskResident
+    {
+        public string ResidentId { get; set; } = "";
+    }
+
+    /// <summary>A request about one visit time at the desk: <c>{slotId}</c> in the path.</summary>
+    public class FrontDeskSlot
+    {
+        public string SlotId { get; set; } = "";
+    }
+
+    /// <summary>The body of a hold or a badge, which the desk's actions bind with [FromBody].</summary>
+    public class HoldRequest
     {
         public int VisitsThisWeek { get; set; }
 
@@ -30,9 +51,21 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
         public string? Source { get; set; }
     }
 
-    public sealed class VisitorsChange
+    /// <summary>A hold or a badge as the page sends it: the time in the path, the rest in the body.</summary>
+    public sealed class HoldVisitRequest : HoldRequest
+    {
+        public string SlotId { get; set; } = "";
+    }
+
+    public class VisitorsChange
     {
         public decimal Visitors { get; set; }
+    }
+
+    /// <summary>A change of visitors as the page sends it: the time in the path, the count in the body.</summary>
+    public sealed class ChangeVisitorsRequest : VisitorsChange
+    {
+        public string SlotId { get; set; } = "";
     }
 
     /// <summary>The desk's answer to a hold: "held" or "tentative", in its own words.</summary>

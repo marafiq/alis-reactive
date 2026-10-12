@@ -69,7 +69,7 @@ Sandbox pages must use framework primitives. Never work around the framework.
 - `Html.NativeButton("id", "text").Reactive(plan, evt => evt.Click, ...)` -- never raw onclick
 - `.Validate<TValidator>("form-id")` -- never manual validation logic
 - `p.Element("id").SetText(...)` -- never raw DOM manipulation
-- `.Gather(g => g.IncludeAll())` -- never manual form serialization
+- `.Gather(g => g.Form())` -- never manual form serialization
 - `Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))` -- never raw label/input combos
 
 Tests must also use the public DSL, not internal constructors. Arrange with `Html.On`,

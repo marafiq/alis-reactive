@@ -1,5 +1,4 @@
 @model Step1DemographicsModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -46,7 +45,7 @@
             {
                 p.Payload(args).Set(a => a.PreventDefaultAction, true);
                 p.Get(searchPhysiciansUrl)
-                 .Gather(g => g.FromEvent(args, x => x.Text, "q"))
+                 .Gather<PhysicianSearchQuery>(g => g.Set(x => x.Q, p.Payload(args).Get(a => a.Text)))
                  .Response(r => r.OnSuccess<PhysicianSearchResponse>((json, s) => { s.Payload(args).Call(a => a.UpdateData, json.Read(j => j.Physicians)); }));
             }); }
     </native-grid>
@@ -81,8 +80,8 @@
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(saveStep1Url,
-                    g => g.IncludeAll())
+                p.Post(saveStep1Url)
+                 .Gather(g => g.Form())
                  .Validate<Step1Validator>("step1-form")
                  .Response(r => r
                     .OnSuccess<SaveStepResponse>((json, s) =>
@@ -93,9 +92,9 @@
                     .OnError(400, e => e.ValidationErrors("step1-form"))
                     .Chained(c => c
                         .Post(loadStepUrl)
-                        .Gather(g => g
-                            .Include<NativeHiddenField, Step1DemographicsModel>(m => m.ScreeningId)
-                            .Static("step", 2))
+                        .Gather<LoadStepRequest>(g => g
+                            .Form(m => m.ScreeningId)
+                            .Set(x => x.Step, 2))
                         .Response(r2 => r2.OnSuccess(s2 => s2.Into("step-container")))));
             }))
     </native-hstack>

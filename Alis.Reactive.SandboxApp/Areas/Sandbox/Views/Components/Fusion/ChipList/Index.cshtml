@@ -1,7 +1,6 @@
 @model ChipListModel
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Syncfusion.EJ2.Buttons
 @{
     ViewData["Title"] = "ChipList";
@@ -93,7 +92,7 @@
                     {
                         var tagList = p.Component<FusionChipList>("care-tags");
                         p.Post(Url.SandboxRoute("QuickFilter", "ChipList"))
-                         .Gather(g => g.Include(tagList.Get(c => c.SelectedChipValues), "filters"))
+                         .Gather<ChipQuickFilterRequest>(g => g.Set(x => x.Filters, tagList.Get(c => c.SelectedChipValues)))
                          .Response(r => r.OnSuccess<ChipQuickFilterResponse>((json, s) =>
                          {
                              s.Element("quick-filter-values").SetText(json, x => x.Filters);

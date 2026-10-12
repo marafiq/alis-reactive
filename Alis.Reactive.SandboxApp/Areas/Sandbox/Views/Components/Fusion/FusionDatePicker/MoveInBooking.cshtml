@@ -1,5 +1,4 @@
 @model MoveInBookingModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -27,7 +26,8 @@
             .CssClass("mt-4 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("BookMoveIn", "FusionDatePicker"), g => g.IncludeAll())
+                p.Post(Url.SandboxRoute("BookMoveIn", "FusionDatePicker"))
+                 .Gather(g => g.Form())
                  .Response(r => r
                     .OnSuccess<MoveInBooked>((json, s) => s.Element("booking-status").SetText(json, x => x.Confirmation))
                     .OnError(400, e => e.Element("booking-status").SetText("The move-in day could not be booked.")));

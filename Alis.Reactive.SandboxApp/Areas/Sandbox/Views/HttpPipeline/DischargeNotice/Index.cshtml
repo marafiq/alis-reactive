@@ -1,5 +1,4 @@
 @model DischargeNoticePageModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "Discharge";
@@ -35,7 +34,7 @@
                             })
                             .Chained(c => c
                                 .Post(Url.SandboxRoute("NotifyFamily", "DischargeNotice"))
-                                .Gather(g => g.Static("channel", resident.Channel))
+                                .Gather<FamilyNoticeRequest>(g => g.Set(x => x.Channel, resident.Channel))
                                 .Response(notice => notice
                                     .OnError<FamilyNoticeResult>(503, (json, e) =>
                                     {

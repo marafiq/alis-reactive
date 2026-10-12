@@ -1,7 +1,6 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
 @using Alis.Reactive.Builders
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @using Alis.Reactive
@@ -246,7 +245,7 @@
                 {
                     var grid = p.Component<FusionGrid>(BatchGridId);
                     p.Post(Url.SandboxRoute("BatchSummary", "Grid"))
-                        .Gather(g => g.Include(grid.Get(c => c.GetBatchChanges<ResidentDirectoryGridItem>()), "batchChanges"))
+                        .Gather<ResidentGridBatchSummaryRequest>(g => g.Set(x => x.BatchChanges, grid.Get(c => c.GetBatchChanges<ResidentDirectoryGridItem>())))
                         .Response(r => r.OnSuccess<ResidentGridBatchSummaryResponse>((json, s) =>
                         {
                             s.Element("batch-summary").SetText(json, x => x.Summary);
@@ -423,12 +422,8 @@
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post(Url.SandboxRoute("ValidateEditDraft", "Grid"), g =>
-                    {
-                        g.Include<FusionTextBox, ResidentGridEditingModel>(m => m.ResidentName);
-                        g.Include<FusionDropDownList, ResidentGridEditingModel>(m => m.RiskLevel);
-                        g.Include<FusionNumericTextBox, ResidentGridEditingModel>(m => m.OpenTasks);
-                    })
+                    p.Post(Url.SandboxRoute("ValidateEditDraft", "Grid"))
+                    .Gather(g => g.Form(m => m.ResidentName, m => m.RiskLevel, m => m.OpenTasks))
                     .Validate<ResidentGridEditingValidator>(ValidationFormId)
                     .Response(r => r
                         .OnSuccess<ResidentGridEditResponse>((json, s) =>

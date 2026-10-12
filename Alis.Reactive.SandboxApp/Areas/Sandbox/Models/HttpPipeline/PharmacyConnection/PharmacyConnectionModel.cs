@@ -10,6 +10,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? PharmacyId { get; set; }
     }
 
+    /// <summary>The test order request <c>TestOrder/{pharmacyId}</c> binds: the pharmacy in the path.</summary>
+    public sealed class PharmacyTestOrder
+    {
+        public string? PharmacyId { get; set; }
+    }
+
     /// <summary>
     /// What the pharmacy's system answered the test order, relayed by the server: its HTTP status and
     /// the body of its reply.

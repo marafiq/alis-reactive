@@ -1,5 +1,4 @@
 @model CompanionVisitPlanModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.SandboxApp.BroughtComponents
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
 @{
@@ -9,7 +8,7 @@
     // The companion's week loads when the panel does.
     Html.On(plan, t => t.DomReady(p =>
         p.Get(weekUrl)
-            .Gather(g => g.RouteParam("residentId", "ruth"))
+            .Gather<ResidentWeekRequest>(g => g.Set(x => x.ResidentId, "ruth"))
             .Response(r => r.OnSuccess<ResidentWeekResponse>((week, s) =>
                 s.Component<VisitPlanner>(m => m.VisitSlots)
                     .Set(c => c.Wing, week.Read(x => x.Wing))
@@ -23,7 +22,7 @@
         .Reactive(evt => evt.WeekChanged, (args, p) =>
         {
             p.Element("companion-planned").SetText(args, x => x.Count);
-            p.Post(Url.SandboxRoute("CompanionHold", "VisitPlanner"), g => g.IncludeAll())
+            p.Post(Url.SandboxRoute("CompanionHold", "VisitPlanner")).Gather(g => g.Form())
                 .Response(r => r.OnSuccess<CompanionHoldResponse>((hold, s) =>
                     s.Element("companion-held").SetText(hold, x => x.Held)));
         }); }

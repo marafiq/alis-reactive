@@ -74,8 +74,11 @@ namespace Alis.Reactive
         }
 
         // A gathered model member: its MVC binding name, and its body path read from the member's types.
-        internal static BindingPath ToMemberBindingPath<TModel, TProp>(Expression<Func<TModel, TProp>> expression) =>
-            BindingPath.ForMember(ToPropertyName(expression), ToBodyPath(expression));
+        internal static BindingPath ToMemberBindingPath(LambdaExpression expression)
+        {
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            return BindingPath.ForMember(ToMemberName(expression.Body), ToBodyPath(expression));
+        }
 
         // A JSON request body needs the member's structure, which the MVC name text cannot carry:
         // Lines[0] and Administered[1042] read alike, yet one is a list item and the other a

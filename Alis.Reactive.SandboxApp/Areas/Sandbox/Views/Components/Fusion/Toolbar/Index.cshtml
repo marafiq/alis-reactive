@@ -1,7 +1,7 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Toolbar.FusionToolbarModel
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Toolbar
 @using Syncfusion.EJ2.Navigations
 @{
     ViewData["Title"] = "FusionToolbar";
@@ -46,10 +46,10 @@
                         pay.Element("payment-panel").AddClass("hidden");
 
                         pay.Post(Url.SandboxRoute("Confirm", "Toolbar"))
-                            .Gather(g => g
-                                .FromEvent(args, x => x.Item.Id, "commandId")
-                                .FromEvent(args, x => x.Item.Text, "commandText")
-                                .FromEvent(args, x => x.Item.Disabled, "commandDisabled"))
+                            .Gather<ResidentCommandRequest>(g => g
+                                .Set(x => x.CommandId, pay.Payload(args).Get(a => a.Item.Id))
+                                .Set(x => x.CommandText, pay.Payload(args).Get(a => a.Item.Text))
+                                .Set(x => x.CommandDisabled, pay.Payload(args).Get(a => a.Item.Disabled)))
                             .Response(r => r.OnSuccess<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Toolbar.ResidentCommandResponse>((json, s) =>
                             {
                                 s.Element("payment-confirmation").SetText(json, x => x.Confirmation);

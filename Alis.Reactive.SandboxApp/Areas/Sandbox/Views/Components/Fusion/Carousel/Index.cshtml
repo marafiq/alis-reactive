@@ -1,7 +1,6 @@
 @model FusionCarouselModel
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Syncfusion.EJ2.Navigations
 @{
     ViewData["Title"] = "FusionCarousel";
@@ -124,12 +123,13 @@
                     .Else(s => s.Element("review-method").SetText("Reached using the navigation buttons."));
 
                 // Record the reviewed section to the chart, gathering the move from the payload.
+                var move = p.Payload(args);
                 p.Post(recordUrl)
-                    .Gather(g => g
-                        .FromEvent(args, x => x.CurrentIndex, "sectionIndex")
-                        .FromEvent(args, x => x.PreviousIndex, "cameFromIndex")
-                        .FromEvent(args, x => x.SlideDirection, "direction")
-                        .FromEvent(args, x => x.IsSwiped, "bySwipe"))
+                    .Gather<CarePlanReviewEntry>(g => g
+                        .Set(x => x.SectionIndex, move.Get(a => a.CurrentIndex))
+                        .Set(x => x.CameFromIndex, move.Get(a => a.PreviousIndex))
+                        .Set(x => x.Direction, move.Get(a => a.SlideDirection))
+                        .Set(x => x.BySwipe, move.Get(a => a.IsSwiped)))
                     .Response(r => r.OnSuccess<CarePlanReviewResponse>((json, s) =>
                     {
                         s.Element("chart-line").SetText(json, x => x.ChartLine);

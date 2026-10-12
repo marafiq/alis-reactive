@@ -1,5 +1,4 @@
 @model FusionRadioButtonModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -153,12 +152,10 @@
                 {
                     var companion = p.Component<FusionRadioButton>(companionId);
                     p.Post(Url.SandboxRoute("ConfirmPlan", "RadioButton"))
-                        .Gather(g =>
-                        {
-                            g.Include(companion.Get(c => c.GetSelectedValue), "room");
-                            g.Include(companion.Get(c => c.Checked), "companionSuiteChosen");
-                            g.Include(companion.Get(c => c.Disabled), "companionSuiteUnavailable");
-                        })
+                        .Gather<RoomPlanRequest>(g => g
+                            .Set(x => x.Room, companion.Get(c => c.GetSelectedValue))
+                            .Set(x => x.CompanionSuiteChosen, companion.Get(c => c.Checked))
+                            .Set(x => x.CompanionSuiteUnavailable, companion.Get(c => c.Disabled)))
                         .Response(r => r.OnSuccess<RoomPlanResponse>((json, s) =>
                         {
                             s.Element("desk-confirmation").SetText(json, x => x.Confirmation);

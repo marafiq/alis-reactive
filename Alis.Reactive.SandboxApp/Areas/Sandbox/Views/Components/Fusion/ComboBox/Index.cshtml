@@ -1,5 +1,4 @@
 @model FusionComboBoxModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.DropDowns
@@ -151,12 +150,10 @@
             {
                 var combo = p.Component<FusionComboBox>(m => m.Resident);
                 p.Post(Url.SandboxRoute("Echo", "ComboBox"))
-                    .Gather(g =>
-                    {
-                        g.Include(combo.Get(c => c.Value), "value");
-                        g.Include(combo.Get(c => c.Text), "text");
-                        g.Include(combo.Get(c => c.Index), "index");
-                    })
+                    .Gather<FusionComboBoxEchoRequest>(g => g
+                        .Set(x => x.Value, combo.Get(c => c.Value))
+                        .Set(x => x.Text, combo.Get(c => c.Text))
+                        .Set(x => x.Index, combo.Get(c => c.Index)))
                     .Response(r => r.OnSuccess<FusionComboBoxEchoResponse>((json, s) =>
                     {
                         s.Element("gather-value").SetText(json, x => x.Value);

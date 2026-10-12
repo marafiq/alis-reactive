@@ -1,5 +1,4 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.GridModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @{
@@ -60,9 +59,9 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Post(Url.SandboxRoute("Data", "Grid"))
-         .Gather(g => g
-             .Static("skip", 0)
-             .Static("take", 10))
+         .Gather<GridDataRequest>(g => g
+             .Set(x => x.Skip, 0)
+             .Set(x => x.Take, 10))
          .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
          {
              s.Component<FusionGrid>("residents-grid")
@@ -124,10 +123,10 @@
                     {
                         p.Element("filter-status").SetText("filtering...");
                         p.Post(Url.SandboxRoute("Data", "Grid"))
-                         .Gather(g => g
-                             .Static("skip", 0)
-                             .Static("take", 10)
-                             .Include<FusionNumericTextBox, GridModel>(m => m.MinAge))
+                         .Gather<GridDataRequest>(g => g
+                             .Set(x => x.Skip, 0)
+                             .Set(x => x.Take, 10)
+                             .Form(m => m.MinAge))
                          .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
                          {
                              s.Component<FusionGrid>("residents-grid")
@@ -167,21 +166,22 @@
                         t.Element("evt-action-page").SetText(args, x => x.Action.CurrentPage);
                         t.Element("evt-action-previous-page").SetText(args, x => x.Action.PreviousPage);
                         t.Element("evt-action-page-size").SetText(args, x => x.Action.PageSize);
+                        var dataState = t.Payload(args);
                         t.Post(Url.SandboxRoute("Data", "Grid"))
-                         .Gather(g => g
-                             .FromEvent(args, x => x.Name, "eventName")
-                             .FromEvent(args, x => x.Skip, "skip")
-                             .FromEvent(args, x => x.Take, "take")
-                             .FromEvent(args, x => x.RequiresCounts, "requiresCounts")
-                             .FromEvent(args, x => x.Action.Name, "actionName")
-                             .FromEvent(args, x => x.Action.Type, "actionType")
-                             .FromEvent(args, x => x.Action.Cancel, "actionCancel")
-                             .FromEvent(args, x => x.Action.RequestType, "actionRequestType")
-                             .FromEvent(args, x => x.Action.CurrentPage, "actionCurrentPage")
-                             .FromEvent(args, x => x.Action.PreviousPage, "actionPreviousPage")
-                             .FromEvent(args, x => x.Action.PageSize, "actionPageSize")
-                             .FromEvent(args, x => x.Sorted, "sorted")
-                             .Include<FusionNumericTextBox, GridModel>(m => m.MinAge))
+                         .Gather<GridDataRequest>(g => g
+                             .Set(x => x.EventName, dataState.Get(a => a.Name))
+                             .Set(x => x.Skip, dataState.Get(a => a.Skip))
+                             .Set(x => x.Take, dataState.Get(a => a.Take))
+                             .Set(x => x.RequiresCounts, dataState.Get(a => a.RequiresCounts))
+                             .Set(x => x.ActionName, dataState.Get(a => a.Action.Name))
+                             .Set(x => x.ActionType, dataState.Get(a => a.Action.Type))
+                             .Set(x => x.ActionCancel, dataState.Get(a => a.Action.Cancel))
+                             .Set(x => x.ActionRequestType, dataState.Get(a => a.Action.RequestType))
+                             .Set(x => x.ActionCurrentPage, dataState.Get(a => a.Action.CurrentPage))
+                             .Set(x => x.ActionPreviousPage, dataState.Get(a => a.Action.PreviousPage))
+                             .Set(x => x.ActionPageSize, dataState.Get(a => a.Action.PageSize))
+                             .Set(x => x.Sorted, dataState.Get(a => a.Sorted))
+                             .Form(m => m.MinAge))
                          .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
                          {
                              s.Component<FusionGrid>("residents-grid")

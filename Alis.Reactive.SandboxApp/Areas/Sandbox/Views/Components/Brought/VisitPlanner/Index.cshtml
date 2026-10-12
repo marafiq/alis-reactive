@@ -1,5 +1,4 @@
 @model FamilyVisitPlanModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.SandboxApp.BroughtComponents
@@ -51,7 +50,7 @@
                         var resident = p.Component<NativeDropDown>(m => m.ResidentId);
                         p.When(resident.Get(c => c.Value)).NotEmpty()
                             .Then(load => load.Get(weekUrl)
-                                .Gather(g => g.RouteParam("residentId", resident.Get(c => c.Value)))
+                                .Gather<ResidentWeekRequest>(g => g.Set(x => x.ResidentId, resident.Get(c => c.Value)))
                                 .Response(r => r.OnSuccess<ResidentWeekResponse>((week, s) =>
                                 {
                                     s.Component<VisitPlanner>(m => m.VisitSlots)
@@ -197,7 +196,7 @@
                     .CssClass(ButtonSubmit)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Post(Url.SandboxRoute("Save", "VisitPlanner"), g => g.IncludeAll())
+                        p.Post(Url.SandboxRoute("Save", "VisitPlanner")).Gather(g => g.Form())
                             .Validate<FamilyVisitPlanValidator>(FormId)
                             .Response(r => r
                                 .OnSuccess<VisitPlanSaved>((saved, s) =>

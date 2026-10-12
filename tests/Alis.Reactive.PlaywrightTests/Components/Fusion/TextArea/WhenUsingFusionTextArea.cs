@@ -219,7 +219,7 @@ public class WhenUsingFusionTextArea : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"careNote\":\"Hydration encouraged at lunch.\""),
+        Assert.That(body, Does.Contain("\"CareNote\":\"Hydration encouraged at lunch.\""),
             "the gather pipeline must carry the care-note Value() source under its declared key");
 
         AssertNoConsoleErrors();

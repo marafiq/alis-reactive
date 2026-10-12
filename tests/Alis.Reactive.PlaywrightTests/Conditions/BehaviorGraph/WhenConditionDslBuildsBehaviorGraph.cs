@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Fusion.Components;
-using Alis.Reactive.Native.Extensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.BehaviorGraph;
@@ -30,7 +29,8 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
                     .Then(hit => hit.Element("grade").SetText("B"))
                     .Else(miss => miss.Element("grade").SetText("Other"));
 
-                pipeline.Post("/audit", gather => gather.FromEvent(args, x => x.Score, "score"));
+                pipeline.Post("/audit")
+                    .Gather<ConditionBehaviorAudit>(gather => gather.Set(x => x.Score, pipeline.Payload(args).Get(a => a.Score)));
 
                 pipeline.When(args, x => x.IsReady).Truthy()
                     .Then(ready => ready.Dispatch(Ready))
@@ -63,7 +63,7 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
             Assert.That(ArmCount(statements[3]), Is.EqualTo(1));
             Assert.That(statements[3].GetProperty("else").GetArrayLength(), Is.GreaterThan(0));
 
-            Assert.That(SentValueNames(statements[2]), Is.EqualTo(new[] { "score" }));
+            Assert.That(SentValueNames(statements[2]), Is.EqualTo(new[] { "Score" }));
         });
     }
 
@@ -82,7 +82,7 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
                         .Arg(args, x => x.Status);
                 var expectedStatus = pipeline.Plugin(plugin.ExpectedStatus);
 
-                pipeline.When(args, x => x.Score).Gte(pipeline.FromUrl<int>("minScore"))
+                pipeline.When(args, x => x.Score).Gte(pipeline.Url<ConditionBehaviorQuery>().Get(q => q.MinScore))
                     .And(schedule.Get(c => c.CurrentView)).Eq("Week")
                     .And(inner => inner
                         .When(schedule.Get(c => c.GetEvents<object>())).NotEmpty()
@@ -96,8 +96,8 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
                     .Response(response => response.OnSuccess<ConditionBehaviorResponse>((json, success) =>
                     {
                         success.When(json, x => x.Status).Eq("approved")
-                            .Then(hit => hit.Post("/resident/{residentId}/approve", gather => gather
-                                .RouteParam("residentId", json.Read(x => x.ResidentId))))
+                            .Then(hit => hit.Post("/resident/{residentId}/approve")
+                                .Gather<ConditionBehaviorApproval>(gather => gather.Set(x => x.ResidentId, json.Read(x => x.ResidentId))))
                             .Else(miss => miss.Element("response-branch").SetText(json, x => x.Status));
                     }));
             }));
@@ -113,7 +113,7 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
                 "score",
                 "property",
                 "url",
-                "minScore",
+                "MinScore",
                 "property")));
             Assert.That(comparisons, Does.Contain(new ConditionComparison(
                 "eq",
@@ -284,6 +284,21 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
     {
         public int ResidentId { get; set; }
         public string Status { get; set; } = "";
+    }
+
+    private sealed class ConditionBehaviorQuery
+    {
+        public int MinScore { get; set; }
+    }
+
+    private sealed class ConditionBehaviorAudit
+    {
+        public int Score { get; set; }
+    }
+
+    private sealed class ConditionBehaviorApproval
+    {
+        public int ResidentId { get; set; }
     }
 
     private sealed class ConditionBehaviorPlugin : Plugin

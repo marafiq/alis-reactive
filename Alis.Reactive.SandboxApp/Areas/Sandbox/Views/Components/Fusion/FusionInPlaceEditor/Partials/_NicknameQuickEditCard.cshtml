@@ -1,5 +1,4 @@
 @model NicknameQuickEdit
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using SfInPlace = Syncfusion.EJ2.InPlaceEditor
@@ -24,9 +23,7 @@
         .Reactive(evt => evt.ActionSuccess, (args, p) =>
         {
             p.Post(updateUrl)
-             .Gather(g => g
-                 .Include<FusionInPlaceEditor, NicknameQuickEdit>(m => m.Value)
-                 .Include<NativeHiddenField, NicknameQuickEdit>(m => m.ResidentId))
+             .Gather(g => g.Form(m => m.Value, m => m.ResidentId))
              .Validate<NicknameQuickEditValidator>("card-nickname-error")
              .Response(r => r
                 .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>

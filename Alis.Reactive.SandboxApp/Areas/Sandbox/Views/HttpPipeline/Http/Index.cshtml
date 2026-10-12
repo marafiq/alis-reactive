@@ -1,6 +1,6 @@
 @model HttpShowcaseModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 @{
     ViewData["Title"] = "HTTP Requests";
 
@@ -28,20 +28,22 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.When(p.FromUrl("tab")).Eq("medications")
+        var link = p.Url<HttpShowcaseQuery>();
+        p.When(link.Get(q => q.Tab)).Eq("medications")
          .Then(then => then.Element("url-cond-meds").Show())
          .Else(els => els.Element("url-cond-meds").Hide());
 
-        p.When(p.FromUrl<int>("page")).Gt(1)
+        p.When(link.Get(q => q.Page)).Gt(1)
          .Then(then => then.Element("url-cond-prev").Show())
          .Else(els => els.Element("url-cond-prev").Hide());
     }));
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Element("url-display-tab").SetText(p.FromUrl("tab"));
-        p.Element("url-display-facility").SetText(p.FromUrl("facilityId"));
-        p.Element("url-display-wings").SetText(p.FromUrl<string[]>("wing"));
+        var link = p.Url<HttpShowcaseQuery>();
+        p.Element("url-display-tab").SetText(link.Get(q => q.Tab));
+        p.Element("url-display-facility").SetText(link.Get(q => q.FacilityId));
+        p.Element("url-display-wings").SetText(link.Get(q => q.Wing));
     }));
 
 }
@@ -74,7 +76,8 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("Save", "Http"), g => g.Static("name", "John Doe"))
+                p.Post(Url.SandboxRoute("Save", "Http"))
+                 .Gather<HttpController.SaveRequest>(g => g.Set(x => x.Name, "John Doe"))
                  .WhileLoading(l => l.Element("save-spinner").Show())
                  .Response(r => r
                     .OnSuccess<SaveResponse>((json, s) =>
@@ -202,9 +205,10 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Put(Url.SandboxRoute("UpdateResident", "Http"), g => g
-                    .Static("name", "Updated Name")
-                    .Static("facilityId", "1"))
+                p.Put(Url.SandboxRoute("UpdateResident", "Http"))
+                 .Gather<HttpController.UpdateRequest>(g => g
+                    .Set(x => x.Name, "Updated Name")
+                    .Set(x => x.FacilityId, 1))
                  .WhileLoading(l => l.Element("put-spinner").Show())
                  .Response(r => r
                     .OnSuccess<UpdateResponse>((json, s) =>
@@ -262,8 +266,8 @@
 
     <native-card>
     <native-card-body>
-        <native-heading level="H2">7. POST FormData &rarr; IncludeAll Gather</native-heading>
-        <p class="text-sm text-text-secondary mb-3">Gathers all form fields and sends as JSON body (IncludeAll pattern).</p>
+        <native-heading level="H2">7. POST Form Fields &rarr; Set in Gather</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Sets FirstName, LastName and Email on the request and sends them as the JSON body.</p>
         <form id="formdata-form" class="flex flex-col gap-3 mb-3">
             @{ Html.InputField(plan, m => m.FirstName, o => o.Label("First Name"))
                .NativeTextBox(b => b
@@ -283,10 +287,11 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("SaveFormData", "Http"), g => g
-                    .Static("FirstName", "John")
-                    .Static("LastName", "Doe")
-                    .Static("Email", "john@example.com"))
+                p.Post(Url.SandboxRoute("SaveFormData", "Http"))
+                 .Gather<HttpController.SaveFormRequest>(g => g
+                    .Set(x => x.FirstName, "John")
+                    .Set(x => x.LastName, "Doe")
+                    .Set(x => x.Email, "john@example.com"))
                  .WhileLoading(l => l.Element("formdata-spinner").Show())
                  .Response(r => r
                     .OnSuccess<FormDataResponse>((json, s) =>
@@ -315,7 +320,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Get(Url.SandboxRoute("Search", "Http"))
-                 .Gather(g => g.Static("q", "John"))
+                 .Gather<ResidentSearchQuery>(g => g.Set(x => x.Q, "John"))
                  .WhileLoading(l => l.Element("search-spinner").Show())
                  .Response(r => r
                     .OnSuccess<SearchResponse>((json, s) =>
@@ -343,9 +348,8 @@
             .CssClass("rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("ValidateResident", "Http"), g => g
-                    .Static("name", "")
-                    .Static("facilityId", ""))
+                p.Post(Url.SandboxRoute("ValidateResident", "Http"))
+                 .Gather<HttpController.ValidateRequest>(g => g.Set(x => x.Name, ""))
                  .WhileLoading(l => l.Element("multi-err-spinner").Show())
                  .Response(r => r
                     .OnSuccess(s =>
@@ -394,7 +398,8 @@
         <p class="text-sm text-text-secondary mb-3">A single native action link can also execute one request chain on its own and load a success fragment directly into a local target.</p>
         <native-hstack gap="Base">
             @(Html.NativeActionLink("Run Standalone NativeActionLink", Url.SandboxRoute("StandaloneNativeActionLink", "Http"), p => p
-                .Post(Url.SandboxRoute("StandaloneNativeActionLink", "Http"), g => g.Static("command", "run"))
+                .Post(Url.SandboxRoute("StandaloneNativeActionLink", "Http"))
+                .Gather<HttpController.StandaloneNativeActionLinkRequest>(g => g.Set(x => x.Command, "run"))
                 .WhileLoading(x => x.Element("standalone-native-action-link-status").SetText("Running standalone NativeActionLink..."))
                 .Response(r => r
                     .OnSuccess(x =>
@@ -415,16 +420,16 @@
 
     <native-card>
     <native-card-body>
-        <native-heading level="H2">19. FromUrl in Gather &rarr; Send URL Params</native-heading>
+        <native-heading level="H2">19. URL Query in Gather &rarr; Send URL Params</native-heading>
         <p class="text-sm text-text-secondary mb-3">Reads ?tab and ?facilityId from the browser URL and sends them as HTTP request params.</p>
         @(Html.NativeButton("url-gather-btn", "Send URL Params")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Get(Url.SandboxRoute("UrlParamEcho", "Http"))
-                 .Gather(g => g
-                     .FromUrl("tab")
-                     .FromUrl("facilityId"))
+                 .Gather<UrlParamEchoQuery>(g => g
+                     .Set(x => x.Tab, p.Url<HttpShowcaseQuery>().Get(q => q.Tab))
+                     .Set(x => x.FacilityId, p.Url<HttpShowcaseQuery>().Get(q => q.FacilityId)))
                  .Response(r => r
                     .OnSuccess<UrlParamEchoResponse>((json, s) =>
                     {
@@ -443,7 +448,7 @@
 
     <native-card>
     <native-card-body>
-        <native-heading level="H2">20. FromUrl in Conditions &rarr; DomReady Branch</native-heading>
+        <native-heading level="H2">20. URL Query in Conditions &rarr; DomReady Branch</native-heading>
         <p class="text-sm text-text-secondary mb-3">On page load, branches based on ?tab and ?page URL params. Navigate with ?tab=medications&amp;page=3 to see results.</p>
         <native-vstack gap="Xs" class="font-mono text-sm">
             <p id="url-cond-meds" hidden class="text-green-600">Medications panel visible (tab=medications)</p>
@@ -454,7 +459,7 @@
 
     <native-card>
     <native-card-body>
-        <native-heading level="H2">21. FromUrl in SetText &rarr; Display URL Params</native-heading>
+        <native-heading level="H2">21. URL Query in SetText &rarr; Display URL Params</native-heading>
         <p class="text-sm text-text-secondary mb-3">Displays ?tab and ?facilityId values directly in the DOM on page load, and every ?wing value, matched by name in any case.</p>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Tab: <span id="url-display-tab"></span></p>
@@ -466,17 +471,18 @@
 
     <native-card>
     <native-card-body>
-        <native-heading level="H2">22. FromUrl Composed &rarr; Route Param + Header + Gather</native-heading>
+        <native-heading level="H2">22. URL Query Composed &rarr; Route Param + Header + Gather</native-heading>
         <p class="text-sm text-text-secondary mb-3">One request composes three value sources: URL route param, URL header, URL gather field.</p>
         @(Html.NativeButton("url-compose-btn", "Compose All Sources")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
+                var link = p.Url<HttpShowcaseQuery>();
                 p.Get(Url.SandboxRouteTemplate("ComposeEcho", "Http", "id"))
-                 .Gather(g => g
-                     .RouteParam("id", p.FromUrl<int>("residentId"))
-                     .Header("X-Tab", p.FromUrl("tab"))
-                     .FromUrl("facilityId", "facility"))
+                 .Gather<ComposeEchoQuery>(g => g
+                     .Set(x => x.Id, link.Get(q => q.ResidentId))
+                     .Header("X-Tab", link.Get(q => q.Tab))
+                     .Set(x => x.Facility, link.Get(q => q.FacilityId)))
                  .Response(r => r
                     .OnSuccess<ComposeEchoResponse>((json, s) =>
                     {
@@ -492,14 +498,14 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Get(Url.SandboxRouteTemplate("ResidentById", "Http", "id"))
-                 .Gather(g => g.RouteParam("id", p.FromUrl<int>("residentId")))
+                 .Gather<ResidentLookup>(g => g.Set(x => x.Id, p.Url<HttpShowcaseQuery>().Get(q => q.ResidentId)))
                  .Response(r => r
                     .OnSuccess<ResidentByIdResponse>((json, s) =>
                     {
                         s.Get(Url.SandboxRouteTemplate("FacilityResident", "Http", "facilityId", "residentId"))
-                         .Gather(g => g
-                            .RouteParam("facilityId", s.FromUrl<int>("facilityId"))
-                            .RouteParam("residentId", json.Read(x => x.ResidentId)))
+                         .Gather<FacilityResidentLookup>(g => g
+                            .Set(x => x.FacilityId, s.Url<HttpShowcaseQuery>().Get(q => q.FacilityId))
+                            .Set(x => x.ResidentId, json.Read(x => x.ResidentId)))
                          .Response(r2 => r2.OnSuccess<FacilityResidentResponse>((json2, s2) =>
                          {
                              s2.Element("url-chain-name").SetText(json2, x => x.Name);
@@ -526,7 +532,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Get(Url.SandboxRouteTemplate("ResidentById", "Http", "id"))
-                 .Gather(g => g.RouteParam("id", 42))
+                 .Gather<ResidentLookup>(g => g.Set(x => x.Id, 42))
                  .WhileLoading(l => l.Element("route-single-spinner").Show())
                  .Response(r => r
                     .OnSuccess<ResidentByIdResponse>((json, s) =>
@@ -555,9 +561,9 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Get(Url.SandboxRouteTemplate("FacilityResident", "Http", "facilityId", "residentId"))
-                 .Gather(g => g
-                     .RouteParam("facilityId", 7)
-                     .RouteParam("residentId", 99))
+                 .Gather<FacilityResidentLookup>(g => g
+                     .Set(x => x.FacilityId, 7)
+                     .Set(x => x.ResidentId, 99))
                  .WhileLoading(l => l.Element("route-multi-spinner").Show())
                  .Response(r => r
                     .OnSuccess<FacilityResidentResponse>((json, s) =>
@@ -588,8 +594,8 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Get(Url.SandboxRouteTemplate("ResidentById", "Http", "id"))
-                 .Gather(g => g
-                     .RouteParam("id", 42)
+                 .Gather<ResidentLookup>(g => g
+                     .Set(x => x.Id, 42)
                      .Header("X-Step", "first"))
                  .WhileLoading(l => l.Element("route-chain-spinner").Show())
                  .Response(r => r
@@ -598,9 +604,9 @@
                         s.Element("route-chain-first-id").SetText(json, x => x.ResidentId);
                         s.Element("route-chain-first").AddClass("text-green-600");
                         s.Get(Url.SandboxRouteTemplate("FacilityResident", "Http", "facilityId", "residentId"))
-                         .Gather(g2 => g2
-                             .RouteParam("facilityId", 3)
-                             .RouteParam("residentId", json.Read(x => x.ResidentId))
+                         .Gather<FacilityResidentLookup>(g2 => g2
+                             .Set(x => x.FacilityId, 3)
+                             .Set(x => x.ResidentId, json.Read(x => x.ResidentId))
                              .Header("X-Step", "second"))
                          .Response(r2 => r2
                              .OnSuccess<FacilityResidentResponse>((json2, s2) =>
@@ -634,7 +640,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Get(Url.SandboxRouteTemplate("ResidentByName", "Http", "name"))
-                 .Gather(g => g.RouteParam("name", "John Doe"))
+                 .Gather<ResidentNameLookup>(g => g.Set(x => x.Name, "John Doe"))
                  .Response(r => r
                     .OnSuccess<ResidentByNameResponse>((json, s) =>
                     {
@@ -707,10 +713,10 @@
                     })
                     .Chained(c => c
                         .Post(Url.SandboxRoute("EchoHeadersPost", "Http"))
-                        .Gather(g2 => g2
+                        .Gather<EchoHeadersBody>(g2 => g2
                             .Header("X-Api-Version", "chain-v2")
                             .Header("X-Tenant-Id", "chain-tenant-99")
-                            .Static("payload", "chained"))
+                            .Set(x => x.Payload, "chained"))
                         .Response(r2 => r2
                             .OnSuccess<EchoHeadersResponse>((json2, s2) =>
                             {
@@ -802,7 +808,7 @@
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post(Url.SandboxRoute("FlakyEndpoint", "Http"), g => g.Static("name", "John"))
+                    p.Post(Url.SandboxRoute("FlakyEndpoint", "Http")).Gather<HttpController.SaveRequest>(g => g.Set(x => x.Name, "John"))
                      .WhileLoading(l => l.Element("finally-spinner").Show())
                      .Response(r => r
                         .OnSuccess(s =>
@@ -818,7 +824,7 @@
                 .CssClass("rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post(Url.SandboxRoute("FlakyEndpoint", "Http"), g => g.Static("name", "fail"))
+                    p.Post(Url.SandboxRoute("FlakyEndpoint", "Http")).Gather<HttpController.SaveRequest>(g => g.Set(x => x.Name, "fail"))
                      .WhileLoading(l => l.Element("finally-spinner").Show())
                      .Response(r => r
                         .OnError(500, e =>

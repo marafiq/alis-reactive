@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using Alis.Reactive.Fusion.Components;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
@@ -191,7 +192,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         private static IEnumerable<ResidentBillingItem> SortBilling(
-            IEnumerable<ResidentBillingItem> source, List<GridSortRequest>? sorted)
+            IEnumerable<ResidentBillingItem> source, List<FusionGridSortColumn>? sorted)
         {
             if (sorted == null || sorted.Count == 0)
                 return source.OrderBy(r => r.ResidentName);

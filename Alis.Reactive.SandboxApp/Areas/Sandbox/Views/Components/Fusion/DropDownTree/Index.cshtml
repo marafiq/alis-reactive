@@ -1,5 +1,4 @@
 @model FusionDropDownTreeModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.DropDowns
@@ -122,11 +121,9 @@
             {
                 var tree = p.Component<FusionDropDownTree>(m => m.ResidentIds);
                 p.Post(Url.SandboxRoute("Echo", "DropDownTree"))
-                    .Gather(g =>
-                    {
-                        g.Include(tree.Get(c => c.Value), "value");
-                        g.Include(tree.Get(c => c.Text), "text");
-                    })
+                    .Gather<FusionDropDownTreeEchoRequest>(g => g
+                        .Set(x => x.Value, tree.Get(c => c.Value))
+                        .Set(x => x.Text, tree.Get(c => c.Text)))
                     .Response(r => r.OnSuccess<FusionDropDownTreeEchoResponse>((json, s) =>
                     {
                         s.Element("gather-value").SetText(json, x => x.ValueSummary);

@@ -1,5 +1,4 @@
 @model SwitchModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -97,10 +96,10 @@
                     var email = p.Component<FusionSwitch>(m => m.EmailReminders);
                     var text = p.Component<FusionSwitch>(m => m.TextMessageAlerts);
                     p.Post(Url.SandboxRoute("Save", "Switch"))
-                        .Gather(g => g
-                            .Include(receive.Get(c => c.Checked), "receiveCareAlerts")
-                            .Include(email.Get(c => c.Checked), "emailReminders")
-                            .Include(text.Get(c => c.Checked), "textMessageAlerts"))
+                        .Gather<CareAlertPreferencesRequest>(g => g
+                            .Set(x => x.ReceiveCareAlerts, receive.Get(c => c.Checked))
+                            .Set(x => x.EmailReminders, email.Get(c => c.Checked))
+                            .Set(x => x.TextMessageAlerts, text.Get(c => c.Checked)))
                         .Response(r => r.OnSuccess<CareAlertPreferencesResponse>((json, s) =>
                         {
                             s.Element("save-confirmation").SetText(json, x => x.Summary);

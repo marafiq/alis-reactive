@@ -1,7 +1,6 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.CareOpsViewModel
 @using Alis.Reactive.Builders
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.Templates
 @using Syncfusion.EJ2.Buttons
@@ -48,7 +47,7 @@
     void LoadCareOps(PipelineBuilder<CareOpsViewModel> p, string status)
     {
         p.Post(Url.SandboxRoute("CareOpsData", "Grid"))
-            .Gather(g => { g.Static("skip", 0); g.Static("take", 10); })
+            .Gather<CareOpsDataRequest>(g => g.Set(x => x.Skip, 0).Set(x => x.Take, 10))
             .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
             {
                 s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
@@ -97,14 +96,8 @@
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post(Url.SandboxRoute("CareOpsAdmit", "Grid"), g =>
-                    {
-                        g.Include<FusionTextBox, CareOpsViewModel>(m => m.NewResidentName);
-                        g.Include<FusionDropDownList, CareOpsViewModel>(m => m.NewWing);
-                        g.Include<FusionDropDownList, CareOpsViewModel>(m => m.NewCareLevel);
-                        g.Include<FusionDropDownList, CareOpsViewModel>(m => m.NewRiskLevel);
-                        g.Include<FusionNumericTextBox, CareOpsViewModel>(m => m.NewOpenTasks);
-                    })
+                    p.Post(Url.SandboxRoute("CareOpsAdmit", "Grid"))
+                    .Gather(g => g.Form(m => m.NewResidentName, m => m.NewWing, m => m.NewCareLevel, m => m.NewRiskLevel, m => m.NewOpenTasks))
                     .Validate<CareOpsAdmitValidator>(AdmitFormId)
                     .Response(r => r
                         .OnSuccess<CareOpsResponse>((json, s) =>
@@ -155,12 +148,10 @@
                     .Reactive(evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("CareOpsData", "Grid"))
-                            .Gather(g =>
-                            {
-                                g.Static("skip", 0);
-                                g.Static("take", 10);
-                                g.FromEvent(args, x => x.Text, "filterRisk");
-                            })
+                            .Gather<CareOpsDataRequest>(g => g
+                                .Set(x => x.Skip, 0)
+                                .Set(x => x.Take, 10)
+                                .Set(x => x.FilterRisk, p.Payload(args).Get(a => a.Text)))
                             .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                             {
                                 s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
@@ -177,12 +168,10 @@
                     .Reactive(evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("CareOpsData", "Grid"))
-                            .Gather(g =>
-                            {
-                                g.Static("skip", 0);
-                                g.Static("take", 10);
-                                g.FromEvent(args, x => x.Text, "filterCareLevel");
-                            })
+                            .Gather<CareOpsDataRequest>(g => g
+                                .Set(x => x.Skip, 0)
+                                .Set(x => x.Take, 10)
+                                .Set(x => x.FilterCareLevel, p.Payload(args).Get(a => a.Text)))
                             .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                             {
                                 s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
@@ -210,7 +199,7 @@
                     var grid = p.Component<FusionGrid>(GridId);
                     grid.Call(c => c.SaveCell);
                     p.Post(Url.SandboxRoute("CareOpsSave", "Grid"))
-                        .Gather(g => g.Include(grid.Get(c => c.GetBatchChanges<ResidentCareItem>()), "batchChanges"))
+                        .Gather<CareOpsSaveRequest>(g => g.Set(x => x.BatchChanges, grid.Get(c => c.GetBatchChanges<ResidentCareItem>())))
                         .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                         {
                             s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
@@ -224,11 +213,9 @@
                 {
                     var grid = p.Component<FusionGrid>(GridId);
                     p.Post(Url.SandboxRoute("CareOpsBulkNurse", "Grid"))
-                        .Gather(g =>
-                        {
-                            g.Static("nurse", "Night Float Team");
-                            g.Include(grid.Get(c => c.GetSelectedRecords<ResidentCareItem>()), "selectedRecords");
-                        })
+                        .Gather<CareOpsBulkRequest>(g => g
+                            .Set(x => x.Nurse, "Night Float Team")
+                            .Set(x => x.SelectedRecords, grid.Get(c => c.GetSelectedRecords<ResidentCareItem>())))
                         .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                         {
                             s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
@@ -242,11 +229,9 @@
                 {
                     var grid = p.Component<FusionGrid>(GridId);
                     p.Post(Url.SandboxRoute("CareOpsBulkRisk", "Grid"))
-                        .Gather(g =>
-                        {
-                            g.Static("risk", "Critical");
-                            g.Include(grid.Get(c => c.GetSelectedRecords<ResidentCareItem>()), "selectedRecords");
-                        })
+                        .Gather<CareOpsBulkRequest>(g => g
+                            .Set(x => x.Risk, "Critical")
+                            .Set(x => x.SelectedRecords, grid.Get(c => c.GetSelectedRecords<ResidentCareItem>())))
                         .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                         {
                             s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
@@ -257,7 +242,7 @@
             @(Html.NativeActionLink("Discharge Selected", Url.SandboxRoute("CareOpsDischargeSelected", "Grid"), p => p
                 .Confirm("Discharge the selected resident(s) from the active census?")
                 .Then(t2 => t2.Post(Url.SandboxRoute("CareOpsDischargeSelected", "Grid"))
-                    .Gather(g => g.Include(p.Component<FusionGrid>(GridId).Get(c => c.GetSelectedRecords<ResidentCareItem>()), "selectedRecords"))
+                    .Gather<CareOpsBulkRequest>(g => g.Set(x => x.SelectedRecords, p.Component<FusionGrid>(GridId).Get(c => c.GetSelectedRecords<ResidentCareItem>())))
                     .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                     {
                         s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
@@ -304,13 +289,12 @@
                 p.When(args, x => x.Action.RequestType).NotEq(FusionGridAction.Refresh)
                     .Then(t =>
                     {
+                        var dataState = t.Payload(args);
                         t.Post(Url.SandboxRoute("CareOpsData", "Grid"))
-                            .Gather(g =>
-                            {
-                                g.FromEvent(args, x => x.Skip, "skip");
-                                g.FromEvent(args, x => x.Take, "take");
-                                g.FromEvent(args, x => x.Sorted, "sorted");
-                            })
+                            .Gather<CareOpsDataRequest>(g => g
+                                .Set(x => x.Skip, dataState.Get(a => a.Skip))
+                                .Set(x => x.Take, dataState.Get(a => a.Take))
+                                .Set(x => x.Sorted, dataState.Get(a => a.Sorted)))
                             .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                             {
                                 s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));

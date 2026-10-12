@@ -210,7 +210,7 @@ public class WhenTimeSelected : PlaywrightTestBase
         // The Value() source must reach the body under its declared key, carrying
         // the picker's Date as the local date and time picked. The date proves the
         // source yielded the component's value; if Value() broke, no date would appear.
-        Assert.That(body, Does.Contain("medicationTime"),
+        Assert.That(body, Does.Contain("MedicationTime"),
             "the gather pipeline must carry the medication time under its declared key");
         Assert.That(body, Does.Contain("2026-01-01T"),
             "the gather pipeline must carry the medication time Value() source as a date and time");

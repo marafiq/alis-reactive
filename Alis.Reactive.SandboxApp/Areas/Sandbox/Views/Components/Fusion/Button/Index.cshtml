@@ -1,5 +1,4 @@
 @model ButtonModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -140,14 +139,12 @@
                 {
                     var action = p.Component<FusionButton>(actionButtonId);
                     p.Post(Url.SandboxRoute("RecordCheckIn", "Button"))
-                        .Gather(g =>
-                        {
-                            g.Include(action.Get(c => c.Content), "action");
-                            g.Include(action.Get(c => c.Disabled), "locked");
-                            g.Include(action.Get(c => c.CssClass), "priority");
-                            g.Include(action.Get(c => c.IsPrimary), "recommended");
-                            g.Include(action.Get(c => c.IsToggle), "followUp");
-                        })
+                        .Gather<ButtonCheckInRequest>(g => g
+                            .Set(x => x.Action, action.Get(c => c.Content))
+                            .Set(x => x.Locked, action.Get(c => c.Disabled))
+                            .Set(x => x.Priority, action.Get(c => c.CssClass))
+                            .Set(x => x.Recommended, action.Get(c => c.IsPrimary))
+                            .Set(x => x.FollowUp, action.Get(c => c.IsToggle)))
                         .Response(r => r.OnSuccess<ButtonCheckInResponse>((json, s) =>
                         {
                             s.Element("checkin-confirmation").SetText(json, x => x.Confirmation);

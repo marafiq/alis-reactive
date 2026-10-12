@@ -1,5 +1,4 @@
 @model DropDownListModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -17,8 +16,8 @@
 
     Html.On(plan, t => t.CustomEvent(DropDownListEvents.DoGather, p =>
     {
-        p.Post(Url.SandboxRoute("Echo", "DropDownList"), g =>
-            g.Include<FusionDropDownList, DropDownListModel>(m => m.Category))
+        p.Post(Url.SandboxRoute("Echo", "DropDownList"))
+         .Gather(g => g.Form(m => m.Category))
          .Response(r => r
             .OnSuccess(s =>
             {
@@ -112,10 +111,10 @@
     </section>
 
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">6. Gather (Include in POST)</h2>
+        <h2 class="text-base font-semibold mb-4">6. Gather (form field in POST)</h2>
         <p class="text-sm text-text-secondary mb-4">
             Click to POST the Category value gathered from the Syncfusion component via
-            <code>Include&lt;FusionDropDownList&gt;</code>.
+            <code>Form(m =&gt; m.Category)</code>.
         </p>
         @(Html.NativeButton("gather-btn", "Gather Category")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mb-3")

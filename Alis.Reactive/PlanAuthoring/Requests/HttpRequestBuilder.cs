@@ -43,13 +43,23 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
         public HttpRequestBuilder<TModel> Delete(string url) { SelectEndpoint(HttpMethodName.Delete, url); return this; }
 
-        /// <summary>Configures request body fields, headers, and route template parameters.</summary>
-        /// <param name="gather">Builds the values to resolve immediately before the request is sent.</param>
-        public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> gather)
+        /// <summary>Builds the request from the view model's own members, for an endpoint that binds the view model.</summary>
+        /// <param name="gather">Sets the members, the form's inputs and the headers sent.</param>
+        public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel, TModel>> gather) =>
+            Gather<TModel>(gather);
+
+        /// <summary>
+        /// Builds the request the endpoint binds: a member named like a URL <c>{placeholder}</c> fills the path,
+        /// and the others go to the query string for GET and to the body otherwise.
+        /// </summary>
+        /// <typeparam name="TRequest">The class the endpoint binds.</typeparam>
+        /// <param name="gather">Sets the members, the form's inputs and the headers sent.</param>
+        public HttpRequestBuilder<TModel> Gather<TRequest>(Action<GatherBuilder<TRequest, TModel>> gather)
+            where TRequest : class
         {
+            if (gather == null) throw new ArgumentNullException(nameof(gather));
             var draft = new GatherInputDraft();
-            var builder = new GatherBuilder<TModel>(_context, draft);
-            gather(builder);
+            gather(new GatherBuilder<TRequest, TModel>(draft));
             _requestInput = draft;
             return this;
         }

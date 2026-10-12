@@ -1,6 +1,5 @@
 @model ComponentGatherModel
 @using Alis.Reactive
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.DropDowns
@@ -147,7 +146,7 @@
         <native-heading level="H2">Submit</native-heading>
         <native-text color="Secondary">
             Two submit modes: JSON POST sends <code>application/json</code>, FormData POST sends <code>multipart/form-data</code>.
-            Both gather all 18 fields via <code>IncludeAll()</code>.
+            Both gather all 18 fields via <code>Form()</code>.
         </native-text>
 
         <native-hstack gap="Base" class="mt-4">
@@ -155,7 +154,7 @@
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post(Url.SandboxRoute("EchoJson", "ComponentGather"), g => g.IncludeAll())
+                    p.Post(Url.SandboxRoute("EchoJson", "ComponentGather")).Gather(g => g.Form())
                      .Validate<ComponentGatherValidator>("gather-form")
                      .Response(r => r
                         .OnSuccess<GatherEchoResponse>((json, s) =>
@@ -193,7 +192,7 @@
                 .CssClass("rounded-md bg-surface-alt px-4 py-2 text-sm font-medium text-text-primary border border-border hover:bg-surface-hover transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post(Url.SandboxRoute("EchoFormData", "ComponentGather"), g => g.IncludeAll())
+                    p.Post(Url.SandboxRoute("EchoFormData", "ComponentGather")).Gather(g => g.Form())
                      .AsFormData()
                      .Validate<ComponentGatherValidator>("gather-form")
                      .Response(r => r
@@ -232,9 +231,10 @@
                 .CssClass("rounded-md bg-surface-alt px-4 py-2 text-sm font-medium text-text-primary border border-border hover:bg-surface-hover transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post(Url.SandboxRoute("EchoJson", "ComponentGather"), g => g.Include<NativeTextBox, ComponentGatherModel>(
-                            IdGenerator.For<ComponentGatherModel>(m => m.ResidentName),
-                            nameof(ComponentGatherModel.ResidentName)))
+                    p.Post(Url.SandboxRoute("EchoJson", "ComponentGather"))
+                     .Gather(g => g.Set(
+                            x => x.ResidentName,
+                            p.Component<NativeTextBox>(IdGenerator.For<ComponentGatherModel>(m => m.ResidentName)).Get(c => c.Value)))
                      .Response(r => r.OnSuccess<GatherEchoResponse>((json, s) =>
                      {
                          s.Element("submit-mode").SetText("ExplicitId");

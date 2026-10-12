@@ -1,5 +1,4 @@
 @model AutoCompleteModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -17,8 +16,8 @@
 
     Html.On(plan, t => t.CustomEvent(AutoCompleteEvents.DoGather, p =>
     {
-        p.Post(Url.SandboxRoute("Echo", "AutoComplete"), g =>
-            g.Include<FusionAutoComplete, AutoCompleteModel>(m => m.Physician))
+        p.Post(Url.SandboxRoute("Echo", "AutoComplete"))
+         .Gather(g => g.Form(m => m.Physician))
          .Response(r => r
             .OnSuccess(s =>
             {
@@ -104,10 +103,10 @@
     </section>
 
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">6. Gather (Include in POST)</h2>
+        <h2 class="text-base font-semibold mb-4">6. Gather (form field in POST)</h2>
         <p class="text-sm text-text-secondary mb-4">
             Click to POST the Physician value gathered from the Syncfusion component via
-            <code>Include&lt;FusionAutoComplete&gt;</code>.
+            <code>Form(m =&gt; m.Physician)</code>.
         </p>
         @(Html.NativeButton("gather-btn", "Gather Physician")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mb-3")
@@ -136,7 +135,7 @@
                 {
                     p.Payload(args).Set(a => a.PreventDefaultAction, true);
                     p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
-                     .Gather(g => g.FromEvent(args, x => x.Text, "MedicationType"))
+                     .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, p.Payload(args).Get(a => a.Text)))
                      .Response(r => r
                         .OnSuccess<MedicationSearchResponse>((json, s) =>
                         {

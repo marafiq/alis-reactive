@@ -1,5 +1,4 @@
 @model PharmacyConnectionModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Microsoft.AspNetCore.Mvc.Rendering
 @{
@@ -29,7 +28,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Get(testOrderUrl)
-                     .Gather(g => g.RouteParam("pharmacyId", p.Component<NativeDropDown>(m => m.PharmacyId).Get(c => c.Value)))
+                     .Gather<PharmacyTestOrder>(g => g.Set(x => x.PharmacyId, p.Component<NativeDropDown>(m => m.PharmacyId).Get(c => c.Value)))
                      .Response(r => r.OnSuccess<PharmacyHandshake>((reply, s) =>
                      {
                          s.Element("pharmacy-reply").SetText(reply, x => x.ResponseBody);

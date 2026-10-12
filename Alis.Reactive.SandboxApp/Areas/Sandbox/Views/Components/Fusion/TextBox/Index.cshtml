@@ -1,5 +1,4 @@
 @model TextBoxModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -147,9 +146,9 @@
                     // A profile must carry a name before it can be saved.
                     p.When(name.Get(c => c.Value)).NotEmpty()
                         .Then(ok => ok.Post(Url.SandboxRoute("Save", "TextBox"))
-                            .Gather(g => g
-                                .Include(name.Get(c => c.Value), "preferredName")
-                                .Include(diet.Get(c => c.Value), "dietaryNote"))
+                            .Gather<ProfileSaveRequest>(g => g
+                                .Set(x => x.PreferredName, name.Get(c => c.Value))
+                                .Set(x => x.DietaryNote, diet.Get(c => c.Value)))
                             .Response(r => r.OnSuccess<ProfileSaveResponse>((json, s) =>
                             {
                                 s.Element("save-confirmation").SetText(json, x => x.Confirmation);

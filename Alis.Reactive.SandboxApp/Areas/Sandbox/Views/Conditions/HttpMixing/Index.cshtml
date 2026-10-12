@@ -1,9 +1,9 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.HttpMixing.HttpMixingModel
 @using Alis.Reactive
 @using Alis.Reactive.Builders.Conditions
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.HttpMixing
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions
 @{
     ViewData["Title"] = "Conditions + HTTP Mixing";
 
@@ -24,7 +24,7 @@
 
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S1SaveThenCheck, (args, p) =>
     {
-        p.Post(saveUrl, g => g.Static("name", "Alice"))
+        p.Post(saveUrl).Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, "Alice"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
              s.Element("s1-status").SetText(json, x => x.ReceivedName);
@@ -39,7 +39,7 @@
         p.When(args, x => x.Active).Truthy()
             .Then(then => then.Element("s2-active-status").SetText("active"))
             .Else(else_ => else_.Element("s2-active-status").SetText("inactive"));
-        p.Post(auditUrl, g => g.Static("action", "login"))
+        p.Post(auditUrl).Gather<HttpMixingController.AuditRequest>(g => g.Set(x => x.Action, "login"))
          .Response(r => r.OnSuccess<HttpMixingAuditResponse>((json, s) =>
          {
              s.Element("s2-audit-result").SetText(json, x => x.Result);
@@ -55,7 +55,7 @@
         p.When(args, x => x.Active).Truthy()
             .Then(then => then.Element("s3-pre-badge").Show());
         p.Element("s3-loading").SetText("please wait");
-        p.Post(saveUrl, g => g.Static("name", "Bob"))
+        p.Post(saveUrl).Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, "Bob"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
              s.Element("s3-http-result").SetText(json, x => x.ReceivedName);
@@ -69,7 +69,7 @@
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S4ConditionInsideSuccess, (args, p) =>
     {
         p.Element("s4-pre").SetText("loading");
-        p.Post(saveUrl, g => g.Static("name", "Carol"))
+        p.Post(saveUrl).Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, "Carol"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
              s.Element("s4-status").SetText("saved");
@@ -83,8 +83,8 @@
 
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S5ElseifInsideSuccess, (args, p) =>
     {
-        p.Post(classifyUrl, g => g
-            .FromEvent(args, x => x.Count, "count"))
+        p.Post(classifyUrl)
+         .Gather<HttpMixingController.ClassifyRequest>(g => g.Set(x => x.Count, p.Payload(args).Get(a => a.Count)))
          .Response(r => r.OnSuccess<HttpMixingClassifyResponse>((json, s) =>
          {
              s.Element("s5-server-tier").SetText(json, x => x.Tier);
@@ -103,7 +103,7 @@
 
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S6MultiConditionsAfterHttp, (args, p) =>
     {
-        p.Post(saveUrl, g => g.Static("name", "Dave"))
+        p.Post(saveUrl).Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, "Dave"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
              s.Element("s6-saved").SetText(json, x => x.ReceivedName);
@@ -131,7 +131,7 @@
 
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S8AndGuardInsideSuccess, (args, p) =>
     {
-        p.Post(saveUrl, g => g.Static("name", "Eve"))
+        p.Post(saveUrl).Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, "Eve"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
              s.Element("s8-saved").SetText(json, x => x.ReceivedName);
@@ -167,7 +167,7 @@
                 else_.Element("s12-sequence").SetText(mark);
                 else_.Element("s12-order").SetText("branch-before-else");
             });
-        p.Post(saveUrl, g => g.Static("name", "Ordered"))
+        p.Post(saveUrl).Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, "Ordered"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
              s.Element("s12-http-done").SetText("done");
@@ -225,13 +225,13 @@
             });
         p.Parallel(
             a => a.Post(saveUrl)
-                  .Gather(g => g.Static("name", "Parallel A"))
+                  .Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, "Parallel A"))
                   .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
                   {
                       s.Element("s13-a").SetText(json, x => x.ReceivedName);
                   })),
             b => b.Post(auditUrl)
-                  .Gather(g => g.Static("action", "parallel-b"))
+                  .Gather<HttpMixingController.AuditRequest>(g => g.Set(x => x.Action, "parallel-b"))
                   .Response(r => r.OnSuccess<HttpMixingAuditResponse>((json, s) =>
                   {
                       s.Element("s13-b").SetText(json, x => x.Result);
@@ -273,7 +273,7 @@
         p.Element("s14-order").SetText("dispatch");
     }));
 
-    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S14RouteTemplateFromEvent, (args, p) =>
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S14RouteTemplateFromPayload, (args, p) =>
     {
         TypedPluginSource<string> categorySlug = p.Plugin(slugify.Slug).Arg(args, x => x.Category);
         TypedPluginSource<string> markStart = p.Plugin(order.Mark).Arg("s14").Arg("start");
@@ -292,10 +292,11 @@
                 else_.Element("s14-sequence").SetText(mark);
                 else_.Element("s14-order").SetText("branch-before-else");
             });
-        p.Post(routeAuditUrl, g => g
-            .RouteParam("residentId", args, x => x.Count)
-            .Header("X-Category", args, x => x.Category)
-            .FromEvent(args, x => x.Category, "action"))
+        p.Post(routeAuditUrl)
+         .Gather<HttpMixingController.ResidentAuditRequest>(g => g
+            .Set(x => x.ResidentId, p.Payload(args).Get(a => a.Count))
+            .Header("X-Category", p.Payload(args).Get(a => a.Category))
+            .Set(x => x.Action, p.Payload(args).Get(a => a.Category)))
          .Response(r => r.OnSuccess<HttpMixingResidentAuditResponse>((json, s) =>
          {
              s.Element("s14-route-id").SetText(json, x => x.ResidentId);
@@ -307,9 +308,9 @@
          })
          .Chained(c => c
              .Post(routeAuditTrailUrl)
-             .Gather(g => g
-                 .RouteParam("residentId", args, x => x.Count)
-                 .RouteParam("categorySlug", categorySlug))
+             .Gather<ResidentAuditTrail>(g => g
+                 .Set(x => x.ResidentId, p.Payload(args).Get(a => a.Count))
+                 .Set(x => x.CategorySlug, categorySlug))
              .Response(r => r.OnSuccess<HttpMixingAuditTrailResponse>((json, s) =>
              {
                  s.Element("s14-trail-id").SetText(json, x => x.ResidentId);
@@ -600,11 +601,11 @@
             @(Html.NativeButton("s14-btn-active-high", "event resident 314")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch(HttpMixingEvents.S14RouteTemplateFromEvent, new HttpMixingPayload { Active = true, Count = 314, Category = "VIP Review" })))
+                    p.Dispatch(HttpMixingEvents.S14RouteTemplateFromPayload, new HttpMixingPayload { Active = true, Count = 314, Category = "VIP Review" })))
             @(Html.NativeButton("s14-btn-inactive-low", "event resident 271")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch(HttpMixingEvents.S14RouteTemplateFromEvent, new HttpMixingPayload { Active = false, Count = 271, Category = "Routine Check" })))
+                    p.Dispatch(HttpMixingEvents.S14RouteTemplateFromPayload, new HttpMixingPayload { Active = false, Count = 271, Category = "Routine Check" })))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Route ID: <span id="s14-route-id">&mdash;</span></p>
@@ -635,8 +636,8 @@
                     .Reactive(evt => evt.Change, (args, p) =>
                     {
                         p.Element("s9-pre").SetText("saving");
-                        p.Post(saveUrl, g => g
-                            .FromEvent(args, x => x.Value!, "name"))
+                        p.Post(saveUrl)
+                         .Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, p.Payload(args).Get(a => a.Value)))
                          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
                          {
                              s.Element("s9-http-result").SetText(json, x => x.ReceivedName);
@@ -672,8 +673,8 @@
                     .Reactive(evt => evt.Change, (args, p) =>
                     {
                         p.Element("s10-pre").SetText("loading");
-                        p.Post(saveUrl, g => g
-                            .FromEvent(args, x => x.Value!, "name"))
+                        p.Post(saveUrl)
+                         .Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, p.Payload(args).Get(a => a.Value)))
                          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
                          {
                              s.Element("s10-http-result").SetText(json, x => x.ReceivedName);

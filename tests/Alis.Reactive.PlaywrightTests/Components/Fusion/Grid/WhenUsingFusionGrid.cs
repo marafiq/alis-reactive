@@ -62,12 +62,12 @@ public class WhenUsingFusionGrid : PlaywrightTestBase
                 && observed.Request.Method == "POST");
         var requestBody = response.Request.PostData ?? "";
 
-        Assert.That(requestBody, Does.Contain("\"eventName\":\"dataStateChange\""));
-        Assert.That(requestBody, Does.Contain("\"requiresCounts\":true"));
-        Assert.That(requestBody, Does.Contain("\"actionName\":\"actionBegin\""));
-        Assert.That(requestBody, Does.Contain("\"actionType\":\"actionBegin\""));
-        Assert.That(requestBody, Does.Contain("\"actionCancel\":false"));
-        Assert.That(requestBody, Does.Contain("\"sorted\""));
+        Assert.That(requestBody, Does.Contain("\"EventName\":\"dataStateChange\""));
+        Assert.That(requestBody, Does.Contain("\"RequiresCounts\":true"));
+        Assert.That(requestBody, Does.Contain("\"ActionName\":\"actionBegin\""));
+        Assert.That(requestBody, Does.Contain("\"ActionType\":\"actionBegin\""));
+        Assert.That(requestBody, Does.Contain("\"ActionCancel\":false"));
+        Assert.That(requestBody, Does.Contain("\"Sorted\""));
         Assert.That(requestBody, Does.Contain("\"name\":\"name\""));
         Assert.That(requestBody, Does.Contain("\"direction\":\"ascending\""));
         using (var requestJson = JsonDocument.Parse(requestBody))
@@ -151,24 +151,24 @@ public class WhenUsingFusionGrid : PlaywrightTestBase
                 && observed.Method == "POST");
         var requestBody = request.PostData ?? "";
 
-        Assert.That(requestBody, Does.Contain("\"eventName\":\"dataStateChange\""));
-        Assert.That(requestBody, Does.Contain("\"skip\":10"));
-        Assert.That(requestBody, Does.Contain("\"take\":10"));
-        Assert.That(requestBody, Does.Contain("\"requiresCounts\":true"));
-        Assert.That(requestBody, Does.Contain("\"actionName\":\"actionBegin\""));
-        Assert.That(requestBody, Does.Contain("\"actionType\":\"actionBegin\""));
-        Assert.That(requestBody, Does.Contain("\"actionCancel\":false"));
-        Assert.That(requestBody, Does.Contain("\"actionRequestType\":\"paging\""));
-        Assert.That(requestBody, Does.Contain("\"actionCurrentPage\":2"));
-        Assert.That(requestBody, Does.Contain("\"actionPreviousPage\":1"));
-        Assert.That(requestBody, Does.Contain("\"actionPageSize\":10"));
+        Assert.That(requestBody, Does.Contain("\"EventName\":\"dataStateChange\""));
+        Assert.That(requestBody, Does.Contain("\"Skip\":10"));
+        Assert.That(requestBody, Does.Contain("\"Take\":10"));
+        Assert.That(requestBody, Does.Contain("\"RequiresCounts\":true"));
+        Assert.That(requestBody, Does.Contain("\"ActionName\":\"actionBegin\""));
+        Assert.That(requestBody, Does.Contain("\"ActionType\":\"actionBegin\""));
+        Assert.That(requestBody, Does.Contain("\"ActionCancel\":false"));
+        Assert.That(requestBody, Does.Contain("\"ActionRequestType\":\"paging\""));
+        Assert.That(requestBody, Does.Contain("\"ActionCurrentPage\":2"));
+        Assert.That(requestBody, Does.Contain("\"ActionPreviousPage\":1"));
+        Assert.That(requestBody, Does.Contain("\"ActionPageSize\":10"));
         using (var requestJson = JsonDocument.Parse(requestBody))
         {
             var root = requestJson.RootElement;
             Assert.That(root.TryGetProperty("where", out _), Is.False);
             Assert.That(root.TryGetProperty("search", out _), Is.False);
             Assert.That(root.TryGetProperty("group", out _), Is.False);
-            Assert.That(root.TryGetProperty("sorted", out _), Is.False);
+            Assert.That(root.TryGetProperty("Sorted", out _), Is.False);
             Assert.That(root.TryGetProperty("actionPreviousPageSize", out _), Is.False);
             Assert.That(root.TryGetProperty("actionRows", out _), Is.False);
             Assert.That(root.TryGetProperty("actionTarget", out _), Is.False);

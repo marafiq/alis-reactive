@@ -30,7 +30,7 @@ browser.
 | Event wiring | JavaScript selectors | `.Reactive(evt => evt.Change, ...)` |
 | Payload reads | `event.detail.someValue` strings | `p.When(args, x => x.SomeValue)` |
 | Component updates | Vendor object calls in JS | `p.Component<T>(...).Set(c => c.Value, ...)` |
-| HTTP payloads | Manually assembled JSON | `.Gather(g => g.IncludeAll())` |
+| HTTP payloads | Manually assembled JSON | `.Gather(g => g.Form())` |
 | Client validation | Separate client rule system | The same FluentValidation `RuleFor(...)` rules |
 
 The result is not less browser behavior. It is browser behavior with a typed

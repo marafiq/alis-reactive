@@ -1,5 +1,4 @@
 @model Step4ReviewModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     var plan = Html.ReactivePlan<Step4ReviewModel>();
@@ -88,8 +87,8 @@
             {
                 p.Element("submit-spinner").Show();
                 p.Element("submit-text").Hide();
-                p.Post(submitUrl,
-                    g => g.IncludeAll())
+                p.Post(submitUrl)
+                 .Gather(g => g.Form())
                  .Validate<Step4Validator>("screening-form")
                  .Response(r => r
                     .OnSuccess<SubmitScreeningResponse>((json, s) =>

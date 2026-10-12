@@ -31,6 +31,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public int Population { get; set; }
     }
 
+    /// <summary>A city lookup to the Cities endpoint: <c>?Country=</c>, the country chosen.</summary>
+    public sealed class CityLookupQuery
+    {
+        public string? Country { get; set; }
+    }
+
     public class CityLookupResponse
     {
         public object[]? Cities { get; set; }

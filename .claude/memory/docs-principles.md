@@ -32,7 +32,7 @@ Show small code (3-5 lines) that answers one question. Never dump big JSON blobs
 All code must be verified in a working sandbox page before appearing in docs. Create the actual view/controller/model in SandboxApp, build, run, test in browser, then copy to docs.
 
 Cascade examples use real Gather pattern:
-`.Gather(g => g.Include(m => m.Country))` -- never string concatenation for URLs.
+`.Gather<CityLookupQuery>(g => g.Form(m => m.Country))` -- never string concatenation for URLs.
 
 "If you get anything wrong in terms of syntax or explanation, users will not use it. It will never come back."
 

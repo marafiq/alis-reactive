@@ -116,6 +116,25 @@ namespace Alis.Reactive.PlanModel
         internal static PluginSource Of(string name) => new PluginSource(name);
     }
 
+    /// <summary>
+    /// An input of the form, by its element id, read through the model as MVC binds it: an input this plan
+    /// or a partial that composes with it rendered, while it is on the page.
+    /// </summary>
+    internal sealed class FormFieldSource : Source
+    {
+        private readonly ComponentId _input;
+
+        /// <summary>The input's element id.</summary>
+        public string Input => _input.Value;
+
+        private FormFieldSource(ComponentId input)
+        {
+            _input = input;
+        }
+
+        internal static FormFieldSource Of(string input) => new FormFieldSource(ComponentId.Of(input));
+    }
+
     /// <summary>Reads from the browser <c>window.location</c> query string.</summary>
     internal sealed class UrlSource : Source
     {

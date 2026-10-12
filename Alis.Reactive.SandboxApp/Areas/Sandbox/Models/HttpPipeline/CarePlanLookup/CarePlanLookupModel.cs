@@ -10,6 +10,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? ResidentId { get; set; }
     }
 
+    /// <summary>The care plan request <c>CarePlan/{residentId}</c> binds: the resident in the path.</summary>
+    public sealed class CarePlanResident
+    {
+        public string? ResidentId { get; set; }
+    }
+
     /// <summary>A resident the nurse can choose.</summary>
     public sealed record CarePlanResidentOption(string Id, string Name);
 

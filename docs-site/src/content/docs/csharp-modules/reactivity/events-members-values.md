@@ -161,11 +161,14 @@ class declares them, and `p.Payload(args)` writes, calls and reads them:
 {
     p.Payload(args).Set(a => a.PreventDefaultAction, true);
     p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
-     .Gather(g => g.FromEvent(args, x => x.Text, "MedicationType"))
+     .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, p.Payload(args).Get(a => a.Text)))
      .Response(r => r.OnSuccess<MedicationSearchResponse>((json, s) =>
          s.Payload(args).Call(a => a.UpdateData, json.Read(j => j.Medications))));
 })
 ```
+
+`p.Payload(args).Get(a => a.Text)` reads a payload member as a value, here the
+text typed so far, sent as the request's `MedicationType`.
 
 ## Value Sources
 
@@ -173,12 +176,41 @@ The same source shape is reused everywhere.
 
 ```csharp
 p.When(args, x => x.Value).Eq("north");
-p.When(p.FromUrl<string>("mode")).Eq("edit");
+p.When(p.Url<HttpShowcaseQuery>().Get(q => q.Tab)).Eq("medications");
 p.Element("message").SetText(body, x => x.Message);
 ```
 
-Use sources for conditions, element text, gather fields, route parameters,
-headers, dispatch payloads, and plugin arguments.
+Use sources for conditions, element text, request members (route values
+included), headers, dispatch payloads, and plugin arguments.
+
+## How do I read the page's URL?
+
+Describe the query string with the class the page's action binds with
+`[FromQuery]`, and read it through `p.Url<TQuery>()`:
+
+```csharp
+public sealed class HttpShowcaseQuery
+{
+    public string? Tab { get; set; }
+    public int FacilityId { get; set; }
+    public int Page { get; set; }
+    public int ResidentId { get; set; }
+    public string[] Wing { get; set; } = Array.Empty<string>();
+}
+```
+
+```csharp
+var link = p.Url<HttpShowcaseQuery>();
+p.When(link.Get(q => q.Page)).Gt(1)
+ .Then(then => then.Element("url-cond-prev").Show())
+ .Else(els => els.Element("url-cond-prev").Hide());
+
+p.Element("url-display-wings").SetText(link.Get(q => q.Wing));
+```
+
+Each member reads the key of its name, ignoring case. A single-value member reads
+the key's first value; an array member such as `Wing` reads every value of the
+key.
 
 ## Plugins
 

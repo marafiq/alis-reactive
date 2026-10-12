@@ -1,5 +1,4 @@
 @model CompanionSuiteModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.SandboxApp.BroughtComponents
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
 @{
@@ -21,7 +20,7 @@
             {
                 var suite = p.Component<TomSelect>(m => m.CompanionSuiteType);
                 p.Get(rateUrl)
-                    .Gather(g => g.RouteParam("suiteType", suite.Get(x => x.Value)))
+                    .Gather<SuiteQuery>(g => g.Set(x => x.SuiteType, suite.Get(x => x.Value)))
                     .Response(r => r.OnSuccess<SuiteRateResponse>((rate, s) =>
                         s.Element("companion-rate").SetText(rate, x => x.MonthlyRate)));
             }); }

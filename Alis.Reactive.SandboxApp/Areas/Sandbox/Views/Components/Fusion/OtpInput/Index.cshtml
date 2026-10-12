@@ -1,5 +1,4 @@
 @model OtpInputModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Inputs
@@ -124,7 +123,7 @@
             {
                 var passcode = p.Component<FusionOtpInput>(m => m.Passcode);
                 p.Post(Url.SandboxRoute("Echo", "OtpInput"))
-                    .Gather(g => g.Include(passcode.Get(c => c.Value), "passcode"))
+                    .Gather<OtpInputEchoRequest>(g => g.Set(x => x.Passcode, passcode.Get(c => c.Value)))
                     .Response(r => r.OnSuccess<OtpInputEchoResponse>((json, s) =>
                     {
                         s.Element("gather-code").SetText(json, x => x.Passcode);
