@@ -49,14 +49,6 @@ from `_Layout.cshtml`.
 
 Replace `{version}` with the package version you installed.
 
-A page with a SignalR trigger (`t.SignalR(...)`) also loads the SignalR client
-before the framework script, the way it loads Syncfusion's. Pages without one
-skip it:
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@10.0.11/dist/browser/signalr.min.js"></script>
-```
-
 ## Create the Model
 
 ```csharp

@@ -29,7 +29,7 @@ is the executor.
 | `Html.ReactivePlan<TModel>()` | Starts a root plan for a view. |
 | `Html.ResolvePlan<TModel>()` | Starts a partial plan that merges into the active plan. |
 | `Html.RenderPlan(plan)` | Emits the plan JSON. Without this, no behavior runs. |
-| `Html.On(plan, t => ...)` | Adds page, custom event, SSE, or SignalR triggers. A SignalR trigger needs the SignalR client script on the page. |
+| `Html.On(plan, t => ...)` | Adds page, custom event, SSE, or SignalR triggers. |
 | `Html.InputField(plan, m => m.Field)` | Renders and registers a model-bound input. |
 | `.Reactive(plan, evt => evt.Event, ...)` | Adds a component event trigger. |
 | `p.Element("id")` | Updates a normal DOM element by ID. |

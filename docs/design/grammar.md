@@ -723,9 +723,8 @@ vocabulary used, the sentence, and a verdict:
 - `runtime/plans`: discovery, composition, boot and mount events.
 - `runtime/modules`: `alis.document`, `alis.http`, `alis.model`, `alis.form`, `alis.slot`. They are
   registered by the framework bundle, receive the evaluator, and do not import the executor.
-- `runtime/realtime`: `alis.stream`, `alis.hub` and the retry indicator. The SignalR client is the
-  page's own script, as Syncfusion's is, so a page without a hub loads none of it (the minified
-  bundle is 36 KB without it, 91 KB with it).
+- `runtime/realtime`: `alis.stream`, `alis.hub` and the retry indicator. The hub module ships the
+  SignalR client inside the framework's bundle, so a page with a hub trigger needs no other script.
 - `components/` (beside `runtime/`, in the same shipped bundle): the framework's own component code,
   built only on `alis:mount`, `alis:unmount` and `window.__alisPlugins`, as an app's is: CheckList,
   RadioGroup, Drawer, Loader, Confirm, SmartTextArea, SmartPasteButton, Mention.
