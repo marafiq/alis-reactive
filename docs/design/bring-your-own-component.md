@@ -214,6 +214,10 @@ the core C# and the runtime name no vendor and no component. Proof: the full sui
   (`49f3bec`, `fc8b4d2`); Fusion and Native compile on the core's public surface, with
   `InternalsVisibleTo` for both removed (`c597a3a`). The core names no component; the runtime names
   no vendor, as the architecture test enforces.
+- **Identity is checked at render.** Markup a helper builds as text (an `HtmlString`) must give an
+  element the component's id; `field.Render<T>` and `plan.Render<T>` refuse it otherwise, naming
+  the component and the id. A vendor builder's own output is written as it is: a first version that
+  re-wrote Syncfusion's output to check it broke those pages in CI and was reverted.
 - **Shipped components construct like brought ones.** The framework's own component code lives in
   `Alis.Reactive.Assets/components/`, beside the runtime, and reaches it only through `alis:mount`,
   `alis:unmount` and `window.__alisPlugins`: CheckList, RadioGroup, Drawer, Loader, Confirm (a
