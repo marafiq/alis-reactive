@@ -209,3 +209,8 @@
 </native-vstack>
 
 @Html.RenderPlan(plan)
+
+@section Scripts {
+    @* The page has hub triggers, so it loads the SignalR client before the framework runs. *@
+    <script src="~/vendor/signalr/signalr.min.js"></script>
+}

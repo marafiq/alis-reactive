@@ -1,11 +1,13 @@
-// alis.hub (grammar.md 6.7), keyed by hub URL. Shipped with the realtime bundle.
+// alis.hub (grammar.md 6.7), keyed by hub URL. The SignalR client is the page's script, as a
+// component's library is (@microsoft/signalr's signalr.min.js, loaded before this bundle), so only
+// the pages that use a hub load it; a hub on a page without it is a boundary error naming the script.
 // B1 One HubConnection per URL, counted by subscriptions, with credentials and automatic reconnect.
 // B2 Starting retries at 0, 2, 10 and 30 seconds, then shows the retry indicator.
 // B3 Client methods are events, matched without regard to case; the payload is the single argument.
 // B4 invoke(method, ...args) and send(method, ...args) are async; state and connectionId are
 //    properties; reconnecting, reconnected and close are events.
 
-import * as signalR from "@microsoft/signalr";
+import type * as SignalR from "@microsoft/signalr";
 import type { Module } from "../objects/modules";
 import type { Listener } from "../objects/vendor-driver";
 import { showRetryIndicator, removeRetryIndicator } from "./retry-indicator";
@@ -14,8 +16,20 @@ import { toJavaScriptString } from "../shared/javascript-string";
 
 const log = scope("signalr");
 
+interface SignalRWindow extends Window {
+  readonly signalR?: typeof SignalR;
+}
+
+function signalRClient(url: string): typeof SignalR {
+  const client = (window as SignalRWindow).signalR;
+  if (client === undefined) {
+    throw new Error(`[alis] hub ${url} needs the SignalR client: load @microsoft/signalr's signalr.min.js before alis-reactive`);
+  }
+  return client;
+}
+
 interface Managed {
-  readonly connection: signalR.HubConnection;
+  readonly connection: SignalR.HubConnection;
   started: Promise<void>;
   subscriptions: number;
   stopping: boolean;
@@ -48,7 +62,7 @@ function retry(url: string): void {
     removeRetryIndicator(url);
     return;
   }
-  if (managed.connection.state !== signalR.HubConnectionState.Disconnected) return;
+  if (managed.connection.state !== "Disconnected") return;
   log.info("retry.manual", { hubUrl: url });
   managed.started = startWithRetry(managed, url);
 }
@@ -61,11 +75,12 @@ function managedFor(url: string): Managed {
   const existing = hubs.get(url);
   if (existing) return existing;
 
+  const signalR = signalRClient(url);
   const connection = new signalR.HubConnectionBuilder()
     .withUrl(url, { withCredentials: true })
     .withAutomaticReconnect()
     .configureLogging({
-      log: (level: signalR.LogLevel, message: string) => {
+      log: (level: SignalR.LogLevel, message: string) => {
         if (level >= signalR.LogLevel.Information) log.debug("lib.forwarded", { level, message });
       },
     })

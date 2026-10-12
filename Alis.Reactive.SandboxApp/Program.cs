@@ -71,6 +71,21 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/vendor/syncfusion"
 });
 
+// The SignalR client is the page's script, like Syncfusion's: only a page with a hub trigger loads it.
+var signalRClientDir = Path.GetFullPath(
+    Path.Combine(app.Environment.ContentRootPath, "..", "node_modules", "@microsoft", "signalr", "dist", "browser"));
+if (!Directory.Exists(signalRClientDir))
+{
+    throw new InvalidOperationException(
+        $"SignalR browser client not found at '{signalRClientDir}'. " +
+        "Run 'npm install' from the repo root before starting the sandbox.");
+}
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(signalRClientDir),
+    RequestPath = "/vendor/signalr"
+});
+
 app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
