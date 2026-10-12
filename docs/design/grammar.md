@@ -353,29 +353,29 @@ The owner's fluent API keeps its shape. Every method lowers to fixed productions
 
 | Fluent API | Lowers to |
 |---|---|
-| `.Reactive(c => c.E, (a, p) => …)`, `t.On(o, x => x.E, (a, p) => …)` | `on(o, "e", a) { … }` |
+| `.Reactive(evt => evt.E, (args, p) => …)`, on a rendered component | `on(o, "e", args) { … }` |
 | `t.DomReady(p => …)` | `on(document, "ready", _)` |
-| `t.On(AppEvent, (e, p) => …)` | `on(document, name, e)`; the payload is `detail`, or the event when it has none |
-| `o.P.Set(v)` | `set(o, ["p"], shape, v)` |
-| `o.M(a, b)`, a void member | `do(call(o, ["m"], [a, b]))` |
-| `o.F(a)`, returning a value | `call(o, ["f"], [a], shape)` |
-| an async member | `let t = await call(…)` where it is called; the value is `ref t` |
-| `p.Let(v)` | `let t = v`; the value is `ref t` |
-| `v.Get(x => x.A.B)` | `get(v, ["a", "b"], shape)` |
-| `p.Element(id).Text.Set(v)`, `SetText(v)` | `set(el, ["textContent"], text, v)` |
+| `t.CustomEvent(appEvent, (e, p) => …)` | `on(document, name, e)`; the payload is `detail`, or the event when it has none |
+| `t.ServerPush(ServerPushStream.At<S>(url), s => s.M, …)`, `t.SignalR(SignalRHub.At<H>(url), h => h.M, …)` | `on(stream, name, e)`, `on(hub, name, e)` |
+| `p.Component<C>(…).Set(c => c.P, v)` | `set(o, ["p"], shape, v)` |
+| `….Call(c => c.M, a, b)`, a void member | `do(call(o, ["m"], [a, b]))` |
+| `….Get(c => c.F, a)`, a member returning a value | `call(o, ["f"], [a], shape)` |
+| a member declared `.Awaited()` | `let t = await call(…)` where it is called; the value is `ref t` |
+| `p.Payload(args).Get(x => x.A.B)`, `json.Read(x => x.A.B)` | `get(v, ["a", "b"], shape)` |
+| `p.Element(id).SetText(v)` | `set(el, ["textContent"], text, v)` |
 | `SetHtml(v)` | `set(el, ["innerHTML"], text, v)` |
 | `Show()`, `Hide()` | `set(el, ["hidden"], boolean, false)` and `true` |
 | `AddClass`, `RemoveClass`, `ToggleClass` | `do(call(el, ["classList", "add"], [..]))`, and so on |
-| `p.Dispatch(evt, e => e.Set(..))` | `do(call(document, ["raise"], [lit name, record]))` |
+| `p.Dispatch(appEvent, payload)`, `p.DispatchWith(appEvent, d => d.Set(..))` | `do(call(document, ["raise"], [lit name, record]))` |
 | `p.When(v).Op(x)…Then(..).ElseIf(..).Else(..)` | `if(op(..), …)`; `And`/`Or` become `&&`/`\|\|`; `Not(g)` becomes `!` |
 | `p.Confirm(m).Then(t).Else(e)` | `let ok = await confirm.ask(m); if (ok) t else e` |
 | `p.Get/Post/Put/Delete(url)` | see 5.1 |
-| `.Into(slotId)` | `do(call(slot, ["load"], [ref res.body]))` |
+| `.Into(elementId)` | `do(call(slot, ["load"], [ref res.body]))`, for the response of the request it follows |
 | `p.ValidationErrors(container)` | in a response route: `do(call(form, ["showErrors"], [ref res.body]))`; elsewhere: `do(call(form, ["validate"]))` |
 | `p.Parallel(a, b).OnAllSettled(c)` | `all(a, b); c` |
 | `p.FromUrl<T>("x")` | `get(get(document, ["query"]), ["x"], shape)`; an array `T` reads `queryAll` |
-| `tools.Count(items, "status")`, a plugin member | `call(plugin, ["count"], [..], shape)` |
-| `Html.NativeActionLink(id, text, url, link => …)` | the anchor plus its own plan script: `on(link, "click", e) { if (!modified(e)) { e.preventDefault(); … } }` |
+| `p.Plugin(tools.Count).Arg(items).Arg("status")`, a plugin member | `call(plugin, ["count"], [..], shape)` |
+| `Html.NativeActionLink(text, url, p => p.Post(url)…)` | the anchor plus its own plan script: `on(link, "click", e) { if (!modified(e)) { e.preventDefault(); … } }` |
 
 ### 5.1 A request
 
@@ -741,7 +741,7 @@ proves it is named in the pull request.
 **Built as specified**
 - The plan document, the two locators, the six statements and nine expressions (`Alis.Reactive/Grammar`),
   the generated contract (`tools/PlanContractGenerator`), and the interpreter with its modules
-  (`Alis.Reactive.Assets/runtime`). The runtime is 2,448 lines of TypeScript, down from 6,134, and
+  (`Alis.Reactive.Assets/runtime`). The runtime is 2,494 lines of TypeScript, down from 6,134, and
   the framework's own components add 452 in `components/`.
 - C# keeps its typed semantic model (`PlanModel`: reaction, condition, value, request and
   validation graphs) as the builders' target, and a lowering pass (`Grammar/Lowering`) compiles it
