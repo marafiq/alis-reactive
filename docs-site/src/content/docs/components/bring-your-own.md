@@ -82,7 +82,9 @@ The commit event is whatever the component raises when a value is settled:
 name of your own. The framework never assumes one.
 
 An awaited method holds the steps after its call until its promise settles, and a
-read of an awaited function is the value it settles with. An event payload is a
+read of an awaited function is the value it settles with. A member that returns a
+promise but is not declared awaited fails where the page reads it, with a message
+that names the member, instead of reading the promise as a value. An event payload is a
 plain class; a handler can write a field back (`p.Payload(args).Set(a => a.Cancel, true)`),
 and the component reads it once the handler returns, as long as nothing in the
 handler waited before the write.
@@ -150,5 +152,7 @@ planner.Call(c => c.Book, p.Payload(args).Get(x => x.Added), visitors.Get(c => c
 ```
 
 The Syncfusion and native components that ship with Alis.Reactive are declared
-exactly this way, against the same public surface. The sandbox's Family Visits
+exactly this way, against the same public surface, and the ones that need
+JavaScript of their own (the native check list, the smart text area, the
+confirm dialog) are constructed on `alis:mount` as in step 1. The sandbox's Family Visits
 page brings a visit planner it wrote itself, with every kind of member above.
