@@ -80,8 +80,10 @@ Six statements, nine expressions. JSON names each node by `kind` with exactly th
 
 ### 1.3 Paths
 
-A path is a list of segments: a member name or an array index. The C# side never mixes the two
-kinds of segment in one node:
+A path is a list of segments: a member name, an array index, or `[]`, which reads the rest of the
+path on each item of the list before it (`filesData[].rawFile` is every file's `rawFile`; a list
+inside a list is refused where it is declared). The C# side never mixes member and data segments in
+one node:
 - **member segments** come from declarations (`grid.DataSource`, `schedule.EventSettings.DataSource`);
 - **data segments** come from `Get(x => x.A.B)` over a data type.
 
@@ -89,7 +91,8 @@ A member read followed by a data read is two nested `get` nodes.
 
 - **Member paths rooted at `obj(id)` are checked.** Every segment must exist, and an absent one is a
   boundary error that names the object, its ID and the path. A vendor version without a declared
-  member fails loudly instead of reading `undefined`.
+  member fails loudly instead of reading `undefined`. The items a `[]` reads are checked the same
+  way, so an upload whose files lost `rawFile` fails at the item instead of posting nothing.
 - **Every other path is optional.** This covers paths off a handler's payload, a response, a record,
   a module's data (`document.query`, `model.values`) or a returned object. A missing link reads as
   missing, and a call on a missing receiver returns missing. This is JavaScript's `?.`.

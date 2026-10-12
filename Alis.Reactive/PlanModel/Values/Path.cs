@@ -159,9 +159,6 @@ namespace Alis.Reactive.PlanModel
             Segments = segments;
         }
 
-        internal static Path Of(IEnumerable<PathSegment> segments) =>
-            new Path(new List<PathSegment>(segments));
-
         internal static Path Property(string name) =>
             new Path(new[] { PathSegment.Property(name) });
 

@@ -133,6 +133,21 @@ describe("paths", () => {
     const scope = scopeWith({}, { name: "Margaret Hill" });
     expect(value(e.call(e.ref("name"), ["startsWith"], [e.lit("Marg")]), scope)).toBe(true);
   });
+
+  it("reads each item of a located object's list, checked like the object", () => {
+    const uploads = { filesData: [{ rawFile: "a.pdf" }, { rawFile: "b.pdf" }] };
+    const renamed = { filesData: [{ file: "a.pdf" }] };
+    const scope = scopeWith({ uploads, renamed });
+    expect(value(e.get(e.obj("uploads"), ["filesData", "[]", "rawFile"]), scope)).toEqual(["a.pdf", "b.pdf"]);
+    expect(() => value(e.get(e.obj("renamed"), ["filesData", "[]", "rawFile"]), scope))
+      .toThrow('[alis] #renamed.filesData[] has no member "rawFile"');
+  });
+
+  it("reads each item of data optionally, and a missing list as no items", () => {
+    const scope = scopeWith({}, { args: { rows: [{ id: 1 }, {}], none: null } });
+    expect(value(e.get(e.ref("args"), ["rows", "[]", "id"]), scope)).toEqual([1, undefined]);
+    expect(value(e.get(e.ref("args"), ["none", "[]", "id"]), scope)).toEqual([]);
+  });
 });
 
 describe("statements", () => {

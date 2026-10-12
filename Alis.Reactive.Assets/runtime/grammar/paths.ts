@@ -2,8 +2,13 @@
 // exist, so a vendor version without a declared member fails loudly. Every other path is optional,
 // as JavaScript's `?.` is. A write rooted at a located object needs its final member; any other write
 // needs only the owner, and creates the final member when absent (a payload's `cancel`).
+// A read's "[]" segment reads the rest of the path on each item of the list before it, in the same
+// mode: an item of a located object's list is checked like the object.
 
+import { toArray } from "./operators";
 import { isMissing } from "./shape";
+
+const EACH_ITEM = "[]";
 
 type Owner = Record<string | number, unknown>;
 
@@ -13,6 +18,7 @@ export function read(root: unknown, path: readonly string[], mode: PathMode, lab
   let current = root;
   for (let index = 0; index < path.length; index++) {
     const key = path[index]!;
+    if (key === EACH_ITEM) return eachItem(current, path, index, mode, label);
     if (mode === "optional") {
       if (isMissing(current)) return undefined;
       current = (current as Owner)[key];
@@ -23,6 +29,13 @@ export function read(root: unknown, path: readonly string[], mode: PathMode, lab
     current = owner[key];
   }
   return current;
+}
+
+function eachItem(list: unknown, path: readonly string[], index: number, mode: PathMode, label: string): unknown[] {
+  const listPath = path.slice(0, index).join(".");
+  const itemLabel = listPath === "" ? `${label}[]` : `${label}.${listPath}[]`;
+  const rest = path.slice(index + 1);
+  return toArray(list).map(item => read(item, rest, mode, itemLabel));
 }
 
 export function write(root: unknown, path: readonly string[], value: unknown, mode: PathMode, label: string): void {
