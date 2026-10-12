@@ -5,8 +5,8 @@
 //    validation when the form has tests.
 // F3 Per field, tests whose `when` is false are skipped and the first failing check decides.
 // F4 validate() clears every inline message and the summary, evaluates every field, returns the AND.
-// F5 A field with no element is skipped when all its `when`s are false; otherwise the form is invalid
-//    and the summary gets the message of the field's first test.
+// F5 A field with no element posts no value: each active test checks a missing value, and the first
+//    that fails puts its message in the summary.
 // F6 A message goes inline into {id}_error when that slot can render, else into the summary.
 // F7 At creation, and whenever HTML mounts (a field a partial loads): DOM `input` clears a field's
 //    message; DOM `blur` and its committed event revalidate it. Each element is wired once.
