@@ -24,6 +24,8 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(2));
 builder.Services.AddReactiveFluentValidation(validation =>
     validation.AddFromAssemblyContaining<Program>());
+// The visit board's streams, keyed by session so browser worlds never hear each other.
+builder.Services.AddSingleton<Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought.VisitBoardStreams>();
 
 // Disable demo broadcasts in Playwright so realtime tests control their own events.
 if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ALIS_NO_BROADCAST")))

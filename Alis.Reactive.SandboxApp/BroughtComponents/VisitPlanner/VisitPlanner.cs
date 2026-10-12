@@ -68,7 +68,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         public ComponentMethod<string> Select => Method<string>("select");
 
         /// <summary>Releases a booked time and raises <see cref="Change"/>.</summary>
-        public ComponentMethod<string> Release => Method<string>("release");
+        public ComponentMethod<string?> Release => Method<string?>("release");
 
         /// <summary>Releases every booked time and raises <see cref="Change"/>.</summary>
         public ComponentMethod Clear => Method("clear");
@@ -81,6 +81,9 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
 
         /// <summary>The prepared summary, empty until one is prepared. Returns a promise the plan waits for.</summary>
         public ComponentFunction<string> Summary => Function<string>("summary").Awaited();
+
+        /// <summary>Marks a time another family holds, by the family's name; it can no longer be booked here.</summary>
+        public ComponentMethod<string?, string?> MarkTaken => Method<string?, string?>("markTaken");
 
         /// <summary>Moves focus to the first time that can be booked.</summary>
         public ComponentMethod Focus => Method("focus");

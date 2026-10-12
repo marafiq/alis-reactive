@@ -4,7 +4,8 @@
 //
 //   properties  value (booked slot ids), capacity, wing, readOnly, slots, labels.empty, count (read only)
 //   functions   remaining(), isBooked(id), firstOpen(), firstBooked(), summary() (a promise)
-//   methods     select(id), release(id), clear(), book(id, visitors, note), focus(), prepareSummary() (a promise)
+//   methods     select(id), release(id), clear(), book(id, visitors, note), focus(), prepareSummary() (a promise),
+//               markTaken(id, family) (another family holds the time; it cannot be booked here)
 //   events      weekChanged, full (its payload can waitlist the time), beforeBook (cancelable),
 //               slotsLoaded, through on(name, fn) / off(name, fn). Its commit event is weekChanged,
 //               not "change": a form learns it from the declaration, not from a convention.
@@ -34,6 +35,7 @@ export class VisitPlanner {
   private readonly listeners = new Map<string, Set<Listener>>();
   private readonly notes = new Map<string, BookingNote>();
   private readonly waitlisted = new Set<string>();
+  private readonly takenBy = new Map<string, string>();
   private booked: string[] = [];
   private offered: VisitSlot[] = [];
   private weeklyCapacity: number;
@@ -139,7 +141,7 @@ export class VisitPlanner {
    */
   select(id: string): void {
     const slot = this.offered.find(candidate => candidate.id === id);
-    if (slot === undefined || this.booked.includes(id)) return;
+    if (slot === undefined || this.booked.includes(id) || this.takenBy.has(id)) return;
 
     const request = { slot: { ...slot }, cancel: false };
     this.emit("beforeBook", request);
@@ -181,6 +183,13 @@ export class VisitPlanner {
   book(id: string, visitors: number, note: string): void {
     if (!this.booked.includes(id)) return;
     this.notes.set(id, { visitors, note: note ?? "" });
+    this.render();
+  }
+
+  /** Marks a time another family holds: it shows who, and it cannot be booked here. */
+  markTaken(id: string, family: string): void {
+    if (!this.offered.some(slot => slot.id === id)) return;
+    this.takenBy.set(id, family ?? "");
     this.render();
   }
 
@@ -261,7 +270,8 @@ export class VisitPlanner {
       button.type = "button";
       button.dataset.slot = slot.id;
       button.setAttribute("aria-pressed", String(booked));
-      button.disabled = this.locked;
+      const takenBy = this.takenBy.get(slot.id);
+      button.disabled = this.locked || takenBy !== undefined;
       if (slot.quiet) button.title = "Quiet hours";
 
       const item = element("li", "vp-item");
@@ -269,6 +279,7 @@ export class VisitPlanner {
       const note = this.notes.get(slot.id);
       if (booked && note !== undefined) item.append(element("span", "vp-note", noteText(note)));
       if (this.waitlisted.has(slot.id)) item.append(element("span", "vp-waitlist", "On the waitlist"));
+      if (takenBy !== undefined) item.append(element("span", "vp-taken", `Taken by the ${takenBy} family`));
       list.append(item);
     }
     return list;
