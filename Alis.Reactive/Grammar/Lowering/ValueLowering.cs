@@ -229,7 +229,7 @@ namespace Alis.Reactive.Grammar.Lowering
                 case "orderBy":
                     return OrderBy(items, operation, scope, descending: false);
                 case "orderByDescending":
-                    return OrderBy(items, operation, scope, descending: true);
+                    return OrderBy(items, operation, scope, descending: false);
                 default:
                     throw new InvalidOperationException("No lowering for array operation '" + operation.Op + "'.");
             }
