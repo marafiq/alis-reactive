@@ -123,7 +123,7 @@ namespace Alis.Reactive.Grammar.Lowering
         private Expr ComponentRead(string componentKey, ReadExpression read, LoweringScope scope)
         {
             if (scope.ReadsInputsAsBound)
-                return G.Call(G.Obj(_context.Objects.Model()), new[] { "boundValueOf" }, new Expr[] { G.Lit(componentKey) }, G.NoShapes, read.Shape);
+                return G.Call(G.Obj(_context.Objects.Model()), new[] { "valueOf" }, new Expr[] { G.Lit(componentKey) }, G.NoShapes, read.Shape);
 
             if (!_context.IsDeclared(componentKey))
             {
