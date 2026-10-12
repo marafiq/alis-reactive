@@ -12,7 +12,7 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TProp">Selected event-payload value type.</typeparam>
         /// <param name="payload">Typed event payload placeholder supplied by the trigger callback.</param>
         /// <param name="path">Payload value compared at runtime.</param>
-        public ConditionSourceBuilder<TModel, TProp> When<TPayload, TProp>(
+        public ConditionSourceBuilder<TModel, TProp, GuardBuilder<TModel>> When<TPayload, TProp>(
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
         {
@@ -20,7 +20,8 @@ namespace Alis.Reactive.Builders
             active._draft.BeginBranch();
 
             var source = PayloadTypedSource<TPayload, TProp>.FromEvent(path);
-            return new ConditionSourceBuilder<TModel, TProp>(source, active);
+            return new ConditionSourceBuilder<TModel, TProp, GuardBuilder<TModel>>(
+                source, graph => new GuardBuilder<TModel>(graph, ConditionContinuation<TModel>.ForPipeline(active)));
         }
 
         /// <summary>Starts a branch whose guard reads from the active HTTP response body.</summary>
@@ -28,7 +29,7 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TProp">Selected response-body value type.</typeparam>
         /// <param name="responseBody">Response body placeholder supplied by the response route callback.</param>
         /// <param name="path">Selects the response value to compare at runtime.</param>
-        public ConditionSourceBuilder<TModel, TProp> When<TResponse, TProp>(
+        public ConditionSourceBuilder<TModel, TProp, GuardBuilder<TModel>> When<TResponse, TProp>(
             ResponseBody<TResponse> responseBody,
             Expression<Func<TResponse, TProp>> path)
             where TResponse : class
@@ -37,17 +38,19 @@ namespace Alis.Reactive.Builders
             active._draft.BeginBranch();
 
             var source = responseBody.Read(path);
-            return new ConditionSourceBuilder<TModel, TProp>(source, active);
+            return new ConditionSourceBuilder<TModel, TProp, GuardBuilder<TModel>>(
+                source, graph => new GuardBuilder<TModel>(graph, ConditionContinuation<TModel>.ForPipeline(active)));
         }
 
         /// <summary>Starts a branch whose guard reads from a typed value source.</summary>
         /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="source">Typed condition value source.</param>
-        public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
+        public ConditionSourceBuilder<TModel, TProp, GuardBuilder<TModel>> When<TProp>(TypedSource<TProp> source)
         {
             var active = Active;
             active._draft.BeginBranch();
-            return new ConditionSourceBuilder<TModel, TProp>(source, active);
+            return new ConditionSourceBuilder<TModel, TProp, GuardBuilder<TModel>>(
+                source, graph => new GuardBuilder<TModel>(graph, ConditionContinuation<TModel>.ForPipeline(active)));
         }
 
         /// <summary>Adds a user-decision guard before the pipeline continues.</summary>
@@ -57,7 +60,7 @@ namespace Alis.Reactive.Builders
             var active = Active;
             active._draft.BeginBranch();
 
-            return new GuardBuilder<TModel>(ConditionGraph.Confirm(message), active);
+            return new GuardBuilder<TModel>(ConditionGraph.Confirm(message), ConditionContinuation<TModel>.ForPipeline(active));
         }
     }
 }

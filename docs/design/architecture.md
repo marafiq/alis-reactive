@@ -1063,3 +1063,11 @@ built and what is not.
     active scope. A handle declared at the top of a trigger and used inside `OnSuccess` writes into
     `OnSuccess`; a step written outside any callback throws at render. The FrontDesk journey declares
     its planner, resident and loading handles once and uses them in every route.
+  - typed conditions (section 4.5). An operator returns a `GuardBuilder` (one comparison: `And`, `Or`,
+    `Not`, `Then`); `And` returns an `AllGuard` (`And`, `Then`) and `Or` an `AnyGuard` (`Or`, `Then`), so
+    a chain cannot mix them and the left fold of `ConditionContinuation` is gone. A group callback
+    starts from `ConditionStart` and builds `GroupCondition`, `GroupAll` or `GroupAny`, none of which
+    has `Then`; `g.Not(n => ..)` negates a group, and `Not()` negates only a single comparison.
+    Ordering (`Gt`, `Gte`, `Lt`, `Lte`, `Between`) exists only for `struct, IComparable<T>` values and
+    their nullable forms, the text operators only for text, and `ArrayContains` only for arrays, lists
+    and enumerables of its item type (`ConditionOperators`). Every sandbox view compiled unchanged.

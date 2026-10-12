@@ -92,27 +92,37 @@ OPERATOR :=
   | .Lte(otherSource)
 ```
 
-All operators return `GuardBuilder<TModel>` → chain to `.Then()` or `.COMPOSE`.
+Every operator applies to every type except where the compiler limits it: ordering (`Gt`, `Gte`,
+`Lt`, `Lte`, `Between`) to comparable values (numbers, dates, times and their nullable forms), the
+text operators to text, `ArrayContains` to arrays, lists and enumerables. `Gt` on a string or
+`Contains` on an int does not compile. These are extension methods in the `Alis.Reactive`
+namespace.
 
 ## Compose — Combining Guards
 
 ```
 COMPOSE :=
-  -- Direct (flat — produces AllGuard or AnyGuard)
-  | .And(SOURCE).OPERATOR                               -- both must be true
-  | .Or(SOURCE).OPERATOR                                -- either can be true
+  | .And(SOURCE).OPERATOR                               -- after And, only And or Then
+  | .Or(SOURCE).OPERATOR                                -- after Or, only Or or Then
+  | .And(g => g.When(SOURCE).OPERATOR [.COMPOSE])       -- a group: evaluated as one term
+  | .Or(g => g.When(SOURCE).OPERATOR [.COMPOSE])
+  | .Not()                                              -- only right after one comparison: negates it
 
-  -- Lambda (nested — for complex boolean trees)
-  | .And(cs => cs.When(SOURCE).OPERATOR [.COMPOSE])     -- inner guard group
-  | .Or(cs => cs.When(SOURCE).OPERATOR [.COMPOSE])
+GROUP :=
+  | g.When(SOURCE).OPERATOR [.And(..)... | .Or(..)...]  -- a group has no Then
+  | g.Confirm("msg")
+  | g.Not(n => n.When(..)...)                           -- negates a whole group
+```
 
-  -- Negation
-  | .Not()                                              -- invert guard
+`And` and `Or` never mix in one chain, so precedence is always written, never folded:
 
--- Chaining:
-  .And().And().And()  →  flat AllGuard([g1, g2, g3])
-  .Or().Or()          →  flat AnyGuard([g1, g2])
-  .And(cs => cs...)   →  nested tree (for mixed And/Or)
+```csharp
+p.When(a).Eq(1).And(b).Gt(2).Then(..)                          // a && b
+p.When(a).Eq(1).Or(b).Gt(2).Then(..)                           // a || b
+p.When(a).Eq(1).And(g => g.When(b).Gt(2).Or(c).Truthy()).Then(..)   // a && (b || c)
+p.When(a).Eq(1).And(b).Gt(2).Or(c)                             // does not compile
+p.When(a).Eq(1).And(g => g.When(b).Gt(2).Then(..))             // does not compile: a group has no Then
+p.When(a).Eq(1).And(b).Gt(2).Not()                             // does not compile; negate a group with g.Not(..)
 ```
 
 ## Type Safety — TProp Flows Through
@@ -125,13 +135,13 @@ string                     Eq, NotEq, In, NotIn, Contains, StartsWith, EndsWith,
                            IsEmpty, NotEmpty
 
 int, long, decimal, double Eq, NotEq, Gt, Gte, Lt, Lte, Between, In, NotIn,
-                           Truthy, Falsy, IsNull, NotNull
+(and their nullable forms) Truthy, Falsy, IsNull, NotNull
 
 bool                       Truthy, Falsy, Eq, NotEq, IsNull, NotNull
 
-DateTime                   Eq, NotEq, Gt, Gte, Lt, Lte, Between
+DateTime, DateOnly, TimeOnly Eq, NotEq, Gt, Gte, Lt, Lte, Between, IsNull, NotNull
 
-string[]                   ArrayContains, IsNull, NotNull, Truthy, Falsy
+string[], List<string>     ArrayContains, IsEmpty, NotEmpty, IsNull, NotNull, Truthy, Falsy
 ```
 
 Coercion is automatic from C# type:

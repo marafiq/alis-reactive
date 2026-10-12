@@ -183,6 +183,27 @@ p.Element("message").SetText(body, x => x.Message);
 Use sources for conditions, element text, request members (route values
 included), headers, dispatch payloads, and plugin arguments.
 
+## How do I combine conditions?
+
+Chain `And` for conditions that must all hold, or `Or` for conditions of which one must hold. One
+chain uses one of them; to mix them, put the inner part in a group, so the order of evaluation is
+written where you read it. From the escalation routing page:
+
+```csharp
+p.When(assessment.Get(c => c.Value)).Gte(85m)
+    .And(cs => cs.When(supervisorOverride.Get(c => c.Checked)).Truthy()
+        .Or(careTrack.Get(c => c.Value)).Eq("memory"))
+    .Then(then => then.Dispatch(EscalationRoutingEvents.ComponentRouteIsolation))
+    .ElseIf(assessment.Get(c => c.Value)).Gte(60m)
+    .And(cs => cs.When(supervisorOverride.Get(c => c.Checked)).Truthy().Not())
+    .Then(then => then.Dispatch(EscalationRoutingEvents.ComponentRouteMonitor));
+```
+
+The first branch reads "85 or more, and either an override or the memory track". `Not()` negates
+the one comparison before it. A group has no `Then` of its own, and the compiler offers each
+operator only where it means something: `Gt` and `Between` on numbers and dates, `Contains` and
+`StartsWith` on text, `ArrayContains` on lists.
+
 ## How do I read the page's URL?
 
 Describe the query string with the class the page's action binds with

@@ -28,7 +28,7 @@ Callback parameter naming convention (locked):
 | `Action<GatherBuilder>` | `gather` |
 | `Action<ResponseBuilder>` | `response` |
 | `Action<HttpRequestBuilder>` | `request` |
-| `Func<ConditionStart<TModel>, GuardBuilder<TModel>>` | `inner` |
+| `Func<ConditionStart<TModel>, Condition<TModel>>` | `group` |
 
 ## Fail-Fast, Not Fallback
 
