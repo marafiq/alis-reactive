@@ -194,55 +194,6 @@ namespace Alis.Reactive.Builders
         /// <returns>The query, whose members are value sources.</returns>
         public UrlQuery<TQuery> Url<TQuery>() where TQuery : class => new UrlQuery<TQuery>();
 
-        /// <summary>Reads the return value from a named function member on a plan-registered plugin.</summary>
-        /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="pluginName">Registered plugin key.</param>
-        /// <param name="member">Function member invoked on the host-provided plugin object.</param>
-        /// <returns>Plugin function call builder.</returns>
-        public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName, string member)
-        {
-            if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
-            if (string.IsNullOrWhiteSpace(member)) throw new System.ArgumentException("Member name required.", nameof(member));
-            var operation = PluginOperationId.Of(pluginName, member);
-            var signature = Context.DeclarePluginMethod(PluginMethodRequirement.Function(
-                operation,
-                PlanModel.Shape.FromClrType(typeof(T))));
-            return new PluginMemberBuilder<T, TModel>(
-                operation,
-                signature.Arguments);
-        }
-
-        /// <summary>Reads the return value from a plan-registered plugin object that is itself callable.</summary>
-        /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="pluginName">Registered plugin key.</param>
-        /// <returns>Plugin root-function call builder.</returns>
-        public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName)
-        {
-            if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
-            var operation = PluginOperationId.Root(pluginName);
-            var signature = Context.DeclarePluginMethod(PluginMethodRequirement.Function(
-                operation,
-                PlanModel.Shape.FromClrType(typeof(T))));
-            return new PluginMemberBuilder<T, TModel>(
-                operation,
-                signature.Arguments);
-        }
-
-        /// <summary>Reads a property value from a plan-registered plugin.</summary>
-        /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="pluginName">Registered plugin key.</param>
-        /// <param name="member">Property member read from the host-provided plugin object.</param>
-        /// <returns>Typed plugin property value source.</returns>
-        public Conditions.TypedPluginPropertySource<T> PluginProperty<T>(string pluginName, string member)
-        {
-            if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
-            if (string.IsNullOrWhiteSpace(member)) throw new System.ArgumentException("Member name required.", nameof(member));
-
-            var property = PluginPropertyId.Of(pluginName, member);
-            Context.DeclarePluginProperty(PluginPropertyRequirement.Read(property, PlanModel.Shape.FromClrType(typeof(T))));
-            return new Conditions.TypedPluginPropertySource<T>(property);
-        }
-
         /// <summary>Reads the return value declared by a reusable plugin function.</summary>
         /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
         /// <param name="function">Plugin function carrying the plugin key, target member, argument contract, and return shape.</param>
@@ -263,36 +214,6 @@ namespace Alis.Reactive.Builders
             if (property == null) throw new System.ArgumentNullException(nameof(property));
             Context.DeclarePluginProperty(PluginPropertyRequirement.Read(property));
             return new Conditions.TypedPluginPropertySource<T>(property.PropertyId);
-        }
-
-        /// <summary>Emits a plugin-call reaction against a named member on a plan-registered plugin.</summary>
-        /// <param name="pluginName">Registered plugin key.</param>
-        /// <param name="member">Command member invoked on the host-provided plugin object.</param>
-        /// <returns>Plugin command call builder.</returns>
-        public PluginCallBuilder<TModel> Plugin(string pluginName, string member)
-        {
-            if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
-            if (string.IsNullOrWhiteSpace(member)) throw new System.ArgumentException("Member name required.", nameof(member));
-            var operation = PluginOperationId.Of(pluginName, member);
-            var signature = Context.DeclarePluginMethod(PluginMethodRequirement.Command(operation));
-            return new PluginCallBuilder<TModel>(
-                operation,
-                this,
-                signature.Arguments);
-        }
-
-        /// <summary>Emits a plugin-call reaction against a plan-registered plugin object that is itself callable.</summary>
-        /// <param name="pluginName">Registered plugin key.</param>
-        /// <returns>Plugin root-command call builder.</returns>
-        public PluginCallBuilder<TModel> Plugin(string pluginName)
-        {
-            if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
-            var operation = PluginOperationId.Root(pluginName);
-            var signature = Context.DeclarePluginMethod(PluginMethodRequirement.Command(operation));
-            return new PluginCallBuilder<TModel>(
-                operation,
-                this,
-                signature.Arguments);
         }
 
         /// <summary>Emits a plugin-call reaction from a reusable plugin command.</summary>

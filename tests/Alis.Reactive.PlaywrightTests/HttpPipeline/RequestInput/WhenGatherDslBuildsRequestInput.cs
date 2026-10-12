@@ -18,13 +18,13 @@ public sealed class WhenGatherDslBuildsRequestInput
     public void assignments_keep_the_authored_source_to_target_order()
     {
         var plan = PlanExtensions.ReactivePlan(Html);
-        plan.RegisterPlugin("metrics", plugin => plugin.Method<int>("count", a => a.Arg<string>()));
+        var metrics = plan.RegisterPlugin<GatherMetricsPlugin>();
 
         HtmlExtensions.On(Html, plan, trigger =>
             trigger.CustomEvent(Save, (args, pipeline) =>
             {
                 TypedPluginSource<int> count =
-                    pipeline.Plugin<int>("metrics", "count")
+                    pipeline.Plugin(metrics.Count)
                         .Arg(args, x => x.Filter);
 
                 var link = pipeline.Url<GatherRequestInputQuery>();
@@ -332,6 +332,17 @@ public sealed class WhenGatherDslBuildsRequestInput
     {
         public string Slug { get; set; } = "";
         public string Token { get; set; } = "";
+    }
+
+    private sealed class GatherMetricsPlugin : Plugin
+    {
+        public GatherMetricsPlugin()
+            : base("metrics")
+        {
+            Count = Function<int>("count").Arg<string>();
+        }
+
+        public PluginFunction<int> Count { get; }
     }
 
     private sealed class GatherRequestInputPlugin : Plugin

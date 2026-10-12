@@ -54,7 +54,7 @@ namespace Alis.Reactive.PlanModel
             if (!_byTypeKey.ContainsKey(typeKey.Value))
                 throw new InvalidOperationException(
                     $"Plugin '{requirement.PluginName.Value}' is not registered. " +
-                    $"Call plan.RegisterPlugin(\"{requirement.PluginName.Value}\", ...) first.");
+                    $"Call plan.RegisterPlugin<TPlugin>() first.");
 
             var method = DeclareMethod(
                 typeKey,
@@ -70,7 +70,7 @@ namespace Alis.Reactive.PlanModel
             if (!_byTypeKey.ContainsKey(typeKey.Value))
                 throw new InvalidOperationException(
                     $"Plugin '{requirement.PluginName.Value}' is not registered. " +
-                    $"Call plan.RegisterPlugin(\"{requirement.PluginName.Value}\", ...) first.");
+                    $"Call plan.RegisterPlugin<TPlugin>() first.");
 
             DeclareProperty(typeKey, requirement.ToObjectPropertyContract());
         }

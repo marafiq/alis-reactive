@@ -235,17 +235,29 @@ key.
 
 ## Plugins
 
-Plugins are the boundary for browser APIs the DSL does not model.
+Plugins are the boundary for browser APIs the DSL does not model. A plugin is declared once as a
+class, like a component: its name, and each member it offers with its types. From the visit board
+page (`VisitBoardModel.cs` and `VisitBoard.cshtml`):
 
 ```csharp
-plan.RegisterPlugin("clipboard", plugin =>
+public sealed class VisitBoardSlugPlugin : Plugin
 {
-    plugin.Command("writeText", args => args.Arg<string>());
-});
+    public VisitBoardSlugPlugin()
+        : base("slugify")
+    {
+        Slug = Function<string>().Arg<string>();
+    }
 
-p.Plugin("clipboard", "writeText")
- .Arg(p.Component<FusionDropDownList>(m => m.UnitId).Get(c => c.Value))
- .Fire();
+    public PluginFunction<string> Slug { get; }
+}
 ```
 
-Keep component APIs typed. Keep string names at the plugin boundary.
+```csharp
+var slugify = plan.RegisterPlugin<VisitBoardSlugPlugin>();
+
+TypedPluginSource<string> boardCode = s.Plugin(slugify.Slug).Arg(planner.Get(c => c.Wing));
+```
+
+`Function<T>(..)` declares a member that returns a value, `Property<T>(..)` one that is read,
+and `Command(..)` one that is called for its effect (`p.Plugin(plugin.Command).Arg(..).Fire()`).
+The plugin's name and its members' JavaScript names are the only strings; every use is typed.

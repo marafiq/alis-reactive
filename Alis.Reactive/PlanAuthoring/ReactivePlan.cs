@@ -57,20 +57,6 @@ namespace Alis.Reactive
             _registeredInputComponents.Snapshot();
         internal PlanBuildContext Context => _context;
 
-        /// <summary>Registers a plugin contract in the plan before pipelines reference it.</summary>
-        /// <param name="pluginName">Plugin registration name used by <c>p.Plugin(...)</c>.</param>
-        /// <param name="configure">Declares the functions, properties, and commands the plan can reference.</param>
-        public void RegisterPlugin(string pluginName, Action<Builders.PluginTypeBuilder> configure)
-        {
-            if (string.IsNullOrWhiteSpace(pluginName))
-                throw new ArgumentException("Plugin name required.", nameof(pluginName));
-            if (configure == null)
-                throw new ArgumentNullException(nameof(configure));
-            var builder = new Builders.PluginTypeBuilder(pluginName);
-            configure(builder);
-            _context.RegisterPlugin(builder.Build());
-        }
-
         /// <summary>Registers a typed plugin contract in the plan.</summary>
         /// <param name="plugin">Plugin instance whose name and members define the contract.</param>
         public void RegisterPlugin(Plugin plugin)

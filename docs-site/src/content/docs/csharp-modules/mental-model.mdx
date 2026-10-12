@@ -88,7 +88,7 @@ The same value-source idea appears across the DSL.
 | Component member | `p.Component<FusionDropDownList>(m => m.UnitId).Get(c => c.Value)` |
 | URL query string | `p.Url<HttpShowcaseQuery>().Get(q => q.ResidentId)` |
 | Response body | `body.Read(x => x.Message)` |
-| Plugin return value | `p.Plugin<string>("clipboard", "readText")` |
+| Plugin return value | `s.Plugin(slugify.Slug).Arg(planner.Get(c => c.Wing))` |
 
 If a DSL primitive needs a value, it should use this shared path.
 

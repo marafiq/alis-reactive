@@ -1071,3 +1071,10 @@ built and what is not.
     Ordering (`Gt`, `Gte`, `Lt`, `Lte`, `Between`) exists only for `struct, IComparable<T>` values and
     their nullable forms, the text operators only for text, and `ArrayContains` only for arrays, lists
     and enumerables of its item type (`ConditionOperators`). Every sandbox view compiled unchanged.
+  - plugins are declared only by a typed `Plugin` class (section 4.8, as built below); the string
+    surface is deleted: `plan.RegisterPlugin(name, b => ..)`, `PluginTypeBuilder`, and
+    `p.Plugin<T>(name, member)`, `p.Plugin<T>(name)`, `p.PluginProperty<T>(name, member)`,
+    `p.Plugin(name, member)`, `p.Plugin(name)`. A `Plugin` subclass names the plugin and declares each
+    member with its types (`Function<T>`, `Property<T>`, `Command`); `plan.RegisterPlugin<TPlugin>()`
+    adds it to the plan, and `p.Plugin(plugin.Member)` reads or calls a member. The `[Plugin]`
+    attribute form of section 4.8 is not built: the base-class constructor names the plugin.
