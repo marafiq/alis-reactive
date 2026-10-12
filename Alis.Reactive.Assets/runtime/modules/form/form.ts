@@ -253,8 +253,6 @@ export const formModule: Module = {
     listenForMounts();
 
     owner.onDispose(() => {
-      const remaining = entriesOf(key).filter(entry => !added.includes(entry));
-      formsByContainer.set(key, remaining);
       clearAndHide(document.getElementById(data.summary));
     });
   },
