@@ -104,7 +104,7 @@ namespace Alis.Reactive
         /// </code>
         /// </example>
         /// <typeparam name="TComponent">The component declaration the markup renders.</typeparam>
-        /// <param name="elementId">The ID the markup gives the component's element; markup built as text without it fails here.</param>
+        /// <param name="elementId">The ID the markup gives the component's element.</param>
         /// <param name="markup">The component's markup.</param>
         /// <returns>The rendered component, ready for <c>.Reactive(...)</c>.</returns>
         public RenderedComponent<TComponent, TModel> Render<TComponent>(
@@ -119,7 +119,6 @@ namespace Alis.Reactive
             if (string.IsNullOrWhiteSpace(elementId))
                 throw new ArgumentException("Element ID required.", nameof(elementId));
             if (markup == null) throw new ArgumentNullException(nameof(markup));
-            ComponentMarkup.RequireElementId(markup, elementId, typeof(TComponent));
             return new RenderedComponent<TComponent, TModel>(this, elementId, markup);
         }
 

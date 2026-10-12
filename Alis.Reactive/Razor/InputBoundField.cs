@@ -54,14 +54,12 @@ namespace Alis.Reactive
         /// Registers <typeparamref name="TComponent"/> as this field's input (value, gather, validation)
         /// and renders its markup inside the field wrapper. Render the markup with
         /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.ElementId"/> and
-        /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.BindingPath"/>; markup built as text
-        /// that gives no element that ID fails here, naming the component.
+        /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.BindingPath"/>.
         /// </summary>
         /// <returns>The rendered component, ready for <c>.Reactive(...)</c>.</returns>
         public RenderedComponent<TComponent, TModel> Render<TComponent>(IHtmlString content)
             where TComponent : IInputComponent, new()
         {
-            ComponentMarkup.RequireElementId(content, ElementId, typeof(TComponent));
             RegisterInputComponent(InputComponentRegistrationProfile.For<TComponent>());
             Render(content);
             return new RenderedComponent<TComponent, TModel>(Plan, ElementId);
@@ -76,14 +74,12 @@ namespace Alis.Reactive
         /// Registers <typeparamref name="TComponent"/> as this field's input (value, gather, validation)
         /// and renders its markup inside the field wrapper. Render the markup with
         /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.ElementId"/> and
-        /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.BindingPath"/>; markup built as text
-        /// that gives no element that ID fails here, naming the component.
+        /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.BindingPath"/>.
         /// </summary>
         /// <returns>The rendered component, ready for <c>.Reactive(...)</c>.</returns>
         public RenderedComponent<TComponent, TModel> Render<TComponent>(IHtmlContent content)
             where TComponent : IInputComponent, new()
         {
-            ComponentMarkup.RequireElementId(content, ElementId, typeof(TComponent));
             RegisterInputComponent(InputComponentRegistrationProfile.For<TComponent>());
             Render(content);
             return new RenderedComponent<TComponent, TModel>(Plan, ElementId);

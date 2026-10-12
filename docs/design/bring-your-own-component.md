@@ -214,10 +214,12 @@ the core C# and the runtime name no vendor and no component. Proof: the full sui
   (`49f3bec`, `fc8b4d2`); Fusion and Native compile on the core's public surface, with
   `InternalsVisibleTo` for both removed (`c597a3a`). The core names no component; the runtime names
   no vendor, as the architecture test enforces.
-- **Identity is checked at render.** Markup a helper builds as text (an `HtmlString`) must give an
-  element the component's id; `field.Render<T>` and `plan.Render<T>` refuse it otherwise, naming
-  the component and the id. A vendor builder's own output is written as it is: a first version that
-  re-wrote Syncfusion's output to check it broke those pages in CI and was reverted.
+- **Identity is not checked at render.** A vendor's builder can write its element under another id
+  and move the component's id onto it from its init script (Syncfusion's `XxxFor` helpers carry it in
+  `htmlAttributes`), and its output is an `HtmlString` like a helper's, so a render-time check
+  cannot tell a forgotten id from a vendor's. Two attempts (`05e9f32`, `08eed7a`) broke Syncfusion
+  pages in CI and were reverted. A missing element is reported in the browser, where the plan looks
+  the component up, naming the id.
 - **The core names no component.** `NativeActionLink` moved to the Native package, built on the
   public surface: a declaration whose vendor hands a click handler the DOM event, and
   `Html.ElementPlan(id)`, a plan of its own for one element so it works wherever its HTML lands.
