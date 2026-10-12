@@ -224,8 +224,11 @@ the core C# and the runtime name no vendor and no component. Proof: the full sui
 - **The core names no component.** `NativeActionLink` moved to the Native package, built on the
   public surface: a declaration whose vendor hands a click handler the DOM event, and
   `Html.ElementPlan(id)`, a plan of its own for one element so it works wherever its HTML lands.
-  What a link cannot carry (another URL, the form's inputs (`Form`), validation, more or fewer
-  than one request) is refused in the view by ALIS002 instead of at render.
+  The id is the developer's (a link in a loop takes its row's key). The callback's type,
+  `NativeActionLinkRequest<TModel>`, offers one request to the link's own href (`link.Post()`,
+  after `link.Confirm(..).Then(..)` when it asks first), so another URL cannot be written and a
+  second request, or none, throws at render. ALIS002 refuses in the view only what a link's own
+  plan cannot have: validating a form or sending `Form()`.
 - **ALIS009 covers brought components.** The typed-API analyzer applies to any `Component` or
   `JsObject` declaration and any helper that returns `RenderedComponent<,>` or extends
   `InputBoundField<,>`, wherever it is declared, not only the shipped slices' namespaces.

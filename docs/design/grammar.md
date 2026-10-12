@@ -376,7 +376,7 @@ The owner's fluent API keeps its shape. Every method lowers to fixed productions
 | `p.Parallel(a, b).OnAllSettled(c)` | `all(a, b); c` |
 | `p.Url<TQuery>().Get(q => q.X)` | `get(get(document, ["query"]), ["X"], shape)`, keyed by the member's binding name; an array member reads `queryAll` |
 | `p.Plugin(tools.Count).Arg(items).Arg("status")`, a plugin member | `call(plugin, ["count"], [..], shape)` |
-| `Html.NativeActionLink(text, url, p => p.Post(url)…)` | the anchor plus its own plan script: `on(link, "click", e) { if (!modified(e)) { e.preventDefault(); … } }` |
+| `Html.NativeActionLink(id, text, url, link => link.Post()…)` | the anchor plus its own plan script: `on(link, "click", e) { if (!modified(e)) { e.preventDefault(); … } }` |
 
 ### 5.1 A request
 

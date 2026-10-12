@@ -397,8 +397,8 @@
         <native-heading level="H2">11. NativeActionLink &rarr; Standalone Single Action</native-heading>
         <p class="text-sm text-text-secondary mb-3">A single native action link can also execute one request chain on its own and load a success fragment directly into a local target.</p>
         <native-hstack gap="Base">
-            @(Html.NativeActionLink("Run Standalone NativeActionLink", Url.SandboxRoute("StandaloneNativeActionLink", "Http"), p => p
-                .Post(Url.SandboxRoute("StandaloneNativeActionLink", "Http"))
+            @(Html.NativeActionLink("standalone-native-action-link", "Run Standalone NativeActionLink", Url.SandboxRoute("StandaloneNativeActionLink", "Http"), link => link
+                .Post()
                 .Gather<HttpController.StandaloneNativeActionLinkRequest>(g => g.Set(x => x.Command, "run"))
                 .WhileLoading(x => x.Element("standalone-native-action-link-status").SetText("Running standalone NativeActionLink..."))
                 .Response(r => r

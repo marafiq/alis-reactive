@@ -239,10 +239,10 @@
                             s.Element("careops-status").SetText("residents flagged critical");
                         }));
                 }))
-            @(Html.NativeActionLink("Discharge Selected", Url.SandboxRoute("CareOpsDischargeSelected", "Grid"), p => p
+            @(Html.NativeActionLink("careops-discharge-selected", "Discharge Selected", Url.SandboxRoute("CareOpsDischargeSelected", "Grid"), link => link
                 .Confirm("Discharge the selected resident(s) from the active census?")
-                .Then(t2 => t2.Post(Url.SandboxRoute("CareOpsDischargeSelected", "Grid"))
-                    .Gather<CareOpsBulkRequest>(g => g.Set(x => x.SelectedRecords, p.Component<FusionGrid>(GridId).Get(c => c.GetSelectedRecords<ResidentCareItem>())))
+                .Then(confirmed => confirmed.Post()
+                    .Gather<CareOpsBulkRequest>(g => g.Set(x => x.SelectedRecords, confirmed.Component<FusionGrid>(GridId).Get(c => c.GetSelectedRecords<ResidentCareItem>())))
                     .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                     {
                         s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));

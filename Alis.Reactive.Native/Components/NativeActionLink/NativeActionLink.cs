@@ -13,7 +13,7 @@ namespace Alis.Reactive.Native.Components
     /// navigating, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.NativeActionLink("Mark Read", url, p =&gt; p.Post(url)...)</c>. The anchor
+    /// Render it with <c>Html.NativeActionLink(id, "Mark Read", url, link =&gt; link.Post()...)</c>. The anchor
     /// keeps the URL in <c>href</c>, so a modified click (a new tab, a download) stays the browser's,
     /// and it carries a plan of its own, so a link in a loaded partial or a grid row works without a
     /// plan on the page.
@@ -69,21 +69,22 @@ namespace Alis.Reactive.Native.Components
     public static class NativeActionLinkHtmlExtensions
     {
         /// <summary>
-        /// Renders an anchor whose unmodified left click executes a reactive request pipeline.
+        /// Renders an anchor whose unmodified left click sends one request to its own <c>href</c>.
         /// </summary>
         /// <remarks>
-        /// The click pipeline holds one HTTP request to <paramref name="url"/>; requests inside its
-        /// response routes, WhileLoading or Finally are kept as written. Analyzer ALIS002 refuses, in
-        /// the view, a pipeline with no request or more than one, a request to another URL, parallel
-        /// or chained requests, the form's inputs (<c>Form</c>) and validation: the link's href must be
-        /// a URL a modified click can open, and its plan sees no page inputs.
+        /// The id is the developer's: a link in a loop takes its row's key. The link carries a plan of
+        /// its own, so it sees no page inputs: its request does not validate a form or send
+        /// <c>Form()</c> (analyzer ALIS002).
         /// <code>
-        /// @Html.NativeActionLink("Delete", "/residents/42/delete", p =&gt; p.Post("/residents/42/delete"))
+        /// @Html.NativeActionLink($"mark-read-{note.Key}", "Mark Read", markReadUrl, link =&gt; link
+        ///     .Post()
+        ///     .Response(r =&gt; r.OnSuccess&lt;HandoverNoteRead&gt;((json, s) =&gt; ..)))
         /// </code>
         /// </remarks>
+        /// <param name="id">The anchor's id, unique on the page.</param>
         /// <param name="linkText">Anchor text.</param>
-        /// <param name="url">Anchor href, and the URL of the pipeline's request.</param>
-        /// <param name="pipeline">Click pipeline with one HTTP request.</param>
+        /// <param name="url">The anchor's href, and the URL of its request.</param>
+        /// <param name="request">Sends the link's one request, after <c>Confirm</c> when it asks first.</param>
         /// <returns>Anchor builder for CSS classes or custom attributes.</returns>
         public static NativeActionLinkBuilder<TModel> NativeActionLink<TModel>(
 #if NET48
@@ -91,20 +92,23 @@ namespace Alis.Reactive.Native.Components
 #else
             this IHtmlHelper<TModel> html,
 #endif
+            string id,
             string linkText,
             string url,
-            Action<PipelineBuilder<TModel>> pipeline)
+            Action<NativeActionLinkRequest<TModel>> request)
             where TModel : class
         {
             if (html == null) throw new ArgumentNullException(nameof(html));
-            if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
+            if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("A link needs an id; a link in a loop takes its row's key.", nameof(id));
+            if (url == null) throw new ArgumentNullException(nameof(url));
+            if (request == null) throw new ArgumentNullException(nameof(request));
 
-            var elementId = NativeActionLinkIdGenerator.Next<TModel>(html.ViewContext);
-            var plan = html.ElementPlan(elementId);
-            var link = new NativeActionLinkBuilder<TModel>(html, plan, elementId, linkText, url);
+            var plan = html.ElementPlan(id);
+            var link = new NativeActionLinkBuilder<TModel>(html, plan, id, linkText, url);
+            var sent = new LinkRequestCount();
 
             // A modified or non-main click, or one the page already handled, stays the browser's.
-            plan.Render<NativeActionLink>(elementId, link).Reactive(evt => evt.Click, (click, p) =>
+            plan.Render<NativeActionLink>(id, link).Reactive(evt => evt.Click, (click, p) =>
                 p.When(click, x => x.Button).Eq(0)
                     .And(click, x => x.DefaultPrevented).Falsy()
                     .And(click, x => x.MetaKey).Falsy()
@@ -114,8 +118,9 @@ namespace Alis.Reactive.Native.Components
                     .Then(follow =>
                     {
                         follow.Payload(click).Call(x => x.PreventDefault);
-                        pipeline(follow);
+                        request(new NativeActionLinkRequest<TModel>(follow, url, sent));
                     }));
+            sent.RequireOne(url);
             return link;
         }
     }

@@ -25,8 +25,8 @@ public sealed class WhenNativeActionLinkBuildsItsRequest
     [Test]
     public void the_link_request_keeps_its_headers_and_its_finally()
     {
-        var link = Html().NativeActionLink("Mark Read", MarkReadUrl, p => p
-            .Post(MarkReadUrl)
+        var link = Html().NativeActionLink("mark-read-1", "Mark Read", MarkReadUrl, request => request
+            .Post()
             .Gather(g => g.Header("X-Shift", "Night"))
             .WhileLoading(l => l.Component<NativeLoader>().Call(c => c.Show))
             .Finally(f => f.Component<NativeLoader>().Call(c => c.Hide)));
@@ -50,7 +50,7 @@ public sealed class WhenNativeActionLinkBuildsItsRequest
     // The Finally a link with only that Finally serializes, so the assertion compares like with like.
     private static string FinallyOf(Action<PipelineBuilder<ShiftHandoverPageModel>> finallyPipeline)
     {
-        var link = Html().NativeActionLink("Mark Read", MarkReadUrl, p => p.Post(MarkReadUrl).Finally(finallyPipeline));
+        var link = Html().NativeActionLink("mark-read-1", "Mark Read", MarkReadUrl, request => request.Post().Finally(finallyPipeline));
         using var plan = PlanOf(link);
         return FinallyIn(plan.RootElement).GetRawText();
     }

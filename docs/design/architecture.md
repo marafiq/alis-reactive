@@ -1078,3 +1078,8 @@ built and what is not.
     member with its types (`Function<T>`, `Property<T>`, `Command`); `plan.RegisterPlugin<TPlugin>()`
     adds it to the plan, and `p.Plugin(plugin.Member)` reads or calls a member. The `[Plugin]`
     attribute form of section 4.8 is not built: the base-class constructor names the plugin.
+  - links (section 4.6): `Html.NativeActionLink(id, text, url, link => link.Post()..)`. The id is the
+    developer's; the generated counter id is gone. The callback's `NativeActionLinkRequest` offers
+    `Get()`, `Post()`, `Put()` and `Delete()` to the href, `Confirm(..).Then(..)` before it, and
+    `Component<T>(id)` for a value it sends; a second request, or none, throws at render. ALIS002
+    keeps only what the link's own plan cannot have (`Validate`, `Form()`).

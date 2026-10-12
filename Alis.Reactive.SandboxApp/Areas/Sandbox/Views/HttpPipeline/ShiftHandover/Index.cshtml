@@ -27,8 +27,8 @@
                         <span class="font-medium text-text">@note.Name</span>
                         <span class="text-text-secondary"> - @note.Note</span>
                     </div>
-                    @(Html.NativeActionLink("Mark Read", markReadUrl, p => p
-                        .Post(markReadUrl)
+                    @(Html.NativeActionLink($"mark-read-{note.Key}", "Mark Read", markReadUrl, link => link
+                        .Post()
                         .Gather(g => g.Header("X-Shift", "Night"))
                         .WhileLoading(l => l.Component<NativeLoader>().Call(c => c.Show))
                         .Response(r => r
