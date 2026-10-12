@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace Alis.Reactive.PlanModel
 {
@@ -208,6 +209,13 @@ namespace Alis.Reactive.PlanModel
                     segments.Add(PathSegment.Property(name));
                 if (eachItem && name.Length != 0) segments.Add(PathSegment.EachItem);
             }
+
+            // One [] reads a list member of each item; a second would read a list of lists, which no
+            // shape the member declares can describe and form data cannot post.
+            if (segments.Count(segment => segment.IsEachItem) > 1)
+                throw new ArgumentException(
+                    $"Path '{dotPath}' reads a list inside a list. Declare the inner list as its own member.",
+                    nameof(dotPath));
 
             return new Path(segments);
         }
