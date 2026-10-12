@@ -36,8 +36,8 @@ function load(id: string, html: unknown): void {
   host.innerHTML = html;
   const plans = discoverPlans(host, true);
 
-  announceUnmount(target);
   target.innerHTML = "";
+  announceUnmount(target);
   target.append(...Array.from(host.childNodes));
   runInsertedScripts(target);
   announceMount(target);
