@@ -111,6 +111,10 @@ public static RenderedComponent<TomSelect, TModel> TomSelect<TModel, TProp>(
 A component that is not a form input renders against the plan with an ID you
 choose: `plan.Render<TComponent>("my-id", markup)`.
 
+The markup must give that ID to an element, because the page finds the
+component by it. If it does not, the view fails when it renders, with a message
+that names the component and the ID it expected.
+
 ## 4. Use It
 
 Every view now has the whole DSL for it, with no further code:

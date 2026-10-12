@@ -43,12 +43,8 @@ namespace Alis.Reactive.Native
         {
         }
 
-        // Component extensions render only after registration; public rendering would bypass the component pipeline.
 #if NET48
-        internal void Render(IHtmlString content)
-        {
-            Render(() => Writer.Write(content.ToHtmlString()));
-        }
+        private static string MarkupOf(IHtmlString content) => content.ToHtmlString();
 
         /// <summary>
         /// Registers <typeparamref name="TComponent"/> as this field's input (value, gather, validation)
@@ -60,14 +56,17 @@ namespace Alis.Reactive.Native
         public RenderedComponent<TComponent, TModel> Render<TComponent>(IHtmlString content)
             where TComponent : IInputComponent, new()
         {
-            RegisterInputComponent(InputComponentRegistrationProfile.For<TComponent>());
-            Render(content);
-            return new RenderedComponent<TComponent, TModel>(Plan, ElementId);
+            if (content == null) throw new System.ArgumentNullException(nameof(content));
+            return RenderIdentified<TComponent>(MarkupOf(content));
         }
 #else
-        internal void Render(IHtmlContent content)
+        private static string MarkupOf(IHtmlContent content)
         {
-            Render(() => content.WriteTo(Writer, HtmlEncoder.Default));
+            using (var markup = new StringWriter())
+            {
+                content.WriteTo(markup, HtmlEncoder.Default);
+                return markup.ToString();
+            }
         }
 
         /// <summary>
@@ -80,9 +79,8 @@ namespace Alis.Reactive.Native
         public RenderedComponent<TComponent, TModel> Render<TComponent>(IHtmlContent content)
             where TComponent : IInputComponent, new()
         {
-            RegisterInputComponent(InputComponentRegistrationProfile.For<TComponent>());
-            Render(content);
-            return new RenderedComponent<TComponent, TModel>(Plan, ElementId);
+            if (content == null) throw new System.ArgumentNullException(nameof(content));
+            return RenderIdentified<TComponent>(MarkupOf(content));
         }
 #endif
 
@@ -97,8 +95,20 @@ namespace Alis.Reactive.Native
             where TComponent : IInputComponent, new()
         {
             if (write == null) throw new System.ArgumentNullException(nameof(write));
+            using (var markup = new StringWriter())
+            {
+                write(markup);
+                return RenderIdentified<TComponent>(markup.ToString());
+            }
+        }
+
+        // The markup must give the field's element id to an element: the plan finds the input by it.
+        private RenderedComponent<TComponent, TModel> RenderIdentified<TComponent>(string markup)
+            where TComponent : IInputComponent, new()
+        {
+            var identified = ComponentMarkup.Identified(markup, ElementId, typeof(TComponent));
             RegisterInputComponent(InputComponentRegistrationProfile.For<TComponent>());
-            Render(() => write(Writer));
+            Render(() => Writer.Write(identified));
             return new RenderedComponent<TComponent, TModel>(Plan, ElementId);
         }
     }
