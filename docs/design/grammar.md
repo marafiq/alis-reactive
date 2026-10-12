@@ -510,7 +510,10 @@ imports none of them. The obligations are numbered so that tests and code can ci
     (`execute.ts:215-228`).
 - **F9 Composition.** Tests from plans that share a `planId` are joined per owner. A slot's load or
   unload removes exactly its own tests and subscriptions, then clears and hides the summary of the
-  plans it touched (`boot.ts:70-94`).
+  plans it touched (`boot.ts:70-94`). Content rendered with the page belongs to the page even inside
+  a slot's container: when a load replaces it, its tests stay, and its fields, no longer rendered,
+  are checked as missing values (F5). A form whose steps replace each other in one slot therefore
+  loads its first step into the slot too (the intake journey, `Validation/IntakeSteps`).
 
 ### 6.5 `slot` (`plugin("alis.slot", containerId)`)
 

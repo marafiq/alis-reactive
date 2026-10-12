@@ -1087,3 +1087,9 @@ built and what is not.
     decides what a validator's `IsValid` decides (`BrowserRule.Pattern(..)`, `Url`, `Email`,
     `CreditCard`, `Length(min, max)`); the framework's own `Url()` uses it, and the move-in review's
     app-declared `WristbandCodeValidator` proves it in the browser.
+  - steps of one form loaded into a slot (law 4 of section 0.3, grammar F9). Each step of the intake
+    journey validates only its own fields against the whole form and leaves with them when the next
+    step replaces it; finishing the care step does not re-check the resident step. This journey was
+    added because a mutation that kept a slot's fields on the form after it unloaded passed all
+    1,377 browser tests. A step rendered with the page stays the page's (grammar F9), so the first
+    step loads into the slot too.
