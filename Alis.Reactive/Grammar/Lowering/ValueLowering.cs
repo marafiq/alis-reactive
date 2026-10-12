@@ -116,9 +116,13 @@ namespace Alis.Reactive.Grammar.Lowering
         }
 
         // A field another plan rendered (a partial's input, validated by the form of the view that
-        // loads it) is read through the model, which every plan of the composition joins.
+        // loads it) is read through the model, which every plan of the composition joins. A validation
+        // rule reads each input it names through the model too, as MVC binds it.
         private Expr ComponentRead(string componentKey, ReadExpression read, LoweringScope scope)
         {
+            if (scope.ReadsInputsAsBound)
+                return G.Call(G.Obj(_context.Objects.Model()), new[] { "boundValueOf" }, new Expr[] { G.Lit(componentKey) }, G.NoShapes, read.Shape);
+
             if (!_context.IsDeclared(componentKey))
             {
                 if (read.Access is MethodValueReadAccess)
@@ -168,9 +172,9 @@ namespace Alis.Reactive.Grammar.Lowering
                     return (G.Ref(scope.EventParam), G.NoPath);
                 case "success":
                 case "error":
-                    var response = scope.Response
+                    var response = scope.ResponseOf(payload.Response)
                         ?? throw new InvalidOperationException(
-                            $"Plan '{_context.PlanId}' reads a response body outside a response route.");
+                            $"Plan '{_context.PlanId}' reads a response body outside the routes of the request that receives it.");
                     return (G.Ref(response), new[] { "body" });
                 case "element":
                     return (G.Ref(scope.Element), G.NoPath);

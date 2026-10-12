@@ -8,8 +8,8 @@ It was checked against all 531 inventoried use cases, then reviewed adversariall
 (section 9). Every decision that changes something a user can see today is listed in section 8,
 with its rows.
 
-**What is built** is recorded in section 11: which parts run as specified, which decisions are
-applied, and which are deferred with today's behavior kept.
+**What is built** is recorded in section 11: which parts run as specified and which decisions are
+applied.
 
 **The rule behind every decision:** the browser computes what the C# the developer wrote would
 compute. Types, operators, evaluation order, scoping and empty values follow C#, and the server's
@@ -168,13 +168,15 @@ a `DateOnly` member cannot bind a time), and every comparison sees the time (2.2
 the exception: a `DateTimeOffset` names a moment, so it is sent as that moment in UTC, which binds
 exactly whatever the zone of the browser or the server.
 
-**Binding reads** (deferred, section 11: model values are read with the shape conversion alone,
-as today). Where the server binds a value, the browser reads it the way MVC binds it.
-- **Where:** the `alis.model` values that tests and `Form()` read, and JSON request bodies.
+**Binding reads.** Where the server binds a value, the browser reads it the way MVC binds it.
+- **Where:** the `alis.model` values a request body carries (`values`, `fill`, `fields`, so
+  `IncludeAll()` sends them), and every input a validation rule reads: its field, a peer, and each
+  member its condition reads, through `model.boundValueOf(id)`.
 - **What:** text that is empty or only whitespace is `null`, as MVC's `ConvertEmptyStringToNull`
-  makes it; a non-nullable number that is empty is 0, and a nullable one is `null`.
-- **Elsewhere** a text read keeps `""`, so `p.When(name.Value).IsEmpty()` sees what today's condition
-  sees.
+  makes it; a non-nullable number, boolean or date left empty is its type's default (0, `false`,
+  0001-01-01), the value the property keeps when there is nothing to bind; a nullable one is `null`.
+- **Elsewhere** a read keeps its shape conversion alone, so `p.When(name.Value).IsEmpty()` still sees
+  `""`, and `model.valueOf(id)` reads another plan's field the way a direct read would.
 
 ### 2.2 Operators
 
@@ -462,6 +464,9 @@ imports none of them. The obligations are numbered so that tests and code can ci
 - **M2 `fields`.** The same inputs, flat, keyed by MVC binding name.
 - **M3 `fill(record)`.** Writes the inputs of M1 into `record` at their body paths and returns it.
   A node already on the path keeps its other members; it is copied before it is written.
+- **M5 `valueOf(id)`, `boundValueOf(id)`.** One input's value, for a read of a field another plan of
+  the composition rendered; missing when none renders it. `valueOf` converts it to its shape, as a
+  direct read does; `boundValueOf` is the binding read every validation rule makes (2.1).
 - **M4 Commit.** Each input carries `committed`, the event its component declares as the one that
   commits a value (`ComponentInput.Of(Value, committedBy: ...)`). When the plan that renders the
   input starts, the model subscribes it and re-raises it on the input's element as the bubbling DOM
@@ -782,9 +787,14 @@ proves it is named in the pull request.
   `addPromptResponse(string,boolean)`) and an access mode (`readwrite`) the grammar does not carry.
   Five client-rule tests were renamed from the retired `WhenField` vocabulary.
 
-**Deferred, with today's behavior kept**
-- Binding reads (2.1) and the empty-value changes of section 8: browser checks keep today's
-  semantics (for example, `GreaterThan` fails on an empty value; email uses today's pattern).
-  FluentValidation's `NotEmpty` on a collection reads as `atLeastOne`.
-- A response handle inside a nested route reads the innermost response, as today.
+- Binding reads (2.1): request bodies and validation read each input as MVC binds it.
+- Empty values follow the server: every check is FluentValidation's verdict on the bound value
+  (7.3), so `ExclusiveBetween` on an empty non-nullable number fails (it is 0), `GreaterThan` on an
+  empty nullable passes, and `Equal`/`NotEqual` compare an empty value instead of skipping it.
+  `NotEmpty` on a collection reads as `atLeastOne`.
+- Email and credit-card checks are FluentValidation's: one `@` with something on each side; dashes
+  and spaces dropped, every other character a digit, then Luhn, with no minimum length.
+- A response handle reads the response it names: each request's routes bind its handle, so a handle
+  read inside a nested request's route reads its own request's response (`ResponseHandle`).
+  `Into(...)`, which names no handle, injects the response of the request it follows.
 

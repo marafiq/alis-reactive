@@ -29,6 +29,8 @@ namespace Alis.Reactive.PlanModel
         public IReadOnlyList<ReactionGraph> Finally => _reactions.Finally;
         /// <summary>Request chain behavior: terminal or followed by another request after success.</summary>
         public RequestChain Chain => _responseRouting.Chain;
+        /// <summary>The response this request receives, which its routes' body handles read.</summary>
+        internal ResponseHandle Response => _responseRouting.Handle;
         private RequestPlan(
             RequestEndpoint endpoint,
             RequestInput input,
@@ -80,24 +82,28 @@ namespace Alis.Reactive.PlanModel
     internal sealed class ResponseRouting
     {
         private ResponseRouting(
+            ResponseHandle handle,
             IReadOnlyList<ResponseRoute> success,
             IReadOnlyList<ResponseRoute> error,
             RequestChain chain)
         {
+            Handle = handle;
             Success = OrderedPlanItems.Snapshot(success);
             Error = OrderedPlanItems.Snapshot(error);
             Chain = chain;
         }
 
+        internal ResponseHandle Handle { get; }
         internal IReadOnlyList<ResponseRoute> Success { get; }
         internal IReadOnlyList<ResponseRoute> Error { get; }
         internal RequestChain Chain { get; }
 
         internal static ResponseRouting From(
+            ResponseHandle handle,
             IReadOnlyList<ResponseRoute> success,
             IReadOnlyList<ResponseRoute> error,
             RequestChain chain) =>
-            new ResponseRouting(success, error, chain);
+            new ResponseRouting(handle, success, error, chain);
     }
 
     internal static class OrderedPlanItems

@@ -8,7 +8,8 @@ namespace Alis.Reactive.Grammar.Lowering
     /// <summary>
     /// Lowers a validation container's rules to <c>alis.form</c> data: per field its value read, the
     /// name the server reports errors under, and one test per rule. A test's check is a lambda of the
-    /// field's value that is true when the value passes.
+    /// field's value that is true when the value passes. Every input a rule reads is read as MVC binds
+    /// it, and each check is FluentValidation's own verdict on that value (grammar.md 7.3).
     /// </summary>
     internal sealed class FormLowering
     {
@@ -17,7 +18,7 @@ namespace Alis.Reactive.Grammar.Lowering
 
         private readonly LoweringContext _context;
         private readonly ValueLowering _values;
-        private readonly LoweringScope _scope = LoweringScope.ForHandler("$form");
+        private readonly LoweringScope _scope = LoweringScope.ForValidation("$form");
 
         internal FormLowering(LoweringContext context, ValueLowering values)
         {
@@ -52,21 +53,21 @@ namespace Alis.Reactive.Grammar.Lowering
             {
                 case "required": passes = G.Not(BlankOrDefault(v, fieldShape)); break;
                 case "empty": passes = BlankOrDefault(v, fieldShape); break;
-                case "minLength": passes = G.Or(NothingEntered(v), G.Op(Operator.Gte, TextLength(v), G.Lit(Constraint(execution)))); break;
-                case "maxLength": passes = G.Or(NothingEntered(v), G.Op(Operator.Lte, TextLength(v), G.Lit(Constraint(execution)))); break;
-                case "email": passes = G.Or(NothingEntered(v), Matches(v, "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")); break;
-                case "regex": passes = G.Or(NothingEntered(v), Pattern(v, execution)); break;
-                case "url": passes = G.Or(NothingEntered(v), Matches(v, "^https?:\\/\\/.+")); break;
-                case "creditCard": passes = G.Or(NothingEntered(v), Luhn(v)); break;
-                case "min": passes = Ordered(v, Target(execution), comparison, Operator.Gte, skipsEmpty: true); break;
-                case "max": passes = Ordered(v, Target(execution), comparison, Operator.Lte, skipsEmpty: true); break;
-                case "lt": passes = Ordered(v, Target(execution), comparison, Operator.Lt, skipsEmpty: true); break;
-                case "gt": passes = Ordered(v, Target(execution), comparison, Operator.Gt, skipsEmpty: false); break;
+                case "minLength": passes = G.Or(Absent(v), G.Op(Operator.Gte, TextLength(v), G.Lit(Constraint(execution)))); break;
+                case "maxLength": passes = G.Or(Absent(v), G.Op(Operator.Lte, TextLength(v), G.Lit(Constraint(execution)))); break;
+                case "email": passes = G.Or(Absent(v), Matches(v, "^[^@]+@[^@]+$")); break;
+                case "regex": passes = G.Or(Absent(v), Pattern(v, execution)); break;
+                case "url": passes = G.Or(Absent(v), Matches(v, "^https?:\\/\\/.+")); break;
+                case "creditCard": passes = G.Or(Absent(v), CardNumber(v)); break;
+                case "min": passes = Ordered(v, Target(execution), comparison, Operator.Gte); break;
+                case "max": passes = Ordered(v, Target(execution), comparison, Operator.Lte); break;
+                case "lt": passes = Ordered(v, Target(execution), comparison, Operator.Lt); break;
+                case "gt": passes = Ordered(v, Target(execution), comparison, Operator.Gt); break;
                 case "range": passes = Range(v, execution, comparison, Operator.Gte, Operator.Lte); break;
                 case "exclusiveRange": passes = Range(v, execution, comparison, Operator.Gt, Operator.Lt); break;
-                case "equalTo": passes = G.Or(NothingEntered(v), Same(v, Target(execution), comparison)); break;
+                case "equalTo": passes = Same(v, Target(execution), comparison); break;
                 case "notEqual":
-                case "notEqualTo": passes = G.Or(NothingEntered(v), G.Not(Same(v, Target(execution), comparison))); break;
+                case "notEqualTo": passes = G.Not(Same(v, Target(execution), comparison)); break;
                 case "atLeastOne": passes = AtLeastOne(v, fieldShape); break;
                 default: throw new InvalidOperationException("No browser check for validation rule '" + rule.Name + "'.");
             }
@@ -84,19 +85,26 @@ namespace Alis.Reactive.Grammar.Lowering
                 ? _values.Value(peer, _scope)
                 : G.Lit(Constraint(execution));
 
+        // A bound value FluentValidation's null checks skip: nothing bound (blank text binds as null).
+        private static Expr Absent(Expr v) => G.Eq(v, G.Null);
+
         // Nothing was entered: a missing value, one whose text is "" (an empty list included), or one
         // with no text form. A pattern with one character of anything fails on exactly those.
         private static Expr NothingEntered(Expr v) => G.Not(Matches(v, "[\\s\\S]"));
 
         // What NotEmpty rejects, as far as the field's shape tells: nothing entered, text of only
-        // whitespace, false for a boolean, 0 for a number.
+        // whitespace, and the type's default: false, 0, or 0001-01-01 for a date.
         private static Expr BlankOrDefault(Expr v, Shape fieldShape)
         {
             var terms = new List<Expr> { NothingEntered(v), Matches(v, "^[" + NetWhitespace + "]*$") };
             if (fieldShape.Kind == "boolean") terms.Add(G.Eq(v, G.False));
             if (fieldShape.Kind == "number") terms.Add(G.Eq(v, G.Lit(0)));
+            if (fieldShape.Kind == "date" || fieldShape.Kind == "instant") terms.Add(G.Op(Operator.Lt, G.Op(Operator.ToNumber, v), G.Lit(DayAfterEarliestDate)));
             return G.Or(terms);
         }
+
+        // 0001-01-02T00:00:00Z: a date before it is DateTime.MinValue, in whatever zone it was read.
+        private const long DayAfterEarliestDate = -62135510400000;
 
         private static Expr AtLeastOne(Expr v, Shape fieldShape)
         {
@@ -115,8 +123,9 @@ namespace Alis.Reactive.Grammar.Lowering
 
         private static Expr TextLength(Expr v) => G.Get(G.Op(Operator.ToText, v), new[] { "length" }, Shape.None);
 
-        // Card numbers: the digits only, at least 13, passing the Luhn check.
-        private Expr Luhn(Expr v)
+        // FluentValidation's card check: dashes and spaces dropped, every other character a digit, and
+        // the Luhn sum a multiple of ten.
+        private Expr CardNumber(Expr v)
         {
             var digits = _context.Fresh("d");
             var character = _context.Fresh("c");
@@ -124,8 +133,9 @@ namespace Alis.Reactive.Grammar.Lowering
             var digit = _context.Fresh("c");
             var index = _context.Fresh("i");
 
-            var onlyDigits = G.Call(
-                G.Call(G.Call(G.Op(Operator.ToText, v), "split", G.Lit("")), "filter", G.Fn(Matches(G.Ref(character), "^\\d$"), character)),
+            var separator = G.Or(G.Eq(G.Ref(character), G.Lit("-")), G.Eq(G.Ref(character), G.Lit(" ")));
+            var withoutSeparators = G.Call(
+                G.Call(G.Call(G.Op(Operator.ToText, v), "split", G.Lit("")), "filter", G.Fn(G.Not(separator), character)),
                 "join",
                 G.Lit(""));
             var value = G.Op(Operator.ToNumber, G.Ref(digit));
@@ -140,20 +150,21 @@ namespace Alis.Reactive.Grammar.Lowering
                 G.Fn(G.Op(Operator.Add, G.Ref(sum), weighted), sum, digit, index),
                 G.Lit(0));
             var valid = G.And(
-                G.Op(Operator.Gte, G.Get(G.Ref(digits), new[] { "length" }, Shape.None), G.Lit(13)),
+                Matches(G.Ref(digits), "^\\d*$"),
                 G.Eq(G.Op(Operator.Mod, total, G.Lit(10)), G.Lit(0)));
-            return G.Apply(G.Fn(valid, digits), onlyDigits);
+            return G.Apply(G.Fn(valid, digits), withoutSeparators);
         }
 
-        // An ordered rule compares the value and its target as numbers under the comparison shape;
-        // a pair that cannot be compared fails. Every ordered rule but GreaterThan passes on nothing.
-        private Expr Ordered(Expr v, Expr target, Shape comparison, Operator op, bool skipsEmpty)
+        // An ordered rule passes on nothing bound, as FluentValidation's comparisons do; otherwise it
+        // compares the value and its target as numbers under the comparison shape, and a pair that
+        // cannot be compared (a peer with nothing bound) fails.
+        private Expr Ordered(Expr v, Expr target, Shape comparison, Operator op)
         {
             var a = _context.Fresh("a");
             var b = _context.Fresh("b");
             var holds = G.And(IsNumber(G.Ref(a)), IsNumber(G.Ref(b)), G.Op(op, G.Ref(a), G.Ref(b)));
             var compared = G.Apply(G.Fn(holds, a, b), Comparable(v, comparison), Comparable(target, comparison));
-            return skipsEmpty ? G.Or(NothingEntered(v), compared) : G.And(G.Not(NothingEntered(v)), compared);
+            return G.Or(Absent(v), compared);
         }
 
         private Expr Range(Expr v, ValidationRuleExecution execution, Shape comparison, Operator lower, Operator upper)
@@ -172,7 +183,7 @@ namespace Alis.Reactive.Grammar.Lowering
                 Comparable(v, comparison),
                 Comparable(G.Lit(bounds[0]), comparison),
                 Comparable(G.Lit(bounds[1]), comparison));
-            return G.Or(NothingEntered(v), compared);
+            return G.Or(Absent(v), compared);
         }
 
         private static Expr IsNumber(Expr value) => G.Eq(G.Op(Operator.Finite, value), value);
@@ -202,8 +213,9 @@ namespace Alis.Reactive.Grammar.Lowering
             }
         }
 
-        // Equality under the comparison shape: both sides converted the way the shape converts a
-        // missing value too; with no shape, both as text.
+        // Equality under the comparison shape, with no skip for nothing bound, as FluentValidation's
+        // Equal and NotEqual: both sides converted the way the shape converts a missing value too;
+        // with no shape, both as text.
         private static Expr Same(Expr v, Expr target, Shape comparison) =>
             G.Eq(Canonical(v, comparison), Canonical(target, comparison));
 

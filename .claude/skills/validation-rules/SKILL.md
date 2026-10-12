@@ -40,21 +40,27 @@ public sealed class AdmissionValidator : ReactiveValidator<Admission>
 
 ## What the browser evaluates
 
-| FluentValidation | Browser rule | Empty value |
+The browser reads each input as MVC binds it (blank text is null; an empty non-nullable number,
+boolean or date is its default: 0, false, 0001-01-01) and gives FluentValidation's own verdict on
+that value. "Nothing bound" below is null: blank text, or an empty nullable input.
+
+| FluentValidation | Browser rule | Nothing bound |
 |---|---|---|
-| `NotEmpty()` | `required` (`atLeastOne` on a collection) | fails |
-| `NotNull()`, not on a collection (a cleared input is sent as null) | `required` | fails |
+| `NotEmpty()` | `required` (`atLeastOne` on a collection); also fails on the type's default | fails |
+| `NotNull()`, not on a collection | `required` | fails |
 | `Empty()` | `empty` | passes |
-| `MinimumLength(n)`, `MaximumLength(n)`, `Length(a, b)` | `minLength`, `maxLength` | skipped |
-| `EmailAddress()` | `email` | skipped |
-| `Matches(pattern)`, `Matches(pattern, options)` (`IgnoreCase`, `Multiline`, `Singleline` become flags; the browser runs it as a JavaScript `RegExp`, where `\w` is ASCII) | `regex` | skipped |
-| `CreditCard()` | `creditCard` | skipped |
-| `Url()` (this framework, `ReactiveRuleBuilderExtensions`) | `url` | skipped |
-| `InclusiveBetween(a, b)`, `ExclusiveBetween(a, b)` | `range`, `exclusiveRange` | skipped |
-| `GreaterThanOrEqualTo`, `LessThanOrEqualTo`, `LessThan` (value or sibling) | `min`, `max`, `lt` | skipped |
-| `GreaterThan` (value or sibling) | `gt` | **fails** (today's behavior) |
-| `Equal`, `NotEqual` (value or sibling) | `equalTo`, `notEqual` / `notEqualTo` | skipped |
+| `MinimumLength(n)`, `MaximumLength(n)`, `Length(a, b)` | `minLength`, `maxLength` | passes |
+| `EmailAddress()`: one `@`, something on each side | `email` | passes |
+| `Matches(pattern)`, `Matches(pattern, options)` (`IgnoreCase`, `Multiline`, `Singleline` become flags; the browser runs it as a JavaScript `RegExp`, where `\w` is ASCII) | `regex` | passes |
+| `CreditCard()`: dashes and spaces dropped, digits only, Luhn | `creditCard` | passes |
+| `Url()` (this framework, `ReactiveRuleBuilderExtensions`) | `url` | passes |
+| `InclusiveBetween(a, b)`, `ExclusiveBetween(a, b)` | `range`, `exclusiveRange` | passes |
+| `GreaterThan`, `GreaterThanOrEqualTo`, `LessThan`, `LessThanOrEqualTo` (value or sibling; a sibling with nothing bound fails) | `gt`, `min`, `lt`, `max` | passes |
+| `Equal`, `NotEqual` (value or sibling) | `equalTo`, `notEqual` / `notEqualTo` | compared, not skipped |
 | `SetValidator(child)`, `RuleForEach(...).SetValidator(child)`, `Include(v)`, `ChildRules(...)` | the child's rules, prefixed | |
+
+An empty non-nullable number is 0, not nothing: `ExclusiveBetween(0, 100)` and `GreaterThan(0)` on
+a `decimal` fail when it is left empty, as on the server.
 
 Messages come from `.WithMessage(...)` or FluentValidation's default template, formatted at render
 (`{PropertyName}`, `{MinLength}`, `{ComparisonValue}`, ...).

@@ -183,26 +183,64 @@ namespace Alis.Reactive.Grammar.Lowering
     internal sealed class LoweringScope
     {
         private readonly string? _element;
+        private readonly ResponseFrame? _responses;
 
-        private LoweringScope(string eventParam, string? response, string? element)
+        private LoweringScope(string eventParam, ResponseFrame? responses, string? element, bool readsInputsAsBound)
         {
             EventParam = eventParam;
-            Response = response;
+            _responses = responses;
             _element = element;
+            ReadsInputsAsBound = readsInputsAsBound;
         }
 
-        internal static LoweringScope ForHandler(string eventParam) => new LoweringScope(eventParam, null, null);
+        internal static LoweringScope ForHandler(string eventParam) => new LoweringScope(eventParam, null, null, false);
+
+        /// <summary>
+        /// A validation rule's scope: every input it reads (its field, a peer, a condition's member) is
+        /// read as MVC binds it (grammar.md 2.1), so the browser judges the value the server will.
+        /// </summary>
+        internal static LoweringScope ForValidation(string eventParam) => new LoweringScope(eventParam, null, null, true);
 
         internal string EventParam { get; }
 
         /// <summary>The binding of the innermost enclosing response, or none outside every route.</summary>
-        internal string? Response { get; }
+        internal string? Response => _responses?.Binding;
+
+        internal bool ReadsInputsAsBound { get; }
 
         internal string Element =>
             _element ?? throw new InvalidOperationException("An array element is read outside an array operation.");
 
-        internal LoweringScope WithResponse(string name) => new LoweringScope(EventParam, name, _element);
+        /// <summary>
+        /// The binding of the response a body read names: its own request's, however many requests'
+        /// routes it is nested in; the innermost for <see cref="ResponseHandle.Innermost"/>. None when
+        /// the read is outside that request's routes.
+        /// </summary>
+        internal string? ResponseOf(ResponseHandle handle)
+        {
+            if (handle == ResponseHandle.Innermost) return Response;
+            for (var frame = _responses; frame != null; frame = frame.Outer)
+                if (frame.Handle == handle) return frame.Binding;
+            return null;
+        }
 
-        internal LoweringScope WithElement(string name) => new LoweringScope(EventParam, Response, name);
+        internal LoweringScope WithResponse(ResponseHandle handle, string binding) =>
+            new LoweringScope(EventParam, new ResponseFrame(handle, binding, _responses), _element, ReadsInputsAsBound);
+
+        internal LoweringScope WithElement(string name) => new LoweringScope(EventParam, _responses, name, ReadsInputsAsBound);
+
+        private sealed class ResponseFrame
+        {
+            internal ResponseFrame(ResponseHandle handle, string binding, ResponseFrame? outer)
+            {
+                Handle = handle;
+                Binding = binding;
+                Outer = outer;
+            }
+
+            internal ResponseHandle Handle { get; }
+            internal string Binding { get; }
+            internal ResponseFrame? Outer { get; }
+        }
     }
 }

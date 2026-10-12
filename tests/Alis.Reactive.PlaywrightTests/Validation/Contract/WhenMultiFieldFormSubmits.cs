@@ -440,6 +440,25 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // FluentValidation's email rule asks for one @ with something on each side, not a dot after it;
+    // the browser asks the same, and the server saves the admission.
+    [Test]
+    public async Task an_email_with_no_dot_after_the_at_is_accepted_as_the_server_accepts_it()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        await FillAllRequired();
+        await Input("Email").FillAsync("jane@sunnyacres");
+        await Input("ConfirmEmail").FillAsync("jane@sunnyacres");
+        await Input("ReasonForNoContact").FillAsync("No relatives nearby");
+        await SubmitBtn.ClickAsync();
+
+        await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
+        await Expect(ErrorFor("Email")).Not.ToBeVisibleAsync();
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task name_error_clears_on_blur_after_valid_input()
     {

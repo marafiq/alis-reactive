@@ -33,6 +33,32 @@ function convert(value: unknown, shape: Shape): unknown {
   }
 }
 
+/**
+ * A value as MVC binds it into the model the server validates (grammar.md 2.1, binding reads): text
+ * that is empty or only whitespace is null, as ConvertEmptyStringToNull makes it; a non-nullable
+ * number, boolean or date left empty is its type's default (0, false, 0001-01-01), the value the
+ * property keeps when binding has nothing to bind. A nullable shape already reads blank as null.
+ */
+export function bound(value: unknown, shape: Shape): unknown {
+  const converted = shaped(value, shape);
+  const nothingBound = isMissing(converted) || isBlankText(converted);
+  switch (shape.kind) {
+    case "string":  return nothingBound ? null : converted;
+    case "number":  return nothingBound ? 0 : converted;
+    case "boolean": return nothingBound ? false : converted;
+    case "date":    return nothingBound ? earliestDate() : converted;
+    case "instant": return nothingBound ? new Instant(EARLIEST_INSTANT) : converted;
+    default:        return converted;
+  }
+}
+
+// DateTime.MinValue: 0001-01-01 at midnight, local for a date, UTC for an instant.
+const EARLIEST_INSTANT = -62_135_596_800_000;
+
+function earliestDate(): Date {
+  return localMidnight(1, 1, 1)!;
+}
+
 /** Number shape: finite numbers; booleans as 1 or 0; text through Number (blank text is 0); dates as their time. */
 export function asNumber(value: unknown): number | undefined {
   if (typeof value === "number") return Number.isFinite(value) ? value : undefined;
@@ -104,7 +130,7 @@ export function asInstant(value: unknown): Instant | undefined {
 // day picked east of UTC would read as the day before, and a DateOnly member could not bind it.
 // asDate reads both forms back as the same local date.
 function localDateText(date: Date): string {
-  const day = `${date.getFullYear()}-${twoDigits(date.getMonth() + 1)}-${twoDigits(date.getDate())}`;
+  const day = `${`${date.getFullYear()}`.padStart(4, "0")}-${twoDigits(date.getMonth() + 1)}-${twoDigits(date.getDate())}`;
   const isMidnight =
     date.getHours() === 0 && date.getMinutes() === 0 && date.getSeconds() === 0 && date.getMilliseconds() === 0;
   if (isMidnight) return day;
@@ -118,8 +144,10 @@ function twoDigits(value: number): string {
   return `${value}`.padStart(2, "0");
 }
 
+// setFullYear, because the Date constructor reads years below 100 as 19xx.
 function localMidnight(year: number, month: number, day: number): Date | undefined {
-  const date = new Date(year, month - 1, day);
+  const date = new Date(2000, 0, 1);
+  date.setFullYear(year, month - 1, day);
   const isTheSameCalendarDay =
     date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
   return isTheSameCalendarDay ? date : undefined;

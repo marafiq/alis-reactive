@@ -28,12 +28,22 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Post(Url.SandboxRoute("Record", "MedicationPass"), g => g.IncludeAll())
-                 .Response(r => r.OnSuccess<MedicationPassConfirmation>((json, s) =>
+                 .Response(r => r.OnSuccess<MedicationPassConfirmation>((pass, s) =>
                  {
-                     s.Element("medication-pass-status").SetText(json, x => x.Confirmation);
+                     s.Element("medication-pass-status").SetText(pass, x => x.Confirmation);
+                     // The next pass is given once the pharmacy has ordered the refills: the refill
+                     // route reads the pass confirmation, the response its own handle names.
+                     s.Get(Url.SandboxRoute("Refills", "MedicationPass"))
+                      .Response(refills => refills.OnSuccess<RefillOrder>((order, ordered) =>
+                      {
+                          ordered.Element("medication-pass-refills").SetText(order, x => x.Status);
+                          ordered.Element("medication-pass-next").SetText(pass, x => x.NextPass);
+                      }));
                  }));
             }))
         <p id="medication-pass-status" class="mt-3 text-sm text-text-muted">No pass recorded yet.</p>
+        <p id="medication-pass-refills" class="text-sm text-text-muted"></p>
+        <p id="medication-pass-next" class="text-sm font-medium"></p>
     </native-card-body>
     </native-card>
 </native-vstack>

@@ -48,6 +48,19 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // An int left empty binds as 0 on the server, where "Age < 18" then holds; the browser reads the
+    // age the same way, so it asks for the guardian before the form is sent.
+    [Test]
+    public async Task an_age_left_empty_counts_as_a_minor_as_the_server_binds_it()
+    {
+        await NavigateToAndWaitForBoot(Path);
+
+        await ClickWhenStable(SubmitBtn);
+
+        await Expect(ErrorFor("Name")).ToContainTextAsync("Guardian name required");
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task lt_condition_skips_when_age_is_adult()
     {

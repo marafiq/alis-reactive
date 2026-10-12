@@ -121,6 +121,11 @@ the server, and so do a rule whose message is written from the model (`WithMessa
 a `Matches` pattern that JavaScript reads differently from .NET (`^\d{5}\z`, `(?i)...`),
 and any rule followed by `.ServerOnly()`.
 
+The browser gives each rule the answer the server gives. It reads a field the way MVC binds it, so
+blank text is null and an empty `decimal` is 0: `ExclusiveBetween(0, 100)` on an empty `decimal`
+fails in both places, and `GreaterThan` on an empty `DateTime?` passes in both. `EmailAddress` and
+`CreditCard` are FluentValidation's own checks, not stricter browser versions.
+
 ## Conditional Rules
 
 Write the condition as a lambda over the model. The browser applies the same condition.

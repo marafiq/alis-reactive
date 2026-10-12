@@ -10,8 +10,12 @@ namespace Alis.Reactive.Builders.Requests
         private readonly List<ResponseRoute> _errorRoutes = new List<ResponseRoute>();
         private RequestChain _chain = RequestChain.Terminal;
 
+        /// <summary>The response this request receives, which its routes' body handles read.</summary>
+        internal ResponseHandle Handle { get; } = new ResponseHandle();
+
         internal ResponseRouting BuildRouting() =>
             ResponseRouting.From(
+                Handle,
                 _successRoutes,
                 _errorRoutes,
                 _chain);

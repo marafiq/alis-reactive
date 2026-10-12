@@ -278,6 +278,67 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    private async Task FillEveryRuleValidly()
+    {
+        await Input("CardNumber").FillAsync("4111111111111111");
+        await Input("Score").FillAsync("50");
+        await Input("MonthlyRate").FillAsync("4250");
+        await Input("MaxDeposit").FillAsync("500000");
+        await Input("Status").FillAsync("active");
+        await Input("Email").FillAsync("nurse@facility.com");
+        await Input("AlternateEmail").FillAsync("backup@facility.com");
+        await Input("Website").FillAsync("https://sunnyacres.com");
+    }
+
+    // The server binds an empty decimal as 0, which is outside (0, 100); the browser judges the same 0.
+    [Test]
+    public async Task a_score_left_empty_is_refused_as_the_zero_the_server_binds()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await FillEveryRuleValidly();
+        await Input("Score").FillAsync("");
+
+        await ClickWhenStable(ValidateBtn);
+
+        await Expect(ErrorFor("Score")).ToContainTextAsync("exclusive", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+        AssertNoConsoleErrors();
+    }
+
+    // FluentValidation drops dashes and spaces and refuses any other character that is not a digit.
+    [Test]
+    public async Task a_card_number_with_a_letter_in_it_is_refused_though_its_digits_check_out()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await FillEveryRuleValidly();
+        await Input("CardNumber").FillAsync("4111 1111 1111 111x1");
+
+        await ClickWhenStable(ValidateBtn);
+
+        await Expect(ErrorFor("CardNumber")).ToContainTextAsync("not valid", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+        AssertNoConsoleErrors();
+    }
+
+    // FluentValidation sets no minimum length: a twelve-digit number that passes the Luhn check is a
+    // card number to the server, so the browser lets it through and the server accepts it.
+    [Test]
+    public async Task a_twelve_digit_card_number_that_passes_the_check_is_accepted_by_the_server_too()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await FillEveryRuleValidly();
+        await Input("CardNumber").FillAsync("4242 4242 4242");
+
+        await ClickWhenStable(ValidateBtn);
+
+        await Expect(Result).ToContainTextAsync("passed", new() { Timeout = 5000 });
+        await Expect(ErrorFor("CardNumber")).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task when_all_fields_are_valid_form_passes()
     {

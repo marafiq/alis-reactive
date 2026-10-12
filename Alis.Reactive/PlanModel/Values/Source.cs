@@ -38,6 +38,16 @@ namespace Alis.Reactive.PlanModel
         internal static ComponentSource Of(ComponentKey component) => new ComponentSource(component);
     }
 
+    /// <summary>
+    /// The response one request receives. A response handle's reads name it, so a handle read inside
+    /// a nested request's route still reads its own request's response.
+    /// </summary>
+    internal sealed class ResponseHandle
+    {
+        /// <summary>The response of the request the step follows, which <c>Into</c> injects.</summary>
+        internal static ResponseHandle Innermost { get; } = new ResponseHandle();
+    }
+
     /// <summary>Identifies an execution payload scope, such as event data or an HTTP response body.</summary>
     internal sealed class PayloadSource : Source
     {
@@ -46,21 +56,33 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Payload scope wire term, for example event or success.</summary>
         public string Scope => _scope.Value;
 
+        /// <summary>The response a success or error body is read from.</summary>
+        internal ResponseHandle Response { get; }
+
         internal PayloadSource(string scope)
-            : this(PayloadScope.From(scope))
+            : this(PayloadScope.From(scope), ResponseHandle.Innermost)
         {
         }
 
-        private PayloadSource(PayloadScope scope)
+        private PayloadSource(PayloadScope scope, ResponseHandle response)
         {
             _scope = scope ?? throw new ArgumentNullException(nameof(scope));
+            Response = response;
+        }
+
+        private PayloadSource(PayloadScope scope)
+            : this(scope, ResponseHandle.Innermost)
+        {
         }
 
         internal static PayloadSource Event() => new PayloadSource(PayloadScope.Event);
 
+        /// <summary>The success body of the request the step follows.</summary>
         internal static PayloadSource Success() => new PayloadSource(PayloadScope.Success);
 
-        internal static PayloadSource Error() => new PayloadSource(PayloadScope.Error);
+        internal static PayloadSource Success(ResponseHandle response) => new PayloadSource(PayloadScope.Success, response);
+
+        internal static PayloadSource Error(ResponseHandle response) => new PayloadSource(PayloadScope.Error, response);
 
         /// <summary>Request snapshot scope. Designed landing zone (owner-confirmed 2026-06-12):
         /// the runtime keeps the request snapshot for deterministic retry; the authoring door is future surface.</summary>

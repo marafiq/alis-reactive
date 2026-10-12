@@ -37,7 +37,7 @@ namespace Alis.Reactive.Grammar.Lowering
         internal IReadOnlyList<Statement> Request(RequestPlan request, LoweringScope scope)
         {
             var response = _context.Fresh("res");
-            var routeScope = scope.WithResponse(response);
+            var routeScope = scope.WithResponse(request.Response, response);
 
             // A gathered value that returns a promise settles just before the request is sent.
             var exchange = _values.WithAwaitedReads(() => new[]
