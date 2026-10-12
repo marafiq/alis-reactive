@@ -46,7 +46,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
     /// <summary>A take as the board sends it to the TakeVisit endpoint: the time in the path, the family in the body.</summary>
     public sealed class TakeVisitRequest : TakeRequest
     {
-        public string SlotId { get; set; } = "";
+        public string? SlotId { get; set; }
     }
 
     /// <summary>The sandbox's slugify plugin: "Garden wing" reads "garden-wing".</summary>

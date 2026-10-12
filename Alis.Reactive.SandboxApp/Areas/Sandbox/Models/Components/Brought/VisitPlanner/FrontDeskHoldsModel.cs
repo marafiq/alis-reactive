@@ -38,7 +38,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
     /// <summary>A request about one visit time at the desk: <c>{slotId}</c> in the path.</summary>
     public class FrontDeskSlot
     {
-        public string SlotId { get; set; } = "";
+        public string? SlotId { get; set; }
     }
 
     /// <summary>The body of a hold or a badge, which the desk's actions bind with [FromBody].</summary>
@@ -54,7 +54,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
     /// <summary>A hold or a badge as the page sends it: the time in the path, the rest in the body.</summary>
     public sealed class HoldVisitRequest : HoldRequest
     {
-        public string SlotId { get; set; } = "";
+        public string? SlotId { get; set; }
     }
 
     public class VisitorsChange

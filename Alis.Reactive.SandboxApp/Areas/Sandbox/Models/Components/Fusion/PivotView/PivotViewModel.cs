@@ -35,7 +35,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     /// <summary>The body of <c>POST api/pivot/{currentView}/audit</c>.</summary>
     public class PivotAuditRequest
     {
-        public string FacilityId { get; init; } = "";
+        public string? FacilityId { get; init; }
         public string Layout { get; init; } = "";
     }
 
