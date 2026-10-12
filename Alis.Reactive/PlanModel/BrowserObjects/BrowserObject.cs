@@ -71,11 +71,12 @@ namespace Alis.Reactive.PlanModel
             new NoInputBinding();
 
 
-        internal static InputBinding RegisteredInput(BindingPath bindingPath, MemberName valueMember, EventName committedBy) =>
+        internal static InputBinding RegisteredInput(BindingPath bindingPath, MemberName valueMember, EventName committedBy, Shape modelShape) =>
             new RegisteredInputBinding(
                 bindingPath,
                 valueMember,
-                committedBy);
+                committedBy,
+                modelShape);
 
         internal abstract InputBinding FillIfAbsent(InputBinding incoming);
     }
@@ -96,12 +97,16 @@ namespace Alis.Reactive.PlanModel
         private readonly MemberName _valueMember;
         private readonly EventName _committedBy;
 
-        internal RegisteredInputBinding(BindingPath bindingPath, MemberName valueMember, EventName committedBy)
+        internal RegisteredInputBinding(BindingPath bindingPath, MemberName valueMember, EventName committedBy, Shape modelShape)
         {
             _bindingPath = bindingPath ?? throw new System.ArgumentNullException(nameof(bindingPath));
             _valueMember = valueMember ?? throw new System.ArgumentNullException(nameof(valueMember));
             _committedBy = committedBy ?? throw new System.ArgumentNullException(nameof(committedBy));
+            ModelShape = modelShape ?? throw new System.ArgumentNullException(nameof(modelShape));
         }
+
+        /// <summary>The model member's type: the model, gather and validation read the value in it.</summary>
+        internal Shape ModelShape { get; }
 
         public string BindingPath => _bindingPath.Value;
         public Path Path => _bindingPath.Path;
@@ -138,8 +143,10 @@ namespace Alis.Reactive.PlanModel
             new InputValueContract(input, shape);
 
         internal InputBinding BindingFor(BindingPath bindingPath) =>
-            InputBinding.RegisteredInput(bindingPath, _input.ValueMember, _input.CommittedBy);
+            InputBinding.RegisteredInput(bindingPath, _input.ValueMember, _input.CommittedBy, Shape);
 
+        // The property is declared as the component holds it, so a page reading it (c => c.Value) and
+        // the model reading it in the model's type are one member; each read converts to what it asks for.
         internal void Enrich(BrowserObjectContract objectContract)
         {
             if (objectContract == null) throw new System.ArgumentNullException(nameof(objectContract));
@@ -147,7 +154,7 @@ namespace Alis.Reactive.PlanModel
             objectContract.Declare(ObjectPropertyContract.Create(
                 _input.ValueMember,
                 _input.ValuePath,
-                Shape,
+                _input.ValueShape,
                 MemberAccess.Read));
 
             var valueMemberNeedsCanonicalAlias = !_input.ValueMember.Equals(CanonicalValueMember);
@@ -155,7 +162,7 @@ namespace Alis.Reactive.PlanModel
                 objectContract.Declare(ObjectPropertyContract.Create(
                     CanonicalValueMember,
                     _input.ValuePath,
-                    Shape,
+                    _input.ValueShape,
                     MemberAccess.Read));
         }
     }

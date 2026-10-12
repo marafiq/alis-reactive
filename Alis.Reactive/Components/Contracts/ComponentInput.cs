@@ -22,15 +22,20 @@ namespace Alis.Reactive
     /// </example>
     public sealed class ComponentInput
     {
-        private ComponentInput(MemberName valueMember, Path valuePath, EventName committedBy)
+        private ComponentInput(MemberName valueMember, Path valuePath, Shape valueShape, EventName committedBy)
         {
             ValueMember = valueMember;
             ValuePath = valuePath;
+            ValueShape = valueShape;
             CommittedBy = committedBy;
         }
 
         internal MemberName ValueMember { get; }
         internal Path ValuePath { get; }
+
+        /// <summary>The value's type as the component holds it; the model's type is applied where the model reads it.</summary>
+        internal Shape ValueShape { get; }
+
         internal EventName CommittedBy { get; }
 
         /// <summary>Declares the input's value property and the event that commits it.</summary>
@@ -42,7 +47,7 @@ namespace Alis.Reactive
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
             if (committedBy == null) throw new ArgumentNullException(nameof(committedBy));
-            return new ComponentInput(MemberName.Of(value.Member), value.Path, EventName.Of(committedBy.ObjectEvent));
+            return new ComponentInput(MemberName.Of(value.Member), value.Path, value.Shape, EventName.Of(committedBy.ObjectEvent));
         }
 
         internal bool Matches(ComponentInput other) =>
