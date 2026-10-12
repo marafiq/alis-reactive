@@ -89,14 +89,6 @@ function evaluateWhen(entry: Entry, test: FormField["tests"][number]): boolean {
   return !!evaluate(test.when, { env: Environment.root(), world: entry.world });
 }
 
-function testIsInactive(entry: Entry, test: FormField["tests"][number]): boolean {
-  try {
-    return !evaluateWhen(entry, test);
-  } catch {
-    return true;
-  }
-}
-
 function checkPasses(entry: Entry, test: FormField["tests"][number], value: unknown): boolean {
   const check = evaluate(test.check, { env: Environment.root(), world: entry.world }) as (value: unknown) => unknown;
   return !!check(value);
@@ -137,7 +129,7 @@ function unmountedField(entry: Entry, summary: HTMLElement | null): boolean {
   const { field } = entry;
   log.trace("validation-field.unmounted", { field: field.id });
   for (const test of field.tests) {
-    if (testIsInactive(entry, test)) continue;
+    if (!evaluateWhen(entry, test)) continue;
     if (checkPasses(entry, test, undefined)) continue;
     addSummaryError(summary, field.id, test.message);
     return false;
