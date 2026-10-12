@@ -1,0 +1,30 @@
+@model IntakeStepsModel
+@{
+    ViewData["Title"] = "Resident Intake";
+    var plan = Html.ReactivePlan<IntakeStepsModel>();
+
+    // The first step loads into the form like every later one, so each step's fields leave with it.
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Get(Url.SandboxRoute("ResidentStep", "IntakeSteps"))
+         .Response(r => r.OnSuccess(s => s.Into("intake-step")));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Resident Intake</native-heading>
+    <native-text color="Secondary">
+        Take a new resident's intake in two steps: who the resident is, then the care they need.
+    </native-text>
+
+    <native-card><native-card-body>
+        <form id="intake-form" class="flex flex-col gap-4">
+            <div id="intake-step">
+                <p class="text-sm text-text-muted">Loading the intake...</p>
+            </div>
+        </form>
+        <p id="intake-status" class="mt-3 text-sm text-text-muted">No intake saved yet.</p>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

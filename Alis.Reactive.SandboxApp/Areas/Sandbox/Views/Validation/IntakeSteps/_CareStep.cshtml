@@ -1,0 +1,40 @@
+@model IntakeStepsModel
+@using Alis.Reactive.Native.Components
+@{
+    var plan = Html.ResolvePlan<IntakeStepsModel>();
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+    var careLevels = new[]
+    {
+        new SelectListItem("Independent living", "Independent living"),
+        new SelectListItem("Assisted living", "Assisted living"),
+        new SelectListItem(IntakeCareValidator.FullCareLevel, IntakeCareValidator.FullCareLevel),
+    };
+}
+
+<native-heading level="H2">Step 2 of 2: Care needs for @Model.ResidentName</native-heading>
+
+<native-grid cols="C2" gap="Base">
+    @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care level"))
+        .NativeDropDown(b => b.Items(careLevels).Placeholder("-- Choose a care level --").CssClass(Field)); }
+    @{ Html.InputField(plan, m => m.MobilityNotes, o => o.Label("Mobility notes"))
+        .NativeTextBox(b => b.Placeholder("Walker, two-person assist, ...").CssClass(Field)); }
+</native-grid>
+
+@* The resident step is no longer on the page: its answers travel with the request, and the
+   server checks the whole intake. *@
+@(Html.NativeButton("finish-intake-btn", "Finish intake")
+    .CssClass("self-start rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+    .Reactive(plan, evt => evt.Click, (args, p) =>
+    {
+        p.Post(Url.SandboxRoute("Finish", "IntakeSteps"))
+         .Gather(g => g
+            .Form()
+            .Set(x => x.ResidentName, Model.ResidentName)
+            .Set(x => x.FamilyPhone, Model.FamilyPhone))
+         .Validate<IntakeCareValidator>("intake-form")
+         .Response(r => r
+            .OnSuccess<IntakeConfirmation>((json, s) => s.Element("intake-status").SetText(json, x => x.Confirmation))
+            .OnError(400, e => e.ValidationErrors("intake-form")));
+    }))
+
+@Html.RenderPlan(plan)

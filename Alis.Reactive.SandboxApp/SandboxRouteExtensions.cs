@@ -27,7 +27,8 @@ namespace Alis.Reactive.SandboxApp
 
         /// <summary>
         /// Resolves a Sandbox-area route as a reactive-plan URL template, keeping the named
-        /// <c>{param}</c> placeholders the runtime substitutes (via <c>RouteParam(...)</c>).
+        /// <c>{param}</c> placeholders that the gathered request member of the same name fills
+        /// (<c>Gather&lt;TRequest&gt;(g =&gt; g.Set(x =&gt; x.Param, ...))</c>).
         /// The route prefix is still MVC-resolved, so template changes flow through, but the
         /// placeholders survive. Sentinel values satisfy <c>{id:int}</c>-style constraints.
         /// </summary>

@@ -1,0 +1,30 @@
+@model IntakeStepsModel
+@using Alis.Reactive.Native.Components
+@{
+    var plan = Html.ResolvePlan<IntakeStepsModel>();
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+}
+
+<native-heading level="H2">Step 1 of 2: Resident</native-heading>
+
+<native-grid cols="C2" gap="Base">
+    @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident name"))
+        .NativeTextBox(b => b.Placeholder("Full name").CssClass(Field)); }
+    @{ Html.InputField(plan, m => m.FamilyPhone, o => o.Required().Label("Family phone"))
+        .NativeTextBox(b => b.Placeholder("555-0100").CssClass(Field)); }
+</native-grid>
+
+@* The step checks its own fields against the whole form; the care step replaces it once the
+   server accepts the resident. *@
+@(Html.NativeButton("continue-to-care-btn", "Continue to care needs")
+    .CssClass("self-start rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+    .Reactive(plan, evt => evt.Click, (args, p) =>
+    {
+        p.Post(Url.SandboxRoute("Resident", "IntakeSteps")).Gather(g => g.Form())
+         .Validate<IntakeResidentValidator>("intake-form")
+         .Response(r => r
+            .OnSuccess(s => s.Into("intake-step"))
+            .OnError(400, e => e.ValidationErrors("intake-form")));
+    }))
+
+@Html.RenderPlan(plan)
