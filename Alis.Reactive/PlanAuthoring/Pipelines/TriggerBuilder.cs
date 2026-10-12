@@ -26,9 +26,7 @@ namespace Alis.Reactive.Builders
         /// <param name="pipeline">Builds the reaction graph for the <c>DomReady</c> trigger.</param>
         public TriggerBuilder<TModel> DomReady(Action<PipelineBuilder<TModel>> pipeline)
         {
-            var reactionPipeline = new PipelineBuilder<TModel>(_context);
-            pipeline(reactionPipeline);
-            AddBehavior(StartsWhen.PageReady(), reactionPipeline);
+            AddBehavior(StartsWhen.PageReady(), PipelineBuilder<TModel>.Build(_context, pipeline));
             return this;
         }
 
@@ -131,24 +129,21 @@ namespace Alis.Reactive.Builders
 
         private TriggerBuilder<TModel> On(StartsWhen trigger, Action<PipelineBuilder<TModel>> pipeline)
         {
-            var reactionPipeline = new PipelineBuilder<TModel>(_context);
-            pipeline(reactionPipeline);
-            AddBehavior(trigger, reactionPipeline);
+            AddBehavior(trigger, PipelineBuilder<TModel>.Build(_context, pipeline));
             return this;
         }
 
         private TriggerBuilder<TModel> On<TPayload>(StartsWhen trigger, Action<TPayload, PipelineBuilder<TModel>> pipeline)
             where TPayload : new()
         {
-            var reactionPipeline = new PipelineBuilder<TModel>(_context);
-            pipeline(new TPayload(), reactionPipeline);
-            AddBehavior(trigger, reactionPipeline);
+            var payload = new TPayload();
+            AddBehavior(trigger, PipelineBuilder<TModel>.Build(_context, p => pipeline(payload, p)));
             return this;
         }
 
-        private void AddBehavior(StartsWhen trigger, PipelineBuilder<TModel> reactionPipeline)
+        private void AddBehavior(StartsWhen trigger, ReactionGraph reaction)
         {
-            _context.AddBehavior(Behavior.On(trigger, reactionPipeline.BuildReaction()));
+            _context.AddBehavior(Behavior.On(trigger, reaction));
         }
     }
 }

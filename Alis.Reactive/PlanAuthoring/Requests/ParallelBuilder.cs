@@ -39,10 +39,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
 
-            var reactionPipeline = new PipelineBuilder<TModel>(_context);
-            pipeline(reactionPipeline);
-            var reaction = reactionPipeline.BuildReaction();
-            _draft.RunWhenAllSettled(reaction);
+            _draft.RunWhenAllSettled(PipelineBuilder<TModel>.Build(_context, pipeline));
             return this;
         }
 

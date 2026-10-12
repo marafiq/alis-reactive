@@ -22,23 +22,27 @@
     // first; the family's holds follow it, asked for under the family's name in a header.
     Html.On(plan, t => t.DomReady(p =>
     {
+        // Declared once; each write lands in the callback it is written in.
         var link = p.Url<FrontDeskQuery>();
+        var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
+        var resident = p.Element("desk-resident");
+        var loading = p.Element("desk-loading");
         p.Get(weekUrl)
             .Gather<FrontDeskResident>(g => g.Set(x => x.ResidentId, link.Get(q => q.Resident)))
-            .WhileLoading(l => l.Element("desk-loading").Show())
+            .WhileLoading(l => loading.Show())
             .Response(r => r
                 .OnSuccess<ResidentWeekResponse>((week, s) =>
                 {
-                    s.Component<VisitPlanner>(m => m.VisitSlots)
+                    planner
                         .Set(c => c.Wing, week.Read(x => x.Wing))
                         .Set(c => c.Capacity, week.Read(x => x.WeeklyVisits))
                         .Set(c => c.Slots, week.Read(x => x.Slots));
-                    s.Element("desk-resident").SetText(week, x => x.ResidentName);
+                    resident.SetText(week, x => x.ResidentName);
                 })
                 .OnError<DeskMessage>(404, (unknown, e) =>
                 {
-                    e.Component<VisitPlanner>(m => m.VisitSlots).Set(c => c.EmptyMessage, unknown.Read(x => x.Message));
-                    e.Element("desk-resident").SetText("Unknown resident");
+                    planner.Set(c => c.EmptyMessage, unknown.Read(x => x.Message));
+                    resident.SetText("Unknown resident");
                 })
                 .Chained(holds => holds.Get(holdsUrl)
                     .Gather<FrontDeskResident>(g => g
@@ -46,12 +50,11 @@
                         .Header("X-Family", link.Get(q => q.Family)))
                     .Response(answer => answer.OnSuccess<FamilyHoldsResponse>((held, s) =>
                     {
-                        var planner = s.Component<VisitPlanner>(m => m.VisitSlots);
                         planner.Set(c => c.Value, held.Read(x => x.Held));
                         s.Element("desk-family").SetText(held, x => x.Family);
                         s.Element("desk-held").SetText(planner.Get(c => c.Count));
                     }))))
-            .Finally(f => f.Element("desk-loading").Hide());
+            .Finally(f => loading.Hide());
     }));
 }
 

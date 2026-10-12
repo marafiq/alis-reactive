@@ -117,6 +117,22 @@ PIPELINE :=
   | p.Into("elementId")
 ```
 
+**Where a step lands.** A step lands in the callback it is written in, whichever pipeline
+variable or handle writes it. Declare a handle once at the top of a trigger and use it in any
+route (FrontDesk.cshtml):
+
+```csharp
+var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
+var loading = p.Element("desk-loading");
+p.Get(weekUrl)
+    .WhileLoading(l => loading.Show())
+    .Response(r => r.OnSuccess<ResidentWeekResponse>((week, s) =>
+        planner.Set(c => c.Wing, week.Read(x => x.Wing))))
+    .Finally(f => loading.Hide());
+```
+
+A step written outside any callback throws when the view renders.
+
 ## Element Actions
 
 ```

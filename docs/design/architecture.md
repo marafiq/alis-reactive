@@ -1057,3 +1057,9 @@ built and what is not.
   section 11 is therefore what ships, with its defects removed (below).
 - **Built from the audit:**
   - typed gather and `p.Url<TQuery>()` (section 4.6, as built).
+  - the active-scope stack (section 4.4). Every callback is built by `PipelineBuilder.Build`, which
+    makes its pipeline the active scope while the callback runs; every step, through any pipeline
+    variable or handle (`ComponentRef`, `ElementBuilder`, `PayloadRef`, a plugin call), lands in the
+    active scope. A handle declared at the top of a trigger and used inside `OnSuccess` writes into
+    `OnSuccess`; a step written outside any callback throws at render. The FrontDesk journey declares
+    its planner, resident and loading handles once and uses them in every route.

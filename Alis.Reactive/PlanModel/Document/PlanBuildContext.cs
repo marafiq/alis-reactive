@@ -16,6 +16,9 @@ namespace Alis.Reactive.PlanModel
         private readonly BehaviorGraph _behaviors;
         private readonly List<ValidationJob> _validationJobs = new List<ValidationJob>();
 
+        // The callbacks being built, innermost last: a reaction step lands in the innermost one.
+        private readonly Stack<object> _scopes = new Stack<object>();
+
         internal PlanBuildContext(
             PlanIdentity identity,
             RegisteredInputComponents registrations)
@@ -24,6 +27,20 @@ namespace Alis.Reactive.PlanModel
             _objectContracts = new BrowserObjectContracts();
             _browserObjects = new BrowserObjects(_objectContracts, registrations);
             _behaviors = new BehaviorGraph(_browserObjects);
+        }
+
+        internal void EnterScope(object pipeline) => _scopes.Push(pipeline);
+
+        internal void ExitScope() => _scopes.Pop();
+
+        internal TPipeline ActiveScope<TPipeline>() where TPipeline : class
+        {
+            if (_scopes.Count == 0)
+                throw new InvalidOperationException(
+                    "A reaction step was written outside any callback. Write it inside a trigger, a component's " +
+                    ".Reactive, Then, Else, OnSuccess, OnError, WhileLoading, Finally or OnAllSettled callback.");
+
+            return (TPipeline)_scopes.Peek();
         }
 
         internal PlanDocument BuildPlan() =>

@@ -16,10 +16,11 @@ namespace Alis.Reactive.Builders
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
         {
-            _draft.BeginBranch();
+            var active = Active;
+            active._draft.BeginBranch();
 
             var source = PayloadTypedSource<TPayload, TProp>.FromEvent(path);
-            return new ConditionSourceBuilder<TModel, TProp>(source, this);
+            return new ConditionSourceBuilder<TModel, TProp>(source, active);
         }
 
         /// <summary>Starts a branch whose guard reads from the active HTTP response body.</summary>
@@ -32,10 +33,11 @@ namespace Alis.Reactive.Builders
             Expression<Func<TResponse, TProp>> path)
             where TResponse : class
         {
-            _draft.BeginBranch();
+            var active = Active;
+            active._draft.BeginBranch();
 
             var source = responseBody.Read(path);
-            return new ConditionSourceBuilder<TModel, TProp>(source, this);
+            return new ConditionSourceBuilder<TModel, TProp>(source, active);
         }
 
         /// <summary>Starts a branch whose guard reads from a typed value source.</summary>
@@ -43,17 +45,19 @@ namespace Alis.Reactive.Builders
         /// <param name="source">Typed condition value source.</param>
         public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
         {
-            _draft.BeginBranch();
-            return new ConditionSourceBuilder<TModel, TProp>(source, this);
+            var active = Active;
+            active._draft.BeginBranch();
+            return new ConditionSourceBuilder<TModel, TProp>(source, active);
         }
 
         /// <summary>Adds a user-decision guard before the pipeline continues.</summary>
         /// <param name="message">User-decision confirmation message.</param>
         public GuardBuilder<TModel> Confirm(string message)
         {
-            _draft.BeginBranch();
+            var active = Active;
+            active._draft.BeginBranch();
 
-            return new GuardBuilder<TModel>(ConditionGraph.Confirm(message), this);
+            return new GuardBuilder<TModel>(ConditionGraph.Confirm(message), active);
         }
     }
 }

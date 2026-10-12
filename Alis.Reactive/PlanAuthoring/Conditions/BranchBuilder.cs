@@ -73,9 +73,7 @@ namespace Alis.Reactive.Builders.Conditions
         {
             EnsureDefaultCanBeAdded();
 
-            var reactionPipeline = new PipelineBuilder<TModel>(Pipeline.Context);
-            pipeline(reactionPipeline);
-            _cases.Add(BranchCase.Default(reactionPipeline.BuildReaction()));
+            _cases.Add(BranchCase.Default(PipelineBuilder<TModel>.Build(Pipeline.Context, pipeline)));
             _hasDefaultCase = true;
         }
 

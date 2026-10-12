@@ -10,7 +10,7 @@ namespace Alis.Reactive.Builders
         /// <returns>Request builder for route values, validation, loading/finally reactions, and response routing.</returns>
         public HttpRequestBuilder<TModel> Get(string url)
         {
-            return _draft.BeginHttp(Context).Get(url);
+            return Active._draft.BeginHttp(Context).Get(url);
         }
 
         /// <summary>Appends an async HTTP POST reaction to this Reactive Plan pipeline.</summary>
@@ -18,7 +18,7 @@ namespace Alis.Reactive.Builders
         /// <returns>Request builder for gathered input, validation, loading/finally reactions, and response routing.</returns>
         public HttpRequestBuilder<TModel> Post(string url)
         {
-            return _draft.BeginHttp(Context).Post(url);
+            return Active._draft.BeginHttp(Context).Post(url);
         }
 
         /// <summary>Appends an async HTTP PUT reaction to this Reactive Plan pipeline.</summary>
@@ -26,7 +26,7 @@ namespace Alis.Reactive.Builders
         /// <returns>Request builder for gathered input, validation, loading/finally reactions, and response routing.</returns>
         public HttpRequestBuilder<TModel> Put(string url)
         {
-            return _draft.BeginHttp(Context).Put(url);
+            return Active._draft.BeginHttp(Context).Put(url);
         }
 
         /// <summary>Appends an async HTTP DELETE reaction to this Reactive Plan pipeline.</summary>
@@ -34,7 +34,7 @@ namespace Alis.Reactive.Builders
         /// <returns>Request builder for route values, validation, loading/finally reactions, and response routing.</returns>
         public HttpRequestBuilder<TModel> Delete(string url)
         {
-            return _draft.BeginHttp(Context).Delete(url);
+            return Active._draft.BeginHttp(Context).Delete(url);
         }
 
         /// <summary>Appends an async reaction whose HTTP request branches execute concurrently.</summary>
@@ -42,7 +42,7 @@ namespace Alis.Reactive.Builders
         /// <returns>Parallel request builder for configuring the optional all-settled reaction.</returns>
         public ParallelBuilder<TModel> Parallel(params Action<HttpRequestBuilder<TModel>>[] branches)
         {
-            var builder = _draft.BeginParallel(Context);
+            var builder = Active._draft.BeginParallel(Context);
             foreach (var branch in branches)
                 builder.AddBranch(branch);
             return builder;

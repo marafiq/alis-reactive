@@ -25,13 +25,12 @@ namespace Alis.Reactive
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
 
             var target = ComponentObjectTarget.For(componentId, vendor);
-            var pipelineBuilder = new PipelineBuilder<TModel>(plan.Context);
-            pipeline(typedEvent.Args, pipelineBuilder);
+            var reaction = PipelineBuilder<TModel>.Build(plan.Context, p => pipeline(typedEvent.Args, p));
             plan.Context.WireComponentEvent(
                 target.ComponentId.Value,
                 target.Vendor,
                 typedEvent.ObjectEvent,
-                pipelineBuilder.BuildReaction());
+                reaction);
         }
     }
 }

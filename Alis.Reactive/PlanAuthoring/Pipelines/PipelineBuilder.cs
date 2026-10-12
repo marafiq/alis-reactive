@@ -32,9 +32,31 @@ namespace Alis.Reactive.Builders
         /// <inheritdoc />
         PlanBuildContext IReactionEmitter.BuildContext => Context;
 
+        // A step lands in the callback being built, whichever pipeline variable or handle wrote it: a
+        // handle declared in a trigger and used inside OnSuccess writes into OnSuccess.
+        private PipelineBuilder<TModel> Active => Context.ActiveScope<PipelineBuilder<TModel>>();
+
         internal void AddStep(ReactionGraph step)
         {
-            _draft.AddReaction(step);
+            Active._draft.AddReaction(step);
+        }
+
+        /// <summary>Builds a callback's reactions with its pipeline as the active scope.</summary>
+        internal static ReactionGraph Build(PlanBuildContext context, Action<PipelineBuilder<TModel>> reactions)
+        {
+            if (reactions == null) throw new ArgumentNullException(nameof(reactions));
+            var pipeline = new PipelineBuilder<TModel>(context);
+            context.EnterScope(pipeline);
+            try
+            {
+                reactions(pipeline);
+            }
+            finally
+            {
+                context.ExitScope();
+            }
+
+            return pipeline.BuildReaction();
         }
 
         /// <summary>Raises a declared document event with no payload.</summary>
