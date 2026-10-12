@@ -98,7 +98,7 @@ namespace Alis.Reactive
         /// </code>
         /// </example>
         /// <typeparam name="TComponent">The component declaration the markup renders.</typeparam>
-        /// <param name="elementId">The ID the markup gives the component's element; markup without it fails here.</param>
+        /// <param name="elementId">The ID the markup gives the component's element.</param>
         /// <param name="markup">The component's markup.</param>
         /// <returns>The rendered component, ready for <c>.Reactive(...)</c>.</returns>
         public RenderedComponent<TComponent, TModel> Render<TComponent>(
@@ -113,17 +113,7 @@ namespace Alis.Reactive
             if (string.IsNullOrWhiteSpace(elementId))
                 throw new ArgumentException("Element ID required.", nameof(elementId));
             if (markup == null) throw new ArgumentNullException(nameof(markup));
-#if NET48
-            var identified = ComponentMarkup.Identified(markup.ToHtmlString(), elementId, typeof(TComponent));
-            return new RenderedComponent<TComponent, TModel>(this, elementId, new System.Web.HtmlString(identified));
-#else
-            using (var written = new System.IO.StringWriter())
-            {
-                markup.WriteTo(written, System.Text.Encodings.Web.HtmlEncoder.Default);
-                var identified = ComponentMarkup.Identified(written.ToString(), elementId, typeof(TComponent));
-                return new RenderedComponent<TComponent, TModel>(this, elementId, new Microsoft.AspNetCore.Html.HtmlString(identified));
-            }
-#endif
+            return new RenderedComponent<TComponent, TModel>(this, elementId, markup);
         }
 
         internal void RegisterInputComponent(ComponentRegistration registration)
