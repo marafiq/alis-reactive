@@ -170,11 +170,12 @@ namespace Alis.Reactive.FluentValidator
         private const RegexOptions NoJavaScriptForm = RegexOptions.IgnorePatternWhitespace | RegexOptions.RightToLeft;
 
         // Syntax .NET reads one way and JavaScript another, or not at all: \A \Z \z \G anchors, inline
-        // options (?i) and (?i:...), atomic (?>...) and comment (?#...) groups, (?'name') groups, Unicode
-        // classes \p{..} (literal "p" without JavaScript's u flag) and class subtraction [a-z-[aeiou]],
-        // a "-[" inside a class (a hyphen before a class, as in \d{3}-[A-Z], is the same in both).
+        // options (?i), (?I) and (?i:...), atomic (?>...) and comment (?#...) groups, (?'name') groups,
+        // balancing groups (?<open-close>...), conditionals (?(x)...), Unicode classes \p{..} (literal
+        // "p" without JavaScript's u flag) and class subtraction [a-z-[aeiou]], a "-[" inside a class (a
+        // hyphen before a class, as in \d{3}-[A-Z], is the same in both).
         private static readonly Regex DotNetOnlySyntax = new Regex(
-            @"\\[AZzG]|\(\?[imnsx-]+[:)]|\(\?>|\(\?#|\(\?'|\\[pP]\{|\[[^\]]*-\[",
+            @"\\[AZzG]|\(\?[imnsxIMNSX-]+[:)]|\(\?>|\(\?#|\(\?'|\(\?<\w*-\w+>|\(\?\(|\\[pP]\{|\[[^\]]*-\[",
             RegexOptions.CultureInvariant);
 
         // The regex FluentValidation tests with, as a JavaScript pattern and flags. A pattern built from
