@@ -12,8 +12,6 @@ namespace Alis.Reactive.Grammar.Lowering
     /// </summary>
     internal sealed class ValueLowering
     {
-        private const string RootCallMember = "$call";
-
         private readonly LoweringContext _context;
 
         // The awaited reads of the statement being lowered; null where nothing can wait for one.
@@ -142,8 +140,7 @@ namespace Alis.Reactive.Grammar.Lowering
             if (read.Access is MethodValueReadAccess method)
             {
                 var declared = _context.Method(contract, read.Member, owner);
-                var path = read.Member == RootCallMember ? G.NoPath : G.PathOf(declared.Path);
-                var call = G.Call(target, path, Arguments(method.Args, scope), ArgumentShapes(declared), Requested(read.Shape, declared.Returns));
+                var call = G.Call(target, G.PathOf(declared.Path), Arguments(method.Args, scope), ArgumentShapes(declared), Requested(read.Shape, declared.Returns));
                 return declared.Signature.Awaits ? Awaited(call, read.Member) : call;
             }
 

@@ -106,8 +106,7 @@ namespace Alis.Reactive.Grammar.Lowering
                     return G.Do(invocation, awaits: method.Signature.Awaits);
                 case PluginSource plugin:
                     var declared = _context.Method(_context.PluginContractOf(plugin.Name), call.Method, "plugin " + plugin.Name);
-                    var pluginPath = call.Method == "$call" ? G.NoPath : G.PathOf(declared.Path);
-                    return G.Do(G.Call(G.Obj(_context.Objects.Plugin(plugin.Name)), pluginPath, args, ValueLowering.ArgumentShapes(declared), Shape.None));
+                    return G.Do(G.Call(G.Obj(_context.Objects.Plugin(plugin.Name)), G.PathOf(declared.Path), args, ValueLowering.ArgumentShapes(declared), Shape.None));
                 case PayloadSource payload:
                     var (root, path) = _values.PayloadRoot(payload, scope);
                     return G.Do(G.Call(root, path.Concat(new[] { call.Method }).ToList(), args, G.NoShapes, Shape.None));
