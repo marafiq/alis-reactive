@@ -9,11 +9,11 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Native
+namespace Alis.Reactive
 {
     /// <summary>
     /// Model-bound input field returned by
-    /// <see cref="Extensions.InputFieldExtensions.InputField{TModel,TProp}"/>, ready to receive
+    /// <see cref="InputFieldExtensions.InputField{TModel,TProp}"/>, ready to receive
     /// a component extension that renders inside the field wrapper.
     /// </summary>
     /// <remarks>

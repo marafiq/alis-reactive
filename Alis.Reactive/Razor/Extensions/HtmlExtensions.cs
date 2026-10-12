@@ -6,7 +6,7 @@ using System.Web.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Native.Extensions
+namespace Alis.Reactive
 {
     /// <summary>
     /// Razor view extensions for adding behavior to a Reactive Plan.

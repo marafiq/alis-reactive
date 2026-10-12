@@ -22,13 +22,12 @@ PLAN_WIRING :=
 ## Required @using
 
 ```
-@using Alis.Reactive.Native.Extensions       -- Html.On, ReactivePlan, RenderPlan, InputField
+@using Alis.Reactive                         -- Html.On, ReactivePlan, RenderPlan, InputField, Field.Of(...)
 @using Alis.Reactive.Native.Components       -- NativeTextBox, NativeButton, NativeCheckBox, ...
 @using Alis.Reactive.Fusion.Components       -- FusionAutoComplete, FusionDropDownList, ...
 @using Alis.Reactive.Builders.Requests       -- Gather Include<TComponent, TModel>(...) (vendor-agnostic)
 @using Alis.Reactive.Native.AppLevel         -- NativeDrawer, NativeLoader, DrawerSize
 @using Alis.Reactive.Fusion.AppLevel         -- FusionToast, FusionToastTone
-@using Alis.Reactive                         -- Field.Of(...) for row and item members
 @using Syncfusion.EJ2                        -- Html.EJS()
 @using Syncfusion.EJ2.DropDowns              -- VisualMode (MultiSelect)
 ```

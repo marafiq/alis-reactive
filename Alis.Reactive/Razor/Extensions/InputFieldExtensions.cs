@@ -8,7 +8,7 @@ using System.Web.Mvc.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Native.Extensions
+namespace Alis.Reactive
 {
     /// <summary>
     /// Razor view extension for starting a model-bound input field.

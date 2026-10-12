@@ -134,7 +134,7 @@ the end.
 
 ```csharp
 @model TodoModel
-@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.AppLevel
