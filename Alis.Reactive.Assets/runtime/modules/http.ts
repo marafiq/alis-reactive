@@ -38,7 +38,7 @@ export interface HttpResponse {
   readonly body: unknown;
 }
 
-const ROUTE_PLACEHOLDER = /\{(\w+)\}/g;
+const ROUTE_PLACEHOLDER = /\{(\w+)\}/;
 
 export async function send(request: HttpRequest): Promise<HttpResponse> {
   const { url, init } = prepare(request);
