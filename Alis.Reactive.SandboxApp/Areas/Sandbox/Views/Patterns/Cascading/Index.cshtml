@@ -8,7 +8,7 @@
     var plan = Html.ReactivePlan<CascadingModel>();
     var countries = (List<CountryItem>)ViewBag.Countries;
 
-    Html.On(plan, t => t.CustomEvent("do-save", p =>
+    Html.On(plan, t => t.CustomEvent(CascadingEvents.DoSave, p =>
     {
         p.Post(Url.SandboxRoute("Save", "Cascading"), g =>
         {
@@ -93,7 +93,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Dispatch("do-save");
+                p.Dispatch(CascadingEvents.DoSave);
             }))
         <p class="font-mono text-sm mt-2">Result: <span id="save-result" class="text-text-muted">&mdash;</span></p>
     </section>

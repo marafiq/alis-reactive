@@ -11,7 +11,7 @@ namespace Alis.Reactive.Builders
     /// </summary>
     /// <remarks>
     /// Received as the <c>p</c> parameter inside trigger callbacks:
-    /// <c>t.DomReady(p =&gt; { p.Element("id").AddClass("x"); p.Dispatch("ready"); })</c>.
+    /// <c>t.DomReady(p =&gt; { p.Element("id").AddClass("x"); p.Dispatch(CareEvents.Ready); })</c>.
     /// Reactions execute in declaration order.
     /// </remarks>
     /// <typeparam name="TModel">View model that owns model-bound component IDs and validation/gather fields.</typeparam>
@@ -37,48 +37,62 @@ namespace Alis.Reactive.Builders
             _draft.AddReaction(step);
         }
 
-        /// <summary>Queues a <c>CustomEvent</c> reaction without a payload.</summary>
-        /// <param name="eventName">Event name matched by <c>t.CustomEvent(...)</c> triggers.</param>
+        /// <summary>Raises a declared document event with no payload.</summary>
+        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Named(string)"/>.</param>
         /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
-        public PipelineBuilder<TModel> Dispatch(string eventName)
+        public PipelineBuilder<TModel> Dispatch(AppEvent appEvent)
         {
-            AddStep(ReactionGraph.Dispatch(eventName));
+            if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
+            AddStep(ReactionGraph.Dispatch(appEvent.Name));
             return this;
         }
 
-        /// <summary>Queues a <c>CustomEvent</c> reaction with a build-time payload literal.</summary>
-        /// <typeparam name="TPayload">Payload contract consumed by matching custom event triggers.</typeparam>
-        /// <param name="eventName">Event name matched by <c>t.CustomEvent&lt;TPayload&gt;(...)</c> triggers.</param>
-        /// <param name="payload">Payload object serialized into the generated plan.</param>
+        /// <summary>Raises a declared document event without its payload: a listener reads every member as missing.</summary>
+        /// <typeparam name="TPayload">The payload the event declares.</typeparam>
+        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Named{TPayload}(string)"/>.</param>
         /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
-        public PipelineBuilder<TModel> Dispatch<TPayload>(string eventName, TPayload payload)
+        public PipelineBuilder<TModel> Dispatch<TPayload>(AppEvent<TPayload> appEvent)
+            where TPayload : class, new()
         {
+            if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
+            AddStep(ReactionGraph.Dispatch(appEvent.Name));
+            return this;
+        }
+
+        /// <summary>Raises a declared document event with a payload fixed when the view renders.</summary>
+        /// <typeparam name="TPayload">The payload the event declares.</typeparam>
+        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Named{TPayload}(string)"/>.</param>
+        /// <param name="payload">The payload, written into the plan.</param>
+        /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
+        public PipelineBuilder<TModel> Dispatch<TPayload>(AppEvent<TPayload> appEvent, TPayload payload)
+            where TPayload : class, new()
+        {
+            if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
             AddStep(ReactionGraph.Dispatch(
-                eventName,
+                appEvent.Name,
                 ValueExpression.LiteralRaw(payload, Shape.FromClrType(typeof(TPayload)))));
             return this;
         }
 
-        /// <summary>Dispatches a <c>CustomEvent</c> whose payload fields come from value sources.</summary>
+        /// <summary>Raises a declared document event whose payload fields come from value sources.</summary>
         /// <remarks>
-        /// <para>Use this when the payload needs current state from Reactive Plan
-        /// value sources, such as component values or URL parameters. The listener consumes the
-        /// payload via <c>t.CustomEvent&lt;TPayload&gt;(name, (payload, p) =&gt; ...)</c>.</para>
-        /// <para>Use <see cref="Dispatch{TPayload}(string, TPayload)"/> for a fixed build-time
-        /// payload object.</para>
+        /// Use this when the payload needs the page's current state, such as component values or URL
+        /// parameters; use <see cref="Dispatch{TPayload}(AppEvent{TPayload}, TPayload)"/> for a payload
+        /// fixed when the view renders.
         /// </remarks>
-        /// <typeparam name="TPayload">Payload contract consumed by matching custom event triggers.</typeparam>
-        /// <param name="eventName">Event name matched by <c>t.CustomEvent&lt;TPayload&gt;(...)</c> triggers.</param>
+        /// <typeparam name="TPayload">The payload the event declares.</typeparam>
+        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Named{TPayload}(string)"/>.</param>
         /// <param name="configure">Maps payload fields to value sources or literals.</param>
         /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
         public PipelineBuilder<TModel> DispatchWith<TPayload>(
-            string eventName,
+            AppEvent<TPayload> appEvent,
             Action<DispatchPayloadBuilder<TPayload, TModel>> configure)
-            where TPayload : class
+            where TPayload : class, new()
         {
+            if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
             var builder = new DispatchPayloadBuilder<TPayload, TModel>();
             configure(builder);
-            AddStep(ReactionGraph.Dispatch(eventName, builder.Build()));
+            AddStep(ReactionGraph.Dispatch(appEvent.Name, builder.Build()));
             return this;
         }
 

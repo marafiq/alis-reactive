@@ -7,7 +7,7 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Dispatch("payload-test", new PayloadShowcaseModel
+        p.Dispatch(PayloadShowcaseEvents.PayloadTest, new PayloadShowcaseModel
         {
             IntValue = 42,
             LongValue = 9007199254740991,
@@ -23,7 +23,7 @@
         });
     }));
 
-    Html.On(plan, t => t.CustomEvent<PayloadShowcaseModel>("payload-test", (payload, p) =>
+    Html.On(plan, t => t.CustomEvent<PayloadShowcaseModel>(PayloadShowcaseEvents.PayloadTest, (payload, p) =>
     {
         p.Element("int-value").SetText(payload, x => x.IntValue);
         p.Element("long-value").SetText(payload, x => x.LongValue);

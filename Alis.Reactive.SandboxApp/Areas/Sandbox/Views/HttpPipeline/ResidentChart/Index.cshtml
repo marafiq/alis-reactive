@@ -6,7 +6,7 @@
     var plan = Html.ReactivePlan<ResidentChartPageModel>();
     var residents = new[] { (Key: "helen", Name: "Helen Park"), (Key: "arthur", Name: "Arthur Bell") };
 
-    Html.On(plan, t => t.CustomEvent<ChartFlagged>("chart-flagged", (flag, p) =>
+    Html.On(plan, t => t.CustomEvent<ChartFlagged>(ResidentChartEvents.ChartFlagged, (flag, p) =>
         p.Element("review-flag").SetText(flag, x => x.MRN!)));
 }
 
@@ -51,7 +51,7 @@
                 .CssClass("self-start rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Dispatch("chart-flagged", new ChartFlagged { MRN = Model.ReviewChartMrn });
+                    p.Dispatch(ResidentChartEvents.ChartFlagged, new ChartFlagged { MRN = Model.ReviewChartMrn });
                 }))
             <p class="text-sm">Flagged chart: <span id="review-flag" class="font-medium">None</span></p>
         </native-vstack>

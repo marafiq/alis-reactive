@@ -23,4 +23,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? State { get; set; }
         public int PostalCode { get; set; }
     }
+
+    /// <summary>The document events the PlaygroundSyntax page raises and hears.</summary>
+    public static class PlaygroundSyntaxEvents
+    {
+        public static readonly AppEvent ResetAll = AppEvent.Named("reset-all");
+    }
 }

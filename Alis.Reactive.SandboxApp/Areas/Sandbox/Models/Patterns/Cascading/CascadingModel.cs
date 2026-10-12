@@ -44,4 +44,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? ReceivedCity { get; set; }
         public string? Message { get; set; }
     }
+
+    /// <summary>The document events the Cascading page raises and hears.</summary>
+    public static class CascadingEvents
+    {
+        public static readonly AppEvent DoSave = AppEvent.Named("do-save");
+    }
 }

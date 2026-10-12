@@ -34,4 +34,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.ResponseCondi
             });
         }
     }
+
+    /// <summary>The document events the ResponseConditions page raises and hears.</summary>
+    public static class ResponseConditionsEvents
+    {
+        public static readonly AppEvent S1WhenApproved = AppEvent.Named("s1-when-approved");
+        public static readonly AppEvent S1WhenDenied = AppEvent.Named("s1-when-denied");
+        public static readonly AppEvent S2ElseifApprove = AppEvent.Named("s2-elseif-approve");
+        public static readonly AppEvent S2ElseifDeny = AppEvent.Named("s2-elseif-deny");
+        public static readonly AppEvent S2ElseifPending = AppEvent.Named("s2-elseif-pending");
+        public static readonly AppEvent S3AndApprove = AppEvent.Named("s3-and-approve");
+        public static readonly AppEvent S3AndDeny = AppEvent.Named("s3-and-deny");
+        public static readonly AppEvent S4ErrorCatchall = AppEvent.Named("s4-error-catchall");
+        public static readonly AppEvent S5ErrorTyped = AppEvent.Named("s5-error-typed");
+    }
 }

@@ -6,7 +6,7 @@
 
     var plan = Html.ReactivePlan<ContentTypeModel>();
 
-    Html.On(plan, t => t.CustomEvent("fetch-flat", p =>
+    Html.On(plan, t => t.CustomEvent(ContentTypeEvents.FetchFlat, p =>
     {
         p.Get(Url.SandboxRoute("FlatJson", "ContentType"))
          .WhileLoading(l => l.Element("flat-spinner").Show())
@@ -20,7 +20,7 @@
          );
     }));
 
-    Html.On(plan, t => t.CustomEvent("fetch-nested", p =>
+    Html.On(plan, t => t.CustomEvent(ContentTypeEvents.FetchNested, p =>
     {
         p.Get(Url.SandboxRoute("NestedJson", "ContentType"))
          .WhileLoading(l => l.Element("nested-spinner").Show())
@@ -35,7 +35,7 @@
          );
     }));
 
-    Html.On(plan, t => t.CustomEvent("fetch-partial", p =>
+    Html.On(plan, t => t.CustomEvent(ContentTypeEvents.FetchPartial, p =>
     {
         p.Get(Url.SandboxRoute("Partial", "ContentType"))
          .WhileLoading(l => l.Element("partial-spinner").Show())
@@ -67,7 +67,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mb-3")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Dispatch("fetch-flat");
+                p.Dispatch(ContentTypeEvents.FetchFlat);
             }))
         <native-vstack gap="Xs" class="font-mono text-sm">
             <p id="flat-spinner" hidden class="text-amber-600">Loading...</p>
@@ -88,7 +88,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mb-3")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Dispatch("fetch-nested");
+                p.Dispatch(ContentTypeEvents.FetchNested);
             }))
         <native-vstack gap="Xs" class="font-mono text-sm">
             <p id="nested-spinner" hidden class="text-amber-600">Loading...</p>
@@ -111,7 +111,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mb-3")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Dispatch("fetch-partial");
+                p.Dispatch(ContentTypeEvents.FetchPartial);
             }))
         <p id="partial-spinner" hidden class="font-mono text-sm text-amber-600">Loading partial...</p>
         <div id="partial-container" class="mt-3 rounded-md border border-dashed border-border p-4">

@@ -22,7 +22,7 @@
            .Placeholder("12345"))
        .Reactive(evt => evt.Change, (args, p) =>
        {
-           p.Dispatch<NativeTextBoxChangeArgs>("zipcode-validated", args);
+           p.Dispatch(ResidentEvents.ZipcodeValidated);
        }); }
 </native-grid>
 
@@ -33,7 +33,7 @@
 </div>
 
 @{
-    Html.On(plan, t => t.CustomEvent("zipcode-validated", p =>
+    Html.On(plan, t => t.CustomEvent(ResidentEvents.ZipcodeValidated, p =>
     {
         p.Element("zipcode-status").SetText("Zip validated");
     }));

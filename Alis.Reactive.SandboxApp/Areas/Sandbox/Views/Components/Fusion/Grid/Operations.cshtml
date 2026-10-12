@@ -35,7 +35,7 @@
 
     var actionTemplate = FusionTemplate.Create<ResidentDirectoryGridItem>()
         .Class("grid-action-template")
-        .EventButton("Review", "grid:review-resident", m => m.ResidentId, "e-small e-primary")
+        .EventButton("Review", GridOperationsEvents.GridReviewResident, e => e.Id, m => m.ResidentId, "e-small e-primary")
         .Render();
 
     void LoadOperationsGrid(PipelineBuilder<GridOperationsModel> p)
@@ -50,7 +50,7 @@
 
     Html.On(plan, t => t.DomReady(p => LoadOperationsGrid(p)));
 
-    Html.On(plan, t => t.CustomEvent<GridTemplateActionPayload>("grid:review-resident", (payload, p) =>
+    Html.On(plan, t => t.CustomEvent<GridTemplateActionPayload>(GridOperationsEvents.GridReviewResident, (payload, p) =>
     {
         p.Post(Url.SandboxRoute("ReviewResident", "Grid"))
             .Gather(g => g.FromEvent(payload, x => x.Id, "id"))

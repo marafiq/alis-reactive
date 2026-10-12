@@ -18,13 +18,16 @@ namespace Alis.Reactive.PlaywrightTests.HttpPipeline.ResidentChart;
 public sealed class WhenPayloadMembersAreNamedInCapitals
 {
     private static readonly IHtmlHelper<ResidentChartPageModel> Html = null!;
+    private static readonly AppEvent OpenChart = AppEvent.Named("open-chart");
+    private static readonly AppEvent FlagChart = AppEvent.Named("flag-chart");
+    private static readonly AppEvent CountCharts = AppEvent.Named("count-charts");
 
     [Test]
     public void a_response_member_named_in_capitals_is_read_as_the_server_writes_it()
     {
         var plan = PlanExtensions.ReactivePlan(Html);
         HtmlExtensions.On(Html, plan, trigger =>
-            trigger.CustomEvent("open-chart", pipeline =>
+            trigger.CustomEvent(OpenChart, pipeline =>
                 pipeline.Get("/Sandbox/HttpPipeline/ResidentChart/Chart/helen")
                     .Response(r => r.OnSuccess<SandboxApp.Areas.Sandbox.Models.ResidentChart>((json, s) =>
                     {
@@ -43,10 +46,10 @@ public sealed class WhenPayloadMembersAreNamedInCapitals
     {
         var plan = PlanExtensions.ReactivePlan(Html);
         HtmlExtensions.On(Html, plan, trigger =>
-            trigger.CustomEvent("flag-chart", pipeline =>
-                pipeline.Dispatch("chart-flagged", new ChartFlagged { MRN = "MRN-20417" })));
+            trigger.CustomEvent(FlagChart, pipeline =>
+                pipeline.Dispatch(ResidentChartEvents.ChartFlagged, new ChartFlagged { MRN = "MRN-20417" })));
         HtmlExtensions.On(Html, plan, trigger =>
-            trigger.CustomEvent<ChartFlagged>("chart-flagged", (flag, pipeline) =>
+            trigger.CustomEvent(ResidentChartEvents.ChartFlagged, (flag, pipeline) =>
                 pipeline.Element("review-flag").SetText(flag, x => x.MRN!)));
 
         var planJson = plan.Render();
@@ -63,7 +66,7 @@ public sealed class WhenPayloadMembersAreNamedInCapitals
     {
         var plan = PlanExtensions.ReactivePlan(Html);
         HtmlExtensions.On(Html, plan, trigger =>
-            trigger.CustomEvent("count-charts", pipeline =>
+            trigger.CustomEvent(CountCharts, pipeline =>
                 pipeline.Get("/Sandbox/HttpPipeline/ResidentChart/Charts")
                     .Response(r => r.OnSuccess<ChartList>((json, s) =>
                     {

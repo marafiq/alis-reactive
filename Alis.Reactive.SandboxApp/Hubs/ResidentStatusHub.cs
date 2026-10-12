@@ -48,6 +48,12 @@ public class ResidentStatusHub : Hub
         context.GetHttpContext()?.Request.Query["drill"].ToString() ?? "";
 }
 
+/// <summary>The client methods <see cref="ResidentStatusHub"/> calls on a page.</summary>
+public sealed class ResidentStatusFeed : SignalRHub
+{
+    public SignalRMessage<ResidentStatusPayload> StatusChanged => Message<ResidentStatusPayload>("StatusChanged");
+}
+
 public class ResidentStatusPayload
 {
     public string ResidentName { get; set; } = "";

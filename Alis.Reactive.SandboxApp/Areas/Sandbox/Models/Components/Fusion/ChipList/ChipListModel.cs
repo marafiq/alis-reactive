@@ -23,4 +23,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string[] Names { get; set; } = System.Array.Empty<string>();
         public int Count { get; set; }
     }
+
+    /// <summary>The document events the ChipList page raises and hears.</summary>
+    public static class ChipListEvents
+    {
+        public static readonly AppEvent<ChipSelectionPayload> ChipSelectionRead = AppEvent.Named<ChipSelectionPayload>("chip-selection-read");
+    }
 }

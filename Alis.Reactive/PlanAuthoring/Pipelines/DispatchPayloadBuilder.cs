@@ -7,11 +7,11 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders
 {
     /// <summary>
-    /// Composes a CustomEvent dispatch payload from Reactive Plan value sources and literals.
-    /// Each field is set via a typed expression on <typeparamref name="TPayload"/>,
-    /// matching the event-payload contract consumed by typed CustomEvent triggers.
+    /// Composes the payload of a declared <see cref="AppEvent{TPayload}"/> from value sources and
+    /// literals. Each field is set through a typed expression on <typeparamref name="TPayload"/>, the
+    /// payload the event's listeners read.
     /// </summary>
-    /// <typeparam name="TPayload">Event-payload contract consumed by matching <c>CustomEvent&lt;TPayload&gt;</c> triggers.</typeparam>
+    /// <typeparam name="TPayload">The payload the event declares.</typeparam>
     /// <typeparam name="TModel">View model type providing component registrations.</typeparam>
     public class DispatchPayloadBuilder<TPayload, TModel>
         where TPayload : class
@@ -74,7 +74,7 @@ namespace Alis.Reactive.Builders
         {
             if (!_draft.HasFields)
                 throw new InvalidOperationException(
-                    "Dispatch payload must have at least one field. Use Dispatch(eventName) for no-payload dispatch.");
+                    "Dispatch payload must have at least one field. An event with no payload is declared with AppEvent.Named(name) and raised with Dispatch(appEvent).");
 
             return _draft.ToValueExpression();
         }

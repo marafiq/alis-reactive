@@ -40,4 +40,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public bool Success { get; set; }
         public string Message { get; set; } = "";
     }
+
+    /// <summary>The document events the BddExperiment page raises and hears.</summary>
+    public static class BddExperimentEvents
+    {
+        public static readonly AppEvent DoSubmit = AppEvent.Named("do-submit");
+    }
 }

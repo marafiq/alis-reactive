@@ -41,31 +41,62 @@ Use `Html.On(...)` for triggers that are not attached to one rendered component.
 }
 ```
 
-Custom events can carry a typed payload.
+Custom events can carry a typed payload. Declare the event once, with its name and payload, so
+the page that raises it and the page that hears it cannot disagree on either.
 
 ```csharp
 public sealed class UnitChangedPayload
 {
     public string? UnitId { get; set; }
 }
+
+public static class UnitEvents
+{
+    public static readonly AppEvent<UnitChangedPayload> UnitChanged =
+        AppEvent.Named<UnitChangedPayload>("unitChanged");
+}
 ```
 
 ```csharp
-Html.On(plan, t => t.CustomEvent<UnitChangedPayload>(
-    "unitChanged",
-    (payload, p) =>
-    {
-        p.Element("selected-unit").SetText(payload, x => x.UnitId);
-    }));
+Html.On(plan, t => t.CustomEvent(UnitEvents.UnitChanged, (payload, p) =>
+{
+    p.Element("selected-unit").SetText(payload, x => x.UnitId);
+}));
 ```
 
-Pipelines can dispatch the same event.
+Pipelines raise the same event.
 
 ```csharp
-p.DispatchWith<UnitChangedPayload>("unitChanged", d => d
+p.DispatchWith(UnitEvents.UnitChanged, d => d
     .Set(x => x.UnitId,
         p.Component<FusionDropDownList>(m => m.UnitId).Get(c => c.Value)));
 ```
+
+An event with no payload is `AppEvent.Named("name")`, heard with `t.CustomEvent(evt, p => ...)` and
+raised with `p.Dispatch(evt)`.
+
+Server-sent events and SignalR hubs are declared the same way: a class lists the messages the
+server sends, by the names it sends them under, and the server writes each under that name.
+
+```csharp
+public sealed class ResidentStatusFeed : SignalRHub
+{
+    public SignalRMessage<ResidentStatusPayload> StatusChanged =>
+        Message<ResidentStatusPayload>("StatusChanged");
+}
+
+Html.On(plan, t => t.SignalR(SignalRHub.At<ResidentStatusFeed>("/hubs/resident-status"),
+    h => h.StatusChanged, (payload, p) =>
+    {
+        p.Element("resident-status").SetText(payload, x => x.Status);
+    }));
+
+// On the server:
+await residentHub.Clients.All.SendAsync(new ResidentStatusFeed().StatusChanged.Name, payload);
+```
+
+A stream is `ServerPushStream` with `Message<T>("event-name")` members, used with
+`t.ServerPush(ServerPushStream.At<TStream>(url), s => s.Member, ...)`.
 
 ## Element Members
 

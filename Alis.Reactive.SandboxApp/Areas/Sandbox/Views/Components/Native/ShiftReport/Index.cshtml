@@ -7,7 +7,7 @@
     var plan = Html.ReactivePlan<ShiftReportModel>();
 
     // Custom-event payload array is queried through element members inside the Reactive Plan.
-    Html.On(plan, t => t.CustomEvent<ShiftReportPayload>("shift-report", (payload, p) =>
+    Html.On(plan, t => t.CustomEvent<ShiftReportPayload>(ShiftReportEvents.ShiftReport, (payload, p) =>
     {
         var alerts = p.From(payload, x => x.Alerts);
 
@@ -27,14 +27,14 @@
         .Reactive(plan, evt => evt.Click, (args, p) =>
             p.Get(Url.SandboxRoute("Alerts", "ShiftReport"))
              .Response(r => r.OnSuccess<AlertsResponse>((json, s) =>
-                 s.DispatchWith<ShiftReportPayload>("shift-report", b =>
+                 s.DispatchWith<ShiftReportPayload>(ShiftReportEvents.ShiftReport, b =>
                      b.Set(x => x.Alerts, json.Read(x => x.Alerts))))));
 
     Html.NativeButton("clear-report-btn", "Generate Clear Report")
         .Reactive(plan, evt => evt.Click, (args, p) =>
             p.Get(Url.SandboxRoute("AlertsAllClear", "ShiftReport"))
              .Response(r => r.OnSuccess<AlertsResponse>((json, s) =>
-                 s.DispatchWith<ShiftReportPayload>("shift-report", b =>
+                 s.DispatchWith<ShiftReportPayload>(ShiftReportEvents.ShiftReport, b =>
                      b.Set(x => x.Alerts, json.Read(x => x.Alerts))))));
 }
 

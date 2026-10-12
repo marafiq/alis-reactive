@@ -33,4 +33,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public List<SupplyItem> Supplies { get; set; } = new();
         public int Count { get; set; }
     }
+
+    /// <summary>The document events the MultiSelect page raises and hears.</summary>
+    public static class MultiSelectEvents
+    {
+        public static readonly AppEvent DoGather = AppEvent.Named("do-gather");
+    }
 }

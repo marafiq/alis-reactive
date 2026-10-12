@@ -26,13 +26,13 @@
         .Class("flex gap-2 p-2 border-t")
         .When(m => m.IsUnassigned,
             then: t => t
-                .EventButton("Assign Staff", "schedule:edit", m => m.Id, "e-primary e-small"),
+                .EventButton("Assign Staff", PointInTimeScheduleEvents.ScheduleEdit, e => e.Id, m => m.Id, "e-primary e-small"),
             @else: e => e
-                .EventButton("Edit", "schedule:edit", m => m.Id, "e-small")
-                .EventButton("Reassign", "schedule:reassign", m => m.Id, "e-small"))
+                .EventButton("Edit", PointInTimeScheduleEvents.ScheduleEdit, e => e.Id, m => m.Id, "e-small")
+                .EventButton("Reassign", PointInTimeScheduleEvents.ScheduleReassign, e => e.Id, m => m.Id, "e-small"))
         .Render();
 
-    Html.On(plan, t => t.CustomEvent("schedule:assignment-saved", p =>
+    Html.On(plan, t => t.CustomEvent(PointInTimeScheduleEvents.ScheduleAssignmentSaved, p =>
     {
         p.Element("status").SetText("Refreshing after save...");
         p.Get("/api/schedule/assignments")
@@ -50,7 +50,7 @@
     }));
 
     // FusionTemplate.EventButton dispatches detail.id for the parent Active Plan to load the drawer form.
-    Html.On(plan, t => t.CustomEvent<ScheduleActionPayload>("schedule:edit", (payload, p) =>
+    Html.On(plan, t => t.CustomEvent<ScheduleActionPayload>(PointInTimeScheduleEvents.ScheduleEdit, (payload, p) =>
     {
         p.Element("alis-drawer-title").SetText("Edit Shift Assignment");
         p.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md);
@@ -60,7 +60,7 @@
         p.Component<NativeDrawer>().Call(c => c.Open);
     }));
 
-    Html.On(plan, t => t.CustomEvent<ScheduleActionPayload>("schedule:reassign", (payload, p) =>
+    Html.On(plan, t => t.CustomEvent<ScheduleActionPayload>(PointInTimeScheduleEvents.ScheduleReassign, (payload, p) =>
     {
         p.Element("alis-drawer-title").SetText("Reassign Shift");
         p.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md);

@@ -11,6 +11,9 @@ namespace Alis.Reactive.PlaywrightTests.HttpPipeline.RequestInput;
 public sealed class WhenGatherDslBuildsRequestInput
 {
     private static readonly IHtmlHelper<GatherRequestInputModel> Html = null!;
+    private static readonly AppEvent<GatherRequestInputEvent> Save = AppEvent.Named<GatherRequestInputEvent>("save");
+    private static readonly AppEvent<GatherRequestInputEvent> PluginRequested = AppEvent.Named<GatherRequestInputEvent>("plugin");
+    private static readonly AppEvent<GatherRequestInputPluginPayload> PluginRequestInput = AppEvent.Named<GatherRequestInputPluginPayload>("plugin-request-input");
 
     [Test]
     public void assignments_keep_the_authored_source_to_target_order()
@@ -19,7 +22,7 @@ public sealed class WhenGatherDslBuildsRequestInput
         plan.RegisterPlugin("metrics", plugin => plugin.Method<int>("count", a => a.Arg<string>()));
 
         HtmlExtensions.On(Html, plan, trigger =>
-            trigger.CustomEvent<GatherRequestInputEvent>("save", (args, pipeline) =>
+            trigger.CustomEvent(Save, (args, pipeline) =>
             {
                 TypedPluginSource<int> count =
                     pipeline.Plugin<int>("metrics", "count")
@@ -160,14 +163,14 @@ public sealed class WhenGatherDslBuildsRequestInput
         var plugin = plan.RegisterPlugin<GatherRequestInputPlugin>();
 
         HtmlExtensions.On(Html, plan, trigger =>
-            trigger.CustomEvent<GatherRequestInputEvent>("plugin", (args, pipeline) =>
+            trigger.CustomEvent(PluginRequested, (args, pipeline) =>
             {
                 TypedPluginSource<string> slug =
                     pipeline.Plugin(plugin.Slugify)
                         .Arg(args, x => x.Filter);
                 var token = pipeline.Plugin(plugin.Token);
 
-                pipeline.DispatchWith<GatherRequestInputPluginPayload>("plugin-request-input", payload => payload
+                pipeline.DispatchWith(PluginRequestInput, payload => payload
                     .Set(x => x.Slug, slug)
                     .Set(x => x.Token, token));
 

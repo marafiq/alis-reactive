@@ -8,10 +8,10 @@
 
     var plan = Html.ReactivePlan<SupportedSyntaxModel>();
 
-    Html.On(plan, t => t.CustomEvent<SupportedSyntaxTriggerPayload>("supported-trigger-review", (args, p) =>
+    Html.On(plan, t => t.CustomEvent<SupportedSyntaxTriggerPayload>(SupportedSyntaxEvents.SupportedTriggerReview, (args, p) =>
     {
         p.Element("trigger-precheck").SetText("Review started");
-        p.Dispatch("supported-trigger-audited");
+        p.Dispatch(SupportedSyntaxEvents.SupportedTriggerAudited);
         p.When(args, x => x.Score).Gte(90)
             .Then(then =>
             {
@@ -34,12 +34,12 @@
         p.Element("trigger-summary").SetText("Workflow complete");
     }));
 
-    Html.On(plan, t => t.CustomEvent("supported-trigger-audited", p =>
+    Html.On(plan, t => t.CustomEvent(SupportedSyntaxEvents.SupportedTriggerAudited, p =>
     {
         p.Element("trigger-audit").SetText("Audit logged");
     }));
 
-    Html.On(plan, t => t.CustomEvent("supported-reactive-audited", p =>
+    Html.On(plan, t => t.CustomEvent(SupportedSyntaxEvents.SupportedReactiveAudited, p =>
     {
         p.Element("reactive-audit").SetText("Audit logged");
     }));
@@ -69,21 +69,21 @@
                     .CssClass("px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Dispatch("supported-trigger-review", new { score = 95 });
+                        p.Dispatch(SupportedSyntaxEvents.SupportedTriggerReview, new SupportedSyntaxTriggerPayload { Score = 95 });
                     }))
 
                 @(Html.NativeButton("btn-trigger-standard", "Standard Review")
                     .CssClass("px-3 py-1.5 rounded bg-slate-600 text-white text-xs font-medium")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Dispatch("supported-trigger-review", new { score = 75 });
+                        p.Dispatch(SupportedSyntaxEvents.SupportedTriggerReview, new SupportedSyntaxTriggerPayload { Score = 75 });
                     }))
 
                 @(Html.NativeButton("btn-trigger-deferred", "Deferred Review")
                     .CssClass("px-3 py-1.5 rounded bg-stone-500 text-white text-xs font-medium")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Dispatch("supported-trigger-review", new { score = 40 });
+                        p.Dispatch(SupportedSyntaxEvents.SupportedTriggerReview, new SupportedSyntaxTriggerPayload { Score = 40 });
                     }))
             </native-hstack>
 
@@ -128,7 +128,7 @@
                     .Reactive(evt => evt.Change, (args, p) =>
                     {
                         p.Element("reactive-precheck").SetText("Risk evaluated");
-                        p.Dispatch("supported-reactive-audited");
+                        p.Dispatch(SupportedSyntaxEvents.SupportedReactiveAudited);
                         p.When(args, x => x.Value).Gte(90m)
                             .Then(then =>
                             {

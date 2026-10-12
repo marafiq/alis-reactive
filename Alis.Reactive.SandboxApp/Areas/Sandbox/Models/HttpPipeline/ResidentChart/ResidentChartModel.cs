@@ -20,4 +20,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public string? MRN { get; set; }
     }
+
+    /// <summary>The document events the ResidentChart page raises and hears.</summary>
+    public static class ResidentChartEvents
+    {
+        public static readonly AppEvent<ChartFlagged> ChartFlagged = AppEvent.Named<ChartFlagged>("chart-flagged");
+    }
 }

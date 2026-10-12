@@ -286,38 +286,55 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Adds a button that dispatches a DOM <c>CustomEvent</c> with <c>detail.id</c> bound from the model.
+        /// Adds a button whose click raises a declared document event, its payload member filled from
+        /// the row: <c>.EventButton("Review", CareEvents.ReviewResident, e =&gt; e.Id, m =&gt; m.ResidentId)</c>.
         /// </summary>
+        /// <typeparam name="TPayload">The payload the event declares.</typeparam>
+        /// <typeparam name="TProperty">The member's type, the same on the payload and the row.</typeparam>
         /// <param name="text">Button text.</param>
-        /// <param name="eventName">DOM <c>CustomEvent</c> name.</param>
-        /// <param name="idProperty">Template model property emitted as <c>detail.id</c>.</param>
-        public FusionTemplateBuilder<TModel> EventButton<TProperty>(
+        /// <param name="raises">The event, declared once with <see cref="AppEvent.Named{TPayload}(string)"/>.</param>
+        /// <param name="member">The payload member the button fills (a direct member).</param>
+        /// <param name="from">The template model property the member's value comes from.</param>
+        public FusionTemplateBuilder<TModel> EventButton<TPayload, TProperty>(
             string text,
-            string eventName,
-            Expression<Func<TModel, TProperty>> idProperty) =>
-            EventButton(text, eventName, idProperty, TemplateCss.None);
+            AppEvent<TPayload> raises,
+            Expression<Func<TPayload, TProperty>> member,
+            Expression<Func<TModel, TProperty>> from)
+            where TPayload : class, new() =>
+            EventButton(text, raises, member, from, TemplateCss.None);
 
         /// <summary>
-        /// Adds a styled button that dispatches a DOM <c>CustomEvent</c> with <c>detail.id</c> bound from the model.
+        /// Adds a styled button whose click raises a declared document event, its payload member filled
+        /// from the row.
         /// </summary>
+        /// <typeparam name="TPayload">The payload the event declares.</typeparam>
+        /// <typeparam name="TProperty">The member's type, the same on the payload and the row.</typeparam>
         /// <param name="text">Button text.</param>
-        /// <param name="eventName">DOM <c>CustomEvent</c> name.</param>
-        /// <param name="idProperty">Template model property emitted as <c>detail.id</c>.</param>
+        /// <param name="raises">The event, declared once with <see cref="AppEvent.Named{TPayload}(string)"/>.</param>
+        /// <param name="member">The payload member the button fills (a direct member).</param>
+        /// <param name="from">The template model property the member's value comes from.</param>
         /// <param name="css">CSS class.</param>
-        public FusionTemplateBuilder<TModel> EventButton<TProperty>(
+        public FusionTemplateBuilder<TModel> EventButton<TPayload, TProperty>(
             string text,
-            string eventName,
-            Expression<Func<TModel, TProperty>> idProperty,
-            string css) =>
-            EventButton(text, eventName, idProperty, TemplateCss.Class(css));
+            AppEvent<TPayload> raises,
+            Expression<Func<TPayload, TProperty>> member,
+            Expression<Func<TModel, TProperty>> from,
+            string css)
+            where TPayload : class, new() =>
+            EventButton(text, raises, member, from, TemplateCss.Class(css));
 
-        private FusionTemplateBuilder<TModel> EventButton<TProperty>(
+        private FusionTemplateBuilder<TModel> EventButton<TPayload, TProperty>(
             string text,
-            string eventName,
-            Expression<Func<TModel, TProperty>> idProperty,
+            AppEvent<TPayload> raises,
+            Expression<Func<TPayload, TProperty>> member,
+            Expression<Func<TModel, TProperty>> from,
             TemplateCss css)
+            where TPayload : class, new()
         {
-            _childRenderers.Add(() => TemplateElements.EventButton(text, eventName, FusionTemplateExpression.ToBinding(idProperty), css));
+            if (raises == null) throw new ArgumentNullException(nameof(raises));
+            var detailMember = TemplateElements.DetailMember(member);
+            var binding = FusionTemplateExpression.ToBinding(from);
+            _childRenderers.Add(() => TemplateElements.EventButton(text, raises.Name, detailMember, binding, css));
             return this;
         }
 

@@ -13,11 +13,8 @@ namespace Alis.Reactive.PlanModel
 
         internal static StartsWhen ComponentEvent(string component, string eventName) => new ComponentEventTrigger(component, eventName);
 
-        internal static StartsWhen ServerPush(string url) =>
-            new ServerPushTrigger(url, ServerPushEventFilter.AnyEvent());
-
         internal static StartsWhen ServerPush(string url, string eventName) =>
-            new ServerPushTrigger(url, ServerPushEventFilter.NamedEvent(eventName));
+            new ServerPushTrigger(url, eventName);
 
         internal static StartsWhen SignalR(string hubUrl, string method) =>
             new SignalRTrigger(hubUrl, method);
@@ -59,15 +56,17 @@ namespace Alis.Reactive.PlanModel
     internal sealed class ServerPushTrigger : StartsWhen
     {
         private readonly RequestUrl _url;
-        private readonly ServerPushEventFilter _filter;
+        private readonly EventName _event;
 
         public string Url => _url.Value;
-        public ServerPushEventFilter EventFilter => _filter;
 
-        internal ServerPushTrigger(string url, ServerPushEventFilter filter)
+        /// <summary>The SSE event name; messages sent without one are "message".</summary>
+        public string Event => _event.Value;
+
+        internal ServerPushTrigger(string url, string eventName)
         {
             _url = RequestUrl.Of(url);
-            _filter = filter ?? throw new ArgumentNullException(nameof(filter));
+            _event = EventName.Of(eventName);
         }
     }
 
@@ -84,35 +83,5 @@ namespace Alis.Reactive.PlanModel
             _hubUrl = RequestUrl.Of(hubUrl);
             _method = MemberName.Of(method);
         }
-    }
-
-    internal abstract class ServerPushEventFilter
-    {
-        private protected ServerPushEventFilter() { }
-
-
-        internal static ServerPushEventFilter AnyEvent() =>
-            new AnyServerPushEvent();
-
-        internal static ServerPushEventFilter NamedEvent(string eventName) =>
-            new NamedServerPushEvent(eventName);
-    }
-
-    internal sealed class AnyServerPushEvent : ServerPushEventFilter
-    {
-        internal AnyServerPushEvent() { }
-
-    }
-
-    internal sealed class NamedServerPushEvent : ServerPushEventFilter
-    {
-        private readonly EventName _event;
-
-        internal NamedServerPushEvent(string eventName)
-        {
-            _event = EventName.Of(eventName);
-        }
-
-        public string Event => _event.Value;
     }
 }

@@ -18,7 +18,7 @@
                         .OnSuccess(x =>
                         {
                             x.Element("native-action-link-status").SetText($"Deleted resident #{row.Id}");
-                            x.Dispatch("native-action-link-grid-refresh");
+                            x.Dispatch(HttpShowcaseEvents.NativeActionLinkGridRefresh);
                         })
                         .OnError(400, x => x.Element("native-action-link-status").SetText($"Delete failed for resident #{row.Id}"))))
                 .Else(x => x.Element("native-action-link-status").SetText($"Cancelled delete for resident #{row.Id}")))

@@ -15,7 +15,7 @@
     var failUrl = Url.Action("Fail", "ResponseConditions", new { area = "Sandbox" })
         ?? throw new InvalidOperationException("Could not resolve ResponseConditions.Fail.");
 
-    Html.On(plan, t => t.CustomEvent("s1-when-approved", p =>
+    Html.On(plan, t => t.CustomEvent(ResponseConditionsEvents.S1WhenApproved, p =>
     {
         p.Post(approveUrl)
          .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
@@ -30,7 +30,7 @@
          }));
     }));
 
-    Html.On(plan, t => t.CustomEvent("s1-when-denied", p =>
+    Html.On(plan, t => t.CustomEvent(ResponseConditionsEvents.S1WhenDenied, p =>
     {
         p.Post(denyUrl)
          .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
@@ -49,7 +49,7 @@
          }));
     }));
 
-    Html.On(plan, t => t.CustomEvent("s2-elseif-approve", p =>
+    Html.On(plan, t => t.CustomEvent(ResponseConditionsEvents.S2ElseifApprove, p =>
     {
         p.Post(approveUrl)
          .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
@@ -62,7 +62,7 @@
          }));
     }));
 
-    Html.On(plan, t => t.CustomEvent("s2-elseif-pending", p =>
+    Html.On(plan, t => t.CustomEvent(ResponseConditionsEvents.S2ElseifPending, p =>
     {
         p.Post(pendingUrl)
          .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
@@ -75,7 +75,7 @@
          }));
     }));
 
-    Html.On(plan, t => t.CustomEvent("s2-elseif-deny", p =>
+    Html.On(plan, t => t.CustomEvent(ResponseConditionsEvents.S2ElseifDeny, p =>
     {
         p.Post(denyUrl)
          .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
@@ -88,7 +88,7 @@
          }));
     }));
 
-    Html.On(plan, t => t.CustomEvent("s3-and-approve", p =>
+    Html.On(plan, t => t.CustomEvent(ResponseConditionsEvents.S3AndApprove, p =>
     {
         p.Post(approveUrl)
          .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
@@ -100,7 +100,7 @@
          }));
     }));
 
-    Html.On(plan, t => t.CustomEvent("s3-and-deny", p =>
+    Html.On(plan, t => t.CustomEvent(ResponseConditionsEvents.S3AndDeny, p =>
     {
         p.Post(denyUrl)
          .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
@@ -112,7 +112,7 @@
          }));
     }));
 
-    Html.On(plan, t => t.CustomEvent("s4-error-catchall", p =>
+    Html.On(plan, t => t.CustomEvent(ResponseConditionsEvents.S4ErrorCatchall, p =>
     {
         p.Post(failUrl)
          .Response(r => r
@@ -121,7 +121,7 @@
     }));
 
     // Razor parses generic OnError<T> poorly in this block, so the helper keeps the DSL shape explicit.
-    Html.On(plan, t => t.CustomEvent("s5-error-typed", p =>
+    Html.On(plan, t => t.CustomEvent(ResponseConditionsEvents.S5ErrorTyped, p =>
     {
         p.Post(failUrl)
          .Response(r => ResponseConditionsHelper.ConfigureTypedErrorHandler(r));
@@ -139,10 +139,10 @@
         <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s1-btn-approve", "Approve")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s1-when-approved")))
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch(ResponseConditionsEvents.S1WhenApproved)))
             @(Html.NativeButton("s1-btn-deny", "Deny")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s1-when-denied")))
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch(ResponseConditionsEvents.S1WhenDenied)))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Result: <span id="s1-result">&mdash;</span></p>
@@ -158,13 +158,13 @@
         <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s2-btn-approve", "Approve")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s2-elseif-approve")))
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch(ResponseConditionsEvents.S2ElseifApprove)))
             @(Html.NativeButton("s2-btn-pending", "Pending")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s2-elseif-pending")))
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch(ResponseConditionsEvents.S2ElseifPending)))
             @(Html.NativeButton("s2-btn-deny", "Deny")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s2-elseif-deny")))
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch(ResponseConditionsEvents.S2ElseifDeny)))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Label: <span id="s2-label">&mdash;</span></p>
@@ -179,10 +179,10 @@
         <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s3-btn-approve", "Approve (count=5)")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s3-and-approve")))
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch(ResponseConditionsEvents.S3AndApprove)))
             @(Html.NativeButton("s3-btn-deny", "Deny (count=0)")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s3-and-deny")))
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch(ResponseConditionsEvents.S3AndDeny)))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Result: <span id="s3-result">&mdash;</span></p>
@@ -197,7 +197,7 @@
         <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s4-btn-fail", "Trigger 422")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s4-error-catchall")))
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch(ResponseConditionsEvents.S4ErrorCatchall)))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Result: <span id="s4-result">&mdash;</span></p>
@@ -212,7 +212,7 @@
         <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s5-btn-fail", "Trigger 422")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s5-error-typed")))
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch(ResponseConditionsEvents.S5ErrorTyped)))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Result: <span id="s5-result">&mdash;</span></p>

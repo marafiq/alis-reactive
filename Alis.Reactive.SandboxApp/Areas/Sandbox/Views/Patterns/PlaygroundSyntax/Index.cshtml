@@ -12,7 +12,7 @@
 
     var plan = Html.ReactivePlan<PlaygroundSyntaxModel>();
 
-    Html.On(plan, t => t.CustomEvent("reset-all", p =>
+    Html.On(plan, t => t.CustomEvent(PlaygroundSyntaxEvents.ResetAll, p =>
     {
         p.Component<FusionNumericTextBox>(m => m.Amount).Set(c => c.Value, 0);
         p.Component<NativeDropDown>(m => m.Status).Set(c => c.Value, "");
@@ -84,7 +84,7 @@
         <native-hstack gap="Sm">
             @(Html.NativeButton("reset-all-btn", "Reset All Fields")
                 .CssClass("px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
-                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("reset-all")))
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch(PlaygroundSyntaxEvents.ResetAll)))
         </native-hstack>
     </native-card-body>
     </native-card>

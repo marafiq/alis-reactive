@@ -64,13 +64,13 @@
             .Response(r => r.OnSuccess(s => s.Into("careops-action-rows")));
     }));
 
-    Html.On(plan, t => t.CustomEvent("careops-rows-refresh", p =>
+    Html.On(plan, t => t.CustomEvent(CareOpsEvents.CareopsRowsRefresh, p =>
     {
         p.Get(Url.SandboxRoute("CareOpsActionRows", "Grid"))
             .Response(r => r.OnSuccess(s => s.Into("careops-action-rows")));
     }));
 
-    Html.On(plan, t => t.CustomEvent("careops-rows-refresh", p => LoadCareOps(p, "census updated")));
+    Html.On(plan, t => t.CustomEvent(CareOpsEvents.CareopsRowsRefresh, p => LoadCareOps(p, "census updated")));
 }
 
 <div id="admit-dialog" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">

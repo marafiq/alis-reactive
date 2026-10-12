@@ -101,4 +101,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? TenantId { get; set; }
     }
 
+    /// <summary>The document events the HttpShowcase page raises and hears.</summary>
+    public static class HttpShowcaseEvents
+    {
+        public static readonly AppEvent NativeActionLinkGridRefresh = AppEvent.Named("native-action-link-grid-refresh");
+    }
 }

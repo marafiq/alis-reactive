@@ -11,7 +11,7 @@
         p.Component<NativeButton>("btn-admit-text").Set(c => c.TextContent, "Admit Resident");
     }));
 
-    Html.On(plan, t => t.CustomEvent("resident-transferred", p =>
+    Html.On(plan, t => t.CustomEvent(NativeButtonEvents.ResidentTransferred, p =>
     {
         p.Element("transfer-status").SetText("transfer confirmed");
         p.Element("transfer-status").AddClass("text-green-600");
@@ -79,7 +79,7 @@
             .CssClass("rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Dispatch("resident-transferred");
+                p.Dispatch(NativeButtonEvents.ResidentTransferred);
             }))
         <p class="font-mono text-sm mt-2">Transfer: <span id="transfer-status" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>

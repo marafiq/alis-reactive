@@ -22,7 +22,7 @@
     var routeAuditUrl = Url.SandboxRouteTemplate("AuditResident", "HttpMixing", "residentId");
     var routeAuditTrailUrl = Url.SandboxRouteTemplate("AuditResidentTrail", "HttpMixing", "residentId", "categorySlug");
 
-    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s1-save-then-check", (args, p) =>
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S1SaveThenCheck, (args, p) =>
     {
         p.Post(saveUrl, g => g.Static("name", "Alice"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
@@ -34,7 +34,7 @@
             .Else(else_ => else_.Element("s1-badge").Hide());
     }));
 
-    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s2-condition-http-condition", (args, p) =>
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S2ConditionHttpCondition, (args, p) =>
     {
         p.When(args, x => x.Active).Truthy()
             .Then(then => then.Element("s2-active-status").SetText("active"))
@@ -49,7 +49,7 @@
             .Else(else_ => else_.Element("s2-count-badge").Hide());
     }));
 
-    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s3-full-interleave", (args, p) =>
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S3FullInterleave, (args, p) =>
     {
         p.Element("s3-header").SetText("start");
         p.When(args, x => x.Active).Truthy()
@@ -66,7 +66,7 @@
         p.Element("s3-footer").SetText("done");
     }));
 
-    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s4-condition-inside-success", (args, p) =>
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S4ConditionInsideSuccess, (args, p) =>
     {
         p.Element("s4-pre").SetText("loading");
         p.Post(saveUrl, g => g.Static("name", "Carol"))
@@ -81,7 +81,7 @@
         p.Element("s4-footer").SetText("done");
     }));
 
-    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s5-elseif-inside-success", (args, p) =>
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S5ElseifInsideSuccess, (args, p) =>
     {
         p.Post(classifyUrl, g => g
             .FromEvent(args, x => x.Count, "count"))
@@ -101,7 +101,7 @@
             .Else(else_ => else_.Element("s5-trial-badge").Show());
     }));
 
-    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s6-multi-conditions-after-http", (args, p) =>
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S6MultiConditionsAfterHttp, (args, p) =>
     {
         p.Post(saveUrl, g => g.Static("name", "Dave"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
@@ -116,7 +116,7 @@
         p.Element("s6-footer").SetText("complete");
     }));
 
-    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s7-condition-in-error", (args, p) =>
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S7ConditionInError, (args, p) =>
     {
         p.Post(failValidationUrl)
          .Response(r => r
@@ -129,7 +129,7 @@
              }));
     }));
 
-    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s8-and-guard-inside-success", (args, p) =>
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S8AndGuardInsideSuccess, (args, p) =>
     {
         p.Post(saveUrl, g => g.Static("name", "Eve"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
@@ -142,14 +142,14 @@
          }));
     }));
 
-    Html.On(plan, t => t.CustomEvent("s12-dispatched", p =>
+    Html.On(plan, t => t.CustomEvent(HttpMixingEvents.S12Dispatched, p =>
     {
         TypedPluginSource<string> mark = p.Plugin(order.Mark).Arg("s12").Arg("dispatch");
         p.Element("s12-sequence").SetText(mark);
         p.Element("s12-order").SetText("dispatch");
     }));
 
-    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s12-ordered-mixed-modules", (args, p) =>
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S12OrderedMixedModules, (args, p) =>
     {
         TypedPluginSource<string> markStart = p.Plugin(order.Mark).Arg("s12").Arg("start");
         p.Element("s12-sequence").SetText(markStart);
@@ -175,7 +175,7 @@
              s.Element("s12-sequence").SetText(mark);
              s.Element("s12-order").SetText("http-success");
         }));
-        p.Dispatch("s12-dispatched");
+        p.Dispatch(HttpMixingEvents.S12Dispatched);
         TypedPluginSource<string> slug = p.Plugin(slugify.Slug).Arg("After Http");
         p.Element("s12-plugin").SetText(slug);
         TypedPluginSource<string> markPlugin = p.Plugin(order.Mark).Arg("s12").Arg("plugin");
@@ -198,14 +198,14 @@
             });
     }));
 
-    Html.On(plan, t => t.CustomEvent("s13-dispatched", p =>
+    Html.On(plan, t => t.CustomEvent(HttpMixingEvents.S13Dispatched, p =>
     {
         TypedPluginSource<string> mark = p.Plugin(order.Mark).Arg("s13").Arg("dispatch");
         p.Element("s13-sequence").SetText(mark);
         p.Element("s13-order").SetText("dispatch");
     }));
 
-    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s13-ordered-parallel-mix", (args, p) =>
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S13OrderedParallelMix, (args, p) =>
     {
         TypedPluginSource<string> markStart = p.Plugin(order.Mark).Arg("s13").Arg("start");
         p.Element("s13-sequence").SetText(markStart);
@@ -243,7 +243,7 @@
              s.Element("s13-sequence").SetText(mark);
              s.Element("s13-order").SetText("settled");
          });
-        p.Dispatch("s13-dispatched");
+        p.Dispatch(HttpMixingEvents.S13Dispatched);
         TypedPluginSource<string> slug = p.Plugin(slugify.Slug).Arg("After Parallel");
         p.Element("s13-plugin").SetText(slug);
         TypedPluginSource<string> markPlugin = p.Plugin(order.Mark).Arg("s13").Arg("plugin");
@@ -266,14 +266,14 @@
             });
     }));
 
-    Html.On(plan, t => t.CustomEvent("s14-dispatched", p =>
+    Html.On(plan, t => t.CustomEvent(HttpMixingEvents.S14Dispatched, p =>
     {
         TypedPluginSource<string> mark = p.Plugin(order.Mark).Arg("s14").Arg("dispatch");
         p.Element("s14-sequence").SetText(mark);
         p.Element("s14-order").SetText("dispatch");
     }));
 
-    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s14-route-template-from-event", (args, p) =>
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S14RouteTemplateFromEvent, (args, p) =>
     {
         TypedPluginSource<string> categorySlug = p.Plugin(slugify.Slug).Arg(args, x => x.Category);
         TypedPluginSource<string> markStart = p.Plugin(order.Mark).Arg("s14").Arg("start");
@@ -319,7 +319,7 @@
                  s.Element("s14-sequence").SetText(mark);
                  s.Element("s14-order").SetText("trail-success");
              }))));
-        p.Dispatch("s14-dispatched");
+        p.Dispatch(HttpMixingEvents.S14Dispatched);
         p.Element("s14-plugin").SetText(categorySlug);
         TypedPluginSource<string> markPlugin = p.Plugin(order.Mark).Arg("s14").Arg("plugin");
         p.Element("s14-sequence").SetText(markPlugin);
@@ -359,11 +359,11 @@
             @(Html.NativeButton("s1-btn-active", "Save (active=true)")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s1-save-then-check", new HttpMixingPayload { Active = true })))
+                    p.Dispatch(HttpMixingEvents.S1SaveThenCheck, new HttpMixingPayload { Active = true })))
             @(Html.NativeButton("s1-btn-inactive", "Save (active=false)")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s1-save-then-check", new HttpMixingPayload { Active = false })))
+                    p.Dispatch(HttpMixingEvents.S1SaveThenCheck, new HttpMixingPayload { Active = false })))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Saved: <span id="s1-status">&mdash;</span></p>
@@ -380,11 +380,11 @@
             @(Html.NativeButton("s2-btn-active-with-count", "active=true, count=5")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s2-condition-http-condition", new HttpMixingPayload { Active = true, Count = 5 })))
+                    p.Dispatch(HttpMixingEvents.S2ConditionHttpCondition, new HttpMixingPayload { Active = true, Count = 5 })))
             @(Html.NativeButton("s2-btn-inactive-zero", "active=false, count=0")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s2-condition-http-condition", new HttpMixingPayload { Active = false, Count = 0 })))
+                    p.Dispatch(HttpMixingEvents.S2ConditionHttpCondition, new HttpMixingPayload { Active = false, Count = 0 })))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Active status: <span id="s2-active-status">&mdash;</span></p>
@@ -402,11 +402,11 @@
             @(Html.NativeButton("s3-btn-all-true", "active=true, count=3")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s3-full-interleave", new HttpMixingPayload { Active = true, Count = 3 })))
+                    p.Dispatch(HttpMixingEvents.S3FullInterleave, new HttpMixingPayload { Active = true, Count = 3 })))
             @(Html.NativeButton("s3-btn-all-false", "active=false, count=0")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s3-full-interleave", new HttpMixingPayload { Active = false, Count = 0 })))
+                    p.Dispatch(HttpMixingEvents.S3FullInterleave, new HttpMixingPayload { Active = false, Count = 0 })))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Header: <span id="s3-header">&mdash;</span></p>
@@ -427,11 +427,11 @@
             @(Html.NativeButton("s4-btn-active", "active=true")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s4-condition-inside-success", new HttpMixingPayload { Active = true })))
+                    p.Dispatch(HttpMixingEvents.S4ConditionInsideSuccess, new HttpMixingPayload { Active = true })))
             @(Html.NativeButton("s4-btn-inactive", "active=false")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s4-condition-inside-success", new HttpMixingPayload { Active = false })))
+                    p.Dispatch(HttpMixingEvents.S4ConditionInsideSuccess, new HttpMixingPayload { Active = false })))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Pre: <span id="s4-pre">&mdash;</span></p>
@@ -451,19 +451,19 @@
             @(Html.NativeButton("s5-btn-enterprise", "count=200, active=true")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s5-elseif-inside-success", new HttpMixingPayload { Count = 200, Active = true })))
+                    p.Dispatch(HttpMixingEvents.S5ElseifInsideSuccess, new HttpMixingPayload { Count = 200, Active = true })))
             @(Html.NativeButton("s5-btn-business", "count=75, active=true")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s5-elseif-inside-success", new HttpMixingPayload { Count = 75, Active = true })))
+                    p.Dispatch(HttpMixingEvents.S5ElseifInsideSuccess, new HttpMixingPayload { Count = 75, Active = true })))
             @(Html.NativeButton("s5-btn-team", "count=25, active=false")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s5-elseif-inside-success", new HttpMixingPayload { Count = 25, Active = false })))
+                    p.Dispatch(HttpMixingEvents.S5ElseifInsideSuccess, new HttpMixingPayload { Count = 25, Active = false })))
             @(Html.NativeButton("s5-btn-individual", "count=3, active=false")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s5-elseif-inside-success", new HttpMixingPayload { Count = 3, Active = false })))
+                    p.Dispatch(HttpMixingEvents.S5ElseifInsideSuccess, new HttpMixingPayload { Count = 3, Active = false })))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Server tier: <span id="s5-server-tier">&mdash;</span></p>
@@ -481,15 +481,15 @@
             @(Html.NativeButton("s6-btn-active-premium", "active, premium")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s6-multi-conditions-after-http", new HttpMixingPayload { Active = true, Category = "premium" })))
+                    p.Dispatch(HttpMixingEvents.S6MultiConditionsAfterHttp, new HttpMixingPayload { Active = true, Category = "premium" })))
             @(Html.NativeButton("s6-btn-active-standard", "active, standard")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s6-multi-conditions-after-http", new HttpMixingPayload { Active = true, Category = "standard" })))
+                    p.Dispatch(HttpMixingEvents.S6MultiConditionsAfterHttp, new HttpMixingPayload { Active = true, Category = "standard" })))
             @(Html.NativeButton("s6-btn-inactive-premium", "inactive, premium")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s6-multi-conditions-after-http", new HttpMixingPayload { Active = false, Category = "premium" })))
+                    p.Dispatch(HttpMixingEvents.S6MultiConditionsAfterHttp, new HttpMixingPayload { Active = false, Category = "premium" })))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Saved: <span id="s6-saved">&mdash;</span></p>
@@ -508,11 +508,11 @@
             @(Html.NativeButton("s7-btn-required", "category=required")
                 .CssClass("rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s7-condition-in-error", new HttpMixingPayload { Category = "required" })))
+                    p.Dispatch(HttpMixingEvents.S7ConditionInError, new HttpMixingPayload { Category = "required" })))
             @(Html.NativeButton("s7-btn-other", "category=format")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s7-condition-in-error", new HttpMixingPayload { Category = "format" })))
+                    p.Dispatch(HttpMixingEvents.S7ConditionInError, new HttpMixingPayload { Category = "format" })))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Status: <span id="s7-status">&mdash;</span></p>
@@ -529,15 +529,15 @@
             @(Html.NativeButton("s8-btn-qualified", "active=true, count=10")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s8-and-guard-inside-success", new HttpMixingPayload { Active = true, Count = 10 })))
+                    p.Dispatch(HttpMixingEvents.S8AndGuardInsideSuccess, new HttpMixingPayload { Active = true, Count = 10 })))
             @(Html.NativeButton("s8-btn-not-qualified", "active=true, count=2")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s8-and-guard-inside-success", new HttpMixingPayload { Active = true, Count = 2 })))
+                    p.Dispatch(HttpMixingEvents.S8AndGuardInsideSuccess, new HttpMixingPayload { Active = true, Count = 2 })))
             @(Html.NativeButton("s8-btn-inactive", "active=false, count=10")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s8-and-guard-inside-success", new HttpMixingPayload { Active = false, Count = 10 })))
+                    p.Dispatch(HttpMixingEvents.S8AndGuardInsideSuccess, new HttpMixingPayload { Active = false, Count = 10 })))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Saved: <span id="s8-saved">&mdash;</span></p>
@@ -556,7 +556,7 @@
             @(Html.NativeButton("s12-btn-run", "run ordered mix")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s12-ordered-mixed-modules", new HttpMixingPayload { Active = true, Category = "premium" })))
+                    p.Dispatch(HttpMixingEvents.S12OrderedMixedModules, new HttpMixingPayload { Active = true, Category = "premium" })))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>HTTP: <span id="s12-http-done">&mdash;</span></p>
@@ -577,7 +577,7 @@
             @(Html.NativeButton("s13-btn-run", "run parallel mix")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s13-ordered-parallel-mix", new HttpMixingPayload { Active = true, Category = "premium", Count = 7 })))
+                    p.Dispatch(HttpMixingEvents.S13OrderedParallelMix, new HttpMixingPayload { Active = true, Category = "premium", Count = 7 })))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>A: <span id="s13-a">&mdash;</span></p>
@@ -600,11 +600,11 @@
             @(Html.NativeButton("s14-btn-active-high", "event resident 314")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s14-route-template-from-event", new HttpMixingPayload { Active = true, Count = 314, Category = "VIP Review" })))
+                    p.Dispatch(HttpMixingEvents.S14RouteTemplateFromEvent, new HttpMixingPayload { Active = true, Count = 314, Category = "VIP Review" })))
             @(Html.NativeButton("s14-btn-inactive-low", "event resident 271")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Dispatch("s14-route-template-from-event", new HttpMixingPayload { Active = false, Count = 271, Category = "Routine Check" })))
+                    p.Dispatch(HttpMixingEvents.S14RouteTemplateFromEvent, new HttpMixingPayload { Active = false, Count = 271, Category = "Routine Check" })))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Route ID: <span id="s14-route-id">&mdash;</span></p>

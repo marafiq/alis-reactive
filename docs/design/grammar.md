@@ -402,8 +402,9 @@ if (form.validate()) {                            // .Validate<V>(container); ou
 
 ### 5.2 Templates
 
-A button inside a vendor template (`FusionTemplate.EventButton`) renders `data-alis-raise="name"`
-and its detail as attributes, not an inline `onclick`. The document module raises the event when it
+A button inside a vendor template (`FusionTemplate.EventButton(text, event, e => e.Member, m => m.Row)`)
+raises a declared `AppEvent<T>` and fills one payload member from the row. It renders
+`data-alis-raise="name"` and its detail as attributes, not an inline `onclick`. The document module raises the event when it
 is clicked (6.1), and handlers hear it with `on(document, name)`.
 
 ## 6. The vocabulary: built-in objects and what each must do

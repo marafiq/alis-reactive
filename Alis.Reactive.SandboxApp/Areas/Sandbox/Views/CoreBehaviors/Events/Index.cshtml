@@ -10,24 +10,24 @@
     {
         p.Element("step-1").AddClass("text-green-600");
         p.Element("step-1").SetText("dom-ready fired → dispatched \"test\"");
-        p.Dispatch("test");
+        p.Dispatch(EventsEvents.Test);
     }));
 
-    Html.On(plan, t => t.CustomEvent("test", p =>
+    Html.On(plan, t => t.CustomEvent(EventsEvents.Test, p =>
     {
         p.Element("step-2").AddClass("text-green-600");
         p.Element("step-2").SetText("\"test\" received → dispatched \"test-received\"");
-        p.Dispatch("test-received");
+        p.Dispatch(EventsEvents.TestReceived);
     }));
 
-    Html.On(plan, t => t.CustomEvent<EventsViewModel>("test-received", (payload, p) =>
+    Html.On(plan, t => t.CustomEvent<EventsViewModel>(EventsEvents.TestReceived, (payload, p) =>
     {
         p.Element("step-3").AddClass("text-green-600");
         p.Element("step-3").SetText("\"test-received\" received → dispatched \"final\" with payload");
-        p.Dispatch("final", new EventsViewModel { EventName = "done" });
+        p.Dispatch(EventsEvents.Final, new EventsViewModel { EventName = "done" });
     }));
 
-    Html.On(plan, t => t.CustomEvent("final", p =>
+    Html.On(plan, t => t.CustomEvent(EventsEvents.Final, p =>
     {
         p.Element("chain-status").RemoveClass("text-text-muted");
         p.Element("chain-status").AddClass("text-green-600");
@@ -66,22 +66,22 @@
 {
     p.Element("step-1").AddClass("text-green-600");
     p.Element("step-1").SetText("dom-ready fired");
-    p.Dispatch("test");
+    p.Dispatch(EventsEvents.Test);
 }));
 
-Html.On(plan, t =&gt; t.CustomEvent("test", p =&gt;
+Html.On(plan, t =&gt; t.CustomEvent(EventsEvents.Test, p =&gt;
 {
     p.Element("step-2").AddClass("text-green-600");
-    p.Dispatch("test-received");
+    p.Dispatch(EventsEvents.TestReceived);
 }));
 
 Html.On(plan, t =&gt; t.CustomEvent&lt;EventsViewModel&gt;("test-received", (payload, p) =&gt;
 {
     p.Element("step-3").AddClass("text-green-600");
-    p.Dispatch("final", new EventsViewModel { EventName = "done" });
+    p.Dispatch(EventsEvents.Final, new EventsViewModel { EventName = "done" });
 }));
 
-Html.On(plan, t =&gt; t.CustomEvent("final", p =&gt;
+Html.On(plan, t =&gt; t.CustomEvent(EventsEvents.Final, p =&gt;
 {
     p.Element("chain-status").RemoveClass("text-text-muted");
     p.Element("chain-status").AddClass("text-green-600");

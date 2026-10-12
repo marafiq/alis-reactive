@@ -28,7 +28,7 @@
         });
     }));
 
-    Html.On(plan, t => t.CustomEvent("intake-saved", pipeline =>
+    Html.On(plan, t => t.CustomEvent(IntakeEvents.IntakeSaved, pipeline =>
     {
         pipeline.Get("/Intake/Summary")
             .Gather(g => g.IncludeAll())
@@ -241,7 +241,7 @@
                     .CssClass("rounded-md border border-border px-4 py-1.5 text-sm font-medium hover:bg-surface-alt")
                     .Reactive(plan, evt => evt.Click, (args, pipeline) =>
                     {
-                        pipeline.Dispatch("intake-saved");
+                        pipeline.Dispatch(IntakeEvents.IntakeSaved);
                     }))
             </div>
         </div>

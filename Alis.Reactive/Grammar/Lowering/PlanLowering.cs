@@ -62,8 +62,7 @@ namespace Alis.Reactive.Grammar.Lowering
                     var channel = context.ContractOf(componentEvent.Component).Events[componentEvent.Event].Channel;
                     return new Handler(context.Objects.Element(componentEvent.Component), channel, EventParam, body);
                 case ServerPushTrigger serverPush:
-                    var message = serverPush.EventFilter is NamedServerPushEvent named ? named.Event : "message";
-                    return new Handler(context.Objects.Stream(serverPush.Url), message, EventParam, body);
+                    return new Handler(context.Objects.Stream(serverPush.Url), serverPush.Event, EventParam, body);
                 case SignalRTrigger signalR:
                     return new Handler(context.Objects.Hub(signalR.HubUrl), signalR.Method, EventParam, body);
                 default:

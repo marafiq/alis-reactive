@@ -10,6 +10,9 @@ namespace Alis.Reactive.PlaywrightTests.Conditions.BehaviorGraph;
 public sealed class WhenConditionDslBuildsBehaviorGraph
 {
     private static readonly IHtmlHelper<ConditionBehaviorModel> Html = null!;
+    private static readonly AppEvent<ConditionBehaviorEvent> ScoreChanged = AppEvent.Named<ConditionBehaviorEvent>("score-changed");
+    private static readonly AppEvent Ready = AppEvent.Named("ready");
+    private static readonly AppEvent NotReady = AppEvent.Named("not-ready");
 
     [Test]
     public void repeated_branch_blocks_mixed_with_requests_keep_declaration_order()
@@ -17,7 +20,7 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
         var plan = PlanExtensions.ReactivePlan(Html);
 
         HtmlExtensions.On(Html, plan, trigger =>
-            trigger.CustomEvent<ConditionBehaviorEvent>("score-changed", (args, pipeline) =>
+            trigger.CustomEvent(ScoreChanged, (args, pipeline) =>
             {
                 pipeline.Element("start").SetText("start");
 
@@ -30,8 +33,8 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
                 pipeline.Post("/audit", gather => gather.FromEvent(args, x => x.Score, "score"));
 
                 pipeline.When(args, x => x.IsReady).Truthy()
-                    .Then(ready => ready.Dispatch("ready"))
-                    .Else(notReady => notReady.Dispatch("not-ready"));
+                    .Then(ready => ready.Dispatch(Ready))
+                    .Else(notReady => notReady.Dispatch(NotReady));
 
                 pipeline.Element("done").SetText("done");
             }));
@@ -71,7 +74,7 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
         var plugin = plan.RegisterPlugin<ConditionBehaviorPlugin>();
 
         HtmlExtensions.On(Html, plan, trigger =>
-            trigger.CustomEvent<ConditionBehaviorEvent>("score-changed", (args, pipeline) =>
+            trigger.CustomEvent(ScoreChanged, (args, pipeline) =>
             {
                 var schedule = pipeline.Component<FusionSchedule>("shift-schedule");
                 TypedPluginSource<string> normalizedStatus =

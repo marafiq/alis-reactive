@@ -25,4 +25,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public List<MedicationTypeItem> Medications { get; set; } = new();
         public int Count { get; set; }
     }
+
+    /// <summary>The document events the AutoComplete page raises and hears.</summary>
+    public static class AutoCompleteEvents
+    {
+        public static readonly AppEvent DoGather = AppEvent.Named("do-gather");
+    }
 }

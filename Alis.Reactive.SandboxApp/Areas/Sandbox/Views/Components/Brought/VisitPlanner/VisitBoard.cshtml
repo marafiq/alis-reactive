@@ -37,7 +37,7 @@
 
     // Another desk's family took a time: if this family had it booked, release it and say so; either
     // way the planner shows the time as taken, and the change goes to the board's log.
-    Html.On(plan, t => t.ServerPush<SlotTaken>(streamUrl, "slot-taken", (taken, p) =>
+    Html.On(plan, t => t.ServerPush(ServerPushStream.At<VisitBoardStream>(streamUrl), s => s.SlotTaken, (taken, p) =>
     {
         var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
         var slot = p.Payload(taken).Get(x => x.Slot);
@@ -54,12 +54,12 @@
                 other.Element("board-alert").RemoveClass("text-danger");
             });
         planner.Call(c => c.MarkTaken, slot, p.Payload(taken).Get(x => x.Family));
-        p.DispatchWith<BoardChange>("board-changed", change => change
+        p.DispatchWith<BoardChange>(VisitBoardEvents.BoardChanged, change => change
             .Set(x => x.Summary, p.Payload(taken).Get(x => x.Message))
             .Set(x => x.Booked, planner.Get(c => c.Count)));
     }));
 
-    Html.On(plan, t => t.CustomEvent<BoardChange>("board-changed", (change, p) =>
+    Html.On(plan, t => t.CustomEvent<BoardChange>(VisitBoardEvents.BoardChanged, (change, p) =>
     {
         p.Element("board-log").SetText(change, x => x.Summary);
         p.Element("board-log-booked").SetText(change, x => x.Booked);

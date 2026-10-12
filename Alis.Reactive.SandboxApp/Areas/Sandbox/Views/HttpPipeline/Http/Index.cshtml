@@ -21,7 +21,7 @@
          )
     ));
 
-    Html.On(plan, t => t.CustomEvent("native-action-link-grid-refresh", p =>
+    Html.On(plan, t => t.CustomEvent(HttpShowcaseEvents.NativeActionLinkGridRefresh, p =>
         p.Get(Url.SandboxRoute("NativeActionLinkGrid", "Http"))
          .Response(r => r.OnSuccess(s => s.Into("native-action-link-grid")))
     ));

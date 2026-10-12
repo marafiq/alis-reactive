@@ -144,7 +144,7 @@ Source: [Microsoft Learn — Recommended XML tags](https://learn.microsoft.com/e
 /// <example>
 /// Dispatch a custom event from a DomReady trigger:
 /// <code>
-/// p.Dispatch("data-loaded");
+/// p.Dispatch(CareEvents.DataLoaded);
 /// </code>
 /// </example>
 ```
@@ -198,7 +198,7 @@ Source: [Microsoft Learn — Recommended XML tags](https://learn.microsoft.com/e
 
 ```xml
 /// <see cref="ReactivePlan{TModel}"/>
-/// <see cref="PipelineBuilder{TModel}.Dispatch(string)">Dispatch</see>
+/// <see cref="PipelineBuilder{TModel}.Dispatch(AppEvent)">Dispatch</see>
 /// <see langword="null"/>
 /// <see href="https://learn.microsoft.com/dotnet">Link text</see>
 ```

@@ -126,4 +126,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.OpenTasks).InclusiveBetween(0m, 7m).WithMessage("Open tasks must be between 0 and 7.");
         }
     }
+
+    /// <summary>The document events the GridOperations page raises and hears.</summary>
+    public static class GridOperationsEvents
+    {
+        public static readonly AppEvent<GridTemplateActionPayload> GridReviewResident = AppEvent.Named<GridTemplateActionPayload>("grid:review-resident");
+    }
 }

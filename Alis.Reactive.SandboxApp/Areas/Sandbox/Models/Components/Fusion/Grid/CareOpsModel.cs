@@ -93,4 +93,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(r => r.OpenTasks).InclusiveBetween(0, 7).WithMessage("Open tasks must be between 0 and 7.");
         }
     }
+
+    /// <summary>The document events the CareOps page raises and hears.</summary>
+    public static class CareOpsEvents
+    {
+        public static readonly AppEvent CareopsRowsRefresh = AppEvent.Named("careops-rows-refresh");
+    }
 }

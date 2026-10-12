@@ -8,7 +8,7 @@
     // existing SignalR connection (same URL = same pooled connection).
     var drillId = (string?)ViewData["DrillId"] ?? "";
 
-    Html.On(plan, t => t.SignalR<ResidentStatusPayload>($"/hubs/resident-status?drill={drillId}", "StatusChanged",
+    Html.On(plan, t => t.SignalR(SignalRHub.At<ResidentStatusFeed>($"/hubs/resident-status?drill={drillId}"), h => h.StatusChanged,
         (payload, p) =>
     {
         p.Element("panel-resident-name").SetText(payload, x => x.ResidentName);

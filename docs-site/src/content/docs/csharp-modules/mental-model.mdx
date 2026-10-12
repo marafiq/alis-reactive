@@ -36,7 +36,7 @@ is the executor.
 | `p.Component<TComponent>(...)` | Reads, writes, or calls a component member. |
 | `p.When(source)` | Branches on a typed value source. |
 | `p.Get(...)`, `p.Post(...)`, `p.Put(...)`, `p.Delete(...)` | Adds an async HTTP reaction. |
-| `p.Dispatch(...)` | Emits a document `CustomEvent`. |
+| `p.Dispatch(...)` | Raises a declared `AppEvent` as a document `CustomEvent`. |
 
 The grammar stays small because components share one object model.
 

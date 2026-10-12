@@ -59,15 +59,31 @@ RAZOR_HELPER  := @Html.RenderPlan(plan) -- IHtmlContent helper
 ```
 TRIGGER :=
   | DomReady(p => { PIPELINE })
-  | CustomEvent("name", p => { PIPELINE })
-  | CustomEvent<TPayload>("name", (payload, p) => { PIPELINE })
-  | ServerPush("url", p => { PIPELINE })                              -- SSE, every message
-  | ServerPush("url", "eventType", p => { PIPELINE })                 -- SSE, filtered
-  | ServerPush<TPayload>("url", "eventType", (payload, p) => { PIPELINE })
-  | SignalR("hubUrl", "methodName", p => { PIPELINE })
-  | SignalR<TPayload>("hubUrl", "methodName", (payload, p) => { PIPELINE })
+  | CustomEvent(EVT, p => { PIPELINE })                               -- EVT: AppEvent
+  | CustomEvent(EVT, (payload, p) => { PIPELINE })                    -- EVT: AppEvent<TPayload>
+  | ServerPush(ServerPushStream.At<TStream>(url), s => s.MESSAGE, (payload, p) => { PIPELINE })
+  | SignalR(SignalRHub.At<THub>(url), h => h.MESSAGE, (payload, p) => { PIPELINE })
 ```
 
+Event names are declared once, never typed at the call:
+
+```csharp
+public static class CareEvents                       // document events
+{
+    public static readonly AppEvent Refreshed = AppEvent.Named("roster-refreshed");
+    public static readonly AppEvent<ResidentFlagged> Flagged = AppEvent.Named<ResidentFlagged>("resident-flagged");
+}
+public sealed class FacilityAlertStream : ServerPushStream   // SSE: event names the server writes
+{
+    public ServerPushMessage<FacilityAlert> Alert => Message<FacilityAlert>("facility-alert");
+}
+public sealed class ResidentStatusFeed : SignalRHub          // SignalR: client methods the hub calls
+{
+    public SignalRMessage<ResidentStatusPayload> StatusChanged => Message<ResidentStatusPayload>("StatusChanged");
+}
+```
+
+The server writes the same declaration's `.Name` (`SendAsync(new ResidentStatusFeed().StatusChanged.Name, ..)`).
 `TPayload` must be `class, new()`. Payload is a phantom — properties become `evt.` dot-paths.
 ServerPush and SignalR are remote triggers — the async lane.
 
@@ -87,8 +103,9 @@ EVENT := Change | Filtering | Select | Focus | Blur | Created | ...    -- the co
 ```
 PIPELINE :=
   | p.Element("id").ELEMENT_ACTION
-  | p.Dispatch("name")
-  | p.Dispatch<T>("name", payload)
+  | p.Dispatch(EVT)                                  -- AppEvent
+  | p.Dispatch(EVT, payload)                         -- AppEvent<T>, payload fixed at render
+  | p.DispatchWith(EVT, d => d.Set(x => x.F, SOURCE)) -- AppEvent<T>, payload read when it runs
   | p.Component<TComp>(m => m.Prop).COMP_ACTION     -- model-bound
   | p.Component<TComp>("refId").COMP_ACTION          -- string ref
   | p.Component<TComp>().COMP_ACTION                 -- app-level singleton
@@ -250,8 +267,9 @@ A hidden InputField: no label or message wrapper, still registered for gather. S
 
 ```
 DISPATCH :=
-  | p.Dispatch("eventName")
-  | p.Dispatch<TPayload>("eventName", new TPayload { ... })
+  | p.Dispatch(CareEvents.Refreshed)
+  | p.Dispatch(CareEvents.Flagged, new ResidentFlagged { ... })
+  | p.DispatchWith(CareEvents.Flagged, d => d.Set(x => x.ResidentId, SOURCE))
 ```
 
 ## Event Payloads with Behavior (Filtering)
@@ -366,7 +384,7 @@ p.When(careLevel.Get(c => c.Value)).Eq("Memory Care")
 **CustomEvent with typed payload (26 uses)**
 Source: `Areas/Sandbox/Views/CoreBehaviors/Payload/Index.cshtml`
 ```csharp
-Html.On(plan, t => t.CustomEvent<PayloadShowcaseModel>("payload-test", (payload, p) =>
+Html.On(plan, t => t.CustomEvent<PayloadShowcaseModel>(PayloadShowcaseEvents.PayloadTest, (payload, p) =>
 {
     p.Element("int-value").SetText(payload, x => x.IntValue);
     p.Element("address-street").SetText(payload, x => x.Address!.Street);

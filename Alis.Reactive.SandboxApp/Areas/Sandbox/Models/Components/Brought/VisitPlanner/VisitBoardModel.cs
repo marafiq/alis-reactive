@@ -45,4 +45,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
 
         public PluginFunction<string> Slug { get; }
     }
+
+    /// <summary>The document events the VisitBoard page raises and hears.</summary>
+    /// <summary>The visit board's stream: a time another desk's family took.</summary>
+    public sealed class VisitBoardStream : ServerPushStream
+    {
+        public ServerPushMessage<SlotTaken> SlotTaken => Message<SlotTaken>("slot-taken");
+    }
+
+    public static class VisitBoardEvents
+    {
+        public static readonly AppEvent<BoardChange> BoardChanged = AppEvent.Named<BoardChange>("board-changed");
+    }
 }

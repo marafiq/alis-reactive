@@ -59,7 +59,7 @@
                          .OnSuccess(s =>
                          {
                              s.Component<FusionDialog>("new-assignment-dialog").Call(c => c.Hide);
-                             s.Dispatch("schedule:assignment-saved");
+                             s.Dispatch(PointInTimeScheduleEvents.ScheduleAssignmentSaved);
                          })
                          .OnError(400, e => e.ValidationErrors("new-assignment-form")));
                 }))

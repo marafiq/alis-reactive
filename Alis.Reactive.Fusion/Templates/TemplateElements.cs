@@ -39,15 +39,24 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Renders a button whose click raises a document event with the bound <c>detail.id</c> value.
-        /// The template carries no script: the runtime raises the event named by <c>data-alis-raise</c>
-        /// with the JSON in <c>data-alis-detail</c>. The detail's quotes are <c>&amp;quot;</c> so they
-        /// survive the Syncfusion template engine's quote conversion.
+        /// Renders a button whose click raises a document event with one payload member bound from the
+        /// row. The template carries no script: the runtime raises the event named by
+        /// <c>data-alis-raise</c> with the JSON in <c>data-alis-detail</c>. The detail's quotes are
+        /// <c>&amp;quot;</c> so they survive the Syncfusion template engine's quote conversion.
         /// </summary>
-        internal static string EventButton(string text, string eventName, string idBinding, TemplateCss css)
+        internal static string EventButton(string text, string eventName, string detailMember, string valueBinding, TemplateCss css)
         {
-            var detail = $"{{&quot;id&quot;:{idBinding}}}";
+            var detail = $"{{&quot;{detailMember}&quot;:{valueBinding}}}";
             return $"<button class=\"{css.AppendTo("e-btn")}\" data-alis-raise=\"{eventName}\" data-alis-detail=\"{detail}\">{text}</button>";
+        }
+
+        /// <summary>The JSON name of the payload member a template button fills; a direct member only.</summary>
+        internal static string DetailMember<TPayload, TProperty>(System.Linq.Expressions.Expression<System.Func<TPayload, TProperty>> member)
+        {
+            var path = FusionTemplateExpression.ToPropertyPath(member);
+            return path.IndexOf('.') < 0
+                ? path
+                : throw new System.ArgumentException($"A template button fills a direct payload member; '{path}' is nested.", nameof(member));
         }
     }
 

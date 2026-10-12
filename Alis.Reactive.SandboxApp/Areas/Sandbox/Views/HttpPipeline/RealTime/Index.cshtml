@@ -12,7 +12,7 @@
     var drillId = Guid.NewGuid().ToString("N");
 
     // ServerPush uses native EventSource, so reconnect behavior belongs to the browser boundary.
-    Html.On(plan, t => t.ServerPush<FacilityAlert>($"/api/facility-alerts?drill={drillId}", "facility-alert",
+    Html.On(plan, t => t.ServerPush(ServerPushStream.At<FacilityAlertStream>($"/api/facility-alerts?drill={drillId}"), s => s.Alert,
         (alert, p) =>
     {
         p.Element("alert-message").SetText(alert, x => x.Message);
@@ -22,7 +22,7 @@
         p.Element("alert-status").SetText("Connected");
     }));
 
-    Html.On(plan, t => t.SignalR<NotificationPayload>("/hubs/notifications", "ReceiveNotification",
+    Html.On(plan, t => t.SignalR(SignalRHub.At<NotificationFeed>("/hubs/notifications"), h => h.ReceiveNotification,
         (payload, p) =>
     {
         p.Element("notif-count").SetText(payload, x => x.Count);
@@ -30,7 +30,7 @@
         p.Element("notif-priority").SetText(payload, x => x.Priority);
     }));
 
-    Html.On(plan, t => t.SignalR<ResidentStatusPayload>($"/hubs/resident-status?drill={drillId}", "StatusChanged",
+    Html.On(plan, t => t.SignalR(SignalRHub.At<ResidentStatusFeed>($"/hubs/resident-status?drill={drillId}"), h => h.StatusChanged,
         (payload, p) =>
     {
         p.Element("resident-name").SetText(payload, x => x.ResidentName);

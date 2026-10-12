@@ -14,16 +14,16 @@
         .NativeTextBox(b => b.Placeholder("Type a city..."));
 
     // DispatchWith mixes runtime value sources, literals, and nested paths in one payload.
-    Html.On(plan, t => t.CustomEvent("do-transfer", p =>
+    Html.On(plan, t => t.CustomEvent(DispatchSourceEvents.DoTransfer, p =>
     {
-        p.DispatchWith<DispatchSourceModel>("transfer", d => d
+        p.DispatchWith<DispatchSourceModel>(DispatchSourceEvents.Transfer, d => d
             .Set(x => x.Name, p.Component<NativeTextBox>(m => m.Name).Get(c => c.Value))
             .Set(x => x.Status, "active")
             .Set(x => x.Address.City, p.Component<NativeTextBox>(m => m.Address.City).Get(c => c.Value))
         );
     }));
 
-    Html.On(plan, t => t.CustomEvent<DispatchSourceModel>("transfer", (payload, p) =>
+    Html.On(plan, t => t.CustomEvent<DispatchSourceModel>(DispatchSourceEvents.Transfer, (payload, p) =>
     {
         p.Element("received-name").SetText(payload, x => x.Name);
         p.Element("received-status-value").SetText(payload, x => x.Status);
@@ -49,7 +49,7 @@
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Dispatch("do-transfer");
+                    p.Dispatch(DispatchSourceEvents.DoTransfer);
                 }))
         </native-vstack>
     </native-card-body></native-card>

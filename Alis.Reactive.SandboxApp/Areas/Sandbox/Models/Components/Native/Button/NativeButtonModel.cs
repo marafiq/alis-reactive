@@ -7,4 +7,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     public class NativeButtonModel
     {
     }
+
+    /// <summary>The document events the NativeButton page raises and hears.</summary>
+    public static class NativeButtonEvents
+    {
+        public static readonly AppEvent ResidentTransferred = AppEvent.Named("resident-transferred");
+    }
 }

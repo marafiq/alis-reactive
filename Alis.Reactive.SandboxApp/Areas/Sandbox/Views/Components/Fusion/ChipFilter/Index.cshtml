@@ -18,7 +18,7 @@
     };
 
     // Custom event carries selected chip objects for ReactiveArray guards and selected texts for server filtering.
-    Html.On(plan, t => t.CustomEvent<ChipFilterPayload>("filters-applied", (payload, p) =>
+    Html.On(plan, t => t.CustomEvent<ChipFilterPayload>(ChipFilterEvents.FiltersApplied, (payload, p) =>
     {
         var selected = p.From(payload, x => x.Selection.Data);
 
@@ -47,7 +47,7 @@
 
     Html.NativeButton("apply-filters-btn", "Apply Filters")
         .Reactive(plan, evt => evt.Click, (args, p) =>
-            p.DispatchWith<ChipFilterPayload>("filters-applied", b =>
+            p.DispatchWith<ChipFilterPayload>(ChipFilterEvents.FiltersApplied, b =>
                 b.Set(x => x.Selection, p.Component<FusionChipList>("care-filters").Get(c => c.GetSelectedChips))));
 }
 

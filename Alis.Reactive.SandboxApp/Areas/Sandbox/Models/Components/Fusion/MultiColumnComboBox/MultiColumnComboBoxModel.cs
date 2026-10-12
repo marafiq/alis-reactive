@@ -18,4 +18,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string City { get; set; } = "";
         public int Capacity { get; set; }
     }
+
+    /// <summary>The document events the MultiColumnComboBox page raises and hears.</summary>
+    public static class MultiColumnComboBoxEvents
+    {
+        public static readonly AppEvent DoGather = AppEvent.Named("do-gather");
+    }
 }

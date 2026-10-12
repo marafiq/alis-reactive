@@ -28,4 +28,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public int Priority { get; set; }
         public bool Acknowledged { get; set; }
     }
+
+    /// <summary>The document events the ShiftReport page raises and hears.</summary>
+    public static class ShiftReportEvents
+    {
+        public static readonly AppEvent<ShiftReportPayload> ShiftReport = AppEvent.Named<ShiftReportPayload>("shift-report");
+    }
 }

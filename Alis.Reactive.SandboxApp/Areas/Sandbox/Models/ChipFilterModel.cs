@@ -34,4 +34,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public string[]? CareLevels { get; set; }
     }
+
+    /// <summary>The document events the ChipFilter page raises and hears.</summary>
+    public static class ChipFilterEvents
+    {
+        public static readonly AppEvent<ChipFilterPayload> FiltersApplied = AppEvent.Named<ChipFilterPayload>("filters-applied");
+    }
 }

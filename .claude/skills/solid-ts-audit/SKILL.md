@@ -114,7 +114,7 @@ Least stable (side effects, DOM)
 
 ### Step 5: Extension Check (OCP + LSP)
 
-For each discriminated union in the generated contract (`runtime/types/plan.ts`) — e.g., `StartsWhen`, `ReactionGraph`, `ValueExpression`, `ServerPushEventFilter`, `DispatchPayload`, `Shape`:
+For each discriminated union in the generated contract (`runtime/types/plan.ts`) — e.g., `Statement`, `Expr`, `ObjectLocator`, `Operator`, `Shape`:
 
 1. **Where is the switch?** One switch in one place = acceptable (TanStack pattern). Same switch in 2+ files = violation. **Nuance:** Repeated switches on the SAME discriminated union but with DIFFERENT target types (e.g., event object vs DOM element) may be acceptable duplication. Weigh the cost of introducing a target abstraction against the cost of the duplication before refactoring.
 2. **Is the resolved root substitutable?** After `resolveRoot()`, does ANY downstream code check vendor? If yes = LSP violation.

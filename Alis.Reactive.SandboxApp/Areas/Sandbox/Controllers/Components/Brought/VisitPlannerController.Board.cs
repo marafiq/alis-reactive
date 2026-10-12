@@ -38,7 +38,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
                 await Response.Body.FlushAsync(ct);
                 await foreach (var message in stream.Reader.ReadAllAsync(ct))
                 {
-                    await Response.WriteAsync($"event: slot-taken\ndata: {message}\n\n", ct);
+                    await Response.WriteAsync($"event: {new VisitBoardStream().SlotTaken.Name}\ndata: {message}\n\n", ct);
                     await Response.Body.FlushAsync(ct);
                 }
             }

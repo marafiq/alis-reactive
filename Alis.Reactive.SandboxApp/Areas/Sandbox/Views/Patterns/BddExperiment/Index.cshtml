@@ -21,7 +21,7 @@
         new() { Value = "memory", Text = "Memory Care" }
     };
 
-    Html.On(plan, t => t.CustomEvent("do-submit", p =>
+    Html.On(plan, t => t.CustomEvent(BddExperimentEvents.DoSubmit, p =>
     {
         p.Post(Url.SandboxRoute("Submit", "BddExperiment"), g => g.IncludeAll())
          .Validate<BddExperimentValidator>("admission-form")
@@ -125,7 +125,7 @@
             .CssClass("px-4 py-2 bg-primary text-white rounded-md text-sm font-medium")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Dispatch("do-submit");
+                p.Dispatch(BddExperimentEvents.DoSubmit);
             }))
         <span id="submit-status" class="text-sm text-text-muted">Ready</span>
     </native-hstack>

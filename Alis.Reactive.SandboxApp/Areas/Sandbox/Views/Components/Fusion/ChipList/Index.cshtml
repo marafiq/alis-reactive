@@ -8,7 +8,7 @@
 
     var plan = Html.ReactivePlan<ChipListModel>();
 
-    Html.On(plan, t => t.CustomEvent<ChipSelectionPayload>("chip-selection-read", (payload, p) =>
+    Html.On(plan, t => t.CustomEvent<ChipSelectionPayload>(ChipListEvents.ChipSelectionRead, (payload, p) =>
     {
         p.Element("selected-chip-texts").SetText(payload, x => x.Selection.Texts);
         p.Element("found-chip-text").SetText(payload, x => x.Found.Text);
@@ -64,7 +64,7 @@
                         var tagList = p.Component<FusionChipList>("care-tags");
                         tagList.Call(c => c.Add, "Wound Care");
                         tagList.Call(c => c.SelectByText, new[] { "Hydration", "Wound Care" });
-                        p.DispatchWith<ChipSelectionPayload>("chip-selection-read", payload =>
+                        p.DispatchWith<ChipSelectionPayload>(ChipListEvents.ChipSelectionRead, payload =>
                         {
                             payload.Set(x => x.Selection, tagList.Get(c => c.GetSelectedChips));
                             payload.Set(x => x.Found, tagList.Get(c => c.Find, 1));

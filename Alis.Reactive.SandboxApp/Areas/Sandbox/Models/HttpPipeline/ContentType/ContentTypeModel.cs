@@ -28,4 +28,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? Name { get; set; }
         public string? Email { get; set; }
     }
+
+    /// <summary>The document events the ContentType page raises and hears.</summary>
+    public static class ContentTypeEvents
+    {
+        public static readonly AppEvent FetchFlat = AppEvent.Named("fetch-flat");
+        public static readonly AppEvent FetchNested = AppEvent.Named("fetch-nested");
+        public static readonly AppEvent FetchPartial = AppEvent.Named("fetch-partial");
+    }
 }

@@ -8,7 +8,7 @@
     var plan = Html.ReactivePlan<CommandOrderingModel>();
 
     // Declaration order matters across condition boundaries; the final SetText must win.
-    Html.On(plan, t => t.CustomEvent<CommandOrderingPayload>("ordering-test", (args, p) =>
+    Html.On(plan, t => t.CustomEvent<CommandOrderingPayload>(CommandOrderingEvents.OrderingTest, (args, p) =>
     {
         p.Element("proof").SetText("before");
         p.When(args, x => x.Level).Eq("high")
@@ -24,12 +24,12 @@
         @(Html.NativeButton("btn-high", "Trigger with level=high")
             .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
-                p.Dispatch("ordering-test", new CommandOrderingPayload { Level = "high" })))
+                p.Dispatch(CommandOrderingEvents.OrderingTest, new CommandOrderingPayload { Level = "high" })))
 
         @(Html.NativeButton("btn-low", "Trigger with level=low")
             .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
-                p.Dispatch("ordering-test", new CommandOrderingPayload { Level = "low" })))
+                p.Dispatch(CommandOrderingEvents.OrderingTest, new CommandOrderingPayload { Level = "low" })))
     </native-hstack>
 
     <p class="font-mono text-sm text-text-muted">Proof element: <span id="proof">&mdash;</span></p>
