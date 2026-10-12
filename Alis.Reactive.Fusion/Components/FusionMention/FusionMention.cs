@@ -78,12 +78,10 @@ namespace Alis.Reactive.Fusion.Components
             build(builder);
 
 #if NET48
-            var content = new HtmlString(
-                RenderBridge(elementId, hostId, builder.model.Target)
-                + builder.Render().ToHtmlString());
+            var content = new HtmlString(RenderBridge(elementId, hostId) + builder.Render().ToHtmlString());
 #else
             var content = new HtmlContentBuilder();
-            content.AppendHtml(RenderBridge(elementId, hostId, builder.model.Target));
+            content.AppendHtml(RenderBridge(elementId, hostId));
             content.AppendHtml(builder.Render());
 #endif
 
@@ -102,20 +100,13 @@ namespace Alis.Reactive.Fusion.Components
             });
         }
 
-        private static string RenderBridge(string elementId, string hostId, string targetSelector)
+        // A Mention with a target turns its own element into the suggestion popup and renames it when the
+        // popup first opens, so the component's element is a hidden span: the framework's mention code
+        // (run on alis:mount, like an app's widget code) gives it the Mention's instance.
+        private static string RenderBridge(string elementId, string hostId)
         {
-            var encodedElementId = JavaScriptEncoder.Default.Encode(elementId);
-            var encodedHostId = JavaScriptEncoder.Default.Encode(hostId);
-            var encodedTargetSelector = JavaScriptEncoder.Default.Encode(targetSelector);
-
-            return "<span id=\"" + HtmlEncoder.Default.Encode(elementId) + "\" hidden></span>"
-                + "<script>(function(){document.addEventListener('DOMContentLoaded',function(){"
-                + "var bridge=document.getElementById('" + encodedElementId + "');"
-                + "var host=document.getElementById('" + encodedHostId + "');"
-                + "var target=document.querySelector('" + encodedTargetSelector + "');"
-                + "var source=(host&&host.ej2_instances)?host:target;"
-                + "if(bridge&&source&&source.ej2_instances){bridge.ej2_instances=source.ej2_instances;}"
-                + "});})();</script>";
+            return "<span id=\"" + HtmlEncoder.Default.Encode(elementId) + "\" hidden data-alis-mention=\""
+                + HtmlEncoder.Default.Encode(hostId) + "\"></span>";
         }
     }
 }

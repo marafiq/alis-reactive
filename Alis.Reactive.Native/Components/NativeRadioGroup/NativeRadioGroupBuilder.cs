@@ -152,8 +152,9 @@ namespace Alis.Reactive.Native.Components
 
             writer.Write($"<div class=\"{encoder.Encode(_cssClass)}\">");
 
-            // Hidden input is the Reactive Plan component target and intentionally omits a name attribute.
-            writer.Write($"<input type=\"hidden\" id=\"{encodedId}\" value=\"{encoder.Encode(selectedValue)}\" />");
+            // The hidden input is the component and has no name: the radios post the value. The framework's
+            // radio-group code (constructed on alis:mount) keeps the picked value on it and raises change.
+            writer.Write($"<input type=\"hidden\" id=\"{encodedId}\" value=\"{encoder.Encode(selectedValue)}\" data-alis-radio-group />");
 
             for (int i = 0; i < _options.Count; i++)
             {
@@ -185,9 +186,6 @@ namespace Alis.Reactive.Native.Components
             }
 
             writer.Write("</div>");
-
-            // Inline initialization works on page load and partial injection without DOM scanning.
-            writer.Write($@"<script>(function(){{var h=document.getElementById(""{encodedId}"");h.isInteracted=false;h.parentElement.addEventListener(""change"",function(e){{if(e.target.type!==""radio"")return;h.value=e.target.value;h.isInteracted=true;h.dispatchEvent(new Event(""change"",{{bubbles:true}}));}});}})();</script>");
         }
     }
 }

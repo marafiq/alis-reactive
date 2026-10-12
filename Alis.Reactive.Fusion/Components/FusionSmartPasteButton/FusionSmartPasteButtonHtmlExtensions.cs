@@ -28,7 +28,7 @@ namespace Alis.Reactive.Fusion.Components
             var options = new FusionSmartPasteButtonOptions();
             configure(options);
 
-            return new HtmlString(RenderButton(elementId, options) + RenderInitializer(elementId, options));
+            return new HtmlString(RenderButton(elementId, options));
         }
 
         private static string RenderButton(string elementId, FusionSmartPasteButtonOptions options)
@@ -43,6 +43,8 @@ namespace Alis.Reactive.Fusion.Components
             {
                 attributes["class"] = options.CssClass;
             }
+
+            attributes["data-alis-smart-paste-button"] = ConstructionOptions(options);
 
             var writer = new System.Text.StringBuilder("<button");
             foreach (var attribute in attributes)
@@ -61,7 +63,9 @@ namespace Alis.Reactive.Fusion.Components
             return writer.ToString();
         }
 
-        private static string RenderInitializer(string elementId, FusionSmartPasteButtonOptions options)
+        // The options the framework's smart-paste-button code (constructed on alis:mount, like an app's
+        // widget) hands to Syncfusion; an assist endpoint becomes the handler that asks it.
+        private static string ConstructionOptions(FusionSmartPasteButtonOptions options)
         {
             var payload = new
             {
@@ -70,17 +74,7 @@ namespace Alis.Reactive.Fusion.Components
                 aiAssistEndpoint = options.AiAssistEndpoint
             };
 
-            var json = JsonSerializer.Serialize(payload);
-            var encodedId = JavaScriptEncoder.Default.Encode(elementId);
-
-            return "<script>(function(){document.addEventListener('DOMContentLoaded',function(){"
-                + "var options=" + json + ";"
-                + "var endpoint=options.aiAssistEndpoint;delete options.aiAssistEndpoint;"
-                + "if(endpoint){options.aiAssistHandler=async function(settings){"
-                + "var response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(settings)});"
-                + "return await response.text();};}"
-                + "new ej.buttons.SmartPasteButton(options).appendTo('#" + encodedId + "');"
-                + "});})();</script>";
+            return JsonSerializer.Serialize(payload);
         }
     }
 }

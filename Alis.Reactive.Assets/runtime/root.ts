@@ -1,6 +1,7 @@
-// The runtime's entry. It registers the framework's own plugins, takes the app's plugins from the
-// queue the app bundle fills, then starts the page's owner with every plan script on the page
-// (grammar.md 3.5) and marks the page booted.
+// The runtime's entry. It registers the framework's own modules, takes the plugins queued in
+// window.__alisPlugins (the app's, and the framework's own components'), announces the page's HTML
+// with alis:mount so every component is constructed, then starts the page's owner with every plan
+// script on the page (grammar.md 3.5) and marks the page booted.
 
 import { registerModule, registerPlugin } from "./objects/modules";
 import { Owner } from "./objects/owner";
@@ -14,9 +15,6 @@ import { formModule } from "./modules/form/form";
 import { slotModule } from "./modules/slot";
 import { streamModule } from "./realtime/stream";
 import { hubModule } from "./realtime/hub";
-import { initConfirm } from "./components/fusion/confirm";
-import "./components/native/drawer";
-import "./components/native/loader";
 import { scope } from "./diagnostics/trace";
 
 const log = scope("boot");
@@ -50,7 +48,6 @@ function start(): void {
   for (const plugin of runtimeWindow.__alisPlugins ?? []) registerPlugin(plugin.name, plugin.instance);
   delete runtimeWindow.__alisPlugins;
 
-  initConfirm();
   announceMount(document.body);
 
   const plans = discoverPlans(document, false);

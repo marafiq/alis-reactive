@@ -101,7 +101,9 @@ namespace Alis.Reactive.Fusion.Components
                 attributes["class"] = options.CssClass;
             }
 
-            var content = new HtmlString(RenderTextArea(attributes, options.Value) + RenderInitializer(setup.ElementId, options));
+            attributes["data-alis-smart-text-area"] = ConstructionOptions(options);
+
+            var content = new HtmlString(RenderTextArea(attributes, options.Value));
             return setup.Render<global::Alis.Reactive.Fusion.Components.FusionSmartTextArea>(content);
         }
 
@@ -126,9 +128,9 @@ namespace Alis.Reactive.Fusion.Components
             return writer.ToString();
         }
 
-        private static string RenderInitializer(
-            string elementId,
-            FusionSmartTextAreaOptions options)
+        // The options the framework's smart-text-area code (constructed on alis:mount, like an app's
+        // widget) hands to Syncfusion; a suggestion endpoint becomes the handler that asks it.
+        private static string ConstructionOptions(FusionSmartTextAreaOptions options)
         {
             var payload = new
             {
@@ -139,17 +141,7 @@ namespace Alis.Reactive.Fusion.Components
                 suggestionEndpoint = options.SuggestionEndpoint
             };
 
-            var json = JsonSerializer.Serialize(payload);
-            var encodedId = JavaScriptEncoder.Default.Encode(elementId);
-
-            return "<script>(function(){document.addEventListener('DOMContentLoaded',function(){"
-                + "var options=" + json + ";"
-                + "var endpoint=options.suggestionEndpoint;delete options.suggestionEndpoint;"
-                + "if(endpoint){options.aiSuggestionHandler=async function(settings){"
-                + "var response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(settings)});"
-                + "return await response.text();};}"
-                + "new ej.inputs.SmartTextArea(options).appendTo('#" + encodedId + "');"
-                + "});})();</script>";
+            return JsonSerializer.Serialize(payload);
         }
 
         private static string ToSyncfusionMode(FusionSmartSuggestionMode mode)

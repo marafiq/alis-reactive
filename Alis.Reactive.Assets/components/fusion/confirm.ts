@@ -1,15 +1,12 @@
 // alis.confirm: the app-level confirmation the core's p.Confirm(..) asks (grammar.md 6.8). The Fusion
-// package implements it with a Syncfusion Dialog rendered by @Html.FusionConfirmDialog().
+// package implements it with a Syncfusion Dialog rendered by @Html.FusionConfirmDialog(), made when
+// the dialog's element mounts; the plan locates it as a plugin.
 // C1 ask(message) resolves true on OK, false on Cancel, close or Escape.
 // C2 Asks queue first in, first out.
 // C3 Escape inside the dialog never reaches the document.
 // C4 A missing dialog is a boundary error naming FusionConfirmDialog.
 
-import { scope } from "../../diagnostics/trace";
-import { registerModule } from "../../objects/modules";
-
-const log = scope("confirm");
-const ELEMENT_ID = "alisConfirmDialog";
+import { onMount, providePlugin } from "../hooks";
 
 let queue = Promise.resolve();
 
@@ -81,11 +78,8 @@ function keepEscapeInConfirm(event: KeyboardEvent): void {
 
 let ask: ((message: string) => Promise<boolean>) | undefined;
 
-function createDialog(): ((message: string) => Promise<boolean>) | undefined {
-  // App-level singleton rendered by @Html.FusionConfirmDialog() in the layout; fixed id.
-  const dialogHostElement = document.getElementById(ELEMENT_ID);
-  if (!dialogHostElement) return undefined;
-
+// App-level singleton rendered by @Html.FusionConfirmDialog() in the layout; fixed id.
+onMount("#alisConfirmDialog", dialogHostElement => {
   const hostWindow = window as unknown as SyncfusionWindow;
   const dialog = new hostWindow.ej.popups.Dialog({
     isModal: true,
@@ -98,23 +92,15 @@ function createDialog(): ((message: string) => Promise<boolean>) | undefined {
   });
   dialog.appendTo(dialogHostElement);
   dialogHostElement.addEventListener("keydown", keepEscapeInConfirm);
-  log.info("initialized", { id: ELEMENT_ID });
 
-  return (message: string) => new Promise<boolean>(outerResolve => {
+  ask = (message: string) => new Promise<boolean>(outerResolve => {
     queue = queue.then(() => showConfirmDialog(dialog, message, outerResolve));
   });
-}
+});
 
-export function initConfirm(): void {
-  ask = createDialog();
-  if (!ask) log.debug("element.not-found", { id: ELEMENT_ID });
-}
-
-registerModule("alis.confirm", {
-  object: () => ({
-    ask(message: string): Promise<boolean> {
-      if (!ask) throw new Error("[alis] confirm condition requires @Html.FusionConfirmDialog() in layout");
-      return ask(message);
-    },
-  }),
+providePlugin("alis.confirm", {
+  ask(message: string): Promise<boolean> {
+    if (!ask) throw new Error("[alis] confirm condition requires @Html.FusionConfirmDialog() in layout");
+    return ask(message);
+  },
 });

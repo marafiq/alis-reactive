@@ -59,6 +59,8 @@ check_browser_assets_are_fresh() {
     "runtime bundle" \
     "Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js" \
     Alis.Reactive.Assets/runtime \
+    Alis.Reactive.Assets/components \
+    Alis.Reactive.Assets/bundle.ts \
     Alis.Reactive.Assets/esbuild.config.mjs \
     Alis.Reactive.Assets/package.json \
     Alis.Reactive.Assets/tsconfig.json

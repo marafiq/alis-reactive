@@ -4,6 +4,6 @@
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "types": ["node"]
   },
-  "include": ["runtime/**/*.ts"],
+  "include": ["bundle.ts", "runtime/**/*.ts", "components/**/*.ts"],
   "exclude": []
 }

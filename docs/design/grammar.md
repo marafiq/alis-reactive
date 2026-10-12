@@ -710,10 +710,12 @@ vocabulary used, the sentence, and a verdict:
   registered by the framework bundle, receive the evaluator, and do not import the executor.
 - The realtime package's bundle: `alis.stream`, `alis.hub` and the retry indicator, so a page
   without realtime loads no SignalR client.
-- `runtime/components/fusion`, `runtime/components/native`: Confirm, Toast, Drawer, Loader,
-  CheckList, RadioGroup.
+- `components/` (beside `runtime/`, in the same shipped bundle): the framework's own component code,
+  built only on `alis:mount`, `alis:unmount` and `window.__alisPlugins`, as an app's is: CheckList,
+  RadioGroup, Drawer, Loader, Confirm, SmartTextArea, SmartPasteButton, Mention.
 
-The architecture test enforces the import directions and that only vendor modules name a vendor.
+The architecture test enforces the import directions, that the runtime names no vendor, and that
+`components/` and `runtime/` import nothing from each other.
 
 ## 11. Implementation status
 

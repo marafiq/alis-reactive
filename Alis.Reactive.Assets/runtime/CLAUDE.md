@@ -16,8 +16,11 @@ feature; every feature is a module. Load `solid-ts-audit` for structural work.
   run `ready`), and announces `alis:mount` / `alis:unmount`.
 - `modules/` are the framework's built-in objects: `alis.document`, `alis.http`, `alis.model`,
   `alis.form`, `alis.slot`. `realtime/` holds `alis.stream` and `alis.hub`.
-  `components/` holds the app-level objects (Confirm, Drawer, Loader).
-- `root.ts` registers the modules, drains `window.__alisPlugins`, and boots the page.
+- `root.ts` registers the modules, drains `window.__alisPlugins`, announces `alis:mount`, and boots
+  the page.
+- The framework's own component code (Native and Fusion widgets, Confirm, Drawer, Loader) is not
+  here: it lives in `../components/`, constructs on `alis:mount` and queues plugins, as an app's
+  does. `../bundle.ts` imports it before this runtime. Neither side imports the other.
 
 ## Posture
 
@@ -29,7 +32,7 @@ JSON the framework did not produce. Each names the object, the path and the plan
 - `getElementById` only; the plan carries every id. Wide queries are allowed only for plan
   discovery and self-stamped cleanup (the architecture test's allowlist).
 - A vendor is plan data (object path, subscribe, unsubscribe, payload); `objects/vendor-driver.ts`
-  follows it for every component. Vendor names appear only in `components/`.
+  follows it for every component. No vendor is named here.
 - Sync stays sync: a handler with no awaited statement never returns a promise, so a vendor reads
   a payload's `cancel` in the same turn. Only `do`/`let` with `await` wait.
 - One evaluator. A second way to read a value is a defect.

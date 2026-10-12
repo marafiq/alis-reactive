@@ -85,7 +85,7 @@ These terms stay identical across C#, generated TS, runtime, tests and docs.
 | Plugins | The escape hatch for work the DSL cannot express (URL, DOM, array APIs). Plugin names may be strings; everything else is typed. |
 | App-level objects | Drawer, Toast, Confirm, Loader, ActionLink: fixed IDs, typed members. |
 | IDs | `IdGenerator` derives input IDs from model type and expression (`Namespace_Type__Member_Path`). Other IDs are the developer's explicit choice. The runtime resolves by `getElementById` only; wide DOM queries are allowed only for plan discovery and self-stamped cleanup (architecture test allowlist). |
-| Vendors | A vendor is data a component declaration carries (`ComponentVendor`: where the object lives on the element, subscribe and unsubscribe methods, what a listener receives). The plan's `vendors` map carries it; one runtime driver follows it. Only app-level object modules (`runtime/components/fusion`, `runtime/components/native`) and the exceptions in the architecture test name a vendor. |
+| Vendors | A vendor is data a component declaration carries (`ComponentVendor`: where the object lives on the element, subscribe and unsubscribe methods, what a listener receives). The plan's `vendors` map carries it; one runtime driver follows it. The runtime names no vendor: the framework's own component code lives in `Alis.Reactive.Assets/components/` and, like an app's, reaches the runtime only through `alis:mount`, `alis:unmount` and `window.__alisPlugins`. |
 
 Async lanes: HTTP, parallel HTTP, remote triggers, user decisions (Confirm) and partial injection.
 Everything else stays sync.

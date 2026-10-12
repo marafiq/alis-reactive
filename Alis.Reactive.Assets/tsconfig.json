@@ -16,6 +16,6 @@
     "forceConsistentCasingInFileNames": true,
     "types": []
   },
-  "include": ["runtime/**/*.ts"],
+  "include": ["bundle.ts", "runtime/**/*.ts", "components/**/*.ts"],
   "exclude": ["runtime/__tests__/**"]
 }

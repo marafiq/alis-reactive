@@ -70,18 +70,10 @@ describe("architecture: plan-driven IDs, no DOM scanning", () => {
 
 describe("architecture: vendor isolation", () => {
   // A vendor is data in the plan (where its object lives, how it subscribes, what a listener
-  // receives), so the vendor driver is vendor-blind. Vendor knowledge stays in the app-level object
-  // modules and the exceptions listed below; fixing one means deleting its line.
-  const vendorBoundaries = [
-    /^components\/fusion\//, // app-level Syncfusion objects (Confirm)
-  ];
-
-  it("Syncfusion knowledge stays behind the vendor boundary", () => {
-    const violations = violationsOf(
-      /Syncfusion|rawFile|ej2_instances|\bej\b/,
-      file => vendorBoundaries.some(pattern => pattern.test(file)),
-    );
-    expect(violations, "Syncfusion knowledge outside the vendor boundary: carry it in the vendor declaration").toEqual([]);
+  // receives), so the runtime names no vendor. Vendor code lives in components/, beside the runtime.
+  it("the runtime holds no Syncfusion knowledge", () => {
+    const violations = violationsOf(/Syncfusion|rawFile|ej2_instances|\bej\b/, () => false);
+    expect(violations, "Syncfusion knowledge in the runtime: carry it in the vendor declaration").toEqual([]);
   });
 });
 
@@ -94,7 +86,6 @@ describe("architecture: import directions", () => {
     plans: ["plans", "objects", "grammar", "types", "shared", "diagnostics"],
     modules: ["modules", "plans", "objects", "grammar", "types", "shared", "diagnostics"],
     realtime: ["realtime", "objects", "types", "shared", "diagnostics"],
-    components: ["components", "objects", "types", "shared", "diagnostics"],
     diagnostics: ["diagnostics", "shared"],
     shared: ["shared"],
   };
@@ -122,6 +113,37 @@ describe("architecture: import directions", () => {
   it("nothing imports the entry point", () => {
     const violations = runtimeSourceFiles()
       .filter(file => /from\s+"\.{1,2}\/(\.\.\/)*root"/.test(codeOnly(readFileSync(join(runtimeDir, file), "utf8"))));
+    expect(violations).toEqual([]);
+  });
+});
+
+describe("architecture: the framework's components are built like an app's", () => {
+  // components/ holds the framework's own components (Native, Fusion, the app-level objects). They
+  // construct on alis:mount and queue plugins in window.__alisPlugins, the hooks an app's components
+  // use, so neither side imports the other: a component the framework ships needs nothing a brought
+  // one cannot have.
+  const assetsDir = resolve(runtimeDir, "..");
+  const componentsDir = join(assetsDir, "components");
+
+  function importsOf(file: string): string[] {
+    const source = codeOnly(readFileSync(file, "utf8"));
+    return [...source.matchAll(/from\s+"(\.[^"]+)"|import\s+"(\.[^"]+)"/g)]
+      .map(match => resolve(dirname(file), match[1] ?? match[2]!));
+  }
+
+  it("components import nothing from the runtime", () => {
+    const violations = walk(componentsDir).flatMap(file =>
+      importsOf(file)
+        .filter(target => !target.startsWith(componentsDir))
+        .map(target => `${relative(assetsDir, file)} imports ${relative(assetsDir, target)}`));
+    expect(violations).toEqual([]);
+  });
+
+  it("the runtime imports nothing from components", () => {
+    const violations = runtimeSourceFiles().flatMap(file =>
+      importsOf(join(runtimeDir, file))
+        .filter(target => !target.startsWith(runtimeDir))
+        .map(target => `runtime/${file} imports ${relative(assetsDir, target)}`));
     expect(violations).toEqual([]);
   });
 });

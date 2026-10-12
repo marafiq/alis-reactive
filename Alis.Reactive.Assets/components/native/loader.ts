@@ -1,8 +1,9 @@
-// Native loader markup is a layout singleton rendered by @Html.NativeLoader(). This module gives the
-// element the members the C# NativeLoader declares: show(), hide(), and the target and timeout of the
-// next show, kept in data-target and data-timeout. A class observer then positions the loader over
-// its target, runs the timeout, and puts it back on the page when it hides.
-export {};
+// Native loader markup is a layout singleton rendered by @Html.NativeLoader(). When it mounts, this
+// gives the element the members the C# NativeLoader declares: show(), hide(), and the target and
+// timeout of the next show, kept in data-target and data-timeout. A class observer then positions the
+// loader over its target, runs the timeout, and puts it back on the page when it hides.
+
+import { onMount } from "../hooks";
 
 const VISIBLE = "alis-loader--visible";
 
@@ -68,10 +69,7 @@ function handleHidden(loader: HTMLElement): void {
   if (msg) msg.textContent = "";
 }
 
-function init(): void {
-  const loader = document.getElementById("alis-loader");
-  if (!loader) return;
-
+onMount("#alis-loader", loader => {
   Object.assign(loader, {
     show: () => show(loader),
     hide: () => hide(loader),
@@ -100,6 +98,4 @@ function init(): void {
   });
 
   observer.observe(loader, { attributes: true, attributeFilter: ["class"] });
-}
-
-init();
+});

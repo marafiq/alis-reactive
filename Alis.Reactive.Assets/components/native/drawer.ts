@@ -1,8 +1,9 @@
-// Native drawer markup is a layout singleton rendered by @Html.NativeDrawer(). This module gives the
-// element the members the C# NativeDrawer declares, so the DSL calls them like any component's:
-// open(), close() and the size property. It also wires the close button, the Escape key and the
-// reset after the close transition, through the drawer's well-known DOM IDs.
-export {};
+// Native drawer markup is a layout singleton rendered by @Html.NativeDrawer(). When it mounts, this
+// gives the element the members the C# NativeDrawer declares, so the DSL calls them like any
+// component's: open(), close() and the size property. It also wires the close button, the Escape key
+// and the reset after the close transition, through the drawer's well-known DOM IDs.
+
+import { onMount } from "../hooks";
 
 const SIZES = ["sm", "md", "lg"] as const;
 type DrawerSize = (typeof SIZES)[number];
@@ -53,10 +54,7 @@ function resetAfterClose(container: HTMLElement): void {
   if (title) title.textContent = "";
 }
 
-function init(): void {
-  const container = document.getElementById("alis-drawer");
-  if (!container) return;
-
+onMount("#alis-drawer", container => {
   declareMembers(container);
 
   const closeBtn = document.getElementById("alis-drawer-close");
@@ -75,6 +73,4 @@ function init(): void {
       resetAfterClose(container);
     }
   });
-}
-
-init();
+});
