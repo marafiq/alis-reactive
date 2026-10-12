@@ -16,7 +16,7 @@ namespace Alis.Reactive
         private readonly RegisteredInputComponents _registeredInputComponents =
             new RegisteredInputComponents();
 
-        private readonly PlanId _planId = Alis.Reactive.PlanModel.PlanId.ForModel(typeof(TModel));
+        private readonly PlanId _planId;
         private readonly PlanBuildContext _context;
         private readonly IServiceProvider? _services;
 
@@ -33,16 +33,22 @@ namespace Alis.Reactive
         }
 
         internal ReactivePlan(ReactivePlanScope scope, IServiceProvider? services)
+            : this(scope, services, Alis.Reactive.PlanModel.PlanId.ForModel(typeof(TModel)))
+        {
+        }
+
+        internal ReactivePlan(ReactivePlanScope scope, IServiceProvider? services, PlanId planId)
         {
             if (scope == null) throw new ArgumentNullException(nameof(scope));
 
+            _planId = planId ?? throw new ArgumentNullException(nameof(planId));
             _scope = scope;
             _services = services;
             var planIdentity = _scope.CreateIdentity(_planId);
             _context = new PlanBuildContext(planIdentity, _registeredInputComponents);
         }
 
-        /// <summary>Unique plan identifier derived from the model type's full name.</summary>
+        /// <summary>The plan's identifier: the model type's full name, or the element's id for an element plan.</summary>
         public string PlanId => _planId.Value;
         /// <summary>Whether this plan is rendered by a partial view and merges into the owning view's Active Plan.</summary>
         public bool IsPartial => _scope.IsPartial;
@@ -217,6 +223,9 @@ namespace Alis.Reactive
         internal static ReactivePlanScope PartialView { get; } =
             new PartialViewPlanScope();
 
+        internal static ReactivePlanScope Element { get; } =
+            new ElementPlanScope();
+
         internal abstract bool IsPartial { get; }
 
         internal abstract bool RendersValidationSummary { get; }
@@ -247,6 +256,21 @@ namespace Alis.Reactive
         {
             if (planId == null) throw new ArgumentNullException(nameof(planId));
             return PlanIdentity.Partial(planId);
+        }
+    }
+
+    // A plan of its own for one element (a link in a row template): it composes with no other plan
+    // and has no form, so it renders no validation summary.
+    internal sealed class ElementPlanScope : ReactivePlanScope
+    {
+        internal override bool IsPartial => false;
+
+        internal override bool RendersValidationSummary => false;
+
+        internal override PlanIdentity CreateIdentity(PlanId planId)
+        {
+            if (planId == null) throw new ArgumentNullException(nameof(planId));
+            return PlanIdentity.Root(planId);
         }
     }
 }

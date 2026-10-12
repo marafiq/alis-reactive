@@ -4,7 +4,6 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Alis.Reactive.Builders;
-using Alis.Reactive.FluentValidator;
 using Alis.Reactive.Native.AppLevel;
 using Alis.Reactive.Native.Components;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
@@ -14,8 +13,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.ShiftHandover;
 
 /// <summary>
-/// The request a NativeActionLink's own plan sends keeps what the link's pipeline declares, and
-/// what the link cannot carry is refused when the view renders instead of being dropped.
+/// The request a NativeActionLink's own plan sends keeps what the link's pipeline declares. What a
+/// link cannot carry (route parameters, IncludeAll, validation, more than one request) is refused in
+/// the view by analyzer ALIS002.
 /// </summary>
 [TestFixture]
 public sealed class WhenNativeActionLinkBuildsItsRequest
@@ -47,42 +47,6 @@ public sealed class WhenNativeActionLinkBuildsItsRequest
         });
     }
 
-    [Test]
-    public void a_route_parameter_is_refused_because_the_href_must_be_a_url_a_modifier_click_can_open()
-    {
-        const string template = "/Sandbox/HttpPipeline/ShiftHandover/MarkRead/{resident}";
-
-        var refusal = Assert.Throws<InvalidOperationException>(() => Html().NativeActionLink("Mark Read", template, p => p
-            .Post(template)
-            .Gather(g => g.RouteParam("resident", "helen"))));
-
-        Assert.That(refusal!.Message, Does.StartWith("NativeActionLink does not support route parameters"));
-    }
-
-    [Test]
-    public void include_all_is_refused_because_the_link_does_not_see_the_page_inputs()
-    {
-        var refusal = Assert.Throws<InvalidOperationException>(() => Html().NativeActionLink("Mark Read", MarkReadUrl, p => p
-            .Post(MarkReadUrl)
-            .Gather(g => g.IncludeAll())));
-
-        Assert.That(refusal!.Message, Does.StartWith("NativeActionLink does not support IncludeAll"));
-    }
-
-    [Test]
-    public void validation_on_the_link_request_itself_is_refused()
-    {
-        var refusal = Assert.Throws<InvalidOperationException>(() => Html().NativeActionLink("Mark Read", MarkReadUrl, p => p
-            .Post(MarkReadUrl)
-            .Validate<HandoverValidator>("handover-form")));
-
-        Assert.That(refusal!.Message, Is.EqualTo("NativeActionLink does not support validation."));
-    }
-
-    private sealed class HandoverValidator : ReactiveValidator<ShiftHandoverPageModel>
-    {
-    }
-
     // The Finally a link with only that Finally serializes, so the assertion compares like with like.
     private static string FinallyOf(Action<PipelineBuilder<ShiftHandoverPageModel>> finallyPipeline)
     {
@@ -99,7 +63,7 @@ public sealed class WhenNativeActionLinkBuildsItsRequest
     {
         using var writer = new StringWriter();
         link.WriteTo(writer, HtmlEncoder.Default);
-        var planJson = Regex.Match(writer.ToString(), "<script type=\"application/json\" data-reactive-plan>(.*)</script>").Groups[1].Value;
+        var planJson = Regex.Match(writer.ToString(), "<script type=\"application/json\"[^>]*data-reactive-plan[^>]*>(.*)</script>").Groups[1].Value;
         return JsonDocument.Parse(planJson);
     }
 

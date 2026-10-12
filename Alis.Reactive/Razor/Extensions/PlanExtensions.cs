@@ -64,6 +64,34 @@ namespace Alis.Reactive
             CreatePlan(html, ReactivePlanScope.PartialView);
 #endif
 
+        /// <summary>
+        /// Starts a <see cref="ReactivePlan{TModel}"/> of its own for one element: it composes with no
+        /// other plan, so the element's behavior works wherever its HTML lands (a grid row template, a
+        /// partial, a list item), with or without a plan on the page.
+        /// </summary>
+        /// <remarks>
+        /// Render the element with <paramref name="elementId"/>, wire it with <c>.Reactive(...)</c> or
+        /// <see cref="HtmlExtensions.On{TModel}"/>, and write <see cref="RenderPlan{TModel}"/> next to
+        /// it. The plan has no form, so it renders no validation summary.
+        /// </remarks>
+        /// <typeparam name="TModel">View model type, providing compile-time expression paths.</typeparam>
+        /// <param name="elementId">The element's id; it also identifies the plan.</param>
+        /// <returns>New plan instance for that element.</returns>
+#if NET48
+        public static ReactivePlan<TModel> ElementPlan<TModel>(this HtmlHelper<TModel> html, string elementId)
+            where TModel : class =>
+            new ReactivePlan<TModel>(ReactivePlanScope.Element, services: null, ElementPlanId(elementId));
+#else
+        public static ReactivePlan<TModel> ElementPlan<TModel>(this IHtmlHelper<TModel> html, string elementId)
+            where TModel : class =>
+            new ReactivePlan<TModel>(ReactivePlanScope.Element, html?.ViewContext.HttpContext.RequestServices, ElementPlanId(elementId));
+#endif
+
+        private static PlanModel.PlanId ElementPlanId(string elementId) =>
+            string.IsNullOrWhiteSpace(elementId)
+                ? throw new System.ArgumentException("Element ID required.", nameof(elementId))
+                : PlanModel.PlanId.Of(elementId);
+
 #if NET48
         // net48 / System.Web has no per-request IServiceProvider, so the plan is
         // created with services: null. Validation metadata is resolved at render

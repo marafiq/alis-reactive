@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Native.Components
 {
+    // A link's id: the model's id scope and the link's place among the request's links, so links in
+    // a view, its partials and its row templates never share one.
     internal static class NativeActionLinkIdGenerator
     {
         private const string CounterKeyPrefix = "__alis_native_action_link_counter__";

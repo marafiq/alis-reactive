@@ -4,8 +4,10 @@ using System.IO;
 using System.Text.Encodings.Web;
 #if NET48
 using System.Web;
+using System.Web.Mvc;
 #else
 using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
 namespace Alis.Reactive.Native.Components
@@ -21,19 +23,34 @@ namespace Alis.Reactive.Native.Components
 #endif
         where TModel : class
     {
+#if NET48
+        private readonly HtmlHelper<TModel> _html;
+#else
+        private readonly IHtmlHelper<TModel> _html;
+#endif
+        private readonly ReactivePlan<TModel> _plan;
         private readonly string _elementId;
         private readonly string _text;
         private readonly string _href;
-        private readonly string _planJson;
         private readonly Dictionary<string, string> _attributes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         private string? _cssClass;
 
-        internal NativeActionLinkBuilder(string elementId, string text, string href, string planJson)
+        internal NativeActionLinkBuilder(
+#if NET48
+            HtmlHelper<TModel> html,
+#else
+            IHtmlHelper<TModel> html,
+#endif
+            ReactivePlan<TModel> plan,
+            string elementId,
+            string text,
+            string href)
         {
-            _elementId = elementId ?? throw new ArgumentNullException(nameof(elementId));
+            _html = html;
+            _plan = plan;
+            _elementId = elementId;
             _text = text ?? throw new ArgumentNullException(nameof(text));
             _href = href ?? throw new ArgumentNullException(nameof(href));
-            _planJson = planJson ?? throw new ArgumentNullException(nameof(planJson));
         }
 
         /// <summary>
@@ -119,10 +136,12 @@ namespace Alis.Reactive.Native.Components
             writer.Write(encoder.Encode(_text));
             writer.Write("</a>");
 
-            // The link's own plan: the JSON escapes '<', so it cannot close the script early.
-            writer.Write("<script type=\"application/json\" data-reactive-plan>");
-            writer.Write(_planJson);
-            writer.Write("</script>");
+            // The link's own plan, rendered beside it.
+#if NET48
+            writer.Write(_html.RenderPlan(_plan).ToHtmlString());
+#else
+            _html.RenderPlan(_plan).WriteTo(writer, encoder);
+#endif
         }
 
         private static bool IsReservedAttribute(string name)

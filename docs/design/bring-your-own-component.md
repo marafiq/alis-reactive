@@ -218,6 +218,11 @@ the core C# and the runtime name no vendor and no component. Proof: the full sui
   element the component's id; `field.Render<T>` and `plan.Render<T>` refuse it otherwise, naming
   the component and the id. A vendor builder's own output is written as it is: a first version that
   re-wrote Syncfusion's output to check it broke those pages in CI and was reverted.
+- **The core names no component.** `NativeActionLink` moved to the Native package, built on the
+  public surface: a declaration whose vendor hands a click handler the DOM event, and
+  `Html.ElementPlan(id)`, a plan of its own for one element so it works wherever its HTML lands.
+  What a link cannot carry (another URL, route parameters, IncludeAll, validation, more or fewer
+  than one request) is refused in the view by ALIS002 instead of at render.
 - **ALIS009 covers brought components.** The typed-API analyzer applies to any `Component` or
   `JsObject` declaration and any helper that returns `RenderedComponent<,>` or extends
   `InputBoundField<,>`, wherever it is declared, not only the shipped slices' namespaces.

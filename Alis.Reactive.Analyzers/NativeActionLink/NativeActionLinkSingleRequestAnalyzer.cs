@@ -15,11 +15,11 @@ namespace Alis.Reactive.Analyzers.NativeActionLink
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             title: "NativeActionLink must stay a single request chain",
-            messageFormat: "NativeActionLink supports exactly one bounded request chain. Parallel, Chained, nested HTTP, IncludeAll, and validation are not allowed.",
+            messageFormat: "NativeActionLink supports exactly one bounded request chain, to its own href. Parallel, Chained, nested HTTP, route parameters, IncludeAll, and validation are not allowed.",
             category: "Alis.Reactive",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "NativeActionLink is limited to one existing HTTP request chain serialized through data-reactive-* attributes.",
+            description: "A NativeActionLink's click runs one request to the URL in its href, so a modified click (a new tab) opens what a plain click requests. Its plan is its own and sees no page inputs or forms.",
             helpLinkUri: null);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
@@ -71,7 +71,8 @@ namespace Alis.Reactive.Analyzers.NativeActionLink
             if (lambda == null)
                 return;
 
-            if (HasProhibitedPattern(lambda, context.SemanticModel, types, context.CancellationToken))
+            var href = HrefArgument(invocation, context.SemanticModel, context.CancellationToken);
+            if (HasProhibitedPattern(lambda, href, context.SemanticModel, types, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Rule, lambda.GetLocation()));
             }
@@ -83,6 +84,7 @@ namespace Alis.Reactive.Analyzers.NativeActionLink
         /// </summary>
         private static bool HasProhibitedPattern(
             LambdaExpressionSyntax lambda,
+            ExpressionSyntax? href,
             SemanticModel semanticModel,
             CachedTypes types,
             System.Threading.CancellationToken cancellationToken)
@@ -103,6 +105,8 @@ namespace Alis.Reactive.Analyzers.NativeActionLink
                     && SymbolEqualityComparer.Default.Equals(containingType, types.PipelineBuilderType))
                 {
                     requestStartCount++;
+                    if (!RequestsTheHref(invocation, href))
+                        return true;
                 }
             }
 
@@ -121,6 +125,7 @@ namespace Alis.Reactive.Analyzers.NativeActionLink
                     return types.ResponseBuilderType != null
                         && SymbolEqualityComparer.Default.Equals(containingType, types.ResponseBuilderType);
                 case "IncludeAll":
+                case "RouteParam":
                     return types.GatherBuilderType != null
                         && SymbolEqualityComparer.Default.Equals(containingType, types.GatherBuilderType);
                 case "Validate":
@@ -130,6 +135,40 @@ namespace Alis.Reactive.Analyzers.NativeActionLink
                     return false;
             }
         }
+
+        // The link's href argument, read by parameter name so named arguments are found too.
+        private static ExpressionSyntax? HrefArgument(
+            InvocationExpressionSyntax invocation,
+            SemanticModel semanticModel,
+            System.Threading.CancellationToken cancellationToken)
+        {
+            if (semanticModel.GetSymbolInfo(invocation, cancellationToken).Symbol is not IMethodSymbol link)
+                return null;
+
+            var parameters = link.ReducedFrom?.Parameters.Skip(1).ToList() ?? link.Parameters.ToList();
+            var arguments = invocation.ArgumentList.Arguments;
+            for (var index = 0; index < arguments.Count; index++)
+            {
+                var argument = arguments[index];
+                var name = argument.NameColon?.Name.Identifier.ValueText
+                    ?? (index < parameters.Count ? parameters[index].Name : null);
+                if (name == "url") return argument.Expression;
+            }
+
+            return null;
+        }
+
+        // The request must go to the href. Written the same way is the same URL; a local variable
+        // holding the URL serves both when the expression is long.
+        private static bool RequestsTheHref(InvocationExpressionSyntax request, ExpressionSyntax? href)
+        {
+            if (href == null) return true;
+            var url = request.ArgumentList.Arguments.FirstOrDefault()?.Expression;
+            return url != null && Normalized(url) == Normalized(href);
+        }
+
+        private static string Normalized(ExpressionSyntax expression) =>
+            new string(expression.ToString().Where(character => !char.IsWhiteSpace(character)).ToArray());
 
         private static bool IsNativeActionLinkInvocation(
             InvocationExpressionSyntax invocation,
