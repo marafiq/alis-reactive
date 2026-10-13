@@ -52,6 +52,37 @@ registeredPlugins.push({
       .replace(/\s+/g, "-"),
 });
 
+// The community's fixed facts: how many beds each ward holds.
+registeredPlugins.push({
+  name: "community",
+  instance: {
+    bedsPerWard: 5,
+  },
+});
+
+const twoDigits = (value: number): string => String(value).padStart(2, "0");
+
+// A visitor pass's lines. Each argument is shown only when it arrives as its declared kind (a boolean,
+// a number, a Date), so a literal sent in the wrong shape reads "?".
+registeredPlugins.push({
+  name: "visitorPass",
+  instance: {
+    heading: (escorted: unknown, passNumber: unknown, day: unknown) => {
+      const who = typeof escorted === "boolean" ? (escorted ? "Escorted visitor" : "Visitor") : "?";
+      const pass = typeof passNumber === "number" ? String(passNumber) : "?";
+      const date = day instanceof Date
+        ? `${day.getFullYear()}-${twoDigits(day.getMonth() + 1)}-${twoDigits(day.getDate())}`
+        : "?";
+      return `${who} · pass ${pass} · ${date}`;
+    },
+    charges: (parking: unknown, hours: unknown) => {
+      const fee = typeof parking === "number" ? parking.toFixed(2) : "?";
+      const length = typeof hours === "number" ? String(hours) : "?";
+      return `Parking $${fee} · ${length} hours`;
+    },
+  },
+});
+
 // The visit board's activity list: each line recorded is added to #board-activity, and entries
 // says how many lines the list holds.
 const visitLogLines: string[] = [];

@@ -24,6 +24,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Plugins
             }
         });
 
+        // The memory-care ward: three residents, one of them critical.
+        [HttpGet("MemoryWard")]
+        public IActionResult MemoryWard() => Json(new
+        {
+            items = new[]
+            {
+                new { id = 11, name = "Edith Lane", status = "active", age = 88 },
+                new { id = 12, name = "Walter Cobb", status = "critical", age = 91 },
+                new { id = 13, name = "Iris Moreno", status = "active", age = 84 },
+            }
+        });
+
         [HttpGet("PluginEcho")]
         public IActionResult PluginEcho(int? count) => Json(new
         {
