@@ -43,10 +43,9 @@ function queryRecord<T>(pick: (values: string[]) => T | undefined): Record<strin
 }
 
 function valuesFor(params: URLSearchParams, key: string): string[] {
-  const wanted = key.toLowerCase();
   const values: string[] = [];
   params.forEach((value, name) => {
-    if (name.toLowerCase() === wanted) values.push(value);
+    if (name === key) values.push(value);
   });
   return values;
 }
