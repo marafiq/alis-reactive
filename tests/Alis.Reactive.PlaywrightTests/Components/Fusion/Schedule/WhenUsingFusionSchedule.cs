@@ -231,6 +231,23 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The schedule's editor opens on the first shift no one covers, and the page's PopupOpen hands it to
+    // the drawer: an open shift has no staff member chosen, where an assigned one would.
+    [Test]
+    public async Task covering_the_next_open_shift_opens_its_assignment_form_with_no_one_chosen()
+    {
+        await NavigateAndWaitForSchedule();
+        await Expect(OpenShifts.First).ToBeVisibleAsync(new() { Timeout = 10000 });
+
+        await ClickWhenStable(Page.Locator("#cover-next-open-shift"));
+
+        await Expect(Page.Locator("#alis-drawer")).ToHaveClassAsync(new Regex("alis-drawer--visible"), new() { Timeout = 10000 });
+        await Expect(Page.Locator("#assignment-form")).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Page.Locator("#assignment-form input[type=radio]").First).ToBeVisibleAsync();
+        await Expect(Page.Locator("#assignment-form input[type=radio]:checked")).ToHaveCountAsync(0);
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task clicking_an_unassigned_shift_offers_to_assign_staff()
     {

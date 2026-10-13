@@ -163,6 +163,14 @@
                 .CssClass("px-3 py-1.5 rounded-md border border-border text-sm font-medium hover:bg-slate-50")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                     p.Component<FusionSchedule>("shift-schedule").ScrollTo("22:00")))
+            @* Opens the editor on the week's first shift no one covers; the page's editor is its drawer. *@
+            @(Html.NativeButton("cover-next-open-shift", "Cover the next open shift")
+                .CssClass("px-3 py-1.5 rounded-md border border-border text-sm font-medium hover:bg-slate-50")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var schedule = p.Component<FusionSchedule>("shift-schedule");
+                    schedule.OpenEditor(p.From(schedule.GetEvents<ShiftAssignment>()).Find(x => x.IsUnassigned), ScheduleAction.Save);
+                }))
             <span>Showing the week of <span id="schedule-week" class="font-medium"></span></span>
             <span>Selected shift: <span id="selected-shift" class="font-medium">No shift selected.</span></span>
         </native-hstack>
