@@ -257,7 +257,21 @@ namespace Alis.Reactive
 
         // The member's JavaScript path from the object a page holds: the holder's property first for a
         // nested object, then the declared name, or the C# name camel-cased.
-        private string JavaScriptPath(string? name, string declaredBy) => _pathPrefix + (name ?? JavaScriptNameOf(declaredBy));
+        private string JavaScriptPath(string? name, string declaredBy) =>
+            _pathPrefix + (name == null ? JavaScriptNameOf(declaredBy) : OwnName(name, declaredBy));
+
+        // A declared name is one JavaScript name, or items[].field for a field of each item of a list. A
+        // member of an object the component holds is declared on that object (Object<T>()): one way to
+        // reach it, which the compiler checks.
+        private string OwnName(string name, string declaredBy)
+        {
+            var reachesIntoAnObject = name.Replace("[].", "").IndexOf('.') >= 0;
+            return reachesIntoAnObject
+                ? throw new ArgumentException(
+                    $"'{GetType().Name}.{declaredBy}' is named '{name}', a path into an object it holds. " +
+                    "Declare that object with Object<T>() and the member on it.", nameof(name))
+                : name;
+        }
 
         private static IReadOnlyList<ValueExpression> Expressions(Arg[] args) =>
             args.Select(arg => arg.Expression).ToList();

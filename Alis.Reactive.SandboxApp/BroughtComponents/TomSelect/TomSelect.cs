@@ -36,8 +36,9 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// <inheritdoc />
         public override ComponentVendor Vendor => TomSelectVendor;
 
-        /// <summary>The original select, which Tom Select keeps in sync with the selection.</summary>
-        public TomSelectInput Input => Object<TomSelectInput>();
+        // The original select, which Tom Select keeps in sync with the selection. A page reads the
+        // selection as Value, the one way to it.
+        private TomSelectInput Input => Object<TomSelectInput>();
 
         /// <summary>The selected value, read from the original select. Change it with <see cref="SetValue"/>.</summary>
         /// <remarks>Tom Select keeps the original select in sync; its value is what a form posts.</remarks>
@@ -57,8 +58,11 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 
-    /// <summary>The original select a <see cref="TomSelect"/> enhances (Tom Select's <c>input</c>).</summary>
-    public sealed class TomSelectInput : JsObject
+    /// <summary>
+    /// The original select a <see cref="TomSelect"/> enhances (Tom Select's <c>input</c>); the component
+    /// reads its value as <see cref="TomSelect.Value"/>.
+    /// </summary>
+    internal sealed class TomSelectInput : JsObject
     {
         /// <summary>The select's value: what a form posts.</summary>
         public Prop<string> Value => Prop<string>();
