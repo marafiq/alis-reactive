@@ -7,9 +7,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
 {
     // The front desk's system, answering by the time asked for: Monday 10:00 is held, Tuesday 3:00 is
     // held until the family confirms, Saturday 11:00 was taken by another family, and on Sunday the
-    // desk does not answer. The Hale family already holds Wednesday 2:00. An arrival prints the
-    // family's badge and gives the visit's arrival card: weekday visits meet in the garden lounge,
-    // weekend visits in the sun room.
+    // desk does not answer. The Hale family already holds Wednesday 2:00 at the desk of the resident's
+    // wing. An arrival prints the family's badge and gives the visit's arrival card: weekday visits
+    // meet in the garden lounge, weekend visits in the sun room.
     public partial class VisitPlannerController
     {
         [HttpGet("FrontDesk")]
@@ -24,13 +24,21 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
                 : Ok(resident.Week());
         }
 
+        // Each wing keeps its own desk: the holds are asked of the desk the X-Wing header names.
         [HttpGet("FrontDesk/Holds/{residentId}")]
         public IActionResult FrontDeskHolds(string residentId)
         {
             var family = Request.Headers["X-Family"].ToString();
             if (string.IsNullOrEmpty(family)) return BadRequest(new DeskMessage { Message = "Name the family." });
+            var wing = Request.Headers["X-Wing"].ToString();
+            if (string.IsNullOrEmpty(wing)) return BadRequest(new DeskMessage { Message = "Name the wing whose desk holds the times." });
 
-            return Ok(new FamilyHoldsResponse { Family = $"{Capitalized(family)} family", Held = new List<string> { "wed-14" } });
+            return Ok(new FamilyHoldsResponse
+            {
+                Family = $"{Capitalized(family)} family",
+                Desk = $"{wing} desk",
+                Held = new List<string> { "wed-14" },
+            });
         }
 
         [HttpPost("FrontDesk/Hold/{slotId}")]
@@ -69,8 +77,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
             Ok(new DeskMessage { Message = $"Released {LabelOf(slotId)}." });
 
         [HttpDelete("FrontDesk/Holds/{residentId}")]
-        public IActionResult ReleaseEveryHold(string residentId) =>
-            Ok(new DeskMessage { Message = $"Released every hold for {Find(residentId)?.Name ?? residentId}." });
+        public IActionResult ReleaseEveryHold(string residentId, [FromBody] FamilyRelease? release) =>
+            Ok(new DeskMessage
+            {
+                Message = $"Released every hold the {Capitalized(release?.Family ?? "")} family had for {Find(residentId)?.Name ?? residentId}.",
+            });
 
         [HttpPost("FrontDesk/Badge/{slotId}")]
         public IActionResult PrintBadge(string slotId, [FromBody] HoldRequest? badge) =>

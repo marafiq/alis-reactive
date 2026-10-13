@@ -13,26 +13,53 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
         public decimal Visitors { get; set; } = 2;
     }
 
-    /// <summary>The times the desk already holds for the family named in the request's X-Family header.</summary>
+    /// <summary>
+    /// The times a wing's desk already holds for the family named in the request's X-Family header; the
+    /// wing is named in its X-Wing header.
+    /// </summary>
     public sealed class FamilyHoldsResponse
     {
         public string Family { get; set; } = "";
 
+        /// <summary>The desk that holds the times, for example "Garden wing desk".</summary>
+        public string Desk { get; set; } = "";
+
         public List<string> Held { get; set; } = new List<string>();
     }
 
-    /// <summary>The desk page's link: <c>?resident=margaret&amp;family=hale</c>.</summary>
+    /// <summary>
+    /// The desk page's link: <c>?resident=margaret&amp;family=hale</c>, which may also name how many visitors
+    /// are coming (<c>&amp;visitors=3</c>) and how many the family's visitor pass allows (<c>&amp;maxVisitors=4</c>).
+    /// </summary>
     public sealed class FrontDeskQuery
     {
         public string Resident { get; set; } = "";
 
         public string? Family { get; set; }
+
+        public decimal Visitors { get; set; }
+
+        public decimal MaxVisitors { get; set; }
     }
 
     /// <summary>A request about one resident's week at the desk: <c>{residentId}</c> in the path.</summary>
     public sealed class FrontDeskResident
     {
         public string ResidentId { get; set; } = "";
+    }
+
+    /// <summary>Releasing every hold of a resident's week: <c>{residentId}</c> in the path, the family in the body.</summary>
+    public sealed class ReleaseEveryHoldRequest
+    {
+        public string ResidentId { get; set; } = "";
+
+        public string? Family { get; set; }
+    }
+
+    /// <summary>The body of a release of every hold, which the desk's action binds with [FromBody].</summary>
+    public class FamilyRelease
+    {
+        public string? Family { get; set; }
     }
 
     /// <summary>A request about one visit time at the desk: <c>{slotId}</c> in the path.</summary>

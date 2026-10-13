@@ -7,13 +7,15 @@
     {
         (Key: "margaret", Name: "Margaret Hill", Room: "Maple 214", Channel: "text", Contact: "Family reached by text message"),
         (Key: "arthur", Name: "Arthur Bell", Room: "Maple 216", Channel: "email", Contact: "Family reached by email"),
+        (Key: "rosa", Name: "Rosa Diaz", Room: "Maple 218", Channel: "phone", Contact: "Family reached by phone"),
     };
 }
 
 <native-vstack gap="Lg">
     <native-heading level="H1">Discharge a Resident</native-heading>
     <native-text color="Secondary">
-        Maple Grove, second floor. Discharging a resident also notifies their family.
+        Maple Grove, second floor. Discharging a resident also notifies their family; a discharge the
+        office refuses notifies no one.
     </native-text>
 
     @foreach (var resident in residents)
@@ -31,6 +33,10 @@
                             .OnSuccess<DischargeResult>((json, s) =>
                             {
                                 s.Element($"{resident.Key}-discharge-status").Text.Set(json.Get(x => x.Message));
+                            })
+                            .OnError<DischargeResult>(409, (refused, e) =>
+                            {
+                                e.Element($"{resident.Key}-discharge-status").Text.Set(refused.Get(x => x.Message));
                             })
                             .Chained(c => c
                                 .Post(Url.SandboxRoute("NotifyFamily", "DischargeNotice"))
