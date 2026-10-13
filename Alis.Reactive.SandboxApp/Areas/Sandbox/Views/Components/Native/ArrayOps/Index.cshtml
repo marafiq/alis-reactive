@@ -11,13 +11,13 @@
         p.Get(Url.SandboxRoute("Residents", "ArrayOps"))
          .Response(r => r.OnSuccess<ResidentRosterResponse>((json, s) =>
          {
-             var residents = p.From(json.Read(x => x.Residents));
+             var residents = p.From(json.Get(x => x.Residents));
 
-             s.Element("res-total").SetText(residents.Count());
-             s.Element("res-active").SetText(residents.Count(x => x.Status == "active"));
-             s.Element("res-active-seniors").SetText(residents.Count(x => x.Status == "active" && x.Age >= 65));
-             s.Element("res-active-age-sum").SetText(residents.Where(x => x.Status == "active").Sum(x => x.Age));
-             s.Element("res-oldest-active").SetText(
+             s.Element("res-total").Text.Set(residents.Count());
+             s.Element("res-active").Text.Set(residents.Count(x => x.Status == "active"));
+             s.Element("res-active-seniors").Text.Set(residents.Count(x => x.Status == "active" && x.Age >= 65));
+             s.Element("res-active-age-sum").Text.Set(residents.Where(x => x.Status == "active").Sum(x => x.Age));
+             s.Element("res-oldest-active").Text.Set(
                  residents.Where(x => x.Status == "active").OrderByDescending(x => x.Age).Find(x => true, x => x.Name));
 
              s.When(residents.Any(x => x.Status == "critical")).Truthy()
@@ -63,8 +63,8 @@
                 .Items(activityItems))
             .Reactive(evt => evt.Change, (args, p) =>
             {
-                var count = p.From(args, e => e.Value).Count();
-                p.Element("selected-count").SetText(count);
+                var count = p.From(args.Value).Count();
+                p.Element("selected-count").Text.Set(count);
             }); }
 
         <p class="font-mono text-sm mt-2">Selected count: <span id="selected-count">&mdash;</span></p>

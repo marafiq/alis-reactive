@@ -27,12 +27,12 @@
              .Response(r => r
                 .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
                 {
-                    s.Element("card-last-admission-display").SetText(json, x => x.DisplayValue);
+                    s.Element("card-last-admission-display").Text.Set(json.Get(x => x.DisplayValue));
                 })
                 .OnError(400, e => e.ValidationErrors("card-last-admission"))
                 .OnError<InPlaceEditorCommitError>((err, e) =>
                 {
-                    e.Element("card-last-admission-error").SetText(err, x => x.Message);
+                    e.Element("card-last-admission-error").Text.Set(err.Get(x => x.Message));
                 }));
         }); }
 

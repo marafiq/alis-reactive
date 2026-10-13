@@ -5,6 +5,7 @@ using Syncfusion.EJ2.RichTextEditor;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Rich Text Editor, declared by the names its JavaScript API uses.
     /// </summary>
@@ -16,10 +17,10 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionRichTextEditor : FusionComponent, IInputComponent
     {
         /// <summary>The content as HTML; <see langword="null"/> when empty.</summary>
-        public ComponentProperty<string?> Value => Property<string?>("value");
+        public Prop<string> Value => Prop<string>();
 
         /// <summary>Moves focus into the editor.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
 
         /// <summary>Raised when the content changes and focus leaves the editor.</summary>
         public TypedEvent<FusionRichTextEditorChangeArgs> Change =>
@@ -31,14 +32,15 @@ namespace Alis.Reactive.Fusion.Components
 
     /// <summary>Payload of <see cref="FusionRichTextEditor.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Value).NotNull()</c>.</remarks>
-    public class FusionRichTextEditorChangeArgs
+    public class FusionRichTextEditorChangeArgs : JsObject
     {
         /// <summary>Content after the change, as HTML.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>Whether user interaction triggered the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionRichTextEditor"/> for a model-bound field.</summary>
     public static class FusionRichTextEditorHtmlExtensions

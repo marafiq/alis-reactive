@@ -10,8 +10,8 @@
     Html.On(plan, t => t.SignalR(SignalRHub.At<ResidentStatusFeed>($"/hubs/resident-status?drill={drillId}"), h => h.StatusChanged,
         (payload, p) =>
     {
-        p.Element("panel-resident-name").SetText(payload, x => x.ResidentName);
-        p.Element("panel-resident-status").SetText(payload, x => x.Status);
+        p.Element("panel-resident-name").Text.Set(payload.Get(x => x.ResidentName));
+        p.Element("panel-resident-status").Text.Set(payload.Get(x => x.Status));
     }));
 }
 

@@ -5,6 +5,7 @@ using Syncfusion.EJ2.Calendars;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion DateRangePicker, declared by the names its JavaScript API uses.
     /// </summary>
@@ -16,13 +17,13 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionDateRangePicker : FusionComponent, IInputComponent
     {
         /// <summary>The first day of the selected range.</summary>
-        public ComponentProperty<DateTime> StartDate => Property<DateTime>("startDate");
+        public Prop<DateTime> StartDate => Prop<DateTime>();
 
         /// <summary>The last day of the selected range.</summary>
-        public ComponentProperty<DateTime> EndDate => Property<DateTime>("endDate");
+        public Prop<DateTime> EndDate => Prop<DateTime>();
 
         /// <summary>The selected range as its start and end dates.</summary>
-        public ComponentProperty<DateTime[]> Value => Property<DateTime[]>("value");
+        public Prop<DateTime[]> Value => Prop<DateTime[]>();
 
         /// <summary>Raised when the selected range changes.</summary>
         public TypedEvent<FusionDateRangePickerChangeArgs> Change =>
@@ -34,20 +35,21 @@ namespace Alis.Reactive.Fusion.Components
 
     /// <summary>Payload of <see cref="FusionDateRangePicker.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.StartDate).NotNull()</c>.</remarks>
-    public class FusionDateRangePickerChangeArgs
+    public class FusionDateRangePickerChangeArgs : JsObject
     {
         /// <summary>First day of the range after the change.</summary>
-        public DateTime? StartDate { get; set; }
+        public ReadOnly<DateTime?> StartDate => ReadOnly<DateTime?>();
 
         /// <summary>Last day of the range after the change.</summary>
-        public DateTime? EndDate { get; set; }
+        public ReadOnly<DateTime?> EndDate => ReadOnly<DateTime?>();
 
         /// <summary>Number of days the range covers.</summary>
-        public int DaySpan { get; set; }
+        public ReadOnly<int> DaySpan => ReadOnly<int>();
 
         /// <summary>Whether user interaction triggered the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionDateRangePicker"/> for a model-bound field.</summary>
     public static class FusionDateRangePickerHtmlExtensions

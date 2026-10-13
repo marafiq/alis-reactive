@@ -15,15 +15,15 @@
 
     Html.On(plan, t => t.CustomEvent<EscalationRoutingTriggerPayload>(EscalationRoutingEvents.EscalationTriggerRoute, (args, p) =>
     {
-        p.Element("trigger-precheck").SetText("Escalation reviewed");
-        p.When(args, x => x.Score).Gte(95)
-            .And(args, x => x.RequiresIsolation).Truthy()
+        p.Element("trigger-precheck").Text.Set("Escalation reviewed");
+        p.When(args.Get(x => x.Score)).Gte(95)
+            .And(args.Get(x => x.RequiresIsolation)).Truthy()
             .Then(then =>
             {
                 then.Dispatch(EscalationRoutingEvents.RouteIsolation);
             })
-            .ElseIf(args, x => x.Score).Gte(70)
-            .Or(args, x => x.ManualOverride).Truthy()
+            .ElseIf(args.Get(x => x.Score)).Gte(70)
+            .Or(args.Get(x => x.ManualOverride)).Truthy()
             .Then(then =>
             {
                 then.Dispatch(EscalationRoutingEvents.RouteExpedited);
@@ -32,52 +32,52 @@
             {
                 else_.Dispatch(EscalationRoutingEvents.RouteRoutine);
             });
-        p.Element("trigger-summary").SetText("Escalation complete");
+        p.Element("trigger-summary").Text.Set("Escalation complete");
     }));
 
     Html.On(plan, t => t.CustomEvent(EscalationRoutingEvents.RouteIsolation, p =>
     {
-        p.Element("trigger-audit").SetText("Isolation route dispatched");
-        p.Element("trigger-result").SetText("Isolation review");
-        p.Element("trigger-badge").SetText("Isolation");
+        p.Element("trigger-audit").Text.Set("Isolation route dispatched");
+        p.Element("trigger-result").Text.Set("Isolation review");
+        p.Element("trigger-badge").Text.Set("Isolation");
         p.Element("trigger-badge").Show();
     }));
 
     Html.On(plan, t => t.CustomEvent(EscalationRoutingEvents.RouteExpedited, p =>
     {
-        p.Element("trigger-audit").SetText("Expedited route dispatched");
-        p.Element("trigger-result").SetText("Expedited review");
-        p.Element("trigger-badge").SetText("Expedited");
+        p.Element("trigger-audit").Text.Set("Expedited route dispatched");
+        p.Element("trigger-result").Text.Set("Expedited review");
+        p.Element("trigger-badge").Text.Set("Expedited");
         p.Element("trigger-badge").Show();
     }));
 
     Html.On(plan, t => t.CustomEvent(EscalationRoutingEvents.RouteRoutine, p =>
     {
-        p.Element("trigger-audit").SetText("Routine route dispatched");
-        p.Element("trigger-result").SetText("Routine review");
+        p.Element("trigger-audit").Text.Set("Routine route dispatched");
+        p.Element("trigger-result").Text.Set("Routine review");
         p.Element("trigger-badge").Hide();
     }));
 
     Html.On(plan, t => t.CustomEvent(EscalationRoutingEvents.ComponentRouteIsolation, p =>
     {
-        p.Element("component-audit").SetText("Isolation route dispatched");
-        p.Element("component-result").SetText("Escalate now");
-        p.Element("component-badge").SetText("Escalate");
+        p.Element("component-audit").Text.Set("Isolation route dispatched");
+        p.Element("component-result").Text.Set("Escalate now");
+        p.Element("component-badge").Text.Set("Escalate");
         p.Element("component-badge").Show();
     }));
 
     Html.On(plan, t => t.CustomEvent(EscalationRoutingEvents.ComponentRouteMonitor, p =>
     {
-        p.Element("component-audit").SetText("Monitor route dispatched");
-        p.Element("component-result").SetText("Monitor closely");
-        p.Element("component-badge").SetText("Monitor");
+        p.Element("component-audit").Text.Set("Monitor route dispatched");
+        p.Element("component-result").Text.Set("Monitor closely");
+        p.Element("component-badge").Text.Set("Monitor");
         p.Element("component-badge").Show();
     }));
 
     Html.On(plan, t => t.CustomEvent(EscalationRoutingEvents.ComponentRouteRoutine, p =>
     {
-        p.Element("component-audit").SetText("Routine route dispatched");
-        p.Element("component-result").SetText("Routine follow-up");
+        p.Element("component-audit").Text.Set("Routine route dispatched");
+        p.Element("component-result").Text.Set("Routine follow-up");
         p.Element("component-badge").Hide();
     }));
 }
@@ -178,16 +178,16 @@
                         var supervisorOverride = p.Component<FusionSwitch>(m => m.SupervisorOverride);
                         var careTrack = p.Component<FusionDropDownList>(m => m.CareTrack);
 
-                        p.Element("component-precheck").SetText("Escalation evaluated");
-                        p.When(assessment.Get(c => c.Value)).Gte(85m)
-                            .And(cs => cs.When(supervisorOverride.Get(c => c.Checked)).Truthy()
-                                .Or(careTrack.Get(c => c.Value)).Eq("memory"))
+                        p.Element("component-precheck").Text.Set("Escalation evaluated");
+                        p.When(assessment.Value).Gte(85m)
+                            .And(cs => cs.When(supervisorOverride.Checked).Truthy()
+                                .Or(careTrack.Value).Eq("memory"))
                             .Then(then =>
                             {
                                 then.Dispatch(EscalationRoutingEvents.ComponentRouteIsolation);
                             })
-                            .ElseIf(assessment.Get(c => c.Value)).Gte(60m)
-                            .And(cs => cs.When(supervisorOverride.Get(c => c.Checked)).Truthy().Not())
+                            .ElseIf(assessment.Value).Gte(60m)
+                            .And(cs => cs.When(supervisorOverride.Checked).Truthy().Not())
                             .Then(then =>
                             {
                                 then.Dispatch(EscalationRoutingEvents.ComponentRouteMonitor);
@@ -196,7 +196,7 @@
                             {
                                 else_.Dispatch(EscalationRoutingEvents.ComponentRouteRoutine);
                             });
-                        p.Element("component-summary").SetText("Escalation decision complete");
+                        p.Element("component-summary").Text.Set("Escalation decision complete");
                     }); }
 
                 @{ Html.InputField(plan, m => m.SupervisorOverride, o => o.Label("Supervisor Override"))
@@ -224,16 +224,16 @@
                     var supervisorOverride = p.Component<FusionSwitch>(m => m.SupervisorOverride);
                     var careTrack = p.Component<FusionDropDownList>(m => m.CareTrack);
 
-                    p.Element("component-precheck").SetText("Escalation evaluated");
-                    p.When(assessment.Get(c => c.Value)).Gte(85m)
-                        .And(cs => cs.When(supervisorOverride.Get(c => c.Checked)).Truthy()
-                            .Or(careTrack.Get(c => c.Value)).Eq("memory"))
+                    p.Element("component-precheck").Text.Set("Escalation evaluated");
+                    p.When(assessment.Value).Gte(85m)
+                        .And(cs => cs.When(supervisorOverride.Checked).Truthy()
+                            .Or(careTrack.Value).Eq("memory"))
                         .Then(then =>
                         {
                             then.Dispatch(EscalationRoutingEvents.ComponentRouteIsolation);
                         })
-                        .ElseIf(assessment.Get(c => c.Value)).Gte(60m)
-                        .And(cs => cs.When(supervisorOverride.Get(c => c.Checked)).Truthy().Not())
+                        .ElseIf(assessment.Value).Gte(60m)
+                        .And(cs => cs.When(supervisorOverride.Checked).Truthy().Not())
                         .Then(then =>
                         {
                             then.Dispatch(EscalationRoutingEvents.ComponentRouteMonitor);
@@ -242,7 +242,7 @@
                         {
                             else_.Dispatch(EscalationRoutingEvents.ComponentRouteRoutine);
                         });
-                    p.Element("component-summary").SetText("Escalation decision complete");
+                    p.Element("component-summary").Text.Set("Escalation decision complete");
                 }));
             }
 

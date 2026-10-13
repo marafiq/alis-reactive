@@ -52,9 +52,9 @@
                  .Validate<AllRulesFormValidator>("all-rules-form")
                  .Response(r => r.OnSuccess(s =>
                  {
-                     s.Element("all-rules-result").SetText("All fields passed client-side validation!");
-                     s.Element("all-rules-result").AddClass("text-green-600");
-                     s.Element("all-rules-result").RemoveClass("text-text-muted");
+                     s.Element("all-rules-result").Text.Set("All fields passed client-side validation!");
+                     s.Element("all-rules-result").ClassList.Add("text-green-600");
+                     s.Element("all-rules-result").ClassList.Remove("text-text-muted");
                  }));
             }))
         <p id="all-rules-result" class="mt-3 text-sm text-text-muted">Click to validate</p>
@@ -83,13 +83,13 @@
                  .Response(r => r
                     .OnSuccess(s =>
                     {
-                        s.Element("server-result").SetText("Server accepted!");
-                        s.Element("server-result").AddClass("text-green-600");
+                        s.Element("server-result").Text.Set("Server accepted!");
+                        s.Element("server-result").ClassList.Add("text-green-600");
                     })
                     .OnError(400, e =>
                     {
-                        e.Element("server-result").SetText("Server returned validation errors");
-                        e.Element("server-result").AddClass("text-red-600");
+                        e.Element("server-result").Text.Set("Server returned validation errors");
+                        e.Element("server-result").ClassList.Add("text-red-600");
                         e.ValidationErrors("server-form");
                     }));
             }))
@@ -117,8 +117,8 @@
                  .Validate<ConditionalFormValidator>("conditional-form")
                  .Response(r => r.OnSuccess(s =>
                  {
-                     s.Element("conditional-result").SetText("Conditional validation passed!");
-                     s.Element("conditional-result").AddClass("text-green-600");
+                     s.Element("conditional-result").Text.Set("Conditional validation passed!");
+                     s.Element("conditional-result").ClassList.Add("text-green-600");
                  }));
             }))
         <p id="conditional-result" class="mt-3 text-sm text-text-muted">Click to validate</p>
@@ -138,7 +138,7 @@
                    .CssClass("h-4 w-4 rounded border-border text-accent"))
                .Reactive(evt => evt.Change, (args, p) =>
                {
-                   p.When(args, a => a.Checked).Truthy()
+                   p.When(args.Checked).Truthy()
                     .Then(t => t.Element("hf_extras").Show())
                     .Else(e => e.Element("hf_extras").Hide());
                }); }
@@ -162,8 +162,8 @@
                  .Validate<HiddenFieldsFormValidator>("hidden-fields-form")
                  .Response(r => r.OnSuccess(s =>
                  {
-                     s.Element("hidden-result").SetText("Validation passed!");
-                     s.Element("hidden-result").AddClass("text-green-600");
+                     s.Element("hidden-result").Text.Set("Validation passed!");
+                     s.Element("hidden-result").ClassList.Add("text-green-600");
                  }));
             }))
         @(Html.NativeButton("hidden-submit-btn", "Submit Profile")
@@ -176,13 +176,13 @@
                  .Response(r => r
                     .OnSuccess(s =>
                     {
-                        s.Element("hidden-result").SetText("Profile saved!");
-                        s.Element("hidden-result").AddClass("text-green-600");
+                        s.Element("hidden-result").Text.Set("Profile saved!");
+                        s.Element("hidden-result").ClassList.Add("text-green-600");
                     })
                     .OnError(400, e =>
                     {
-                        e.Element("hidden-result").SetText("Server validation errors");
-                        e.Element("hidden-result").AddClass("text-red-600");
+                        e.Element("hidden-result").Text.Set("Server validation errors");
+                        e.Element("hidden-result").ClassList.Add("text-red-600");
                         e.ValidationErrors("hidden-fields-form");
                     }));
             }))
@@ -212,13 +212,13 @@
                  .Response(r => r
                     .OnSuccess(s =>
                     {
-                        s.Element("db-result").SetText("Saved to database!");
-                        s.Element("db-result").AddClass("text-green-600");
+                        s.Element("db-result").Text.Set("Saved to database!");
+                        s.Element("db-result").ClassList.Add("text-green-600");
                     })
                     .OnError(400, e =>
                     {
-                        e.Element("db-result").SetText("Database validation failed");
-                        e.Element("db-result").AddClass("text-red-600");
+                        e.Element("db-result").Text.Set("Database validation failed");
+                        e.Element("db-result").ClassList.Add("text-red-600");
                         e.ValidationErrors("db-form");
                     }));
             }))
@@ -281,8 +281,8 @@
                  .Validate<OrderLinesFormValidator>("order-lines-form")
                  .Response(r => r.OnSuccess(s =>
                  {
-                     s.Element("order-lines-result").SetText("Line validation passed!");
-                     s.Element("order-lines-result").AddClass("text-green-600");
+                     s.Element("order-lines-result").Text.Set("Line validation passed!");
+                     s.Element("order-lines-result").ClassList.Add("text-green-600");
                  }));
             }))
         <p id="order-lines-result" class="mt-3 text-sm text-text-muted">Click to validate</p>

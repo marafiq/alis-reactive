@@ -10,6 +10,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     // alis:mount. This file is everything the framework needs, written against its public surface
     // only: the vendor, the members by Tom Select's own names, and a render helper.
 
+#nullable disable annotations
     /// <summary>A Tom Select dropdown, declared by the names its JavaScript API uses.</summary>
     public sealed class TomSelect : Component, IInputComponent
     {
@@ -29,13 +30,13 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
 
         /// <summary>The selected value, read from the original select. Change it with <see cref="SetValue"/>.</summary>
         /// <remarks>Tom Select keeps the original select in sync; its value is what a form posts.</remarks>
-        public ComponentProperty<string> Value => Property<string>("input.value");
+        public Prop<string> Value => Prop<string>("input.value");
 
         /// <summary>Selects an option by its value and raises <see cref="Change"/>.</summary>
-        public ComponentMethod<string> SetValue => Method<string>("setValue");
+        public void SetValue(Arg<string> value) => Call(value);
 
         /// <summary>Clears the selection and raises <see cref="Change"/>.</summary>
-        public ComponentMethod Clear => Method("clear");
+        public void Clear() => Call();
 
         /// <summary>Raised when the selection changes, by the user or by <see cref="SetValue"/>.</summary>
         public TypedEvent<TomSelectChangeArgs> Change => Event<TomSelectChangeArgs>("change");
@@ -48,9 +49,10 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     /// Payload of <see cref="TomSelect.Change"/>. Tom Select hands the listener the new value
     /// itself; read it from the component with <c>Get(c =&gt; c.Value)</c>.
     /// </summary>
-    public class TomSelectChangeArgs
+    public class TomSelectChangeArgs : JsObject
     {
     }
+#nullable restore annotations
 
     /// <summary>One option a <see cref="TomSelect"/> offers.</summary>
     public sealed class TomSelectOption

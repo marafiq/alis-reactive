@@ -25,8 +25,8 @@
         Html.On(plan, t => t.DomReady(p =>
         {
             var comp = p.Component<FusionInPlaceEditor>(m => m.Value);
-            p.Element("control-echo").SetText(comp.Get(c => c.Value));
-            p.When(comp.Get(c => c.Value)).Eq("Hello")
+            p.Element("control-echo").Text.Set(comp.Value);
+            p.When(comp.Value).Eq("Hello")
                 .Then(then => then.Element("control-greeting").Show())
                 .Else(e => e.Element("control-greeting").Hide());
         }));
@@ -36,32 +36,32 @@
         @(Html.NativeButton("ctrl-btn-set-hello", "SetValue(\"Hello\")")
             .CssClass("rounded-md bg-accent/80 px-3 py-1 text-xs text-white")
             .Reactive(plan, evt => evt.Click, (args, p) =>
-                p.Component<FusionInPlaceEditor>(m => m.Value).Set(c => c.Value, "Hello")))
+                p.Component<FusionInPlaceEditor>(m => m.Value).Value.Set("Hello")))
 
         @(Html.NativeButton("ctrl-btn-set-null", "SetValue(null)")
             .CssClass("rounded-md bg-accent/80 px-3 py-1 text-xs text-white")
             .Reactive(plan, evt => evt.Click, (args, p) =>
-                p.Component<FusionInPlaceEditor>(m => m.Value).Set(c => c.Value, null)))
+                p.Component<FusionInPlaceEditor>(m => m.Value).Value.Set(null)))
 
         @(Html.NativeButton("ctrl-btn-enable", "Enable()")
             .CssClass("rounded-md bg-emerald-600 px-3 py-1 text-xs text-white")
             .Reactive(plan, evt => evt.Click, (args, p) =>
-                p.Component<FusionInPlaceEditor>(m => m.Value).Call(c => c.Disable, false)))
+                p.Component<FusionInPlaceEditor>(m => m.Value).Disable(false)))
 
         @(Html.NativeButton("ctrl-btn-disable", "Disable()")
             .CssClass("rounded-md bg-amber-600 px-3 py-1 text-xs text-white")
             .Reactive(plan, evt => evt.Click, (args, p) =>
-                p.Component<FusionInPlaceEditor>(m => m.Value).Call(c => c.Disable, true)))
+                p.Component<FusionInPlaceEditor>(m => m.Value).Disable(true)))
 
         @(Html.NativeButton("ctrl-btn-focus", "Focus()")
             .CssClass("rounded-md bg-sky-600 px-3 py-1 text-xs text-white")
             .Reactive(plan, evt => evt.Click, (args, p) =>
-                p.Component<FusionInPlaceEditor>(m => m.Value).Call(c => c.SetFocus)))
+                p.Component<FusionInPlaceEditor>(m => m.Value).SetFocus()))
 
         @(Html.NativeButton("ctrl-btn-save", "Save()")
             .CssClass("rounded-md bg-indigo-600 px-3 py-1 text-xs text-white")
             .Reactive(plan, evt => evt.Click, (args, p) =>
-                p.Component<FusionInPlaceEditor>(m => m.Value).Call(c => c.Save)))
+                p.Component<FusionInPlaceEditor>(m => m.Value).Save()))
     </div>
 
     <p class="text-sm mt-4">Current Value() read: <span id="control-echo" class="font-mono text-text-muted"></span></p>

@@ -6,6 +6,7 @@ using Syncfusion.EJ2.DropDowns;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion DropDownList, declared by the names its JavaScript API uses.
     /// </summary>
@@ -17,29 +18,29 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionDropDownList : FusionComponent, IInputComponent
     {
         /// <summary>The selected value; <see langword="null"/> when empty.</summary>
-        public ComponentProperty<string?> Value => Property<string?>("value");
+        public Prop<string> Value => Prop<string>();
 
         /// <summary>The text shown for the selection, without changing the selected value.</summary>
-        public ComponentProperty<string?> Text => Property<string?>("text");
+        public Prop<string> Text => Prop<string>();
 
         /// <summary>The items the list offers.</summary>
         /// <remarks>Call <see cref="DataBind"/> after writing it so the list renders the new items.</remarks>
-        public ComponentProperty<IEnumerable<object>?> DataSource => Property<IEnumerable<object>?>("dataSource");
+        public Prop<IEnumerable<object>> DataSource => Prop<IEnumerable<object>>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Moves focus into the list.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
 
         /// <summary>Removes focus from the list.</summary>
-        public ComponentMethod FocusOut => Method("focusOut");
+        public void FocusOut() => Call();
 
         /// <summary>Opens the popup.</summary>
-        public ComponentMethod ShowPopup => Method("showPopup");
+        public void ShowPopup() => Call();
 
         /// <summary>Closes the popup.</summary>
-        public ComponentMethod HidePopup => Method("hidePopup");
+        public void HidePopup() => Call();
 
         /// <summary>Raised when the selected value changes.</summary>
         public TypedEvent<FusionDropDownListChangeArgs> Change =>
@@ -59,24 +60,25 @@ namespace Alis.Reactive.Fusion.Components
 
     /// <summary>Payload of <see cref="FusionDropDownList.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Value).Eq("US")</c>.</remarks>
-    public class FusionDropDownListChangeArgs
+    public class FusionDropDownListChangeArgs : JsObject
     {
         /// <summary>Selected value after the change.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>Whether user interaction triggered the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionDropDownList.Focus"/>; carries no data.</summary>
-    public class FusionDropDownListFocusArgs
+    public class FusionDropDownListFocusArgs : JsObject
     {
     }
 
     /// <summary>Payload of <see cref="FusionDropDownList.Blur"/>; carries no data.</summary>
-    public class FusionDropDownListBlurArgs
+    public class FusionDropDownListBlurArgs : JsObject
     {
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionDropDownList"/> for a model-bound field.</summary>
     public static class FusionDropDownListHtmlExtensions

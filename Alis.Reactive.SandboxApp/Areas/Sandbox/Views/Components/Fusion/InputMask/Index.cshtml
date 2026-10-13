@@ -8,9 +8,9 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<FusionInputMask>(m => m.PhoneNumber).Set(c => c.Value, "(555) 123-4567");
+        p.Component<FusionInputMask>(m => m.PhoneNumber).Value.Set("(555) 123-4567");
         var comp = p.Component<FusionInputMask>(m => m.PhoneNumber);
-        p.Element("value-echo").SetText(comp.Get(c => c.Value));
+        p.Element("value-echo").Text.Set(comp.Value);
     }));
 }
 
@@ -34,16 +34,16 @@
                     .Placeholder("Enter phone number"))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("change-value").SetText(args, x => x.Value);
-                    p.When(args, x => x.Value).NotEmpty()
-                        .Then(t => t.Element("args-condition").SetText("phone entered"))
-                        .Else(e => e.Element("args-condition").SetText("no phone"));
+                    p.Element("change-value").Text.Set(args.Value);
+                    p.When(args.Value).NotEmpty()
+                        .Then(t => t.Element("args-condition").Text.Set("phone entered"))
+                        .Else(e => e.Element("args-condition").Text.Set("no phone"));
                     var comp = p.Component<FusionInputMask>(m => m.PhoneNumber);
-                    p.When(comp.Get(c => c.Value)).NotEmpty()
+                    p.When(comp.Value).NotEmpty()
                         .Then(then =>
                         {
                             then.Element("selected-indicator").Show();
-                            then.Element("selected-indicator").SetText("phone on file");
+                            then.Element("selected-indicator").Text.Set("phone on file");
                         })
                         .Else(else_ =>
                         {
@@ -86,9 +86,9 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var comp = p.Component<FusionInputMask>(m => m.PhoneNumber);
-                    p.When(comp.Get(c => c.Value)).IsEmpty()
-                        .Then(t => t.Element("phone-warning").SetText("phone number is required"))
-                        .Else(e => e.Element("phone-warning").SetText("phone number set"));
+                    p.When(comp.Value).IsEmpty()
+                        .Then(t => t.Element("phone-warning").Text.Set("phone number is required"))
+                        .Else(e => e.Element("phone-warning").Text.Set("phone number set"));
                 }))
         </native-hstack>
         <p class="font-mono text-sm mt-2">Warning: <span id="phone-warning" class="text-text-muted">&mdash;</span></p>

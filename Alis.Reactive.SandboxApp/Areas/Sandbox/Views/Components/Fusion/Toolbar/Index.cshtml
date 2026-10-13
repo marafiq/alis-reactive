@@ -38,28 +38,28 @@
             })
             .Reactive(evt => evt.Clicked, (args, p) =>
             {
-                p.When(args, x => x.Item.Id).Eq("pay-balance")
+                p.When(args.Item.Get(x => x.Id)).Eq("pay-balance")
                     .Then(pay =>
                     {
-                        pay.Component<FusionToolbar>(ToolbarId).Call(c => c.Disable, true);
-                        pay.Element("account-status").SetText("Processing your payment. The command bar is locked until it completes.");
-                        pay.Element("payment-panel").AddClass("hidden");
+                        pay.Component<FusionToolbar>(ToolbarId).Disable(true);
+                        pay.Element("account-status").Text.Set("Processing your payment. The command bar is locked until it completes.");
+                        pay.Element("payment-panel").ClassList.Add("hidden");
 
                         pay.Post(Url.SandboxRoute("Confirm", "Toolbar"))
                             .Gather<ResidentCommandRequest>(g => g
-                                .Set(x => x.CommandId, pay.Payload(args).Get(a => a.Item.Id))
-                                .Set(x => x.CommandText, pay.Payload(args).Get(a => a.Item.Text))
-                                .Set(x => x.CommandDisabled, pay.Payload(args).Get(a => a.Item.Disabled)))
+                                .Set(x => x.CommandId, args.Item.Get(x => x.Id))
+                                .Set(x => x.CommandText, args.Item.Get(x => x.Text))
+                                .Set(x => x.CommandDisabled, args.Item.Get(x => x.Disabled)))
                             .Response(r => r.OnSuccess<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Toolbar.ResidentCommandResponse>((json, s) =>
                             {
-                                s.Element("payment-confirmation").SetText(json, x => x.Confirmation);
-                                s.Element("payment-panel").RemoveClass("hidden");
+                                s.Element("payment-confirmation").Text.Set(json.Get(x => x.Confirmation));
+                                s.Element("payment-panel").ClassList.Remove("hidden");
                             }));
                     })
                     .Else(other =>
                     {
-                        other.Element("account-status").SetText(args, x => x.Item.Text);
-                        other.Element("account-status-panel").RemoveClass("hidden");
+                        other.Element("account-status").Text.Set(args.Item.Get(x => x.Text));
+                        other.Element("account-status-panel").ClassList.Remove("hidden");
                     });
             }))
 
@@ -78,9 +78,9 @@
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionToolbar>(ToolbarId).Call(c => c.Disable, false);
-                    p.Element("account-status").SetText("Your payment is complete. The command bar is ready again.");
-                    p.Element("account-status-panel").RemoveClass("hidden");
+                    p.Component<FusionToolbar>(ToolbarId).Disable(false);
+                    p.Element("account-status").Text.Set("Your payment is complete. The command bar is ready again.");
+                    p.Element("account-status-panel").ClassList.Remove("hidden");
                 }))
         </native-vstack>
     </native-card-body></native-card>

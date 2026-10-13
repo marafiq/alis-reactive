@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Native.AppLevel
 {
+#nullable disable annotations
     /// <summary>
     /// The page's loading overlay, declared by the members its element carries.
     /// </summary>
@@ -26,17 +27,18 @@ namespace Alis.Reactive.Native.AppLevel
         public string DefaultId => ElementId;
 
         /// <summary>The ID of the element the loader covers on its next show; hiding clears it.</summary>
-        public ComponentProperty<string> Target => Property<string>("target");
+        public Prop<string> Target => Prop<string>();
 
         /// <summary>Milliseconds after which the next show hides itself; hiding clears it.</summary>
-        public ComponentProperty<int> Timeout => Property<int>("timeout");
+        public Prop<int> Timeout => Prop<int>();
 
         /// <summary>Shows the loader.</summary>
-        public ComponentMethod Show => Method("show");
+        public void Show() => Call();
 
         /// <summary>Hides the loader.</summary>
-        public ComponentMethod Hide => Method("hide");
+        public void Hide() => Call();
     }
+#nullable restore annotations
 
     /// <summary>Renders the page's <see cref="NativeLoader"/>.</summary>
     public static class NativeLoaderHtmlExtensions

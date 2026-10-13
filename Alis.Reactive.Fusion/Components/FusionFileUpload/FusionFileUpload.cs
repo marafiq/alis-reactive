@@ -5,6 +5,7 @@ using Syncfusion.EJ2.Inputs;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Uploader, declared by the names its JavaScript API uses.
     /// </summary>
@@ -18,7 +19,7 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>The selected files, as the browser's <c>File</c> objects a form-data request sends.</summary>
         /// <remarks>The uploader lists its files as items that each carry the browser's file as <c>rawFile</c>.</remarks>
-        public ComponentProperty<IReadOnlyList<object>> Files => Property<IReadOnlyList<object>>("filesData[].rawFile");
+        public Prop<IReadOnlyList<object>> Files => Prop<IReadOnlyList<object>>("filesData[].rawFile");
 
         /// <summary>Raised when the user selects files.</summary>
         public TypedEvent<FusionFileUploadSelectedArgs> Selected =>
@@ -29,14 +30,15 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionFileUpload.Selected"/>.</summary>
-    public class FusionFileUploadSelectedArgs
+    public class FusionFileUploadSelectedArgs : JsObject
     {
         /// <summary>Number of files selected.</summary>
-        public int FilesCount { get; set; }
+        public ReadOnly<int> FilesCount => ReadOnly<int>();
 
         /// <summary>Whether user interaction made the selection.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Renders the file upload component inside a bound input field.

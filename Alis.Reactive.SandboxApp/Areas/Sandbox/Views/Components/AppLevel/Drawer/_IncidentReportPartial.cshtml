@@ -15,16 +15,21 @@
         {
             p.Post(Url.SandboxRoute("FileIncidentReport", "Drawer")).Gather(g => g.Form())
              .Validate<IncidentReportValidator>("incident-report-form")
-             .WhileLoading(l => l.Component<NativeLoader>().Set(c => c.Target, "incident-report-form").Call(c => c.Show))
+             .WhileLoading(l =>
+             {
+                 var loader = l.Component<NativeLoader>();
+                 loader.Target.Set("incident-report-form");
+                 loader.Show();
+             })
              .Response(r => r
                 .OnSuccess<IncidentReportFiled>((json, s) =>
                 {
-                    s.Component<NativeLoader>().Call(c => c.Hide);
-                    s.Element("incident-status").SetText(json, x => x.Confirmation);
+                    s.Component<NativeLoader>().Hide();
+                    s.Element("incident-status").Text.Set(json.Get(x => x.Confirmation));
                 })
                 .OnError(400, e =>
                 {
-                    e.Component<NativeLoader>().Call(c => c.Hide);
+                    e.Component<NativeLoader>().Hide();
                     e.ValidationErrors("incident-report-form");
                 }));
         }))

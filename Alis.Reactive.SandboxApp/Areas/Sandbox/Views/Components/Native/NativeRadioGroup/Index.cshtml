@@ -28,7 +28,7 @@
                 .Option("Kosher", "Kosher"))
             .Reactive(evt => evt.Change, (args, p) =>
             {
-                p.Element("meal-echo").SetText(args, a => a.Value);
+                p.Element("meal-echo").Text.Set(args.Value);
             }); }
 
         <p class="font-mono text-sm">Selected: <span id="meal-echo" class="text-text-muted">&mdash;</span></p>
@@ -48,18 +48,18 @@
                 .Option("Skilled Nursing", "Skilled Nursing", "24/7 medical supervision with licensed nursing staff"))
             .Reactive(evt => evt.Change, (args, p) =>
             {
-                p.When(args, x => x.Value).Eq("Memory Care")
+                p.When(args.Value).Eq("Memory Care")
                     .Then(t =>
                     {
-                        t.Element("care-notice").SetText("Memory Care selected — assessment score required");
-                        t.Element("care-notice").RemoveClass("text-text-muted");
-                        t.Element("care-notice").AddClass("text-amber-600");
+                        t.Element("care-notice").Text.Set("Memory Care selected — assessment score required");
+                        t.Element("care-notice").ClassList.Remove("text-text-muted");
+                        t.Element("care-notice").ClassList.Add("text-amber-600");
                     })
                     .Else(e =>
                     {
-                        e.Element("care-notice").SetText("Standard admission process");
-                        e.Element("care-notice").RemoveClass("text-amber-600");
-                        e.Element("care-notice").AddClass("text-text-muted");
+                        e.Element("care-notice").Text.Set("Standard admission process");
+                        e.Element("care-notice").ClassList.Remove("text-amber-600");
+                        e.Element("care-notice").ClassList.Add("text-text-muted");
                     });
             }); }
 
@@ -88,7 +88,7 @@
                         p.Post(Url.SandboxRoute("Submit", "NativeRadioGroup")).Gather(g => g.Form())
                          .Validate<NativeRadioGroupFormValidator>("radio-form")
                          .Response(r => r
-                            .OnSuccess(s => s.Element("result").SetText("Preferences saved"))
+                            .OnSuccess(s => s.Element("result").Text.Set("Preferences saved"))
                             .OnError(400, e =>
                             {
                                 e.ValidationErrors("radio-form");
@@ -111,9 +111,9 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var comp = p.Component<NativeRadioGroup>(m => m.CareLevel);
-                p.When(comp.Get(c => c.Value)).NotEmpty()
-                    .Then(t => t.Element("care-confirmation").SetText("care level confirmed"))
-                    .Else(e => e.Element("care-confirmation").SetText("care level is required"));
+                p.When(comp.Value).NotEmpty()
+                    .Then(t => t.Element("care-confirmation").Text.Set("care level confirmed"))
+                    .Else(e => e.Element("care-confirmation").Text.Set("care level is required"));
             }))
         <p class="font-mono text-sm">Status: <span id="care-confirmation" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>

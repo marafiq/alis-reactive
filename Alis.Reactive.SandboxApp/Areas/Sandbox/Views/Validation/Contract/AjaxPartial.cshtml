@@ -47,12 +47,12 @@
                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm"))
            .Reactive(evt => evt.Change, (args, p) =>
            {
-               p.When(args, a => a.Value).Eq("Custom Address")
+               p.When(args.Value).Eq("Custom Address")
                    .Then(t =>
                        t.Get(Url.SandboxRoute("AddressPartial", "ValidationContract"))
                         .Response(r => r.OnSuccess(s => s.Into("address-container"))))
                    .Else(e =>
-                       e.Element("address-container").SetHtml(""));
+                       e.Element("address-container").Html.Set(""));
            }); }
 
         <div id="address-container" class="mt-4"></div>
@@ -65,7 +65,7 @@
                     p.Post(Url.SandboxRoute("SubmitAjaxPartial", "ValidationContract")).Gather(g => g.Form())
                      .Validate<AjaxPartialValidator>("resident-form")
                      .Response(r => r
-                        .OnSuccess(s => s.Element("result").SetText("Admission saved"))
+                        .OnSuccess(s => s.Element("result").Text.Set("Admission saved"))
                         .OnError(400, e =>
                         {
                             e.ValidationErrors("resident-form");

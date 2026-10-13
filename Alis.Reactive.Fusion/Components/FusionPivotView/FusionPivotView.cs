@@ -9,6 +9,7 @@ using Syncfusion.EJ2.PivotView;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion PivotView, declared by the names its JavaScript API uses.
     /// </summary>
@@ -20,25 +21,25 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionPivotView : FusionComponent
     {
         /// <summary>The shown view: <c>"Table"</c> or <c>"Chart"</c>.</summary>
-        public ComponentProperty<string> CurrentView => Property<string>("currentView");
+        public Prop<string> CurrentView => Prop<string>();
 
         /// <summary>The rows the pivot summarizes; call <see cref="Refresh"/> after writing it.</summary>
-        public ComponentProperty<object> DataSource => Property<object>("dataSourceSettings.dataSource");
+        public Prop<object> DataSource => Prop<object>("dataSourceSettings.dataSource");
 
         /// <summary>Re-renders the pivot from its data source.</summary>
-        public ComponentMethod Refresh => Method("refresh");
+        public void Refresh() => Call();
 
         /// <summary>The layout as JSON; the argument says whether to leave the data source out.</summary>
-        public ComponentFunction<bool, string> GetPersistData => Function<bool, string>("getPersistData");
+        public TypedSource<string> GetPersistData(Arg<bool> value) => Invoke<string>(value);
 
         /// <summary>Restores a layout from its JSON.</summary>
-        public ComponentMethod<string> LoadPersistData => Method<string>("loadPersistData");
+        public void LoadPersistData(Arg<string> value) => Call(value);
 
         /// <summary>Opens the conditional formatting dialog.</summary>
-        public ComponentMethod ShowConditionalFormattingDialog => Method("showConditionalFormattingDialog");
+        public void ShowConditionalFormattingDialog() => Call();
 
         /// <summary>Opens the calculated field dialog.</summary>
-        public ComponentMethod CreateCalculatedFieldDialog => Method("createCalculatedFieldDialog");
+        public void CreateCalculatedFieldDialog() => Call();
 
         /// <summary>Raised after the pivot renders its data.</summary>
         public TypedEvent<FusionPivotViewDataBoundArgs> DataBound =>
@@ -50,16 +51,17 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionPivotView.DataBound"/>; carries no data.</summary>
-    public class FusionPivotViewDataBoundArgs
+    public class FusionPivotViewDataBoundArgs : JsObject
     {
     }
 
     /// <summary>Payload of <see cref="FusionPivotView.CellSelecting"/>.</summary>
-    public class FusionPivotViewCellSelectingArgs
+    public class FusionPivotViewCellSelectingArgs : JsObject
     {
         /// <summary>The selected cell.</summary>
-        public FusionPivotViewCellData Data { get; set; } = new FusionPivotViewCellData();
+        public ReadOnly<FusionPivotViewCellData> Data => ReadOnly<FusionPivotViewCellData>();
     }
+#nullable restore annotations
 
     /// <summary>A pivot cell as the <see cref="FusionPivotView.CellSelecting"/> payload reports it.</summary>
     public class FusionPivotViewCellData

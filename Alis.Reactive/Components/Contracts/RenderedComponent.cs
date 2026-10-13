@@ -24,7 +24,7 @@ namespace Alis.Reactive
     /// <code>
     /// Html.InputField(plan, m =&gt; m.Rate)
     ///     .FusionNumericTextBox(b =&gt; b.Min(0))
-    ///     .Reactive(evt =&gt; evt.Change, (args, p) =&gt; p.Element("rate-echo").SetText(args, x =&gt; x.Value));
+    ///     .Reactive(evt =&gt; evt.Change, (args, p) =&gt; p.Element("rate-echo").Text.Set(args.Value));
     /// </code>
     /// </example>
     /// <typeparam name="TComponent">The component declaration whose events can be selected.</typeparam>
@@ -70,11 +70,12 @@ namespace Alis.Reactive
         /// <summary>Runs <paramref name="pipeline"/> whenever the selected event fires on this component.</summary>
         /// <typeparam name="TArgs">The event's typed payload.</typeparam>
         /// <param name="eventSelector">Selects a declared event, for example <c>evt =&gt; evt.Change</c>.</param>
-        /// <param name="pipeline">The reaction, given the typed payload and the pipeline.</param>
+        /// <param name="pipeline">The reaction, given the event's payload, live, and the pipeline.</param>
         /// <returns>This component, so further events can be wired.</returns>
         public RenderedComponent<TComponent, TModel> Reactive<TArgs>(
             Func<TComponent, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
+            where TArgs : JsObject
         {
             if (eventSelector == null) throw new ArgumentNullException(nameof(eventSelector));
 

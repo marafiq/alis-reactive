@@ -13,25 +13,8 @@ namespace Alis.Reactive
     // Only property chains and MVC-style constant indexers are valid.
     internal static class ExpressionPathHelper
     {
-        public static string ToEventPath<TPayload>(Expression<Func<TPayload, object?>> expression)
-        {
-            var members = ExtractRuntimeMemberChain(expression.Body);
-            return ToRuntimePath(members);
-        }
 
         public static string ToEventPath<TPayload, TProp>(Expression<Func<TPayload, TProp>> expression)
-        {
-            var members = ExtractRuntimeMemberChain(expression.Body);
-            return ToRuntimePath(members);
-        }
-
-        public static string ToResponsePath<TResponse>(Expression<Func<TResponse, object?>> expression)
-        {
-            var members = ExtractRuntimeMemberChain(expression.Body);
-            return ToRuntimePath(members);
-        }
-
-        public static string ToResponsePath<TResponse, TProp>(Expression<Func<TResponse, TProp>> expression)
         {
             var members = ExtractRuntimeMemberChain(expression.Body);
             return ToRuntimePath(members);

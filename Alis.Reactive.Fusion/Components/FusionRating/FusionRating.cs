@@ -5,6 +5,7 @@ using Syncfusion.EJ2.Inputs;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Rating, declared by the names its JavaScript API uses.
     /// </summary>
@@ -17,13 +18,13 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionRating : FusionComponent, IInputComponent
     {
         /// <summary>The rating.</summary>
-        public ComponentProperty<double> Value => Property<double>("value");
+        public Prop<double> Value => Prop<double>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Resets the rating to its minimum.</summary>
-        public ComponentMethod Reset => Method("reset");
+        public void Reset() => Call();
 
         /// <summary>Raised when the rating changes.</summary>
         public TypedEvent<FusionRatingValueChangedArgs> ValueChanged =>
@@ -34,17 +35,18 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionRating.ValueChanged"/>.</summary>
-    public class FusionRatingValueChangedArgs
+    public class FusionRatingValueChangedArgs : JsObject
     {
         /// <summary>Rating after the change.</summary>
-        public double Value { get; set; }
+        public ReadOnly<double> Value => ReadOnly<double>();
 
         /// <summary>Rating before the change.</summary>
-        public double PreviousValue { get; set; }
+        public ReadOnly<double> PreviousValue => ReadOnly<double>();
 
         /// <summary>Whether user interaction triggered the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionRating"/> for a model-bound field.</summary>
     public static class FusionRatingHtmlExtensions

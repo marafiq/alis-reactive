@@ -9,16 +9,16 @@
             a => a.Get("/Intake/Facilities")
                   .Response(r => r.OnSuccess<FacilitiesResponse>((json, s) =>
                   {
-                      s.Component<FusionDropDownList>(m => m.FacilityId)
-                          .Set(c => c.DataSource, json.Read(j => j.Facilities))
-                          .Call(c => c.DataBind);
+                      var facilityId = s.Component<FusionDropDownList>(m => m.FacilityId);
+                      facilityId.DataSource.Set(json.Get(j => j.Facilities));
+                      facilityId.DataBind();
                   })),
             b => b.Get("/Intake/CareLevels")
                   .Response(r => r.OnSuccess<CareLevelsResponse>((json, s) =>
                   {
-                      s.Component<FusionDropDownList>(m => m.CareLevel)
-                          .Set(c => c.DataSource, json.Read(j => j.Levels))
-                          .Call(c => c.DataBind);
+                      var careLevel = s.Component<FusionDropDownList>(m => m.CareLevel);
+                      careLevel.DataSource.Set(json.Get(j => j.Levels));
+                      careLevel.DataBind();
                   }))
         ).OnAllSettled(s =>
         {
@@ -38,9 +38,9 @@
             {
                 s.Into("alis-drawer-content");
             }));
-        pipeline.Element("alis-drawer-title").SetText("Intake Summary");
-        pipeline.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md);
-        pipeline.Component<NativeDrawer>().Call(c => c.Open);
+        pipeline.Element("alis-drawer-title").Text.Set("Intake Summary");
+        pipeline.Component<NativeDrawer>().Size.Set(DrawerSize.Md);
+        pipeline.Component<NativeDrawer>().Open();
     }));
 }
 
@@ -92,9 +92,9 @@
                             .Response(r => r
                                 .OnSuccess<UnitsResponse>((json, s) =>
                                 {
-                                    s.Component<FusionDropDownList>(m => m.UnitId)
-                                        .Set(c => c.DataSource, json.Read(j => j.Units))
-                                        .Call(c => c.DataBind);
+                                    var unitId = s.Component<FusionDropDownList>(m => m.UnitId);
+                                    unitId.DataSource.Set(json.Get(j => j.Units));
+                                    unitId.DataBind();
                                 })),
                         b => b.Get("/Intake/FacilityInfo")
                             .Gather(g => g.Form(m => m.FacilityId))
@@ -121,7 +121,7 @@
                     .Fields<LookupItem>(t => t.Name, v => v.Id))
                 .Reactive(evt => evt.Change, (args, pipeline) =>
                 {
-                    pipeline.When(args, a => a.Value).Eq("memory-care")
+                    pipeline.When(args.Value).Eq("memory-care")
                         .Then(t => t.Element("cognitive-section").Show())
                         .Else(e => e.Element("cognitive-section").Hide());
                 }); }
@@ -152,7 +152,7 @@
                         .CssClass("h-4 w-4 rounded border-border text-accent"))
                     .Reactive(evt => evt.Change, (args, pipeline) =>
                     {
-                        pipeline.When(args, a => a.Checked).Truthy()
+                        pipeline.When(args.Checked).Truthy()
                             .Then(t => t.Element("physician-section").Show())
                             .Else(e => e.Element("physician-section").Hide());
                     }); }
@@ -196,23 +196,23 @@
                              .Validate<IntakeValidator>("intake-form")
                              .WhileLoading(l =>
                              {
-                                 l.Component<NativeLoader>().Call(c => c.Show);
+                                 l.Component<NativeLoader>().Show();
                              })
                              .Response(r => r
                                 .OnSuccess(s =>
                                 {
-                                    s.Component<NativeLoader>().Call(c => c.Hide);
-                                    s.Component<FusionToast>()
-                                        .Set(c => c.Title, "Resident Intake")
-                                        .Set(c => c.Content, "Intake submitted successfully")
-                                        .Set(c => c.Tone, FusionToastTone.Success)
-                                        .Call(c => c.Show);
+                                    s.Component<NativeLoader>().Hide();
+                                    var toast = s.Component<FusionToast>();
+                                    toast.Title.Set("Resident Intake");
+                                    toast.Content.Set("Intake submitted successfully");
+                                    toast.Tone.Set(FusionToastTone.Success);
+                                    toast.Show();
                                     s.Element("post-save-section").Show();
                                     s.Element("submit-intake").Hide();
                                 })
                                 .OnError(400, e =>
                                 {
-                                    e.Component<NativeLoader>().Call(c => c.Hide);
+                                    e.Component<NativeLoader>().Hide();
                                     e.ValidationErrors("intake-form");
                                 })
                                 .Chained(c => c
@@ -221,7 +221,7 @@
                                         .OnSuccess<ConfirmationResponse>((json, s2) =>
                                         {
                                             s2.Element("confirmation-number")
-                                                .SetText(json, j => j.Number);
+                                                .Text.Set(json.Get(j => j.Number));
                                         }))));
                         });
                 }))

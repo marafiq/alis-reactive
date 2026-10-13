@@ -9,6 +9,7 @@ using Syncfusion.EJ2.Buttons;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Button, declared by the names its JavaScript API uses.
     /// </summary>
@@ -21,35 +22,36 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionButton : FusionComponent
     {
         /// <summary>The button text.</summary>
-        public ComponentProperty<string> Content => Property<string>("content");
+        public Prop<string> Content => Prop<string>();
 
         /// <summary>Whether the button is disabled.</summary>
-        public ComponentProperty<bool> Disabled => Property<bool>("disabled");
+        public Prop<bool> Disabled => Prop<bool>();
 
         /// <summary>The icon CSS classes.</summary>
-        public ComponentProperty<string> IconCss => Property<string>("iconCss");
+        public Prop<string> IconCss => Prop<string>();
 
         /// <summary>Where the icon sits relative to the text.</summary>
-        public ComponentProperty<FusionButtonIconPosition> IconPosition => Property<FusionButtonIconPosition>("iconPosition");
+        public Prop<FusionButtonIconPosition> IconPosition => Prop<FusionButtonIconPosition>();
 
         /// <summary>The CSS classes on the button.</summary>
-        public ComponentProperty<string> CssClass => Property<string>("cssClass");
+        public Prop<string> CssClass => Prop<string>();
 
         /// <summary>Whether the button has the primary style.</summary>
-        public ComponentProperty<bool> IsPrimary => Property<bool>("isPrimary");
+        public Prop<bool> IsPrimary => Prop<bool>();
 
         /// <summary>Whether the button toggles its active state when clicked.</summary>
-        public ComponentProperty<bool> IsToggle => Property<bool>("isToggle");
+        public Prop<bool> IsToggle => Prop<bool>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Clicks the button.</summary>
-        public ComponentMethod Click => Method("click");
+        public void Click() => Call();
 
         /// <summary>Moves focus to the button.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Creates a FusionButton with Syncfusion MVC builder-owned initial render.

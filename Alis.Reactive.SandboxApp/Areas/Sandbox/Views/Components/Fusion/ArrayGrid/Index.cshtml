@@ -12,28 +12,27 @@
         p.Get(Url.SandboxRoute("Residents", "ArrayGrid"))
          .Response(r => r.OnSuccess<ResidentRosterResponse>((json, s) =>
          {
-             var roster = p.From(json.Read(x => x.Residents));
-             s.Component<FusionGrid>("roster-grid")
-                 .Set(c => c.DataSource, roster.OrderBy(x => x.Name).AsSource());
-             s.Element("grid-status").SetText("roster loaded");
+             var roster = p.From(json.Get(x => x.Residents));
+             s.Component<FusionGrid>("roster-grid").DataSource.Set(roster.OrderBy(x => x.Name));
+             s.Element("grid-status").Text.Set("roster loaded");
          }))));
 
     // Client-side path reads and rebinds the grid's current dataSource.
     Html.NativeButton("show-active-btn", "Show Active Only")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {
-            var current = p.From(p.Component<FusionGrid>("roster-grid").Get(c => c.Rows<ResidentRow>()));
-            p.Component<FusionGrid>("roster-grid")
-                .Set(c => c.DataSource, current.Where(x => x.Status == "active").OrderBy(x => x.Name).AsSource())
-                .Call(c => c.Refresh);
-            p.Element("grid-status").SetText("active only");
+            var current = p.From(p.Component<FusionGrid>("roster-grid").Rows<ResidentRow>());
+            var rosterGrid = p.Component<FusionGrid>("roster-grid");
+            rosterGrid.DataSource.Set(current.Where(x => x.Status == "active").OrderBy(x => x.Name));
+            rosterGrid.Refresh();
+            p.Element("grid-status").Text.Set("active only");
         });
 }
 
 <native-vstack gap="Lg">
     <native-heading level="H1">ArrayGrid &mdash; client-side transform into a grid data source</native-heading>
     <native-text color="Secondary">
-        The array DSL is just value routing: <code>p.From(roster).Where(x =&gt; x.Status == "active").OrderBy(x =&gt; x.Name).AsSource()</code>
+        The array DSL is just value routing: <code>p.From(roster).Where(x =&gt; x.Status == "active").OrderBy(x =&gt; x.Name)</code>
         flows into the grid's <code>dataSource</code> member via <code>Set(c =&gt; c.DataSource, source)</code>.
         The filter runs in the plan over element members &mdash; no HTTP round-trip, no per-row code.
     </native-text>

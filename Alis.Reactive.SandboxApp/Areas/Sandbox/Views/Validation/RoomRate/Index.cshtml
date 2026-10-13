@@ -31,7 +31,7 @@
                  .Response(r => r
                     .OnSuccess<RoomRateConfirmation>((json, s) =>
                     {
-                        s.Element("room-rate-status").SetText(json, x => x.Confirmation);
+                        s.Element("room-rate-status").Text.Set(json.Get(x => x.Confirmation));
                     })
                     .OnError(400, e => e.ValidationErrors("room-rate-form")));
             }))

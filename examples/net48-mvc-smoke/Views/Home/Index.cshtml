@@ -15,7 +15,7 @@
         .NativeCheckBox()
         .Reactive(evt => evt.Change, (args, pipeline) =>
         {
-            pipeline.When(args, a => a.Checked).Truthy()
+            pipeline.When(args.Checked).Truthy()
                 .Then(t => t.Element("reactive-proof").Show())
                 .Else(e => e.Element("reactive-proof").Hide());
         }); }

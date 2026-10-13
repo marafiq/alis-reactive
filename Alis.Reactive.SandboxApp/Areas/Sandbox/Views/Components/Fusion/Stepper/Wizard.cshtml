@@ -29,8 +29,8 @@
                 .Set(x => x.Step, 1))
             .Response(r => r.OnSuccess(s => s.Into(StepContainerId)));
 
-        p.Element("stepper-wizard-current").SetText(p.Component<FusionStepper>(StepperId).Get(c => c.ActiveStep));
-        p.Element("stepper-wizard-status").SetText("loaded intake");
+        p.Element("stepper-wizard-current").Text.Set(p.Component<FusionStepper>(StepperId).ActiveStep);
+        p.Element("stepper-wizard-status").Text.Set("loaded intake");
     }));
 }
 
@@ -65,35 +65,35 @@
         })
         .Reactive(evt => evt.StepChanging, (args, p) =>
         {
-            var maxUnlockedStep = p.Component<NativeHiddenField>(m => m.MaxUnlockedStep).Get(c => c.Value);
+            var maxUnlockedStep = p.Component<NativeHiddenField>(m => m.MaxUnlockedStep).Value;
 
-            p.When(args, x => x.ActiveStep).Eq(1)
+            p.When(args.ActiveStep).Eq(1)
                 .And(maxUnlockedStep).Eq("0")
                 .Then(t =>
                 {
-                    t.Payload(args).Set(a => a.Cancel, true);
-                    t.Element("stepper-wizard-status").SetText("complete intake before opening care");
+                    args.Cancel.Set(true);
+                    t.Element("stepper-wizard-status").Text.Set("complete intake before opening care");
                 })
-                .ElseIf(args, x => x.ActiveStep).Eq(2)
+                .ElseIf(args.ActiveStep).Eq(2)
                 .And(maxUnlockedStep).In("0", "1")
                 .Then(t =>
                 {
-                    t.Payload(args).Set(a => a.Cancel, true);
-                    t.Element("stepper-wizard-status").SetText("complete care before opening contacts");
+                    args.Cancel.Set(true);
+                    t.Element("stepper-wizard-status").Text.Set("complete care before opening contacts");
                 })
-                .ElseIf(args, x => x.ActiveStep).Eq(3)
+                .ElseIf(args.ActiveStep).Eq(3)
                 .And(maxUnlockedStep).In("0", "1", "2")
                 .Then(t =>
                 {
-                    t.Payload(args).Set(a => a.Cancel, true);
-                    t.Element("stepper-wizard-status").SetText("complete contacts before review");
+                    args.Cancel.Set(true);
+                    t.Element("stepper-wizard-status").Text.Set("complete contacts before review");
                 });
         })
         .Reactive(evt => evt.StepChanged, (args, p) =>
         {
-            p.Element("stepper-wizard-current").SetText(args, x => x.ActiveStep);
+            p.Element("stepper-wizard-current").Text.Set(args.ActiveStep);
 
-            p.When(args, x => x.ActiveStep).Eq(0)
+            p.When(args.ActiveStep).Eq(0)
                 .Then(t =>
                 {
                     t.Post(loadStepUrl)
@@ -102,7 +102,7 @@
                             .Set(x => x.Step, 1))
                         .Response(r => r.OnSuccess(s => s.Into(StepContainerId)));
                 })
-                .ElseIf(args, x => x.ActiveStep).Eq(1)
+                .ElseIf(args.ActiveStep).Eq(1)
                 .Then(t =>
                 {
                     t.Post(loadStepUrl)
@@ -111,7 +111,7 @@
                             .Set(x => x.Step, 2))
                         .Response(r => r.OnSuccess(s => s.Into(StepContainerId)));
                 })
-                .ElseIf(args, x => x.ActiveStep).Eq(2)
+                .ElseIf(args.ActiveStep).Eq(2)
                 .Then(t =>
                 {
                     t.Post(loadStepUrl)
@@ -120,7 +120,7 @@
                             .Set(x => x.Step, 3))
                         .Response(r => r.OnSuccess(s => s.Into(StepContainerId)));
                 })
-                .ElseIf(args, x => x.ActiveStep).Eq(3)
+                .ElseIf(args.ActiveStep).Eq(3)
                 .Then(t =>
                 {
                     t.Post(loadStepUrl)

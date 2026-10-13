@@ -28,7 +28,7 @@
                         p.Get(Url.SandboxRoute("Residents", "OutingRoster"))
                          .Gather(g => g.Form(m => m.MobilityAids))
                          .Response(r => r.OnSuccess<OutingRosterAnswer>((json, s) =>
-                             s.Element("roster-residents").SetText(json, x => x.Residents)));
+                             s.Element("roster-residents").Text.Set(json.Get(x => x.Residents))));
                     }))
                 @(Html.NativeButton("book-bus-btn", "Book the Bus")
                     .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
@@ -39,13 +39,13 @@
                          .Response(r => r
                             .OnSuccess<OutingBookingAnswer>((json, s) =>
                             {
-                                s.Element("bus-booking").SetText(json, x => x.Confirmation);
-                                s.Element("bus-booking").RemoveClass("text-red-600");
+                                s.Element("bus-booking").Text.Set(json.Get(x => x.Confirmation));
+                                s.Element("bus-booking").ClassList.Remove("text-red-600");
                             })
                             .OnError<OutingBookingRefusal>(400, (json, e) =>
                             {
-                                e.Element("bus-booking").SetText(json, x => x.Reason);
-                                e.Element("bus-booking").AddClass("text-red-600");
+                                e.Element("bus-booking").Text.Set(json.Get(x => x.Reason));
+                                e.Element("bus-booking").ClassList.Add("text-red-600");
                             }));
                     }))
             </native-hstack>

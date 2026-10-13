@@ -28,11 +28,11 @@
              .Response(r => r
                 .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
                 {
-                    s.Element("card-nickname-display").SetText(json, x => x.DisplayValue);
+                    s.Element("card-nickname-display").Text.Set(json.Get(x => x.DisplayValue));
                 })
                 .OnError<InPlaceEditorCommitError>((err, e) =>
                 {
-                    e.Element("card-nickname-error-message").SetText(err, x => x.Message);
+                    e.Element("card-nickname-error-message").Text.Set(err.Get(x => x.Message));
                 }));
         }); }
 

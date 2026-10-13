@@ -29,14 +29,14 @@
                 p.Post(Url.SandboxRoute("Record", "MedicationPass")).Gather(g => g.Form())
                  .Response(r => r.OnSuccess<MedicationPassConfirmation>((pass, s) =>
                  {
-                     s.Element("medication-pass-status").SetText(pass, x => x.Confirmation);
+                     s.Element("medication-pass-status").Text.Set(pass.Get(x => x.Confirmation));
                      // The next pass is given once the pharmacy has ordered the refills: the refill
                      // route reads the pass confirmation, the response its own handle names.
                      s.Get(Url.SandboxRoute("Refills", "MedicationPass"))
                       .Response(refills => refills.OnSuccess<RefillOrder>((order, ordered) =>
                       {
-                          ordered.Element("medication-pass-refills").SetText(order, x => x.Status);
-                          ordered.Element("medication-pass-next").SetText(pass, x => x.NextPass);
+                          ordered.Element("medication-pass-refills").Text.Set(order.Get(x => x.Status));
+                          ordered.Element("medication-pass-next").Text.Set(pass.Get(x => x.NextPass));
                       }));
                  }));
             }))

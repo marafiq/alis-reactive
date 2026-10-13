@@ -41,12 +41,12 @@
              .Response(r => r
                 .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
                 {
-                    s.Element("card-allergies-display").SetText(json, x => x.DisplayValue);
+                    s.Element("card-allergies-display").Text.Set(json.Get(x => x.DisplayValue));
                 })
                 .OnError(400, e => e.ValidationErrors("card-allergies"))
                 .OnError<InPlaceEditorCommitError>((err, e) =>
                 {
-                    e.Element("card-allergies-error").SetText(err, x => x.Message);
+                    e.Element("card-allergies-error").Text.Set(err.Get(x => x.Message));
                 }));
         }); }
 

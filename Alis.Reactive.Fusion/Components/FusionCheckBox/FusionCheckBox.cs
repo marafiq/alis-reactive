@@ -5,6 +5,7 @@ using Syncfusion.EJ2.Buttons;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion CheckBox, declared by the names its JavaScript API uses.
     /// </summary>
@@ -17,22 +18,22 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionCheckBox : FusionComponent, IInputComponent
     {
         /// <summary>Whether the box is checked.</summary>
-        public ComponentProperty<bool> Checked => Property<bool>("checked");
+        public Prop<bool> Checked => Prop<bool>();
 
         /// <summary>Whether the box shows the indeterminate state.</summary>
-        public ComponentProperty<bool> Indeterminate => Property<bool>("indeterminate");
+        public Prop<bool> Indeterminate => Prop<bool>();
 
         /// <summary>Whether the box is disabled.</summary>
-        public ComponentProperty<bool> Disabled => Property<bool>("disabled");
+        public Prop<bool> Disabled => Prop<bool>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Toggles the box as a click would, raising <see cref="Change"/>.</summary>
-        public ComponentMethod Click => Method("click");
+        public void Click() => Call();
 
         /// <summary>Moves focus into the box.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
 
         /// <summary>Raised when the box is checked or cleared.</summary>
         public TypedEvent<FusionCheckBoxChangeArgs> Change => Event<FusionCheckBoxChangeArgs>("change");
@@ -43,11 +44,12 @@ namespace Alis.Reactive.Fusion.Components
 
     /// <summary>Payload of <see cref="FusionCheckBox.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Checked).Truthy()</c>.</remarks>
-    public class FusionCheckBoxChangeArgs
+    public class FusionCheckBoxChangeArgs : JsObject
     {
         /// <summary>Whether the box is checked after the change.</summary>
-        public bool Checked { get; set; }
+        public ReadOnly<bool> Checked => ReadOnly<bool>();
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionCheckBox"/> for a model-bound field.</summary>
     public static class FusionCheckBoxHtmlExtensions

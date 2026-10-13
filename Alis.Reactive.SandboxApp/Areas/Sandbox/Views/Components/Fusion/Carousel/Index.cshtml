@@ -24,11 +24,11 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var review = p.Component<FusionCarousel>(CarouselId);
-        p.When(review.Get(c => c.SelectedIndex)).Eq(0)
-            .Then(s => s.Element("review-position").SetText("Section 1 of 3: Medications"))
-            .ElseIf(review.Get(c => c.SelectedIndex)).Eq(1)
-            .Then(s => s.Element("review-position").SetText("Section 2 of 3: Therapy Goals"))
-            .Else(s => s.Element("review-position").SetText("Section 3 of 3: Discharge Steps"));
+        p.When(review.SelectedIndex).Eq(0)
+            .Then(s => s.Element("review-position").Text.Set("Section 1 of 3: Medications"))
+            .ElseIf(review.SelectedIndex).Eq(1)
+            .Then(s => s.Element("review-position").Text.Set("Section 2 of 3: Therapy Goals"))
+            .Else(s => s.Element("review-position").Text.Set("Section 3 of 3: Discharge Steps"));
     }));
 }
 
@@ -63,77 +63,76 @@
                 // A move that would land back on it is blocked, and the nurse is
                 // told why. The direction and how-you-tried come straight from the
                 // changing payload so the message is specific.
-                p.When(args, x => x.NextIndex).Eq(0)
+                p.When(args.NextIndex).Eq(0)
                     .Then(blocked =>
                     {
-                        blocked.Payload(args).Set(a => a.Cancel, true);
-                        blocked.Element("gate-notice").SetText("The medications sign-off is locked. Continue forward through the care plan.");
-                        blocked.Element("gate-notice-panel").RemoveClass("hidden");
+                        args.Cancel.Set(true);
+                        blocked.Element("gate-notice").Text.Set("The medications sign-off is locked. Continue forward through the care plan.");
+                        blocked.Element("gate-notice-panel").ClassList.Remove("hidden");
 
-                        blocked.When(args, x => x.SlideDirection).Eq("Previous")
-                            .Then(d => d.Element("gate-direction").SetText("You tried to go back to the medications section."))
-                            .Else(d => d.Element("gate-direction").SetText("You tried to move to the medications section."));
+                        blocked.When(args.SlideDirection).Eq("Previous")
+                            .Then(d => d.Element("gate-direction").Text.Set("You tried to go back to the medications section."))
+                            .Else(d => d.Element("gate-direction").Text.Set("You tried to move to the medications section."));
 
                         // The section the resident is leaving from, read from the changing payload.
-                        blocked.When(args, x => x.CurrentIndex).Eq(1)
-                            .Then(f => f.Element("gate-from").SetText("You are still on the therapy goals section."))
-                            .ElseIf(args, x => x.CurrentIndex).Eq(2)
-                            .Then(f => f.Element("gate-from").SetText("You are still on the discharge steps section."))
-                            .Else(f => f.Element("gate-from").SetText("You are still on the current section."));
+                        blocked.When(args.CurrentIndex).Eq(1)
+                            .Then(f => f.Element("gate-from").Text.Set("You are still on the therapy goals section."))
+                            .ElseIf(args.CurrentIndex).Eq(2)
+                            .Then(f => f.Element("gate-from").Text.Set("You are still on the discharge steps section."))
+                            .Else(f => f.Element("gate-from").Text.Set("You are still on the current section."));
 
-                        blocked.When(args, x => x.IsSwiped).Truthy()
-                            .Then(s => s.Element("gate-method").SetText("That swipe was not applied."))
-                            .Else(s => s.Element("gate-method").SetText("That button press was not applied."));
+                        blocked.When(args.IsSwiped).Truthy()
+                            .Then(s => s.Element("gate-method").Text.Set("That swipe was not applied."))
+                            .Else(s => s.Element("gate-method").Text.Set("That button press was not applied."));
                     })
-                    .Else(allowed => allowed.Element("gate-notice-panel").AddClass("hidden"));
+                    .Else(allowed => allowed.Element("gate-notice-panel").ClassList.Add("hidden"));
             })
             .Reactive(evt => evt.SlideChanged, (args, p) =>
             {
                 var review = p.Component<FusionCarousel>(CarouselId);
 
                 // Where the resident is now, read from the carousel after the move.
-                p.When(review.Get(c => c.SelectedIndex)).Eq(0)
-                    .Then(s => s.Element("review-position").SetText("Section 1 of 3: Medications"))
-                    .ElseIf(review.Get(c => c.SelectedIndex)).Eq(1)
-                    .Then(s => s.Element("review-position").SetText("Section 2 of 3: Therapy Goals"))
-                    .Else(s => s.Element("review-position").SetText("Section 3 of 3: Discharge Steps"));
+                p.When(review.SelectedIndex).Eq(0)
+                    .Then(s => s.Element("review-position").Text.Set("Section 1 of 3: Medications"))
+                    .ElseIf(review.SelectedIndex).Eq(1)
+                    .Then(s => s.Element("review-position").Text.Set("Section 2 of 3: Therapy Goals"))
+                    .Else(s => s.Element("review-position").Text.Set("Section 3 of 3: Discharge Steps"));
 
                 // The section just reached, from the changed payload's current index.
-                p.When(args, x => x.CurrentIndex).Eq(1)
-                    .Then(s => s.Element("review-section").SetText("Therapy Goals"))
-                    .ElseIf(args, x => x.CurrentIndex).Eq(2)
-                    .Then(s => s.Element("review-section").SetText("Discharge Steps"))
-                    .Else(s => s.Element("review-section").SetText("Medications"));
+                p.When(args.CurrentIndex).Eq(1)
+                    .Then(s => s.Element("review-section").Text.Set("Therapy Goals"))
+                    .ElseIf(args.CurrentIndex).Eq(2)
+                    .Then(s => s.Element("review-section").Text.Set("Discharge Steps"))
+                    .Else(s => s.Element("review-section").Text.Set("Medications"));
 
                 // The section the resident came from, from the changed payload's previous index.
-                p.When(args, x => x.PreviousIndex).Eq(0)
-                    .Then(s => s.Element("review-came-from").SetText("after the medications section"))
-                    .ElseIf(args, x => x.PreviousIndex).Eq(2)
-                    .Then(s => s.Element("review-came-from").SetText("after the discharge steps"))
-                    .Else(s => s.Element("review-came-from").SetText("after the therapy goals"));
+                p.When(args.PreviousIndex).Eq(0)
+                    .Then(s => s.Element("review-came-from").Text.Set("after the medications section"))
+                    .ElseIf(args.PreviousIndex).Eq(2)
+                    .Then(s => s.Element("review-came-from").Text.Set("after the discharge steps"))
+                    .Else(s => s.Element("review-came-from").Text.Set("after the therapy goals"));
 
                 // Which way the resident moved, from the changed payload's direction.
-                p.When(args, x => x.SlideDirection).Eq("Previous")
-                    .Then(s => s.Element("review-movement").SetText("You went back a section."))
-                    .Else(s => s.Element("review-movement").SetText("You moved forward a section."));
+                p.When(args.SlideDirection).Eq("Previous")
+                    .Then(s => s.Element("review-movement").Text.Set("You went back a section."))
+                    .Else(s => s.Element("review-movement").Text.Set("You moved forward a section."));
 
                 // How the resident navigated, from the changed payload's swipe flag.
-                p.When(args, x => x.IsSwiped).Truthy()
-                    .Then(s => s.Element("review-method").SetText("Reached by swiping."))
-                    .Else(s => s.Element("review-method").SetText("Reached using the navigation buttons."));
+                p.When(args.IsSwiped).Truthy()
+                    .Then(s => s.Element("review-method").Text.Set("Reached by swiping."))
+                    .Else(s => s.Element("review-method").Text.Set("Reached using the navigation buttons."));
 
                 // Record the reviewed section to the chart, gathering the move from the payload.
-                var move = p.Payload(args);
                 p.Post(recordUrl)
                     .Gather<CarePlanReviewEntry>(g => g
-                        .Set(x => x.SectionIndex, move.Get(a => a.CurrentIndex))
-                        .Set(x => x.CameFromIndex, move.Get(a => a.PreviousIndex))
-                        .Set(x => x.Direction, move.Get(a => a.SlideDirection))
-                        .Set(x => x.BySwipe, move.Get(a => a.IsSwiped)))
+                        .Set(x => x.SectionIndex, args.CurrentIndex)
+                        .Set(x => x.CameFromIndex, args.PreviousIndex)
+                        .Set(x => x.Direction, args.SlideDirection)
+                        .Set(x => x.BySwipe, args.IsSwiped))
                     .Response(r => r.OnSuccess<CarePlanReviewResponse>((json, s) =>
                     {
-                        s.Element("chart-line").SetText(json, x => x.ChartLine);
-                        s.Element("chart-panel").RemoveClass("hidden");
+                        s.Element("chart-line").Text.Set(json.Get(x => x.ChartLine));
+                        s.Element("chart-panel").ClassList.Remove("hidden");
                     }));
             }))
 
@@ -142,13 +141,13 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
-                        p.Component<FusionCarousel>(CarouselId).Call(c => c.Prev);
+                        p.Component<FusionCarousel>(CarouselId).Prev();
                     }))
                 @(Html.NativeButton("review-next", "Next section")
                     .CssClass(ButtonPrimary)
                     .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
-                        p.Component<FusionCarousel>(CarouselId).Call(c => c.Next);
+                        p.Component<FusionCarousel>(CarouselId).Next();
                     }))
             </native-hstack>
         </native-vstack>

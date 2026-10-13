@@ -26,7 +26,7 @@
                     .CssClass("h-4 w-4 rounded border-border text-accent"))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.When(args, a => a.Checked).Truthy()
+                    p.When(args.Checked).Truthy()
                         .Then(t => t.Element("due-date-section").Show())
                         .Else(e => e.Element("due-date-section").Hide());
                 }); }
@@ -46,11 +46,11 @@
                  .Response(r => r
                     .OnSuccess(s =>
                     {
-                        s.Component<FusionToast>()
-                            .Set(c => c.Title, "Todo")
-                            .Set(c => c.Content, "Todo saved successfully")
-                            .Set(c => c.Tone, FusionToastTone.Success)
-                            .Call(c => c.Show);
+                        var toast = s.Component<FusionToast>();
+                        toast.Title.Set("Todo");
+                        toast.Content.Set("Todo saved successfully");
+                        toast.Tone.Set(FusionToastTone.Success);
+                        toast.Show();
                     })
                     .OnError(400, e => e.ValidationErrors("todo-form")));
             }))

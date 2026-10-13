@@ -9,6 +9,7 @@ using Syncfusion.EJ2.Buttons;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion ChipList, declared by the names its JavaScript API uses.
     /// </summary>
@@ -21,37 +22,37 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionChipList : FusionComponent
     {
         /// <summary>Adds a chip with this text.</summary>
-        public ComponentMethod<string> Add => Method<string>("add");
+        public void Add(Arg<string> value) => Call(value);
 
         /// <summary>Selects the chip at a zero-based index.</summary>
-        public ComponentMethod<int> SelectByIndex => Method<int>("select");
+        public void SelectByIndex(Arg<int> value) => Call(value, name: "select");
 
         /// <summary>Selects the chips at these zero-based indexes.</summary>
-        public ComponentMethod<int[]> SelectByIndexes => Method<int[]>("select");
+        public void SelectByIndexes(Arg<int[]> value) => Call(value, name: "select");
 
         /// <summary>Selects the chips with these texts.</summary>
-        public ComponentMethod<string[]> SelectByText => Method<string[]>("select").Passing("text");
+        public void SelectByText(Arg<string[]> value) => Call(value, Fixed("text"), name: "select");
 
         /// <summary>Removes the chip at a zero-based index.</summary>
-        public ComponentMethod<int> RemoveByIndex => Method<int>("remove");
+        public void RemoveByIndex(Arg<int> value) => Call(value, name: "remove");
 
         /// <summary>Removes the chips at these zero-based indexes.</summary>
-        public ComponentMethod<int[]> RemoveByIndexes => Method<int[]>("remove");
+        public void RemoveByIndexes(Arg<int[]> value) => Call(value, name: "remove");
 
         /// <summary>The chip at a zero-based index.</summary>
-        public ComponentFunction<int, FusionChipData> Find => Function<int, FusionChipData>("find");
+        public TypedSource<FusionChipData> Find(Arg<int> value) => Invoke<FusionChipData>(value);
 
         /// <summary>The selected chips.</summary>
-        public ComponentFunction<FusionSelectedChips> GetSelectedChips => Function<FusionSelectedChips>("getSelectedChips");
+        public TypedSource<FusionSelectedChips> GetSelectedChips() => Invoke<FusionSelectedChips>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>The selected chips, by value.</summary>
-        public ComponentProperty<string[]> SelectedChipValues => Property<string[]>("selectedChips");
+        public Prop<string[]> SelectedChipValues => Prop<string[]>("selectedChips");
 
         /// <summary>The selected chips, by zero-based index.</summary>
-        public ComponentProperty<int[]> SelectedChipIndexes => Property<int[]>("selectedChips");
+        public Prop<int[]> SelectedChipIndexes => Prop<int[]>("selectedChips");
 
         /// <summary>Raised when the user clicks a chip.</summary>
         public TypedEvent<FusionChipListClickArgs> Click =>
@@ -63,27 +64,28 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionChipList.Click"/>.</summary>
-    public class FusionChipListClickArgs
+    public class FusionChipListClickArgs : JsObject
     {
         /// <summary>Text of the clicked chip.</summary>
-        public string Text { get; set; } = "";
+        public ReadOnly<string> Text => ReadOnly<string>();
 
         /// <summary>Zero-based index of the clicked chip.</summary>
-        public int Index { get; set; }
+        public ReadOnly<int> Index => ReadOnly<int>();
 
         /// <summary>Whether the chip is selected after the click.</summary>
-        public bool Selected { get; set; }
+        public ReadOnly<bool> Selected => ReadOnly<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionChipList.Deleted"/>.</summary>
-    public class FusionChipListDeletedArgs
+    public class FusionChipListDeletedArgs : JsObject
     {
         /// <summary>Text of the deleted chip.</summary>
-        public string Text { get; set; } = "";
+        public ReadOnly<string> Text => ReadOnly<string>();
 
         /// <summary>Zero-based index the chip had.</summary>
-        public int Index { get; set; }
+        public ReadOnly<int> Index => ReadOnly<int>();
     }
+#nullable restore annotations
 
     /// <summary>A chip as <see cref="FusionChipList.Find"/> returns it.</summary>
     public class FusionChipData

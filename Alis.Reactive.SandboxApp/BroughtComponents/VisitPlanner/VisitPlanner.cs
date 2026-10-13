@@ -11,6 +11,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     // against the framework's public surface only: where its object lives, its members by their
     // JavaScript names, its event payloads, and a render helper.
 
+#nullable disable annotations
     /// <summary>A week of family visit times for one resident; its value is the booked time ids.</summary>
     public sealed class VisitPlanner : Component, IInputComponent
     {
@@ -28,64 +29,64 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// <inheritdoc />
         public override ComponentVendor Vendor => VisitPlannerVendor;
         /// <summary>The booked time ids, in the week's order. Setting it raises no event.</summary>
-        public ComponentProperty<IReadOnlyList<string>> Value => Property<IReadOnlyList<string>>("value");
+        public Prop<IReadOnlyList<string>> Value => Prop<IReadOnlyList<string>>();
 
         /// <summary>How many visits the resident's week allows.</summary>
-        public ComponentProperty<int> Capacity => Property<int>("capacity");
+        public Prop<int> Capacity => Prop<int>();
 
         /// <summary>The wing the planner names in its heading.</summary>
-        public ComponentProperty<string> Wing => Property<string>("wing");
+        public Prop<string> Wing => Prop<string>();
 
         /// <summary>When true, the times cannot be booked or released.</summary>
-        public ComponentProperty<bool> ReadOnly => Property<bool>("readOnly");
+        public Prop<bool> ReadOnly => Prop<bool>();
 
         /// <summary>The times offered this week. Setting them raises <see cref="SlotsLoaded"/>.</summary>
-        public ComponentProperty<IReadOnlyList<VisitSlot>> Slots => Property<IReadOnlyList<VisitSlot>>("slots");
+        public Prop<IReadOnlyList<VisitSlot>> Slots => Prop<IReadOnlyList<VisitSlot>>();
 
         /// <summary>The day of each offered time: every item of <c>slots</c>, read at <c>day</c>.</summary>
-        public ComponentProperty<IReadOnlyList<string>> OfferedDays => Property<IReadOnlyList<string>>("slots[].day");
+        public Prop<IReadOnlyList<string>> OfferedDays => Prop<IReadOnlyList<string>>("slots[].day");
 
         /// <summary>What the planner says before any time is offered.</summary>
-        public ComponentProperty<string> EmptyMessage => Property<string>("labels.empty");
+        public Prop<string> EmptyMessage => Prop<string>("labels.empty");
 
-        /// <summary>How many times are booked. Read only.</summary>
-        public ComponentProperty<int> Count => Property<int>("count");
+        /// <summary>How many times are booked.</summary>
+        public ReadOnly<int> Count => ReadOnly<int>();
 
         /// <summary>How many more visits the week allows.</summary>
-        public ComponentFunction<int> Remaining => Function<int>("remaining");
+        public TypedSource<int> Remaining() => Invoke<int>();
 
         /// <summary>Whether a time is booked.</summary>
-        public ComponentFunction<string?, bool> IsBooked => Function<string?, bool>("isBooked");
+        public TypedSource<bool> IsBooked(Arg<string> slot) => Invoke<bool>(slot);
 
         /// <summary>The first time that is neither booked nor in quiet hours; empty when there is none.</summary>
-        public ComponentFunction<string> FirstOpen => Function<string>("firstOpen");
+        public TypedSource<string> FirstOpen() => Invoke<string>();
 
         /// <summary>The earliest booked time; empty when none is booked.</summary>
-        public ComponentFunction<string> FirstBooked => Function<string>("firstBooked");
+        public TypedSource<string> FirstBooked() => Invoke<string>();
 
         /// <summary>Books a time: raises <see cref="BeforeBook"/>, then <see cref="Change"/>, or <see cref="Full"/>.</summary>
-        public ComponentMethod<string> Select => Method<string>("select");
+        public void Select(Arg<string> slot) => Call(slot);
 
         /// <summary>Releases a booked time and raises <see cref="Change"/>.</summary>
-        public ComponentMethod<string?> Release => Method<string?>("release");
+        public void Release(Arg<string> slot) => Call(slot);
 
         /// <summary>Releases every booked time and raises <see cref="Change"/>.</summary>
-        public ComponentMethod Clear => Method("clear");
+        public void Clear() => Call();
 
         /// <summary>Records who is coming to a booked time: its id, how many visitors, and a note.</summary>
-        public ComponentMethod<string?, decimal, string?> Book => Method<string?, decimal, string?>("book");
+        public void Book(Arg<string> slot, Arg<decimal> visitors, Arg<string> note) => Call(slot, visitors, note);
 
         /// <summary>Prepares the summary the family receives. Returns a promise the plan waits for.</summary>
-        public ComponentMethod PrepareSummary => Method("prepareSummary").Awaited();
+        public void PrepareSummary() => CallAsync();
 
         /// <summary>The prepared summary, empty until one is prepared. Returns a promise the plan waits for.</summary>
-        public ComponentFunction<string> Summary => Function<string>("summary").Awaited();
+        public TypedSource<string> Summary() => InvokeAsync<string>();
 
         /// <summary>Marks a time another family holds, by the family's name; it can no longer be booked here.</summary>
-        public ComponentMethod<string?, string?> MarkTaken => Method<string?, string?>("markTaken");
+        public void MarkTaken(Arg<string> slot, Arg<string> family) => Call(slot, family);
 
         /// <summary>Moves focus to the first time that can be booked.</summary>
-        public ComponentMethod Focus => Method("focus");
+        public void Focus() => Call();
 
         /// <summary>
         /// Raised when the booked times change, by the user or by a method. The planner names it its own
@@ -120,48 +121,49 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     }
 
     /// <summary>Payload of <see cref="VisitPlanner.WeekChanged"/>.</summary>
-    public class VisitPlannerWeekChangedArgs
+    public class VisitPlannerWeekChangedArgs : JsObject
     {
-        public List<string> Value { get; set; } = new List<string>();
+        public ReadOnly<List<string>> Value => ReadOnly<List<string>>();
 
         /// <summary>The time just booked, when the change booked one.</summary>
-        public string? Added { get; set; }
+        public ReadOnly<string> Added => ReadOnly<string>();
 
         /// <summary>The time just released, when the change released one.</summary>
-        public string? Removed { get; set; }
+        public ReadOnly<string> Removed => ReadOnly<string>();
 
-        public int Count { get; set; }
+        public ReadOnly<int> Count => ReadOnly<int>();
 
-        public int Remaining { get; set; }
+        public ReadOnly<int> Remaining => ReadOnly<int>();
     }
 
     /// <summary>Payload of <see cref="VisitPlanner.Full"/>; it carries a method as well as data.</summary>
     public class VisitPlannerFullArgs : JsObject
     {
-        public int Capacity { get; set; }
+        public ReadOnly<int> Capacity => ReadOnly<int>();
 
         /// <summary>The time that could not be booked.</summary>
-        public string Attempted { get; set; } = "";
+        public ReadOnly<string> Attempted => ReadOnly<string>();
 
         /// <summary>Puts the time that could not be booked on the waitlist; the planner shows it.</summary>
-        public ComponentMethod Waitlist => Method("waitlist");
+        public void Waitlist() => Call();
     }
 
     /// <summary>Payload of <see cref="VisitPlanner.BeforeBook"/>; the planner reads <see cref="Cancel"/> back.</summary>
-    public class VisitPlannerBeforeBookArgs
+    public class VisitPlannerBeforeBookArgs : JsObject
     {
-        public VisitSlot Slot { get; set; } = new VisitSlot();
+        public ReadOnly<VisitSlot> Slot => ReadOnly<VisitSlot>();
 
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="VisitPlanner.SlotsLoaded"/>.</summary>
-    public class VisitPlannerSlotsLoadedArgs
+    public class VisitPlannerSlotsLoadedArgs : JsObject
     {
-        public int Count { get; set; }
+        public ReadOnly<int> Count => ReadOnly<int>();
 
-        public string Wing { get; set; } = "";
+        public ReadOnly<string> Wing => ReadOnly<string>();
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="VisitPlanner"/> for a model-bound list of time ids.</summary>
     public static class VisitPlannerHtmlExtensions

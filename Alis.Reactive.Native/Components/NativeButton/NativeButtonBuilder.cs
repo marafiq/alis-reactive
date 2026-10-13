@@ -39,12 +39,13 @@ namespace Alis.Reactive.Native.Components
         /// <typeparam name="TArgs">The event's typed payload.</typeparam>
         /// <param name="plan">The plan the behavior belongs to.</param>
         /// <param name="eventSelector">Selects a declared event, for example <c>evt =&gt; evt.Click</c>.</param>
-        /// <param name="pipeline">The reaction, given the typed payload and the pipeline.</param>
+        /// <param name="pipeline">The reaction, given the event's payload and the pipeline.</param>
         /// <returns>This builder, so configuration and further events can follow.</returns>
         public NativeButtonBuilder<TModel> Reactive<TArgs>(
             ReactivePlan<TModel> plan,
             Func<NativeButton, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
+            where TArgs : JsObject
         {
             if (plan == null) throw new ArgumentNullException(nameof(plan));
             plan.Render<NativeButton>(_elementId, this).Reactive(eventSelector, pipeline);

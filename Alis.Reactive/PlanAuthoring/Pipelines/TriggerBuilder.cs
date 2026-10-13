@@ -42,9 +42,9 @@ namespace Alis.Reactive.Builders
         /// <summary>Runs a pipeline each time a declared document event is raised, reading its payload.</summary>
         /// <typeparam name="TPayload">The payload the event declares. A member is read by its camel-case JSON name (<c>MRN</c> reads <c>mrn</c>), the name <c>Dispatch</c> writes.</typeparam>
         /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Named{TPayload}(string)"/>.</param>
-        /// <param name="pipeline">Builds the reaction graph, given the payload and the pipeline.</param>
+        /// <param name="pipeline">Builds the reaction graph, given the payload (<c>payload.Get(x =&gt; x.UnitId)</c>) and the pipeline.</param>
         public TriggerBuilder<TModel> CustomEvent<TPayload>(AppEvent<TPayload> appEvent,
-            Action<TPayload, PipelineBuilder<TModel>> pipeline)
+            Action<Data<TPayload>, PipelineBuilder<TModel>> pipeline)
             where TPayload : class, new()
         {
             if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
@@ -86,7 +86,7 @@ namespace Alis.Reactive.Builders
         /// <param name="pipeline">Builds the reaction graph, given the message's data and the pipeline.</param>
         public TriggerBuilder<TModel> ServerPush<TStream, TPayload>(ServerPushSource<TStream> stream,
             Func<TStream, ServerPushMessage<TPayload>> message,
-            Action<TPayload, PipelineBuilder<TModel>> pipeline)
+            Action<Data<TPayload>, PipelineBuilder<TModel>> pipeline)
             where TStream : ServerPushStream, new()
             where TPayload : class, new()
         {
@@ -118,7 +118,7 @@ namespace Alis.Reactive.Builders
         /// <param name="pipeline">Builds the reaction graph, given the argument and the pipeline.</param>
         public TriggerBuilder<TModel> SignalR<THub, TPayload>(SignalRSource<THub> hub,
             Func<THub, SignalRMessage<TPayload>> message,
-            Action<TPayload, PipelineBuilder<TModel>> pipeline)
+            Action<Data<TPayload>, PipelineBuilder<TModel>> pipeline)
             where THub : SignalRHub, new()
             where TPayload : class, new()
         {
@@ -133,10 +133,9 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        private TriggerBuilder<TModel> On<TPayload>(StartsWhen trigger, Action<TPayload, PipelineBuilder<TModel>> pipeline)
-            where TPayload : new()
+        private TriggerBuilder<TModel> On<TPayload>(StartsWhen trigger, Action<Data<TPayload>, PipelineBuilder<TModel>> pipeline)
         {
-            var payload = new TPayload();
+            var payload = new Data<TPayload>(PayloadSource.Event());
             AddBehavior(trigger, PipelineBuilder<TModel>.Build(_context, p => pipeline(payload, p)));
             return this;
         }

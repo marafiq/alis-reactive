@@ -35,17 +35,6 @@ namespace Alis.Reactive.Builders.Conditions
             _continuation = continuation ?? throw new ArgumentNullException(nameof(continuation));
         }
 
-        /// <summary>Also requires a comparison of the triggering event's payload.</summary>
-        public ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>> And<TPayload, TProp>(
-            TPayload payload, Expression<Func<TPayload, TProp>> path) =>
-            And(PayloadTypedSource<TPayload, TProp>.FromEvent(path));
-
-        /// <summary>Also requires a comparison of the response body.</summary>
-        public ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>> And<TResponse, TProp>(
-            ResponseBody<TResponse> responseBody, Expression<Func<TResponse, TProp>> path)
-            where TResponse : class =>
-            And(responseBody.Read(path));
-
         /// <summary>Also requires a comparison of a value read when the condition runs.</summary>
         public ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>> And<TProp>(TypedSource<TProp> source) =>
             new ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>>(
@@ -54,17 +43,6 @@ namespace Alis.Reactive.Builders.Conditions
         /// <summary>Also requires a group, whose own <c>And</c> and <c>Or</c> are evaluated first.</summary>
         public AllGuard<TModel> And(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
             new AllGuard<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)), _continuation);
-
-        /// <summary>Alternatively accepts a comparison of the triggering event's payload.</summary>
-        public ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>> Or<TPayload, TProp>(
-            TPayload payload, Expression<Func<TPayload, TProp>> path) =>
-            Or(PayloadTypedSource<TPayload, TProp>.FromEvent(path));
-
-        /// <summary>Alternatively accepts a comparison of the response body.</summary>
-        public ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>> Or<TResponse, TProp>(
-            ResponseBody<TResponse> responseBody, Expression<Func<TResponse, TProp>> path)
-            where TResponse : class =>
-            Or(responseBody.Read(path));
 
         /// <summary>Alternatively accepts a comparison of a value read when the condition runs.</summary>
         public ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>> Or<TProp>(TypedSource<TProp> source) =>
@@ -98,17 +76,6 @@ namespace Alis.Reactive.Builders.Conditions
             _continuation = continuation;
         }
 
-        /// <summary>Also requires a comparison of the triggering event's payload.</summary>
-        public ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>> And<TPayload, TProp>(
-            TPayload payload, Expression<Func<TPayload, TProp>> path) =>
-            And(PayloadTypedSource<TPayload, TProp>.FromEvent(path));
-
-        /// <summary>Also requires a comparison of the response body.</summary>
-        public ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>> And<TResponse, TProp>(
-            ResponseBody<TResponse> responseBody, Expression<Func<TResponse, TProp>> path)
-            where TResponse : class =>
-            And(responseBody.Read(path));
-
         /// <summary>Also requires a comparison of a value read when the condition runs.</summary>
         public ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>> And<TProp>(TypedSource<TProp> source) =>
             new ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>>(
@@ -138,17 +105,6 @@ namespace Alis.Reactive.Builders.Conditions
             _continuation = continuation;
         }
 
-        /// <summary>Alternatively accepts a comparison of the triggering event's payload.</summary>
-        public ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>> Or<TPayload, TProp>(
-            TPayload payload, Expression<Func<TPayload, TProp>> path) =>
-            Or(PayloadTypedSource<TPayload, TProp>.FromEvent(path));
-
-        /// <summary>Alternatively accepts a comparison of the response body.</summary>
-        public ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>> Or<TResponse, TProp>(
-            ResponseBody<TResponse> responseBody, Expression<Func<TResponse, TProp>> path)
-            where TResponse : class =>
-            Or(responseBody.Read(path));
-
         /// <summary>Alternatively accepts a comparison of a value read when the condition runs.</summary>
         public ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>> Or<TProp>(TypedSource<TProp> source) =>
             new ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>>(
@@ -173,17 +129,6 @@ namespace Alis.Reactive.Builders.Conditions
     {
         internal GroupCondition(ConditionGraph graph) : base(graph) { }
 
-        /// <summary>Also requires a comparison of the triggering event's payload.</summary>
-        public ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>> And<TPayload, TProp>(
-            TPayload payload, Expression<Func<TPayload, TProp>> path) =>
-            And(PayloadTypedSource<TPayload, TProp>.FromEvent(path));
-
-        /// <summary>Also requires a comparison of the response body.</summary>
-        public ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>> And<TResponse, TProp>(
-            ResponseBody<TResponse> responseBody, Expression<Func<TResponse, TProp>> path)
-            where TResponse : class =>
-            And(responseBody.Read(path));
-
         /// <summary>Also requires a comparison of a value read when the condition runs.</summary>
         public ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>> And<TProp>(TypedSource<TProp> source) =>
             new ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>>(
@@ -192,17 +137,6 @@ namespace Alis.Reactive.Builders.Conditions
         /// <summary>Also requires a nested group.</summary>
         public GroupAll<TModel> And(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
             new GroupAll<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)));
-
-        /// <summary>Alternatively accepts a comparison of the triggering event's payload.</summary>
-        public ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>> Or<TPayload, TProp>(
-            TPayload payload, Expression<Func<TPayload, TProp>> path) =>
-            Or(PayloadTypedSource<TPayload, TProp>.FromEvent(path));
-
-        /// <summary>Alternatively accepts a comparison of the response body.</summary>
-        public ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>> Or<TResponse, TProp>(
-            ResponseBody<TResponse> responseBody, Expression<Func<TResponse, TProp>> path)
-            where TResponse : class =>
-            Or(responseBody.Read(path));
 
         /// <summary>Alternatively accepts a comparison of a value read when the condition runs.</summary>
         public ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>> Or<TProp>(TypedSource<TProp> source) =>
@@ -223,17 +157,6 @@ namespace Alis.Reactive.Builders.Conditions
     {
         internal GroupAll(ConditionGraph graph) : base(graph) { }
 
-        /// <summary>Also requires a comparison of the triggering event's payload.</summary>
-        public ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>> And<TPayload, TProp>(
-            TPayload payload, Expression<Func<TPayload, TProp>> path) =>
-            And(PayloadTypedSource<TPayload, TProp>.FromEvent(path));
-
-        /// <summary>Also requires a comparison of the response body.</summary>
-        public ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>> And<TResponse, TProp>(
-            ResponseBody<TResponse> responseBody, Expression<Func<TResponse, TProp>> path)
-            where TResponse : class =>
-            And(responseBody.Read(path));
-
         /// <summary>Also requires a comparison of a value read when the condition runs.</summary>
         public ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>> And<TProp>(TypedSource<TProp> source) =>
             new ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>>(
@@ -249,17 +172,6 @@ namespace Alis.Reactive.Builders.Conditions
     public sealed class GroupAny<TModel> : Condition<TModel> where TModel : class
     {
         internal GroupAny(ConditionGraph graph) : base(graph) { }
-
-        /// <summary>Alternatively accepts a comparison of the triggering event's payload.</summary>
-        public ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>> Or<TPayload, TProp>(
-            TPayload payload, Expression<Func<TPayload, TProp>> path) =>
-            Or(PayloadTypedSource<TPayload, TProp>.FromEvent(path));
-
-        /// <summary>Alternatively accepts a comparison of the response body.</summary>
-        public ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>> Or<TResponse, TProp>(
-            ResponseBody<TResponse> responseBody, Expression<Func<TResponse, TProp>> path)
-            where TResponse : class =>
-            Or(responseBody.Read(path));
 
         /// <summary>Alternatively accepts a comparison of a value read when the condition runs.</summary>
         public ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>> Or<TProp>(TypedSource<TProp> source) =>

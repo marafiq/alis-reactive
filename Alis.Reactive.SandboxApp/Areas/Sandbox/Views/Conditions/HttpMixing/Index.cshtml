@@ -1,6 +1,5 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.HttpMixing.HttpMixingModel
 @using Alis.Reactive
-@using Alis.Reactive.Builders.Conditions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.HttpMixing
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions
@@ -27,76 +26,76 @@
         p.Post(saveUrl).Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, "Alice"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
-             s.Element("s1-status").SetText(json, x => x.ReceivedName);
+             s.Element("s1-status").Text.Set(json.Get(x => x.ReceivedName));
          }));
-        p.When(args, x => x.Active).Truthy()
+        p.When(args.Get(x => x.Active)).Truthy()
             .Then(then => then.Element("s1-badge").Show())
             .Else(else_ => else_.Element("s1-badge").Hide());
     }));
 
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S2ConditionHttpCondition, (args, p) =>
     {
-        p.When(args, x => x.Active).Truthy()
-            .Then(then => then.Element("s2-active-status").SetText("active"))
-            .Else(else_ => else_.Element("s2-active-status").SetText("inactive"));
+        p.When(args.Get(x => x.Active)).Truthy()
+            .Then(then => then.Element("s2-active-status").Text.Set("active"))
+            .Else(else_ => else_.Element("s2-active-status").Text.Set("inactive"));
         p.Post(auditUrl).Gather<HttpMixingController.AuditRequest>(g => g.Set(x => x.Action, "login"))
          .Response(r => r.OnSuccess<HttpMixingAuditResponse>((json, s) =>
          {
-             s.Element("s2-audit-result").SetText(json, x => x.Result);
+             s.Element("s2-audit-result").Text.Set(json.Get(x => x.Result));
          }));
-        p.When(args, x => x.Count).Gt(0)
+        p.When(args.Get(x => x.Count)).Gt(0)
             .Then(then => then.Element("s2-count-badge").Show())
             .Else(else_ => else_.Element("s2-count-badge").Hide());
     }));
 
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S3FullInterleave, (args, p) =>
     {
-        p.Element("s3-header").SetText("start");
-        p.When(args, x => x.Active).Truthy()
+        p.Element("s3-header").Text.Set("start");
+        p.When(args.Get(x => x.Active)).Truthy()
             .Then(then => then.Element("s3-pre-badge").Show());
-        p.Element("s3-loading").SetText("please wait");
+        p.Element("s3-loading").Text.Set("please wait");
         p.Post(saveUrl).Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, "Bob"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
-             s.Element("s3-http-result").SetText(json, x => x.ReceivedName);
+             s.Element("s3-http-result").Text.Set(json.Get(x => x.ReceivedName));
          }));
-        p.When(args, x => x.Count).Gt(0)
+        p.When(args.Get(x => x.Count)).Gt(0)
             .Then(then => then.Element("s3-count").Show())
             .Else(else_ => else_.Element("s3-count").Hide());
-        p.Element("s3-footer").SetText("done");
+        p.Element("s3-footer").Text.Set("done");
     }));
 
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S4ConditionInsideSuccess, (args, p) =>
     {
-        p.Element("s4-pre").SetText("loading");
+        p.Element("s4-pre").Text.Set("loading");
         p.Post(saveUrl).Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, "Carol"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
-             s.Element("s4-status").SetText("saved");
-             s.When(args, x => x.Active).Truthy()
+             s.Element("s4-status").Text.Set("saved");
+             s.When(args.Get(x => x.Active)).Truthy()
                  .Then(then => then.Element("s4-inner-badge").Show())
                  .Else(else_ => else_.Element("s4-inner-badge").Hide());
-             s.Element("s4-timestamp").SetText("now");
+             s.Element("s4-timestamp").Text.Set("now");
          }));
-        p.Element("s4-footer").SetText("done");
+        p.Element("s4-footer").Text.Set("done");
     }));
 
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S5ElseifInsideSuccess, (args, p) =>
     {
         p.Post(classifyUrl)
-         .Gather<HttpMixingController.ClassifyRequest>(g => g.Set(x => x.Count, p.Payload(args).Get(a => a.Count)))
+         .Gather<HttpMixingController.ClassifyRequest>(g => g.Set(x => x.Count, args.Get(a => a.Count)))
          .Response(r => r.OnSuccess<HttpMixingClassifyResponse>((json, s) =>
          {
-             s.Element("s5-server-tier").SetText(json, x => x.Tier);
-             s.When(args, x => x.Count).Gt(100)
-                 .Then(then => then.Element("s5-client-tier").SetText("gold"))
-                 .ElseIf(args, x => x.Count).Gt(50)
-                 .Then(then => then.Element("s5-client-tier").SetText("silver"))
-                 .ElseIf(args, x => x.Count).Gt(10)
-                 .Then(then => then.Element("s5-client-tier").SetText("bronze"))
-                 .Else(else_ => else_.Element("s5-client-tier").SetText("none"));
+             s.Element("s5-server-tier").Text.Set(json.Get(x => x.Tier));
+             s.When(args.Get(x => x.Count)).Gt(100)
+                 .Then(then => then.Element("s5-client-tier").Text.Set("gold"))
+                 .ElseIf(args.Get(x => x.Count)).Gt(50)
+                 .Then(then => then.Element("s5-client-tier").Text.Set("silver"))
+                 .ElseIf(args.Get(x => x.Count)).Gt(10)
+                 .Then(then => then.Element("s5-client-tier").Text.Set("bronze"))
+                 .Else(else_ => else_.Element("s5-client-tier").Text.Set("none"));
          }));
-        p.When(args, x => x.Active).Truthy()
+        p.When(args.Get(x => x.Active)).Truthy()
             .Then(then => then.Element("s5-trial-badge").Hide())
             .Else(else_ => else_.Element("s5-trial-badge").Show());
     }));
@@ -106,26 +105,26 @@
         p.Post(saveUrl).Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, "Dave"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
-             s.Element("s6-saved").SetText(json, x => x.ReceivedName);
+             s.Element("s6-saved").Text.Set(json.Get(x => x.ReceivedName));
          }));
-        p.When(args, x => x.Active).Truthy()
+        p.When(args.Get(x => x.Active)).Truthy()
             .Then(then => then.Element("s6-active-badge").Show());
-        p.When(args, x => x.Category).Eq("premium")
+        p.When(args.Get(x => x.Category)).Eq("premium")
             .Then(then => then.Element("s6-premium-label").Show())
             .Else(else_ => else_.Element("s6-premium-label").Hide());
-        p.Element("s6-footer").SetText("complete");
+        p.Element("s6-footer").Text.Set("complete");
     }));
 
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S7ConditionInError, (args, p) =>
     {
         p.Post(failValidationUrl)
          .Response(r => r
-             .OnSuccess(s => s.Element("s7-status").SetText("should not happen"))
+             .OnSuccess(s => s.Element("s7-status").Text.Set("should not happen"))
              .OnError(400, e =>
              {
-                 e.When(args, x => x.Category).Eq("required")
-                     .Then(then => then.Element("s7-error-msg").SetText("missing required fields"))
-                     .Else(else_ => else_.Element("s7-error-msg").SetText("validation error"));
+                 e.When(args.Get(x => x.Category)).Eq("required")
+                     .Then(then => then.Element("s7-error-msg").Text.Set("missing required fields"))
+                     .Else(else_ => else_.Element("s7-error-msg").Text.Set("validation error"));
              }));
     }));
 
@@ -134,9 +133,9 @@
         p.Post(saveUrl).Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, "Eve"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
-             s.Element("s8-saved").SetText(json, x => x.ReceivedName);
-             s.When(args, x => x.Active).Truthy()
-                 .And(args, x => x.Count).Gt(5)
+             s.Element("s8-saved").Text.Set(json.Get(x => x.ReceivedName));
+             s.When(args.Get(x => x.Active)).Truthy()
+                 .And(args.Get(x => x.Count)).Gt(5)
                  .Then(then => then.Element("s8-qualified").Show())
                  .Else(else_ => else_.Element("s8-qualified").Hide());
          }));
@@ -144,199 +143,199 @@
 
     Html.On(plan, t => t.CustomEvent(HttpMixingEvents.S12Dispatched, p =>
     {
-        TypedPluginSource<string> mark = p.Plugin(order.Mark).Arg("s12").Arg("dispatch");
-        p.Element("s12-sequence").SetText(mark);
-        p.Element("s12-order").SetText("dispatch");
+        TypedSource<string> mark = order.Mark("s12", "dispatch");
+        p.Element("s12-sequence").Text.Set(mark);
+        p.Element("s12-order").Text.Set("dispatch");
     }));
 
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S12OrderedMixedModules, (args, p) =>
     {
-        TypedPluginSource<string> markStart = p.Plugin(order.Mark).Arg("s12").Arg("start");
-        p.Element("s12-sequence").SetText(markStart);
-        p.Element("s12-order").SetText("start");
-        p.When(args, x => x.Active).Truthy()
+        TypedSource<string> markStart = order.Mark("s12", "start");
+        p.Element("s12-sequence").Text.Set(markStart);
+        p.Element("s12-order").Text.Set("start");
+        p.When(args.Get(x => x.Active)).Truthy()
             .Then(then =>
             {
-                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s12").Arg("branch-before");
-                then.Element("s12-sequence").SetText(mark);
-                then.Element("s12-order").SetText("branch-before");
+                TypedSource<string> mark = order.Mark("s12", "branch-before");
+                then.Element("s12-sequence").Text.Set(mark);
+                then.Element("s12-order").Text.Set("branch-before");
             })
             .Else(else_ =>
             {
-                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s12").Arg("branch-before-else");
-                else_.Element("s12-sequence").SetText(mark);
-                else_.Element("s12-order").SetText("branch-before-else");
+                TypedSource<string> mark = order.Mark("s12", "branch-before-else");
+                else_.Element("s12-sequence").Text.Set(mark);
+                else_.Element("s12-order").Text.Set("branch-before-else");
             });
         p.Post(saveUrl).Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, "Ordered"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
-             s.Element("s12-http-done").SetText("done");
-             TypedPluginSource<string> mark = s.Plugin(order.Mark).Arg("s12").Arg("http-success");
-             s.Element("s12-sequence").SetText(mark);
-             s.Element("s12-order").SetText("http-success");
+             s.Element("s12-http-done").Text.Set("done");
+             TypedSource<string> mark = order.Mark("s12", "http-success");
+             s.Element("s12-sequence").Text.Set(mark);
+             s.Element("s12-order").Text.Set("http-success");
         }));
         p.Dispatch(HttpMixingEvents.S12Dispatched);
-        TypedPluginSource<string> slug = p.Plugin(slugify.Slug).Arg("After Http");
-        p.Element("s12-plugin").SetText(slug);
-        TypedPluginSource<string> markPlugin = p.Plugin(order.Mark).Arg("s12").Arg("plugin");
-        p.Element("s12-sequence").SetText(markPlugin);
-        p.Element("s12-order").SetText("tail");
-        TypedPluginSource<string> markTail = p.Plugin(order.Mark).Arg("s12").Arg("tail");
-        p.Element("s12-sequence").SetText(markTail);
-        p.When(args, x => x.Category).Eq("premium")
+        TypedSource<string> slug = slugify.Slug("After Http");
+        p.Element("s12-plugin").Text.Set(slug);
+        TypedSource<string> markPlugin = order.Mark("s12", "plugin");
+        p.Element("s12-sequence").Text.Set(markPlugin);
+        p.Element("s12-order").Text.Set("tail");
+        TypedSource<string> markTail = order.Mark("s12", "tail");
+        p.Element("s12-sequence").Text.Set(markTail);
+        p.When(args.Get(x => x.Category)).Eq("premium")
             .Then(then =>
             {
-                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s12").Arg("branch-after");
-                then.Element("s12-sequence").SetText(mark);
-                then.Element("s12-order").SetText("branch-after");
+                TypedSource<string> mark = order.Mark("s12", "branch-after");
+                then.Element("s12-sequence").Text.Set(mark);
+                then.Element("s12-order").Text.Set("branch-after");
             })
             .Else(else_ =>
             {
-                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s12").Arg("branch-after-else");
-                else_.Element("s12-sequence").SetText(mark);
-                else_.Element("s12-order").SetText("branch-after-else");
+                TypedSource<string> mark = order.Mark("s12", "branch-after-else");
+                else_.Element("s12-sequence").Text.Set(mark);
+                else_.Element("s12-order").Text.Set("branch-after-else");
             });
     }));
 
     Html.On(plan, t => t.CustomEvent(HttpMixingEvents.S13Dispatched, p =>
     {
-        TypedPluginSource<string> mark = p.Plugin(order.Mark).Arg("s13").Arg("dispatch");
-        p.Element("s13-sequence").SetText(mark);
-        p.Element("s13-order").SetText("dispatch");
+        TypedSource<string> mark = order.Mark("s13", "dispatch");
+        p.Element("s13-sequence").Text.Set(mark);
+        p.Element("s13-order").Text.Set("dispatch");
     }));
 
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S13OrderedParallelMix, (args, p) =>
     {
-        TypedPluginSource<string> markStart = p.Plugin(order.Mark).Arg("s13").Arg("start");
-        p.Element("s13-sequence").SetText(markStart);
-        p.Element("s13-order").SetText("start");
-        p.When(args, x => x.Active).Truthy()
+        TypedSource<string> markStart = order.Mark("s13", "start");
+        p.Element("s13-sequence").Text.Set(markStart);
+        p.Element("s13-order").Text.Set("start");
+        p.When(args.Get(x => x.Active)).Truthy()
             .Then(then =>
             {
-                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s13").Arg("branch-before");
-                then.Element("s13-sequence").SetText(mark);
-                then.Element("s13-order").SetText("branch-before");
+                TypedSource<string> mark = order.Mark("s13", "branch-before");
+                then.Element("s13-sequence").Text.Set(mark);
+                then.Element("s13-order").Text.Set("branch-before");
             })
             .Else(else_ =>
             {
-                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s13").Arg("branch-before-else");
-                else_.Element("s13-sequence").SetText(mark);
-                else_.Element("s13-order").SetText("branch-before-else");
+                TypedSource<string> mark = order.Mark("s13", "branch-before-else");
+                else_.Element("s13-sequence").Text.Set(mark);
+                else_.Element("s13-order").Text.Set("branch-before-else");
             });
         p.Parallel(
             a => a.Post(saveUrl)
                   .Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, "Parallel A"))
                   .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
                   {
-                      s.Element("s13-a").SetText(json, x => x.ReceivedName);
+                      s.Element("s13-a").Text.Set(json.Get(x => x.ReceivedName));
                   })),
             b => b.Post(auditUrl)
                   .Gather<HttpMixingController.AuditRequest>(g => g.Set(x => x.Action, "parallel-b"))
                   .Response(r => r.OnSuccess<HttpMixingAuditResponse>((json, s) =>
                   {
-                      s.Element("s13-b").SetText(json, x => x.Result);
+                      s.Element("s13-b").Text.Set(json.Get(x => x.Result));
                   })))
          .OnAllSettled(s =>
          {
-             s.Element("s13-all").SetText("settled");
-             TypedPluginSource<string> mark = s.Plugin(order.Mark).Arg("s13").Arg("settled");
-             s.Element("s13-sequence").SetText(mark);
-             s.Element("s13-order").SetText("settled");
+             s.Element("s13-all").Text.Set("settled");
+             TypedSource<string> mark = order.Mark("s13", "settled");
+             s.Element("s13-sequence").Text.Set(mark);
+             s.Element("s13-order").Text.Set("settled");
          });
         p.Dispatch(HttpMixingEvents.S13Dispatched);
-        TypedPluginSource<string> slug = p.Plugin(slugify.Slug).Arg("After Parallel");
-        p.Element("s13-plugin").SetText(slug);
-        TypedPluginSource<string> markPlugin = p.Plugin(order.Mark).Arg("s13").Arg("plugin");
-        p.Element("s13-sequence").SetText(markPlugin);
-        p.Element("s13-order").SetText("tail");
-        TypedPluginSource<string> markTail = p.Plugin(order.Mark).Arg("s13").Arg("tail");
-        p.Element("s13-sequence").SetText(markTail);
-        p.When(args, x => x.Count).Gt(0)
+        TypedSource<string> slug = slugify.Slug("After Parallel");
+        p.Element("s13-plugin").Text.Set(slug);
+        TypedSource<string> markPlugin = order.Mark("s13", "plugin");
+        p.Element("s13-sequence").Text.Set(markPlugin);
+        p.Element("s13-order").Text.Set("tail");
+        TypedSource<string> markTail = order.Mark("s13", "tail");
+        p.Element("s13-sequence").Text.Set(markTail);
+        p.When(args.Get(x => x.Count)).Gt(0)
             .Then(then =>
             {
-                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s13").Arg("branch-after");
-                then.Element("s13-sequence").SetText(mark);
-                then.Element("s13-order").SetText("branch-after");
+                TypedSource<string> mark = order.Mark("s13", "branch-after");
+                then.Element("s13-sequence").Text.Set(mark);
+                then.Element("s13-order").Text.Set("branch-after");
             })
             .Else(else_ =>
             {
-                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s13").Arg("branch-after-else");
-                else_.Element("s13-sequence").SetText(mark);
-                else_.Element("s13-order").SetText("branch-after-else");
+                TypedSource<string> mark = order.Mark("s13", "branch-after-else");
+                else_.Element("s13-sequence").Text.Set(mark);
+                else_.Element("s13-order").Text.Set("branch-after-else");
             });
     }));
 
     Html.On(plan, t => t.CustomEvent(HttpMixingEvents.S14Dispatched, p =>
     {
-        TypedPluginSource<string> mark = p.Plugin(order.Mark).Arg("s14").Arg("dispatch");
-        p.Element("s14-sequence").SetText(mark);
-        p.Element("s14-order").SetText("dispatch");
+        TypedSource<string> mark = order.Mark("s14", "dispatch");
+        p.Element("s14-sequence").Text.Set(mark);
+        p.Element("s14-order").Text.Set("dispatch");
     }));
 
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>(HttpMixingEvents.S14RouteTemplateFromPayload, (args, p) =>
     {
-        TypedPluginSource<string> categorySlug = p.Plugin(slugify.Slug).Arg(args, x => x.Category);
-        TypedPluginSource<string> markStart = p.Plugin(order.Mark).Arg("s14").Arg("start");
-        p.Element("s14-sequence").SetText(markStart);
-        p.Element("s14-order").SetText("start");
-        p.When(args, x => x.Active).Truthy()
+        TypedSource<string> categorySlug = slugify.Slug(args.Get(x => x.Category));
+        TypedSource<string> markStart = order.Mark("s14", "start");
+        p.Element("s14-sequence").Text.Set(markStart);
+        p.Element("s14-order").Text.Set("start");
+        p.When(args.Get(x => x.Active)).Truthy()
             .Then(then =>
             {
-                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s14").Arg("branch-before");
-                then.Element("s14-sequence").SetText(mark);
-                then.Element("s14-order").SetText("branch-before");
+                TypedSource<string> mark = order.Mark("s14", "branch-before");
+                then.Element("s14-sequence").Text.Set(mark);
+                then.Element("s14-order").Text.Set("branch-before");
             })
             .Else(else_ =>
             {
-                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s14").Arg("branch-before-else");
-                else_.Element("s14-sequence").SetText(mark);
-                else_.Element("s14-order").SetText("branch-before-else");
+                TypedSource<string> mark = order.Mark("s14", "branch-before-else");
+                else_.Element("s14-sequence").Text.Set(mark);
+                else_.Element("s14-order").Text.Set("branch-before-else");
             });
         p.Post(routeAuditUrl)
          .Gather<HttpMixingController.ResidentAuditRequest>(g => g
-            .Set(x => x.ResidentId, p.Payload(args).Get(a => a.Count))
-            .Header("X-Category", p.Payload(args).Get(a => a.Category))
-            .Set(x => x.Action, p.Payload(args).Get(a => a.Category)))
+            .Set(x => x.ResidentId, args.Get(a => a.Count))
+            .Header("X-Category", args.Get(a => a.Category))
+            .Set(x => x.Action, args.Get(a => a.Category)))
          .Response(r => r.OnSuccess<HttpMixingResidentAuditResponse>((json, s) =>
          {
-             s.Element("s14-route-id").SetText(json, x => x.ResidentId);
-             s.Element("s14-body-action").SetText(json, x => x.Action);
-             s.Element("s14-header-category").SetText(json, x => x.HeaderCategory);
-             TypedPluginSource<string> mark = s.Plugin(order.Mark).Arg("s14").Arg("http-success");
-             s.Element("s14-sequence").SetText(mark);
-             s.Element("s14-order").SetText("http-success");
+             s.Element("s14-route-id").Text.Set(json.Get(x => x.ResidentId));
+             s.Element("s14-body-action").Text.Set(json.Get(x => x.Action));
+             s.Element("s14-header-category").Text.Set(json.Get(x => x.HeaderCategory));
+             TypedSource<string> mark = order.Mark("s14", "http-success");
+             s.Element("s14-sequence").Text.Set(mark);
+             s.Element("s14-order").Text.Set("http-success");
          })
          .Chained(c => c
              .Post(routeAuditTrailUrl)
              .Gather<ResidentAuditTrail>(g => g
-                 .Set(x => x.ResidentId, p.Payload(args).Get(a => a.Count))
+                 .Set(x => x.ResidentId, args.Get(a => a.Count))
                  .Set(x => x.CategorySlug, categorySlug))
              .Response(r => r.OnSuccess<HttpMixingAuditTrailResponse>((json, s) =>
              {
-                 s.Element("s14-trail-id").SetText(json, x => x.ResidentId);
-                 s.Element("s14-trail-slug").SetText(json, x => x.CategorySlug);
-                 s.Element("s14-trail-step").SetText(json, x => x.Step);
-                 TypedPluginSource<string> mark = s.Plugin(order.Mark).Arg("s14").Arg("trail-success");
-                 s.Element("s14-sequence").SetText(mark);
-                 s.Element("s14-order").SetText("trail-success");
+                 s.Element("s14-trail-id").Text.Set(json.Get(x => x.ResidentId));
+                 s.Element("s14-trail-slug").Text.Set(json.Get(x => x.CategorySlug));
+                 s.Element("s14-trail-step").Text.Set(json.Get(x => x.Step));
+                 TypedSource<string> mark = order.Mark("s14", "trail-success");
+                 s.Element("s14-sequence").Text.Set(mark);
+                 s.Element("s14-order").Text.Set("trail-success");
              }))));
         p.Dispatch(HttpMixingEvents.S14Dispatched);
-        p.Element("s14-plugin").SetText(categorySlug);
-        TypedPluginSource<string> markPlugin = p.Plugin(order.Mark).Arg("s14").Arg("plugin");
-        p.Element("s14-sequence").SetText(markPlugin);
-        p.Element("s14-order").SetText("tail");
-        p.When(args, x => x.Count).Gt(300)
+        p.Element("s14-plugin").Text.Set(categorySlug);
+        TypedSource<string> markPlugin = order.Mark("s14", "plugin");
+        p.Element("s14-sequence").Text.Set(markPlugin);
+        p.Element("s14-order").Text.Set("tail");
+        p.When(args.Get(x => x.Count)).Gt(300)
             .Then(then =>
             {
-                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s14").Arg("branch-after");
-                then.Element("s14-sequence").SetText(mark);
-                then.Element("s14-order").SetText("branch-after");
+                TypedSource<string> mark = order.Mark("s14", "branch-after");
+                then.Element("s14-sequence").Text.Set(mark);
+                then.Element("s14-order").Text.Set("branch-after");
             })
             .Else(else_ =>
             {
-                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s14").Arg("branch-after-else");
-                else_.Element("s14-sequence").SetText(mark);
-                else_.Element("s14-order").SetText("branch-after-else");
+                TypedSource<string> mark = order.Mark("s14", "branch-after-else");
+                else_.Element("s14-sequence").Text.Set(mark);
+                else_.Element("s14-order").Text.Set("branch-after-else");
             });
     }));
 
@@ -635,17 +634,17 @@
                         .Placeholder("Type VIP Alice or Bob"))
                     .Reactive(evt => evt.Change, (args, p) =>
                     {
-                        p.Element("s9-pre").SetText("saving");
+                        p.Element("s9-pre").Text.Set("saving");
                         p.Post(saveUrl)
-                         .Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, p.Payload(args).Get(a => a.Value)))
+                         .Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, args.Value))
                          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
                          {
-                             s.Element("s9-http-result").SetText(json, x => x.ReceivedName);
+                             s.Element("s9-http-result").Text.Set(json.Get(x => x.ReceivedName));
                          }));
-                        p.When(args, x => x.Value!).Contains("VIP")
+                        p.When(args.Value).Contains("VIP")
                             .Then(then => then.Element("s9-badge").Show())
                             .Else(else_ => else_.Element("s9-badge").Hide());
-                        p.Element("s9-tail").SetText("complete");
+                        p.Element("s9-tail").Text.Set("complete");
                     });
             }
         </native-grid>
@@ -672,16 +671,16 @@
                         .Placeholder("Type a long or short label"))
                     .Reactive(evt => evt.Change, (args, p) =>
                     {
-                        p.Element("s10-pre").SetText("loading");
+                        p.Element("s10-pre").Text.Set("loading");
                         p.Post(saveUrl)
-                         .Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, p.Payload(args).Get(a => a.Value)))
+                         .Gather<HttpMixingController.SaveRequest>(g => g.Set(x => x.Name, args.Value))
                          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
                          {
-                             s.Element("s10-http-result").SetText(json, x => x.ReceivedName);
-                             s.When(args, x => x.Value!).MinLength(5)
-                                 .Then(then => then.Element("s10-classification").SetText("long name"))
-                                 .Else(else_ => else_.Element("s10-classification").SetText("short name"));
-                             s.Element("s10-tail").SetText("success complete");
+                             s.Element("s10-http-result").Text.Set(json.Get(x => x.ReceivedName));
+                             s.When(args.Value).MinLength(5)
+                                 .Then(then => then.Element("s10-classification").Text.Set("long name"))
+                                 .Else(else_ => else_.Element("s10-classification").Text.Set("short name"));
+                             s.Element("s10-tail").Text.Set("success complete");
                          }));
                     });
             }
@@ -709,17 +708,17 @@
                         .Placeholder("Type required or format"))
                     .Reactive(evt => evt.Change, (args, p) =>
                     {
-                        p.Element("s11-pre").SetText("validating");
+                        p.Element("s11-pre").Text.Set("validating");
                         p.Post(failValidationUrl)
                          .Response(r => r
-                             .OnSuccess(s => s.Element("s11-status").SetText("should not happen"))
+                             .OnSuccess(s => s.Element("s11-status").Text.Set("should not happen"))
                              .OnError(400, e =>
                              {
-                                 e.Element("s11-status").SetText("failed");
-                                 e.When(args, x => x.Value!).Eq("required")
-                                     .Then(then => then.Element("s11-error-msg").SetText("missing required fields"))
-                                     .Else(else_ => else_.Element("s11-error-msg").SetText("validation error"));
-                                 e.Element("s11-tail").SetText("error complete");
+                                 e.Element("s11-status").Text.Set("failed");
+                                 e.When(args.Value).Eq("required")
+                                     .Then(then => then.Element("s11-error-msg").Text.Set("missing required fields"))
+                                     .Else(else_ => else_.Element("s11-error-msg").Text.Set("validation error"));
+                                 e.Element("s11-tail").Text.Set("error complete");
                              }));
                     });
             }
@@ -742,10 +741,9 @@
         public HttpMixingSlugifyPlugin()
             : base("slugify")
         {
-            Slug = Function<string>().Arg<string>();
         }
 
-        public PluginFunction<string> Slug { get; }
+        public TypedSource<string> Slug(Arg<string> text) => Invoke<string>(text, name: "");
     }
 
     private sealed class HttpMixingOrderPlugin : Plugin
@@ -753,9 +751,8 @@
         public HttpMixingOrderPlugin()
             : base("order")
         {
-            Mark = Function<string>().Arg<string>().Arg<string>();
         }
 
-        public PluginFunction<string> Mark { get; }
+        public TypedSource<string> Mark(Arg<string> scenario, Arg<string> step) => Invoke<string>(scenario, step, name: "");
     }
 }

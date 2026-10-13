@@ -26,39 +26,6 @@ namespace Alis.Reactive.Builders.Conditions
             _cases = cases;
         }
 
-        /// <summary>Adds the next ordered <c>ElseIf</c> branch from the triggering event payload.</summary>
-        /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
-        /// <typeparam name="TProp">Selected event-payload value type.</typeparam>
-        /// <param name="payload">Trigger payload placeholder.</param>
-        /// <param name="path">Payload value compared at runtime.</param>
-        public ConditionSourceBuilder<TModel, TProp, GuardBuilder<TModel>> ElseIf<TPayload, TProp>(
-            TPayload payload,
-            Expression<Func<TPayload, TProp>> path)
-        {
-            EnsureElseIfCanBeAdded();
-
-            var source = PayloadTypedSource<TPayload, TProp>.FromEvent(path);
-            return new ConditionSourceBuilder<TModel, TProp, GuardBuilder<TModel>>(
-                source, graph => new GuardBuilder<TModel>(graph, ConditionContinuation<TModel>.ForBranch(this)));
-        }
-
-        /// <summary>Adds the next ordered <c>ElseIf</c> branch from the active HTTP response body.</summary>
-        /// <typeparam name="TResponse">Response body contract for the active response route.</typeparam>
-        /// <typeparam name="TProp">Selected response-body value type.</typeparam>
-        /// <param name="responseBody">Response body placeholder supplied by the response route callback.</param>
-        /// <param name="path">Selects the response value to compare at runtime.</param>
-        public ConditionSourceBuilder<TModel, TProp, GuardBuilder<TModel>> ElseIf<TResponse, TProp>(
-            ResponseBody<TResponse> responseBody,
-            Expression<Func<TResponse, TProp>> path)
-            where TResponse : class
-        {
-            EnsureElseIfCanBeAdded();
-
-            var source = responseBody.Read(path);
-            return new ConditionSourceBuilder<TModel, TProp, GuardBuilder<TModel>>(
-                source, graph => new GuardBuilder<TModel>(graph, ConditionContinuation<TModel>.ForBranch(this)));
-        }
-
         /// <summary>Adds the next ordered <c>ElseIf</c> branch from a typed value source.</summary>
         /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="source">Typed condition value source.</param>

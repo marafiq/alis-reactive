@@ -14,9 +14,9 @@
         .Response(r => r
             .OnSuccess<CascadingSaveResponse>((json, s) =>
             {
-                s.Element("save-result").SetText(json, j => j.Message);
-                s.Element("save-result").AddClass("text-green-600");
-                s.Element("save-result").RemoveClass("text-text-muted");
+                s.Element("save-result").Text.Set(json.Get(j => j.Message));
+                s.Element("save-result").ClassList.Add("text-green-600");
+                s.Element("save-result").ClassList.Remove("text-text-muted");
             }));
     }));
 }
@@ -47,14 +47,14 @@
                 .Response(r => r
                    .OnSuccess<CityLookupResponse>((json, s) =>
                    {
-                       s.Component<FusionDropDownList>(m => m.City)
-                           .Set(c => c.DataSource, json.Read(j => j.Cities))
-                           .Call(c => c.DataBind);
-                       s.Element("cascade-status").SetText("cities loaded");
-                       s.Element("cascade-status").AddClass("text-green-600");
-                       s.Element("cascade-status").RemoveClass("text-text-muted");
-                       s.Element("city-count").SetText(json, j => j.Count);
-                       s.Element("city-count").RemoveClass("text-text-muted");
+                       var city = s.Component<FusionDropDownList>(m => m.City);
+                       city.DataSource.Set(json.Get(j => j.Cities));
+                       city.DataBind();
+                       s.Element("cascade-status").Text.Set("cities loaded");
+                       s.Element("cascade-status").ClassList.Add("text-green-600");
+                       s.Element("cascade-status").ClassList.Remove("text-text-muted");
+                       s.Element("city-count").Text.Set(json.Get(j => j.Count));
+                       s.Element("city-count").ClassList.Remove("text-text-muted");
                    }));
            }); }
     </section>
@@ -70,8 +70,8 @@
                 .Placeholder("Select a city (choose country first)"))
            .Reactive(evt => evt.Change, (args, p) =>
            {
-               p.Element("selected-city").SetText(args, x => x.Value);
-               p.Element("selected-city").RemoveClass("text-text-muted");
+               p.Element("selected-city").Text.Set(args.Value);
+               p.Element("selected-city").ClassList.Remove("text-text-muted");
            }); }
         <native-vstack gap="Xs" class="font-mono text-sm mt-2">
             <p>Cascade status: <span id="cascade-status" class="text-text-muted">&mdash;</span></p>

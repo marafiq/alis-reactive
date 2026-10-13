@@ -29,8 +29,8 @@
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                s.Element("ac-load-status").SetText("loaded actionComplete rows");
+                s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                s.Element("ac-load-status").Text.Set("loaded actionComplete rows");
             }));
     }));
 }
@@ -58,22 +58,22 @@
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).Call(c => c.SelectRow, 0);
-                    p.Element("ac-command-status").SetText("row selected");
+                    p.Component<FusionGrid>(GridId).SelectRow(0);
+                    p.Element("ac-command-status").Text.Set("row selected");
                 }))
             @(Html.NativeButton("ac-start-edit", "Start Edit")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).Call(c => c.StartEdit);
-                    p.Element("ac-command-status").SetText("startEdit called");
+                    p.Component<FusionGrid>(GridId).StartEdit();
+                    p.Element("ac-command-status").Text.Set("startEdit called");
                 }))
             @(Html.NativeButton("ac-end-edit", "End Edit")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).Call(c => c.EndEdit);
-                    p.Element("ac-command-status").SetText("endEdit called");
+                    p.Component<FusionGrid>(GridId).EndEdit();
+                    p.Element("ac-command-status").Text.Set("endEdit called");
                 }))
         </native-hstack>
 
@@ -89,18 +89,18 @@
             .Columns(Columns()))
             .Reactive(evt => evt.ActionComplete<ResidentDirectoryGridItem>(), (args, p) =>
             {
-                p.Element("ac-request-type").SetText(args, x => x.RequestType);
-                p.Element("ac-action").SetText(args, x => x.Action);
-                p.Element("ac-type").SetText(args, x => x.Type);
-                p.Element("ac-name").SetText(args, x => x.Name);
-                p.Element("ac-cancel").SetText(args, x => x.Cancel);
-                p.Element("ac-row-index").SetText(args, x => x.RowIndex);
-                p.Element("ac-selected-row").SetText(args, x => x.SelectedRow);
-                p.When(args, x => x.RequestType).Eq("save")
+                p.Element("ac-request-type").Text.Set(args.RequestType);
+                p.Element("ac-action").Text.Set(args.Action);
+                p.Element("ac-type").Text.Set(args.Type);
+                p.Element("ac-name").Text.Set(args.Name);
+                p.Element("ac-cancel").Text.Set(args.Cancel);
+                p.Element("ac-row-index").Text.Set(args.RowIndex);
+                p.Element("ac-selected-row").Text.Set(args.SelectedRow);
+                p.When(args.RequestType).Eq("save")
                     .Then(t =>
                     {
-                        t.Element("ac-current-resident").SetText(args, x => x.Data.ResidentName);
-                        t.Element("ac-previous-resident").SetText(args, x => x.PreviousData.ResidentName);
+                        t.Element("ac-current-resident").Text.Set(args.Data.Get(x => x.ResidentName));
+                        t.Element("ac-previous-resident").Text.Set(args.PreviousData.Get(x => x.ResidentName));
                     });
             }))
 

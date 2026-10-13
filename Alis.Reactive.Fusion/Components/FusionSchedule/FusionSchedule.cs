@@ -9,6 +9,7 @@ using Syncfusion.EJ2.Schedule;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Schedule, declared by the names its JavaScript API uses.
     /// </summary>
@@ -21,47 +22,43 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionSchedule : FusionComponent
     {
         /// <summary>The shown view, for example <c>"Week"</c>.</summary>
-        public ComponentProperty<string> CurrentView => Property<string>("currentView");
+        public Prop<string> CurrentView => Prop<string>();
 
         /// <summary>The date the view shows.</summary>
-        public ComponentProperty<DateTime> SelectedDate => Property<DateTime>("selectedDate");
+        public Prop<DateTime> SelectedDate => Prop<DateTime>();
 
         /// <summary>The events; call <see cref="DataBind"/> after writing them.</summary>
-        public ComponentProperty<object> EventDataSource => Property<object>("eventSettings.dataSource");
+        public Prop<object> EventDataSource => Prop<object>("eventSettings.dataSource");
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>The events, typed by your event class.</summary>
-        public ComponentFunction<TEvent[]> GetEvents<TEvent>() where TEvent : class =>
-            Function<TEvent[]>("getEvents");
+        public TypedSource<TEvent[]> GetEvents<TEvent>() where TEvent : class => Invoke<TEvent[]>();
 
         /// <summary>Adds an event.</summary>
-        public ComponentMethod<object> AddEvent => Method<object>("addEvent");
+        public void AddEvent(Arg<object> value) => Call(value);
 
         /// <summary>Saves an edited event.</summary>
-        public ComponentMethod<TEvent, ScheduleAction> SaveEvent<TEvent>() where TEvent : class =>
-            Method<TEvent, ScheduleAction>("saveEvent");
+        public void SaveEvent<TEvent>(Arg<TEvent> first, Arg<ScheduleAction> second) where TEvent : class => Call(first, second);
 
         /// <summary>Deletes an event, given the event or its key.</summary>
-        public ComponentMethod<TKey, ScheduleAction> DeleteEvent<TKey>() =>
-            Method<TKey, ScheduleAction>("deleteEvent");
+        public void DeleteEvent<TKey>(Arg<TKey> first, Arg<ScheduleAction> second) => Call(first, second);
 
         /// <summary>Opens the event editor for an event.</summary>
-        public ComponentMethod<TEvent, ScheduleAction> OpenEditor<TEvent>() where TEvent : class =>
-            Method<TEvent, ScheduleAction>("openEditor");
+        public void OpenEditor<TEvent>(Arg<TEvent> first, Arg<ScheduleAction> second) where TEvent : class => Call(first, second);
 
         /// <summary>Closes the event editor.</summary>
-        public ComponentMethod CloseEditor => Method("closeEditor");
+        public void CloseEditor() => Call();
 
         /// <summary>Re-renders the events.</summary>
-        public ComponentMethod RefreshEvents => Method("refreshEvents");
+        public void RefreshEvents() => Call();
 
         /// <summary>Prints the schedule.</summary>
-        public ComponentMethod Print => Method("print");
+        public void Print() => Call();
 
         /// <summary>Scrolls to an hour, for example <c>"09:00"</c>.</summary>
-        public ComponentMethod<string> ScrollTo => Method<string>("scrollTo");
+        public void ScrollTo(Arg<string> value) => Call(value);
 
         /// <summary>Raised when the user clicks a cell.</summary>
         public TypedEvent<FusionScheduleCellClickArgs> CellClick =>
@@ -101,81 +98,81 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.CellClick"/>.</summary>
-    public class FusionScheduleCellClickArgs
+    public class FusionScheduleCellClickArgs : JsObject
     {
         /// <summary>Start of the clicked cell.</summary>
-        public DateTime StartTime { get; set; }
+        public ReadOnly<DateTime> StartTime => ReadOnly<DateTime>();
 
         /// <summary>End of the clicked cell.</summary>
-        public DateTime EndTime { get; set; }
+        public ReadOnly<DateTime> EndTime => ReadOnly<DateTime>();
 
         /// <summary>Resource group of the clicked cell.</summary>
-        public int GroupIndex { get; set; }
+        public ReadOnly<int> GroupIndex => ReadOnly<int>();
 
         /// <summary>Whether the cell is in the all-day row.</summary>
-        public bool IsAllDay { get; set; }
+        public ReadOnly<bool> IsAllDay => ReadOnly<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.EventClick"/>.</summary>
-    public class FusionScheduleEventClickArgs
+    public class FusionScheduleEventClickArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.ActionBegin"/>.</summary>
-    public class FusionScheduleActionBeginArgs
+    public class FusionScheduleActionBeginArgs : JsObject
     {
         /// <summary>The kind of action.</summary>
-        public string RequestType { get; set; } = "";
+        public ReadOnly<string> RequestType => ReadOnly<string>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.ActionComplete"/>.</summary>
-    public class FusionScheduleActionCompleteArgs
+    public class FusionScheduleActionCompleteArgs : JsObject
     {
         /// <summary>The kind of action.</summary>
-        public string RequestType { get; set; } = "";
+        public ReadOnly<string> RequestType => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.Navigating"/>.</summary>
-    public class FusionScheduleNavigatingArgs
+    public class FusionScheduleNavigatingArgs : JsObject
     {
         /// <summary><c>"date"</c> or <c>"view"</c>.</summary>
-        public string Action { get; set; } = "";
+        public ReadOnly<string> Action => ReadOnly<string>();
 
         /// <summary>The date the schedule moves to.</summary>
-        public string CurrentDate { get; set; } = "";
+        public ReadOnly<string> CurrentDate => ReadOnly<string>();
 
         /// <summary>The date it shows now.</summary>
-        public string PreviousDate { get; set; } = "";
+        public ReadOnly<string> PreviousDate => ReadOnly<string>();
 
         /// <summary>The view it moves to.</summary>
-        public string CurrentView { get; set; } = "";
+        public ReadOnly<string> CurrentView => ReadOnly<string>();
 
         /// <summary>The view it shows now.</summary>
-        public string PreviousView { get; set; } = "";
+        public ReadOnly<string> PreviousView => ReadOnly<string>();
 
         /// <summary>Index of the view it moves to.</summary>
-        public int ViewIndex { get; set; }
+        public ReadOnly<int> ViewIndex => ReadOnly<int>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.PopupOpen"/>.</summary>
-    public class FusionSchedulePopupOpenArgs
+    public class FusionSchedulePopupOpenArgs : JsObject
     {
         /// <summary>The popup: <c>"QuickInfo"</c>, <c>"Editor"</c>, ...</summary>
-        public string Type { get; set; } = "";
+        public ReadOnly<string> Type => ReadOnly<string>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
 
         /// <summary>The event or cell the popup is for.</summary>
-        public FusionSchedulePopupData Data { get; set; } = new FusionSchedulePopupData();
+        public ReadOnly<FusionSchedulePopupData> Data => ReadOnly<FusionSchedulePopupData>();
     }
 
     /// <summary>The event a popup is for, as <see cref="FusionSchedulePopupOpenArgs"/> reports it.</summary>
@@ -189,30 +186,31 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.PopupClose"/>.</summary>
-    public class FusionSchedulePopupCloseArgs
+    public class FusionSchedulePopupCloseArgs : JsObject
     {
         /// <summary>The popup that closes.</summary>
-        public string Type { get; set; } = "";
+        public ReadOnly<string> Type => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.DataBound"/>; carries no data.</summary>
-    public class FusionScheduleDataBoundArgs
+    public class FusionScheduleDataBoundArgs : JsObject
     {
     }
 
     /// <summary>Payload of <c>EventRendered</c>.</summary>
-    public class FusionScheduleEventRenderedArgs<TEvent>
+    public class FusionScheduleEventRenderedArgs<TEvent> : JsObject
         where TEvent : class, new()
     {
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
 
         /// <summary>The rendered event.</summary>
-        public TEvent Data { get; set; } = new TEvent();
+        public ReadOnly<TEvent> Data => ReadOnly<TEvent>();
 
         /// <summary>Where the event renders.</summary>
-        public string Type { get; set; } = "";
+        public ReadOnly<string> Type => ReadOnly<string>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Editor action for schedule event operations. Mirrors the Syncfusion EJ2 Schedule

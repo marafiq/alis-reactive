@@ -14,8 +14,8 @@
         p.Get(Url.SandboxRoute("OperationRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                s.Element("review-status").SetText("loaded");
+                s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                s.Element("review-status").Text.Set("loaded");
             }))));
 }
 
@@ -32,9 +32,9 @@
             {
                 var grid = p.Component<FusionGrid>(GridId);
                 p.Post(Url.SandboxRoute("CurrentViewSummary", "Grid"))
-                    .Gather<ResidentCurrentViewRequest>(g => g.Set(x => x.Records, grid.Get(c => c.GetCurrentViewRecords<ResidentDirectoryGridItem>())))
+                    .Gather<ResidentCurrentViewRequest>(g => g.Set(x => x.Records, grid.GetCurrentViewRecords<ResidentDirectoryGridItem>()))
                     .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
-                        s.Element("view-summary").SetText(json, x => x.Summary)));
+                        s.Element("view-summary").Text.Set(json.Get(x => x.Summary))));
             }))
         @(Html.NativeButton("review-row-index", "Find Resident 6005")
             .CssClass(Button)
@@ -42,31 +42,31 @@
             {
                 var grid = p.Component<FusionGrid>(GridId);
                 p.Post(Url.SandboxRoute("RowIndexSummary", "Grid"))
-                    .Gather<ResidentRowIndexRequest>(g => g.Set(x => x.RowIndex, grid.Get(c => c.GetRowIndexByPrimaryKey, 6005)))
+                    .Gather<ResidentRowIndexRequest>(g => g.Set(x => x.RowIndex, grid.GetRowIndexByPrimaryKey(6005)))
                     .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
-                        s.Element("index-summary").SetText(json, x => x.Summary)));
+                        s.Element("index-summary").Text.Set(json.Get(x => x.Summary))));
             }))
         @(Html.NativeButton("review-selected", "Review Selected")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var grid = p.Component<FusionGrid>(GridId);
-                grid.Call(c => c.SelectRowsByRange, 0, 1);
+                grid.SelectRowsByRange(0, 1);
                 p.Post(Url.SandboxRoute("SelectionRecords", "Grid"))
-                    .Gather<ResidentSelectionRecordsRequest>(g => g.Set(x => x.SelectedRecords, grid.Get(c => c.GetSelectedRecords<ResidentDirectoryGridItem>())))
+                    .Gather<ResidentSelectionRecordsRequest>(g => g.Set(x => x.SelectedRecords, grid.GetSelectedRecords<ResidentDirectoryGridItem>()))
                     .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
-                        s.Element("selected-summary").SetText(json, x => x.Summary)));
+                        s.Element("selected-summary").Text.Set(json.Get(x => x.Summary))));
             }))
         @(Html.NativeButton("review-indexes", "Selected Indexes")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var grid = p.Component<FusionGrid>(GridId);
-                grid.Call(c => c.SelectRowsByRange, 0, 1);
+                grid.SelectRowsByRange(0, 1);
                 p.Post(Url.SandboxRoute("SelectionIndexes", "Grid"))
-                    .Gather<ResidentSelectionIndexesRequest>(g => g.Set(x => x.SelectedRowIndexes, grid.Get(c => c.GetSelectedRowIndexes)))
+                    .Gather<ResidentSelectionIndexesRequest>(g => g.Set(x => x.SelectedRowIndexes, grid.GetSelectedRowIndexes()))
                     .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
-                        s.Element("indexes-summary").SetText(json, x => x.Summary)));
+                        s.Element("indexes-summary").Text.Set(json.Get(x => x.Summary))));
             }))
     </native-hstack>
 

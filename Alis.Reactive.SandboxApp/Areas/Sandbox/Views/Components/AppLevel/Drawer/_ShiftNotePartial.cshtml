@@ -17,7 +17,7 @@
                 p.Post(Url.SandboxRoute("SaveShiftNote", "Drawer")).Gather(g => g.Form())
                  .Response(r => r.OnSuccess<ShiftNoteSaved>((json, s) =>
                  {
-                     s.Element("shift-note-status").SetText(json, x => x.Confirmation);
+                     s.Element("shift-note-status").Text.Set(json.Get(x => x.Confirmation));
                  }));
             }))
         @(Html.NativeButton("discharge-resident-btn", "Discharge Resident")
@@ -30,7 +30,7 @@
                      then.Post(Url.SandboxRoute("DischargeResident", "Drawer")).Gather(g => g.Form())
                          .Response(r => r.OnSuccess<ResidentDischarged>((json, s) =>
                          {
-                             s.Element("shift-note-status").SetText(json, x => x.Confirmation);
+                             s.Element("shift-note-status").Text.Set(json.Get(x => x.Confirmation));
                          }));
                  });
             }))

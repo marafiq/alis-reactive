@@ -120,7 +120,7 @@
                     p.Post(Url.SandboxRoute("Submit", "ValidationContract")).Gather(g => g.Form())
                      .Validate<ResidentValidator>("resident-form")
                      .Response(r => r
-                        .OnSuccess(s => s.Element("result").SetText("Admission saved"))
+                        .OnSuccess(s => s.Element("result").Text.Set("Admission saved"))
                         .OnError(400, e =>
                         {
                             e.ValidationErrors("resident-form");

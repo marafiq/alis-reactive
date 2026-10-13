@@ -7,10 +7,10 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Element("resident-id-echo").SetText(
-            p.Component<NativeHiddenField>(m => m.ResidentId).Get(c => c.Value));
-        p.Element("form-token-echo").SetText(
-            p.Component<NativeHiddenField>(m => m.FormToken).Get(c => c.Value));
+        p.Element("resident-id-echo").Text.Set(
+            p.Component<NativeHiddenField>(m => m.ResidentId).Value);
+        p.Element("form-token-echo").Text.Set(
+            p.Component<NativeHiddenField>(m => m.FormToken).Value);
     }));
 }
 
@@ -65,11 +65,11 @@
                  .Response(r => r
                     .OnSuccess<NativeHiddenFieldEchoResponse>((json, s) =>
                     {
-                        s.Element("echo-resident-id").SetText(json, x => x.ResidentId);
-                        s.Element("echo-form-token").SetText(json, x => x.FormToken);
-                        s.Element("echo-resident-name").SetText(json, x => x.ResidentName);
-                        s.Element("echo-field-count").SetText(json, x => x.FieldCount);
-                        s.Element("echo-result").AddClass("text-green-600");
+                        s.Element("echo-resident-id").Text.Set(json.Get(x => x.ResidentId));
+                        s.Element("echo-form-token").Text.Set(json.Get(x => x.FormToken));
+                        s.Element("echo-resident-name").Text.Set(json.Get(x => x.ResidentName));
+                        s.Element("echo-field-count").Text.Set(json.Get(x => x.FieldCount));
+                        s.Element("echo-result").ClassList.Add("text-green-600");
                     })
                  );
             }))

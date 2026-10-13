@@ -6,6 +6,7 @@ using Syncfusion.EJ2.DropDowns;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion MultiSelect, declared by the names its JavaScript API uses.
     /// </summary>
@@ -17,19 +18,19 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionMultiSelect : FusionComponent, IInputComponent
     {
         /// <summary>The selected values.</summary>
-        public ComponentProperty<string[]> Value => Property<string[]>("value");
+        public Prop<string[]> Value => Prop<string[]>();
 
         /// <summary>The items the list offers. Call <see cref="DataBind"/> after writing it outside a filtering event.</summary>
-        public ComponentProperty<IEnumerable<object>?> DataSource => Property<IEnumerable<object>?>("dataSource");
+        public Prop<IEnumerable<object>> DataSource => Prop<IEnumerable<object>>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Opens the selection popup.</summary>
-        public ComponentMethod ShowPopup => Method("showPopup");
+        public void ShowPopup() => Call();
 
         /// <summary>Closes the selection popup.</summary>
-        public ComponentMethod HidePopup => Method("hidePopup");
+        public void HidePopup() => Call();
 
         /// <summary>Raised when the selection changes.</summary>
         public TypedEvent<FusionMultiSelectChangeArgs> Change =>
@@ -45,13 +46,13 @@ namespace Alis.Reactive.Fusion.Components
 
     /// <summary>Payload of <see cref="FusionMultiSelect.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Value).NotNull()</c>.</remarks>
-    public class FusionMultiSelectChangeArgs
+    public class FusionMultiSelectChangeArgs : JsObject
     {
         /// <summary>Selected values after the change.</summary>
-        public string[]? Value { get; set; }
+        public ReadOnly<string[]> Value => ReadOnly<string[]>();
 
         /// <summary>Whether user interaction triggered the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionMultiSelect.Filtering"/>.</summary>
@@ -59,14 +60,18 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionMultiSelectFilteringArgs : JsObject
     {
         /// <summary>Text the user typed.</summary>
-        public string Text { get; set; } = "";
+        public ReadOnly<string> Text => ReadOnly<string>();
 
         /// <summary>Set to <see langword="true"/> to suppress the built-in client-side filter while a server request is in flight.</summary>
-        public bool PreventDefaultAction { get; set; }
+        public Prop<bool> PreventDefaultAction => Prop<bool>();
 
         /// <summary>Hands filtered items to the popup; valid after an HTTP response returns.</summary>
-        public ComponentMethod<IEnumerable<object>> UpdateData => Method<IEnumerable<object>>("updateData");
+        /// <typeparam name="TItems">The items' type, such as the server's own list.</typeparam>
+        /// <param name="items">The items to show, read when the step runs.</param>
+        public void UpdateData<TItems>(TypedSource<TItems> items) where TItems : IEnumerable<object> =>
+            Call(Pass<IEnumerable<object>, TItems>(items));
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionMultiSelect"/> for a model-bound field.</summary>
     public static class FusionMultiSelectHtmlExtensions

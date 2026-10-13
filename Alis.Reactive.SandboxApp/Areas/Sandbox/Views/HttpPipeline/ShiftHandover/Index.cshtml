@@ -30,12 +30,12 @@
                     @(Html.NativeActionLink($"mark-read-{note.Key}", "Mark Read", markReadUrl, link => link
                         .Post()
                         .Gather(g => g.Header("X-Shift", "Night"))
-                        .WhileLoading(l => l.Component<NativeLoader>().Call(c => c.Show))
+                        .WhileLoading(l => l.Component<NativeLoader>().Show())
                         .Response(r => r
-                            .OnSuccess<HandoverNoteRead>((json, s) => s.Element("handover-status").SetText(json, x => x.Message))
-                            .OnError<HandoverNoteRead>(400, (json, e) => e.Element("handover-status").SetText(json, x => x.Message))
-                            .OnError<HandoverNoteRead>(409, (json, e) => e.Element("handover-status").SetText(json, x => x.Message)))
-                        .Finally(f => f.Component<NativeLoader>().Call(c => c.Hide)))
+                            .OnSuccess<HandoverNoteRead>((json, s) => s.Element("handover-status").Text.Set(json.Get(x => x.Message)))
+                            .OnError<HandoverNoteRead>(400, (json, e) => e.Element("handover-status").Text.Set(json.Get(x => x.Message)))
+                            .OnError<HandoverNoteRead>(409, (json, e) => e.Element("handover-status").Text.Set(json.Get(x => x.Message))))
+                        .Finally(f => f.Component<NativeLoader>().Hide()))
                         .CssClass("text-sm font-medium text-accent hover:text-accent/80")
                         .Attr("data-testid", $"mark-read-{note.Key}"))
                 </div>

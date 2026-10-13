@@ -49,7 +49,7 @@ public class WhenUsingFusionGrid : PlaywrightTestBase
         using (var plan = JsonDocument.Parse(await Page.Locator("#plan-json").TextContentAsync() ?? "{}"))
         {
             Assert.That(HasResponseBodyRead(plan.RootElement, pathMustBeEmpty: true), Is.True,
-                "Set(c => c.DataSource, json.Read(x => x)) must emit the canonical whole response-body read with member=responseBody and an empty path.");
+                "DataSource.Set(json) must emit the canonical whole response-body read with member=responseBody and an empty path.");
             Assert.That(HasResponseBodyRead(plan.RootElement, pathMustBeEmpty: false), Is.False,
                 "This Grid page must not emit responseBody as a member-path read for a whole-response data source.");
         }

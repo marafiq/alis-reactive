@@ -2,6 +2,7 @@ using System;
 
 namespace Alis.Reactive.Native.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The native HTML checkbox, declared by the names its JavaScript API uses.
     /// </summary>
@@ -12,10 +13,10 @@ namespace Alis.Reactive.Native.Components
     public sealed class NativeCheckBox : NativeComponent, IInputComponent
     {
         /// <summary>Whether the box is checked.</summary>
-        public ComponentProperty<bool> Checked => Property<bool>("checked");
+        public Prop<bool> Checked => Prop<bool>();
 
         /// <summary>Moves focus to the element.</summary>
-        public ComponentMethod Focus => Method("focus");
+        public void Focus() => Call();
 
         /// <summary>Raised when the user checks or clears the box.</summary>
         public TypedEvent<NativeCheckBoxChangeArgs> Change =>
@@ -26,11 +27,12 @@ namespace Alis.Reactive.Native.Components
     }
 
     /// <summary>Payload of <see cref="NativeCheckBox.Change"/>, read from the element.</summary>
-    public class NativeCheckBoxChangeArgs
+    public class NativeCheckBoxChangeArgs : JsObject
     {
         /// <summary>Whether the box is checked after the change.</summary>
-        public bool? Checked { get; set; }
+        public ReadOnly<bool?> Checked => ReadOnly<bool?>();
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="NativeCheckBox"/> for a model-bound field.</summary>
     public static class NativeCheckBoxHtmlExtensions

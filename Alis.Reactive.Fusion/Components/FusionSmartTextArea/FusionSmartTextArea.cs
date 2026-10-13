@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Html;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion SmartTextArea, declared by the names its JavaScript API uses.
     /// </summary>
@@ -21,10 +22,10 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionSmartTextArea : FusionComponent, IInputComponent
     {
         /// <summary>The text; <see langword="null"/> when empty.</summary>
-        public ComponentProperty<string?> Value => Property<string?>("value");
+        public Prop<string> Value => Prop<string>();
 
         /// <summary>Moves focus into the text area.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
 
         /// <summary>Raised when the text is committed (on blur after an edit), as the EJ2 TextArea it extends.</summary>
         public TypedEvent<FusionSmartTextAreaChangeArgs> Change =>
@@ -43,34 +44,35 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionSmartTextArea.Change"/>.</summary>
-    public class FusionSmartTextAreaChangeArgs
+    public class FusionSmartTextAreaChangeArgs : JsObject
     {
         /// <summary>Text after the change.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>Previously committed text.</summary>
-        public string? PreviousValue { get; set; }
+        public ReadOnly<string> PreviousValue => ReadOnly<string>();
 
         /// <summary>Whether user interaction triggered the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionSmartTextArea.BeforeSuggestionInsert"/>.</summary>
-    public class FusionSmartTextAreaBeforeSuggestionInsertArgs
+    public class FusionSmartTextAreaBeforeSuggestionInsertArgs : JsObject
     {
         /// <summary>The suggestion about to be inserted.</summary>
-        public string Text { get; set; } = "";
+        public ReadOnly<string> Text => ReadOnly<string>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionSmartTextArea.AfterSuggestionInsert"/>.</summary>
-    public class FusionSmartTextAreaAfterSuggestionInsertArgs
+    public class FusionSmartTextAreaAfterSuggestionInsertArgs : JsObject
     {
         /// <summary>The inserted suggestion.</summary>
-        public string InsertedText { get; set; } = "";
+        public ReadOnly<string> InsertedText => ReadOnly<string>();
     }
+#nullable restore annotations
 
     public static class FusionSmartTextAreaHtmlExtensions
     {

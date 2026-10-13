@@ -35,7 +35,7 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var hist = p.Component<FusionDropDownList>(m => m.FallHistory);
-                p.When(hist.Get(c => c.Value)).In("1-2 falls", "3+ falls")
+                p.When(hist.Value).In("1-2 falls", "3+ falls")
                     .Then(t => t.Element("fall-details").Show())
                     .Else(e => e.Element("fall-details").Hide());
             }); }
@@ -52,16 +52,16 @@
                 var fallRisk = p.Component<FusionNumericTextBox>(m => m.FallRiskScore);
                 var age = p.Component<FusionNumericTextBox>(m => m.Age);
 
-                p.When(fallRisk.Get(c => c.Value)).Gte(7m).And(age.Get(c => c.Value)).Gte(80m)
+                p.When(fallRisk.Value).Gte(7m).And(age.Value).Gte(80m)
                     .Then(t =>
                     {
-                        t.Component<NativeHiddenField>(m => m.MonitoringLevel).Set(c => c.Value, "Continuous");
-                        t.Element("fallrisk-result").SetText("Continuous monitoring required");
+                        t.Component<NativeHiddenField>(m => m.MonitoringLevel).Value.Set("Continuous");
+                        t.Element("fallrisk-result").Text.Set("Continuous monitoring required");
                         t.Element("fallrisk-result").Show();
                     })
                     .Else(e =>
                     {
-                        e.Element("fallrisk-result").SetText("Standard monitoring");
+                        e.Element("fallrisk-result").Text.Set("Standard monitoring");
                         e.Element("fallrisk-result").Show();
                     });
             }))
@@ -77,11 +77,11 @@
             {
                 var aid = p.Component<FusionDropDownList>(m => m.MobilityAid);
 
-                p.When(aid.Get(c => c.Value)).In("Walker", "Wheelchair")
+                p.When(aid.Value).In("Walker", "Wheelchair")
                     .Then(t => t.Element("escort-indicator").Show())
                     .Else(e => e.Element("escort-indicator").Hide());
 
-                p.When(aid.Get(c => c.Value)).Eq("Wheelchair")
+                p.When(aid.Value).Eq("Wheelchair")
                     .Then(then =>
                     {
                         then.Element("room-spinner").Show();
@@ -89,7 +89,7 @@
                          .Gather<RequestRoomSetupRequest>(g => g.Form(m => m.MobilityAid, m => m.ResidentName))
                          .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
                          {
-                             s.Element("room-result").SetText(json, x => x.Message);
+                             s.Element("room-result").Text.Set(json.Get(x => x.Message));
                              s.Element("room-result").Show();
                              s.Element("room-spinner").Hide();
                          }));
@@ -102,7 +102,7 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var meds = p.Component<FusionNumericTextBox>(m => m.MedicationCount);
-                p.When(meds.Get(c => c.Value)).Gt(10m)
+                p.When(meds.Value).Gt(10m)
                     .Then(t => t.Element("polypharmacy-warning").Show())
                     .Else(e => e.Element("polypharmacy-warning").Hide());
             }); }
@@ -125,9 +125,9 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var bt = p.Component<FusionSwitch>(m => m.TakesBloodThinners);
-                p.When(bt.Get(c => c.Checked)).Truthy()
-                    .Then(t => t.Component<NativeHiddenField>(m => m.MonitoringLevel).Set(c => c.Value, "Enhanced"))
-                    .Else(e => e.Component<NativeHiddenField>(m => m.MonitoringLevel).Set(c => c.Value, "Standard"));
+                p.When(bt.Checked).Truthy()
+                    .Then(t => t.Component<NativeHiddenField>(m => m.MonitoringLevel).Value.Set("Enhanced"))
+                    .Else(e => e.Component<NativeHiddenField>(m => m.MonitoringLevel).Value.Set("Standard"));
             }); }
 
         @{ Html.InputField(plan, m => m.TakesPainMedication, o => o.Label("Takes Pain Medication"))
@@ -135,7 +135,7 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var pm = p.Component<FusionSwitch>(m => m.TakesPainMedication);
-                p.When(pm.Get(c => c.Checked)).Truthy()
+                p.When(pm.Checked).Truthy()
                     .Then(t => t.Element("pain-section").Show())
                     .Else(e => e.Element("pain-section").Hide());
             }); }
@@ -156,10 +156,10 @@
             {
                 p.Element("step-3").Hide();
                 p.Element("step-2").Show();
-                p.Element("step-ind-3").RemoveClass("font-bold");
-                p.Element("step-ind-3").RemoveClass("text-accent");
-                p.Element("step-ind-2").AddClass("font-bold");
-                p.Element("step-ind-2").AddClass("text-accent");
+                p.Element("step-ind-3").ClassList.Remove("font-bold");
+                p.Element("step-ind-3").ClassList.Remove("text-accent");
+                p.Element("step-ind-2").ClassList.Add("font-bold");
+                p.Element("step-ind-2").ClassList.Add("text-accent");
             }))
         @(Html.NativeButton("next-3", "Next: Review \u2192")
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
@@ -173,10 +173,10 @@
                     {
                         s.Element("step-3").Hide();
                         s.Element("step-4").Show();
-                        s.Element("step-ind-3").RemoveClass("font-bold");
-                        s.Element("step-ind-3").RemoveClass("text-accent");
-                        s.Element("step-ind-4").AddClass("font-bold");
-                        s.Element("step-ind-4").AddClass("text-accent");
+                        s.Element("step-ind-3").ClassList.Remove("font-bold");
+                        s.Element("step-ind-3").ClassList.Remove("text-accent");
+                        s.Element("step-ind-4").ClassList.Add("font-bold");
+                        s.Element("step-ind-4").ClassList.Add("text-accent");
                     })
                     .OnError(400, e =>
                     {

@@ -15,6 +15,9 @@ namespace Alis.Reactive.PlanModel
 
         internal abstract Shape OutputShape { get; }
 
+        /// <summary>The value an element shows as text: data a callback received, as it arrived.</summary>
+        internal virtual ValueExpression AsArrived() => this;
+
         internal static ValueExpression Literal(bool value) =>
             new LiteralExpression(value, Shape.Boolean);
 
@@ -128,6 +131,10 @@ namespace Alis.Reactive.PlanModel
 
         internal static ValueExpression Invoke(RuntimeObjectSource from, string method, Shape returns, IReadOnlyList<ValueExpression> args) =>
             new ReadExpression(ValueRead.Method(from, method, returns, args));
+
+        /// <summary>Calls a method of the object an event hands its callback and reads what it returns.</summary>
+        internal static ValueExpression InvokePayload(PayloadSource from, string method, Shape returns, IReadOnlyList<ValueExpression> args) =>
+            new ReadExpression(ValueRead.Method(from, method, Path.Parse(method), returns, args));
 
         /// <summary>
         /// Invokes a method on the current array element. The path carries receiver
@@ -334,6 +341,13 @@ namespace Alis.Reactive.PlanModel
             _read = read ?? throw new ArgumentNullException(nameof(read));
         }
 
+        // Data a callback received is shown as the server or the event sent it; an object's member, the URL
+        // and a method read keep their type, which decides how they are read (one URL value, or all of them).
+        internal override ValueExpression AsArrived() =>
+            _read.From is PayloadSource && _read.Access == ValueReadAccess.Property
+                ? new ReadExpression(_read.WithShape(Shape.None))
+                : this;
+
         internal override Shape OutputShape => Shape;
     }
 
@@ -353,6 +367,8 @@ namespace Alis.Reactive.PlanModel
         internal ValueReadAccess Access { get; }
 
         private ValueReadTarget Target { get; }
+
+        internal ValueRead WithShape(Shape shape) => new ValueRead(Target, shape, Access);
 
         internal static ValueRead Property(Source from, string member, Shape shape) =>
             new ValueRead(

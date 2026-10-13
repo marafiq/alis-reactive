@@ -8,9 +8,9 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<FusionDatePicker>(m => m.AdmissionDate).Set(c => c.Value, new DateTime(2026, 6, 15));
+        p.Component<FusionDatePicker>(m => m.AdmissionDate).Value.Set(new DateTime(2026, 6, 15));
         var comp = p.Component<FusionDatePicker>(m => m.AdmissionDate);
-        p.Element("value-echo").SetText(comp.Get(c => c.Value));
+        p.Element("value-echo").Text.Set(comp.Value);
     }));
 }
 
@@ -33,16 +33,16 @@
                     .Placeholder("Select admission date"))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("change-value").SetText(args, x => x.Value);
-                    p.When(args, x => x.Value).NotNull()
-                        .Then(t => t.Element("args-condition").SetText("date selected"))
-                        .Else(e => e.Element("args-condition").SetText("no date"));
+                    p.Element("change-value").Text.Set(args.Value);
+                    p.When(args.Value).NotNull()
+                        .Then(t => t.Element("args-condition").Text.Set("date selected"))
+                        .Else(e => e.Element("args-condition").Text.Set("no date"));
                     var comp = p.Component<FusionDatePicker>(m => m.AdmissionDate);
-                    p.When(comp.Get(c => c.Value)).NotNull()
+                    p.When(comp.Value).NotNull()
                         .Then(then =>
                         {
                             then.Element("selected-indicator").Show();
-                            then.Element("selected-indicator").SetText("admission set");
+                            then.Element("selected-indicator").Text.Set("admission set");
                         })
                         .Else(else_ =>
                         {
@@ -88,9 +88,9 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var comp = p.Component<FusionDatePicker>(m => m.DischargeDate);
-                    p.When(comp.Get(c => c.Value)).IsEmpty()
-                        .Then(t => t.Element("discharge-warning").SetText("discharge date is required"))
-                        .Else(e => e.Element("discharge-warning").SetText("discharge date set"));
+                    p.When(comp.Value).IsEmpty()
+                        .Then(t => t.Element("discharge-warning").Text.Set("discharge date is required"))
+                        .Else(e => e.Element("discharge-warning").Text.Set("discharge date set"));
                 }))
         </native-hstack>
         <p class="font-mono text-sm mt-2">Warning: <span id="discharge-warning" class="text-text-muted">&mdash;</span></p>

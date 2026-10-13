@@ -5,6 +5,7 @@ using Syncfusion.EJ2.Inputs;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion TextArea, declared by the names its JavaScript API uses.
     /// </summary>
@@ -17,16 +18,16 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionTextArea : FusionComponent, IInputComponent
     {
         /// <summary>The text; <see langword="null"/> when empty.</summary>
-        public ComponentProperty<string?> Value => Property<string?>("value");
+        public Prop<string> Value => Prop<string>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Moves focus into the textarea.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
 
         /// <summary>Removes focus from the textarea.</summary>
-        public ComponentMethod FocusOut => Method("focusOut");
+        public void FocusOut() => Call();
 
         /// <summary>Raised on every edit while typing.</summary>
         public TypedEvent<FusionTextAreaInputArgs> Input =>
@@ -49,41 +50,42 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionTextArea.Input"/>.</summary>
-    public class FusionTextAreaInputArgs
+    public class FusionTextAreaInputArgs : JsObject
     {
         /// <summary>Text reported by the input event.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>Text before this edit.</summary>
-        public string? PreviousValue { get; set; }
+        public ReadOnly<string> PreviousValue => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionTextArea.Change"/>.</summary>
-    public class FusionTextAreaChangeArgs
+    public class FusionTextAreaChangeArgs : JsObject
     {
         /// <summary>Text after the change.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>Previously committed text.</summary>
-        public string? PreviousValue { get; set; }
+        public ReadOnly<string> PreviousValue => ReadOnly<string>();
 
         /// <summary>Whether user interaction triggered the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionTextArea.Focus"/>.</summary>
-    public class FusionTextAreaFocusArgs
+    public class FusionTextAreaFocusArgs : JsObject
     {
         /// <summary>Text when the textarea receives focus.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionTextArea.Blur"/>.</summary>
-    public class FusionTextAreaBlurArgs
+    public class FusionTextAreaBlurArgs : JsObject
     {
         /// <summary>Text when the textarea loses focus.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionTextArea"/> for a model-bound field.</summary>
     public static class FusionTextAreaHtmlExtensions

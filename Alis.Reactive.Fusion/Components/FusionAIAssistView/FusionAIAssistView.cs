@@ -9,6 +9,7 @@ using Syncfusion.EJ2.InteractiveChat;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion AIAssistView, declared by the names its JavaScript API uses.
     /// </summary>
@@ -20,22 +21,22 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionAIAssistView : FusionComponent
     {
         /// <summary>The prompt text in the input.</summary>
-        public ComponentProperty<string> Prompt => Property<string>("prompt");
+        public Prop<string> Prompt => Prop<string>();
 
         /// <summary>The zero-based index of the shown view.</summary>
-        public ComponentProperty<int> ActiveView => Property<int>("activeView");
+        public Prop<int> ActiveView => Prop<int>();
 
         /// <summary>Sends a prompt as if the user typed it.</summary>
-        public ComponentMethod<string> ExecutePrompt => Method<string>("executePrompt");
+        public void ExecutePrompt(Arg<string> value) => Call(value);
 
         /// <summary>Adds response text to the latest prompt; the second argument says whether it is the final update.</summary>
-        public ComponentMethod<string, bool> AddPromptResponse => Method<string, bool>("addPromptResponse");
+        public void AddPromptResponse(Arg<string> first, Arg<bool> second) => Call(first, second);
 
         /// <summary>Adds a prompt with its response; the second argument says whether it is the final update.</summary>
-        public ComponentMethod<FusionAIAssistViewPromptModel, bool> AddPromptResponseModel => Method<FusionAIAssistViewPromptModel, bool>("addPromptResponse");
+        public void AddPromptResponseModel(Arg<FusionAIAssistViewPromptModel> first, Arg<bool> second) => Call(first, second, name: "addPromptResponse");
 
         /// <summary>Scrolls the conversation to the latest response.</summary>
-        public ComponentMethod ScrollToBottom => Method("scrollToBottom");
+        public void ScrollToBottom() => Call();
 
         /// <summary>Raised when the user sends a prompt.</summary>
         public TypedEvent<FusionAIAssistViewPromptRequestArgs> PromptRequest =>
@@ -61,37 +62,38 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionAIAssistView.PromptRequest"/>.</summary>
-    public class FusionAIAssistViewPromptRequestArgs
+    public class FusionAIAssistViewPromptRequestArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
 
         /// <summary>The prompt the user sent.</summary>
-        public string Prompt { get; set; } = "";
+        public ReadOnly<string> Prompt => ReadOnly<string>();
 
         /// <summary>Suggestions offered for the next prompt.</summary>
-        public string[] PromptSuggestions { get; set; } = Array.Empty<string>();
+        public ReadOnly<string[]> PromptSuggestions => ReadOnly<string[]>();
     }
 
     /// <summary>Payload of <see cref="FusionAIAssistView.PromptChanged"/>.</summary>
-    public class FusionAIAssistViewPromptChangedArgs
+    public class FusionAIAssistViewPromptChangedArgs : JsObject
     {
         /// <summary>The prompt text after the change.</summary>
-        public string Value { get; set; } = "";
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>The prompt text before the change.</summary>
-        public string PreviousValue { get; set; } = "";
+        public ReadOnly<string> PreviousValue => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionAIAssistView.StopRespondingClick"/>.</summary>
-    public class FusionAIAssistViewStopRespondingClickArgs
+    public class FusionAIAssistViewStopRespondingClickArgs : JsObject
     {
         /// <summary>The prompt whose response stopped.</summary>
-        public string Prompt { get; set; } = "";
+        public ReadOnly<string> Prompt => ReadOnly<string>();
 
         /// <summary>Index of the prompt in the conversation.</summary>
-        public int DataIndex { get; set; }
+        public ReadOnly<int> DataIndex => ReadOnly<int>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Factory extension for rendering Syncfusion AIAssistView with reactive event support.

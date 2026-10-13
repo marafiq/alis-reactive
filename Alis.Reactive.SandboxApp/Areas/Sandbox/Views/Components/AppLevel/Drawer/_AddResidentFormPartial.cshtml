@@ -33,24 +33,30 @@
                 .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Element("alis-loader-message").SetText("Saving resident...");
+                    p.Element("alis-loader-message").Text.Set("Saving resident...");
                     p.Post(Url.SandboxRoute("SubmitResident", "Drawer")).Gather(g => g.Form())
                      .Validate<DrawerResidentValidator>("drawer-resident-form")
-                     .WhileLoading(loader=> loader.Component<NativeLoader>().Set(c => c.Target, "drawer-resident-form").Set(c => c.Timeout, 1000).Call(c => c.Show))
+                     .WhileLoading(l =>
+                     {
+                         var loader = l.Component<NativeLoader>();
+                         loader.Target.Set("drawer-resident-form");
+                         loader.Timeout.Set(1000);
+                         loader.Show();
+                     })
                      .Response(r => r
                         .OnSuccess(s =>
                         {
-                            s.Component<NativeLoader>().Call(c => c.Hide);
-                            s.Component<FusionToast>()
-                                .Set(c => c.Title, "Admission")
-                                .Set(c => c.Content, "Resident saved successfully")
-                                .Set(c => c.Tone, FusionToastTone.Success)
-                                .Call(c => c.Show);
-                            s.Component<NativeDrawer>().Call(c => c.Close);
+                            s.Component<NativeLoader>().Hide();
+                            var toast = s.Component<FusionToast>();
+                            toast.Title.Set("Admission");
+                            toast.Content.Set("Resident saved successfully");
+                            toast.Tone.Set(FusionToastTone.Success);
+                            toast.Show();
+                            s.Component<NativeDrawer>().Close();
                         })
                         .OnError(400, e =>
                         {
-                            e.Component<NativeLoader>().Call(c => c.Hide);
+                            e.Component<NativeLoader>().Hide();
                             e.ValidationErrors("drawer-resident-form");
                         }));
                 }))

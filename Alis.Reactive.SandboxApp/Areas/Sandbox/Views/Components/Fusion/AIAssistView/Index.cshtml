@@ -21,18 +21,16 @@
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionAIAssistView>("care-ai")
-                        .Call(c => c.ExecutePrompt, "Summarize the medication changes");
-                    p.Element("command-status").SetText("executePrompt called");
+                    p.Component<FusionAIAssistView>("care-ai").ExecutePrompt("Summarize the medication changes");
+                    p.Element("command-status").Text.Set("executePrompt called");
                 }))
 
             @(Html.NativeButton("append-object-response-btn", "Append Object Response")
                 .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionAIAssistView>("care-ai")
-                        .Call(c => c.AddPromptResponseModel, new FusionAIAssistViewPromptModel { Prompt = "Care plan follow up", Response = "Schedule hydration checks and confirm the updated medication list with the nurse." }, true);
-                    p.Element("object-response-status").SetText("object response added");
+                    p.Component<FusionAIAssistView>("care-ai").AddPromptResponseModel(new FusionAIAssistViewPromptModel { Prompt = "Care plan follow up", Response = "Schedule hydration checks and confirm the updated medication list with the nurse." }, true);
+                    p.Element("object-response-status").Text.Set("object response added");
                 }))
 
             @(Html.NativeButton("set-prompt-btn", "Set Prompt")
@@ -40,24 +38,24 @@
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
                     var assist = p.Component<FusionAIAssistView>("care-ai");
-                    assist.Set(c => c.Prompt, "Prepare discharge summary");
-                    p.Element("current-prompt").SetText(assist.Get(c => c.Prompt));
+                    assist.Prompt.Set("Prepare discharge summary");
+                    p.Element("current-prompt").Text.Set(assist.Prompt);
                 }))
 
             @(Html.NativeButton("read-active-view-btn", "Read Active View")
                 .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Element("active-view").SetText(
-                        p.Component<FusionAIAssistView>("care-ai").Get(c => c.ActiveView));
+                    p.Element("active-view").Text.Set(
+                        p.Component<FusionAIAssistView>("care-ai").ActiveView);
                 }))
 
             @(Html.NativeButton("scroll-bottom-btn", "Scroll Bottom")
                 .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionAIAssistView>("care-ai").Call(c => c.ScrollToBottom);
-                    p.Element("scroll-status").SetText("scrollToBottom called");
+                    p.Component<FusionAIAssistView>("care-ai").ScrollToBottom();
+                    p.Element("scroll-status").Text.Set("scrollToBottom called");
                 }))
         </native-hstack>
 
@@ -89,19 +87,18 @@
         })
         .Reactive(evt => evt.PromptChanged, (args, p) =>
         {
-            p.Element("prompt-changed-value").SetText(args, x => x.Value);
+            p.Element("prompt-changed-value").Text.Set(args.Value);
         })
         .Reactive(evt => evt.PromptRequest, (args, p) =>
         {
-            p.Element("request-prompt").SetText(args, x => x.Prompt);
-            p.Element("request-status").SetText("promptRequest fired");
-            p.Component<FusionAIAssistView>("care-ai")
-                .Call(c => c.AddPromptResponse, "Reactive response added from promptRequest.", true);
+            p.Element("request-prompt").Text.Set(args.Prompt);
+            p.Element("request-status").Text.Set("promptRequest fired");
+            p.Component<FusionAIAssistView>("care-ai").AddPromptResponse("Reactive response added from promptRequest.", true);
         })
         .Reactive(evt => evt.StopRespondingClick, (args, p) =>
         {
-            p.Element("stop-prompt").SetText(args, x => x.Prompt);
-            p.Element("stop-index").SetText(args, x => x.DataIndex);
+            p.Element("stop-prompt").Text.Set(args.Prompt);
+            p.Element("stop-index").Text.Set(args.DataIndex);
         }))
     </native-card-body></native-card>
 

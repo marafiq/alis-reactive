@@ -9,6 +9,7 @@ using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Breadcrumb, declared by the names its JavaScript API uses.
     /// </summary>
@@ -21,10 +22,10 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionBreadcrumb : FusionComponent
     {
         /// <summary>The URL of the active item.</summary>
-        public ComponentProperty<string> ActiveItem => Property<string>("activeItem");
+        public Prop<string> ActiveItem => Prop<string>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Raised when the user clicks an item.</summary>
         public TypedEvent<FusionBreadcrumbItemClickArgs> ItemClick =>
@@ -32,11 +33,12 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionBreadcrumb.ItemClick"/>.</summary>
-    public class FusionBreadcrumbItemClickArgs
+    public class FusionBreadcrumbItemClickArgs : JsObject
     {
         /// <summary>The clicked item.</summary>
-        public FusionBreadcrumbItem Item { get; set; } = new FusionBreadcrumbItem();
+        public ReadOnly<FusionBreadcrumbItem> Item => ReadOnly<FusionBreadcrumbItem>();
     }
+#nullable restore annotations
 
     /// <summary>A breadcrumb item as the <see cref="FusionBreadcrumb.ItemClick"/> payload reports it.</summary>
     public class FusionBreadcrumbItem

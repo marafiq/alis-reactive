@@ -35,8 +35,8 @@
             .CssClass("rounded-md bg-surface px-5 py-2 text-sm font-medium text-text hover:bg-surface-2 transition-colors")
             .Reactive(plan, evt => evt.Click, (_, p) =>
             {
-                p.Component<FusionStepper>(StepperId).Set(c => c.ActiveStep, 1);
-                p.Element("stepper-wizard-status").SetText("returned to care");
+                p.Component<FusionStepper>(StepperId).ActiveStep.Set(1);
+                p.Element("stepper-wizard-status").Text.Set("returned to care");
             }))
 
         @(Html.NativeButton("stepper-wizard-next-contact", "Next: Review")
@@ -48,10 +48,10 @@
                     .Response(r => r
                         .OnSuccess<FusionStepperWizardSaveResponse>((json, s) =>
                         {
-                            s.Component<NativeHiddenField>(m => m.WizardId).Set(c => c.Value, json.Read(x => x.WizardId));
-                            s.Component<NativeHiddenField, FusionStepperWizardShellModel>(m => m.MaxUnlockedStep).Set(c => c.Value, "3");
-                            s.Component<FusionStepper>(StepperId).Set(c => c.ActiveStep, 3);
-                            s.Element("stepper-wizard-status").SetText(json, x => x.Message);
+                            s.Component<NativeHiddenField>(m => m.WizardId).Value.Set(json.Get(x => x.WizardId));
+                            s.Component<NativeHiddenField, FusionStepperWizardShellModel>(m => m.MaxUnlockedStep).Value.Set("3");
+                            s.Component<FusionStepper>(StepperId).ActiveStep.Set(3);
+                            s.Element("stepper-wizard-status").Text.Set(json.Get(x => x.Message));
                         })
                         .OnError(400, e => e.ValidationErrors(FormId)));
             }))

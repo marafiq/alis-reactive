@@ -31,7 +31,7 @@
                  .Response(r => r
                     .OnSuccess<FallRiskScreeningConfirmation>((json, s) =>
                     {
-                        s.Element("fall-risk-status").SetText(json, x => x.Confirmation);
+                        s.Element("fall-risk-status").Text.Set(json.Get(x => x.Confirmation));
                     })
                     .OnError(400, e => e.ValidationErrors("fall-risk-form")));
             }))

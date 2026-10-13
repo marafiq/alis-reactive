@@ -10,8 +10,9 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var menu = p.Component<FusionDropDownButton>(menuId);
-        menu.Set(c => c.Content, "Ready Actions").Call(c => c.DataBind);
-        p.Element("content-echo").SetText(menu.Get(c => c.Content));
+        menu.Content.Set("Ready Actions");
+        menu.DataBind();
+        p.Element("content-echo").Text.Set(menu.Content);
     }));
 }
 
@@ -32,12 +33,12 @@
                 }))
                 .Reactive(evt => evt.Select, (args, p) =>
                 {
-                    p.Element("selected-id").SetText(args, x => x.Item.Id);
-                    p.Element("selected-text").SetText(args, x => x.Item.Text);
-                    p.Element("selected-disabled").SetText(args, x => x.Item.Disabled);
-                    p.When(args, x => x.Item.Id).Eq("assign")
-                        .Then(t => t.Element("selected-condition").SetText("assign selected"))
-                        .Else(e => e.Element("selected-condition").SetText("other selected"));
+                    p.Element("selected-id").Text.Set(args.Item.Get(x => x.Id));
+                    p.Element("selected-text").Text.Set(args.Item.Get(x => x.Text));
+                    p.Element("selected-disabled").Text.Set(args.Item.Get(x => x.Disabled));
+                    p.When(args.Item.Get(x => x.Id)).Eq("assign")
+                        .Then(t => t.Element("selected-condition").Text.Set("assign selected"))
+                        .Else(e => e.Element("selected-condition").Text.Set("other selected"));
                 }))
         </native-hstack>
 
@@ -47,73 +48,77 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var menu = p.Component<FusionDropDownButton>(menuId);
-                    menu.Set(c => c.Content, "Discharge Actions").Call(c => c.DataBind);
-                    p.Element("content-echo").SetText(menu.Get(c => c.Content));
-                    p.Element("command-state").SetText("content set");
+                    menu.Content.Set("Discharge Actions");
+                    menu.DataBind();
+                    p.Element("content-echo").Text.Set(menu.Content);
+                    p.Element("command-state").Text.Set("content set");
                 }))
             @(Html.NativeButton("disable-menu-btn", "Disable")
                 .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var menu = p.Component<FusionDropDownButton>(menuId);
-                    menu.Set(c => c.Disabled, true).Call(c => c.DataBind);
-                    p.Element("disabled-echo").SetText(menu.Get(c => c.Disabled));
-                    p.Element("command-state").SetText("disabled");
+                    menu.Disabled.Set(true);
+                    menu.DataBind();
+                    p.Element("disabled-echo").Text.Set(menu.Disabled);
+                    p.Element("command-state").Text.Set("disabled");
                 }))
             @(Html.NativeButton("enable-menu-btn", "Enable")
                 .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var menu = p.Component<FusionDropDownButton>(menuId);
-                    menu.Set(c => c.Disabled, false).Call(c => c.DataBind);
-                    p.Element("disabled-echo").SetText(menu.Get(c => c.Disabled));
-                    p.Element("command-state").SetText("enabled");
+                    menu.Disabled.Set(false);
+                    menu.DataBind();
+                    p.Element("disabled-echo").Text.Set(menu.Disabled);
+                    p.Element("command-state").Text.Set("enabled");
                 }))
             @(Html.NativeButton("set-css-btn", "Set Css")
                 .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var menu = p.Component<FusionDropDownButton>(menuId);
-                    menu.Set(c => c.CssClass, "e-success extra-class").Call(c => c.DataBind);
-                    p.Element("css-echo").SetText(menu.Get(c => c.CssClass));
-                    p.Element("command-state").SetText("css set");
+                    menu.CssClass.Set("e-success extra-class");
+                    menu.DataBind();
+                    p.Element("css-echo").Text.Set(menu.CssClass);
+                    p.Element("command-state").Text.Set("css set");
                 }))
             @(Html.NativeButton("toggle-menu-btn", "Toggle Menu")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionDropDownButton>(menuId).Call(c => c.Toggle);
-                    p.Element("toggle-state").SetText("toggle called");
+                    p.Component<FusionDropDownButton>(menuId).Toggle();
+                    p.Element("toggle-state").Text.Set("toggle called");
                 }))
             @(Html.NativeButton("focus-menu-btn", "Focus Menu")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionDropDownButton>(menuId).Call(c => c.FocusIn);
-                    p.Element("focus-state").SetText("focus called");
+                    p.Component<FusionDropDownButton>(menuId).FocusIn();
+                    p.Element("focus-state").Text.Set("focus called");
                 }))
             @(Html.NativeButton("remove-assign-btn", "Remove Assign")
                 .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionDropDownButton>(menuId).Call(c => c.RemoveItems, new[] { "Assign nurse" }, false);
-                    p.Element("remove-state").SetText("assign removed");
+                    p.Component<FusionDropDownButton>(menuId).RemoveItems(new[] { "Assign nurse" }, false);
+                    p.Element("remove-state").Text.Set("assign removed");
                 }))
             @(Html.NativeButton("remove-hold-btn", "Remove Hold")
                 .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionDropDownButton>(menuId).Call(c => c.RemoveItems, new[] { "hold" }, true);
-                    p.Element("remove-state").SetText("hold removed");
+                    p.Component<FusionDropDownButton>(menuId).RemoveItems(new[] { "hold" }, true);
+                    p.Element("remove-state").Text.Set("hold removed");
                 }))
             @(Html.NativeButton("check-disabled-btn", "Check Disabled")
                 .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var menu = p.Component<FusionDropDownButton>(menuId);
-                    p.When(menu.Get(c => c.Disabled)).Eq(true)
-                        .Then(t => t.Element("disabled-state").SetText("disabled"))
-                        .Else(e => e.Element("disabled-state").SetText("enabled"));
+                    p.When(menu.Disabled).Eq(true)
+                        .Then(t => t.Element("disabled-state").Text.Set("disabled"))
+                        .Else(e => e.Element("disabled-state").Text.Set("enabled"));
                 }))
         </native-hstack>
     </native-card-body></native-card>
@@ -127,15 +132,15 @@
                 var menu = p.Component<FusionDropDownButton>(menuId);
                 p.Post(Url.SandboxRoute("Echo", "DropDownButton"))
                     .Gather<FusionDropDownButtonEchoRequest>(g => g
-                        .Set(x => x.Content, menu.Get(c => c.Content))
-                        .Set(x => x.Disabled, menu.Get(c => c.Disabled))
-                        .Set(x => x.CssClass, menu.Get(c => c.CssClass)))
+                        .Set(x => x.Content, menu.Content)
+                        .Set(x => x.Disabled, menu.Disabled)
+                        .Set(x => x.CssClass, menu.CssClass))
                     .Response(r => r.OnSuccess<FusionDropDownButtonEchoResponse>((json, s) =>
                     {
-                        s.Element("gather-content").SetText(json, x => x.Content);
-                        s.Element("gather-disabled").SetText(json, x => x.Disabled);
-                        s.Element("gather-css").SetText(json, x => x.CssClass);
-                        s.Element("gather-summary").SetText(json, x => x.Summary);
+                        s.Element("gather-content").Text.Set(json.Get(x => x.Content));
+                        s.Element("gather-disabled").Text.Set(json.Get(x => x.Disabled));
+                        s.Element("gather-css").Text.Set(json.Get(x => x.CssClass));
+                        s.Element("gather-summary").Text.Set(json.Get(x => x.Summary));
                     }));
             }))
     </native-card-body></native-card>

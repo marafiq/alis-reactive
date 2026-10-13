@@ -28,8 +28,7 @@
     };
 
     Html.On(plan, t => t.DomReady(p =>
-        p.Component<VisitPlanner>(m => m.VisitSlots)
-            .Set(c => c.EmptyMessage, "Choose a resident to see this week's visit times.")));
+        p.Component<VisitPlanner>(m => m.VisitSlots).EmptyMessage.Set("Choose a resident to see this week's visit times.")));
 }
 
 <native-vstack gap="Lg">
@@ -48,16 +47,16 @@
                     .Reactive(evt => evt.Change, (args, p) =>
                     {
                         var resident = p.Component<NativeDropDown>(m => m.ResidentId);
-                        p.When(resident.Get(c => c.Value)).NotEmpty()
+                        p.When(resident.Value).NotEmpty()
                             .Then(load => load.Get(weekUrl)
-                                .Gather<ResidentWeekRequest>(g => g.Set(x => x.ResidentId, resident.Get(c => c.Value)))
+                                .Gather<ResidentWeekRequest>(g => g.Set(x => x.ResidentId, resident.Value))
                                 .Response(r => r.OnSuccess<ResidentWeekResponse>((week, s) =>
                                 {
-                                    s.Component<VisitPlanner>(m => m.VisitSlots)
-                                        .Set(c => c.Wing, week.Read(x => x.Wing))
-                                        .Set(c => c.Capacity, week.Read(x => x.WeeklyVisits))
-                                        .Set(c => c.Slots, week.Read(x => x.Slots));
-                                    s.Element("resident-name").SetText(week, x => x.ResidentName);
+                                    var visitSlots = s.Component<VisitPlanner>(m => m.VisitSlots);
+                                    visitSlots.Wing.Set(week.Get(x => x.Wing));
+                                    visitSlots.Capacity.Set(week.Get(x => x.WeeklyVisits));
+                                    visitSlots.Slots.Set(week.Get(x => x.Slots));
+                                    s.Element("resident-name").Text.Set(week.Get(x => x.ResidentName));
                                 })));
                     }); }
 
@@ -69,51 +68,50 @@
                 .VisitPlanner(capacity: 1)
                 .Reactive(evt => evt.SlotsLoaded, (args, p) =>
                 {
-                    p.Element("offered-count").SetText(args, x => x.Count);
-                    p.When(p.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.OfferedDays)).ArrayContains("Sunday")
+                    p.Element("offered-count").Text.Set(args.Count);
+                    p.When(p.Component<VisitPlanner>(m => m.VisitSlots).OfferedDays).ArrayContains("Sunday")
                         .Then(sunday => sunday.Element("sunday-offered").Show())
                         .Else(none => none.Element("sunday-offered").Hide());
                 })
                 .Reactive(evt => evt.BeforeBook, (args, p) =>
-                    p.When(args, x => x.Slot.Quiet).Truthy()
+                    p.When(args.Slot.Get(x => x.Quiet)).Truthy()
                         .Then(quiet =>
                         {
-                            quiet.Payload(args).Set(a => a.Cancel, true);
-                            quiet.Element("quiet-slot").SetText(args, x => x.Slot.Label);
+                            args.Cancel.Set(true);
+                            quiet.Element("quiet-slot").Text.Set(args.Slot.Get(x => x.Label));
                             quiet.Element("quiet-hours").Show();
                         })
                         .Else(open => open.Element("quiet-hours").Hide()))
                 .Reactive(evt => evt.Full, (args, p) =>
                     // Swapping releases and books from inside the planner's own full event: each
                     // raises change, whose handler runs before this one goes on.
-                    p.When(p.Component<NativeCheckBox>(m => m.SwapWhenFull).Get(c => c.Checked)).Truthy()
+                    p.When(p.Component<NativeCheckBox>(m => m.SwapWhenFull).Checked).Truthy()
                         .Then(swap =>
                         {
                             var planner = swap.Component<VisitPlanner>(m => m.VisitSlots);
-                            planner.Call(c => c.Release, planner.Get(c => c.FirstBooked));
-                            planner.Call(c => c.Select, swap.Payload(args).Get(x => x.Attempted));
+                            planner.Release(planner.FirstBooked());
+                            planner.Select(args.Attempted);
                         })
                         .Else(refuse =>
                         {
-                            refuse.Payload(args).Call(a => a.Waitlist);
-                            refuse.Element("week-full-capacity").SetText(args, x => x.Capacity);
+                            args.Waitlist();
+                            refuse.Element("week-full-capacity").Text.Set(args.Capacity);
                             refuse.Element("week-full").Show();
                         }))
                 .Reactive(evt => evt.WeekChanged, (args, p) =>
                 {
                     var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
                     p.Element("week-full").Hide();
-                    p.Element("planned-count").SetText(args, x => x.Count);
-                    p.Element("visits-left").SetText(planner.Get(c => c.Remaining));
-                    p.When(args, x => x.Added).NotEmpty()
-                        .Then(added => added.Component<VisitPlanner>(m => m.VisitSlots).Call(c => c.Book,
-                            added.Payload(args).Get(x => x.Added),
-                            added.Component<FusionNumericTextBox>(m => m.Visitors).Get(c => c.Value),
-                            added.Component<NativeTextBox>(m => m.Note).Get(c => c.Value)));
-                    p.When(planner.Get(c => c.Count)).Gt(0)
+                    p.Element("planned-count").Text.Set(args.Count);
+                    p.Element("visits-left").Text.Set(planner.Remaining());
+                    p.When(args.Added).NotEmpty()
+                        .Then(added => added.Component<VisitPlanner>(m => m.VisitSlots).Book(args.Added,
+                            added.Component<FusionNumericTextBox>(m => m.Visitors).Value,
+                            added.Component<NativeTextBox>(m => m.Note).Value));
+                    p.When(planner.Count).Gt(0)
                         .Then(some => some.Element("plan-empty").Hide())
                         .Else(none => none.Element("plan-empty").Show());
-                    p.When(args, x => x.Value).ArrayContains("sun-11")
+                    p.When(args.Value).ArrayContains("sun-11")
                         .Then(brunch => brunch.Element("brunch-planned").Show())
                         .Else(none => none.Element("brunch-planned").Hide());
                 }); }
@@ -130,9 +128,9 @@
                         .Reactive(plan, evt => evt.Click, (args, p) =>
                         {
                             var requested = p.Component<NativeDropDown>(m => m.RequestedTime);
-                            p.When(p.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.IsBooked, requested.Get(c => c.Value))).Truthy()
-                                .Then(t => t.Element("requested-status").SetText("That time is already booked for the family."))
-                                .Else(e => e.Element("requested-status").SetText("That time is not booked yet."));
+                            p.When(p.Component<VisitPlanner>(m => m.VisitSlots).IsBooked(requested.Value)).Truthy()
+                                .Then(t => t.Element("requested-status").Text.Set("That time is already booked for the family."))
+                                .Else(e => e.Element("requested-status").Text.Set("That time is not booked yet."));
                         }))
                     <native-text color="Secondary"><span id="requested-status"></span></native-text>
                 </native-vstack>
@@ -144,8 +142,7 @@
             @{ Html.InputField(plan, m => m.LockWeek, o => o.Label("Lock this week"))
                 .NativeCheckBox(b => b.CssClass("rounded border-border"))
                 .Reactive(evt => evt.Change, (args, p) =>
-                    p.Component<VisitPlanner>(m => m.VisitSlots)
-                        .Set(c => c.ReadOnly, p.Component<NativeCheckBox>(m => m.LockWeek).Get(c => c.Checked))); }
+                    p.Component<VisitPlanner>(m => m.VisitSlots).ReadOnly.Set(p.Component<NativeCheckBox>(m => m.LockWeek).Checked)); }
 
             <native-vstack gap="Xs">
                 <native-text><span id="resident-name">No resident chosen</span> · <span id="offered-count">0</span> times offered</native-text>
@@ -163,34 +160,34 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
-                        planner.Call(c => c.Select, planner.Get(c => c.FirstOpen));
+                        planner.Select(planner.FirstOpen());
                     }))
                 @(Html.NativeButton("check-brunch", "Is Sunday brunch booked?")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.When(p.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.IsBooked, "sun-11")).Truthy()
-                            .Then(t => t.Element("brunch-status").SetText("Sunday brunch is booked."))
-                            .Else(e => e.Element("brunch-status").SetText("Sunday brunch is still open."));
+                        p.When(p.Component<VisitPlanner>(m => m.VisitSlots).IsBooked("sun-11")).Truthy()
+                            .Then(t => t.Element("brunch-status").Text.Set("Sunday brunch is booked."))
+                            .Else(e => e.Element("brunch-status").Text.Set("Sunday brunch is still open."));
                     }))
                 @(Html.NativeButton("clear-week", "Clear the week")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
-                        p.Component<VisitPlanner>(m => m.VisitSlots).Call(c => c.Clear)))
+                        p.Component<VisitPlanner>(m => m.VisitSlots).Clear()))
                 @(Html.NativeButton("share-week", "Share the week with the family")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
-                        p.Element("share-status").SetText("Preparing the summary...");
-                        planner.Call(c => c.PrepareSummary);
-                        p.When(planner.Get(c => c.Summary)).NotEmpty()
+                        p.Element("share-status").Text.Set("Preparing the summary...");
+                        planner.PrepareSummary();
+                        p.When(planner.Summary()).NotEmpty()
                             .Then(ready =>
                             {
-                                ready.Element("family-summary").SetText(planner.Get(c => c.Summary));
-                                ready.Element("share-status").SetText("Summary ready to send.");
+                                ready.Element("family-summary").Text.Set(planner.Summary());
+                                ready.Element("share-status").Text.Set("Summary ready to send.");
                             })
-                            .Else(empty => empty.Element("share-status").SetText("Plan a visit before sharing the week."));
+                            .Else(empty => empty.Element("share-status").Text.Set("Plan a visit before sharing the week."));
                     }))
                 @(Html.NativeButton("save-visits", "Save visits")
                     .CssClass(ButtonSubmit)
@@ -200,7 +197,7 @@
                             .Validate<FamilyVisitPlanValidator>(FormId)
                             .Response(r => r
                                 .OnSuccess<VisitPlanSaved>((saved, s) =>
-                                    s.Element("visit-confirmation").SetText(saved, x => x.Confirmation))
+                                    s.Element("visit-confirmation").Text.Set(saved.Get(x => x.Confirmation)))
                                 .OnError(400, e => e.ValidationErrors(FormId)));
                     }))
             </native-hstack>

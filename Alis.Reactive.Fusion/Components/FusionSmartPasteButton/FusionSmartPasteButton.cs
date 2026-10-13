@@ -1,5 +1,6 @@
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion SmartPasteButton, declared by the names its JavaScript API uses.
     /// </summary>
@@ -11,12 +12,13 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionSmartPasteButton : FusionComponent
     {
         /// <summary>Whether the button is disabled.</summary>
-        public ComponentProperty<bool> Disabled => Property<bool>("disabled");
+        public Prop<bool> Disabled => Prop<bool>();
 
         /// <summary>Clicks the button, pasting the clipboard into the form.</summary>
-        public ComponentMethod Click => Method("click");
+        public void Click() => Call();
 
         /// <summary>Moves focus to the button.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
     }
+#nullable restore annotations
 }

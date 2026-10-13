@@ -4,11 +4,8 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
 {
-    /// <summary>
-    /// Reads a typed value from a Reactive Plan payload scope such as event,
-    /// success, error, or dispatch.
-    /// </summary>
-    public sealed class PayloadTypedSource<TPayload, TProp> : TypedSource<TProp>
+    /// <summary>A member of data a callback received: an event's payload, a response body, a message.</summary>
+    internal sealed class PayloadTypedSource<TPayload, TProp> : TypedSource<TProp>
     {
         private readonly PayloadSource _source;
         private readonly Expression<Func<TPayload, TProp>> _expression;
@@ -18,12 +15,6 @@ namespace Alis.Reactive.Builders.Conditions
             _source = source;
             _expression = expression;
         }
-
-        internal static PayloadTypedSource<TPayload, TProp> FromEvent(
-            Expression<Func<TPayload, TProp>> expression) =>
-            new PayloadTypedSource<TPayload, TProp>(
-                PayloadSource.Event(),
-                expression);
 
         // The identity expression (x => x) selects no member: it reads the whole payload, for example
         // a response body that is itself the array a grid binds.

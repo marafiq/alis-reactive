@@ -13,6 +13,7 @@ using Syncfusion.EJ2.DropDowns;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Mention, declared by the names its JavaScript API uses.
     /// </summary>
@@ -24,13 +25,13 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionMention : FusionComponent
     {
         /// <summary>Filters the suggestions by a text and shows them at a position, in pixels.</summary>
-        public ComponentMethod<string, int, int> Search => Method<string, int, int>("search");
+        public void Search(Arg<string> first, Arg<int> second, Arg<int> third) => Call(first, second, third);
 
         /// <summary>Opens the suggestion popup.</summary>
-        public ComponentMethod ShowPopup => Method("showPopup");
+        public void ShowPopup() => Call();
 
         /// <summary>Closes the suggestion popup.</summary>
-        public ComponentMethod HidePopup => Method("hidePopup");
+        public void HidePopup() => Call();
 
         /// <summary>Raised when the user picks a suggestion.</summary>
         public TypedEvent<FusionMentionChangeArgs> Change =>
@@ -46,19 +47,20 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionMention.Change"/>.</summary>
-    public class FusionMentionChangeArgs
+    public class FusionMentionChangeArgs : JsObject
     {
         /// <summary>The picked suggestion's value.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>Whether user interaction made the pick.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionMention.Opened"/> and <see cref="FusionMention.Closed"/>; carries no data.</summary>
-    public class FusionMentionPopupArgs
+    public class FusionMentionPopupArgs : JsObject
     {
     }
+#nullable restore annotations
 
     public static class FusionMentionHtmlExtensions
     {

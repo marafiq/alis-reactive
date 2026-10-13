@@ -1,5 +1,4 @@
 @model VisitBoardModel
-@using Alis.Reactive.Builders.Conditions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.SandboxApp.BroughtComponents
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
@@ -23,15 +22,14 @@
             .Response(r => r.OnSuccess<ResidentWeekResponse>((week, s) =>
             {
                 var planner = s.Component<VisitPlanner>(m => m.VisitSlots);
-                planner
-                    .Set(c => c.Wing, week.Read(x => x.Wing))
-                    .Set(c => c.Capacity, week.Read(x => x.WeeklyVisits))
-                    .Set(c => c.Slots, week.Read(x => x.Slots));
-                TypedPluginSource<string> boardCode = s.Plugin(slugify.Slug).Arg(planner.Get(c => c.Wing));
-                s.Element("board-code").SetText(boardCode);
-                s.Element("board-quiet").SetText(s.From(planner.Get(c => c.Slots)).Count(slot => slot.Quiet));
-                s.Element("board-first-weekend").SetText(
-                    s.From(planner.Get(c => c.Slots)).Where(slot => slot.Day == "Saturday" || slot.Day == "Sunday").Select(slot => slot.Label).Find(label => label != ""));
+                planner.Wing.Set(week.Get(x => x.Wing));
+                planner.Capacity.Set(week.Get(x => x.WeeklyVisits));
+                planner.Slots.Set(week.Get(x => x.Slots));
+                TypedSource<string> boardCode = slugify.Slug(planner.Wing);
+                s.Element("board-code").Text.Set(boardCode);
+                s.Element("board-quiet").Text.Set(s.From(planner.Slots).Count(slot => slot.Quiet));
+                s.Element("board-first-weekend").Text.Set(
+                    s.From(planner.Slots).Where(slot => slot.Day == "Saturday" || slot.Day == "Sunday").Select(slot => slot.Label).Find(label => label != ""));
             }))));
 
     // Another desk's family took a time: if this family had it booked, release it and say so; either
@@ -39,29 +37,29 @@
     Html.On(plan, t => t.ServerPush(ServerPushStream.At<VisitBoardStream>(streamUrl), s => s.SlotTaken, (taken, p) =>
     {
         var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
-        var slot = p.Payload(taken).Get(x => x.Slot);
-        p.When(planner.Get(c => c.IsBooked, slot)).Truthy()
+        var slot = taken.Get(x => x.Slot);
+        p.When(planner.IsBooked(slot)).Truthy()
             .Then(mine =>
             {
-                mine.Component<VisitPlanner>(m => m.VisitSlots).Call(c => c.Release, mine.Payload(taken).Get(x => x.Slot));
-                mine.Element("board-alert").SetText(taken, x => x.Message);
-                mine.Element("board-alert").AddClass("text-danger");
+                mine.Component<VisitPlanner>(m => m.VisitSlots).Release(taken.Get(x => x.Slot));
+                mine.Element("board-alert").Text.Set(taken.Get(x => x.Message));
+                mine.Element("board-alert").ClassList.Add("text-danger");
             })
             .Else(other =>
             {
-                other.Element("board-alert").SetText(taken, x => x.Message);
-                other.Element("board-alert").RemoveClass("text-danger");
+                other.Element("board-alert").Text.Set(taken.Get(x => x.Message));
+                other.Element("board-alert").ClassList.Remove("text-danger");
             });
-        planner.Call(c => c.MarkTaken, slot, p.Payload(taken).Get(x => x.Family));
-        p.DispatchWith<BoardChange>(VisitBoardEvents.BoardChanged, change => change
-            .Set(x => x.Summary, p.Payload(taken).Get(x => x.Message))
-            .Set(x => x.Booked, planner.Get(c => c.Count)));
+        planner.MarkTaken(slot, taken.Get(x => x.Family));
+        p.Dispatch<BoardChange>(VisitBoardEvents.BoardChanged, change => change
+            .Set(x => x.Summary, taken.Get(x => x.Message))
+            .Set(x => x.Booked, planner.Count));
     }));
 
     Html.On(plan, t => t.CustomEvent<BoardChange>(VisitBoardEvents.BoardChanged, (change, p) =>
     {
-        p.Element("board-log").SetText(change, x => x.Summary);
-        p.Element("board-log-booked").SetText(change, x => x.Booked);
+        p.Element("board-log").Text.Set(change.Get(x => x.Summary));
+        p.Element("board-log-booked").Text.Set(change.Get(x => x.Booked));
     }));
 }
 
@@ -86,34 +84,34 @@
                 .Reactive(evt => evt.WeekChanged, (args, p) =>
                 {
                     var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
-                    p.Element("board-weekend").SetText(
-                        p.From(args, x => x.Value).Count(id => id.StartsWith("sat") || id.StartsWith("sun")));
+                    p.Element("board-weekend").Text.Set(
+                        p.From(args.Value).Count(id => id.StartsWith("sat") || id.StartsWith("sun")));
 
-                    p.When(planner.Get(c => c.Remaining)).Eq(0)
+                    p.When(planner.Remaining()).Eq(0)
                         .Then(full =>
                         {
-                            full.Element("board-capacity").SetText("This week is full.");
-                            full.Element("board-capacity").AddClass("text-warning");
+                            full.Element("board-capacity").Text.Set("This week is full.");
+                            full.Element("board-capacity").ClassList.Add("text-warning");
                         })
-                        .ElseIf(planner.Get(c => c.Remaining)).Eq(1)
+                        .ElseIf(planner.Remaining()).Eq(1)
                         .Then(one =>
                         {
-                            one.Element("board-capacity").SetText("One visit left this week.");
-                            one.Element("board-capacity").RemoveClass("text-warning");
+                            one.Element("board-capacity").Text.Set("One visit left this week.");
+                            one.Element("board-capacity").ClassList.Remove("text-warning");
                         })
                         .Else(more =>
                         {
-                            more.Element("board-capacity").SetText("More than one visit left this week.");
-                            more.Element("board-capacity").RemoveClass("text-warning");
+                            more.Element("board-capacity").Text.Set("More than one visit left this week.");
+                            more.Element("board-capacity").ClassList.Remove("text-warning");
                         });
 
-                    p.When(args, x => x.Added).NotEmpty()
+                    p.When(args.Added).NotEmpty()
                         .Then(added => added.Post(takeUrl)
                             .Gather<TakeVisitRequest>(g => g
-                                .Set(x => x.SlotId, added.Payload(args).Get(a => a.Added))
+                                .Set(x => x.SlotId, args.Added)
                                 .Set(x => x.Family, added.Url<VisitBoardQuery>().Get(q => q.Family)))
                             .Response(r => r.OnSuccess<DeskMessage>((held, s) =>
-                                s.Element("board-status").SetText(held, x => x.Message))));
+                                s.Element("board-status").Text.Set(held.Get(x => x.Message)))));
                 }); }
 
             <native-vstack gap="Xs">
@@ -127,8 +125,8 @@
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Element("board-legend").ToggleClass("hidden");
-                    p.Element("board-legend").SetHtml("<strong>Taken</strong> times belong to another desk's family; <em>dashed</em> times are quiet hours.");
+                    p.Element("board-legend").ClassList.Toggle("hidden");
+                    p.Element("board-legend").Html.Set("<strong>Taken</strong> times belong to another desk's family; <em>dashed</em> times are quiet hours.");
                 }))
             <p id="board-legend" class="hidden text-sm text-text-secondary"></p>
         </native-vstack>

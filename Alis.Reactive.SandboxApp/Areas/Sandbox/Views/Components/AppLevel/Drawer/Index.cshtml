@@ -26,33 +26,33 @@
                 .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Element("alis-drawer-title").SetText("Resident Details");
-                    p.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Sm);
+                    p.Element("alis-drawer-title").Text.Set("Resident Details");
+                    p.Component<NativeDrawer>().Size.Set(DrawerSize.Sm);
                     p.Get(Url.SandboxRoute("ResidentDetails", "Drawer"))
                      .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
-                    p.Component<NativeDrawer>().Call(c => c.Open);
+                    p.Component<NativeDrawer>().Open();
                 }))
 
             @(Html.NativeButton("btn-open-md", "Medium — Care Plan Notes")
                 .CssClass("px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent-dark transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Element("alis-drawer-title").SetText("Care Plan Notes");
-                    p.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md);
+                    p.Element("alis-drawer-title").Text.Set("Care Plan Notes");
+                    p.Component<NativeDrawer>().Size.Set(DrawerSize.Md);
                     p.Get(Url.SandboxRoute("CarePlanNotes", "Drawer"))
                      .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
-                    p.Component<NativeDrawer>().Call(c => c.Open);
+                    p.Component<NativeDrawer>().Open();
                 }))
 
             @(Html.NativeButton("btn-open-lg", "Large — Add Resident Form")
                 .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Element("alis-drawer-title").SetText("Add Resident");
-                    p.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Lg);
+                    p.Element("alis-drawer-title").Text.Set("Add Resident");
+                    p.Component<NativeDrawer>().Size.Set(DrawerSize.Lg);
                     p.Get(Url.SandboxRoute("AddResidentForm", "Drawer"))
                      .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
-                    p.Component<NativeDrawer>().Call(c => c.Open);
+                    p.Component<NativeDrawer>().Open();
                 }))
         </native-hstack>
     </native-card-body></native-card>
@@ -66,7 +66,7 @@
             .CssClass("px-4 py-2 rounded-lg border border-border text-sm font-medium text-text-secondary hover:bg-surface-alt transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<NativeDrawer>().Call(c => c.Close);
+                p.Component<NativeDrawer>().Close();
             }))
     </native-card-body></native-card>
 

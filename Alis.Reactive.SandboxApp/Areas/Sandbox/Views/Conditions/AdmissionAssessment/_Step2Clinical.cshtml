@@ -39,10 +39,10 @@
             {
                 p.Element("step-2").Hide();
                 p.Element("step-1").Show();
-                p.Element("step-ind-2").RemoveClass("font-bold");
-                p.Element("step-ind-2").RemoveClass("text-accent");
-                p.Element("step-ind-1").AddClass("font-bold");
-                p.Element("step-ind-1").AddClass("text-accent");
+                p.Element("step-ind-2").ClassList.Remove("font-bold");
+                p.Element("step-ind-2").ClassList.Remove("text-accent");
+                p.Element("step-ind-1").ClassList.Add("font-bold");
+                p.Element("step-ind-1").ClassList.Add("text-accent");
             }))
         @(Html.NativeButton("next-2", "Next: Functional \u2192")
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
@@ -56,10 +56,10 @@
                     {
                         s.Element("step-2").Hide();
                         s.Element("step-3").Show();
-                        s.Element("step-ind-2").RemoveClass("font-bold");
-                        s.Element("step-ind-2").RemoveClass("text-accent");
-                        s.Element("step-ind-3").AddClass("font-bold");
-                        s.Element("step-ind-3").AddClass("text-accent");
+                        s.Element("step-ind-2").ClassList.Remove("font-bold");
+                        s.Element("step-ind-2").ClassList.Remove("text-accent");
+                        s.Element("step-ind-3").ClassList.Add("font-bold");
+                        s.Element("step-ind-3").ClassList.Add("text-accent");
                     })
                     .OnError(400, e =>
                     {

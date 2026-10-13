@@ -9,6 +9,7 @@ using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Tab, declared by the names its JavaScript API uses.
     /// </summary>
@@ -20,13 +21,13 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionTab : FusionComponent
     {
         /// <summary>The zero-based index of the selected tab.</summary>
-        public ComponentProperty<int> SelectedItem => Property<int>("selectedItem");
+        public Prop<int> SelectedItem => Prop<int>();
 
         /// <summary>Selects the tab at a zero-based index.</summary>
-        public ComponentMethod<int> Select => Method<int>("select");
+        public void Select(Arg<int> value) => Call(value);
 
         /// <summary>Hides (<see langword="true"/>) or shows (<see langword="false"/>) the tab at a zero-based index.</summary>
-        public ComponentMethod<int, bool> HideTab => Method<int, bool>("hideTab");
+        public void HideTab(Arg<int> first, Arg<bool> second) => Call(first, second);
 
         /// <summary>Raised after a tab is selected.</summary>
         public TypedEvent<FusionTabSelectedArgs> Selected =>
@@ -34,17 +35,18 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionTab.Selected"/>.</summary>
-    public class FusionTabSelectedArgs
+    public class FusionTabSelectedArgs : JsObject
     {
         /// <summary>Index of the selected tab.</summary>
-        public int SelectedIndex { get; set; }
+        public ReadOnly<int> SelectedIndex => ReadOnly<int>();
 
         /// <summary>Index of the previously selected tab.</summary>
-        public int PreviousIndex { get; set; }
+        public ReadOnly<int> PreviousIndex => ReadOnly<int>();
 
         /// <summary>Whether a swipe selected the tab.</summary>
-        public bool IsSwiped { get; set; }
+        public ReadOnly<bool> IsSwiped => ReadOnly<bool>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Renders the component for a plan, ready for <c>.Reactive(...)</c>.

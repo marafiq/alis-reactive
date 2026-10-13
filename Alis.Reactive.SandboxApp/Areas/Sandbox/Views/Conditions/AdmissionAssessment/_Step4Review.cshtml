@@ -25,7 +25,7 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var contact = p.Component<NativeTextBox>(m => m.EmergencyContact);
-                p.When(contact.Get(c => c.Value)).IsEmpty()
+                p.When(contact.Value).IsEmpty()
                     .Then(t => t.Element("contact-warning").Show())
                     .Else(e => e.Element("contact-warning").Hide());
             }); }
@@ -76,10 +76,10 @@
             {
                 p.Element("step-4").Hide();
                 p.Element("step-3").Show();
-                p.Element("step-ind-4").RemoveClass("font-bold");
-                p.Element("step-ind-4").RemoveClass("text-accent");
-                p.Element("step-ind-3").AddClass("font-bold");
-                p.Element("step-ind-3").AddClass("text-accent");
+                p.Element("step-ind-4").ClassList.Remove("font-bold");
+                p.Element("step-ind-4").ClassList.Remove("text-accent");
+                p.Element("step-ind-3").ClassList.Add("font-bold");
+                p.Element("step-ind-3").ClassList.Add("text-accent");
             }))
         @(Html.NativeButton("submit-btn", "Submit Assessment")
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
@@ -93,7 +93,7 @@
                  .Response(r => r
                     .OnSuccess<SubmitScreeningResponse>((json, s) =>
                     {
-                        s.Element("submit-result").SetText(json, x => x.Message);
+                        s.Element("submit-result").Text.Set(json.Get(x => x.Message));
                         s.Element("submit-result").Show();
                         s.Element("submit-spinner").Hide();
                         s.Element("submit-text").Show();

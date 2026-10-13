@@ -5,6 +5,7 @@ using Syncfusion.EJ2.Inputs;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion NumericTextBox, declared by the names its JavaScript API uses.
     /// </summary>
@@ -16,22 +17,22 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
     {
         /// <summary>The numeric value.</summary>
-        public ComponentProperty<decimal> Value => Property<decimal>("value");
+        public Prop<decimal> Value => Prop<decimal>();
 
         /// <summary>The minimum allowed value.</summary>
-        public ComponentProperty<decimal> Min => Property<decimal>("min");
+        public Prop<decimal> Min => Prop<decimal>();
 
         /// <summary>Moves focus into the input.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
 
         /// <summary>Removes focus from the input.</summary>
-        public ComponentMethod FocusOut => Method("focusOut");
+        public void FocusOut() => Call();
 
         /// <summary>Increments the value by one step.</summary>
-        public ComponentMethod Increment => Method("increment");
+        public void Increment() => Call();
 
         /// <summary>Decrements the value by one step.</summary>
-        public ComponentMethod Decrement => Method("decrement");
+        public void Decrement() => Call();
 
         /// <summary>Raised when the value changes.</summary>
         public TypedEvent<FusionNumericTextBoxChangeArgs> Change =>
@@ -51,27 +52,28 @@ namespace Alis.Reactive.Fusion.Components
 
     /// <summary>Payload of <see cref="FusionNumericTextBox.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Value).Gte(100m)</c>.</remarks>
-    public class FusionNumericTextBoxChangeArgs
+    public class FusionNumericTextBoxChangeArgs : JsObject
     {
         /// <summary>Numeric value after the change.</summary>
-        public decimal Value { get; set; }
+        public ReadOnly<decimal> Value => ReadOnly<decimal>();
 
         /// <summary>Numeric value before the change.</summary>
-        public decimal PreviousValue { get; set; }
+        public ReadOnly<decimal> PreviousValue => ReadOnly<decimal>();
 
         /// <summary>Whether user interaction triggered the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionNumericTextBox.Focus"/>; carries no data.</summary>
-    public class FusionNumericTextBoxFocusArgs
+    public class FusionNumericTextBoxFocusArgs : JsObject
     {
     }
 
     /// <summary>Payload of <see cref="FusionNumericTextBox.Blur"/>; carries no data.</summary>
-    public class FusionNumericTextBoxBlurArgs
+    public class FusionNumericTextBoxBlurArgs : JsObject
     {
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionNumericTextBox"/> for a model-bound field.</summary>
     public static class FusionNumericTextBoxHtmlExtensions

@@ -29,8 +29,8 @@
                 p.Post(Url.SandboxRoute("BookMoveIn", "FusionDatePicker"))
                  .Gather(g => g.Form())
                  .Response(r => r
-                    .OnSuccess<MoveInBooked>((json, s) => s.Element("booking-status").SetText(json, x => x.Confirmation))
-                    .OnError(400, e => e.Element("booking-status").SetText("The move-in day could not be booked.")));
+                    .OnSuccess<MoveInBooked>((json, s) => s.Element("booking-status").Text.Set(json.Get(x => x.Confirmation)))
+                    .OnError(400, e => e.Element("booking-status").Text.Set("The move-in day could not be booked.")));
             }))
         <p id="booking-status" class="mt-3 text-sm text-text-muted">Not booked yet.</p>
     </native-card-body></native-card>

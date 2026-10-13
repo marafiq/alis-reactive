@@ -13,11 +13,12 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var listBox = p.Component<FusionListBox>(ListBoxId);
-        listBox.Set(c => c.Value, new[] { "alice" }).Call(c => c.DataBind);
-        p.Element("value-echo").SetText(listBox.Get(c => c.Value));
-        p.When(listBox.Get(c => c.Value)).NotEmpty()
-            .Then(t => t.Element("value-state").SetText("has values"))
-            .Else(e => e.Element("value-state").SetText("empty"));
+        listBox.Value.Set(new[] { "alice" });
+        listBox.DataBind();
+        p.Element("value-echo").Text.Set(listBox.Value);
+        p.When(listBox.Value).NotEmpty()
+            .Then(t => t.Element("value-state").Text.Set("has values"))
+            .Else(e => e.Element("value-state").Text.Set("empty"));
     }));
 }
 
@@ -32,17 +33,17 @@
             .Height("220px"))
             .Reactive(evt => evt.Change, (args, p) =>
             {
-                p.Element("change-value").SetText(args, x => x.Value);
-                p.When(args, x => x.Value).NotEmpty()
-                    .Then(t => t.Element("change-state").SetText("has values"))
-                    .Else(e => e.Element("change-state").SetText("empty"));
+                p.Element("change-value").Text.Set(args.Value);
+                p.When(args.Value).NotEmpty()
+                    .Then(t => t.Element("change-state").Text.Set("has values"))
+                    .Else(e => e.Element("change-state").Text.Set("empty"));
 
                 var listBox = p.Component<FusionListBox>(ListBoxId);
-                p.When(listBox.Get(c => c.Value)).NotEmpty()
+                p.When(listBox.Value).NotEmpty()
                     .Then(t =>
                     {
                         t.Element("selected-indicator").Show();
-                        t.Element("selected-indicator").SetText("selected");
+                        t.Element("selected-indicator").Text.Set("selected");
                     })
                     .Else(e => e.Element("selected-indicator").Hide());
             }))
@@ -56,62 +57,63 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var listBox = p.Component<FusionListBox>(ListBoxId);
-                    listBox.Set(c => c.Value, new[] { "bennett", "dawson" }).Call(c => c.DataBind);
-                    p.Element("value-echo").SetText(listBox.Get(c => c.Value));
-                    p.Element("command-state").SetText("value set");
+                    listBox.Value.Set(new[] { "bennett", "dawson" });
+                    listBox.DataBind();
+                    p.Element("value-echo").Text.Set(listBox.Value);
+                    p.Element("command-state").Text.Set("value set");
                 }))
             @(Html.NativeButton("select-carey-btn", "Select Carey")
                 .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var listBox = p.Component<FusionListBox>(ListBoxId);
-                    listBox.Call(c => c.SelectItems, new[] { "carey" }, true, true);
-                    p.Element("value-echo").SetText(listBox.Get(c => c.Value));
-                    p.Element("command-state").SetText("carey selected");
+                    listBox.SelectItems(new[] { "carey" }, true, true);
+                    p.Element("value-echo").Text.Set(listBox.Value);
+                    p.Element("command-state").Text.Set("carey selected");
                 }))
             @(Html.NativeButton("unselect-carey-btn", "Unselect Carey")
                 .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var listBox = p.Component<FusionListBox>(ListBoxId);
-                    listBox.Call(c => c.SelectItems, new[] { "carey" }, false, true);
-                    p.Element("value-echo").SetText(listBox.Get(c => c.Value));
-                    p.Element("command-state").SetText("carey unselected");
+                    listBox.SelectItems(new[] { "carey" }, false, true);
+                    p.Element("value-echo").Text.Set(listBox.Value);
+                    p.Element("command-state").Text.Set("carey unselected");
                 }))
             @(Html.NativeButton("select-all-btn", "Select All")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var listBox = p.Component<FusionListBox>(ListBoxId);
-                    listBox.Call(c => c.SelectAll, true);
-                    p.Element("value-echo").SetText(listBox.Get(c => c.Value));
-                    p.Element("command-state").SetText("all selected");
+                    listBox.SelectAll(true);
+                    p.Element("value-echo").Text.Set(listBox.Value);
+                    p.Element("command-state").Text.Set("all selected");
                 }))
             @(Html.NativeButton("unselect-all-btn", "Unselect All")
                 .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var listBox = p.Component<FusionListBox>(ListBoxId);
-                    listBox.Call(c => c.SelectAll, false);
-                    p.Element("value-echo").SetText(listBox.Get(c => c.Value));
-                    p.Element("command-state").SetText("all unselected");
-                    p.When(listBox.Get(c => c.Value)).NotEmpty()
-                        .Then(t => t.Element("value-state").SetText("has values"))
-                        .Else(e => e.Element("value-state").SetText("empty"));
+                    listBox.SelectAll(false);
+                    p.Element("value-echo").Text.Set(listBox.Value);
+                    p.Element("command-state").Text.Set("all unselected");
+                    p.When(listBox.Value).NotEmpty()
+                        .Then(t => t.Element("value-state").Text.Set("has values"))
+                        .Else(e => e.Element("value-state").Text.Set("empty"));
                 }))
             @(Html.NativeButton("disable-carey-btn", "Disable Carey")
                 .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionListBox>(ListBoxId).Call(c => c.EnableItems, new[] { "carey" }, false, true);
-                    p.Element("command-state").SetText("carey disabled");
+                    p.Component<FusionListBox>(ListBoxId).EnableItems(new[] { "carey" }, false, true);
+                    p.Element("command-state").Text.Set("carey disabled");
                 }))
             @(Html.NativeButton("enable-carey-btn", "Enable Carey")
                 .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionListBox>(ListBoxId).Call(c => c.EnableItems, new[] { "carey" }, true, true);
-                    p.Element("command-state").SetText("carey enabled");
+                    p.Component<FusionListBox>(ListBoxId).EnableItems(new[] { "carey" }, true, true);
+                    p.Element("command-state").Text.Set("carey enabled");
                 }))
         </native-hstack>
     </native-card-body></native-card>
@@ -124,11 +126,11 @@
             {
                 var listBox = p.Component<FusionListBox>(ListBoxId);
                 p.Post(Url.SandboxRoute("Echo", "ListBox"))
-                    .Gather<FusionListBoxEchoRequest>(g => g.Set(x => x.Value, listBox.Get(c => c.Value)))
+                    .Gather<FusionListBoxEchoRequest>(g => g.Set(x => x.Value, listBox.Value))
                     .Response(r => r.OnSuccess<FusionListBoxEchoResponse>((json, s) =>
                     {
-                        s.Element("gather-value").SetText(json, x => x.ValueSummary);
-                        s.Element("gather-count").SetText(json, x => x.CountSummary);
+                        s.Element("gather-value").Text.Set(json.Get(x => x.ValueSummary));
+                        s.Element("gather-count").Text.Set(json.Get(x => x.CountSummary));
                     }));
             }))
     </native-card-body></native-card>

@@ -54,9 +54,9 @@
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(InlineGridId).Set(c => c.DataSource, json.Read(x => x));
-                s.Component<FusionGrid>(DialogGridId).Set(c => c.DataSource, json.Read(x => x));
-                s.Element("edit-form-load-status").SetText("loaded edit form rows");
+                s.Component<FusionGrid>(InlineGridId).DataSource.Set(json);
+                s.Component<FusionGrid>(DialogGridId).DataSource.Set(json);
+                s.Element("edit-form-load-status").Text.Set("loaded edit form rows");
             }))));
 }
 
@@ -77,9 +77,9 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var grid = p.Component<FusionGrid>(InlineGridId);
-                    grid.Call(c => c.SelectRow, 0);
-                    grid.Call(c => c.StartEdit);
-                    p.Element("inline-tpl-status").SetText("inline edit started");
+                    grid.SelectRow(0);
+                    grid.StartEdit();
+                    p.Element("inline-tpl-status").Text.Set("inline edit started");
                 }))
         </native-hstack>
         @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, InlineGridId, b => b
@@ -97,9 +97,9 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var grid = p.Component<FusionGrid>(DialogGridId);
-                    grid.Call(c => c.SelectRow, 0);
-                    grid.Call(c => c.StartEdit);
-                    p.Element("dialog-tpl-status").SetText("dialog edit started");
+                    grid.SelectRow(0);
+                    grid.StartEdit();
+                    p.Element("dialog-tpl-status").Text.Set("dialog edit started");
                 }))
         </native-hstack>
         @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, DialogGridId, b => b

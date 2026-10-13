@@ -11,6 +11,7 @@ using Syncfusion.EJ2.Grids;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Grid, declared by the names its JavaScript API uses.
     /// </summary>
@@ -29,142 +30,130 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionGrid : FusionComponent
     {
         /// <summary>The rows; write an array, or a response body that is one.</summary>
-        public ComponentProperty<object> DataSource => Property<object>("dataSource");
+        public Prop<object> DataSource => Prop<object>();
 
         /// <summary>The rows, typed by your row class.</summary>
-        public ComponentProperty<TRow[]> Rows<TRow>() where TRow : class =>
-            Property<TRow[]>("dataSource");
+        public Prop<TRow[]> Rows<TRow>() where TRow : class => Prop<TRow[]>("dataSource");
 
         /// <summary>Renders the rows again from the data source.</summary>
-        public ComponentMethod Refresh => Method("refresh");
+        public void Refresh() => Call();
 
         /// <summary>The rows on the current page, after sorting, filtering and grouping.</summary>
-        public ComponentFunction<TRow[]> GetCurrentViewRecords<TRow>() where TRow : class =>
-            Function<TRow[]>("getCurrentViewRecords");
+        public TypedSource<TRow[]> GetCurrentViewRecords<TRow>() where TRow : class => Invoke<TRow[]>();
 
         /// <summary>The zero-based index of the row with this primary key.</summary>
-        public ComponentFunction<int, int> GetRowIndexByPrimaryKey => Function<int, int>("getRowIndexByPrimaryKey");
+        public TypedSource<int> GetRowIndexByPrimaryKey(Arg<int> value) => Invoke<int>(value);
 
         /// <summary>Selects the row at a zero-based index.</summary>
-        public ComponentMethod<int> SelectRow => Method<int>("selectRow");
+        public void SelectRow(Arg<int> value) => Call(value);
 
         /// <summary>Selects the rows from one zero-based index to another.</summary>
-        public ComponentMethod<int, int> SelectRowsByRange => Method<int, int>("selectRowsByRange");
+        public void SelectRowsByRange(Arg<int> first, Arg<int> second) => Call(first, second);
 
         /// <summary>Clears the selection.</summary>
-        public ComponentMethod ClearSelection => Method("clearSelection");
+        public void ClearSelection() => Call();
 
         /// <summary>The zero-based indexes of the selected rows.</summary>
-        public ComponentFunction<int[]> GetSelectedRowIndexes => Function<int[]>("getSelectedRowIndexes");
+        public TypedSource<int[]> GetSelectedRowIndexes() => Invoke<int[]>();
 
         /// <summary>The selected rows, typed by your row class.</summary>
-        public ComponentFunction<TRow[]> GetSelectedRecords<TRow>() where TRow : class =>
-            Function<TRow[]>("getSelectedRecords");
+        public TypedSource<TRow[]> GetSelectedRecords<TRow>() where TRow : class => Invoke<TRow[]>();
 
         /// <summary>Shows a page, counted from one.</summary>
-        public ComponentMethod<int> GoToPage => Method<int>("goToPage");
+        public void GoToPage(Arg<int> value) => Call(value);
 
         /// <summary>Sorts by a column; pass <see langword="true"/> to keep the sorts already applied.</summary>
-        public ComponentMethod<Field, FusionGridSortDirection, bool> SortColumn =>
-            Method<Field, FusionGridSortDirection, bool>("sortColumn");
+        public void SortColumn(Arg<Field> first, Arg<FusionGridSortDirection> second, Arg<bool> third) => Call(first, second, third);
 
         /// <summary>Clears every sort.</summary>
-        public ComponentMethod ClearSorting => Method("clearSorting");
+        public void ClearSorting() => Call();
 
         /// <summary>Shows the rows that contain this text; an empty text clears the search.</summary>
-        public ComponentMethod<string> Search => Method<string>("search");
+        public void Search(Arg<string> value) => Call(value);
 
         /// <summary>Filters a column by text.</summary>
-        public ComponentMethod<Field, FusionGridTextFilterOperator, string> FilterByColumn =>
-            Method<Field, FusionGridTextFilterOperator, string>("filterByColumn");
+        public void FilterByColumn(Arg<Field> first, Arg<FusionGridTextFilterOperator> second, Arg<string> third) => Call(first, second, third);
 
         /// <summary>Clears every filter.</summary>
-        public ComponentMethod ClearFiltering => Method("clearFiltering");
+        public void ClearFiltering() => Call();
 
         /// <summary>Groups the rows by a column.</summary>
-        public ComponentMethod<Field> GroupColumn => Method<Field>("groupColumn");
+        public void GroupColumn(Arg<Field> value) => Call(value);
 
         /// <summary>Removes the grouping by a column.</summary>
-        public ComponentMethod<Field> UngroupColumn => Method<Field>("ungroupColumn");
+        public void UngroupColumn(Arg<Field> value) => Call(value);
 
         /// <summary>Clears every grouping.</summary>
-        public ComponentMethod ClearGrouping => Method("clearGrouping");
+        public void ClearGrouping() => Call();
 
         /// <summary>Shows a hidden column.</summary>
-        public ComponentMethod<Field> ShowColumn => Method<Field>("showColumns").Passing("field");
+        public void ShowColumn(Arg<Field> value) => Call(value, Fixed("field"), name: "showColumns");
 
         /// <summary>Hides a column.</summary>
-        public ComponentMethod<Field> HideColumn => Method<Field>("hideColumns").Passing("field");
+        public void HideColumn(Arg<Field> value) => Call(value, Fixed("field"), name: "hideColumns");
 
         /// <summary>Moves a column before another one.</summary>
-        public ComponentMethod<Field, Field> ReorderColumns => Method<Field, Field>("reorderColumns");
+        public void ReorderColumns(Arg<Field> first, Arg<Field> second) => Call(first, second);
 
         /// <summary>Fits every column to its content.</summary>
-        public ComponentMethod AutoFitColumns => Method("autoFitColumns");
+        public void AutoFitColumns() => Call();
 
         /// <summary>Fits one column to its content.</summary>
-        public ComponentMethod<Field> AutoFitColumn => Method<Field>("autoFitColumns");
+        public void AutoFitColumn(Arg<Field> value) => Call(value, name: "autoFitColumns");
 
         /// <summary>Opens the column chooser.</summary>
-        public ComponentMethod OpenColumnChooser => Method("openColumnChooser");
+        public void OpenColumnChooser() => Call();
 
         /// <summary>Starts editing the selected row, inline or in a dialog as the edit settings say.</summary>
-        public ComponentMethod StartEdit => Method("startEdit");
+        public void StartEdit() => Call();
 
         /// <summary>Saves the edit; in batch mode, saves the pending changes.</summary>
-        public ComponentMethod EndEdit => Method("endEdit");
+        public void EndEdit() => Call();
 
         /// <summary>Cancels the edit.</summary>
-        public ComponentMethod CloseEdit => Method("closeEdit");
+        public void CloseEdit() => Call();
 
         /// <summary>Adds a row at the top.</summary>
-        public ComponentMethod<TRow> AddRecord<TRow>() where TRow : class =>
-            Method<TRow>("addRecord");
+        public void AddRecord<TRow>(Arg<TRow> value) where TRow : class => Call(value);
 
         /// <summary>Adds a row at a zero-based index.</summary>
-        public ComponentMethod<TRow, int> AddRecordAt<TRow>() where TRow : class =>
-            Method<TRow, int>("addRecord");
+        public void AddRecordAt<TRow>(Arg<TRow> first, Arg<int> second) where TRow : class => Call(first, second, name: "addRecord");
 
         /// <summary>Deletes the selected row.</summary>
-        public ComponentMethod DeleteRecord => Method("deleteRecord");
+        public void DeleteRecord() => Call();
 
         /// <summary>Replaces the row at a zero-based index.</summary>
-        public ComponentMethod<int, TRow> UpdateRow<TRow>() where TRow : class =>
-            Method<int, TRow>("updateRow");
+        public void UpdateRow<TRow>(Arg<int> first, Arg<TRow> second) where TRow : class => Call(first, second);
 
         /// <summary>Replaces the data of the row with this primary key.</summary>
-        public ComponentMethod<int, TRow> SetRowData<TRow>() where TRow : class =>
-            Method<int, TRow>("setRowData");
+        public void SetRowData<TRow>(Arg<int> first, Arg<TRow> second) where TRow : class => Call(first, second);
 
         /// <summary>Sets a cell of the row with this primary key.</summary>
-        public ComponentMethod<int, Field<TValue>, TValue> SetCellValue<TValue>() =>
-            Method<int, Field<TValue>, TValue>("setCellValue");
+        public void SetCellValue<TValue>(Arg<int> first, Arg<Field<TValue>> second, Arg<TValue> third) => Call(first, second, third);
 
         /// <summary>Opens a cell for batch editing: the row's zero-based index, then the column.</summary>
-        public ComponentMethod<int, Field> EditCell => Method<int, Field>("editCell");
+        public void EditCell(Arg<int> first, Arg<Field> second) => Call(first, second);
 
         /// <summary>Saves the cell being batch edited.</summary>
-        public ComponentMethod SaveCell => Method("saveCell");
+        public void SaveCell() => Call();
 
         /// <summary>Changes a cell as a pending batch edit: the row's zero-based index, the column, the value.</summary>
-        public ComponentMethod<int, Field<TValue>, TValue> UpdateCell<TValue>() =>
-            Method<int, Field<TValue>, TValue>("updateCell");
+        public void UpdateCell<TValue>(Arg<int> first, Arg<Field<TValue>> second, Arg<TValue> third) => Call(first, second, third);
 
         /// <summary>The pending batch edits, typed by your row class.</summary>
-        public ComponentFunction<FusionGridBatchChanges<TRow>> GetBatchChanges<TRow>() where TRow : class =>
-            Function<FusionGridBatchChanges<TRow>>("getBatchChanges");
+        public TypedSource<FusionGridBatchChanges<TRow>> GetBatchChanges<TRow>() where TRow : class => Invoke<FusionGridBatchChanges<TRow>>();
 
         /// <summary>Downloads the rows as an Excel file.</summary>
-        public ComponentMethod ExcelExport => Method("excelExport");
+        public void ExcelExport() => Call();
 
         /// <summary>Downloads the rows as a CSV file.</summary>
-        public ComponentMethod CsvExport => Method("csvExport");
+        public void CsvExport() => Call();
 
         /// <summary>Downloads the rows as a PDF file.</summary>
-        public ComponentMethod PdfExport => Method("pdfExport");
+        public void PdfExport() => Call();
 
         /// <summary>Prints the grid.</summary>
-        public ComponentMethod Print => Method("print");
+        public void Print() => Call();
 
         /// <summary>Raised when the grid needs data for a page, sort or filter, in custom binding.</summary>
         public TypedEvent<FusionGridDataStateChangeArgs> DataStateChange =>
@@ -251,37 +240,37 @@ namespace Alis.Reactive.Fusion.Components
     /// and <c>search</c> appear only on the trigger variants that emit them.
     /// Do not infer missing fields from another variant.
     /// </remarks>
-    public class FusionGridDataStateChangeArgs
+    public class FusionGridDataStateChangeArgs : JsObject
     {
         /// <summary>Syncfusion event name injected by the EJ2 event observer.</summary>
-        public string? Name { get; set; }
+        public ReadOnly<string> Name => ReadOnly<string>();
 
         /// <summary>Paging offset (0-based). Always present.</summary>
-        public int Skip { get; set; }
+        public ReadOnly<int> Skip => ReadOnly<int>();
 
         /// <summary>Page size. Always present.</summary>
-        public int Take { get; set; }
+        public ReadOnly<int> Take => ReadOnly<int>();
 
         /// <summary>Whether the data response must include both result records and total count.</summary>
-        public bool RequiresCounts { get; set; }
+        public ReadOnly<bool> RequiresCounts => ReadOnly<bool>();
 
         /// <summary>Active sort columns when this trigger emits sorting state. Supports multi-sort.</summary>
-        public List<FusionGridSortColumn>? Sorted { get; set; }
+        public ReadOnly<List<FusionGridSortColumn>> Sorted => ReadOnly<List<FusionGridSortColumn>>();
 
         /// <summary>
         /// Active group fields when this trigger emits grouping state.
         /// Method-trigger ungrouping omits this payload key rather than emitting an empty array.
         /// </summary>
-        public List<string>? Group { get; set; }
+        public ReadOnly<List<string>> Group => ReadOnly<List<string>>();
 
         /// <summary>Active text filter criteria from Grid filter UI.</summary>
-        public List<FusionGridTextFilterCriterion>? Where { get; set; }
+        public ReadOnly<List<FusionGridTextFilterCriterion>> Where => ReadOnly<List<FusionGridTextFilterCriterion>>();
 
         /// <summary>Active search criteria from Grid toolbar or public search method.</summary>
-        public List<FusionGridSearchDescriptor>? Search { get; set; }
+        public ReadOnly<List<FusionGridSearchDescriptor>> Search => ReadOnly<List<FusionGridSearchDescriptor>>();
 
         /// <summary>Action details such as request type, column name, direction, and current page.</summary>
-        public FusionGridAction Action { get; set; } = new FusionGridAction();
+        public ReadOnly<FusionGridAction> Action => ReadOnly<FusionGridAction>();
     }
 
     /// <summary>
@@ -303,22 +292,22 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionGridTextFilterCriterion
     {
         /// <summary>Field being filtered.</summary>
-        public string? Field { get; set; }
+        public string Field { get; set; }
 
         /// <summary>Filter operator such as <c>contains</c>, <c>equal</c>, or <c>startswith</c>.</summary>
-        public string? Operator { get; set; }
+        public string Operator { get; set; }
 
         /// <summary>Filter text supplied by this criterion.</summary>
-        public string? Value { get; set; }
+        public string Value { get; set; }
 
         /// <summary>Composite predicate condition such as <c>and</c> or <c>or</c>.</summary>
-        public string? Condition { get; set; }
+        public string Condition { get; set; }
 
         /// <summary>Whether this predicate node contains nested predicates.</summary>
         public bool IsComplex { get; set; }
 
         /// <summary>Nested predicates when Syncfusion emits a composite Predicate.</summary>
-        public List<FusionGridTextFilterCriterion>? Predicates { get; set; }
+        public List<FusionGridTextFilterCriterion> Predicates { get; set; }
 
         /// <summary>Whether the filter ignores case.</summary>
         public bool IgnoreCase { get; set; }
@@ -333,13 +322,13 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionGridSearchDescriptor
     {
         /// <summary>Fields included in the search.</summary>
-        public List<string>? Fields { get; set; }
+        public List<string> Fields { get; set; }
 
         /// <summary>Search text.</summary>
-        public string? Key { get; set; }
+        public string Key { get; set; }
 
         /// <summary>Search operator such as <c>contains</c>.</summary>
-        public string? Operator { get; set; }
+        public string Operator { get; set; }
 
         /// <summary>Whether search is case-insensitive.</summary>
         public bool IgnoreCase { get; set; }
@@ -364,22 +353,22 @@ namespace Alis.Reactive.Fusion.Components
         public const string Refresh = "refresh";
 
         /// <summary>Syncfusion request type, such as <c>sorting</c> or <c>paging</c>.</summary>
-        public string? RequestType { get; set; }
+        public string RequestType { get; set; }
 
         /// <summary>Syncfusion action event name injected by the EJ2 event observer.</summary>
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
         /// <summary>Syncfusion action event type, such as <c>actionBegin</c>.</summary>
-        public string? Type { get; set; }
+        public string Type { get; set; }
 
         /// <summary>Whether the current action can be cancelled.</summary>
         public bool Cancel { get; set; }
 
         /// <summary>Column name for sorting actions.</summary>
-        public string? ColumnName { get; set; }
+        public string ColumnName { get; set; }
 
         /// <summary>Sort direction for sorting actions.</summary>
-        public string? Direction { get; set; }
+        public string Direction { get; set; }
 
         /// <summary>Page number after the data-state action.</summary>
         public int CurrentPage { get; set; }
@@ -396,16 +385,16 @@ namespace Alis.Reactive.Fusion.Components
     /// Fires when any toolbar item is clicked, including custom items.
     /// Read <see cref="Item"/> to branch on which button was pressed.
     /// </summary>
-    public class FusionGridToolbarClickArgs
+    public class FusionGridToolbarClickArgs : JsObject
     {
         /// <summary>Toolbar item that raised the click event.</summary>
-        public FusionGridToolbarItem Item { get; set; } = new FusionGridToolbarItem();
+        public ReadOnly<FusionGridToolbarItem> Item => ReadOnly<FusionGridToolbarItem>();
 
         /// <summary>Toolbar action cancel flag carried by Syncfusion.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
 
         /// <summary>Syncfusion event name.</summary>
-        public string? Name { get; set; }
+        public ReadOnly<string> Name => ReadOnly<string>();
     }
 
     /// <summary>
@@ -415,53 +404,53 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionGridToolbarItem
     {
         /// <summary>Toolbar item id, such as a custom command id or <c>{gridId}_excelexport</c>.</summary>
-        public string? Id { get; set; }
+        public string Id { get; set; }
 
         /// <summary>Toolbar item display text.</summary>
-        public string? Text { get; set; }
+        public string Text { get; set; }
     }
 
     /// <summary>
     /// Event args for the Syncfusion Grid "recordClick" event.
     /// </summary>
     /// <typeparam name="TRow">Grid row DTO type.</typeparam>
-    public class FusionGridRecordClickArgs<TRow>
+    public class FusionGridRecordClickArgs<TRow> : JsObject
         where TRow : class
     {
         /// <summary>Row data for the clicked record.</summary>
-        public TRow RowData { get; set; } = default!;
+        public ReadOnly<TRow> RowData => ReadOnly<TRow>();
 
         /// <summary>Zero-based row index.</summary>
-        public int RowIndex { get; set; }
+        public ReadOnly<int> RowIndex => ReadOnly<int>();
 
         /// <summary>Zero-based cell index.</summary>
-        public int CellIndex { get; set; }
+        public ReadOnly<int> CellIndex => ReadOnly<int>();
 
         /// <summary>Syncfusion event name.</summary>
-        public string? Name { get; set; }
+        public ReadOnly<string> Name => ReadOnly<string>();
     }
 
     /// <summary>
     /// Event args for the Syncfusion Grid "rowSelected" event.
     /// </summary>
     /// <typeparam name="TRow">Grid row DTO type.</typeparam>
-    public class FusionGridRowSelectedArgs<TRow>
+    public class FusionGridRowSelectedArgs<TRow> : JsObject
         where TRow : class
     {
         /// <summary>Row data carried by the selected row event.</summary>
-        public TRow Data { get; set; } = default!;
+        public ReadOnly<TRow> Data => ReadOnly<TRow>();
 
         /// <summary>Zero-based index of the row after selection.</summary>
-        public int RowIndex { get; set; }
+        public ReadOnly<int> RowIndex => ReadOnly<int>();
 
         /// <summary>Zero-based index of the previously selected row, when one exists.</summary>
-        public int? PreviousRowIndex { get; set; }
+        public ReadOnly<int?> PreviousRowIndex => ReadOnly<int?>();
 
         /// <summary>Whether user interaction triggered the row selection.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
 
         /// <summary>Syncfusion event name.</summary>
-        public string? Name { get; set; }
+        public ReadOnly<string> Name => ReadOnly<string>();
     }
 
     /// <summary>The pending batch edits, as <see cref="FusionGrid.GetBatchChanges{TRow}"/> returns them.</summary>
@@ -481,107 +470,108 @@ namespace Alis.Reactive.Fusion.Components
 
     /// <summary>Payload of <c>BeginEdit</c>; set <c>Cancel</c> to keep the row out of edit mode.</summary>
     /// <typeparam name="TRow">Your row class.</typeparam>
-    public class FusionGridBeginEditArgs<TRow>
+    public class FusionGridBeginEditArgs<TRow> : JsObject
         where TRow : class
     {
         /// <summary>The row about to be edited.</summary>
-        public TRow RowData { get; set; } = default!;
+        public ReadOnly<TRow> RowData => ReadOnly<TRow>();
 
         /// <summary>Zero-based index of the row.</summary>
-        public int RowIndex { get; set; }
+        public ReadOnly<int> RowIndex => ReadOnly<int>();
 
         /// <summary>The edit type the grid reports.</summary>
-        public string? Type { get; set; }
+        public ReadOnly<string> Type => ReadOnly<string>();
 
         /// <summary>Set to <see langword="true"/> to cancel the edit.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <c>ActionBegin</c> and <c>ActionComplete</c>; set <c>Cancel</c> in <c>ActionBegin</c> to stop the action.</summary>
     /// <typeparam name="TRow">Your row class.</typeparam>
-    public class FusionGridEditActionArgs<TRow>
+    public class FusionGridEditActionArgs<TRow> : JsObject
         where TRow : class
     {
         /// <summary>The event name.</summary>
-        public string? Name { get; set; }
+        public ReadOnly<string> Name => ReadOnly<string>();
 
         /// <summary>The kind of action, for example <c>"save"</c>, <c>"delete"</c> or <c>"sorting"</c>.</summary>
-        public string? RequestType { get; set; }
+        public ReadOnly<string> RequestType => ReadOnly<string>();
 
         /// <summary><c>"add"</c> or <c>"edit"</c> when a row is saved.</summary>
-        public string? Action { get; set; }
+        public ReadOnly<string> Action => ReadOnly<string>();
 
         /// <summary>The edit type the grid reports.</summary>
-        public string? Type { get; set; }
+        public ReadOnly<string> Type => ReadOnly<string>();
 
         /// <summary>Set to <see langword="true"/> in <c>ActionBegin</c> to cancel the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
 
         /// <summary>The row the action applies to.</summary>
-        public TRow Data { get; set; } = default!;
+        public ReadOnly<TRow> Data => ReadOnly<TRow>();
 
         /// <summary>The row before the edit.</summary>
-        public TRow PreviousData { get; set; } = default!;
+        public ReadOnly<TRow> PreviousData => ReadOnly<TRow>();
 
         /// <summary>Zero-based index of the row, when the action has one.</summary>
-        public int? RowIndex { get; set; }
+        public ReadOnly<int?> RowIndex => ReadOnly<int?>();
 
         /// <summary>Zero-based index of the selected row.</summary>
-        public int SelectedRow { get; set; }
+        public ReadOnly<int> SelectedRow => ReadOnly<int>();
     }
 
     /// <summary>Payload of <c>CellSave</c>; set <c>Cancel</c> to keep the cell from saving.</summary>
     /// <typeparam name="TRow">Your row class.</typeparam>
     /// <typeparam name="TValue">The type of the cell value.</typeparam>
-    public class FusionGridCellSaveArgs<TRow, TValue>
+    public class FusionGridCellSaveArgs<TRow, TValue> : JsObject
         where TRow : class
     {
         /// <summary>The row of the cell.</summary>
-        public TRow RowData { get; set; } = default!;
+        public ReadOnly<TRow> RowData => ReadOnly<TRow>();
 
         /// <summary>The column field of the cell.</summary>
-        public string? ColumnName { get; set; }
+        public ReadOnly<string> ColumnName => ReadOnly<string>();
 
         /// <summary>The value being saved.</summary>
-        public TValue? Value { get; set; }
+        public ReadOnly<TValue> Value => ReadOnly<TValue>();
 
         /// <summary>The value before the edit.</summary>
-        public TValue? PreviousValue { get; set; }
+        public ReadOnly<TValue> PreviousValue => ReadOnly<TValue>();
 
         /// <summary>Set to <see langword="true"/> to cancel the save.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <c>CellSaved</c>.</summary>
     /// <typeparam name="TRow">Your row class.</typeparam>
     /// <typeparam name="TValue">The type of the cell value.</typeparam>
-    public class FusionGridCellSavedArgs<TRow, TValue>
+    public class FusionGridCellSavedArgs<TRow, TValue> : JsObject
         where TRow : class
     {
         /// <summary>The row of the cell.</summary>
-        public TRow RowData { get; set; } = default!;
+        public ReadOnly<TRow> RowData => ReadOnly<TRow>();
 
         /// <summary>The column field of the cell.</summary>
-        public string? ColumnName { get; set; }
+        public ReadOnly<string> ColumnName => ReadOnly<string>();
 
         /// <summary>The saved value.</summary>
-        public TValue? Value { get; set; }
+        public ReadOnly<TValue> Value => ReadOnly<TValue>();
 
         /// <summary>The value before the edit.</summary>
-        public TValue? PreviousValue { get; set; }
+        public ReadOnly<TValue> PreviousValue => ReadOnly<TValue>();
     }
 
     /// <summary>Payload of <c>BeforeBatchSave</c>; set <c>Cancel</c> to keep the pending edits unsaved.</summary>
     /// <typeparam name="TRow">Your row class.</typeparam>
-    public class FusionGridBeforeBatchSaveArgs<TRow>
+    public class FusionGridBeforeBatchSaveArgs<TRow> : JsObject
         where TRow : class
     {
         /// <summary>The pending edits.</summary>
-        public FusionGridBatchChanges<TRow> BatchChanges { get; set; } = new FusionGridBatchChanges<TRow>();
+        public ReadOnly<FusionGridBatchChanges<TRow>> BatchChanges => ReadOnly<FusionGridBatchChanges<TRow>>();
 
         /// <summary>Set to <see langword="true"/> to cancel the save.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionGrid"/> against a plan.</summary>
     public static class FusionGridHtmlExtensions

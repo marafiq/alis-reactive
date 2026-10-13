@@ -40,7 +40,7 @@
                  .Response(r => r
                     .OnSuccess<RespiteBookingConfirmation>((json, s) =>
                     {
-                        s.Element("respite-booking-status").SetText(json, x => x.Confirmation);
+                        s.Element("respite-booking-status").Text.Set(json.Get(x => x.Confirmation));
                     })
                     .OnError(400, e => e.ValidationErrors("respite-booking-form")));
             }))

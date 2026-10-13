@@ -7,31 +7,31 @@
     // DomReady dispatches after CustomEvent listeners are wired, so this chain runs in order.
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Element("step-1").AddClass("text-green-600");
-        p.Element("step-1").SetText("dom-ready fired → dispatched \"test\"");
+        p.Element("step-1").ClassList.Add("text-green-600");
+        p.Element("step-1").Text.Set("dom-ready fired → dispatched \"test\"");
         p.Dispatch(EventsEvents.Test);
     }));
 
     Html.On(plan, t => t.CustomEvent(EventsEvents.Test, p =>
     {
-        p.Element("step-2").AddClass("text-green-600");
-        p.Element("step-2").SetText("\"test\" received → dispatched \"test-received\"");
+        p.Element("step-2").ClassList.Add("text-green-600");
+        p.Element("step-2").Text.Set("\"test\" received → dispatched \"test-received\"");
         p.Dispatch(EventsEvents.TestReceived);
     }));
 
     Html.On(plan, t => t.CustomEvent<EventsViewModel>(EventsEvents.TestReceived, (payload, p) =>
     {
-        p.Element("step-3").AddClass("text-green-600");
-        p.Element("step-3").SetText("\"test-received\" received → dispatched \"final\" with payload");
+        p.Element("step-3").ClassList.Add("text-green-600");
+        p.Element("step-3").Text.Set("\"test-received\" received → dispatched \"final\" with payload");
         p.Dispatch(EventsEvents.Final, new EventsViewModel { EventName = "done" });
     }));
 
     Html.On(plan, t => t.CustomEvent(EventsEvents.Final, p =>
     {
-        p.Element("chain-status").RemoveClass("text-text-muted");
-        p.Element("chain-status").AddClass("text-green-600");
-        p.Element("chain-status").AddClass("font-semibold");
-        p.Element("chain-status").SetText("Chain complete — all 3 hops executed successfully");
+        p.Element("chain-status").ClassList.Remove("text-text-muted");
+        p.Element("chain-status").ClassList.Add("text-green-600");
+        p.Element("chain-status").ClassList.Add("font-semibold");
+        p.Element("chain-status").Text.Set("Chain complete — all 3 hops executed successfully");
     }));
 
     var formattedJson = plan.RenderFormatted();
@@ -63,28 +63,28 @@
         <native-heading level="H2">C# DSL</native-heading>
         <pre class="rounded-md bg-slate-900 text-sky-400 p-4 font-mono text-xs overflow-x-auto"><code>Html.On(plan, t =&gt; t.DomReady(p =&gt;
 {
-    p.Element("step-1").AddClass("text-green-600");
-    p.Element("step-1").SetText("dom-ready fired");
+    p.Element("step-1").ClassList.Add("text-green-600");
+    p.Element("step-1").Text.Set("dom-ready fired");
     p.Dispatch(EventsEvents.Test);
 }));
 
 Html.On(plan, t =&gt; t.CustomEvent(EventsEvents.Test, p =&gt;
 {
-    p.Element("step-2").AddClass("text-green-600");
+    p.Element("step-2").ClassList.Add("text-green-600");
     p.Dispatch(EventsEvents.TestReceived);
 }));
 
 Html.On(plan, t =&gt; t.CustomEvent&lt;EventsViewModel&gt;("test-received", (payload, p) =&gt;
 {
-    p.Element("step-3").AddClass("text-green-600");
+    p.Element("step-3").ClassList.Add("text-green-600");
     p.Dispatch(EventsEvents.Final, new EventsViewModel { EventName = "done" });
 }));
 
 Html.On(plan, t =&gt; t.CustomEvent(EventsEvents.Final, p =&gt;
 {
-    p.Element("chain-status").RemoveClass("text-text-muted");
-    p.Element("chain-status").AddClass("text-green-600");
-    p.Element("chain-status").SetText("Chain complete");
+    p.Element("chain-status").ClassList.Remove("text-text-muted");
+    p.Element("chain-status").ClassList.Add("text-green-600");
+    p.Element("chain-status").Text.Set("Chain complete");
 }));</code></pre>
     </native-card-body></native-card>
 

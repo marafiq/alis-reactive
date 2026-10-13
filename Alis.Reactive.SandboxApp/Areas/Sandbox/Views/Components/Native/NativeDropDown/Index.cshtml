@@ -10,13 +10,13 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<NativeDropDown>(m => m.CareLevel).Set(c => c.Value, "Memory Care");
+        p.Component<NativeDropDown>(m => m.CareLevel).Value.Set("Memory Care");
     }));
 
     Html.On(plan, t => t.DomReady(p =>
     {
         var comp = p.Component<NativeDropDown>(m => m.CareLevel);
-        p.Element("value-echo").SetText(comp.Get(c => c.Value));
+        p.Element("value-echo").Text.Set(comp.Value);
     }));
 }
 
@@ -61,18 +61,18 @@
                 .CssClass("rounded-md border border-border px-3 py-1.5 text-sm"))
             .Reactive(evt => evt.Change, (args, p) =>
             {
-                p.When(args, x => x.Value).Eq("Medical")
+                p.When(args.Value).Eq("Medical")
                     .Then(t =>
                     {
-                        t.Element("medical-notice").SetText("medical facility selected");
-                        t.Element("medical-notice").AddClass("text-green-600");
-                        t.Element("medical-notice").RemoveClass("text-text-muted");
+                        t.Element("medical-notice").Text.Set("medical facility selected");
+                        t.Element("medical-notice").ClassList.Add("text-green-600");
+                        t.Element("medical-notice").ClassList.Remove("text-text-muted");
                     })
                     .Else(e =>
                     {
-                        e.Element("medical-notice").SetText("not a medical facility");
-                        e.Element("medical-notice").RemoveClass("text-green-600");
-                        e.Element("medical-notice").AddClass("text-text-muted");
+                        e.Element("medical-notice").Text.Set("not a medical facility");
+                        e.Element("medical-notice").ClassList.Remove("text-green-600");
+                        e.Element("medical-notice").ClassList.Add("text-text-muted");
                     });
             }); }
         <p class="font-mono text-sm mt-2">Notice: <span id="medical-notice" class="text-text-muted">&mdash;</span></p>
@@ -89,9 +89,9 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var comp = p.Component<NativeDropDown>(m => m.CareLevel);
-                p.When(comp.Get(c => c.Value)).NotEmpty()
-                    .Then(t => t.Element("care-confirmation").SetText("care level confirmed"))
-                    .Else(e => e.Element("care-confirmation").SetText("care level is required"));
+                p.When(comp.Value).NotEmpty()
+                    .Then(t => t.Element("care-confirmation").Text.Set("care level confirmed"))
+                    .Else(e => e.Element("care-confirmation").Text.Set("care level is required"));
             }))
         <p class="font-mono text-sm mt-2">Status: <span id="care-confirmation" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>

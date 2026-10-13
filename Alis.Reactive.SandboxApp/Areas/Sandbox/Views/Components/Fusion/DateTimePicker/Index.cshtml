@@ -8,9 +8,9 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<FusionDateTimePicker>(m => m.MedicationTime).Set(c => c.Value, new DateTime(2026, 6, 15, 14, 30, 0));
+        p.Component<FusionDateTimePicker>(m => m.MedicationTime).Value.Set(new DateTime(2026, 6, 15, 14, 30, 0));
         var comp = p.Component<FusionDateTimePicker>(m => m.MedicationTime);
-        p.Element("value-echo").SetText(comp.Get(c => c.Value));
+        p.Element("value-echo").Text.Set(comp.Value);
     }));
 }
 
@@ -33,16 +33,16 @@
                     .Placeholder("Select medication time"))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("change-value").SetText(args, x => x.Value);
-                    p.When(args, x => x.Value).NotNull()
-                        .Then(t => t.Element("args-condition").SetText("time selected"))
-                        .Else(e => e.Element("args-condition").SetText("no time"));
+                    p.Element("change-value").Text.Set(args.Value);
+                    p.When(args.Value).NotNull()
+                        .Then(t => t.Element("args-condition").Text.Set("time selected"))
+                        .Else(e => e.Element("args-condition").Text.Set("no time"));
                     var comp = p.Component<FusionDateTimePicker>(m => m.MedicationTime);
-                    p.When(comp.Get(c => c.Value)).NotNull()
+                    p.When(comp.Value).NotNull()
                         .Then(then =>
                         {
                             then.Element("selected-indicator").Show();
-                            then.Element("selected-indicator").SetText("medication scheduled");
+                            then.Element("selected-indicator").Text.Set("medication scheduled");
                         })
                         .Else(else_ =>
                         {
@@ -85,9 +85,9 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var comp = p.Component<FusionDateTimePicker>(m => m.MedicationTime);
-                    p.When(comp.Get(c => c.Value)).IsEmpty()
-                        .Then(t => t.Element("medication-warning").SetText("medication time is required"))
-                        .Else(e => e.Element("medication-warning").SetText("medication time set"));
+                    p.When(comp.Value).IsEmpty()
+                        .Then(t => t.Element("medication-warning").Text.Set("medication time is required"))
+                        .Else(e => e.Element("medication-warning").Text.Set("medication time set"));
                 }))
         </native-hstack>
         <p class="font-mono text-sm mt-2">Warning: <span id="medication-warning" class="text-text-muted">&mdash;</span></p>

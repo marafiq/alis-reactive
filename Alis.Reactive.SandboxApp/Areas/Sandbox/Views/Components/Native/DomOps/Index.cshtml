@@ -5,37 +5,37 @@
 
     var plan = Html.ReactivePlan<DomOpsModel>();
 
-    // FromDom normalizes DOMTokenList and HTMLCollection so array operators run at the browser boundary.
+    // A class list and a child list are arrays: the array operators run over them in the browser.
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Element("dom-total-classes").SetText(p.FromDom("dom-card", "classList").Count());
-        p.Element("dom-risk-count").SetText(
-            p.FromDom("dom-card", "classList").Where(x => x.StartsWith("risk-")).Count());
-        p.Element("dom-child-count").SetText(p.FromDom("dom-list", "children").Count());
+        p.Element("dom-total-classes").Text.Set(p.Element("dom-card").ClassList.Items.Count());
+        p.Element("dom-risk-count").Text.Set(
+            p.Element("dom-card").ClassList.Items.Where(x => x.StartsWith("risk-")).Count());
+        p.Element("dom-child-count").Text.Set(p.Element("dom-list").Children.Count());
 
-        p.When(p.FromDom("dom-card", "classList").Any(x => x == "care-memory")).Truthy()
+        p.When(p.Element("dom-card").ClassList.Items.Any(x => x == "care-memory")).Truthy()
          .Then(then => then.Element("dom-memory-yes").Show())
          .Else(els => els.Element("dom-memory-no").Show());
 
         // RuntimePath.call invokes getAttribute at each DOM child element scope.
-        p.Element("dom-high-risk-count").SetText(
-            p.FromDom<DomChild>("risk-list", "children").Count(x => x.GetAttribute("data-risk") == "high"));
+        p.Element("dom-high-risk-count").Text.Set(
+            p.Element("risk-list").Children.Count(x => x.GetAttribute("data-risk") == "high"));
     }));
 
     // Follow-up read observes the class added earlier in the same reaction.
     Html.NativeButton("dom-add-risk-btn", "Add Risk Flag")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {
-            p.Element("dom-card").AddClass("risk-extra");
-            p.Element("dom-risk-count").SetText(
-                p.FromDom("dom-card", "classList").Where(x => x.StartsWith("risk-")).Count());
+            p.Element("dom-card").ClassList.Add("risk-extra");
+            p.Element("dom-risk-count").Text.Set(
+                p.Element("dom-card").ClassList.Items.Where(x => x.StartsWith("risk-")).Count());
         });
 }
 
 <native-vstack gap="Lg">
     <native-heading level="H1">DomOps</native-heading>
     <native-text color="Secondary">
-        The array DSL over native DOM. <code>p.FromDom("dom-card", "classList").Where(x =&gt; x.StartsWith("risk-")).Count()</code>
+        The array DSL over native DOM. <code>p.Element("dom-card").ClassList.Items.Where(x =&gt; x.StartsWith("risk-")).Count()</code>
         reads a DOM element by id, normalizes its DOMTokenList, and counts — deterministically, in the plan.
     </native-text>
 

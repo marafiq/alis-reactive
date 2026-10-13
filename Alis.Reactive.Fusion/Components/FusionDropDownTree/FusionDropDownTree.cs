@@ -5,6 +5,7 @@ using Syncfusion.EJ2.DropDowns;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion DropDownTree, declared by the names its JavaScript API uses.
     /// </summary>
@@ -16,22 +17,22 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionDropDownTree : FusionComponent, IInputComponent
     {
         /// <summary>The selected node values; <see langword="null"/> clears them.</summary>
-        public ComponentProperty<string[]?> Value => Property<string[]?>("value");
+        public Prop<string[]> Value => Prop<string[]>();
 
         /// <summary>The text shown for the selection.</summary>
-        public ComponentProperty<string?> Text => Property<string?>("text");
+        public Prop<string> Text => Prop<string>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Opens the popup.</summary>
-        public ComponentMethod ShowPopup => Method("showPopup");
+        public void ShowPopup() => Call();
 
         /// <summary>Closes the popup.</summary>
-        public ComponentMethod HidePopup => Method("hidePopup");
+        public void HidePopup() => Call();
 
         /// <summary>Clears the selection.</summary>
-        public ComponentMethod Clear => Method("clear");
+        public void Clear() => Call();
 
         /// <summary>Raised when the selection changes.</summary>
         public TypedEvent<FusionDropDownTreeChangeArgs> Change =>
@@ -42,17 +43,18 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionDropDownTree.Change"/>.</summary>
-    public class FusionDropDownTreeChangeArgs
+    public class FusionDropDownTreeChangeArgs : JsObject
     {
         /// <summary>Selected values after the change.</summary>
-        public string[]? Value { get; set; }
+        public ReadOnly<string[]> Value => ReadOnly<string[]>();
 
         /// <summary>Selected values before the change.</summary>
-        public string[]? OldValue { get; set; }
+        public ReadOnly<string[]> OldValue => ReadOnly<string[]>();
 
         /// <summary>Whether user interaction made the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Creates a FusionDropDownTree inside a field wrapper, bound to a model property.

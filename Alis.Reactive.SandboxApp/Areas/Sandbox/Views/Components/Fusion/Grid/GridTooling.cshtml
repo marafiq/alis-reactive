@@ -14,8 +14,8 @@
         p.Get(Url.SandboxRoute("OperationRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                s.Element("tooling-status").SetText("loaded");
+                s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                s.Element("tooling-status").Text.Set("loaded");
             }))));
 }
 
@@ -30,15 +30,15 @@
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.GoToPage, 2);
-                p.Element("tooling-status").SetText("goToPage called");
+                p.Component<FusionGrid>(GridId).GoToPage(2);
+                p.Element("tooling-status").Text.Set("goToPage called");
             }))
         @(Html.NativeButton("tooling-column-chooser", "Open Column Chooser")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.OpenColumnChooser);
-                p.Element("tooling-status").SetText("showColumnChooser called");
+                p.Component<FusionGrid>(GridId).OpenColumnChooser();
+                p.Element("tooling-status").Text.Set("showColumnChooser called");
             }))
     </native-hstack>
 

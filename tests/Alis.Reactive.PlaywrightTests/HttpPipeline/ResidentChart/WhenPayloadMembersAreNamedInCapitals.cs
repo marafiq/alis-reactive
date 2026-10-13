@@ -30,9 +30,9 @@ public sealed class WhenPayloadMembersAreNamedInCapitals
                 pipeline.Get("/Sandbox/HttpPipeline/ResidentChart/Chart/helen")
                     .Response(r => r.OnSuccess<SandboxApp.Areas.Sandbox.Models.ResidentChart>((json, s) =>
                     {
-                        s.Element("chart-mrn").SetText(json, x => x.MRN!);
-                        s.When(json, x => x.MRN).NotEmpty()
-                         .Then(t => t.Element("chart-record").SetText("linked"));
+                        s.Element("chart-mrn").Text.Set(json.Get(x => x.MRN!));
+                        s.When(json.Get(x => x.MRN)).NotEmpty()
+                         .Then(t => t.Element("chart-record").Text.Set("linked"));
                     }))));
 
         var members = ReadMembers(plan.Render());
@@ -49,7 +49,7 @@ public sealed class WhenPayloadMembersAreNamedInCapitals
                 pipeline.Dispatch(ResidentChartEvents.ChartFlagged, new ChartFlagged { MRN = "MRN-20417" })));
         HtmlExtensions.On(Html, plan, trigger =>
             trigger.CustomEvent(ResidentChartEvents.ChartFlagged, (flag, pipeline) =>
-                pipeline.Element("review-flag").SetText(flag, x => x.MRN!)));
+                pipeline.Element("review-flag").Text.Set(flag.Get(x => x.MRN!))));
 
         var planJson = plan.Render();
 
@@ -69,8 +69,8 @@ public sealed class WhenPayloadMembersAreNamedInCapitals
                 pipeline.Get("/Sandbox/HttpPipeline/ResidentChart/Charts")
                     .Response(r => r.OnSuccess<ChartList>((json, s) =>
                     {
-                        var charts = s.From(json.Read(x => x.Charts));
-                        s.Element("linked-charts").SetText(charts.Count(chart => chart.MRN != null));
+                        var charts = s.From(json.Get(x => x.Charts));
+                        s.Element("linked-charts").Text.Set(charts.Count(chart => chart.MRN != null));
                     }))));
 
         var members = ReadMembers(plan.Render());

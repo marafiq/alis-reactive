@@ -15,8 +15,8 @@
         p.Get(Url.SandboxRoute("OperationRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                s.Element("selection-status").SetText("loaded");
+                s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                s.Element("selection-status").Text.Set("loaded");
             }))));
 }
 
@@ -31,22 +31,22 @@
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.SelectRow, 0);
-                p.Element("selection-status").SetText("selectRow called");
+                p.Component<FusionGrid>(GridId).SelectRow(0);
+                p.Element("selection-status").Text.Set("selectRow called");
             }))
         @(Html.NativeButton("select-range", "Select Residents 2-4")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.SelectRowsByRange, 1, 3);
-                p.Element("selection-status").SetText("selectRowsByRange called");
+                p.Component<FusionGrid>(GridId).SelectRowsByRange(1, 3);
+                p.Element("selection-status").Text.Set("selectRowsByRange called");
             }))
         @(Html.NativeButton("clear-selection", "Clear Selection")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.ClearSelection);
-                p.Element("selection-status").SetText("clearSelection called");
+                p.Component<FusionGrid>(GridId).ClearSelection();
+                p.Element("selection-status").Text.Set("clearSelection called");
             }))
     </native-hstack>
 

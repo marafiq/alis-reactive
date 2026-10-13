@@ -32,9 +32,9 @@
                  .Validate<DateValidationValidator>("date-form")
                  .Response(r => r.OnSuccess(s =>
                  {
-                     s.Element("date-result").SetText("All dates valid!");
-                     s.Element("date-result").AddClass("text-green-600");
-                     s.Element("date-result").RemoveClass("text-text-muted");
+                     s.Element("date-result").Text.Set("All dates valid!");
+                     s.Element("date-result").ClassList.Add("text-green-600");
+                     s.Element("date-result").ClassList.Remove("text-text-muted");
                  }));
             }))
         <p id="date-result" class="mt-3 text-sm text-text-muted">Click to validate</p>

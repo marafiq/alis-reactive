@@ -29,24 +29,24 @@
                 {
                     var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
 
-                    p.When(comp.Get(c => c.Value)).Gt(100m)
+                    p.When(comp.Value).Gt(100m)
                         .Then(then =>
                         {
                             then.Element("tachycardia-warning").Show();
-                            then.Element("tachycardia-warning").SetText("Tachycardia detected");
+                            then.Element("tachycardia-warning").Text.Set("Tachycardia detected");
                         })
                         .Else(else_ =>
                         {
                             else_.Element("tachycardia-warning").Hide();
                         });
 
-                    p.When(comp.Get(c => c.Value)).Gte(120m)
-                        .Then(t => t.Element("hr-zone").SetText("Critical"))
-                        .ElseIf(comp.Get(c => c.Value)).Gte(100m)
-                        .Then(t => t.Element("hr-zone").SetText("High"))
-                        .ElseIf(comp.Get(c => c.Value)).Gte(60m)
-                        .Then(t => t.Element("hr-zone").SetText("Normal"))
-                        .Else(e => e.Element("hr-zone").SetText("Low"));
+                    p.When(comp.Value).Gte(120m)
+                        .Then(t => t.Element("hr-zone").Text.Set("Critical"))
+                        .ElseIf(comp.Value).Gte(100m)
+                        .Then(t => t.Element("hr-zone").Text.Set("High"))
+                        .ElseIf(comp.Value).Gte(60m)
+                        .Then(t => t.Element("hr-zone").Text.Set("Normal"))
+                        .Else(e => e.Element("hr-zone").Text.Set("Low"));
                 }); }
         </native-grid>
         <p class="font-mono text-sm">Warning: <span id="tachycardia-warning" hidden class="text-rose-600">&mdash;</span></p>
@@ -76,15 +76,15 @@
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
                     var comp = p.Component<FusionNumericTextBox>(m => m.BloodPressure);
-                    p.When(comp.Get(c => c.Value)).Gte(60m)
-                        .And(comp.Get(c => c.Value)).Lte(120m)
+                    p.When(comp.Value).Gte(60m)
+                        .And(comp.Value).Lte(120m)
                         .Then(then =>
                         {
-                            then.Element("bp-range").SetText("Normal range");
+                            then.Element("bp-range").Text.Set("Normal range");
                         })
                         .Else(else_ =>
                         {
-                            else_.Element("bp-range").SetText("Out of range");
+                            else_.Element("bp-range").Text.Set("Out of range");
                         });
                 }); }
         </native-grid>
@@ -110,9 +110,9 @@
                 {
                     var hr = p.Component<FusionNumericTextBox>(m => m.HeartRate);
                     var threshold = p.Component<FusionNumericTextBox>(m => m.ThresholdValue);
-                    p.When(hr.Get(c => c.Value)).Gte(threshold.Get(c => c.Value))
-                        .Then(t => t.Element("threshold-result").SetText("Above threshold"))
-                        .Else(e => e.Element("threshold-result").SetText("Below threshold"));
+                    p.When(hr.Value).Gte(threshold.Value)
+                        .Then(t => t.Element("threshold-result").Text.Set("Above threshold"))
+                        .Else(e => e.Element("threshold-result").Text.Set("Below threshold"));
                 }))
         </native-hstack>
         <p class="font-mono text-sm mt-2">Result: <span id="threshold-result" class="text-text-muted">&mdash;</span></p>

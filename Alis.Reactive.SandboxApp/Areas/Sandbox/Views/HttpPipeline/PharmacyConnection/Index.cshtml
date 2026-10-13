@@ -28,13 +28,13 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Get(testOrderUrl)
-                     .Gather<PharmacyTestOrder>(g => g.Set(x => x.PharmacyId, p.Component<NativeDropDown>(m => m.PharmacyId).Get(c => c.Value)))
+                     .Gather<PharmacyTestOrder>(g => g.Set(x => x.PharmacyId, p.Component<NativeDropDown>(m => m.PharmacyId).Value))
                      .Response(r => r.OnSuccess<PharmacyHandshake>((reply, s) =>
                      {
-                         s.Element("pharmacy-reply").SetText(reply, x => x.ResponseBody);
-                         s.When(reply, x => x.StatusCode).Eq(200)
-                          .Then(connected => connected.Element("pharmacy-status").SetText("Connected"))
-                          .Else(down => down.Element("pharmacy-status").SetText("Not connected"));
+                         s.Element("pharmacy-reply").Text.Set(reply.Get(x => x.ResponseBody));
+                         s.When(reply.Get(x => x.StatusCode)).Eq(200)
+                          .Then(connected => connected.Element("pharmacy-status").Text.Set("Connected"))
+                          .Else(down => down.Element("pharmacy-status").Text.Set("Not connected"));
                      }));
                 }))
         </native-vstack>

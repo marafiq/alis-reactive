@@ -5,6 +5,7 @@ using Syncfusion.EJ2.Inputs;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion OTP Input, declared by the names its JavaScript API uses.
     /// </summary>
@@ -17,16 +18,16 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionOtpInput : FusionComponent, IInputComponent
     {
         /// <summary>The passcode; <see langword="null"/> when empty.</summary>
-        public ComponentProperty<string?> Value => Property<string?>("value");
+        public Prop<string> Value => Prop<string>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Moves focus into the first empty field.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
 
         /// <summary>Removes focus from the fields.</summary>
-        public ComponentMethod FocusOut => Method("focusOut");
+        public void FocusOut() => Call();
 
         /// <summary>Raised as a field changes while the user types.</summary>
         public TypedEvent<FusionOtpInputInputArgs> Input =>
@@ -49,56 +50,57 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionOtpInput.Input"/>.</summary>
-    public class FusionOtpInputInputArgs
+    public class FusionOtpInputInputArgs : JsObject
     {
         /// <summary>Passcode after the edit.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>Passcode before the edit.</summary>
-        public string? PreviousValue { get; set; }
+        public ReadOnly<string> PreviousValue => ReadOnly<string>();
 
         /// <summary>Zero-based index of the field that changed.</summary>
-        public int Index { get; set; }
+        public ReadOnly<int> Index => ReadOnly<int>();
     }
 
     /// <summary>Payload of <see cref="FusionOtpInput.ValueChanged"/>.</summary>
-    public class FusionOtpInputValueChangedArgs
+    public class FusionOtpInputValueChangedArgs : JsObject
     {
         /// <summary>Passcode after the change.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>Previously committed passcode.</summary>
-        public string? PreviousValue { get; set; }
+        public ReadOnly<string> PreviousValue => ReadOnly<string>();
 
         /// <summary>Whether user interaction triggered the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionOtpInput.Focus"/>.</summary>
-    public class FusionOtpInputFocusArgs
+    public class FusionOtpInputFocusArgs : JsObject
     {
         /// <summary>Passcode when the field receives focus.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>Zero-based index of the field that received focus.</summary>
-        public int Index { get; set; }
+        public ReadOnly<int> Index => ReadOnly<int>();
 
         /// <summary>Whether user interaction caused the focus.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionOtpInput.Blur"/>.</summary>
-    public class FusionOtpInputBlurArgs
+    public class FusionOtpInputBlurArgs : JsObject
     {
         /// <summary>Passcode when the field loses focus.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>Zero-based index of the field that lost focus.</summary>
-        public int Index { get; set; }
+        public ReadOnly<int> Index => ReadOnly<int>();
 
         /// <summary>Whether user interaction caused the blur.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionOtpInput"/> for a model-bound field.</summary>
     public static class FusionOtpInputHtmlExtensions

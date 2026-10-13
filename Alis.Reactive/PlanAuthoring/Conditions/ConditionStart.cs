@@ -13,19 +13,6 @@ namespace Alis.Reactive.Builders.Conditions
     {
         internal ConditionStart() { }
 
-        /// <summary>Starts the group with a comparison of the triggering event's payload.</summary>
-        public ConditionSourceBuilder<TModel, TProp, GroupCondition<TModel>> When<TPayload, TProp>(
-            TPayload payload,
-            Expression<Func<TPayload, TProp>> path) =>
-            When(PayloadTypedSource<TPayload, TProp>.FromEvent(path));
-
-        /// <summary>Starts the group with a comparison of the response body.</summary>
-        public ConditionSourceBuilder<TModel, TProp, GroupCondition<TModel>> When<TResponse, TProp>(
-            ResponseBody<TResponse> responseBody,
-            Expression<Func<TResponse, TProp>> path)
-            where TResponse : class =>
-            When(responseBody.Read(path));
-
         /// <summary>Starts the group with a comparison of a value read when the condition runs.</summary>
         public ConditionSourceBuilder<TModel, TProp, GroupCondition<TModel>> When<TProp>(TypedSource<TProp> source) =>
             new ConditionSourceBuilder<TModel, TProp, GroupCondition<TModel>>(source, graph => new GroupCondition<TModel>(graph));

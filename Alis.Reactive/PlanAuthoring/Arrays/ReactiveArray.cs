@@ -10,10 +10,11 @@ namespace Alis.Reactive.Builders.Arrays
     /// Reactive Plan <c>array-op</c> nodes; they do not execute on the server. Deliberately not
     /// <see cref="System.Collections.IEnumerable"/>/<c>IQueryable</c>, so LINQ extension methods
     /// are not candidates (no collision) and lambdas are captured, not invoked. Per-element
-    /// predicates and selectors read the element scope; chains compose as plan nodes.
+    /// predicates and selectors read the element scope; chains compose as plan nodes. The transformed
+    /// array is itself a value: <c>grid.DataSource.Set(rows.Where(r =&gt; r.Active))</c>.
     /// </summary>
     /// <typeparam name="TElement">Element type carried through transforms.</typeparam>
-    public sealed class ReactiveArray<TElement>
+    public sealed class ReactiveArray<TElement> : TypedSource<TElement[]>
     {
         private readonly ValueExpression _source;
         private readonly Shape _elementShape;
@@ -112,13 +113,7 @@ namespace Alis.Reactive.Builders.Arrays
                 ValueExpression.ArrayFind(_source, Predicate(predicate), Projection(selector), _elementShape, fieldShape));
         }
 
-        /// <summary>
-        /// Exposes the composed array as a typed source so the transformed array can bind to a
-        /// component data source wherever a <see cref="TypedSource{T}"/> is accepted, such as
-        /// <c>Set(c =&gt; c.DataSource, rows.AsSource())</c>, without an HTTP round-trip. The
-        /// underlying value is the same array-op expression the runtime already evaluates.
-        /// </summary>
-        public TypedSource<TElement[]> AsSource() => new ReactiveArraySource<TElement>(_source);
+        internal override ValueExpression ToValueExpression() => _source;
 
         private static ConditionGraph Predicate(Expression<Func<TElement, bool>> predicate)
         {
@@ -131,18 +126,5 @@ namespace Alis.Reactive.Builders.Arrays
             if (selector == null) throw new ArgumentNullException(nameof(selector));
             return ElementExpressionCompiler.CompileProjection(selector);
         }
-    }
-
-    /// <summary>Array-op result exposed as a typed source for component data-source binding.</summary>
-    internal sealed class ReactiveArraySource<TElement> : TypedSource<TElement[]>
-    {
-        private readonly ValueExpression _value;
-
-        internal ReactiveArraySource(ValueExpression value)
-        {
-            _value = value ?? throw new ArgumentNullException(nameof(value));
-        }
-
-        internal override ValueExpression ToValueExpression() => _value;
     }
 }

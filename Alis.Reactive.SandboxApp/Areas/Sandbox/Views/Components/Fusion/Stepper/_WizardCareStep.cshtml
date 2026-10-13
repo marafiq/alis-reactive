@@ -33,16 +33,16 @@
                 .Placeholder("Select care level"))
             .Reactive(evt => evt.Change, (args, p) =>
             {
-                p.When(args, x => x.Value).Eq("Memory Care")
+                p.When(args.Value).Eq("Memory Care")
                     .Then(t =>
                     {
                         t.Element("memory-assessment-panel").Show();
-                        t.Element("stepper-wizard-status").SetText("memory assessment required");
+                        t.Element("stepper-wizard-status").Text.Set("memory assessment required");
                     })
                     .Else(e =>
                     {
                         e.Element("memory-assessment-panel").Hide();
-                        e.Element("stepper-wizard-status").SetText("standard care path");
+                        e.Element("stepper-wizard-status").Text.Set("standard care path");
                     });
             }); }
 
@@ -65,8 +65,8 @@
             .CssClass("rounded-md bg-surface px-5 py-2 text-sm font-medium text-text hover:bg-surface-2 transition-colors")
             .Reactive(plan, evt => evt.Click, (_, p) =>
             {
-                p.Component<FusionStepper>(StepperId).Set(c => c.ActiveStep, 0);
-                p.Element("stepper-wizard-status").SetText("returned to intake");
+                p.Component<FusionStepper>(StepperId).ActiveStep.Set(0);
+                p.Element("stepper-wizard-status").Text.Set("returned to intake");
             }))
 
         @(Html.NativeButton("stepper-wizard-next-care", "Next: Contacts")
@@ -78,10 +78,10 @@
                     .Response(r => r
                         .OnSuccess<FusionStepperWizardSaveResponse>((json, s) =>
                         {
-                            s.Component<NativeHiddenField>(m => m.WizardId).Set(c => c.Value, json.Read(x => x.WizardId));
-                            s.Component<NativeHiddenField, FusionStepperWizardShellModel>(m => m.MaxUnlockedStep).Set(c => c.Value, "2");
-                            s.Component<FusionStepper>(StepperId).Set(c => c.ActiveStep, 2);
-                            s.Element("stepper-wizard-status").SetText(json, x => x.Message);
+                            s.Component<NativeHiddenField>(m => m.WizardId).Value.Set(json.Get(x => x.WizardId));
+                            s.Component<NativeHiddenField, FusionStepperWizardShellModel>(m => m.MaxUnlockedStep).Value.Set("2");
+                            s.Component<FusionStepper>(StepperId).ActiveStep.Set(2);
+                            s.Element("stepper-wizard-status").Text.Set(json.Get(x => x.Message));
                         })
                         .OnError(400, e => e.ValidationErrors(FormId)));
             }))

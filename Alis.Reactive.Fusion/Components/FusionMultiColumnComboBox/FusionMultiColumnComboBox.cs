@@ -6,6 +6,7 @@ using Syncfusion.EJ2.MultiColumnComboBox;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion MultiColumnComboBox, declared by the names its JavaScript API uses.
     /// </summary>
@@ -17,28 +18,28 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionMultiColumnComboBox : FusionComponent, IInputComponent
     {
         /// <summary>The selected value; <see langword="null"/> when empty.</summary>
-        public ComponentProperty<string?> Value => Property<string?>("value");
+        public Prop<string> Value => Prop<string>();
 
         /// <summary>The text shown for the selection.</summary>
-        public ComponentProperty<string?> Text => Property<string?>("text");
+        public Prop<string> Text => Prop<string>();
 
         /// <summary>The rows the popup offers; call <see cref="DataBind"/> after writing it.</summary>
-        public ComponentProperty<object> DataSource => Property<object>("dataSource");
+        public Prop<object> DataSource => Prop<object>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Moves focus into the input.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
 
         /// <summary>Removes focus from the input.</summary>
-        public ComponentMethod FocusOut => Method("focusOut");
+        public void FocusOut() => Call();
 
         /// <summary>Opens the popup.</summary>
-        public ComponentMethod ShowPopup => Method("showPopup");
+        public void ShowPopup() => Call();
 
         /// <summary>Closes the popup.</summary>
-        public ComponentMethod HidePopup => Method("hidePopup");
+        public void HidePopup() => Call();
 
         /// <summary>Raised when the selection changes.</summary>
         public TypedEvent<FusionMultiColumnComboBoxChangeArgs> Change =>
@@ -49,14 +50,15 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionMultiColumnComboBox.Change"/>.</summary>
-    public class FusionMultiColumnComboBoxChangeArgs
+    public class FusionMultiColumnComboBoxChangeArgs : JsObject
     {
         /// <summary>Selected value after the change.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>Whether user interaction made the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Adds typed field mapping and rendering helpers for <see cref="FusionMultiColumnComboBox"/>.

@@ -9,6 +9,7 @@ using Syncfusion.EJ2.Popups;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Tooltip, declared by the names its JavaScript API uses.
     /// </summary>
@@ -21,13 +22,13 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionTooltip : FusionComponent
     {
         /// <summary>Shows the tooltip.</summary>
-        public ComponentMethod Open => Method("open");
+        public void Open() => Call();
 
         /// <summary>Hides the tooltip.</summary>
-        public ComponentMethod Close => Method("close");
+        public void Close() => Call();
 
         /// <summary>Re-renders the tooltip for its current target.</summary>
-        public ComponentMethod Refresh => Method("refresh");
+        public void Refresh() => Call();
 
         /// <summary>Raised before the tooltip opens.</summary>
         public TypedEvent<FusionTooltipBeforeOpenArgs> BeforeOpen =>
@@ -51,35 +52,36 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionTooltip.BeforeOpen"/>.</summary>
-    public class FusionTooltipBeforeOpenArgs
+    public class FusionTooltipBeforeOpenArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionTooltip.BeforeClose"/>.</summary>
-    public class FusionTooltipBeforeCloseArgs
+    public class FusionTooltipBeforeCloseArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionTooltip.Opened"/>; carries no data.</summary>
-    public class FusionTooltipOpenedArgs
+    public class FusionTooltipOpenedArgs : JsObject
     {
     }
 
     /// <summary>Payload of <see cref="FusionTooltip.Closed"/>; carries no data.</summary>
-    public class FusionTooltipClosedArgs
+    public class FusionTooltipClosedArgs : JsObject
     {
     }
 
     /// <summary>Payload of <see cref="FusionTooltip.BeforeRender"/>.</summary>
-    public class FusionTooltipBeforeRenderArgs
+    public class FusionTooltipBeforeRenderArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Renders the component for a plan, ready for <c>.Reactive(...)</c>.

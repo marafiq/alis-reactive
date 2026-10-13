@@ -10,6 +10,7 @@ using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Menu, declared by the names its JavaScript API uses.
     /// </summary>
@@ -21,10 +22,10 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionMenu : FusionComponent
     {
         /// <summary>Opens the menu (a hamburger menu).</summary>
-        public ComponentMethod Open => Method("open");
+        public void Open() => Call();
 
         /// <summary>Closes the menu (a hamburger menu).</summary>
-        public ComponentMethod Close => Method("close");
+        public void Close() => Call();
 
         /// <summary>Raised before each item renders.</summary>
         public TypedEvent<FusionMenuBeforeItemRenderArgs> BeforeItemRender =>
@@ -52,63 +53,64 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionMenu.BeforeItemRender"/>.</summary>
-    public class FusionMenuBeforeItemRenderArgs
+    public class FusionMenuBeforeItemRenderArgs : JsObject
     {
         /// <summary>The item about to render.</summary>
-        public FusionMenuItem Item { get; set; } = new FusionMenuItem();
+        public ReadOnly<FusionMenuItem> Item => ReadOnly<FusionMenuItem>();
     }
 
     /// <summary>Payload of <see cref="FusionMenu.BeforeOpen"/>.</summary>
-    public class FusionMenuBeforeOpenArgs
+    public class FusionMenuBeforeOpenArgs : JsObject
     {
         /// <summary>The items of the menu level involved.</summary>
-        public List<FusionMenuItem> Items { get; set; } = [];
+        public ReadOnly<List<FusionMenuItem>> Items => ReadOnly<List<FusionMenuItem>>();
 
         /// <summary>The parent item of a submenu; <see langword="null"/> for the top level.</summary>
-        public FusionMenuItem? ParentItem { get; set; }
+        public ReadOnly<FusionMenuItem> ParentItem => ReadOnly<FusionMenuItem>();
 
         /// <summary>Top position of the menu, in pixels.</summary>
-        public double Top { get; set; }
+        public ReadOnly<double> Top => ReadOnly<double>();
 
         /// <summary>Left position of the menu, in pixels.</summary>
-        public double Left { get; set; }
+        public ReadOnly<double> Left => ReadOnly<double>();
 
         /// <summary>Whether the menu opens with focus.</summary>
-        public bool? IsFocused { get; set; }
+        public ReadOnly<bool?> IsFocused => ReadOnly<bool?>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionMenu.OnOpen"/> and <see cref="FusionMenu.OnClose"/>.</summary>
-    public class FusionMenuOpenCloseArgs
+    public class FusionMenuOpenCloseArgs : JsObject
     {
         /// <summary>The items of the menu level involved.</summary>
-        public List<FusionMenuItem> Items { get; set; } = [];
+        public ReadOnly<List<FusionMenuItem>> Items => ReadOnly<List<FusionMenuItem>>();
 
         /// <summary>The parent item of a submenu; <see langword="null"/> for the top level.</summary>
-        public FusionMenuItem? ParentItem { get; set; }
+        public ReadOnly<FusionMenuItem> ParentItem => ReadOnly<FusionMenuItem>();
     }
 
     /// <summary>Payload of <see cref="FusionMenu.BeforeClose"/>.</summary>
-    public class FusionMenuBeforeCloseArgs
+    public class FusionMenuBeforeCloseArgs : JsObject
     {
         /// <summary>The items of the menu level involved.</summary>
-        public List<FusionMenuItem> Items { get; set; } = [];
+        public ReadOnly<List<FusionMenuItem>> Items => ReadOnly<List<FusionMenuItem>>();
 
         /// <summary>The parent item of a submenu; <see langword="null"/> for the top level.</summary>
-        public FusionMenuItem? ParentItem { get; set; }
+        public ReadOnly<FusionMenuItem> ParentItem => ReadOnly<FusionMenuItem>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionMenu.Select"/>.</summary>
-    public class FusionMenuSelectArgs
+    public class FusionMenuSelectArgs : JsObject
     {
         /// <summary>The selected item.</summary>
-        public FusionMenuItem Item { get; set; } = new FusionMenuItem();
+        public ReadOnly<FusionMenuItem> Item => ReadOnly<FusionMenuItem>();
     }
+#nullable restore annotations
 
     /// <summary>A menu item as the <see cref="FusionMenu"/> payloads report it.</summary>
     public class FusionMenuItem

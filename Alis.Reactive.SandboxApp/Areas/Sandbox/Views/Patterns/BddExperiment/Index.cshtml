@@ -26,19 +26,19 @@
          .Validate<BddExperimentValidator>("admission-form")
          .WhileLoading(l =>
          {
-             l.Element("submit-status").SetText("Saving...");
+             l.Element("submit-status").Text.Set("Saving...");
          })
          .Response(r => r
             .OnSuccess<BddExperimentResponse>((json, s) =>
             {
-                s.Element("submit-status").SetText(json, x => x.Message);
-                s.Element("submit-status").AddClass("text-green-600");
-                s.Element("submit-status").RemoveClass("text-red-600");
+                s.Element("submit-status").Text.Set(json.Get(x => x.Message));
+                s.Element("submit-status").ClassList.Add("text-green-600");
+                s.Element("submit-status").ClassList.Remove("text-red-600");
             })
             .OnError(400, e =>
             {
-                e.Element("submit-status").SetText("Validation failed");
-                e.Element("submit-status").AddClass("text-red-600");
+                e.Element("submit-status").Text.Set("Validation failed");
+                e.Element("submit-status").ClassList.Add("text-red-600");
                 e.ValidationErrors("admission-form");
             }));
     }));
@@ -58,7 +58,7 @@
                     .CssClass("rounded-md border border-border px-3 py-1.5 text-sm"))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("name-echo").SetText(args, x => x.Value);
+                    p.Element("name-echo").Text.Set(args.Value);
                 }); }
 
             @{ Html.InputField(plan, m => m.Physician, o => o.Required().Label("Physician"))
@@ -68,7 +68,7 @@
                     .Placeholder("Search physician..."))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("physician-echo").SetText(args, x => x.Value);
+                    p.Element("physician-echo").Text.Set(args.Value);
                 }); }
 
             @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care Level"))
@@ -78,7 +78,7 @@
                     .Placeholder("Select care level"))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("care-echo").SetText(args, x => x.Value);
+                    p.Element("care-echo").Text.Set(args.Value);
                 }); }
 
             @{ Html.InputField(plan, m => m.MonthlyRate, o => o.Required().Label("Monthly Rate ($)"))
@@ -86,14 +86,14 @@
                     .Min(0).Max(99999).Step(100))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("rate-echo").SetText(args, x => x.Value);
+                    p.Element("rate-echo").Text.Set(args.Value);
                 }); }
 
             @{ Html.InputField(plan, m => m.IsActive, o => o.Label("Active Status"))
                 .FusionSwitch()
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("active-echo").SetText(args, x => x.Checked);
+                    p.Element("active-echo").Text.Set(args.Checked);
                 }); }
 
             @{ Html.InputField(plan, m => m.Notes, o => o.Label("Notes"))
@@ -102,7 +102,7 @@
                     .CssClass("rounded-md border border-border px-3 py-1.5 text-sm"))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("notes-echo").SetText(args, x => x.Value);
+                    p.Element("notes-echo").Text.Set(args.Value);
                 }); }
         </native-grid>
     </native-card-body></native-card>

@@ -8,9 +8,9 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<FusionRichTextEditor>(m => m.CarePlan).Set(c => c.Value, "<p>Resident requires daily medication review and weekly physical therapy sessions.</p>");
+        p.Component<FusionRichTextEditor>(m => m.CarePlan).Value.Set("<p>Resident requires daily medication review and weekly physical therapy sessions.</p>");
         var comp = p.Component<FusionRichTextEditor>(m => m.CarePlan);
-        p.Element("value-echo").SetText(comp.Get(c => c.Value));
+        p.Element("value-echo").Text.Set(comp.Value);
     }));
 }
 
@@ -33,16 +33,16 @@
                     .Placeholder("Enter care plan notes..."))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("change-value").SetText(args, x => x.Value);
-                    p.When(args, x => x.Value).NotEmpty()
-                        .Then(t => t.Element("args-condition").SetText("content entered"))
-                        .Else(e => e.Element("args-condition").SetText("no content"));
+                    p.Element("change-value").Text.Set(args.Value);
+                    p.When(args.Value).NotEmpty()
+                        .Then(t => t.Element("args-condition").Text.Set("content entered"))
+                        .Else(e => e.Element("args-condition").Text.Set("no content"));
                     var comp = p.Component<FusionRichTextEditor>(m => m.CarePlan);
-                    p.When(comp.Get(c => c.Value)).NotEmpty()
+                    p.When(comp.Value).NotEmpty()
                         .Then(then =>
                         {
                             then.Element("selected-indicator").Show();
-                            then.Element("selected-indicator").SetText("care plan on file");
+                            then.Element("selected-indicator").Text.Set("care plan on file");
                         })
                         .Else(else_ =>
                         {
@@ -85,9 +85,9 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var comp = p.Component<FusionRichTextEditor>(m => m.CarePlan);
-                    p.When(comp.Get(c => c.Value)).IsEmpty()
-                        .Then(t => t.Element("careplan-warning").SetText("care plan is required"))
-                        .Else(e => e.Element("careplan-warning").SetText("care plan set"));
+                    p.When(comp.Value).IsEmpty()
+                        .Then(t => t.Element("careplan-warning").Text.Set("care plan is required"))
+                        .Else(e => e.Element("careplan-warning").Text.Set("care plan set"));
                 }))
         </native-hstack>
         <p class="font-mono text-sm mt-2">Warning: <span id="careplan-warning" class="text-text-muted">&mdash;</span></p>

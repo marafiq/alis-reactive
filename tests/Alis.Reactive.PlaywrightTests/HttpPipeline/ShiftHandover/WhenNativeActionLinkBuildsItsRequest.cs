@@ -28,8 +28,8 @@ public sealed class WhenNativeActionLinkBuildsItsRequest
         var link = Html().NativeActionLink("mark-read-1", "Mark Read", MarkReadUrl, request => request
             .Post()
             .Gather(g => g.Header("X-Shift", "Night"))
-            .WhileLoading(l => l.Component<NativeLoader>().Call(c => c.Show))
-            .Finally(f => f.Component<NativeLoader>().Call(c => c.Hide)));
+            .WhileLoading(l => l.Component<NativeLoader>().Show())
+            .Finally(f => f.Component<NativeLoader>().Hide()));
 
         using var plan = PlanOf(link);
         var request = SentRequestIn(plan.RootElement);
@@ -43,7 +43,7 @@ public sealed class WhenNativeActionLinkBuildsItsRequest
             Assert.That(headers, Is.EqualTo(new[] { "X-Shift" }), $"The link's request lost its gather: {request.GetRawText()}");
             Assert.That(cleanup.GetArrayLength(), Is.GreaterThan(0));
             Assert.That(cleanup.GetRawText(),
-                Is.EqualTo(FinallyOf(p => p.Component<NativeLoader>().Call(c => c.Hide))));
+                Is.EqualTo(FinallyOf(p => p.Component<NativeLoader>().Hide())));
         });
     }
 

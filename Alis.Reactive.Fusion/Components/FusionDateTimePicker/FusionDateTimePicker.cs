@@ -5,6 +5,7 @@ using Syncfusion.EJ2.Calendars;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion DateTimePicker, declared by the names its JavaScript API uses.
     /// </summary>
@@ -17,13 +18,13 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionDateTimePicker : FusionComponent, IInputComponent
     {
         /// <summary>The selected date and time.</summary>
-        public ComponentProperty<DateTime> Value => Property<DateTime>("value");
+        public Prop<DateTime> Value => Prop<DateTime>();
 
         /// <summary>Moves focus into the input.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
 
         /// <summary>Removes focus from the input.</summary>
-        public ComponentMethod FocusOut => Method("focusOut");
+        public void FocusOut() => Call();
 
         /// <summary>Raised when the selected date and time change.</summary>
         public TypedEvent<FusionDateTimePickerChangeArgs> Change =>
@@ -35,14 +36,15 @@ namespace Alis.Reactive.Fusion.Components
 
     /// <summary>Payload of <see cref="FusionDateTimePicker.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Value).NotNull()</c>.</remarks>
-    public class FusionDateTimePickerChangeArgs
+    public class FusionDateTimePickerChangeArgs : JsObject
     {
         /// <summary>Date and time after the change.</summary>
-        public DateTime? Value { get; set; }
+        public ReadOnly<DateTime?> Value => ReadOnly<DateTime?>();
 
         /// <summary>Whether user interaction triggered the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionDateTimePicker"/> for a model-bound field.</summary>
     public static class FusionDateTimePickerHtmlExtensions

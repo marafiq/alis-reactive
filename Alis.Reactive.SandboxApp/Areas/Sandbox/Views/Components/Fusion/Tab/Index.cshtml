@@ -84,25 +84,25 @@
                 }))
                 .Reactive(evt => evt.Selected, (args, p) =>
                 {
-                    p.When(args, x => x.SelectedIndex).Eq(0)
-                        .Then(t => t.Element("active-section").SetText("Care Schedule"))
-                        .ElseIf(args, x => x.SelectedIndex).Eq(1)
-                        .Then(t => t.Element("active-section").SetText("Medications"))
-                        .ElseIf(args, x => x.SelectedIndex).Eq(2)
-                        .Then(t => t.Element("active-section").SetText("Incident Reports"))
-                        .Else(e => e.Element("active-section").SetText("Billing"));
+                    p.When(args.SelectedIndex).Eq(0)
+                        .Then(t => t.Element("active-section").Text.Set("Care Schedule"))
+                        .ElseIf(args.SelectedIndex).Eq(1)
+                        .Then(t => t.Element("active-section").Text.Set("Medications"))
+                        .ElseIf(args.SelectedIndex).Eq(2)
+                        .Then(t => t.Element("active-section").Text.Set("Incident Reports"))
+                        .Else(e => e.Element("active-section").Text.Set("Billing"));
 
-                    p.When(args, x => x.PreviousIndex).Eq(0)
-                        .Then(t => t.Element("section-context").SetText("You moved here from Care Schedule."))
-                        .ElseIf(args, x => x.PreviousIndex).Eq(1)
-                        .Then(t => t.Element("section-context").SetText("You moved here from Medications."))
-                        .ElseIf(args, x => x.PreviousIndex).Eq(2)
-                        .Then(t => t.Element("section-context").SetText("You moved here from Incident Reports."))
-                        .Else(e => e.Element("section-context").SetText("You moved here from Billing."));
+                    p.When(args.PreviousIndex).Eq(0)
+                        .Then(t => t.Element("section-context").Text.Set("You moved here from Care Schedule."))
+                        .ElseIf(args.PreviousIndex).Eq(1)
+                        .Then(t => t.Element("section-context").Text.Set("You moved here from Medications."))
+                        .ElseIf(args.PreviousIndex).Eq(2)
+                        .Then(t => t.Element("section-context").Text.Set("You moved here from Incident Reports."))
+                        .Else(e => e.Element("section-context").Text.Set("You moved here from Billing."));
 
-                    p.When(args, x => x.IsSwiped).Truthy()
-                        .Then(t => t.Element("navigation-mode").SetText("Last navigation: opened by swipe."))
-                        .Else(e => e.Element("navigation-mode").SetText("Last navigation: opened by selection."));
+                    p.When(args.IsSwiped).Truthy()
+                        .Then(t => t.Element("navigation-mode").Text.Set("Last navigation: opened by swipe."))
+                        .Else(e => e.Element("navigation-mode").Text.Set("Last navigation: opened by selection."));
                 }))
         </div>
     </div>
@@ -114,27 +114,27 @@
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionTab>(Workspace).Set(c => c.SelectedItem, 1);
+                    p.Component<FusionTab>(Workspace).SelectedItem.Set(1);
                 }))
             @(Html.NativeButton("log-incident", "Log an incident now")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionTab>(Workspace).Call(c => c.Select, 2);
+                    p.Component<FusionTab>(Workspace).Select(2);
                 }))
             @(Html.NativeButton("hide-billing", "Hide billing from this view")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionTab>(Workspace).Call(c => c.HideTab, 3, true);
-                    p.Element("billing-access").SetText("Billing is hidden from this workspace.");
+                    p.Component<FusionTab>(Workspace).HideTab(3, true);
+                    p.Element("billing-access").Text.Set("Billing is hidden from this workspace.");
                 }))
             @(Html.NativeButton("show-billing", "Restore billing tab")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionTab>(Workspace).Call(c => c.HideTab, 3, false);
-                    p.Element("billing-access").SetText("Billing is visible to coordinators.");
+                    p.Component<FusionTab>(Workspace).HideTab(3, false);
+                    p.Element("billing-access").Text.Set("Billing is visible to coordinators.");
                 }))
         </div>
         <p class="text-sm text-text-secondary"><span id="billing-access">Billing is visible to coordinators.</span></p>

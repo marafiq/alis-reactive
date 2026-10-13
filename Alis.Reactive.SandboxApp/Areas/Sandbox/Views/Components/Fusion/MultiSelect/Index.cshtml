@@ -12,7 +12,7 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var comp = p.Component<FusionMultiSelect>(m => m.Allergies);
-        p.Element("value-echo").SetText(comp.Get(c => c.Value));
+        p.Element("value-echo").Text.Set(comp.Value);
     }));
 
     Html.On(plan, t => t.CustomEvent(MultiSelectEvents.DoGather, p =>
@@ -22,7 +22,7 @@
          .Response(r => r
             .OnSuccess(s =>
             {
-                s.Element("gather-result").SetText("gathered");
+                s.Element("gather-result").Text.Set("gathered");
             }));
     }));
 }
@@ -50,13 +50,13 @@
                     .Value(new string[] { "peanuts" }))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("change-value").SetText(args, x => x.Value);
+                    p.Element("change-value").Text.Set(args.Value);
                     var comp = p.Component<FusionMultiSelect>(m => m.Allergies);
-                    p.When(comp.Get(c => c.Value)).NotNull()
+                    p.When(comp.Value).NotNull()
                         .Then(then =>
                         {
                             then.Element("selected-indicator").Show();
-                            then.Element("selected-indicator").SetText("selected");
+                            then.Element("selected-indicator").Text.Set("selected");
                         })
                         .Else(else_ =>
                         {
@@ -81,7 +81,7 @@
                     .Mode(VisualMode.Box))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("dietary-change-value").SetText(args, x => x.Value);
+                    p.Element("dietary-change-value").Text.Set(args.Value);
                 }); }
         </native-grid>
     </section>
@@ -137,14 +137,14 @@
                     .Mode(VisualMode.Box))
                 .Reactive(evt => evt.Filtering, (args, p) =>
                 {
-                    p.Payload(args).Set(a => a.PreventDefaultAction, true);
+                    args.PreventDefaultAction.Set(true);
                     p.Get(Url.SandboxRoute("Supplies", "MultiSelect"))
-                     .Gather<SupplySearchQuery>(g => g.Set(x => x.Supplies, p.Payload(args).Get(a => a.Text)))
+                     .Gather<SupplySearchQuery>(g => g.Set(x => x.Supplies, args.Text))
                      .Response(r => r
                         .OnSuccess<SupplySearchResponse>((json, s) =>
                         {
-                            s.Payload(args).Call(a => a.UpdateData, json.Read(j => j.Supplies));
-                            s.Element("filter-status").SetText("results loaded");
+                            args.UpdateData(json.Get(j => j.Supplies));
+                            s.Element("filter-status").Text.Set("results loaded");
                         }));
                 }); }
         </native-grid>

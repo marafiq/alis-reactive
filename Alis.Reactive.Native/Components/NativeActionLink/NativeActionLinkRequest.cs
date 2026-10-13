@@ -40,11 +40,11 @@ namespace Alis.Reactive.Native.Components
         /// <summary>Sends a DELETE to the link's <c>href</c>.</summary>
         public HttpRequestBuilder<TModel> Delete() { _sent.One(_href); return _pipeline.Delete(_href); }
 
-        /// <summary>A component on the page, for a value the request sends (<c>Set(x =&gt; x.Ids, grid.Get(..))</c>).</summary>
+        /// <summary>A component on the page, for a value the request sends (<c>Set(x =&gt; x.Ids, grid.GetSelectedRowIndexes())</c>).</summary>
         /// <typeparam name="TComponent">The component's declaration.</typeparam>
         /// <param name="refId">The component's id.</param>
-        public ComponentRef<TComponent, TModel> Component<TComponent>(string refId)
-            where TComponent : IComponent, new() =>
+        public TComponent Component<TComponent>(string refId)
+            where TComponent : JsObject, IComponent, new() =>
             _pipeline.Component<TComponent>(refId);
 
         /// <summary>Asks the user first; the request goes in <c>Then</c>, and <c>Else</c> runs when they decline.</summary>

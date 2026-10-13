@@ -80,7 +80,7 @@
                  .Response(r => r
                     .OnSuccess<SubmitScreeningResponse>((json, s) =>
                     {
-                        s.Element("submit-result").SetText(json, x => x.Message);
+                        s.Element("submit-result").Text.Set(json.Get(x => x.Message));
                         s.Element("submit-result").Show();
                     })
                     .OnError(400, e => e.ValidationErrors("screening-form")));

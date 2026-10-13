@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Native.Components
 {
+#nullable disable annotations
     /// <summary>
     /// A native <c>&lt;a&gt;</c> whose unmodified left click runs a request pipeline instead of
     /// navigating, declared by the names its JavaScript API uses.
@@ -42,26 +43,27 @@ namespace Alis.Reactive.Native.Components
     public sealed class NativeActionLinkClickArgs : JsObject
     {
         /// <summary>The mouse button: 0 for the main one.</summary>
-        public int Button { get; set; }
+        public ReadOnly<int> Button => ReadOnly<int>();
 
         /// <summary>Whether a handler earlier in the page already handled the click.</summary>
-        public bool DefaultPrevented { get; set; }
+        public ReadOnly<bool> DefaultPrevented => ReadOnly<bool>();
 
         /// <summary>Whether the Meta (Command) key was down.</summary>
-        public bool MetaKey { get; set; }
+        public ReadOnly<bool> MetaKey => ReadOnly<bool>();
 
         /// <summary>Whether the Ctrl key was down.</summary>
-        public bool CtrlKey { get; set; }
+        public ReadOnly<bool> CtrlKey => ReadOnly<bool>();
 
         /// <summary>Whether the Shift key was down.</summary>
-        public bool ShiftKey { get; set; }
+        public ReadOnly<bool> ShiftKey => ReadOnly<bool>();
 
         /// <summary>Whether the Alt key was down.</summary>
-        public bool AltKey { get; set; }
+        public ReadOnly<bool> AltKey => ReadOnly<bool>();
 
         /// <summary>Stops the browser from following the link.</summary>
-        public ComponentMethod PreventDefault => Method("preventDefault");
+        public void PreventDefault() => Call();
     }
+#nullable restore annotations
 
     /// <summary>
     /// HTML helper extensions for links that execute reactive request pipelines.
@@ -109,15 +111,15 @@ namespace Alis.Reactive.Native.Components
 
             // A modified or non-main click, or one the page already handled, stays the browser's.
             plan.Render<NativeActionLink>(id, link).Reactive(evt => evt.Click, (click, p) =>
-                p.When(click, x => x.Button).Eq(0)
-                    .And(click, x => x.DefaultPrevented).Falsy()
-                    .And(click, x => x.MetaKey).Falsy()
-                    .And(click, x => x.CtrlKey).Falsy()
-                    .And(click, x => x.ShiftKey).Falsy()
-                    .And(click, x => x.AltKey).Falsy()
+                p.When(click.Button).Eq(0)
+                    .And(click.DefaultPrevented).Falsy()
+                    .And(click.MetaKey).Falsy()
+                    .And(click.CtrlKey).Falsy()
+                    .And(click.ShiftKey).Falsy()
+                    .And(click.AltKey).Falsy()
                     .Then(follow =>
                     {
-                        follow.Payload(click).Call(x => x.PreventDefault);
+                        click.PreventDefault();
                         request(new NativeActionLinkRequest<TModel>(follow, url, sent));
                     }));
             sent.RequireOne(url);

@@ -15,8 +15,8 @@
         p.Get(Url.SandboxRoute("OperationRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                s.Element("fit-status").SetText("loaded");
+                s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                s.Element("fit-status").Text.Set("loaded");
             }))));
 }
 
@@ -31,15 +31,15 @@
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.AutoFitColumn, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel));
-                p.Element("fit-status").SetText("autoFitColumn called");
+                p.Component<FusionGrid>(GridId).AutoFitColumn(Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel));
+                p.Element("fit-status").Text.Set("autoFitColumn called");
             }))
         @(Html.NativeButton("fit-all", "Fit All Columns")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.AutoFitColumns);
-                p.Element("fit-status").SetText("autoFitColumns called");
+                p.Component<FusionGrid>(GridId).AutoFitColumns();
+                p.Element("fit-status").Text.Set("autoFitColumns called");
             }))
     </native-hstack>
 

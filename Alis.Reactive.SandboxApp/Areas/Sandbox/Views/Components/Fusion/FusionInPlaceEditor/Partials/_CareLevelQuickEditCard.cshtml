@@ -32,11 +32,11 @@
              .Response(r => r
                 .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
                 {
-                    s.Element("card-care-level-display").SetText(json, x => x.DisplayValue);
+                    s.Element("card-care-level-display").Text.Set(json.Get(x => x.DisplayValue));
                 })
                 .OnError<InPlaceEditorCommitError>((err, e) =>
                 {
-                    e.Element("card-care-level-error").SetText(err, x => x.Message);
+                    e.Element("card-care-level-error").Text.Set(err.Get(x => x.Message));
                 }));
         }); }
 

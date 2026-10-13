@@ -1,7 +1,6 @@
 @model ArrayManagerModel
 @using Alis.Reactive
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Builders.Conditions
 @{
     ViewData["Title"] = "Array Plugin";
 
@@ -15,38 +14,34 @@
         p.Get(Url.SandboxRoute("Residents", "ArrayManager"))
          .Response(r => r.OnSuccess<ResidentsListResponse>((json, s) =>
          {
-             TypedPluginSource<int> countSrc = p.Plugin(array.Count).Arg(json, x => x.Items);
-             s.Element("arr-total").SetText(countSrc);
+             TypedSource<int> countSrc = array.Count(json.Get(x => x.Items));
+             s.Element("arr-total").Text.Set(countSrc);
 
-             TypedPluginSource<object> pluckSrc = p.Plugin(array.Pluck)
-                 .Arg(json, x => x.Items).Arg(0).Arg("name");
-             s.Element("arr-first-name").SetText(pluckSrc);
+             TypedSource<object> pluckSrc = array.Pluck(json.Get(x => x.Items), 0, "name");
+             s.Element("arr-first-name").Text.Set(pluckSrc);
 
-             TypedPluginSource<object> filtered = p.Plugin(array.Filter)
-                 .Arg(json, x => x.Items).Arg("status").Arg("active");
-             TypedPluginSource<int> activeCount = p.Plugin(array.Count).Arg(filtered);
-             s.Element("arr-active-count").SetText(activeCount);
+             TypedSource<object> filtered = array.Filter(json.Get(x => x.Items), "status", "active");
+             TypedSource<int> activeCount = array.Count(filtered);
+             s.Element("arr-active-count").Text.Set(activeCount);
 
-             TypedPluginSource<int> sumSrc = p.Plugin(array.Sum)
-                 .Arg(json, x => x.Items).Arg("age");
-             s.Element("arr-total-age").SetText(sumSrc);
+             TypedSource<int> sumSrc = array.Sum(json.Get(x => x.Items), "age");
+             s.Element("arr-total-age").Text.Set(sumSrc);
 
-             TypedPluginSource<bool> someSrc = p.Plugin(array.Some)
-                 .Arg(json, x => x.Items).Arg("status").Arg("critical");
+             TypedSource<bool> someSrc = array.Some(json.Get(x => x.Items), "status", "critical");
              s.When(someSrc).Truthy()
               .Then(then => then.Element("arr-has-critical").Show())
               .Else(els => els.Element("arr-no-critical").Show());
 
-             TypedPluginSource<string> slugSrc = p.Plugin(slugify.Slug).Arg("John Doe");
-             s.Element("arr-root-slug").SetText(slugSrc);
+             TypedSource<string> slugSrc = slugify.Slug("John Doe");
+             s.Element("arr-root-slug").Text.Set(slugSrc);
 
-             s.Element("arr-results").AddClass("text-green-600");
+             s.Element("arr-results").ClassList.Add("text-green-600");
          }))));
 
     Html.NativeButton("arr-send-btn", "Send to Server")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {
-            TypedPluginSource<int> countForGather = p.Plugin(array.Count).Arg("items");
+            TypedSource<int> countForGather = array.Count("items");
             p.Get(Url.SandboxRoute("PluginEcho", "ArrayManager"))
              .Gather<PluginEchoQuery>(g => g
                  .Header("X-Array-Count", countForGather)
@@ -54,10 +49,10 @@
              .Response(r => r
                 .OnSuccess<PluginArrayEchoResponse>((json, s) =>
                 {
-                    s.Element("arr-echo-count").SetText(json, x => x.ReceivedCount);
-                    s.Element("arr-echo-header").SetText(json, x => x.ReceivedHeader);
-                    s.Element("arr-echo-result").AddClass("text-green-600");
-                    s.Plugin(analytics.Track).Arg("array-sent").Fire();
+                    s.Element("arr-echo-count").Text.Set(json.Get(x => x.ReceivedCount));
+                    s.Element("arr-echo-header").Text.Set(json.Get(x => x.ReceivedHeader));
+                    s.Element("arr-echo-result").ClassList.Add("text-green-600");
+                    analytics.Track("array-sent");
                 }));
         });
 
@@ -67,26 +62,23 @@
             p.Get(Url.SandboxRoute("Residents", "ArrayManager"))
              .Response(r => r.OnSuccess<ResidentsListResponse>((json, s) =>
              {
-                 TypedPluginSource<object> active = p.Plugin(array.Filter)
-                     .Arg(json, x => x.Items).Arg("status").Arg("active");
+                 TypedSource<object> active = array.Filter(json.Get(x => x.Items), "status", "active");
 
-                 TypedPluginSource<int> activeCount = p.Plugin(array.Count).Arg(active);
-                 s.Element("arr-f-count").SetText(activeCount);
+                 TypedSource<int> activeCount = array.Count(active);
+                 s.Element("arr-f-count").Text.Set(activeCount);
 
-                 TypedPluginSource<int> activeAgeSum = p.Plugin(array.Sum).Arg(active).Arg("age");
-                 s.Element("arr-f-age-sum").SetText(activeAgeSum);
+                 TypedSource<int> activeAgeSum = array.Sum(active, "age");
+                 s.Element("arr-f-age-sum").Text.Set(activeAgeSum);
 
-                 TypedPluginSource<object> firstName = p.Plugin(array.Pluck)
-                     .Arg(active).Arg(0).Arg("name");
-                 s.Element("arr-f-first").SetText(firstName);
+                 TypedSource<object> firstName = array.Pluck(active, 0, "name");
+                 s.Element("arr-f-first").Text.Set(firstName);
 
-                 TypedPluginSource<bool> allActive = p.Plugin(array.Some)
-                     .Arg(active).Arg("status").Arg("active");
-                 s.Element("arr-f-some").SetText(allActive);
+                 TypedSource<bool> allActive = array.Some(active, "status", "active");
+                 s.Element("arr-f-some").Text.Set(allActive);
 
-                 s.Element("arr-f-result").AddClass("text-green-600");
+                 s.Element("arr-f-result").ClassList.Add("text-green-600");
 
-                 s.Plugin(analytics.Track).Arg("filter-inspect").Fire();
+                 analytics.Track("filter-inspect");
              }));
         });
 
@@ -156,18 +148,17 @@
         public ArrayPlugin()
             : base("array")
         {
-            Count = Function<int>("count").Arg<object>();
-            Pluck = Function<object>("pluck").Arg<object>().Arg<int>().Arg<string>();
-            Filter = Function<object>("filter").Arg<object>().Arg<string>().Arg<string>();
-            Sum = Function<int>("sum").Arg<object>().Arg<string>();
-            Some = Function<bool>("some").Arg<object>().Arg<string>().Arg<string>();
         }
 
-        public PluginFunction<int> Count { get; }
-        public PluginFunction<object> Pluck { get; }
-        public PluginFunction<object> Filter { get; }
-        public PluginFunction<int> Sum { get; }
-        public PluginFunction<bool> Some { get; }
+        public TypedSource<int> Count(Arg<object> items) => Invoke<int>(items);
+
+        public TypedSource<object> Pluck(Arg<object> items, Arg<int> index, Arg<string> field) => Invoke<object>(items, index, field);
+
+        public TypedSource<object> Filter(Arg<object> items, Arg<string> field, Arg<string> value) => Invoke<object>(items, field, value);
+
+        public TypedSource<int> Sum(Arg<object> items, Arg<string> field) => Invoke<int>(items, field);
+
+        public TypedSource<bool> Some(Arg<object> items, Arg<string> field, Arg<string> value) => Invoke<bool>(items, field, value);
     }
 
     private sealed class AnalyticsPlugin : Plugin
@@ -175,10 +166,9 @@
         public AnalyticsPlugin()
             : base("analytics")
         {
-            Track = Command("track").Arg<string>();
         }
 
-        public PluginCommand Track { get; }
+        public void Track(Arg<string> name) => Call(name);
     }
 
     private sealed class SlugifyPlugin : Plugin
@@ -186,9 +176,8 @@
         public SlugifyPlugin()
             : base("slugify")
         {
-            Slug = Function<string>().Arg<string>();
         }
 
-        public PluginFunction<string> Slug { get; }
+        public TypedSource<string> Slug(Arg<string> text) => Invoke<string>(text, name: "");
     }
 }

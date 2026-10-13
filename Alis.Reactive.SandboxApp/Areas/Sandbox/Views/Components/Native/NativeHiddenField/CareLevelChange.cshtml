@@ -26,7 +26,7 @@
                 p.Post(Url.SandboxRoute("SubmitCareLevelChange", "NativeHiddenField")).Gather(g => g.Form())
                  .Response(r => r.OnSuccess<CareLevelChangeConfirmation>((json, s) =>
                  {
-                     s.Element("care-level-change-status").SetText(json, x => x.Confirmation);
+                     s.Element("care-level-change-status").Text.Set(json.Get(x => x.Confirmation));
                  }));
             }))
         <p id="care-level-change-status" class="mt-3 text-sm text-text-muted">No change requested yet.</p>

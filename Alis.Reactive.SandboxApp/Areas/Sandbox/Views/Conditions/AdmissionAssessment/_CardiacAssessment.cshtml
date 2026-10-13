@@ -21,9 +21,9 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var comp = p.Component<FusionNumericTextBox>(m => m.SystolicBP);
-                p.Element("bp-echo").SetText(comp.Get(c => c.Value));
+                p.Element("bp-echo").Text.Set(comp.Value);
 
-                p.When(comp.Get(c => c.Value)).Gt(140m)
+                p.When(comp.Value).Gt(140m)
                     .Then(then =>
                     {
                         then.Element("hypertension-spinner").Show();
@@ -31,14 +31,14 @@
                          .Gather<AlertHypertensionRequest>(g => g.Form(m => m.SystolicBP, m => m.ResidentName))
                          .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
                          {
-                             s.Element("hypertension-result").SetText(json, x => x.Message);
+                             s.Element("hypertension-result").Text.Set(json.Get(x => x.Message));
                              s.Element("hypertension-result").Show();
                              s.Element("hypertension-spinner").Hide();
                          }));
                     })
                     .Else(e =>
                     {
-                        e.Element("hypertension-result").SetText("Normal");
+                        e.Element("hypertension-result").Text.Set("Normal");
                         e.Element("hypertension-result").Show();
                     });
             }); }
@@ -48,7 +48,7 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var pm = p.Component<FusionSwitch>(m => m.HasPacemaker);
-                p.When(pm.Get(c => c.Checked)).Truthy()
+                p.When(pm.Checked).Truthy()
                     .Then(t => t.Element("pacemaker-details").Show())
                     .Else(e => e.Element("pacemaker-details").Hide());
             }); }

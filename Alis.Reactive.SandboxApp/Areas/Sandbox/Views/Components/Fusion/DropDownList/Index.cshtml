@@ -9,9 +9,9 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<FusionDropDownList>(m => m.Category).Set(c => c.Value, "Books");
+        p.Component<FusionDropDownList>(m => m.Category).Value.Set("Books");
         var comp = p.Component<FusionDropDownList>(m => m.Category);
-        p.Element("value-echo").SetText(comp.Get(c => c.Value));
+        p.Element("value-echo").Text.Set(comp.Value);
     }));
 
     Html.On(plan, t => t.CustomEvent(DropDownListEvents.DoGather, p =>
@@ -21,7 +21,7 @@
          .Response(r => r
             .OnSuccess(s =>
             {
-                s.Element("gather-result").SetText("gathered");
+                s.Element("gather-result").Text.Set("gathered");
             }));
     }));
 }
@@ -45,16 +45,16 @@
                     .Placeholder("Select a category"))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("change-value").SetText(args, x => x.Value);
-                    p.When(args, x => x.Value).Eq("Electronics")
-                        .Then(t => t.Element("args-condition").SetText("electronics selected"))
-                        .Else(e => e.Element("args-condition").SetText("other category"));
+                    p.Element("change-value").Text.Set(args.Value);
+                    p.When(args.Value).Eq("Electronics")
+                        .Then(t => t.Element("args-condition").Text.Set("electronics selected"))
+                        .Else(e => e.Element("args-condition").Text.Set("other category"));
                     var comp = p.Component<FusionDropDownList>(m => m.Category);
-                    p.When(comp.Get(c => c.Value)).NotNull()
+                    p.When(comp.Value).NotNull()
                         .Then(then =>
                         {
                             then.Element("selected-indicator").Show();
-                            then.Element("selected-indicator").SetText("selected");
+                            then.Element("selected-indicator").Text.Set("selected");
                         })
                         .Else(else_ =>
                         {
@@ -63,11 +63,11 @@
                 })
                 .Reactive(evt => evt.Focus, (args, p) =>
                 {
-                    p.Element("focus-state").SetText("focused");
+                    p.Element("focus-state").Text.Set("focused");
                 })
                 .Reactive(evt => evt.Blur, (args, p) =>
                 {
-                    p.Element("focus-state").SetText("blurred");
+                    p.Element("focus-state").Text.Set("blurred");
                 }); }
         </native-grid>
         <native-hstack gap="Sm" class="mt-4">
@@ -75,13 +75,13 @@
                 .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionDropDownList>(m => m.Category).Call(c => c.ShowPopup);
+                    p.Component<FusionDropDownList>(m => m.Category).ShowPopup();
                 }))
             @(Html.NativeButton("hide-popup-btn", "Hide Popup")
                 .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionDropDownList>(m => m.Category).Call(c => c.HidePopup);
+                    p.Component<FusionDropDownList>(m => m.Category).HidePopup();
                 }))
         </native-hstack>
         <p class="font-mono text-sm mt-4">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>

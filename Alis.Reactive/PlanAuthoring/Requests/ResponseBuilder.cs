@@ -39,10 +39,10 @@ namespace Alis.Reactive.Builders.Requests
         /// <typeparam name="TResponse">Response body type exposed to downstream value sources.</typeparam>
         /// <param name="pipeline">Builds the reaction graph using the success body scope.</param>
         public ResponseBuilder<TModel> OnSuccess<TResponse>(
-            Action<ResponseBody<TResponse>, PipelineBuilder<TModel>> pipeline)
+            Action<Data<TResponse>, PipelineBuilder<TModel>> pipeline)
             where TResponse : class
         {
-            var body = new ResponseBody<TResponse>(PayloadSource.Success(_draft.Handle));
+            var body = new Data<TResponse>(PayloadSource.Success(_draft.Handle));
             _draft.AddSuccessRoute(PipelineBuilder<TModel>.Build(_context, p => pipeline(body, p)));
             return this;
         }
@@ -71,10 +71,10 @@ namespace Alis.Reactive.Builders.Requests
         /// <typeparam name="TError">Error body type exposed to downstream value sources.</typeparam>
         /// <param name="pipeline">Builds the reaction graph using the error body scope.</param>
         public ResponseBuilder<TModel> OnError<TError>(
-            Action<ResponseBody<TError>, PipelineBuilder<TModel>> pipeline)
+            Action<Data<TError>, PipelineBuilder<TModel>> pipeline)
             where TError : class
         {
-            var body = new ResponseBody<TError>(PayloadSource.Error(_draft.Handle));
+            var body = new Data<TError>(PayloadSource.Error(_draft.Handle));
             _draft.AddErrorRoute(PipelineBuilder<TModel>.Build(_context, p => pipeline(body, p)));
             return this;
         }
@@ -87,10 +87,10 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="statusCode">HTTP status code to match.</param>
         /// <param name="pipeline">Builds the reaction graph using the error body scope.</param>
         public ResponseBuilder<TModel> OnError<TError>(int statusCode,
-            Action<ResponseBody<TError>, PipelineBuilder<TModel>> pipeline)
+            Action<Data<TError>, PipelineBuilder<TModel>> pipeline)
             where TError : class
         {
-            var body = new ResponseBody<TError>(PayloadSource.Error(_draft.Handle));
+            var body = new Data<TError>(PayloadSource.Error(_draft.Handle));
             _draft.AddErrorRoute(statusCode, PipelineBuilder<TModel>.Build(_context, p => pipeline(body, p)));
             return this;
         }

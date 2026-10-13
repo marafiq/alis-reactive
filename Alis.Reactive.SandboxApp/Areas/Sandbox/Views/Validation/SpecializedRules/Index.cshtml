@@ -67,9 +67,9 @@
                  .Response(r => r
                      .OnSuccess(s =>
                      {
-                         s.Element("new-rules-result").SetText("All new rule types passed!");
-                         s.Element("new-rules-result").AddClass("text-green-600");
-                         s.Element("new-rules-result").RemoveClass("text-text-muted");
+                         s.Element("new-rules-result").Text.Set("All new rule types passed!");
+                         s.Element("new-rules-result").ClassList.Add("text-green-600");
+                         s.Element("new-rules-result").ClassList.Remove("text-text-muted");
                      })
                      .OnError(400, e => e.ValidationErrors("new-rules-form")));
             }))

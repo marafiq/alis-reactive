@@ -25,12 +25,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.ResponseCondi
     {
         public static void ConfigureTypedErrorHandler(ResponseBuilder<ResponseConditionsModel> r)
         {
-            r.OnSuccess(s => s.Element("s5-result").SetText("success"));
+            r.OnSuccess(s => s.Element("s5-result").Text.Set("success"));
             r.OnError<ErrorDetailResponse>((err, e) =>
             {
-                e.When(err, x => x.Code).Eq(422)
-                 .Then(then => then.Element("s5-result").SetText("validation error"))
-                 .Else(el => el.Element("s5-result").SetText("other error"));
+                e.When(err.Get(x => x.Code)).Eq(422)
+                 .Then(then => then.Element("s5-result").Text.Set("validation error"))
+                 .Else(el => el.Element("s5-result").Text.Set("other error"));
             });
         }
     }

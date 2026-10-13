@@ -5,6 +5,7 @@ using Syncfusion.EJ2.Inputs;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion MaskedTextBox, declared by the names its JavaScript API uses.
     /// </summary>
@@ -16,10 +17,10 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionInputMask : FusionComponent, IInputComponent
     {
         /// <summary>The value without the mask's literal characters; <see langword="null"/> when empty.</summary>
-        public ComponentProperty<string?> Value => Property<string?>("value");
+        public Prop<string> Value => Prop<string>();
 
         /// <summary>Moves focus into the input.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
 
         /// <summary>Raised when the value changes.</summary>
         public TypedEvent<FusionInputMaskChangeArgs> Change =>
@@ -31,14 +32,15 @@ namespace Alis.Reactive.Fusion.Components
 
     /// <summary>Payload of <see cref="FusionInputMask.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Value).NotNull()</c>.</remarks>
-    public class FusionInputMaskChangeArgs
+    public class FusionInputMaskChangeArgs : JsObject
     {
         /// <summary>Value after the change.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>Whether user interaction triggered the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionInputMask"/> for a model-bound field.</summary>
     public static class FusionInputMaskHtmlExtensions

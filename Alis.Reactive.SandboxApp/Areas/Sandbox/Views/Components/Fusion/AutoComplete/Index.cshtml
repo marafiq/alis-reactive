@@ -9,9 +9,9 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<FusionAutoComplete>(m => m.Physician).Set(c => c.Value, "smith");
+        p.Component<FusionAutoComplete>(m => m.Physician).Value.Set("smith");
         var comp = p.Component<FusionAutoComplete>(m => m.Physician);
-        p.Element("value-echo").SetText(comp.Get(c => c.Value));
+        p.Element("value-echo").Text.Set(comp.Value);
     }));
 
     Html.On(plan, t => t.CustomEvent(AutoCompleteEvents.DoGather, p =>
@@ -21,7 +21,7 @@
          .Response(r => r
             .OnSuccess(s =>
             {
-                s.Element("gather-result").SetText("gathered");
+                s.Element("gather-result").Text.Set("gathered");
             }));
     }));
 
@@ -47,16 +47,16 @@
                     .Placeholder("Select a physician"))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("change-value").SetText(args, x => x.Value);
-                    p.When(args, x => x.Value).Eq("smith")
-                        .Then(t => t.Element("args-condition").SetText("dr smith selected"))
-                        .Else(e => e.Element("args-condition").SetText("other physician"));
+                    p.Element("change-value").Text.Set(args.Value);
+                    p.When(args.Value).Eq("smith")
+                        .Then(t => t.Element("args-condition").Text.Set("dr smith selected"))
+                        .Else(e => e.Element("args-condition").Text.Set("other physician"));
                     var comp = p.Component<FusionAutoComplete>(m => m.Physician);
-                    p.When(comp.Get(c => c.Value)).NotNull()
+                    p.When(comp.Value).NotNull()
                         .Then(then =>
                         {
                             then.Element("selected-indicator").Show();
-                            then.Element("selected-indicator").SetText("selected");
+                            then.Element("selected-indicator").Text.Set("selected");
                         })
                         .Else(else_ =>
                         {
@@ -69,13 +69,13 @@
                 .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionAutoComplete>(m => m.Physician).Call(c => c.ShowPopup);
+                    p.Component<FusionAutoComplete>(m => m.Physician).ShowPopup();
                 }))
             @(Html.NativeButton("hide-popup-btn", "Hide Popup")
                 .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionAutoComplete>(m => m.Physician).Call(c => c.HidePopup);
+                    p.Component<FusionAutoComplete>(m => m.Physician).HidePopup();
                 }))
         </native-hstack>
         <p class="font-mono text-sm mt-4">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
@@ -133,14 +133,14 @@
                     .AllowCustom(false).ShowPopupButton().Highlight(true))
                 .Reactive(evt => evt.Filtering, (args, p) =>
                 {
-                    p.Payload(args).Set(a => a.PreventDefaultAction, true);
+                    args.PreventDefaultAction.Set(true);
                     p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
-                     .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, p.Payload(args).Get(a => a.Text)))
+                     .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, args.Text))
                      .Response(r => r
                         .OnSuccess<MedicationSearchResponse>((json, s) =>
                         {
-                            s.Payload(args).Call(a => a.UpdateData, json.Read(j => j.Medications));
-                            s.Element("filter-status").SetText("results loaded");
+                            args.UpdateData(json.Get(j => j.Medications));
+                            s.Element("filter-status").Text.Set("results loaded");
                         }));
                 }); }
         </native-grid>

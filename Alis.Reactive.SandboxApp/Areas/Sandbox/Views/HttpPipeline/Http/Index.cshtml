@@ -13,10 +13,10 @@
             .OnSuccess<ResidentsResponse>((json, s) =>
             {
                 s.Element("load-spinner").Hide();
-                s.Element("load-first").SetText(json, x => x.First);
-                s.Element("load-second").SetText(json, x => x.Second);
-                s.Element("load-count").SetText(json, x => x.Count);
-                s.Element("load-result").AddClass("text-green-600");
+                s.Element("load-first").Text.Set(json.Get(x => x.First));
+                s.Element("load-second").Text.Set(json.Get(x => x.Second));
+                s.Element("load-count").Text.Set(json.Get(x => x.Count));
+                s.Element("load-result").ClassList.Add("text-green-600");
             })
          )
     ));
@@ -41,9 +41,9 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var link = p.Url<HttpShowcaseQuery>();
-        p.Element("url-display-tab").SetText(link.Get(q => q.Tab));
-        p.Element("url-display-facility").SetText(link.Get(q => q.FacilityId));
-        p.Element("url-display-wings").SetText(link.Get(q => q.Wing));
+        p.Element("url-display-tab").Text.Set(link.Get(q => q.Tab));
+        p.Element("url-display-facility").Text.Set(link.Get(q => q.FacilityId));
+        p.Element("url-display-wings").Text.Set(link.Get(q => q.Wing));
     }));
 
 }
@@ -83,17 +83,17 @@
                     .OnSuccess<SaveResponse>((json, s) =>
                     {
                         s.Element("save-spinner").Hide();
-                        s.Element("save-message").SetText(json, x => x.Message);
-                        s.Element("save-received-name").SetText(json, x => x.ReceivedName);
-                        s.Element("save-result").AddClass("text-green-600");
-                        s.Element("save-result").RemoveClass("text-red-600");
+                        s.Element("save-message").Text.Set(json.Get(x => x.Message));
+                        s.Element("save-received-name").Text.Set(json.Get(x => x.ReceivedName));
+                        s.Element("save-result").ClassList.Add("text-green-600");
+                        s.Element("save-result").ClassList.Remove("text-red-600");
                     })
                     .OnError(400, e =>
                     {
                         e.Element("save-spinner").Hide();
-                        e.Element("save-error").SetText("Validation failed: Name is required");
-                        e.Element("save-result").AddClass("text-red-600");
-                        e.Element("save-result").RemoveClass("text-green-600");
+                        e.Element("save-error").Text.Set("Validation failed: Name is required");
+                        e.Element("save-result").ClassList.Add("text-red-600");
+                        e.Element("save-result").ClassList.Remove("text-green-600");
                     })
                  );
             }))
@@ -119,9 +119,9 @@
                  .Response(r => r
                     .OnSuccess<ResidentsResponse>((json, s) =>
                     {
-                        s.Element("chain-resident-first").SetText(json, x => x.First);
-                        s.Element("chain-resident-second").SetText(json, x => x.Second);
-                        s.Element("chain-residents").AddClass("text-green-600");
+                        s.Element("chain-resident-first").Text.Set(json.Get(x => x.First));
+                        s.Element("chain-resident-second").Text.Set(json.Get(x => x.Second));
+                        s.Element("chain-residents").ClassList.Add("text-green-600");
                     })
                     .Chained(c => c
                         .Get(Url.SandboxRoute("Facilities", "Http"))
@@ -129,9 +129,9 @@
                             .OnSuccess<FacilitiesResponse>((json2, s2) =>
                             {
                                 s2.Element("chain-spinner").Hide();
-                                s2.Element("chain-facility-first").SetText(json2, x => x.First);
-                                s2.Element("chain-facility-second").SetText(json2, x => x.Second);
-                                s2.Element("chain-facilities").AddClass("text-green-600");
+                                s2.Element("chain-facility-first").Text.Set(json2.Get(x => x.First));
+                                s2.Element("chain-facility-second").Text.Set(json2.Get(x => x.Second));
+                                s2.Element("chain-facilities").ClassList.Add("text-green-600");
                             })
                         )
                     )
@@ -164,22 +164,22 @@
                     a => a.Get(Url.SandboxRoute("Residents", "Http"))
                           .Response(ra => ra.OnSuccess<ResidentsResponse>((json, sa) =>
                           {
-                              sa.Element("parallel-resident-first").SetText(json, x => x.First);
-                              sa.Element("parallel-resident-second").SetText(json, x => x.Second);
-                              sa.Element("parallel-residents").AddClass("text-green-600");
+                              sa.Element("parallel-resident-first").Text.Set(json.Get(x => x.First));
+                              sa.Element("parallel-resident-second").Text.Set(json.Get(x => x.Second));
+                              sa.Element("parallel-residents").ClassList.Add("text-green-600");
                           })),
                     b => b.Get(Url.SandboxRoute("Facilities", "Http"))
                           .Response(rb => rb.OnSuccess<FacilitiesResponse>((json, sb) =>
                           {
-                              sb.Element("parallel-facility-first").SetText(json, x => x.First);
-                              sb.Element("parallel-facility-second").SetText(json, x => x.Second);
-                              sb.Element("parallel-facilities").AddClass("text-green-600");
+                              sb.Element("parallel-facility-first").Text.Set(json.Get(x => x.First));
+                              sb.Element("parallel-facility-second").Text.Set(json.Get(x => x.Second));
+                              sb.Element("parallel-facilities").ClassList.Add("text-green-600");
                           }))
                 ).OnAllSettled(s =>
                 {
                     s.Element("parallel-spinner").Hide();
-                    s.Element("parallel-all").SetText("All parallel requests completed!");
-                    s.Element("parallel-all").AddClass("text-green-600");
+                    s.Element("parallel-all").Text.Set("All parallel requests completed!");
+                    s.Element("parallel-all").ClassList.Add("text-green-600");
                 });
             }))
         <native-vstack gap="Xs" class="mt-3 font-mono text-sm">
@@ -214,15 +214,15 @@
                     .OnSuccess<UpdateResponse>((json, s) =>
                     {
                         s.Element("put-spinner").Hide();
-                        s.Element("put-received-name").SetText(json, x => x.ReceivedName);
-                        s.Element("put-received-facility").SetText(json, x => x.ReceivedFacilityId);
-                        s.Element("put-result").AddClass("text-green-600");
+                        s.Element("put-received-name").Text.Set(json.Get(x => x.ReceivedName));
+                        s.Element("put-received-facility").Text.Set(json.Get(x => x.ReceivedFacilityId));
+                        s.Element("put-result").ClassList.Add("text-green-600");
                     })
                     .OnError(400, e =>
                     {
                         e.Element("put-spinner").Hide();
-                        e.Element("put-result").SetText("Validation failed");
-                        e.Element("put-result").AddClass("text-red-600");
+                        e.Element("put-result").Text.Set("Validation failed");
+                        e.Element("put-result").ClassList.Add("text-red-600");
                     })
                  );
             }))
@@ -251,8 +251,8 @@
                         .OnSuccess<DeleteResponse>((json, s) =>
                         {
                             s.Element("delete-spinner").Hide();
-                            s.Element("delete-id").SetText(json, x => x.DeletedId);
-                            s.Element("delete-result").AddClass("text-green-600");
+                            s.Element("delete-id").Text.Set(json.Get(x => x.DeletedId));
+                            s.Element("delete-result").ClassList.Add("text-green-600");
                         })
                      );
                  });
@@ -297,9 +297,9 @@
                     .OnSuccess<FormDataResponse>((json, s) =>
                     {
                         s.Element("formdata-spinner").Hide();
-                        s.Element("formdata-count").SetText(json, x => x.Count);
-                        s.Element("formdata-fields").SetText(json, x => x.ReceivedFields);
-                        s.Element("formdata-result").AddClass("text-green-600");
+                        s.Element("formdata-count").Text.Set(json.Get(x => x.Count));
+                        s.Element("formdata-fields").Text.Set(json.Get(x => x.ReceivedFields));
+                        s.Element("formdata-result").ClassList.Add("text-green-600");
                     })
                  );
             }))
@@ -326,9 +326,9 @@
                     .OnSuccess<SearchResponse>((json, s) =>
                     {
                         s.Element("search-spinner").Hide();
-                        s.Element("search-query").SetText(json, x => x.Query);
-                        s.Element("search-match-count").SetText(json, x => x.MatchCount);
-                        s.Element("search-result").AddClass("text-green-600");
+                        s.Element("search-query").Text.Set(json.Get(x => x.Query));
+                        s.Element("search-match-count").Text.Set(json.Get(x => x.MatchCount));
+                        s.Element("search-result").ClassList.Add("text-green-600");
                     })
                  );
             }))
@@ -355,20 +355,20 @@
                     .OnSuccess(s =>
                     {
                         s.Element("multi-err-spinner").Hide();
-                        s.Element("multi-err-result").SetText("Validation passed");
-                        s.Element("multi-err-result").AddClass("text-green-600");
+                        s.Element("multi-err-result").Text.Set("Validation passed");
+                        s.Element("multi-err-result").ClassList.Add("text-green-600");
                     })
                     .OnError(422, e =>
                     {
                         e.Element("multi-err-spinner").Hide();
-                        e.Element("multi-err-summary").SetText("422 — 2 validation error(s): Name, FacilityId");
-                        e.Element("multi-err-result").AddClass("text-amber-600");
+                        e.Element("multi-err-summary").Text.Set("422 — 2 validation error(s): Name, FacilityId");
+                        e.Element("multi-err-result").ClassList.Add("text-amber-600");
                     })
                     .OnError(500, e =>
                     {
                         e.Element("multi-err-spinner").Hide();
-                        e.Element("multi-err-result").SetText("500 — Server error");
-                        e.Element("multi-err-result").AddClass("text-red-600");
+                        e.Element("multi-err-result").Text.Set("500 — Server error");
+                        e.Element("multi-err-result").ClassList.Add("text-red-600");
                     })
                  );
             }))
@@ -400,14 +400,14 @@
             @(Html.NativeActionLink("standalone-native-action-link", "Run Standalone NativeActionLink", Url.SandboxRoute("StandaloneNativeActionLink", "Http"), link => link
                 .Post()
                 .Gather<HttpController.StandaloneNativeActionLinkRequest>(g => g.Set(x => x.Command, "run"))
-                .WhileLoading(x => x.Element("standalone-native-action-link-status").SetText("Running standalone NativeActionLink..."))
+                .WhileLoading(x => x.Element("standalone-native-action-link-status").Text.Set("Running standalone NativeActionLink..."))
                 .Response(r => r
                     .OnSuccess(x =>
                     {
                         x.Into("standalone-native-action-link-result");
-                        x.Element("standalone-native-action-link-status").SetText("Standalone NativeActionLink succeeded");
+                        x.Element("standalone-native-action-link-status").Text.Set("Standalone NativeActionLink succeeded");
                     })
-                    .OnError(400, x => x.Element("standalone-native-action-link-status").SetText("Standalone NativeActionLink failed"))))
+                    .OnError(400, x => x.Element("standalone-native-action-link-status").Text.Set("Standalone NativeActionLink failed"))))
                 .CssClass("text-sm font-medium text-blue-600 hover:text-blue-700")
                 .Attr("data-testid", "standalone-native-action-link"))
         </native-hstack>
@@ -433,9 +433,9 @@
                  .Response(r => r
                     .OnSuccess<UrlParamEchoResponse>((json, s) =>
                     {
-                        s.Element("url-gather-tab").SetText(json, x => x.Tab);
-                        s.Element("url-gather-facility").SetText(json, x => x.FacilityId);
-                        s.Element("url-gather-result").AddClass("text-green-600");
+                        s.Element("url-gather-tab").Text.Set(json.Get(x => x.Tab));
+                        s.Element("url-gather-facility").Text.Set(json.Get(x => x.FacilityId));
+                        s.Element("url-gather-result").ClassList.Add("text-green-600");
                     })
                  );
             }))
@@ -486,10 +486,10 @@
                  .Response(r => r
                     .OnSuccess<ComposeEchoResponse>((json, s) =>
                     {
-                        s.Element("url-compose-name").SetText(json, x => x.Name);
-                        s.Element("url-compose-tab").SetText(json, x => x.ReceivedTab);
-                        s.Element("url-compose-facility").SetText(json, x => x.ReceivedFacility);
-                        s.Element("url-compose-result").AddClass("text-green-600");
+                        s.Element("url-compose-name").Text.Set(json.Get(x => x.Name));
+                        s.Element("url-compose-tab").Text.Set(json.Get(x => x.ReceivedTab));
+                        s.Element("url-compose-facility").Text.Set(json.Get(x => x.ReceivedFacility));
+                        s.Element("url-compose-result").ClassList.Add("text-green-600");
                     })
                  );
             }))
@@ -505,11 +505,11 @@
                         s.Get(Url.SandboxRouteTemplate("FacilityResident", "Http", "facilityId", "residentId"))
                          .Gather<FacilityResidentLookup>(g => g
                             .Set(x => x.FacilityId, s.Url<HttpShowcaseQuery>().Get(q => q.FacilityId))
-                            .Set(x => x.ResidentId, json.Read(x => x.ResidentId)))
+                            .Set(x => x.ResidentId, json.Get(x => x.ResidentId)))
                          .Response(r2 => r2.OnSuccess<FacilityResidentResponse>((json2, s2) =>
                          {
-                             s2.Element("url-chain-name").SetText(json2, x => x.Name);
-                             s2.Element("url-chain-result").AddClass("text-green-600");
+                             s2.Element("url-chain-name").Text.Set(json2.Get(x => x.Name));
+                             s2.Element("url-chain-result").ClassList.Add("text-green-600");
                          }));
                     })
                  );
@@ -538,9 +538,9 @@
                     .OnSuccess<ResidentByIdResponse>((json, s) =>
                     {
                         s.Element("route-single-spinner").Hide();
-                        s.Element("route-single-id").SetText(json, x => x.ResidentId);
-                        s.Element("route-single-name").SetText(json, x => x.Name);
-                        s.Element("route-single-result").AddClass("text-green-600");
+                        s.Element("route-single-id").Text.Set(json.Get(x => x.ResidentId));
+                        s.Element("route-single-name").Text.Set(json.Get(x => x.Name));
+                        s.Element("route-single-result").ClassList.Add("text-green-600");
                     })
                  );
             }))
@@ -569,10 +569,10 @@
                     .OnSuccess<FacilityResidentResponse>((json, s) =>
                     {
                         s.Element("route-multi-spinner").Hide();
-                        s.Element("route-multi-facility").SetText(json, x => x.FacilityId);
-                        s.Element("route-multi-resident").SetText(json, x => x.ResidentId);
-                        s.Element("route-multi-name").SetText(json, x => x.Name);
-                        s.Element("route-multi-result").AddClass("text-green-600");
+                        s.Element("route-multi-facility").Text.Set(json.Get(x => x.FacilityId));
+                        s.Element("route-multi-resident").Text.Set(json.Get(x => x.ResidentId));
+                        s.Element("route-multi-name").Text.Set(json.Get(x => x.Name));
+                        s.Element("route-multi-result").ClassList.Add("text-green-600");
                     })
                  );
             }))
@@ -601,19 +601,19 @@
                  .Response(r => r
                     .OnSuccess<ResidentByIdResponse>((json, s) =>
                     {
-                        s.Element("route-chain-first-id").SetText(json, x => x.ResidentId);
-                        s.Element("route-chain-first").AddClass("text-green-600");
+                        s.Element("route-chain-first-id").Text.Set(json.Get(x => x.ResidentId));
+                        s.Element("route-chain-first").ClassList.Add("text-green-600");
                         s.Get(Url.SandboxRouteTemplate("FacilityResident", "Http", "facilityId", "residentId"))
                          .Gather<FacilityResidentLookup>(g2 => g2
                              .Set(x => x.FacilityId, 3)
-                             .Set(x => x.ResidentId, json.Read(x => x.ResidentId))
+                             .Set(x => x.ResidentId, json.Get(x => x.ResidentId))
                              .Header("X-Step", "second"))
                          .Response(r2 => r2
                              .OnSuccess<FacilityResidentResponse>((json2, s2) =>
                              {
                                  s2.Element("route-chain-spinner").Hide();
-                                 s2.Element("route-chain-second-name").SetText(json2, x => x.Name);
-                                 s2.Element("route-chain-second").AddClass("text-green-600");
+                                 s2.Element("route-chain-second-name").Text.Set(json2.Get(x => x.Name));
+                                 s2.Element("route-chain-second").ClassList.Add("text-green-600");
                              })
                          );
                     })
@@ -644,8 +644,8 @@
                  .Response(r => r
                     .OnSuccess<ResidentByNameResponse>((json, s) =>
                     {
-                        s.Element("route-encoded-name").SetText(json, x => x.ReceivedName);
-                        s.Element("route-encoded-result").AddClass("text-green-600");
+                        s.Element("route-encoded-name").Text.Set(json.Get(x => x.ReceivedName));
+                        s.Element("route-encoded-result").ClassList.Add("text-green-600");
                     })
                  );
             }))
@@ -674,10 +674,10 @@
                     .OnSuccess<EchoHeadersResponse>((json, s) =>
                     {
                         s.Element("header-spinner").Hide();
-                        s.Element("header-api-version").SetText(json, x => x.ApiVersion);
-                        s.Element("header-request-id").SetText(json, x => x.RequestId);
-                        s.Element("header-tenant-id").SetText(json, x => x.TenantId);
-                        s.Element("header-result").AddClass("text-green-600");
+                        s.Element("header-api-version").Text.Set(json.Get(x => x.ApiVersion));
+                        s.Element("header-request-id").Text.Set(json.Get(x => x.RequestId));
+                        s.Element("header-tenant-id").Text.Set(json.Get(x => x.TenantId));
+                        s.Element("header-result").ClassList.Add("text-green-600");
                     })
                  );
             }))
@@ -707,9 +707,9 @@
                  .Response(r => r
                     .OnSuccess<EchoHeadersResponse>((json, s) =>
                     {
-                        s.Element("header-chain-first-version").SetText(json, x => x.ApiVersion);
-                        s.Element("header-chain-first-id").SetText(json, x => x.RequestId);
-                        s.Element("header-chain-first").AddClass("text-green-600");
+                        s.Element("header-chain-first-version").Text.Set(json.Get(x => x.ApiVersion));
+                        s.Element("header-chain-first-id").Text.Set(json.Get(x => x.RequestId));
+                        s.Element("header-chain-first").ClassList.Add("text-green-600");
                     })
                     .Chained(c => c
                         .Post(Url.SandboxRoute("EchoHeadersPost", "Http"))
@@ -721,9 +721,9 @@
                             .OnSuccess<EchoHeadersResponse>((json2, s2) =>
                             {
                                 s2.Element("header-chain-spinner").Hide();
-                                s2.Element("header-chain-second-version").SetText(json2, x => x.ApiVersion);
-                                s2.Element("header-chain-second-tenant").SetText(json2, x => x.TenantId);
-                                s2.Element("header-chain-second").AddClass("text-green-600");
+                                s2.Element("header-chain-second-version").Text.Set(json2.Get(x => x.ApiVersion));
+                                s2.Element("header-chain-second-tenant").Text.Set(json2.Get(x => x.TenantId));
+                                s2.Element("header-chain-second").ClassList.Add("text-green-600");
                             })
                         )
                     )
@@ -760,9 +760,9 @@
                               .Header("X-Request-Id", "parallel-req-a"))
                           .Response(ra => ra.OnSuccess<EchoHeadersResponse>((json, sa) =>
                           {
-                              sa.Element("header-parallel-a-version").SetText(json, x => x.ApiVersion);
-                              sa.Element("header-parallel-a-id").SetText(json, x => x.RequestId);
-                              sa.Element("header-parallel-a").AddClass("text-green-600");
+                              sa.Element("header-parallel-a-version").Text.Set(json.Get(x => x.ApiVersion));
+                              sa.Element("header-parallel-a-id").Text.Set(json.Get(x => x.RequestId));
+                              sa.Element("header-parallel-a").ClassList.Add("text-green-600");
                           })),
                     b => b.Get(Url.SandboxRoute("EchoHeadersPost", "Http"))
                           .Gather(g => g
@@ -770,15 +770,15 @@
                               .Header("X-Tenant-Id", "parallel-tenant-b"))
                           .Response(rb => rb.OnSuccess<EchoHeadersResponse>((json, sb) =>
                           {
-                              sb.Element("header-parallel-b-version").SetText(json, x => x.ApiVersion);
-                              sb.Element("header-parallel-b-tenant").SetText(json, x => x.TenantId);
-                              sb.Element("header-parallel-b").AddClass("text-green-600");
+                              sb.Element("header-parallel-b-version").Text.Set(json.Get(x => x.ApiVersion));
+                              sb.Element("header-parallel-b-tenant").Text.Set(json.Get(x => x.TenantId));
+                              sb.Element("header-parallel-b").ClassList.Add("text-green-600");
                           }))
                 ).OnAllSettled(s =>
                 {
                     s.Element("header-parallel-spinner").Hide();
-                    s.Element("header-parallel-all").SetText("Both parallel requests with headers completed!");
-                    s.Element("header-parallel-all").AddClass("text-green-600");
+                    s.Element("header-parallel-all").Text.Set("Both parallel requests with headers completed!");
+                    s.Element("header-parallel-all").ClassList.Add("text-green-600");
                 });
             }))
         <native-vstack gap="Xs" class="mt-3 font-mono text-sm">
@@ -813,9 +813,9 @@
                      .Response(r => r
                         .OnSuccess(s =>
                         {
-                            s.Element("finally-result").SetText("Saved successfully!");
-                            s.Element("finally-result").AddClass("text-green-600");
-                            s.Element("finally-result").RemoveClass("text-red-600");
+                            s.Element("finally-result").Text.Set("Saved successfully!");
+                            s.Element("finally-result").ClassList.Add("text-green-600");
+                            s.Element("finally-result").ClassList.Remove("text-red-600");
                         })
                      )
                      .Finally(f => f.Element("finally-spinner").Hide());
@@ -829,9 +829,9 @@
                      .Response(r => r
                         .OnError(500, e =>
                         {
-                            e.Element("finally-result").SetText("Server error (500) — but spinner is gone!");
-                            e.Element("finally-result").AddClass("text-red-600");
-                            e.Element("finally-result").RemoveClass("text-green-600");
+                            e.Element("finally-result").Text.Set("Server error (500) — but spinner is gone!");
+                            e.Element("finally-result").ClassList.Add("text-red-600");
+                            e.Element("finally-result").ClassList.Remove("text-green-600");
                         })
                      )
                      .Finally(f => f.Element("finally-spinner").Hide());

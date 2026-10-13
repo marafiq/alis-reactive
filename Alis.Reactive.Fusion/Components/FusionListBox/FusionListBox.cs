@@ -9,6 +9,7 @@ using Syncfusion.EJ2.DropDowns;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion ListBox, declared by the names its JavaScript API uses.
     /// </summary>
@@ -20,19 +21,19 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionListBox : FusionComponent
     {
         /// <summary>The selected values.</summary>
-        public ComponentProperty<string[]> Value => Property<string[]>("value");
+        public Prop<string[]> Value => Prop<string[]>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Selects (<see langword="true"/>) or clears the items; the third argument says the first holds values, not texts.</summary>
-        public ComponentMethod<string[], bool, bool> SelectItems => Method<string[], bool, bool>("selectItems");
+        public void SelectItems(Arg<string[]> first, Arg<bool> second, Arg<bool> third) => Call(first, second, third);
 
         /// <summary>Selects (<see langword="true"/>) or clears every item.</summary>
-        public ComponentMethod<bool> SelectAll => Method<bool>("selectAll");
+        public void SelectAll(Arg<bool> value) => Call(value);
 
         /// <summary>Enables (<see langword="true"/>) or disables the items; the third argument says the first holds values, not texts.</summary>
-        public ComponentMethod<string[], bool, bool> EnableItems => Method<string[], bool, bool>("enableItems");
+        public void EnableItems(Arg<string[]> first, Arg<bool> second, Arg<bool> third) => Call(first, second, third);
 
         /// <summary>Raised when the selection changes.</summary>
         public TypedEvent<FusionListBoxChangeArgs> Change =>
@@ -40,11 +41,12 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionListBox.Change"/>.</summary>
-    public class FusionListBoxChangeArgs
+    public class FusionListBoxChangeArgs : JsObject
     {
         /// <summary>Selected values after the change.</summary>
-        public string[]? Value { get; set; }
+        public ReadOnly<string[]> Value => ReadOnly<string[]>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Creates a FusionListBox with Syncfusion MVC builder-owned static configuration.

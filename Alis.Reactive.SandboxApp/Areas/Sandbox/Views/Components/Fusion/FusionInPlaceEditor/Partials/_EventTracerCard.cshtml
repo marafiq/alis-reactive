@@ -22,33 +22,33 @@
         })
         .Reactive(evt => evt.BeginEdit, (args, p) =>
         {
-            p.Element("trace-begin").SetText(args, x => x.Mode);
-            p.When(p.Component<FusionInPlaceEditor>(m => m.Value).Get(c => c.Value)).Eq("lock")
-                .Then(then => then.Payload(args).Set(a => a.Cancel, true));
+            p.Element("trace-begin").Text.Set(args.Mode);
+            p.When(p.Component<FusionInPlaceEditor>(m => m.Value).Value).Eq("lock")
+                .Then(then => args.Cancel.Set(true));
         })
         .Reactive(evt => evt.Change, (args, p) =>
         {
-            p.Element("trace-change").SetText(args, x => x.Value);
+            p.Element("trace-change").Text.Set(args.Value);
         })
         .Reactive(evt => evt.EndEdit, (args, p) =>
         {
-            p.Element("trace-endedit").SetText(args, x => x.Action);
+            p.Element("trace-endedit").Text.Set(args.Action);
         })
         .Reactive(evt => evt.ActionBegin, (args, p) =>
         {
-            p.Element("trace-actionbegin").SetText("fired");
+            p.Element("trace-actionbegin").Text.Set("fired");
         })
         .Reactive(evt => evt.ActionSuccess, (args, p) =>
         {
-            p.Element("trace-actionsuccess").SetText(args, x => x.Value);
+            p.Element("trace-actionsuccess").Text.Set(args.Value);
         })
         .Reactive(evt => evt.SubmitClick, (args, p) =>
         {
-            p.Element("trace-submitclick").SetText(args, x => x.Name);
+            p.Element("trace-submitclick").Text.Set(args.Name);
         })
         .Reactive(evt => evt.CancelClick, (args, p) =>
         {
-            p.Element("trace-cancelclick").SetText(args, x => x.Name);
+            p.Element("trace-cancelclick").Text.Set(args.Name);
         }); }
 
     <dl class="mt-4 grid grid-cols-2 gap-2 text-xs font-mono">

@@ -2,6 +2,7 @@ using System;
 
 namespace Alis.Reactive.Native.Components
 {
+#nullable disable annotations
     /// <summary>
     /// A native list of checkboxes whose value is the checked values, declared by the names its element uses.
     /// </summary>
@@ -12,10 +13,10 @@ namespace Alis.Reactive.Native.Components
     public sealed class NativeCheckList : NativeComponent, IInputComponent
     {
         /// <summary>The checked values.</summary>
-        public ComponentProperty<string[]> Value => Property<string[]>("value");
+        public Prop<string[]> Value => Prop<string[]>();
 
         /// <summary>Moves focus to the element.</summary>
-        public ComponentMethod Focus => Method("focus");
+        public void Focus() => Call();
 
         /// <summary>Raised when the user checks or clears a box.</summary>
         public TypedEvent<NativeCheckListChangeArgs> Change =>
@@ -26,11 +27,12 @@ namespace Alis.Reactive.Native.Components
     }
 
     /// <summary>Payload of <see cref="NativeCheckList.Change"/>, read from the container.</summary>
-    public class NativeCheckListChangeArgs
+    public class NativeCheckListChangeArgs : JsObject
     {
         /// <summary>The checked values after the change.</summary>
-        public string[]? Value { get; set; }
+        public ReadOnly<string[]> Value => ReadOnly<string[]>();
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="NativeCheckList"/> for a model-bound field.</summary>
     public static class NativeCheckListHtmlExtensions

@@ -20,9 +20,9 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var comp = p.Component<FusionNumericTextBox>(m => m.PainLevel);
-                p.Element("pain-echo").SetText(comp.Get(c => c.Value));
+                p.Element("pain-echo").Text.Set(comp.Value);
 
-                p.When(comp.Get(c => c.Value)).Gt(7m)
+                p.When(comp.Value).Gt(7m)
                     .Then(then =>
                     {
                         then.Element("pain-spinner").Show();
@@ -31,7 +31,7 @@
                          .Gather<AlertPainRequest>(g => g.Form(m => m.PainLevel, m => m.PainLocation))
                          .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
                          {
-                             s.Element("pain-result").SetText(json, x => x.Message);
+                             s.Element("pain-result").Text.Set(json.Get(x => x.Message));
                              s.Element("pain-result").Show();
                              s.Element("pain-spinner").Hide();
                          }));

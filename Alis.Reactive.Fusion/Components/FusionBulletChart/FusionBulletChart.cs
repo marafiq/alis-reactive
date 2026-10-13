@@ -9,6 +9,7 @@ using Syncfusion.EJ2.Charts;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion BulletChart, declared by the names its JavaScript API uses.
     /// </summary>
@@ -20,7 +21,7 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionBulletChart : FusionComponent
     {
         /// <summary>Maps a data index to its drawn position, given the number of points.</summary>
-        public ComponentFunction<int, int, int> GetActualIndex => Function<int, int, int>("getActualIndex");
+        public TypedSource<int> GetActualIndex(Arg<int> first, Arg<int> second) => Invoke<int>(first, second);
 
         /// <summary>Raised before a tooltip renders.</summary>
         public TypedEvent<FusionBulletChartTooltipRenderArgs> TooltipRender =>
@@ -33,36 +34,37 @@ namespace Alis.Reactive.Fusion.Components
 
     /// <summary>Payload of <see cref="FusionBulletChart.TooltipRender"/>.</summary>
     /// <remarks>Rewrite the tooltip: <c>p.Payload(args).Set(a =&gt; a.Text, "On target")</c>.</remarks>
-    public class FusionBulletChartTooltipRenderArgs
+    public class FusionBulletChartTooltipRenderArgs : JsObject
     {
         /// <summary>Actual value of the feature bar.</summary>
-        public string Value { get; set; } = string.Empty;
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>Target values of the comparative bar.</summary>
-        public string[] Target { get; set; } = System.Array.Empty<string>();
+        public ReadOnly<string[]> Target => ReadOnly<string[]>();
 
         /// <summary>The event name.</summary>
-        public string Name { get; set; } = string.Empty;
+        public ReadOnly<string> Name => ReadOnly<string>();
 
         /// <summary>Tooltip template markup when the chart renders a template.</summary>
-        public string? Template { get; set; }
+        public ReadOnly<string> Template => ReadOnly<string>();
 
         /// <summary>Tooltip text; write it to replace the text before it renders.</summary>
-        public string? Text { get; set; }
+        public Prop<string> Text => Prop<string>();
     }
 
     /// <summary>Payload of <see cref="FusionBulletChart.BulletChartMouseClick"/>.</summary>
-    public class FusionBulletChartMouseClickArgs
+    public class FusionBulletChartMouseClickArgs : JsObject
     {
         /// <summary>ID of the clicked element.</summary>
-        public string Target { get; set; } = string.Empty;
+        public ReadOnly<string> Target => ReadOnly<string>();
 
         /// <summary>Horizontal position of the click in the chart.</summary>
-        public double X { get; set; }
+        public ReadOnly<double> X => ReadOnly<double>();
 
         /// <summary>Vertical position of the click in the chart.</summary>
-        public double Y { get; set; }
+        public ReadOnly<double> Y => ReadOnly<double>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Renders the component for a plan, ready for <c>.Reactive(...)</c>.

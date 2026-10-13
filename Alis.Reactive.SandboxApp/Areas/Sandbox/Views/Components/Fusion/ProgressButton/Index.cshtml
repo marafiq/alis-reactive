@@ -10,10 +10,12 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var button = p.Component<FusionProgressButton>(buttonId);
-        button.Set(c => c.Content, "Ready Save").Call(c => c.DataBind);
-        button.Set(c => c.EnableProgress, true).Call(c => c.DataBind);
-        p.Element("content-echo").SetText(button.Get(c => c.Content));
-        p.Element("progress-enabled-echo").SetText(button.Get(c => c.EnableProgress));
+        button.Content.Set("Ready Save");
+        button.DataBind();
+        button.EnableProgress.Set(true);
+        button.DataBind();
+        p.Element("content-echo").Text.Set(button.Content);
+        p.Element("progress-enabled-echo").Text.Set(button.EnableProgress);
     }));
 }
 
@@ -30,30 +32,30 @@
                 .EnableProgress(false))
                 .Reactive(evt => evt.Begin, (args, p) =>
                 {
-                    p.Element("begin-percent").SetText(args, x => x.Percent);
-                    p.Element("begin-duration").SetText(args, x => x.CurrentDuration);
-                    p.Element("begin-step").SetText(args, x => x.Step);
-                    p.When(args, x => x.Percent).Eq(0d)
-                        .Then(t => t.Element("begin-condition").SetText("begin zero"))
-                        .Else(e => e.Element("begin-condition").SetText("begin nonzero"));
+                    p.Element("begin-percent").Text.Set(args.Percent);
+                    p.Element("begin-duration").Text.Set(args.CurrentDuration);
+                    p.Element("begin-step").Text.Set(args.Step);
+                    p.When(args.Percent).Eq(0d)
+                        .Then(t => t.Element("begin-condition").Text.Set("begin zero"))
+                        .Else(e => e.Element("begin-condition").Text.Set("begin nonzero"));
                 })
                 .Reactive(evt => evt.Progress, (args, p) =>
                 {
-                    p.Element("progress-percent").SetText(args, x => x.Percent);
-                    p.Element("progress-duration").SetText(args, x => x.CurrentDuration);
-                    p.Element("progress-step").SetText(args, x => x.Step);
-                    p.When(args, x => x.Percent).Gte(60d)
-                        .Then(t => t.Element("progress-condition").SetText("at least sixty"))
-                        .Else(e => e.Element("progress-condition").SetText("below sixty"));
+                    p.Element("progress-percent").Text.Set(args.Percent);
+                    p.Element("progress-duration").Text.Set(args.CurrentDuration);
+                    p.Element("progress-step").Text.Set(args.Step);
+                    p.When(args.Percent).Gte(60d)
+                        .Then(t => t.Element("progress-condition").Text.Set("at least sixty"))
+                        .Else(e => e.Element("progress-condition").Text.Set("below sixty"));
                 })
                 .Reactive(evt => evt.End, (args, p) =>
                 {
-                    p.Element("end-percent").SetText(args, x => x.Percent);
-                    p.Element("end-duration").SetText(args, x => x.CurrentDuration);
-                    p.Element("end-step").SetText(args, x => x.Step);
-                    p.When(args, x => x.Percent).Eq(100d)
-                        .Then(t => t.Element("end-condition").SetText("complete"))
-                        .Else(e => e.Element("end-condition").SetText("incomplete"));
+                    p.Element("end-percent").Text.Set(args.Percent);
+                    p.Element("end-duration").Text.Set(args.CurrentDuration);
+                    p.Element("end-step").Text.Set(args.Step);
+                    p.When(args.Percent).Eq(100d)
+                        .Then(t => t.Element("end-condition").Text.Set("complete"))
+                        .Else(e => e.Element("end-condition").Text.Set("incomplete"));
                 }))
         </native-hstack>
 
@@ -63,91 +65,97 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var button = p.Component<FusionProgressButton>(buttonId);
-                    button.Set(c => c.Content, "Discharge Save").Call(c => c.DataBind);
-                    p.Element("content-echo").SetText(button.Get(c => c.Content));
-                    p.Element("command-state").SetText("content set");
+                    button.Content.Set("Discharge Save");
+                    button.DataBind();
+                    p.Element("content-echo").Text.Set(button.Content);
+                    p.Element("command-state").Text.Set("content set");
                 }))
             @(Html.NativeButton("disable-progress-button-btn", "Disable")
                 .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var button = p.Component<FusionProgressButton>(buttonId);
-                    button.Set(c => c.Disabled, true).Call(c => c.DataBind);
-                    p.Element("disabled-echo").SetText(button.Get(c => c.Disabled));
-                    p.Element("command-state").SetText("disabled");
+                    button.Disabled.Set(true);
+                    button.DataBind();
+                    p.Element("disabled-echo").Text.Set(button.Disabled);
+                    p.Element("command-state").Text.Set("disabled");
                 }))
             @(Html.NativeButton("enable-progress-button-btn", "Enable")
                 .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var button = p.Component<FusionProgressButton>(buttonId);
-                    button.Set(c => c.Disabled, false).Call(c => c.DataBind);
-                    p.Element("disabled-echo").SetText(button.Get(c => c.Disabled));
-                    p.Element("command-state").SetText("enabled");
+                    button.Disabled.Set(false);
+                    button.DataBind();
+                    p.Element("disabled-echo").Text.Set(button.Disabled);
+                    p.Element("command-state").Text.Set("enabled");
                 }))
             @(Html.NativeButton("set-css-btn", "Set Css")
                 .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var button = p.Component<FusionProgressButton>(buttonId);
-                    button.Set(c => c.CssClass, "e-success extra-class").Call(c => c.DataBind);
-                    p.Element("css-echo").SetText(button.Get(c => c.CssClass));
-                    p.Element("command-state").SetText("css set");
+                    button.CssClass.Set("e-success extra-class");
+                    button.DataBind();
+                    p.Element("css-echo").Text.Set(button.CssClass);
+                    p.Element("command-state").Text.Set("css set");
                 }))
             @(Html.NativeButton("enable-progress-btn", "Enable Progress")
                 .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var button = p.Component<FusionProgressButton>(buttonId);
-                    button.Set(c => c.EnableProgress, true).Call(c => c.DataBind);
-                    p.Element("progress-enabled-echo").SetText(button.Get(c => c.EnableProgress));
-                    p.Element("command-state").SetText("progress enabled");
+                    button.EnableProgress.Set(true);
+                    button.DataBind();
+                    p.Element("progress-enabled-echo").Text.Set(button.EnableProgress);
+                    p.Element("command-state").Text.Set("progress enabled");
                 }))
             @(Html.NativeButton("disable-progress-btn", "Disable Progress")
                 .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var button = p.Component<FusionProgressButton>(buttonId);
-                    button.Set(c => c.EnableProgress, false).Call(c => c.DataBind);
-                    p.Element("progress-enabled-echo").SetText(button.Get(c => c.EnableProgress));
-                    p.Element("command-state").SetText("progress disabled");
+                    button.EnableProgress.Set(false);
+                    button.DataBind();
+                    p.Element("progress-enabled-echo").Text.Set(button.EnableProgress);
+                    p.Element("command-state").Text.Set("progress disabled");
                 }))
             @(Html.NativeButton("start-progress-btn", "Start")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionProgressButton>(buttonId).Call(c => c.Start);
-                    p.Element("start-state").SetText("start called");
+                    p.Component<FusionProgressButton>(buttonId).Start();
+                    p.Element("start-state").Text.Set("start called");
                 }))
             @(Html.NativeButton("start-at-progress-btn", "Start At 60")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionProgressButton>(buttonId).Call(c => c.StartAt, 60d);
-                    p.Element("start-state").SetText("start at 60 called");
+                    p.Component<FusionProgressButton>(buttonId).StartAt(60d);
+                    p.Element("start-state").Text.Set("start at 60 called");
                 }))
             @(Html.NativeButton("complete-progress-btn", "Complete")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionProgressButton>(buttonId).Call(c => c.ProgressComplete);
-                    p.Element("complete-state").SetText("complete called");
+                    p.Component<FusionProgressButton>(buttonId).ProgressComplete();
+                    p.Element("complete-state").Text.Set("complete called");
                 }))
             @(Html.NativeButton("focus-progress-btn", "Focus")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionProgressButton>(buttonId).Call(c => c.FocusIn);
-                    p.Element("focus-state").SetText("focus called");
+                    p.Component<FusionProgressButton>(buttonId).FocusIn();
+                    p.Element("focus-state").Text.Set("focus called");
                 }))
             @(Html.NativeButton("check-progress-enabled-btn", "Check Progress")
                 .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var button = p.Component<FusionProgressButton>(buttonId);
-                    p.When(button.Get(c => c.EnableProgress)).Truthy()
-                        .Then(t => t.Element("progress-enabled-state").SetText("progress enabled"))
-                        .Else(e => e.Element("progress-enabled-state").SetText("progress disabled"));
+                    p.When(button.EnableProgress).Truthy()
+                        .Then(t => t.Element("progress-enabled-state").Text.Set("progress enabled"))
+                        .Else(e => e.Element("progress-enabled-state").Text.Set("progress disabled"));
                 }))
         </native-hstack>
     </native-card-body></native-card>
@@ -161,17 +169,17 @@
                 var button = p.Component<FusionProgressButton>(buttonId);
                 p.Post(Url.SandboxRoute("Echo", "ProgressButton"))
                     .Gather<FusionProgressButtonEchoRequest>(g => g
-                        .Set(x => x.Content, button.Get(c => c.Content))
-                        .Set(x => x.Disabled, button.Get(c => c.Disabled))
-                        .Set(x => x.CssClass, button.Get(c => c.CssClass))
-                        .Set(x => x.ProgressEnabled, button.Get(c => c.EnableProgress)))
+                        .Set(x => x.Content, button.Content)
+                        .Set(x => x.Disabled, button.Disabled)
+                        .Set(x => x.CssClass, button.CssClass)
+                        .Set(x => x.ProgressEnabled, button.EnableProgress))
                     .Response(r => r.OnSuccess<FusionProgressButtonEchoResponse>((json, s) =>
                     {
-                        s.Element("gather-content").SetText(json, x => x.Content);
-                        s.Element("gather-disabled").SetText(json, x => x.Disabled);
-                        s.Element("gather-css").SetText(json, x => x.CssClass);
-                        s.Element("gather-progress-enabled").SetText(json, x => x.ProgressEnabled);
-                        s.Element("gather-summary").SetText(json, x => x.Summary);
+                        s.Element("gather-content").Text.Set(json.Get(x => x.Content));
+                        s.Element("gather-disabled").Text.Set(json.Get(x => x.Disabled));
+                        s.Element("gather-css").Text.Set(json.Get(x => x.CssClass));
+                        s.Element("gather-progress-enabled").Text.Set(json.Get(x => x.ProgressEnabled));
+                        s.Element("gather-summary").Text.Set(json.Get(x => x.Summary));
                     }));
             }))
     </native-card-body></native-card>

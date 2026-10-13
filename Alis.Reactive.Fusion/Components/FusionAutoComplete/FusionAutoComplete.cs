@@ -6,6 +6,7 @@ using Syncfusion.EJ2.DropDowns;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion AutoComplete, declared by the names its JavaScript API uses.
     /// </summary>
@@ -17,32 +18,32 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionAutoComplete : FusionComponent, IInputComponent
     {
         /// <summary>The selected value; <see langword="null"/> when empty.</summary>
-        public ComponentProperty<string?> Value => Property<string?>("value");
+        public Prop<string> Value => Prop<string>();
 
         /// <summary>The text shown in the input, without changing the selected value.</summary>
-        public ComponentProperty<string?> Text => Property<string?>("text");
+        public Prop<string> Text => Prop<string>();
 
         /// <summary>The items the popup suggests from.</summary>
         /// <remarks>Call <see cref="DataBind"/> after writing it outside a filtering event.</remarks>
-        public ComponentProperty<IEnumerable<object>?> DataSource => Property<IEnumerable<object>?>("dataSource");
+        public Prop<IEnumerable<object>> DataSource => Prop<IEnumerable<object>>();
 
         /// <summary>Whether the input accepts interaction.</summary>
-        public ComponentProperty<bool> Enabled => Property<bool>("enabled");
+        public Prop<bool> Enabled => Prop<bool>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Moves focus into the input.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
 
         /// <summary>Removes focus from the input.</summary>
-        public ComponentMethod FocusOut => Method("focusOut");
+        public void FocusOut() => Call();
 
         /// <summary>Opens the suggestion popup.</summary>
-        public ComponentMethod ShowPopup => Method("showPopup");
+        public void ShowPopup() => Call();
 
         /// <summary>Closes the suggestion popup.</summary>
-        public ComponentMethod HidePopup => Method("hidePopup");
+        public void HidePopup() => Call();
 
         /// <summary>Raised when the selected value changes.</summary>
         public TypedEvent<FusionAutoCompleteChangeArgs> Change =>
@@ -58,13 +59,13 @@ namespace Alis.Reactive.Fusion.Components
 
     /// <summary>Payload of <see cref="FusionAutoComplete.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Value).Eq("smith")</c>.</remarks>
-    public class FusionAutoCompleteChangeArgs
+    public class FusionAutoCompleteChangeArgs : JsObject
     {
         /// <summary>Selected value after the change.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>Whether user interaction triggered the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionAutoComplete.Filtering"/>.</summary>
@@ -82,17 +83,21 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionAutoCompleteFilteringArgs : JsObject
     {
         /// <summary>Text the user typed.</summary>
-        public string Text { get; set; } = "";
+        public ReadOnly<string> Text => ReadOnly<string>();
 
         /// <summary>
         /// Set to <see langword="true"/> to suppress the built-in client-side filter, so the popup
         /// does not show "No records found" while a server request is in flight.
         /// </summary>
-        public bool PreventDefaultAction { get; set; }
+        public Prop<bool> PreventDefaultAction => Prop<bool>();
 
         /// <summary>Hands filtered items to the popup; valid after an HTTP response returns.</summary>
-        public ComponentMethod<IEnumerable<object>> UpdateData => Method<IEnumerable<object>>("updateData");
+        /// <typeparam name="TItems">The items' type, such as the server's own list.</typeparam>
+        /// <param name="items">The items to show, read when the step runs.</param>
+        public void UpdateData<TItems>(TypedSource<TItems> items) where TItems : IEnumerable<object> =>
+            Call(Pass<IEnumerable<object>, TItems>(items));
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionAutoComplete"/> for a model-bound field.</summary>
     public static class FusionAutoCompleteHtmlExtensions

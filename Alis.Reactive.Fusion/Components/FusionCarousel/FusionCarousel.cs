@@ -9,6 +9,7 @@ using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Carousel, declared by the names its JavaScript API uses.
     /// </summary>
@@ -20,13 +21,13 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionCarousel : FusionComponent
     {
         /// <summary>The zero-based index of the shown slide.</summary>
-        public ComponentProperty<int> SelectedIndex => Property<int>("selectedIndex");
+        public Prop<int> SelectedIndex => Prop<int>();
 
         /// <summary>Shows the next slide.</summary>
-        public ComponentMethod Next => Method("next");
+        public void Next() => Call();
 
         /// <summary>Shows the previous slide.</summary>
-        public ComponentMethod Prev => Method("prev");
+        public void Prev() => Call();
 
         /// <summary>Raised before the slide changes.</summary>
         public TypedEvent<FusionCarouselSlideChangingArgs> SlideChanging =>
@@ -38,39 +39,40 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionCarousel.SlideChanging"/>.</summary>
-    public class FusionCarouselSlideChangingArgs
+    public class FusionCarouselSlideChangingArgs : JsObject
     {
         /// <summary>Index of the slide shown now.</summary>
-        public int CurrentIndex { get; set; }
+        public ReadOnly<int> CurrentIndex => ReadOnly<int>();
 
         /// <summary>Index of the slide about to show.</summary>
-        public int NextIndex { get; set; }
+        public ReadOnly<int> NextIndex => ReadOnly<int>();
 
         /// <summary>Whether a swipe started the change.</summary>
-        public bool IsSwiped { get; set; }
+        public ReadOnly<bool> IsSwiped => ReadOnly<bool>();
 
         /// <summary><c>"Next"</c> or <c>"Previous"</c>.</summary>
-        public string SlideDirection { get; set; } = string.Empty;
+        public ReadOnly<string> SlideDirection => ReadOnly<string>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionCarousel.SlideChanged"/>.</summary>
-    public class FusionCarouselSlideChangedArgs
+    public class FusionCarouselSlideChangedArgs : JsObject
     {
         /// <summary>Index of the slide shown now.</summary>
-        public int CurrentIndex { get; set; }
+        public ReadOnly<int> CurrentIndex => ReadOnly<int>();
 
         /// <summary>Index of the slide shown before.</summary>
-        public int PreviousIndex { get; set; }
+        public ReadOnly<int> PreviousIndex => ReadOnly<int>();
 
         /// <summary>Whether a swipe made the change.</summary>
-        public bool IsSwiped { get; set; }
+        public ReadOnly<bool> IsSwiped => ReadOnly<bool>();
 
         /// <summary><c>"Next"</c> or <c>"Previous"</c>.</summary>
-        public string SlideDirection { get; set; } = string.Empty;
+        public ReadOnly<string> SlideDirection => ReadOnly<string>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Renders the component for a plan, ready for <c>.Reactive(...)</c>.

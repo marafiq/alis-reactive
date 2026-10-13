@@ -17,6 +17,7 @@ namespace Alis.Reactive
             TypedEvent<TArgs> typedEvent,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
+            where TArgs : JsObject
         {
             if (plan == null) throw new ArgumentNullException(nameof(plan));
             if (componentId == null) throw new ArgumentNullException(nameof(componentId));
@@ -25,7 +26,9 @@ namespace Alis.Reactive
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
 
             var target = ComponentObjectTarget.For(componentId, vendor);
-            var reaction = PipelineBuilder<TModel>.Build(plan.Context, p => pipeline(typedEvent.Args, p));
+            var args = typedEvent.Args;
+            args.BindTo(new EventPayloadBinding(plan.Context));
+            var reaction = PipelineBuilder<TModel>.Build(plan.Context, p => pipeline(args, p));
             plan.Context.WireComponentEvent(
                 target.ComponentId.Value,
                 target.Vendor,

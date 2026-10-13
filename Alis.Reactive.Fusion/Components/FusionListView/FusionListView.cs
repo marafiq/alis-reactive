@@ -9,6 +9,7 @@ using Syncfusion.EJ2.Lists;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion ListView, declared by the names its JavaScript API uses.
     /// </summary>
@@ -20,16 +21,16 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionListView : FusionComponent
     {
         /// <summary>Selects the item with this text.</summary>
-        public ComponentMethod<string> SelectItem => Method<string>("selectItem");
+        public void SelectItem(Arg<string> value) => Call(value);
 
         /// <summary>Clears the selection of the item with this text.</summary>
-        public ComponentMethod<string> UnselectItem => Method<string>("unselectItem");
+        public void UnselectItem(Arg<string> value) => Call(value);
 
         /// <summary>Checks every item of a checkbox list.</summary>
-        public ComponentMethod CheckAllItems => Method("checkAllItems");
+        public void CheckAllItems() => Call();
 
         /// <summary>Unchecks every item of a checkbox list.</summary>
-        public ComponentMethod UncheckAllItems => Method("uncheckAllItems");
+        public void UncheckAllItems() => Call();
 
         /// <summary>Raised when an item is selected.</summary>
         public TypedEvent<FusionListViewSelectArgs> Select =>
@@ -37,23 +38,24 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionListView.Select"/>.</summary>
-    public class FusionListViewSelectArgs
+    public class FusionListViewSelectArgs : JsObject
     {
         /// <summary>Text of the selected item.</summary>
-        public string? Text { get; set; }
+        public ReadOnly<string> Text => ReadOnly<string>();
 
         /// <summary>Zero-based index of the selected item when the user selected it.</summary>
-        public int? Index { get; set; }
+        public ReadOnly<int?> Index => ReadOnly<int?>();
 
         /// <summary>Whether user interaction made the selection.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
 
         /// <summary>Checkbox state in a checkbox list.</summary>
-        public bool? IsChecked { get; set; }
+        public ReadOnly<bool?> IsChecked => ReadOnly<bool?>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Creates a FusionListView with Syncfusion MVC builder-owned static configuration.

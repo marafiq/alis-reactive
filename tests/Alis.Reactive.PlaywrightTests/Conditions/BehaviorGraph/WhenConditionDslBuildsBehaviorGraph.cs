@@ -21,22 +21,22 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
         HtmlExtensions.On(Html, plan, trigger =>
             trigger.CustomEvent(ScoreChanged, (args, pipeline) =>
             {
-                pipeline.Element("start").SetText("start");
+                pipeline.Element("start").Text.Set("start");
 
-                pipeline.When(args, x => x.Score).Gte(90)
-                    .Then(hit => hit.Element("grade").SetText("A"))
-                    .ElseIf(args, x => x.Score).Gte(80)
-                    .Then(hit => hit.Element("grade").SetText("B"))
-                    .Else(miss => miss.Element("grade").SetText("Other"));
+                pipeline.When(args.Get(x => x.Score)).Gte(90)
+                    .Then(hit => hit.Element("grade").Text.Set("A"))
+                    .ElseIf(args.Get(x => x.Score)).Gte(80)
+                    .Then(hit => hit.Element("grade").Text.Set("B"))
+                    .Else(miss => miss.Element("grade").Text.Set("Other"));
 
                 pipeline.Post("/audit")
-                    .Gather<ConditionBehaviorAudit>(gather => gather.Set(x => x.Score, pipeline.Payload(args).Get(a => a.Score)));
+                    .Gather<ConditionBehaviorAudit>(gather => gather.Set(x => x.Score, args.Get(a => a.Score)));
 
-                pipeline.When(args, x => x.IsReady).Truthy()
+                pipeline.When(args.Get(x => x.IsReady)).Truthy()
                     .Then(ready => ready.Dispatch(Ready))
                     .Else(notReady => notReady.Dispatch(NotReady));
 
-                pipeline.Element("done").SetText("done");
+                pipeline.Element("done").Text.Set("done");
             }));
 
         using var doc = JsonDocument.Parse(plan.RenderFormatted());
@@ -77,28 +77,27 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
             trigger.CustomEvent(ScoreChanged, (args, pipeline) =>
             {
                 var schedule = pipeline.Component<FusionSchedule>("shift-schedule");
-                TypedPluginSource<string> normalizedStatus =
-                    pipeline.Plugin(plugin.NormalizeStatus)
-                        .Arg(args, x => x.Status);
-                var expectedStatus = pipeline.Plugin(plugin.ExpectedStatus);
+                TypedSource<string> normalizedStatus =
+                    plugin.NormalizeStatus(args.Get(x => x.Status));
+                var expectedStatus = plugin.ExpectedStatus;
 
-                pipeline.When(args, x => x.Score).Gte(pipeline.Url<ConditionBehaviorQuery>().Get(q => q.MinScore))
-                    .And(schedule.Get(c => c.CurrentView)).Eq("Week")
+                pipeline.When(args.Get(x => x.Score)).Gte(pipeline.Url<ConditionBehaviorQuery>().Get(q => q.MinScore))
+                    .And(schedule.CurrentView).Eq("Week")
                     .And(inner => inner
-                        .When(schedule.Get(c => c.GetEvents<object>())).NotEmpty()
+                        .When(schedule.GetEvents<object>()).NotEmpty()
                         .Or(normalizedStatus).Eq(expectedStatus))
-                    .Then(hit => hit.Element("event-branch").SetText("accepted"))
-                    .ElseIf(args, x => x.Status).Eq("manual")
-                    .Then(hit => hit.Element("event-branch").SetText("manual"))
-                    .Else(miss => miss.Element("event-branch").SetText("rejected"));
+                    .Then(hit => hit.Element("event-branch").Text.Set("accepted"))
+                    .ElseIf(args.Get(x => x.Status)).Eq("manual")
+                    .Then(hit => hit.Element("event-branch").Text.Set("manual"))
+                    .Else(miss => miss.Element("event-branch").Text.Set("rejected"));
 
                 pipeline.Get("/status")
                     .Response(response => response.OnSuccess<ConditionBehaviorResponse>((json, success) =>
                     {
-                        success.When(json, x => x.Status).Eq("approved")
+                        success.When(json.Get(x => x.Status)).Eq("approved")
                             .Then(hit => hit.Post("/resident/{residentId}/approve")
-                                .Gather<ConditionBehaviorApproval>(gather => gather.Set(x => x.ResidentId, json.Read(x => x.ResidentId))))
-                            .Else(miss => miss.Element("response-branch").SetText(json, x => x.Status));
+                                .Gather<ConditionBehaviorApproval>(gather => gather.Set(x => x.ResidentId, json.Get(x => x.ResidentId))))
+                            .Else(miss => miss.Element("response-branch").Text.Set(json.Get(x => x.Status)));
                     }));
             }));
 
@@ -306,11 +305,10 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
         public ConditionBehaviorPlugin()
             : base("conditionBehavior")
         {
-            ExpectedStatus = Property<string>("expectedStatus");
-            NormalizeStatus = Function<string>("normalizeStatus").Arg<string>();
         }
 
-        public PluginProperty<string> ExpectedStatus { get; }
-        public PluginFunction<string> NormalizeStatus { get; }
+        public ReadOnly<string> ExpectedStatus => ReadOnly<string>();
+
+        public TypedSource<string> NormalizeStatus(Arg<string> status) => Invoke<string>(status);
     }
 }

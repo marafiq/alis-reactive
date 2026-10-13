@@ -9,8 +9,8 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var note = p.Component<FusionSmartTextArea>(m => m.CareNote);
-        note.Set(c => c.Value, "Resident is");
-        p.Element("smart-note-value").SetText(note.Get(c => c.Value));
+        note.Value.Set("Resident is");
+        p.Element("smart-note-value").Text.Set(note.Value);
     }));
 }
 
@@ -32,11 +32,11 @@
                 })
                 .Reactive(evt => evt.BeforeSuggestionInsert, (args, p) =>
                 {
-                    p.Element("before-suggestion").SetText(args, x => x.Text);
+                    p.Element("before-suggestion").Text.Set(args.Text);
                 })
                 .Reactive(evt => evt.AfterSuggestionInsert, (args, p) =>
                 {
-                    p.Element("after-suggestion").SetText(args, x => x.InsertedText);
+                    p.Element("after-suggestion").Text.Set(args.InsertedText);
                 }); }
 
             <native-hstack gap="Sm">
@@ -45,15 +45,15 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var note = p.Component<FusionSmartTextArea>(m => m.CareNote);
-                        note.Set(c => c.Value, "Resident prefers morning therapy");
-                        p.Element("smart-note-value").SetText(note.Get(c => c.Value));
+                        note.Value.Set("Resident prefers morning therapy");
+                        p.Element("smart-note-value").Text.Set(note.Value);
                     }))
                 @(Html.NativeButton("focus-smart-note-btn", "Focus Note")
                     .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionSmartTextArea>(m => m.CareNote).Call(c => c.FocusIn);
-                        p.Element("smart-note-focus-status").SetText("focus called");
+                        p.Component<FusionSmartTextArea>(m => m.CareNote).FocusIn();
+                        p.Element("smart-note-focus-status").Text.Set("focus called");
                     }))
             </native-hstack>
 
@@ -99,23 +99,23 @@
                     .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionSmartPasteButton>("smart-paste").Call(c => c.Click);
-                        p.Element("paste-command-status").SetText("click called");
+                        p.Component<FusionSmartPasteButton>("smart-paste").Click();
+                        p.Element("paste-command-status").Text.Set("click called");
                     }))
                 @(Html.NativeButton("focus-smart-paste-btn", "Focus Paste")
                     .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionSmartPasteButton>("smart-paste").Call(c => c.FocusIn);
-                        p.Element("paste-focus-status").SetText("focus called");
+                        p.Component<FusionSmartPasteButton>("smart-paste").FocusIn();
+                        p.Element("paste-focus-status").Text.Set("focus called");
                     }))
                 @(Html.NativeButton("disable-smart-paste-btn", "Disable Paste")
                     .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var paste = p.Component<FusionSmartPasteButton>("smart-paste");
-                        paste.Set(c => c.Disabled, true);
-                        p.Element("paste-disabled-value").SetText(paste.Get(c => c.Disabled));
+                        paste.Disabled.Set(true);
+                        p.Element("paste-disabled-value").Text.Set(paste.Disabled);
                     }))
             </native-hstack>
 

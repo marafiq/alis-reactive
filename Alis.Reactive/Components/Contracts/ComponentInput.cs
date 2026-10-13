@@ -12,7 +12,7 @@ namespace Alis.Reactive
     /// <code>
     /// public sealed class FusionRating : FusionComponent, IInputComponent
     /// {
-    ///     public ComponentProperty&lt;double&gt; Value =&gt; Property&lt;double&gt;("value");
+    ///     public Prop&lt;double&gt; Value =&gt; Prop&lt;double&gt;();
     ///     public TypedEvent&lt;FusionRatingValueChangedArgs&gt; ValueChanged =&gt;
     ///         Event&lt;FusionRatingValueChangedArgs&gt;("valueChanged");
     ///
@@ -43,11 +43,13 @@ namespace Alis.Reactive
         /// <typeparam name="TArgs">The payload of the committing event.</typeparam>
         /// <param name="value">The property that holds the value, declared on the component.</param>
         /// <param name="committedBy">The event the component raises when the person commits a value.</param>
-        public static ComponentInput Of<TValue, TArgs>(ComponentProperty<TValue> value, TypedEvent<TArgs> committedBy)
+        public static ComponentInput Of<TValue, TArgs>(ReadOnly<TValue> value, TypedEvent<TArgs> committedBy)
+            where TArgs : JsObject
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
             if (committedBy == null) throw new ArgumentNullException(nameof(committedBy));
-            return new ComponentInput(MemberName.Of(value.Member), value.Path, value.Shape, EventName.Of(committedBy.ObjectEvent));
+            var member = value.Member;
+            return new ComponentInput(MemberName.Of(member.Member), member.Path, member.Shape, EventName.Of(committedBy.ObjectEvent));
         }
 
         internal bool Matches(ComponentInput other) =>

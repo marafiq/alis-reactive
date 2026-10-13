@@ -5,6 +5,7 @@ using Syncfusion.EJ2.Inputs;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion ColorPicker, declared by the names its JavaScript API uses.
     /// </summary>
@@ -16,13 +17,13 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionColorPicker : FusionComponent, IInputComponent
     {
         /// <summary>The color as a hex string with alpha, for example <c>#e11d48ff</c>; <see langword="null"/> clears it.</summary>
-        public ComponentProperty<string?> Value => Property<string?>("value");
+        public Prop<string> Value => Prop<string>();
 
         /// <summary>Whether the picker is disabled.</summary>
-        public ComponentProperty<bool> Disabled => Property<bool>("disabled");
+        public Prop<bool> Disabled => Prop<bool>();
 
         /// <summary>Opens or closes the picker popup.</summary>
-        public ComponentMethod Toggle => Method("toggle");
+        public void Toggle() => Call();
 
         /// <summary>Raised when the color changes.</summary>
         public TypedEvent<FusionColorPickerChangeArgs> Change =>
@@ -34,11 +35,12 @@ namespace Alis.Reactive.Fusion.Components
 
     /// <summary>Payload of <see cref="FusionColorPicker.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Value).NotNull()</c>.</remarks>
-    public class FusionColorPickerChangeArgs
+    public class FusionColorPickerChangeArgs : JsObject
     {
         /// <summary>Color after the change, as a hex string with alpha such as <c>#1dc7e1ff</c>.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionColorPicker"/> for a model-bound field.</summary>
     public static class FusionColorPickerHtmlExtensions

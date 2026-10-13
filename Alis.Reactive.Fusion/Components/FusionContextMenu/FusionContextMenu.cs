@@ -10,6 +10,7 @@ using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion ContextMenu, declared by the names its JavaScript API uses.
     /// </summary>
@@ -21,10 +22,10 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionContextMenu : FusionComponent
     {
         /// <summary>Opens the menu at a top and left position, in pixels.</summary>
-        public ComponentMethod<double, double> Open => Method<double, double>("open");
+        public void Open(Arg<double> first, Arg<double> second) => Call(first, second);
 
         /// <summary>Closes the menu.</summary>
-        public ComponentMethod Close => Method("close");
+        public void Close() => Call();
 
         /// <summary>Raised before each item renders.</summary>
         public TypedEvent<FusionContextMenuBeforeItemRenderArgs> BeforeItemRender =>
@@ -52,63 +53,64 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionContextMenu.BeforeItemRender"/>.</summary>
-    public class FusionContextMenuBeforeItemRenderArgs
+    public class FusionContextMenuBeforeItemRenderArgs : JsObject
     {
         /// <summary>The item about to render.</summary>
-        public FusionContextMenuItem Item { get; set; } = new FusionContextMenuItem();
+        public ReadOnly<FusionContextMenuItem> Item => ReadOnly<FusionContextMenuItem>();
     }
 
     /// <summary>Payload of <see cref="FusionContextMenu.BeforeOpen"/>.</summary>
-    public class FusionContextMenuBeforeOpenArgs
+    public class FusionContextMenuBeforeOpenArgs : JsObject
     {
         /// <summary>The items of the menu level involved.</summary>
-        public List<FusionContextMenuItem> Items { get; set; } = [];
+        public ReadOnly<List<FusionContextMenuItem>> Items => ReadOnly<List<FusionContextMenuItem>>();
 
         /// <summary>The parent item of a submenu; <see langword="null"/> for the top level.</summary>
-        public FusionContextMenuItem? ParentItem { get; set; }
+        public ReadOnly<FusionContextMenuItem> ParentItem => ReadOnly<FusionContextMenuItem>();
 
         /// <summary>Top position of the menu, in pixels.</summary>
-        public double Top { get; set; }
+        public ReadOnly<double> Top => ReadOnly<double>();
 
         /// <summary>Left position of the menu, in pixels.</summary>
-        public double Left { get; set; }
+        public ReadOnly<double> Left => ReadOnly<double>();
 
         /// <summary>Whether the menu opens with focus.</summary>
-        public bool? IsFocused { get; set; }
+        public ReadOnly<bool?> IsFocused => ReadOnly<bool?>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionContextMenu.OnOpen"/> and <see cref="FusionContextMenu.OnClose"/>.</summary>
-    public class FusionContextMenuOpenCloseArgs
+    public class FusionContextMenuOpenCloseArgs : JsObject
     {
         /// <summary>The items of the menu level involved.</summary>
-        public List<FusionContextMenuItem> Items { get; set; } = [];
+        public ReadOnly<List<FusionContextMenuItem>> Items => ReadOnly<List<FusionContextMenuItem>>();
 
         /// <summary>The parent item of a submenu; <see langword="null"/> for the top level.</summary>
-        public FusionContextMenuItem? ParentItem { get; set; }
+        public ReadOnly<FusionContextMenuItem> ParentItem => ReadOnly<FusionContextMenuItem>();
     }
 
     /// <summary>Payload of <see cref="FusionContextMenu.BeforeClose"/>.</summary>
-    public class FusionContextMenuBeforeCloseArgs
+    public class FusionContextMenuBeforeCloseArgs : JsObject
     {
         /// <summary>The items of the menu level involved.</summary>
-        public List<FusionContextMenuItem> Items { get; set; } = [];
+        public ReadOnly<List<FusionContextMenuItem>> Items => ReadOnly<List<FusionContextMenuItem>>();
 
         /// <summary>The parent item of a submenu; <see langword="null"/> for the top level.</summary>
-        public FusionContextMenuItem? ParentItem { get; set; }
+        public ReadOnly<FusionContextMenuItem> ParentItem => ReadOnly<FusionContextMenuItem>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionContextMenu.Select"/>.</summary>
-    public class FusionContextMenuSelectArgs
+    public class FusionContextMenuSelectArgs : JsObject
     {
         /// <summary>The selected item.</summary>
-        public FusionContextMenuItem Item { get; set; } = new FusionContextMenuItem();
+        public ReadOnly<FusionContextMenuItem> Item => ReadOnly<FusionContextMenuItem>();
     }
+#nullable restore annotations
 
     /// <summary>A menu item as the <see cref="FusionContextMenu"/> payloads report it.</summary>
     public class FusionContextMenuItem

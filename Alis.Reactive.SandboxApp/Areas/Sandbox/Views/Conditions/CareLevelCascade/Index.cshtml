@@ -32,24 +32,24 @@
                 {
                     var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
 
-                    p.Element("s1-current-level").SetText(careLevel.Get(c => c.Value));
+                    p.Element("s1-current-level").Text.Set(careLevel.Value);
 
-                    p.When(careLevel.Get(c => c.Value)).Eq("Memory Care")
+                    p.When(careLevel.Value).Eq("Memory Care")
                         .Then(then =>
                         {
-                            then.Component<FusionDropDownList>(m => m.Protocol).Set(c => c.Value, "Enhanced Monitoring");
+                            then.Component<FusionDropDownList>(m => m.Protocol).Value.Set("Enhanced Monitoring");
                         })
-                        .ElseIf(careLevel.Get(c => c.Value)).Eq("Skilled Nursing")
+                        .ElseIf(careLevel.Value).Eq("Skilled Nursing")
                         .Then(then =>
                         {
-                            then.Component<FusionDropDownList>(m => m.Protocol).Set(c => c.Value, "Full Clinical");
+                            then.Component<FusionDropDownList>(m => m.Protocol).Value.Set("Full Clinical");
                         })
                         .Else(else_ =>
                         {
-                            else_.Component<FusionDropDownList>(m => m.Protocol).Set(c => c.Value, "");
+                            else_.Component<FusionDropDownList>(m => m.Protocol).Value.Set("");
                         });
 
-                    p.Element("s1-action-status").SetText("cascade-complete");
+                    p.Element("s1-action-status").Text.Set("cascade-complete");
                 }); }
 
             @{ Html.InputField(plan, m => m.Protocol, o => o.Label("Protocol (auto-set by care level)"))
@@ -82,21 +82,21 @@
                 {
                     var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
 
-                    p.Element("s2-checking").SetText(careLevel.Get(c => c.Value));
+                    p.Element("s2-checking").Text.Set(careLevel.Value);
 
-                    p.When(careLevel.Get(c => c.Value)).In("Memory Care", "Skilled Nursing")
+                    p.When(careLevel.Value).In("Memory Care", "Skilled Nursing")
                         .Then(then =>
                         {
-                            then.Component<FusionSwitch>(m => m.RequiresEscort).Set(c => c.Checked, true);
-                            then.Element("s2-result").SetText("escort required");
+                            then.Component<FusionSwitch>(m => m.RequiresEscort).Checked.Set(true);
+                            then.Element("s2-result").Text.Set("escort required");
                         })
                         .Else(else_ =>
                         {
-                            else_.Component<FusionSwitch>(m => m.RequiresEscort).Set(c => c.Checked, false);
-                            else_.Element("s2-result").SetText("no escort needed");
+                            else_.Component<FusionSwitch>(m => m.RequiresEscort).Checked.Set(false);
+                            else_.Element("s2-result").Text.Set("no escort needed");
                         });
 
-                    p.Element("s2-policy-status").SetText("policy-applied");
+                    p.Element("s2-policy-status").Text.Set("policy-applied");
                 }))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm mt-3">

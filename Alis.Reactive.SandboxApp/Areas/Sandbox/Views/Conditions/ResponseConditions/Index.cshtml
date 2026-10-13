@@ -19,13 +19,13 @@
         p.Post(approveUrl)
          .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
          {
-             s.When(json, j => j.Status).Eq("approved")
+             s.When(json.Get(j => j.Status)).Eq("approved")
               .Then(then =>
               {
                   then.Element("s1-badge").Show();
-                  then.Element("s1-result").SetText("approved");
+                  then.Element("s1-result").Text.Set("approved");
               })
-              .Else(el => el.Element("s1-result").SetText("not approved"));
+              .Else(el => el.Element("s1-result").Text.Set("not approved"));
          }));
     }));
 
@@ -34,16 +34,16 @@
         p.Post(denyUrl)
          .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
          {
-             s.When(json, j => j.Status).Eq("approved")
+             s.When(json.Get(j => j.Status)).Eq("approved")
               .Then(then =>
               {
                   then.Element("s1-badge").Show();
-                  then.Element("s1-result").SetText("approved");
+                  then.Element("s1-result").Text.Set("approved");
               })
               .Else(el =>
               {
                   el.Element("s1-badge").Hide();
-                  el.Element("s1-result").SetText("not approved");
+                  el.Element("s1-result").Text.Set("not approved");
               });
          }));
     }));
@@ -53,11 +53,11 @@
         p.Post(approveUrl)
          .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
          {
-             s.When(json, j => j.Status).Eq("approved")
-              .Then(then => then.Element("s2-label").SetText("green"))
-              .ElseIf(json, j => j.Status).Eq("pending")
-              .Then(then => then.Element("s2-label").SetText("yellow"))
-              .Else(el => el.Element("s2-label").SetText("red"));
+             s.When(json.Get(j => j.Status)).Eq("approved")
+              .Then(then => then.Element("s2-label").Text.Set("green"))
+              .ElseIf(json.Get(j => j.Status)).Eq("pending")
+              .Then(then => then.Element("s2-label").Text.Set("yellow"))
+              .Else(el => el.Element("s2-label").Text.Set("red"));
          }));
     }));
 
@@ -66,11 +66,11 @@
         p.Post(pendingUrl)
          .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
          {
-             s.When(json, j => j.Status).Eq("approved")
-              .Then(then => then.Element("s2-label").SetText("green"))
-              .ElseIf(json, j => j.Status).Eq("pending")
-              .Then(then => then.Element("s2-label").SetText("yellow"))
-              .Else(el => el.Element("s2-label").SetText("red"));
+             s.When(json.Get(j => j.Status)).Eq("approved")
+              .Then(then => then.Element("s2-label").Text.Set("green"))
+              .ElseIf(json.Get(j => j.Status)).Eq("pending")
+              .Then(then => then.Element("s2-label").Text.Set("yellow"))
+              .Else(el => el.Element("s2-label").Text.Set("red"));
          }));
     }));
 
@@ -79,11 +79,11 @@
         p.Post(denyUrl)
          .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
          {
-             s.When(json, j => j.Status).Eq("approved")
-              .Then(then => then.Element("s2-label").SetText("green"))
-              .ElseIf(json, j => j.Status).Eq("pending")
-              .Then(then => then.Element("s2-label").SetText("yellow"))
-              .Else(el => el.Element("s2-label").SetText("red"));
+             s.When(json.Get(j => j.Status)).Eq("approved")
+              .Then(then => then.Element("s2-label").Text.Set("green"))
+              .ElseIf(json.Get(j => j.Status)).Eq("pending")
+              .Then(then => then.Element("s2-label").Text.Set("yellow"))
+              .Else(el => el.Element("s2-label").Text.Set("red"));
          }));
     }));
 
@@ -92,10 +92,10 @@
         p.Post(approveUrl)
          .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
          {
-             s.When(json, j => j.Status).Eq("approved")
-              .And(json, j => j.Count).Gt(0)
-              .Then(then => then.Element("s3-result").SetText("approved with items"))
-              .Else(el => el.Element("s3-result").SetText("condition not met"));
+             s.When(json.Get(j => j.Status)).Eq("approved")
+              .And(json.Get(j => j.Count)).Gt(0)
+              .Then(then => then.Element("s3-result").Text.Set("approved with items"))
+              .Else(el => el.Element("s3-result").Text.Set("condition not met"));
          }));
     }));
 
@@ -104,10 +104,10 @@
         p.Post(denyUrl)
          .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
          {
-             s.When(json, j => j.Status).Eq("approved")
-              .And(json, j => j.Count).Gt(0)
-              .Then(then => then.Element("s3-result").SetText("approved with items"))
-              .Else(el => el.Element("s3-result").SetText("condition not met"));
+             s.When(json.Get(j => j.Status)).Eq("approved")
+              .And(json.Get(j => j.Count)).Gt(0)
+              .Then(then => then.Element("s3-result").Text.Set("approved with items"))
+              .Else(el => el.Element("s3-result").Text.Set("condition not met"));
          }));
     }));
 
@@ -115,8 +115,8 @@
     {
         p.Post(failUrl)
          .Response(r => r
-             .OnSuccess(s => s.Element("s4-result").SetText("success"))
-             .OnError(e => e.Element("s4-result").SetText("error caught")));
+             .OnSuccess(s => s.Element("s4-result").Text.Set("success"))
+             .OnError(e => e.Element("s4-result").Text.Set("error caught")));
     }));
 
     // Razor parses generic OnError<T> poorly in this block, so the helper keeps the DSL shape explicit.

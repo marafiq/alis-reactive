@@ -21,52 +21,31 @@ namespace Alis.Reactive.Builders
 
         internal DispatchPayloadBuilder() { }
 
-        /// <summary>Sets payload field from a value source evaluated when the dispatch runs.</summary>
-        /// <typeparam name="TProp">Field value type, inferred from the expression.</typeparam>
-        /// <param name="field">Payload property to populate.</param>
-        /// <param name="source">Component value, URL parameter, or plugin read that supplies the field value.</param>
+        /// <summary>Sets a member of the payload to a value read when the dispatch runs.</summary>
+        /// <remarks>The value's type must be the member's type or derive from it.</remarks>
+        /// <typeparam name="TProp">The member's type.</typeparam>
+        /// <typeparam name="TSource">The value's type.</typeparam>
+        /// <param name="field">The payload member, for example <c>x =&gt; x.UnitId</c>.</param>
+        /// <param name="source">The value: a component's property, a payload, a response, the URL or an array.</param>
+        public DispatchPayloadBuilder<TPayload, TModel> Set<TProp, TSource>(
+            Expression<Func<TPayload, TProp>> field,
+            TypedSource<TSource> source)
+            where TSource : TProp
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            _draft.Set(ExpressionPathHelper.ToEventPath(field), source.ToValueExpression());
+            return this;
+        }
+
+        /// <summary>Sets a member of the payload to a value fixed when the view renders.</summary>
+        /// <typeparam name="TProp">The member's type.</typeparam>
+        /// <param name="field">The payload member.</param>
+        /// <param name="value">The value, written into the plan.</param>
         public DispatchPayloadBuilder<TPayload, TModel> Set<TProp>(
             Expression<Func<TPayload, TProp>> field,
-            TypedSource<TProp> source)
+            TProp value)
         {
-            var payloadPath = ExpressionPathHelper.ToEventPath<TPayload, TProp>(field);
-            _draft.Set(payloadPath, source.ToValueExpression());
-            return this;
-        }
-
-        /// <summary>Sets payload field to a literal string value.</summary>
-        /// <param name="field">Payload property to populate.</param>
-        /// <param name="value">Compile-time constant embedded in the Reactive Plan.</param>
-        public DispatchPayloadBuilder<TPayload, TModel> Set(
-            Expression<Func<TPayload, string>> field,
-            string value)
-        {
-            var payloadPath = ExpressionPathHelper.ToEventPath<TPayload, string>(field);
-            _draft.Set(payloadPath, ValueExpression.Literal(value));
-            return this;
-        }
-
-        /// <summary>Sets payload field to a literal int value.</summary>
-        /// <param name="field">Payload property to populate.</param>
-        /// <param name="value">Compile-time constant embedded in the Reactive Plan.</param>
-        public DispatchPayloadBuilder<TPayload, TModel> Set(
-            Expression<Func<TPayload, int>> field,
-            int value)
-        {
-            var payloadPath = ExpressionPathHelper.ToEventPath<TPayload, int>(field);
-            _draft.Set(payloadPath, ValueExpression.Literal(value));
-            return this;
-        }
-
-        /// <summary>Sets payload field to a literal bool value.</summary>
-        /// <param name="field">Payload property to populate.</param>
-        /// <param name="value">Compile-time constant embedded in the Reactive Plan.</param>
-        public DispatchPayloadBuilder<TPayload, TModel> Set(
-            Expression<Func<TPayload, bool>> field,
-            bool value)
-        {
-            var payloadPath = ExpressionPathHelper.ToEventPath<TPayload, bool>(field);
-            _draft.Set(payloadPath, ValueExpression.Literal(value));
+            _draft.Set(ExpressionPathHelper.ToEventPath(field), ValueExpression.LiteralFor(value, Shape.FromClrType(typeof(TProp))));
             return this;
         }
 

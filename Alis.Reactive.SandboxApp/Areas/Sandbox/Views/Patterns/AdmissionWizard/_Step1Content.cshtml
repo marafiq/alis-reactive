@@ -28,11 +28,11 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var ageComp = p.Component<FusionNumericTextBox>(m => m.Age);
-                p.When(ageComp.Get(c => c.Value)).Gte(85m)
-                    .Then(t => { t.Component<FusionDropDownList>(m => m.RiskTier).Set(c => c.Value, "High"); t.Element("risk-badge").SetText("High Risk"); t.Element("risk-badge").Show(); })
-                    .ElseIf(ageComp.Get(c => c.Value)).Gte(65m)
-                    .Then(t => { t.Component<FusionDropDownList>(m => m.RiskTier).Set(c => c.Value, "Standard"); t.Element("risk-badge").SetText("Standard Risk"); t.Element("risk-badge").Show(); })
-                    .Else(e => { e.Component<FusionDropDownList>(m => m.RiskTier).Set(c => c.Value, "Low"); e.Element("risk-badge").SetText("Low Risk"); e.Element("risk-badge").Show(); });
+                p.When(ageComp.Value).Gte(85m)
+                    .Then(t => { t.Component<FusionDropDownList>(m => m.RiskTier).Value.Set("High"); t.Element("risk-badge").Text.Set("High Risk"); t.Element("risk-badge").Show(); })
+                    .ElseIf(ageComp.Value).Gte(65m)
+                    .Then(t => { t.Component<FusionDropDownList>(m => m.RiskTier).Value.Set("Standard"); t.Element("risk-badge").Text.Set("Standard Risk"); t.Element("risk-badge").Show(); })
+                    .Else(e => { e.Component<FusionDropDownList>(m => m.RiskTier).Value.Set("Low"); e.Element("risk-badge").Text.Set("Low Risk"); e.Element("risk-badge").Show(); });
             }); }
     </native-grid>
 
@@ -43,10 +43,10 @@
             .FusionAutoComplete(b => b.Placeholder("Type to search...").DebounceDelay(300))
             .Reactive(evt => evt.Filtering, (args, p) =>
             {
-                p.Payload(args).Set(a => a.PreventDefaultAction, true);
+                args.PreventDefaultAction.Set(true);
                 p.Get(searchPhysiciansUrl)
-                 .Gather<PhysicianSearchQuery>(g => g.Set(x => x.Q, p.Payload(args).Get(a => a.Text)))
-                 .Response(r => r.OnSuccess<PhysicianSearchResponse>((json, s) => { s.Payload(args).Call(a => a.UpdateData, json.Read(j => j.Physicians)); }));
+                 .Gather<PhysicianSearchQuery>(g => g.Set(x => x.Q, args.Text))
+                 .Response(r => r.OnSuccess<PhysicianSearchResponse>((json, s) => { args.UpdateData(json.Get(j => j.Physicians)); }));
             }); }
     </native-grid>
 
@@ -58,7 +58,7 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var sw = p.Component<FusionSwitch>(m => m.IsVeteran);
-                p.When(sw.Get(c => c.Checked)).Truthy()
+                p.When(sw.Checked).Truthy()
                     .Then(t => t.Element("veteran-section").Show())
                     .Else(e => e.Element("veteran-section").Hide());
             }); }
@@ -86,8 +86,7 @@
                  .Response(r => r
                     .OnSuccess<SaveStepResponse>((json, s) =>
                     {
-                        s.Component<NativeHiddenField>(m => m.ScreeningId)
-                            .Set(c => c.Value, json.Read(x => x.ScreeningId));
+                        s.Component<NativeHiddenField>(m => m.ScreeningId).Value.Set(json.Get(x => x.ScreeningId));
                     })
                     .OnError(400, e => e.ValidationErrors("step1-form"))
                     .Chained(c => c

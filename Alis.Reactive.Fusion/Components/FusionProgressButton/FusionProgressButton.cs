@@ -9,6 +9,7 @@ using Syncfusion.EJ2.SplitButtons;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion ProgressButton, declared by the names its JavaScript API uses.
     /// </summary>
@@ -21,31 +22,31 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionProgressButton : FusionComponent
     {
         /// <summary>The button text.</summary>
-        public ComponentProperty<string> Content => Property<string>("content");
+        public Prop<string> Content => Prop<string>();
 
         /// <summary>Whether the button is disabled.</summary>
-        public ComponentProperty<bool> Disabled => Property<bool>("disabled");
+        public Prop<bool> Disabled => Prop<bool>();
 
         /// <summary>The CSS classes on the button.</summary>
-        public ComponentProperty<string> CssClass => Property<string>("cssClass");
+        public Prop<string> CssClass => Prop<string>();
 
         /// <summary>Whether the button shows progress while it spins.</summary>
-        public ComponentProperty<bool> EnableProgress => Property<bool>("enableProgress");
+        public Prop<bool> EnableProgress => Prop<bool>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Starts the progress from the beginning.</summary>
-        public ComponentMethod Start => Method("start");
+        public void Start() => Call();
 
         /// <summary>Starts the progress at a percentage.</summary>
-        public ComponentMethod<double> StartAt => Method<double>("start");
+        public void StartAt(Arg<double> value) => Call(value, name: "start");
 
         /// <summary>Completes the progress at once.</summary>
-        public ComponentMethod ProgressComplete => Method("progressComplete");
+        public void ProgressComplete() => Call();
 
         /// <summary>Moves focus to the button.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
 
         /// <summary>Raised when the progress starts.</summary>
         public TypedEvent<FusionProgressButtonProgressArgs> Begin =>
@@ -61,17 +62,18 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionProgressButton.Begin"/>, <see cref="FusionProgressButton.Progress"/> and <see cref="FusionProgressButton.End"/>.</summary>
-    public class FusionProgressButtonProgressArgs
+    public class FusionProgressButtonProgressArgs : JsObject
     {
         /// <summary>Progress completed, in percent.</summary>
-        public double Percent { get; set; }
+        public ReadOnly<double> Percent => ReadOnly<double>();
 
         /// <summary>Time elapsed, in milliseconds.</summary>
-        public double CurrentDuration { get; set; }
+        public ReadOnly<double> CurrentDuration => ReadOnly<double>();
 
         /// <summary>Progress step, in percent.</summary>
-        public double Step { get; set; }
+        public ReadOnly<double> Step => ReadOnly<double>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Creates a FusionProgressButton with Syncfusion MVC builder-owned initial render.

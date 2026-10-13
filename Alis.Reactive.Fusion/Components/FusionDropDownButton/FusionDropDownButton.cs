@@ -9,6 +9,7 @@ using Syncfusion.EJ2.SplitButtons;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion DropDownButton, declared by the names its JavaScript API uses.
     /// </summary>
@@ -21,25 +22,25 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionDropDownButton : FusionComponent
     {
         /// <summary>The button text.</summary>
-        public ComponentProperty<string> Content => Property<string>("content");
+        public Prop<string> Content => Prop<string>();
 
         /// <summary>Whether the button is disabled.</summary>
-        public ComponentProperty<bool> Disabled => Property<bool>("disabled");
+        public Prop<bool> Disabled => Prop<bool>();
 
         /// <summary>The CSS classes on the button.</summary>
-        public ComponentProperty<string> CssClass => Property<string>("cssClass");
+        public Prop<string> CssClass => Prop<string>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Opens or closes the popup.</summary>
-        public ComponentMethod Toggle => Method("toggle");
+        public void Toggle() => Call();
 
         /// <summary>Moves focus to the button.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
 
         /// <summary>Removes items by their text, or by their IDs when the second argument is <see langword="true"/>.</summary>
-        public ComponentMethod<string[], bool> RemoveItems => Method<string[], bool>("removeItems");
+        public void RemoveItems(Arg<string[]> first, Arg<bool> second) => Call(first, second);
 
         /// <summary>Raised when the user selects a popup item.</summary>
         public TypedEvent<FusionDropDownButtonSelectArgs> Select =>
@@ -47,11 +48,12 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionDropDownButton.Select"/>.</summary>
-    public class FusionDropDownButtonSelectArgs
+    public class FusionDropDownButtonSelectArgs : JsObject
     {
         /// <summary>The selected item.</summary>
-        public FusionDropDownButtonItem Item { get; set; } = new FusionDropDownButtonItem();
+        public ReadOnly<FusionDropDownButtonItem> Item => ReadOnly<FusionDropDownButtonItem>();
     }
+#nullable restore annotations
 
     /// <summary>A popup item as the <see cref="FusionDropDownButton.Select"/> payload reports it.</summary>
     public class FusionDropDownButtonItem

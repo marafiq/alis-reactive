@@ -28,14 +28,14 @@
                     .Min(4).Max(21).Step(1).Value(Model.MealsPerWeek).ShowSpinButton(false))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("meals-summary").SetText(args, x => x.Value);
-                    p.Element("meals-previous").SetText(args, x => x.PreviousValue);
+                    p.Element("meals-summary").Text.Set(args.Value);
+                    p.Element("meals-previous").Text.Set(args.PreviousValue);
 
-                    p.When(args, x => x.IsInteracted).Truthy()
+                    p.When(args.IsInteracted).Truthy()
                         .Then(chosen => chosen.Element("meals-source")
-                            .SetText("You entered this number of meals."))
+                            .Text.Set("You entered this number of meals."))
                         .Else(applied => applied.Element("meals-source")
-                            .SetText("This number of meals was applied from a plan template."));
+                            .Text.Set("This number of meals was applied from a plan template."));
                 }); }
 
             <native-vstack gap="Xs">
@@ -51,26 +51,26 @@
                     .CssClass(ButtonStepper)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Call(c => c.Increment);
+                        p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Increment();
                     }))
                 @(Html.NativeButton("meals-remove", "Remove a meal")
                     .CssClass(ButtonStepper)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Call(c => c.Decrement);
+                        p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Decrement();
                     }))
                 @(Html.NativeButton("meals-standard-plan", "Apply the standard plan (14 meals)")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Set(c => c.Value, 14);
+                        p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Value.Set(14);
                     }))
                 @(Html.NativeButton("meals-reduced-diet", "Allow a reduced-diet plan (fewer meals)")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Set(c => c.Min, 2);
-                        p.Element("meals-floor-note").SetText("A reduced-diet plan is now allowed — you can enter as few as 2 meals.");
+                        p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Min.Set(2);
+                        p.Element("meals-floor-note").Text.Set("A reduced-diet plan is now allowed — you can enter as few as 2 meals.");
                     }))
             </native-hstack>
             <native-text color="Secondary"><span id="meals-floor-note">Plans include at least 4 meals per week.</span></native-text>
@@ -86,11 +86,11 @@
                     .Min(0).Max(14).Step(1).Value(Model.WellnessChecksPerWeek).ShowSpinButton(false))
                 .Reactive(evt => evt.Focus, (args, p) =>
                 {
-                    p.Element("wellness-hint").SetText("A nurse visits for each wellness check-in. Most residents have 2 to 5 per week.");
+                    p.Element("wellness-hint").Text.Set("A nurse visits for each wellness check-in. Most residents have 2 to 5 per week.");
                 })
                 .Reactive(evt => evt.Blur, (args, p) =>
                 {
-                    p.Element("wellness-hint").SetText("Wellness check-ins saved with the plan below.");
+                    p.Element("wellness-hint").Text.Set("Wellness check-ins saved with the plan below.");
                 }); }
 
             <native-text color="Secondary"><span id="wellness-hint">Select the field to see guidance on wellness check-ins.</span></native-text>
@@ -100,13 +100,13 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionNumericTextBox>(m => m.WellnessChecksPerWeek).Call(c => c.FocusIn);
+                        p.Component<FusionNumericTextBox>(m => m.WellnessChecksPerWeek).FocusIn();
                     }))
                 @(Html.NativeButton("wellness-done", "Done with wellness check-ins")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionNumericTextBox>(m => m.WellnessChecksPerWeek).Call(c => c.FocusOut);
+                        p.Component<FusionNumericTextBox>(m => m.WellnessChecksPerWeek).FocusOut();
                     }))
             </native-hstack>
         </native-vstack>
@@ -120,11 +120,11 @@
                 {
                     var meals = p.Component<FusionNumericTextBox>(m => m.MealsPerWeek);
                     p.Post(Url.SandboxRoute("Save", "NumericTextBox"))
-                        .Gather<ServicePlanRequest>(g => g.Set(x => x.MealsPerWeek, meals.Get(c => c.Value)))
+                        .Gather<ServicePlanRequest>(g => g.Set(x => x.MealsPerWeek, meals.Value))
                         .Response(r => r.OnSuccess<ServicePlanResponse>((json, s) =>
                         {
-                            s.Element("plan-confirmation").SetText(json, x => x.Summary);
-                            s.Element("plan-confirmation-panel").RemoveClass("hidden");
+                            s.Element("plan-confirmation").Text.Set(json.Get(x => x.Summary));
+                            s.Element("plan-confirmation-panel").ClassList.Remove("hidden");
                         }));
                 }))
             <div id="plan-confirmation-panel" class="hidden rounded-md border border-green-300 bg-green-50 p-4">

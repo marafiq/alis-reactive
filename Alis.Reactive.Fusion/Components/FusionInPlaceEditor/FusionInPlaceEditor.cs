@@ -5,6 +5,7 @@ using Syncfusion.EJ2.InPlaceEditor;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion InPlaceEditor, declared by the names its JavaScript API uses.
     /// </summary>
@@ -16,22 +17,22 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionInPlaceEditor : FusionComponent, IInputComponent
     {
         /// <summary>The edited value.</summary>
-        public ComponentProperty<string?> Value => Property<string?>("value");
+        public Prop<string> Value => Prop<string>();
 
         /// <summary>Disables (<see langword="true"/>) or enables the editor.</summary>
-        public ComponentMethod<bool> Disable => Method<bool>("disable");
+        public void Disable(Arg<bool> value) => Call(value);
 
         /// <summary>Saves the edited value.</summary>
-        public ComponentMethod Save => Method("save");
+        public void Save() => Call();
 
         /// <summary>Moves focus into the editor.</summary>
-        public ComponentMethod SetFocus => Method("setFocus");
+        public void SetFocus() => Call();
 
         /// <summary>Adds a CSS class to the editor element.</summary>
-        public ComponentMethod<string> AddClass => Method<string>("element.classList.add");
+        public void AddClass(Arg<string> value) => Call(value, name: "element.classList.add");
 
         /// <summary>Removes a CSS class from the editor element.</summary>
-        public ComponentMethod<string> RemoveClass => Method<string>("element.classList.remove");
+        public void RemoveClass(Arg<string> value) => Call(value, name: "element.classList.remove");
 
         /// <summary>Raised before the editor opens.</summary>
         public TypedEvent<FusionInPlaceEditorBeginEditArgs> BeginEdit =>
@@ -66,86 +67,87 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.BeginEdit"/>.</summary>
-    public class FusionInPlaceEditorBeginEditArgs
+    public class FusionInPlaceEditorBeginEditArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
 
         /// <summary>Set to <see langword="true"/> to keep focus off the editor.</summary>
-        public bool CancelFocus { get; set; }
+        public ReadOnly<bool> CancelFocus => ReadOnly<bool>();
 
         /// <summary>The edit mode.</summary>
-        public string? Mode { get; set; }
+        public ReadOnly<string> Mode => ReadOnly<string>();
 
         /// <summary>The field name.</summary>
-        public string? Name { get; set; }
+        public ReadOnly<string> Name => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.EndEdit"/>.</summary>
-    public class FusionInPlaceEditorEndEditArgs
+    public class FusionInPlaceEditorEndEditArgs : JsObject
     {
         /// <summary>Why the editor is closing.</summary>
-        public string? Action { get; set; }
+        public ReadOnly<string> Action => ReadOnly<string>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
 
         /// <summary>The edit mode.</summary>
-        public string? Mode { get; set; }
+        public ReadOnly<string> Mode => ReadOnly<string>();
 
         /// <summary>The field name.</summary>
-        public string? Name { get; set; }
+        public ReadOnly<string> Name => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.Change"/>.</summary>
-    public class FusionInPlaceEditorChangeArgs
+    public class FusionInPlaceEditorChangeArgs : JsObject
     {
         /// <summary>The value after the change.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>The value before the change.</summary>
-        public string? PreviousValue { get; set; }
+        public ReadOnly<string> PreviousValue => ReadOnly<string>();
 
         /// <summary>The field name.</summary>
-        public string? Name { get; set; }
+        public ReadOnly<string> Name => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.ActionBegin"/>.</summary>
-    public class FusionInPlaceEditorActionBeginArgs
+    public class FusionInPlaceEditorActionBeginArgs : JsObject
     {
         /// <summary>The data about to be submitted.</summary>
-        public IDictionary<string, object>? Data { get; set; }
+        public ReadOnly<IDictionary<string, object>> Data => ReadOnly<IDictionary<string, object>>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.ActionSuccess"/>.</summary>
-    public class FusionInPlaceEditorActionSuccessArgs
+    public class FusionInPlaceEditorActionSuccessArgs : JsObject
     {
         /// <summary>The server's answer.</summary>
-        public object? Data { get; set; }
+        public ReadOnly<object> Data => ReadOnly<object>();
 
         /// <summary>The submitted value.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>The field name.</summary>
-        public string? Name { get; set; }
+        public ReadOnly<string> Name => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.SubmitClick"/>.</summary>
-    public class FusionInPlaceEditorSubmitClickArgs
+    public class FusionInPlaceEditorSubmitClickArgs : JsObject
     {
         /// <summary>The field name.</summary>
-        public string? Name { get; set; }
+        public ReadOnly<string> Name => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.CancelClick"/>.</summary>
-    public class FusionInPlaceEditorCancelClickArgs
+    public class FusionInPlaceEditorCancelClickArgs : JsObject
     {
         /// <summary>The field name.</summary>
-        public string? Name { get; set; }
+        public ReadOnly<string> Name => ReadOnly<string>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Renders the in-place editor component inside a bound input field.

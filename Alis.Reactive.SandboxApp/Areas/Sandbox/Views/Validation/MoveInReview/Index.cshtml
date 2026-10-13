@@ -44,7 +44,7 @@
                  .Response(r => r
                     .OnSuccess<MoveInReviewSaved>((json, s) =>
                     {
-                        s.Element("review-status").SetText(json, x => x.Confirmation);
+                        s.Element("review-status").Text.Set(json.Get(x => x.Confirmation));
                     })
                     .OnError(400, e => e.ValidationErrors("move-in-review-form")));
             }))

@@ -15,27 +15,27 @@
     Html.On(plan, t => t.ServerPush(ServerPushStream.At<FacilityAlertStream>($"/api/facility-alerts?drill={drillId}"), s => s.Alert,
         (alert, p) =>
     {
-        p.Element("alert-message").SetText(alert, x => x.Message);
-        p.Element("alert-level").SetText(alert, x => x.Level);
-        p.Element("alert-status").RemoveClass("text-text-muted");
-        p.Element("alert-status").AddClass("text-success");
-        p.Element("alert-status").SetText("Connected");
+        p.Element("alert-message").Text.Set(alert.Get(x => x.Message));
+        p.Element("alert-level").Text.Set(alert.Get(x => x.Level));
+        p.Element("alert-status").ClassList.Remove("text-text-muted");
+        p.Element("alert-status").ClassList.Add("text-success");
+        p.Element("alert-status").Text.Set("Connected");
     }));
 
     Html.On(plan, t => t.SignalR(SignalRHub.At<NotificationFeed>("/hubs/notifications"), h => h.ReceiveNotification,
         (payload, p) =>
     {
-        p.Element("notif-count").SetText(payload, x => x.Count);
-        p.Element("notif-message").SetText(payload, x => x.Message);
-        p.Element("notif-priority").SetText(payload, x => x.Priority);
+        p.Element("notif-count").Text.Set(payload.Get(x => x.Count));
+        p.Element("notif-message").Text.Set(payload.Get(x => x.Message));
+        p.Element("notif-priority").Text.Set(payload.Get(x => x.Priority));
     }));
 
     Html.On(plan, t => t.SignalR(SignalRHub.At<ResidentStatusFeed>($"/hubs/resident-status?drill={drillId}"), h => h.StatusChanged,
         (payload, p) =>
     {
-        p.Element("resident-name").SetText(payload, x => x.ResidentName);
-        p.Element("resident-status").SetText(payload, x => x.Status);
-        p.Element("resident-care-level").SetText(payload, x => x.CareLevel);
+        p.Element("resident-name").Text.Set(payload.Get(x => x.ResidentName));
+        p.Element("resident-status").Text.Set(payload.Get(x => x.Status));
+        p.Element("resident-care-level").Text.Set(payload.Get(x => x.CareLevel));
     }));
 }
 

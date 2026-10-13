@@ -32,7 +32,7 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var comp = p.Component<FusionDropDownList>(m => m.FallHistory);
-                p.When(comp.Get(c => c.Value)).In("1-2 falls", "3+ falls")
+                p.When(comp.Value).In("1-2 falls", "3+ falls")
                     .Then(t => t.Element("fall-details").Show())
                     .Else(e => e.Element("fall-details").Hide());
             }); }
@@ -55,16 +55,16 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var comp = p.Component<FusionSwitch>(m => m.TakesBloodThinners);
-                p.When(comp.Get(c => c.Checked)).Truthy()
-                    .Then(t => t.Component<NativeHiddenField>(m => m.MonitoringLevel).Set(c => c.Value, "Enhanced"))
-                    .Else(e => e.Component<NativeHiddenField>(m => m.MonitoringLevel).Set(c => c.Value, "Standard"));
+                p.When(comp.Checked).Truthy()
+                    .Then(t => t.Component<NativeHiddenField>(m => m.MonitoringLevel).Value.Set("Enhanced"))
+                    .Else(e => e.Component<NativeHiddenField>(m => m.MonitoringLevel).Value.Set("Standard"));
             }); }
         @{ Html.InputField(plan, m => m.TakesPainMedication, o => o.Label("Takes Pain Medication"))
             .FusionSwitch()
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var comp = p.Component<FusionSwitch>(m => m.TakesPainMedication);
-                p.When(comp.Get(c => c.Checked)).Truthy()
+                p.When(comp.Checked).Truthy()
                     .Then(t => t.Element("pain-section").Show())
                     .Else(e => e.Element("pain-section").Hide());
             }); }
@@ -77,7 +77,7 @@
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
                     var sw = p.Component<FusionSwitch>(m => m.CausedInjury);
-                    p.When(sw.Get(c => c.Checked)).Truthy()
+                    p.When(sw.Checked).Truthy()
                         .Then(t => t.Element("injury-details").Show())
                         .Else(e => e.Element("injury-details").Hide());
                 }); }
@@ -122,8 +122,7 @@
                  .Response(r => r
                     .OnSuccess<SaveStepResponse>((json, s) =>
                     {
-                        s.Component<NativeHiddenField>(m => m.ScreeningId)
-                            .Set(c => c.Value, json.Read(x => x.ScreeningId));
+                        s.Component<NativeHiddenField>(m => m.ScreeningId).Value.Set(json.Get(x => x.ScreeningId));
                     })
                     .OnError(400, e => e.ValidationErrors("step3-form"))
                     .Chained(c => c

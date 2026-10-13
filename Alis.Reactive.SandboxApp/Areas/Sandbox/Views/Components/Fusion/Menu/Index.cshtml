@@ -28,41 +28,41 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Element("before-item-state").SetText("pending");
-        p.Element("before-item-text").SetText("pending");
-        p.Element("before-item-id").SetText("pending");
-        p.Element("before-item-url").SetText("pending");
-        p.Element("before-item-icon-css").SetText("pending");
-        p.Element("before-item-separator").SetText("pending");
-        p.Element("before-open-state").SetText("pending");
-        p.Element("before-open-kind").SetText("pending");
-        p.Element("before-open-top").SetText("pending");
-        p.Element("before-open-left").SetText("pending");
-        p.Element("before-open-focused").SetText("pending");
-        p.Element("before-open-first-item").SetText("pending");
-        p.Element("before-open-parent").SetText("pending");
-        p.Element("before-open-cancel").SetText("pending");
-        p.Element("before-open-cancel-value").SetText("pending");
-        p.Element("open-state").SetText("pending");
-        p.Element("open-kind").SetText("pending");
-        p.Element("open-first-item").SetText("pending");
-        p.Element("open-parent").SetText("pending");
-        p.Element("menu-visibility").SetText("pending");
-        p.Element("before-close-state").SetText("pending");
-        p.Element("before-close-first-item").SetText("pending");
-        p.Element("before-close-parent").SetText("pending");
-        p.Element("before-close-cancel").SetText("pending");
-        p.Element("before-close-cancel-value").SetText("pending");
-        p.Element("close-state").SetText("pending");
-        p.Element("close-first-item").SetText("pending");
-        p.Element("close-parent").SetText("pending");
-        p.Element("select-state").SetText("pending");
-        p.Element("select-text").SetText("pending");
-        p.Element("select-id").SetText("pending");
-        p.Element("select-url").SetText("pending");
-        p.Element("select-icon-css").SetText("pending");
-        p.Element("select-separator").SetText("pending");
-        p.Element("select-first-child").SetText("pending");
+        p.Element("before-item-state").Text.Set("pending");
+        p.Element("before-item-text").Text.Set("pending");
+        p.Element("before-item-id").Text.Set("pending");
+        p.Element("before-item-url").Text.Set("pending");
+        p.Element("before-item-icon-css").Text.Set("pending");
+        p.Element("before-item-separator").Text.Set("pending");
+        p.Element("before-open-state").Text.Set("pending");
+        p.Element("before-open-kind").Text.Set("pending");
+        p.Element("before-open-top").Text.Set("pending");
+        p.Element("before-open-left").Text.Set("pending");
+        p.Element("before-open-focused").Text.Set("pending");
+        p.Element("before-open-first-item").Text.Set("pending");
+        p.Element("before-open-parent").Text.Set("pending");
+        p.Element("before-open-cancel").Text.Set("pending");
+        p.Element("before-open-cancel-value").Text.Set("pending");
+        p.Element("open-state").Text.Set("pending");
+        p.Element("open-kind").Text.Set("pending");
+        p.Element("open-first-item").Text.Set("pending");
+        p.Element("open-parent").Text.Set("pending");
+        p.Element("menu-visibility").Text.Set("pending");
+        p.Element("before-close-state").Text.Set("pending");
+        p.Element("before-close-first-item").Text.Set("pending");
+        p.Element("before-close-parent").Text.Set("pending");
+        p.Element("before-close-cancel").Text.Set("pending");
+        p.Element("before-close-cancel-value").Text.Set("pending");
+        p.Element("close-state").Text.Set("pending");
+        p.Element("close-first-item").Text.Set("pending");
+        p.Element("close-parent").Text.Set("pending");
+        p.Element("select-state").Text.Set("pending");
+        p.Element("select-text").Text.Set("pending");
+        p.Element("select-id").Text.Set("pending");
+        p.Element("select-url").Text.Set("pending");
+        p.Element("select-icon-css").Text.Set("pending");
+        p.Element("select-separator").Text.Set("pending");
+        p.Element("select-first-child").Text.Set("pending");
     }));
 }
 
@@ -88,14 +88,14 @@
                     .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
                         var menu = p.Component<FusionMenu>(MenuId);
-                        menu.Call(c => c.Open);
+                        menu.Open();
                     }))
                 @(Html.NativeButton("close-menu-btn", "Close menu")
                     .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
                     .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
                         var menu = p.Component<FusionMenu>(MenuId);
-                        menu.Call(c => c.Close);
+                        menu.Close();
                     }))
             </native-hstack>
         </native-vstack>
@@ -124,101 +124,101 @@
         })
         .Reactive(evt => evt.BeforeItemRender, (args, p) =>
         {
-            p.Element("before-item-state").SetText("rendered");
-            p.Element("before-item-text").SetText(args, x => x.Item.Text);
-            p.Element("before-item-id").SetText(args, x => x.Item.Id);
-            p.Element("before-item-url").SetText(args, x => x.Item.Url);
-            p.Element("before-item-icon-css").SetText(args, x => x.Item.IconCss);
-            p.Element("before-item-separator").SetText(args, x => x.Item.Separator);
+            p.Element("before-item-state").Text.Set("rendered");
+            p.Element("before-item-text").Text.Set(args.Item.Get(x => x.Text));
+            p.Element("before-item-id").Text.Set(args.Item.Get(x => x.Id));
+            p.Element("before-item-url").Text.Set(args.Item.Get(x => x.Url));
+            p.Element("before-item-icon-css").Text.Set(args.Item.Get(x => x.IconCss));
+            p.Element("before-item-separator").Text.Set(args.Item.Get(x => x.Separator));
         })
         .Reactive(evt => evt.BeforeOpen, (args, p) =>
         {
-            p.Element("before-open-state").SetText("rendered");
-            p.When(args, x => x.IsFocused).Truthy()
-                .Then(t => t.Element("before-open-focused").SetText("true"))
-                .Else(e => e.Element("before-open-focused").SetText("false"));
-            p.Element("before-open-first-item").SetText(args, x => x.Items[0].Text);
-            p.Element("before-open-cancel-value").SetText(args, x => x.Cancel);
+            p.Element("before-open-state").Text.Set("rendered");
+            p.When(args.IsFocused).Truthy()
+                .Then(t => t.Element("before-open-focused").Text.Set("true"))
+                .Else(e => e.Element("before-open-focused").Text.Set("false"));
+            p.Element("before-open-first-item").Text.Set(args.Items.Get(x => x[0].Text));
+            p.Element("before-open-cancel-value").Text.Set(args.Cancel);
 
-            p.When(args, x => x.ParentItem).IsNull()
+            p.When(args.ParentItem).IsNull()
                 .Then(t =>
                 {
-                    t.Element("before-open-kind").SetText("root");
-                    t.Element("before-open-top").SetText(args, x => x.Top);
-                    t.Element("before-open-left").SetText(args, x => x.Left);
-                    t.Element("before-open-parent").SetText("root");
+                    t.Element("before-open-kind").Text.Set("root");
+                    t.Element("before-open-top").Text.Set(args.Top);
+                    t.Element("before-open-left").Text.Set(args.Left);
+                    t.Element("before-open-parent").Text.Set("root");
                 })
                 .Else(e =>
                 {
-                    e.Element("before-open-kind").SetText("submenu");
-                    e.Element("before-open-top").SetText(args, x => x.Top);
-                    e.Element("before-open-left").SetText(args, x => x.Left);
-                    e.Element("before-open-parent").SetText(args, x => x.ParentItem!.Text);
+                    e.Element("before-open-kind").Text.Set("submenu");
+                    e.Element("before-open-top").Text.Set(args.Top);
+                    e.Element("before-open-left").Text.Set(args.Left);
+                    e.Element("before-open-parent").Text.Set(args.ParentItem.Get(x => x.Text));
                 });
 
-            p.When(p.Component<NativeCheckBox>(m => m.BlockOpen).Get(c => c.Checked)).Truthy()
+            p.When(p.Component<NativeCheckBox>(m => m.BlockOpen).Checked).Truthy()
                 .Then(t =>
                 {
-                    t.Element("before-open-cancel").SetText("cancelled");
-                    t.Payload(args).Set(a => a.Cancel, true);
-                    t.Element("before-open-cancel-value").SetText(args, x => x.Cancel);
+                    t.Element("before-open-cancel").Text.Set("cancelled");
+                    args.Cancel.Set(true);
+                    t.Element("before-open-cancel-value").Text.Set(args.Cancel);
                 })
-                .Else(e => e.Element("before-open-cancel").SetText("allowed"));
+                .Else(e => e.Element("before-open-cancel").Text.Set("allowed"));
         })
         .Reactive(evt => evt.OnOpen, (args, p) =>
         {
-            p.When(args, x => x.ParentItem).IsNull()
+            p.When(args.ParentItem).IsNull()
                 .Then(t =>
                 {
-                    t.Element("open-kind").SetText("root");
-                    t.Element("open-parent").SetText("root");
+                    t.Element("open-kind").Text.Set("root");
+                    t.Element("open-parent").Text.Set("root");
                 })
                 .Else(e =>
                 {
-                    e.Element("open-kind").SetText("submenu");
-                    e.Element("open-parent").SetText(args, x => x.ParentItem!.Text);
+                    e.Element("open-kind").Text.Set("submenu");
+                    e.Element("open-parent").Text.Set(args.ParentItem.Get(x => x.Text));
                 });
 
-            p.Element("open-state").SetText("opened");
-            p.Element("open-first-item").SetText(args, x => x.Items[0].Text);
-            p.Element("menu-visibility").SetText("visible");
+            p.Element("open-state").Text.Set("opened");
+            p.Element("open-first-item").Text.Set(args.Items.Get(x => x[0].Text));
+            p.Element("menu-visibility").Text.Set("visible");
         })
         .Reactive(evt => evt.BeforeClose, (args, p) =>
         {
-            p.Element("before-close-state").SetText("rendered");
-            p.Element("before-close-first-item").SetText(args, x => x.Items[0].Text);
-            p.When(args, x => x.ParentItem).IsNull()
-                .Then(t => t.Element("before-close-parent").SetText("root"))
-                .Else(e => e.Element("before-close-parent").SetText(args, x => x.ParentItem!.Text));
-            p.Element("before-close-cancel-value").SetText(args, x => x.Cancel);
+            p.Element("before-close-state").Text.Set("rendered");
+            p.Element("before-close-first-item").Text.Set(args.Items.Get(x => x[0].Text));
+            p.When(args.ParentItem).IsNull()
+                .Then(t => t.Element("before-close-parent").Text.Set("root"))
+                .Else(e => e.Element("before-close-parent").Text.Set(args.ParentItem.Get(x => x.Text)));
+            p.Element("before-close-cancel-value").Text.Set(args.Cancel);
 
-            p.When(p.Component<NativeCheckBox>(m => m.BlockClose).Get(c => c.Checked)).Truthy()
+            p.When(p.Component<NativeCheckBox>(m => m.BlockClose).Checked).Truthy()
                 .Then(t =>
                 {
-                    t.Element("before-close-cancel").SetText("cancelled");
-                    t.Payload(args).Set(a => a.Cancel, true);
-                    t.Element("before-close-cancel-value").SetText(args, x => x.Cancel);
+                    t.Element("before-close-cancel").Text.Set("cancelled");
+                    args.Cancel.Set(true);
+                    t.Element("before-close-cancel-value").Text.Set(args.Cancel);
                 })
-                .Else(e => e.Element("before-close-cancel").SetText("allowed"));
+                .Else(e => e.Element("before-close-cancel").Text.Set("allowed"));
         })
         .Reactive(evt => evt.OnClose, (args, p) =>
         {
-            p.Element("close-state").SetText("closed");
-            p.Element("close-first-item").SetText(args, x => x.Items[0].Text);
-            p.When(args, x => x.ParentItem).IsNull()
-                .Then(t => t.Element("close-parent").SetText("root"))
-                .Else(e => e.Element("close-parent").SetText(args, x => x.ParentItem!.Text));
-            p.Element("menu-visibility").SetText("hidden");
+            p.Element("close-state").Text.Set("closed");
+            p.Element("close-first-item").Text.Set(args.Items.Get(x => x[0].Text));
+            p.When(args.ParentItem).IsNull()
+                .Then(t => t.Element("close-parent").Text.Set("root"))
+                .Else(e => e.Element("close-parent").Text.Set(args.ParentItem.Get(x => x.Text)));
+            p.Element("menu-visibility").Text.Set("hidden");
         })
         .Reactive(evt => evt.Select, (args, p) =>
         {
-            p.Element("select-state").SetText("selected");
-            p.Element("select-text").SetText(args, x => x.Item.Text);
-            p.Element("select-id").SetText(args, x => x.Item.Id);
-            p.Element("select-url").SetText(args, x => x.Item.Url);
-            p.Element("select-icon-css").SetText(args, x => x.Item.IconCss);
-            p.Element("select-separator").SetText(args, x => x.Item.Separator);
-            p.Element("select-first-child").SetText(args, x => x.Item.Items[0].Text);
+            p.Element("select-state").Text.Set("selected");
+            p.Element("select-text").Text.Set(args.Item.Get(x => x.Text));
+            p.Element("select-id").Text.Set(args.Item.Get(x => x.Id));
+            p.Element("select-url").Text.Set(args.Item.Get(x => x.Url));
+            p.Element("select-icon-css").Text.Set(args.Item.Get(x => x.IconCss));
+            p.Element("select-separator").Text.Set(args.Item.Get(x => x.Separator));
+            p.Element("select-first-child").Text.Set(args.Item.Get(x => x.Items[0].Text));
         }))
     </native-card-body></native-card>
 

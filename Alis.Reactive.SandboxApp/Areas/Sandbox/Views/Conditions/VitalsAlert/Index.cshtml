@@ -37,26 +37,26 @@
                 {
                     var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
 
-                    p.Element("s1-last-reading").SetText(comp.Get(c => c.Value));
+                    p.Element("s1-last-reading").Text.Set(comp.Value);
 
-                    p.When(comp.Get(c => c.Value)).Gt(140m)
+                    p.When(comp.Value).Gt(140m)
                         .Then(then =>
                         {
                             then.Post(alertUrl)
                                 .Gather<VitalsAlertController.AlertRequest>(g => g.Form(m => m.HeartRate))
                                 .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
                                 {
-                                    s.Element("s1-alert-status").SetText(json, x => x.Message);
-                                    s.Element("s1-alert-time").SetText(json, x => x.Timestamp);
+                                    s.Element("s1-alert-status").Text.Set(json.Get(x => x.Message));
+                                    s.Element("s1-alert-time").Text.Set(json.Get(x => x.Timestamp));
                                 }));
                         })
                         .Else(else_ =>
                         {
-                            else_.Element("s1-alert-status").SetText("Vitals normal");
-                            else_.Element("s1-alert-time").SetText("");
+                            else_.Element("s1-alert-status").Text.Set("Vitals normal");
+                            else_.Element("s1-alert-time").Text.Set("");
                         });
 
-                    p.Element("s1-check-status").SetText("checked");
+                    p.Element("s1-check-status").Text.Set("checked");
                 }); }
         </native-grid>
         <native-vstack gap="Xs" class="font-mono text-sm">
@@ -81,32 +81,32 @@
                 {
                     var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
 
-                    p.When(comp.Get(c => c.Value)).Gte(180m)
+                    p.When(comp.Value).Gte(180m)
                         .Then(then =>
                         {
                             then.Post(criticalUrl)
                                 .Gather<VitalsAlertController.AlertRequest>(g => g.Form(m => m.HeartRate))
                                 .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
                                 {
-                                    s.Element("s2-tier-status").SetText(json, x => x.Message);
-                                    s.Element("s2-tier-level").SetText(json, x => x.Level);
+                                    s.Element("s2-tier-status").Text.Set(json.Get(x => x.Message));
+                                    s.Element("s2-tier-level").Text.Set(json.Get(x => x.Level));
                                 }));
                         })
-                        .ElseIf(comp.Get(c => c.Value)).Gte(140m)
+                        .ElseIf(comp.Value).Gte(140m)
                         .Then(then =>
                         {
                             then.Post(warningUrl)
                                 .Gather<VitalsAlertController.AlertRequest>(g => g.Form(m => m.HeartRate))
                                 .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
                                 {
-                                    s.Element("s2-tier-status").SetText(json, x => x.Message);
-                                    s.Element("s2-tier-level").SetText(json, x => x.Level);
+                                    s.Element("s2-tier-status").Text.Set(json.Get(x => x.Message));
+                                    s.Element("s2-tier-level").Text.Set(json.Get(x => x.Level));
                                 }));
                         })
                         .Else(else_ =>
                         {
-                            else_.Element("s2-tier-status").SetText("Normal — no alert needed");
-                            else_.Element("s2-tier-level").SetText("normal");
+                            else_.Element("s2-tier-status").Text.Set("Normal — no alert needed");
+                            else_.Element("s2-tier-level").Text.Set("normal");
                         });
                 }))
         </native-hstack>
@@ -130,25 +130,25 @@
                 {
                     var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
 
-                    p.Element("s3-before").SetText("before-ran");
-                    p.Element("s3-reading").SetText(comp.Get(c => c.Value));
+                    p.Element("s3-before").Text.Set("before-ran");
+                    p.Element("s3-reading").Text.Set(comp.Value);
 
-                    p.When(comp.Get(c => c.Value)).Gt(140m)
+                    p.When(comp.Value).Gt(140m)
                         .Then(then =>
                         {
                             then.Post(alertUrl)
                                 .Gather<VitalsAlertController.AlertRequest>(g => g.Form(m => m.HeartRate))
                                 .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
                                 {
-                                    s.Element("s3-branch").SetText(json, x => x.Message);
+                                    s.Element("s3-branch").Text.Set(json.Get(x => x.Message));
                                 }));
                         })
                         .Else(else_ =>
                         {
-                            else_.Element("s3-branch").SetText("no alert");
+                            else_.Element("s3-branch").Text.Set("no alert");
                         });
 
-                    p.Element("s3-after").SetText("after-ran");
+                    p.Element("s3-after").Text.Set("after-ran");
                 }))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm mt-3">

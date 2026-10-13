@@ -31,28 +31,28 @@
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
                     // The live reading follows the handle as the resident drags it.
-                    p.Element("comfort-reading").SetText(args, x => x.Text);
+                    p.Element("comfort-reading").Text.Set(args.Text);
 
-                    p.When(args, x => x.Value).Gte(74d)
+                    p.When(args.Value).Gte(74d)
                         .Then(warm => warm.Element("comfort-zone")
-                            .SetText("That's on the warm side — comfortable if you tend to feel cold."))
-                        .ElseIf(args, x => x.Value).Gte(66d)
+                            .Text.Set("That's on the warm side — comfortable if you tend to feel cold."))
+                        .ElseIf(args.Value).Gte(66d)
                         .Then(mid => mid.Element("comfort-zone")
-                            .SetText("That's a comfortable mid-range temperature for most residents."))
+                            .Text.Set("That's a comfortable mid-range temperature for most residents."))
                         .Else(cool => cool.Element("comfort-zone")
-                            .SetText("That's on the cool side — we'll have a blanket ready."));
+                            .Text.Set("That's on the cool side — we'll have a blanket ready."));
                 })
                 .Reactive(evt => evt.Changed, (args, p) =>
                 {
                     // When the handle settles, record what it changed from and how.
-                    p.Element("settle-from").SetText(args, x => x.PreviousValue);
-                    p.Element("settle-action").SetText(args, x => x.Action);
+                    p.Element("settle-from").Text.Set(args.PreviousValue);
+                    p.Element("settle-action").Text.Set(args.Action);
 
-                    p.When(args, x => x.IsInteracted).Truthy()
+                    p.When(args.IsInteracted).Truthy()
                         .Then(chosen => chosen.Element("comfort-source")
-                            .SetText("You set this temperature yourself."))
+                            .Text.Set("You set this temperature yourself."))
                         .Else(applied => applied.Element("comfort-source")
-                            .SetText("We applied the temperature recommended by your care team."));
+                            .Text.Set("We applied the temperature recommended by your care team."));
                 }); }
 
             <native-vstack gap="Xs">
@@ -71,18 +71,20 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionSlider>(m => m.RoomTemperature).Set(c => c.Value, 72).Call(c => c.DataBind);
+                        var roomTemperature = p.Component<FusionSlider>(m => m.RoomTemperature);
+                        roomTemperature.Value.Set(72);
+                        roomTemperature.DataBind();
                     }))
                 @(Html.NativeButton("check-temp-guidance", "Check this temperature")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var temp = p.Component<FusionSlider>(m => m.RoomTemperature);
-                        p.When(temp.Get(c => c.Value)).Gte(74d)
+                        p.When(temp.Value).Gte(74d)
                             .Then(warm => warm.Element("temp-guidance")
-                                .SetText("A care manager will check in to make sure that's not too warm overnight."))
+                                .Text.Set("A care manager will check in to make sure that's not too warm overnight."))
                             .Else(ok => ok.Element("temp-guidance")
-                                .SetText("That temperature is within the comfortable range — no follow-up needed."));
+                                .Text.Set("That temperature is within the comfortable range — no follow-up needed."));
                     }))
             </native-hstack>
             <native-text color="Secondary"><span id="temp-guidance"></span></native-text>
@@ -109,8 +111,9 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var rest = p.Component<FusionSlider>(m => m.QuietHours);
-                        rest.Set(c => c.RangeValue, new double[] { 14, 16 }).Call(c => c.DataBind);
-                        p.Element("rest-summary").SetText(rest.Get(c => c.RangeValue));
+                        rest.RangeValue.Set(new double[] { 14, 16 });
+                        rest.DataBind();
+                        p.Element("rest-summary").Text.Set(rest.RangeValue);
                     }))
             </native-hstack>
             <native-text color="Secondary">Saved rest window (start, end hours): <span id="rest-summary">@string.Join(", ", Model.QuietHours)</span></native-text>
@@ -127,12 +130,12 @@
                     var rest = p.Component<FusionSlider>(m => m.QuietHours);
                     p.Post(Url.SandboxRoute("Save", "Slider"))
                         .Gather<ComfortPreferencesRequest>(g => g
-                            .Set(x => x.RoomTemperature, temp.Get(c => c.Value))
-                            .Set(x => x.QuietHours, rest.Get(c => c.RangeValue)))
+                            .Set(x => x.RoomTemperature, temp.Value)
+                            .Set(x => x.QuietHours, rest.RangeValue))
                         .Response(r => r.OnSuccess<ComfortPreferencesResponse>((json, s) =>
                         {
-                            s.Element("save-confirmation").SetText(json, x => x.Summary);
-                            s.Element("save-confirmation-panel").RemoveClass("hidden");
+                            s.Element("save-confirmation").Text.Set(json.Get(x => x.Summary));
+                            s.Element("save-confirmation-panel").ClassList.Remove("hidden");
                         }));
                 }))
             <div id="save-confirmation-panel" class="hidden rounded-md border border-green-300 bg-green-50 p-4">

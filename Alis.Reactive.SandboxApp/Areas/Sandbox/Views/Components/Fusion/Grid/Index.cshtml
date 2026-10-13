@@ -64,9 +64,8 @@
              .Set(x => x.Take, 10))
          .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
          {
-             s.Component<FusionGrid>("residents-grid")
-                 .Set(c => c.DataSource, json.Read(x => x));
-             s.Element("load-status").SetText("initial data loaded");
+             s.Component<FusionGrid>("residents-grid").DataSource.Set(json);
+             s.Element("load-status").Text.Set("initial data loaded");
          }));
     }));
 }
@@ -121,7 +120,7 @@
                         .Placeholder("e.g. 80"))
                     .Reactive(evt => evt.Change, (args, p) =>
                     {
-                        p.Element("filter-status").SetText("filtering...");
+                        p.Element("filter-status").Text.Set("filtering...");
                         p.Post(Url.SandboxRoute("Data", "Grid"))
                          .Gather<GridDataRequest>(g => g
                              .Set(x => x.Skip, 0)
@@ -129,9 +128,8 @@
                              .Form(m => m.MinAge))
                          .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
                          {
-                             s.Component<FusionGrid>("residents-grid")
-                                 .Set(c => c.DataSource, json.Read(x => x));
-                             s.Element("filter-status").SetText("filtered");
+                             s.Component<FusionGrid>("residents-grid").DataSource.Set(json);
+                             s.Element("filter-status").Text.Set("filtered");
                          }));
                     }); }
             </native-grid>
@@ -150,43 +148,41 @@
             }))
             .Reactive(evt => evt.DataStateChange, (args, p) =>
             {
-                p.When(args, x => x.Action.RequestType).NotEq(FusionGridAction.Refresh)
+                p.When(args.Action.Get(x => x.RequestType)).NotEq(FusionGridAction.Refresh)
                     .Then(t =>
                     {
-                        t.Element("evt-name").SetText(args, x => x.Name);
-                        t.Element("evt-skip").SetText(args, x => x.Skip);
-                        t.Element("evt-take").SetText(args, x => x.Take);
-                        t.Element("evt-requires-counts").SetText(args, x => x.RequiresCounts);
-                        t.Element("evt-action-name").SetText(args, x => x.Action.Name);
-                        t.Element("evt-action-event-type").SetText(args, x => x.Action.Type);
-                        t.Element("evt-action-cancel").SetText(args, x => x.Action.Cancel);
-                        t.Element("evt-action-type").SetText(args, x => x.Action.RequestType);
-                        t.Element("evt-action-column").SetText(args, x => x.Action.ColumnName);
-                        t.Element("evt-action-direction").SetText(args, x => x.Action.Direction);
-                        t.Element("evt-action-page").SetText(args, x => x.Action.CurrentPage);
-                        t.Element("evt-action-previous-page").SetText(args, x => x.Action.PreviousPage);
-                        t.Element("evt-action-page-size").SetText(args, x => x.Action.PageSize);
-                        var dataState = t.Payload(args);
+                        t.Element("evt-name").Text.Set(args.Name);
+                        t.Element("evt-skip").Text.Set(args.Skip);
+                        t.Element("evt-take").Text.Set(args.Take);
+                        t.Element("evt-requires-counts").Text.Set(args.RequiresCounts);
+                        t.Element("evt-action-name").Text.Set(args.Action.Get(x => x.Name));
+                        t.Element("evt-action-event-type").Text.Set(args.Action.Get(x => x.Type));
+                        t.Element("evt-action-cancel").Text.Set(args.Action.Get(x => x.Cancel));
+                        t.Element("evt-action-type").Text.Set(args.Action.Get(x => x.RequestType));
+                        t.Element("evt-action-column").Text.Set(args.Action.Get(x => x.ColumnName));
+                        t.Element("evt-action-direction").Text.Set(args.Action.Get(x => x.Direction));
+                        t.Element("evt-action-page").Text.Set(args.Action.Get(x => x.CurrentPage));
+                        t.Element("evt-action-previous-page").Text.Set(args.Action.Get(x => x.PreviousPage));
+                        t.Element("evt-action-page-size").Text.Set(args.Action.Get(x => x.PageSize));
                         t.Post(Url.SandboxRoute("Data", "Grid"))
                          .Gather<GridDataRequest>(g => g
-                             .Set(x => x.EventName, dataState.Get(a => a.Name))
-                             .Set(x => x.Skip, dataState.Get(a => a.Skip))
-                             .Set(x => x.Take, dataState.Get(a => a.Take))
-                             .Set(x => x.RequiresCounts, dataState.Get(a => a.RequiresCounts))
-                             .Set(x => x.ActionName, dataState.Get(a => a.Action.Name))
-                             .Set(x => x.ActionType, dataState.Get(a => a.Action.Type))
-                             .Set(x => x.ActionCancel, dataState.Get(a => a.Action.Cancel))
-                             .Set(x => x.ActionRequestType, dataState.Get(a => a.Action.RequestType))
-                             .Set(x => x.ActionCurrentPage, dataState.Get(a => a.Action.CurrentPage))
-                             .Set(x => x.ActionPreviousPage, dataState.Get(a => a.Action.PreviousPage))
-                             .Set(x => x.ActionPageSize, dataState.Get(a => a.Action.PageSize))
-                             .Set(x => x.Sorted, dataState.Get(a => a.Sorted))
+                             .Set(x => x.EventName, args.Name)
+                             .Set(x => x.Skip, args.Skip)
+                             .Set(x => x.Take, args.Take)
+                             .Set(x => x.RequiresCounts, args.RequiresCounts)
+                             .Set(x => x.ActionName, args.Action.Get(x => x.Name))
+                             .Set(x => x.ActionType, args.Action.Get(x => x.Type))
+                             .Set(x => x.ActionCancel, args.Action.Get(x => x.Cancel))
+                             .Set(x => x.ActionRequestType, args.Action.Get(x => x.RequestType))
+                             .Set(x => x.ActionCurrentPage, args.Action.Get(x => x.CurrentPage))
+                             .Set(x => x.ActionPreviousPage, args.Action.Get(x => x.PreviousPage))
+                             .Set(x => x.ActionPageSize, args.Action.Get(x => x.PageSize))
+                             .Set(x => x.Sorted, args.Sorted)
                              .Form(m => m.MinAge))
                          .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
                          {
-                             s.Component<FusionGrid>("residents-grid")
-                                 .Set(c => c.DataSource, json.Read(x => x));
-                             s.Element("action-status").SetText("data refreshed");
+                             s.Component<FusionGrid>("residents-grid").DataSource.Set(json);
+                             s.Element("action-status").Text.Set("data refreshed");
                          }));
                     });
             }))

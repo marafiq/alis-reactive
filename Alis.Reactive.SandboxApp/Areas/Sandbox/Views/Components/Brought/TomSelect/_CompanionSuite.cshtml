@@ -20,9 +20,9 @@
             {
                 var suite = p.Component<TomSelect>(m => m.CompanionSuiteType);
                 p.Get(rateUrl)
-                    .Gather<SuiteQuery>(g => g.Set(x => x.SuiteType, suite.Get(x => x.Value)))
+                    .Gather<SuiteQuery>(g => g.Set(x => x.SuiteType, suite.Value))
                     .Response(r => r.OnSuccess<SuiteRateResponse>((rate, s) =>
-                        s.Element("companion-rate").SetText(rate, x => x.MonthlyRate)));
+                        s.Element("companion-rate").Text.Set(rate.Get(x => x.MonthlyRate))));
             }); }
     </native-grid>
     <native-text color="Secondary">Companion's monthly rate: $<span id="companion-rate">not quoted yet</span></native-text>

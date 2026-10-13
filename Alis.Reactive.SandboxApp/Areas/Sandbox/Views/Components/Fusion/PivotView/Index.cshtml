@@ -23,8 +23,8 @@
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
                     var pivot = p.Component<FusionPivotView>("care-pivot");
-                    p.Element("current-view").SetText(pivot.Get(c => c.CurrentView));
-                    p.Element("layout-json").SetText(pivot.Get(c => c.GetPersistData, true));
+                    p.Element("current-view").Text.Set(pivot.CurrentView);
+                    p.Element("layout-json").Text.Set(pivot.GetPersistData(true));
                 }))
 
             @(Html.NativeButton("load-march-btn", "Load March Census")
@@ -35,9 +35,10 @@
                      .Gather<PivotCensusQuery>(g => g.Set(x => x.FacilityId, p.Url<PivotViewQuery>().Get(q => q.FacilityId)))
                      .Response(r => r.OnSuccess<PivotCensusResponse>((json, s) =>
                      {
-                         s.Component<FusionPivotView>("care-pivot")
-                             .Set(c => c.DataSource, json.Read(x => x.Rows)).Call(c => c.Refresh);
-                         s.Element("data-status").SetText(json, x => x.Message);
+                         var carePivot = s.Component<FusionPivotView>("care-pivot");
+                         carePivot.DataSource.Set(json.Get(x => x.Rows));
+                         carePivot.Refresh();
+                         s.Element("data-status").Text.Set(json.Get(x => x.Message));
                      }));
                 }))
 
@@ -45,8 +46,8 @@
                 .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionPivotView>("care-pivot").Call(c => c.Refresh);
-                    p.Element("refresh-status").SetText("refresh called");
+                    p.Component<FusionPivotView>("care-pivot").Refresh();
+                    p.Element("refresh-status").Text.Set("refresh called");
                 }))
 
             @(Html.NativeButton("audit-pivot-btn", "Audit Layout")
@@ -56,13 +57,13 @@
                     var pivot = p.Component<FusionPivotView>("care-pivot");
                     p.Post("/api/pivot/{currentView}/audit")
                      .Gather<PivotAuditVisit>(g => g
-                         .Set(x => x.CurrentView, pivot.Get(c => c.CurrentView))
+                         .Set(x => x.CurrentView, pivot.CurrentView)
                          .Set(x => x.FacilityId, p.Url<PivotViewQuery>().Get(q => q.FacilityId))
-                         .Set(x => x.Layout, pivot.Get(c => c.GetPersistData, true)))
+                         .Set(x => x.Layout, pivot.GetPersistData(true)))
                      .Response(r => r.OnSuccess<PivotAuditResponse>((json, s) =>
                      {
-                         s.Element("audit-summary").SetText(json, x => x.Summary);
-                         s.Element("layout-length").SetText(json, x => x.LayoutLength);
+                         s.Element("audit-summary").Text.Set(json.Get(x => x.Summary));
+                         s.Element("layout-length").Text.Set(json.Get(x => x.LayoutLength));
                      }));
                 }))
 
@@ -72,12 +73,11 @@
                 {
                     var pivot = p.Component<FusionPivotView>("care-pivot");
                     p.Post("/api/pivot/layout/echo")
-                     .Gather<PivotLayoutRequest>(g => g.Set(x => x.Layout, pivot.Get(c => c.GetPersistData, true)))
+                     .Gather<PivotLayoutRequest>(g => g.Set(x => x.Layout, pivot.GetPersistData(true)))
                      .Response(r => r.OnSuccess<PivotLayoutResponse>((json, s) =>
                      {
-                         s.Component<FusionPivotView>("care-pivot")
-                             .Call(c => c.LoadPersistData, json.Read(x => x.Layout));
-                         s.Element("layout-status").SetText(json, x => x.Message);
+                         s.Component<FusionPivotView>("care-pivot").LoadPersistData(json.Get(x => x.Layout));
+                         s.Element("layout-status").Text.Set(json.Get(x => x.Message));
                      }));
                 }))
 
@@ -85,16 +85,16 @@
                 .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionPivotView>("care-pivot").Call(c => c.ShowConditionalFormattingDialog);
-                    p.Element("dialog-status").SetText("conditional formatting opened");
+                    p.Component<FusionPivotView>("care-pivot").ShowConditionalFormattingDialog();
+                    p.Element("dialog-status").Text.Set("conditional formatting opened");
                 }))
 
             @(Html.NativeButton("calculated-dialog-btn", "Calculated Field Dialog")
                 .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionPivotView>("care-pivot").Call(c => c.CreateCalculatedFieldDialog);
-                    p.Element("dialog-status").SetText("calculated field opened");
+                    p.Component<FusionPivotView>("care-pivot").CreateCalculatedFieldDialog();
+                    p.Element("dialog-status").Text.Set("calculated field opened");
                 }))
         </native-hstack>
 
@@ -142,15 +142,15 @@
         })
         .Reactive(evt => evt.DataBound, (_, p) =>
         {
-            p.Element("data-bound-status").SetText("dataBound fired");
+            p.Element("data-bound-status").Text.Set("dataBound fired");
         })
         .Reactive(evt => evt.CellSelecting, (args, p) =>
         {
-            p.Element("cell-axis").SetText(args, x => x.Data.Axis);
-            p.Element("cell-text").SetText(args, x => x.Data.FormattedText);
-            p.Element("cell-row").SetText(args, x => x.Data.RowHeaders);
-            p.Element("cell-column").SetText(args, x => x.Data.ColumnHeaders);
-            p.Element("cell-value").SetText(args, x => x.Data.Value);
+            p.Element("cell-axis").Text.Set(args.Data.Get(x => x.Axis));
+            p.Element("cell-text").Text.Set(args.Data.Get(x => x.FormattedText));
+            p.Element("cell-row").Text.Set(args.Data.Get(x => x.RowHeaders));
+            p.Element("cell-column").Text.Set(args.Data.Get(x => x.ColumnHeaders));
+            p.Element("cell-value").Text.Set(args.Data.Get(x => x.Value));
         }))
     </native-card-body></native-card>
 

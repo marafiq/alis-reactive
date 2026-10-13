@@ -41,7 +41,7 @@
                  .Response(r => r
                     .OnSuccess<EmergencyContactsConfirmation>((json, s) =>
                     {
-                        s.Element("emergency-contacts-status").SetText(json, x => x.Confirmation);
+                        s.Element("emergency-contacts-status").Text.Set(json.Get(x => x.Confirmation));
                     })
                     .OnError(400, e => e.ValidationErrors("emergency-contacts-form")));
             }))

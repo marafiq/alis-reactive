@@ -33,7 +33,7 @@
             .Set(x => x.FamilyPhone, Model.FamilyPhone))
          .Validate<IntakeCareValidator>("intake-form")
          .Response(r => r
-            .OnSuccess<IntakeConfirmation>((json, s) => s.Element("intake-status").SetText(json, x => x.Confirmation))
+            .OnSuccess<IntakeConfirmation>((json, s) => s.Element("intake-status").Text.Set(json.Get(x => x.Confirmation)))
             .OnError(400, e => e.ValidationErrors("intake-form")));
     }))
 

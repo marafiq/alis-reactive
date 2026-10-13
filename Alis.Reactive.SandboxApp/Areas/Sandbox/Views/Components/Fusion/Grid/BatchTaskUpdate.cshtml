@@ -16,8 +16,8 @@
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                s.Element("batch-status").SetText("loaded");
+                s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                s.Element("batch-status").Text.Set("loaded");
             }))));
 }
 
@@ -32,22 +32,22 @@
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.EditCell, 0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks));
-                p.Element("batch-status").SetText("editCell called");
+                p.Component<FusionGrid>(GridId).EditCell(0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks));
+                p.Element("batch-status").Text.Set("editCell called");
             }))
         @(Html.NativeButton("batch-update-cell", "Set Tasks To 6")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.UpdateCell<int>(), 0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 6);
-                p.Element("batch-status").SetText("updateCell called");
+                p.Component<FusionGrid>(GridId).UpdateCell<int>(0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 6);
+                p.Element("batch-status").Text.Set("updateCell called");
             }))
         @(Html.NativeButton("batch-save-cell", "Save Cell")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.SaveCell);
-                p.Element("batch-status").SetText("saveCell called");
+                p.Component<FusionGrid>(GridId).SaveCell();
+                p.Element("batch-status").Text.Set("saveCell called");
             }))
     </native-hstack>
 

@@ -28,15 +28,15 @@
                 .PopupWidth("280px"))
                 .Reactive(evt => evt.Opened, (args, p) =>
                 {
-                    p.Element("mention-popup-status").SetText("opened");
+                    p.Element("mention-popup-status").Text.Set("opened");
                 })
                 .Reactive(evt => evt.Closed, (args, p) =>
                 {
-                    p.Element("mention-popup-status").SetText("closed");
+                    p.Element("mention-popup-status").Text.Set("closed");
                 })
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("mention-value").SetHtml(args, x => x.Value);
+                    p.Element("mention-value").Html.Set(args.Value);
                 }))
 
             <native-hstack gap="Sm">
@@ -44,15 +44,15 @@
                     .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionMention>("care-mention").Call(c => c.Search, "No", 96, 160);
-                        p.Element("mention-command-status").SetText("search called");
+                        p.Component<FusionMention>("care-mention").Search("No", 96, 160);
+                        p.Element("mention-command-status").Text.Set("search called");
                     }))
                 @(Html.NativeButton("mention-show-btn", "Show")
                     .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionMention>("care-mention").Call(c => c.ShowPopup);
-                        p.Element("mention-command-status").SetText("show called");
+                        p.Component<FusionMention>("care-mention").ShowPopup();
+                        p.Element("mention-command-status").Text.Set("show called");
                     }))
             </native-hstack>
 
@@ -80,11 +80,11 @@
                 .PopupWidth("280px"))
                 .Reactive(evt => evt.Opened, (args, p) =>
                 {
-                    p.Element("mention-auto-hide-popup-status").SetText("opened");
+                    p.Element("mention-auto-hide-popup-status").Text.Set("opened");
                 })
                 .Reactive(evt => evt.Closed, (args, p) =>
                 {
-                    p.Element("mention-auto-hide-popup-status").SetText("closed");
+                    p.Element("mention-auto-hide-popup-status").Text.Set("closed");
                 }))
 
             @* HidePopup runs from its own gesture, never inside Opened: Syncfusion raises Opened before it
@@ -95,15 +95,15 @@
                     .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionMention>("auto-hide-mention").Call(c => c.Search, "No", 96, 160);
-                        p.Element("mention-auto-hide-command-status").SetText("search called");
+                        p.Component<FusionMention>("auto-hide-mention").Search("No", 96, 160);
+                        p.Element("mention-auto-hide-command-status").Text.Set("search called");
                     }))
                 @(Html.NativeButton("mention-hide-btn", "Hide")
                     .CssClass("rounded-md border border-border px-4 py-2 text-sm font-medium")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionMention>("auto-hide-mention").Call(c => c.HidePopup);
-                        p.Element("mention-hide-status").SetText("hide called");
+                        p.Component<FusionMention>("auto-hide-mention").HidePopup();
+                        p.Element("mention-hide-status").Text.Set("hide called");
                     }))
             </native-hstack>
 

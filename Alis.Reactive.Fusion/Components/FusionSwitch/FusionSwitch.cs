@@ -5,6 +5,7 @@ using Syncfusion.EJ2.Buttons;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Switch, declared by the names its JavaScript API uses.
     /// </summary>
@@ -16,7 +17,7 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionSwitch : FusionComponent, IInputComponent
     {
         /// <summary>Whether the switch is on.</summary>
-        public ComponentProperty<bool> Checked => Property<bool>("checked");
+        public Prop<bool> Checked => Prop<bool>();
 
         /// <summary>Raised when the switch is turned on or off.</summary>
         public TypedEvent<FusionSwitchChangeArgs> Change => Event<FusionSwitchChangeArgs>("change");
@@ -27,14 +28,15 @@ namespace Alis.Reactive.Fusion.Components
 
     /// <summary>Payload of <see cref="FusionSwitch.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Checked).Truthy()</c>.</remarks>
-    public class FusionSwitchChangeArgs
+    public class FusionSwitchChangeArgs : JsObject
     {
         /// <summary>Whether the switch is on after the change.</summary>
-        public bool Checked { get; set; }
+        public ReadOnly<bool> Checked => ReadOnly<bool>();
 
         /// <summary>Whether user interaction triggered the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionSwitch"/> for a model-bound field.</summary>
     public static class FusionSwitchHtmlExtensions

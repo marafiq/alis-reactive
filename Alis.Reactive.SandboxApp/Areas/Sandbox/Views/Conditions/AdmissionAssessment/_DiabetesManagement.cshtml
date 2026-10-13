@@ -25,9 +25,9 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var comp = p.Component<FusionNumericTextBox>(m => m.A1cLevel);
-                p.Element("a1c-echo").SetText(comp.Get(c => c.Value));
+                p.Element("a1c-echo").Text.Set(comp.Value);
 
-                p.When(comp.Get(c => c.Value)).Gt(9m)
+                p.When(comp.Value).Gt(9m)
                     .Then(then =>
                     {
                         then.Element("uncontrolled-spinner").Show();
@@ -35,14 +35,14 @@
                          .Gather<AlertUncontrolledRequest>(g => g.Form(m => m.A1cLevel, m => m.DiabetesType))
                          .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
                          {
-                             s.Element("uncontrolled-result").SetText(json, x => x.Message);
+                             s.Element("uncontrolled-result").Text.Set(json.Get(x => x.Message));
                              s.Element("uncontrolled-result").Show();
                              s.Element("uncontrolled-spinner").Hide();
                          }));
                     })
                     .Else(e =>
                     {
-                        e.Element("uncontrolled-result").SetText("Controlled");
+                        e.Element("uncontrolled-result").Text.Set("Controlled");
                         e.Element("uncontrolled-result").Show();
                     });
             }); }
@@ -54,7 +54,7 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var sw = p.Component<FusionSwitch>(m => m.InsulinDependent);
-                p.When(sw.Get(c => c.Checked)).Truthy()
+                p.When(sw.Checked).Truthy()
                     .Then(t => t.Element("insulin-details").Show())
                     .Else(e => e.Element("insulin-details").Hide());
             }); }

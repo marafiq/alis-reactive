@@ -29,29 +29,29 @@
                     .ShowClearButton(true))
                 .Reactive(evt => evt.Input, (args, p) =>
                 {
-                    p.Element("note-draft").SetText(args, x => x.Value);
-                    p.Element("note-draft-previous").SetText(args, x => x.PreviousValue);
+                    p.Element("note-draft").Text.Set(args.Value);
+                    p.Element("note-draft-previous").Text.Set(args.PreviousValue);
                 })
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("note-committed").SetText(args, x => x.Value);
-                    p.Element("note-replaced").SetText(args, x => x.PreviousValue);
+                    p.Element("note-committed").Text.Set(args.Value);
+                    p.Element("note-replaced").Text.Set(args.PreviousValue);
 
-                    p.When(args, x => x.IsInteracted).Truthy()
+                    p.When(args.IsInteracted).Truthy()
                         .Then(edited => edited.Element("note-commit-status")
-                            .SetText("Edited by you this shift — ready to save."))
+                            .Text.Set("Edited by you this shift — ready to save."))
                         .Else(carried => carried.Element("note-commit-status")
-                            .SetText("Filled from last shift's note, not edited by hand."));
+                            .Text.Set("Filled from last shift's note, not edited by hand."));
                 })
                 .Reactive(evt => evt.Focus, (args, p) =>
                 {
-                    p.Element("note-presence").SetText("You are editing this note now.");
-                    p.Element("note-focus-snapshot").SetText(args, x => x.Value);
+                    p.Element("note-presence").Text.Set("You are editing this note now.");
+                    p.Element("note-focus-snapshot").Text.Set(args.Value);
                 })
                 .Reactive(evt => evt.Blur, (args, p) =>
                 {
-                    p.Element("note-presence").SetText("Autosave pending — your changes are held.");
-                    p.Element("note-blur-snapshot").SetText(args, x => x.Value);
+                    p.Element("note-presence").Text.Set("Autosave pending — your changes are held.");
+                    p.Element("note-blur-snapshot").Text.Set(args.Value);
                 }); }
 
             <native-vstack gap="Xs">
@@ -66,21 +66,22 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionTextArea>(m => m.CareNote).Call(c => c.FocusIn);
+                        p.Component<FusionTextArea>(m => m.CareNote).FocusIn();
                     }))
                 @(Html.NativeButton("close-note", "Done documenting — close the note")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionTextArea>(m => m.CareNote).Call(c => c.FocusOut);
+                        p.Component<FusionTextArea>(m => m.CareNote).FocusOut();
                     }))
                 @(Html.NativeButton("restore-note", "Use last shift's note")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var note = p.Component<FusionTextArea>(m => m.CareNote);
-                        note.Set(c => c.Value, lastShiftNote).Call(c => c.DataBind);
-                        p.Element("note-restored").SetText(note.Get(c => c.Value));
+                        note.Value.Set(lastShiftNote);
+                        note.DataBind();
+                        p.Element("note-restored").Text.Set(note.Value);
                     }))
             </native-hstack>
         </native-vstack>
@@ -105,17 +106,17 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var note = p.Component<FusionTextArea>(m => m.CareNote);
-                    p.When(note.Get(c => c.Value)).IsEmpty()
+                    p.When(note.Value).IsEmpty()
                         .Then(empty => empty.Element("note-save-guard")
-                            .SetText("Please write a care note before saving."))
+                            .Text.Set("Please write a care note before saving."))
                         .Else(ready =>
                             ready.Post(Url.SandboxRoute("Echo", "TextArea"))
-                                .Gather<CareNoteEchoRequest>(g => g.Set(x => x.CareNote, note.Get(c => c.Value)))
+                                .Gather<CareNoteEchoRequest>(g => g.Set(x => x.CareNote, note.Value))
                                 .Response(r => r.OnSuccess<CareNoteEchoResponse>((json, s) =>
                                 {
-                                    s.Element("note-save-guard").SetText("");
-                                    s.Element("note-confirmation").SetText(json, x => x.Summary);
-                                    s.Element("note-confirmation-panel").RemoveClass("hidden");
+                                    s.Element("note-save-guard").Text.Set("");
+                                    s.Element("note-confirmation").Text.Set(json.Get(x => x.Summary));
+                                    s.Element("note-confirmation-panel").ClassList.Remove("hidden");
                                 })));
                 }))
             <native-text color="Secondary"><span id="note-save-guard" class="text-amber-700"></span></native-text>

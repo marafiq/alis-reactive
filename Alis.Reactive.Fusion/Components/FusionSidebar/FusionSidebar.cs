@@ -9,6 +9,7 @@ using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Sidebar, declared by the names its JavaScript API uses.
     /// </summary>
@@ -20,16 +21,16 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionSidebar : FusionComponent
     {
         /// <summary>Whether the sidebar is open.</summary>
-        public ComponentProperty<bool> IsOpen => Property<bool>("isOpen");
+        public Prop<bool> IsOpen => Prop<bool>();
 
         /// <summary>Opens the sidebar.</summary>
-        public ComponentMethod Show => Method("show");
+        public void Show() => Call();
 
         /// <summary>Closes the sidebar.</summary>
-        public ComponentMethod Hide => Method("hide");
+        public void Hide() => Call();
 
         /// <summary>Opens the sidebar when closed and closes it when open.</summary>
-        public ComponentMethod Toggle => Method("toggle");
+        public void Toggle() => Call();
 
         /// <summary>Raised when the sidebar opens.</summary>
         public TypedEvent<FusionSidebarTransitionArgs> Open =>
@@ -41,11 +42,12 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionSidebar.Open"/> and <see cref="FusionSidebar.Close"/>.</summary>
-    public class FusionSidebarTransitionArgs
+    public class FusionSidebarTransitionArgs : JsObject
     {
         /// <summary>Whether user interaction caused the transition.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Renders the component for a plan, ready for <c>.Reactive(...)</c>.

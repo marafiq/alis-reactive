@@ -14,8 +14,8 @@
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                s.Element("lock-edit-status").SetText("loaded");
+                s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                s.Element("lock-edit-status").Text.Set("loaded");
             }))));
 }
 
@@ -31,18 +31,18 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var grid = p.Component<FusionGrid>(GridId);
-                grid.Call(c => c.SelectRow, 1);
-                grid.Call(c => c.StartEdit);
-                p.Element("lock-edit-status").SetText("editing 6001");
+                grid.SelectRow(1);
+                grid.StartEdit();
+                p.Element("lock-edit-status").Text.Set("editing 6001");
             }))
         @(Html.NativeButton("edit-6000", "Edit Resident 6000")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var grid = p.Component<FusionGrid>(GridId);
-                grid.Call(c => c.SelectRow, 0);
-                grid.Call(c => c.StartEdit);
-                p.Element("lock-edit-status").SetText("editing 6000");
+                grid.SelectRow(0);
+                grid.StartEdit();
+                p.Element("lock-edit-status").Text.Set("editing 6000");
             }))
     </native-hstack>
 
@@ -69,11 +69,11 @@
             }))
             .Reactive(evt => evt.BeginEdit<ResidentDirectoryGridItem>(), (args, p) =>
             {
-                p.When(args, x => x.RowData.ResidentId).Eq(6001)
+                p.When(args.RowData.Get(x => x.ResidentId)).Eq(6001)
                     .Then(t =>
                     {
-                        t.Payload(args).Set(a => a.Cancel, true);
-                        t.Element("lock-result").SetText("edit blocked for 6001");
+                        args.Cancel.Set(true);
+                        t.Element("lock-result").Text.Set("edit blocked for 6001");
                     });
             }))
     </section>

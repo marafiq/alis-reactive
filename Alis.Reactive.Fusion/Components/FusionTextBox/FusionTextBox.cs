@@ -5,6 +5,7 @@ using Syncfusion.EJ2.Inputs;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion TextBox, declared by the names its JavaScript API uses.
     /// </summary>
@@ -17,19 +18,19 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionTextBox : FusionComponent, IInputComponent
     {
         /// <summary>The text; <see langword="null"/> when empty.</summary>
-        public ComponentProperty<string?> Value => Property<string?>("value");
+        public Prop<string> Value => Prop<string>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Moves focus into the input.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
 
         /// <summary>Removes focus from the input.</summary>
-        public ComponentMethod FocusOut => Method("focusOut");
+        public void FocusOut() => Call();
 
         /// <summary>Adds an icon: the position (<c>"append"</c> or <c>"prepend"</c>) and its CSS classes.</summary>
-        public ComponentMethod<string, string> AddIcon => Method<string, string>("addIcon");
+        public void AddIcon(Arg<string> first, Arg<string> second) => Call(first, second);
 
         /// <summary>Raised on every edit while typing.</summary>
         public TypedEvent<FusionTextBoxInputArgs> Input =>
@@ -52,41 +53,42 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionTextBox.Input"/>.</summary>
-    public class FusionTextBoxInputArgs
+    public class FusionTextBoxInputArgs : JsObject
     {
         /// <summary>Text reported by the input event.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>Text before this edit.</summary>
-        public string? PreviousValue { get; set; }
+        public ReadOnly<string> PreviousValue => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionTextBox.Change"/>.</summary>
-    public class FusionTextBoxChangeArgs
+    public class FusionTextBoxChangeArgs : JsObject
     {
         /// <summary>Text after the change.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>Previously committed text.</summary>
-        public string? PreviousValue { get; set; }
+        public ReadOnly<string> PreviousValue => ReadOnly<string>();
 
         /// <summary>Whether user interaction triggered the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionTextBox.Focus"/>.</summary>
-    public class FusionTextBoxFocusArgs
+    public class FusionTextBoxFocusArgs : JsObject
     {
         /// <summary>Text when the input receives focus.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionTextBox.Blur"/>.</summary>
-    public class FusionTextBoxBlurArgs
+    public class FusionTextBoxBlurArgs : JsObject
     {
         /// <summary>Text when the input loses focus.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionTextBox"/> for a model-bound field.</summary>
     public static class FusionTextBoxHtmlExtensions

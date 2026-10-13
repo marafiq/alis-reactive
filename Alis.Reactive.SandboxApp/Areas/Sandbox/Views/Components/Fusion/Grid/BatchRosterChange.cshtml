@@ -23,8 +23,8 @@
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                s.Element("roster-load-status").SetText("loaded roster rows");
+                s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                s.Element("roster-load-status").Text.Set("loaded roster rows");
             }))));
 }
 
@@ -44,15 +44,15 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var grid = p.Component<FusionGrid>(GridId);
-                grid.Call(c => c.SelectRow, 0);
-                grid.Call(c => c.DeleteRecord);
-                p.Element("roster-command-status").SetText("discharge staged");
+                grid.SelectRow(0);
+                grid.DeleteRecord();
+                p.Element("roster-command-status").Text.Set("discharge staged");
             }))
         @(Html.NativeButton("roster-admit", "Admit Zara")
             .CssClass(ButtonSecondary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.AddRecord<ResidentDirectoryGridItem>(), new ResidentDirectoryGridItem
+                p.Component<FusionGrid>(GridId).AddRecord<ResidentDirectoryGridItem>(new ResidentDirectoryGridItem
                 {
                     ResidentId = 9001,
                     ResidentName = "Zara Admitted",
@@ -65,14 +65,14 @@
                     OpenTasks = 1,
                     NextReviewDate = "2026-06-30"
                 });
-                p.Element("roster-command-status").SetText("admit staged");
+                p.Element("roster-command-status").Text.Set("admit staged");
             }))
         @(Html.NativeButton("roster-review", "Review And Commit")
             .CssClass(ButtonPrimary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.EndEdit);
-                p.Element("roster-command-status").SetText("endEdit called");
+                p.Component<FusionGrid>(GridId).EndEdit();
+                p.Element("roster-command-status").Text.Set("endEdit called");
             }))
     </native-hstack>
 
@@ -92,10 +92,10 @@
             .Columns(RosterColumns()))
             .Reactive(evt => evt.BeforeBatchSave<ResidentDirectoryGridItem>(), (args, p) =>
             {
-                p.Element("roster-added-resident").SetText(args, x => x.BatchChanges.AddedRecords[0].ResidentName);
-                p.Element("roster-deleted-resident").SetText(args, x => x.BatchChanges.DeletedRecords[0].ResidentName);
-                p.Payload(args).Set(a => a.Cancel, true);
-                p.Element("roster-review-status").SetText("batch reviewed");
+                p.Element("roster-added-resident").Text.Set(args.BatchChanges.Get(x => x.AddedRecords[0].ResidentName));
+                p.Element("roster-deleted-resident").Text.Set(args.BatchChanges.Get(x => x.DeletedRecords[0].ResidentName));
+                args.Cancel.Set(true);
+                p.Element("roster-review-status").Text.Set("batch reviewed");
             }))
 
         <native-grid cols="C2" gap="Base" class="mt-4 font-mono text-sm">

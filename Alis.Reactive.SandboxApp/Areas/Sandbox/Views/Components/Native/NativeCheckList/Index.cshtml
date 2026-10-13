@@ -27,7 +27,7 @@
                 .Items(allergyItems))
             .Reactive(evt => evt.Change, (args, p) =>
             {
-                p.Element("allergy-echo").SetText(args, a => a.Value);
+                p.Element("allergy-echo").Text.Set(args.Value);
             }); }
 
         <p class="font-mono text-sm">Selected: <span id="allergy-echo" class="text-text-muted">&mdash;</span></p>
@@ -65,7 +65,7 @@
                         p.Post(Url.SandboxRoute("Submit", "NativeCheckList")).Gather(g => g.Form())
                          .Validate<NativeCheckListFormValidator>("checklist-form")
                          .Response(r => r
-                            .OnSuccess(s => s.Element("result").SetText("Preferences saved"))
+                            .OnSuccess(s => s.Element("result").Text.Set("Preferences saved"))
                             .OnError(400, e =>
                             {
                                 e.ValidationErrors("checklist-form");
@@ -88,9 +88,9 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var comp = p.Component<NativeCheckList>(m => m.Allergies);
-                p.When(comp.Get(c => c.Value)).NotEmpty()
-                    .Then(t => t.Element("allergy-confirmation").SetText("allergies recorded"))
-                    .Else(e => e.Element("allergy-confirmation").SetText("no allergies selected"));
+                p.When(comp.Value).NotEmpty()
+                    .Then(t => t.Element("allergy-confirmation").Text.Set("allergies recorded"))
+                    .Else(e => e.Element("allergy-confirmation").Text.Set("no allergies selected"));
             }))
         <p class="font-mono text-sm">Status: <span id="allergy-confirmation" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>

@@ -55,10 +55,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
         public VisitBoardSlugPlugin()
             : base("slugify")
         {
-            Slug = Function<string>().Arg<string>();
         }
 
-        public PluginFunction<string> Slug { get; }
+        /// <summary>The plugin is itself the function: it takes text and returns its slug.</summary>
+        public TypedSource<string> Slug(Arg<string> text) => Invoke<string>(text, name: "");
     }
 
     /// <summary>The document events the VisitBoard page raises and hears.</summary>

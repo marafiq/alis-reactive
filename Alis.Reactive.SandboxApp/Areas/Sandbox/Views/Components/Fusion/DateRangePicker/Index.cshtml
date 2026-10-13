@@ -9,8 +9,8 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var comp = p.Component<FusionDateRangePicker>(m => m.StayPeriod);
-        p.Element("start-echo").SetText(comp.Get(c => c.StartDate));
-        p.Element("end-echo").SetText(comp.Get(c => c.EndDate));
+        p.Element("start-echo").Text.Set(comp.StartDate);
+        p.Element("end-echo").Text.Set(comp.EndDate);
     }));
 }
 
@@ -34,17 +34,17 @@
                     .Placeholder("Select stay period"))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("change-start").SetText(args, x => x.StartDate);
-                    p.Element("change-end").SetText(args, x => x.EndDate);
-                    p.When(args, x => x.StartDate).NotNull()
-                        .Then(t => t.Element("args-condition").SetText("stay period selected"))
-                        .Else(e => e.Element("args-condition").SetText("no period"));
+                    p.Element("change-start").Text.Set(args.StartDate);
+                    p.Element("change-end").Text.Set(args.EndDate);
+                    p.When(args.StartDate).NotNull()
+                        .Then(t => t.Element("args-condition").Text.Set("stay period selected"))
+                        .Else(e => e.Element("args-condition").Text.Set("no period"));
                     var comp = p.Component<FusionDateRangePicker>(m => m.StayPeriod);
-                    p.When(comp.Get(c => c.StartDate)).NotNull()
+                    p.When(comp.StartDate).NotNull()
                         .Then(then =>
                         {
                             then.Element("selected-indicator").Show();
-                            then.Element("selected-indicator").SetText("stay period confirmed");
+                            then.Element("selected-indicator").Text.Set("stay period confirmed");
                         })
                         .Else(else_ =>
                         {
@@ -92,9 +92,9 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var comp = p.Component<FusionDateRangePicker>(m => m.StayPeriod);
-                    p.When(comp.Get(c => c.StartDate)).IsEmpty()
-                        .Then(t => t.Element("stay-warning").SetText("stay period is required"))
-                        .Else(e => e.Element("stay-warning").SetText("stay period set"));
+                    p.When(comp.StartDate).IsEmpty()
+                        .Then(t => t.Element("stay-warning").Text.Set("stay period is required"))
+                        .Else(e => e.Element("stay-warning").Text.Set("stay period set"));
                 }))
         </native-hstack>
         <p class="font-mono text-sm mt-2">Warning: <span id="stay-warning" class="text-text-muted">&mdash;</span></p>

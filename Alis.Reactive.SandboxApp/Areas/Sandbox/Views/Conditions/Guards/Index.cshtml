@@ -15,155 +15,155 @@
     }
     Html.On(plan, t => t.CustomEvent<ScorePayload>(ConditionsShowcaseEvents.SetScore, (args, p) =>
     {
-        p.Element("score-display").SetText(args, x => x.Score);
+        p.Element("score-display").Text.Set(args.Get(x => x.Score));
     }));
     Html.On(plan, t => t.CustomEvent<ScorePayload>(ConditionsShowcaseEvents.SetScore, (args, p) =>
-        p.When(args, x => x.Score).Gte(90)
-            .Then(then => then.Element("grade").SetText("A"))
-            .ElseIf(args, x => x.Score).Gte(80)
-            .Then(then => then.Element("grade").SetText("B"))
-            .Else(else_ => else_.Element("grade").SetText("F"))
+        p.When(args.Get(x => x.Score)).Gte(90)
+            .Then(then => then.Element("grade").Text.Set("A"))
+            .ElseIf(args.Get(x => x.Score)).Gte(80)
+            .Then(then => then.Element("grade").Text.Set("B"))
+            .Else(else_ => else_.Element("grade").Text.Set("F"))
     ));
     Html.On(plan, t => t.CustomEvent<LongPayload>(ConditionsShowcaseEvents.CheckLong, (args, p) =>
-        p.When(args, x => x.Balance).Gt(1000000L)
-            .Then(then => then.Element("long-result").SetText("High Value"))
-            .Else(else_ => else_.Element("long-result").SetText("Standard"))
+        p.When(args.Get(x => x.Balance)).Gt(1000000L)
+            .Then(then => then.Element("long-result").Text.Set("High Value"))
+            .Else(else_ => else_.Element("long-result").Text.Set("Standard"))
     ));
     Html.On(plan, t => t.CustomEvent<DoublePayload>(ConditionsShowcaseEvents.CheckDouble, (args, p) =>
-        p.When(args, x => x.Temperature).Gt(98.6)
-            .Then(then => then.Element("double-result").SetText("Fever"))
-            .Else(else_ => else_.Element("double-result").SetText("Normal"))
+        p.When(args.Get(x => x.Temperature)).Gt(98.6)
+            .Then(then => then.Element("double-result").Text.Set("Fever"))
+            .Else(else_ => else_.Element("double-result").Text.Set("Normal"))
     ));
     Html.On(plan, t => t.CustomEvent<BoolPayload>(ConditionsShowcaseEvents.CheckBool, (args, p) =>
-        p.When(args, x => x.IsActive).Truthy()
-            .Then(then => then.Element("bool-result").SetText("Online"))
-            .Else(else_ => else_.Element("bool-result").SetText("Offline"))
+        p.When(args.Get(x => x.IsActive)).Truthy()
+            .Then(then => then.Element("bool-result").Text.Set("Online"))
+            .Else(else_ => else_.Element("bool-result").Text.Set("Offline"))
     ));
     Html.On(plan, t => t.CustomEvent<RolePayload>(ConditionsShowcaseEvents.CheckString, (args, p) =>
-        p.When(args, x => x.Role).Eq("Alice")
-            .Then(then => then.Element("string-result").SetText("Welcome Alice!"))
-            .Else(else_ => else_.Element("string-result").SetText("Hello Stranger"))
+        p.When(args.Get(x => x.Role)).Eq("Alice")
+            .Then(then => then.Element("string-result").Text.Set("Welcome Alice!"))
+            .Else(else_ => else_.Element("string-result").Text.Set("Hello Stranger"))
     ));
     Html.On(plan, t => t.CustomEvent<DatePayload>(ConditionsShowcaseEvents.CheckDate, (args, p) =>
-        p.When(args, x => x.Deadline).Gt(new DateTime(2026, 6, 1))
-            .Then(then => then.Element("date-result").SetText("On Time"))
-            .Else(else_ => else_.Element("date-result").SetText("Overdue"))
+        p.When(args.Get(x => x.Deadline)).Gt(new DateTime(2026, 6, 1))
+            .Then(then => then.Element("date-result").Text.Set("On Time"))
+            .Else(else_ => else_.Element("date-result").Text.Set("Overdue"))
     ));
     Html.On(plan, t => t.CustomEvent<NullablePayload>(ConditionsShowcaseEvents.CheckNullable, (args, p) =>
-        p.When(args, x => x.NullableScore).IsNull()
-            .Then(then => then.Element("nullable-result").SetText("No Score"))
-            .Else(else_ => else_.Element("nullable-result").SetText("Has Score"))
+        p.When(args.Get(x => x.NullableScore)).IsNull()
+            .Then(then => then.Element("nullable-result").Text.Set("No Score"))
+            .Else(else_ => else_.Element("nullable-result").Text.Set("Has Score"))
     ));
     Html.On(plan, t => t.CustomEvent<ScorePayload>(ConditionsShowcaseEvents.CheckAnd, (args, p) =>
-        p.When(args, x => x.Score).Gte(90)
-            .And(g => g.When(args, x => x.Status).Eq("active"))
-            .Then(then => then.Element("and-result").SetText("Active High Scorer"))
-            .Else(else_ => else_.Element("and-result").SetText("Nope"))
+        p.When(args.Get(x => x.Score)).Gte(90)
+            .And(g => g.When(args.Get(x => x.Status)).Eq("active"))
+            .Then(then => then.Element("and-result").Text.Set("Active High Scorer"))
+            .Else(else_ => else_.Element("and-result").Text.Set("Nope"))
     ));
     Html.On(plan, t => t.CustomEvent<RolePayload>(ConditionsShowcaseEvents.CheckOr, (args, p) =>
-        p.When(args, x => x.Role).Eq("admin")
-            .Or(g => g.When(args, x => x.Role).Eq("superuser"))
-            .Then(then => then.Element("or-result").SetText("Authorized"))
-            .Else(else_ => else_.Element("or-result").SetText("Denied"))
+        p.When(args.Get(x => x.Role)).Eq("admin")
+            .Or(g => g.When(args.Get(x => x.Role)).Eq("superuser"))
+            .Then(then => then.Element("or-result").Text.Set("Authorized"))
+            .Else(else_ => else_.Element("or-result").Text.Set("Denied"))
     ));
     Html.On(plan, t => t.CustomEvent<NestedPayload>(ConditionsShowcaseEvents.CheckNested, (args, p) =>
-        p.When(args, x => x.Address!.City).Eq("Seattle")
-            .Then(then => then.Element("nested-result").SetText("Found Seattle"))
-            .Else(else_ => else_.Element("nested-result").SetText("Other City"))
+        p.When(args.Get(x => x.Address!.City)).Eq("Seattle")
+            .Then(then => then.Element("nested-result").Text.Set("Found Seattle"))
+            .Else(else_ => else_.Element("nested-result").Text.Set("Other City"))
     ));
     Html.On(plan, t => t.CustomEvent<NestedPayload>(ConditionsShowcaseEvents.CheckNestedNull, (args, p) =>
-        p.When(args, x => x.Address).IsNull()
-            .Then(then => then.Element("nested-null-result").SetText("No Address"))
-            .Else(else_ => else_.Element("nested-null-result").SetText("Has Address"))
+        p.When(args.Get(x => x.Address)).IsNull()
+            .Then(then => then.Element("nested-null-result").Text.Set("No Address"))
+            .Else(else_ => else_.Element("nested-null-result").Text.Set("Has Address"))
     ));
     Html.On(plan, t => t.CustomEvent<NestedPayload>(ConditionsShowcaseEvents.CheckNestedAnd, (args, p) =>
-        p.When(args, x => x.Id).Gte(1)
-            .And(g => g.When(args, x => x.Address!.City).NotNull())
-            .Then(then => { then.Element("nested-and-result").SetText("Valid"); })
-            .Else(else_ => else_.Element("nested-and-result").SetText("Invalid"))
+        p.When(args.Get(x => x.Id)).Gte(1)
+            .And(g => g.When(args.Get(x => x.Address!.City)).NotNull())
+            .Then(then => { then.Element("nested-and-result").Text.Set("Valid"); })
+            .Else(else_ => else_.Element("nested-and-result").Text.Set("Invalid"))
     ));
     Html.On(plan, t => t.CustomEvent<NestedPayload>(ConditionsShowcaseEvents.CheckNullLeaf, (args, p) =>
-        p.When(args, x => x.Address!.City).Eq("Seattle")
-            .Then(then => then.Element("null-leaf-result").SetText("Seattle"))
-            .Else(else_ => else_.Element("null-leaf-result").SetText("Not Seattle"))
+        p.When(args.Get(x => x.Address!.City)).Eq("Seattle")
+            .Then(then => then.Element("null-leaf-result").Text.Set("Seattle"))
+            .Else(else_ => else_.Element("null-leaf-result").Text.Set("Not Seattle"))
     ));
     Html.On(plan, t => t.CustomEvent<MembershipPayload>(ConditionsShowcaseEvents.CheckIn, (args, p) =>
-        p.When(args, x => x.Category).In("A", "B", "C")
-            .Then(then => then.Element("in-result").SetText("In Group"))
-            .Else(else_ => else_.Element("in-result").SetText("Not In Group"))
+        p.When(args.Get(x => x.Category)).In("A", "B", "C")
+            .Then(then => then.Element("in-result").Text.Set("In Group"))
+            .Else(else_ => else_.Element("in-result").Text.Set("Not In Group"))
     ));
     Html.On(plan, t => t.CustomEvent<MembershipPayload>(ConditionsShowcaseEvents.CheckNotin, (args, p) =>
-        p.When(args, x => x.Category).NotIn("X", "Y")
-            .Then(then => then.Element("notin-result").SetText("Allowed"))
-            .Else(else_ => else_.Element("notin-result").SetText("Blocked"))
+        p.When(args.Get(x => x.Category)).NotIn("X", "Y")
+            .Then(then => then.Element("notin-result").Text.Set("Allowed"))
+            .Else(else_ => else_.Element("notin-result").Text.Set("Blocked"))
     ));
     Html.On(plan, t => t.CustomEvent<RangePayload>(ConditionsShowcaseEvents.CheckBetween, (args, p) =>
-        p.When(args, x => x.Age).Between(18, 65)
-            .Then(then => then.Element("between-result").SetText("Working Age"))
-            .Else(else_ => else_.Element("between-result").SetText("Outside Range"))
+        p.When(args.Get(x => x.Age)).Between(18, 65)
+            .Then(then => then.Element("between-result").Text.Set("Working Age"))
+            .Else(else_ => else_.Element("between-result").Text.Set("Outside Range"))
     ));
     Html.On(plan, t => t.CustomEvent<TextPayload>(ConditionsShowcaseEvents.CheckContains, (args, p) =>
-        p.When(args, x => x.Name).Contains("admin")
-            .Then(then => then.Element("contains-result").SetText("Has admin"))
-            .Else(else_ => else_.Element("contains-result").SetText("No admin"))
+        p.When(args.Get(x => x.Name)).Contains("admin")
+            .Then(then => then.Element("contains-result").Text.Set("Has admin"))
+            .Else(else_ => else_.Element("contains-result").Text.Set("No admin"))
     ));
     Html.On(plan, t => t.CustomEvent<TextPayload>(ConditionsShowcaseEvents.CheckStartswith, (args, p) =>
-        p.When(args, x => x.Email).StartsWith("admin@")
-            .Then(then => then.Element("startswith-result").SetText("Admin email"))
-            .Else(else_ => else_.Element("startswith-result").SetText("Other email"))
+        p.When(args.Get(x => x.Email)).StartsWith("admin@")
+            .Then(then => then.Element("startswith-result").Text.Set("Admin email"))
+            .Else(else_ => else_.Element("startswith-result").Text.Set("Other email"))
     ));
     Html.On(plan, t => t.CustomEvent<TextPayload>(ConditionsShowcaseEvents.CheckMatches, (args, p) =>
-        p.When(args, x => x.Email).Matches(@"^[a-z]+@[a-z]+\.[a-z]+$")
-            .Then(then => then.Element("matches-result").SetText("Valid"))
-            .Else(else_ => else_.Element("matches-result").SetText("Invalid"))
+        p.When(args.Get(x => x.Email)).Matches(@"^[a-z]+@[a-z]+\.[a-z]+$")
+            .Then(then => then.Element("matches-result").Text.Set("Valid"))
+            .Else(else_ => else_.Element("matches-result").Text.Set("Invalid"))
     ));
     Html.On(plan, t => t.CustomEvent<TextPayload>(ConditionsShowcaseEvents.CheckMinlength, (args, p) =>
-        p.When(args, x => x.Name).MinLength(3)
-            .Then(then => then.Element("minlength-result").SetText("Long enough"))
-            .Else(else_ => else_.Element("minlength-result").SetText("Too short"))
+        p.When(args.Get(x => x.Name)).MinLength(3)
+            .Then(then => then.Element("minlength-result").Text.Set("Long enough"))
+            .Else(else_ => else_.Element("minlength-result").Text.Set("Too short"))
     ));
     Html.On(plan, t => t.CustomEvent<TextPayload>(ConditionsShowcaseEvents.CheckIsempty, (args, p) =>
-        p.When(args, x => x.Name).IsEmpty()
-            .Then(then => then.Element("isempty-result").SetText("Empty"))
-            .Else(else_ => else_.Element("isempty-result").SetText("Has value"))
+        p.When(args.Get(x => x.Name)).IsEmpty()
+            .Then(then => then.Element("isempty-result").Text.Set("Empty"))
+            .Else(else_ => else_.Element("isempty-result").Text.Set("Has value"))
     ));
     Html.On(plan, t => t.CustomEvent<RolePayload>(ConditionsShowcaseEvents.CheckNot, (args, p) =>
-        p.When(args, x => x.Role).Eq("admin").Not()
-            .Then(then => then.Element("not-result").SetText("Not admin"))
-            .Else(else_ => else_.Element("not-result").SetText("Is admin"))
+        p.When(args.Get(x => x.Role)).Eq("admin").Not()
+            .Then(then => then.Element("not-result").Text.Set("Not admin"))
+            .Else(else_ => else_.Element("not-result").Text.Set("Is admin"))
     ));
     Html.On(plan, t => t.CustomEvent<ScorePayload>(ConditionsShowcaseEvents.CheckConfirm, (args, p) =>
         p.Confirm("Are you sure you want to proceed?")
-            .Then(then => then.Element("confirm-result").SetText("Confirmed"))
-            .Else(else_ => else_.Element("confirm-result").SetText("Cancelled"))
+            .Then(then => then.Element("confirm-result").Text.Set("Confirmed"))
+            .Else(else_ => else_.Element("confirm-result").Text.Set("Cancelled"))
     ));
     Html.On(plan, t => t.CustomEvent<ScorePayload>(ConditionsShowcaseEvents.CheckSingleCommandCondition, (args, p) =>
     {
-        p.Element("single-command-condition-result").SetText("Always runs");
-        p.When(args, x => x.Score).Gte(90)
-            .Then(then => then.Element("single-command-condition-bonus").SetText("Bonus!"));
+        p.Element("single-command-condition-result").Text.Set("Always runs");
+        p.When(args.Get(x => x.Score)).Gte(90)
+            .Then(then => then.Element("single-command-condition-bonus").Text.Set("Bonus!"));
     }));
     Html.On(plan, t => t.CustomEvent<ScorePayload>(ConditionsShowcaseEvents.CheckDirectAnd, (args, p) =>
-        p.When(args, x => x.Score).Gte(90)
-            .And(args, x => x.Status).Eq("active")
-            .Then(then => then.Element("direct-and-result").SetText("Pass"))
-            .Else(else_ => else_.Element("direct-and-result").SetText("Fail"))
+        p.When(args.Get(x => x.Score)).Gte(90)
+            .And(args.Get(x => x.Status)).Eq("active")
+            .Then(then => then.Element("direct-and-result").Text.Set("Pass"))
+            .Else(else_ => else_.Element("direct-and-result").Text.Set("Fail"))
     ));
     Html.On(plan, t => t.CustomEvent<RolePayload>(ConditionsShowcaseEvents.CheckDirectOr, (args, p) =>
-        p.When(args, x => x.Role).Eq("admin")
-            .Or(args, x => x.Role).Eq("superuser")
-            .Then(then => then.Element("direct-or-result").SetText("Authorized"))
-            .Else(else_ => else_.Element("direct-or-result").SetText("Denied"))
+        p.When(args.Get(x => x.Role)).Eq("admin")
+            .Or(args.Get(x => x.Role)).Eq("superuser")
+            .Then(then => then.Element("direct-or-result").Text.Set("Authorized"))
+            .Else(else_ => else_.Element("direct-or-result").Text.Set("Denied"))
     ));
     Html.On(plan, t => t.CustomEvent<ScorePayload>(ConditionsShowcaseEvents.CheckNestedBranch, (args, p) =>
-        p.When(args, x => x.Score).Gte(90)
+        p.When(args.Get(x => x.Score)).Gte(90)
             .Then(then =>
             {
-                then.When(args, x => x.Status).Eq("active")
-                    .Then(innerThen => innerThen.Element("nested-branch-result").SetText("Senior Active"))
-                    .Else(innerElse => innerElse.Element("nested-branch-result").SetText("Senior Inactive"));
+                then.When(args.Get(x => x.Status)).Eq("active")
+                    .Then(innerThen => innerThen.Element("nested-branch-result").Text.Set("Senior Active"))
+                    .Else(innerElse => innerElse.Element("nested-branch-result").Text.Set("Senior Inactive"));
             })
-            .Else(else_ => else_.Element("nested-branch-result").SetText("Junior"))
+            .Else(else_ => else_.Element("nested-branch-result").Text.Set("Junior"))
     ));
 
     var formattedJson = plan.RenderFormatted();

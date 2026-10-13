@@ -2,6 +2,7 @@ using System;
 
 namespace Alis.Reactive.Native.Components
 {
+#nullable disable annotations
     /// <summary>
     /// A native group of radio buttons whose value is the chosen option, declared by the names its element uses.
     /// </summary>
@@ -12,10 +13,10 @@ namespace Alis.Reactive.Native.Components
     public sealed class NativeRadioGroup : NativeComponent, IInputComponent
     {
         /// <summary>The chosen option value; empty text when none is chosen.</summary>
-        public ComponentProperty<string?> Value => Property<string?>("value");
+        public Prop<string> Value => Prop<string>();
 
         /// <summary>Moves focus to the element.</summary>
-        public ComponentMethod Focus => Method("focus");
+        public void Focus() => Call();
 
         /// <summary>Raised when the user chooses an option.</summary>
         public TypedEvent<NativeRadioGroupChangeArgs> Change =>
@@ -26,11 +27,12 @@ namespace Alis.Reactive.Native.Components
     }
 
     /// <summary>Payload of <see cref="NativeRadioGroup.Change"/>, read from the hidden input.</summary>
-    public class NativeRadioGroupChangeArgs
+    public class NativeRadioGroupChangeArgs : JsObject
     {
         /// <summary>The chosen option value after the change.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="NativeRadioGroup"/> for a model-bound field.</summary>
     public static class NativeRadioGroupHtmlExtensions

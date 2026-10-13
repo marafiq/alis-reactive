@@ -14,8 +14,8 @@
         p.Get(Url.SandboxRoute("OperationRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                s.Element("export-status").SetText("loaded");
+                s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                s.Element("export-status").Text.Set("loaded");
             }))));
 }
 
@@ -30,22 +30,22 @@
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.CsvExport);
-                p.Element("export-status").SetText("csvExport called");
+                p.Component<FusionGrid>(GridId).CsvExport();
+                p.Element("export-status").Text.Set("csvExport called");
             }))
         @(Html.NativeButton("export-excel", "Export Excel")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.ExcelExport);
-                p.Element("export-status").SetText("excelExport called");
+                p.Component<FusionGrid>(GridId).ExcelExport();
+                p.Element("export-status").Text.Set("excelExport called");
             }))
         @(Html.NativeButton("export-pdf", "Export PDF")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.PdfExport);
-                p.Element("export-status").SetText("pdfExport called");
+                p.Component<FusionGrid>(GridId).PdfExport();
+                p.Element("export-status").Text.Set("pdfExport called");
             }))
     </native-hstack>
 

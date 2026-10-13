@@ -50,9 +50,9 @@
             .Gather<CareOpsDataRequest>(g => g.Set(x => x.Skip, 0).Set(x => x.Take, 10))
             .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                s.Element("careops-summary").SetText(json, x => x.Summary);
-                s.Element("careops-status").SetText(status);
+                s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
+                s.Element("careops-status").Text.Set(status);
             }));
     }
 
@@ -91,7 +91,7 @@
         <native-hstack gap="Sm" justify="End" class="mt-5">
             @(Html.NativeButton("admit-cancel", "Cancel")
                 .CssClass(ButtonSecondary)
-                .Reactive(plan, evt => evt.Click, (args, p) => { p.Element("admit-dialog").AddClass("hidden"); }))
+                .Reactive(plan, evt => evt.Click, (args, p) => { p.Element("admit-dialog").ClassList.Add("hidden"); }))
             @(Html.NativeButton("admit-save", "Admit")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -102,15 +102,15 @@
                     .Response(r => r
                         .OnSuccess<CareOpsResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                            s.Element("careops-summary").SetText(json, x => x.Summary);
-                            s.Element("careops-status").SetText("resident admitted");
-                            s.Element("admit-dialog").AddClass("hidden");
+                            s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                            s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
+                            s.Element("careops-status").Text.Set("resident admitted");
+                            s.Element("admit-dialog").ClassList.Add("hidden");
                         })
                         .OnError(400, e =>
                         {
                             e.ValidationErrors(AdmitFormId);
-                            e.Element("careops-status").SetText("admit validation failed");
+                            e.Element("careops-status").Text.Set("admit validation failed");
                         }));
                 }))
         </native-hstack>
@@ -151,12 +151,12 @@
                             .Gather<CareOpsDataRequest>(g => g
                                 .Set(x => x.Skip, 0)
                                 .Set(x => x.Take, 10)
-                                .Set(x => x.FilterRisk, p.Payload(args).Get(a => a.Text)))
+                                .Set(x => x.FilterRisk, args.Text))
                             .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                             {
-                                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                                s.Element("careops-summary").SetText(json, x => x.Summary);
-                                s.Element("careops-status").SetText(args, x => x.Text);
+                                s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                                s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
+                                s.Element("careops-status").Text.Set(args.Text);
                             }));
                     }))
             </div>
@@ -171,12 +171,12 @@
                             .Gather<CareOpsDataRequest>(g => g
                                 .Set(x => x.Skip, 0)
                                 .Set(x => x.Take, 10)
-                                .Set(x => x.FilterCareLevel, p.Payload(args).Get(a => a.Text)))
+                                .Set(x => x.FilterCareLevel, args.Text))
                             .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                             {
-                                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                                s.Element("careops-summary").SetText(json, x => x.Summary);
-                                s.Element("careops-status").SetText(args, x => x.Text);
+                                s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                                s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
+                                s.Element("careops-status").Text.Set(args.Text);
                             }));
                     }))
             </div>
@@ -191,20 +191,20 @@
         <native-hstack gap="Sm" class="mt-4 flex-wrap">
             @(Html.NativeButton("careops-admit-open", "Admit Resident")
                 .CssClass(ButtonAccent)
-                .Reactive(plan, evt => evt.Click, (args, p) => { p.Element("admit-dialog").RemoveClass("hidden"); }))
+                .Reactive(plan, evt => evt.Click, (args, p) => { p.Element("admit-dialog").ClassList.Remove("hidden"); }))
             @(Html.NativeButton("careops-save-all", "Save All Care Edits")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var grid = p.Component<FusionGrid>(GridId);
-                    grid.Call(c => c.SaveCell);
+                    grid.SaveCell();
                     p.Post(Url.SandboxRoute("CareOpsSave", "Grid"))
-                        .Gather<CareOpsSaveRequest>(g => g.Set(x => x.BatchChanges, grid.Get(c => c.GetBatchChanges<ResidentCareItem>())))
+                        .Gather<CareOpsSaveRequest>(g => g.Set(x => x.BatchChanges, grid.GetBatchChanges<ResidentCareItem>()))
                         .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                            s.Element("careops-summary").SetText(json, x => x.Summary);
-                            s.Element("careops-status").SetText("care edits saved");
+                            s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                            s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
+                            s.Element("careops-status").Text.Set("care edits saved");
                         }));
                 }))
             @(Html.NativeButton("careops-reassign", "Reassign Selected To Night Float")
@@ -215,12 +215,12 @@
                     p.Post(Url.SandboxRoute("CareOpsBulkNurse", "Grid"))
                         .Gather<CareOpsBulkRequest>(g => g
                             .Set(x => x.Nurse, "Night Float Team")
-                            .Set(x => x.SelectedRecords, grid.Get(c => c.GetSelectedRecords<ResidentCareItem>())))
+                            .Set(x => x.SelectedRecords, grid.GetSelectedRecords<ResidentCareItem>()))
                         .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                            s.Element("careops-summary").SetText(json, x => x.Summary);
-                            s.Element("careops-status").SetText("nurse reassigned");
+                            s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                            s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
+                            s.Element("careops-status").Text.Set("nurse reassigned");
                         }));
                 }))
             @(Html.NativeButton("careops-flag-risk", "Flag Selected Critical")
@@ -231,23 +231,23 @@
                     p.Post(Url.SandboxRoute("CareOpsBulkRisk", "Grid"))
                         .Gather<CareOpsBulkRequest>(g => g
                             .Set(x => x.Risk, "Critical")
-                            .Set(x => x.SelectedRecords, grid.Get(c => c.GetSelectedRecords<ResidentCareItem>())))
+                            .Set(x => x.SelectedRecords, grid.GetSelectedRecords<ResidentCareItem>()))
                         .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                            s.Element("careops-summary").SetText(json, x => x.Summary);
-                            s.Element("careops-status").SetText("residents flagged critical");
+                            s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                            s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
+                            s.Element("careops-status").Text.Set("residents flagged critical");
                         }));
                 }))
             @(Html.NativeActionLink("careops-discharge-selected", "Discharge Selected", Url.SandboxRoute("CareOpsDischargeSelected", "Grid"), link => link
                 .Confirm("Discharge the selected resident(s) from the active census?")
                 .Then(confirmed => confirmed.Post()
-                    .Gather<CareOpsBulkRequest>(g => g.Set(x => x.SelectedRecords, confirmed.Component<FusionGrid>(GridId).Get(c => c.GetSelectedRecords<ResidentCareItem>())))
+                    .Gather<CareOpsBulkRequest>(g => g.Set(x => x.SelectedRecords, confirmed.Component<FusionGrid>(GridId).GetSelectedRecords<ResidentCareItem>()))
                     .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                     {
-                        s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                        s.Element("careops-summary").SetText(json, x => x.Summary);
-                        s.Element("careops-status").SetText("resident discharged");
+                        s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                        s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
+                        s.Element("careops-status").Text.Set("resident discharged");
                     }))))
                 .CssClass("inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700"))
         </native-hstack>
@@ -286,20 +286,19 @@
             }))
             .Reactive(evt => evt.DataStateChange, (args, p) =>
             {
-                p.When(args, x => x.Action.RequestType).NotEq(FusionGridAction.Refresh)
+                p.When(args.Action.Get(x => x.RequestType)).NotEq(FusionGridAction.Refresh)
                     .Then(t =>
                     {
-                        var dataState = t.Payload(args);
                         t.Post(Url.SandboxRoute("CareOpsData", "Grid"))
                             .Gather<CareOpsDataRequest>(g => g
-                                .Set(x => x.Skip, dataState.Get(a => a.Skip))
-                                .Set(x => x.Take, dataState.Get(a => a.Take))
-                                .Set(x => x.Sorted, dataState.Get(a => a.Sorted)))
+                                .Set(x => x.Skip, args.Skip)
+                                .Set(x => x.Take, args.Take)
+                                .Set(x => x.Sorted, args.Sorted))
                             .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
                             {
-                                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                                s.Element("careops-summary").SetText(json, x => x.Summary);
-                                s.Element("careops-status").SetText("grid state sent to server");
+                                s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                                s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
+                                s.Element("careops-status").Text.Set("grid state sent to server");
                             }));
                     });
             }))

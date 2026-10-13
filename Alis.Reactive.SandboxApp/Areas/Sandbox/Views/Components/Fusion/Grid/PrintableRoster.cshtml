@@ -30,8 +30,8 @@
             .CssClass(ButtonPrimary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.Print);
-                p.Element("print-status").SetText("print issued");
+                p.Component<FusionGrid>(GridId).Print();
+                p.Element("print-status").Text.Set("print issued");
             }))
     </native-hstack>
 

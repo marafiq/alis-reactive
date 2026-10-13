@@ -2,6 +2,7 @@ using System;
 
 namespace Alis.Reactive.Native.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The native HTML <c>&lt;input&gt;</c>, declared by the names its JavaScript API uses.
     /// </summary>
@@ -13,10 +14,10 @@ namespace Alis.Reactive.Native.Components
     public sealed class NativeTextBox : NativeComponent, IInputComponent
     {
         /// <summary>The input value; empty text when nothing is entered.</summary>
-        public ComponentProperty<string?> Value => Property<string?>("value");
+        public Prop<string> Value => Prop<string>();
 
         /// <summary>Moves focus to the element.</summary>
-        public ComponentMethod Focus => Method("focus");
+        public void Focus() => Call();
 
         /// <summary>Raised when the value changes and the element loses focus.</summary>
         public TypedEvent<NativeTextBoxChangeArgs> Change =>
@@ -27,11 +28,12 @@ namespace Alis.Reactive.Native.Components
     }
 
     /// <summary>Payload of <see cref="NativeTextBox.Change"/>, read from the element.</summary>
-    public class NativeTextBoxChangeArgs
+    public class NativeTextBoxChangeArgs : JsObject
     {
         /// <summary>The input value after the change.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="NativeTextBox"/> for a model-bound field.</summary>
     public static class NativeTextBoxHtmlExtensions

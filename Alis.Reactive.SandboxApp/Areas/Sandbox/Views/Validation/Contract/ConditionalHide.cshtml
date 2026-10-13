@@ -43,10 +43,10 @@
                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm"))
                .Reactive(evt => evt.Change, (args, p) =>
                {
-                   p.When(args, a => a.Value).Eq("Memory Care")
+                   p.When(args.Value).Eq("Memory Care")
                        .Then(t => t.Element("memory-section").Show())
                        .Else(e => e.Element("memory-section").Hide());
-                   p.When(args, a => a.Value).Eq("Independent")
+                   p.When(args.Value).Eq("Independent")
                        .Then(t => t.Element("physician-section").Hide())
                        .Else(e => e.Element("physician-section").Show());
                }); }
@@ -59,7 +59,7 @@
                .CssClass("rounded border-border"))
            .Reactive(evt => evt.Change, (args, p) =>
            {
-               p.When(args, a => a.Checked).Truthy()
+               p.When(args.Checked).Truthy()
                    .Then(t => t.Element("veteran-section").Show())
                    .Else(e => e.Element("veteran-section").Hide());
            }); }
@@ -94,7 +94,7 @@
                .CssClass("rounded border-border"))
            .Reactive(evt => evt.Change, (args, p) =>
            {
-               p.When(args, a => a.Checked).Truthy()
+               p.When(args.Checked).Truthy()
                    .Then(t =>
                    {
                        t.Element("emergency-section").Show();
@@ -153,7 +153,7 @@
                     p.Post(Url.SandboxRoute("Submit", "ValidationContract")).Gather(g => g.Form())
                      .Validate<ResidentValidator>("resident-form")
                      .Response(r => r
-                        .OnSuccess(s => s.Element("result").SetText("Admission saved"))
+                        .OnSuccess(s => s.Element("result").Text.Set("Admission saved"))
                         .OnError(400, e =>
                         {
                             e.ValidationErrors("resident-form");

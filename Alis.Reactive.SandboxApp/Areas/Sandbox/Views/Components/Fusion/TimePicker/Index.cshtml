@@ -30,21 +30,21 @@
                     .Format("HH:mm"))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.When(args, x => x.Value).NotNull()
+                    p.When(args.Value).NotNull()
                         .Then(scheduled => scheduled.Element("medication-status")
-                            .SetText("This medication time is ready to confirm."))
+                            .Text.Set("This medication time is ready to confirm."))
                         .Else(cleared => cleared.Element("medication-status")
-                            .SetText("No medication time is set. Please choose one to continue."));
+                            .Text.Set("No medication time is set. Please choose one to continue."));
 
-                    p.When(args, x => x.IsInteracted).Truthy()
+                    p.When(args.IsInteracted).Truthy()
                         .Then(chosen => chosen.Element("medication-origin")
-                            .SetText("You set this medication time."))
+                            .Text.Set("You set this medication time."))
                         .Else(applied => applied.Element("medication-origin")
-                            .SetText("We applied the community's standard morning round for you."));
+                            .Text.Set("We applied the community's standard morning round for you."));
 
                     // Once a time is chosen, release the field so the time list
                     // closes and the coordinator can move on to confirming.
-                    p.Component<FusionTimePicker>(m => m.MedicationTime).Call(c => c.FocusOut);
+                    p.Component<FusionTimePicker>(m => m.MedicationTime).FocusOut();
                 }); }
 
             <native-text color="Secondary"><span id="medication-origin">This is the medication time currently on the record.</span></native-text>
@@ -54,13 +54,13 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionTimePicker>(m => m.MedicationTime).Set(c => c.Value, standardMorningRound);
+                        p.Component<FusionTimePicker>(m => m.MedicationTime).Value.Set(standardMorningRound);
                     }))
                 @(Html.NativeButton("adjust-medication-time", "Adjust the time")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionTimePicker>(m => m.MedicationTime).Call(c => c.FocusIn);
+                        p.Component<FusionTimePicker>(m => m.MedicationTime).FocusIn();
                     }))
             </native-hstack>
         </native-vstack>
@@ -76,11 +76,11 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var medication = p.Component<FusionTimePicker>(m => m.MedicationTime);
-                        p.When(medication.Get(c => c.Value)).IsEmpty()
+                        p.When(medication.Value).IsEmpty()
                             .Then(empty => empty.Element("confirm-result")
-                                .SetText("A medication time is required before scheduling."))
+                                .Text.Set("A medication time is required before scheduling."))
                             .Else(set => set.Element("confirm-result")
-                                .SetText("Medication time confirmed. You can schedule it now."));
+                                .Text.Set("Medication time confirmed. You can schedule it now."));
                     }))
                 @(Html.NativeButton("schedule-medication", "Schedule the medication")
                     .CssClass(ButtonPrimary)
@@ -88,11 +88,11 @@
                     {
                         var medication = p.Component<FusionTimePicker>(m => m.MedicationTime);
                         p.Post(Url.SandboxRoute("Schedule", "TimePicker"))
-                            .Gather<MedicationScheduleRequest>(g => g.Set(x => x.MedicationTime, medication.Get(c => c.Value)))
+                            .Gather<MedicationScheduleRequest>(g => g.Set(x => x.MedicationTime, medication.Value))
                             .Response(r => r.OnSuccess<MedicationScheduleResponse>((json, s) =>
                             {
-                                s.Element("schedule-confirmation").SetText(json, x => x.Confirmation);
-                                s.Element("schedule-confirmation-panel").RemoveClass("hidden");
+                                s.Element("schedule-confirmation").Text.Set(json.Get(x => x.Confirmation));
+                                s.Element("schedule-confirmation-panel").ClassList.Remove("hidden");
                             }));
                     }))
             </native-hstack>

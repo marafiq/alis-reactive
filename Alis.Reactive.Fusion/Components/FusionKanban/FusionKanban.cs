@@ -10,6 +10,7 @@ using Syncfusion.EJ2.Kanban;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Kanban, declared by the names its JavaScript API uses.
     /// </summary>
@@ -23,57 +24,52 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionKanban : FusionComponent
     {
         /// <summary>The cards; call <see cref="DataBind"/> after writing them.</summary>
-        public ComponentProperty<object> DataSource => Property<object>("dataSource");
+        public Prop<object> DataSource => Prop<object>();
 
         /// <summary>The cards, typed by your card class.</summary>
-        public ComponentProperty<TCard[]> Cards<TCard>() where TCard : class =>
-            Property<TCard[]>("dataSource");
+        public Prop<TCard[]> Cards<TCard>() where TCard : class => Prop<TCard[]>("dataSource");
 
         /// <summary>The cards in the column with this key.</summary>
-        public ComponentFunction<string, TCard[]> GetColumnData<TCard>() where TCard : class =>
-            Function<string, TCard[]>("getColumnData");
+        public TypedSource<TCard[]> GetColumnData<TCard>(Arg<string> value) where TCard : class => Invoke<TCard[]>(value);
 
         /// <summary>The cards in the swimlane with this key.</summary>
-        public ComponentFunction<string, TCard[]> GetSwimlaneData<TCard>() where TCard : class =>
-            Function<string, TCard[]>("getSwimlaneData");
+        public TypedSource<TCard[]> GetSwimlaneData<TCard>(Arg<string> value) where TCard : class => Invoke<TCard[]>(value);
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Adds a card at a zero-based index.</summary>
-        public ComponentMethod<TCard, int> AddCard<TCard>() where TCard : class =>
-            Method<TCard, int>("addCard");
+        public void AddCard<TCard>(Arg<TCard> first, Arg<int> second) where TCard : class => Call(first, second);
 
         /// <summary>Replaces the card with the same key.</summary>
-        public ComponentMethod<object> UpdateCard => Method<object>("updateCard");
+        public void UpdateCard(Arg<object> value) => Call(value);
 
         /// <summary>Deletes a card, given the card or its key.</summary>
-        public ComponentMethod<object> DeleteCard => Method<object>("deleteCard");
+        public void DeleteCard(Arg<object> value) => Call(value);
 
         /// <summary>Adds a column at a zero-based index.</summary>
-        public ComponentMethod<FusionKanbanColumn, int> AddColumn => Method<FusionKanbanColumn, int>("addColumn");
+        public void AddColumn(Arg<FusionKanbanColumn> first, Arg<int> second) => Call(first, second);
 
         /// <summary>Deletes the column at a zero-based index.</summary>
-        public ComponentMethod<int> DeleteColumn => Method<int>("deleteColumn");
+        public void DeleteColumn(Arg<int> value) => Call(value);
 
         /// <summary>Shows the column with this key.</summary>
-        public ComponentMethod<string> ShowColumn => Method<string>("showColumn");
+        public void ShowColumn(Arg<string> value) => Call(value);
 
         /// <summary>Hides the column with this key.</summary>
-        public ComponentMethod<string> HideColumn => Method<string>("hideColumn");
+        public void HideColumn(Arg<string> value) => Call(value);
 
         /// <summary>Shows the loading spinner.</summary>
-        public ComponentMethod ShowSpinner => Method("showSpinner");
+        public void ShowSpinner() => Call();
 
         /// <summary>Hides the loading spinner.</summary>
-        public ComponentMethod HideSpinner => Method("hideSpinner");
+        public void HideSpinner() => Call();
 
         /// <summary>Opens the card dialog: <c>"Add"</c> or <c>"Edit"</c>, for a card.</summary>
-        public ComponentMethod<string, TCard> OpenDialog<TCard>() where TCard : class =>
-            Method<string, TCard>("openDialog");
+        public void OpenDialog<TCard>(Arg<string> first, Arg<TCard> second) where TCard : class => Call(first, second);
 
         /// <summary>Closes the card dialog.</summary>
-        public ComponentMethod CloseDialog => Method("closeDialog");
+        public void CloseDialog() => Call();
 
         /// <summary>Raised before a card action runs.</summary>
         public TypedEvent<FusionKanbanActionArgs<TCard>> ActionBegin<TCard>() where TCard : class, new() =>
@@ -133,89 +129,89 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of an event that carries no data.</summary>
-    public class FusionKanbanEmptyArgs
+    public class FusionKanbanEmptyArgs : JsObject
     {
     }
 
     /// <summary>Payload of <c>ActionBegin</c> and <c>ActionComplete</c>.</summary>
-    public class FusionKanbanActionArgs<TCard>
+    public class FusionKanbanActionArgs<TCard> : JsObject
         where TCard : class, new()
     {
         /// <summary>The kind of action.</summary>
-        public string RequestType { get; set; } = "";
+        public ReadOnly<string> RequestType => ReadOnly<string>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
 
         /// <summary>Cards the action adds.</summary>
-        public List<TCard> AddedRecords { get; set; } = new List<TCard>();
+        public ReadOnly<List<TCard>> AddedRecords => ReadOnly<List<TCard>>();
 
         /// <summary>Cards the action changes.</summary>
-        public List<TCard> ChangedRecords { get; set; } = new List<TCard>();
+        public ReadOnly<List<TCard>> ChangedRecords => ReadOnly<List<TCard>>();
 
         /// <summary>Cards the action deletes.</summary>
-        public List<TCard> DeletedRecords { get; set; } = new List<TCard>();
+        public ReadOnly<List<TCard>> DeletedRecords => ReadOnly<List<TCard>>();
     }
 
     /// <summary>Payload of <c>DataBinding</c>.</summary>
-    public class FusionKanbanDataBindingArgs<TCard>
+    public class FusionKanbanDataBindingArgs<TCard> : JsObject
         where TCard : class, new()
     {
         /// <summary>The cards about to bind.</summary>
-        public List<TCard> Result { get; set; } = new List<TCard>();
+        public ReadOnly<List<TCard>> Result => ReadOnly<List<TCard>>();
 
         /// <summary>The number of cards.</summary>
-        public int? Count { get; set; }
+        public ReadOnly<int?> Count => ReadOnly<int?>();
     }
 
     /// <summary>Payload of <c>CardClick</c> and <c>CardDoubleClick</c>.</summary>
-    public class FusionKanbanCardClickArgs<TCard>
+    public class FusionKanbanCardClickArgs<TCard> : JsObject
         where TCard : class, new()
     {
         /// <summary>The clicked card.</summary>
-        public TCard Data { get; set; } = new TCard();
+        public ReadOnly<TCard> Data => ReadOnly<TCard>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <c>CardRendered</c>.</summary>
-    public class FusionKanbanCardRenderedArgs<TCard>
+    public class FusionKanbanCardRenderedArgs<TCard> : JsObject
         where TCard : class, new()
     {
         /// <summary>The rendered card.</summary>
-        public TCard Data { get; set; } = new TCard();
+        public ReadOnly<TCard> Data => ReadOnly<TCard>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <c>DialogOpen</c> and <c>DialogClose</c>.</summary>
-    public class FusionKanbanDialogArgs<TCard>
+    public class FusionKanbanDialogArgs<TCard> : JsObject
         where TCard : class, new()
     {
         /// <summary>The card in the dialog.</summary>
-        public TCard Data { get; set; } = new TCard();
+        public ReadOnly<TCard> Data => ReadOnly<TCard>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
 
         /// <summary><c>"Add"</c> or <c>"Edit"</c>.</summary>
-        public string RequestType { get; set; } = "";
+        public ReadOnly<string> RequestType => ReadOnly<string>();
     }
 
     /// <summary>Payload of <c>DragStart</c>, <c>Drag</c> and <c>DragStop</c>.</summary>
-    public class FusionKanbanDragArgs<TCard>
+    public class FusionKanbanDragArgs<TCard> : JsObject
         where TCard : class, new()
     {
         /// <summary>The dragged cards.</summary>
-        public List<TCard> Data { get; set; } = new List<TCard>();
+        public ReadOnly<List<TCard>> Data => ReadOnly<List<TCard>>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
 
         /// <summary>Zero-based index where the cards drop.</summary>
-        public int DropIndex { get; set; }
+        public ReadOnly<int> DropIndex => ReadOnly<int>();
     }
 
     /// <summary>A column header as <see cref="FusionKanbanQueryCellInfoArgs"/> reports it.</summary>
@@ -232,16 +228,16 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionKanban.QueryCellInfo"/>.</summary>
-    public class FusionKanbanQueryCellInfoArgs
+    public class FusionKanbanQueryCellInfoArgs : JsObject
     {
         /// <summary>The column headers.</summary>
-        public List<FusionKanbanHeaderArgs> Data { get; set; } = new List<FusionKanbanHeaderArgs>();
+        public ReadOnly<List<FusionKanbanHeaderArgs>> Data => ReadOnly<List<FusionKanbanHeaderArgs>>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
 
         /// <summary>The kind of render.</summary>
-        public string RequestType { get; set; } = "";
+        public ReadOnly<string> RequestType => ReadOnly<string>();
     }
 
     /// <summary>Payload of <c>DataSourceChanged</c>.</summary>
@@ -250,26 +246,27 @@ namespace Alis.Reactive.Fusion.Components
         where TCard : class, new()
     {
         /// <summary>The kind of change.</summary>
-        public string RequestType { get; set; } = "";
+        public ReadOnly<string> RequestType => ReadOnly<string>();
 
         /// <summary>Cards the user added.</summary>
-        public List<TCard> AddedRecords { get; set; } = new List<TCard>();
+        public ReadOnly<List<TCard>> AddedRecords => ReadOnly<List<TCard>>();
 
         /// <summary>Cards the user changed.</summary>
-        public List<TCard> ChangedRecords { get; set; } = new List<TCard>();
+        public ReadOnly<List<TCard>> ChangedRecords => ReadOnly<List<TCard>>();
 
         /// <summary>Cards the user deleted.</summary>
-        public List<TCard> DeletedRecords { get; set; } = new List<TCard>();
+        public ReadOnly<List<TCard>> DeletedRecords => ReadOnly<List<TCard>>();
 
         /// <summary>Zero-based index of the change.</summary>
-        public int Index { get; set; }
+        public ReadOnly<int> Index => ReadOnly<int>();
 
         /// <summary>Applies the change to the board.</summary>
-        public ComponentMethod EndEdit => Method("endEdit");
+        public void EndEdit() => Call();
 
         /// <summary>Reverts the change.</summary>
-        public ComponentMethod CancelEdit => Method("cancelEdit");
+        public void CancelEdit() => Call();
     }
+#nullable restore annotations
 
     /// <summary>A column for <see cref="FusionKanban.AddColumn"/>.</summary>
     public class FusionKanbanColumn

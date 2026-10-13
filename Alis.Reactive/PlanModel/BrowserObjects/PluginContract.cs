@@ -37,12 +37,6 @@ namespace Alis.Reactive.PlanModel
         internal static PluginOperationId Root(PluginName pluginName) =>
             new PluginOperationId(pluginName, ObjectMemberKey.RootCall);
 
-        internal static PluginOperationId Of(PluginOperation operation)
-        {
-            if (operation == null) throw new ArgumentNullException(nameof(operation));
-            return operation.OperationId;
-        }
-
         public bool Equals(PluginOperationId? other) =>
             other != null
             && _pluginName.Equals(other._pluginName)
@@ -377,20 +371,18 @@ namespace Alis.Reactive.PlanModel
         internal ObjectMethodContract ToObjectMethodContract() =>
             PluginOperationContract.Create(_operation, Signature).ToObjectMethodContract();
 
+        internal static PluginMethodRequirement Exact(PluginOperationId operation, MethodSignature signature)
+        {
+            if (operation == null) throw new ArgumentNullException(nameof(operation));
+            return new PluginMethodRequirement(operation, signature);
+        }
+
         internal static PluginMethodRequirement Function(PluginOperationId operation, Shape returns)
         {
             if (operation == null) throw new ArgumentNullException(nameof(operation));
             return new PluginMethodRequirement(
                 operation,
                 MethodSignature.Open(returns));
-        }
-
-        internal static PluginMethodRequirement Function(PluginOperation operation)
-        {
-            if (operation == null) throw new ArgumentNullException(nameof(operation));
-            return new PluginMethodRequirement(
-                operation.OperationId,
-                operation.Signature);
         }
 
         internal static PluginMethodRequirement Command(PluginOperationId operation)
@@ -401,13 +393,6 @@ namespace Alis.Reactive.PlanModel
                 MethodSignature.Open(Shape.None));
         }
 
-        internal static PluginMethodRequirement Command(PluginOperation operation)
-        {
-            if (operation == null) throw new ArgumentNullException(nameof(operation));
-            return new PluginMethodRequirement(
-                operation.OperationId,
-                operation.Signature);
-        }
     }
 
     internal sealed class PluginPropertyRequirement
@@ -433,10 +418,5 @@ namespace Alis.Reactive.PlanModel
             return new PluginPropertyRequirement(property, shape);
         }
 
-        internal static PluginPropertyRequirement Read<TValue>(Alis.Reactive.PluginProperty<TValue> property)
-        {
-            if (property == null) throw new ArgumentNullException(nameof(property));
-            return Read(property.PropertyId, property.Shape);
-        }
     }
 }

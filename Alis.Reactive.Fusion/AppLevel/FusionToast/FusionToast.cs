@@ -11,6 +11,7 @@ using Syncfusion.EJ2.Notifications;
 
 namespace Alis.Reactive.Fusion.AppLevel
 {
+#nullable disable annotations
     /// <summary>
     /// The page's Syncfusion Toast, declared by the names its JavaScript API uses.
     /// </summary>
@@ -33,29 +34,30 @@ namespace Alis.Reactive.Fusion.AppLevel
         public string DefaultId => ElementId;
 
         /// <summary>The heading of the next toast.</summary>
-        public ComponentProperty<string> Title => Property<string>("title");
+        public Prop<string> Title => Prop<string>();
 
         /// <summary>The message of the next toast.</summary>
-        public ComponentProperty<string> Content => Property<string>("content");
+        public Prop<string> Content => Prop<string>();
 
         /// <summary>Milliseconds the next toast stays before it hides; 0 keeps it until closed.</summary>
-        public ComponentProperty<int> TimeOut => Property<int>("timeOut");
+        public Prop<int> TimeOut => Prop<int>();
 
         /// <summary>Whether the next toast shows a close button.</summary>
-        public ComponentProperty<bool> ShowCloseButton => Property<bool>("showCloseButton");
+        public Prop<bool> ShowCloseButton => Prop<bool>();
 
         /// <summary>Whether the next toast shows its remaining time as a progress bar.</summary>
-        public ComponentProperty<bool> ShowProgressBar => Property<bool>("showProgressBar");
+        public Prop<bool> ShowProgressBar => Prop<bool>();
 
         /// <summary>The look of the next toast: success, warning, danger or info.</summary>
-        public ComponentProperty<FusionToastTone> Tone => Property<FusionToastTone>("cssClass");
+        public Prop<FusionToastTone> Tone => Prop<FusionToastTone>("cssClass");
 
         /// <summary>Shows a toast with the current title, content and settings.</summary>
-        public ComponentMethod Show => Method("show");
+        public void Show() => Call();
 
         /// <summary>Hides the toast.</summary>
-        public ComponentMethod Hide => Method("hide");
+        public void Hide() => Call();
     }
+#nullable restore annotations
 
     /// <summary>The look of a <see cref="FusionToast"/>, by Syncfusion's toast classes.</summary>
     public enum FusionToastTone

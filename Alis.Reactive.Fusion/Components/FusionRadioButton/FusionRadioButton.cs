@@ -9,6 +9,7 @@ using Syncfusion.EJ2.Buttons;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion RadioButton, declared by the names its JavaScript API uses.
     /// </summary>
@@ -21,22 +22,22 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionRadioButton : FusionComponent
     {
         /// <summary>Whether the radio button is checked.</summary>
-        public ComponentProperty<bool> Checked => Property<bool>("checked");
+        public Prop<bool> Checked => Prop<bool>();
 
         /// <summary>Whether the button is disabled.</summary>
-        public ComponentProperty<bool> Disabled => Property<bool>("disabled");
+        public Prop<bool> Disabled => Prop<bool>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>The value of the checked radio button in the group.</summary>
-        public ComponentFunction<string> GetSelectedValue => Function<string>("getSelectedValue");
+        public TypedSource<string> GetSelectedValue() => Invoke<string>();
 
         /// <summary>Clicks the radio button.</summary>
-        public ComponentMethod Click => Method("click");
+        public void Click() => Call();
 
         /// <summary>Moves focus to the radio button.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
 
         /// <summary>Raised when the radio button becomes checked.</summary>
         public TypedEvent<FusionRadioButtonChangeArgs> Change =>
@@ -44,11 +45,12 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionRadioButton.Change"/>.</summary>
-    public class FusionRadioButtonChangeArgs
+    public class FusionRadioButtonChangeArgs : JsObject
     {
         /// <summary>Value of the checked radio button.</summary>
-        public string Value { get; set; } = string.Empty;
+        public ReadOnly<string> Value => ReadOnly<string>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Creates a FusionRadioButton with Syncfusion MVC builder-owned initial render.

@@ -30,7 +30,7 @@
                          .Response(r => r
                             .OnSuccess<DischargeResult>((json, s) =>
                             {
-                                s.Element($"{resident.Key}-discharge-status").SetText(json, x => x.Message);
+                                s.Element($"{resident.Key}-discharge-status").Text.Set(json.Get(x => x.Message));
                             })
                             .Chained(c => c
                                 .Post(Url.SandboxRoute("NotifyFamily", "DischargeNotice"))
@@ -38,8 +38,8 @@
                                 .Response(notice => notice
                                     .OnError<FamilyNoticeResult>(503, (json, e) =>
                                     {
-                                        e.Element($"{resident.Key}-family-reason").SetText(json, x => x.Message);
-                                        e.Element($"{resident.Key}-family-status").SetText("The family was not notified.");
+                                        e.Element($"{resident.Key}-family-reason").Text.Set(json.Get(x => x.Message));
+                                        e.Element($"{resident.Key}-family-status").Text.Set("The family was not notified.");
                                     }))));
                     }))
                 <p id="@(resident.Key)-discharge-status" class="text-sm text-text-muted">Not discharged yet.</p>

@@ -9,6 +9,7 @@ using Syncfusion.EJ2.Popups;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Dialog, declared by the names its JavaScript API uses.
     /// </summary>
@@ -20,13 +21,13 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionDialog : FusionComponent
     {
         /// <summary>Opens the dialog.</summary>
-        public ComponentMethod Show => Method("show");
+        public void Show() => Call();
 
         /// <summary>Closes the dialog.</summary>
-        public ComponentMethod Hide => Method("hide");
+        public void Hide() => Call();
 
         /// <summary>Recomputes the dialog position after its content changes size.</summary>
-        public ComponentMethod RefreshPosition => Method("refreshPosition");
+        public void RefreshPosition() => Call();
 
         /// <summary>Raised before the dialog opens.</summary>
         public TypedEvent<FusionDialogBeforeOpenArgs> BeforeOpen =>
@@ -50,36 +51,37 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionDialog.BeforeOpen"/>.</summary>
-    public class FusionDialogBeforeOpenArgs
+    public class FusionDialogBeforeOpenArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionDialog.BeforeClose"/>.</summary>
-    public class FusionDialogBeforeCloseArgs
+    public class FusionDialogBeforeCloseArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
 
         /// <summary>Whether user interaction started the close.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionDialog.Open"/>; carries no data.</summary>
-    public class FusionDialogOpenArgs
+    public class FusionDialogOpenArgs : JsObject
     {
     }
 
     /// <summary>Payload of <see cref="FusionDialog.Close"/>; carries no data.</summary>
-    public class FusionDialogCloseArgs
+    public class FusionDialogCloseArgs : JsObject
     {
     }
 
     /// <summary>Payload of <see cref="FusionDialog.OverlayClick"/>; carries no data.</summary>
-    public class FusionDialogOverlayClickArgs
+    public class FusionDialogOverlayClickArgs : JsObject
     {
     }
+#nullable restore annotations
 
     /// <summary>
     /// Renders the component for a plan, ready for <c>.Reactive(...)</c>.

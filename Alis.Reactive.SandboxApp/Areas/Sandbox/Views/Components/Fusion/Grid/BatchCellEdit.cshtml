@@ -26,8 +26,8 @@
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(BatchGridId).Set(c => c.DataSource, json.Read(x => x));
-                s.Element("batch-load-status").SetText("loaded batch rows");
+                s.Component<FusionGrid>(BatchGridId).DataSource.Set(json);
+                s.Element("batch-load-status").Text.Set("loaded batch rows");
             }))));
 }
 
@@ -47,24 +47,22 @@
             .CssClass(ButtonSecondary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(BatchGridId)
-                    .Call(c => c.EditCell, 0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks));
-                p.Element("batch-command-status").SetText("editCell called");
+                p.Component<FusionGrid>(BatchGridId).EditCell(0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks));
+                p.Element("batch-command-status").Text.Set("editCell called");
             }))
         @(Html.NativeButton("batch-update-cell", "Set Tasks To 6")
             .CssClass(ButtonPrimary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(BatchGridId)
-                    .Call(c => c.UpdateCell<int>(), 0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 6);
-                p.Element("batch-command-status").SetText("updateCell called");
+                p.Component<FusionGrid>(BatchGridId).UpdateCell<int>(0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 6);
+                p.Element("batch-command-status").Text.Set("updateCell called");
             }))
         @(Html.NativeButton("batch-save-cell", "Save Cell")
             .CssClass(ButtonSecondary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(BatchGridId).Call(c => c.SaveCell);
-                p.Element("batch-command-status").SetText("saveCell called");
+                p.Component<FusionGrid>(BatchGridId).SaveCell();
+                p.Element("batch-command-status").Text.Set("saveCell called");
             }))
         @(Html.NativeButton("batch-gather-changes", "Gather Changes")
             .CssClass(ButtonAccent)
@@ -72,18 +70,18 @@
             {
                 var grid = p.Component<FusionGrid>(BatchGridId);
                 p.Post(Url.SandboxRoute("BatchSummary", "Grid"))
-                    .Gather<ResidentGridBatchSummaryRequest>(g => g.Set(x => x.BatchChanges, grid.Get(c => c.GetBatchChanges<ResidentDirectoryGridItem>())))
+                    .Gather<ResidentGridBatchSummaryRequest>(g => g.Set(x => x.BatchChanges, grid.GetBatchChanges<ResidentDirectoryGridItem>()))
                     .Response(r => r.OnSuccess<ResidentGridBatchSummaryResponse>((json, s) =>
                     {
-                        s.Element("batch-summary").SetText(json, x => x.Summary);
+                        s.Element("batch-summary").Text.Set(json.Get(x => x.Summary));
                     }));
             }))
         @(Html.NativeButton("batch-end-edit", "Commit Batch")
             .CssClass(ButtonPrimary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(BatchGridId).Call(c => c.EndEdit);
-                p.Element("batch-command-status").SetText("endEdit called");
+                p.Component<FusionGrid>(BatchGridId).EndEdit();
+                p.Element("batch-command-status").Text.Set("endEdit called");
             }))
     </native-hstack>
 
@@ -101,41 +99,41 @@
             .Columns(EditColumns()))
             .Reactive(evt => evt.CellSave<ResidentDirectoryGridItem, int>(), (args, p) =>
             {
-                p.Element("batch-cell-save-column").SetText(args, x => x.ColumnName);
-                p.Element("batch-cell-save-value").SetText(args, x => x.Value);
-                p.Element("batch-cell-save-previous").SetText(args, x => x.PreviousValue);
-                p.Element("batch-cell-save-resident").SetText(args, x => x.RowData.ResidentName);
-                p.Element("batch-cell-save-cancel").SetText(args, x => x.Cancel);
-                p.When(args, x => x.Value).Eq(99)
+                p.Element("batch-cell-save-column").Text.Set(args.ColumnName);
+                p.Element("batch-cell-save-value").Text.Set(args.Value);
+                p.Element("batch-cell-save-previous").Text.Set(args.PreviousValue);
+                p.Element("batch-cell-save-resident").Text.Set(args.RowData.Get(x => x.ResidentName));
+                p.Element("batch-cell-save-cancel").Text.Set(args.Cancel);
+                p.When(args.Value).Eq(99)
                     .Then(t =>
                     {
-                        t.Payload(args).Set(a => a.Cancel, true);
-                        t.Element("batch-cell-save-cancelled").SetText("blocked 99");
+                        args.Cancel.Set(true);
+                        t.Element("batch-cell-save-cancelled").Text.Set("blocked 99");
                     });
             })
             .Reactive(evt => evt.CellSaved<ResidentDirectoryGridItem, int>(), (args, p) =>
             {
-                p.Element("batch-cell-saved-column").SetText(args, x => x.ColumnName);
-                p.Element("batch-cell-saved-value").SetText(args, x => x.Value);
-                p.Element("batch-cell-saved-previous").SetText(args, x => x.PreviousValue);
-                p.Element("batch-cell-saved-resident").SetText(args, x => x.RowData.ResidentName);
+                p.Element("batch-cell-saved-column").Text.Set(args.ColumnName);
+                p.Element("batch-cell-saved-value").Text.Set(args.Value);
+                p.Element("batch-cell-saved-previous").Text.Set(args.PreviousValue);
+                p.Element("batch-cell-saved-resident").Text.Set(args.RowData.Get(x => x.ResidentName));
             })
             .Reactive(evt => evt.BeforeBatchSave<ResidentDirectoryGridItem>(), (args, p) =>
             {
-                p.Element("batch-before-save-resident").SetText(args, x => x.BatchChanges.ChangedRecords[0].ResidentName);
-                p.Element("batch-before-save-tasks").SetText(args, x => x.BatchChanges.ChangedRecords[0].OpenTasks);
-                p.Element("batch-before-save-cancel").SetText(args, x => x.Cancel);
-                p.When(args, x => x.BatchChanges.ChangedRecords[0].OpenTasks).Eq(8)
+                p.Element("batch-before-save-resident").Text.Set(args.BatchChanges.Get(x => x.ChangedRecords[0].ResidentName));
+                p.Element("batch-before-save-tasks").Text.Set(args.BatchChanges.Get(x => x.ChangedRecords[0].OpenTasks));
+                p.Element("batch-before-save-cancel").Text.Set(args.Cancel);
+                p.When(args.BatchChanges.Get(x => x.ChangedRecords[0].OpenTasks)).Eq(8)
                     .Then(t =>
                     {
-                        t.Payload(args).Set(a => a.Cancel, true);
-                        t.Element("batch-before-save-cancelled").SetText("blocked batch 8");
-                        t.Element("batch-action-complete").SetText("waiting after cancelled batch");
+                        args.Cancel.Set(true);
+                        t.Element("batch-before-save-cancelled").Text.Set("blocked batch 8");
+                        t.Element("batch-action-complete").Text.Set("waiting after cancelled batch");
                     });
             })
             .Reactive(evt => evt.ActionComplete<ResidentDirectoryGridItem>(), (args, p) =>
             {
-                p.Element("batch-action-complete").SetText(args, x => x.RequestType);
+                p.Element("batch-action-complete").Text.Set(args.RequestType);
             }))
 
         <native-grid cols="C4" gap="Base" class="mt-4 font-mono text-sm">

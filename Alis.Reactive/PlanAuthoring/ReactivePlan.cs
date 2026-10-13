@@ -57,22 +57,15 @@ namespace Alis.Reactive
             _registeredInputComponents.Snapshot();
         internal PlanBuildContext Context => _context;
 
-        /// <summary>Registers a typed plugin contract in the plan.</summary>
-        /// <param name="plugin">Plugin instance whose name and members define the contract.</param>
-        public void RegisterPlugin(Plugin plugin)
-        {
-            if (plugin == null) throw new ArgumentNullException(nameof(plugin));
-            _context.RegisterPlugin(plugin.ToContract());
-        }
-
-        /// <summary>Creates and registers a typed plugin contract in the plan.</summary>
-        /// <typeparam name="TPlugin">Plugin type to instantiate and register.</typeparam>
-        /// <returns>Registered plugin instance for use in pipeline calls.</returns>
+        /// <summary>Registers a plugin with the plan; the returned plugin's members are used directly.</summary>
+        /// <typeparam name="TPlugin">The plugin's declaration.</typeparam>
+        /// <returns>The plugin: <c>slugify.Slug(planner.Wing)</c>.</returns>
         public TPlugin RegisterPlugin<TPlugin>()
             where TPlugin : Plugin, new()
         {
             var plugin = new TPlugin();
-            RegisterPlugin(plugin);
+            _context.RegisterPlugin(plugin.ToContract());
+            plugin.BindTo(new PluginBinding(plugin.Name, _context));
             return plugin;
         }
 

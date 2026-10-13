@@ -6,7 +6,7 @@
     var residents = new[] { (Key: "helen", Name: "Helen Park"), (Key: "arthur", Name: "Arthur Bell") };
 
     Html.On(plan, t => t.CustomEvent<ChartFlagged>(ResidentChartEvents.ChartFlagged, (flag, p) =>
-        p.Element("review-flag").SetText(flag, x => x.MRN!)));
+        p.Element("review-flag").Text.Set(flag.Get(x => x.MRN!))));
 }
 
 <native-vstack gap="Lg">
@@ -24,11 +24,11 @@
                         p.Get(Url.SandboxRoute("Chart", "ResidentChart", new { resident = resident.Key }))
                          .Response(r => r.OnSuccess<ResidentChart>((json, s) =>
                          {
-                             s.Element("chart-name").SetText(json, x => x.Name);
-                             s.Element("chart-mrn").SetText(json, x => x.MRN!);
-                             s.When(json, x => x.MRN).NotEmpty()
-                              .Then(t => t.Element("chart-record").SetText("Chart linked to the medical record."))
-                              .Else(e => e.Element("chart-record").SetText("No medical record yet: request one from admissions."));
+                             s.Element("chart-name").Text.Set(json.Get(x => x.Name));
+                             s.Element("chart-mrn").Text.Set(json.Get(x => x.MRN!));
+                             s.When(json.Get(x => x.MRN)).NotEmpty()
+                              .Then(t => t.Element("chart-record").Text.Set("Chart linked to the medical record."))
+                              .Else(e => e.Element("chart-record").Text.Set("No medical record yet: request one from admissions."));
                          }));
                     }))
             }

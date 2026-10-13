@@ -13,8 +13,8 @@
             .OnSuccess<FlatResponse>((json, s) =>
             {
                 s.Element("flat-spinner").Hide();
-                s.Element("flat-message").SetText(json, x => x.Message);
-                s.Element("flat-count").SetText(json, x => x.Count);
+                s.Element("flat-message").Text.Set(json.Get(x => x.Message));
+                s.Element("flat-count").Text.Set(json.Get(x => x.Count));
             })
          );
     }));
@@ -27,9 +27,9 @@
             .OnSuccess<NestedResponse>((json, s) =>
             {
                 s.Element("nested-spinner").Hide();
-                s.Element("nested-name").SetText(json, x => x.Data!.User!.Name);
-                s.Element("nested-email").SetText(json, x => x.Data!.User!.Email);
-                s.Element("nested-total").SetText(json, x => x.Data!.Total);
+                s.Element("nested-name").Text.Set(json.Get(x => x.Data!.User!.Name));
+                s.Element("nested-email").Text.Set(json.Get(x => x.Data!.User!.Email));
+                s.Element("nested-total").Text.Set(json.Get(x => x.Data!.Total));
             })
          );
     }));
@@ -59,7 +59,7 @@
     <native-card-body>
         <native-heading level="H2">1. JSON Flat Response</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            <code>OnSuccess&lt;FlatResponse&gt;((json, s) =&gt; s.Element("x").SetText(json, r =&gt; r.Message))</code>
+            <code>OnSuccess&lt;FlatResponse&gt;((json, s) =&gt; s.Element("x").Text.Set(json, r =&gt; r.Message))</code>
             — walks <code>responseBody.message</code> at runtime.
         </p>
         @(Html.NativeButton("flat-btn", "Fetch Flat JSON")
@@ -80,7 +80,7 @@
     <native-card-body>
         <native-heading level="H2">2. JSON Nested Response</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            <code>OnSuccess&lt;NestedResponse&gt;((json, s) =&gt; s.Element("x").SetText(json, r =&gt; r.Data.User.Name))</code>
+            <code>OnSuccess&lt;NestedResponse&gt;((json, s) =&gt; s.Element("x").Text.Set(json, r =&gt; r.Data.User.Name))</code>
             — walks <code>responseBody.data.user.name</code> (3 levels deep).
         </p>
         @(Html.NativeButton("nested-btn", "Fetch Nested JSON")

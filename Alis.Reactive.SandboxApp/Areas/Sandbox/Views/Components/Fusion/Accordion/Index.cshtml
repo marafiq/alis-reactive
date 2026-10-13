@@ -25,7 +25,7 @@
             .CssClass(ButtonPrimary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionAccordion>("care-plan").Call(c => c.ExpandItem, true, 0);
+                p.Component<FusionAccordion>("care-plan").ExpandItem(true, 0);
             }))
         <native-text color="Secondary">
             Currently open: <span id="open-section" class="font-semibold text-text">No section open</span>
@@ -62,18 +62,18 @@
             .Reactive(evt => evt.Expanded, (args, p) =>
             {
                 // Which section the resident is reading, named from the panel index.
-                p.When(args, x => x.IsExpanded).Truthy()
+                p.When(args.IsExpanded).Truthy()
                     .Then(open =>
-                        open.When(args, x => x.Index).Eq(0)
-                            .Then(t => t.Element("open-section").SetText("My Care Team"))
-                            .ElseIf(args, x => x.Index).Eq(1)
-                            .Then(t => t.Element("open-section").SetText("My Services & Monthly Charges"))
-                            .Else(t => t.Element("open-section").SetText("My Care Agreement")))
-                    .Else(closed => closed.Element("open-section").SetText("No section open"));
+                        open.When(args.Index).Eq(0)
+                            .Then(t => t.Element("open-section").Text.Set("My Care Team"))
+                            .ElseIf(args.Index).Eq(1)
+                            .Then(t => t.Element("open-section").Text.Set("My Services & Monthly Charges"))
+                            .Else(t => t.Element("open-section").Text.Set("My Care Agreement")))
+                    .Else(closed => closed.Element("open-section").Text.Set("No section open"));
 
                 // Charges detail is fetched on demand the first time the charges section opens.
-                p.When(args, x => x.IsExpanded).Truthy()
-                    .And(args, x => x.Index).Eq(1)
+                p.When(args.IsExpanded).Truthy()
+                    .And(args.Index).Eq(1)
                     .Then(t => t
                         .Get(Url.SandboxRoute("MonthlyChargesDetail", "Accordion"))
                         .Response(r => r.OnSuccess(s => s.Into("charges-detail"))));
@@ -91,9 +91,9 @@
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionAccordion>("care-plan").Call(c => c.EnableItem, 2, true);
+                    p.Component<FusionAccordion>("care-plan").EnableItem(2, true);
                     p.Element("agreement-status")
-                        .SetText("Care agreement confirmed. Your care agreement section is now available.");
+                        .Text.Set("Care agreement confirmed. Your care agreement section is now available.");
                 }))
         </native-vstack>
     </native-card-body></native-card>

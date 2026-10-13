@@ -50,8 +50,8 @@
             .CssClass("rounded-md bg-surface px-5 py-2 text-sm font-medium text-text hover:bg-surface-2 transition-colors")
             .Reactive(plan, evt => evt.Click, (_, p) =>
             {
-                p.Component<FusionStepper>(StepperId).Set(c => c.ActiveStep, 2);
-                p.Element("stepper-wizard-status").SetText("returned to contacts");
+                p.Component<FusionStepper>(StepperId).ActiveStep.Set(2);
+                p.Element("stepper-wizard-status").Text.Set("returned to contacts");
             }))
 
         @(Html.NativeButton("stepper-wizard-submit", "Submit Admission")
@@ -63,8 +63,8 @@
                     .Response(r => r
                         .OnSuccess<FusionStepperWizardSubmitResponse>((json, s) =>
                         {
-                            s.Element("stepper-wizard-status").SetText("submitted");
-                            s.Element("stepper-wizard-submit-result").SetText(json, x => x.Message);
+                            s.Element("stepper-wizard-status").Text.Set("submitted");
+                            s.Element("stepper-wizard-submit-result").Text.Set(json.Get(x => x.Message));
                         })
                         .OnError(400, e => e.ValidationErrors(FormId)));
             }))

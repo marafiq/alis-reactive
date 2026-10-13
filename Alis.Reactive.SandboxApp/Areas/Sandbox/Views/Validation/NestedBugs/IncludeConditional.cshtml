@@ -24,7 +24,7 @@
             p.Post(Url.SandboxRoute("SubmitInclude", "NestedBugs")).Gather(g => g.Form())
              .Validate<IncludeBugValidator>("include-form")
              .Response(r => r
-                .OnSuccess(s => s.Element("result").SetText("Saved"))
+                .OnSuccess(s => s.Element("result").Text.Set("Saved"))
                 .OnError(400, e => e.ValidationErrors("include-form")));
         }))
 

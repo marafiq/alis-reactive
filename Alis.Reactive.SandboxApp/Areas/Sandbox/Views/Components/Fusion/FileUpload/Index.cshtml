@@ -49,12 +49,12 @@
                  .Response(r => r
                     .OnSuccess<FileUploadEchoResponse>((json, s) =>
                     {
-                        s.Element("echo-name").SetText(json, x => x.ResidentName);
-                        s.Element("echo-count").SetText(json, x => x.FileCount);
-                        s.Element("echo-files").SetText(json, x => x.FileNames);
-                        s.Element("echo-sizes").SetText(json, x => x.FileSizes);
-                        s.Element("echo-result").AddClass("text-green-600");
-                        s.Element("echo-result").RemoveClass("text-red-600");
+                        s.Element("echo-name").Text.Set(json.Get(x => x.ResidentName));
+                        s.Element("echo-count").Text.Set(json.Get(x => x.FileCount));
+                        s.Element("echo-files").Text.Set(json.Get(x => x.FileNames));
+                        s.Element("echo-sizes").Text.Set(json.Get(x => x.FileSizes));
+                        s.Element("echo-result").ClassList.Add("text-green-600");
+                        s.Element("echo-result").ClassList.Remove("text-red-600");
                     })
                     .OnError(400, e => { e.ValidationErrors("upload-form"); })
                  );

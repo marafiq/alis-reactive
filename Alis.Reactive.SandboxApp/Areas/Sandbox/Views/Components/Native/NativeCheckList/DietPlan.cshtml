@@ -25,7 +25,7 @@
                     p.Post(Url.SandboxRoute("SaveDietPlan", "NativeCheckList")).Gather(g => g.Form())
                      .Response(r => r.OnSuccess<DietPlanSaved>((json, s) =>
                      {
-                         s.Element("diet-plan-status").SetText(json, x => x.Confirmation);
+                         s.Element("diet-plan-status").Text.Set(json.Get(x => x.Confirmation));
                      }));
                 }))
             <p id="diet-plan-status" class="text-sm text-text-muted"></p>

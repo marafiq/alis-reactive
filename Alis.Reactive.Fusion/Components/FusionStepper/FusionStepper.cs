@@ -9,6 +9,7 @@ using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Stepper, declared by the names its JavaScript API uses.
     /// </summary>
@@ -20,19 +21,19 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionStepper : FusionComponent
     {
         /// <summary>The zero-based index of the active step.</summary>
-        public ComponentProperty<int> ActiveStep => Property<int>("activeStep");
+        public Prop<int> ActiveStep => Prop<int>();
 
         /// <summary>Moves to the next step.</summary>
-        public ComponentMethod NextStep => Method("nextStep");
+        public void NextStep() => Call();
 
         /// <summary>Moves to the previous step.</summary>
-        public ComponentMethod PreviousStep => Method("previousStep");
+        public void PreviousStep() => Call();
 
         /// <summary>Returns to the first step and clears step states.</summary>
-        public ComponentMethod Reset => Method("reset");
+        public void Reset() => Call();
 
         /// <summary>Redraws the progress bar after the steps change.</summary>
-        public ComponentMethod RefreshProgressbar => Method("refreshProgressbar");
+        public void RefreshProgressbar() => Call();
 
         /// <summary>Raised after the active step changes.</summary>
         public TypedEvent<FusionStepperChangedArgs> StepChanged =>
@@ -48,43 +49,44 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionStepper.StepChanged"/>.</summary>
-    public class FusionStepperChangedArgs
+    public class FusionStepperChangedArgs : JsObject
     {
         /// <summary>Index of the step active before the change.</summary>
-        public int PreviousStep { get; set; }
+        public ReadOnly<int> PreviousStep => ReadOnly<int>();
 
         /// <summary>Index of the step active after the change.</summary>
-        public int ActiveStep { get; set; }
+        public ReadOnly<int> ActiveStep => ReadOnly<int>();
 
         /// <summary>Whether user interaction made the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionStepper.StepChanging"/>.</summary>
-    public class FusionStepperChangingArgs
+    public class FusionStepperChangingArgs : JsObject
     {
         /// <summary>Index of the step active now.</summary>
-        public int PreviousStep { get; set; }
+        public ReadOnly<int> PreviousStep => ReadOnly<int>();
 
         /// <summary>Index of the step the change moves to.</summary>
-        public int ActiveStep { get; set; }
+        public ReadOnly<int> ActiveStep => ReadOnly<int>();
 
         /// <summary>Whether user interaction started the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
 
         /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
-        public bool Cancel { get; set; }
+        public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionStepper.StepClick"/>.</summary>
-    public class FusionStepperClickArgs
+    public class FusionStepperClickArgs : JsObject
     {
         /// <summary>Index of the step active before the click.</summary>
-        public int PreviousStep { get; set; }
+        public ReadOnly<int> PreviousStep => ReadOnly<int>();
 
         /// <summary>Index of the clicked step.</summary>
-        public int ActiveStep { get; set; }
+        public ReadOnly<int> ActiveStep => ReadOnly<int>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Renders the component for a plan, ready for <c>.Reactive(...)</c>.

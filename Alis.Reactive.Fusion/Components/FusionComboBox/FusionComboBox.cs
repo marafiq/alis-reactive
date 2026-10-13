@@ -5,6 +5,7 @@ using Syncfusion.EJ2.DropDowns;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion ComboBox, declared by the names its JavaScript API uses.
     /// </summary>
@@ -16,31 +17,31 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionComboBox : FusionComponent, IInputComponent
     {
         /// <summary>The selected value.</summary>
-        public ComponentProperty<string?> Value => Property<string?>("value");
+        public Prop<string> Value => Prop<string>();
 
         /// <summary>The text shown in the input.</summary>
-        public ComponentProperty<string?> Text => Property<string?>("text");
+        public Prop<string> Text => Prop<string>();
 
         /// <summary>The zero-based index of the selected item.</summary>
-        public ComponentProperty<int?> Index => Property<int?>("index");
+        public Prop<int?> Index => Prop<int?>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Moves focus into the input.</summary>
-        public ComponentMethod FocusIn => Method("focusIn");
+        public void FocusIn() => Call();
 
         /// <summary>Removes focus from the input.</summary>
-        public ComponentMethod FocusOut => Method("focusOut");
+        public void FocusOut() => Call();
 
         /// <summary>Opens the popup.</summary>
-        public ComponentMethod ShowPopup => Method("showPopup");
+        public void ShowPopup() => Call();
 
         /// <summary>Closes the popup.</summary>
-        public ComponentMethod HidePopup => Method("hidePopup");
+        public void HidePopup() => Call();
 
         /// <summary>Clears the selection and the text.</summary>
-        public ComponentMethod Clear => Method("clear");
+        public void Clear() => Call();
 
         /// <summary>Raised when the selected value changes.</summary>
         public TypedEvent<FusionComboBoxChangeArgs> Change =>
@@ -60,24 +61,25 @@ namespace Alis.Reactive.Fusion.Components
 
     /// <summary>Payload of <see cref="FusionComboBox.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Value).Eq("alice")</c>.</remarks>
-    public class FusionComboBoxChangeArgs
+    public class FusionComboBoxChangeArgs : JsObject
     {
         /// <summary>Selected value after the change.</summary>
-        public string? Value { get; set; }
+        public ReadOnly<string> Value => ReadOnly<string>();
 
         /// <summary>Whether user interaction triggered the change.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionComboBox.Focus"/>; carries no data.</summary>
-    public class FusionComboBoxFocusArgs
+    public class FusionComboBoxFocusArgs : JsObject
     {
     }
 
     /// <summary>Payload of <see cref="FusionComboBox.Blur"/>; carries no data.</summary>
-    public class FusionComboBoxBlurArgs
+    public class FusionComboBoxBlurArgs : JsObject
     {
     }
+#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionComboBox"/> for a model-bound field.</summary>
     public static class FusionComboBoxHtmlExtensions

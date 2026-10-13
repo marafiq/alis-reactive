@@ -34,13 +34,13 @@
                     .CssClass(MenuButton)
                     .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
-                        p.Component<FusionSidebar>(SidebarId).Call(c => c.Show);
+                        p.Component<FusionSidebar>(SidebarId).Show();
                     }))
                 @(Html.NativeButton("toggle-menu", "Care-services menu")
                     .CssClass(MenuButton)
                     .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
-                        p.Component<FusionSidebar>(SidebarId).Call(c => c.Toggle);
+                        p.Component<FusionSidebar>(SidebarId).Toggle();
                     }))
             </native-hstack>
 
@@ -79,19 +79,19 @@
                     .CssClass(LinkButton)
                     .Reactive(plan, evt => evt.Click, (_, pp) =>
                     {
-                        pp.Component<FusionSidebar>(SidebarId).Call(c => c.Toggle);
+                        pp.Component<FusionSidebar>(SidebarId).Toggle();
                     }))
                 @(Html.NativeButton("close-menu", "Close menu")
                     .CssClass(LinkButton)
                     .Reactive(plan, evt => evt.Click, (_, pp) =>
                     {
                         var panel = pp.Component<FusionSidebar>(SidebarId);
-                        panel.Call(c => c.Hide);
+                        panel.Hide();
                         pp.Post(closeActivityUrl)
-                            .Gather<FusionSidebarCloseRequest>(g => g.Set(x => x.IsOpen, panel.Get(c => c.IsOpen)))
+                            .Gather<FusionSidebarCloseRequest>(g => g.Set(x => x.IsOpen, panel.IsOpen))
                             .Response(r => r.OnSuccess<FusionSidebarCloseResponse>((json, s) =>
                             {
-                                s.Element("activity-note").SetText(json, x => x.ActivityNote);
+                                s.Element("activity-note").Text.Set(json.Get(x => x.ActivityNote));
                             }));
                     }))
             </div>
@@ -99,22 +99,22 @@
     })
     .Reactive(evt => evt.Open, (args, p) =>
     {
-        p.Element("menu-state").SetText("Care-services menu is open.");
+        p.Element("menu-state").Text.Set("Care-services menu is open.");
         p.Post(openPanelUrl)
-            .Gather<FusionSidebarOpenRequest>(g => g.Set(x => x.OpenedByCoordinator, p.Payload(args).Get(a => a.IsInteracted)))
+            .Gather<FusionSidebarOpenRequest>(g => g.Set(x => x.OpenedByCoordinator, args.IsInteracted))
             .Response(r => r.OnSuccess<FusionSidebarOpenResponse>((json, s) =>
             {
-                s.Element("services-summary").SetText(json, x => x.ServicesSummary);
-                s.Element("activity-note").SetText(json, x => x.OpenedNote);
+                s.Element("services-summary").Text.Set(json.Get(x => x.ServicesSummary));
+                s.Element("activity-note").Text.Set(json.Get(x => x.OpenedNote));
             }));
     })
     .Reactive(evt => evt.Close, (args, p) =>
     {
-        p.When(args, x => x.IsInteracted).Truthy()
+        p.When(args.IsInteracted).Truthy()
             .Then(byUser => byUser.Element("menu-state")
-                .SetText("You closed the care-services menu."))
+                .Text.Set("You closed the care-services menu."))
             .Else(byApp => byApp.Element("menu-state")
-                .SetText("Care-services menu closed automatically."));
+                .Text.Set("Care-services menu closed automatically."));
     }))
 </native-vstack>
 

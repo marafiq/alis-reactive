@@ -16,8 +16,8 @@
         p.Get(Url.SandboxRoute("OperationRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                s.Element("keyed-status").SetText("loaded");
+                s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                s.Element("keyed-status").Text.Set("loaded");
             }))));
 }
 
@@ -32,21 +32,21 @@
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.SetCellValue<int>(), 6000, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 99);
-                p.Element("keyed-status").SetText("setCellValue int called");
+                p.Component<FusionGrid>(GridId).SetCellValue<int>(6000, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 99);
+                p.Element("keyed-status").Text.Set("setCellValue int called");
             }))
         @(Html.NativeButton("keyed-set-risk", "Quarantine Risk (6001)")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.SetCellValue<string>(), 6001, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), "Quarantine");
-                p.Element("keyed-status").SetText("setCellValue string called");
+                p.Component<FusionGrid>(GridId).SetCellValue<string>(6001, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), "Quarantine");
+                p.Element("keyed-status").Text.Set("setCellValue string called");
             }))
         @(Html.NativeButton("keyed-set-row", "Replace Row (6002)")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.SetRowData<ResidentDirectoryGridItem>(), 6002, new ResidentDirectoryGridItem
+                p.Component<FusionGrid>(GridId).SetRowData<ResidentDirectoryGridItem>(6002, new ResidentDirectoryGridItem
                 {
                     ResidentId = 6002,
                     ResidentName = "Keyed Row",
@@ -59,7 +59,7 @@
                     OpenTasks = 4,
                     NextReviewDate = "2026-06-25"
                 });
-                p.Element("keyed-status").SetText("setRowData called");
+                p.Element("keyed-status").Text.Set("setRowData called");
             }))
     </native-hstack>
 

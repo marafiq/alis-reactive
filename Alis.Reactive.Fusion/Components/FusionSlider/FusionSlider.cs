@@ -5,6 +5,7 @@ using Syncfusion.EJ2.Inputs;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Slider, declared by the names its JavaScript API uses.
     /// </summary>
@@ -17,13 +18,13 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionSlider : FusionComponent, IInputComponent
     {
         /// <summary>The value of a single-handle slider.</summary>
-        public ComponentProperty<double> Value => Property<double>("value");
+        public Prop<double> Value => Prop<double>();
 
         /// <summary>The start and end of a range slider.</summary>
-        public ComponentProperty<double[]> RangeValue => Property<double[]>("value");
+        public Prop<double[]> RangeValue => Prop<double[]>("value");
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public ComponentMethod DataBind => Method("dataBind");
+        public void DataBind() => Call();
 
         /// <summary>Raised as the handle moves.</summary>
         public TypedEvent<FusionSliderChangeArgs> Change =>
@@ -38,23 +39,24 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionSlider.Change"/> and <see cref="FusionSlider.Changed"/>.</summary>
-    public class FusionSliderChangeArgs
+    public class FusionSliderChangeArgs : JsObject
     {
         /// <summary>The value after the move.</summary>
-        public double Value { get; set; }
+        public ReadOnly<double> Value => ReadOnly<double>();
 
         /// <summary>The value before the move.</summary>
-        public double PreviousValue { get; set; }
+        public ReadOnly<double> PreviousValue => ReadOnly<double>();
 
         /// <summary>The value as shown.</summary>
-        public string? Text { get; set; }
+        public ReadOnly<string> Text => ReadOnly<string>();
 
         /// <summary>The kind of move.</summary>
-        public string? Action { get; set; }
+        public ReadOnly<string> Action => ReadOnly<string>();
 
         /// <summary>Whether user interaction made the move.</summary>
-        public bool IsInteracted { get; set; }
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Creates a FusionSlider inside a field wrapper, bound to a model property.

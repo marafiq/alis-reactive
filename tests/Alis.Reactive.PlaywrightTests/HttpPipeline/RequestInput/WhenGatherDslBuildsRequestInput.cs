@@ -23,18 +23,17 @@ public sealed class WhenGatherDslBuildsRequestInput
         HtmlExtensions.On(Html, plan, trigger =>
             trigger.CustomEvent(Save, (args, pipeline) =>
             {
-                TypedPluginSource<int> count =
-                    pipeline.Plugin(metrics.Count)
-                        .Arg(args, x => x.Filter);
+                TypedSource<int> count =
+                    metrics.Count(args.Get(x => x.Filter));
 
                 var link = pipeline.Url<GatherRequestInputQuery>();
                 pipeline.Post("/residents/{residentId}/facilities/{facilityId}/notes")
                     .Gather<GatherRequestInputNote>(gather => gather
                         .Header("X-Trace", link.Get(q => q.Trace))
                         .Set(x => x.Literal, "yes")
-                        .Set(x => x.ResidentId, pipeline.Payload(args).Get(a => a.ResidentId))
+                        .Set(x => x.ResidentId, args.Get(a => a.ResidentId))
                         .Set(x => x.FacilityId, link.Get(q => q.FacilityId))
-                        .Set(x => x.Filter, pipeline.Payload(args).Get(a => a.Filter))
+                        .Set(x => x.Filter, args.Get(a => a.Filter))
                         .Set(x => x.Facility, link.Get(q => q.FacilityId))
                         .Set(x => x.Count, count));
             }));
@@ -98,8 +97,8 @@ public sealed class WhenGatherDslBuildsRequestInput
                 var schedule = pipeline.Component<FusionSchedule>("shift-schedule");
                 pipeline.Post("/schedule/events")
                     .Gather<GatherRequestInputSchedule>(gather => gather
-                        .Set(x => x.CurrentView, schedule.Get(c => c.CurrentView))
-                        .Set(x => x.Events, schedule.Get(c => c.GetEvents<object>())));
+                        .Set(x => x.CurrentView, schedule.CurrentView)
+                        .Set(x => x.Events, schedule.GetEvents<object>()));
             }));
 
         using var doc = JsonDocument.Parse(plan.RenderFormatted());
@@ -140,7 +139,7 @@ public sealed class WhenGatherDslBuildsRequestInput
                         success.Get("/facilities/{facilityId}/residents/{residentId}")
                             .Gather<GatherRequestInputFacilityResident>(gather => gather
                                 .Set(x => x.FacilityId, 3)
-                                .Set(x => x.ResidentId, json.Read(x => x.ResidentId)));
+                                .Set(x => x.ResidentId, json.Get(x => x.ResidentId)));
                     }));
             }));
 
@@ -167,18 +166,15 @@ public sealed class WhenGatherDslBuildsRequestInput
         HtmlExtensions.On(Html, plan, trigger =>
             trigger.CustomEvent(PluginRequested, (args, pipeline) =>
             {
-                TypedPluginSource<string> slug =
-                    pipeline.Plugin(plugin.Slugify)
-                        .Arg(args, x => x.Filter);
-                var token = pipeline.Plugin(plugin.Token);
+                TypedSource<string> slug =
+                    plugin.Slugify(args.Get(x => x.Filter));
+                var token = plugin.Token;
 
-                pipeline.DispatchWith(PluginRequestInput, payload => payload
+                pipeline.Dispatch(PluginRequestInput, payload => payload
                     .Set(x => x.Slug, slug)
                     .Set(x => x.Token, token));
 
-                pipeline.Plugin(plugin.Track)
-                    .Arg(slug)
-                    .Fire();
+                plugin.Track(slug);
             }));
 
         using var doc = JsonDocument.Parse(plan.RenderFormatted());
@@ -339,10 +335,9 @@ public sealed class WhenGatherDslBuildsRequestInput
         public GatherMetricsPlugin()
             : base("metrics")
         {
-            Count = Function<int>("count").Arg<string>();
         }
 
-        public PluginFunction<int> Count { get; }
+        public TypedSource<int> Count(Arg<string> text) => Invoke<int>(text);
     }
 
     private sealed class GatherRequestInputPlugin : Plugin
@@ -350,13 +345,12 @@ public sealed class WhenGatherDslBuildsRequestInput
         public GatherRequestInputPlugin()
             : base("gatherRequestInput")
         {
-            Token = Property<string>("token");
-            Slugify = Function<string>("slugify").Arg<string>();
-            Track = Command("track").Arg<string>();
         }
 
-        public PluginProperty<string> Token { get; }
-        public PluginFunction<string> Slugify { get; }
-        public PluginCommand Track { get; }
+        public ReadOnly<string> Token => ReadOnly<string>();
+
+        public TypedSource<string> Slugify(Arg<string> text) => Invoke<string>(text);
+
+        public void Track(Arg<string> name) => Call(name);
     }
 }

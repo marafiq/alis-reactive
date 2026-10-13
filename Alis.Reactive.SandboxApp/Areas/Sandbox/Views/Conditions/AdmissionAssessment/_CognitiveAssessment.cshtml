@@ -21,27 +21,27 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var comp = p.Component<FusionNumericTextBox>(m => m.CognitiveScore);
-                p.Element("score-echo").SetText(comp.Get(c => c.Value));
+                p.Element("score-echo").Text.Set(comp.Value);
 
-                p.When(comp.Get(c => c.Value)).Lt(15m)
+                p.When(comp.Value).Lt(15m)
                     .Then(t =>
                     {
-                        t.Component<NativeHiddenField>(m => m.CareUnit).Set(c => c.Value, "Memory Care");
-                        t.Element("cognitive-status").SetText("Severe Impairment — Memory Care");
+                        t.Component<NativeHiddenField>(m => m.CareUnit).Value.Set("Memory Care");
+                        t.Element("cognitive-status").Text.Set("Severe Impairment — Memory Care");
                     })
-                    .ElseIf(comp.Get(c => c.Value)).Lt(25m)
+                    .ElseIf(comp.Value).Lt(25m)
                     .Then(t =>
                     {
-                        t.Component<NativeHiddenField>(m => m.CareUnit).Set(c => c.Value, "Assisted Living with Memory Support");
-                        t.Element("cognitive-status").SetText("Moderate Impairment — Assisted Living + Memory");
+                        t.Component<NativeHiddenField>(m => m.CareUnit).Value.Set("Assisted Living with Memory Support");
+                        t.Element("cognitive-status").Text.Set("Moderate Impairment — Assisted Living + Memory");
                     })
                     .Else(e =>
                     {
-                        e.Component<NativeHiddenField>(m => m.CareUnit).Set(c => c.Value, "Standard Assisted Living");
-                        e.Element("cognitive-status").SetText("Mild/Normal — Standard");
+                        e.Component<NativeHiddenField>(m => m.CareUnit).Value.Set("Standard Assisted Living");
+                        e.Element("cognitive-status").Text.Set("Mild/Normal — Standard");
                     });
 
-                p.Element("cognitive-scored").SetText("scored");
+                p.Element("cognitive-scored").Text.Set("scored");
             }); }
 
         @{ Html.InputField(plan, m => m.Wanders, o => o.Label("Wanders"))
@@ -49,7 +49,7 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var sw = p.Component<FusionSwitch>(m => m.Wanders);
-                p.When(sw.Get(c => c.Checked)).Truthy()
+                p.When(sw.Checked).Truthy()
                     .Then(t => t.Element("wander-details").Show())
                     .Else(e => e.Element("wander-details").Hide());
             }); }
@@ -70,7 +70,7 @@
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
                     var freq = p.Component<FusionDropDownList>(m => m.WanderFrequency);
-                    p.When(freq.Get(c => c.Value)).Eq("Frequently")
+                    p.When(freq.Value).Eq("Frequently")
                         .Then(then =>
                         {
                             then.Element("elopement-spinner").Show();
@@ -78,7 +78,7 @@
                              .Gather<AlertElopementRequest>(g => g.Form(m => m.WanderFrequency, m => m.ResidentName))
                              .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
                              {
-                                 s.Element("elopement-result").SetText(json, x => x.Message);
+                                 s.Element("elopement-result").Text.Set(json.Get(x => x.Message));
                                  s.Element("elopement-result").Show();
                                  s.Element("elopement-spinner").Hide();
                              }));

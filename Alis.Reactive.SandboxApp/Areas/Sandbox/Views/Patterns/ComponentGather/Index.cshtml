@@ -159,30 +159,30 @@
                      .Response(r => r
                         .OnSuccess<GatherEchoResponse>((json, s) =>
                         {
-                            s.Element("submit-mode").SetText("JSON");
-                            s.Element("echo-resident-id").SetText(json, x => x.ResidentId);
-                            s.Element("echo-form-token").SetText(json, x => x.FormToken);
-                            s.Element("echo-resident-name").SetText(json, x => x.ResidentName);
-                            s.Element("echo-care-notes").SetText(json, x => x.CareNotes);
-                            s.Element("echo-has-allergies").SetText(json, x => x.HasAllergies);
-                            s.Element("echo-mobility-level").SetText(json, x => x.MobilityLevel);
-                            s.Element("echo-care-level").SetText(json, x => x.CareLevel);
-                            s.Element("echo-allergies").SetText(json, x => x.Allergies);
-                            s.Element("echo-monthly-rate").SetText(json, x => x.MonthlyRate);
-                            s.Element("echo-facility-id").SetText(json, x => x.FacilityId);
-                            s.Element("echo-physician-name").SetText(json, x => x.PhysicianName);
-                            s.Element("echo-admission-date").SetText(json, x => x.AdmissionDate);
-                            s.Element("echo-medication-time").SetText(json, x => x.MedicationTime);
-                            s.Element("echo-appointment-time").SetText(json, x => x.AppointmentTime);
-                            s.Element("echo-stay-start").SetText(json, x => x.StayPeriod);
-                            s.Element("echo-insurance-provider").SetText(json, x => x.InsuranceProvider);
-                            s.Element("echo-phone-number").SetText(json, x => x.PhoneNumber);
-                            s.Element("echo-care-plan").SetText(json, x => x.CarePlan);
-                            s.Element("echo-receive-notifications").SetText(json, x => x.ReceiveNotifications);
-                            s.Element("echo-dietary-restrictions").SetText(json, x => x.DietaryRestrictions);
-                            s.Element("echo-field-count").SetText(json, x => x.FieldCount);
-                            s.Element("echo-result").AddClass("text-green-600");
-                            s.Element("echo-result").RemoveClass("text-red-600");
+                            s.Element("submit-mode").Text.Set("JSON");
+                            s.Element("echo-resident-id").Text.Set(json.Get(x => x.ResidentId));
+                            s.Element("echo-form-token").Text.Set(json.Get(x => x.FormToken));
+                            s.Element("echo-resident-name").Text.Set(json.Get(x => x.ResidentName));
+                            s.Element("echo-care-notes").Text.Set(json.Get(x => x.CareNotes));
+                            s.Element("echo-has-allergies").Text.Set(json.Get(x => x.HasAllergies));
+                            s.Element("echo-mobility-level").Text.Set(json.Get(x => x.MobilityLevel));
+                            s.Element("echo-care-level").Text.Set(json.Get(x => x.CareLevel));
+                            s.Element("echo-allergies").Text.Set(json.Get(x => x.Allergies));
+                            s.Element("echo-monthly-rate").Text.Set(json.Get(x => x.MonthlyRate));
+                            s.Element("echo-facility-id").Text.Set(json.Get(x => x.FacilityId));
+                            s.Element("echo-physician-name").Text.Set(json.Get(x => x.PhysicianName));
+                            s.Element("echo-admission-date").Text.Set(json.Get(x => x.AdmissionDate));
+                            s.Element("echo-medication-time").Text.Set(json.Get(x => x.MedicationTime));
+                            s.Element("echo-appointment-time").Text.Set(json.Get(x => x.AppointmentTime));
+                            s.Element("echo-stay-start").Text.Set(json.Get(x => x.StayPeriod));
+                            s.Element("echo-insurance-provider").Text.Set(json.Get(x => x.InsuranceProvider));
+                            s.Element("echo-phone-number").Text.Set(json.Get(x => x.PhoneNumber));
+                            s.Element("echo-care-plan").Text.Set(json.Get(x => x.CarePlan));
+                            s.Element("echo-receive-notifications").Text.Set(json.Get(x => x.ReceiveNotifications));
+                            s.Element("echo-dietary-restrictions").Text.Set(json.Get(x => x.DietaryRestrictions));
+                            s.Element("echo-field-count").Text.Set(json.Get(x => x.FieldCount));
+                            s.Element("echo-result").ClassList.Add("text-green-600");
+                            s.Element("echo-result").ClassList.Remove("text-red-600");
                         })
                         .OnError(400, e => { e.ValidationErrors("gather-form"); })
                      );
@@ -198,30 +198,30 @@
                      .Response(r => r
                         .OnSuccess<GatherEchoResponse>((json, s) =>
                         {
-                            s.Element("submit-mode").SetText("FormData");
-                            s.Element("echo-resident-id").SetText(json, x => x.ResidentId);
-                            s.Element("echo-form-token").SetText(json, x => x.FormToken);
-                            s.Element("echo-resident-name").SetText(json, x => x.ResidentName);
-                            s.Element("echo-care-notes").SetText(json, x => x.CareNotes);
-                            s.Element("echo-has-allergies").SetText(json, x => x.HasAllergies);
-                            s.Element("echo-mobility-level").SetText(json, x => x.MobilityLevel);
-                            s.Element("echo-care-level").SetText(json, x => x.CareLevel);
-                            s.Element("echo-allergies").SetText(json, x => x.Allergies);
-                            s.Element("echo-monthly-rate").SetText(json, x => x.MonthlyRate);
-                            s.Element("echo-facility-id").SetText(json, x => x.FacilityId);
-                            s.Element("echo-physician-name").SetText(json, x => x.PhysicianName);
-                            s.Element("echo-admission-date").SetText(json, x => x.AdmissionDate);
-                            s.Element("echo-medication-time").SetText(json, x => x.MedicationTime);
-                            s.Element("echo-appointment-time").SetText(json, x => x.AppointmentTime);
-                            s.Element("echo-stay-start").SetText(json, x => x.StayPeriod);
-                            s.Element("echo-insurance-provider").SetText(json, x => x.InsuranceProvider);
-                            s.Element("echo-phone-number").SetText(json, x => x.PhoneNumber);
-                            s.Element("echo-care-plan").SetText(json, x => x.CarePlan);
-                            s.Element("echo-receive-notifications").SetText(json, x => x.ReceiveNotifications);
-                            s.Element("echo-dietary-restrictions").SetText(json, x => x.DietaryRestrictions);
-                            s.Element("echo-field-count").SetText(json, x => x.FieldCount);
-                            s.Element("echo-result").AddClass("text-green-600");
-                            s.Element("echo-result").RemoveClass("text-red-600");
+                            s.Element("submit-mode").Text.Set("FormData");
+                            s.Element("echo-resident-id").Text.Set(json.Get(x => x.ResidentId));
+                            s.Element("echo-form-token").Text.Set(json.Get(x => x.FormToken));
+                            s.Element("echo-resident-name").Text.Set(json.Get(x => x.ResidentName));
+                            s.Element("echo-care-notes").Text.Set(json.Get(x => x.CareNotes));
+                            s.Element("echo-has-allergies").Text.Set(json.Get(x => x.HasAllergies));
+                            s.Element("echo-mobility-level").Text.Set(json.Get(x => x.MobilityLevel));
+                            s.Element("echo-care-level").Text.Set(json.Get(x => x.CareLevel));
+                            s.Element("echo-allergies").Text.Set(json.Get(x => x.Allergies));
+                            s.Element("echo-monthly-rate").Text.Set(json.Get(x => x.MonthlyRate));
+                            s.Element("echo-facility-id").Text.Set(json.Get(x => x.FacilityId));
+                            s.Element("echo-physician-name").Text.Set(json.Get(x => x.PhysicianName));
+                            s.Element("echo-admission-date").Text.Set(json.Get(x => x.AdmissionDate));
+                            s.Element("echo-medication-time").Text.Set(json.Get(x => x.MedicationTime));
+                            s.Element("echo-appointment-time").Text.Set(json.Get(x => x.AppointmentTime));
+                            s.Element("echo-stay-start").Text.Set(json.Get(x => x.StayPeriod));
+                            s.Element("echo-insurance-provider").Text.Set(json.Get(x => x.InsuranceProvider));
+                            s.Element("echo-phone-number").Text.Set(json.Get(x => x.PhoneNumber));
+                            s.Element("echo-care-plan").Text.Set(json.Get(x => x.CarePlan));
+                            s.Element("echo-receive-notifications").Text.Set(json.Get(x => x.ReceiveNotifications));
+                            s.Element("echo-dietary-restrictions").Text.Set(json.Get(x => x.DietaryRestrictions));
+                            s.Element("echo-field-count").Text.Set(json.Get(x => x.FieldCount));
+                            s.Element("echo-result").ClassList.Add("text-green-600");
+                            s.Element("echo-result").ClassList.Remove("text-red-600");
                         })
                         .OnError(400, e => { e.ValidationErrors("gather-form"); })
                      );
@@ -234,14 +234,14 @@
                     p.Post(Url.SandboxRoute("EchoJson", "ComponentGather"))
                      .Gather(g => g.Set(
                             x => x.ResidentName,
-                            p.Component<NativeTextBox>(IdGenerator.For<ComponentGatherModel>(m => m.ResidentName)).Get(c => c.Value)))
+                            p.Component<NativeTextBox>(IdGenerator.For<ComponentGatherModel>(m => m.ResidentName)).Value))
                      .Response(r => r.OnSuccess<GatherEchoResponse>((json, s) =>
                      {
-                         s.Element("submit-mode").SetText("ExplicitId");
-                         s.Element("echo-resident-name").SetText(json, x => x.ResidentName);
-                         s.Element("echo-field-count").SetText(json, x => x.FieldCount);
-                         s.Element("echo-result").AddClass("text-green-600");
-                         s.Element("echo-result").RemoveClass("text-red-600");
+                         s.Element("submit-mode").Text.Set("ExplicitId");
+                         s.Element("echo-resident-name").Text.Set(json.Get(x => x.ResidentName));
+                         s.Element("echo-field-count").Text.Set(json.Get(x => x.FieldCount));
+                         s.Element("echo-result").ClassList.Add("text-green-600");
+                         s.Element("echo-result").ClassList.Remove("text-red-600");
                      }));
                 }))
         </native-hstack>

@@ -9,10 +9,10 @@
     // Declaration order matters across condition boundaries; the final SetText must win.
     Html.On(plan, t => t.CustomEvent<CommandOrderingPayload>(CommandOrderingEvents.OrderingTest, (args, p) =>
     {
-        p.Element("proof").SetText("before");
-        p.When(args, x => x.Level).Eq("high")
-            .Then(then => then.Element("proof").SetText("conditional"));
-        p.Element("proof").SetText("after");
+        p.Element("proof").Text.Set("before");
+        p.When(args.Get(x => x.Level)).Eq("high")
+            .Then(then => then.Element("proof").Text.Set("conditional"));
+        p.Element("proof").Text.Set("after");
     }));
 }
 

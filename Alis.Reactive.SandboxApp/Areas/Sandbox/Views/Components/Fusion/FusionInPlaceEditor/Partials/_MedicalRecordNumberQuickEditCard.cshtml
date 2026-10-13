@@ -28,12 +28,12 @@
              .Response(r => r
                 .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
                 {
-                    s.Element("card-mrn-display").SetText(json, x => x.DisplayValue);
+                    s.Element("card-mrn-display").Text.Set(json.Get(x => x.DisplayValue));
                 })
                 .OnError(400, e => e.ValidationErrors("card-mrn"))
                 .OnError<InPlaceEditorCommitError>((err, e) =>
                 {
-                    e.Element("card-mrn-error").SetText(err, x => x.Message);
+                    e.Element("card-mrn-error").Text.Set(err.Get(x => x.Message));
                 }));
         }); }
 

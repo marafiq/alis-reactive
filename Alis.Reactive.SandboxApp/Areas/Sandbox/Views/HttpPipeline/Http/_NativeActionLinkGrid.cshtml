@@ -15,15 +15,15 @@
                 .Then(t => t
                     .Post()
                     .Gather<HttpController.ActionLinkDeleteRequest>(g => g.Set(x => x.Id, row.Id))
-                    .WhileLoading(x => x.Element("native-action-link-status").SetText($"Deleting resident #{row.Id}..."))
+                    .WhileLoading(x => x.Element("native-action-link-status").Text.Set($"Deleting resident #{row.Id}..."))
                     .Response(r => r
                         .OnSuccess(x =>
                         {
-                            x.Element("native-action-link-status").SetText($"Deleted resident #{row.Id}");
+                            x.Element("native-action-link-status").Text.Set($"Deleted resident #{row.Id}");
                             x.Dispatch(HttpShowcaseEvents.NativeActionLinkGridRefresh);
                         })
-                        .OnError(400, x => x.Element("native-action-link-status").SetText($"Delete failed for resident #{row.Id}"))))
-                .Else(x => x.Element("native-action-link-status").SetText($"Cancelled delete for resident #{row.Id}")))
+                        .OnError(400, x => x.Element("native-action-link-status").Text.Set($"Delete failed for resident #{row.Id}"))))
+                .Else(x => x.Element("native-action-link-status").Text.Set($"Cancelled delete for resident #{row.Id}")))
                 .CssClass("text-sm font-medium text-red-600 hover:text-red-700")
                 .Attr("data-testid", $"native-action-link-{row.Id}")))
         </div>

@@ -8,13 +8,13 @@
     // Custom-event payload array is queried through element members inside the Reactive Plan.
     Html.On(plan, t => t.CustomEvent<ShiftReportPayload>(ShiftReportEvents.ShiftReport, (payload, p) =>
     {
-        var alerts = p.From(payload, x => x.Alerts);
+        var alerts = p.From(payload.Get(x => x.Alerts));
 
-        p.Element("alert-total").SetText(alerts.Count());
-        p.Element("critical-count").SetText(alerts.Count(a => a.Severity == "critical"));
-        p.Element("critical-priority-sum").SetText(
+        p.Element("alert-total").Text.Set(alerts.Count());
+        p.Element("critical-count").Text.Set(alerts.Count(a => a.Severity == "critical"));
+        p.Element("critical-priority-sum").Text.Set(
             alerts.Where(a => a.Severity == "critical").Sum(a => a.Priority));
-        p.Element("top-critical").SetText(
+        p.Element("top-critical").Text.Set(
             alerts.Where(a => a.Severity == "critical").OrderByDescending(a => a.Priority).Find(a => true, a => a.Resident));
 
         p.When(alerts.Any(a => a.Severity == "critical" && !a.Acknowledged)).Truthy()
@@ -26,15 +26,15 @@
         .Reactive(plan, evt => evt.Click, (args, p) =>
             p.Get(Url.SandboxRoute("Alerts", "ShiftReport"))
              .Response(r => r.OnSuccess<AlertsResponse>((json, s) =>
-                 s.DispatchWith<ShiftReportPayload>(ShiftReportEvents.ShiftReport, b =>
-                     b.Set(x => x.Alerts, json.Read(x => x.Alerts))))));
+                 s.Dispatch<ShiftReportPayload>(ShiftReportEvents.ShiftReport, b =>
+                     b.Set(x => x.Alerts, json.Get(x => x.Alerts))))));
 
     Html.NativeButton("clear-report-btn", "Generate Clear Report")
         .Reactive(plan, evt => evt.Click, (args, p) =>
             p.Get(Url.SandboxRoute("AlertsAllClear", "ShiftReport"))
              .Response(r => r.OnSuccess<AlertsResponse>((json, s) =>
-                 s.DispatchWith<ShiftReportPayload>(ShiftReportEvents.ShiftReport, b =>
-                     b.Set(x => x.Alerts, json.Read(x => x.Alerts))))));
+                 s.Dispatch<ShiftReportPayload>(ShiftReportEvents.ShiftReport, b =>
+                     b.Set(x => x.Alerts, json.Get(x => x.Alerts))))));
 }
 
 <native-vstack gap="Lg">

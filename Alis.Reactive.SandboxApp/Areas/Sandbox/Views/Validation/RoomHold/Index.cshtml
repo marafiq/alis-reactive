@@ -21,8 +21,8 @@
                     .CssClass(ChooseButton)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<NativeHiddenField>(m => m.RoomCode).Set(c => c.Value, "Maple 214");
-                        p.Element("selected-room").SetText("Maple 214");
+                        p.Component<NativeHiddenField>(m => m.RoomCode).Value.Set("Maple 214");
+                        p.Element("selected-room").Text.Set("Maple 214");
                     }))
             </native-vstack>
             <native-vstack gap="Sm">
@@ -32,8 +32,8 @@
                     .CssClass(ChooseButton)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<NativeHiddenField>(m => m.RoomCode).Set(c => c.Value, "Maple 216");
-                        p.Element("selected-room").SetText("Maple 216");
+                        p.Component<NativeHiddenField>(m => m.RoomCode).Value.Set("Maple 216");
+                        p.Element("selected-room").Text.Set("Maple 216");
                     }))
             </native-vstack>
         </native-hstack>
@@ -55,7 +55,7 @@
                  .Response(r => r
                     .OnSuccess<RoomHoldConfirmation>((json, s) =>
                     {
-                        s.Element("room-hold-status").SetText(json, x => x.Confirmation);
+                        s.Element("room-hold-status").Text.Set(json.Get(x => x.Confirmation));
                     })
                     .OnError(400, e => e.ValidationErrors("room-hold-form")));
             }))

@@ -20,7 +20,7 @@
            .Placeholder("555-0123"))
        .Reactive(evt => evt.Change, (args, p) =>
        {
-           p.Element("phone-format-status").SetText("Phone updated");
+           p.Element("phone-format-status").Text.Set("Phone updated");
        }); }
 
     @{ Html.InputField(plan, m => m.ReasonForNoContact, o => o.Label("Reason for No Contact"))

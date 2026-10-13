@@ -10,10 +10,12 @@
         p.Get(weekUrl)
             .Gather<ResidentWeekRequest>(g => g.Set(x => x.ResidentId, "ruth"))
             .Response(r => r.OnSuccess<ResidentWeekResponse>((week, s) =>
-                s.Component<VisitPlanner>(m => m.VisitSlots)
-                    .Set(c => c.Wing, week.Read(x => x.Wing))
-                    .Set(c => c.Capacity, week.Read(x => x.WeeklyVisits))
-                    .Set(c => c.Slots, week.Read(x => x.Slots))))));
+            {
+                    var visitSlots = s.Component<VisitPlanner>(m => m.VisitSlots);
+                    visitSlots.Wing.Set(week.Get(x => x.Wing));
+                    visitSlots.Capacity.Set(week.Get(x => x.WeeklyVisits));
+                    visitSlots.Slots.Set(week.Get(x => x.Slots));
+            }))));
 }
 
 <native-vstack gap="Sm">
@@ -21,10 +23,10 @@
         .VisitPlanner(capacity: 1)
         .Reactive(evt => evt.WeekChanged, (args, p) =>
         {
-            p.Element("companion-planned").SetText(args, x => x.Count);
+            p.Element("companion-planned").Text.Set(args.Count);
             p.Post(Url.SandboxRoute("CompanionHold", "VisitPlanner")).Gather(g => g.Form())
                 .Response(r => r.OnSuccess<CompanionHoldResponse>((hold, s) =>
-                    s.Element("companion-held").SetText(hold, x => x.Held)));
+                    s.Element("companion-held").Text.Set(hold.Get(x => x.Held))));
         }); }
     <native-text color="Secondary">Companion's visits planned: <span id="companion-planned">0</span> · Front desk holds: <span id="companion-held">nothing yet</span></native-text>
 </native-vstack>

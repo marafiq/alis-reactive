@@ -29,24 +29,24 @@
                     .ShowLabel(true))
                 .Reactive(evt => evt.ValueChanged, (args, p) =>
                 {
-                    p.Element("survey-rating").SetText(args, x => x.Value);
+                    p.Element("survey-rating").Text.Set(args.Value);
 
-                    p.When(args, x => x.Value).Gte(4d)
+                    p.When(args.Value).Gte(4d)
                         .Then(high => high.Element("survey-sentiment")
-                            .SetText("We're so glad your care is meeting your expectations."))
-                        .ElseIf(args, x => x.Value).Gte(1d)
+                            .Text.Set("We're so glad your care is meeting your expectations."))
+                        .ElseIf(args.Value).Gte(1d)
                         .Then(mid => mid.Element("survey-sentiment")
-                            .SetText("Thank you. A care manager will follow up to see how we can improve."))
+                            .Text.Set("Thank you. A care manager will follow up to see how we can improve."))
                         .Else(none => none.Element("survey-sentiment")
-                            .SetText("Please choose a rating to tell us how your care has been."));
+                            .Text.Set("Please choose a rating to tell us how your care has been."));
 
-                    p.Element("survey-change-note").SetText(args, x => x.PreviousValue);
+                    p.Element("survey-change-note").Text.Set(args.PreviousValue);
 
-                    p.When(args, x => x.IsInteracted).Truthy()
+                    p.When(args.IsInteracted).Truthy()
                         .Then(ready => ready.Element("survey-readiness")
-                            .SetText("Thank you for rating your care yourself — your rating is ready to submit."))
+                            .Text.Set("Thank you for rating your care yourself — your rating is ready to submit."))
                         .Else(cleared => cleared.Element("survey-readiness")
-                            .SetText("Your rating was cleared. Please rate your care to continue."));
+                            .Text.Set("Your rating was cleared. Please rate your care to continue."));
                 }); }
 
             <native-vstack gap="Xs">
@@ -62,15 +62,17 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionRating>(m => m.SatisfactionScore).Set(c => c.Value, Model.SatisfactionScore).Call(c => c.DataBind);
-                        p.Element("survey-rating").SetText(p.Component<FusionRating>(m => m.SatisfactionScore).Get(c => c.Value));
-                        p.Element("survey-sentiment").SetText("Restored the rating you submitted last month.");
+                        var satisfactionScore = p.Component<FusionRating>(m => m.SatisfactionScore);
+                        satisfactionScore.Value.Set(Model.SatisfactionScore);
+                        satisfactionScore.DataBind();
+                        p.Element("survey-rating").Text.Set(p.Component<FusionRating>(m => m.SatisfactionScore).Value);
+                        p.Element("survey-sentiment").Text.Set("Restored the rating you submitted last month.");
                     }))
                 @(Html.NativeButton("clear-rating", "Clear my rating")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionRating>(m => m.SatisfactionScore).Call(c => c.Reset);
+                        p.Component<FusionRating>(m => m.SatisfactionScore).Reset();
                     }))
             </native-hstack>
         </native-vstack>
@@ -85,13 +87,13 @@
                 {
                     var rating = p.Component<FusionRating>(m => m.SatisfactionScore);
                     p.Post(Url.SandboxRoute("Echo", "Rating"))
-                        .Gather<RatingEchoRequest>(g => g.Set(x => x.SatisfactionScore, rating.Get(c => c.Value)))
+                        .Gather<RatingEchoRequest>(g => g.Set(x => x.SatisfactionScore, rating.Value))
                         .Validate<RatingSurveyValidator>("survey-form")
                         .Response(r => r
                             .OnSuccess<RatingEchoResponse>((json, s) =>
                             {
-                                s.Element("survey-confirmation").SetText(json, x => x.Summary);
-                                s.Element("survey-confirmation-panel").RemoveClass("hidden");
+                                s.Element("survey-confirmation").Text.Set(json.Get(x => x.Summary));
+                                s.Element("survey-confirmation-panel").ClassList.Remove("hidden");
                             })
                             .OnError(400, e => e.ValidationErrors("survey-form")));
                 }))

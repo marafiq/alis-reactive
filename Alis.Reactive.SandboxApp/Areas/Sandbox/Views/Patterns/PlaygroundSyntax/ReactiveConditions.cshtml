@@ -29,33 +29,33 @@
                    .Items(statusItems))
                .Reactive(evt => evt.Change, (args, p) =>
                {
-                   p.When(args, x => x.Value).Eq("active")
+                   p.When(args.Value).Eq("active")
                        .Then(then =>
                        {
-                           then.Component<FusionNumericTextBox>(m => m.Amount).Set(c => c.Value, 100);
-                           then.Component<NativeDropDown>(m => m.Address!.City).Set(c => c.Value, "seattle");
-                           then.Element("status-result").SetText("Active: Amount=100, City=Seattle");
-                           then.Element("status-result").AddClass("text-emerald-700");
-                           then.Element("status-result").RemoveClass("text-amber-600");
-                           then.Element("status-result").RemoveClass("text-slate-500");
+                           then.Component<FusionNumericTextBox>(m => m.Amount).Value.Set(100);
+                           then.Component<NativeDropDown>(m => m.Address!.City).Value.Set("seattle");
+                           then.Element("status-result").Text.Set("Active: Amount=100, City=Seattle");
+                           then.Element("status-result").ClassList.Add("text-emerald-700");
+                           then.Element("status-result").ClassList.Remove("text-amber-600");
+                           then.Element("status-result").ClassList.Remove("text-slate-500");
                            then.Element("address-section").Show();
                        })
-                       .ElseIf(args, x => x.Value).Eq("inactive")
+                       .ElseIf(args.Value).Eq("inactive")
                        .Then(then =>
                        {
-                           then.Component<FusionNumericTextBox>(m => m.Amount).Set(c => c.Value, 0);
-                           then.Element("status-result").SetText("Inactive: Amount=0, address hidden");
-                           then.Element("status-result").AddClass("text-amber-600");
-                           then.Element("status-result").RemoveClass("text-emerald-700");
-                           then.Element("status-result").RemoveClass("text-slate-500");
+                           then.Component<FusionNumericTextBox>(m => m.Amount).Value.Set(0);
+                           then.Element("status-result").Text.Set("Inactive: Amount=0, address hidden");
+                           then.Element("status-result").ClassList.Add("text-amber-600");
+                           then.Element("status-result").ClassList.Remove("text-emerald-700");
+                           then.Element("status-result").ClassList.Remove("text-slate-500");
                            then.Element("address-section").Hide();
                        })
                        .Else(else_ =>
                        {
-                           else_.Element("status-result").SetText("Pending or empty");
-                           else_.Element("status-result").AddClass("text-slate-500");
-                           else_.Element("status-result").RemoveClass("text-emerald-700");
-                           else_.Element("status-result").RemoveClass("text-amber-600");
+                           else_.Element("status-result").Text.Set("Pending or empty");
+                           else_.Element("status-result").ClassList.Add("text-slate-500");
+                           else_.Element("status-result").ClassList.Remove("text-emerald-700");
+                           else_.Element("status-result").ClassList.Remove("text-amber-600");
                            else_.Element("address-section").Show();
                        });
                }); }
@@ -65,28 +65,28 @@
                    .Min(0).Max(99999).Step(100))
                .Reactive(evt => evt.Change, (args, p) =>
                {
-                   p.When(args, x => x.Value).Gte(5000m)
+                   p.When(args.Value).Gte(5000m)
                        .Then(then =>
                        {
-                           then.Element("amount-tier").SetText("High value order");
-                           then.Element("amount-tier").AddClass("text-rose-600");
-                           then.Element("amount-tier").RemoveClass("text-sky-600");
-                           then.Element("amount-tier").RemoveClass("text-slate-500");
+                           then.Element("amount-tier").Text.Set("High value order");
+                           then.Element("amount-tier").ClassList.Add("text-rose-600");
+                           then.Element("amount-tier").ClassList.Remove("text-sky-600");
+                           then.Element("amount-tier").ClassList.Remove("text-slate-500");
                        })
-                       .ElseIf(args, x => x.Value).Gte(1000m)
+                       .ElseIf(args.Value).Gte(1000m)
                        .Then(then =>
                        {
-                           then.Element("amount-tier").SetText("Standard order");
-                           then.Element("amount-tier").AddClass("text-sky-600");
-                           then.Element("amount-tier").RemoveClass("text-rose-600");
-                           then.Element("amount-tier").RemoveClass("text-slate-500");
+                           then.Element("amount-tier").Text.Set("Standard order");
+                           then.Element("amount-tier").ClassList.Add("text-sky-600");
+                           then.Element("amount-tier").ClassList.Remove("text-rose-600");
+                           then.Element("amount-tier").ClassList.Remove("text-slate-500");
                        })
                        .Else(else_ =>
                        {
-                           else_.Element("amount-tier").SetText("Small order");
-                           else_.Element("amount-tier").AddClass("text-slate-500");
-                           else_.Element("amount-tier").RemoveClass("text-rose-600");
-                           else_.Element("amount-tier").RemoveClass("text-sky-600");
+                           else_.Element("amount-tier").Text.Set("Small order");
+                           else_.Element("amount-tier").ClassList.Add("text-slate-500");
+                           else_.Element("amount-tier").ClassList.Remove("text-rose-600");
+                           else_.Element("amount-tier").ClassList.Remove("text-sky-600");
                        });
                }); }
         </native-grid>
@@ -98,32 +98,32 @@
                    .Items(cityItems))
                .Reactive(evt => evt.Change, (args, p) =>
                {
-                   p.When(args, x => x.Value).Eq("seattle")
+                   p.When(args.Value).Eq("seattle")
                        .Then(then =>
                        {
-                           then.Component<NativeDropDown>(m => m.Address!.State).Set(c => c.Value, "WA");
-                           then.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).Set(c => c.Value, 98101);
-                           then.Element("city-auto").SetText("Auto-filled: WA, 98101");
+                           then.Component<NativeDropDown>(m => m.Address!.State).Value.Set("WA");
+                           then.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).Value.Set(98101);
+                           then.Element("city-auto").Text.Set("Auto-filled: WA, 98101");
                        })
-                       .ElseIf(args, x => x.Value).Eq("portland")
+                       .ElseIf(args.Value).Eq("portland")
                        .Then(then =>
                        {
-                           then.Component<NativeDropDown>(m => m.Address!.State).Set(c => c.Value, "OR");
-                           then.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).Set(c => c.Value, 97201);
-                           then.Element("city-auto").SetText("Auto-filled: OR, 97201");
+                           then.Component<NativeDropDown>(m => m.Address!.State).Value.Set("OR");
+                           then.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).Value.Set(97201);
+                           then.Element("city-auto").Text.Set("Auto-filled: OR, 97201");
                        })
-                       .ElseIf(args, x => x.Value).Eq("denver")
+                       .ElseIf(args.Value).Eq("denver")
                        .Then(then =>
                        {
-                           then.Component<NativeDropDown>(m => m.Address!.State).Set(c => c.Value, "CO");
-                           then.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).Set(c => c.Value, 80201);
-                           then.Element("city-auto").SetText("Auto-filled: CO, 80201");
+                           then.Component<NativeDropDown>(m => m.Address!.State).Value.Set("CO");
+                           then.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).Value.Set(80201);
+                           then.Element("city-auto").Text.Set("Auto-filled: CO, 80201");
                        })
                        .Else(else_ =>
                        {
-                           else_.Component<NativeDropDown>(m => m.Address!.State).Set(c => c.Value, "");
-                           else_.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).Set(c => c.Value, 0);
-                           else_.Element("city-auto").SetText("Select a city");
+                           else_.Component<NativeDropDown>(m => m.Address!.State).Value.Set("");
+                           else_.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).Value.Set(0);
+                           else_.Element("city-auto").Text.Set("Select a city");
                        });
                }); }
 

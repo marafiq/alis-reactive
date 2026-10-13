@@ -40,10 +40,10 @@
                     .Response(r => r
                         .OnSuccess<FusionStepperWizardSaveResponse>((json, s) =>
                         {
-                            s.Component<NativeHiddenField>(m => m.WizardId).Set(c => c.Value, json.Read(x => x.WizardId));
-                            s.Component<NativeHiddenField, FusionStepperWizardShellModel>(m => m.MaxUnlockedStep).Set(c => c.Value, "1");
-                            s.Component<FusionStepper>(StepperId).Set(c => c.ActiveStep, 1);
-                            s.Element("stepper-wizard-status").SetText(json, x => x.Message);
+                            s.Component<NativeHiddenField>(m => m.WizardId).Value.Set(json.Get(x => x.WizardId));
+                            s.Component<NativeHiddenField, FusionStepperWizardShellModel>(m => m.MaxUnlockedStep).Value.Set("1");
+                            s.Component<FusionStepper>(StepperId).ActiveStep.Set(1);
+                            s.Element("stepper-wizard-status").Text.Set(json.Get(x => x.Message));
                         })
                         .OnError(400, e => e.ValidationErrors(FormId)));
             }))

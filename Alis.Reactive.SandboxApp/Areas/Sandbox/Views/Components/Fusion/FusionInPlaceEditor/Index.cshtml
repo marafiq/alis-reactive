@@ -76,10 +76,10 @@
                      .Response(r => r
                         .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
                         {
-                            s.Element("profile-status").SetText("Saved");
+                            s.Element("profile-status").Text.Set("Saved");
                         })
                         .OnError(400, e => e.ValidationErrors("resident-form"))
-                        .OnError(e => e.Element("profile-status").SetText("Failed")));
+                        .OnError(e => e.Element("profile-status").Text.Set("Failed")));
                 }))
         </native-hstack>
 

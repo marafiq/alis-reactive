@@ -106,7 +106,7 @@ namespace Alis.Reactive.Builders
         /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Named{TPayload}(string)"/>.</param>
         /// <param name="configure">Maps payload fields to value sources or literals.</param>
         /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
-        public PipelineBuilder<TModel> DispatchWith<TPayload>(
+        public PipelineBuilder<TModel> Dispatch<TPayload>(
             AppEvent<TPayload> appEvent,
             Action<DispatchPayloadBuilder<TPayload, TModel>> configure)
             where TPayload : class, new()
@@ -118,72 +118,47 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Targets a controlled DOM element for updates in this Reactive Plan pipeline.</summary>
-        /// <param name="elementId">Markup ID resolved directly by the runtime.</param>
-        /// <returns>Element update builder.</returns>
-        public ElementBuilder<TModel> Element(string elementId)
-        {
-            return new ElementBuilder<TModel>(this, elementId);
-        }
+        /// <summary>The element the view rendered with this id: its text, HTML, classes and whether it shows.</summary>
+        /// <param name="elementId">The element's id.</param>
+        /// <example><c>p.Element("status").Text.Set("Saved")</c></example>
+        public HtmlElement Element(string elementId) => new HtmlElement(Context, elementId);
 
-        /// <summary>Targets the component registered for a property on this plan's view model.</summary>
-        /// <typeparam name="TComponent">Component contract that determines available reads, writes, and calls.</typeparam>
-        /// <param name="expr">
-        /// Model property expression used to compute the same controlled ID as the markup helper.
-        /// </param>
-        /// <returns>An authoring handle joined to the generated component ID.</returns>
-        public ComponentRef<TComponent, TModel> Component<TComponent>(
-            Expression<Func<TModel, object?>> expr)
-            where TComponent : IComponent, new()
-        {
-            var elementId = IdGenerator.For<TModel, object?>(expr);
-            return new ComponentRef<TComponent, TModel>(elementId, this);
-        }
+        /// <summary>The component the view rendered for a member of this plan's model.</summary>
+        /// <typeparam name="TComponent">The component's declaration, whose members the page uses directly.</typeparam>
+        /// <param name="expr">The model member the component is bound to; its id is derived as the render helper derives it.</param>
+        /// <returns>The component: <c>rate.Min.Set(0m)</c>, <c>rate.Increment()</c>, <c>p.When(rate.Value).Gt(1m)</c>.</returns>
+        public TComponent Component<TComponent>(Expression<Func<TModel, object?>> expr)
+            where TComponent : JsObject, IComponent, new() =>
+            Live<TComponent>(ComponentObjectTarget.For<TComponent>(IdGenerator.For<TModel, object?>(expr)));
 
-        /// <summary>Targets the component registered for a property on another view model type.</summary>
-        /// <typeparam name="TComponent">Component contract that determines available reads, writes, and calls.</typeparam>
-        /// <typeparam name="TOtherModel">View model type used when the component was rendered.</typeparam>
-        /// <param name="expr">
-        /// Other model's property expression used to compute the same controlled ID as the markup helper.
-        /// </param>
-        /// <returns>An authoring handle joined to the other model's generated component ID.</returns>
-        public ComponentRef<TComponent, TModel> Component<TComponent, TOtherModel>(
-            Expression<Func<TOtherModel, object?>> expr)
-            where TComponent : IComponent, new()
-            where TOtherModel : class
-        {
-            var elementId = IdGenerator.For<TOtherModel, object?>(expr);
-            return new ComponentRef<TComponent, TModel>(elementId, this);
-        }
+        /// <summary>The component the view rendered for a member of another model, such as a partial's.</summary>
+        /// <typeparam name="TComponent">The component's declaration.</typeparam>
+        /// <typeparam name="TOtherModel">The model the component was rendered for.</typeparam>
+        /// <param name="expr">The other model's member the component is bound to.</param>
+        public TComponent Component<TComponent, TOtherModel>(Expression<Func<TOtherModel, object?>> expr)
+            where TComponent : JsObject, IComponent, new()
+            where TOtherModel : class =>
+            Live<TComponent>(ComponentObjectTarget.For<TComponent>(IdGenerator.For<TOtherModel, object?>(expr)));
 
-        /// <summary>Targets a component registered with an explicit markup ID.</summary>
-        /// <typeparam name="TComponent">Component contract that determines available reads, writes, and calls.</typeparam>
-        /// <param name="refId">Controlled component ID already present in markup.</param>
-        /// <returns>An authoring handle joined to the explicit component ID.</returns>
-        public ComponentRef<TComponent, TModel> Component<TComponent>(string refId)
-            where TComponent : IComponent, new()
-        {
-            return new ComponentRef<TComponent, TModel>(refId, this);
-        }
+        /// <summary>The component the view rendered with an id it chose.</summary>
+        /// <typeparam name="TComponent">The component's declaration.</typeparam>
+        /// <param name="refId">The component's element id.</param>
+        public TComponent Component<TComponent>(string refId)
+            where TComponent : JsObject, IComponent, new() =>
+            Live<TComponent>(ComponentObjectTarget.For<TComponent>(refId));
 
-        /// <summary>Targets a layout-owned app component by the ID declared by its component contract.</summary>
-        /// <typeparam name="TComponent">App-level component contract that supplies its default ID.</typeparam>
-        /// <returns>An authoring handle joined to the contract's default component ID.</returns>
-        public ComponentRef<TComponent, TModel> Component<TComponent>()
-            where TComponent : IAppLevelComponent, new()
-        {
-            return new ComponentRef<TComponent, TModel>(
-                ComponentObjectTarget.ForLayout<TComponent>(),
-                this);
-        }
+        /// <summary>An app object the layout renders once, at the id its declaration names: Toast, Drawer, Loader.</summary>
+        /// <typeparam name="TComponent">The app object's declaration.</typeparam>
+        public TComponent Component<TComponent>()
+            where TComponent : JsObject, IAppLevelComponent, new() =>
+            Live<TComponent>(ComponentObjectTarget.ForLayout<TComponent>());
 
-        /// <summary>Targets the JavaScript object the triggering event handed its callback.</summary>
-        /// <typeparam name="TArgs">The event's payload type.</typeparam>
-        /// <param name="args">The typed payload the reaction received, for example <c>(args, p) =&gt; p.Payload(args)</c>.</param>
-        /// <returns>An authoring handle that writes the payload's fields and calls its methods.</returns>
-        public PayloadRef<TArgs, TModel> Payload<TArgs>(TArgs args)
+        private TComponent Live<TComponent>(ComponentObjectTarget target)
+            where TComponent : JsObject, new()
         {
-            return new PayloadRef<TArgs, TModel>(args, this);
+            var component = new TComponent();
+            component.BindTo(new ComponentBinding(target, Context));
+            return component;
         }
 
         /// <summary>
@@ -193,38 +168,6 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TQuery">The query class.</typeparam>
         /// <returns>The query, whose members are value sources.</returns>
         public UrlQuery<TQuery> Url<TQuery>() where TQuery : class => new UrlQuery<TQuery>();
-
-        /// <summary>Reads the return value declared by a reusable plugin function.</summary>
-        /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="function">Plugin function carrying the plugin key, target member, argument contract, and return shape.</param>
-        /// <returns>Plugin function call builder.</returns>
-        public PluginMemberBuilder<T, TModel> Plugin<T>(PluginFunction<T> function)
-        {
-            if (function == null) throw new System.ArgumentNullException(nameof(function));
-            Context.DeclarePluginMethod(PluginMethodRequirement.Function(function));
-            return new PluginMemberBuilder<T, TModel>(function);
-        }
-
-        /// <summary>Reads the value declared by a reusable plugin property.</summary>
-        /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="property">Plugin property carrying the plugin key, property member, and value shape.</param>
-        /// <returns>Typed plugin property value source.</returns>
-        public Conditions.TypedPluginPropertySource<T> Plugin<T>(PluginProperty<T> property)
-        {
-            if (property == null) throw new System.ArgumentNullException(nameof(property));
-            Context.DeclarePluginProperty(PluginPropertyRequirement.Read(property));
-            return new Conditions.TypedPluginPropertySource<T>(property.PropertyId);
-        }
-
-        /// <summary>Emits a plugin-call reaction from a reusable plugin command.</summary>
-        /// <param name="command">Plugin command carrying the plugin key, target member, and argument contract.</param>
-        /// <returns>Plugin command call builder.</returns>
-        public PluginCallBuilder<TModel> Plugin(PluginCommand command)
-        {
-            if (command == null) throw new System.ArgumentNullException(nameof(command));
-            Context.DeclarePluginMethod(PluginMethodRequirement.Command(command));
-            return new PluginCallBuilder<TModel>(command, this);
-        }
 
         /// <summary>Appends a reaction that renders accumulated validation errors into a container.</summary>
         /// <param name="formId">Validation error container element ID.</param>

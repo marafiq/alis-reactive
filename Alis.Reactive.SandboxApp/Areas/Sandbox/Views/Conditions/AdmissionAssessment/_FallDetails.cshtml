@@ -19,7 +19,7 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var sw = p.Component<FusionSwitch>(m => m.CausedInjury);
-                p.When(sw.Get(c => c.Checked)).Truthy()
+                p.When(sw.Checked).Truthy()
                     .Then(t => t.Element("injury-details").Show())
                     .Else(e => e.Element("injury-details").Hide());
             }); }
@@ -34,7 +34,7 @@
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
                     var inj = p.Component<FusionDropDownList>(m => m.InjuryType);
-                    p.When(inj.Get(c => c.Value)).Eq("Head Injury")
+                    p.When(inj.Value).Eq("Head Injury")
                         .Then(then =>
                         {
                             then.Element("neuro-spinner").Show();
@@ -42,14 +42,14 @@
                              .Gather<AlertNeuroRequest>(g => g.Form(m => m.InjuryType, m => m.ResidentName))
                              .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
                              {
-                                 s.Element("neuro-result").SetText(json, x => x.Message);
+                                 s.Element("neuro-result").Text.Set(json.Get(x => x.Message));
                                  s.Element("neuro-result").Show();
                                  s.Element("neuro-spinner").Hide();
                              }));
                         })
                         .Else(e =>
                         {
-                            e.Element("neuro-result").SetText("Noted");
+                            e.Element("neuro-result").Text.Set("Noted");
                             e.Element("neuro-result").Show();
                         });
                 }); }

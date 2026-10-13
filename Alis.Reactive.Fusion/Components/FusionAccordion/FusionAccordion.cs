@@ -9,6 +9,7 @@ using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.Components
 {
+#nullable disable annotations
     /// <summary>
     /// The Syncfusion Accordion, declared by the names its JavaScript API uses.
     /// </summary>
@@ -20,10 +21,10 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionAccordion : FusionComponent
     {
         /// <summary>Expands (<see langword="true"/>) or collapses (<see langword="false"/>) the item at a zero-based index.</summary>
-        public ComponentMethod<bool, int> ExpandItem => Method<bool, int>("expandItem");
+        public void ExpandItem(Arg<bool> first, Arg<int> second) => Call(first, second);
 
         /// <summary>Enables (<see langword="true"/>) or disables (<see langword="false"/>) the item at a zero-based index.</summary>
-        public ComponentMethod<int, bool> EnableItem => Method<int, bool>("enableItem");
+        public void EnableItem(Arg<int> first, Arg<bool> second) => Call(first, second);
 
         /// <summary>Raised after an item expands or collapses.</summary>
         public TypedEvent<FusionAccordionExpandedArgs> Expanded =>
@@ -31,14 +32,15 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionAccordion.Expanded"/>.</summary>
-    public class FusionAccordionExpandedArgs
+    public class FusionAccordionExpandedArgs : JsObject
     {
         /// <summary>Index of the item that changed.</summary>
-        public int Index { get; set; }
+        public ReadOnly<int> Index => ReadOnly<int>();
 
         /// <summary>Whether the item is now expanded.</summary>
-        public bool IsExpanded { get; set; }
+        public ReadOnly<bool> IsExpanded => ReadOnly<bool>();
     }
+#nullable restore annotations
 
     /// <summary>
     /// Renders the component for a plan, ready for <c>.Reactive(...)</c>.

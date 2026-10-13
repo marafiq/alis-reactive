@@ -13,7 +13,7 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Element("command-state").SetText("ready");
+        p.Element("command-state").Text.Set("ready");
     }));
 }
 
@@ -28,19 +28,19 @@
                 .Height("210px"))
                 .Reactive(evt => evt.Select, (args, p) =>
                 {
-                    p.Element("selected-text").SetText(args, x => x.Text);
-                    p.Element("selected-index").SetText(args, x => x.Index);
-                    p.Element("selected-interacted").SetText(args, x => x.IsInteracted);
-                    p.When(args, x => x.Text).Eq("Alice")
-                        .Then(t => t.Element("selected-kind").SetText("primary"))
-                        .Else(e => e.Element("selected-kind").SetText("other"));
-                    p.When(args, x => x.Text).Eq("Carey")
+                    p.Element("selected-text").Text.Set(args.Text);
+                    p.Element("selected-index").Text.Set(args.Index);
+                    p.Element("selected-interacted").Text.Set(args.IsInteracted);
+                    p.When(args.Text).Eq("Alice")
+                        .Then(t => t.Element("selected-kind").Text.Set("primary"))
+                        .Else(e => e.Element("selected-kind").Text.Set("other"));
+                    p.When(args.Text).Eq("Carey")
                         .Then(t =>
                         {
-                            t.Payload(args).Set(a => a.Cancel, true);
-                            t.Element("cancel-state").SetText("cancelled");
+                            args.Cancel.Set(true);
+                            t.Element("cancel-state").Text.Set("cancelled");
                         })
-                        .Else(e => e.Element("cancel-state").SetText("allowed"));
+                        .Else(e => e.Element("cancel-state").Text.Set("allowed"));
                 }))
         </native-card-body></native-card>
 
@@ -52,11 +52,11 @@
                 .Height("210px"))
                 .Reactive(evt => evt.Select, (args, p) =>
                 {
-                    p.Element("task-selected-text").SetText(args, x => x.Text);
-                    p.Element("task-checked").SetText(args, x => x.IsChecked);
-                    p.When(args, x => x.IsChecked).Truthy()
-                        .Then(t => t.Element("task-check-state").SetText("checked"))
-                        .Else(e => e.Element("task-check-state").SetText("unchecked"));
+                    p.Element("task-selected-text").Text.Set(args.Text);
+                    p.Element("task-checked").Text.Set(args.IsChecked);
+                    p.When(args.IsChecked).Truthy()
+                        .Then(t => t.Element("task-check-state").Text.Set("checked"))
+                        .Else(e => e.Element("task-check-state").Text.Set("unchecked"));
                 }))
         </native-card-body></native-card>
     </native-grid>
@@ -68,29 +68,29 @@
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionListView>(ResidentListId).Call(c => c.SelectItem, "Bennett");
-                    p.Element("command-state").SetText("selected Bennett");
+                    p.Component<FusionListView>(ResidentListId).SelectItem("Bennett");
+                    p.Element("command-state").Text.Set("selected Bennett");
                 }))
             @(Html.NativeButton("unselect-bennett-btn", "Unselect Bennett")
                 .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionListView>(ResidentListId).Call(c => c.UnselectItem, "Bennett");
-                    p.Element("command-state").SetText("unselected Bennett");
+                    p.Component<FusionListView>(ResidentListId).UnselectItem("Bennett");
+                    p.Element("command-state").Text.Set("unselected Bennett");
                 }))
             @(Html.NativeButton("check-all-btn", "Check All")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionListView>(TaskListId).Call(c => c.CheckAllItems);
-                    p.Element("task-command-state").SetText("checked all");
+                    p.Component<FusionListView>(TaskListId).CheckAllItems();
+                    p.Element("task-command-state").Text.Set("checked all");
                 }))
             @(Html.NativeButton("uncheck-all-btn", "Uncheck All")
                 .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionListView>(TaskListId).Call(c => c.UncheckAllItems);
-                    p.Element("task-command-state").SetText("unchecked all");
+                    p.Component<FusionListView>(TaskListId).UncheckAllItems();
+                    p.Element("task-command-state").Text.Set("unchecked all");
                 }))
         </native-hstack>
     </native-card-body></native-card>

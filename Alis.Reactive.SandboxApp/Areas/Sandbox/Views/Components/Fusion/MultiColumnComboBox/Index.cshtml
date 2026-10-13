@@ -9,9 +9,9 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<FusionMultiColumnComboBox>(m => m.Facility).Set(c => c.Value, "1");
+        p.Component<FusionMultiColumnComboBox>(m => m.Facility).Value.Set("1");
         var comp = p.Component<FusionMultiColumnComboBox>(m => m.Facility);
-        p.Element("value-echo").SetText(comp.Get(c => c.Value));
+        p.Element("value-echo").Text.Set(comp.Value);
     }));
 
     Html.On(plan, t => t.CustomEvent(MultiColumnComboBoxEvents.DoGather, p =>
@@ -21,7 +21,7 @@
          .Response(r => r
             .OnSuccess(s =>
             {
-                s.Element("gather-result").SetText("gathered");
+                s.Element("gather-result").Text.Set("gathered");
             }));
     }));
 }
@@ -53,16 +53,16 @@
                     .PopupWidth("400"))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("change-value").SetText(args, x => x.Value);
-                    p.When(args, x => x.Value).Eq("1")
-                        .Then(t => t.Element("args-condition").SetText("sunrise manor selected"))
-                        .Else(e => e.Element("args-condition").SetText("other facility"));
+                    p.Element("change-value").Text.Set(args.Value);
+                    p.When(args.Value).Eq("1")
+                        .Then(t => t.Element("args-condition").Text.Set("sunrise manor selected"))
+                        .Else(e => e.Element("args-condition").Text.Set("other facility"));
                     var comp = p.Component<FusionMultiColumnComboBox>(m => m.Facility);
-                    p.When(comp.Get(c => c.Value)).NotNull()
+                    p.When(comp.Value).NotNull()
                         .Then(then =>
                         {
                             then.Element("selected-indicator").Show();
-                            then.Element("selected-indicator").SetText("selected");
+                            then.Element("selected-indicator").Text.Set("selected");
                         })
                         .Else(else_ =>
                         {
@@ -75,13 +75,13 @@
                 .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionMultiColumnComboBox>(m => m.Facility).Call(c => c.ShowPopup);
+                    p.Component<FusionMultiColumnComboBox>(m => m.Facility).ShowPopup();
                 }))
             @(Html.NativeButton("hide-popup-btn", "Hide Popup")
                 .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionMultiColumnComboBox>(m => m.Facility).Call(c => c.HidePopup);
+                    p.Component<FusionMultiColumnComboBox>(m => m.Facility).HidePopup();
                 }))
         </native-hstack>
         <p class="font-mono text-sm mt-4">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>

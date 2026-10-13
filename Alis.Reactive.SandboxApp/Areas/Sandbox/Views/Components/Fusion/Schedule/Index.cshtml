@@ -33,40 +33,41 @@
 
     Html.On(plan, t => t.CustomEvent(PointInTimeScheduleEvents.ScheduleAssignmentSaved, p =>
     {
-        p.Element("status").SetText("Refreshing after save...");
+        p.Element("status").Text.Set("Refreshing after save...");
         p.Get("/api/schedule/assignments")
          .Gather<ScheduleAssignmentsQuery>(g => g
              .Form(m => m.SelectedFacilityId)
-             .Set(x => x.CurrentView, p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView))
-             .Set(x => x.CurrentDate, p.Component<FusionSchedule>("shift-schedule").Get(c => c.SelectedDate)))
+             .Set(x => x.CurrentView, p.Component<FusionSchedule>("shift-schedule").CurrentView)
+             .Set(x => x.CurrentDate, p.Component<FusionSchedule>("shift-schedule").SelectedDate))
          .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
          {
-             s.Component<FusionSchedule>("shift-schedule")
-                 .Set(c => c.EventDataSource, json.Read(j => j.Assignments)).Call(c => c.DataBind);
-             s.Element("status").SetText("Refreshed after assignment");
-             s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
+             var shiftSchedule = s.Component<FusionSchedule>("shift-schedule");
+             shiftSchedule.EventDataSource.Set(json.Get(j => j.Assignments));
+             shiftSchedule.DataBind();
+             s.Element("status").Text.Set("Refreshed after assignment");
+             s.Element("unassigned-count").Text.Set(json.Get(j => j.UnassignedCount));
          }));
     }));
 
     // FusionTemplate.EventButton dispatches detail.id for the parent Active Plan to load the drawer form.
     Html.On(plan, t => t.CustomEvent<ScheduleActionPayload>(PointInTimeScheduleEvents.ScheduleEdit, (payload, p) =>
     {
-        p.Element("alis-drawer-title").SetText("Edit Shift Assignment");
-        p.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md);
+        p.Element("alis-drawer-title").Text.Set("Edit Shift Assignment");
+        p.Component<NativeDrawer>().Size.Set(DrawerSize.Md);
         p.Get(Url.SandboxRoute("EditForm", "Schedule"))
-         .Gather<EditAssignmentQuery>(g => g.Set(x => x.AssignmentId, p.Payload(payload).Get(a => a.Id)))
+         .Gather<EditAssignmentQuery>(g => g.Set(x => x.AssignmentId, payload.Get(a => a.Id)))
          .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
-        p.Component<NativeDrawer>().Call(c => c.Open);
+        p.Component<NativeDrawer>().Open();
     }));
 
     Html.On(plan, t => t.CustomEvent<ScheduleActionPayload>(PointInTimeScheduleEvents.ScheduleReassign, (payload, p) =>
     {
-        p.Element("alis-drawer-title").SetText("Reassign Shift");
-        p.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md);
+        p.Element("alis-drawer-title").Text.Set("Reassign Shift");
+        p.Component<NativeDrawer>().Size.Set(DrawerSize.Md);
         p.Get(Url.SandboxRoute("EditForm", "Schedule"))
-         .Gather<EditAssignmentQuery>(g => g.Set(x => x.AssignmentId, p.Payload(payload).Get(a => a.Id)))
+         .Gather<EditAssignmentQuery>(g => g.Set(x => x.AssignmentId, payload.Get(a => a.Id)))
          .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
-        p.Component<NativeDrawer>().Call(c => c.Open);
+        p.Component<NativeDrawer>().Open();
     }));
 
     Html.On(plan, t => t.DomReady(p =>
@@ -74,10 +75,11 @@
         p.Get("/api/schedule/assignments?selectedFacilityId=mystery-manor")
          .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
          {
-             s.Component<FusionSchedule>("shift-schedule")
-                 .Set(c => c.EventDataSource, json.Read(j => j.Assignments)).Call(c => c.DataBind);
-             s.Element("status").SetText("Schedule loaded");
-             s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
+             var shiftSchedule = s.Component<FusionSchedule>("shift-schedule");
+             shiftSchedule.EventDataSource.Set(json.Get(j => j.Assignments));
+             shiftSchedule.DataBind();
+             s.Element("status").Text.Set("Schedule loaded");
+             s.Element("unassigned-count").Text.Set(json.Get(j => j.UnassignedCount));
          }));
     }));
 }
@@ -99,18 +101,19 @@
                         .Value("mystery-manor"))
                     .Reactive(evt => evt.Change, (args, p) =>
                     {
-                        p.Element("status").SetText("Loading...");
+                        p.Element("status").Text.Set("Loading...");
                         p.Get("/api/schedule/assignments")
                          .Gather<ScheduleAssignmentsQuery>(g => g
                              .Form(m => m.SelectedFacilityId)
-                             .Set(x => x.CurrentView, p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView))
-                             .Set(x => x.CurrentDate, p.Component<FusionSchedule>("shift-schedule").Get(c => c.SelectedDate)))
+                             .Set(x => x.CurrentView, p.Component<FusionSchedule>("shift-schedule").CurrentView)
+                             .Set(x => x.CurrentDate, p.Component<FusionSchedule>("shift-schedule").SelectedDate))
                          .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                          {
-                             s.Component<FusionSchedule>("shift-schedule")
-                                 .Set(c => c.EventDataSource, json.Read(j => j.Assignments)).Call(c => c.DataBind);
-                             s.Element("status").SetText("Facility changed");
-                             s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
+                             var shiftSchedule = s.Component<FusionSchedule>("shift-schedule");
+                             shiftSchedule.EventDataSource.Set(json.Get(j => j.Assignments));
+                             shiftSchedule.DataBind();
+                             s.Element("status").Text.Set("Facility changed");
+                             s.Element("unassigned-count").Text.Set(json.Get(j => j.UnassignedCount));
                          }));
                     }); }
             <native-hstack gap="Sm" class="ml-auto text-sm">
@@ -124,7 +127,7 @@
                 .CssClass("px-4 py-2 rounded-md border border-border text-sm font-medium hover:bg-slate-50")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionSchedule>("shift-schedule").Call(c => c.Print);
+                    p.Component<FusionSchedule>("shift-schedule").Print();
                 }))
             @(Html.NativeButton("route-template-schedule-btn", "Audit View Route")
                 .CssClass("px-4 py-2 rounded-md border border-border text-sm font-medium hover:bg-slate-50")
@@ -133,19 +136,19 @@
                     p.Get("/api/schedule/view/{currentView}/echo")
                      .Gather<ScheduleViewRequest>(g => g.Set(
                          x => x.CurrentView,
-                         p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView)))
+                         p.Component<FusionSchedule>("shift-schedule").CurrentView))
                      .Response(r => r.OnSuccess<ScheduleViewRouteResponse>((json, s) =>
                      {
-                         s.Element("route-view").SetText(json, x => x.CurrentView);
+                         s.Element("route-view").Text.Set(json.Get(x => x.CurrentView));
                      })
                      .Chained(c => c
                          .Get("/api/schedule/view/{currentView}/summary")
                          .Gather<ScheduleViewRequest>(g => g.Set(
                              x => x.CurrentView,
-                             p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView)))
+                             p.Component<FusionSchedule>("shift-schedule").CurrentView))
                          .Response(r2 => r2.OnSuccess<ScheduleViewRouteResponse>((json, s) =>
                          {
-                             s.Element("route-view-summary").SetText(json, x => x.Summary);
+                             s.Element("route-view-summary").Text.Set(json.Get(x => x.Summary));
                          }))));
                 }))
             @(Html.NativeButton("audit-events-btn", "Audit Events")
@@ -155,10 +158,10 @@
                     p.Post("/api/schedule/events/audit")
                      .Gather<ScheduleEventsAuditRequest>(g => g.Set(
                          x => x.Events,
-                         p.Component<FusionSchedule>("shift-schedule").Get(c => c.GetEvents<ShiftAssignment>())))
+                         p.Component<FusionSchedule>("shift-schedule").GetEvents<ShiftAssignment>()))
                      .Response(r => r.OnSuccess<ScheduleEventsAuditResponse>((json, s) =>
                      {
-                         s.Element("schedule-events-count").SetText(json, x => x.Count);
+                         s.Element("schedule-events-count").Text.Set(json.Get(x => x.Count));
                      }));
                 }))
         </native-hstack>
@@ -211,90 +214,92 @@
             })
             .Reactive(evt => evt.CellClick, (args, p) =>
             {
-                p.Element("event-trace").SetText(args, x => x.StartTime);
-                p.Element("event-shift").SetText(args, x => x.GroupIndex);
+                p.Element("event-trace").Text.Set(args.StartTime);
+                p.Element("event-shift").Text.Set(args.GroupIndex);
 
                 p.Get(Url.SandboxRoute("NewAssignmentForm", "Schedule"))
                  .Gather<NewAssignmentQuery>(g => g
-                     .Set(x => x.StartTime, p.Payload(args).Get(a => a.StartTime))
-                     .Set(x => x.EndTime, p.Payload(args).Get(a => a.EndTime))
-                     .Set(x => x.ShiftId, p.Payload(args).Get(a => a.GroupIndex))
+                     .Set(x => x.StartTime, args.StartTime)
+                     .Set(x => x.EndTime, args.EndTime)
+                     .Set(x => x.ShiftId, args.GroupIndex)
                      .Form(m => m.SelectedFacilityId))
                  .Response(r => r.OnSuccess(s => s.Into("new-assignment-content")));
-                p.Component<FusionDialog>("new-assignment-dialog").Call(c => c.Show);
+                p.Component<FusionDialog>("new-assignment-dialog").Show();
             })
             .Reactive(evt => evt.PopupOpen, (args, p) =>
             {
                 // Syncfusion opens QuickInfo for empty cells too; cancel only those so event QuickInfo keeps the custom template.
-                p.When(args, x => x.Type).Eq("QuickInfo")
-                 .And(args, x => x.Data.Id).Eq(0)
-                 .Then(t => { t.Payload(args).Set(a => a.Cancel, true); });
+                p.When(args.Type).Eq("QuickInfo")
+                 .And(args.Data.Get(x => x.Id)).Eq(0)
+                 .Then(t => { args.Cancel.Set(true); });
 
                 // Replace Syncfusion's built-in editor with the app-level drawer.
-                p.When(args, x => x.Type).Eq("Editor")
+                p.When(args.Type).Eq("Editor")
                  .Then(t =>
                  {
-                     t.Payload(args).Set(a => a.Cancel, true);
-                     t.Element("alis-drawer-title").SetText("Edit Shift Assignment");
-                     t.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md);
+                     args.Cancel.Set(true);
+                     t.Element("alis-drawer-title").Text.Set("Edit Shift Assignment");
+                     t.Component<NativeDrawer>().Size.Set(DrawerSize.Md);
                      t.Get(Url.SandboxRoute("EditForm", "Schedule"))
-                      .Gather<EditAssignmentQuery>(g => g.Set(x => x.AssignmentId, t.Payload(args).Get(a => a.Data.Id)))
+                      .Gather<EditAssignmentQuery>(g => g.Set(x => x.AssignmentId, args.Data.Get(x => x.Id)))
                       .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
-                     t.Component<NativeDrawer>().Call(c => c.Open);
+                     t.Component<NativeDrawer>().Open();
                  })
                  .Else(e =>
                  {
-                     e.Element("event-shift").SetText("NOT Editor");
+                     e.Element("event-shift").Text.Set("NOT Editor");
                  });
             })
             .Reactive(evt => evt.ActionBegin, (args, p) =>
             {
-                p.When(args, x => x.RequestType).Eq("eventChange")
+                p.When(args.RequestType).Eq("eventChange")
                  .Then(t =>
                  {
-                     t.Element("status").SetText("Saving...");
+                     t.Element("status").Text.Set("Saving...");
                  });
             })
             .Reactive(evt => evt.ActionComplete, (args, p) =>
             {
                 // Syncfusion emits eventChanged after CRUD; reload authoritative assignments then.
-                p.When(args, x => x.RequestType).Eq("eventChanged")
+                p.When(args.RequestType).Eq("eventChanged")
                  .Then(t =>
                  {
-                     t.Element("status").SetText("Saved — reloading...");
+                     t.Element("status").Text.Set("Saved — reloading...");
                      t.Get("/api/schedule/assignments")
                       .Gather<ScheduleAssignmentsQuery>(g => g
                           .Form(m => m.SelectedFacilityId)
-                          .Set(x => x.CurrentView, p.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView))
-                          .Set(x => x.CurrentDate, p.Component<FusionSchedule>("shift-schedule").Get(c => c.SelectedDate)))
+                          .Set(x => x.CurrentView, p.Component<FusionSchedule>("shift-schedule").CurrentView)
+                          .Set(x => x.CurrentDate, p.Component<FusionSchedule>("shift-schedule").SelectedDate))
                       .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                       {
-                          s.Component<FusionSchedule>("shift-schedule")
-                              .Set(c => c.EventDataSource, json.Read(j => j.Assignments)).Call(c => c.DataBind);
-                          s.Element("status").SetText("Refreshed after save");
-                          s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
+                          var shiftSchedule = s.Component<FusionSchedule>("shift-schedule");
+                          shiftSchedule.EventDataSource.Set(json.Get(j => j.Assignments));
+                          shiftSchedule.DataBind();
+                          s.Element("status").Text.Set("Refreshed after save");
+                          s.Element("unassigned-count").Text.Set(json.Get(j => j.UnassignedCount));
                       }));
                  });
             })
             .Reactive(evt => evt.Navigating, (args, p) =>
             {
-                p.Element("status").SetText("Navigating...");
+                p.Element("status").Text.Set("Navigating...");
 
                 // For view switches, Syncfusion args carry the new currentView.
-                p.When(args, x => x.Action).Eq("view")
+                p.When(args.Action).Eq("view")
                  .Then(t =>
                  {
                      t.Get("/api/schedule/assignments")
                       .Gather<ScheduleNavigationQuery>(g => g
                           .Form(m => m.SelectedFacilityId)
-                          .Set(x => x.CurrentDate, t.Payload(args).Get(a => a.CurrentDate))
-                          .Set(x => x.CurrentView, t.Payload(args).Get(a => a.CurrentView)))
+                          .Set(x => x.CurrentDate, args.CurrentDate)
+                          .Set(x => x.CurrentView, args.CurrentView))
                       .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                       {
-                          s.Component<FusionSchedule>("shift-schedule")
-                              .Set(c => c.EventDataSource, json.Read(j => j.Assignments)).Call(c => c.DataBind);
-                          s.Element("status").SetText("View loaded");
-                          s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
+                          var shiftSchedule = s.Component<FusionSchedule>("shift-schedule");
+                          shiftSchedule.EventDataSource.Set(json.Get(j => j.Assignments));
+                          shiftSchedule.DataBind();
+                          s.Element("status").Text.Set("View loaded");
+                          s.Element("unassigned-count").Text.Set(json.Get(j => j.UnassignedCount));
                       }));
                  })
                  // For date navigation, read the unchanged view from the component.
@@ -303,20 +308,21 @@
                      e.Get("/api/schedule/assignments")
                       .Gather<ScheduleNavigationQuery>(g => g
                           .Form(m => m.SelectedFacilityId)
-                          .Set(x => x.CurrentDate, e.Payload(args).Get(a => a.CurrentDate))
-                          .Set(x => x.CurrentView, e.Component<FusionSchedule>("shift-schedule").Get(c => c.CurrentView)))
+                          .Set(x => x.CurrentDate, args.CurrentDate)
+                          .Set(x => x.CurrentView, e.Component<FusionSchedule>("shift-schedule").CurrentView))
                       .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                       {
-                          s.Component<FusionSchedule>("shift-schedule")
-                              .Set(c => c.EventDataSource, json.Read(j => j.Assignments)).Call(c => c.DataBind);
-                          s.Element("status").SetText("Date loaded");
-                          s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
+                          var shiftSchedule = s.Component<FusionSchedule>("shift-schedule");
+                          shiftSchedule.EventDataSource.Set(json.Get(j => j.Assignments));
+                          shiftSchedule.DataBind();
+                          s.Element("status").Text.Set("Date loaded");
+                          s.Element("unassigned-count").Text.Set(json.Get(j => j.UnassignedCount));
                       }));
                  });
             })
             .Reactive(evt => evt.DataBound, (args, p) =>
             {
-                p.Element("status").SetText("Ready");
+                p.Element("status").Text.Set("Ready");
             }))
     </section>
 
@@ -332,7 +338,7 @@
     })
     .Reactive(evt => evt.OverlayClick, (args, p) =>
     {
-        p.Component<FusionDialog>("new-assignment-dialog").Call(c => c.Hide);
+        p.Component<FusionDialog>("new-assignment-dialog").Hide();
     }))
 
     <section class="rounded-lg border border-border bg-white p-4 shadow-sm">

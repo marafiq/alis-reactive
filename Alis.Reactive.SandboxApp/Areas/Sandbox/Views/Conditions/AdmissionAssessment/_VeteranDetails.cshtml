@@ -34,7 +34,7 @@
                  .Gather<VerifyVeteranRequest>(g => g.Form(m => m.VaId, m => m.ServiceBranch))
                  .Response(r => r.OnSuccess<VerifyVaResponse>((json, s) =>
                  {
-                     s.Element("va-result").SetText(json, x => x.Message);
+                     s.Element("va-result").Text.Set(json.Get(x => x.Message));
                      s.Element("va-result").Show();
                      s.Element("va-spinner").Hide();
                      s.Element("verify-va-btn-text").Show();

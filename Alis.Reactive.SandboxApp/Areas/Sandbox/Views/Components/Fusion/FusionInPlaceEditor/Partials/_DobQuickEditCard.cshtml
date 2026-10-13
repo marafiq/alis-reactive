@@ -24,7 +24,7 @@
             .EditableOn(SfInPlace.EditableType.Click))
         .Reactive(evt => evt.BeginEdit, (args, p) =>
         {
-            p.Component<FusionInPlaceEditor>(m => m.Value).Call(c => c.RemoveClass, "alis-editor-saved");
+            p.Component<FusionInPlaceEditor>(m => m.Value).RemoveClass("alis-editor-saved");
         })
         .Reactive(evt => evt.ActionSuccess, (args, p) =>
         {
@@ -34,12 +34,12 @@
              .Response(r => r
                 .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
                 {
-                    s.Element("card-dob-display").SetText(json, x => x.DisplayValue);
-                    s.Component<FusionInPlaceEditor>(m => m.Value).Call(c => c.AddClass, "alis-editor-saved");
+                    s.Element("card-dob-display").Text.Set(json.Get(x => x.DisplayValue));
+                    s.Component<FusionInPlaceEditor>(m => m.Value).AddClass("alis-editor-saved");
                 })
                 .OnError<InPlaceEditorCommitError>((err, e) =>
                 {
-                    e.Element("card-dob-error").SetText(err, x => x.Message);
+                    e.Element("card-dob-error").Text.Set(err.Get(x => x.Message));
                 }));
         }); }
 

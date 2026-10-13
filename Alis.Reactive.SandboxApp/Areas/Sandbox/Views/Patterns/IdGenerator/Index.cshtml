@@ -65,8 +65,8 @@
                  .Response(r => r
                     .OnSuccess<IdGeneratorJsonResponse>((json, s) =>
                     {
-                        s.Element("json-result").SetText(json, j => j.Summary);
-                        s.Element("json-result").AddClass("text-green-600");
+                        s.Element("json-result").Text.Set(json.Get(j => j.Summary));
+                        s.Element("json-result").ClassList.Add("text-green-600");
                     })
                  );
             }))
@@ -97,8 +97,8 @@
                  .Response(r => r
                     .OnSuccess<IdGeneratorJsonResponse>((json, s) =>
                     {
-                        s.Element("form-result").SetText(json, j => j.Summary);
-                        s.Element("form-result").AddClass("text-green-600");
+                        s.Element("form-result").Text.Set(json.Get(j => j.Summary));
+                        s.Element("form-result").ClassList.Add("text-green-600");
                     })
                  );
             }))

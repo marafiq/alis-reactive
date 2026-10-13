@@ -15,8 +15,8 @@
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
             {
-                s.Component<FusionGrid>(GridId).Set(c => c.DataSource, json.Read(x => x));
-                s.Element("crud-status").SetText("loaded");
+                s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                s.Element("crud-status").Text.Set("loaded");
             }))));
 }
 
@@ -31,7 +31,7 @@
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.AddRecordAt<ResidentDirectoryGridItem>(), new ResidentDirectoryGridItem
+                p.Component<FusionGrid>(GridId).AddRecordAt<ResidentDirectoryGridItem>(new ResidentDirectoryGridItem
                 {
                     ResidentId = 7100,
                     ResidentName = "Zara Inline",
@@ -44,13 +44,13 @@
                     OpenTasks = 5,
                     NextReviewDate = "2026-06-22"
                 }, 0);
-                p.Element("crud-status").SetText("addRecord called");
+                p.Element("crud-status").Text.Set("addRecord called");
             }))
         @(Html.NativeButton("crud-update", "Replace Top Row")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).Call(c => c.UpdateRow<ResidentDirectoryGridItem>(), 0, new ResidentDirectoryGridItem
+                p.Component<FusionGrid>(GridId).UpdateRow<ResidentDirectoryGridItem>(0, new ResidentDirectoryGridItem
                 {
                     ResidentId = 7100,
                     ResidentName = "Amina Updated",
@@ -63,16 +63,16 @@
                     OpenTasks = 3,
                     NextReviewDate = "2026-06-19"
                 });
-                p.Element("crud-status").SetText("updateRow called");
+                p.Element("crud-status").Text.Set("updateRow called");
             }))
         @(Html.NativeButton("crud-delete", "Delete Top Resident")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var grid = p.Component<FusionGrid>(GridId);
-                grid.Call(c => c.SelectRow, 0);
-                grid.Call(c => c.DeleteRecord);
-                p.Element("crud-status").SetText("deleteRecord called");
+                grid.SelectRow(0);
+                grid.DeleteRecord();
+                p.Element("crud-status").Text.Set("deleteRecord called");
             }))
     </native-hstack>
 
