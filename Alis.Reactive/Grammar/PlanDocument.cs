@@ -37,8 +37,13 @@ namespace Alis.Reactive.Grammar
     /// <summary>Where a vendor's objects live on an element and how they raise events.</summary>
     internal sealed class Vendor
     {
-        internal const string ArgumentPayload = "argument";
-        internal const string ElementPayload = "element";
+        /// <summary>What a vendor's listener receives, as the plan names it: one name per declared kind.</summary>
+        internal static string PayloadOf(VendorEventPayload payload) => payload switch
+        {
+            VendorEventPayload.Argument => "argument",
+            VendorEventPayload.DomEvent => "element",
+            _ => throw new ArgumentOutOfRangeException(nameof(payload), payload, "A vendor payload the plan has no name for."),
+        };
 
         internal Vendor(IReadOnlyList<string> objectPath, string subscribe, string unsubscribe, string payload)
         {

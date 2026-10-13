@@ -92,7 +92,7 @@ namespace Alis.Reactive
                 G.PathOf(_objectPath),
                 _subscribe.Value,
                 _unsubscribe.Value,
-                _payload == VendorEventPayload.Argument ? Vendor.ArgumentPayload : Vendor.ElementPayload);
+                Vendor.PayloadOf(_payload));
 
         /// <inheritdoc />
         public bool Equals(ComponentVendor? other) =>

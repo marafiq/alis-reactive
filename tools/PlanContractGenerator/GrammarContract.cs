@@ -34,7 +34,7 @@ namespace Alis.Reactive.ContractGeneration
                 "  | string\n  | number\n  | boolean\n  | null\n  | JsonValue[]\n  | { [key: string]: JsonValue };");
             writer.Visit(typeof(GrammarPlan));
             writer.Declare("VendorPayload", LiteralUnion("VendorPayload",
-                new[] { Vendor.ArgumentPayload, Vendor.ElementPayload }));
+                Enum.GetValues(typeof(VendorEventPayload)).Cast<VendorEventPayload>().Select(Vendor.PayloadOf)));
             writer.Declare("Operator", LiteralUnion("Operator", Operator.Table.Select(op => op.Token)));
             writer.DeclareShapes();
             return Header + "\n" + writer.Text();
