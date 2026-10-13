@@ -65,8 +65,8 @@ public class WhenUsingFusionPivotView : PlaywrightTestBase
 
         await Expect(Page.Locator("#data-status"))
             .ToHaveTextAsync("March census loaded for evergreen", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#data-bound-status"))
-            .ToHaveTextAsync("dataBound fired", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#report-status"))
+            .ToHaveTextAsync("Report is up to date.", new() { Timeout = 10000 });
         await Expect(Page.Locator("#care-pivot"))
             .ToContainTextAsync("Mar", new() { Timeout = 10000 });
         await Expect(Page.Locator("#care-pivot"))
@@ -87,16 +87,17 @@ public class WhenUsingFusionPivotView : PlaywrightTestBase
     }
 
     [Test]
-    public async Task refresh_button_calls_public_refresh_method_and_updates_visible_status()
+    public async Task refreshing_the_report_brings_it_up_to_date()
     {
         await NavigateAndWaitForPivotView();
 
         await Page.Locator("#refresh-pivot-btn").ClickAsync();
 
-        await Expect(Page.Locator("#refresh-status"))
-            .ToHaveTextAsync("refresh called", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#data-bound-status"))
-            .ToHaveTextAsync("dataBound fired", new() { Timeout = 10000 });
+        // The click says "Refreshing the report..." before Refresh; only the dataBound that the
+        // refresh raises says the report is up to date again.
+        await Expect(Page.Locator("#report-status"))
+            .ToHaveTextAsync("Report is up to date.", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#care-pivot")).ToContainTextAsync("Memory Care");
 
         AssertNoConsoleErrors();
     }
@@ -117,14 +118,26 @@ public class WhenUsingFusionPivotView : PlaywrightTestBase
     }
 
     [Test]
-    public async Task persisted_layout_can_round_trip_through_server_and_reload()
+    public async Task returning_to_a_saved_view_brings_back_the_census_it_showed()
     {
-        await NavigateAndWaitForPivotView();
+        // A facility of this test's own, so the saved view is this test's alone.
+        var facility = "pinecrest-" + Guid.NewGuid().ToString("N")[..8];
+        await NavigateToAndWaitForBoot($"/Sandbox/Components/PivotView?facilityId={facility}");
+        await Expect(Page.Locator("#care-pivot")).ToContainTextAsync("Jan", new() { Timeout = 10000 });
 
-        await Page.Locator("#load-layout-btn").ClickAsync();
+        await Page.Locator("#save-view-btn").ClickAsync();
+        await Expect(Page.Locator("#view-status")).ToHaveTextAsync("View saved.", new() { Timeout = 10000 });
 
-        await Expect(Page.Locator("#layout-status"))
-            .ToHaveTextAsync(new Regex("^layout echoed:[1-9][0-9]+$"), new() { Timeout = 10000 });
+        await Page.Locator("#load-march-btn").ClickAsync();
+        await Expect(Page.Locator("#care-pivot")).ToContainTextAsync("Mar", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#care-pivot")).Not.ToContainTextAsync("Jan");
+
+        await Page.Locator("#restore-view-btn").ClickAsync();
+
+        // LoadPersistData puts back the saved layout and its January and February census.
+        await Expect(Page.Locator("#view-status")).ToHaveTextAsync("Saved view restored.", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#care-pivot")).ToContainTextAsync("Jan", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#care-pivot")).Not.ToContainTextAsync("Mar");
 
         AssertNoConsoleErrors();
     }

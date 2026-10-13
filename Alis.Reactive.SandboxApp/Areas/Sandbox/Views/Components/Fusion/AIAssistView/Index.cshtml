@@ -50,13 +50,10 @@
                         p.Component<FusionAIAssistView>("care-ai").ActiveView);
                 }))
 
-            @(Html.NativeButton("scroll-bottom-btn", "Scroll Bottom")
+            @(Html.NativeButton("scroll-bottom-btn", "Jump to Latest Answer")
                 .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
-                {
-                    p.Component<FusionAIAssistView>("care-ai").ScrollToBottom();
-                    p.Element("scroll-status").Text.Set("scrollToBottom called");
-                }))
+                    p.Component<FusionAIAssistView>("care-ai").ScrollToBottom()))
         </native-hstack>
 
         <native-vstack gap="Xs" class="font-mono text-sm mt-4">
@@ -64,7 +61,6 @@
             <p>Object response: <span id="object-response-status" class="text-text-muted">-</span></p>
             <p>Current prompt: <span id="current-prompt" class="text-text-muted">-</span></p>
             <p>Active view: <span id="active-view" class="text-text-muted">-</span></p>
-            <p>Scroll: <span id="scroll-status" class="text-text-muted">-</span></p>
         </native-vstack>
     </native-card-body></native-card>
 
@@ -93,14 +89,20 @@
         {
             p.Element("request-prompt").Text.Set(args.Prompt);
             p.Element("request-status").Text.Set("promptRequest fired");
-            p.Component<FusionAIAssistView>("care-ai").AddPromptResponse("Reactive response added from promptRequest.", true);
+            // The answer comes from the care team's notes on the server.
+            p.Get(Url.SandboxRoute("Reply", "AIAssistView"))
+             .Gather<AIAssistReplyQuery>(g => g.Set(x => x.Prompt, args.Prompt))
+             .Response(r => r.OnSuccess<AIAssistReply>((reply, s) =>
+                 s.Component<FusionAIAssistView>("care-ai").AddPromptResponse(reply.Get(x => x.Answer), true)));
         })
         .Reactive(evt => evt.StopRespondingClick, (args, p) =>
         {
-            p.Element("stop-prompt").Text.Set(args.Prompt);
-            p.Element("stop-index").Text.Set(args.DataIndex);
+            p.Element("stopped-prompt").Text.Set(args.Prompt);
+            p.Element("assist-stopped").Show();
         }))
     </native-card-body></native-card>
+
+    <p id="assist-stopped" class="text-sm text-text-secondary" hidden>Stopped the answer to "<span id="stopped-prompt"></span>".</p>
 
     <native-card><native-card-body>
         <native-heading level="H2">Event Signals</native-heading>
@@ -108,8 +110,6 @@
             <p>Prompt changed: <span id="prompt-changed-value" class="text-text-muted">-</span></p>
             <p>Request status: <span id="request-status" class="text-text-muted">-</span></p>
             <p>Request prompt: <span id="request-prompt" class="text-text-muted">-</span></p>
-            <p>Stop prompt: <span id="stop-prompt" class="text-text-muted">-</span></p>
-            <p>Stop index: <span id="stop-index" class="text-text-muted">-</span></p>
         </native-vstack>
     </native-card-body></native-card>
 

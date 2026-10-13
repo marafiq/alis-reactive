@@ -46,8 +46,9 @@
                 .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
+                    // The report says it is refreshing until its next dataBound says it is up to date.
+                    p.Element("report-status").Text.Set("Refreshing the report...");
                     p.Component<FusionPivotView>("care-pivot").Refresh();
-                    p.Element("refresh-status").Text.Set("refresh called");
                 }))
 
             @(Html.NativeButton("audit-pivot-btn", "Audit Layout")
@@ -67,17 +68,29 @@
                      }));
                 }))
 
-            @(Html.NativeButton("load-layout-btn", "Round Trip Layout")
+            @(Html.NativeButton("save-view-btn", "Save This View")
                 .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    var pivot = p.Component<FusionPivotView>("care-pivot");
-                    p.Post("/api/pivot/layout/echo")
-                     .Gather<PivotLayoutRequest>(g => g.Set(x => x.Layout, pivot.GetPersistData(true)))
+                    // The saved view keeps the report's layout and the census it shows.
+                    p.Post("/api/pivot/views/{facilityId}")
+                     .Gather<PivotSavedView>(g => g
+                         .Set(x => x.FacilityId, p.Url<PivotViewQuery>().Get(q => q.FacilityId))
+                         .Set(x => x.Layout, p.Component<FusionPivotView>("care-pivot").GetPersistData(false)))
+                     .Response(r => r.OnSuccess<PivotLayoutResponse>((json, s) =>
+                         s.Element("view-status").Text.Set(json.Get(x => x.Message))));
+                }))
+
+            @(Html.NativeButton("restore-view-btn", "Return to Saved View")
+                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Get("/api/pivot/views/{facilityId}")
+                     .Gather<PivotSavedViewQuery>(g => g.Set(x => x.FacilityId, p.Url<PivotViewQuery>().Get(q => q.FacilityId)))
                      .Response(r => r.OnSuccess<PivotLayoutResponse>((json, s) =>
                      {
                          s.Component<FusionPivotView>("care-pivot").LoadPersistData(json.Get(x => x.Layout));
-                         s.Element("layout-status").Text.Set(json.Get(x => x.Message));
+                         s.Element("view-status").Text.Set(json.Get(x => x.Message));
                      }));
                 }))
 
@@ -101,11 +114,10 @@
         <native-vstack gap="Xs" class="font-mono text-sm mt-4">
             <p>Current view: <span id="current-view" class="text-text-muted">-</span></p>
             <p>Data status: <span id="data-status" class="text-text-muted">-</span></p>
-            <p>Refresh: <span id="refresh-status" class="text-text-muted">-</span></p>
-            <p>Data bound: <span id="data-bound-status" class="text-text-muted">-</span></p>
+            <p>Report: <span id="report-status" class="text-text-muted">-</span></p>
             <p>Audit: <span id="audit-summary" class="text-text-muted">-</span></p>
             <p>Layout length: <span id="layout-length" class="text-text-muted">-</span></p>
-            <p>Layout status: <span id="layout-status" class="text-text-muted">-</span></p>
+            <p>Saved view: <span id="view-status" class="text-text-muted">-</span></p>
             <p>Dialog: <span id="dialog-status" class="text-text-muted">-</span></p>
         </native-vstack>
     </native-card-body></native-card>
@@ -142,7 +154,7 @@
         })
         .Reactive(evt => evt.DataBound, (_, p) =>
         {
-            p.Element("data-bound-status").Text.Set("dataBound fired");
+            p.Element("report-status").Text.Set("Report is up to date.");
         })
         .Reactive(evt => evt.CellSelecting, (args, p) =>
         {

@@ -15,5 +15,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 "~/Areas/Sandbox/Views/Components/Fusion/AIAssistView/Index.cshtml",
                 new AIAssistViewModel());
         }
+
+        [HttpGet("Reply")]
+        public IActionResult Reply([FromQuery] AIAssistReplyQuery query)
+        {
+            return Ok(new AIAssistReply
+            {
+                Answer = $"Here is what the care team recorded about: {query.Prompt}."
+            });
+        }
     }
 }

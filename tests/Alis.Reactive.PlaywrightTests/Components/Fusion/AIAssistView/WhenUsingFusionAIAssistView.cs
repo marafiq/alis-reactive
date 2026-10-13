@@ -7,6 +7,15 @@ public class WhenUsingFusionAIAssistView : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/AIAssistView";
 
+    // The whole assistant fits in the window, so an item is in view exactly when the assistant's
+    // own scrolling shows it.
+    public override BrowserNewContextOptions ContextOptions()
+    {
+        var options = base.ContextOptions() ?? new BrowserNewContextOptions();
+        options.ViewportSize = new() { Width = 1280, Height = 1400 };
+        return options;
+    }
+
     private async Task NavigateAndWaitForAssistView()
     {
         await NavigateToAndWaitForBoot(Path);
@@ -55,7 +64,7 @@ public class WhenUsingFusionAIAssistView : PlaywrightTestBase
         await Expect(Page.Locator("#request-prompt"))
             .ToHaveTextAsync("Summarize the medication changes", new() { Timeout = 5000 });
         await Expect(Page.Locator("#care-ai"))
-            .ToContainTextAsync("Reactive response added from promptRequest.", new() { Timeout = 5000 });
+            .ToContainTextAsync("Here is what the care team recorded about: Summarize the medication changes.", new() { Timeout = 10000 });
 
         AssertNoConsoleErrors();
     }
@@ -108,18 +117,51 @@ public class WhenUsingFusionAIAssistView : PlaywrightTestBase
     }
 
     [Test]
-    public async Task scroll_to_bottom_calls_js_method()
+    public async Task jumping_to_the_latest_answer_scrolls_the_conversation_to_its_end()
     {
         await NavigateAndWaitForAssistView();
+        for (var answer = 0; answer < 5; answer++)
+            await Page.Locator("#append-object-response-btn").ClickAsync();
+        var firstQuestion = Page.Locator("#care-ai #e-prompt-item_0");
+        var latestAnswer = Page.Locator("#care-ai #e-response-item_4");
+        await Expect(latestAnswer).ToContainTextAsync("Schedule hydration checks", new() { Timeout = 5000 });
 
-        await Page.Locator("#append-object-response-btn").ClickAsync();
+        // The coordinator scrolls back up to the first question.
+        await firstQuestion.HoverAsync();
+        await Page.Mouse.WheelAsync(0, -5000);
+        await Expect(firstQuestion).ToBeInViewportAsync(new() { Timeout = 5000 });
+
         await Page.Locator("#scroll-bottom-btn").ClickAsync();
 
-        await Expect(Page.Locator("#scroll-status"))
-            .ToHaveTextAsync("scrollToBottom called", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#care-ai"))
-            .ToContainTextAsync("Care plan follow up", new() { Timeout = 5000 });
+        await Expect(latestAnswer).ToBeInViewportAsync(new() { Timeout = 5000 });
+        await Expect(firstQuestion).Not.ToBeInViewportAsync();
+        AssertNoConsoleErrors();
+    }
 
+    [Test]
+    public async Task stopping_an_answer_notes_the_question_it_belonged_to()
+    {
+        // The care team's answer is held, so the assistant is still answering when Stop is clicked.
+        var answerReleased = new SemaphoreSlim(0);
+        await Page.RouteAsync("**/Sandbox/Components/AIAssistView/Reply*", async route =>
+        {
+            await answerReleased.WaitAsync(TimeSpan.FromSeconds(30));
+            await route.ContinueAsync();
+        });
+        await NavigateAndWaitForAssistView();
+        var prompt = Page.Locator("#care-ai .e-assist-textarea");
+
+        await prompt.FillAsync("Summarize Margaret's day");
+        await prompt.PressAsync("Enter");
+        await Page.Locator("#care-ai .e-assist-stop").ClickAsync(new() { Timeout = 10000 });
+
+        await Expect(Page.Locator("#assist-stopped"))
+            .ToHaveTextAsync("Stopped the answer to \"Summarize Margaret's day\".", new() { Timeout = 5000 });
+
+        // Let the held answer arrive before the page closes; the stopped assistant does not show it.
+        await Page.RunAndWaitForResponseAsync(
+            () => { answerReleased.Release(); return Task.CompletedTask; },
+            "**/Sandbox/Components/AIAssistView/Reply*");
         AssertNoConsoleErrors();
     }
 

@@ -51,9 +51,17 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public int LayoutLength { get; init; }
     }
 
-    public sealed class PivotLayoutRequest
+    /// <summary>A view saved for a facility, <c>POST api/pivot/views/{facilityId}</c>: the facility in the path, the view in the body.</summary>
+    public sealed class PivotSavedView
     {
+        public string? FacilityId { get; init; }
         public string Layout { get; init; } = "";
+    }
+
+    /// <summary>The query of <c>GET api/pivot/views/{facilityId}</c>: the facility whose saved view returns.</summary>
+    public sealed class PivotSavedViewQuery
+    {
+        public string? FacilityId { get; init; }
     }
 
     public sealed class PivotLayoutResponse
