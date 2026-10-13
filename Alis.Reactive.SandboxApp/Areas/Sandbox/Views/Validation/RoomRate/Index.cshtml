@@ -21,6 +21,8 @@
                 .NativeTextBox(b => b.Type("number").Placeholder("0.00")); }
             @{ Html.InputField(plan, m => m.CommunityFee, o => o.Required().Label("Community Fee ($)"))
                 .NativeTextBox(b => b.Type("number").Placeholder("0 if waived")); }
+            @{ Html.InputField(plan, m => m.SquareFeet, o => o.Label("Square Feet (suites)"))
+                .NativeTextBox(b => b.Type("number").Placeholder("e.g. 650")); }
         </form>
         @(Html.NativeButton("add-room-btn", "Add Room")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")

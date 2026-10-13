@@ -217,6 +217,28 @@ public class WhenAdministratorAddsRoomRate : PlaywrightTestBase
         AssertTheRoomWasSentOnce();
     }
 
+    // Suites are priced by size: a room whose name ends in "Suite" needs its square footage; the
+    // other tests add "Maple 214" without one.
+    [Test]
+    public async Task a_suite_needs_its_square_footage()
+    {
+        await NavigateAndBoot();
+        await RoomName.Fill("Maple Garden Suite");
+        await MonthlyRate.Fill("6800");
+        await CommunityFee.Fill("2000");
+
+        await ClickWhenStable(AddRoom);
+
+        await Expect(_plan.ErrorFor(m => m.SquareFeet)).ToHaveTextAsync("Give the suite's square footage.");
+        await Expect(RoomRateStatus).ToHaveTextAsync("No room added yet.");
+
+        await _plan.TextBox(m => m.SquareFeet).Fill("650");
+        await ClickWhenStable(AddRoom);
+        await Expect(RoomRateStatus).ToHaveTextAsync(
+            "Maple Garden Suite added to the rate sheet at $6,800.00 a month, community fee $2,000.00.");
+        AssertTheRoomWasSentOnce();
+    }
+
     [Test]
     public async Task a_named_room_with_a_monthly_rate_is_added_to_the_rate_sheet()
     {

@@ -10,6 +10,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? RoomName { get; set; }
         public decimal MonthlyRate { get; set; }
         public decimal? CommunityFee { get; set; }
+
+        /// <summary>A suite's floor area; suites are priced by size.</summary>
+        public int? SquareFeet { get; set; }
     }
 
     /// <summary>The confirmation the server returns once the room is on the rate sheet.</summary>

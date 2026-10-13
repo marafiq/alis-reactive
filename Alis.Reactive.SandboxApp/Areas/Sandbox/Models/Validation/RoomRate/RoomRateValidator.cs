@@ -19,6 +19,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                 .WithMessage($"{policy.Community} caps a room at ${policy.MaxMonthlyRate.ToString("#,##0", CultureInfo.InvariantCulture)} a month.");
             RuleFor(x => x.CommunityFee).NotEmpty().WithMessage("Enter the community fee, or 0 if it is waived.");
 
+            // Suites are priced by size, so a room named "... Suite" needs its square footage.
+            When(x => x.RoomName != null && x.RoomName.EndsWith("Suite"), () =>
+                RuleFor(x => x.SquareFeet).NotEmpty().WithMessage("Give the suite's square footage."));
+
             // The fee is measured against the rate once there is a rate to measure it against.
             When(x => x.MonthlyRate > 0, () =>
                 RuleFor(x => x.CommunityFee)

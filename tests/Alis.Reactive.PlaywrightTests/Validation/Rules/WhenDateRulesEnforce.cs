@@ -14,6 +14,13 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
 
     private DatePickerLocator DatePicker(string suffix) => new(Page, ModelIdPrefix + suffix);
 
+    // Typed dates reach any year without paging the calendar; leaving each one lets its message settle.
+    private async Task EnterStay(string admission, string discharge)
+    {
+        await DatePicker("AdmissionDate").FillAndBlur(admission);
+        await DatePicker("DischargeDate").FillAndBlur(discharge);
+    }
+
     [Test]
     public async Task empty_dates_show_required_errors_on_submit()
     {
@@ -111,6 +118,123 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
 
         await Expect(Result).ToContainTextAsync("valid", new() { Timeout = 5000 });
 
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_care_plan_review_dated_december_31_2024_is_refused_as_before_the_2025_form()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await EnterStay("12/01/2024", "03/31/2025");
+        await DatePicker("CarePlanReviewDate").FillAndBlur("12/31/2024");
+
+        await ClickWhenStable(ValidateBtn);
+
+        // GreaterThan(December 31, 2024): the day itself is not after it.
+        await Expect(ErrorFor("CarePlanReviewDate")).ToHaveTextAsync("Date the care plan review after December 31, 2024.");
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+
+        await DatePicker("CarePlanReviewDate").FillAndBlur("01/02/2025");
+        await ClickWhenStable(ValidateBtn);
+        await Expect(Result).ToHaveTextAsync("All dates valid!", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_care_plan_review_before_admission_is_refused_and_one_on_the_admission_day_is_accepted()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await EnterStay("03/01/2025", "03/31/2025");
+        await DatePicker("CarePlanReviewDate").FillAndBlur("02/28/2025");
+
+        await ClickWhenStable(ValidateBtn);
+
+        await Expect(ErrorFor("CarePlanReviewDate")).ToHaveTextAsync("The care plan review cannot come before admission.");
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+
+        await DatePicker("CarePlanReviewDate").FillAndBlur("03/01/2025");
+        await ClickWhenStable(ValidateBtn);
+        await Expect(Result).ToHaveTextAsync("All dates valid!", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_care_plan_review_on_the_discharge_day_is_refused()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await EnterStay("03/01/2025", "03/31/2025");
+        await DatePicker("CarePlanReviewDate").FillAndBlur("03/31/2025");
+
+        await ClickWhenStable(ValidateBtn);
+
+        await Expect(ErrorFor("CarePlanReviewDate")).ToHaveTextAsync("The care plan review must come before discharge.");
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+
+        await DatePicker("CarePlanReviewDate").FillAndBlur("03/30/2025");
+        await ClickWhenStable(ValidateBtn);
+        await Expect(Result).ToHaveTextAsync("All dates valid!", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_follow_up_visit_after_discharge_is_refused_and_one_on_the_discharge_day_is_accepted()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await EnterStay("03/01/2025", "03/31/2025");
+        await DatePicker("FollowUpVisitDate").FillAndBlur("04/01/2025");
+
+        await ClickWhenStable(ValidateBtn);
+
+        await Expect(ErrorFor("FollowUpVisitDate")).ToHaveTextAsync("The follow-up visit cannot come after discharge.");
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+
+        await DatePicker("FollowUpVisitDate").FillAndBlur("03/31/2025");
+        await ClickWhenStable(ValidateBtn);
+        await Expect(Result).ToHaveTextAsync("All dates valid!", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_follow_up_visit_on_the_care_plan_review_day_is_refused()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await EnterStay("03/01/2025", "03/31/2025");
+        await DatePicker("CarePlanReviewDate").FillAndBlur("03/10/2025");
+        await DatePicker("FollowUpVisitDate").FillAndBlur("03/10/2025");
+
+        await ClickWhenStable(ValidateBtn);
+
+        await Expect(ErrorFor("FollowUpVisitDate"))
+            .ToHaveTextAsync("Book the follow-up visit on a different day from the care plan review.");
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+
+        await DatePicker("FollowUpVisitDate").FillAndBlur("03/11/2025");
+        await ClickWhenStable(ValidateBtn);
+        await Expect(Result).ToHaveTextAsync("All dates valid!", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_move_out_inspection_off_the_discharge_day_is_refused()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await EnterStay("03/01/2025", "03/31/2025");
+        await DatePicker("MoveOutInspectionDate").FillAndBlur("03/30/2025");
+
+        await ClickWhenStable(ValidateBtn);
+
+        await Expect(ErrorFor("MoveOutInspectionDate")).ToHaveTextAsync("The move-out inspection happens on the discharge day.");
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+
+        await DatePicker("MoveOutInspectionDate").FillAndBlur("03/31/2025");
+        await ClickWhenStable(ValidateBtn);
+        await Expect(Result).ToHaveTextAsync("All dates valid!", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 

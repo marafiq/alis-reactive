@@ -19,6 +19,17 @@
                 .NativeRadioGroup(b => b
                     .Option("true", "Yes", "Record the fall details in the incident log")
                     .Option("false", "No", "No falls reported by staff or family")); }
+            @{ Html.InputField(plan, m => m.FallsCount, o => o.Label("Falls in the last 90 days"))
+                .NativeTextBox(b => b.Type("number").Placeholder("0")); }
+            @{ Html.InputField(plan, m => m.InjuryReported, o => o.Label("A fall caused an injury"))
+                .NativeCheckBox(b => b.CssClass("h-4 w-4 rounded border-border text-accent")); }
+            @{ Html.InputField(plan, m => m.FallFactors, o => o.Label("What contributed to the falls"))
+                .NativeCheckList(b => b
+                    .Option("Medication change", "Medication change")
+                    .Option("Unwitnessed fall", "Unwitnessed fall")
+                    .Option("Unsafe footwear", "Unsafe footwear")); }
+            @{ Html.InputField(plan, m => m.NeuroChecksStartedAt, o => o.Label("Neuro checks started at"))
+                .NativeTextBox(b => b.Placeholder("e.g. 2:15 PM")); }
             @{ Html.InputField(plan, m => m.ObservedWalkingInPerson, o => o.Required().Label("I observed the resident walking in person"))
                 .NativeCheckBox(b => b.CssClass("h-4 w-4 rounded border-border text-accent")); }
         </form>

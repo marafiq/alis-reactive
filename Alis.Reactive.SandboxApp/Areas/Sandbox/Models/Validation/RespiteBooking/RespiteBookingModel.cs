@@ -11,6 +11,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public int? CommunityId { get; set; }
         public decimal? DailyRate { get; set; }
         public int? ExpectedNights { get; set; }
+
+        /// <summary>How an open-ended stay ends: who decides, and when.</summary>
+        public string? EndOfStayPlan { get; set; }
+
+        /// <summary>When the family picks the resident up on the last day of a planned stay.</summary>
+        public string? LastDayPickupTime { get; set; }
         public bool? NeedsTransport { get; set; }
     }
 
