@@ -13,7 +13,7 @@ applied.
 
 **The rule behind every decision:** the browser computes what the C# the developer wrote would
 compute. Types, operators, evaluation order, scoping and empty values follow C#, and the server's
-model binding and FluentValidation where those apply. Where JavaScript would answer differently,
+model binding and validation rules where those apply. Where JavaScript would answer differently,
 the grammar says so explicitly instead of inheriting JavaScript's answer.
 
 ## 1. Syntax
@@ -206,8 +206,8 @@ expression over the converted values.
 | `order(a, b)` | The `OrderBy` comparator. Finite numbers order by difference, with non-finite values last; everything else orders by `String(v)` in code-unit order. It is stable. |
 
 - **An `if` arm** is taken when its condition is truthy. A missing value is false.
-- **FluentValidation's `NotEmpty`** is not `empty`. It projects to a check chosen by the property's
-  type (section 7.3).
+- **The validation rule `NotEmpty`** is not `empty`. It is a check chosen by the property's
+  type (section 7.4).
 
 ### 2.3 Lambdas, arrays and text
 
@@ -348,10 +348,9 @@ A failing handler is logged and stops no other handler.
 | Every route placeholder is filled from the request | render |
 | A regular expression is in JavaScript's dialect | render |
 | Input IDs come from `IdGenerator`; other IDs are explicit; no ID repeats in a plan | render |
-| A validation rule reaches the browser only when the page can evaluate it (7.4) | render |
+| A validation rule reaches the browser only when the page can evaluate it (7.5) | render |
 | Enum literals are emitted as names, the same text the input reads | construction |
 | A member path and a data path are never one node (1.3) | construction |
-| A validation peer is a sibling of the validated property (7.3) | render, naming the rule |
 | Exact-status routes match before catch-alls; only the first `OnSuccess` route runs; error routes sit behind `!res.ok` | construction: the request builder orders them |
 
 ## 5. Lowering: each fluent method, as productions
@@ -598,59 +597,82 @@ imports none of them. The obligations are numbered so that tests and code can ci
 
 ### 7.1 One statement per rule
 
-`ReactiveValidator<T>` is a FluentValidation `AbstractValidator<T>`. Its rules serve the server
-unchanged, and the browser gets the projection of the same instance the server uses for that
-request.
+`ReactiveValidator<T>` is the framework's own implementation of FluentValidation's grammar:
+`RuleFor`, `RuleForEach`, `When`, `Unless`, `Otherwise`, `Include`, `SetValidator`, `ChildRules`,
+the checks and `WithMessage`, written as FluentValidation users write them. The FluentValidation
+package is not used. Each check is one term of the vocabulary and defines both halves where both
+exist: what the server decides, and, for a term the browser decides the same way, the `ClientRule`
+the plan carries. The rules are data, like the `rules` schema of Syncfusion's React form, but they
+are typed C#, bound to inputs by component ID, and conditional. The browser gets the rules of the
+validator instance the server resolves for that request.
 
-### 7.2 Conditions
+### 7.2 Server-only by what a rule is
 
-- `ReactiveValidator<T>` declares `When(Expression<Func<T, bool>>, Action)` and `Unless(…)`. They
-  record the expression and pass its compiled delegate to FluentValidation.
-- C# prefers the derived overload for a lambda, so lambdas are recorded.
-- A method group or delegate variable binds to FluentValidation's own `When` and stays server-only.
-- `Otherwise(…)` records the negation of its `When`.
-- The recorded conditions are AND-ed onto each rule added inside them (`OnRuleAdded`).
+A rule reaches the browser unless something in it only the server can do. No list is kept:
+- `Must` and `MustAsync` are C# (a lookup, a service); they have no browser term.
+- `WithMessage(model => ...)` builds its text from the model; only the server can say it.
+- A message with nothing left to say once the sentence naming the entered value is dropped.
+- `Matches` with an option JavaScript lacks or syntax it reads differently (`\A`, `\z`, `\G`,
+  inline `(?i)`, atomic and comment groups, `\p{..}`, class subtraction).
+- A condition that reads anything but model members and fixed values (a method call, `.Length`).
+- A rule on a computed value (`x => x.Name.Trim()`), which has no input.
+- `.ServerOnly()`, which keeps the checks written before it on the server, for a member the page has
+  no input for.
 
-### 7.3 What projects, and to what
+### 7.3 Conditions
 
-The descriptors are read in this order. The first type a component matches decides.
+- `When(predicate, rules)`, `Unless(...)` and `Otherwise(...)` around a block, and `.When(predicate)`
+  and `.Unless(predicate)` after a rule's checks, take an expression. The server compiles it;
+  `BrowserCondition` translates it into a `ClientCondition` when every part has a browser form:
+  comparisons of members with fixed values, `string.IsNullOrEmpty`, `Contains`, `StartsWith`,
+  `EndsWith`, `Regex.IsMatch`, membership in a fixed set, joined by `&&`, `||` and `!`.
+- A condition after a rule's checks applies to every check written before it, as in
+  FluentValidation.
+- Blocks nest: a check's browser condition is the AND of its blocks' conditions and its own.
+- A condition with no browser form keeps the checks under it on the server.
 
-| FluentValidation component | Browser check `(v, m)` |
-|---|---|
-| `IChildValidatorAdaptor`, `IIncludeRule` | recurse into the validator instance the rule holds (`SetValidator(v)`, `Include(v)`, `ChildRules`), prefixing paths and AND-ing the enclosing conditions; a validator chosen per model by a factory or by the value's type is server-only |
-| `INotNullValidator` | `v != null` |
-| `INotEmptyValidator` | by the property's type: text `v != null && v.trim() !== ""`; number `v != null && v !== 0`; collection `v != null && v.length > 0`; otherwise `v != null && v != default` |
-| `EmptyValidator<,>` | the negation of the row above |
-| `ILengthValidator` | `v == null` or the length is within bounds |
-| `IEmailValidator` | `v == null` or FluentValidation's own rule: exactly one `@`, neither first nor last |
-| `IRegularExpressionValidator` | `v == null` or `matches(v, expression, flags)`, with flags from `RegexOptions` |
-| `ICreditCardValidator` | `v == null` or FluentValidation's rule: digits, dashes and spaces only, then Luhn, written with `call` and `fn` |
-| `IComparisonValidator`, literal | ordered: `v == null` or `v op literal`; equality: `v op literal`, with no null skip, as FluentValidation |
-| `IComparisonValidator`, peer | the peer read is the rule's prefix plus `MemberToCompare.Name`; ordered: `v == null` or (peer present and `v op peer`); equality: `v op peer`. The peer must be a sibling: FluentValidation keeps only the leaf member, so `x => x.Stay.AdmitDate` cannot be located and is a render error naming the rule. Written in the child validator, the peer is a sibling. |
-| `IInclusiveBetweenValidator`, `ExclusiveBetweenValidator<,>` | `v == null` or within the bounds |
-| `IBrowserRule<T>` (the framework's `Url()`) | its own expression |
-| anything else (`Must`, `Custom`, async rules, components with their own conditions) | not projected: server-only |
+### 7.4 The vocabulary
 
+| Term | Server | Browser check `(v, m)` |
+|---|---|---|
+| `NotNull` | `v != null` | `v != null` |
+| `NotEmpty` | not null, blank text, an empty list or the type's default | by the property's type: text `v != null && v.trim() !== ""`; number `v != null && v !== 0`; collection `v != null && v.length > 0`; otherwise `v != null && v != default` |
+| `Empty` | the negation of `NotEmpty` | the negation of the row above |
+| `MinimumLength`, `MaximumLength`, `Length` | null passes; the length is within bounds | `v == null` or the length is within bounds |
+| `EmailAddress` | null passes; exactly one `@`, neither first nor last | the same |
+| `Url` | null or empty passes; an absolute `http` or `https` address | the same |
+| `CreditCard` | null passes; dashes and spaces dropped, every other character a digit, then Luhn | the same, written with `call` and `fn` |
+| `Matches` | null passes; the regex matches | `v == null` or `matches(v, pattern, flags)`, flags from `RegexOptions`, when JavaScript reads the pattern the same way |
+| comparison with a literal | ordered: null passes; equality: no null skip | ordered: `v == null` or `v op literal`; equality: `v op literal` |
+| comparison with another member | the member is read by its path from the model | the peer is read by that path; ordered: `v == null` or (peer present and `v op peer`); equality: `v op peer` |
+| `InclusiveBetween`, `ExclusiveBetween` | null passes; within the bounds | `v == null` or within the bounds |
+| `SetValidator`, `ChildRules`, `RuleForEach(..).SetValidator`, `Include` | the child's rules, paths prefixed | the child's browser rules, prefixed, under the enclosing conditions |
+| `Must`, `MustAsync` | the predicate | none: server-only |
+
+- **Custom checks** are extension methods that compose the vocabulary, so they run in both places:
+  `WristbandCode()` is `Matches(@"^WB-\d{6}$").WithMessage(..)`.
 - **Empty values** follow model binding: `v` and `model` are binding reads (2.1). A non-nullable
   number reads an empty input as 0, a nullable one as `null`, and text that is empty or only
   whitespace as `null`. So `MinimumLength`, `Matches` and `EmailAddress` pass on an empty optional
   field and `NotNull` fails on one, as on the server.
-- **Messages** come from `GetUnformattedErrorMessage()`, formatted at render with what is known
-  there (property name, comparison value). `.WithMessage` keeps today's text.
+- **Messages.** The defaults are FluentValidation's English templates. The server fills every
+  placeholder (`{PropertyName}`, `{PropertyValue}`, `{ComparisonValue}`, `{MaxLength}`, `{From}` and
+  the rest, with `{Name:format}`); the browser fills those known at render and drops a sentence that
+  names the entered value (`{PropertyValue}`, `{TotalLength}`).
 - **Collections.** `RuleForEach(x => x.Lines).SetValidator(V)` emits V's tests once per rendered item
   index; the index is literal in the field ID and in every model path.
 
-### 7.4 Which rules reach the browser
+### 7.5 Which rules reach the browser
 
 A rule reaches the browser when the page can evaluate it:
 - its property is bound to an input on the page;
 - every member its condition or peer reads is bound to an input or is a closure literal;
-- its condition was recorded as an expression.
+- nothing in it is the server's alone (7.2).
 
 Every other rule stays server-only, with no extra code: `ServerFlag` has no input, and a collection
 of complex items has none. The decision is made at render and is deterministic.
 
-### 7.5 Grid column rules
+### 7.6 Grid column rules
 
 The Fusion grid maps the same typed projection model to Syncfusion's column rules (`required`,
 `email`, `url`, `minLength`, `maxLength`, `regex`, `min`, `max`, `range`). It reads the projection,
@@ -664,10 +686,10 @@ Each change is deliberate and named here, so that nothing changes silently. The 
 | Change | Rows | Why |
 |---|---|---|
 | Empty values follow the server: `ExclusiveBetween` on a non-nullable number fails on empty; `GreaterThan(date)` on `DateTime?` passes on empty; `Equal`/`NotEqual` no longer skip empty; `When(x => x.Age < 18)` on `int` fires on empty | validation 22, 28, 33, 34, 37, 39, 48 | Today the browser accepts what the server rejects, or rejects what it accepts. Written once means one answer. |
-| Email and credit-card checks follow FluentValidation | validation rows using them | Same reason. Today the browser requires a dot that the server does not, and strips letters that the server rejects. |
+| Email and credit-card checks follow the server's | validation rows using them | Same reason. Today the browser requires a dot that the server does not, and strips letters that the server rejects. |
 | `NotEmpty` on a collection of complex items is server-only | validation 74 | It has no input. Today it always blocks, which is a defect. |
 | `Include` enforces on the server as well | validation 76 | Today `ClientRulesFrom` is browser-only. |
-| `AddReactiveClientValidation` is replaced by FluentValidation validators registered through DI | validation 77 | A browser rule always has a server rule behind it. |
+| `AddReactiveClientValidation` is replaced by `ReactiveValidator` validators registered through DI | validation 77 | A browser rule always has a server rule behind it. |
 | A URL query read (`p.Url<TQuery>()`) matches keys case-insensitively, and an array reads every value | conditions 14-16, 68, 138; http 26, 38, 42-50 | It reads the query the way MVC binds it. Today it is case-sensitive and reads the first value. This widens matching only. |
 | A response handle reads the response it names | http (ambiguity 9) | Today a handle reads whichever response is current, so an outer handle inside a nested route reads the inner response. No view relies on that. |
 | A link is an element with an ID the view chooses, and it carries its own plan script | components 117; http 113-121 | It replaces the delegated listener, the plan in `data-reactive-link`, and the runtime rewriting the request URL. The fixtures locate links by `data-testid`. |
@@ -677,7 +699,6 @@ Each change is deliberate and named here, so that nothing changes silently. The 
 | The Pivot audit view sends the current view as two members, route and body | `Components/Fusion/PivotView/Index.cshtml:59-61` | A placeholder member fills only the path. |
 | `p.Request` is deleted | none | No builder exposes it (`Source.cs:73` has no caller). |
 | A plugin method's date arguments arrive as `Date` objects | conditions 152 | Every plugin member is declared with typed arguments. Today an open-argument plugin call receives a date literal as a number (`evaluate.ts:46`). |
-| A validation peer must be a sibling | none in the sandbox | FluentValidation does not expose a nested peer's path. Today's `ClientRule` peers could reach one. |
 | Three fixtures that parse plan JSON or call deleted APIs are rewritten to assert behavior in step 0, before the assertions freeze | `WhenComplexArrayItemRulesApply.cs:76-82`, `WhenReactiveValidatorsDeclareClientRules.cs:166-185`, `WhenAGridColumnGeneratesNativeValidationFromClientRules.cs:17-25` | A test of plan shape is not a test of behavior. |
 
 ## 9. Coverage
@@ -714,7 +735,7 @@ vocabulary used, the sentence, and a verdict:
   - `ready` belongs to the owner being started (D1);
   - the complete member table (2.3);
   - modules as plugins, so the grammar names no feature (1.1);
-  - sibling peers and `Otherwise` (7.2, 7.3);
+  - peers read by path, and `Otherwise` (7.3, 7.4);
   - booted marks and summary clearing (3.5, F9);
   - sync values read at use, with `p.Let` (3.3);
   - the document-event payload and plugin date arguments (D2, section 8).
@@ -770,21 +791,24 @@ proves it is named in the pull request.
   used in (`PlanModel/Writing/Scope.cs`). `PlanBuildContext.Write` writes the plan at render: the
   objects, the model's inputs, each form's rules (`FormWriter`) and the handlers. There is no
   separate semantic graph and no lowering pass.
-- Validation projection (section 7): rules are written once in FluentValidation's grammar on
-  `ReactiveValidator<T>` and read from FluentValidation's descriptors (`ClientRuleProjection`).
-  `When`/`Unless`/`Otherwise` lambdas are recorded (`BrowserCondition`), and each rule reaches the
-  core as the public `ClientRule`, `ClientCondition` and `ClientRuleSet`, so the integration uses no
-  core internals; FluentValidation's own
-  condition overloads sit on `RecordingValidator<T>`, so a method group or a context condition keeps
-  its rules on the server even when nested. `SetValidator`, `RuleForEach(...).SetValidator`,
-  `Include` and `ChildRules` read the child validator instance the rule holds; one a factory chooses
-  per model, or `SetInheritanceValidator` by type, stays on the server. `NotNull` reads as required
-  except on a collection. `Matches` carries `IgnoreCase`, `Multiline` and `Singleline` as flags; a
-  pattern built from the model, with an option JavaScript lacks, or with syntax JavaScript reads
-  differently (`\A`, `\z`, `\G`, inline `(?i)`, atomic and comment groups, `\p{..}`, class
-  subtraction) stays on the server. A message written from the model (`WithMessage(x => ...)`)
-  keeps its component on the server. `.ServerOnly()` keeps a rule on the server. A peer must be a sibling; any other peer is refused when the page renders. The
-  rules are read per request, from the validator that request resolves (7.1).
+- Validation projection (section 7): `Alis.Reactive.FluentValidator` implements FluentValidation's
+  grammar itself and does not reference the FluentValidation package. Each check is a term with a
+  server half (`Check<T, TValue>.Passes`) and, when the browser decides it the same way, a browser
+  half (`IBrowserCheck.ForBrowser`) that returns the core's public `ClientRule`; the C# predicates
+  `Must` and `MustAsync` have none. Conditions are expressions: the server compiles them and
+  `BrowserCondition` translates them into `ClientCondition` when it can, for blocks and for a rule's
+  own `.When`. `SetValidator`, `RuleForEach(...).SetValidator`, `Include` and `ChildRules` bring
+  the child validator's rules under the enclosing conditions. `Matches` carries `IgnoreCase`,
+  `Multiline` and `Singleline` as flags. A comparison's other member is read by its path from the
+  model, wherever it is. The rules are read per request, from the validator that request resolves
+  (7.1). A differential run checked the change: the 83 sandbox validators and six probes of every
+  term, condition form and message placeholder, each on 1,500 generated models, gave the same browser
+  rules and the same server messages as the FluentValidation-based engine it replaced. The
+  differences were deliberate: a rule's own `.When` now reaches the browser; a browser message fills
+  `{Name:format}` placeholders, and a check whose message is only about the entered value stays on
+  the server instead of showing an empty or raw message; and the sandbox's wristband check, now
+  composed from `Matches`, refuses an explicit `""` as `Matches` does (a cleared input is sent as
+  null, so the page is unaffected).
 
 - Promise-returning members (section 5): a method declared with `CallAsync` writes a call as
   `do await call(…)`, on a component, a plugin or an event's payload alike, and a read of one
@@ -817,11 +841,11 @@ proves it is named in the pull request.
   Five client-rule tests were renamed from the retired `WhenField` vocabulary.
 
 - Binding reads (2.1): request bodies and validation read each input as MVC binds it.
-- Empty values follow the server: every check is FluentValidation's verdict on the bound value
-  (7.3), so `ExclusiveBetween` on an empty non-nullable number fails (it is 0), `GreaterThan` on an
+- Empty values follow the server: every check is the server rule's verdict on the bound value
+  (7.4), so `ExclusiveBetween` on an empty non-nullable number fails (it is 0), `GreaterThan` on an
   empty nullable passes, and `Equal`/`NotEqual` compare an empty value instead of skipping it.
   `NotEmpty` on a collection reads as `atLeastOne`.
-- Email and credit-card checks are FluentValidation's: one `@` with something on each side; dashes
+- Email and credit-card checks are the server's: one `@` with something on each side; dashes
   and spaces dropped, every other character a digit, then Luhn, with no minimum length.
 - A response handle reads the response it names: each request's routes bind its handle, so a handle
   read inside a nested request's route reads its own request's response (`ResponseHandle`).

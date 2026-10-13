@@ -1,3 +1,4 @@
+using Alis.Reactive.FluentValidator;
 using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionAssessment;
@@ -281,17 +282,11 @@ public class AdmissionAssessmentController : Controller
         });
     }
 
-    private static void CollectErrors(FluentValidation.Results.ValidationResult result,
-        Dictionary<string, string[]> errors)
+    // The submit answers to every step's rules: each step's messages join the others' by field.
+    private static void CollectErrors(ValidationResult result, Dictionary<string, string[]> errors)
     {
-        foreach (var failure in result.Errors)
-        {
-            var key = failure.PropertyName;
-            if (!errors.ContainsKey(key))
-                errors[key] = [failure.ErrorMessage];
-            else
-                errors[key] = [..errors[key], failure.ErrorMessage];
-        }
+        foreach (var field in result.ErrorsByField)
+            errors[field.Key] = errors.TryGetValue(field.Key, out var earlier) ? [.. earlier, .. field.Value] : field.Value;
     }
 
 }

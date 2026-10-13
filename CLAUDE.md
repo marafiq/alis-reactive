@@ -82,7 +82,7 @@ These terms stay identical across C#, generated TS, runtime, tests and docs.
 | ValueExpression | The one way to read a value: component or plugin member, URL param, event payload, success or error body, request snapshot, literal, object, array. A second resolver is a defect. |
 | HTTP pipeline | Get, Post, Put, Delete. Gather is `target <- source`. Responses open success and error scopes. Chained runs after success and may gather from it; Parallel completes after all branches settle. WhileLoading, Into. |
 | Conditions | When, ElseIf, Else graphs over the same value sources, in authored order; first match wins. |
-| Validation | Rules are written once, in FluentValidation's grammar, on a `ReactiveValidator<T>` registered through DI. Every rule the browser can evaluate reaches it (read from FluentValidation's own rule descriptors), bound by component ID; `Must`, async rules, method-group conditions and `.ServerOnly()` stay on the server. |
+| Validation | Rules are written once, in FluentValidation's grammar, on a `ReactiveValidator<T>` registered through DI; the framework implements the grammar and does not use the FluentValidation package. Each check defines what the server decides and, when the browser can decide it the same way, the rule the plan carries, bound by component ID. What only the server can do stays there by what it is: `Must`, `MustAsync`, a message built from the model, a condition with no browser form, `.ServerOnly()`. |
 | Partials and slots | SSR plans compose by `PlanId`. Injected partials load and unload by `SlotId`; unload removes slot-owned components, rules and behavior and keeps boot-level objects. |
 | Realtime | Server push and SignalR remote triggers. |
 | Plugins | The escape hatch for work the DSL cannot express (URL, DOM, array APIs). Plugin names may be strings; everything else is typed. |
@@ -134,7 +134,7 @@ Everything else stays sync.
 | `reactive-dsl` | Plan, triggers, Element, Dispatch, Component, InputField |
 | `http-pipeline` | Get/Post, Gather, Response, Chained, Parallel, WhileLoading, Into |
 | `conditions-dsl` | When/Then/ElseIf/Else, operators, guards |
-| `validation-rules` | FluentValidation rules (written once, run on server and browser), Validate, ValidationErrors |
+| `validation-rules` | Validation rules in FluentValidation's grammar (written once, run on server and browser), Validate, ValidationErrors |
 | `bdd-testing` | Playwright tests; load before writing one |
 | `modern-csharp` | C# 14 patterns for the plan domain |
 | `dotnet-xml-docs` | XML docs on the public C# surface |

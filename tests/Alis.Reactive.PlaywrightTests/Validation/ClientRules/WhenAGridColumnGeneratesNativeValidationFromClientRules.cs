@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlaywrightTests.Validation.ClientRules;
 /// <summary>
 /// Grid column validation reuses <c>ReactiveValidator</c> client metadata to build
 /// EJ2 <c>column.validationRules</c>. Single-field rules with an EJ2 equivalent keep
-/// their FluentValidation messages; conditional, cross-field, and unsupported rules
+/// the validator's messages; conditional, cross-field, and unsupported rules
 /// stay server-authoritative.
 /// </summary>
 [TestFixture]

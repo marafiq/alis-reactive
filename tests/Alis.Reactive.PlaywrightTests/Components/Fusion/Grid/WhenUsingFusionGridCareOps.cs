@@ -161,7 +161,7 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
 
         // Leaving the cell runs EJ2's native cell validation. The rule was generated
         // from ResidentCareItemValidator's RuleFor(r => r.OpenTasks).InclusiveBetween(0, 7) —
-        // the same FluentValidation metadata that powers form validation. No second
+        // the same validator rules that power form validation. No second
         // ruleset is authored: the message proves the single source reached the cell.
         await openTasksCells.Nth(1).DblClickAsync();
 

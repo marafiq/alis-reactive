@@ -9,7 +9,7 @@ Plan-driven reactive framework for ASP.NET MVC. C# fluent builders produce React
 | `Alis.Reactive` | Core plan model, builders, and serialization |
 | `Alis.Reactive.Native` | Native HTML components (TextBox, CheckBox, DropDown, Button, etc.) |
 | `Alis.Reactive.Fusion` | Syncfusion EJ2 component integration |
-| `Alis.Reactive.FluentValidator` | FluentValidation client-validation metadata adapter |
+| `Alis.Reactive.FluentValidator` | Validation rules in FluentValidation's grammar, run by the server and the browser |
 | `Alis.Reactive.DesignSystem` | Design-system tokens, layout helpers, and stylesheet |
 | `Alis.Reactive.NativeTagHelpers` | ASP.NET Core Tag Helpers for native components |
 

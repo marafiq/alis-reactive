@@ -28,8 +28,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             if (model == null) return BadRequest(new { errors = new { Name = new[] { "Request body required." } } });
             var result = new NestedAddressParentValidator().Validate(model);
             if (!result.IsValid)
-                return BadRequest(new { errors = result.Errors.GroupBy(e => e.PropertyName)
-                    .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray()) });
+                return BadRequest(new { errors = result.ErrorsByField });
             return Ok(new { message = "Saved" });
         }
 
@@ -39,8 +38,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             if (model == null) return BadRequest(new { errors = new { ParentFlag = new[] { "Request body required." } } });
             var result = new ParentChildBugValidator().Validate(model);
             if (!result.IsValid)
-                return BadRequest(new { errors = result.Errors.GroupBy(e => e.PropertyName)
-                    .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray()) });
+                return BadRequest(new { errors = result.ErrorsByField });
             return Ok(new { message = "Saved" });
         }
 
@@ -50,8 +48,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             if (model == null) return BadRequest(new { errors = new { IsEmployed = new[] { "Request body required." } } });
             var result = new IncludeBugValidator().Validate(model);
             if (!result.IsValid)
-                return BadRequest(new { errors = result.Errors.GroupBy(e => e.PropertyName)
-                    .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray()) });
+                return BadRequest(new { errors = result.ErrorsByField });
             return Ok(new { message = "Saved" });
         }
 
@@ -66,8 +63,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             if (model == null) return BadRequest(new { errors = new { Age = new[] { "Request body required." } } });
             var result = new OperatorConditionValidator().Validate(model);
             if (!result.IsValid)
-                return BadRequest(new { errors = result.Errors.GroupBy(e => e.PropertyName)
-                    .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray()) });
+                return BadRequest(new { errors = result.ErrorsByField });
             return Ok(new { message = "Saved" });
         }
     }

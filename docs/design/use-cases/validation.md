@@ -245,19 +245,22 @@ Test names are under `Alis.Reactive.PlaywrightTests.`.
 ## Use cases added after the inventory
 
 The validation rework and the work after step 0 added these after this list was read. The Move-in
-Review page proves rows 118 to 125 (`SB/Views/Validation/MoveInReview/Index.cshtml`; validator
-`SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs`), whose test names are under
+Review page proves rows 118 to 125 and 127 (`SB/Views/Validation/MoveInReview/Index.cshtml`;
+validator `SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs`), whose test names are under
 `Alis.Reactive.PlaywrightTests.Validation.MoveInReview.WhenCoordinatorReviewsMoveIn.`; row 126 names
-its test in full. These rows are outside the counts above.
+its test in full. These rows are outside the counts above. Since the framework implements
+FluentValidation's grammar itself, the `FV/` anchors in the rows above point at the commits their
+notes name; the files they cite (`ClientRuleProjection.cs`, `RecordingValidator.cs`) are deleted.
 
 | # | Use case | Example | Status | Proof |
 |---|----------|---------|--------|-------|
-| 118 | An app's own validator reaches the browser by naming the check it equals (`IBrowserRule`) | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:61, 101 | PROVEN | `a_wristband_code_is_checked_the_way_the_communitys_printer_reads_it` (refused in the page with the validator's message and nothing sent; the right code is saved) |
-| 119 | Rules for a nested object written inline (`ChildRules`) | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:72 | PROVEN | `the_pharmacy_phone_is_asked_for_in_the_house_format` |
-| 120 | `When(..).Otherwise(..)`: one rule inside the condition, another outside it | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:31-34 | PROVEN | `a_high_fall_risk_needs_a_mobility_plan` (score 9), `a_low_fall_risk_keeps_the_mobility_plan_short` (score 3) |
-| 121 | `Url()` | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:58 | PROVEN | `a_family_portal_link_must_be_a_web_address_and_may_be_left_blank` |
-| 122 | `Matches` with `RegexOptions.IgnoreCase`, run in the page as a JavaScript flag | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:51 | PROVEN | `an_assigned_room_reads_the_same_in_any_case` |
-| 123 | A message written from the model (`WithMessage(x => ..)`) is the server's: the rule runs there, and its words show beside the field | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:22 | PROVEN | `a_name_too_long_for_the_wristband_is_refused_by_the_server_in_its_own_words` (one request; the server's message) |
-| 124 | A pattern JavaScript reads differently (`\z`) is checked by the server only | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:77 | PROVEN | `a_forwarding_zip_is_checked_the_way_the_server_checks_it` |
-| 125 | `.ServerOnly()` keeps a rule off the page, and a length rule for a field the page does not render passes, as on the server | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:80, 87 | PROVEN | `a_rule_for_the_care_plan_summary_another_page_edits_does_not_hold_up_the_review` (the review is saved; were `ReviewedBy`'s `NotEmpty` run in the page, the field the page does not render would fail it: RT/modules/form/form.ts:125-128) |
+| 118 | An app's own check reaches the browser by composing the grammar's (`WristbandCode()` is `Matches` with its message) | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:60, 99-100 | PROVEN | `a_wristband_code_is_checked_the_way_the_communitys_printer_reads_it` (refused in the page with the validator's message and nothing sent; the right code is saved) |
+| 119 | Rules for a nested object written inline (`ChildRules`) | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:71-72 | PROVEN | `the_pharmacy_phone_is_asked_for_in_the_house_format` |
+| 120 | `When(..).Otherwise(..)`: one rule inside the condition, another outside it | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:29-32 | PROVEN | `a_high_fall_risk_needs_a_mobility_plan` (score 9), `a_low_fall_risk_keeps_the_mobility_plan_short` (score 3) |
+| 121 | `Url()` | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:57 | PROVEN | `a_family_portal_link_must_be_a_web_address_and_may_be_left_blank` |
+| 122 | `Matches` with `RegexOptions.IgnoreCase`, run in the page as a JavaScript flag | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:50 | PROVEN | `an_assigned_room_reads_the_same_in_any_case` |
+| 123 | A message written from the model (`WithMessage(x => ..)`) is the server's: the rule runs there, and its words show beside the field | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:20 | PROVEN | `a_name_too_long_for_the_wristband_is_refused_by_the_server_in_its_own_words` (one request; the server's message) |
+| 124 | A pattern JavaScript reads differently (`\z`) is checked by the server only | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:76 | PROVEN | `a_forwarding_zip_is_checked_the_way_the_server_checks_it` |
+| 125 | `.ServerOnly()` keeps a rule off the page, and a length rule for a field the page does not render passes, as on the server | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:79, 86 | PROVEN | `a_rule_for_the_care_plan_summary_another_page_edits_does_not_hold_up_the_review` (the review is saved; were `ReviewedBy`'s `NotEmpty` run in the page, the field the page does not render would fail it: RT/modules/form/form.ts:125-128) |
 | 126 | A field that two validated containers hold (a section saved on its own, inside the whole form) is rechecked on leaving it against every container that holds it, whichever was declared first | `SB/Views/Validation/EmergencyContacts/Index.cshtml`; RT/modules/form/form.ts:169-190 | PROVEN | `Alis.Reactive.PlaywrightTests.Validation.EmergencyContacts.WhenCoordinatorRecordsEmergencyContacts.leaving_the_residents_name_empty_asks_for_it_before_anything_is_saved` |
+| 127 | A rule's own `.When(x => ..)`, written after its checks, conditions them in the page as well as on the server | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:36-37 | PROVEN | `a_moderate_fall_risk_of_five_needs_a_reassessment_plan`, `a_fall_risk_of_seven_needs_a_reassessment_plan_and_eight_does_not` (nothing is sent while the plan is missing: were the condition the server's alone, the review would be sent and refused) |

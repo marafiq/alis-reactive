@@ -1,4 +1,4 @@
-using FluentValidation;
+using Alis.Reactive.FluentValidator;
 using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.Fusion.Components;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
@@ -810,29 +810,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return rows;
         }
 
-        private static IActionResult ValidationError(Dictionary<string, string[]> errors) =>
+        private static IActionResult ValidationError(IReadOnlyDictionary<string, string[]> errors) =>
             new BadRequestObjectResult(new { errors });
 
         private static bool TryValidate<T>(IValidator<T> validator, T model, out IActionResult error)
         {
             var result = validator.Validate(model);
-            if (result.IsValid)
-            {
-                error = null!;
-                return true;
-            }
-
-            var errors = new Dictionary<string, string[]>();
-            foreach (var failure in result.Errors)
-            {
-                if (!errors.TryGetValue(failure.PropertyName, out var existing))
-                    errors[failure.PropertyName] = [failure.ErrorMessage];
-                else
-                    errors[failure.PropertyName] = [.. existing, failure.ErrorMessage];
-            }
-
-            error = ValidationError(errors);
-            return false;
+            error = result.IsValid ? null! : ValidationError(result.ErrorsByField);
+            return result.IsValid;
         }
     }
 

@@ -31,24 +31,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
             var result = validator.Validate(model);
 
             if (!result.IsValid)
-            {
-                var errors = new Dictionary<string, string[]>();
-                foreach (var failure in result.Errors)
-                {
-                    var key = failure.PropertyName;
-                    if (!errors.ContainsKey(key))
-                        errors[key] = new[] { failure.ErrorMessage };
-                    else
-                    {
-                        var existing = errors[key];
-                        var extended = new string[existing.Length + 1];
-                        existing.CopyTo(extended, 0);
-                        extended[existing.Length] = failure.ErrorMessage;
-                        errors[key] = extended;
-                    }
-                }
-                return BadRequest(new { errors });
-            }
+                return BadRequest(new { errors = result.ErrorsByField });
 
             return Ok(new { message = $"Preferences saved for {model.ResidentName}: {model.RoomType}" });
         }

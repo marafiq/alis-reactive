@@ -1,5 +1,4 @@
 using Alis.Reactive.FluentValidator;
-using FluentValidation;
 using Alis.Reactive.Fusion.Components;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
@@ -82,7 +81,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
     /// <summary>
     /// Client and server validation for an in-cell care row edit. The same
-    /// FluentValidation rules drive EJ2-native column validation in the grid
+    /// validator rules drive EJ2-native column validation in the grid
     /// (via <c>FusionGridValidation</c>) and a full server check on save.
     /// </summary>
     public class ResidentCareItemValidator : ReactiveValidator<ResidentCareItem>

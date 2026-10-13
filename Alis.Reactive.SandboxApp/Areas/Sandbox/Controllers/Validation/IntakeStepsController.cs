@@ -1,5 +1,5 @@
+using Alis.Reactive.FluentValidator;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
-using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
@@ -26,7 +26,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             if (intake == null) return BadRequest();
 
             var result = new IntakeResidentValidator().Validate(intake);
-            if (!result.IsValid) return BadRequest(new { errors = ByField(result) });
+            if (!result.IsValid) return BadRequest(new { errors = result.ErrorsByField });
 
             return PartialView(Views + "_CareStep.cshtml",
                 new IntakeStepsModel { ResidentName = intake.ResidentName, FamilyPhone = intake.FamilyPhone });
@@ -43,10 +43,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             if (intake == null) return BadRequest();
 
             // The finished intake answers to both steps' rules, whichever step is on the page.
-            var result = new ValidationResult(
-                new IntakeResidentValidator().Validate(intake).Errors
-                    .Concat(new IntakeCareValidator().Validate(intake).Errors));
-            if (!result.IsValid) return BadRequest(new { errors = ByField(result) });
+            var finished = new InlineValidator<IntakeStepsModel>();
+            finished.Include(new IntakeResidentValidator());
+            finished.Include(new IntakeCareValidator());
+            var result = finished.Validate(intake);
+            if (!result.IsValid) return BadRequest(new { errors = result.ErrorsByField });
 
             return Ok(new IntakeConfirmation($"{intake.CareLevel} intake saved for {intake.ResidentName}."));
         }
@@ -58,14 +59,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             if (intake == null) return BadRequest();
 
             var result = new IntakeCareValidator().Validate(intake);
-            if (!result.IsValid) return BadRequest(new { errors = ByField(result) });
+            if (!result.IsValid) return BadRequest(new { errors = result.ErrorsByField });
 
             return Ok(new IntakeConfirmation($"{intake.CareLevel} care needs sent to the nurse for review."));
         }
-
-        private static Dictionary<string, string[]> ByField(ValidationResult result) =>
-            result.Errors
-                .GroupBy(error => error.PropertyName)
-                .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).ToArray());
     }
 }

@@ -195,13 +195,13 @@ namespace Alis.Reactive
             throw new InvalidOperationException(
                 $"{requiredBy} specifies validation source '{validationSource.Name}', " +
                 "but no IClientValidationRuleSource could be resolved. " +
-                "Register the FluentValidation integration with AddReactiveFluentValidation(...) and bridge it to " +
+                "Register the validators with AddReactiveFluentValidation(...) and bridge it to " +
                 "MVC5 by calling DependencyResolver.SetResolver(...) in Application_Start.");
 #else
             throw new InvalidOperationException(
                 $"{requiredBy} specifies validation source '{validationSource.Name}', " +
                 "but no IClientValidationRuleSource is registered in DI. " +
-                "Register the FluentValidation integration with services.AddReactiveFluentValidation(...), " +
+                "Register the validators with services.AddReactiveFluentValidation(...), " +
                 "or register your own IClientValidationRuleSource.");
 #endif
         }

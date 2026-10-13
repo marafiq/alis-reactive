@@ -10,10 +10,10 @@ namespace Alis.Reactive.PlaywrightTests.Validation.MoveInReview;
 /// same rules the server applies, so that a review I save is one the community accepts.
 /// </summary>
 /// <remarks>
-/// The rules are written once in FluentValidation. The page checks every rule it can; a rule whose
-/// condition only the server can decide (a returning resident's previous room) is answered by the
-/// server, in the page's validation summary. The page sends every field it renders and, beside the
-/// pharmacy phone, the pharmacy network the community contracts.
+/// The rules are written once, in FluentValidation's grammar. The page checks every rule it can; a
+/// rule whose condition only the server can decide (a returning resident's previous room) is answered
+/// by the server, in the page's validation summary. The page sends every field it renders and, beside
+/// the pharmacy phone, the pharmacy network the community contracts.
 /// </remarks>
 [TestFixture]
 public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase

@@ -1,3 +1,4 @@
+using Alis.Reactive.FluentValidator;
 using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
@@ -65,32 +66,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             return ValidateAndRespond(model, new AjaxPartialValidator());
         }
 
-        private IActionResult ValidateAndRespond(ResidentModel? model, FluentValidation.IValidator<ResidentModel> validator)
+        private IActionResult ValidateAndRespond(ResidentModel? model, IValidator<ResidentModel> validator)
         {
             if (model == null)
                 return BadRequest(new { errors = new { Name = new[] { "Request body is required." } } });
 
             var result = validator.Validate(model);
-
             if (!result.IsValid)
-            {
-                var errors = new Dictionary<string, string[]>();
-                foreach (var failure in result.Errors)
-                {
-                    var key = failure.PropertyName;
-                    if (!errors.ContainsKey(key))
-                        errors[key] = new[] { failure.ErrorMessage };
-                    else
-                    {
-                        var existing = errors[key];
-                        var extended = new string[existing.Length + 1];
-                        existing.CopyTo(extended, 0);
-                        extended[existing.Length] = failure.ErrorMessage;
-                        errors[key] = extended;
-                    }
-                }
-                return BadRequest(new { errors });
-            }
+                return BadRequest(new { errors = result.ErrorsByField });
 
             return Ok(new { message = "Admission saved" });
         }

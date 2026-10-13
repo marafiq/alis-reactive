@@ -1,7 +1,6 @@
 namespace Alis.Reactive.PlaywrightTests.Validation.ClientRules;
 
 using Alis.Reactive.FluentValidator;
-using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 [TestFixture]
@@ -98,6 +97,23 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
     }
 
     [Test]
+    public void a_comparison_with_a_member_of_another_object_reads_that_member()
+    {
+        using var doc = ClientValidationRulePlanHarness
+            .RenderPlan<StayPlanModel, CrossObjectPeerValidator>();
+        var rule = ClientValidationRulePlanHarness
+            .RulesFor(doc.RootElement, "Review.ReviewDate")
+            .Single();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(rule.GetProperty("rule").GetString(), Is.EqualTo("gt"));
+            Assert.That(ClientValidationRulePlanHarness.PeerComponents(new[] { rule }),
+                Is.EqualTo(new[] { IdGenerator.For(typeof(StayPlanModel), "Stay.DischargeDate") }));
+        });
+    }
+
+    [Test]
     public void a_when_lambda_becomes_the_browser_condition()
     {
         using var doc = ClientValidationRulePlanHarness
@@ -113,6 +129,26 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
             Assert.That(condition.GetProperty("op").GetString(), Is.EqualTo("truthy"));
             Assert.That(ClientValidationRulePlanHarness.ComponentsReadBy(condition),
                 Is.EqualTo(new[] { IdGenerator.For(typeof(AssessmentModel), nameof(AssessmentModel.IsVeteran)) }));
+        });
+    }
+
+    [Test]
+    public void a_condition_after_a_rules_checks_becomes_the_browser_condition_of_those_checks()
+    {
+        using var doc = ClientValidationRulePlanHarness
+            .RenderPlan<AssessmentModel, RuleConditionValidator>();
+        var rules = ClientValidationRulePlanHarness.RulesFor(doc.RootElement, nameof(AssessmentModel.Notes));
+        var required = rules.Single(rule => rule.GetProperty("rule").GetString() == "required");
+        var maxLength = rules.Single(rule => rule.GetProperty("rule").GetString() == "maxLength");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(ClientValidationRulePlanHarness.RuleNames(rules), Is.EqualTo(new[] { "required", "maxLength" }));
+            Assert.That(required.GetProperty("when").GetProperty("op").GetString(), Is.EqualTo("truthy"));
+            Assert.That(ClientValidationRulePlanHarness.ComponentsReadBy(required.GetProperty("when")),
+                Is.EqualTo(new[] { IdGenerator.For(typeof(AssessmentModel), nameof(AssessmentModel.IsVeteran)) }));
+            Assert.That(ClientValidationRulePlanHarness.ComponentsReadBy(maxLength.GetProperty("when")), Is.Empty,
+                "The condition conditions only the checks written before it.");
         });
     }
 
@@ -166,7 +202,7 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
     }
 
     [Test]
-    public void rules_under_a_method_group_condition_stay_on_the_server()
+    public void rules_under_a_condition_that_calls_a_method_stay_on_the_server()
     {
         using var doc = ClientValidationRulePlanHarness
             .RenderPlan<AssessmentModel, MixedConditionValidator>();
@@ -186,7 +222,7 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
     }
 
     [Test]
-    public void fluent_validation_registrations_merge_across_service_modules()
+    public void validator_registrations_merge_across_service_modules()
     {
         var services = new ServiceCollection();
         services.AddReactiveFluentValidation(rules => rules.Add<BuiltInClientRulesValidator>());
@@ -216,7 +252,7 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
     }
 
     [Test]
-    public void assembly_scan_registers_client_metadata_validators_and_leaves_server_validators_server_only()
+    public void assembly_scan_registers_every_validator_and_builds_only_the_one_the_page_renders()
     {
         AssemblyScanServerOnlyValidator.InstanceCount = 0;
         var services = new ServiceCollection();
@@ -269,13 +305,13 @@ internal sealed class AssemblyScanServerOnlyModel
     public string? ServerOnly { get; set; }
 }
 
-internal sealed class AssemblyScanServerOnlyValidator : AbstractValidator<AssemblyScanServerOnlyModel>
+internal sealed class AssemblyScanServerOnlyValidator : ReactiveValidator<AssemblyScanServerOnlyModel>
 {
     internal static int InstanceCount { get; set; }
 
     public AssemblyScanServerOnlyValidator()
     {
         InstanceCount++;
-        RuleFor(model => model.ServerOnly).NotEmpty();
+        RuleFor(model => model.ServerOnly).NotEmpty().ServerOnly();
     }
 }

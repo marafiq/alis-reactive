@@ -80,7 +80,7 @@ namespace Alis.Reactive.Validation
         public static ClientRule MaxLength(int length, string message) =>
             new ClientRule("maxLength", message, length, null, ClientCondition.Always, Shape.None, ShapeDependence.None);
 
-        /// <summary>An email address, as FluentValidation's <c>EmailAddress()</c> reads one.</summary>
+        /// <summary>An email address, as <c>EmailAddress()</c> reads one: one @, neither first nor last.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
         public static ClientRule Email(string message) => Plain("email", message);
 

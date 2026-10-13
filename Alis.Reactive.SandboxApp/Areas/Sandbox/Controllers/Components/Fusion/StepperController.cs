@@ -1,5 +1,5 @@
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper;
-using FluentValidation;
+using Alis.Reactive.FluentValidator;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Concurrent;
 
@@ -95,8 +95,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         {
             model = model with { WizardId = EnsureWizardId(model.WizardId) };
 
-            var errors = new Dictionary<string, string[]>();
-            CollectErrors(new FusionStepperWizardReviewValidator().Validate(model), errors);
+            var errors = new Dictionary<string, string[]>(new FusionStepperWizardReviewValidator().Validate(model).ErrorsByField);
 
             if (!IntakeDrafts.TryGetValue(model.WizardId, out var intake))
                 errors["ResidentName"] = ["Complete intake before submitting."];
@@ -127,7 +126,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private static T GetDraft<T>(ConcurrentDictionary<string, T> store, string wizardId) where T : new() =>
             !string.IsNullOrEmpty(wizardId) && store.TryGetValue(wizardId, out var draft) ? draft : new T();
 
-        private static IActionResult ValidationError(Dictionary<string, string[]> errors) =>
+        private static IActionResult ValidationError(IReadOnlyDictionary<string, string[]> errors) =>
             new BadRequestObjectResult(new { errors });
 
         private IActionResult StepPartial<T>(string view, T model) =>
@@ -163,27 +162,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private static bool TryValidate<T>(IValidator<T> validator, T model, out IActionResult error)
         {
             var result = validator.Validate(model);
-            if (result.IsValid)
-            {
-                error = null!;
-                return true;
-            }
-
-            var errors = new Dictionary<string, string[]>();
-            CollectErrors(result, errors);
-            error = ValidationError(errors);
-            return false;
-        }
-
-        private static void CollectErrors(FluentValidation.Results.ValidationResult result, Dictionary<string, string[]> errors)
-        {
-            foreach (var failure in result.Errors)
-            {
-                if (!errors.TryGetValue(failure.PropertyName, out var existing))
-                    errors[failure.PropertyName] = [failure.ErrorMessage];
-                else
-                    errors[failure.PropertyName] = [.. existing, failure.ErrorMessage];
-            }
+            error = result.IsValid ? null! : ValidationError(result.ErrorsByField);
+            return result.IsValid;
         }
     }
 }

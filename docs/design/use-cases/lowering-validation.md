@@ -1,6 +1,12 @@
 > Lowering of `validation.md` into the grammar, read at `195d3a1`. The verdicts were recorded before [`../grammar.md`](../grammar.md) settled the gaps and ambiguities; that file's sections 8 and 9 give the decisions and the final counts. Each table was produced by one reader against the code and spot-checked.
 >
 > References re-anchored at `f36f62e`, and the C# ones again at `6ac4198`, where the lowering pass is gone: the FluentValidator builds the core's public `ClientRule` and `ClientCondition`, and the form writes its own grammar. The validation rework (`b966c57`) implemented this lowering, so verdicts and obligations stay as recorded at `195d3a1` and each now cites the code that carries it: `ClientRuleProjection.cs` and `BrowserCondition.cs` (`ClientCondition.cs` in the FluentValidator before `6ac4198`) read the FluentValidation rules and the `When` lambdas (O-ID, O-WHEN, O-PFX, O-IDX, O-CHILD), `FormWriter.cs` writes each rule as an `alis.form` test, and `Alis.Reactive.Assets/runtime/modules/form/form.ts` runs the tests; where the outcome changed, the row says how. The deleted rule engine (`rule-engine.ts`, `compare-engine.ts`, `orchestrator.ts`, `live-clear.ts`, `error-display.ts`) and C# builders (`ReactiveClientRuleBuilder.cs`, `FieldConditionBuilder.cs`, the app-level builders) are named without line numbers. Validation does not pass through `ObjectBinding`: a rule reads each input as MVC binds it, through `alis.model` (FormChecks.cs:34-35, 129-133; ValueExpression.cs:268-269), not through a component's members.
+>
+> Later, the framework implemented FluentValidation's grammar itself and dropped the package
+> ([`../grammar.md`](../grammar.md) section 7). The `ClientRuleProjection.cs`, `RecordingValidator.cs`,
+> `BrowserRule.cs` and `ReactiveRuleBuilderExtensions.cs` anchors below point at the commits named
+> above; those files are deleted, and each check's browser half now sits beside its server half in
+> `Checks.cs`.
 
 # Validation use cases lowered into architecture.md (v6)
 

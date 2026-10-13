@@ -1,3 +1,4 @@
+using Alis.Reactive.FluentValidator;
 using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.AdmissionWizard;
@@ -242,29 +243,17 @@ public class AdmissionWizardController : Controller
     public async Task<IActionResult> RequestRoomSetup([FromBody] RequestRoomSetupRequest? r)
     { await Task.Delay(500); return Ok(new ScreeningAlertResponse { Message = $"Room setup for {r?.ResidentName}", Urgency = "routine" }); }
 
-    private bool TryValidate<T>(FluentValidation.IValidator<T> validator, T model, out IActionResult error)
+    private bool TryValidate<T>(IValidator<T> validator, T model, out IActionResult error)
     {
         var result = validator.Validate(model);
-        if (result.IsValid)
-        {
-            error = null!;
-            return true;
-        }
-
-        var errors = new Dictionary<string, string[]>();
-        CollectErrors(result, errors);
-        error = BadRequest(new { errors });
-        return false;
+        error = result.IsValid ? null! : BadRequest(new { errors = result.ErrorsByField });
+        return result.IsValid;
     }
 
-    private static void CollectErrors(FluentValidation.Results.ValidationResult result, Dictionary<string, string[]> errors)
+    // The submit answers to every step's rules: each step's messages join the others' by field.
+    private static void CollectErrors(ValidationResult result, Dictionary<string, string[]> errors)
     {
-        foreach (var f in result.Errors)
-        {
-            if (!errors.ContainsKey(f.PropertyName))
-                errors[f.PropertyName] = [f.ErrorMessage];
-            else
-                errors[f.PropertyName] = [..errors[f.PropertyName], f.ErrorMessage];
-        }
+        foreach (var field in result.ErrorsByField)
+            errors[field.Key] = errors.TryGetValue(field.Key, out var earlier) ? [.. earlier, .. field.Value] : field.Value;
     }
 }

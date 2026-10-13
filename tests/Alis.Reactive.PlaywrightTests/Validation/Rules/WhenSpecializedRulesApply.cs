@@ -306,7 +306,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // FluentValidation drops dashes and spaces and refuses any other character that is not a digit.
+    // The card rule drops dashes and spaces and refuses any other character that is not a digit.
     [Test]
     public async Task a_card_number_with_a_letter_in_it_is_refused_though_its_digits_check_out()
     {
@@ -322,7 +322,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // FluentValidation sets no minimum length: a twelve-digit number that passes the Luhn check is a
+    // The card rule sets no minimum length: a twelve-digit number that passes the Luhn check is a
     // card number to the server, so the browser lets it through and the server accepts it.
     [Test]
     public async Task a_twelve_digit_card_number_that_passes_the_check_is_accepted_by_the_server_too()

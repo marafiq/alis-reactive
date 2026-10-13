@@ -1,6 +1,6 @@
+using Alis.Reactive.FluentValidator;
 using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
-using FluentValidation.Results;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 {
@@ -33,11 +33,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             if (model == null)
                 return BadRequest(new { errors = new { Name = new[] { "Request body is required." } } });
 
-            var validator = new ValidationShowcaseValidator();
-            var result = validator.Validate(model);
-
+            var result = new ValidationShowcaseValidator().Validate(model);
             if (!result.IsValid)
-                return BuildValidationBadRequest(result);
+                return BadRequest(new { errors = result.ErrorsByField });
 
             return Ok(new { message = "Saved successfully!" });
         }
@@ -67,15 +65,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             var dbSection = model.Db;
             if (dbSection != null)
             {
-                var sectionValidator = new BasicSectionValidator();
-                var fvResult = sectionValidator.Validate(dbSection);
-
-                if (!fvResult.IsValid)
+                // The section's own rules name its fields from the section; the page names them under Db.
+                var sectionResult = new BasicSectionValidator().Validate(dbSection);
+                if (!sectionResult.IsValid)
                 {
-                    var fvErrors = new Dictionary<string, string[]>();
-                    foreach (var failure in fvResult.Errors)
-                        fvErrors["Db." + failure.PropertyName] = new[] { failure.ErrorMessage };
-                    return BadRequest(new { errors = fvErrors });
+                    var sectionErrors = sectionResult.ErrorsByField.ToDictionary(field => "Db." + field.Key, field => field.Value);
+                    return BadRequest(new { errors = sectionErrors });
                 }
             }
 
@@ -93,25 +88,5 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 
         [HttpPost("ValidateClient")]
         public IActionResult ValidateClient() => Ok(new { message = "Client validation passed!" });
-
-        private IActionResult BuildValidationBadRequest(ValidationResult result)
-        {
-            var errors = new Dictionary<string, string[]>();
-            foreach (var failure in result.Errors)
-            {
-                if (!errors.TryGetValue(failure.PropertyName, out var existing))
-                {
-                    errors[failure.PropertyName] = new[] { failure.ErrorMessage };
-                }
-                else
-                {
-                    var extended = new string[existing.Length + 1];
-                    existing.CopyTo(extended, 0);
-                    extended[existing.Length] = failure.ErrorMessage;
-                    errors[failure.PropertyName] = extended;
-                }
-            }
-            return BadRequest(new { errors });
-        }
     }
 }

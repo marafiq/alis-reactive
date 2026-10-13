@@ -55,12 +55,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
 
             var result = new FamilyVisitPlanValidator().Validate(plan);
             if (!result.IsValid)
-            {
-                var errors = result.Errors
-                    .GroupBy(error => error.PropertyName)
-                    .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).ToArray());
-                return BadRequest(new { errors });
-            }
+                return BadRequest(new { errors = result.ErrorsByField });
 
             var resident = Find(plan.ResidentId);
             if (resident == null) return BadRequest();

@@ -6,7 +6,7 @@ namespace Alis.Reactive.Validation
     /// <summary>
     /// The browser rules of a validator, by its type: what a plan's forms check and what
     /// <c>plan.ClientRules&lt;TValidator&gt;()</c> returns. <c>AddReactiveFluentValidation</c> registers
-    /// FluentValidation's; another validation library registers its own, built with <see cref="ClientRuleSet"/>.
+    /// <c>ReactiveValidator</c>'s; another validation library registers its own, built with <see cref="ClientRuleSet"/>.
     /// </summary>
     public interface IClientValidationRuleSource
     {

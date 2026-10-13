@@ -89,7 +89,7 @@ a missing secret, mention the possibility without reading the secret store.
 ### Schema Principles
 - `shape` on ValidationRule is derived from the comparison operand's CLR type during rule extraction (via `Shape.FromClrType()`). Non-comparison rules (required, email, regex) carry `Shape.None`; component shape comes from `Shape.FromClrType(typeof(TProp))` at registration time.
 - `field` on ValidationRule for cross-property comparisons uses the same deterministic ID system as everything else: TModel, prop expression, known type, predictable ID.
-- Schema must be deterministic — no fallbacks, no silent drops. Every FluentValidation rule either extracts to a client rule or is explicitly documented as server-only.
+- Schema must be deterministic — no fallbacks, no silent drops. Every validation rule either reaches the browser or is server-only by what it is (a C# predicate, a message built from the model, a condition with no browser form, `.ServerOnly()`).
 - `Empty()` and `Null()` are extractable. PrecisionScale, IsInEnum, IsEnumName are server-only.
 
 ### Cross-Property Comparisons

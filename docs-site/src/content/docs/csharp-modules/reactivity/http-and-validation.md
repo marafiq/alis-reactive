@@ -188,9 +188,10 @@ p.Post("/Todo/Save").Gather(g => g.Form())
     .OnError(400, e => e.ValidationErrors("todo-form")));
 ```
 
-The validator is a FluentValidation validator that derives from `ReactiveValidator<T>`.
-Rules are written once, in FluentValidation's grammar; the server runs them all, and the
-browser runs every rule it can evaluate.
+The validator derives from `ReactiveValidator<T>` and is written in FluentValidation's grammar.
+Rules are written once; the server runs them all, and the browser runs every rule it can evaluate.
+You do not install FluentValidation: the framework implements its grammar, so each check knows
+whether the browser can run it.
 
 ```csharp
 public sealed class TodoValidator : ReactiveValidator<TodoModel>
@@ -203,40 +204,47 @@ public sealed class TodoValidator : ReactiveValidator<TodoModel>
 ```
 
 The browser evaluates `NotEmpty`, `NotNull` (not on a collection), `Empty`, `MinimumLength`, `MaximumLength`, `Length`,
-`EmailAddress`, `Matches`, `CreditCard`, `Url()`, `InclusiveBetween`, `ExclusiveBetween`, and
-comparisons with a value or a sibling member. `SetValidator`, `RuleForEach(...).SetValidator`,
-`Include` and `ChildRules` bring a child validator's rules along. `Must`, `Custom` and async rules stay on
+`EmailAddress`, `Matches`, `CreditCard`, `Url`, `InclusiveBetween`, `ExclusiveBetween`, and
+comparisons with a value or another member. `SetValidator`, `RuleForEach(...).SetValidator`,
+`Include` and `ChildRules` bring a child validator's rules along. `Must` and `MustAsync` stay on
 the server, and so do a rule whose message is written from the model (`WithMessage(x => ...)`),
 a `Matches` pattern that JavaScript reads differently from .NET (`^\d{5}\z`, `(?i)...`),
 and any rule followed by `.ServerOnly()`.
 
-Your own validator reaches the browser when it implements `IBrowserRule` and names the browser
-check that decides what its `IsValid` decides. From the move-in review page:
+### How do I write my own check?
+
+Write an extension method that composes the checks above. The server and the browser both run it.
+From the move-in review page:
 
 ```csharp
-public sealed class WristbandCodeValidator<T> : PropertyValidator<T, string?>, IBrowserRule
+public static class WristbandRules
 {
-    private const string Code = @"^WB-\d{6}$";
-
-    public override string Name => "WristbandCodeValidator";
-
-    public BrowserRule Browser => BrowserRule.Pattern(Code);
-
-    public override bool IsValid(ValidationContext<T> context, string? value) =>
-        string.IsNullOrEmpty(value) || Regex.IsMatch(value, Code);
-
-    protected override string GetDefaultMessageTemplate(string errorCode) =>
-        "Enter the wristband code as WB- and six digits, like WB-104233.";
+    /// <summary>The wristband printer reads WB- and six digits.</summary>
+    public static IRuleBuilderOptions<T, string?> WristbandCode<T>(this IRuleBuilder<T, string?> rule) =>
+        rule.Matches(@"^WB-\d{6}$").WithMessage("Enter the wristband code as WB- and six digits, like WB-104233.");
 }
+
+RuleFor(x => x.WristbandCode).WristbandCode();
 ```
 
-`BrowserRule` offers `Pattern(..)`, `Url`, `Email`, `CreditCard` and `Length(min, max)`. A validator
-without `IBrowserRule` runs on the server only.
+A check that needs C# (a database lookup, a service) is `Must` or `MustAsync`, and the server
+alone runs it.
+
+### What does the controller send back?
+
+`Validate` returns the broken rules; `ErrorsByField` is what a 400 response sends for the page to
+show beside each field. A validator with a `MustAsync` rule validates with `ValidateAsync`.
+
+```csharp
+var result = new TodoValidator().Validate(model);
+if (!result.IsValid)
+    return BadRequest(new { errors = result.ErrorsByField });
+```
 
 The browser gives each rule the answer the server gives. It reads a field the way MVC binds it, so
 blank text is null and an empty `decimal` is 0: `ExclusiveBetween(0, 100)` on an empty `decimal`
 fails in both places, and `GreaterThan` on an empty `DateTime?` passes in both. `EmailAddress` and
-`CreditCard` are FluentValidation's own checks, not stricter browser versions.
+`CreditCard` are the server's own checks, not stricter browser versions.
 
 ## Conditional Rules
 
@@ -249,10 +257,18 @@ When(x => x.IsUrgent, () =>
 });
 ```
 
+A condition can also follow a rule's checks, and it applies to the checks written before it. From
+the move-in review page:
+
+```csharp
+RuleFor(x => x.ReassessmentPlan).NotEmpty().WithMessage("A moderate fall risk needs a reassessment plan.")
+    .When(x => x.FallRiskScore >= 5 && x.FallRiskScore <= 7);
+```
+
 The browser understands comparisons of model members with values, `string.IsNullOrEmpty`,
 `Contains`, `StartsWith`, `EndsWith`, `Regex.IsMatch` and membership in a fixed set, joined by
-`&&`, `||` and `!`. `Otherwise` and `Unless` work the same way. A condition written as a method
-group, over the validation context, or async keeps its rules on the server.
+`&&`, `||` and `!`. `Otherwise` and `Unless` work the same way. A condition that calls a method,
+or reads anything else, keeps its rules on the server.
 
 ## Parallel Requests
 

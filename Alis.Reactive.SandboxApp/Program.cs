@@ -25,7 +25,7 @@ builder.Services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(
 builder.Services.AddReactiveFluentValidation(validation =>
     validation.AddFromAssemblyContaining<Program>());
 // The reservations office registers its own validators, as a module from its own assembly would; the
-// registrations merge with the app's, and its plain FluentValidation rules stay on the server.
+// registrations merge with the app's, and its hold-book rule runs on the server alone.
 builder.Services.AddReactiveFluentValidation(validation =>
     validation.Add<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ReservationsOfficeValidator>());
 // Maple Grove's rate policy: the rate sheet's validator takes it from DI, for the page and the server alike.

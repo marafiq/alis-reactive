@@ -25,12 +25,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 
             var result = new EmergencyContactsValidator().Validate(intake);
             if (!result.IsValid)
-            {
-                var errors = result.Errors
-                    .GroupBy(error => error.PropertyName)
-                    .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).ToArray());
-                return BadRequest(new { errors });
-            }
+                return BadRequest(new { errors = result.ErrorsByField });
 
             return Ok(new EmergencyContactsConfirmation(ConfirmationFor(intake)));
         }

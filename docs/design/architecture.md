@@ -243,9 +243,9 @@ These are the features that make Alis.Reactive what it is. The design must keep 
 1. **Behavior is typed C#, written where the component renders.** Views carry no JavaScript. The
    plan is data, and the generated TS contract turns drift between C# and the runtime into a
    typecheck failure.
-2. **Validation is written once.** A FluentValidation rule runs on the server and in the browser,
-   including conditional, nested and per-item rules, live clearing and revalidation, server
-   errors mapped back to fields, and grid column rules from the same validator.
+2. **Validation is written once.** A rule written in FluentValidation's grammar runs on the server
+   and in the browser, including conditional, nested and per-item rules, live clearing and
+   revalidation, server errors mapped back to fields, and grid column rules from the same validator.
 3. **A typed HTTP pipeline.**
    - Values gathered from any source, URL templates, typed responses routed by status.
    - Chained and parallel requests, `WhileLoading`, `Finally`, validation before send.
@@ -733,62 +733,64 @@ These are all declarations, used the same way as components.
   - Confirm's `Ask` is an async member. The Fusion package's confirm module defines it on the dialog
     element, so the `window.alis.confirm` global (`confirm.ts:103`) goes.
 
-### 4.9 Validation: FluentValidation's grammar, projected to the browser
+### 4.9 Validation: FluentValidation's grammar, owned by the framework
 
 ```csharp
 public sealed class AdmissionValidator : ReactiveValidator<Admission>
 {
-    public AdmissionValidator()
+    public AdmissionValidator(IRoomBook rooms)
     {
         RuleFor(x => x.Age).GreaterThan(0).WithMessage("Enter the resident's age.");
         RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmitDate);
         When(x => x.CareLevel == CareLevel.Memory, () =>
             RuleFor(x => x.Physician).NotEmpty());
+        RuleFor(x => x.Notes).NotEmpty().When(x => x.IsVeteran);
         RuleForEach(x => x.Contacts).SetValidator(new ContactValidator());
-        RuleFor(x => x.Website).Url();                 // a framework validator that projects itself
+        RuleFor(x => x.Website).Url();
+        RuleFor(x => x.Room).MustAsync(rooms.IsFreeAsync).WithMessage("That room is taken.");
     }
 }
 ```
 
-- **One statement per rule.** FluentValidation's own statement serves server and browser. Today
-  about 100 properties in 20 sandbox validators state each rule twice.
-- **Projection.** The framework reads FluentValidation's public rule descriptors.
-  `IValidationRule.Components`, `HasCondition` and `HasAsyncCondition`, and
-  `IComparisonValidator.Comparison`, `MemberToCompare` and `ValueToCompare` were confirmed in
-  FluentValidation's source; 11.12 is checked in step 0.
-- **Which rules reach the browser.** Each built-in validator the browser can run projects to a test
-  expression:
+- **One statement per rule.** The developer writes FluentValidation's grammar; the framework
+  implements it and does not use the FluentValidation package. Each check is one term of the
+  vocabulary with two halves: what the server decides, and, when the browser decides it the same
+  way, the `ClientRule` the plan carries. Before this redesign about 100 properties in 20 sandbox
+  validators stated each rule twice; a first version of the redesign read FluentValidation's rule
+  descriptors by reflection, which needed its internals (a private regex field, a protected message
+  method) and a parallel condition recorder.
+- **Which rules reach the browser.** Every term the browser can run:
   - `NotNull`, `NotEmpty`, `Empty`;
   - `Length`, `MinimumLength`, `MaximumLength`;
-  - the six comparisons against a literal or a peer;
+  - the six comparisons against a literal or another member;
   - `InclusiveBetween`, `ExclusiveBetween`;
-  - `Matches`, `EmailAddress`, `CreditCard`;
+  - `Matches`, `EmailAddress`, `CreditCard`, `Url`;
   - `NotEmpty` on a collection, which is "at least one".
-- **Custom validators opt in** by implementing `IBrowserRule<T>`; the framework's `Url()` is one.
-- **Server-only rules.** `Must`, `MustAsync`, `Custom` and delegate conditions stay server-only
-  with no extra code. An analyzer warns when a `ReactiveValidator` uses a rule-level delegate
-  `.When`, which the browser cannot see.
-- **Conditions.** `When` and `Unless` blocks take an expression. The server compiles it, and the
-  browser gets it through the same compiler as array predicates.
-- **Peers.** A peer (`MemberToCompare`) resolves against the validated property's parent. The 7
-  peer rules in the sandbox are all siblings.
+- **Custom checks compose the vocabulary.** An app's check is an extension method over the grammar
+  (`rule.Matches(..).WithMessage(..)`), so the server and the browser run it with no new term.
+- **Server-only by what a rule is.** `Must` and `MustAsync` are C#; a message built from the model,
+  a pattern JavaScript reads differently and a condition with no browser form are the server's;
+  `.ServerOnly()` keeps the checks before it on the server. Nothing lists them.
+- **Conditions.** `When` and `Unless`, around a block or after a rule's checks, take an expression.
+  The server compiles it, and the browser gets it through the same compiler as array predicates.
+- **Peers.** Another member is read by its path from the model, so it need not be a sibling.
 - **Semantics decided in C#:**
   - `NotEmpty` means FluentValidation's empty: null, blank text, an empty collection, or the
     type's default value.
-  - Empty input follows the property's CLR type, as model binding and FluentValidation do on the
-    server. A non-nullable number reads an empty input as its default, so `GreaterThan(0)` fails on
-    empty. A nullable property's comparison passes on empty.
+  - Empty input follows the property's CLR type, as model binding and the server's checks do. A
+    non-nullable number reads an empty input as its default, so `GreaterThan(0)` fails on empty. A
+    nullable property's comparison passes on empty.
     - Before this redesign the browser failed `gt` on empty but passed `min`, `max`, `lt` and
       ranges (the deleted `rule-engine.ts`).
     - A frozen journey that depended on that difference fails at the validation step and comes to
       the owner for a decision; it is not edited.
-  - Messages keep today's browser text through `.WithMessage`, because FluentValidation's defaults
-    differ. For example, its default `'Age' must be greater than '0'.` differs from today's
-    `'Age' must be greater than 0.`.
+  - Default messages are FluentValidation's English templates. Messages keep today's browser text
+    through `.WithMessage`, because the defaults differ: `'Age' must be greater than '0'.` is not
+    today's `'Age' must be greater than 0.`.
   - Dates compare as timestamps.
-  - A regex pattern reaches the browser only when JavaScript reads it the same way. A pattern built
-    from the model, with an option JavaScript lacks, or with .NET-only syntax stays on the server
-    (`ClientRuleProjection.cs`, `PatternCheck`).
+  - A regex pattern reaches the browser only when JavaScript reads it the same way. A pattern with
+    an option JavaScript lacks, or with .NET-only syntax, stays on the server (`Checks.cs`,
+    `JavaScriptPattern`).
 - **The form is an object.** `plugin("alis.form", id)` holds the projected tests and the inputs bound to
   it. `Validate()`, `ShowErrors(problem)` and `Values` are its members, and live clearing and
   revalidation happen inside it. Each test is `{ field, check, when, message }`, where `check` and
@@ -796,8 +798,8 @@ public sealed class AdmissionValidator : ReactiveValidator<Admission>
 - **Deleted:** the hand-written `ClientRule` builders, the 18 `WhenField*` methods and `WhenFields`,
   the field-condition builders, the operand and activation types, `AddReactiveClientValidation`, and
   the whole runtime rule engine. What a validator gives the browser is public data: `ClientRule`,
-  `ClientCondition` and `ClientRuleSet` (`Alis.Reactive/Validation`), which the FluentValidation
-  integration builds with no core internals. `IClientValidationRuleSource` is how a plan reaches the
+  `ClientCondition` and `ClientRuleSet` (`Alis.Reactive/Validation`), which the validation package
+  builds with no core internals. `IClientValidationRuleSource` is how a plan reaches the
   validators registered through DI; a grid reads a validator's rules from its plan,
   `FusionGridValidation.From<TRow>(plan.ClientRules<TValidator>())`.
 
@@ -861,8 +863,8 @@ How it works:
 - **Members** of `string`, `DateTime`, `IEnumerable<T>` and declared objects map through the one
   member table (`grammar.md` section 2.3). A new member is one table row and no runtime change.
 - **Anything else** fails at render, naming the construct. In a validator's `When` or `Unless`,
-  a condition the browser cannot evaluate keeps the rules inside it on the server instead
-  (`ClientScope.cs`).
+  a condition the browser cannot evaluate keeps the rules under it on the server instead
+  (`Rules.cs`, `Conditions<T>.TryForBrowser`).
 
 ## 7. Component onboarding, inverted
 
@@ -1053,7 +1055,7 @@ executor. The switch is deleted with today's executor when the last area has mov
    | 1 | HTTP pipeline | `http`, elements, Loader, the action link, the request API |
    | 2 | Conditions, arrays, dispatch, plugins | the fluent conditions, Confirm, the document, plugins |
    | 3 | Fusion Grid journeys | the Fusion vendor, Grid and its payloads, slots and `Into` |
-   | 4 | Validation | `form`, the FluentValidation projection, inputs and `Committed` events |
+   | 4 | Validation | `form`, the validator projection, inputs and `Committed` events |
    | 5 | Realtime | `stream`, `hub` |
    | 6 | Patterns and every remaining component page | the rest of the 66 declarations, Native, Tom Select |
 
@@ -1121,10 +1123,9 @@ built and what is not.
     `Get()`, `Post()`, `Put()` and `Delete()` to the href, `Confirm(..).Then(..)` before it, and
     `Component<T>(id)` for a value it sends; a second request, or none, throws at render. ALIS002
     keeps only what the link's own plan cannot have (`Validate`, `Form()`).
-  - custom validators reach the browser (section 4.9): `IBrowserRule` names the browser check that
-    decides what a validator's `IsValid` decides (`BrowserRule.Pattern(..)`, `Url`, `Email`,
-    `CreditCard`, `Length(min, max)`); the framework's own `Url()` uses it, and the move-in review's
-    app-declared `WristbandCodeValidator` proves it in the browser.
+  - custom checks reach the browser (section 4.9): an app's check composes the vocabulary, so the
+    move-in review's app-declared `WristbandCode()` (`Matches` with its message) runs in the browser
+    with no new term.
   - steps of one form loaded into a slot (law 4 of section 0.3, grammar F9). Each step of the intake
     journey validates only its own fields against the whole form and leaves with them when the next
     step replaces it; finishing the care step does not re-check the resident step. This journey was
@@ -1150,7 +1151,7 @@ built and what is not.
   - declarations are ordinary nullable-annotated C# (`2696e3e`); the `#nullable disable annotations`
     region is gone.
   - a public browser-rule contract (`6ac4198`): `ClientRule`, `ClientCondition` and `ClientRuleSet`;
-    the FluentValidation integration builds them with no core internals, and the core's
+    the validation package builds them with no core internals, and the core's
     `InternalsVisibleTo` names only the contract generator.
   - shapes, paths and typed sources are each one small type (`d439302`); the open-object shape, which
     nothing produced, leaves the contract and the runtime.
@@ -1182,6 +1183,13 @@ built and what is not.
   - `p.Confirm` no longer needs Syncfusion (`3dbacfc`): the Fusion confirm answers only on a page
     that renders its dialog, and a page may give `alis.confirm` from its own code (the sandbox's
     Room Holds page answers with a native `<dialog>`).
+- **Built after the October 13 validation review:**
+  - the framework implements FluentValidation's grammar itself and drops the package (section 4.9).
+    Each check defines its server and browser halves in one place; a C# predicate has no browser
+    half, so it is the server's by what it is. The reflection over FluentValidation's descriptors,
+    the recording base class, `IBrowserRule` and analyzer ALIS006 (a rule's own `.When` was
+    server-only) are deleted. A rule's own `.When(x => ..)` now runs in the browser, and the move-in
+    review's reassessment plan uses it.
 - **Step 0, closed after the redesign** (`1ca7c9a` through `a1af1a2`; CI run 38366597452, 1,526
   Playwright tests passed). Step 0 (sections 10 and 12) was not done before the redesign. Its
   inventories were re-audited at `7c34a86`: of 155 rows still marked weak, plan-only or missing, 14 were

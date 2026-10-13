@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Alis.Reactive.FluentValidator;
 using Alis.Reactive.Validation;
-using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -114,11 +113,13 @@ internal static class ClientValidationRulePlanHarness
         {
             rules.Add<AsyncOnlyValidator>();
             rules.Add<BuiltInPeerComparisonValidator>();
+            rules.Add<CrossObjectPeerValidator>();
             rules.Add<BuiltInClientRulesValidator>();
             rules.Add<ConfirmEmailValidator>();
             rules.Add<ReactiveAssessmentValidator>();
             rules.Add<ComposedAssessmentValidator>();
             rules.Add<MixedConditionValidator>();
+            rules.Add<RuleConditionValidator>();
             rules.Add<ServerOnlyRuleValidator>();
             rules.Add<TaggedAssessmentValidator>();
         });
@@ -200,6 +201,26 @@ internal sealed class BuiltInPeerComparisonValidator : ReactiveValidator<StayWin
     }
 }
 
+internal sealed class StayPlanModel
+{
+    public StayWindow Stay { get; set; } = new StayWindow();
+    public CarePlanReview Review { get; set; } = new CarePlanReview();
+}
+
+internal sealed class CarePlanReview
+{
+    public DateTime ReviewDate { get; set; }
+}
+
+internal sealed class CrossObjectPeerValidator : ReactiveValidator<StayPlanModel>
+{
+    public CrossObjectPeerValidator()
+    {
+        RuleFor(model => model.Review.ReviewDate)
+            .GreaterThan(model => model.Stay.DischargeDate).WithMessage("Review the care plan after discharge.");
+    }
+}
+
 internal sealed class ConfirmEmailValidator : ReactiveValidator<ConfirmEmailModel>
 {
     public ConfirmEmailValidator()
@@ -242,7 +263,7 @@ internal sealed class MixedConditionValidator : ReactiveValidator<AssessmentMode
     {
         When(model => model.IsVeteran, () =>
         {
-            When(IsServerFlagged, () =>
+            When(model => IsServerFlagged(model), () =>
             {
                 RuleFor(model => model.Score).NotEmpty()
                     .WithMessage("Score required by server condition.");
@@ -250,8 +271,19 @@ internal sealed class MixedConditionValidator : ReactiveValidator<AssessmentMode
         });
     }
 
-    // A method group is a C# predicate FluentValidation runs; the browser has no form of it.
+    // A method is C# only the server runs; the browser has no form of a condition that calls one.
     private static bool IsServerFlagged(AssessmentModel model) => model.ServerFlag;
+}
+
+internal sealed class RuleConditionValidator : ReactiveValidator<AssessmentModel>
+{
+    public RuleConditionValidator()
+    {
+        RuleFor(model => model.Notes)
+            .NotEmpty().WithMessage("Notes are required for veterans.")
+            .When(model => model.IsVeteran)
+            .MaximumLength(200).WithMessage("Keep notes under 200 characters.");
+    }
 }
 
 internal sealed class ServerOnlyRuleValidator : ReactiveValidator<AssessmentModel>

@@ -71,7 +71,7 @@ namespace Alis.Reactive.Validation
     /// model (<c>"Address.City"</c>) and typed by its C# type.
     /// </summary>
     /// <remarks>
-    /// A validation integration builds one from its validator's own condition; FluentValidation's
+    /// A validator builds one from a rule's own condition: <c>ReactiveValidator</c>'s
     /// <c>When(x =&gt; x.IsVeteran)</c> is <c>ClientCondition.Is("IsVeteran", typeof(bool), ClientValueTest.Truthy)</c>.
     /// </remarks>
     public abstract class ClientCondition

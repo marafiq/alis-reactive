@@ -10,7 +10,7 @@ namespace Alis.Reactive.PlanModel
     /// Writes a validation container's rules as <c>alis.form</c> data: per field its value read, the
     /// name the server reports errors under, and one test per rule. A test's check is a lambda of the
     /// field's value that is true when the value passes. Every input a rule reads is read as MVC binds
-    /// it, and each check is FluentValidation's own verdict on that value (grammar.md 7.3).
+    /// it, and each check is the server rule's own verdict on that value (grammar.md 7.4).
     /// </summary>
     internal sealed class FormWriter
     {
@@ -85,7 +85,7 @@ namespace Alis.Reactive.PlanModel
                 ? values.Value(rule.Peer).Write(_scope)
                 : G.Lit(Constraint(rule));
 
-        // A bound value FluentValidation's null checks skip: nothing bound (blank text binds as null).
+        // A bound value the server's null checks skip: nothing bound (blank text binds as null).
         private static Expr Absent(Expr v) => G.Eq(v, G.Null);
 
         // Nothing was entered: a missing value, one whose text is "" (an empty list included), or one
@@ -123,7 +123,7 @@ namespace Alis.Reactive.PlanModel
 
         private static Expr TextLength(Expr v) => G.Get(G.Op(Operator.ToText, v), new[] { "length" }, Shape.None);
 
-        // FluentValidation's card check: dashes and spaces dropped, every other character a digit, and
+        // The server's card check: dashes and spaces dropped, every other character a digit, and
         // the Luhn sum a multiple of ten.
         private Expr CardNumber(Expr v)
         {
@@ -155,7 +155,7 @@ namespace Alis.Reactive.PlanModel
             return G.Apply(G.Fn(valid, digits), withoutSeparators);
         }
 
-        // An ordered rule passes on nothing bound, as FluentValidation's comparisons do; otherwise it
+        // An ordered rule passes on nothing bound, as the server's comparisons do; otherwise it
         // compares the value and its target as numbers under the comparison shape, and a pair that
         // cannot be compared (a peer with nothing bound) fails.
         private Expr Ordered(Expr v, Expr target, Shape comparison, Operator op)
@@ -213,7 +213,7 @@ namespace Alis.Reactive.PlanModel
             }
         }
 
-        // Equality under the comparison shape, with no skip for nothing bound, as FluentValidation's
+        // Equality under the comparison shape, with no skip for nothing bound, as the server's
         // Equal and NotEqual: both sides converted the way the shape converts a missing value too;
         // with no shape, both as text.
         private static Expr Same(Expr v, Expr target, Shape comparison) =>

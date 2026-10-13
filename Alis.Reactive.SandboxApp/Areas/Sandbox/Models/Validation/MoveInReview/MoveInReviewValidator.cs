@@ -1,7 +1,5 @@
 using Alis.Reactive.FluentValidator;
 using System.Text.RegularExpressions;
-using FluentValidation;
-using FluentValidation.Validators;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
@@ -13,7 +11,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public MoveInReviewValidator()
         {
-            // FluentValidation's own message, named the way FluentValidation names the field.
+            // The grammar's own message, naming the field the way FluentValidation names it.
             RuleFor(x => x.ResidentName).NotEmpty();
 
             // A message written from the model can only be said by the server, so this rule runs there;
@@ -33,9 +31,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                 .Otherwise(() =>
                     RuleFor(x => x.MobilityNotes).MaximumLength(40).WithMessage("Keep mobility notes under 40 characters."));
 
-            // A moderate score, 5 to 7, needs a plan for reassessing the resident.
-            When(x => x.FallRiskScore >= 5 && x.FallRiskScore <= 7, () =>
-                RuleFor(x => x.ReassessmentPlan).NotEmpty().WithMessage("A moderate fall risk needs a reassessment plan."));
+            // A moderate score, 5 to 7, needs a plan for reassessing the resident. A condition written after
+            // a rule's checks conditions them in the browser too.
+            RuleFor(x => x.ReassessmentPlan).NotEmpty().WithMessage("A moderate fall risk needs a reassessment plan.")
+                .When(x => x.FallRiskScore >= 5 && x.FallRiskScore <= 7);
 
             // A long mobility plan goes to a therapist. A condition on a length has no browser form,
             // so the server alone checks this rule.
@@ -57,7 +56,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             Unless(x => string.IsNullOrEmpty(x.FamilyPortalLink), () =>
                 RuleFor(x => x.FamilyPortalLink).Url().WithMessage("The family portal link must be a web address."));
 
-            // The community's own validator: it names the browser check that decides what it decides.
+            // The community's own check, composed from the grammar's, so the browser runs it too.
             RuleFor(x => x.WristbandCode).WristbandCode();
 
             // Temporary wristbands are numbered WB-9 and five digits.
@@ -79,8 +78,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             // A field another page edits: this page sends no summary, which is under 500 characters.
             RuleFor(x => x.CarePlanSummary).MaximumLength(500).WithMessage("Keep the care plan summary under 500 characters.");
 
-            // A condition written as a method: the server decides it, so the browser does not run the rule.
-            When(IsReturningResident, () =>
+            // A condition that calls a method: only the server can run it, so the browser does not run the rule.
+            When(x => IsReturningResident(x), () =>
                 RuleFor(x => x.PreviousRoom).NotEmpty().WithMessage("A returning resident's previous room is required."));
 
             // The server fills this in; the page has no input for it.
@@ -90,26 +89,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         private static bool IsReturningResident(MoveInReviewModel review) => review.IsReturning;
     }
 
-    /// <summary>The community's wristband rule, declared in the app: the framework ships no such check.</summary>
+    /// <summary>
+    /// The community's wristband rule, declared in the app: the framework ships no such check. It is written
+    /// with the grammar's own checks, so the server and the browser decide it the same way.
+    /// </summary>
     public static class WristbandRules
     {
+        /// <summary>The wristband printer reads WB- and six digits.</summary>
         public static IRuleBuilderOptions<T, string?> WristbandCode<T>(this IRuleBuilder<T, string?> rule) =>
-            rule.SetValidator(new WristbandCodeValidator<T>());
-    }
-
-    /// <summary>The wristband printer reads WB- and six digits; the browser checks the same pattern.</summary>
-    public sealed class WristbandCodeValidator<T> : PropertyValidator<T, string?>, IBrowserRule
-    {
-        private const string Code = @"^WB-\d{6}$";
-
-        public override string Name => "WristbandCodeValidator";
-
-        public BrowserRule Browser => BrowserRule.Pattern(Code);
-
-        public override bool IsValid(ValidationContext<T> context, string? value) =>
-            string.IsNullOrEmpty(value) || Regex.IsMatch(value, Code);
-
-        protected override string GetDefaultMessageTemplate(string errorCode) =>
-            "Enter the wristband code as WB- and six digits, like WB-104233.";
+            rule.Matches(@"^WB-\d{6}$").WithMessage("Enter the wristband code as WB- and six digits, like WB-104233.");
     }
 }

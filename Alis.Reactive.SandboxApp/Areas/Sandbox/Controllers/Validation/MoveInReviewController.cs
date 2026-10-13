@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 {
     /// <summary>
-    /// Move-in reviews: one FluentValidation validator serves the page and the server. The server fills
+    /// Move-in reviews: one validator serves the page and the server. The server fills
     /// in the coordinator on duty before it validates.
     /// </summary>
     [Area("Sandbox")]
@@ -23,12 +23,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             review.ReviewedBy = "Coordinator on duty";
             var result = new MoveInReviewValidator().Validate(review);
             if (!result.IsValid)
-            {
-                var errors = result.Errors
-                    .GroupBy(error => error.PropertyName)
-                    .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).ToArray());
-                return BadRequest(new { errors });
-            }
+                return BadRequest(new { errors = result.ErrorsByField });
 
             var prescriptions = string.IsNullOrEmpty(review.Pharmacy.Phone)
                 ? ""

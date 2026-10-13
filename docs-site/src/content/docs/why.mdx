@@ -31,7 +31,7 @@ browser.
 | Payload reads | `event.detail.someValue` strings | `p.When(args.Checked)` |
 | Component updates | Vendor object calls in JS | `p.Component<T>(...).Value.Set(...)` |
 | HTTP payloads | Manually assembled JSON | `.Gather(g => g.Form())` |
-| Client validation | Separate client rule system | The same FluentValidation `RuleFor(...)` rules |
+| Client validation | Separate client rule system | The same `RuleFor(...)` rules, in FluentValidation's grammar |
 
 The result is not less browser behavior. It is browser behavior with a typed
 C# authoring surface.

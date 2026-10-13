@@ -23,7 +23,7 @@ If you use the design system directly, add:
 
 ## Register Validation
 
-Register the FluentValidation bridge in `Program.cs`.
+Register your validators in `Program.cs`.
 
 ```csharp
 using Alis.Reactive.FluentValidator;
@@ -63,11 +63,11 @@ public sealed class TodoModel
 ## Create the Validator
 
 Write the rules once, in FluentValidation's grammar. The server runs them, and the browser runs
-every rule it can evaluate, under the same conditions.
+every rule it can evaluate, under the same conditions. You do not install FluentValidation: the
+framework implements its grammar.
 
 ```csharp
 using Alis.Reactive.FluentValidator;
-using FluentValidation;
 
 public sealed class TodoValidator : ReactiveValidator<TodoModel>
 {
@@ -85,13 +85,12 @@ public sealed class TodoValidator : ReactiveValidator<TodoModel>
 }
 ```
 
-`Must`, `Custom` and async rules stay on the server, and so does a rule followed by
-`.ServerOnly()`.
+`Must` and `MustAsync` stay on the server, and so does a rule followed by `.ServerOnly()`.
 
 ## Add the Endpoint
 
 ```csharp
-using FluentValidation;
+using Alis.Reactive.FluentValidator;
 using Microsoft.AspNetCore.Mvc;
 
 public sealed class TodoController(IValidator<TodoModel> validator) : Controller
@@ -102,17 +101,8 @@ public sealed class TodoController(IValidator<TodoModel> validator) : Controller
     public IActionResult Save([FromBody] TodoModel model)
     {
         var result = validator.Validate(model);
-
         if (!result.IsValid)
-        {
-            var errors = result.Errors
-                .GroupBy(e => e.PropertyName)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(e => e.ErrorMessage).ToArray());
-
-            return BadRequest(new { errors });
-        }
+            return BadRequest(new { errors = result.ErrorsByField });
 
         return Ok(new { message = "Todo saved." });
     }

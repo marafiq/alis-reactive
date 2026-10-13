@@ -102,24 +102,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             // client writes each message into its per-field validation slot. No custom rules, no Syncfusion channel.
             var result = new MonthlyRateQuickEditValidator().Validate(body);
             if (!result.IsValid)
-            {
-                var errors = new Dictionary<string, string[]>();
-                foreach (var failure in result.Errors)
-                {
-                    if (errors.TryGetValue(failure.PropertyName, out var existing))
-                    {
-                        var extended = new string[existing.Length + 1];
-                        existing.CopyTo(extended, 0);
-                        extended[existing.Length] = failure.ErrorMessage;
-                        errors[failure.PropertyName] = extended;
-                    }
-                    else
-                    {
-                        errors[failure.PropertyName] = new[] { failure.ErrorMessage };
-                    }
-                }
-                return BadRequest(new { errors });
-            }
+                return BadRequest(new { errors = result.ErrorsByField });
 
             return Ok(new InPlaceEditorUpdateResponse
             {

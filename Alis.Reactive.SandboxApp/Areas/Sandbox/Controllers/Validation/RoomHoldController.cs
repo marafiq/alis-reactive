@@ -1,3 +1,4 @@
+using Alis.Reactive.FluentValidator;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,16 +33,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 
             // The availability rule asks the hold book asynchronously, so the server validates asynchronously;
             // the reservations office's rules are its own validator's, which only the server runs.
-            var failures = (await _holdRules.ValidateAsync(hold)).Errors
-                .Concat(_reservationsOffice.Validate(hold).Errors)
-                .ToList();
-            if (failures.Count > 0)
-            {
-                var errors = failures
-                    .GroupBy(error => error.PropertyName)
-                    .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).ToArray());
-                return BadRequest(new { errors });
-            }
+            var rules = new InlineValidator<RoomHoldModel>();
+            rules.Include(_holdRules);
+            rules.Include(_reservationsOffice);
+            var result = await rules.ValidateAsync(hold);
+            if (!result.IsValid) return BadRequest(new { errors = result.ErrorsByField });
 
             return Ok(new RoomHoldConfirmation($"{hold.RoomCode} is held for {hold.ProspectName}."));
         }

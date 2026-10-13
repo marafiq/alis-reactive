@@ -1,12 +1,12 @@
-using FluentValidation;
+using Alis.Reactive.FluentValidator;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
-    /// The reservations office's rules for a hold: a plain FluentValidation validator, not a reactive
-    /// one, so its rules never reach the page. The server checks them when a hold is placed.
+    /// The reservations office's rules for a hold, registered by the office the way a module registers its
+    /// own. Its rule asks the office's hold book, C# that only the server runs, so the page never checks it.
     /// </summary>
-    public class ReservationsOfficeValidator : AbstractValidator<RoomHoldModel>
+    public class ReservationsOfficeValidator : ReactiveValidator<RoomHoldModel>
     {
         public const string ProspectWithHold = "Ruth Carter";
 
@@ -14,8 +14,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         {
             // One hold per prospect: a family releases its hold before placing another.
             RuleFor(x => x.ProspectName)
-                .NotEqual(ProspectWithHold)
+                .Must(prospect => !HoldsARoom(prospect))
                 .WithMessage($"{ProspectWithHold} already holds Maple 218. Release that hold before placing another.");
         }
+
+        // The office's hold book: Ruth Carter holds Maple 218 this week.
+        private static bool HoldsARoom(string? prospect) => prospect == ProspectWithHold;
     }
 }

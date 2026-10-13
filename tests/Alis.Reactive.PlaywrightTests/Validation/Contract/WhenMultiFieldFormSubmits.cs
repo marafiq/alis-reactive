@@ -440,7 +440,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // FluentValidation's email rule asks for one @ with something on each side, not a dot after it;
+    // The email rule asks for one @ with something on each side, not a dot after it;
     // the browser asks the same, and the server saves the admission.
     [Test]
     public async Task an_email_with_no_dot_after_the_at_is_accepted_as_the_server_accepts_it()

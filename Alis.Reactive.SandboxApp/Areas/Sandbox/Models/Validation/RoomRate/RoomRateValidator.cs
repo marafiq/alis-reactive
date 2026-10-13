@@ -1,6 +1,5 @@
 using System.Globalization;
 using Alis.Reactive.FluentValidator;
-using FluentValidation;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {

@@ -34,7 +34,7 @@ public class WhenResidentProfileFormValidatesInPlaceEditorFields : PlaywrightTes
         await Page.WaitForTimeoutAsync(2800);
 
         Assert.That(postFired, Is.False,
-            "FluentValidation must block the profile POST when Nickname exceeds MaximumLength.");
+            "The validator must block the profile POST when Nickname exceeds MaximumLength.");
 
         AssertNoConsoleErrors();
     }

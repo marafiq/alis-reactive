@@ -21,10 +21,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             var result = new NewRuleTypesValidator().Validate(model ?? new NewRuleTypesModel());
             if (result.IsValid) return Ok(new { message = "All new rule types passed!" });
 
-            var errors = result.Errors
-                .GroupBy(failure => failure.PropertyName)
-                .ToDictionary(field => field.Key, field => field.Select(failure => failure.ErrorMessage).ToArray());
-            return BadRequest(new { errors });
+            return BadRequest(new { errors = result.ErrorsByField });
         }
     }
 }

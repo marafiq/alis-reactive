@@ -96,8 +96,8 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
         AssertNoConsoleErrorsExcept("400");
     }
 
-    // The office's one-hold-per-prospect rule is a plain FluentValidation rule the browser could check,
-    // but a plain validator gives the page no rules: the hold is sent and the server answers by the name.
+    // The office's one-hold-per-prospect rule asks the office's hold book, which only the server can:
+    // the hold is sent and the server answers by the name.
     [Test]
     public async Task a_prospect_who_already_holds_a_room_is_refused_by_the_reservations_office()
     {
