@@ -83,11 +83,9 @@ function all(blocks: readonly (readonly Statement[])[], scope: Scope): Completio
     }
   }
   if (pending.length === 0) return;
-  return Promise.allSettled(pending).then(results => {
-    for (const result of results) {
-      if (result.status === "rejected") log.error("all.block-failed", { error: toJavaScriptString(result.reason) });
-    }
-  });
+  return Promise.race(pending.map(completion => completion.catch(error => {
+    log.error("all.block-failed", { error: toJavaScriptString(error) });
+  })));
 }
 
 // The body runs in the enclosing block's scope, so its top-level bindings stay visible after the
