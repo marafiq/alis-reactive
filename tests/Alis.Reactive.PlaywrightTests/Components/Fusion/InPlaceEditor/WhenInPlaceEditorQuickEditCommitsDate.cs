@@ -75,5 +75,40 @@ public class WhenInPlaceEditorQuickEditCommitsDate : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The last-admission card validates with LastAdmissionQuickEditValidator: "at most now".
+    [Test]
+    public async Task a_last_admission_after_now_is_refused_and_an_earlier_one_is_saved()
+    {
+        await NavigateToAndWaitForVisibleSignal(Path, "#card-last-admission .e-editable-value-wrapper");
+        var commits = new ConcurrentQueue<string>();
+        Page.Request += (_, request) =>
+        {
+            if (request.Url.Contains("/Sandbox/Components/FusionInPlaceEditor/UpdateLastAdmission")) commits.Enqueue(request.Url);
+        };
+        var valueWrapper = Page.Locator("#card-last-admission .e-editable-value-wrapper").First;
+        var inner = Page.Locator("#card-last-admission input.e-control").First;
+
+        await valueWrapper.ClickAsync();
+        await Expect(inner).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await inner.FillAsync("1/15/2099 10:00 AM");
+        await inner.PressAsync("Enter");
+
+        await Expect(Page.Locator($"#{LastAdmissionId}_error"))
+            .ToHaveTextAsync("'Value' must be at most now.", new() { Timeout = 5000 });
+        Assert.That(commits, Is.Empty, "A last admission after now is not sent.");
+        await Expect(Page.Locator("#card-last-admission-display")).ToHaveTextAsync("unchanged");
+
+        await valueWrapper.ClickAsync();
+        await Expect(inner).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await inner.FillAsync("3/2/2024 9:30 AM");
+        await inner.PressAsync("Enter");
+
+        await Expect(Page.Locator("#card-last-admission-display"))
+            .ToHaveTextAsync("2024-03-02 09:30 (resident=resident-42)", new() { Timeout = 5000 });
+        Assert.That(commits, Has.Count.EqualTo(1));
+        AssertNoConsoleErrors();
+    }
+
     private static readonly string DateOfBirthId = IdGenerator.For<DateOfBirthQuickEdit>(m => m.Value);
+    private static readonly string LastAdmissionId = IdGenerator.For<LastAdmissionQuickEdit>(m => m.Value);
 }
