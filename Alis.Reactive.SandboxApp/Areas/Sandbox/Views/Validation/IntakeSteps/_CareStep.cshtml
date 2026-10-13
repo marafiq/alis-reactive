@@ -13,6 +13,8 @@
 
 <native-heading level="H2">Step 2 of 2: Care needs for @Model.ResidentName</native-heading>
 
+@* The care needs the nurse reviews: only this step renders them. *@
+<div id="care-needs" class="flex flex-col gap-4">
 <native-grid cols="C2" gap="Base">
     @* The mobility questions depend on the care level, so the server sends them once a level is chosen. *@
     @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care level"))
@@ -30,6 +32,7 @@
 
 <div id="mobility-questions">
     <p class="text-sm text-text-muted">Choose a care level to see its mobility questions.</p>
+</div>
 </div>
 
 @* Finish checks this step's care answers in the browser, including the mobility questions, even

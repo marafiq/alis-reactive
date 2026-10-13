@@ -16,7 +16,8 @@ namespace Alis.Reactive.PlaywrightTests.Validation.IntakeSteps;
 /// Each step is a partial the server returns into the form. A step checks its fields against the
 /// whole form, so the form must forget a step's rules when the next step replaces it. The care
 /// step's mobility questions arrive once a care level is chosen; until then Finish says what they
-/// still need. The server checks the whole intake with the same rules the steps check.
+/// still need. The server checks the whole intake with the same rules the steps check. The nurse
+/// review, a page action, checks the care needs only where the care step renders them.
 /// </remarks>
 [TestFixture]
 public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
@@ -30,6 +31,7 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
     private PagePlan<IntakeStepsModel> _plan = null!;
     private ConcurrentQueue<string> _residentStepsSent = null!;
     private ConcurrentQueue<string> _finishesSent = null!;
+    private ConcurrentQueue<string> _nurseReviewsSent = null!;
 
     private ILocator ValidationSummary => Page.Locator("[data-reactive-validation-summary]");
     private ILocator StepHeading => Page.Locator("#intake-step h2");
@@ -40,6 +42,8 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
     private ILocator ContinueToCare => Page.Locator("#continue-to-care-btn");
     private ILocator FinishIntake => Page.Locator("#finish-intake-btn");
     private ILocator IntakeStatus => Page.Locator("#intake-status");
+    private ILocator AskNurseToReview => Page.Locator("#ask-nurse-review-btn");
+    private ILocator NurseReviewStatus => Page.Locator("#nurse-review-status");
 
     // The steps arrive after boot, so their inputs are found by the id the model member gives them.
     private ILocator Input(Expression<Func<IntakeStepsModel, object?>> member) =>
@@ -49,10 +53,12 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
     {
         _residentStepsSent = new ConcurrentQueue<string>();
         _finishesSent = new ConcurrentQueue<string>();
+        _nurseReviewsSent = new ConcurrentQueue<string>();
         Page.Request += (_, request) =>
         {
             if (request.Url.EndsWith("/Sandbox/Validation/IntakeSteps/Resident")) _residentStepsSent.Enqueue(request.Url);
             if (request.Url.Contains("/Sandbox/Validation/IntakeSteps/Finish")) _finishesSent.Enqueue(request.Url);
+            if (request.Url.Contains("/Sandbox/Validation/IntakeSteps/NurseReview")) _nurseReviewsSent.Enqueue(request.Url);
         };
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
@@ -157,6 +163,28 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
         await Expect(IntakeStatus).ToHaveTextAsync("Assisted living intake saved for Jane Smith.", new() { Timeout = 5000 });
         await Expect(ValidationSummary).ToBeHiddenAsync();
         Assert.That(_finishesSent, Has.Count.EqualTo(1), "Only the complete intake is sent.");
+        AssertNoConsoleErrors();
+    }
+
+    // The review checks the care needs where the care step renders them. Before that step there is no
+    // such place on the page: nothing is checked, so nothing is asked for, and nothing is sent.
+    [Test]
+    public async Task asking_the_nurse_to_review_care_needs_before_the_care_step_sends_nothing()
+    {
+        await NavigateAndBoot();
+
+        await ClickWhenStable(AskNurseToReview);
+
+        await Expect(NurseReviewStatus).ToHaveTextAsync("Not sent to the nurse yet.");
+        await Expect(ValidationSummary).ToBeHiddenAsync();
+        await Expect(StepHeading).ToHaveTextAsync("Step 1 of 2: Resident");
+
+        await CompleteResidentStep("Jane Smith");
+        await ChooseCareLevelAndAid("Assisted living", "Walker");
+        await ClickWhenStable(AskNurseToReview);
+        await Expect(NurseReviewStatus).ToHaveTextAsync(
+            "Assisted living care needs sent to the nurse for review.", new() { Timeout = 5000 });
+        Assert.That(_nurseReviewsSent, Has.Count.EqualTo(1), "The review asked for before the care step was not sent.");
         AssertNoConsoleErrors();
     }
 

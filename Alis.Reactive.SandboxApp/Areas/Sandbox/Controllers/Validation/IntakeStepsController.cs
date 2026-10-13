@@ -51,6 +51,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             return Ok(new IntakeConfirmation($"{intake.CareLevel} intake saved for {intake.ResidentName}."));
         }
 
+        /// <summary>Sends the care step's answers to the nurse, who reviews them before the intake is finished.</summary>
+        [HttpPost("NurseReview")]
+        public IActionResult NurseReview([FromBody] IntakeStepsModel? intake)
+        {
+            if (intake == null) return BadRequest();
+
+            var result = new IntakeCareValidator().Validate(intake);
+            if (!result.IsValid) return BadRequest(new { errors = ByField(result) });
+
+            return Ok(new IntakeConfirmation($"{intake.CareLevel} care needs sent to the nurse for review."));
+        }
+
         private static Dictionary<string, string[]> ByField(ValidationResult result) =>
             result.Errors
                 .GroupBy(error => error.PropertyName)
