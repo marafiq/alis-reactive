@@ -8,6 +8,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         /// <summary>The codes of the mobility aids chosen; null until the coordinator chooses one.</summary>
         public string[]? MobilityAids { get; set; }
+
+        /// <summary>The staff member who works the bus lift; chosen only while a wheelchair is among the aids.</summary>
+        public string? LiftAttendant { get; set; }
     }
 
     /// <summary>A mobility aid the coordinator can choose: the code the server matches, the name people read.</summary>

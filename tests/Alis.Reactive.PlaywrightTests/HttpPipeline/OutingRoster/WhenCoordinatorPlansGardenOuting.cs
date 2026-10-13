@@ -13,7 +13,7 @@ namespace Alis.Reactive.PlaywrightTests.HttpPipeline.OutingRoster;
 /// The search sends the chosen aids in a GET query; the booking posts them as form data. Helen Park
 /// uses a walker, Arthur Bell a wheelchair, Frank Moore a cane; Rosa Diaz uses none, and nobody uses a
 /// mobility scooter. The bus has two boarding-help spaces. While a wheelchair is among the chosen aids,
-/// the page notes that the trip takes the lift bus.
+/// the page notes that the trip takes the lift bus and the lift-bus attendant can be chosen.
 /// </remarks>
 [TestFixture]
 public class WhenCoordinatorPlansGardenOuting : PlaywrightTestBase
@@ -59,6 +59,21 @@ public class WhenCoordinatorPlansGardenOuting : PlaywrightTestBase
         await MobilityAids.RemoveItem("Wheelchair");
 
         await Expect(LiftBusNote).ToBeHiddenAsync(new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task the_lift_attendant_can_be_chosen_only_while_a_wheelchair_is_among_the_aids()
+    {
+        await NavigateAndBoot();
+        var attendant = _plan.AutoComplete(m => m.LiftAttendant).Input;
+        await Expect(attendant).ToBeDisabledAsync(new() { Timeout = 5000 });
+
+        await MobilityAids.SelectItems("Walker", "Wheelchair");
+        await Expect(attendant).ToBeEnabledAsync(new() { Timeout = 5000 });
+
+        await MobilityAids.RemoveItem("Wheelchair");
+        await Expect(attendant).ToBeDisabledAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 

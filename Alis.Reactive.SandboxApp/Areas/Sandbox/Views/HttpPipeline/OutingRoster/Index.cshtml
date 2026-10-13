@@ -6,6 +6,10 @@
     ViewData["Title"] = "Garden Outing";
     var plan = Html.ReactivePlan<OutingRosterModel>();
     var aids = new List<MobilityAidOption> { new("WALKER", "Walker"), new("WHEELCHAIR", "Wheelchair"), new("CANE", "Cane"), new("SCOOTER", "Mobility scooter") };
+    var attendants = new[] { "Nora Ellis", "Malik Stone", "Elena Ruiz" };
+
+    // No aid is chosen yet, so nobody works the lift.
+    Html.On(plan, t => t.DomReady(p => p.Component<FusionAutoComplete>(m => m.LiftAttendant).Enabled.Set(false)));
 }
 
 <native-vstack gap="Lg">
@@ -24,10 +28,22 @@
                 {
                     // A wheelchair boards only the bus with a lift.
                     p.When(args.Value).ArrayContains("WHEELCHAIR")
-                        .Then(lift => lift.Element("lift-bus-note").Show())
-                        .Else(noLift => noLift.Element("lift-bus-note").Hide());
+                        .Then(lift =>
+                        {
+                            lift.Element("lift-bus-note").Show();
+                            lift.Component<FusionAutoComplete>(m => m.LiftAttendant).Enabled.Set(true);
+                        })
+                        .Else(noLift =>
+                        {
+                            noLift.Element("lift-bus-note").Hide();
+                            noLift.Component<FusionAutoComplete>(m => m.LiftAttendant).Enabled.Set(false);
+                        });
                 }); }
             <p id="lift-bus-note" class="text-sm text-warning" hidden>A wheelchair boards only the lift bus: the garden trip takes the lift bus.</p>
+            @{ Html.InputField(plan, m => m.LiftAttendant, o => o.Label("Lift-bus attendant"))
+                .FusionAutoComplete(b => b
+                    .DataSource(attendants)
+                    .Placeholder("Who works the lift?")); }
             <native-hstack gap="Sm">
                 @(Html.NativeButton("find-residents-btn", "Find Residents")
                     .CssClass("rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors")
