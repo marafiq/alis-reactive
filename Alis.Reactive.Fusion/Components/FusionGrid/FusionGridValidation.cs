@@ -20,27 +20,21 @@ namespace Alis.Reactive.Fusion.Components
     /// (under <c>When</c>), cross-field, and exotic rules carry no EJ2 equivalent and stay
     /// server-authoritative on save.
     /// <code>
-    /// @inject Alis.Reactive.Validation.IClientValidationRuleSource ClientRules
-    /// @{ var care = FusionGridValidation.From&lt;ResidentCareItemValidator, ResidentCareItem&gt;(ClientRules); }
+    /// var care = FusionGridValidation.From&lt;ResidentCareItem&gt;(plan.ClientRules&lt;ResidentCareItemValidator&gt;());
     /// new GridColumn { Field = "openTasks", EditType = "numericedit",
     ///     ValidationRules = care.Field(r =&gt; r.OpenTasks) }
     /// </code>
     /// </remarks>
     public static class FusionGridValidation
     {
-        /// <summary>
-        /// Reads the client validation metadata for <typeparamref name="TValidator"/> and
-        /// returns a per-field emitter for grid columns over <typeparamref name="TRow"/>.
-        /// </summary>
-        /// <typeparam name="TValidator">The <c>ReactiveValidator</c> that declares the row's rules.</typeparam>
+        /// <summary>The column rules for grid columns over <typeparamref name="TRow"/>, from a validator's browser rules.</summary>
         /// <typeparam name="TRow">Your row class.</typeparam>
-        /// <param name="source">The client rule source, injected into the view as <see cref="IClientValidationRuleSource"/>.</param>
-        public static FusionGridFieldValidation<TRow> From<TValidator, TRow>(IClientValidationRuleSource source)
-            where TValidator : class
+        /// <param name="rules">The row validator's browser rules: <c>plan.ClientRules&lt;ResidentCareItemValidator&gt;()</c>.</param>
+        public static FusionGridFieldValidation<TRow> From<TRow>(IReadOnlyList<ClientValidationField> rules)
             where TRow : class
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            return new FusionGridFieldValidation<TRow>(source.GetClientRules(typeof(TValidator)));
+            if (rules == null) throw new ArgumentNullException(nameof(rules));
+            return new FusionGridFieldValidation<TRow>(rules);
         }
     }
 

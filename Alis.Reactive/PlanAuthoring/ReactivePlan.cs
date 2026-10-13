@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
@@ -109,6 +110,17 @@ namespace Alis.Reactive
         internal bool HasRegisteredInputComponent(BindingPath bindingPath) =>
             _registeredInputComponents.Contains(bindingPath);
 
+        /// <summary>
+        /// The browser rules <typeparamref name="TValidator"/> declares, resolved from the services the plan
+        /// renders with, for a component whose own JavaScript validates: a grid's cell editor.
+        /// </summary>
+        /// <example><c>FusionGridValidation.From&lt;ResidentCareItem&gt;(plan.ClientRules&lt;ResidentCareItemValidator&gt;())</c></example>
+        /// <typeparam name="TValidator">The validator registered with <c>AddReactiveFluentValidation</c>.</typeparam>
+        /// <returns>Each field the validator names, with the rules the browser can evaluate.</returns>
+        public IReadOnlyList<ClientValidationField> ClientRules<TValidator>() where TValidator : class =>
+            RequireClientValidationRuleSource(_services, typeof(TValidator), "This view")
+                .GetClientRules(typeof(TValidator));
+
         /// <summary>Registers components, resolves validation, and serializes the Reactive Plan as compact JSON.</summary>
         /// <returns>Compact Reactive Plan JSON ready for a <c>data-reactive-plan</c> script.</returns>
         public string Render()
@@ -148,24 +160,23 @@ namespace Alis.Reactive
         {
             _context.DeclareRegisteredInputs();
 
-            var validated = _context.ValidatedRequests;
-            if (validated.Count == 0)
+            var validated = _context.ValidatedRequests.FirstOrDefault();
+            if (validated?.Validation is not { } validation)
                 return;
 
             new ClientValidationRuleBinder(
                     _context,
                     _registeredInputComponents.Snapshot(),
                     typeof(TModel),
-                    RequireClientValidationRuleSource(services, validated[0]))
+                    RequireClientValidationRuleSource(services, validation.Source, $"Request at '{validated.Url}'"))
                 .BindQueuedJobs();
         }
 
         private static IClientValidationRuleSource RequireClientValidationRuleSource(
             IServiceProvider? services,
-            RequestStep request)
+            Type validationSource,
+            string requiredBy)
         {
-            var validation = request.Validation
-                ?? throw new InvalidOperationException("A validated request names its validation source.");
 
             // ASP.NET Core flows the source through the per-request IServiceProvider.
             var source = services?.GetService(typeof(IClientValidationRuleSource)) as IClientValidationRuleSource;
@@ -181,13 +192,13 @@ namespace Alis.Reactive
 
 #if NET48
             throw new InvalidOperationException(
-                $"Request at '{request.Url}' specifies validation source '{validation.Source.Name}', " +
+                $"{requiredBy} specifies validation source '{validationSource.Name}', " +
                 "but no IClientValidationRuleSource could be resolved. " +
                 "Register the FluentValidation integration with AddReactiveFluentValidation(...) and bridge it to " +
                 "MVC5 by calling DependencyResolver.SetResolver(...) in Application_Start.");
 #else
             throw new InvalidOperationException(
-                $"Request at '{request.Url}' specifies validation source '{validation.Source.Name}', " +
+                $"{requiredBy} specifies validation source '{validationSource.Name}', " +
                 "but no IClientValidationRuleSource is registered in DI. " +
                 "Register the FluentValidation integration with services.AddReactiveFluentValidation(...), " +
                 "or register your own IClientValidationRuleSource.");

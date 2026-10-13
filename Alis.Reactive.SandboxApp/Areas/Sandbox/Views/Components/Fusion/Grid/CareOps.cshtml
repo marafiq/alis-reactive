@@ -5,12 +5,8 @@
 @using Alis.Reactive.Fusion.Templates
 @using Syncfusion.EJ2.Buttons
 @using Syncfusion.EJ2.Grids
-@inject Alis.Reactive.Validation.IClientValidationRuleSource ClientRules
 @{
     ViewData["Title"] = "FusionGrid Care Operations";
-
-    // EJ2 column validation uses the same ResidentCareItemValidator metadata as Reactive validation.
-    var careValidation = FusionGridValidation.From<ResidentCareItemValidator, ResidentCareItem>(ClientRules);
 
     const string GridId = "careops-grid";
     const string AdmitFormId = "careops-admit-form";
@@ -19,6 +15,10 @@
     const string ButtonAccent = "rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90";
 
     var plan = Html.ReactivePlan<CareOpsViewModel>();
+
+    // The grid's cell editor checks the rules ResidentCareItemValidator gives the browser.
+    var careValidation = FusionGridValidation.From<ResidentCareItem>(plan.ClientRules<ResidentCareItemValidator>());
+
     var wings = (List<string>)ViewBag.Wings;
     var careLevels = (List<string>)ViewBag.CareLevels;
     var riskLevels = (List<string>)ViewBag.RiskLevels;

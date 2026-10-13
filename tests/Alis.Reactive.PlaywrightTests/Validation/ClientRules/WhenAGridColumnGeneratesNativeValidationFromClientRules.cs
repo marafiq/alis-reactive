@@ -28,7 +28,7 @@ public class WhenAGridColumnGeneratesNativeValidationFromClientRules
     private static FusionGridFieldValidation<TRow> ValidationFor<TValidator, TRow>()
         where TValidator : class
         where TRow : class =>
-        FusionGridValidation.From<TValidator, TRow>(RuleSource());
+        FusionGridValidation.From<TRow>(RuleSource().GetClientRules(typeof(TValidator)));
 
     [Test]
     public void string_rules_map_directly_with_their_fluentvalidation_messages()
