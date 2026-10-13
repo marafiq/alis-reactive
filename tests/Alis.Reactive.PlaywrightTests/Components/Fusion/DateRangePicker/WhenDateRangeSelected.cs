@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DateRangePicker;
@@ -12,6 +13,19 @@ public class WhenDateRangeSelected : PlaywrightTestBase
     private const string StayStartId = GeneratedTypeScope + "__StayPeriod";
 
     private DateRangePickerLocator StayStart => new(Page, StayStartId);
+    private ILocator StayPeriodError => Page.Locator($"#{StayStartId}_error");
+    private ILocator ReserveStay => Page.Locator("#reserve-stay-btn");
+    private ILocator ReservationStatus => Page.Locator("#stay-reservation-status");
+
+    private ConcurrentQueue<string> TrackReservations()
+    {
+        var reservationsSent = new ConcurrentQueue<string>();
+        Page.Request += (_, request) =>
+        {
+            if (request.Url.Contains("/Sandbox/Components/DateRangePicker/Reserve")) reservationsSent.Enqueue(request.Url);
+        };
+        return reservationsSent;
+    }
 
     private async Task NavigateAndBoot()
     {
@@ -103,6 +117,26 @@ public class WhenDateRangeSelected : PlaywrightTestBase
 
         var warning = Page.Locator("#stay-warning");
         await Expect(warning).ToHaveTextAsync("stay period set", new() { Timeout = 3000 });
+        AssertNoConsoleErrors();
+    }
+
+    // The stay period is a list of dates; an empty list is no stay at all, so the reservation asks for it.
+    [Test]
+    public async Task reserving_a_stay_without_its_dates_asks_for_them()
+    {
+        var reservationsSent = TrackReservations();
+        await NavigateAndBoot();
+
+        await ClickWhenStable(ReserveStay);
+
+        await Expect(StayPeriodError).ToHaveTextAsync("Choose the stay dates.");
+        await Expect(ReservationStatus).ToHaveTextAsync("No stay reserved yet.");
+
+        await StayStart.SelectRange(2026, 7, 1, 2026, 7, 15);
+        await ClickWhenStable(ReserveStay);
+        await Expect(ReservationStatus).ToHaveTextAsync("Respite stay reserved for 14 nights.", new() { Timeout = 5000 });
+        await Expect(StayPeriodError).ToBeHiddenAsync();
+        Assert.That(reservationsSent, Has.Count.EqualTo(1), "A stay without dates is not sent.");
         AssertNoConsoleErrors();
     }
 

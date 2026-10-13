@@ -28,6 +28,7 @@
             On DomReady, reads the date range component's <code>startDate</code> and <code>endDate</code>
             properties and displays them in text elements.
         </p>
+        <form id="stay-form" class="flex flex-col gap-4">
         <native-grid cols="C2" gap="Base">
             @{ Html.InputField(plan, m => m.StayPeriod, o => o.Label("Stay Period"))
                 .FusionDateRangePicker(b => b
@@ -52,6 +53,19 @@
                         });
                 }); }
         </native-grid>
+        @* The stay is reserved for the dates picked above; without them there is nothing to reserve. *@
+        @(Html.NativeButton("reserve-stay-btn", "Reserve Stay")
+            .CssClass("self-start rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("Reserve", "DateRangePicker")).Gather(g => g.Form())
+                 .Validate<StayReservationValidator>("stay-form")
+                 .Response(r => r
+                    .OnSuccess<StayReservation>((json, s) => s.Element("stay-reservation-status").Text.Set(json.Get(x => x.Confirmation)))
+                    .OnError(400, e => e.ValidationErrors("stay-form")));
+            }))
+        </form>
+        <p id="stay-reservation-status" class="mt-3 text-sm text-text-muted">No stay reserved yet.</p>
     </native-card-body></native-card>
 
     <native-card><native-card-body>

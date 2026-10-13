@@ -12,5 +12,25 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         {
             return View("~/Areas/Sandbox/Views/Components/Fusion/DateRangePicker/Index.cshtml", new DateRangePickerModel());
         }
+
+        /// <summary>Reserves the respite stay for the chosen stay period.</summary>
+        [HttpPost("Reserve")]
+        public IActionResult Reserve([FromBody] DateRangePickerModel? stay)
+        {
+            if (stay == null) return BadRequest();
+
+            var result = new StayReservationValidator().Validate(stay);
+            if (!result.IsValid)
+            {
+                var errors = result.Errors
+                    .GroupBy(error => error.PropertyName)
+                    .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).ToArray());
+                return BadRequest(new { errors });
+            }
+
+            var period = stay.StayPeriod!;
+            var nights = (period[period.Length - 1].Date - period[0].Date).Days;
+            return Ok(new StayReservation($"Respite stay reserved for {nights} nights."));
+        }
     }
 }
