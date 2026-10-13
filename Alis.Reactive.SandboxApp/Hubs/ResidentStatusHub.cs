@@ -63,6 +63,9 @@ public sealed class ResidentStatusFeed : SignalRHub
 
 public class ResidentStatusPayload
 {
+    /// <summary>How many live connections the page that pushed the status holds to this hub.</summary>
+    public int Connections { get; set; }
+
     public string ResidentName { get; set; } = "";
     public string Status { get; set; } = "";
     public string CareLevel { get; set; } = "";

@@ -45,21 +45,22 @@ public class WhenResidentStatusUpdatesLive : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // Each hub has a connection of its own: while this page's resident hub connection is down
+    // (aborted, and its reconnects refused), the notification hub still delivers.
     [Test]
-    public async Task two_hubs_operate_independently()
+    public async Task notifications_keep_arriving_while_the_resident_hub_is_down()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-        await WaitForTraceMessage("[alis:signalr] connected", 10000);
+        await WaitForTraceMessage("connected {\"hubUrl\":\"/hubs/notifications\"}", 10000);
+        await WaitForTraceMessage("connected {\"hubUrl\":\"/hubs/resident-status", 10000);
 
-        await PushStatusBtn.ClickAsync();
+        await ClickWhenStable(Page.Locator("#btn-break-hub"));
+        await WaitForTraceMessage("[alis:signalr] connection.reconnecting", 10000);
+        await ClickWhenStable(Page.Locator("#btn-push-notification"));
 
-        await Expect(ResidentName).ToContainTextAsync("Helen Martinez",
-            new() { Timeout = 5000 });
-
-        var notifCount = Page.Locator("#notif-count");
-        await Expect(notifCount).ToContainTextAsync("—");
-
-        AssertNoConsoleErrors();
+        await Expect(Page.Locator("#notif-count")).ToHaveTextAsync("99", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#notif-priority")).ToHaveTextAsync("high");
+        AssertNoConsoleErrorsExcept("connection.disconnected", "start.failed", "WebSocket", "Failed to load resource");
     }
 }

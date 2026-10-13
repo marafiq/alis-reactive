@@ -209,7 +209,7 @@
                     .CssClass("px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Post(Url.SandboxRoute("PushResidentStatus", "RealTime"))
+                        p.Post(Url.SandboxRoute("PushResidentStatus", "RealTime", new { drill = drillId }))
                          .Gather<ResidentStatusPayload>(g => g
                              .Set(x => x.ResidentName, "Helen Martinez (Manual)")
                              .Set(x => x.Status, "Under Review")
@@ -227,6 +227,7 @@
             <native-text color="Secondary" size="Sm">
                 Loads a partial view with its own plan and SignalR trigger.
                 The runtime reuses the existing /hubs/resident-status connection — no duplicate WebSocket.
+                Closing the panel stops its live updates; the page's own stay live.
             </native-text>
             <native-divider />
             <native-hstack gap="Sm">
@@ -237,7 +238,19 @@
                         p.Get(Url.SandboxRoute("ResidentPanel", "RealTime") + $"?drill={drillId}")
                          .Response(r => r.OnSuccess(s => s.Into("panel-container")));
                     }))
+                @(Html.NativeButton("close-panel", "Close Resident Panel")
+                    .CssClass("px-4 py-2 rounded-lg border border-border bg-white text-sm font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Get(Url.SandboxRoute("ResidentPanelClosed", "RealTime"))
+                         .Response(r => r.OnSuccess(s =>
+                         {
+                             s.Into("panel-container");
+                             s.Element("panel-summary").Text.Set("Resident panel closed.");
+                         }));
+                    }))
             </native-hstack>
+            <p id="panel-summary" class="mt-2 text-sm text-text-secondary">No resident panel open.</p>
             <div id="panel-container" class="mt-4"></div>
         </native-card-body>
     </native-card>

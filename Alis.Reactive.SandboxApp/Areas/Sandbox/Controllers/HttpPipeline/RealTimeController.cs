@@ -40,9 +40,15 @@ public class RealTimeController : Controller
         return Ok();
     }
 
+    [HttpGet("ResidentPanelClosed")]
+    public IActionResult ResidentPanelClosed() =>
+        PartialView("~/Areas/Sandbox/Views/HttpPipeline/RealTime/_ResidentPanelClosed.cshtml");
+
+    // The status names how many live connections the pushing page holds to this hub.
     [HttpPost("PushResidentStatus")]
-    public async Task<IActionResult> PushResidentStatus([FromBody] ResidentStatusPayload payload)
+    public async Task<IActionResult> PushResidentStatus([FromBody] ResidentStatusPayload payload, [FromQuery] string? drill)
     {
+        payload.Connections = ResidentStatusHub.ConnectionsOf(drill ?? "").Count;
         await _residentHub.Clients.All.SendAsync(new ResidentStatusFeed().StatusChanged.Name, payload);
         return Ok();
     }

@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.ShiftHandover;
 
 /// <summary>
@@ -37,6 +39,31 @@ public class WhenChargeNurseMarksHandoverRead : PlaywrightTestBase
             await _markReadReleased.WaitAsync();
             await route.ContinueAsync();
         });
+    }
+
+    // A Ctrl or Cmd click is the browser's: the link's address opens in a new tab, and the page sends
+    // nothing and marks nothing read.
+    [Test]
+    public async Task a_ctrl_click_opens_the_note_in_a_new_tab_and_marks_nothing_read()
+    {
+        await NavigateAndBoot();
+        var markReads = new ConcurrentQueue<string>();
+        Page.Request += (_, request) =>
+        {
+            if (request.Method == "POST" && request.Url.Contains("/ShiftHandover/MarkRead/")) markReads.Enqueue(request.Url);
+        };
+
+        var noteTab = await Page.RunAndWaitForPopupAsync(async () =>
+        {
+            await MarkRead("helen").ClickAsync(new() { Modifiers = new[] { KeyboardModifier.ControlOrMeta } });
+        });
+
+        await noteTab.WaitForLoadStateAsync();
+        Assert.That(noteTab.Url, Does.EndWith("/Sandbox/HttpPipeline/ShiftHandover/MarkRead/helen"));
+        await Expect(noteTab.Locator("body")).ToContainTextAsync("Helen Park's handover note is open.", new() { Timeout = 10000 });
+        await Expect(HandoverStatus).ToHaveTextAsync("No note marked read yet.");
+        Assert.That(markReads, Is.Empty, "A Ctrl or Cmd click sends no request from the page.");
+        AssertNoConsoleErrors();
     }
 
     [Test]
