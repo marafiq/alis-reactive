@@ -7,7 +7,7 @@
     const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
     const string SubmitReady = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
 
-    var lastShiftNote = Model.CareNote;
+    var lastShiftNote = Model.CareNote ?? "";
 
     var plan = Html.ReactivePlan<TextAreaModel>();
 }

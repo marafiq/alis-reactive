@@ -15,7 +15,7 @@ namespace Alis.Reactive.Analyzers.NativeActionLink
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             title: "A NativeActionLink's request sees no page form",
-            messageFormat: "A NativeActionLink carries a plan of its own, so its request cannot validate a form or send Form(): the link sees no page inputs.",
+            messageFormat: "A NativeActionLink carries a plan of its own, so its request cannot validate a form or send Form(): the link sees no page inputs",
             category: "Alis.Reactive",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,

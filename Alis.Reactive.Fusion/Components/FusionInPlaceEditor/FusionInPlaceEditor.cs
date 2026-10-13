@@ -16,7 +16,7 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionInPlaceEditor : FusionComponent, IInputComponent
     {
         /// <summary>The edited value.</summary>
-        public Prop<string> Value => Prop<string>();
+        public Prop<string?> Value => Prop<string?>();
 
         /// <summary>Disables (<see langword="true"/>) or enables the editor.</summary>
         /// <param name="value"><see langword="true"/> to disable the editor; <see langword="false"/> to enable it.</param>

@@ -39,7 +39,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
     public class CityLookupResponse
     {
-        public object[]? Cities { get; set; }
+        public object[] Cities { get; set; } = [];
         public string? Country { get; set; }
         public int Count { get; set; }
     }
