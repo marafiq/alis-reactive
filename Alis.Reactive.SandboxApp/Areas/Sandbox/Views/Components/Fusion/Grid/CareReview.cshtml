@@ -70,6 +70,42 @@
             }))
     </native-hstack>
 
+    <native-hstack gap="Sm" class="flex-wrap">
+        @(Html.NativeButton("count-high-risk", "Count High-Risk Residents")
+            .CssClass(Button)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var grid = p.Component<FusionGrid>(GridId);
+                p.Element("high-risk-count").Text.Set(
+                    p.From(grid.GetCurrentViewRecords<ResidentDirectoryGridItem>()).Count(row => row.RiskLevel == "High"));
+                p.Element("high-risk-line").Show();
+            }))
+        @(Html.NativeButton("flag-selected", "Flag Selected for Care Review")
+            .CssClass(Button)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var grid = p.Component<FusionGrid>(GridId);
+                p.When(grid.GetSelectedRowIndexes()).NotEmpty()
+                    .Then(selected =>
+                    {
+                        selected.Element("flagged-count").Text.Set(
+                            selected.From(grid.GetSelectedRecords<ResidentDirectoryGridItem>()).Count());
+                        selected.Element("flag-prompt").Hide();
+                        selected.Element("flagged-line").Show();
+                    })
+                    .Else(none =>
+                    {
+                        none.Element("flagged-line").Hide();
+                        none.Element("flag-prompt").Show();
+                    });
+            }))
+    </native-hstack>
+    <native-vstack gap="Xs" class="text-sm">
+        <p id="high-risk-line" hidden>High-risk residents on this page: <span id="high-risk-count"></span></p>
+        <p id="flagged-line" hidden>Residents flagged for care review: <span id="flagged-count"></span></p>
+        <p id="flag-prompt" class="text-warning" hidden>Select residents in the roster to flag them for care review.</p>
+    </native-vstack>
+
     <native-grid cols="C1" gap="Base" class="mt-4 font-mono text-sm">
         <p>Load: <span id="review-status" class="text-text-muted">waiting</span></p>
         <p>View: <span id="view-summary" class="text-text-muted">waiting</span></p>

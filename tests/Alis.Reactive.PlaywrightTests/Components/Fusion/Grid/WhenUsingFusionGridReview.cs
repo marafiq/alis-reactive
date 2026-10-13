@@ -42,4 +42,46 @@ public class WhenUsingFusionGridReview : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // The first twelve directory residents carry four High risk levels: Katherine Ortiz, Noah Walsh,
+    // Ruth Carter and Samuel Diaz (GridController.GenerateResidentDirectory).
+    [Test]
+    public async Task counting_high_risk_residents_counts_those_on_the_current_page()
+    {
+        await NavigateReview();
+
+        await ClickWhenStable(Page.Locator("#count-high-risk"));
+
+        await Expect(Page.Locator("#high-risk-line"))
+            .ToHaveTextAsync("High-risk residents on this page: 4", new() { Timeout = 10000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task flagging_with_no_resident_selected_asks_for_a_selection()
+    {
+        await NavigateReview();
+
+        await ClickWhenStable(Page.Locator("#flag-selected"));
+
+        await Expect(Page.Locator("#flag-prompt"))
+            .ToHaveTextAsync("Select residents in the roster to flag them for care review.", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#flag-prompt")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#flagged-line")).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task flagging_the_selected_resident_counts_them_for_care_review()
+    {
+        await NavigateReview();
+
+        await Page.Locator("#care-review-grid .e-rowcell").Filter(new() { HasText = "Amina Patel" }).ClickAsync();
+        await ClickWhenStable(Page.Locator("#flag-selected"));
+
+        await Expect(Page.Locator("#flagged-line"))
+            .ToHaveTextAsync("Residents flagged for care review: 1", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#flag-prompt")).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
 }
