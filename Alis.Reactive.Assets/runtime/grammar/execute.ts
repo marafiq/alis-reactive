@@ -59,7 +59,6 @@ function traceName(target: Expr): string {
 
 function bind(name: string, expr: Expr, awaits: boolean, scope: Scope): Completion {
   const value = awaits ? evaluateStatement(expr, scope) : evaluate(expr, scope);
-  if (awaits && isPromise(value)) return value.then(settled => scope.env.bind(name, settled));
   scope.env.bind(name, value);
 }
 
