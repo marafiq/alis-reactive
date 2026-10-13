@@ -128,7 +128,7 @@ These are the dependencies the release inverts.
   driver follows them.
 - ~~Live clearing hard-codes `"change"` and silently skips a not-ready Fusion object~~: closed. Each input
   declares the event that commits it, the model re-raises it as `alis:commit` and logs a subscription it
-  cannot make (`Alis.Reactive.Assets/runtime/modules/model.ts:170-185`); `input`/`blur` still go to the element
+  cannot make (`Alis.Reactive.Assets/runtime/modules/model.ts:160-175`); `input`/`blur` still go to the element
   (`Alis.Reactive.Assets/runtime/modules/form/form.ts:209-226`).
 - ~~Injection calls `ej.base.append(nodes, container, true)`~~: closed. A slot re-creates the inserted
   `<script>` nodes itself (`Alis.Reactive.Assets/runtime/modules/slot.ts:62-73`), and the RadioGroup and CheckList scripts became
