@@ -126,8 +126,8 @@ public class WhenUsingFusionAIAssistView : PlaywrightTestBase
         var latestAnswer = Page.Locator("#care-ai #e-response-item_4");
         await Expect(latestAnswer).ToContainTextAsync("Schedule hydration checks", new() { Timeout = 5000 });
 
-        // The coordinator scrolls back up to the first question.
-        await firstQuestion.HoverAsync();
+        // The coordinator scrolls the conversation back up to the first question.
+        await latestAnswer.HoverAsync();
         await Page.Mouse.WheelAsync(0, -5000);
         await Expect(firstQuestion).ToBeInViewportAsync(new() { Timeout = 5000 });
 
