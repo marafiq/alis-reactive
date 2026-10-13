@@ -1,6 +1,6 @@
 > **Step 0 is closed.** The table at the end, "Status at HEAD", gives each weak, plan-only or missing row's status and proof after the redesign; it supersedes the statuses in the rows.
 >
-> Step 0 work list, read at `0452a4e`. Each WEAK, PLAN-ONLY and NONE row gets a Playwright test that fails when the behavior breaks, written against the current code. This list is not a gate; it is deleted when step 0 closes. See [`../architecture.md`](../architecture.md) section 10.
+> Read at `0452a4e` as the step 0 work list: each WEAK, PLAN-ONLY and NONE row was to get a Playwright test that fails when the behavior breaks. The list was to be deleted when step 0 closed; it stays because the `lowering-*.md` maps and [`../grammar.md`](../grammar.md) cite its rows by number. It is a catalog of use cases, not a gate. See [`../architecture.md`](../architecture.md) section 10.
 >
 > Examples use the DSL at `f36f62e`: an object is used as the object (`comp.Value`, `p.Element("x").Text.Set(..)`, `slugify.Slug(..)`), a callback's data is read with `Get` (`args.Get(x => x.Score)`), and an event is a declared `AppEvent`. Every `file:line` was re-anchored at `f36f62e` to the line that holds the cited code, and again at `6ac4198` where that code moved. Statuses and proofs are as read at `0452a4e`, except rows 140, 142 and 147, re-read at `f36f62e` because their cited code changed.
 

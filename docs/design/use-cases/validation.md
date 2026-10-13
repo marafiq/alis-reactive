@@ -1,6 +1,6 @@
 > **Step 0 is closed.** The table at the end, "Status at HEAD", gives each weak, plan-only or missing row's status and proof after the redesign; it supersedes the statuses in the rows.
 >
-> Step 0 work list, read at `0452a4e`. Each WEAK, PLAN-ONLY and NONE row gets a Playwright test that fails when the behavior breaks, written against the current code. This list is not a gate; it is deleted when step 0 closes. See [`../architecture.md`](../architecture.md) section 10.
+> Read at `0452a4e` as the step 0 work list: each WEAK, PLAN-ONLY and NONE row was to get a Playwright test that fails when the behavior breaks. The list was to be deleted when step 0 closed; it stays because the `lowering-*.md` maps and [`../grammar.md`](../grammar.md) cite its rows by number. It is a catalog of use cases, not a gate. See [`../architecture.md`](../architecture.md) section 10.
 >
 > Examples use FluentValidation's grammar at `f36f62e`: a rule is written once on a `ReactiveValidator<T>` (`RuleFor`, `RuleForEach(..).SetValidator(..)`, `Include`) and a condition is a `When(x => ..)` or `Unless(x => ..)` lambda; `ClientRule`, `ClientRuleEach`, `ClientRulesFrom`, `WhenField*` and the app-level `AddReactiveClientValidation` builders were deleted at `b966c57`. Every `file:line` was re-anchored at `f36f62e` to the line that holds the cited code, and again at `6ac4198` where the C# moved (the lowering pass and the core's validation internals are gone; the FluentValidator builds the core's public `ClientRule` and `ClientCondition`); runtime references point at `runtime/modules/form/form.ts` and `display.ts`, which replaced `runtime/validation/**`. Statuses and proofs are as read at `0452a4e`, except rows 9, 17, 46, 51, 52, 56, 61-64, 68, 69, 74, 77, 82, 84, 96 and 102, restated or re-read at `f36f62e` because the code they named changed or a later page proves them.
 
@@ -241,3 +241,22 @@ Test names are under `Alis.Reactive.PlaywrightTests.`.
 | 113 | PROVEN (already at `7c34a86`, Rating) | the row-23 test; DropDownList and DatePicker popup selection are not exercised |
 | 115 | PROVEN (already at `7c34a86`) | the row-23 test (the message appears before any submit) |
 | 117 | PROVEN | `Components.Fusion.Grid.WhenUsingFusionGridCareOps.a_resident_who_is_not_critical_can_be_left_with_no_open_tasks`, `…a_critical_resident_left_with_no_open_tasks_is_refused_when_the_edits_are_saved` |
+
+## Use cases added after the inventory
+
+The validation rework added these after this list was read. The Move-in Review page proves each one
+(`SB/Views/Validation/MoveInReview/Index.cshtml`; validator
+`SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs`). Test names are under
+`Alis.Reactive.PlaywrightTests.Validation.MoveInReview.WhenCoordinatorReviewsMoveIn.`. These rows are
+outside the counts above.
+
+| # | Use case | Example | Status | Proof |
+|---|----------|---------|--------|-------|
+| 118 | An app's own validator reaches the browser by naming the check it equals (`IBrowserRule`) | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:61, 101 | PROVEN | `a_wristband_code_is_checked_the_way_the_communitys_printer_reads_it` (refused in the page with the validator's message and nothing sent; the right code is saved) |
+| 119 | Rules for a nested object written inline (`ChildRules`) | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:72 | PROVEN | `the_pharmacy_phone_is_asked_for_in_the_house_format` |
+| 120 | `When(..).Otherwise(..)`: one rule inside the condition, another outside it | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:31-34 | PROVEN | `a_high_fall_risk_needs_a_mobility_plan` (score 9), `a_low_fall_risk_keeps_the_mobility_plan_short` (score 3) |
+| 121 | `Url()` | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:58 | PROVEN | `a_family_portal_link_must_be_a_web_address_and_may_be_left_blank` |
+| 122 | `Matches` with `RegexOptions.IgnoreCase`, run in the page as a JavaScript flag | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:51 | PROVEN | `an_assigned_room_reads_the_same_in_any_case` |
+| 123 | A message written from the model (`WithMessage(x => ..)`) is the server's: the rule runs there, and its words show beside the field | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:22 | PROVEN | `a_name_too_long_for_the_wristband_is_refused_by_the_server_in_its_own_words` (one request; the server's message) |
+| 124 | A pattern JavaScript reads differently (`\z`) is checked by the server only | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:77 | PROVEN | `a_forwarding_zip_is_checked_the_way_the_server_checks_it` |
+| 125 | `.ServerOnly()` keeps a rule off the page, and a length rule for a field the page does not render passes, as on the server | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:80, 87 | PROVEN | `a_rule_for_the_care_plan_summary_another_page_edits_does_not_hold_up_the_review` (the review is saved; were `ReviewedBy`'s `NotEmpty` run in the page, the field the page does not render would fail it: RT/modules/form/form.ts:125-128) |
