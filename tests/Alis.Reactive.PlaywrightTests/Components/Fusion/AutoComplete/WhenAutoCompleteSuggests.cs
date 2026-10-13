@@ -13,6 +13,8 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
     private const string MedicationId = GeneratedTypeScope + "__MedicationType";
 
     private AutoCompleteLocator Physician => new(Page, PhysicianId);
+    private AutoCompleteLocator Medication => new(Page, MedicationId);
+    private ILocator FilterStatus => Page.Locator("#filter-status");
 
     private async Task NavigateAndBoot()
     {
@@ -353,9 +355,52 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
             async () => await input.PressSequentiallyAsync("ster", new() { Delay = 50 }),
             r => r.Url.Contains("/Medications"));
 
-        Assert.That(medicationRequest.Url, Does.Contain("Medications"),
-            "GET request should target the Medications endpoint");
+        // The typed text joins the formulary the search URL already carries, after an "&".
+        Assert.That(medicationRequest.Url, Does.Contain("/Medications?formulary=assisted-living&MedicationType=s"),
+            "The search sends the typed text beside the formulary in its URL");
 
+        AssertNoConsoleErrors();
+    }
+
+    // The pharmacy filters by both the formulary in the search URL and the typed text: the assisted
+    // living formulary has Antibiotic and Antiviral but no Antifungal, and all six of its medications
+    // come back when the typed text is lost.
+    [Test]
+    public async Task searching_offers_only_the_formulary_medications_that_match_the_typed_text()
+    {
+        await NavigateAndBoot();
+
+        await TypeInMedication("anti");
+
+        await Expect(FilterStatus).ToHaveTextAsync("results loaded", new() { Timeout = 10000 });
+        await Expect(Medication.PopupItem("Antibiotic")).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Medication.PopupItem("Antiviral")).ToBeVisibleAsync();
+        await Expect(Medication.PopupItems).ToHaveCountAsync(2);
+        AssertNoConsoleErrors();
+    }
+
+    // The field keeps the nurse's recent medications; while the pharmacy is searched it offers none of
+    // them, so "Sterile saline flush" is never shown for "ster", and the pharmacy's answer replaces it.
+    [Test]
+    public async Task while_the_pharmacy_is_searched_the_recent_medications_are_not_offered()
+    {
+        var searchReleased = new SemaphoreSlim(0);
+        await Page.RouteAsync("**/Sandbox/Components/AutoComplete/Medications**", async route =>
+        {
+            await searchReleased.WaitAsync(TimeSpan.FromSeconds(30));
+            await route.ContinueAsync();
+        });
+        await NavigateAndBoot();
+
+        await TypeInMedication("ster");
+
+        await Expect(FilterStatus).ToHaveTextAsync("Searching the pharmacy...", new() { Timeout = 10000 });
+        await Expect(Medication.PopupItem("Sterile saline flush")).ToHaveCountAsync(0);
+        searchReleased.Release();
+
+        await Expect(FilterStatus).ToHaveTextAsync("results loaded", new() { Timeout = 10000 });
+        await Expect(Medication.PopupItem("Steroid")).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Medication.PopupItems).ToHaveCountAsync(1);
         AssertNoConsoleErrors();
     }
 

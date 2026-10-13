@@ -6,6 +6,7 @@
 
     var plan = Html.ReactivePlan<AutoCompleteModel>();
     var physicians = (List<PhysicianItem>)ViewBag.Physicians;
+    var recentMedications = (List<MedicationTypeItem>)ViewBag.RecentMedications;
 
     Html.On(plan, t => t.DomReady(p =>
     {
@@ -120,12 +121,14 @@
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">7. Filtering Event (Server-Filtered HTTP)</h2>
         <p class="text-sm text-text-secondary mb-4">
-            Type to search medications. The Filtering event fires on each keystroke (debounced 500ms),
-            sends the typed text to the server via HTTP GET, and updates the dropdown DataSource from the response.
+            Type to search the assisted living formulary. The Filtering event fires on each keystroke (debounced 500ms),
+            sends the typed text to the pharmacy via HTTP GET, and updates the dropdown from the response. Your recent
+            medications are not offered while the pharmacy is searched.
         </p>
         <native-grid cols="C2" gap="Base">
             @{ Html.InputField(plan, m => m.MedicationType, o => o.Label("Medication (Server-Filtered)"))
                 .FusionAutoComplete(b => b
+                    .DataSource(recentMedications)
                     .Fields<MedicationTypeItem>(t => t.Text, v => v.Value)
                     .Placeholder("Type to search medications...")
                     .DebounceDelay(500)
@@ -134,8 +137,9 @@
                 .Reactive(evt => evt.Filtering, (args, p) =>
                 {
                     args.PreventDefaultAction.Set(true);
-                    p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
+                    p.Get(Url.SandboxRoute("Medications", "AutoComplete", new { formulary = "assisted-living" }))
                      .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, args.Text))
+                     .WhileLoading(l => l.Element("filter-status").Text.Set("Searching the pharmacy..."))
                      .Response(r => r
                         .OnSuccess<MedicationSearchResponse>((json, s) =>
                         {

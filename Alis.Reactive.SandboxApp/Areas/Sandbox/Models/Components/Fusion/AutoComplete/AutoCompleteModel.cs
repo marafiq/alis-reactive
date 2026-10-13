@@ -20,9 +20,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string Category { get; set; } = "";
     }
 
-    /// <summary>The search text the medication AutoComplete sends to <c>GET AutoComplete/Medications</c>.</summary>
+    /// <summary>
+    /// The medication search <c>GET AutoComplete/Medications</c> binds: the community's formulary, fixed
+    /// in the search URL (<c>?formulary=assisted-living</c>), and the text the nurse typed.
+    /// </summary>
     public sealed class MedicationSearchQuery
     {
+        public string? Formulary { get; set; }
         public string MedicationType { get; set; } = "";
     }
 

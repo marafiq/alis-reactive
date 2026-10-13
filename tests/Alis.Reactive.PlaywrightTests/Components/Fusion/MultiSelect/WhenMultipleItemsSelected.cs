@@ -236,8 +236,8 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
             async () => await filterInput.PressSequentiallyAsync("band", new() { Delay = 50 }),
             r => r.Url.Contains("/Supplies"));
 
-        Assert.That(request.Url, Does.Contain("Supplies"),
-            "GET request should target the Supplies endpoint");
+        Assert.That(request.Url, Does.Contain("/Supplies?Supplies=b"),
+            "The search sends the typed text as the Supplies query member");
 
         AssertNoConsoleErrors();
     }
