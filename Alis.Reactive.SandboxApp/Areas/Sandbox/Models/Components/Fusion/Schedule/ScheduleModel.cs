@@ -9,6 +9,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     public class PointInTimeScheduleModel
     {
         public string? SelectedFacilityId { get; set; }
+
+        /// <summary>While payroll runs, the schedule stays on its week and no shift opens.</summary>
+        public bool ScheduleLocked { get; set; }
+
+        /// <summary>Shows only the shifts no one covers yet.</summary>
+        public bool NeedsCoverageOnly { get; set; }
     }
 
     /// <summary>

@@ -72,6 +72,7 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
+        p.Element("schedule-week").Text.Set(p.Component<FusionSchedule>("shift-schedule").SelectedDate);
         p.Get("/api/schedule/assignments?selectedFacilityId=mystery-manor")
          .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
          {
@@ -116,6 +117,12 @@
                              s.Element("unassigned-count").Text.Set(json.Get(j => j.UnassignedCount));
                          }));
                     }); }
+            @{ Html.InputField(plan, m => m.ScheduleLocked, o => o.Label("Lock the schedule for payroll"))
+                    .NativeCheckBox(b => b.CssClass("rounded border-border")); }
+            @{ Html.InputField(plan, m => m.NeedsCoverageOnly, o => o.Label("Show only shifts that need coverage"))
+                    .NativeCheckBox(b => b.CssClass("rounded border-border"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                        p.Component<FusionSchedule>("shift-schedule").RefreshEvents()); }
             <native-hstack gap="Sm" class="ml-auto text-sm">
                 <span class="text-text-secondary">Unassigned:</span>
                 <span id="unassigned-count" class="font-bold text-red-600">--</span>
@@ -165,6 +172,19 @@
                      }));
                 }))
         </native-hstack>
+        <native-hstack gap="Lg" wrap="true" class="mt-3 text-sm">
+            @(Html.NativeButton("schedule-show-morning", "Jump to the AM shift")
+                .CssClass("px-3 py-1.5 rounded-md border border-border text-sm font-medium hover:bg-slate-50")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Component<FusionSchedule>("shift-schedule").ScrollTo("06:00")))
+            @(Html.NativeButton("schedule-show-night", "Jump to the night shift")
+                .CssClass("px-3 py-1.5 rounded-md border border-border text-sm font-medium hover:bg-slate-50")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Component<FusionSchedule>("shift-schedule").ScrollTo("22:00")))
+            <span>Showing the week of <span id="schedule-week" class="font-medium"></span></span>
+            <span>Selected shift: <span id="selected-shift" class="font-medium">No shift selected.</span></span>
+        </native-hstack>
+        <p id="schedule-locked-note" class="mt-2 text-sm text-warning" hidden></p>
     </section>
 
     <section class="rounded-lg border border-border bg-white shadow-sm" style="height: 600px;">
@@ -214,9 +234,6 @@
             })
             .Reactive(evt => evt.CellClick, (args, p) =>
             {
-                p.Element("event-trace").Text.Set(args.StartTime);
-                p.Element("event-shift").Text.Set(args.GroupIndex);
-
                 p.Get(Url.SandboxRoute("NewAssignmentForm", "Schedule"))
                  .Gather<NewAssignmentQuery>(g => g
                      .Set(x => x.StartTime, args.StartTime)
@@ -228,10 +245,15 @@
             })
             .Reactive(evt => evt.PopupOpen, (args, p) =>
             {
-                // Syncfusion opens QuickInfo for empty cells too; cancel only those so event QuickInfo keeps the custom template.
+                // Syncfusion opens QuickInfo for empty cells too, with data that carries no id; cancel only
+                // those, since an empty cell opens the new-assignment dialog instead.
                 p.When(args.Type).Eq("QuickInfo")
-                 .And(args.Data.Get(x => x.Id)).Eq(0)
+                 .And(args.Data.Get(x => x.Id)).Falsy()
                  .Then(t => { args.Cancel.Set(true); });
+
+                p.When(args.Type).Eq("QuickInfo")
+                 .And(args.Data.Get(x => x.Id)).Truthy()
+                 .Then(t => t.Element("selected-shift").Text.Set(args.Data.Get(x => x.Subject)));
 
                 // Replace Syncfusion's built-in editor with the app-level drawer.
                 p.When(args.Type).Eq("Editor")
@@ -244,11 +266,28 @@
                       .Gather<EditAssignmentQuery>(g => g.Set(x => x.AssignmentId, args.Data.Get(x => x.Id)))
                       .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
                      t.Component<NativeDrawer>().Open();
-                 })
-                 .Else(e =>
-                 {
-                     e.Element("event-shift").Text.Set("NOT Editor");
                  });
+            })
+            .Reactive(evt => evt.PopupClose, (args, p) =>
+            {
+                p.When(args.Type).Eq("QuickInfo")
+                 .Then(t => t.Element("selected-shift").Text.Set("No shift selected."));
+            })
+            .Reactive(evt => evt.EventClick, (args, p) =>
+            {
+                p.When(p.Component<NativeCheckBox>(m => m.ScheduleLocked).Checked).Truthy()
+                 .Then(locked =>
+                 {
+                     args.Cancel.Set(true);
+                     locked.Element("schedule-locked-note").Text.Set("The schedule is locked for payroll; unlock it to open a shift.");
+                     locked.Element("schedule-locked-note").Show();
+                 });
+            })
+            .Reactive(evt => evt.EventRendered<ShiftAssignment>(), (args, p) =>
+            {
+                p.When(p.Component<NativeCheckBox>(m => m.NeedsCoverageOnly).Checked).Truthy()
+                 .And(args.Data.Get(x => x.IsUnassigned)).Falsy()
+                 .Then(t => { args.Cancel.Set(true); });
             })
             .Reactive(evt => evt.ActionBegin, (args, p) =>
             {
@@ -257,9 +296,21 @@
                  {
                      t.Element("status").Text.Set("Saving...");
                  });
+
+                p.When(args.RequestType).Eq("dateNavigate")
+                 .And(p.Component<NativeCheckBox>(m => m.ScheduleLocked).Checked).Truthy()
+                 .Then(locked =>
+                 {
+                     args.Cancel.Set(true);
+                     locked.Element("schedule-locked-note").Text.Set("The schedule is locked for payroll; it stays on this week.");
+                     locked.Element("schedule-locked-note").Show();
+                 });
             })
             .Reactive(evt => evt.ActionComplete, (args, p) =>
             {
+                p.When(args.RequestType).Eq("dateNavigate")
+                 .Then(t => t.Element("schedule-week").Text.Set(t.Component<FusionSchedule>("shift-schedule").SelectedDate));
+
                 // Syncfusion emits eventChanged after CRUD; reload authoritative assignments then.
                 p.When(args.RequestType).Eq("eventChanged")
                  .Then(t =>
@@ -344,8 +395,6 @@
     <section class="rounded-lg border border-border bg-white p-4 shadow-sm">
         <h3 class="text-sm font-semibold mb-2">Event Trace</h3>
         <native-vstack gap="Xs" class="font-mono text-xs">
-            <p>Last cell click: <span id="event-trace" class="text-text-muted">--</span></p>
-            <p>Shift group: <span id="event-shift" class="text-text-muted">--</span></p>
             <p>Route view: <span id="route-view" class="text-text-muted">--</span></p>
             <p>Route view summary: <span id="route-view-summary" class="text-text-muted">--</span></p>
             <p>Schedule events: <span id="schedule-events-count" class="text-text-muted">--</span></p>
