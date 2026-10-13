@@ -15,14 +15,19 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion ContextMenu, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionContextMenu(plan, "resident-actions", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionContextMenu&gt;("resident-actions")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Call(c =&gt; c.Open, 120d, 240d)</c>.
+    /// Render it with <c>Html.FusionContextMenu(plan, "resident-actions", b =&gt; ...)</c>, then reach it in a callback
+    /// and use its members directly:
+    /// <code>
+    /// var menu = p.Component&lt;FusionContextMenu&gt;("resident-actions");
+    /// menu.Open(120d, 240d);
+    /// </code>
     /// </remarks>
     public sealed class FusionContextMenu : FusionComponent
     {
         /// <summary>Opens the menu at a top and left position, in pixels.</summary>
-        public void Open(Arg<double> first, Arg<double> second) => Call(first, second);
+        /// <param name="top">The menu's vertical position, in pixels.</param>
+        /// <param name="left">The menu's horizontal position, in pixels.</param>
+        public void Open(Arg<double> top, Arg<double> left) => Call(top, left);
 
         /// <summary>Closes the menu.</summary>
         public void Close() => Call();
@@ -77,7 +82,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Whether the menu opens with focus.</summary>
         public ReadOnly<bool?> IsFocused => ReadOnly<bool?>();
 
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 
@@ -100,7 +105,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The parent item of a submenu; <see langword="null"/> for the top level.</summary>
         public ReadOnly<FusionContextMenuItem> ParentItem => ReadOnly<FusionContextMenuItem>();
 
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 
@@ -142,6 +147,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion ContextMenu and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan receiving context menu event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>

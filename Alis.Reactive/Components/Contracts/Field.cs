@@ -11,8 +11,8 @@ namespace Alis.Reactive
     /// Pass a field wherever a declared member takes a field name, so the compiler checks the name
     /// and, through <see cref="Field{TValue}"/>, the value that goes with it:
     /// <code>
-    /// grid.Call(c =&gt; c.SortColumn, Field.Of((Resident r) =&gt; r.Name), FusionGridSortDirection.Descending, false)
-    /// grid.Call(c =&gt; c.SetCellValue&lt;int&gt;(), 6001, Field.Of((Resident r) =&gt; r.OpenTasks), 4)
+    /// grid.SortColumn(Field.Of((Resident r) =&gt; r.Name), FusionGridSortDirection.Descending, false);
+    /// grid.SetCellValue&lt;int&gt;(6001, Field.Of((Resident r) =&gt; r.OpenTasks), 4);
     /// </code>
     /// A nested member is a dotted name: <c>r =&gt; r.Address.City</c> is <c>"address.city"</c>.
     /// </remarks>

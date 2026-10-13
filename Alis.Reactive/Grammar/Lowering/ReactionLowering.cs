@@ -94,7 +94,7 @@ namespace Alis.Reactive.Grammar.Lowering
             }
         }
 
-        // A component method declared Awaited is waited for before the next step runs.
+        // A method declared with CallAsync is waited for before the next step runs.
         private Statement Call(CallReaction call, LoweringScope scope)
         {
             var args = _values.Arguments(call.Args, scope);

@@ -38,6 +38,8 @@ namespace Alis.Reactive.Native.Components
     public static class NativeCheckListHtmlExtensions
     {
         /// <summary>Renders a NativeCheckList with its defaults; see the overload that takes <c>build</c>.</summary>
+        /// <typeparam name="TModel">The view's model.</typeparam>
+        /// <typeparam name="TProp">The type of the bound model property.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeCheckList, TModel> NativeCheckList<TModel, TProp>(
             this InputBoundField<TModel, TProp> field)
             where TModel : class
@@ -47,6 +49,10 @@ namespace Alis.Reactive.Native.Components
         /// Renders a NativeCheckList bound to the field's model property, with the framework's element ID and
         /// binding name.
         /// </summary>
+        /// <typeparam name="TModel">The view's model.</typeparam>
+        /// <typeparam name="TProp">The type of the bound model property.</typeparam>
+        /// <param name="field">The model-bound field the check list renders into.</param>
+        /// <param name="build">Configures the check list, for example <c>b =&gt; b.Option("Gluten free")</c>.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeCheckList, TModel> NativeCheckList<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,

@@ -14,17 +14,24 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion Accordion, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionAccordion(plan, "care-accordion", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionAccordion&gt;("care-accordion")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Call(c =&gt; c.ExpandItem, true, 1)</c>.
+    /// Render it with <c>Html.FusionAccordion(plan, "care-accordion", b =&gt; ...)</c>, then reach it in a callback
+    /// and use its members directly:
+    /// <code>
+    /// var accordion = p.Component&lt;FusionAccordion&gt;("care-accordion");
+    /// accordion.ExpandItem(true, 1);
+    /// </code>
     /// </remarks>
     public sealed class FusionAccordion : FusionComponent
     {
         /// <summary>Expands (<see langword="true"/>) or collapses (<see langword="false"/>) the item at a zero-based index.</summary>
-        public void ExpandItem(Arg<bool> first, Arg<int> second) => Call(first, second);
+        /// <param name="isExpand"><see langword="true"/> to expand the item, <see langword="false"/> to collapse it.</param>
+        /// <param name="index">The item's zero-based index.</param>
+        public void ExpandItem(Arg<bool> isExpand, Arg<int> index) => Call(isExpand, index);
 
         /// <summary>Enables (<see langword="true"/>) or disables (<see langword="false"/>) the item at a zero-based index.</summary>
-        public void EnableItem(Arg<int> first, Arg<bool> second) => Call(first, second);
+        /// <param name="index">The item's zero-based index.</param>
+        /// <param name="isEnable"><see langword="true"/> to enable the item, <see langword="false"/> to disable it.</param>
+        public void EnableItem(Arg<int> index, Arg<bool> isEnable) => Call(index, isEnable);
 
         /// <summary>Raised after an item expands or collapses.</summary>
         public TypedEvent<FusionAccordionExpandedArgs> Expanded =>
@@ -50,6 +57,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion Accordion and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan receiving accordion event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>

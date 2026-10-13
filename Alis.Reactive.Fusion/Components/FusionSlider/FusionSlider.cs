@@ -10,10 +10,10 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion Slider, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.InputField(plan, m =&gt; m.RoomTemperature).FusionSlider(b =&gt; ...)</c>; target it with
-    /// <c>p.Component&lt;FusionSlider&gt;(m =&gt; m.RoomTemperature)</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>. A range slider's value is <see cref="RangeValue"/>, the same JavaScript property typed as its
-    /// start and end: <c>.Set(c =&gt; c.RangeValue, new double[] { 14, 16 }).Call(c =&gt; c.DataBind)</c>.
+    /// Render it with <c>Html.InputField(plan, m =&gt; m.RoomTemperature).FusionSlider(b =&gt; ...)</c>, reach it with
+    /// <c>var temperature = p.Component&lt;FusionSlider&gt;(m =&gt; m.RoomTemperature);</c> and use its members directly.
+    /// A range slider's value is <see cref="RangeValue"/>, the same JavaScript property typed as its start and end:
+    /// <c>temperature.RangeValue.Set(new double[] { 14, 16 }); temperature.DataBind();</c>.
     /// </remarks>
     public sealed class FusionSlider : FusionComponent, IInputComponent
     {
@@ -64,6 +64,8 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionSliderHtmlExtensions
     {
         /// <summary>Renders a FusionSlider with its defaults; see the overload that takes the configuration.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionSlider, TModel> FusionSlider<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup)
             where TModel : class
@@ -72,6 +74,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Renders a FusionSlider bound to the field's model property.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
         /// <typeparam name="TProp">Model value type rendered by the slider.</typeparam>
         /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Configures initial Slider options before rendering.</param>

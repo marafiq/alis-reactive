@@ -11,9 +11,8 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion MultiSelect, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use as the type in <c>p.Component&lt;FusionMultiSelect&gt;(m =&gt; m.Skills)</c>; every
-    /// declared member works with <c>Set</c>, <c>Call</c> and <c>Get</c>, for example
-    /// <c>.Set(c =&gt; c.Value, new[] { "cpr" })</c> or <c>p.When(ms.Get(c =&gt; c.Value)).NotNull()</c>.
+    /// Reach it with <c>var skills = p.Component&lt;FusionMultiSelect&gt;(m =&gt; m.Skills);</c> and use its
+    /// members directly: <c>skills.Value.Set(new[] { "cpr" });</c> or <c>p.When(skills.Value).NotNull()</c>.
     /// </remarks>
     public sealed class FusionMultiSelect : FusionComponent, IInputComponent
     {
@@ -45,7 +44,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionMultiSelect.Change"/>.</summary>
-    /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Value).NotNull()</c>.</remarks>
+    /// <remarks>Read in conditions: <c>p.When(args.Value).NotNull()</c>.</remarks>
     public class FusionMultiSelectChangeArgs : JsObject
     {
         /// <summary>Selected values after the change.</summary>
@@ -56,7 +55,11 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionMultiSelect.Filtering"/>.</summary>
-    /// <remarks>Server-side filtering: <c>p.Payload(args).Set(a =&gt; a.PreventDefaultAction, true)</c>, request matches, then <c>s.Payload(args).Call(a =&gt; a.UpdateData, res.Read(r =&gt; r.Items))</c>.</remarks>
+    /// <remarks>
+    /// For server-side filtering, stop the built-in filter with <c>args.PreventDefaultAction.Set(true)</c>,
+    /// request the matches, and hand them over in the success callback with
+    /// <c>args.UpdateData(json.Get(x =&gt; x.Items))</c>.
+    /// </remarks>
     public class FusionMultiSelectFilteringArgs : JsObject
     {
         /// <summary>Text the user typed.</summary>
@@ -77,6 +80,10 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionMultiSelectHtmlExtensions
     {
         /// <summary>Maps display text and selected value fields using typed item expressions.</summary>
+        /// <typeparam name="TItem">The item class the data source holds.</typeparam>
+        /// <param name="builder">The Syncfusion builder being configured.</param>
+        /// <param name="text">The item member shown as each option's text.</param>
+        /// <param name="value">The item member submitted as each option's value.</param>
         public static MultiSelectBuilder Fields<TItem>(
             this MultiSelectBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -90,6 +97,11 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>Maps display text, selected value and grouping fields using typed item expressions.</summary>
+        /// <typeparam name="TItem">The item class the data source holds.</typeparam>
+        /// <param name="builder">The Syncfusion builder being configured.</param>
+        /// <param name="text">The item member shown as each option's text.</param>
+        /// <param name="value">The item member submitted as each option's value.</param>
+        /// <param name="groupBy">The item member the options are grouped by.</param>
         public static MultiSelectBuilder Fields<TItem>(
             this MultiSelectBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -105,6 +117,8 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>Renders a FusionMultiSelect with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionMultiSelect, TModel> FusionMultiSelect<TModel, TProp>(
             this InputBoundField<TModel, TProp> field)
             where TModel : class
@@ -114,6 +128,10 @@ namespace Alis.Reactive.Fusion.Components
         /// Renders a FusionMultiSelect bound to the field's model property, with the framework's element ID and
         /// binding name.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
+        /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
+        /// <param name="build">Configures the Syncfusion builder before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionMultiSelect, TModel> FusionMultiSelect<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,

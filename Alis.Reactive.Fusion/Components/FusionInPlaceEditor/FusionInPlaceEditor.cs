@@ -11,8 +11,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Render it with <c>Html.InputField(plan, m =&gt; m.Value).FusionInPlaceEditor(b =&gt; ...)</c>; target it with
-    /// <c>p.Component&lt;FusionInPlaceEditor&gt;(m =&gt; m.Value)</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Call(c =&gt; c.Disable, true)</c> or <c>.Call(c =&gt; c.Save)</c>.
+    /// <c>var editor = p.Component&lt;FusionInPlaceEditor&gt;(m =&gt; m.Value)</c>, then write or call a member as its own
+    /// statement, for example <c>editor.Disable(true)</c> or <c>editor.Save()</c>.
     /// </remarks>
     public sealed class FusionInPlaceEditor : FusionComponent, IInputComponent
     {
@@ -20,6 +20,7 @@ namespace Alis.Reactive.Fusion.Components
         public Prop<string> Value => Prop<string>();
 
         /// <summary>Disables (<see langword="true"/>) or enables the editor.</summary>
+        /// <param name="value"><see langword="true"/> to disable the editor; <see langword="false"/> to enable it.</param>
         public void Disable(Arg<bool> value) => Call(value);
 
         /// <summary>Saves the edited value.</summary>
@@ -29,10 +30,12 @@ namespace Alis.Reactive.Fusion.Components
         public void SetFocus() => Call();
 
         /// <summary>Adds a CSS class to the editor element.</summary>
-        public void AddClass(Arg<string> value) => Call(value, name: "element.classList.add");
+        /// <param name="token">The CSS class to add.</param>
+        public void AddClass(Arg<string> token) => Call(token, name: "element.classList.add");
 
         /// <summary>Removes a CSS class from the editor element.</summary>
-        public void RemoveClass(Arg<string> value) => Call(value, name: "element.classList.remove");
+        /// <param name="token">The CSS class to remove.</param>
+        public void RemoveClass(Arg<string> token) => Call(token, name: "element.classList.remove");
 
         /// <summary>Raised before the editor opens.</summary>
         public TypedEvent<FusionInPlaceEditorBeginEditArgs> BeginEdit =>
@@ -69,10 +72,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>Payload of <see cref="FusionInPlaceEditor.BeginEdit"/>.</summary>
     public class FusionInPlaceEditorBeginEditArgs : JsObject
     {
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
 
-        /// <summary>Set to <see langword="true"/> to keep focus off the editor.</summary>
+        /// <summary>Whether the editor opens without taking focus.</summary>
         public ReadOnly<bool> CancelFocus => ReadOnly<bool>();
 
         /// <summary>The edit mode.</summary>
@@ -88,7 +91,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Why the editor is closing.</summary>
         public ReadOnly<string> Action => ReadOnly<string>();
 
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
 
         /// <summary>The edit mode.</summary>
@@ -117,7 +120,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The data about to be submitted.</summary>
         public ReadOnly<IDictionary<string, object>> Data => ReadOnly<IDictionary<string, object>>();
 
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 
@@ -156,11 +159,13 @@ namespace Alis.Reactive.Fusion.Components
     /// Start the chain with <c>Html.InputField(plan, m =&gt; m.DateOfBirth)</c>, then call
     /// <c>.FusionInPlaceEditor(b =&gt; { b.Type(InputType.Date).Mode(RenderMode.Inline); })</c>.
     /// Use the vendor builder directly for configuration (<c>Type</c>, <c>Mode</c>, <c>EditableOn</c>,
-    /// <c>ShowButtons</c>, etc.) and <c>.Reactive(plan, evt =&gt; evt.ActionBegin, …)</c> to own the commit flow.
+    /// <c>ShowButtons</c>, etc.) and <c>.Reactive(evt =&gt; evt.ActionBegin, ...)</c> to own the commit flow.
     /// </remarks>
     public static class FusionInPlaceEditorHtmlExtensions
     {
         /// <summary>Renders a FusionInPlaceEditor with its defaults; see the overload that takes the configuration.</summary>
+        /// <typeparam name="TModel">The view model the plan is authored for.</typeparam>
+        /// <typeparam name="TProp">Model value type rendered by the in-place editor.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionInPlaceEditor, TModel> FusionInPlaceEditor<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup)
             where TModel : class
@@ -169,9 +174,11 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Renders the in-place editor component bound to the field's model property.
         /// </summary>
+        /// <typeparam name="TModel">The view model the plan is authored for.</typeparam>
         /// <typeparam name="TProp">Model value type rendered by the in-place editor.</typeparam>
         /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to configure the editor (type, mode, inner model, reactive events).</param>
+        /// <param name="build">Configures the editor on the Syncfusion builder: type, mode, editable-on and the rest.</param>
+        /// <returns>The rendered editor; wire its events with <c>.Reactive(evt =&gt; evt.ActionBegin, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionInPlaceEditor, TModel> FusionInPlaceEditor<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<InPlaceEditorBuilder> build)

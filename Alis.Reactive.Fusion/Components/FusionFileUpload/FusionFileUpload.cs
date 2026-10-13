@@ -10,9 +10,8 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion Uploader, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.InputField(plan, m =&gt; m.CarePlanDocument).FusionFileUpload(b =&gt; ...)</c>; target it with
-    /// <c>p.Component&lt;FusionFileUpload&gt;(m =&gt; m.CarePlanDocument)</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>. A form-data request sends the selected files with the form's other inputs:
+    /// Render it with <c>Html.InputField(plan, m =&gt; m.CarePlanDocument).FusionFileUpload(b =&gt; ...)</c>. A
+    /// form-data request sends the selected files with the form's other inputs:
     /// <c>p.Post(url).Gather(g =&gt; g.Form()).AsFormData()</c>.
     /// </remarks>
     public sealed class FusionFileUpload : FusionComponent, IInputComponent
@@ -50,6 +49,8 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionFileUploadHtmlExtensions
     {
         /// <summary>Renders a FusionFileUpload with its defaults; see the overload that takes the configuration.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionFileUpload, TModel> FusionFileUpload<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup)
             where TModel : class
@@ -58,6 +59,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Renders the file upload component bound to the field's model property.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
         /// <typeparam name="TProp">Model value type represented by the file upload input.</typeparam>
         /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Configures initial uploader options before rendering.</param>

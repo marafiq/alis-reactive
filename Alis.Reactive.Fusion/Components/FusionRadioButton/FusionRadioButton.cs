@@ -14,10 +14,10 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion RadioButton, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionRadioButton(plan, "companion-suite", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionRadioButton&gt;("companion-suite")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Set(c =&gt; c.Checked, true).Call(c =&gt; c.DataBind)</c> or
-    /// <c>.Get(c =&gt; c.GetSelectedValue)</c>.
+    /// Render it with <c>Html.FusionRadioButton(plan, "companion-suite", b =&gt; ...)</c>, reach it with
+    /// <c>var companionSuite = p.Component&lt;FusionRadioButton&gt;("companion-suite");</c> and use its members
+    /// directly: <c>companionSuite.Checked.Set(true); companionSuite.DataBind();</c> or
+    /// <c>p.When(companionSuite.GetSelectedValue()).Eq("companion")</c>.
     /// </remarks>
     public sealed class FusionRadioButton : FusionComponent
     {
@@ -60,6 +60,11 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Renders one Syncfusion RadioButton with a stable component id.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
+        /// <param name="plan">The plan the component's events are wired into.</param>
+        /// <param name="elementId">The component's element ID, chosen by the view.</param>
+        /// <param name="build">Configures the Syncfusion builder before rendering.</param>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionRadioButton, TModel> FusionRadioButton<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,

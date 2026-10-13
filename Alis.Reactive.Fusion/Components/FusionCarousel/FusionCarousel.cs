@@ -14,9 +14,13 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion Carousel, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionCarousel(plan, "activity-carousel", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionCarousel&gt;("activity-carousel")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Call(c =&gt; c.Next)</c> or <c>.Get(c =&gt; c.SelectedIndex)</c>.
+    /// Render it with <c>Html.FusionCarousel(plan, "activity-carousel", b =&gt; ...)</c>, then reach it in a callback
+    /// and use its members directly:
+    /// <code>
+    /// var carousel = p.Component&lt;FusionCarousel&gt;("activity-carousel");
+    /// carousel.Next();
+    /// </code>
+    /// Read it in a condition: <c>p.When(carousel.SelectedIndex).Eq(0)</c>.
     /// </remarks>
     public sealed class FusionCarousel : FusionComponent
     {
@@ -53,7 +57,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary><c>"Next"</c> or <c>"Previous"</c>.</summary>
         public ReadOnly<string> SlideDirection => ReadOnly<string>();
 
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 
@@ -82,6 +86,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion Carousel and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan receiving carousel event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>

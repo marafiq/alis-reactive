@@ -16,7 +16,11 @@ namespace Alis.Reactive.Native.AppLevel
     /// <remarks>
     /// One drawer exists per page, rendered by <c>@Html.NativeDrawer()</c> in the layout, and is
     /// referenced without an ID:
-    /// <code>p.Component&lt;NativeDrawer&gt;().Set(c =&gt; c.Size, DrawerSize.Md).Call(c =&gt; c.Open)</code>
+    /// <code>
+    /// var drawer = p.Component&lt;NativeDrawer&gt;();
+    /// drawer.Size.Set(DrawerSize.Md);
+    /// drawer.Open();
+    /// </code>
     /// Load its content into <c>alis-drawer-content</c> and its heading into <c>alis-drawer-title</c>.
     /// </remarks>
     public sealed class NativeDrawer : NativeComponent, IAppLevelComponent

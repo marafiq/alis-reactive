@@ -15,6 +15,7 @@ namespace Alis.Reactive.Native.Components
     /// <summary>
     /// Builds the anchor element returned by <c>NativeActionLink</c>.
     /// </summary>
+    /// <typeparam name="TModel">The view's model.</typeparam>
     public sealed class NativeActionLinkBuilder<TModel> :
 #if NET48
         IHtmlString

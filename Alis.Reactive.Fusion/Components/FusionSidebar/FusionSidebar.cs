@@ -14,9 +14,9 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion Sidebar, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionSidebar(plan, "resident-sidebar", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionSidebar&gt;("resident-sidebar")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Call(c =&gt; c.Toggle)</c> or <c>p.When(sidebar.Get(c =&gt; c.IsOpen)).Truthy()</c>.
+    /// Render it with <c>Html.FusionSidebar(plan, "resident-sidebar", b =&gt; ...)</c>, reach it with
+    /// <c>var sidebar = p.Component&lt;FusionSidebar&gt;("resident-sidebar");</c> and use its members directly:
+    /// <c>sidebar.Toggle();</c> or <c>p.When(sidebar.IsOpen).Truthy()</c>.
     /// </remarks>
     public sealed class FusionSidebar : FusionComponent
     {
@@ -57,6 +57,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion Sidebar and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan receiving sidebar event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>

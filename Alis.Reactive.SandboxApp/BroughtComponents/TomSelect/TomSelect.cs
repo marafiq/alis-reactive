@@ -12,6 +12,15 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
 
 #nullable disable annotations
     /// <summary>A Tom Select dropdown, declared by the names its JavaScript API uses.</summary>
+    /// <remarks>
+    /// A page reaches the dropdown and uses its members directly, one statement each:
+    /// <code>
+    /// var suite = p.Component&lt;TomSelect&gt;(m =&gt; m.SuiteType);
+    /// p.When(suite.Value).NotEmpty().Then(..);
+    /// suite.SetValue(recommendation.Get(x =&gt; x.SuiteType));
+    /// suite.Clear();
+    /// </code>
+    /// </remarks>
     public sealed class TomSelect : Component, IInputComponent
     {
         /// <summary>
@@ -33,6 +42,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         public Prop<string> Value => Prop<string>("input.value");
 
         /// <summary>Selects an option by its value and raises <see cref="Change"/>.</summary>
+        /// <param name="value">The option's value.</param>
         public void SetValue(Arg<string> value) => Call(value);
 
         /// <summary>Clears the selection and raises <see cref="Change"/>.</summary>
@@ -46,8 +56,9 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     }
 
     /// <summary>
-    /// Payload of <see cref="TomSelect.Change"/>. Tom Select hands the listener the new value
-    /// itself; read it from the component with <c>Get(c =&gt; c.Value)</c>.
+    /// Payload of <see cref="TomSelect.Change"/>. Tom Select hands the listener the new value itself,
+    /// which has no members to declare; read it from the component instead:
+    /// <c>p.When(suite.Value).NotEmpty()</c>.
     /// </summary>
     public class TomSelectChangeArgs : JsObject
     {
@@ -57,14 +68,19 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     /// <summary>One option a <see cref="TomSelect"/> offers.</summary>
     public sealed class TomSelectOption
     {
+        /// <summary>Creates an option.</summary>
+        /// <param name="value">The value the form posts when the option is selected.</param>
+        /// <param name="text">What the dropdown shows for the option.</param>
         public TomSelectOption(string value, string text)
         {
             Value = value;
             Text = text;
         }
 
+        /// <summary>The value the form posts when the option is selected.</summary>
         public string Value { get; }
 
+        /// <summary>What the dropdown shows for the option.</summary>
         public string Text { get; }
     }
 
@@ -75,6 +91,12 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// Renders the select Tom Select enhances, with the framework's element ID and binding name,
         /// the field's current value selected.
         /// </summary>
+        /// <typeparam name="TModel">The view's model.</typeparam>
+        /// <typeparam name="TProp">The type of the bound model property.</typeparam>
+        /// <param name="field">The model-bound field the dropdown renders into.</param>
+        /// <param name="options">The options the dropdown offers.</param>
+        /// <param name="placeholder">What the dropdown shows before an option is selected.</param>
+        /// <returns>The rendered dropdown; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.SandboxApp.BroughtComponents.TomSelect, TModel> TomSelect<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,
             IEnumerable<TomSelectOption> options,

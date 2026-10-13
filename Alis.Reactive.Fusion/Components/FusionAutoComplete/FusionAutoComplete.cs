@@ -11,9 +11,13 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion AutoComplete, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use as the type in <c>p.Component&lt;FusionAutoComplete&gt;(m =&gt; m.Physician)</c>; every
-    /// declared member works with <c>Set</c>, <c>Call</c> and <c>Get</c>, for example
-    /// <c>.Set(c =&gt; c.Value, "smith")</c>, <c>.Call(c =&gt; c.ShowPopup)</c>, <c>.Get(c =&gt; c.Value)</c>.
+    /// Reach it in a callback by its model member and use its members directly:
+    /// <code>
+    /// var physician = p.Component&lt;FusionAutoComplete&gt;(m =&gt; m.Physician);
+    /// physician.Value.Set("smith");
+    /// physician.ShowPopup();
+    /// </code>
+    /// Read it in a condition: <c>p.When(physician.Value).NotNull()</c>.
     /// </remarks>
     public sealed class FusionAutoComplete : FusionComponent, IInputComponent
     {
@@ -58,7 +62,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionAutoComplete.Change"/>.</summary>
-    /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Value).Eq("smith")</c>.</remarks>
+    /// <remarks>Read in conditions: <c>p.When(args.Value).Eq("smith")</c>.</remarks>
     public class FusionAutoCompleteChangeArgs : JsObject
     {
         /// <summary>Selected value after the change.</summary>
@@ -73,11 +77,11 @@ namespace Alis.Reactive.Fusion.Components
     /// Server-side filtering: suppress the built-in filter, request matches, then hand them to the
     /// popup.
     /// <code>
-    /// p.Payload(args).Set(a =&gt; a.PreventDefaultAction, true);
+    /// args.PreventDefaultAction.Set(true);
     /// p.Get(url)
-    ///  .Gather&lt;MedicationSearchQuery&gt;(g =&gt; g.Set(x =&gt; x.MedicationType, p.Payload(args).Get(a =&gt; a.Text)))
+    ///  .Gather&lt;MedicationSearchQuery&gt;(g =&gt; g.Set(x =&gt; x.MedicationType, args.Text))
     ///  .Response(r =&gt; r.OnSuccess&lt;MedicationSearchResponse&gt;((json, s) =&gt;
-    ///      s.Payload(args).Call(a =&gt; a.UpdateData, json.Read(j =&gt; j.Medications))));
+    ///      args.UpdateData(json.Get(j =&gt; j.Medications))));
     /// </code>
     /// </remarks>
     public class FusionAutoCompleteFilteringArgs : JsObject
@@ -103,6 +107,10 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionAutoCompleteHtmlExtensions
     {
         /// <summary>Maps display text and selected value fields using typed item expressions.</summary>
+        /// <typeparam name="TItem">The item class the data source holds.</typeparam>
+        /// <param name="builder">The Syncfusion builder being configured.</param>
+        /// <param name="text">The item member shown as each option's text.</param>
+        /// <param name="value">The item member submitted as each option's value.</param>
         public static AutoCompleteBuilder Fields<TItem>(
             this AutoCompleteBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -116,6 +124,11 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>Maps display text, selected value and grouping fields using typed item expressions.</summary>
+        /// <typeparam name="TItem">The item class the data source holds.</typeparam>
+        /// <param name="builder">The Syncfusion builder being configured.</param>
+        /// <param name="text">The item member shown as each option's text.</param>
+        /// <param name="value">The item member submitted as each option's value.</param>
+        /// <param name="groupBy">The item member the options are grouped by.</param>
         public static AutoCompleteBuilder Fields<TItem>(
             this AutoCompleteBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -134,6 +147,10 @@ namespace Alis.Reactive.Fusion.Components
         /// Renders a FusionAutoComplete bound to the field's model property, with the framework's
         /// element ID and binding name.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
+        /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
+        /// <param name="build">Configures the component before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionAutoComplete, TModel> FusionAutoComplete<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,

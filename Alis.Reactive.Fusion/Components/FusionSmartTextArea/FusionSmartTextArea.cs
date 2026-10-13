@@ -15,9 +15,9 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion SmartTextArea, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.InputField(plan, m =&gt; m.CareNote).FusionSmartTextArea(b =&gt; ...)</c>; target it with
-    /// <c>p.Component&lt;FusionSmartTextArea&gt;(m =&gt; m.CareNote)</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Set(c =&gt; c.Value, "Resident prefers morning therapy")</c>.
+    /// Render it with <c>Html.InputField(plan, m =&gt; m.CareNote).FusionSmartTextArea(o =&gt; ...)</c>, reach it with
+    /// <c>var careNote = p.Component&lt;FusionSmartTextArea&gt;(m =&gt; m.CareNote);</c> and use its members directly:
+    /// <c>careNote.Value.Set("Resident prefers morning therapy");</c>.
     /// </remarks>
     public sealed class FusionSmartTextArea : FusionComponent, IInputComponent
     {
@@ -62,7 +62,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The suggestion about to be inserted.</summary>
         public ReadOnly<string> Text => ReadOnly<string>();
 
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 
@@ -74,14 +74,25 @@ namespace Alis.Reactive.Fusion.Components
     }
 #nullable restore annotations
 
+    /// <summary>Renders a <see cref="FusionSmartTextArea"/> for a model-bound field.</summary>
     public static class FusionSmartTextAreaHtmlExtensions
     {
         /// <summary>Renders a FusionSmartTextArea with its defaults; see the overload that takes the configuration.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionSmartTextArea, TModel> FusionSmartTextArea<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup)
             where TModel : class
             => setup.FusionSmartTextArea(_ => { });
 
+        /// <summary>
+        /// Renders a FusionSmartTextArea bound to the field's model property, with the framework's element ID and
+        /// binding name.
+        /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
+        /// <param name="setup">The model-bound field from <c>Html.InputField(...)</c>.</param>
+        /// <param name="configure">Sets the text area's starting text, rows, suggestions and look.</param>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionSmartTextArea, TModel> FusionSmartTextArea<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<FusionSmartTextAreaOptions> configure)

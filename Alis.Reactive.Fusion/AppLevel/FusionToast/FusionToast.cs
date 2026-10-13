@@ -19,10 +19,10 @@ namespace Alis.Reactive.Fusion.AppLevel
     /// One toast exists per page, rendered by <c>@Html.FusionToast()</c> in the layout, and is referenced
     /// without an ID. Set what the next toast says, then show it:
     /// <code>
-    /// p.Component&lt;FusionToast&gt;()
-    ///     .Set(c =&gt; c.Content, "Care plan saved")
-    ///     .Set(c =&gt; c.Tone, FusionToastTone.Success)
-    ///     .Call(c =&gt; c.Show)
+    /// var toast = p.Component&lt;FusionToast&gt;();
+    /// toast.Content.Set("Care plan saved");
+    /// toast.Tone.Set(FusionToastTone.Success);
+    /// toast.Show();
     /// </code>
     /// </remarks>
     public sealed class FusionToast : FusionComponent, IAppLevelComponent

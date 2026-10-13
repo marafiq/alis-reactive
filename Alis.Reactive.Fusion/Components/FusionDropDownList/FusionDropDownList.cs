@@ -11,9 +11,13 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion DropDownList, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use as the type in <c>p.Component&lt;FusionDropDownList&gt;(m =&gt; m.CareLevel)</c>; every
-    /// declared member works with <c>Set</c>, <c>Call</c> and <c>Get</c>, for example
-    /// <c>.Set(c =&gt; c.Value, "memory")</c>, <c>.Call(c =&gt; c.ShowPopup)</c>, <c>.Get(c =&gt; c.Value)</c>.
+    /// Reach it in a callback by its model member and use its members directly:
+    /// <code>
+    /// var careLevel = p.Component&lt;FusionDropDownList&gt;(m =&gt; m.CareLevel);
+    /// careLevel.Value.Set("memory");
+    /// careLevel.ShowPopup();
+    /// </code>
+    /// Read it in a condition: <c>p.When(careLevel.Value).Eq("memory")</c>.
     /// </remarks>
     public sealed class FusionDropDownList : FusionComponent, IInputComponent
     {
@@ -59,7 +63,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionDropDownList.Change"/>.</summary>
-    /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Value).Eq("US")</c>.</remarks>
+    /// <remarks>Read in conditions: <c>p.When(args.Value).Eq("US")</c>.</remarks>
     public class FusionDropDownListChangeArgs : JsObject
     {
         /// <summary>Selected value after the change.</summary>
@@ -84,6 +88,10 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionDropDownListHtmlExtensions
     {
         /// <summary>Maps display text and selected value fields using typed item expressions.</summary>
+        /// <typeparam name="TItem">The item class the data source holds.</typeparam>
+        /// <param name="builder">The Syncfusion builder being configured.</param>
+        /// <param name="text">The item member shown as each option's text.</param>
+        /// <param name="value">The item member submitted as each option's value.</param>
         public static DropDownListBuilder Fields<TItem>(
             this DropDownListBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -97,6 +105,11 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>Maps display text, selected value and grouping fields using typed item expressions.</summary>
+        /// <typeparam name="TItem">The item class the data source holds.</typeparam>
+        /// <param name="builder">The Syncfusion builder being configured.</param>
+        /// <param name="text">The item member shown as each option's text.</param>
+        /// <param name="value">The item member submitted as each option's value.</param>
+        /// <param name="groupBy">The item member the options are grouped by.</param>
         public static DropDownListBuilder Fields<TItem>(
             this DropDownListBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -112,6 +125,8 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>Renders a FusionDropDownList with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionDropDownList, TModel> FusionDropDownList<TModel, TProp>(
             this InputBoundField<TModel, TProp> field)
             where TModel : class
@@ -121,6 +136,10 @@ namespace Alis.Reactive.Fusion.Components
         /// Renders a FusionDropDownList bound to the field's model property, with the framework's
         /// element ID and binding name.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
+        /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
+        /// <param name="build">Configures the component before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionDropDownList, TModel> FusionDropDownList<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,

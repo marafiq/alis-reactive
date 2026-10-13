@@ -15,7 +15,11 @@ namespace Alis.Reactive.Native.AppLevel
     /// <remarks>
     /// One loader exists per page, rendered by <c>@Html.NativeLoader()</c> in the layout, and is
     /// referenced without an ID:
-    /// <code>p.Component&lt;NativeLoader&gt;().Set(c =&gt; c.Target, "resident-form").Call(c =&gt; c.Show)</code>
+    /// <code>
+    /// var loader = p.Component&lt;NativeLoader&gt;();
+    /// loader.Target.Set("resident-form");
+    /// loader.Show();
+    /// </code>
     /// Without a target it covers the viewport.
     /// </remarks>
     public sealed class NativeLoader : NativeComponent, IAppLevelComponent

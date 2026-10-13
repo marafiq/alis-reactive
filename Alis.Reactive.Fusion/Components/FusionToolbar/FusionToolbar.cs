@@ -14,13 +14,14 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion Toolbar, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionToolbar(plan, "care-toolbar", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionToolbar&gt;("care-toolbar")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Call(c =&gt; c.Disable, true)</c>.
+    /// Render it with <c>Html.FusionToolbar(plan, "care-toolbar", b =&gt; ...)</c>, reach it with
+    /// <c>var careToolbar = p.Component&lt;FusionToolbar&gt;("care-toolbar");</c> and use its members directly:
+    /// <c>careToolbar.Disable(true);</c>.
     /// </remarks>
     public sealed class FusionToolbar : FusionComponent
     {
         /// <summary>Disables (<see langword="true"/>) or enables (<see langword="false"/>) the whole toolbar.</summary>
+        /// <param name="value"><see langword="true"/> to disable the toolbar; <see langword="false"/> to enable it.</param>
         public void Disable(Arg<bool> value) => Call(value);
 
         /// <summary>Raised when the user clicks a toolbar item.</summary>
@@ -29,7 +30,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionToolbar.Clicked"/>.</summary>
-    /// <remarks>Read the clicked item: <c>p.When(args, x =&gt; x.Item.Id).Eq("save")</c>.</remarks>
+    /// <remarks>Read the clicked item: <c>p.When(args.Item.Get(i =&gt; i.Id)).Eq("save")</c>.</remarks>
     public class FusionToolbarClickedArgs : JsObject
     {
         /// <summary>The clicked item.</summary>
@@ -58,6 +59,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion Toolbar and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan receiving toolbar event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>

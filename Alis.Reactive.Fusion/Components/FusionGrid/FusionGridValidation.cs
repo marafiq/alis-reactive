@@ -32,6 +32,9 @@ namespace Alis.Reactive.Fusion.Components
         /// Reads the client validation metadata for <typeparamref name="TValidator"/> and
         /// returns a per-field emitter for grid columns over <typeparamref name="TRow"/>.
         /// </summary>
+        /// <typeparam name="TValidator">The <c>ReactiveValidator</c> that declares the row's rules.</typeparam>
+        /// <typeparam name="TRow">Your row class.</typeparam>
+        /// <param name="source">The client rule source, injected into the view as <see cref="IClientValidationRuleSource"/>.</param>
         public static FusionGridFieldValidation<TRow> From<TValidator, TRow>(IClientValidationRuleSource source)
             where TValidator : class
             where TRow : class
@@ -45,6 +48,7 @@ namespace Alis.Reactive.Fusion.Components
     /// Per-field bridge from <c>ReactiveValidator</c> client metadata to an EJ2 column
     /// <c>validationRules</c> object, keyed by typed row field.
     /// </summary>
+    /// <typeparam name="TRow">Your row class.</typeparam>
     public sealed class FusionGridFieldValidation<TRow>
         where TRow : class
     {
@@ -63,6 +67,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <remarks>
         /// Assign it to Syncfusion's <c>GridColumn.ValidationRules</c>, which takes any object.
         /// </remarks>
+        /// <typeparam name="TField">The type of the column's member.</typeparam>
+        /// <param name="field">The column's member, for example <c>r =&gt; r.OpenTasks</c>.</param>
         public IReadOnlyDictionary<string, object>? Field<TField>(Expression<Func<TRow, TField>> field)
         {
             if (field == null) throw new ArgumentNullException(nameof(field));

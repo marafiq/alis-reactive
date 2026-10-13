@@ -10,9 +10,13 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion DropDownTree, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.InputField(plan, m =&gt; m.ResidentIds).FusionDropDownTree(b =&gt; ...)</c>; target it with
-    /// <c>p.Component&lt;FusionDropDownTree&gt;(m =&gt; m.ResidentIds)</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Set(c =&gt; c.Value, new[] { "alice" }).Call(c =&gt; c.DataBind)</c>.
+    /// Render it with <c>Html.InputField(plan, m =&gt; m.ResidentIds).FusionDropDownTree(b =&gt; ...)</c>, then reach it
+    /// in a callback by its model member and use its members directly:
+    /// <code>
+    /// var residents = p.Component&lt;FusionDropDownTree&gt;(m =&gt; m.ResidentIds);
+    /// residents.Value.Set(new[] { "alice" });
+    /// residents.DataBind();
+    /// </code>
     /// </remarks>
     public sealed class FusionDropDownTree : FusionComponent, IInputComponent
     {
@@ -66,6 +70,8 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionDropDownTreeHtmlExtensions
     {
         /// <summary>Renders a FusionDropDownTree with its defaults; see the overload that takes the configuration.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionDropDownTree, TModel> FusionDropDownTree<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup)
             where TModel : class
@@ -74,6 +80,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Renders a FusionDropDownTree bound to the field's model property.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
         /// <typeparam name="TProp">Model value type rendered by the drop-down tree.</typeparam>
         /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Configures initial DropDownTree options before rendering.</param>

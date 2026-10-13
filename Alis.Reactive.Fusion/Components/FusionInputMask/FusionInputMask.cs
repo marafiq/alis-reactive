@@ -10,9 +10,9 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion MaskedTextBox, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use as the type in <c>p.Component&lt;FusionInputMask&gt;(m =&gt; m.PhoneNumber)</c>; every
-    /// declared member works with <c>Set</c>, <c>Call</c> and <c>Get</c>, for example
-    /// <c>.Set(c =&gt; c.Value, "(555) 123-4567")</c> or <c>p.When(phone.Get(c =&gt; c.Value)).NotEmpty()</c>.
+    /// Target it with <c>var phone = p.Component&lt;FusionInputMask&gt;(m =&gt; m.PhoneNumber)</c>, then write or
+    /// read its members, for example <c>phone.Value.Set("(555) 123-4567")</c> or
+    /// <c>p.When(phone.Value).NotEmpty()</c>.
     /// </remarks>
     public sealed class FusionInputMask : FusionComponent, IInputComponent
     {
@@ -31,7 +31,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionInputMask.Change"/>.</summary>
-    /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Value).NotNull()</c>.</remarks>
+    /// <remarks>Read in conditions: <c>p.When(args.Value).NotNull()</c>.</remarks>
     public class FusionInputMaskChangeArgs : JsObject
     {
         /// <summary>Value after the change.</summary>
@@ -46,6 +46,8 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionInputMaskHtmlExtensions
     {
         /// <summary>Renders a FusionInputMask with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
+        /// <typeparam name="TModel">The view model the plan is authored for.</typeparam>
+        /// <typeparam name="TProp">The type of the bound model property.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionInputMask, TModel> FusionInputMask<TModel, TProp>(
             this InputBoundField<TModel, TProp> field)
             where TModel : class
@@ -55,6 +57,10 @@ namespace Alis.Reactive.Fusion.Components
         /// Renders a FusionInputMask bound to the field's model property, with the framework's element ID and
         /// binding name.
         /// </summary>
+        /// <typeparam name="TModel">The view model the plan is authored for.</typeparam>
+        /// <typeparam name="TProp">The type of the bound model property.</typeparam>
+        /// <param name="field">The field from <c>Html.InputField(plan, m =&gt; m.PhoneNumber)</c>.</param>
+        /// <param name="build">Configures the mask and the rest on the Syncfusion builder.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionInputMask, TModel> FusionInputMask<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,

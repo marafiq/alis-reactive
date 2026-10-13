@@ -59,60 +59,123 @@ namespace Alis.Reactive
 
         /// <summary>Calls the method the C# member declares.</summary>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
-        /// <param name="declaredBy">Supplied by the compiler.</param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
         protected void Call(string? name = null, [CallerMemberName] string declaredBy = "") =>
             Emit(name, declaredBy, awaits: false);
 
         /// <summary>Calls the method the C# member declares with one argument.</summary>
+        /// <param name="first">The argument: a literal, or a value read when the step runs.</param>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
         protected void Call(Arg first, string? name = null, [CallerMemberName] string declaredBy = "") =>
             Emit(name, declaredBy, awaits: false, first);
 
         /// <summary>Calls the method the C# member declares with two arguments.</summary>
+        /// <param name="first">The first argument: a literal, or a value read when the step runs.</param>
+        /// <param name="second">The second argument.</param>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
         protected void Call(Arg first, Arg second, string? name = null, [CallerMemberName] string declaredBy = "") =>
             Emit(name, declaredBy, awaits: false, first, second);
 
         /// <summary>Calls the method the C# member declares with three arguments.</summary>
+        /// <param name="first">The first argument: a literal, or a value read when the step runs.</param>
+        /// <param name="second">The second argument.</param>
+        /// <param name="third">The third argument.</param>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
         protected void Call(Arg first, Arg second, Arg third, string? name = null, [CallerMemberName] string declaredBy = "") =>
             Emit(name, declaredBy, awaits: false, first, second, third);
 
         /// <summary>Calls the method the C# member declares with four arguments.</summary>
+        /// <param name="first">The first argument: a literal, or a value read when the step runs.</param>
+        /// <param name="second">The second argument.</param>
+        /// <param name="third">The third argument.</param>
+        /// <param name="fourth">The fourth argument.</param>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
         protected void Call(Arg first, Arg second, Arg third, Arg fourth, string? name = null, [CallerMemberName] string declaredBy = "") =>
             Emit(name, declaredBy, awaits: false, first, second, third, fourth);
 
         /// <summary>Calls a method that returns a promise; the steps after it wait for it to settle.</summary>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
         protected void CallAsync(string? name = null, [CallerMemberName] string declaredBy = "") =>
             Emit(name, declaredBy, awaits: true);
 
         /// <summary>Calls a method that returns a promise with one argument; the steps after it wait for it.</summary>
+        /// <param name="first">The argument: a literal, or a value read when the step runs.</param>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
         protected void CallAsync(Arg first, string? name = null, [CallerMemberName] string declaredBy = "") =>
             Emit(name, declaredBy, awaits: true, first);
 
         /// <summary>Calls a method that returns a promise with two arguments; the steps after it wait for it.</summary>
+        /// <param name="first">The first argument: a literal, or a value read when the step runs.</param>
+        /// <param name="second">The second argument.</param>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
         protected void CallAsync(Arg first, Arg second, string? name = null, [CallerMemberName] string declaredBy = "") =>
             Emit(name, declaredBy, awaits: true, first, second);
 
         /// <summary>Reads what the method the C# member declares returns.</summary>
         /// <typeparam name="TResult">The C# type of the returned value.</typeparam>
+        /// <param name="name">
+        /// The JavaScript name, when it is not the C# name camel-cased; <c>""</c> calls a plugin that is
+        /// itself a function.
+        /// </param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
         protected TypedSource<TResult> Invoke<TResult>(string? name = null, [CallerMemberName] string declaredBy = "") =>
             Read<TResult>(name, declaredBy, awaits: false);
 
         /// <summary>Reads what the method returns for one argument.</summary>
+        /// <typeparam name="TResult">The C# type of the returned value.</typeparam>
+        /// <param name="first">The argument: a literal, or a value read when the step runs.</param>
+        /// <param name="name">
+        /// The JavaScript name, when it is not the C# name camel-cased; <c>""</c> calls a plugin that is
+        /// itself a function.
+        /// </param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
         protected TypedSource<TResult> Invoke<TResult>(Arg first, string? name = null, [CallerMemberName] string declaredBy = "") =>
             Read<TResult>(name, declaredBy, awaits: false, first);
 
         /// <summary>Reads what the method returns for two arguments.</summary>
+        /// <typeparam name="TResult">The C# type of the returned value.</typeparam>
+        /// <param name="first">The first argument: a literal, or a value read when the step runs.</param>
+        /// <param name="second">The second argument.</param>
+        /// <param name="name">
+        /// The JavaScript name, when it is not the C# name camel-cased; <c>""</c> calls a plugin that is
+        /// itself a function.
+        /// </param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
         protected TypedSource<TResult> Invoke<TResult>(Arg first, Arg second, string? name = null, [CallerMemberName] string declaredBy = "") =>
             Read<TResult>(name, declaredBy, awaits: false, first, second);
 
         /// <summary>Reads what the method returns for three arguments.</summary>
+        /// <typeparam name="TResult">The C# type of the returned value.</typeparam>
+        /// <param name="first">The first argument: a literal, or a value read when the step runs.</param>
+        /// <param name="second">The second argument.</param>
+        /// <param name="third">The third argument.</param>
+        /// <param name="name">
+        /// The JavaScript name, when it is not the C# name camel-cased; <c>""</c> calls a plugin that is
+        /// itself a function.
+        /// </param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
         protected TypedSource<TResult> Invoke<TResult>(Arg first, Arg second, Arg third, string? name = null, [CallerMemberName] string declaredBy = "") =>
             Read<TResult>(name, declaredBy, awaits: false, first, second, third);
 
-        /// <summary>Reads the value a method's promise settles with.</summary>
+        /// <summary>Reads the value a method's promise settles with; the step that reads it waits for the promise.</summary>
+        /// <typeparam name="TResult">The C# type of the value the promise settles with.</typeparam>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
         protected TypedSource<TResult> InvokeAsync<TResult>(string? name = null, [CallerMemberName] string declaredBy = "") =>
             Read<TResult>(name, declaredBy, awaits: true);
 
         /// <summary>Reads the value a method's promise settles with, for one argument.</summary>
+        /// <typeparam name="TResult">The C# type of the value the promise settles with.</typeparam>
+        /// <param name="first">The argument: a literal, or a value read when the step runs.</param>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
         protected TypedSource<TResult> InvokeAsync<TResult>(Arg first, string? name = null, [CallerMemberName] string declaredBy = "") =>
             Read<TResult>(name, declaredBy, awaits: true, first);
 

@@ -37,7 +37,10 @@ namespace Alis.Reactive.Builders.Requests
         /// response-body access.
         /// </summary>
         /// <typeparam name="TResponse">Response body type exposed to downstream value sources.</typeparam>
-        /// <param name="pipeline">Builds the reaction graph using the success body scope.</param>
+        /// <param name="pipeline">
+        /// Builds the reactions, given the response body and the pipeline: <c>json.Get(x =&gt; x.Name)</c> reads a
+        /// member, and <c>json</c> itself is the whole body.
+        /// </param>
         public ResponseBuilder<TModel> OnSuccess<TResponse>(
             Action<Data<TResponse>, PipelineBuilder<TModel>> pipeline)
             where TResponse : class
@@ -69,7 +72,10 @@ namespace Alis.Reactive.Builders.Requests
         /// a response body is available.
         /// </summary>
         /// <typeparam name="TError">Error body type exposed to downstream value sources.</typeparam>
-        /// <param name="pipeline">Builds the reaction graph using the error body scope.</param>
+        /// <param name="pipeline">
+        /// Builds the reactions, given the error body and the pipeline: <c>error.Get(x =&gt; x.Message)</c> reads a
+        /// member, and <c>error</c> itself is the whole body.
+        /// </param>
         public ResponseBuilder<TModel> OnError<TError>(
             Action<Data<TError>, PipelineBuilder<TModel>> pipeline)
             where TError : class
@@ -85,7 +91,10 @@ namespace Alis.Reactive.Builders.Requests
         /// </summary>
         /// <typeparam name="TError">Error body type exposed to downstream value sources.</typeparam>
         /// <param name="statusCode">HTTP status code to match.</param>
-        /// <param name="pipeline">Builds the reaction graph using the error body scope.</param>
+        /// <param name="pipeline">
+        /// Builds the reactions, given the error body and the pipeline: <c>error.Get(x =&gt; x.Message)</c> reads a
+        /// member, and <c>error</c> itself is the whole body.
+        /// </param>
         public ResponseBuilder<TModel> OnError<TError>(int statusCode,
             Action<Data<TError>, PipelineBuilder<TModel>> pipeline)
             where TError : class

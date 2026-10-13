@@ -14,14 +14,20 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion BulletChart, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionBulletChart(plan, "census-chart", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionBulletChart&gt;("census-chart")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Get(c =&gt; c.GetActualIndex, 2, 5)</c>.
+    /// Render it with <c>Html.FusionBulletChart(plan, "census-chart", b =&gt; ...)</c>, then reach it in a callback
+    /// and use its members directly:
+    /// <code>
+    /// var chart = p.Component&lt;FusionBulletChart&gt;("census-chart");
+    /// p.Element("last-position").Text.Set(chart.GetActualIndex(-1, 5));
+    /// </code>
     /// </remarks>
     public sealed class FusionBulletChart : FusionComponent
     {
-        /// <summary>Maps a data index to its drawn position, given the number of points.</summary>
-        public TypedSource<int> GetActualIndex(Arg<int> first, Arg<int> second) => Invoke<int>(first, second);
+        /// <summary>Wraps an index into a range of items: past the last item it becomes 0, below 0 it becomes the last index.</summary>
+        /// <param name="index">The zero-based index to wrap.</param>
+        /// <param name="totalLength">The number of items in the range.</param>
+        /// <returns>The index within the range; an index already inside it comes back unchanged.</returns>
+        public TypedSource<int> GetActualIndex(Arg<int> index, Arg<int> totalLength) => Invoke<int>(index, totalLength);
 
         /// <summary>Raised before a tooltip renders.</summary>
         public TypedEvent<FusionBulletChartTooltipRenderArgs> TooltipRender =>
@@ -33,7 +39,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionBulletChart.TooltipRender"/>.</summary>
-    /// <remarks>Rewrite the tooltip: <c>p.Payload(args).Set(a =&gt; a.Text, "On target")</c>.</remarks>
+    /// <remarks>Rewrite the tooltip: <c>args.Text.Set("On target")</c>.</remarks>
     public class FusionBulletChartTooltipRenderArgs : JsObject
     {
         /// <summary>Actual value of the feature bar.</summary>
@@ -74,6 +80,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion BulletChart and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan receiving bullet chart event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>

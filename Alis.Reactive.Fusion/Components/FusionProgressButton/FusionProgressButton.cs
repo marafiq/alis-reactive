@@ -14,10 +14,10 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion ProgressButton, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionProgressButton(plan, "send-report", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionProgressButton&gt;("send-report")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>. Syncfusion applies property writes on its next tick; follow writes with
-    /// <c>.Call(c =&gt; c.DataBind)</c>: <c>.Set(c =&gt; c.Content, "Saved").Call(c =&gt; c.DataBind)</c>.
+    /// Render it with <c>Html.FusionProgressButton(plan, "send-report", b =&gt; ...)</c>, reach it with
+    /// <c>var sendReport = p.Component&lt;FusionProgressButton&gt;("send-report");</c> and use its members directly.
+    /// Syncfusion applies property writes on its next tick; follow writes with <see cref="DataBind"/>:
+    /// <c>sendReport.Content.Set("Saved"); sendReport.DataBind();</c>.
     /// </remarks>
     public sealed class FusionProgressButton : FusionComponent
     {
@@ -40,7 +40,8 @@ namespace Alis.Reactive.Fusion.Components
         public void Start() => Call();
 
         /// <summary>Starts the progress at a percentage.</summary>
-        public void StartAt(Arg<double> value) => Call(value, name: "start");
+        /// <param name="percent">The percent the progress starts at.</param>
+        public void StartAt(Arg<double> percent) => Call(percent, name: "start");
 
         /// <summary>Completes the progress at once.</summary>
         public void ProgressComplete() => Call();
@@ -83,6 +84,11 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Renders one Syncfusion ProgressButton with a stable component id.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
+        /// <param name="plan">The plan the component's events are wired into.</param>
+        /// <param name="elementId">The component's element ID, chosen by the view.</param>
+        /// <param name="build">Configures the Syncfusion builder before rendering.</param>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionProgressButton, TModel> FusionProgressButton<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,

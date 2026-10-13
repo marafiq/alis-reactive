@@ -7,8 +7,13 @@ namespace Alis.Reactive.Native.Components
     /// The native HTML checkbox, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.InputField(plan, m =&gt; m.Ambulatory).NativeCheckBox(b =&gt; ...)</c>; target it with
-    /// <c>p.Component&lt;NativeCheckBox&gt;(m =&gt; m.Ambulatory)</c>, for example <c>.Set(c =&gt; c.Checked, true)</c>.
+    /// Render it with <c>Html.InputField(plan, m =&gt; m.Ambulatory).NativeCheckBox(b =&gt; ...)</c>; reach it with
+    /// <c>p.Component&lt;NativeCheckBox&gt;(m =&gt; m.Ambulatory)</c> and use its members directly:
+    /// <code>
+    /// var ambulatory = p.Component&lt;NativeCheckBox&gt;(m =&gt; m.Ambulatory);
+    /// ambulatory.Checked.Set(true);
+    /// p.When(ambulatory.Checked).Truthy().Then(..);
+    /// </code>
     /// </remarks>
     public sealed class NativeCheckBox : NativeComponent, IInputComponent
     {
@@ -38,6 +43,7 @@ namespace Alis.Reactive.Native.Components
     public static class NativeCheckBoxHtmlExtensions
     {
         /// <summary>Renders a NativeCheckBox with its defaults; see the overload that takes <c>build</c>.</summary>
+        /// <typeparam name="TModel">The view's model.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeCheckBox, TModel> NativeCheckBox<TModel>(
             this InputBoundField<TModel, bool> field)
             where TModel : class
@@ -47,6 +53,9 @@ namespace Alis.Reactive.Native.Components
         /// Renders a NativeCheckBox bound to the field's model property, with the framework's element ID and
         /// binding name.
         /// </summary>
+        /// <typeparam name="TModel">The view's model.</typeparam>
+        /// <param name="field">The model-bound field the checkbox renders into.</param>
+        /// <param name="build">Configures the checkbox, for example <c>b =&gt; b.CssClass("...")</c>.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeCheckBox, TModel> NativeCheckBox<TModel>(
             this InputBoundField<TModel, bool> field,

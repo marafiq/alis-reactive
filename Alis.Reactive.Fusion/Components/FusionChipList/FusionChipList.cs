@@ -14,33 +14,44 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion ChipList, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionChipList(plan, "diet-chips", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionChipList&gt;("diet-chips")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>. The JavaScript <c>select</c> and <c>remove</c> take several argument types; each is its own
-    /// member: <c>.Call(c =&gt; c.SelectByIndexes, new[] { 0, 2 })</c>, <c>.Call(c =&gt; c.SelectByText, new[] { "Diabetic" })</c>.
+    /// Render it with <c>Html.FusionChipList(plan, "diet-chips", b =&gt; ...)</c>, then reach it in a callback and
+    /// use its members directly. The JavaScript <c>select</c> and <c>remove</c> take several argument types; each
+    /// is its own member:
+    /// <code>
+    /// var chips = p.Component&lt;FusionChipList&gt;("diet-chips");
+    /// chips.SelectByIndexes(new[] { 0, 2 });
+    /// chips.SelectByText(new[] { "Diabetic" });
+    /// </code>
     /// </remarks>
     public sealed class FusionChipList : FusionComponent
     {
         /// <summary>Adds a chip with this text.</summary>
-        public void Add(Arg<string> value) => Call(value);
+        /// <param name="text">The new chip's text.</param>
+        public void Add(Arg<string> text) => Call(text);
 
         /// <summary>Selects the chip at a zero-based index.</summary>
-        public void SelectByIndex(Arg<int> value) => Call(value, name: "select");
+        /// <param name="index">The chip's zero-based index.</param>
+        public void SelectByIndex(Arg<int> index) => Call(index, name: "select");
 
         /// <summary>Selects the chips at these zero-based indexes.</summary>
-        public void SelectByIndexes(Arg<int[]> value) => Call(value, name: "select");
+        /// <param name="indexes">The chips' zero-based indexes.</param>
+        public void SelectByIndexes(Arg<int[]> indexes) => Call(indexes, name: "select");
 
         /// <summary>Selects the chips with these texts.</summary>
-        public void SelectByText(Arg<string[]> value) => Call(value, Fixed("text"), name: "select");
+        /// <param name="texts">The texts of the chips to select.</param>
+        public void SelectByText(Arg<string[]> texts) => Call(texts, Fixed("text"), name: "select");
 
         /// <summary>Removes the chip at a zero-based index.</summary>
-        public void RemoveByIndex(Arg<int> value) => Call(value, name: "remove");
+        /// <param name="index">The chip's zero-based index.</param>
+        public void RemoveByIndex(Arg<int> index) => Call(index, name: "remove");
 
         /// <summary>Removes the chips at these zero-based indexes.</summary>
-        public void RemoveByIndexes(Arg<int[]> value) => Call(value, name: "remove");
+        /// <param name="indexes">The chips' zero-based indexes.</param>
+        public void RemoveByIndexes(Arg<int[]> indexes) => Call(indexes, name: "remove");
 
         /// <summary>The chip at a zero-based index.</summary>
-        public TypedSource<FusionChipData> Find(Arg<int> value) => Invoke<FusionChipData>(value);
+        /// <param name="index">The chip's zero-based index.</param>
+        public TypedSource<FusionChipData> Find(Arg<int> index) => Invoke<FusionChipData>(index);
 
         /// <summary>The selected chips.</summary>
         public TypedSource<FusionSelectedChips> GetSelectedChips() => Invoke<FusionSelectedChips>();
@@ -120,8 +131,19 @@ namespace Alis.Reactive.Fusion.Components
         public int[] Indexes { get; set; } = Array.Empty<int>();
     }
 
+    /// <summary>
+    /// Renders the component for a plan, ready for <c>.Reactive(...)</c>.
+    /// </summary>
     public static class FusionChipListHtmlExtensions
     {
+        /// <summary>
+        /// Creates a Syncfusion ChipList and carries its controlled component ID into the Reactive Plan.
+        /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
+        /// <param name="plan">Reactive Plan receiving chip list event wiring.</param>
+        /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
+        /// <param name="build">Configures the component before rendering.</param>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionChipList, TModel> FusionChipList<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,

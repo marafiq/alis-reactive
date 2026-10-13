@@ -166,10 +166,14 @@ namespace Alis.Reactive
     /// One argument of a method: a literal, or a value read when the step runs. Write either one where
     /// the method takes it; the conversion is implicit.
     /// </summary>
+    /// <remarks>
+    /// A generic method names its type argument, because C# does not infer it through the conversion:
+    /// <c>kanban.AddCard&lt;CareCard&gt;(json.Get(x =&gt; x.Card), 0)</c>.
+    /// </remarks>
     /// <example>
     /// <code>
     /// planner.Book(args.Added, visitors.Value, "Bring the photo album");
-    /// kanban.AddCard(json.Get(x =&gt; x.Card), 0);
+    /// kanban.AddCard&lt;CareCard&gt;(json.Get(x =&gt; x.Card), 0);
     /// </code>
     /// </example>
     /// <typeparam name="T">The C# type the method declares for the argument.</typeparam>
@@ -182,12 +186,14 @@ namespace Alis.Reactive
 
         /// <summary>A literal argument, written into the plan.</summary>
         /// <remarks>A parameter typed <c>object</c> takes any value read when the step runs, too.</remarks>
+        /// <param name="value">The literal.</param>
         public static implicit operator Arg<T>(T value) =>
             new Arg<T>(value is IValueSource source
                 ? source.ToValueExpression()
                 : ValueExpression.LiteralFor(value, Shape.FromClrType(typeof(T))));
 
         /// <summary>An argument read when the step runs.</summary>
+        /// <param name="source">The value: a property, a method's result, a payload, a response, the URL or an array.</param>
         public static implicit operator Arg<T>(TypedSource<T> source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));

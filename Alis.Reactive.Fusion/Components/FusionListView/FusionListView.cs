@@ -15,16 +15,18 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Render it with <c>Html.FusionListView(plan, "resident-list", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionListView&gt;("resident-list")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Call(c =&gt; c.SelectItem, "Ada")</c>.
+    /// <c>var residents = p.Component&lt;FusionListView&gt;("resident-list")</c>, then call a member as its own
+    /// statement, for example <c>residents.SelectItem("Ada")</c>.
     /// </remarks>
     public sealed class FusionListView : FusionComponent
     {
         /// <summary>Selects the item with this text.</summary>
-        public void SelectItem(Arg<string> value) => Call(value);
+        /// <param name="item">The text of the item to select.</param>
+        public void SelectItem(Arg<string> item) => Call(item);
 
         /// <summary>Clears the selection of the item with this text.</summary>
-        public void UnselectItem(Arg<string> value) => Call(value);
+        /// <param name="item">The text of the item to clear.</param>
+        public void UnselectItem(Arg<string> item) => Call(item);
 
         /// <summary>Checks every item of a checkbox list.</summary>
         public void CheckAllItems() => Call();
@@ -52,7 +54,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Checkbox state in a checkbox list.</summary>
         public ReadOnly<bool?> IsChecked => ReadOnly<bool?>();
 
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 #nullable restore annotations
@@ -65,6 +67,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion ListView and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view model the plan is authored for.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan receiving list view event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>

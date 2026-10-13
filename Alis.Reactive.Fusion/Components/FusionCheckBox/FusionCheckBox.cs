@@ -10,10 +10,14 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion CheckBox, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use as the type in <c>p.Component&lt;FusionCheckBox&gt;(m =&gt; m.Consent)</c>; every
-    /// declared member works with <c>Set</c>, <c>Call</c> and <c>Get</c>. Syncfusion applies
-    /// property writes on its next tick; follow a write with <c>.Call(c =&gt; c.DataBind)</c> to apply
-    /// it before the next step: <c>.Set(c =&gt; c.Checked, true).Call(c =&gt; c.DataBind)</c>.
+    /// Reach it in a callback by its model member and use its members directly. Syncfusion applies
+    /// property writes on its next tick; follow a write with <c>DataBind()</c> to apply it before the
+    /// next step:
+    /// <code>
+    /// var checkBox = p.Component&lt;FusionCheckBox&gt;(m =&gt; m.Consent);
+    /// checkBox.Checked.Set(true);
+    /// checkBox.DataBind();
+    /// </code>
     /// </remarks>
     public sealed class FusionCheckBox : FusionComponent, IInputComponent
     {
@@ -43,7 +47,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionCheckBox.Change"/>.</summary>
-    /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Checked).Truthy()</c>.</remarks>
+    /// <remarks>Read in conditions: <c>p.When(args.Checked).Truthy()</c>.</remarks>
     public class FusionCheckBoxChangeArgs : JsObject
     {
         /// <summary>Whether the box is checked after the change.</summary>
@@ -55,6 +59,7 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionCheckBoxHtmlExtensions
     {
         /// <summary>Renders a FusionCheckBox with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionCheckBox, TModel> FusionCheckBox<TModel>(
             this InputBoundField<TModel, bool> field)
             where TModel : class
@@ -64,6 +69,9 @@ namespace Alis.Reactive.Fusion.Components
         /// Renders a FusionCheckBox bound to the field's boolean model property, with the framework's
         /// element ID and binding name.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
+        /// <param name="build">Configures the component before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionCheckBox, TModel> FusionCheckBox<TModel>(
             this InputBoundField<TModel, bool> field,

@@ -10,9 +10,8 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion Switch, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use as the type in <c>p.Component&lt;FusionSwitch&gt;(m =&gt; m.ReceiveNotifications)</c>; every
-    /// declared member works with <c>Set</c>, <c>Call</c> and <c>Get</c>, for example
-    /// <c>.Set(c =&gt; c.Checked, true)</c> or <c>p.When(sw.Get(c =&gt; c.Checked)).Truthy()</c>.
+    /// Reach it with <c>var notifications = p.Component&lt;FusionSwitch&gt;(m =&gt; m.ReceiveNotifications);</c> and use
+    /// its members directly: <c>notifications.Checked.Set(true);</c> or <c>p.When(notifications.Checked).Truthy()</c>.
     /// </remarks>
     public sealed class FusionSwitch : FusionComponent, IInputComponent
     {
@@ -27,7 +26,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionSwitch.Change"/>.</summary>
-    /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Checked).Truthy()</c>.</remarks>
+    /// <remarks>Read in conditions: <c>p.When(args.Checked).Truthy()</c>.</remarks>
     public class FusionSwitchChangeArgs : JsObject
     {
         /// <summary>Whether the switch is on after the change.</summary>
@@ -42,6 +41,7 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionSwitchHtmlExtensions
     {
         /// <summary>Renders a FusionSwitch with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionSwitch, TModel> FusionSwitch<TModel>(
             this InputBoundField<TModel, bool> field)
             where TModel : class
@@ -51,6 +51,9 @@ namespace Alis.Reactive.Fusion.Components
         /// Renders a FusionSwitch bound to the field's boolean model property, with the framework's
         /// element ID and binding name.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
+        /// <param name="build">Configures the Syncfusion builder before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionSwitch, TModel> FusionSwitch<TModel>(
             this InputBoundField<TModel, bool> field,

@@ -10,9 +10,9 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion TimePicker, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use as the type in <c>p.Component&lt;FusionTimePicker&gt;(m =&gt; m.MedicationTime)</c>; every
-    /// declared member works with <c>Set</c>, <c>Call</c> and <c>Get</c>, for example
-    /// <c>.Set(c =&gt; c.Value, new DateTime(1, 1, 1, 8, 0, 0))</c> or <c>p.When(picker.Get(c =&gt; c.Value)).NotNull()</c>.
+    /// Reach it with <c>var medicationTime = p.Component&lt;FusionTimePicker&gt;(m =&gt; m.MedicationTime);</c> and use
+    /// its members directly: <c>medicationTime.Value.Set(new DateTime(1, 1, 1, 8, 0, 0));</c> or
+    /// <c>p.When(medicationTime.Value).NotNull()</c>.
     /// A <see cref="DateTime"/> without a kind is the browser's local wall time.
     /// </remarks>
     public sealed class FusionTimePicker : FusionComponent, IInputComponent
@@ -35,7 +35,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionTimePicker.Change"/>.</summary>
-    /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Value).NotNull()</c>.</remarks>
+    /// <remarks>Read in conditions: <c>p.When(args.Value).NotNull()</c>.</remarks>
     public class FusionTimePickerChangeArgs : JsObject
     {
         /// <summary>Time after the change.</summary>
@@ -50,6 +50,8 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionTimePickerHtmlExtensions
     {
         /// <summary>Renders a FusionTimePicker with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionTimePicker, TModel> FusionTimePicker<TModel, TProp>(
             this InputBoundField<TModel, TProp> field)
             where TModel : class
@@ -59,6 +61,10 @@ namespace Alis.Reactive.Fusion.Components
         /// Renders a FusionTimePicker bound to the field's model property, with the framework's element ID and
         /// binding name.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
+        /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
+        /// <param name="build">Configures the Syncfusion builder before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionTimePicker, TModel> FusionTimePicker<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,

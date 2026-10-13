@@ -6,14 +6,16 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Arrays
 {
     /// <summary>
-    /// Typed, deferred array transform. Operators capture authoring intent as
-    /// Reactive Plan <c>array-op</c> nodes; they do not execute on the server. Deliberately not
-    /// <see cref="System.Collections.IEnumerable"/>/<c>IQueryable</c>, so LINQ extension methods
-    /// are not candidates (no collision) and lambdas are captured, not invoked. Per-element
-    /// predicates and selectors read the element scope; chains compose as plan nodes. The transformed
-    /// array is itself a value: <c>grid.DataSource.Set(rows.Where(r =&gt; r.Active))</c>.
+    /// An array read when the step runs, transformed and tested in the browser:
+    /// <c>var residents = p.From(json.Get(x =&gt; x.Residents));</c>. A transformed array is itself a value:
+    /// <c>grid.DataSource.Set(residents.Where(r =&gt; r.Active))</c>.
     /// </summary>
-    /// <typeparam name="TElement">Element type carried through transforms.</typeparam>
+    /// <remarks>
+    /// The operators run in the browser, not on the server. The type is deliberately not
+    /// <see cref="System.Collections.IEnumerable"/> or <c>IQueryable</c>, so LINQ's extension methods
+    /// never apply and each lambda describes the per-element work instead of running in C#.
+    /// </remarks>
+    /// <typeparam name="TElement">The type of each element.</typeparam>
     public sealed class ReactiveArray<TElement> : TypedSource<TElement[]>
     {
         private readonly ValueExpression _source;
@@ -26,12 +28,17 @@ namespace Alis.Reactive.Builders.Arrays
         }
 
         /// <summary>Keeps only the elements that match the per-element predicate.</summary>
+        /// <param name="predicate">The test each kept element passes, for example <c>r =&gt; r.Active</c>.</param>
+        /// <returns>The matching elements, in their order.</returns>
         public ReactiveArray<TElement> Where(Expression<Func<TElement, bool>> predicate) =>
             new ReactiveArray<TElement>(
                 ValueExpression.ArrayFilter(_source, Predicate(predicate), _elementShape),
                 _elementShape);
 
         /// <summary>Projects each element through a per-element selector.</summary>
+        /// <typeparam name="TResult">The type each element projects to.</typeparam>
+        /// <param name="selector">The projection, for example <c>r =&gt; r.Name</c>.</param>
+        /// <returns>The projected elements, in their order.</returns>
         public ReactiveArray<TResult> Select<TResult>(Expression<Func<TElement, TResult>> selector)
         {
             var resultShape = Shape.FromClrType(typeof(TResult));
@@ -41,10 +48,18 @@ namespace Alis.Reactive.Builders.Arrays
         }
 
         /// <summary>Orders elements ascending by a per-element key.</summary>
+        /// <typeparam name="TKey">The key's type: a string, number, date, bool or enum.</typeparam>
+        /// <param name="key">The key, for example <c>r =&gt; r.Name</c>.</param>
+        /// <returns>The elements in ascending key order.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the key is not a scalar.</exception>
         public ReactiveArray<TElement> OrderBy<TKey>(Expression<Func<TElement, TKey>> key) =>
             Order(key, descending: false);
 
         /// <summary>Orders elements descending by a per-element key.</summary>
+        /// <typeparam name="TKey">The key's type: a string, number, date, bool or enum.</typeparam>
+        /// <param name="key">The key, for example <c>r =&gt; r.StartDate</c>.</param>
+        /// <returns>The elements in descending key order.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the key is not a scalar.</exception>
         public ReactiveArray<TElement> OrderByDescending<TKey>(Expression<Func<TElement, TKey>> key) =>
             Order(key, descending: true);
 
@@ -68,43 +83,63 @@ namespace Alis.Reactive.Builders.Arrays
         }
 
         /// <summary>Counts all elements.</summary>
+        /// <returns>The count, read when the step runs.</returns>
         public ReactiveValue<int> Count() =>
             new ReactiveValue<int>(ValueExpression.ArrayCount(_source, _elementShape));
 
         /// <summary>Counts the elements that match the predicate.</summary>
+        /// <param name="predicate">The test each counted element passes.</param>
+        /// <returns>The count, read when the step runs.</returns>
         public ReactiveValue<int> Count(Expression<Func<TElement, bool>> predicate) =>
             Where(predicate).Count();
 
         /// <summary>True when the array is non-empty.</summary>
+        /// <returns>Whether any element exists, read when the step runs.</returns>
         public ReactiveValue<bool> Any() =>
             new ReactiveValue<bool>(ValueExpression.ArrayAny(_source, predicate: null, _elementShape));
 
         /// <summary>True when any element matches the predicate.</summary>
+        /// <param name="predicate">The test an element passes.</param>
+        /// <returns>Whether any element passes, read when the step runs.</returns>
         public ReactiveValue<bool> Any(Expression<Func<TElement, bool>> predicate) =>
             new ReactiveValue<bool>(ValueExpression.ArrayAny(_source, Predicate(predicate), _elementShape));
 
         /// <summary>True when every element matches the predicate.</summary>
+        /// <param name="predicate">The test every element passes.</param>
+        /// <returns>Whether every element passes, read when the step runs.</returns>
         public ReactiveValue<bool> All(Expression<Func<TElement, bool>> predicate) =>
             new ReactiveValue<bool>(ValueExpression.ArrayAll(_source, Predicate(predicate), _elementShape));
 
         /// <summary>Sums an integer per-element selector.</summary>
+        /// <param name="selector">The number each element adds, for example <c>r =&gt; r.OpenTasks</c>.</param>
+        /// <returns>The sum, read when the step runs.</returns>
         public ReactiveValue<int> Sum(Expression<Func<TElement, int>> selector) =>
             new ReactiveValue<int>(ValueExpression.ArraySum(_source, Projection(selector), _elementShape));
 
         /// <summary>Sums a decimal per-element selector.</summary>
+        /// <param name="selector">The number each element adds.</param>
+        /// <returns>The sum, read when the step runs.</returns>
         public ReactiveValue<decimal> Sum(Expression<Func<TElement, decimal>> selector) =>
             new ReactiveValue<decimal>(ValueExpression.ArraySum(_source, Projection(selector), _elementShape));
 
         /// <summary>Sums a double per-element selector.</summary>
+        /// <param name="selector">The number each element adds.</param>
+        /// <returns>The sum, read when the step runs.</returns>
         public ReactiveValue<double> Sum(Expression<Func<TElement, double>> selector) =>
             new ReactiveValue<double>(ValueExpression.ArraySum(_source, Projection(selector), _elementShape));
 
         /// <summary>Finds the first element matching the predicate, or null when none match.</summary>
+        /// <param name="predicate">The test the element passes.</param>
+        /// <returns>The element, read when the step runs.</returns>
         public ReactiveValue<TElement> Find(Expression<Func<TElement, bool>> predicate) =>
             new ReactiveValue<TElement>(
                 ValueExpression.ArrayFind(_source, Predicate(predicate), projection: null, _elementShape, _elementShape));
 
         /// <summary>Finds a per-element field from the first element matching the predicate.</summary>
+        /// <typeparam name="TField">The field's type.</typeparam>
+        /// <param name="predicate">The test the element passes.</param>
+        /// <param name="selector">The field read from that element, for example <c>r =&gt; r.Name</c>.</param>
+        /// <returns>The field's value, read when the step runs.</returns>
         public ReactiveValue<TField> Find<TField>(
             Expression<Func<TElement, bool>> predicate, Expression<Func<TElement, TField>> selector)
         {

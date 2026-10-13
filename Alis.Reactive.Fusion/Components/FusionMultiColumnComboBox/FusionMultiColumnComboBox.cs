@@ -11,9 +11,9 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion MultiColumnComboBox, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.InputField(plan, m =&gt; m.Facility).FusionMultiColumnComboBox(b =&gt; ...)</c>; target it with
-    /// <c>p.Component&lt;FusionMultiColumnComboBox&gt;(m =&gt; m.Facility)</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Set(c =&gt; c.Value, "1")</c> or <c>.Call(c =&gt; c.ShowPopup)</c>.
+    /// Render it with <c>Html.InputField(plan, m =&gt; m.Facility).FusionMultiColumnComboBox(b =&gt; ...)</c>, reach it with
+    /// <c>var facility = p.Component&lt;FusionMultiColumnComboBox&gt;(m =&gt; m.Facility);</c> and use its members
+    /// directly: <c>facility.Value.Set("1");</c> or <c>facility.ShowPopup();</c>.
     /// </remarks>
     public sealed class FusionMultiColumnComboBox : FusionComponent, IInputComponent
     {
@@ -68,6 +68,10 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Maps display text and selected value fields using typed item expressions.
         /// </summary>
+        /// <typeparam name="TItem">The row class the data source holds.</typeparam>
+        /// <param name="builder">The Syncfusion builder being configured.</param>
+        /// <param name="text">The row member shown as the selection's text.</param>
+        /// <param name="value">The row member submitted as the selected value.</param>
         public static MultiColumnComboBoxBuilder Fields<TItem>(
             this MultiColumnComboBoxBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -83,6 +87,11 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Maps display text, selected value, and grouping fields using typed item expressions.
         /// </summary>
+        /// <typeparam name="TItem">The row class the data source holds.</typeparam>
+        /// <param name="builder">The Syncfusion builder being configured.</param>
+        /// <param name="text">The row member shown as the selection's text.</param>
+        /// <param name="value">The row member submitted as the selected value.</param>
+        /// <param name="groupBy">The row member the rows are grouped by.</param>
         public static MultiColumnComboBoxBuilder Fields<TItem>(
             this MultiColumnComboBoxBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -98,6 +107,8 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>Renders a FusionMultiColumnComboBox with its defaults; see the overload that takes the configuration.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionMultiColumnComboBox, TModel> FusionMultiColumnComboBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup)
             where TModel : class
@@ -106,6 +117,10 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Renders a FusionMultiColumnComboBox bound to the field wrapper's model property.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
+        /// <param name="setup">The model-bound field from <c>Html.InputField(...)</c>.</param>
+        /// <param name="build">Configures the Syncfusion builder before rendering.</param>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionMultiColumnComboBox, TModel> FusionMultiColumnComboBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<MultiColumnComboBoxBuilder> build)

@@ -14,10 +14,10 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion SplitButton, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionSplitButton(plan, "visit-actions", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionSplitButton&gt;("visit-actions")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>. Syncfusion applies property writes on its next tick; follow writes with
-    /// <c>.Call(c =&gt; c.DataBind)</c>: <c>.Set(c =&gt; c.Content, "Saved").Call(c =&gt; c.DataBind)</c>.
+    /// Render it with <c>Html.FusionSplitButton(plan, "visit-actions", b =&gt; ...)</c>, reach it with
+    /// <c>var visitActions = p.Component&lt;FusionSplitButton&gt;("visit-actions");</c> and use its members directly.
+    /// Syncfusion applies property writes on its next tick; follow writes with <see cref="DataBind"/>:
+    /// <c>visitActions.Content.Set("Saved"); visitActions.DataBind();</c>.
     /// </remarks>
     public sealed class FusionSplitButton : FusionComponent
     {
@@ -39,8 +39,10 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Moves focus to the button.</summary>
         public void FocusIn() => Call();
 
-        /// <summary>Removes items by their text, or by their IDs when the second argument is <see langword="true"/>.</summary>
-        public void RemoveItems(Arg<string[]> first, Arg<bool> second) => Call(first, second);
+        /// <summary>Removes items by their text, or by their IDs when <paramref name="isUniqueId"/> is <see langword="true"/>.</summary>
+        /// <param name="items">The texts, or the IDs, of the items to remove.</param>
+        /// <param name="isUniqueId"><see langword="true"/> when <paramref name="items"/> holds item IDs.</param>
+        public void RemoveItems(Arg<string[]> items, Arg<bool> isUniqueId) => Call(items, isUniqueId);
 
         /// <summary>Raised when the user clicks the primary button.</summary>
         public TypedEvent<FusionSplitButtonClickArgs> Click =>
@@ -85,6 +87,11 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Renders one Syncfusion SplitButton with a stable component id.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
+        /// <param name="plan">The plan the component's events are wired into.</param>
+        /// <param name="elementId">The component's element ID, chosen by the view.</param>
+        /// <param name="build">Configures the Syncfusion builder before rendering.</param>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionSplitButton, TModel> FusionSplitButton<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,

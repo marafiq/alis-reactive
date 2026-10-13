@@ -12,8 +12,13 @@ namespace Alis.Reactive.Native.Components
     /// </summary>
     /// <remarks>
     /// Render it with <c>Html.NativeButton("save-plan", "Save")</c> and wire it with
-    /// <c>.Reactive(plan, evt =&gt; evt.Click, (args, p) =&gt; ...)</c>; target it with
-    /// <c>p.Component&lt;NativeButton&gt;("save-plan")</c>, for example <c>.Set(c =&gt; c.TextContent, "Saved")</c>.
+    /// <c>.Reactive(plan, evt =&gt; evt.Click, (args, p) =&gt; ...)</c>; reach it with
+    /// <c>p.Component&lt;NativeButton&gt;("save-plan")</c> and use its members directly:
+    /// <code>
+    /// var save = p.Component&lt;NativeButton&gt;("save-plan");
+    /// save.TextContent.Set("Saved");
+    /// save.Focus();
+    /// </code>
     /// </remarks>
     public sealed class NativeButton : NativeComponent
     {
@@ -42,6 +47,8 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Creates a native button builder with the element ID used by Reactive Plan event wiring.
         /// </summary>
+        /// <typeparam name="TModel">The view's model.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="elementId">Element ID rendered on the button and used for component lookup.</param>
         /// <param name="text">Button text content.</param>
         /// <returns>Button builder for inline rendering.</returns>

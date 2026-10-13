@@ -5,9 +5,9 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion SmartPasteButton, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionSmartPasteButton("smart-paste", o =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionSmartPasteButton&gt;("smart-paste")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Call(c =&gt; c.Click)</c>.
+    /// Render it with <c>Html.FusionSmartPasteButton("smart-paste", o =&gt; ...)</c>, reach it with
+    /// <c>var smartPaste = p.Component&lt;FusionSmartPasteButton&gt;("smart-paste");</c> and use its members
+    /// directly: <c>smartPaste.Click();</c>.
     /// </remarks>
     public sealed class FusionSmartPasteButton : FusionComponent
     {

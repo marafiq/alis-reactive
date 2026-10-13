@@ -12,8 +12,14 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Fusion.Components
 {
+    /// <summary>Renders a <see cref="FusionSmartPasteButton"/>.</summary>
     public static class FusionSmartPasteButtonHtmlExtensions
     {
+        /// <summary>Renders a Syncfusion SmartPasteButton with the element ID the view chooses.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
+        /// <param name="elementId">The button's element ID, chosen by the view.</param>
+        /// <param name="configure">Sets the button's text, look and assist endpoint.</param>
 #if NET48
         public static IHtmlString FusionSmartPasteButton<TModel>(
             this HtmlHelper<TModel> html,

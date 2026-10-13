@@ -13,9 +13,13 @@ namespace Alis.Reactive.Native.Components
     /// The native HTML <c>&lt;input type="hidden"&gt;</c>, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.HiddenFieldFor(plan, m =&gt; m.ScreeningId)</c>; target it with
-    /// <c>p.Component&lt;NativeHiddenField&gt;(m =&gt; m.ScreeningId)</c>, for example
-    /// <c>.Set(c =&gt; c.Value, json.Read(x =&gt; x.ScreeningId))</c>.
+    /// Render it with <c>Html.HiddenFieldFor(plan, m =&gt; m.ScreeningId)</c>; reach it with
+    /// <c>p.Component&lt;NativeHiddenField&gt;(m =&gt; m.ScreeningId)</c> and use its members directly, for
+    /// example to keep the id a response returns:
+    /// <code>
+    /// var screening = s.Component&lt;NativeHiddenField&gt;(m =&gt; m.ScreeningId);
+    /// screening.Value.Set(json.Get(x =&gt; x.ScreeningId));
+    /// </code>
     /// </remarks>
     public sealed class NativeHiddenField : NativeComponent, IInputComponent
     {

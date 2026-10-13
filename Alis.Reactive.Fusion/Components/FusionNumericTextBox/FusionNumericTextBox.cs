@@ -10,9 +10,9 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion NumericTextBox, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use as the type in <c>p.Component&lt;FusionNumericTextBox&gt;(m =&gt; m.Amount)</c>; every
-    /// declared member works with <c>Set</c>, <c>Call</c> and <c>Get</c>, for example
-    /// <c>.Set(c =&gt; c.Value, 14)</c>, <c>.Call(c =&gt; c.Increment)</c>, <c>.Get(c =&gt; c.Value)</c>.
+    /// Reach it with <c>var amount = p.Component&lt;FusionNumericTextBox&gt;(m =&gt; m.Amount);</c> and use its
+    /// members directly: <c>amount.Value.Set(14m);</c>, <c>amount.Increment();</c> or
+    /// <c>p.When(amount.Value).Gt(100m)</c>.
     /// </remarks>
     public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
     {
@@ -51,7 +51,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionNumericTextBox.Change"/>.</summary>
-    /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Value).Gte(100m)</c>.</remarks>
+    /// <remarks>Read in conditions: <c>p.When(args.Value).Gte(100m)</c>.</remarks>
     public class FusionNumericTextBoxChangeArgs : JsObject
     {
         /// <summary>Numeric value after the change.</summary>
@@ -82,6 +82,10 @@ namespace Alis.Reactive.Fusion.Components
         /// Renders a FusionNumericTextBox bound to the field's model property, with the framework's
         /// element ID and binding name.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
+        /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
+        /// <param name="build">Configures the Syncfusion builder before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionNumericTextBox, TModel> FusionNumericTextBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,

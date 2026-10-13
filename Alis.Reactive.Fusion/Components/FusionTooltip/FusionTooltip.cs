@@ -14,9 +14,9 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion Tooltip, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionTooltip(plan, "care-tip", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionTooltip&gt;("care-tip")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>. Its open and close events are <see cref="Opened"/> and <see cref="Closed"/>,
+    /// Render it with <c>Html.FusionTooltip(plan, "care-tip", b =&gt; ...)</c>, reach it with
+    /// <c>var careTip = p.Component&lt;FusionTooltip&gt;("care-tip");</c> and use its members directly:
+    /// <c>careTip.Open();</c>. Its open and close events are <see cref="Opened"/> and <see cref="Closed"/>,
     /// because <see cref="Open"/> and <see cref="Close"/> are its methods.
     /// </remarks>
     public sealed class FusionTooltip : FusionComponent
@@ -54,14 +54,14 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>Payload of <see cref="FusionTooltip.BeforeOpen"/>.</summary>
     public class FusionTooltipBeforeOpenArgs : JsObject
     {
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionTooltip.BeforeClose"/>.</summary>
     public class FusionTooltipBeforeCloseArgs : JsObject
     {
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 
@@ -78,7 +78,7 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>Payload of <see cref="FusionTooltip.BeforeRender"/>.</summary>
     public class FusionTooltipBeforeRenderArgs : JsObject
     {
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 #nullable restore annotations
@@ -91,6 +91,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion Tooltip and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan receiving tooltip event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>

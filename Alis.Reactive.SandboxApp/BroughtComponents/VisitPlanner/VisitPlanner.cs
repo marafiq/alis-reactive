@@ -13,6 +13,16 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
 
 #nullable disable annotations
     /// <summary>A week of family visit times for one resident; its value is the booked time ids.</summary>
+    /// <remarks>
+    /// Each member is declared by the planner's own JavaScript name. A page reaches the planner and uses
+    /// those members directly, one statement each:
+    /// <code>
+    /// var planner = p.Component&lt;VisitPlanner&gt;(m =&gt; m.VisitSlots);
+    /// planner.Select(planner.FirstOpen());
+    /// p.Element("visits-left").Text.Set(planner.Remaining());
+    /// p.When(planner.Count).Gt(0).Then(..);
+    /// </code>
+    /// </remarks>
     public sealed class VisitPlanner : Component, IInputComponent
     {
         /// <summary>
@@ -37,7 +47,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// <summary>The wing the planner names in its heading.</summary>
         public Prop<string> Wing => Prop<string>();
 
-        /// <summary>When true, the times cannot be booked or released.</summary>
+        /// <summary>When <see langword="true"/>, the times cannot be booked or released.</summary>
         public Prop<bool> ReadOnly => Prop<bool>();
 
         /// <summary>The times offered this week. Setting them raises <see cref="SlotsLoaded"/>.</summary>
@@ -56,6 +66,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         public TypedSource<int> Remaining() => Invoke<int>();
 
         /// <summary>Whether a time is booked.</summary>
+        /// <param name="slot">The time's id.</param>
         public TypedSource<bool> IsBooked(Arg<string> slot) => Invoke<bool>(slot);
 
         /// <summary>The first time that is neither booked nor in quiet hours; empty when there is none.</summary>
@@ -64,25 +75,35 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// <summary>The earliest booked time; empty when none is booked.</summary>
         public TypedSource<string> FirstBooked() => Invoke<string>();
 
-        /// <summary>Books a time: raises <see cref="BeforeBook"/>, then <see cref="Change"/>, or <see cref="Full"/>.</summary>
+        /// <summary>
+        /// Books a time: raises <see cref="BeforeBook"/>, then <see cref="WeekChanged"/>; raises
+        /// <see cref="Full"/> instead when the week is full.
+        /// </summary>
+        /// <param name="slot">The time's id.</param>
         public void Select(Arg<string> slot) => Call(slot);
 
-        /// <summary>Releases a booked time and raises <see cref="Change"/>.</summary>
+        /// <summary>Releases a booked time and raises <see cref="WeekChanged"/>.</summary>
+        /// <param name="slot">The time's id.</param>
         public void Release(Arg<string> slot) => Call(slot);
 
-        /// <summary>Releases every booked time and raises <see cref="Change"/>.</summary>
+        /// <summary>Releases every booked time and raises <see cref="WeekChanged"/>.</summary>
         public void Clear() => Call();
 
-        /// <summary>Records who is coming to a booked time: its id, how many visitors, and a note.</summary>
+        /// <summary>Records who is coming to a booked time; the planner shows it under the time.</summary>
+        /// <param name="slot">The booked time's id.</param>
+        /// <param name="visitors">How many visitors are coming.</param>
+        /// <param name="note">A note for the front desk.</param>
         public void Book(Arg<string> slot, Arg<decimal> visitors, Arg<string> note) => Call(slot, visitors, note);
 
-        /// <summary>Prepares the summary the family receives. Returns a promise the plan waits for.</summary>
+        /// <summary>Prepares the summary the family receives; the steps after it wait for its promise to settle.</summary>
         public void PrepareSummary() => CallAsync();
 
-        /// <summary>The prepared summary, empty until one is prepared. Returns a promise the plan waits for.</summary>
+        /// <summary>The prepared summary, empty until one is prepared; the step that reads it waits for its promise.</summary>
         public TypedSource<string> Summary() => InvokeAsync<string>();
 
-        /// <summary>Marks a time another family holds, by the family's name; it can no longer be booked here.</summary>
+        /// <summary>Marks a time another family holds; it can no longer be booked here.</summary>
+        /// <param name="slot">The time's id.</param>
+        /// <param name="family">The name of the family that holds it, which the planner shows.</param>
         public void MarkTaken(Arg<string> slot, Arg<string> family) => Call(slot, family);
 
         /// <summary>Moves focus to the first time that can be booked.</summary>
@@ -110,10 +131,13 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     /// <summary>A time the planner offers.</summary>
     public sealed class VisitSlot
     {
+        /// <summary>The time's id, which the planner books and releases by.</summary>
         public string Id { get; set; } = "";
 
+        /// <summary>What the planner shows for the time, for example <c>"Sat 11:00 AM"</c>.</summary>
         public string Label { get; set; } = "";
 
+        /// <summary>The day the time falls on, for example <c>"Saturday"</c>.</summary>
         public string Day { get; set; } = "";
 
         /// <summary>Quiet hours: the community asks families not to visit then.</summary>
@@ -123,6 +147,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     /// <summary>Payload of <see cref="VisitPlanner.WeekChanged"/>.</summary>
     public class VisitPlannerWeekChangedArgs : JsObject
     {
+        /// <summary>The booked time ids after the change.</summary>
         public ReadOnly<List<string>> Value => ReadOnly<List<string>>();
 
         /// <summary>The time just booked, when the change booked one.</summary>
@@ -131,14 +156,17 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// <summary>The time just released, when the change released one.</summary>
         public ReadOnly<string> Removed => ReadOnly<string>();
 
+        /// <summary>How many times are booked after the change.</summary>
         public ReadOnly<int> Count => ReadOnly<int>();
 
+        /// <summary>How many more visits the week allows after the change.</summary>
         public ReadOnly<int> Remaining => ReadOnly<int>();
     }
 
     /// <summary>Payload of <see cref="VisitPlanner.Full"/>; it carries a method as well as data.</summary>
     public class VisitPlannerFullArgs : JsObject
     {
+        /// <summary>How many visits the week allows.</summary>
         public ReadOnly<int> Capacity => ReadOnly<int>();
 
         /// <summary>The time that could not be booked.</summary>
@@ -151,16 +179,20 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     /// <summary>Payload of <see cref="VisitPlanner.BeforeBook"/>; the planner reads <see cref="Cancel"/> back.</summary>
     public class VisitPlannerBeforeBookArgs : JsObject
     {
+        /// <summary>The time about to be booked; read into it with <c>args.Slot.Get(x =&gt; x.Quiet)</c>.</summary>
         public ReadOnly<VisitSlot> Slot => ReadOnly<VisitSlot>();
 
+        /// <summary>Set to <see langword="true"/> to refuse the booking: <c>args.Cancel.Set(true)</c>.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="VisitPlanner.SlotsLoaded"/>.</summary>
     public class VisitPlannerSlotsLoadedArgs : JsObject
     {
+        /// <summary>How many times are offered.</summary>
         public ReadOnly<int> Count => ReadOnly<int>();
 
+        /// <summary>The wing the planner names in its heading.</summary>
         public ReadOnly<string> Wing => ReadOnly<string>();
     }
 #nullable restore annotations
@@ -172,6 +204,10 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// Renders the planner's host with the framework's element ID and binding name, the week's
         /// capacity, and the times already booked; the app's bundle constructs the planner on it.
         /// </summary>
+        /// <typeparam name="TModel">The view's model.</typeparam>
+        /// <param name="field">The model-bound list of booked time ids the planner renders into.</param>
+        /// <param name="capacity">How many visits the resident's week allows.</param>
+        /// <returns>The rendered planner; wire its events with <c>.Reactive(evt =&gt; evt.WeekChanged, ...)</c>.</returns>
         public static RenderedComponent<VisitPlanner, TModel> VisitPlanner<TModel>(
             this InputBoundField<TModel, List<string>> field,
             int capacity)

@@ -10,10 +10,9 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion Rating, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use as the type in <c>p.Component&lt;FusionRating&gt;(m =&gt; m.SatisfactionScore)</c>; every
-    /// declared member works with <c>Set</c>, <c>Call</c> and <c>Get</c>. Syncfusion applies property writes on its next tick; follow a write with
-    /// <c>.Call(c =&gt; c.DataBind)</c> to apply it before the next step:
-    /// <c>.Set(c =&gt; c.Value, 4d).Call(c =&gt; c.DataBind)</c>.
+    /// Reach it with <c>var satisfaction = p.Component&lt;FusionRating&gt;(m =&gt; m.SatisfactionScore);</c> and use its
+    /// members directly. Syncfusion applies property writes on its next tick; follow a write with
+    /// <see cref="DataBind"/> to apply it before the next step: <c>satisfaction.Value.Set(4d); satisfaction.DataBind();</c>.
     /// </remarks>
     public sealed class FusionRating : FusionComponent, IInputComponent
     {
@@ -52,6 +51,7 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionRatingHtmlExtensions
     {
         /// <summary>Renders a FusionRating with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionRating, TModel> FusionRating<TModel>(
             this InputBoundField<TModel, double> field)
             where TModel : class
@@ -61,6 +61,9 @@ namespace Alis.Reactive.Fusion.Components
         /// Renders a FusionRating bound to the field's model property, with the framework's element ID and
         /// binding name.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
+        /// <param name="build">Configures the Syncfusion builder before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.ValueChanged, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionRating, TModel> FusionRating<TModel>(
             this InputBoundField<TModel, double> field,

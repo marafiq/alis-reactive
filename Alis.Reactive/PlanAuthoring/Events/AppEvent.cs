@@ -15,7 +15,7 @@ namespace Alis.Reactive
     /// }
     ///
     /// Html.On(plan, t =&gt; t.CustomEvent(CareEvents.Flagged, (flagged, p) =&gt; ...));
-    /// p.DispatchWith(CareEvents.Flagged, e =&gt; e.Set(x =&gt; x.ResidentId, row.Get(r =&gt; r.Id)));
+    /// p.Dispatch(CareEvents.Flagged, e =&gt; e.Set(x =&gt; x.ResidentId, row.Get(r =&gt; r.Id)));
     /// </code>
     /// </remarks>
     public sealed class AppEvent

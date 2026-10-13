@@ -22,6 +22,11 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a single-select cell editor bound to a typed row field and populated from a string list.
         /// </summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
+        /// <typeparam name="TField">The type of the edited member.</typeparam>
+        /// <param name="field">The edited member, for example <c>(ResidentRow r) =&gt; r.CareLevel</c>.</param>
+        /// <param name="options">The option texts; each is also the option's value.</param>
+        /// <returns>The editor markup for the column's <c>EditTemplate</c>.</returns>
         public static string Select<TRow, TField>(
             Expression<Func<TRow, TField>> field,
             IEnumerable<string> options)
@@ -34,6 +39,14 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a single-select cell editor over a typed option list with text/value selectors.
         /// </summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
+        /// <typeparam name="TField">The type of the edited member.</typeparam>
+        /// <typeparam name="TItem">The type of an option item.</typeparam>
+        /// <param name="field">The edited member, for example <c>(ResidentRow r) =&gt; r.CareLevel</c>.</param>
+        /// <param name="items">The option items.</param>
+        /// <param name="text">Reads an option's display text from its item.</param>
+        /// <param name="value">Reads an option's value from its item.</param>
+        /// <returns>The editor markup for the column's <c>EditTemplate</c>.</returns>
         public static string Select<TRow, TField, TItem>(
             Expression<Func<TRow, TField>> field,
             IEnumerable<TItem> items,
@@ -48,6 +61,10 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a native date cell editor bound to a typed row field.
         /// </summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
+        /// <typeparam name="TField">The type of the edited member.</typeparam>
+        /// <param name="field">The edited member, for example <c>(ResidentRow r) =&gt; r.NextReviewDate</c>.</param>
+        /// <returns>The editor markup for the column's <c>EditTemplate</c>.</returns>
         public static string DateInput<TRow, TField>(Expression<Func<TRow, TField>> field)
             where TRow : class
         {
@@ -68,6 +85,9 @@ namespace Alis.Reactive.Fusion.Components
         /// and raw HTML in the view.
         /// Example: <c>FusionGridEditTemplates.DialogForm&lt;ResidentRow&gt;(d =&gt; d.Text(r =&gt; r.Name, "Name"))</c>.
         /// </remarks>
+        /// <typeparam name="TRow">Your row class.</typeparam>
+        /// <param name="build">Adds the form's labeled fields.</param>
+        /// <returns>The form markup for <c>GridEditSettings.Template</c>.</returns>
         public static string DialogForm<TRow>(Action<FusionGridDialogFormBuilder<TRow>> build)
             where TRow : class
         {
@@ -104,6 +124,7 @@ namespace Alis.Reactive.Fusion.Components
     /// field is declared from a typed row expression; the editing row's current value
     /// binds through the Syncfusion <c>${field}</c> template token.
     /// </summary>
+    /// <typeparam name="TRow">Your row class.</typeparam>
     public sealed class FusionGridDialogFormBuilder<TRow>
         where TRow : class
     {
@@ -112,18 +133,35 @@ namespace Alis.Reactive.Fusion.Components
         internal FusionGridDialogFormBuilder() { }
 
         /// <summary>Adds a labeled text field bound to a typed row field.</summary>
+        /// <typeparam name="TField">The type of the edited member.</typeparam>
+        /// <param name="field">The edited member, for example <c>r =&gt; r.Name</c>.</param>
+        /// <param name="label">The label shown above the field.</param>
+        /// <returns>This builder, for the next field.</returns>
         public FusionGridDialogFormBuilder<TRow> Text<TField>(Expression<Func<TRow, TField>> field, string label) =>
             AddField(field, label, name => "<input name=\"" + name + "\" value=\"${" + name + "}\" class=\"e-field e-input\" />");
 
         /// <summary>Adds a labeled numeric field bound to a typed row field.</summary>
+        /// <typeparam name="TField">The type of the edited member.</typeparam>
+        /// <param name="field">The edited member, for example <c>r =&gt; r.OpenTasks</c>.</param>
+        /// <param name="label">The label shown above the field.</param>
+        /// <returns>This builder, for the next field.</returns>
         public FusionGridDialogFormBuilder<TRow> Number<TField>(Expression<Func<TRow, TField>> field, string label) =>
             AddField(field, label, name => "<input type=\"number\" name=\"" + name + "\" value=\"${" + name + "}\" class=\"e-field e-input\" />");
 
         /// <summary>Adds a labeled date field bound to a typed row field.</summary>
+        /// <typeparam name="TField">The type of the edited member.</typeparam>
+        /// <param name="field">The edited member, for example <c>r =&gt; r.NextReviewDate</c>.</param>
+        /// <param name="label">The label shown above the field.</param>
+        /// <returns>This builder, for the next field.</returns>
         public FusionGridDialogFormBuilder<TRow> Date<TField>(Expression<Func<TRow, TField>> field, string label) =>
             AddField(field, label, name => "<input type=\"date\" name=\"" + name + "\" value=\"${" + name + "}\" class=\"e-field e-input\" />");
 
         /// <summary>Adds a labeled single-select field bound to a typed row field.</summary>
+        /// <typeparam name="TField">The type of the edited member.</typeparam>
+        /// <param name="field">The edited member, for example <c>r =&gt; r.CareLevel</c>.</param>
+        /// <param name="label">The label shown above the field.</param>
+        /// <param name="options">The option texts; each is also the option's value, and empty texts are skipped.</param>
+        /// <returns>This builder, for the next field.</returns>
         public FusionGridDialogFormBuilder<TRow> Select<TField>(
             Expression<Func<TRow, TField>> field, string label, IEnumerable<string> options) =>
             AddField(field, label, name => BuildSelect(name, options));

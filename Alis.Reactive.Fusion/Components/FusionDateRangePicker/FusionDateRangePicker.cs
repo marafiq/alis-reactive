@@ -10,9 +10,12 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion DateRangePicker, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use as the type in <c>p.Component&lt;FusionDateRangePicker&gt;(m =&gt; m.StayPeriod)</c>; every
-    /// declared member works with <c>Set</c>, <c>Call</c> and <c>Get</c>, for example
-    /// <c>p.When(stay.Get(c =&gt; c.StartDate)).NotNull()</c>.
+    /// Reach it in a callback by its model member and use its members directly:
+    /// <code>
+    /// var stay = p.Component&lt;FusionDateRangePicker&gt;(m =&gt; m.StayPeriod);
+    /// p.Element("stay-start").Text.Set(stay.StartDate);
+    /// </code>
+    /// Read it in a condition: <c>p.When(stay.StartDate).NotNull()</c>.
     /// </remarks>
     public sealed class FusionDateRangePicker : FusionComponent, IInputComponent
     {
@@ -34,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionDateRangePicker.Change"/>.</summary>
-    /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.StartDate).NotNull()</c>.</remarks>
+    /// <remarks>Read in conditions: <c>p.When(args.StartDate).NotNull()</c>.</remarks>
     public class FusionDateRangePickerChangeArgs : JsObject
     {
         /// <summary>First day of the range after the change.</summary>
@@ -55,6 +58,8 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionDateRangePickerHtmlExtensions
     {
         /// <summary>Renders a FusionDateRangePicker with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionDateRangePicker, TModel> FusionDateRangePicker<TModel, TProp>(
             this InputBoundField<TModel, TProp> field)
             where TModel : class
@@ -64,6 +69,10 @@ namespace Alis.Reactive.Fusion.Components
         /// Renders a FusionDateRangePicker bound to the field's model property, with the framework's element ID and
         /// binding name.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
+        /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
+        /// <param name="build">Configures the component before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionDateRangePicker, TModel> FusionDateRangePicker<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,

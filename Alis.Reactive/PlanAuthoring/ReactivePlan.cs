@@ -11,6 +11,7 @@ namespace Alis.Reactive
     /// Collects reactive behavior for a view: triggers, reactions, and component registrations.
     /// Renders the collected behavior as generated Reactive Plan JSON.
     /// </summary>
+    /// <typeparam name="TModel">The view's model, whose members name the plan's inputs.</typeparam>
     public sealed class ReactivePlan<TModel> where TModel : class
     {
         private readonly RegisteredInputComponents _registeredInputComponents =

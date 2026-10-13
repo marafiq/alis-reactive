@@ -10,9 +10,13 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion ColorPicker, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use as the type in <c>p.Component&lt;FusionColorPicker&gt;(m =&gt; m.ThemeColor)</c>; every
-    /// declared member works with <c>Set</c>, <c>Call</c> and <c>Get</c>, for example
-    /// <c>.Set(c =&gt; c.Value, "#e11d48")</c>, <c>.Call(c =&gt; c.Toggle)</c> or <c>.Get(c =&gt; c.Value)</c>.
+    /// Reach it in a callback by its model member and use its members directly:
+    /// <code>
+    /// var themeColor = p.Component&lt;FusionColorPicker&gt;(m =&gt; m.ThemeColor);
+    /// themeColor.Value.Set("#e11d48");
+    /// themeColor.Toggle();
+    /// </code>
+    /// Read it in a condition: <c>p.When(themeColor.Value).NotNull()</c>.
     /// </remarks>
     public sealed class FusionColorPicker : FusionComponent, IInputComponent
     {
@@ -34,7 +38,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionColorPicker.Change"/>.</summary>
-    /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Value).NotNull()</c>.</remarks>
+    /// <remarks>Read in conditions: <c>p.When(args.Value).NotNull()</c>.</remarks>
     public class FusionColorPickerChangeArgs : JsObject
     {
         /// <summary>Color after the change, as a hex string with alpha such as <c>#1dc7e1ff</c>.</summary>
@@ -46,6 +50,8 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionColorPickerHtmlExtensions
     {
         /// <summary>Renders a FusionColorPicker with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionColorPicker, TModel> FusionColorPicker<TModel, TProp>(
             this InputBoundField<TModel, TProp> field)
             where TModel : class
@@ -55,6 +61,10 @@ namespace Alis.Reactive.Fusion.Components
         /// Renders a FusionColorPicker bound to the field's model property, with the framework's element ID and
         /// binding name.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
+        /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
+        /// <param name="build">Configures the component before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionColorPicker, TModel> FusionColorPicker<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,

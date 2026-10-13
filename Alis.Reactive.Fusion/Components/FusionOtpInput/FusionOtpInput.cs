@@ -10,10 +10,9 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion OTP Input, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use as the type in <c>p.Component&lt;FusionOtpInput&gt;(m =&gt; m.Passcode)</c>; every
-    /// declared member works with <c>Set</c>, <c>Call</c> and <c>Get</c>. Syncfusion applies property writes on its next tick; follow a write with
-    /// <c>.Call(c =&gt; c.DataBind)</c> to apply it before the next step:
-    /// <c>.Set(c =&gt; c.Value, "1357").Call(c =&gt; c.DataBind)</c>.
+    /// Reach it with <c>var passcode = p.Component&lt;FusionOtpInput&gt;(m =&gt; m.Passcode);</c> and use its members
+    /// directly. Syncfusion applies property writes on its next tick; follow a write with <see cref="DataBind"/>
+    /// to apply it before the next step: <c>passcode.Value.Set("1357"); passcode.DataBind();</c>.
     /// </remarks>
     public sealed class FusionOtpInput : FusionComponent, IInputComponent
     {
@@ -106,6 +105,7 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionOtpInputHtmlExtensions
     {
         /// <summary>Renders a FusionOtpInput with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionOtpInput, TModel> FusionOtpInput<TModel>(
             this InputBoundField<TModel, string?> field)
             where TModel : class
@@ -115,6 +115,9 @@ namespace Alis.Reactive.Fusion.Components
         /// Renders a FusionOtpInput bound to the field's model property, with the framework's element ID and
         /// binding name.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
+        /// <param name="build">Configures the Syncfusion builder before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Input, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionOtpInput, TModel> FusionOtpInput<TModel>(
             this InputBoundField<TModel, string?> field,

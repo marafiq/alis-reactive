@@ -14,10 +14,14 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion Breadcrumb, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionBreadcrumb(plan, "care-breadcrumb", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionBreadcrumb&gt;("care-breadcrumb")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>. Syncfusion applies property writes on its next tick; follow a write with
-    /// <c>.Call(c =&gt; c.DataBind)</c>: <c>.Set(c =&gt; c.ActiveItem, "/plans").Call(c =&gt; c.DataBind)</c>.
+    /// Render it with <c>Html.FusionBreadcrumb(plan, "care-breadcrumb", b =&gt; ...)</c>, then reach it in a callback
+    /// and use its members directly. Syncfusion applies property writes on its next tick; follow a write with
+    /// <c>DataBind()</c>:
+    /// <code>
+    /// var breadcrumb = p.Component&lt;FusionBreadcrumb&gt;("care-breadcrumb");
+    /// breadcrumb.ActiveItem.Set("/plans");
+    /// breadcrumb.DataBind();
+    /// </code>
     /// </remarks>
     public sealed class FusionBreadcrumb : FusionComponent
     {
@@ -67,6 +71,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion Breadcrumb and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan receiving breadcrumb event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>

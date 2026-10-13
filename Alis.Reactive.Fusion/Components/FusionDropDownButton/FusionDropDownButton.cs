@@ -14,10 +14,14 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion DropDownButton, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionDropDownButton(plan, "care-actions", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionDropDownButton&gt;("care-actions")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>. Syncfusion applies property writes on its next tick; follow writes with
-    /// <c>.Call(c =&gt; c.DataBind)</c>: <c>.Set(c =&gt; c.Content, "Saved").Call(c =&gt; c.DataBind)</c>.
+    /// Render it with <c>Html.FusionDropDownButton(plan, "care-actions", b =&gt; ...)</c>, then reach it in a callback
+    /// and use its members directly. Syncfusion applies property writes on its next tick; follow writes with
+    /// <c>DataBind()</c>:
+    /// <code>
+    /// var actions = p.Component&lt;FusionDropDownButton&gt;("care-actions");
+    /// actions.Content.Set("Saved");
+    /// actions.DataBind();
+    /// </code>
     /// </remarks>
     public sealed class FusionDropDownButton : FusionComponent
     {
@@ -40,7 +44,9 @@ namespace Alis.Reactive.Fusion.Components
         public void FocusIn() => Call();
 
         /// <summary>Removes items by their text, or by their IDs when the second argument is <see langword="true"/>.</summary>
-        public void RemoveItems(Arg<string[]> first, Arg<bool> second) => Call(first, second);
+        /// <param name="items">The texts of the items to remove, or their IDs when <paramref name="isUniqueId"/> is <see langword="true"/>.</param>
+        /// <param name="isUniqueId"><see langword="true"/> when <paramref name="items"/> holds item IDs rather than texts.</param>
+        public void RemoveItems(Arg<string[]> items, Arg<bool> isUniqueId) => Call(items, isUniqueId);
 
         /// <summary>Raised when the user selects a popup item.</summary>
         public TypedEvent<FusionDropDownButtonSelectArgs> Select =>
@@ -76,6 +82,11 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Renders one Syncfusion DropDownButton with a stable component id.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
+        /// <param name="plan">Reactive Plan receiving drop-down button event wiring.</param>
+        /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
+        /// <param name="build">Configures the component before rendering.</param>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionDropDownButton, TModel> FusionDropDownButton<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,

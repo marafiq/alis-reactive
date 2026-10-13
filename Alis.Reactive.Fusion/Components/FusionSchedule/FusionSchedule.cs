@@ -14,10 +14,12 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion Schedule, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionSchedule(plan, "shift-schedule", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionSchedule&gt;("shift-schedule")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>. Event data is typed by your event class: <c>.Get(c =&gt; c.GetEvents&lt;Shift&gt;())</c>,
-    /// <c>.Reactive(evt =&gt; evt.EventRendered&lt;Shift&gt;(), ...)</c>.
+    /// Render it with <c>Html.FusionSchedule(plan, "shift-schedule", b =&gt; ...)</c>, reach it with
+    /// <c>var schedule = p.Component&lt;FusionSchedule&gt;("shift-schedule");</c> and use its members directly:
+    /// <c>schedule.ScrollTo("09:00");</c>. Event data is typed by your event class:
+    /// <c>schedule.GetEvents&lt;Shift&gt;()</c> reads the events as <c>Shift[]</c>, and
+    /// <c>.Reactive(evt =&gt; evt.EventRendered&lt;Shift&gt;(), (args, p) =&gt; ...)</c> hands each rendered
+    /// <c>Shift</c> over as <c>args.Data</c>.
     /// </remarks>
     public sealed class FusionSchedule : FusionComponent
     {
@@ -34,19 +36,39 @@ namespace Alis.Reactive.Fusion.Components
         public void DataBind() => Call();
 
         /// <summary>The events, typed by your event class.</summary>
+        /// <typeparam name="TEvent">Your event class.</typeparam>
         public TypedSource<TEvent[]> GetEvents<TEvent>() where TEvent : class => Invoke<TEvent[]>();
 
         /// <summary>Adds an event.</summary>
-        public void AddEvent(Arg<object> value) => Call(value);
+        /// <param name="data">The event to add, or an array of events.</param>
+        public void AddEvent(Arg<object> data) => Call(data);
 
         /// <summary>Saves an edited event.</summary>
-        public void SaveEvent<TEvent>(Arg<TEvent> first, Arg<ScheduleAction> second) where TEvent : class => Call(first, second);
+        /// <typeparam name="TEvent">Your event class.</typeparam>
+        /// <param name="data">The edited event.</param>
+        /// <param name="currentAction">
+        /// For a recurring event, whether the edit applies to one occurrence
+        /// (<see cref="ScheduleAction.EditOccurrence"/>) or the whole series (<see cref="ScheduleAction.EditSeries"/>).
+        /// </param>
+        public void SaveEvent<TEvent>(Arg<TEvent> data, Arg<ScheduleAction> currentAction) where TEvent : class => Call(data, currentAction);
 
         /// <summary>Deletes an event, given the event or its key.</summary>
-        public void DeleteEvent<TKey>(Arg<TKey> first, Arg<ScheduleAction> second) => Call(first, second);
+        /// <typeparam name="TKey">The type of the event's key, or your event class when you pass the event.</typeparam>
+        /// <param name="id">The event's key, or the event itself.</param>
+        /// <param name="currentAction">
+        /// What to delete: <see cref="ScheduleAction.Delete"/>, <see cref="ScheduleAction.DeleteOccurrence"/> or
+        /// <see cref="ScheduleAction.DeleteSeries"/>.
+        /// </param>
+        public void DeleteEvent<TKey>(Arg<TKey> id, Arg<ScheduleAction> currentAction) => Call(id, currentAction);
 
         /// <summary>Opens the event editor for an event.</summary>
-        public void OpenEditor<TEvent>(Arg<TEvent> first, Arg<ScheduleAction> second) where TEvent : class => Call(first, second);
+        /// <typeparam name="TEvent">Your event class.</typeparam>
+        /// <param name="data">The event to edit, or the cell data a new event starts from.</param>
+        /// <param name="action">
+        /// What the editor opens for: <see cref="ScheduleAction.Add"/>, <see cref="ScheduleAction.Save"/>,
+        /// <see cref="ScheduleAction.EditOccurrence"/> or <see cref="ScheduleAction.EditSeries"/>.
+        /// </param>
+        public void OpenEditor<TEvent>(Arg<TEvent> data, Arg<ScheduleAction> action) where TEvent : class => Call(data, action);
 
         /// <summary>Closes the event editor.</summary>
         public void CloseEditor() => Call();
@@ -58,7 +80,8 @@ namespace Alis.Reactive.Fusion.Components
         public void Print() => Call();
 
         /// <summary>Scrolls to an hour, for example <c>"09:00"</c>.</summary>
-        public void ScrollTo(Arg<string> value) => Call(value);
+        /// <param name="hour">The hour and minute to scroll to, in 24-hour form.</param>
+        public void ScrollTo(Arg<string> hour) => Call(hour);
 
         /// <summary>Raised when the user clicks a cell.</summary>
         public TypedEvent<FusionScheduleCellClickArgs> CellClick =>
@@ -93,6 +116,7 @@ namespace Alis.Reactive.Fusion.Components
             Event<FusionScheduleDataBoundArgs>("dataBound");
 
         /// <summary>Raised after each event renders.</summary>
+        /// <typeparam name="TEvent">Your event class; the payload's <c>Data</c> reads the rendered event as it.</typeparam>
         public TypedEvent<FusionScheduleEventRenderedArgs<TEvent>> EventRendered<TEvent>() where TEvent : class, new() =>
             Event<FusionScheduleEventRenderedArgs<TEvent>>("eventRendered");
     }
@@ -116,7 +140,7 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>Payload of <see cref="FusionSchedule.EventClick"/>.</summary>
     public class FusionScheduleEventClickArgs : JsObject
     {
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 
@@ -126,7 +150,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The kind of action.</summary>
         public ReadOnly<string> RequestType => ReadOnly<string>();
 
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 
@@ -158,7 +182,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Index of the view it moves to.</summary>
         public ReadOnly<int> ViewIndex => ReadOnly<int>();
 
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 
@@ -168,7 +192,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The popup: <c>"QuickInfo"</c>, <c>"Editor"</c>, ...</summary>
         public ReadOnly<string> Type => ReadOnly<string>();
 
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
 
         /// <summary>The event or cell the popup is for.</summary>
@@ -197,11 +221,12 @@ namespace Alis.Reactive.Fusion.Components
     {
     }
 
-    /// <summary>Payload of <c>EventRendered</c>.</summary>
+    /// <summary>Payload of <see cref="FusionSchedule.EventRendered{TEvent}"/>.</summary>
+    /// <typeparam name="TEvent">Your event class.</typeparam>
     public class FusionScheduleEventRenderedArgs<TEvent> : JsObject
         where TEvent : class, new()
     {
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
 
         /// <summary>The rendered event.</summary>
@@ -246,6 +271,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion Schedule and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan receiving schedule event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>

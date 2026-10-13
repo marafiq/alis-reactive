@@ -14,10 +14,14 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion Button, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionButton(plan, "begin-check-in", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionButton&gt;("begin-check-in")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>. Syncfusion applies property writes on its next tick; follow writes with
-    /// <c>.Call(c =&gt; c.DataBind)</c>: <c>.Set(c =&gt; c.Content, "Saved").Call(c =&gt; c.DataBind)</c>.
+    /// Render it with <c>Html.FusionButton(plan, "begin-check-in", b =&gt; ...)</c>, then reach it in a callback
+    /// and use its members directly. Syncfusion applies property writes on its next tick; follow writes with
+    /// <c>DataBind()</c>:
+    /// <code>
+    /// var checkIn = p.Component&lt;FusionButton&gt;("begin-check-in");
+    /// checkIn.Content.Set("Saved");
+    /// checkIn.DataBind();
+    /// </code>
     /// </remarks>
     public sealed class FusionButton : FusionComponent
     {
@@ -61,6 +65,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Renders a non-input FusionButton with a stable component id.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan referencing this component.</param>
         /// <param name="elementId">Controlled DOM element ID used as the runtime join key.</param>
         /// <param name="build">Configures initial Syncfusion Button options.</param>

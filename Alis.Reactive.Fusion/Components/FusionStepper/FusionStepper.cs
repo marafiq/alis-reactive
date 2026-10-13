@@ -14,9 +14,9 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion Stepper, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionStepper(plan, "admission-steps", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionStepper&gt;("admission-steps")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Call(c =&gt; c.NextStep)</c> or <c>.Get(c =&gt; c.ActiveStep)</c>.
+    /// Render it with <c>Html.FusionStepper(plan, "admission-steps", b =&gt; ...)</c>, reach it with
+    /// <c>var admissionSteps = p.Component&lt;FusionStepper&gt;("admission-steps");</c> and use its members directly:
+    /// <c>admissionSteps.NextStep();</c> or <c>p.When(admissionSteps.ActiveStep).Eq(2)</c>.
     /// </remarks>
     public sealed class FusionStepper : FusionComponent
     {
@@ -73,7 +73,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Whether user interaction started the change.</summary>
         public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
 
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 
@@ -96,6 +96,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion Stepper and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan receiving stepper event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>

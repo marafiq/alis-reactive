@@ -17,15 +17,15 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Render it with <c>Html.FusionGrid&lt;TModel, ResidentRow&gt;(plan, "roster", b =&gt; ...)</c> and target it
-    /// with <c>p.Component&lt;FusionGrid&gt;("roster")</c>; every declared member works with <c>Set</c>, <c>Call</c>
-    /// and <c>Get</c>. Columns are named by <see cref="Field"/>, and row members and events are typed by
-    /// your row class:
+    /// with <c>var grid = p.Component&lt;FusionGrid&gt;("roster")</c>; each write or call is its own statement.
+    /// Columns are named by <see cref="Field"/>, and row members and events are typed by your row class:
     /// <code>
-    /// grid.Call(c =&gt; c.SortColumn, Field.Of((ResidentRow r) =&gt; r.Name), FusionGridSortDirection.Descending, false)
-    /// grid.Call(c =&gt; c.SetCellValue&lt;int&gt;(), 6001, Field.Of((ResidentRow r) =&gt; r.OpenTasks), 4)
+    /// grid.SortColumn(Field.Of((ResidentRow r) =&gt; r.Name), FusionGridSortDirection.Descending, false);
+    /// grid.SetCellValue&lt;int&gt;(6001, Field.Of((ResidentRow r) =&gt; r.OpenTasks), 4);
     /// .Reactive(evt =&gt; evt.RowSelected&lt;ResidentRow&gt;(), (args, p) =&gt; ...)
     /// </code>
-    /// The grid is not a form input: read its rows and selection with <c>Get</c> where a request gathers them.
+    /// The grid is not a form input: a request gathers its rows and selection by reading them, for example
+    /// <c>g.Set(x =&gt; x.SelectedRecords, grid.GetSelectedRecords&lt;ResidentRow&gt;())</c>.
     /// </remarks>
     public sealed class FusionGrid : FusionComponent
     {
@@ -33,22 +33,28 @@ namespace Alis.Reactive.Fusion.Components
         public Prop<object> DataSource => Prop<object>();
 
         /// <summary>The rows, typed by your row class.</summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
         public Prop<TRow[]> Rows<TRow>() where TRow : class => Prop<TRow[]>("dataSource");
 
         /// <summary>Renders the rows again from the data source.</summary>
         public void Refresh() => Call();
 
         /// <summary>The rows on the current page, after sorting, filtering and grouping.</summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
         public TypedSource<TRow[]> GetCurrentViewRecords<TRow>() where TRow : class => Invoke<TRow[]>();
 
         /// <summary>The zero-based index of the row with this primary key.</summary>
+        /// <param name="value">The row's primary key value.</param>
         public TypedSource<int> GetRowIndexByPrimaryKey(Arg<int> value) => Invoke<int>(value);
 
         /// <summary>Selects the row at a zero-based index.</summary>
-        public void SelectRow(Arg<int> value) => Call(value);
+        /// <param name="index">The zero-based index of the row.</param>
+        public void SelectRow(Arg<int> index) => Call(index);
 
         /// <summary>Selects the rows from one zero-based index to another.</summary>
-        public void SelectRowsByRange(Arg<int> first, Arg<int> second) => Call(first, second);
+        /// <param name="startIndex">The zero-based index of the first row to select.</param>
+        /// <param name="endIndex">The zero-based index of the last row to select.</param>
+        public void SelectRowsByRange(Arg<int> startIndex, Arg<int> endIndex) => Call(startIndex, endIndex);
 
         /// <summary>Clears the selection.</summary>
         public void ClearSelection() => Call();
@@ -57,49 +63,65 @@ namespace Alis.Reactive.Fusion.Components
         public TypedSource<int[]> GetSelectedRowIndexes() => Invoke<int[]>();
 
         /// <summary>The selected rows, typed by your row class.</summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
         public TypedSource<TRow[]> GetSelectedRecords<TRow>() where TRow : class => Invoke<TRow[]>();
 
         /// <summary>Shows a page, counted from one.</summary>
-        public void GoToPage(Arg<int> value) => Call(value);
+        /// <param name="pageNo">The page number, counted from one.</param>
+        public void GoToPage(Arg<int> pageNo) => Call(pageNo);
 
         /// <summary>Sorts by a column; pass <see langword="true"/> to keep the sorts already applied.</summary>
-        public void SortColumn(Arg<Field> first, Arg<FusionGridSortDirection> second, Arg<bool> third) => Call(first, second, third);
+        /// <param name="columnName">The column to sort by, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.Name)</c>.</param>
+        /// <param name="direction">The sort direction.</param>
+        /// <param name="isMultiSort"><see langword="true"/> to keep the sorts already applied; <see langword="false"/> to replace them.</param>
+        public void SortColumn(Arg<Field> columnName, Arg<FusionGridSortDirection> direction, Arg<bool> isMultiSort) => Call(columnName, direction, isMultiSort);
 
         /// <summary>Clears every sort.</summary>
         public void ClearSorting() => Call();
 
         /// <summary>Shows the rows that contain this text; an empty text clears the search.</summary>
-        public void Search(Arg<string> value) => Call(value);
+        /// <param name="searchString">The text to search for.</param>
+        public void Search(Arg<string> searchString) => Call(searchString);
 
         /// <summary>Filters a column by text.</summary>
-        public void FilterByColumn(Arg<Field> first, Arg<FusionGridTextFilterOperator> second, Arg<string> third) => Call(first, second, third);
+        /// <param name="fieldName">The column to filter, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.Wing)</c>.</param>
+        /// <param name="filterOperator">How the column's value is compared with the text.</param>
+        /// <param name="filterValue">The text to filter by.</param>
+        public void FilterByColumn(Arg<Field> fieldName, Arg<FusionGridTextFilterOperator> filterOperator, Arg<string> filterValue) => Call(fieldName, filterOperator, filterValue);
 
         /// <summary>Clears every filter.</summary>
         public void ClearFiltering() => Call();
 
         /// <summary>Groups the rows by a column.</summary>
-        public void GroupColumn(Arg<Field> value) => Call(value);
+        /// <param name="columnName">The column to group by, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.CareLevel)</c>.</param>
+        public void GroupColumn(Arg<Field> columnName) => Call(columnName);
 
         /// <summary>Removes the grouping by a column.</summary>
-        public void UngroupColumn(Arg<Field> value) => Call(value);
+        /// <param name="columnName">The column to stop grouping by, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.CareLevel)</c>.</param>
+        public void UngroupColumn(Arg<Field> columnName) => Call(columnName);
 
         /// <summary>Clears every grouping.</summary>
         public void ClearGrouping() => Call();
 
         /// <summary>Shows a hidden column.</summary>
-        public void ShowColumn(Arg<Field> value) => Call(value, Fixed("field"), name: "showColumns");
+        /// <param name="key">The column to show, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.PrimaryNurse)</c>.</param>
+        public void ShowColumn(Arg<Field> key) => Call(key, Fixed("field"), name: "showColumns");
 
         /// <summary>Hides a column.</summary>
-        public void HideColumn(Arg<Field> value) => Call(value, Fixed("field"), name: "hideColumns");
+        /// <param name="key">The column to hide, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.PrimaryNurse)</c>.</param>
+        public void HideColumn(Arg<Field> key) => Call(key, Fixed("field"), name: "hideColumns");
 
         /// <summary>Moves a column before another one.</summary>
-        public void ReorderColumns(Arg<Field> first, Arg<Field> second) => Call(first, second);
+        /// <param name="fromFName">The column to move, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.RiskLevel)</c>.</param>
+        /// <param name="toFName">The column whose place it moves to, named by a member of your row class.</param>
+        public void ReorderColumns(Arg<Field> fromFName, Arg<Field> toFName) => Call(fromFName, toFName);
 
         /// <summary>Fits every column to its content.</summary>
         public void AutoFitColumns() => Call();
 
         /// <summary>Fits one column to its content.</summary>
-        public void AutoFitColumn(Arg<Field> value) => Call(value, name: "autoFitColumns");
+        /// <param name="fieldName">The column to fit, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.RiskLevel)</c>.</param>
+        public void AutoFitColumn(Arg<Field> fieldName) => Call(fieldName, name: "autoFitColumns");
 
         /// <summary>Opens the column chooser.</summary>
         public void OpenColumnChooser() => Call();
@@ -114,33 +136,55 @@ namespace Alis.Reactive.Fusion.Components
         public void CloseEdit() => Call();
 
         /// <summary>Adds a row at the top.</summary>
-        public void AddRecord<TRow>(Arg<TRow> value) where TRow : class => Call(value);
+        /// <typeparam name="TRow">Your row class.</typeparam>
+        /// <param name="data">The row to add.</param>
+        public void AddRecord<TRow>(Arg<TRow> data) where TRow : class => Call(data);
 
         /// <summary>Adds a row at a zero-based index.</summary>
-        public void AddRecordAt<TRow>(Arg<TRow> first, Arg<int> second) where TRow : class => Call(first, second, name: "addRecord");
+        /// <typeparam name="TRow">Your row class.</typeparam>
+        /// <param name="data">The row to add.</param>
+        /// <param name="index">The zero-based index the row takes.</param>
+        public void AddRecordAt<TRow>(Arg<TRow> data, Arg<int> index) where TRow : class => Call(data, index, name: "addRecord");
 
         /// <summary>Deletes the selected row.</summary>
         public void DeleteRecord() => Call();
 
         /// <summary>Replaces the row at a zero-based index.</summary>
-        public void UpdateRow<TRow>(Arg<int> first, Arg<TRow> second) where TRow : class => Call(first, second);
+        /// <typeparam name="TRow">Your row class.</typeparam>
+        /// <param name="index">The zero-based index of the row.</param>
+        /// <param name="data">The row that replaces it.</param>
+        public void UpdateRow<TRow>(Arg<int> index, Arg<TRow> data) where TRow : class => Call(index, data);
 
         /// <summary>Replaces the data of the row with this primary key.</summary>
-        public void SetRowData<TRow>(Arg<int> first, Arg<TRow> second) where TRow : class => Call(first, second);
+        /// <typeparam name="TRow">Your row class.</typeparam>
+        /// <param name="key">The row's primary key value.</param>
+        /// <param name="rowData">The row data that replaces it.</param>
+        public void SetRowData<TRow>(Arg<int> key, Arg<TRow> rowData) where TRow : class => Call(key, rowData);
 
         /// <summary>Sets a cell of the row with this primary key.</summary>
-        public void SetCellValue<TValue>(Arg<int> first, Arg<Field<TValue>> second, Arg<TValue> third) => Call(first, second, third);
+        /// <typeparam name="TValue">The type of the column's member, which the value must match.</typeparam>
+        /// <param name="key">The row's primary key value.</param>
+        /// <param name="field">The column, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.OpenTasks)</c>.</param>
+        /// <param name="value">The cell's new value.</param>
+        public void SetCellValue<TValue>(Arg<int> key, Arg<Field<TValue>> field, Arg<TValue> value) => Call(key, field, value);
 
         /// <summary>Opens a cell for batch editing: the row's zero-based index, then the column.</summary>
-        public void EditCell(Arg<int> first, Arg<Field> second) => Call(first, second);
+        /// <param name="index">The zero-based index of the row.</param>
+        /// <param name="field">The column, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.OpenTasks)</c>.</param>
+        public void EditCell(Arg<int> index, Arg<Field> field) => Call(index, field);
 
         /// <summary>Saves the cell being batch edited.</summary>
         public void SaveCell() => Call();
 
         /// <summary>Changes a cell as a pending batch edit: the row's zero-based index, the column, the value.</summary>
-        public void UpdateCell<TValue>(Arg<int> first, Arg<Field<TValue>> second, Arg<TValue> third) => Call(first, second, third);
+        /// <typeparam name="TValue">The type of the column's member, which the value must match.</typeparam>
+        /// <param name="rowIndex">The zero-based index of the row.</param>
+        /// <param name="field">The column, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.OpenTasks)</c>.</param>
+        /// <param name="value">The cell's new value.</param>
+        public void UpdateCell<TValue>(Arg<int> rowIndex, Arg<Field<TValue>> field, Arg<TValue> value) => Call(rowIndex, field, value);
 
         /// <summary>The pending batch edits, typed by your row class.</summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
         public TypedSource<FusionGridBatchChanges<TRow>> GetBatchChanges<TRow>() where TRow : class => Invoke<FusionGridBatchChanges<TRow>>();
 
         /// <summary>Downloads the rows as an Excel file.</summary>
@@ -164,34 +208,44 @@ namespace Alis.Reactive.Fusion.Components
             Event<FusionGridToolbarClickArgs>("toolbarClick");
 
         /// <summary>Raised when the user clicks a row.</summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
         public TypedEvent<FusionGridRecordClickArgs<TRow>> RecordClick<TRow>() where TRow : class =>
             Event<FusionGridRecordClickArgs<TRow>>("recordClick");
 
         /// <summary>Raised after a row is selected.</summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
         public TypedEvent<FusionGridRowSelectedArgs<TRow>> RowSelected<TRow>() where TRow : class =>
             Event<FusionGridRowSelectedArgs<TRow>>("rowSelected");
 
         /// <summary>Raised before an action such as edit, save, delete, sort, page or filter runs.</summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
         public TypedEvent<FusionGridEditActionArgs<TRow>> ActionBegin<TRow>() where TRow : class =>
             Event<FusionGridEditActionArgs<TRow>>("actionBegin");
 
         /// <summary>Raised after an action such as edit, save, delete, sort, page or filter completes.</summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
         public TypedEvent<FusionGridEditActionArgs<TRow>> ActionComplete<TRow>() where TRow : class =>
             Event<FusionGridEditActionArgs<TRow>>("actionComplete");
 
         /// <summary>Raised before a row enters edit mode.</summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
         public TypedEvent<FusionGridBeginEditArgs<TRow>> BeginEdit<TRow>() where TRow : class =>
             Event<FusionGridBeginEditArgs<TRow>>("beginEdit");
 
         /// <summary>Raised before a batch-edited cell is saved.</summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
+        /// <typeparam name="TValue">The type of the cell value.</typeparam>
         public TypedEvent<FusionGridCellSaveArgs<TRow, TValue>> CellSave<TRow, TValue>() where TRow : class =>
             Event<FusionGridCellSaveArgs<TRow, TValue>>("cellSave");
 
         /// <summary>Raised after a batch-edited cell is saved.</summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
+        /// <typeparam name="TValue">The type of the cell value.</typeparam>
         public TypedEvent<FusionGridCellSavedArgs<TRow, TValue>> CellSaved<TRow, TValue>() where TRow : class =>
             Event<FusionGridCellSavedArgs<TRow, TValue>>("cellSaved");
 
         /// <summary>Raised before the pending batch edits are saved.</summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
         public TypedEvent<FusionGridBeforeBatchSaveArgs<TRow>> BeforeBatchSave<TRow>() where TRow : class =>
             Event<FusionGridBeforeBatchSaveArgs<TRow>>("beforeBatchSave");
     }
@@ -341,15 +395,28 @@ namespace Alis.Reactive.Fusion.Components
     /// Action details from the dataStateChange event.
     /// Contains <c>requestType</c> plus context-specific parameters.
     /// </summary>
+    /// <remarks>Compare <see cref="RequestType"/> with the constants, such as <see cref="Sorting"/>, in <c>When</c> conditions.</remarks>
     public class FusionGridAction
     {
-        /// <summary>Syncfusion Grid action type constants for use with <c>When</c> conditions.</summary>
+        /// <summary>The request type of a sort.</summary>
         public const string Sorting = "sorting";
+
+        /// <summary>The request type of a page change.</summary>
         public const string Paging = "paging";
+
+        /// <summary>The request type of a filter.</summary>
         public const string Filtering = "filtering";
+
+        /// <summary>The request type of a search.</summary>
         public const string Searching = "searching";
+
+        /// <summary>The request type of a grouping.</summary>
         public const string Grouping = "grouping";
+
+        /// <summary>The request type of an ungrouping.</summary>
         public const string Ungrouping = "ungrouping";
+
+        /// <summary>The request type of a refresh.</summary>
         public const string Refresh = "refresh";
 
         /// <summary>Syncfusion request type, such as <c>sorting</c> or <c>paging</c>.</summary>

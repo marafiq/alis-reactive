@@ -15,8 +15,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Render it with <c>Html.FusionListBox(plan, "dining-companions", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionListBox&gt;("dining-companions")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Call(c =&gt; c.SelectItems, new[] { "carey" }, true, true)</c>.
+    /// <c>var companions = p.Component&lt;FusionListBox&gt;("dining-companions")</c>, then write or call a member as
+    /// its own statement, for example <c>companions.SelectItems(new[] { "carey" }, true, true)</c>.
     /// </remarks>
     public sealed class FusionListBox : FusionComponent
     {
@@ -27,13 +27,20 @@ namespace Alis.Reactive.Fusion.Components
         public void DataBind() => Call();
 
         /// <summary>Selects (<see langword="true"/>) or clears the items; the third argument says the first holds values, not texts.</summary>
-        public void SelectItems(Arg<string[]> first, Arg<bool> second, Arg<bool> third) => Call(first, second, third);
+        /// <param name="items">The items, by text, or by value when <paramref name="isValue"/> is <see langword="true"/>.</param>
+        /// <param name="state"><see langword="true"/> to select the items; <see langword="false"/> to clear them.</param>
+        /// <param name="isValue"><see langword="true"/> when <paramref name="items"/> holds values, not texts.</param>
+        public void SelectItems(Arg<string[]> items, Arg<bool> state, Arg<bool> isValue) => Call(items, state, isValue);
 
         /// <summary>Selects (<see langword="true"/>) or clears every item.</summary>
-        public void SelectAll(Arg<bool> value) => Call(value);
+        /// <param name="state"><see langword="true"/> to select every item; <see langword="false"/> to clear them all.</param>
+        public void SelectAll(Arg<bool> state) => Call(state);
 
         /// <summary>Enables (<see langword="true"/>) or disables the items; the third argument says the first holds values, not texts.</summary>
-        public void EnableItems(Arg<string[]> first, Arg<bool> second, Arg<bool> third) => Call(first, second, third);
+        /// <param name="items">The items, by text, or by value when <paramref name="isValue"/> is <see langword="true"/>.</param>
+        /// <param name="enable"><see langword="true"/> to enable the items; <see langword="false"/> to disable them.</param>
+        /// <param name="isValue"><see langword="true"/> when <paramref name="items"/> holds values, not texts.</param>
+        public void EnableItems(Arg<string[]> items, Arg<bool> enable, Arg<bool> isValue) => Call(items, enable, isValue);
 
         /// <summary>Raised when the selection changes.</summary>
         public TypedEvent<FusionListBoxChangeArgs> Change =>
@@ -56,6 +63,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion ListBox and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view model the plan is authored for.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan receiving list box event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>

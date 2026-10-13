@@ -14,9 +14,12 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion Dialog, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionDialog(plan, "discharge-dialog", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionDialog&gt;("discharge-dialog")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Call(c =&gt; c.Show)</c>.
+    /// Render it with <c>Html.FusionDialog(plan, "discharge-dialog", b =&gt; ...)</c>, then reach it in a callback
+    /// and use its members directly:
+    /// <code>
+    /// var dialog = p.Component&lt;FusionDialog&gt;("discharge-dialog");
+    /// dialog.Show();
+    /// </code>
     /// </remarks>
     public sealed class FusionDialog : FusionComponent
     {
@@ -53,14 +56,14 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>Payload of <see cref="FusionDialog.BeforeOpen"/>.</summary>
     public class FusionDialogBeforeOpenArgs : JsObject
     {
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionDialog.BeforeClose"/>.</summary>
     public class FusionDialogBeforeCloseArgs : JsObject
     {
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
 
         /// <summary>Whether user interaction started the close.</summary>
@@ -91,6 +94,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion Dialog and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan receiving dialog event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>

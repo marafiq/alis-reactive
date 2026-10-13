@@ -11,7 +11,7 @@ namespace Alis.Reactive.Builders
     /// </summary>
     /// <remarks>
     /// Received as the <c>p</c> parameter inside trigger callbacks:
-    /// <c>t.DomReady(p =&gt; { p.Element("id").AddClass("x"); p.Dispatch(CareEvents.Ready); })</c>.
+    /// <c>t.DomReady(p =&gt; { p.Element("id").ClassList.Add("x"); p.Dispatch(CareEvents.Ready); })</c>.
     /// Reactions execute in declaration order.
     /// </remarks>
     /// <typeparam name="TModel">View model that owns model-bound component IDs and validation/gather fields.</typeparam>
@@ -135,6 +135,7 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TComponent">The component's declaration.</typeparam>
         /// <typeparam name="TOtherModel">The model the component was rendered for.</typeparam>
         /// <param name="expr">The other model's member the component is bound to.</param>
+        /// <returns>The component, whose members the page uses directly.</returns>
         public TComponent Component<TComponent, TOtherModel>(Expression<Func<TOtherModel, object?>> expr)
             where TComponent : JsObject, IComponent, new()
             where TOtherModel : class =>
@@ -143,12 +144,14 @@ namespace Alis.Reactive.Builders
         /// <summary>The component the view rendered with an id it chose.</summary>
         /// <typeparam name="TComponent">The component's declaration.</typeparam>
         /// <param name="refId">The component's element id.</param>
+        /// <returns>The component: <c>grid.Refresh()</c>, <c>grid.SelectRow(0)</c>.</returns>
         public TComponent Component<TComponent>(string refId)
             where TComponent : JsObject, IComponent, new() =>
             Live<TComponent>(ComponentObjectTarget.For<TComponent>(refId));
 
         /// <summary>An app object the layout renders once, at the id its declaration names: Toast, Drawer, Loader.</summary>
         /// <typeparam name="TComponent">The app object's declaration.</typeparam>
+        /// <returns>The app object: <c>toast.Content.Set("Saved")</c>, <c>toast.Show()</c>.</returns>
         public TComponent Component<TComponent>()
             where TComponent : JsObject, IAppLevelComponent, new() =>
             Live<TComponent>(ComponentObjectTarget.ForLayout<TComponent>());

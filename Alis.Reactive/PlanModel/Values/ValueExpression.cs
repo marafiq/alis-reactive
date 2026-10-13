@@ -297,7 +297,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Literal value node serialized directly into generated plan JSON.</summary>
     /// <remarks>
-    /// Created when a literal is passed to a builder such as <c>p.Element("id").SetText("hello")</c>.
+    /// Created when a literal is passed to a builder such as <c>p.Element("id").Text.Set("hello")</c>.
     /// </remarks>
     internal sealed class LiteralExpression : ValueExpression
     {

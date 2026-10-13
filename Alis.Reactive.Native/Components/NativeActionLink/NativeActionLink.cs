@@ -83,6 +83,8 @@ namespace Alis.Reactive.Native.Components
         ///     .Response(r =&gt; r.OnSuccess&lt;HandoverNoteRead&gt;((json, s) =&gt; ..)))
         /// </code>
         /// </remarks>
+        /// <typeparam name="TModel">The view's model.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="id">The anchor's id, unique on the page.</param>
         /// <param name="linkText">Anchor text.</param>
         /// <param name="url">The anchor's href, and the URL of its request.</param>

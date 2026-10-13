@@ -12,9 +12,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Model-bound input field returned by
-    /// <see cref="InputFieldExtensions.InputField{TModel,TProp}"/>, ready to receive
-    /// a component extension that renders inside the field wrapper.
+    /// Model-bound input field returned by <c>Html.InputField(plan, m =&gt; m.Name)</c>
+    /// (<see cref="InputFieldExtensions"/>), ready to receive a component extension that renders
+    /// inside the field wrapper.
     /// </summary>
     /// <remarks>
     /// Component extensions choose the concrete rendered control. The field
@@ -56,6 +56,8 @@ namespace Alis.Reactive
         /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.ElementId"/> and
         /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.BindingPath"/>.
         /// </summary>
+        /// <typeparam name="TComponent">The component's declaration.</typeparam>
+        /// <param name="content">The component's markup.</param>
         /// <returns>The rendered component, ready for <c>.Reactive(...)</c>.</returns>
         public RenderedComponent<TComponent, TModel> Render<TComponent>(IHtmlString content)
             where TComponent : IInputComponent, new()
@@ -76,6 +78,8 @@ namespace Alis.Reactive
         /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.ElementId"/> and
         /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}.BindingPath"/>.
         /// </summary>
+        /// <typeparam name="TComponent">The component's declaration.</typeparam>
+        /// <param name="content">The component's markup.</param>
         /// <returns>The rendered component, ready for <c>.Reactive(...)</c>.</returns>
         public RenderedComponent<TComponent, TModel> Render<TComponent>(IHtmlContent content)
             where TComponent : IInputComponent, new()
@@ -91,6 +95,7 @@ namespace Alis.Reactive
         /// and renders its markup inside the field wrapper, for a vendor helper that writes its markup to
         /// a <see cref="TextWriter"/> instead of returning it.
         /// </summary>
+        /// <typeparam name="TComponent">The component's declaration.</typeparam>
         /// <param name="write">Writes the component markup to the writer it receives.</param>
         /// <returns>The rendered component, ready for <c>.Reactive(...)</c>.</returns>
         public RenderedComponent<TComponent, TModel> Render<TComponent>(System.Action<TextWriter> write)

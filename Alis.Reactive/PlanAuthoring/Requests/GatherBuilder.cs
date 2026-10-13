@@ -18,13 +18,13 @@ namespace Alis.Reactive.Builders.Requests
     /// </para>
     /// <code>
     /// p.Get("/suites/{suiteType}/rate")
-    ///  .Gather&lt;SuiteRateQuery&gt;(g =&gt; g.Set(x =&gt; x.SuiteType, suite.Get(c =&gt; c.Value)));
+    ///  .Gather&lt;SuiteRateQuery&gt;(g =&gt; g.Set(x =&gt; x.SuiteType, suite.Value));
     ///
     /// p.Post("/discharge")
     ///  .Gather&lt;DischargeRequest&gt;(g =&gt; g
     ///      .Form()
     ///      .Set(x =&gt; x.FacilityId, p.Url&lt;CensusQuery&gt;().Get(q =&gt; q.FacilityId))
-    ///      .Header("X-Category", p.Payload(args).Get(a =&gt; a.Category)));
+    ///      .Header("X-Category", args.Category));
     /// </code>
     /// </remarks>
     /// <typeparam name="TRequest">The class the endpoint binds.</typeparam>

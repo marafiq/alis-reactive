@@ -15,9 +15,9 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion Menu, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionMenu(plan, "care-menu", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionMenu&gt;("care-menu")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Call(c =&gt; c.Open)</c>.
+    /// Render it with <c>Html.FusionMenu(plan, "care-menu", b =&gt; ...)</c>, reach it with
+    /// <c>var menu = p.Component&lt;FusionMenu&gt;("care-menu");</c> and use its members directly:
+    /// <c>menu.Open();</c>.
     /// </remarks>
     public sealed class FusionMenu : FusionComponent
     {
@@ -77,7 +77,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Whether the menu opens with focus.</summary>
         public ReadOnly<bool?> IsFocused => ReadOnly<bool?>();
 
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 
@@ -100,7 +100,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The parent item of a submenu; <see langword="null"/> for the top level.</summary>
         public ReadOnly<FusionMenuItem> ParentItem => ReadOnly<FusionMenuItem>();
 
-        /// <summary>Set to <see langword="true"/> with <c>p.Payload(args).Set(a =&gt; a.Cancel, true)</c> to stop the action.</summary>
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 
@@ -142,6 +142,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion Menu and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan receiving menu event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>

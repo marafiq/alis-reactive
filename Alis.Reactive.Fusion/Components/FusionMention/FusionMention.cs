@@ -18,14 +18,17 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion Mention, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionMention(plan, "care-mention", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionMention&gt;("care-mention")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Call(c =&gt; c.Search, "No", 96, 160)</c>.
+    /// Render it with <c>Html.FusionMention(plan, "care-mention", b =&gt; ...)</c>, reach it with
+    /// <c>var mention = p.Component&lt;FusionMention&gt;("care-mention");</c> and use its members directly:
+    /// <c>mention.Search("No", 96, 160);</c>.
     /// </remarks>
     public sealed class FusionMention : FusionComponent
     {
         /// <summary>Filters the suggestions by a text and shows them at a position, in pixels.</summary>
-        public void Search(Arg<string> first, Arg<int> second, Arg<int> third) => Call(first, second, third);
+        /// <param name="text">The text the suggestions are filtered by.</param>
+        /// <param name="positionX">The popup's horizontal position, in pixels.</param>
+        /// <param name="positionY">The popup's vertical position, in pixels.</param>
+        public void Search(Arg<string> text, Arg<int> positionX, Arg<int> positionY) => Call(text, positionX, positionY);
 
         /// <summary>Opens the suggestion popup.</summary>
         public void ShowPopup() => Call();
@@ -62,8 +65,15 @@ namespace Alis.Reactive.Fusion.Components
     }
 #nullable restore annotations
 
+    /// <summary>Renders a <see cref="FusionMention"/> for a plan and maps its fields.</summary>
     public static class FusionMentionHtmlExtensions
     {
+        /// <summary>Renders a Syncfusion Mention with the element ID the view chooses.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
+        /// <param name="plan">The plan the component's events are wired into.</param>
+        /// <param name="elementId">The component's element ID, chosen by the view.</param>
+        /// <param name="build">Configures the Syncfusion builder before rendering.</param>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionMention, TModel> FusionMention<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,
@@ -90,6 +100,11 @@ namespace Alis.Reactive.Fusion.Components
             return plan.Render<global::Alis.Reactive.Fusion.Components.FusionMention>(elementId, content);
         }
 
+        /// <summary>Maps display text and value fields using typed item expressions.</summary>
+        /// <typeparam name="TItem">The item class the data source holds.</typeparam>
+        /// <param name="builder">The Syncfusion builder being configured.</param>
+        /// <param name="text">The item member shown as each suggestion's text.</param>
+        /// <param name="value">The item member used as each suggestion's value.</param>
         public static MentionBuilder Fields<TItem>(
             this MentionBuilder builder,
             Expression<Func<TItem, object?>> text,

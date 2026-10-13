@@ -10,9 +10,9 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion Rich Text Editor, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use as the type in <c>p.Component&lt;FusionRichTextEditor&gt;(m =&gt; m.CarePlan)</c>; every
-    /// declared member works with <c>Set</c>, <c>Call</c> and <c>Get</c>, for example
-    /// <c>.Set(c =&gt; c.Value, "&lt;p&gt;Daily review&lt;/p&gt;")</c> or <c>p.When(carePlan.Get(c =&gt; c.Value)).NotEmpty()</c>.
+    /// Reach it with <c>var carePlan = p.Component&lt;FusionRichTextEditor&gt;(m =&gt; m.CarePlan);</c> and use its
+    /// members directly: <c>carePlan.Value.Set("&lt;p&gt;Daily review&lt;/p&gt;");</c> or
+    /// <c>p.When(carePlan.Value).NotEmpty()</c>.
     /// </remarks>
     public sealed class FusionRichTextEditor : FusionComponent, IInputComponent
     {
@@ -31,7 +31,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionRichTextEditor.Change"/>.</summary>
-    /// <remarks>Read in conditions: <c>p.When(args, x =&gt; x.Value).NotNull()</c>.</remarks>
+    /// <remarks>Read in conditions: <c>p.When(args.Value).NotNull()</c>.</remarks>
     public class FusionRichTextEditorChangeArgs : JsObject
     {
         /// <summary>Content after the change, as HTML.</summary>
@@ -46,6 +46,8 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionRichTextEditorHtmlExtensions
     {
         /// <summary>Renders a FusionRichTextEditor with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionRichTextEditor, TModel> FusionRichTextEditor<TModel, TProp>(
             this InputBoundField<TModel, TProp> field)
             where TModel : class
@@ -55,6 +57,10 @@ namespace Alis.Reactive.Fusion.Components
         /// Renders a FusionRichTextEditor bound to the field's model property, with the framework's element ID and
         /// binding name.
         /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
+        /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
+        /// <param name="build">Configures the Syncfusion builder before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionRichTextEditor, TModel> FusionRichTextEditor<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,

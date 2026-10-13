@@ -14,9 +14,9 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion PivotView, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.FusionPivotView(plan, "care-pivot", b =&gt; ...)</c> and target it with
-    /// <c>p.Component&lt;FusionPivotView&gt;("care-pivot")</c>; every declared member works with <c>Set</c>,
-    /// <c>Call</c> and <c>Get</c>, for example <c>.Set(c =&gt; c.DataSource, json.Read(x =&gt; x.Rows)).Call(c =&gt; c.Refresh)</c>.
+    /// Render it with <c>Html.FusionPivotView(plan, "care-pivot", b =&gt; ...)</c>, reach it with
+    /// <c>var pivot = p.Component&lt;FusionPivotView&gt;("care-pivot");</c> and use its members directly:
+    /// <c>pivot.DataSource.Set(json.Get(x =&gt; x.Rows)); pivot.Refresh();</c>.
     /// </remarks>
     public sealed class FusionPivotView : FusionComponent
     {
@@ -29,11 +29,13 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Re-renders the pivot from its data source.</summary>
         public void Refresh() => Call();
 
-        /// <summary>The layout as JSON; the argument says whether to leave the data source out.</summary>
-        public TypedSource<string> GetPersistData(Arg<bool> value) => Invoke<string>(value);
+        /// <summary>The layout as JSON.</summary>
+        /// <param name="isRemoveDatasource"><see langword="true"/> to leave the data source out of the JSON.</param>
+        public TypedSource<string> GetPersistData(Arg<bool> isRemoveDatasource) => Invoke<string>(isRemoveDatasource);
 
         /// <summary>Restores a layout from its JSON.</summary>
-        public void LoadPersistData(Arg<string> value) => Call(value);
+        /// <param name="persistData">The layout JSON, as <see cref="GetPersistData"/> reads it.</param>
+        public void LoadPersistData(Arg<string> persistData) => Call(persistData);
 
         /// <summary>Opens the conditional formatting dialog.</summary>
         public void ShowConditionalFormattingDialog() => Call();
@@ -105,6 +107,12 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public static class FusionPivotViewHtmlExtensions
     {
+        /// <summary>Renders a Syncfusion PivotView with the element ID the view chooses.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
+        /// <param name="plan">The plan the component's events are wired into.</param>
+        /// <param name="elementId">The component's element ID, chosen by the view.</param>
+        /// <param name="build">Configures the Syncfusion builder before rendering.</param>
         public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionPivotView, TModel> FusionPivotView<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,

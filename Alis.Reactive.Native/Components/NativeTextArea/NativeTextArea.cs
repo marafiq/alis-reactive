@@ -7,9 +7,12 @@ namespace Alis.Reactive.Native.Components
     /// The native HTML <c>&lt;textarea&gt;</c>, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.InputField(plan, m =&gt; m.CareNote).NativeTextArea(b =&gt; ...)</c>; target it with
-    /// <c>p.Component&lt;NativeTextArea&gt;(m =&gt; m.CareNote)</c> and its members work with <c>Set</c>, <c>Call</c>
-    /// and <c>Get</c>.
+    /// Render it with <c>Html.InputField(plan, m =&gt; m.CareNote).NativeTextArea(b =&gt; ...)</c>; reach it with
+    /// <c>p.Component&lt;NativeTextArea&gt;(m =&gt; m.CareNote)</c> and use its members directly:
+    /// <code>
+    /// var careNote = p.Component&lt;NativeTextArea&gt;(m =&gt; m.CareNote);
+    /// p.When(careNote.Value).IsEmpty().Then(t =&gt; careNote.Focus());
+    /// </code>
     /// </remarks>
     public sealed class NativeTextArea : NativeComponent, IInputComponent
     {
@@ -39,6 +42,8 @@ namespace Alis.Reactive.Native.Components
     public static class NativeTextAreaHtmlExtensions
     {
         /// <summary>Renders a NativeTextArea with its defaults; see the overload that takes <c>build</c>.</summary>
+        /// <typeparam name="TModel">The view's model.</typeparam>
+        /// <typeparam name="TProp">The type of the bound model property.</typeparam>
         public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeTextArea, TModel> NativeTextArea<TModel, TProp>(
             this InputBoundField<TModel, TProp> field)
             where TModel : class
@@ -48,6 +53,10 @@ namespace Alis.Reactive.Native.Components
         /// Renders a NativeTextArea bound to the field's model property, with the framework's element ID and
         /// binding name.
         /// </summary>
+        /// <typeparam name="TModel">The view's model.</typeparam>
+        /// <typeparam name="TProp">The type of the bound model property.</typeparam>
+        /// <param name="field">The model-bound field the textarea renders into.</param>
+        /// <param name="build">Configures the textarea, for example <c>b =&gt; b.Rows(6)</c>.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
         public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeTextArea, TModel> NativeTextArea<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,
