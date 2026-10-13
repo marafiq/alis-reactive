@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
@@ -7,14 +8,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
     [Route("Sandbox/HttpPipeline/Http")]
     public class HttpController : Controller
     {
-        private static readonly object NativeActionLinkLock = new object();
         private static readonly HttpActionLinkRow[] NativeActionLinkSeedRows =
         {
             new HttpActionLinkRow { Id = 41, Name = "John Doe" },
             new HttpActionLinkRow { Id = 42, Name = "Jane Smith" },
             new HttpActionLinkRow { Id = 43, Name = "Bob Johnson" }
         };
-        private static HashSet<int> _deletedNativeActionLinkRows = new HashSet<int>();
+
+        // The rows this browser deleted since it opened the page: its own, in its session.
+        private const string DeletedActionLinkRowsKey = "httpActionLinkDeletedRows";
 
         [HttpGet("")]
         public IActionResult Index()
@@ -134,10 +136,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
                 return BadRequest(new { errors = new { Id = new[] { "Route id and payload id must match." } } });
             }
 
-            lock (NativeActionLinkLock)
-            {
-                _deletedNativeActionLinkRows.Add(id);
-            }
+            SaveDeletedActionLinkRows(DeletedActionLinkRows().Append(id));
 
             return Ok(new { deleted = true, id });
         }
@@ -155,28 +154,25 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
                 "text/html");
         }
 
-        private static IReadOnlyList<HttpActionLinkRow> GetNativeActionLinkRows()
+        private IReadOnlyList<HttpActionLinkRow> GetNativeActionLinkRows()
         {
-            lock (NativeActionLinkLock)
-            {
-                return NativeActionLinkSeedRows
-                    .Where(row => !_deletedNativeActionLinkRows.Contains(row.Id))
-                    .Select(row => new HttpActionLinkRow
-                    {
-                        Id = row.Id,
-                        Name = row.Name
-                    })
-                    .ToArray();
-            }
+            var deleted = DeletedActionLinkRows();
+            return NativeActionLinkSeedRows
+                .Where(row => !deleted.Contains(row.Id))
+                .Select(row => new HttpActionLinkRow { Id = row.Id, Name = row.Name })
+                .ToArray();
         }
 
-        private static void ResetNativeActionLinkRows()
+        private void ResetNativeActionLinkRows() => SaveDeletedActionLinkRows(Enumerable.Empty<int>());
+
+        private IReadOnlyList<int> DeletedActionLinkRows()
         {
-            lock (NativeActionLinkLock)
-            {
-                _deletedNativeActionLinkRows = new HashSet<int>();
-            }
+            var json = HttpContext.Session.GetString(DeletedActionLinkRowsKey);
+            return json == null ? Array.Empty<int>() : JsonSerializer.Deserialize<int[]>(json)!;
         }
+
+        private void SaveDeletedActionLinkRows(IEnumerable<int> ids) =>
+            HttpContext.Session.SetString(DeletedActionLinkRowsKey, JsonSerializer.Serialize(ids.Distinct().ToArray()));
 
         [HttpGet("UrlParamEcho")]
         public IActionResult UrlParamEcho(string? tab, string? facilityId, string? page) =>

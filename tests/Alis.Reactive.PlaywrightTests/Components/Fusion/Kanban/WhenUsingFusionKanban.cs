@@ -9,21 +9,11 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Kanban";
 
-    private async Task ResetKanbanBoard()
-    {
-        using var client = new System.Net.Http.HttpClient();
-        var response = await client.PostAsync($"{BaseUrl}/api/kanban/reset", null);
-        response.EnsureSuccessStatusCode();
-    }
-
+    // Each browser context has its own board, seeded on its first visit; a reload keeps its changes.
     private async Task NavigateAndWaitForKanban(
-        bool reset = true,
         int cardCount = 2,
         string expectedCardText = "Assess fall risk")
     {
-        if (reset)
-            await ResetKanbanBoard();
-
         await NavigateToAndWaitForBoot(Path);
         await Expect(Page.Locator("#care-kanban.e-kanban"))
             .ToBeVisibleAsync(new() { Timeout = 10000 });
@@ -189,7 +179,6 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
             .Not.ToContainTextAsync("Assess fall risk", new() { Timeout = 10000 });
 
         await NavigateAndWaitForKanban(
-            reset: false,
             cardCount: 2,
             expectedCardText: "Remote wound consult");
         await Expect(Page.Locator("#care-kanban"))
@@ -218,7 +207,7 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
         await Expect(Page.Locator("#kanban-audit-summary"))
             .ToHaveTextAsync("audit:2:0:2", new() { Timeout = 10000 });
 
-        await NavigateAndWaitForKanban(reset: false);
+        await NavigateAndWaitForKanban();
         await Page.Locator("#kanban-audit-btn").ClickAsync();
         await Expect(Page.Locator("#kanban-audit-summary"))
             .ToHaveTextAsync("audit:2:0:2", new() { Timeout = 10000 });
@@ -286,7 +275,6 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
             .ToContainTextAsync("Remote wound consult", new() { Timeout = 10000 });
 
         await NavigateAndWaitForKanban(
-            reset: false,
             cardCount: 3,
             expectedCardText: "Remote wound consult");
 
@@ -318,7 +306,7 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
         await Expect(Page.Locator("#care-kanban"))
             .ToContainTextAsync("Medication reconciliation updated", new() { Timeout = 10000 });
 
-        await NavigateAndWaitForKanban(reset: false);
+        await NavigateAndWaitForKanban();
         await Expect(Page.Locator("#care-kanban"))
             .ToContainTextAsync("Medication reconciliation updated", new() { Timeout = 10000 });
 

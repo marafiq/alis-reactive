@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,9 +8,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     [Route("Sandbox/Components/Kanban")]
     public class KanbanController : Controller
     {
-        private static readonly object BoardLock = new object();
-        private static List<KanbanTaskCard> BoardCards = KanbanSeedData.Cards.ToList();
-        private static int NextCardId = 900;
+        // Each browser keeps its own board in its session, seeded on first read, so one test's moves
+        // are never another's.
+        private const string BoardKey = "kanbanBoard";
+        private const string NextCardIdKey = "kanbanNextCardId";
+        private const int FirstNewCardId = 900;
 
         [HttpGet("")]
         [HttpGet("Index")]
@@ -34,18 +37,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        [HttpPost("~/api/kanban/reset")]
-        public IActionResult Reset()
-        {
-            lock (BoardLock)
-            {
-                BoardCards = KanbanSeedData.Cards.ToList();
-                NextCardId = 900;
-            }
-
-            return Ok(new { message = "reset" });
-        }
-
         [HttpPost("~/api/kanban/audit")]
         public IActionResult Audit([FromBody] KanbanAuditRequest request)
         {
@@ -61,12 +52,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         [HttpPost("~/api/kanban/cards")]
         public IActionResult Add()
         {
-            KanbanTaskCard card;
-            lock (BoardLock)
-            {
-                card = KanbanSeedData.NewCard(NextCardId++, "AL");
-                BoardCards.Add(card);
-            }
+            var card = KanbanSeedData.NewCard(TakeNextCardId(), "AL");
+            var board = Board();
+            board.Add(card);
+            SaveBoard(board);
 
             return Ok(new KanbanCardMutationResponse
             {
@@ -80,12 +69,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         public IActionResult Update(int cardId)
         {
             var card = KanbanSeedData.UpdatedCard();
-            lock (BoardLock)
-            {
-                BoardCards = BoardCards
-                    .Select(existing => existing.Id == cardId ? card : existing)
-                    .ToList();
-            }
+            SaveBoard(Board().Select(existing => existing.Id == cardId ? card : existing).ToList());
 
             return Ok(new KanbanCardMutationResponse
             {
@@ -98,12 +82,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         [HttpDelete("~/api/kanban/cards/{cardId:int}")]
         public IActionResult Delete(int cardId)
         {
-            lock (BoardLock)
-            {
-                BoardCards = BoardCards
-                    .Where(card => card.Id != cardId)
-                    .ToList();
-            }
+            SaveBoard(Board().Where(card => card.Id != cardId).ToList());
 
             return Ok(new KanbanCardMutationResponse
             {
@@ -116,17 +95,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         public IActionResult Commit([FromBody] KanbanCommitRequest request)
         {
             var changed = request.AddedRecords.Count + request.ChangedRecords.Count + request.DeletedRecords.Count;
-            lock (BoardLock)
-            {
-                foreach (var deleted in request.DeletedRecords)
-                    BoardCards.RemoveAll(card => card.Id == deleted.Id);
+            var board = Board();
+            foreach (var deleted in request.DeletedRecords)
+                board.RemoveAll(card => card.Id == deleted.Id);
 
-                foreach (var changedCard in request.ChangedRecords)
-                    UpsertCard(changedCard);
+            foreach (var changedCard in request.ChangedRecords)
+                Upsert(board, changedCard);
 
-                foreach (var added in request.AddedRecords)
-                    UpsertCard(added);
-            }
+            foreach (var added in request.AddedRecords)
+                Upsert(board, added);
+            SaveBoard(board);
 
             return Ok(new KanbanCommitResponse
             {
@@ -139,12 +117,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         public IActionResult Move([FromBody] KanbanMoveRequest request)
         {
             var moved = request.Cards[0];
-            lock (BoardLock)
-            {
-                BoardCards = BoardCards
-                    .Select(card => card.Id == moved.Id ? moved : card)
-                    .ToList();
-            }
+            SaveBoard(Board().Select(card => card.Id == moved.Id ? moved : card).ToList());
 
             return Ok(new KanbanMoveResponse
             {
@@ -172,25 +145,38 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        private static List<KanbanTaskCard> CardsForFacility(string? facilityId)
+        private List<KanbanTaskCard> CardsForFacility(string? facilityId)
         {
-            lock (BoardLock)
-            {
-                var cards = BoardCards.AsEnumerable();
-                if (!string.IsNullOrWhiteSpace(facilityId) && facilityId != "ALL")
-                    cards = cards.Where(card => card.FacilityId == facilityId);
+            var cards = Board().AsEnumerable();
+            if (!string.IsNullOrWhiteSpace(facilityId) && facilityId != "ALL")
+                cards = cards.Where(card => card.FacilityId == facilityId);
 
-                return cards.ToList();
-            }
+            return cards.ToList();
         }
 
-        private static void UpsertCard(KanbanTaskCard card)
+        private List<KanbanTaskCard> Board()
         {
-            var index = BoardCards.FindIndex(existing => existing.Id == card.Id);
+            var json = HttpContext.Session.GetString(BoardKey);
+            return json == null ? KanbanSeedData.Cards.ToList() : JsonSerializer.Deserialize<List<KanbanTaskCard>>(json)!;
+        }
+
+        private void SaveBoard(List<KanbanTaskCard> board) =>
+            HttpContext.Session.SetString(BoardKey, JsonSerializer.Serialize(board));
+
+        private int TakeNextCardId()
+        {
+            var next = HttpContext.Session.GetInt32(NextCardIdKey) ?? FirstNewCardId;
+            HttpContext.Session.SetInt32(NextCardIdKey, next + 1);
+            return next;
+        }
+
+        private static void Upsert(List<KanbanTaskCard> board, KanbanTaskCard card)
+        {
+            var index = board.FindIndex(existing => existing.Id == card.Id);
             if (index >= 0)
-                BoardCards[index] = card;
+                board[index] = card;
             else
-                BoardCards.Add(card);
+                board.Add(card);
         }
     }
 }

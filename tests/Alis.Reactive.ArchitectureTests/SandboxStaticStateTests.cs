@@ -15,9 +15,8 @@ namespace Alis.Reactive.ArchitectureTests;
 [TestFixture]
 public class SandboxStaticStateTests
 {
-    // The only registry of exceptions. Two categories: keyed stores whose key
-    // already isolates (per flow id or per world), and process-global debt with
-    // a named removal trigger. New statics get a per-world mechanism (the Grid
+    // The only registry of exceptions: keyed stores whose key already isolates
+    // (per flow id or per world). New statics get a per-world mechanism (the Grid
     // Billing session store is the exemplar), not an allowlist entry.
     private static readonly string[] Allowlist =
     [
@@ -37,15 +36,6 @@ public class SandboxStaticStateTests
         "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion.StepperController.ContactDrafts",
         "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion.StepperController.ReviewDrafts",
         "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline.RealTimeController.DrillWorlds",
-
-        // -- Process-global debt: shared across browser worlds, real collision
-        //    surface. Each names its removal trigger.
-        // Deleted-row set shared across worlds — remove when the ActionLink
-        // slice gets a per-world store.
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline.HttpController._deletedNativeActionLinkRows",
-        // Kanban board shared across worlds — remove when the Kanban slice
-        // gets a per-world store.
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion.KanbanController.BoardCards",
     ];
 
     [Test]
