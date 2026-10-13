@@ -86,6 +86,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.Guards
         public static readonly AppEvent<ScorePayload> CheckDirectAnd = AppEvent.Named<ScorePayload>("check-direct-and");
         public static readonly AppEvent<RolePayload> CheckDirectOr = AppEvent.Named<RolePayload>("check-direct-or");
         public static readonly AppEvent<DoublePayload> CheckDouble = AppEvent.Named<DoublePayload>("check-double");
+        public static readonly AppEvent<TextPayload> CheckEndswith = AppEvent.Named<TextPayload>("check-endswith");
         public static readonly AppEvent<MembershipPayload> CheckIn = AppEvent.Named<MembershipPayload>("check-in");
         public static readonly AppEvent<TextPayload> CheckIsempty = AppEvent.Named<TextPayload>("check-isempty");
         public static readonly AppEvent<LongPayload> CheckLong = AppEvent.Named<LongPayload>("check-long");

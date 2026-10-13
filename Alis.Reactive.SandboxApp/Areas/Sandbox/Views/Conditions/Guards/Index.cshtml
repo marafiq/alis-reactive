@@ -112,6 +112,11 @@
             .Then(then => then.Element("startswith-result").Text.Set("Admin email"))
             .Else(else_ => else_.Element("startswith-result").Text.Set("Other email"))
     ));
+    Html.On(plan, t => t.CustomEvent<TextPayload>(ConditionsShowcaseEvents.CheckEndswith, (args, p) =>
+        p.When(args.Get(x => x.Email)).EndsWith("@corp.com")
+            .Then(then => then.Element("endswith-result").Text.Set("Staff email"))
+            .Else(else_ => else_.Element("endswith-result").Text.Set("Outside email"))
+    ));
     Html.On(plan, t => t.CustomEvent<TextPayload>(ConditionsShowcaseEvents.CheckMatches, (args, p) =>
         p.When(args.Get(x => x.Email)).Matches(@"^[a-z]+@[a-z]+\.[a-z]+$")
             .Then(then => then.Element("matches-result").Text.Set("Valid"))
@@ -345,8 +350,18 @@
         <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-startswith-yes", "admin@corp.com", ConditionsShowcaseEvents.CheckStartswith, new TextPayload { Name = "", Email = "admin@corp.com" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-startswith-no", "user@corp.com", ConditionsShowcaseEvents.CheckStartswith, new TextPayload { Name = "", Email = "user@corp.com" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
+            @DispatchButton("btn-startswith-later", "it.admin@corp.com", ConditionsShowcaseEvents.CheckStartswith, new TextPayload { Name = "", Email = "it.admin@corp.com" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </native-hstack>
         <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="startswith-result">&mdash;</span></native-hstack>
+    </native-card-body></native-card>
+    <native-card><native-card-body>
+        <native-heading level="H2">EndsWith — Text Suffix</native-heading>
+        <p class="text-xs text-text-secondary mb-3">Email ends-with "&#64;corp.com" &rarr; "Staff email" &bull; else &rarr; "Outside email"</p>
+        <native-hstack gap="Sm" class="mb-4">
+            @DispatchButton("btn-endswith-yes", "nurse@corp.com", ConditionsShowcaseEvents.CheckEndswith, new TextPayload { Name = "", Email = "nurse@corp.com" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-endswith-no", "nurse@corp.com.au", ConditionsShowcaseEvents.CheckEndswith, new TextPayload { Name = "", Email = "nurse@corp.com.au" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="endswith-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
     <native-card><native-card-body>
         <native-heading level="H2">Matches — Regex Pattern</native-heading>

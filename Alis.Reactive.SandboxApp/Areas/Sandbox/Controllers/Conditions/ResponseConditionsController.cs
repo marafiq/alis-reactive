@@ -20,6 +20,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions
             return Ok(new { status = "approved", count = 5 });
         }
 
+        // Approved, but nothing to act on: the And guard's count arm decides.
+        [HttpPost("ApproveEmpty")]
+        public IActionResult ApproveEmpty()
+        {
+            return Ok(new { status = "approved", count = 0 });
+        }
+
         [HttpPost("Deny")]
         public IActionResult Deny()
         {

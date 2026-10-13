@@ -9,6 +9,8 @@
         ?? throw new InvalidOperationException("Could not resolve ResponseConditions.Approve.");
     var denyUrl = Url.Action("Deny", "ResponseConditions", new { area = "Sandbox" })
         ?? throw new InvalidOperationException("Could not resolve ResponseConditions.Deny.");
+    var approveEmptyUrl = Url.Action("ApproveEmpty", "ResponseConditions", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve ResponseConditions.ApproveEmpty.");
     var pendingUrl = Url.Action("Pending", "ResponseConditions", new { area = "Sandbox" })
         ?? throw new InvalidOperationException("Could not resolve ResponseConditions.Pending.");
     var failUrl = Url.Action("Fail", "ResponseConditions", new { area = "Sandbox" })
@@ -99,6 +101,18 @@
          }));
     }));
 
+    Html.On(plan, t => t.CustomEvent(ResponseConditionsEvents.S3AndApproveEmpty, p =>
+    {
+        p.Post(approveEmptyUrl)
+         .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
+         {
+             s.When(json.Get(j => j.Status)).Eq("approved")
+              .And(json.Get(j => j.Count)).Gt(0)
+              .Then(then => then.Element("s3-result").Text.Set("approved with items"))
+              .Else(el => el.Element("s3-result").Text.Set("condition not met"));
+         }));
+    }));
+
     Html.On(plan, t => t.CustomEvent(ResponseConditionsEvents.S3AndDeny, p =>
     {
         p.Post(denyUrl)
@@ -174,7 +188,7 @@
     <native-card>
     <native-card-body>
         <native-heading level="H2">3. And composition on response body</native-heading>
-        <p class="text-sm text-text-secondary mb-3"><code>When(status == approved).And(count &gt; 0)</code>. Approve has count=5, Deny has count=0.</p>
+        <p class="text-sm text-text-secondary mb-3"><code>When(status == approved).And(count &gt; 0)</code>. Approve has count=5, Deny has count=0, and an empty approval is approved with count=0.</p>
         <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s3-btn-approve", "Approve (count=5)")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
@@ -182,6 +196,9 @@
             @(Html.NativeButton("s3-btn-deny", "Deny (count=0)")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch(ResponseConditionsEvents.S3AndDeny)))
+            @(Html.NativeButton("s3-btn-approve-empty", "Approve (count=0)")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch(ResponseConditionsEvents.S3AndApproveEmpty)))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Result: <span id="s3-result">&mdash;</span></p>

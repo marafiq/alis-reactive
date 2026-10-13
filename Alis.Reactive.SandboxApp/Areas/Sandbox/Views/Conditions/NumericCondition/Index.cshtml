@@ -113,9 +113,25 @@
                     p.When(hr.Value).Gte(threshold.Value)
                         .Then(t => t.Element("threshold-result").Text.Set("Above threshold"))
                         .Else(e => e.Element("threshold-result").Text.Set("Below threshold"));
+
+                    // Where the reading sits against the resident's care-plan limit.
+                    p.When(hr.Value).Gt(threshold.Value)
+                        .Then(t => t.Element("threshold-band").Text.Set("Over the care-plan limit"))
+                        .ElseIf(hr.Value).Lt(threshold.Value)
+                        .Then(t => t.Element("threshold-band").Text.Set("Under the care-plan limit"))
+                        .ElseIf(hr.Value).Eq(threshold.Value)
+                        .Then(t => t.Element("threshold-band").Text.Set("At the care-plan limit"))
+                        .Else(e => e.Element("threshold-band").Text.Set("No care-plan limit set"));
+
+                    // A reading at the limit is still within it; only a reading over it calls the nurse.
+                    p.When(hr.Value).Lte(threshold.Value)
+                        .Then(t => t.Element("threshold-call").Text.Set("No nurse call needed"))
+                        .Else(e => e.Element("threshold-call").Text.Set("Call the nurse"));
                 }))
         </native-hstack>
         <p class="font-mono text-sm mt-2">Result: <span id="threshold-result" class="text-text-muted">&mdash;</span></p>
+        <p class="text-sm mt-1">Care-plan limit: <span id="threshold-band" class="font-medium">&mdash;</span></p>
+        <p class="text-sm mt-1">Nurse call: <span id="threshold-call" class="font-medium">&mdash;</span></p>
     </native-card-body></native-card>
 
     <native-card><native-card-body>

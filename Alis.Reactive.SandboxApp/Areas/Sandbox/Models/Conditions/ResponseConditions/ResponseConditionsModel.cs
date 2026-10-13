@@ -45,6 +45,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.ResponseCondi
         public static readonly AppEvent S2ElseifPending = AppEvent.Named("s2-elseif-pending");
         public static readonly AppEvent S3AndApprove = AppEvent.Named("s3-and-approve");
         public static readonly AppEvent S3AndDeny = AppEvent.Named("s3-and-deny");
+        public static readonly AppEvent S3AndApproveEmpty = AppEvent.Named("s3-and-approve-empty");
         public static readonly AppEvent S4ErrorCatchall = AppEvent.Named("s4-error-catchall");
         public static readonly AppEvent S5ErrorTyped = AppEvent.Named("s5-error-typed");
     }

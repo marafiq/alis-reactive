@@ -133,6 +133,66 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         AssertNoConsoleErrors();
     }
 
+    // The ladder is Lt(15) for Memory Care, then Lt(25) for memory support, else standard. At 15 an
+    // Lte(15) would still say Memory Care; at 25 an Lte(25) would still say memory support.
+    [Test]
+    public async Task a_moderate_cognitive_score_routes_the_resident_to_assisted_living_with_memory_support()
+    {
+        await NavigateAndBoot();
+        await CompleteStep1("Margaret Thompson", "82", "Alzheimer's");
+
+        await FillAndBlur<Step2ClinicalModel>(m => m.CognitiveScore, "15");
+        await Expect(Page.Locator("#cognitive-status"))
+            .ToHaveTextAsync("Moderate Impairment — Assisted Living + Memory", new() { Timeout = 5000 });
+        await Expect(Input<Step2ClinicalModel>(m => m.CareUnit)).ToHaveValueAsync("Assisted Living with Memory Support");
+
+        await FillAndBlur<Step2ClinicalModel>(m => m.CognitiveScore, "24");
+        await Expect(Page.Locator("#cognitive-status"))
+            .ToHaveTextAsync("Moderate Impairment — Assisted Living + Memory", new() { Timeout = 5000 });
+
+        await FillAndBlur<Step2ClinicalModel>(m => m.CognitiveScore, "25");
+        await Expect(Page.Locator("#cognitive-status")).ToHaveTextAsync("Mild/Normal — Standard", new() { Timeout = 5000 });
+        await Expect(Input<Step2ClinicalModel>(m => m.CareUnit)).ToHaveValueAsync("Standard Assisted Living");
+        AssertNoConsoleErrors();
+    }
+
+    // Continuous monitoring needs both a fall risk of 7 or more AND an age (from step 1) of 80 or more.
+    // A score of 5 at age 88 fails the first term: an And that read only the age arm would say Continuous.
+    [Test]
+    public async Task a_high_fall_risk_resident_aged_eighty_or_more_needs_continuous_monitoring()
+    {
+        await NavigateAndBoot();
+        await CompleteStep1("Robert Miles", "88", "Other");
+        await CompleteStep2();
+
+        await FillAndBlur<Step3FunctionalModel>(m => m.FallRiskScore, "8");
+        await ClickWhenStable(Page.Locator("#check-fallrisk-btn"));
+        await Expect(Page.Locator("#fallrisk-result")).ToHaveTextAsync("Continuous monitoring required", new() { Timeout = 5000 });
+        await Expect(Input<Step3FunctionalModel>(m => m.MonitoringLevel)).ToHaveValueAsync("Continuous");
+
+        await FillAndBlur<Step3FunctionalModel>(m => m.FallRiskScore, "5");
+        await ClickWhenStable(Page.Locator("#check-fallrisk-btn"));
+        await Expect(Page.Locator("#fallrisk-result")).ToHaveTextAsync("Standard monitoring", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    // The age arm reads a second component: at 74 a high fall risk alone does not call for continuous
+    // monitoring. A dropped And arm, or Or semantics, would say Continuous.
+    [Test]
+    public async Task a_high_fall_risk_resident_under_eighty_keeps_standard_monitoring()
+    {
+        await NavigateAndBoot();
+        await CompleteStep1("Evelyn Hart", "74", "Other");
+        await CompleteStep2();
+
+        await FillAndBlur<Step3FunctionalModel>(m => m.FallRiskScore, "8");
+        await ClickWhenStable(Page.Locator("#check-fallrisk-btn"));
+
+        await Expect(Page.Locator("#fallrisk-result")).ToHaveTextAsync("Standard monitoring", new() { Timeout = 5000 });
+        await Expect(Input<Step3FunctionalModel>(m => m.MonitoringLevel)).Not.ToHaveValueAsync("Continuous");
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task step3_executes_room_setup_neuro_and_pain_alert_branches()
     {

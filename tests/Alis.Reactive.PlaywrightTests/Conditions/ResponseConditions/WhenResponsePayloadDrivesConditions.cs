@@ -98,6 +98,21 @@ public class WhenResponsePayloadDrivesConditions : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // Approved with count 0: the status arm holds and the count arm does not. Or semantics, or an And
+    // that dropped its count arm, would say "approved with items".
+    [Test]
+    public async Task an_approval_with_no_items_does_not_meet_the_and_guard()
+    {
+        await NavigateAndBoot();
+        await Page.Locator("#s3-btn-approve").ClickAsync();
+        await Expect(Page.Locator("#s3-result")).ToHaveTextAsync("approved with items", new() { Timeout = 5000 });
+
+        await Page.Locator("#s3-btn-approve-empty").ClickAsync();
+
+        await Expect(Page.Locator("#s3-result")).ToHaveTextAsync("condition not met", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task error_catchall_fires_on_422()
     {

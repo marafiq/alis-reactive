@@ -301,6 +301,39 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // "it.admin@corp.com" holds "admin@" but not at the start: a StartsWith that tested Contains says Admin.
+    [Test]
+    public async Task an_email_holding_the_prefix_later_in_the_text_is_not_an_admin_email()
+    {
+        await NavigateAndBoot();
+        var result = Page.Locator("#startswith-result");
+
+        await Page.Locator("#btn-startswith-yes").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Admin email");
+
+        await Page.Locator("#btn-startswith-later").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Other email");
+
+        AssertNoConsoleErrors();
+    }
+
+    // "nurse@corp.com.au" holds "@corp.com" but does not end with it: a Contains in place of EndsWith
+    // says Staff; a StartsWith says Outside for "nurse@corp.com".
+    [Test]
+    public async Task an_email_ending_in_the_staff_domain_is_a_staff_email_and_one_holding_it_mid_address_is_not()
+    {
+        await NavigateAndBoot();
+        var result = Page.Locator("#endswith-result");
+
+        await Page.Locator("#btn-endswith-yes").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Staff email");
+
+        await Page.Locator("#btn-endswith-no").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Outside email");
+
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task matches_regex()
     {

@@ -317,6 +317,64 @@ public class WhenNumericConditionEvaluates : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The care-plan limit is the threshold field (100 by default). Gt, Lt and Eq each read both
+    // components; at exactly 100 a Gte or Lte in place of Gt or Lt would answer Over or Under.
+    [Test]
+    public async Task a_reading_over_under_or_at_the_care_plan_limit_is_named_as_such()
+    {
+        await NavigateAndBoot();
+
+        await HeartRate.FillAndBlur("101");
+        await Page.Locator("#check-threshold-btn").ClickAsync();
+        await Expect(Page.Locator("#threshold-band")).ToHaveTextAsync("Over the care-plan limit", new() { Timeout = 5000 });
+
+        await HeartRate.FillAndBlur("99");
+        await Page.Locator("#check-threshold-btn").ClickAsync();
+        await Expect(Page.Locator("#threshold-band")).ToHaveTextAsync("Under the care-plan limit", new() { Timeout = 5000 });
+
+        await HeartRate.FillAndBlur("100");
+        await Page.Locator("#check-threshold-btn").ClickAsync();
+        await Expect(Page.Locator("#threshold-band")).ToHaveTextAsync("At the care-plan limit", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // A cleared limit is missing: every ordering against it is false and it equals nothing, so the
+    // ladder falls through to Else rather than calling the reading over, under or at the limit.
+    [Test]
+    public async Task a_reading_with_no_care_plan_limit_is_not_placed_against_one()
+    {
+        await NavigateAndBoot();
+        await HeartRate.FillAndBlur("80");
+        await Page.Locator("#check-threshold-btn").ClickAsync();
+        await Expect(Page.Locator("#threshold-band")).ToHaveTextAsync("Under the care-plan limit", new() { Timeout = 5000 });
+
+        await ThresholdValue.Clear();
+        await ThresholdValue.Blur();
+        await Page.Locator("#check-threshold-btn").ClickAsync();
+
+        await Expect(Page.Locator("#threshold-band")).ToHaveTextAsync("No care-plan limit set", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    // Lte against the second component: a reading at the limit needs no call (an Lt would call the
+    // nurse at 100), a reading one over it does.
+    [Test]
+    public async Task a_reading_at_the_care_plan_limit_needs_no_nurse_call_but_one_over_it_does()
+    {
+        await NavigateAndBoot();
+
+        await HeartRate.FillAndBlur("100");
+        await Page.Locator("#check-threshold-btn").ClickAsync();
+        await Expect(Page.Locator("#threshold-call")).ToHaveTextAsync("No nurse call needed", new() { Timeout = 5000 });
+
+        await HeartRate.FillAndBlur("101");
+        await Page.Locator("#check-threshold-btn").ClickAsync();
+        await Expect(Page.Locator("#threshold-call")).ToHaveTextAsync("Call the nurse", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task cross_component_boundary_equal_values_is_above()
     {

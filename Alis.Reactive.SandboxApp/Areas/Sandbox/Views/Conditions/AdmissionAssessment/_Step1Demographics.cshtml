@@ -145,6 +145,8 @@
                         s.Component<NativeHiddenField, Step2ClinicalModel>(m => m.ScreeningId).Value.Set(json.Get(x => x.ScreeningId));
                         s.Component<NativeHiddenField, Step3FunctionalModel>(m => m.ScreeningId).Value.Set(json.Get(x => x.ScreeningId));
                         s.Component<NativeHiddenField, Step4ReviewModel>(m => m.ScreeningId).Value.Set(json.Get(x => x.ScreeningId));
+                        // Step 3 judges fall risk against the age entered here.
+                        s.Component<FusionNumericTextBox, Step3FunctionalModel>(m => m.Age).Value.Set(s.Component<FusionNumericTextBox>(m => m.Age).Value);
 
                         s.Element("step-1").Hide();
                         s.Element("step-2").Show();
