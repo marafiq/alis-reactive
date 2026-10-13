@@ -158,24 +158,25 @@ Vocabulary, by what the JavaScript object has:
 | payload method | a method on a payload that derives from `JsObject` | `args.EndEdit()` |
 | plugin | a class deriving `Plugin`, registered with `plan.RegisterPlugin<T>()` | `slug.Slug(name.Value)` |
 
-Arguments. Each parameter is an `Arg<T>`, which a literal or a `TypedSource<T>` converts to, so
-literals and runtime values mix: `planner.Book(args.Added, visitors.Value, "Bring the photo album")`.
-A generic method names its type argument, because C# does not infer it through that conversion:
-`kanban.AddCard<CareCard>(json.Get(x => x.Card), 0)`. An enum literal is its member name, or the
+Arguments. Each parameter is an `Arg<T>`: a literal converts to it, and a `TypedSource<T>` is one,
+so literals and runtime values mix: `planner.Book(args.Added, visitors.Value, "Bring the photo album")`.
+A generic method infers its type argument from a runtime value: `kanban.AddCard(json.Get(x => x.Card), 0)`;
+given only literals, it names it: `kanban.AddCard<CareCard>(card, 0)`. An enum literal is its member name, or the
 text its `[JsonStringEnumMemberName]` gives (`"notequal"`); a `DateTime` is ISO text; a response
 `json` is itself the whole body. Name each parameter as the JavaScript API names it.
 
 Row and item members. `Field.Of((Resident r) => r.CareLevel)` is the camel-case name a
 component uses for a member (`"careLevel"`, nested `"address.city"`). `Field<TValue>` carries the
-member's type, so `grid.SetCellValue<int>(6001, Field.Of((Resident r) => r.OpenTasks), 4)` only
-compiles with a value of that type.
+member's type, so `grid.SetCellValue(6001, Field.Of((Resident r) => r.OpenTasks), 4)` infers `int` from
+the field and only compiles with a value of that type. A declaration takes a field as `Field` or
+`Field<TValue>`, not an `Arg`: a field is named when the view renders.
 
 Generic members. A member typed by the app's own class is a generic method of the declaration:
 `grid.GetSelectedRecords<Resident>()`, `.Reactive(evt => evt.RowSelected<Resident>(), ...)`,
-`kanban.AddCard<CareCard>(json.Get(x => x.Card), 0)`.
+`kanban.AddCard(json.Get(x => x.Card), 0)`.
 
 Fixed arguments. When the JavaScript method always takes a mode the page never chooses, the
-declaration passes it: `public void ShowColumn(Arg<Field> key) => Call(key, Fixed("field"), name:
+declaration passes it: `public void ShowColumn(Field key) => Call(key, Fixed("field"), name:
 "showColumns");`, so the page passes only the field. Where the JavaScript method takes a wider type
 than the page's own list, `Pass<TDeclared, TSource>(items)` passes it (`UpdateData` above).
 

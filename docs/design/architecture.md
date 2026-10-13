@@ -791,11 +791,13 @@ public sealed class AdmissionValidator : ReactiveValidator<Admission>
   it. `Validate()`, `ShowErrors(problem)` and `Values` are its members, and live clearing and
   revalidation happen inside it. Each test is `{ field, check, when, message }`, where `check` and
   `when` are expressions (section 0.5).
-- **Deleted:** `ClientRule` and its builders, the 18 `WhenField*` methods and `WhenFields`, the
-  field-condition builders, the operand and activation types, `AddReactiveClientValidation`, and the
-  whole runtime rule engine. `IClientValidationRuleSource` stays: it is how a plan reaches the
-  validators registered through DI, and the grid's row validation reads its rules through it
-  (`FusionGridValidation.cs`).
+- **Deleted:** the hand-written `ClientRule` builders, the 18 `WhenField*` methods and `WhenFields`,
+  the field-condition builders, the operand and activation types, `AddReactiveClientValidation`, and
+  the whole runtime rule engine. What a validator gives the browser is public data: `ClientRule`,
+  `ClientCondition` and `ClientRuleSet` (`Alis.Reactive/Validation`), which the FluentValidation
+  integration builds with no core internals. `IClientValidationRuleSource` is how a plan reaches the
+  validators registered through DI; a grid reads a validator's rules from its plan,
+  `FusionGridValidation.From<TRow>(plan.ClientRules<TValidator>())`.
 
 ## 5. Authoring rules: one parameter order everywhere
 
@@ -1091,7 +1093,7 @@ built and what is not.
 - **Built from the audit:**
   - typed gather and `p.Url<TQuery>()` (section 4.6, as built).
   - the active-scope stack (section 4.4). Every callback is built by `PipelineBuilder.Build`, which
-    makes its pipeline the active scope while the callback runs; every step, through any pipeline
+    makes its block the active one while the callback runs; every step, through any pipeline
     variable or object (a component, an element, an event payload, a plugin), lands in the active
     scope. A handle declared at the top of a trigger and used inside `OnSuccess` writes into
     `OnSuccess`; a step written outside any callback throws at render. The FrontDesk journey declares
@@ -1127,3 +1129,24 @@ built and what is not.
     added because a mutation that kept a slot's fields on the form after it unloaded passed all
     1,377 browser tests. A step rendered with the page stays the page's (grammar F9), so the first
     step loads into the slot too.
+- **Built after the design review of October 13** (each its own commit; every one left the twenty
+  harness pages byte-identical and every sandbox view compiling):
+  - one model in the core (`6d573d3`). A callback is a `Block` of steps placed where they are
+    written; a value, a condition and a step write their own grammar in the `Scope` they are used in,
+    and `PlanBuildContext.Write` writes the plan once at render. The semantic plan graph, the
+    lowering pass, the member-contract registry and the pipeline drafts are deleted, and with them
+    four silent losses: a component's or plugin's `ReadOnly.Get` sub-path, an unawaited plugin
+    `CallAsync`, a request, branch or response configured after the next step, and a second
+    catch-all route (which now throws). A plugin property can be written like any object's.
+  - an event is named like every other member, by its C# name (`d959765`): `Event<TArgs>()`.
+  - a view reads a validator's browser rules from its plan (`9f9b300`):
+    `FusionGridValidation.From<TRow>(plan.ClientRules<TValidator>())`; no view injects
+    `IClientValidationRuleSource`.
+  - a generic member infers its type argument (`e4d4720`): a `TypedSource<T>` is an `Arg<T>`, so
+    `kanban.AddCard(json.Get(x => x.Card), 0)` needs no `<CareCard>`, and a grid's `Field<TValue>`
+    infers the value's type.
+  - declarations are ordinary nullable-annotated C# (`2696e3e`); the `#nullable disable annotations`
+    region is gone.
+  - a public browser-rule contract (`6ac4198`): `ClientRule`, `ClientCondition` and `ClientRuleSet`;
+    the FluentValidation integration builds them with no core internals, and the core's
+    `InternalsVisibleTo` names only the contract generator.

@@ -221,7 +221,7 @@ city.DataSource.Set(json.Get(j => j.Cities));
 city.DataBind();
 p.When(careLevel.Value).Eq("Memory Care")                                     // Conditions/CareLevelCascade/Index.cshtml
 grid.HideColumn(Field.Of((ResidentDirectoryGridItem x) => x.PrimaryNurse));   // Grid/Operations.cshtml
-p.Component<FusionGrid>(GridId).SetCellValue<string>(6002, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), "Critical");
+p.Component<FusionGrid>(GridId).SetCellValue(6002, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), "Critical");
 .Gather<ResidentSelectionRecordsRequest>(g => g.Set(x => x.SelectedRecords, grid.GetSelectedRecords<ResidentDirectoryGridItem>()))
 s.Component<FusionGrid>("residents-grid").DataSource.Set(json);              // Grid/Index.cshtml: the body is the rows
 ```

@@ -99,9 +99,9 @@ Note the JSON contract role:
 
 ```csharp
 /// <summary>
-/// A behavior pairing a <see cref="StartsWhen"/> trigger with a
-/// <see cref="ReactionGraph"/> reaction. Serialized as one element of the
-/// <c>behaviors</c> array in the plan JSON.
+/// A handler of one object's event: the statements the runtime runs each time
+/// it fires. Serialized as one element of the <c>handlers</c> array in the
+/// plan JSON.
 /// </summary>
 ```
 

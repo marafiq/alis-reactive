@@ -1,7 +1,7 @@
 # Capability catalog: the release's behavior contract
 
 Read from the Playwright suites, the sandbox views they drive and the source at `a2c497b`
-(2026-10-11); DSL names and `file:line` references updated at `f36f62e`, where a component, a payload
+(2026-10-11); DSL names and `file:line` references updated at `f36f62e` (C# references again at `6ac4198`), where a component, a payload
 and a plugin are used as the objects they are (`rate.Value.Set(..)`, `grid.Refresh()`, `args.Cancel.Set(true)`). Every capability lists where a browser proves it. "Plan-only" means an NUnit fixture
 inside the Playwright project asserts plan JSON without opening a browser; under the release rule
 (Playwright is the only verification) that is not proof.
@@ -19,8 +19,8 @@ inside the Playwright project asserts plan JSON without opening a browser; under
 
 The plan and runtime treat components and plugins alike: the runtime locates either as a plan object
 (`Alis.Reactive.Assets/runtime/objects/world.ts:14-18`), and in C# both are `JsObject` declarations bound through
-`ComponentBinding` and `PluginBinding` (`Alis.Reactive/Components/Contracts/ObjectBinding.cs:40-84, 112-159`). Event payloads are read by path,
-through `EventPayloadBinding` (`Alis.Reactive/Components/Contracts/ObjectBinding.cs:88-109`).
+`ComponentBinding` and `PluginBinding` (`Alis.Reactive/Components/Contracts/ObjectBinding.cs:57-72, 89-100`). Event payloads are read by path,
+through `EventPayloadBinding` (`Alis.Reactive/Components/Contracts/ObjectBinding.cs:78-86`).
 
 ## 2. Capabilities and their proofs
 
@@ -106,20 +106,22 @@ These are the dependencies the release inverts.
   files hand-write payload members with `ReactionGraph`~~: closed. A declaration is a public `JsObject`
   (`Alis.Reactive/Components/Contracts/JsObject.cs:35`), a payload member is a `ReadOnly<T>` or `Prop<T>`
   (`Alis.Reactive/Components/Contracts/JsMembers.cs:21, 77`), no slice names `ReactionGraph`, and
-  `InternalsVisibleTo` names only the validator and the contract generator (`Alis.Reactive/Alis.Reactive.csproj:69-70`).
+  `InternalsVisibleTo` names only the contract generator (`Alis.Reactive/Alis.Reactive.csproj:69`).
 - ~~An input's value must be one named property: `IInputComponent.ValueMember` feeds registration,
   gather, validation~~: closed. An input declares `ComponentInput` (its value property and the
-  event that commits it); fields another plan renders still read the literal `"value"` member.
-- ~~`RegisteredInputValueRead.ForFusionInPlaceEditorValueRead`~~: closed; one `ForGatherValueRead(componentId, valueMember)`
-  serves every component (`RegisteredInputValueRead.cs:28`).
+  event that commits it); a field another plan renders is read through the model by the id its
+  member gives it (`Alis.Reactive/Validation/FormChecks.cs:124-126`).
+- ~~`RegisteredInputValueRead.ForFusionInPlaceEditorValueRead`~~: closed; one bound read, `ValueExpression.ReadBound(inputId, shape)`,
+  serves every component (`Alis.Reactive/PlanModel/Values/ValueExpression.cs:89-90, 268-269`).
 - ~~`ComponentVendor.Fusion` token~~: closed by D2 (`FusionComponent.FusionVendor` declares it);
-  the EJ2 projections left `ClientRule`, which is read-only rule data (`Alis.Reactive/Validation/ClientRule.cs:10-14`),
-  for the grid's own slice (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs:123-156`).
+  the EJ2 projections left `ClientRule`, the public browser-rule contract a component reads back (`Alis.Reactive/Validation/ClientRule.cs:10-14`),
+  for the grid's own slice (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs:117-150`).
 - ~~`Include<TComponent>` reads the input's declared value; `NativeGatherExtensions` assumes NativeTextBox~~:
   closed; both were deleted with the typed request, and `Form(m => ..)` sends an input by its binding name.
-- Method contracts are keyed per component instance, so two arities of one member on one grid
-  throw (`BrowserObjectContract.cs:257-268`); a member keys by its own C# name, so two C# members
-  typing one JS method do not collide (`Alis.Reactive/Components/Contracts/JsObject.cs:214-221`).
+- ~~Method contracts are keyed per component instance, so two arities of one member on one grid
+  throw~~: closed; the member-contract registry is gone, and each call carries the argument shapes its own
+  C# member declares (`Alis.Reactive/Components/Contracts/ComponentMember.cs:57, 62-63`; `Alis.Reactive/PlanModel/Reactions/Steps.cs:76-82`),
+  so two C# members typing one JS method do not collide (`Alis.Reactive/Components/Contracts/JsObject.cs:208-209, 214-221`).
 
 **Runtime**
 - ~~Two hard-coded drivers and two event adapters~~: closed by D2; vendors are plan data and one
@@ -132,7 +134,7 @@ These are the dependencies the release inverts.
   `<script>` nodes itself (`Alis.Reactive.Assets/runtime/modules/slot.ts:62-73`), and the RadioGroup and CheckList scripts became
   component code (`Alis.Reactive.Assets/components/native/radio-group.ts:6-14`, `Alis.Reactive.Assets/components/native/check-list.ts:10-20`).
 - ~~The request writer unwraps Syncfusion's uploader `rawFile`~~: closed; the uploader declares its files at
-  `filesData[].rawFile` (`Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:21`).
+  `filesData[].rawFile` (`Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:20`).
 - ~~`p.Confirm()` needs `window.alis.confirm`; `root.ts` statically imports confirm, action link, drawer,
   loader~~: closed. `alis.confirm` is a plugin the Fusion component code provides (`Alis.Reactive.Assets/components/fusion/confirm.ts:101-106`),
   and `root.ts` registers only the runtime's own modules (`Alis.Reactive.Assets/runtime/root.ts:32-38`).
