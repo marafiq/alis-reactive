@@ -40,17 +40,22 @@
             .Reactive(evt => evt.BeforeOpen, (args, p) =>
                 p.Element("memory-care-term").ClassList.Add("bg-accent/10"))
             .Reactive(evt => evt.BeforeClose, (args, p) =>
-                p.Element("memory-care-term").ClassList.Remove("bg-accent/10")))
+                p.Element("memory-care-term").ClassList.Remove("bg-accent/10"))
+            .Reactive(evt => evt.AfterOpen, (args, p) => p.Element("explanation-actions").Show())
+            .Reactive(evt => evt.AfterClose, (args, p) => p.Element("explanation-actions").Hide()))
 
             <native-hstack gap="Sm">
                 @(Html.NativeButton("explain-memory-care", "Explain Memory Care")
                     .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                         p.Component<FusionTooltip>("care-level-tooltip").Open()))
-                @(Html.NativeButton("explanation-done", "Got it")
-                    .CssClass(ButtonSecondary)
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                        p.Component<FusionTooltip>("care-level-tooltip").Close()))
+                @* "Got it" is offered only while the explanation is open. *@
+                <div id="explanation-actions" hidden>
+                    @(Html.NativeButton("explanation-done", "Got it")
+                        .CssClass(ButtonSecondary)
+                        .Reactive(plan, evt => evt.Click, (args, p) =>
+                            p.Component<FusionTooltip>("care-level-tooltip").Close()))
+                </div>
             </native-hstack>
 
             @{ Html.InputField(plan, m => m.HideExplanations, o => o.Label("Hide explanations on this screen"))

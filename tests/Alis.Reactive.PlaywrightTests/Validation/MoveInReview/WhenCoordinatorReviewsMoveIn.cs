@@ -94,7 +94,7 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
 
         // The server refuses the name twice, too long and not letters only, and the page shows both reasons.
         await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync(
-            $"{NameWithDigits} is longer than the 30 characters a wristband prints., " +
+            $"{NameWithDigits} is longer than the 30 characters a wristband prints. " +
             "A wristband prints letters only: remove the digits from the name.");
         Assert.That(_reviewsSent, Has.Count.EqualTo(1), "Both checks are the server's.");
         await Write(m => m.ResidentName, "Margaret Hale");

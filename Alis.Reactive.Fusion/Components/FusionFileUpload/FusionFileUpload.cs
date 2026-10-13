@@ -30,11 +30,24 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>Payload of <see cref="FusionFileUpload.Selected"/>.</summary>
     public class FusionFileUploadSelectedArgs : JsObject
     {
-        /// <summary>Number of files selected.</summary>
-        public ReadOnly<int> FilesCount => ReadOnly<int>();
+        /// <summary>The files just selected: <c>p.From(args.FilesData).Count()</c> counts them.</summary>
+        public ReadOnly<IReadOnlyList<FusionUploaderFile>> FilesData => ReadOnly<IReadOnlyList<FusionUploaderFile>>();
 
-        /// <summary>Whether user interaction made the selection.</summary>
-        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to refuse the selection.</summary>
+        public Prop<bool> Cancel => Prop<bool>();
+    }
+
+    /// <summary>A file the uploader lists, by the names its JavaScript API uses.</summary>
+    public class FusionUploaderFile
+    {
+        /// <summary>The file's name.</summary>
+        public string Name { get; set; } = "";
+
+        /// <summary>The file's size in bytes.</summary>
+        public long Size { get; set; }
+
+        /// <summary>The file's extension, without the dot.</summary>
+        public string Type { get; set; } = "";
     }
 
     /// <summary>

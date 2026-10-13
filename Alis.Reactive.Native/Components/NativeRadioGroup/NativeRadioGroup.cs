@@ -14,9 +14,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>The chosen option value; empty text when none is chosen.</summary>
         public Prop<string> Value => Prop<string>();
 
-        /// <summary>Moves focus to the element.</summary>
-        public void Focus() => Call();
-
         /// <summary>Raised when the user chooses an option.</summary>
         public TypedEvent<NativeRadioGroupChangeArgs> Change =>
             Event<NativeRadioGroupChangeArgs>();

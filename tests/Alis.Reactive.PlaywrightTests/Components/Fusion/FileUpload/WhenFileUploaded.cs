@@ -66,10 +66,12 @@ public class WhenFileUploaded : PlaywrightTestBase
         var prompt = Page.Locator("#documents-ready");
         await Expect(prompt).ToBeHiddenAsync();
 
-        await ChooseFiles(("care-plan.pdf", "%PDF-mock", "application/pdf"));
+        await ChooseFiles(
+            ("care-plan.pdf", "%PDF-mock", "application/pdf"),
+            ("consent-form.pdf", "%PDF-mock", "application/pdf"));
 
         await Expect(prompt).ToBeVisibleAsync(new() { Timeout = 5000 });
-        await Expect(prompt).ToHaveTextAsync("Documents chosen. Press Upload to add them to the resident's record.");
+        await Expect(prompt).ToHaveTextAsync("Documents chosen: 2. Press Upload to add them to the resident's record.");
         AssertNoConsoleErrors();
     }
 

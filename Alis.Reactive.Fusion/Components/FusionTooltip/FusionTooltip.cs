@@ -37,13 +37,13 @@ namespace Alis.Reactive.Fusion.Components
         public TypedEvent<FusionTooltipBeforeCloseArgs> BeforeClose =>
             Event<FusionTooltipBeforeCloseArgs>();
 
-        /// <summary>Raised after the tooltip opens (the JavaScript <c>open</c> event).</summary>
-        public TypedEvent<FusionTooltipOpenedArgs> Opened =>
-            Event<FusionTooltipOpenedArgs>("open");
+        /// <summary>Raised after the tooltip opens.</summary>
+        public TypedEvent<FusionTooltipAfterOpenArgs> AfterOpen =>
+            Event<FusionTooltipAfterOpenArgs>();
 
-        /// <summary>Raised after the tooltip closes (the JavaScript <c>close</c> event).</summary>
-        public TypedEvent<FusionTooltipClosedArgs> Closed =>
-            Event<FusionTooltipClosedArgs>("close");
+        /// <summary>Raised after the tooltip closes.</summary>
+        public TypedEvent<FusionTooltipAfterCloseArgs> AfterClose =>
+            Event<FusionTooltipAfterCloseArgs>();
 
         /// <summary>Raised before the tooltip renders its content.</summary>
         public TypedEvent<FusionTooltipBeforeRenderArgs> BeforeRender =>
@@ -64,13 +64,13 @@ namespace Alis.Reactive.Fusion.Components
         public Prop<bool> Cancel => Prop<bool>();
     }
 
-    /// <summary>Payload of <see cref="FusionTooltip.Opened"/>; carries no data.</summary>
-    public class FusionTooltipOpenedArgs : JsObject
+    /// <summary>Payload of <see cref="FusionTooltip.AfterOpen"/>; carries no data.</summary>
+    public class FusionTooltipAfterOpenArgs : JsObject
     {
     }
 
-    /// <summary>Payload of <see cref="FusionTooltip.Closed"/>; carries no data.</summary>
-    public class FusionTooltipClosedArgs : JsObject
+    /// <summary>Payload of <see cref="FusionTooltip.AfterClose"/>; carries no data.</summary>
+    public class FusionTooltipAfterCloseArgs : JsObject
     {
     }
 

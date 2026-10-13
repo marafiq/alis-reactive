@@ -104,8 +104,8 @@ describe("server errors", () => {
   it("places each error on the field with that binding name, joining messages, else in the summary", () => {
     render(`<form id="admission">${field("Ns__Name")}</form><div id="Test_Plan_validation_summary" hidden></div>`);
     const form = startForm([requiredField("Ns__Name", "Name", "msg")]);
-    form.showErrors({ errors: { Name: ["Too short", "Not unique"], Room: "Taken" } });
-    expect(errorText("Ns__Name")).toBe("Too short, Not unique");
+    form.showErrors({ errors: { Name: ["Too short.", "Not unique."], Room: "Taken" } });
+    expect(errorText("Ns__Name")).toBe("Too short. Not unique.");
     expect(document.getElementById("Test_Plan_validation_summary")!.textContent).toBe("Taken");
   });
 

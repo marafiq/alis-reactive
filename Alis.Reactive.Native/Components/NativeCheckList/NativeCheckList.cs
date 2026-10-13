@@ -14,9 +14,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>The checked values.</summary>
         public Prop<string[]> Value => Prop<string[]>();
 
-        /// <summary>Moves focus to the element.</summary>
-        public void Focus() => Call();
-
         /// <summary>Raised when the user checks or clears a box.</summary>
         public TypedEvent<NativeCheckListChangeArgs> Change =>
             Event<NativeCheckListChangeArgs>();

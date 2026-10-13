@@ -191,8 +191,10 @@ function showErrors(containerId: string, problem: unknown): void {
     return;
   }
 
+  // Each server message is a sentence (FluentValidation's and MVC's end with a period), so several read
+  // one after another.
   for (const [name, messages] of Object.entries(errors as Record<string, unknown>)) {
-    const message = Array.isArray(messages) ? messages.join(", ") : asText(messages) ?? "";
+    const message = Array.isArray(messages) ? messages.join(" ") : asText(messages) ?? "";
     const entry = entries.find(candidate => candidate.field.name === name);
     const element = entry ? document.getElementById(entry.field.id) : null;
     if (entry && element && canRenderInline(entry.field.id)) {

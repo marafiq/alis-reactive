@@ -37,6 +37,20 @@ public class WhenCoordinatorExplainsACareLevel : PlaywrightTestBase
     }
 
     [Test]
+    public async Task got_it_is_offered_only_once_the_explanation_has_opened()
+    {
+        await NavigateToAndWaitForVisibleSignal(Path, "#explain-memory-care");
+        await Expect(GotIt).ToBeHiddenAsync();
+
+        await Explain.ClickAsync();
+
+        // afterOpen offers "Got it" once the explanation is showing.
+        await Expect(Explanation).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(GotIt).ToBeVisibleAsync(new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task got_it_closes_the_explanation_and_clears_the_highlight()
     {
         await NavigateToAndWaitForVisibleSignal(Path, "#explain-memory-care");
@@ -46,9 +60,11 @@ public class WhenCoordinatorExplainsACareLevel : PlaywrightTestBase
 
         await GotIt.ClickAsync();
 
-        // Close hides the tooltip; its beforeClose takes the highlight off the term.
+        // Close hides the tooltip; beforeClose takes the highlight off the term, and afterClose
+        // withdraws "Got it".
         await Expect(Explanation).ToBeHiddenAsync(new() { Timeout = 5000 });
         await Expect(MemoryCareTerm).Not.ToHaveClassAsync(Highlighted);
+        await Expect(GotIt).ToBeHiddenAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
