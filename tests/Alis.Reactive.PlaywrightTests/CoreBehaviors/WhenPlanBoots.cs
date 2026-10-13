@@ -3,8 +3,6 @@ namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 [TestFixture]
 public class WhenPlanBoots : PlaywrightTestBase
 {
-    private const int ExpectedEventsViewBehaviorCount = 4;
-
     [Test]
     public async Task home_page_links_to_sandbox_events()
     {
@@ -20,26 +18,6 @@ public class WhenPlanBoots : PlaywrightTestBase
         await Page.GetByRole(AriaRole.Link, new() { Name = "Events" }).ClickAsync();
         await Page.WaitForURLAsync("**/Sandbox/CoreBehaviors/Events");
         await Expect(Page).ToHaveTitleAsync("Events & Dispatch — Alis.Reactive Sandbox");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task events_page_renders_plan_json()
-    {
-        await NavigateTo("/Sandbox/CoreBehaviors/Events");
-
-        var planJson = Page.Locator("#plan-json");
-        await Expect(planJson).Not.ToBeEmptyAsync();
-
-        var text = await planJson.TextContentAsync();
-        Assert.That(text, Is.Not.Null.And.Not.Empty, "Plan JSON must not be empty");
-
-        Assert.That(text, Does.Contain("\"handlers\""), "Plan must have handlers array");
-        Assert.That(text, Does.Contain("\"ready\""), "Plan must contain a ready handler");
-        Assert.That(text, Does.Contain("\"$document\""), "Plan must contain document-event handlers");
-        Assert.That(text, Does.Contain("\"raise\""), "Plan must contain dispatch reactions");
-        Assert.That(text, Does.Contain("\"set\""), "Plan must contain set reactions");
-
         AssertNoConsoleErrors();
     }
 
@@ -61,23 +39,6 @@ public class WhenPlanBoots : PlaywrightTestBase
     {
         await NavigateTo("/Sandbox/CoreBehaviors/Events");
         await Expect(Page).ToHaveTitleAsync("Events & Dispatch — Alis.Reactive Sandbox");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_json_has_correct_entry_count()
-    {
-        await NavigateTo("/Sandbox/CoreBehaviors/Events");
-
-        var planJson = Page.Locator("#plan-json");
-        var text = await planJson.TextContentAsync();
-        Assert.That(text, Is.Not.Null.And.Not.Empty, "Plan JSON must not be empty");
-
-        var doc = System.Text.Json.JsonDocument.Parse(text!);
-        var entries = doc.RootElement.GetProperty("handlers");
-        Assert.That(entries.GetArrayLength(), Is.EqualTo(ExpectedEventsViewBehaviorCount),
-            $"Plan must have exactly {ExpectedEventsViewBehaviorCount} handlers (1 ready + 3 document-event)");
-
         AssertNoConsoleErrors();
     }
 }

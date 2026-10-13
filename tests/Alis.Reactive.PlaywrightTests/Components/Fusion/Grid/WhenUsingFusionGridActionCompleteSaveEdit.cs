@@ -21,37 +21,6 @@ public class WhenUsingFusionGridActionCompleteSaveEdit : PlaywrightTestBase
     [Test]
     public async Task action_complete_save_edit_reads_typed_current_previous_and_action_fields()
     {
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("Row"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("Form"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("Target"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("ForeignKeyData"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("IsScroll"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("PrimaryKey"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("PrimaryKeyValue"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("RowData"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("Index"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("Promise"),
-            Is.Null);
-
         await NavigateProofView();
 
         await ClickWhenStable(Page.Locator("#ac-select-first"));

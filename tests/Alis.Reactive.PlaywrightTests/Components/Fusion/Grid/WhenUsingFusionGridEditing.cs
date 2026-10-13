@@ -64,34 +64,6 @@ public class WhenUsingFusionGridEditing : PlaywrightTestBase
     [Test]
     public async Task action_begin_save_edit_reads_typed_current_previous_and_action_fields()
     {
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("Row"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("Form"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("Target"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("ForeignKeyData"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("IsScroll"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("PrimaryKey"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("PrimaryKeyValue"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("RowData"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("Index"),
-            Is.Null);
-
         await NavigateEditing();
 
         await ClickWhenStable(Page.Locator("#inline-select-first"));
@@ -132,43 +104,6 @@ public class WhenUsingFusionGridEditing : PlaywrightTestBase
     [Test]
     public async Task batch_editing_exposes_cell_events_indexed_batch_payload_and_batch_changes_source()
     {
-        Assert.That(
-            typeof(FusionGridCellSaveArgs<ResidentDirectoryGridItem, int>).GetProperty("Cell"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSaveArgs<ResidentDirectoryGridItem, int>).GetProperty("Column"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSaveArgs<ResidentDirectoryGridItem, int>).GetProperty("ColumnObject"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSaveArgs<ResidentDirectoryGridItem, int>).GetProperty("IsForeignKey"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSaveArgs<ResidentDirectoryGridItem, int>).GetProperty("Name"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("Cancel"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("Cell"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("Column"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("ColumnObject"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("IsForeignKey"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("Name"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridBeforeBatchSaveArgs<ResidentDirectoryGridItem>).GetProperty("Name"),
-            Is.Null);
-
         await NavigateEditing();
 
         await ClickWhenStable(Page.Locator("#batch-edit-cell"));

@@ -27,25 +27,6 @@ public class WhenUsingFusionOtpInput : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_json_contains_typed_otp_input_members()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""));
-        Assert.That(planJson, Does.Contain(PasscodeId));
-        Assert.That(planJson, Does.Contain("\"value\""));
-        Assert.That(planJson, Does.Contain("\"dataBind\""));
-        Assert.That(planJson, Does.Contain("\"focusIn\""));
-        Assert.That(planJson, Does.Contain("\"focusOut\""));
-        Assert.That(planJson, Does.Contain("\"input\""));
-        Assert.That(planJson, Does.Contain("\"valueChanged\""));
-        Assert.That(planJson, Does.Contain("\"focus\""));
-        Assert.That(planJson, Does.Contain("\"blur\""));
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
     public async Task domready_sets_visible_value_and_reads_value_source()
     {
         await NavigateAndBoot();

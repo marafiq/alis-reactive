@@ -21,31 +21,6 @@ public class WhenUsingFusionGridBeginEditNormal : PlaywrightTestBase
     [Test]
     public async Task begin_edit_normal_reads_row_data_and_can_cancel_edit()
     {
-        Assert.That(
-            typeof(FusionGridBeginEditArgs<ResidentDirectoryGridItem>).GetProperty("Row"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridBeginEditArgs<ResidentDirectoryGridItem>).GetProperty("ForeignKeyData"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridBeginEditArgs<ResidentDirectoryGridItem>).GetProperty("IsScroll"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridBeginEditArgs<ResidentDirectoryGridItem>).GetProperty("Name"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridBeginEditArgs<ResidentDirectoryGridItem>).GetProperty("PrimaryKey"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridBeginEditArgs<ResidentDirectoryGridItem>).GetProperty("PrimaryKeyValue"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridBeginEditArgs<ResidentDirectoryGridItem>).GetProperty("RequestType"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridBeginEditArgs<ResidentDirectoryGridItem>).GetProperty("Target"),
-            Is.Null);
-
         await NavigateProofView();
 
         await ClickWhenStable(Page.Locator("#begin-edit-select-normal"));

@@ -222,26 +222,4 @@ public class WhenUsingFusionPivotView : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    [Test]
-    public async Task plan_json_declares_typed_runtime_members()
-    {
-        await NavigateAndWaitForPivotView();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-
-        Assert.That(planJson, Does.Contain("care-pivot"));
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""));
-        Assert.That(planJson, Does.Contain("currentView"));
-        Assert.That(planJson, Does.Contain("dataSource"));
-        Assert.That(planJson, Does.Contain("dataSourceSettings"));
-        Assert.That(planJson, Does.Contain("refresh"));
-        Assert.That(planJson, Does.Contain("getPersistData"));
-        Assert.That(planJson, Does.Contain("loadPersistData"));
-        Assert.That(planJson, Does.Contain("showConditionalFormattingDialog"));
-        Assert.That(planJson, Does.Contain("createCalculatedFieldDialog"));
-        Assert.That(planJson, Does.Match(new Regex("dataBound|cellSelecting")));
-
-        AssertNoConsoleErrors();
-    }
 }

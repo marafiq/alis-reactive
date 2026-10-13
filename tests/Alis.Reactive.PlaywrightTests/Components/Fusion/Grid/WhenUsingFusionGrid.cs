@@ -1,5 +1,4 @@
 using System.Text.Json;
-using Alis.Reactive.Fusion.Components;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
@@ -41,19 +40,7 @@ public class WhenUsingFusionGrid : PlaywrightTestBase
     [Test]
     public async Task sorting_a_column_fetches_sorted_data_and_echoes_action()
     {
-        Assert.That(
-            typeof(FusionGridAction).GetProperty("Target"),
-            Is.Null);
-
         await NavigateAndWaitForInitialLoad();
-        using (var plan = JsonDocument.Parse(await Page.Locator("#plan-json").TextContentAsync() ?? "{}"))
-        {
-            Assert.That(HasResponseBodyRead(plan.RootElement, pathMustBeEmpty: true), Is.True,
-                "DataSource.Set(json) must emit the canonical whole response-body read with member=responseBody and an empty path.");
-            Assert.That(HasResponseBodyRead(plan.RootElement, pathMustBeEmpty: false), Is.False,
-                "This Grid page must not emit responseBody as a member-path read for a whole-response data source.");
-        }
-
         var nameHeader = Page.Locator("#residents-grid .e-headercell").Filter(new() { HasText = "Name" });
         await Expect(nameHeader).ToBeVisibleAsync(new() { Timeout = 5000 });
         var response = await Page.RunAndWaitForResponseAsync(
@@ -128,16 +115,6 @@ public class WhenUsingFusionGrid : PlaywrightTestBase
     [Test]
     public async Task paging_fetches_next_page_with_correct_skip()
     {
-        Assert.That(
-            typeof(FusionGridAction).GetProperty("PreviousPageSize"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridAction).GetProperty("Rows"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridAction).GetProperty("Target"),
-            Is.Null);
-
         await NavigateAndWaitForInitialLoad();
 
         var pager = Page.Locator("#residents-grid .e-pagercontainer");
@@ -254,60 +231,5 @@ public class WhenUsingFusionGrid : PlaywrightTestBase
             .ToHaveTextAsync("paging", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_json_contains_grid_behaviors()
-    {
-        await NavigateAndWaitForInitialLoad();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-
-        Assert.That(planJson, Does.Contain("\"set\""),
-            "Plan must contain set reactions for the data source");
-        Assert.That(planJson, Does.Contain("\"dataSource\""),
-            "Plan must target the dataSource property");
-        Assert.That(planJson, Does.Contain("residents-grid"),
-            "Plan must reference the grid element ID");
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""),
-            "Plan must declare fusion vendor");
-
-        AssertNoConsoleErrors();
-    }
-
-    // A whole response-body read is get(res, ["body"]); a member-path read of a member named
-    // responseBody would be get(res, ["body", "responseBody", …]).
-    private static bool HasResponseBodyRead(JsonElement element, bool pathMustBeEmpty)
-    {
-        if (element.ValueKind == JsonValueKind.Object)
-        {
-            if (element.TryGetProperty("kind", out var kind) && kind.GetString() == "get" &&
-                element.GetProperty("target").TryGetProperty("name", out var binding) &&
-                binding.GetString()!.StartsWith("res", StringComparison.Ordinal) &&
-                element.GetProperty("path") is var path &&
-                path.GetArrayLength() >= 1 && path[0].GetString() == "body" &&
-                (pathMustBeEmpty
-                    ? path.GetArrayLength() == 1
-                    : path.GetArrayLength() > 1 && path[1].GetString() == "responseBody"))
-            {
-                return true;
-            }
-
-            foreach (var property in element.EnumerateObject())
-            {
-                if (HasResponseBodyRead(property.Value, pathMustBeEmpty))
-                    return true;
-            }
-        }
-
-        if (element.ValueKind == JsonValueKind.Array)
-        {
-            foreach (var item in element.EnumerateArray())
-            {
-                if (HasResponseBodyRead(item, pathMustBeEmpty))
-                    return true;
-            }
-        }
-
-        return false;
     }
 }

@@ -158,25 +158,4 @@ public class WhenUsingFusionAIAssistView : PlaywrightTestBase
             "**/Sandbox/Components/AIAssistView/Reply*");
         AssertNoConsoleErrors();
     }
-
-    [Test]
-    public async Task plan_json_declares_typed_runtime_members()
-    {
-        await NavigateAndWaitForAssistView();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-
-        Assert.That(planJson, Does.Contain("care-ai"));
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""));
-        Assert.That(planJson, Does.Contain("executePrompt"));
-        // Two C# members type two signatures of the JavaScript addPromptResponse method; both call
-        // the one JavaScript member, each with its own argument shapes.
-        Assert.That(planJson, Does.Contain("\"addPromptResponse\""));
-        Assert.That(planJson, Does.Contain("scrollToBottom"));
-        Assert.That(planJson, Does.Contain("prompt"));
-        Assert.That(planJson, Does.Contain("activeView"));
-        Assert.That(planJson, Does.Match(new Regex("promptChanged|promptRequest|stopRespondingClick")));
-
-        AssertNoConsoleErrors();
-    }
 }

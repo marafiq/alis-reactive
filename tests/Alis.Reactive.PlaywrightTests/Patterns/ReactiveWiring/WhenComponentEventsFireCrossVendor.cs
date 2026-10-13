@@ -210,17 +210,6 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_element_is_present_and_non_empty()
-    {
-        await NavigateAndBoot();
-        var planEl = Page.Locator("#plan-json");
-        await Expect(planEl).ToBeAttachedAsync(new() { Timeout = 5000 });
-        var text = await planEl.TextContentAsync();
-        Assert.That(text, Is.Not.Null.And.Not.Empty, "Plan JSON must be present for runtime boot");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
     public async Task fusion_numeric_fires_on_every_value_change()
     {
         await NavigateAndBoot();

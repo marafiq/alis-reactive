@@ -208,24 +208,6 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_carries_native_vendor()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"vendor\": \"native\""));
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_value_value_member()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"value\""));
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
     public async Task toggling_multiple_checkboxes_updates_correctly()
     {
         await NavigateAndBoot();

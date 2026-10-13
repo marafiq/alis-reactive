@@ -24,26 +24,6 @@ public class WhenUsingFusionStepper : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_json_contains_typed_stepper_members()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""));
-        Assert.That(planJson, Does.Contain("resident-stepper"));
-        Assert.That(planJson, Does.Contain("\"activeStep\""));
-        Assert.That(planJson, Does.Contain("\"nextStep\""));
-        Assert.That(planJson, Does.Contain("\"previousStep\""));
-        Assert.That(planJson, Does.Contain("\"reset\""));
-        Assert.That(planJson, Does.Contain("\"refreshProgressbar\""));
-        Assert.That(planJson, Does.Contain("\"stepChanging\""));
-        Assert.That(planJson, Does.Contain("\"stepClick\""));
-        Assert.That(planJson, Does.Contain("\"stepChanged\""));
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
     public async Task direct_step_writes_move_the_stepper_both_ways()
     {
         await NavigateAndBoot();

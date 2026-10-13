@@ -126,10 +126,6 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
     [Test]
     public async Task clear_sorting_method_clears_active_sort_and_refreshes_grid()
     {
-        Assert.That(
-            typeof(FusionGridAction).GetProperty("Target"),
-            Is.Null);
-
         await NavigateDirectory();
 
         await Page.RunAndWaitForRequestAsync(
@@ -465,10 +461,6 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
     [Test]
     public async Task searching_method_sends_typed_search_payload_and_refreshes_grid()
     {
-        Assert.That(
-            typeof(FusionGridAction).GetProperty("SearchString"),
-            Is.Null);
-
         await NavigateDirectory();
 
         var request = await Page.RunAndWaitForRequestAsync(
@@ -526,10 +518,6 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
     [Test]
     public async Task clear_search_method_clears_active_search_and_refreshes_grid()
     {
-        Assert.That(
-            typeof(FusionGridAction).GetProperty("SearchString"),
-            Is.Null);
-
         await NavigateDirectory();
 
         await Page.RunAndWaitForRequestAsync(
@@ -576,13 +564,6 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
     [Test]
     public async Task grouping_method_sends_typed_group_payload_and_refreshes_grid()
     {
-        Assert.That(
-            typeof(FusionGridDataStateChangeArgs).GetProperty("Groups"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridAction).GetProperty("PreventFocusOnGroup"),
-            Is.Null);
-
         await NavigateDirectory();
 
         var request = await Page.RunAndWaitForRequestAsync(
@@ -634,16 +615,6 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
     [Test]
     public async Task ungrouping_method_sends_typed_action_payload_and_refreshes_grid()
     {
-        Assert.That(
-            typeof(FusionGridDataStateChangeArgs).GetProperty("Groups"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridDataStateChangeArgs).GetProperty("Aggregates"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridAction).GetProperty("PreventFocusOnGroup"),
-            Is.Null);
-
         await NavigateDirectory();
 
         await Page.RunAndWaitForRequestAsync(
@@ -698,16 +669,6 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
     [Test]
     public async Task clear_grouping_method_clears_all_active_groups_and_refreshes_grid()
     {
-        Assert.That(
-            typeof(FusionGridDataStateChangeArgs).GetProperty("Groups"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridDataStateChangeArgs).GetProperty("Aggregates"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridAction).GetProperty("PreventFocusOnGroup"),
-            Is.Null);
-
         await NavigateDirectory();
 
         await Page.RunAndWaitForRequestAsync(

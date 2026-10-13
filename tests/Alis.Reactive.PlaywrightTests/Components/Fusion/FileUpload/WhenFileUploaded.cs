@@ -32,16 +32,6 @@ public class WhenFileUploaded : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("form-data"),
-            "Plan must contain form-data content type for file upload POST");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
     public async Task file_picker_renders_syncfusion_uploader()
     {
         await NavigateAndBoot();

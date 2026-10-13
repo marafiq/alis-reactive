@@ -247,16 +247,6 @@
 
     </native-card-body>
     </native-card>
-
-    <native-card>
-    <native-card-body>
-        <native-heading level="H3">Plan JSON</native-heading>
-        <native-text color="Secondary" class="mb-3">
-            The rendered Reactive Plan JSON is the contract consumed by the runtime.
-        </native-text>
-        <pre class="text-xs overflow-auto max-h-96 p-3 bg-surface-alt rounded-md"><code>@Html.Raw(plan.RenderFormatted())</code></pre>
-    </native-card-body>
-    </native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

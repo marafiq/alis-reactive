@@ -140,54 +140,6 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"set\""),
-            "Plan must contain set reactions");
-        Assert.That(planJson, Does.Contain("\"path\""),
-            "Plan must contain structured property field for SetValue");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_native_vendor_for_dropdown_set_reactions()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"vendor\": \"native\""),
-            "Plan must carry vendor 'native' for dropdown set reactions — " +
-            "runtime uses this to choose resolveRoot strategy");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_value_value_member_for_component_source()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"value\""),
-            "Plan must carry property member 'value' for NativeDropDown component sources — " +
-            "runtime reads this property to get the selected value");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_prop_value_for_setvalue_reaction()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"textContent\""),
-            "Plan must write the echo element's text content");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
     public async Task both_dropdowns_render_with_correct_element_ids()
     {
         // Generated IDs are the DOM/Reactive Plan join keys.

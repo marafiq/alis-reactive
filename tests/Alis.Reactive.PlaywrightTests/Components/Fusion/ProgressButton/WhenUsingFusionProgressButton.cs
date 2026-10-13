@@ -25,28 +25,6 @@ public class WhenUsingFusionProgressButton : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_json_contains_typed_progress_button_members()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""));
-        Assert.That(planJson, Does.Contain(ButtonId));
-        Assert.That(planJson, Does.Contain("\"content\""));
-        Assert.That(planJson, Does.Contain("\"disabled\""));
-        Assert.That(planJson, Does.Contain("\"cssClass\""));
-        Assert.That(planJson, Does.Contain("\"enableProgress\""));
-        Assert.That(planJson, Does.Contain("\"dataBind\""));
-        Assert.That(planJson, Does.Contain("\"start\""));
-        Assert.That(planJson, Does.Contain("\"progressComplete\""));
-        Assert.That(planJson, Does.Contain("\"focusIn\""));
-        Assert.That(planJson, Does.Contain("\"begin\""));
-        Assert.That(planJson, Does.Contain("\"progress\""));
-        Assert.That(planJson, Does.Contain("\"end\""));
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
     public async Task domready_sets_visible_content_and_enables_progress_source()
     {
         await NavigateAndBoot();

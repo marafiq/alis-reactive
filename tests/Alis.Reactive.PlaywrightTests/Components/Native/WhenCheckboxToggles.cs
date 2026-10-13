@@ -21,18 +21,6 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"set\""),
-            "Plan must contain set reactions");
-        Assert.That(planJson, Does.Contain("\"path\""),
-            "Plan must contain structured property field");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
     public async Task domready_overrides_checked_model_value_for_medication_checkbox()
     {
         await NavigateAndBoot();
@@ -156,54 +144,6 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         await checkMedicationButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("no medication on record", new() { Timeout = 3000 });
 
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_native_vendor_for_checkbox_set_reactions()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"vendor\": \"native\""),
-            "Plan must carry vendor 'native' for checkbox set reactions — " +
-            "runtime uses this to choose resolveRoot strategy");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_checked_value_member_for_component_source()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"checked\""),
-            "Plan must carry property member 'checked' for NativeCheckBox component sources — " +
-            "runtime reads this property to get the checkbox state");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_boolean_coerce_for_setchecked()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"kind\": \"boolean\""),
-            "Plan must carry shape boolean for SetChecked — " +
-            "without it, string 'false' is truthy and checkbox stays checked");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_prop_checked_for_setchecked_reaction()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"checked\""),
-            "Plan must carry property .checked. for SetChecked reaction — " +
-            "runtime uses bracket notation root[prop] = val");
         AssertNoConsoleErrors();
     }
 

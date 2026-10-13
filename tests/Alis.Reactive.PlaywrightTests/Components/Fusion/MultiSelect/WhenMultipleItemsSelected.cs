@@ -31,18 +31,6 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"set\""),
-            "Plan must contain set reactions");
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""),
-            "Plan must contain fusion vendor");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
     public async Task both_multiselect_components_render()
     {
         await NavigateAndBoot();

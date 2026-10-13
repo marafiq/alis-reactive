@@ -33,8 +33,6 @@
         p.Element("chain-status").ClassList.Add("font-semibold");
         p.Element("chain-status").Text.Set("Chain complete — all 3 hops executed successfully");
     }));
-
-    var formattedJson = plan.RenderFormatted();
 }
 
 <native-vstack gap="Lg">
@@ -52,11 +50,6 @@
             <p id="step-3" class="text-text-muted">Step 3: waiting for "test-received" event...</p>
             <p id="chain-status" class="text-text-muted mt-4">Chain not started</p>
         </native-vstack>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(formattedJson)</code></pre>
     </native-card-body></native-card>
 
     <native-card><native-card-body>

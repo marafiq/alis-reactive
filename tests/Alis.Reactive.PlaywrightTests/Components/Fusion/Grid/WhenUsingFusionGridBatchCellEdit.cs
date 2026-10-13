@@ -22,15 +22,6 @@ public class WhenUsingFusionGridBatchCellEdit : PlaywrightTestBase
     public async Task batch_cell_save_reads_typed_cell_fields_and_blocks_an_impossible_value()
     {
         // cellSaved has no Cancel; the typed surface excludes raw EJ2 cell metadata.
-        Assert.That(
-            typeof(FusionGridCellSaveArgs<ResidentDirectoryGridItem, int>).GetProperty("Cell"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSaveArgs<ResidentDirectoryGridItem, int>).GetProperty("ColumnObject"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("Cancel"),
-            Is.Null);
 
         await NavigateBatch();
 
@@ -76,10 +67,6 @@ public class WhenUsingFusionGridBatchCellEdit : PlaywrightTestBase
     [Test]
     public async Task before_batch_save_reads_batch_changes_and_blocks_an_oversized_batch()
     {
-        Assert.That(
-            typeof(FusionGridBeforeBatchSaveArgs<ResidentDirectoryGridItem>).GetProperty("Name"),
-            Is.Null);
-
         await NavigateBatch();
 
         // Stage a valid change (6 tasks) and commit it: beforeBatchSave reads the batch

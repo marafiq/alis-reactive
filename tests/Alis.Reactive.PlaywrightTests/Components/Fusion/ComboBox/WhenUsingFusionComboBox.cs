@@ -25,29 +25,6 @@ public class WhenUsingFusionComboBox : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_json_contains_typed_combo_box_members()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""));
-        Assert.That(planJson, Does.Contain(ResidentId));
-        Assert.That(planJson, Does.Contain("\"value\""));
-        Assert.That(planJson, Does.Contain("\"text\""));
-        Assert.That(planJson, Does.Contain("\"index\""));
-        Assert.That(planJson, Does.Contain("\"dataBind\""));
-        Assert.That(planJson, Does.Contain("\"showPopup\""));
-        Assert.That(planJson, Does.Contain("\"hidePopup\""));
-        Assert.That(planJson, Does.Contain("\"focusIn\""));
-        Assert.That(planJson, Does.Contain("\"focusOut\""));
-        Assert.That(planJson, Does.Contain("\"clear\""));
-        Assert.That(planJson, Does.Contain("\"change\""));
-        Assert.That(planJson, Does.Contain("\"focus\""));
-        Assert.That(planJson, Does.Contain("\"blur\""));
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
     public async Task domready_sets_value_and_reads_value_text_index_sources()
     {
         await NavigateAndBoot();

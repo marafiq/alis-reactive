@@ -23,26 +23,6 @@ public class WhenUsingFusionContextMenu : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_json_contains_typed_context_menu_members()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""));
-        Assert.That(planJson, Does.Contain("resident-context-menu"));
-        Assert.That(planJson, Does.Contain("\"beforeItemRender\""));
-        Assert.That(planJson, Does.Contain("\"beforeOpen\""));
-        Assert.That(planJson, Does.Contain("\"onOpen\""));
-        Assert.That(planJson, Does.Contain("\"beforeClose\""));
-        Assert.That(planJson, Does.Contain("\"onClose\""));
-        Assert.That(planJson, Does.Contain("\"select\""));
-        Assert.That(planJson, Does.Contain("\"open\""));
-        Assert.That(planJson, Does.Contain("\"close\""));
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
     public async Task open_method_exposes_root_payloads_and_programmatic_state()
     {
         await NavigateAndBoot();

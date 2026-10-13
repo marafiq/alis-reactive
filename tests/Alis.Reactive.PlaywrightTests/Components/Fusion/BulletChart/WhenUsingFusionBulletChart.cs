@@ -24,21 +24,6 @@ public class WhenUsingFusionBulletChart : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_json_contains_typed_bullet_chart_members()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""));
-        Assert.That(planJson, Does.Contain("resident-bullet-chart"));
-        Assert.That(planJson, Does.Contain("\"tooltipRender\""));
-        Assert.That(planJson, Does.Contain("\"bulletChartMouseClick\""));
-        Assert.That(planJson, Does.Contain("\"getActualIndex\""));
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
     public async Task load_and_method_reads_are_proven()
     {
         await NavigateAndBoot();

@@ -117,17 +117,6 @@ public class WhenArrayPluginManipulates : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    [Test]
-    public async Task plan_json_renders_plugin_types()
-    {
-        await NavigateAndWaitForDomReady();
-        var planJson = Page.Locator("#plan-json");
-        await Expect(planJson).ToBeVisibleAsync();
-        await Expect(planJson).ToContainTextAsync("$plugin:array");
-        await Expect(planJson).ToContainTextAsync("$plugin:analytics");
-        AssertNoConsoleErrors();
-    }
-
     // The gathered count is the array plugin's count of the active residents (3 of 5), a value no
     // literal, string length or whole-roster count gives.
     [Test]

@@ -39,8 +39,6 @@
         p.Element("payload-status").ClassList.Add("font-semibold");
         p.Element("payload-status").Text.Set("All payload properties resolved successfully");
     }));
-
-    var formattedJson = plan.RenderFormatted();
 }
 
 <native-vstack gap="Lg">
@@ -100,10 +98,6 @@
         <p id="payload-status" class="text-text-muted mt-6">Waiting for payload dispatch...</p>
     </native-card-body></native-card>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(formattedJson)</code></pre>
-    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

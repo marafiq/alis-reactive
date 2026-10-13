@@ -170,8 +170,6 @@
             })
             .Else(else_ => else_.Element("nested-branch-result").Text.Set("Junior"))
     ));
-
-    var formattedJson = plan.RenderFormatted();
 }
 
 <native-vstack gap="Md">
@@ -449,10 +447,6 @@
             @DispatchButton("btn-nested-branch-low", "70 + active", ConditionsShowcaseEvents.CheckNestedBranch, new ScorePayload { Score = 70, Status = "active" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </native-hstack>
         <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="nested-branch-result">&mdash;</span></native-hstack>
-    </native-card-body></native-card>
-    <native-card><native-card-body>
-        <native-heading level="H2" spacing="Base">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(formattedJson)</code></pre>
     </native-card-body></native-card>
 </native-vstack>
 

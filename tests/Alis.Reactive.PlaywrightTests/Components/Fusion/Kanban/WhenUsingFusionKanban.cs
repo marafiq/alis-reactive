@@ -324,48 +324,6 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_json_declares_typed_kanban_runtime_members()
-    {
-        await NavigateAndWaitForKanban();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-
-        Assert.That(planJson, Does.Contain("care-kanban"));
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""));
-        Assert.That(planJson, Does.Contain("dataSource"));
-        Assert.That(planJson, Does.Contain("dataBind"));
-        Assert.That(planJson, Does.Contain("getColumnData"));
-        Assert.That(planJson, Does.Contain("getSwimlaneData"));
-        Assert.That(planJson, Does.Contain("addCard"));
-        Assert.That(planJson, Does.Contain("updateCard"));
-        Assert.That(planJson, Does.Contain("deleteCard"));
-        Assert.That(planJson, Does.Contain("addColumn"));
-        Assert.That(planJson, Does.Contain("deleteColumn"));
-        Assert.That(planJson, Does.Contain("showColumn"));
-        Assert.That(planJson, Does.Contain("hideColumn"));
-        Assert.That(planJson, Does.Contain("showSpinner"));
-        Assert.That(planJson, Does.Contain("hideSpinner"));
-        Assert.That(planJson, Does.Contain("openDialog"));
-        Assert.That(planJson, Does.Contain("closeDialog"));
-        Assert.That(planJson, Does.Contain("dataBinding"));
-        Assert.That(planJson, Does.Contain("dataBound"));
-        Assert.That(planJson, Does.Contain("cardClick"));
-        Assert.That(planJson, Does.Contain("cardDoubleClick"));
-        Assert.That(planJson, Does.Contain("queryCellInfo"));
-        Assert.That(planJson, Does.Contain("cardRendered"));
-        Assert.That(planJson, Does.Contain("actionBegin"));
-        Assert.That(planJson, Does.Contain("actionComplete"));
-        Assert.That(planJson, Does.Contain("dataSourceChanged"));
-        Assert.That(planJson, Does.Contain("dragStart"));
-        Assert.That(planJson, Does.Contain("drag"));
-        Assert.That(planJson, Does.Contain("dragStop"));
-        Assert.That(planJson, Does.Contain("dialogOpen"));
-        Assert.That(planJson, Does.Contain("dialogClose"));
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
     public async Task an_audit_shows_the_board_spinner_until_its_answer_arrives()
     {
         var auditReleased = new SemaphoreSlim(0);
