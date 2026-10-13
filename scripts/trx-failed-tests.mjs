@@ -9,6 +9,9 @@
 // With "flaky" and the TRX of the re-run it prints one ::warning command per test that failed in
 // the first file and passed in the re-run, carrying the start of the failure the re-run hid, so a
 // flaky test's check says why it failed (the failure artifacts are uploaded only for a red job).
+// A failure's annotation also carries the end of the page console the test wrote on failure
+// (PlaywrightTestBase's "Page Console Output"), and every error line in it, so the check shows what
+// the page said without the job's artifacts.
 //
 // Used by scripts/playwright.sh --retry-failed to re-run only what failed, to report which tests
 // then passed (the flaky list) and why they failed, and to annotate what still failed.
@@ -78,14 +81,29 @@ function results(path, wanted) {
     const testId = /\btestId="([^"]+)"/.exec(match[1]);
     const outcome = /\boutcome="([^"]+)"/.exec(match[1]);
     const fqn = testId && idToFqn.get(testId[1]);
-    if (fqn && outcome && wanted(outcome[1])) selected.set(fqn, failureMessage(match[2] ?? ""));
+    if (fqn && outcome && wanted(outcome[1])) selected.set(fqn, failure(match[2] ?? ""));
   }
   return selected;
 }
 
-function failureMessage(body) {
+// The failure message, and the page console the test wrote to its output when it failed.
+function failure(body) {
   const message = /<Message>([\s\S]*?)<\/Message>/.exec(body);
-  return message ? unescapeXml(message[1]).trim() : "";
+  const output = /<StdOut>([\s\S]*?)<\/StdOut>/.exec(body);
+  return {
+    message: message ? unescapeXml(message[1]).trim() : "",
+    console: output ? pageConsole(unescapeXml(output[1])) : "",
+  };
+}
+
+// The page console's error lines, then its last thirty lines.
+function pageConsole(output) {
+  const section = /=== Page Console Output ===\r?\n([\s\S]*?)=== End Console Output ===/.exec(output);
+  if (!section) return "";
+  const lines = section[1].split(/\r?\n/).filter(line => line.trim() !== "");
+  const errors = lines.filter(line => /^\[(error|PAGE ERROR)\]/.test(line)).join("\n").slice(0, 1500);
+  const last = lines.slice(-30).join("\n").slice(-2500);
+  return `Page console errors:\n${errors || "none"}\nPage console, last lines:\n${last}`;
 }
 
 function unescapeXml(text) {
@@ -100,9 +118,10 @@ function unescapeXml(text) {
 }
 
 // GitHub Actions workflow commands escape %, CR and LF in the message; the start of the failure
-// message is enough to name the defect, and the artifact carries the rest.
-function annotation(level, title, subject, message) {
-  const text = `${subject}${message ? ` — ${message.slice(0, 4000)}` : ""}`;
+// message names the defect, the end of the page console shows what the page did, and the artifact
+// carries the rest.
+function annotation(level, title, subject, { message, console }) {
+  const text = `${subject}${message ? ` — ${message.slice(0, 3000)}` : ""}${console ? `\n${console}` : ""}`;
   const escaped = text.replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
   return `::${level} title=${title}::${escaped}`;
 }

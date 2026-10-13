@@ -159,7 +159,9 @@ because the test step already carries the verdict). The job needs `checks: write
 to the same summary. When the last attempt is still red, the wrapper also prints one
 `::error title=Failed test::` annotation per failing test with the start of its failure message
 (`scripts/trx-failed-tests.mjs <trx> annotations`), so the pull request's checks, and the
-check-run annotations API, name the failures without opening the log or the artifact.
+check-run annotations API, name the failures without opening the log or the artifact. The
+annotation, like the flaky warning, also carries the page console the failed test wrote to its
+output (`PlaywrightTestBase` writes it on failure): its error lines, then its last thirty lines.
 Every shard also prints one `::notice` naming each fixture and how many of its tests passed on
 the first attempt (`scripts/trx-failed-tests.mjs <trx> summary`), so a green shard's check-run
 annotations say what it proved.
