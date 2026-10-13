@@ -1,0 +1,23 @@
+@model IntakeStepsModel
+@using Alis.Reactive.Native.Components
+@{
+    var plan = Html.ResolvePlan<IntakeStepsModel>();
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+    var aids = Model.CareLevel == "Independent living"
+        ? new[] { "None", "Cane" }
+        : new[] { "None", "Cane", "Walker", "Wheelchair" };
+}
+
+<native-heading level="H3">Mobility for @Model.CareLevel</native-heading>
+
+<native-grid cols="C2" gap="Base">
+    @{ Html.InputField(plan, m => m.MobilityAid, o => o.Required().Label("Mobility aid"))
+        .NativeDropDown(b => b
+            .Items(aids.Select(aid => new SelectListItem(aid, aid)))
+            .Placeholder("-- Choose a mobility aid --")
+            .CssClass(Field)); }
+    @{ Html.InputField(plan, m => m.MobilityNotes, o => o.Label("Mobility notes"))
+        .NativeTextBox(b => b.Placeholder("Two-person assist on stairs, ...").CssClass(Field)); }
+</native-grid>
+
+@Html.RenderPlan(plan)

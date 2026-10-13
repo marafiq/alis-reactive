@@ -12,6 +12,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? ResidentName { get; set; }
         public string? FamilyPhone { get; set; }
         public string? CareLevel { get; set; }
+
+        /// <summary>The aid the resident walks with; the care step asks once a care level is chosen.</summary>
+        public string? MobilityAid { get; set; }
         public string? MobilityNotes { get; set; }
     }
 
@@ -38,6 +41,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.CareLevel)
                 .Must(level => level != FullCareLevel)
                 .WithMessage($"{FullCareLevel} has no open room this month. Choose another level or add the resident to the waitlist.");
+            RuleFor(x => x.MobilityAid).NotEmpty().WithMessage("Choose the resident's mobility aid.");
             RuleFor(x => x.MobilityNotes).MaximumLength(40).WithMessage("Keep mobility notes under 40 characters.");
         }
     }

@@ -32,6 +32,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
                 new IntakeStepsModel { ResidentName = intake.ResidentName, FamilyPhone = intake.FamilyPhone });
         }
 
+        /// <summary>The care step's mobility questions, which depend on the care level chosen.</summary>
+        [HttpGet("MobilityQuestions")]
+        public IActionResult MobilityQuestions([FromQuery] string? careLevel) =>
+            PartialView(Views + "_MobilityQuestions.cshtml", new IntakeStepsModel { CareLevel = careLevel });
+
         [HttpPost("Finish")]
         public IActionResult Finish([FromBody] IntakeStepsModel? intake)
         {
