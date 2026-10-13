@@ -244,11 +244,11 @@ Test names are under `Alis.Reactive.PlaywrightTests.`.
 
 ## Use cases added after the inventory
 
-The validation rework added these after this list was read. The Move-in Review page proves each one
-(`SB/Views/Validation/MoveInReview/Index.cshtml`; validator
-`SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs`). Test names are under
-`Alis.Reactive.PlaywrightTests.Validation.MoveInReview.WhenCoordinatorReviewsMoveIn.`. These rows are
-outside the counts above.
+The validation rework and the work after step 0 added these after this list was read. The Move-in
+Review page proves rows 118 to 125 (`SB/Views/Validation/MoveInReview/Index.cshtml`; validator
+`SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs`), whose test names are under
+`Alis.Reactive.PlaywrightTests.Validation.MoveInReview.WhenCoordinatorReviewsMoveIn.`; row 126 names
+its test in full. These rows are outside the counts above.
 
 | # | Use case | Example | Status | Proof |
 |---|----------|---------|--------|-------|
@@ -260,3 +260,4 @@ outside the counts above.
 | 123 | A message written from the model (`WithMessage(x => ..)`) is the server's: the rule runs there, and its words show beside the field | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:22 | PROVEN | `a_name_too_long_for_the_wristband_is_refused_by_the_server_in_its_own_words` (one request; the server's message) |
 | 124 | A pattern JavaScript reads differently (`\z`) is checked by the server only | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:77 | PROVEN | `a_forwarding_zip_is_checked_the_way_the_server_checks_it` |
 | 125 | `.ServerOnly()` keeps a rule off the page, and a length rule for a field the page does not render passes, as on the server | SB/Models/Validation/MoveInReview/MoveInReviewValidator.cs:80, 87 | PROVEN | `a_rule_for_the_care_plan_summary_another_page_edits_does_not_hold_up_the_review` (the review is saved; were `ReviewedBy`'s `NotEmpty` run in the page, the field the page does not render would fail it: RT/modules/form/form.ts:125-128) |
+| 126 | A field that two validated containers hold (a section saved on its own, inside the whole form) is rechecked on leaving it against every container that holds it, whichever was declared first | `SB/Views/Validation/EmergencyContacts/Index.cshtml`; RT/modules/form/form.ts:169-190 | PROVEN | `Alis.Reactive.PlaywrightTests.Validation.EmergencyContacts.WhenCoordinatorRecordsEmergencyContacts.leaving_the_residents_name_empty_asks_for_it_before_anything_is_saved` |

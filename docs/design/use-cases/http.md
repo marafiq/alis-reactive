@@ -224,3 +224,12 @@ Test names are under `Alis.Reactive.PlaywrightTests.`.
 | 116 | PROVEN | `HttpPipeline.WhenServerDataLoads.cancelling_the_delete_keeps_resident_42_and_sends_nothing` |
 | 120 | PROVEN | `HttpPipeline.ShiftHandover.WhenChargeNurseMarksHandoverRead.a_ctrl_click_opens_the_note_in_a_new_tab_and_marks_nothing_read` |
 | 121 | OPEN (not a page behavior) | ALIS002 is a compile-time analyzer diagnostic and a second request throws while the view renders; neither has a product screen. |
+
+## Use cases added after the inventory
+
+Test names are under `Alis.Reactive.PlaywrightTests.`. These rows are outside the counts above.
+
+| # | Use case | Example | Status | Proof |
+|---|----------|---------|--------|-------|
+| 122 | A chained request is given its parent's success body (`Chained<TResponse>((body, next) => ..)`) and sends what the first answer said | `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/FrontDesk.cshtml` (the holds request's `X-Wing` header) | PROVEN | `Components.Brought.VisitPlanner.WhenHoldingVisitsAtTheFrontDesk.the_familys_holds_are_asked_of_the_desk_of_the_wing_the_week_names` |
+| 123 | Each browser has its own server-side store, kept in its session: a save is seen after a reload in the same browser and not in a new one | `Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Schedule/ScheduleWorld.cs`; the Kanban and action-link controllers | PROVEN | `Components.Fusion.Schedule.WhenUsingFusionSchedule.assigning_staff_to_an_open_hour_adds_the_shift_to_the_week` (after the reload); `Components.Fusion.Kanban.WhenUsingFusionKanban.drag_stop_persists_move_through_reactive_http_put` (after the reload). Each test opens a new browser context, and the Kanban fixture no longer resets the board between tests: the tests that move cards and the tests that read the seeded board pass in one run. No single test opens a second browser to look. |

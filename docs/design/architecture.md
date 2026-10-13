@@ -1160,9 +1160,17 @@ built and what is not.
     the visit planner's `Labels.Empty`), and `InvokeObject<T>(..)` a method that returns one
     (`grid.GetColumnByField(..).HeaderText.Set("Neighborhood"); grid.RefreshHeader();` on the care
     staff columns page). No runtime change: the grammar already reads, writes and calls on any
-    expression. The twenty harness pages rendered byte-identical plans with the nested labels.
-  - a chained request is given its parent's success body: `Chained<TResponse>((body, next) => ..)`.
-  - live validation rechecks a field against every container that holds it (grammar F7).
+    expression. The twenty harness pages rendered byte-identical plans with the nested labels
+    (`d9aedc4`).
+  - a chained request is given its parent's success body: `Chained<TResponse>((body, next) => ..)`
+    (`e88c3d8`).
+  - live validation rechecks a field against every container that holds it (grammar F7, `4708a24`).
+  - an argument typed by the app's own class is a record of its members (`Shape.OfArgument`,
+    `79eb42b`), so its dates arrive as `Date` objects; the schedule's `SaveEvent` refuses text dates.
+  - the sandbox keeps each browser's data in its session: the schedule's week (`ab3d381`), the Kanban
+    board and the action-link rows (`494a0ca`). The schedule then gained add, save, cancel and
+    "Cover the next open shift" through `AddEvent`, `SaveEvent`, `DeleteEvent` and `OpenEditor`
+    (`ab3d381`, `a632922`, `edde975`).
 - **Step 0, closed after the redesign** (`1ca7c9a` through `a1af1a2`; CI run 38366597452, 1,526
   Playwright tests passed). Step 0 (sections 10 and 12) was not done before the redesign. Its
   inventories were re-audited at `7c34a86`: of 155 rows still marked weak, plan-only or missing, 14 were
