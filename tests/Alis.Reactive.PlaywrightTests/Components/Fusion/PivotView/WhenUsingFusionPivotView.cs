@@ -57,7 +57,7 @@ public class WhenUsingFusionPivotView : PlaywrightTestBase
     }
 
     [Test]
-    public async Task http_response_replaces_nested_datasource_and_refreshes_pivot()
+    public async Task loading_the_march_census_replaces_january_and_february()
     {
         await NavigateAndWaitForPivotView();
 

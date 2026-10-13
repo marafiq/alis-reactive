@@ -423,8 +423,9 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
         holdReleased.Release();
 
         // Ruth holds card 101, so CloseDialog closes it and the board says so.
+        await Expect(Page.Locator("#kanban-lock-note")).ToBeVisibleAsync(new() { Timeout = 10000 });
         await Expect(Page.Locator("#kanban-lock-note"))
-            .ToHaveTextAsync("Ruth Alvarez is updating this task; try again when she is done.", new() { Timeout = 10000 });
+            .ToHaveTextAsync("Ruth Alvarez is updating this task; try again when she is done.");
         await Expect(editDialog).ToHaveCountAsync(0, new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }

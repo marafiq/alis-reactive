@@ -77,8 +77,8 @@ public class WhenCoordinatorExplainsACareLevel : PlaywrightTestBase
         await Explain.ClickAsync();
 
         // beforeRender cancels the tooltip before it renders and says why.
-        await Expect(Page.Locator("#explanations-off"))
-            .ToHaveTextAsync("Explanations are turned off on this screen.", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#explanations-off")).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#explanations-off")).ToHaveTextAsync("Explanations are turned off on this screen.");
         await Expect(Explanation).ToHaveCountAsync(0);
         await Expect(MemoryCareTerm).Not.ToHaveClassAsync(Highlighted);
         AssertNoConsoleErrors();

@@ -224,7 +224,7 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
     }
 
     [Test]
-    public async Task filtering_http_request_includes_supplies_query_param()
+    public async Task searching_supplies_sends_the_typed_text_to_the_search()
     {
         await NavigateAndBoot();
 
@@ -234,9 +234,9 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
 
         var request = await Page.RunAndWaitForRequestAsync(
             async () => await filterInput.PressSequentiallyAsync("band", new() { Delay = 50 }),
-            r => r.Url.Contains("/Supplies"));
+            r => r.Url.Contains("/Supplies") && r.Url.Contains("Supplies=band"));
 
-        Assert.That(request.Url, Does.Contain("/Supplies?Supplies=b"),
+        Assert.That(request.Url, Does.Contain("/Supplies?Supplies=band"),
             "The search sends the typed text as the Supplies query member");
 
         AssertNoConsoleErrors();

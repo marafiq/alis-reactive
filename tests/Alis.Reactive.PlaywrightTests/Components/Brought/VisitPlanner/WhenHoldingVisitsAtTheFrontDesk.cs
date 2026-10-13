@@ -129,6 +129,12 @@ public class WhenHoldingVisitsAtTheFrontDesk : PlaywrightTestBase
     [Test]
     public async Task the_desk_stops_saying_it_is_asking_once_the_week_arrives_while_the_holds_still_load()
     {
+        var weekReleased = new SemaphoreSlim(0);
+        await Page.RouteAsync("**/Sandbox/Components/VisitPlanner/FrontDesk/Week/*", async route =>
+        {
+            await weekReleased.WaitAsync(TimeSpan.FromSeconds(30));
+            await route.ContinueAsync();
+        });
         var holdsReleased = new SemaphoreSlim(0);
         await Page.RouteAsync("**/Sandbox/Components/VisitPlanner/FrontDesk/Holds/*", async route =>
         {
@@ -136,6 +142,9 @@ public class WhenHoldingVisitsAtTheFrontDesk : PlaywrightTestBase
             await route.ContinueAsync();
         });
         await NavigateToAndWaitForBoot(FamilyLink);
+        await Expect(Loading).ToBeVisibleAsync();
+
+        weekReleased.Release();
 
         await Expect(Resident).ToHaveTextAsync("Margaret Hale");
         await Expect(Loading).ToBeHiddenAsync();

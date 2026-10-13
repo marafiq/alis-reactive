@@ -29,7 +29,7 @@ public class WhenArrayOpsTransformsResidents : PlaywrightTestBase
 
     // Ed is active and exactly 65: >= counts him (Ada, Cy, Ed), a > in its place would say 2.
     [Test]
-    public async Task counts_active_seniors_by_compound_member_predicate()
+    public async Task the_roster_counts_active_residents_aged_65_and_over()
     {
         await NavigateAndBoot();
         await Expect(Page.Locator("#res-active-seniors")).ToHaveTextAsync("3", new() { Timeout = 5000 });
@@ -37,7 +37,7 @@ public class WhenArrayOpsTransformsResidents : PlaywrightTestBase
     }
 
     [Test]
-    public async Task sums_ages_of_active_residents_via_chained_filter_then_sum()
+    public async Task the_roster_totals_the_ages_of_active_residents()
     {
         await NavigateAndBoot();
         await Expect(Page.Locator("#res-active-age-sum")).ToHaveTextAsync("216", new() { Timeout = 5000 });

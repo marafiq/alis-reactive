@@ -129,7 +129,7 @@ public class WhenRouteParamsResolve : PlaywrightTestBase
 
     // Unencoded, the browser would end the path at "#" and the server would receive "John Doe ".
     [Test]
-    public async Task route_param_with_a_space_and_a_hash_reaches_the_server_whole()
+    public async Task a_resident_name_with_a_space_and_a_hash_is_looked_up_whole()
     {
         await NavigateAndWaitForBoot();
 

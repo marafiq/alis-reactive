@@ -403,7 +403,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     // Cancel runs the link's Else, and the Else is all it runs: a delete sent anyway would set the
     // status to "Deleting resident #42..." in the same turn.
     [Test]
-    public async Task native_action_link_delete_with_confirm_does_not_delete_when_cancelled()
+    public async Task cancelling_the_delete_keeps_resident_42_and_sends_nothing()
     {
         await WaitForDomReadyGet();
         var deletes = new ConcurrentQueue<string>();

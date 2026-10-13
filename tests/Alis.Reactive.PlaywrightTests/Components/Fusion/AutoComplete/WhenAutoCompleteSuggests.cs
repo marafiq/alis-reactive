@@ -343,7 +343,7 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
     }
 
     [Test]
-    public async Task filtering_http_request_includes_medication_type_query_param()
+    public async Task searching_sends_the_typed_text_with_the_formulary()
     {
         await NavigateAndBoot();
 
@@ -353,10 +353,10 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
 
         var medicationRequest = await Page.RunAndWaitForRequestAsync(
             async () => await input.PressSequentiallyAsync("ster", new() { Delay = 50 }),
-            r => r.Url.Contains("/Medications"));
+            r => r.Url.Contains("/Medications") && r.Url.Contains("MedicationType=ster"));
 
         // The typed text joins the formulary the search URL already carries, after an "&".
-        Assert.That(medicationRequest.Url, Does.Contain("/Medications?formulary=assisted-living&MedicationType=s"),
+        Assert.That(medicationRequest.Url, Does.Contain("/Medications?formulary=assisted-living&MedicationType=ster"),
             "The search sends the typed text beside the formulary in its URL");
 
         AssertNoConsoleErrors();

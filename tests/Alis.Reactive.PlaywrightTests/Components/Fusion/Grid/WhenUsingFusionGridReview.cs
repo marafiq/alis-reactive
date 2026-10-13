@@ -52,8 +52,8 @@ public class WhenUsingFusionGridReview : PlaywrightTestBase
 
         await ClickWhenStable(Page.Locator("#count-high-risk"));
 
-        await Expect(Page.Locator("#high-risk-line"))
-            .ToHaveTextAsync("High-risk residents on this page: 4", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#high-risk-line")).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Page.Locator("#high-risk-line")).ToHaveTextAsync("High-risk residents on this page: 4");
         AssertNoConsoleErrors();
     }
 
@@ -79,8 +79,8 @@ public class WhenUsingFusionGridReview : PlaywrightTestBase
         await Page.Locator("#care-review-grid .e-rowcell").Filter(new() { HasText = "Amina Patel" }).ClickAsync();
         await ClickWhenStable(Page.Locator("#flag-selected"));
 
-        await Expect(Page.Locator("#flagged-line"))
-            .ToHaveTextAsync("Residents flagged for care review: 1", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#flagged-line")).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Page.Locator("#flagged-line")).ToHaveTextAsync("Residents flagged for care review: 1");
         await Expect(Page.Locator("#flag-prompt")).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }

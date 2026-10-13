@@ -32,8 +32,9 @@ public class WhenResidentStatusUpdatesLive : PlaywrightTestBase
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
+        await WaitForTraceMessage("connected {\"hubUrl\":\"/hubs/resident-status", 10000);
         await PushStatusBtn.ClickAsync();
-        await Expect(ResidentName).ToContainTextAsync("Helen Martinez",
+        await Expect(ResidentName).ToHaveTextAsync("Helen Martinez (Manual)",
             new() { Timeout = 5000 });
 
         await Page.Locator("#btn-clear-board").ClickAsync();

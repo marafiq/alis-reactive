@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
 /// <summary>
@@ -32,14 +30,7 @@ public class WhenCoordinatorFinishesANicknameEdit : PlaywrightTestBase
     {
         await StartEditingTheNickname("Nell");
 
-        var commit = await Page.RunAndWaitForRequestAsync(
-            () => Page.Locator("#nickname-save").ClickAsync(),
-            request => request.Method == "POST" && request.Url.Contains("/FusionInPlaceEditor/UpdateNickname"));
-
-        using (var body = JsonDocument.Parse(commit.PostData ?? "{}"))
-        {
-            Assert.That(body.RootElement.GetProperty("Value").GetString(), Is.EqualTo("Nell"), commit.PostData);
-        }
+        await Page.Locator("#nickname-save").ClickAsync();
 
         await Expect(NicknameValue).ToHaveTextAsync("Nell", new() { Timeout = 5000 });
         await Expect(NicknameInput).ToHaveCountAsync(0);

@@ -122,7 +122,7 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
     }
 
     [Test]
-    public async Task a_care_plan_review_dated_december_31_2024_is_refused_as_before_the_2025_form()
+    public async Task a_care_plan_review_dated_december_31_2024_is_refused_and_january_1_2025_is_accepted()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
@@ -135,7 +135,7 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await Expect(ErrorFor("CarePlanReviewDate")).ToHaveTextAsync("Date the care plan review after December 31, 2024.");
         await Expect(Result).ToHaveTextAsync("Click to validate");
 
-        await DatePicker("CarePlanReviewDate").FillAndBlur("01/02/2025");
+        await DatePicker("CarePlanReviewDate").FillAndBlur("01/01/2025");
         await ClickWhenStable(ValidateBtn);
         await Expect(Result).ToHaveTextAsync("All dates valid!", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -229,6 +229,14 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
 
         await ClickWhenStable(ValidateBtn);
 
+        await Expect(ErrorFor("MoveOutInspectionDate")).ToHaveTextAsync("The move-out inspection happens on the discharge day.");
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+
+        // A day after discharge is off the discharge day too.
+        await DatePicker("MoveOutInspectionDate").FillAndBlur("03/31/2025");
+        await Expect(ErrorFor("MoveOutInspectionDate")).ToHaveTextAsync("");
+        await DatePicker("MoveOutInspectionDate").FillAndBlur("04/01/2025");
+        await ClickWhenStable(ValidateBtn);
         await Expect(ErrorFor("MoveOutInspectionDate")).ToHaveTextAsync("The move-out inspection happens on the discharge day.");
         await Expect(Result).ToHaveTextAsync("Click to validate");
 

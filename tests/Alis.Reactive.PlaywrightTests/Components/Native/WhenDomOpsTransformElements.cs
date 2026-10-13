@@ -14,7 +14,7 @@ public class WhenDomOpsTransformElements : PlaywrightTestBase
     }
 
     [Test]
-    public async Task counts_the_css_classes_of_a_dom_element()
+    public async Task the_care_card_carries_four_care_flags()
     {
         await NavigateAndBoot();
         await Expect(Page.Locator("#dom-total-classes")).ToHaveTextAsync("4", new() { Timeout = 5000 });

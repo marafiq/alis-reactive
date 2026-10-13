@@ -270,7 +270,6 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
     public async Task the_board_says_how_many_desks_are_watching_the_week()
     {
         await OpenBoardForTheHales();
-        await WaitForTraceMessage("[alis:server-push] connected", 10000);
         await Expect(Desks).ToHaveTextAsync("1 desk is watching this week", new() { Timeout = 10000 });
 
         var okaforDesk = await OpenTheOkaforDeskPage();
@@ -284,7 +283,7 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
     // write the alert, record a line and tell the log), and a slot-taken message must not run the desks
     // trigger (it would blank the count).
     [Test]
-    public async Task each_board_event_runs_only_its_own_trigger()
+    public async Task a_desk_joining_leaves_the_taken_time_alert_alone_and_a_taken_time_leaves_the_desk_count()
     {
         await OpenBoardForTheHales();
         var okaforDesk = await OpenTheOkaforDeskPage();

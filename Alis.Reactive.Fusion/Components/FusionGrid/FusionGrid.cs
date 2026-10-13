@@ -345,22 +345,22 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionGridTextFilterCriterion
     {
         /// <summary>Field being filtered.</summary>
-        public string Field { get; set; }
+        public string Field { get; set; } = "";
 
         /// <summary>Filter operator such as <c>contains</c>, <c>equal</c>, or <c>startswith</c>.</summary>
-        public string Operator { get; set; }
+        public string Operator { get; set; } = "";
 
         /// <summary>Filter text supplied by this criterion.</summary>
-        public string Value { get; set; }
+        public string Value { get; set; } = "";
 
         /// <summary>Composite predicate condition such as <c>and</c> or <c>or</c>.</summary>
-        public string Condition { get; set; }
+        public string Condition { get; set; } = "";
 
         /// <summary>Whether this predicate node contains nested predicates.</summary>
         public bool IsComplex { get; set; }
 
         /// <summary>Nested predicates when Syncfusion emits a composite Predicate.</summary>
-        public List<FusionGridTextFilterCriterion> Predicates { get; set; }
+        public List<FusionGridTextFilterCriterion> Predicates { get; set; } = new List<FusionGridTextFilterCriterion>();
 
         /// <summary>Whether the filter ignores case.</summary>
         public bool IgnoreCase { get; set; }
@@ -375,13 +375,13 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionGridSearchDescriptor
     {
         /// <summary>Fields included in the search.</summary>
-        public List<string> Fields { get; set; }
+        public List<string> Fields { get; set; } = new List<string>();
 
         /// <summary>Search text.</summary>
-        public string Key { get; set; }
+        public string Key { get; set; } = "";
 
         /// <summary>Search operator such as <c>contains</c>.</summary>
-        public string Operator { get; set; }
+        public string Operator { get; set; } = "";
 
         /// <summary>Whether search is case-insensitive.</summary>
         public bool IgnoreCase { get; set; }
@@ -419,22 +419,22 @@ namespace Alis.Reactive.Fusion.Components
         public const string Refresh = "refresh";
 
         /// <summary>Syncfusion request type, such as <c>sorting</c> or <c>paging</c>.</summary>
-        public string RequestType { get; set; }
+        public string RequestType { get; set; } = "";
 
         /// <summary>Syncfusion action event name injected by the EJ2 event observer.</summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         /// <summary>Syncfusion action event type, such as <c>actionBegin</c>.</summary>
-        public string Type { get; set; }
+        public string Type { get; set; } = "";
 
         /// <summary>Whether the current action can be cancelled.</summary>
         public bool Cancel { get; set; }
 
         /// <summary>Column name for sorting actions.</summary>
-        public string ColumnName { get; set; }
+        public string ColumnName { get; set; } = "";
 
         /// <summary>Sort direction for sorting actions.</summary>
-        public string Direction { get; set; }
+        public string Direction { get; set; } = "";
 
         /// <summary>Page number after the data-state action.</summary>
         public int CurrentPage { get; set; }
@@ -470,10 +470,10 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionGridToolbarItem
     {
         /// <summary>Toolbar item id, such as a custom command id or <c>{gridId}_excelexport</c>.</summary>
-        public string Id { get; set; }
+        public string Id { get; set; } = "";
 
         /// <summary>Toolbar item display text.</summary>
-        public string Text { get; set; }
+        public string Text { get; set; } = "";
     }
 
     /// <summary>

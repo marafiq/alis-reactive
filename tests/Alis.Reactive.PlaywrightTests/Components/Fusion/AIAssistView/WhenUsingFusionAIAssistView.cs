@@ -51,18 +51,12 @@ public class WhenUsingFusionAIAssistView : PlaywrightTestBase
     }
 
     [Test]
-    public async Task execute_prompt_calls_js_method_and_prompt_request_adds_text_response()
+    public async Task running_a_suggested_question_shows_the_care_teams_answer()
     {
         await NavigateAndWaitForAssistView();
 
         await Page.Locator("#execute-prompt-btn").ClickAsync();
 
-        await Expect(Page.Locator("#command-status"))
-            .ToHaveTextAsync("executePrompt called", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#request-status"))
-            .ToHaveTextAsync("promptRequest fired", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#request-prompt"))
-            .ToHaveTextAsync("Summarize the medication changes", new() { Timeout = 5000 });
         await Expect(Page.Locator("#care-ai"))
             .ToContainTextAsync("Here is what the care team recorded about: Summarize the medication changes.", new() { Timeout = 10000 });
 

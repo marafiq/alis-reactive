@@ -70,7 +70,7 @@ public class WhenUrlParamsRead : PlaywrightTestBase
 
     // The medications panel shows on both pages, so the page condition has run when it is checked.
     [Test]
-    public async Task url_condition_numeric_gt_shows_prev_button_from_page_two_but_not_on_page_one()
+    public async Task the_previous_page_control_shows_from_page_two_but_not_on_page_one()
     {
         await NavigateTo("/Sandbox/HttpPipeline/Http?tab=medications&page=1");
         await WaitForTraceMessage("booted", 10000);
@@ -156,7 +156,7 @@ public class WhenUrlParamsRead : PlaywrightTestBase
     }
 
     [Test]
-    public async Task missing_url_param_takes_the_else_branch_and_shows_the_overview()
+    public async Task opening_the_page_with_no_tab_shows_the_overview_not_medications()
     {
         await NavigateWithoutParams();
 

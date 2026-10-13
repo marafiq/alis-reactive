@@ -278,7 +278,7 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         await Write(m => m.SecuredUnitConsentBy, "Ana Hale");
         await ClickWhenStable(SaveReview);
         await Expect(ReviewStatus).ToHaveTextAsync(Saved);
-        Assert.That(_reviewsSent, Has.Count.EqualTo(1), "A room on another wing, like MA-214, needs no consent.");
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1), "The review without the family's consent was not sent.");
         AssertNoConsoleErrors();
     }
 
@@ -297,7 +297,7 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         await Write(m => m.TemporaryBandReason, "Band printer down at admission");
         await ClickWhenStable(SaveReview);
         await Expect(ReviewStatus).ToHaveTextAsync(Saved);
-        Assert.That(_reviewsSent, Has.Count.EqualTo(1), "A permanent band, like WB-104233, needs no reason.");
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1), "The review without a reason for the temporary band was not sent.");
         AssertNoConsoleErrors();
     }
 
@@ -413,7 +413,7 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         await Write(m => m.Pharmacy.Name, "Riverside Pharmacy");
         await ClickWhenStable(SaveReview);
         await Expect(ReviewStatus).ToHaveTextAsync(SavedWithPharmacy);
-        Assert.That(_reviewsSent, Has.Count.EqualTo(1), "A review with no pharmacy phone needs no pharmacy name; the other saves prove it.");
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1), "The review with a phone but no pharmacy name was not sent.");
         AssertNoConsoleErrors();
     }
 

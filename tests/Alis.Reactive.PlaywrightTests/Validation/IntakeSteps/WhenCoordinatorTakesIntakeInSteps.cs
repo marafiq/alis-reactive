@@ -212,28 +212,34 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
     }
 
     [Test]
-    public async Task a_family_phone_corrected_on_the_care_step_is_refused_by_the_server_in_the_resident_steps_words()
+    public async Task the_resident_step_refuses_a_family_phone_out_of_house_format_without_sending_it()
     {
         await NavigateAndBoot();
         await ResidentName.FillAsync("Jane Smith");
         await FamilyPhone.FillAsync("5550100");
         await Page.Keyboard.PressAsync("Tab");
+
         await ClickWhenStable(ContinueToCare);
 
-        // The resident step checks the phone in the browser...
         await Expect(_plan.ErrorFor(m => m.FamilyPhone)).ToHaveTextAsync(FamilyPhoneFormat);
+        await Expect(StepHeading).ToHaveTextAsync("Step 1 of 2: Resident");
         Assert.That(_residentStepsSent, Is.Empty, "The resident step sends no phone it can see is wrong.");
-        await FamilyPhone.FillAsync("555-0100");
-        await Page.Keyboard.PressAsync("Tab");
-        await ClickWhenStable(ContinueToCare);
-        await Expect(StepHeading).ToHaveTextAsync("Step 2 of 2: Care needs for Jane Smith", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_family_phone_out_of_house_format_on_the_care_step_is_refused_by_the_server_with_the_same_message()
+    {
+        await NavigateAndBoot();
+        await CompleteResidentStep("Jane Smith");
         await ChooseCareLevelAndAid("Assisted living", "Walker");
         await FamilyPhone.FillAsync("5550100");
         await Page.Keyboard.PressAsync("Tab");
 
         await ClickWhenStable(FinishIntake);
 
-        // ...and the care step does not, so the server answers with the same rule, in the same words.
+        // The care step does not check the phone in the browser, so the server answers with the
+        // resident step's rule, in the same words.
         await Expect(ValidationSummary).ToHaveTextAsync(FamilyPhoneFormat, new() { Timeout = 5000 });
         await Expect(_plan.ErrorFor(m => m.FamilyPhone)).ToHaveTextAsync("");
         await Expect(IntakeStatus).ToHaveTextAsync("No intake saved yet.");

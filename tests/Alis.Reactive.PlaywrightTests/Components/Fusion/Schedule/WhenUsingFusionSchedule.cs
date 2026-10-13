@@ -388,11 +388,20 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
     public async Task changing_the_facility_reloads_the_schedule_until_it_is_ready()
     {
         await NavigateAndWaitForSchedule();
+        await Expect(Status).ToHaveTextAsync("Ready", new() { Timeout = 10000 });
+        var assignmentsReleased = new SemaphoreSlim(0);
+        await Page.RouteAsync("**/api/schedule/assignments**", async route =>
+        {
+            await assignmentsReleased.WaitAsync(TimeSpan.FromSeconds(30));
+            await route.ContinueAsync();
+        });
 
         await Facility.Select("Sunrise Gardens");
 
-        // The change handler says "Loading..." and its response "Facility changed"; only the
-        // schedule's dataBound, after the new shifts bind, says "Ready".
+        // The change handler says "Loading..." while Sunrise Gardens' shifts are asked for; only the
+        // schedule's dataBound, after they bind, says "Ready".
+        await Expect(Status).ToHaveTextAsync("Loading...", new() { Timeout = 10000 });
+        assignmentsReleased.Release();
         await Expect(Status).ToHaveTextAsync("Ready", new() { Timeout = 10000 });
         await Expect(StaffedShifts.First).ToBeVisibleAsync();
         AssertNoConsoleErrors();
@@ -405,15 +414,16 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         var amShiftStart = WorkCell(DateTime.Today.AddHours(6), shiftColumn: 0);
         var nightShiftStart = WorkCell(DateTime.Today.AddHours(22), shiftColumn: 2);
 
-        await Page.Locator("#schedule-show-morning").ClickAsync();
-
-        await Expect(amShiftStart).ToBeInViewportAsync(new() { Timeout = 5000 });
-        await Expect(nightShiftStart).Not.ToBeInViewportAsync();
-
+        // The schedule opens at the start of the work hours (6 AM), so the night shift comes first.
         await Page.Locator("#schedule-show-night").ClickAsync();
 
         await Expect(nightShiftStart).ToBeInViewportAsync(new() { Timeout = 5000 });
         await Expect(amShiftStart).Not.ToBeInViewportAsync();
+
+        await Page.Locator("#schedule-show-morning").ClickAsync();
+
+        await Expect(amShiftStart).ToBeInViewportAsync(new() { Timeout = 5000 });
+        await Expect(nightShiftStart).Not.ToBeInViewportAsync();
         AssertNoConsoleErrors();
     }
 

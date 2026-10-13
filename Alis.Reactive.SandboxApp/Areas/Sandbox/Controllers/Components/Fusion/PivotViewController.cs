@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,20 +37,21 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // Saved views, one per facility; each test opens the page for a facility of its own.
-        private static readonly ConcurrentDictionary<string, string> SavedViews = new();
+        // Saved views, one per facility, in the browser's session: each browser world keeps its own.
+        private static string SavedViewKey(string facilityId) => "pivotView:" + facilityId;
 
         [HttpPost("~/api/pivot/views/{facilityId}")]
         public IActionResult SaveView(string facilityId, [FromBody] PivotSavedView view)
         {
-            SavedViews[facilityId] = view.Layout;
+            HttpContext.Session.SetString(SavedViewKey(facilityId), view.Layout);
             return Ok(new PivotLayoutResponse { Message = "View saved.", Layout = view.Layout });
         }
 
         [HttpGet("~/api/pivot/views/{facilityId}")]
         public IActionResult SavedView(string facilityId)
         {
-            return SavedViews.TryGetValue(facilityId, out var layout)
+            var layout = HttpContext.Session.GetString(SavedViewKey(facilityId));
+            return layout != null
                 ? Ok(new PivotLayoutResponse { Message = "Saved view restored.", Layout = layout })
                 : NotFound(new PivotLayoutResponse { Message = "No view is saved for this facility." });
         }

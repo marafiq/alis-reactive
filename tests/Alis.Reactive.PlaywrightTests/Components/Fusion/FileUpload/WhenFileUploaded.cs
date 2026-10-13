@@ -76,7 +76,7 @@ public class WhenFileUploaded : PlaywrightTestBase
     }
 
     [Test]
-    public async Task selecting_files_and_submitting_sends_to_server()
+    public async Task uploading_two_documents_adds_both_to_the_record()
     {
         await NavigateAndBoot();
 
@@ -86,17 +86,12 @@ public class WhenFileUploaded : PlaywrightTestBase
 
         await Page.Locator("#upload-btn").ClickAsync();
 
-        await Expect(Page.Locator("#echo-count"))
-            .Not.ToHaveTextAsync("\u2014", new() { Timeout = 10000 });
-
-        var count = await Page.Locator("#echo-count").TextContentAsync();
-        Assert.That(count, Is.EqualTo("2"),
-            "Server should receive exactly 2 files via FormData POST");
+        await Expect(Page.Locator("#echo-count")).ToHaveTextAsync("2", new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task server_echoes_file_names()
+    public async Task an_uploaded_photo_is_listed_by_name()
     {
         await NavigateAndBoot();
 
@@ -104,17 +99,12 @@ public class WhenFileUploaded : PlaywrightTestBase
 
         await Page.Locator("#upload-btn").ClickAsync();
 
-        await Expect(Page.Locator("#echo-files"))
-            .Not.ToHaveTextAsync("\u2014", new() { Timeout = 10000 });
-
-        var files = await Page.Locator("#echo-files").TextContentAsync();
-        Assert.That(files, Does.Contain("photo.jpg"),
-            "Server should echo back the uploaded file name");
+        await Expect(Page.Locator("#echo-files")).ToContainTextAsync("photo.jpg", new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task files_coexist_with_scalar_fields()
+    public async Task uploading_intake_documents_keeps_the_residents_name_with_them()
     {
         await NavigateAndBoot();
 
@@ -129,9 +119,7 @@ public class WhenFileUploaded : PlaywrightTestBase
         await Expect(Page.Locator("#echo-name"))
             .ToHaveTextAsync("Eleanor Vance", new() { Timeout = 10000 });
 
-        var count = await Page.Locator("#echo-count").TextContentAsync();
-        Assert.That(count, Is.EqualTo("1"),
-            "Server should receive 1 file alongside the scalar field");
+        await Expect(Page.Locator("#echo-count")).ToHaveTextAsync("1");
         AssertNoConsoleErrors();
     }
 

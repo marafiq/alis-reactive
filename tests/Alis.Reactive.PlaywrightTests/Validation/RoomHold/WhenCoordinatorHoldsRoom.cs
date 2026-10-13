@@ -67,9 +67,12 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
         await Expect(_plan.ErrorFor(m => m.ProspectName)).ToBeHiddenAsync();
         await Expect(RoomHoldStatus).ToHaveTextAsync("No room held yet.");
 
-        await ClickWhenStable(PlaceHold);
+        // Only the server knows which rooms are held, so placing the hold again asks it again.
+        await Page.RunAndWaitForResponseAsync(
+            async () => await ClickWhenStable(PlaceHold),
+            "**/Sandbox/Validation/RoomHold/Hold**");
+        Assert.That(_holdsSent, Has.Count.EqualTo(2), "Each Place Hold asks the server once.");
         await Expect(ValidationSummary).ToHaveTextAsync(RoomHeldElsewhere);
-        Assert.That(_holdsSent, Has.Count.EqualTo(2), "Each Place Hold asks the server once: only it knows which rooms are held.");
         AssertNoConsoleErrorsExcept("400");
     }
 

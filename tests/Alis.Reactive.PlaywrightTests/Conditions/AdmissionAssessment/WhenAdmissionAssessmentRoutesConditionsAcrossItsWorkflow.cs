@@ -146,13 +146,15 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
             .ToHaveTextAsync("Moderate Impairment — Assisted Living + Memory", new() { Timeout = 5000 });
         await Expect(Input<Step2ClinicalModel>(m => m.CareUnit)).ToHaveValueAsync("Assisted Living with Memory Support");
 
-        await FillAndBlur<Step2ClinicalModel>(m => m.CognitiveScore, "24");
-        await Expect(Page.Locator("#cognitive-status"))
-            .ToHaveTextAsync("Moderate Impairment — Assisted Living + Memory", new() { Timeout = 5000 });
-
         await FillAndBlur<Step2ClinicalModel>(m => m.CognitiveScore, "25");
         await Expect(Page.Locator("#cognitive-status")).ToHaveTextAsync("Mild/Normal — Standard", new() { Timeout = 5000 });
         await Expect(Input<Step2ClinicalModel>(m => m.CareUnit)).ToHaveValueAsync("Standard Assisted Living");
+
+        // 24 is the highest moderate score: each step above changes what the status says.
+        await FillAndBlur<Step2ClinicalModel>(m => m.CognitiveScore, "24");
+        await Expect(Page.Locator("#cognitive-status"))
+            .ToHaveTextAsync("Moderate Impairment — Assisted Living + Memory", new() { Timeout = 5000 });
+        await Expect(Input<Step2ClinicalModel>(m => m.CareUnit)).ToHaveValueAsync("Assisted Living with Memory Support");
         AssertNoConsoleErrors();
     }
 
