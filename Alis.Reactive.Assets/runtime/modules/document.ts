@@ -25,7 +25,7 @@ export interface DocumentObject {
 
 export function raise(name: string, detail?: unknown): void {
   executeLog.debug("dispatch", { event: name, detail });
-  document.dispatchEvent(new CustomEvent(name, { detail: detail ?? {} }));
+  document.dispatchEvent(new CustomEvent(name, { detail: {} }));
 }
 
 function queryRecord<T>(pick: (values: string[]) => T | undefined): Record<string, T> {
