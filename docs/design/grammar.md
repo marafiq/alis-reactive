@@ -22,7 +22,7 @@ the grammar says so explicitly instead of inheriting JavaScript's answer.
 
 ```
 plan      := { version, planId, vendors, objects, handlers }
-vendor    := name -> { objectPath, subscribe, unsubscribe, payload: argument | element | event }
+vendor    := name -> { objectPath, subscribe, unsubscribe, payload: argument | element }
 object    := id -> locator
 locator   := element(id, vendor)            found on an element, through its vendor's data
            | plugin(name, key, data)        made by the module a bundle registered under `name`
@@ -587,10 +587,11 @@ imports none of them. The obligations are numbered so that tests and code can ci
 - **E1 Lookup.** An element or vendor object is looked up with `getElementById` at each use and is
   never cached. Absent is a boundary error.
 - **E2 Payload.** The vendor's `payload` decides what a handler's parameter is:
-  - `argument`: the vendor's listener argument (Syncfusion);
-  - `element`: the element itself, for native inputs whose values are read after an `await`;
-  - `event`: the DOM `Event`, for `element(id, dom)`. The link reads the button, the modifier keys
-    and `preventDefault` from it.
+  - `argument`: the vendor's listener argument (Syncfusion; the native link, whose listener argument
+    is the click's DOM `Event`, from which it reads the button, the modifier keys and
+    `preventDefault`);
+  - `element`: the element itself, for native inputs whose values are read after an `await`, or a
+    `CustomEvent`'s `detail`.
 - **E3 Writes.** A write converts by the member's shape: a date member receives a `Date`.
 
 ## 7. Validation projection

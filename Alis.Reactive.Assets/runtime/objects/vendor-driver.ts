@@ -35,7 +35,6 @@ function payloadOf(vendor: Vendor, first: unknown): unknown {
   switch (vendor.payload) {
     case "argument": return isMissing(first) ? {} : first;
     case "element":  return elementPayload(first);
-    case "event":    return first;
     default:         return assertNever(vendor.payload, "vendor payload");
   }
 }

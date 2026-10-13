@@ -224,8 +224,7 @@ export interface TryStatement {
 
 export type VendorPayload =
   | "argument"
-  | "element"
-  | "event";
+  | "element";
 
 export type Operator =
   | "eq"

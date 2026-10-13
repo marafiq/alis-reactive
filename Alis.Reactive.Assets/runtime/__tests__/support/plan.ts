@@ -48,12 +48,11 @@ export const st = {
 };
 
 export const vendors: Record<string, Vendor> = {
-  dom: { objectPath: [], subscribe: "addEventListener", unsubscribe: "removeEventListener", payload: "event" },
   native: { objectPath: [], subscribe: "addEventListener", unsubscribe: "removeEventListener", payload: "element" },
   fake: { objectPath: ["widget"], subscribe: "on", unsubscribe: "off", payload: "argument" },
 };
 
-export function element(id: string, vendor = "dom"): ObjectLocator {
+export function element(id: string, vendor = "native"): ObjectLocator {
   return { kind: "element", id, vendor };
 }
 

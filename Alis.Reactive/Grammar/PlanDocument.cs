@@ -39,16 +39,13 @@ namespace Alis.Reactive.Grammar
     {
         internal const string ArgumentPayload = "argument";
         internal const string ElementPayload = "element";
-        internal const string EventPayload = "event";
 
         internal Vendor(IReadOnlyList<string> objectPath, string subscribe, string unsubscribe, string payload)
         {
             ObjectPath = objectPath ?? throw new ArgumentNullException(nameof(objectPath));
             Subscribe = subscribe ?? throw new ArgumentNullException(nameof(subscribe));
             Unsubscribe = unsubscribe ?? throw new ArgumentNullException(nameof(unsubscribe));
-            if (payload != ArgumentPayload && payload != ElementPayload && payload != EventPayload)
-                throw new ArgumentException("Unknown vendor payload '" + payload + "'.", nameof(payload));
-            Payload = payload;
+            Payload = payload ?? throw new ArgumentNullException(nameof(payload));
         }
 
         public IReadOnlyList<string> ObjectPath { get; }
