@@ -226,3 +226,31 @@ JavaScript of their own (the native check list, the smart text area, the
 confirm dialog) are constructed on `alis:mount` as in step 1. The sandbox also
 brings [Tom Select](https://tom-select.js.org), an npm package, the same way
 (`BroughtComponents/TomSelect/TomSelect.cs`).
+
+## Your Own Confirmation
+
+`p.Confirm("Release Ruth Alvarez's hold on room 214?")` asks the page's
+`alis.confirm`: an object with `ask(message)` that resolves to `true` or `false`.
+`@Html.FusionConfirmDialog()` gives the Syncfusion one, on a page that renders it.
+A page that does not render it can give its own, through the queue a plugin uses,
+from a script that runs after the dialog's markup and before the framework's bundle:
+
+```ts
+const dialog = document.getElementById("house-confirm") as HTMLDialogElement;
+(window.__alisPlugins ??= []).push({
+  name: "alis.confirm",
+  instance: {
+    ask: (message: string) => new Promise<boolean>(resolve => {
+      document.getElementById("house-confirm-message")!.textContent = message;
+      dialog.returnValue = "";
+      dialog.showModal();
+      dialog.addEventListener("close", () => resolve(dialog.returnValue === "yes"), { once: true });
+    }),
+  },
+});
+```
+
+The dialog is plain markup in the page: a `<dialog>` whose `<form method="dialog">`
+has a button with `value="yes"` and one with `value="no"`. A page renders one
+confirmation or the other; with both, the page fails to boot. The sandbox's Room
+Holds page brings its own this way (`Scripts/house-confirm.ts`).

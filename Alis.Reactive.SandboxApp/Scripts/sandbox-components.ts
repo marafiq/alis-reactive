@@ -6,6 +6,7 @@
 import TomSelect from "tom-select";
 import "tom-select/dist/css/tom-select.css";
 import { VisitPlanner, visitPlannerHosts } from "./visit-planner";
+import "./house-confirm";
 
 interface MountEventDetail {
   readonly root: HTMLElement;

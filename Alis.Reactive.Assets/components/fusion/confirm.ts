@@ -4,9 +4,12 @@
 // C1 ask(message) resolves true on OK, false on Cancel, close or Escape.
 // C2 Asks queue first in, first out.
 // C3 Escape inside the dialog never reaches the document.
-// C4 A missing dialog is a boundary error naming FusionConfirmDialog.
+// C4 It answers only on a page that renders the dialog. A page without it may give alis.confirm from
+//    its own code, and the core asks that one; a page with neither has no alis.confirm to ask.
 
-import { onMount, providePlugin } from "../hooks";
+import { onMount, providePlugin, whenParsed } from "../hooks";
+
+const dialogId = "alisConfirmDialog";
 
 let queue = Promise.resolve();
 
@@ -79,7 +82,7 @@ function keepEscapeInConfirm(event: KeyboardEvent): void {
 let ask: ((message: string) => Promise<boolean>) | undefined;
 
 // App-level singleton rendered by @Html.FusionConfirmDialog() in the layout; fixed id.
-onMount("#alisConfirmDialog", dialogHostElement => {
+onMount(`#${dialogId}`, dialogHostElement => {
   const hostWindow = window as unknown as SyncfusionWindow;
   const dialog = new hostWindow.ej.popups.Dialog({
     isModal: true,
@@ -98,9 +101,12 @@ onMount("#alisConfirmDialog", dialogHostElement => {
   });
 });
 
-providePlugin("alis.confirm", {
-  ask(message: string): Promise<boolean> {
-    if (!ask) throw new Error("[alis] confirm condition requires @Html.FusionConfirmDialog() in layout");
-    return ask(message);
-  },
+whenParsed(() => {
+  if (document.getElementById(dialogId) === null) return;
+  providePlugin("alis.confirm", {
+    ask(message: string): Promise<boolean> {
+      if (!ask) throw new Error(`[alis] #${dialogId} is on the page but its Syncfusion Dialog was not made`);
+      return ask(message);
+    },
+  });
 });

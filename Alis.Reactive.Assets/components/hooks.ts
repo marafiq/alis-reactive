@@ -2,7 +2,7 @@
 // (docs/design/bring-your-own-component.md). The runtime raises alis:mount when HTML is in the
 // document and about to be wired (the page at boot, a partial when it loads) and alis:unmount before
 // wired HTML is removed; both carry the HTML's root. It takes plugins from window.__alisPlugins when
-// it boots. Nothing here imports the runtime.
+// it boots, once the document is parsed. Nothing here imports the runtime.
 
 interface MountEventDetail {
   readonly root: HTMLElement;
@@ -25,6 +25,15 @@ export function onMount(selector: string, construct: (element: HTMLElement) => v
 /** Destroys each element of HTML about to be removed that matches the selector, the root included. */
 export function onUnmount(selector: string, destroy: (element: HTMLElement) => void): void {
   document.addEventListener("alis:unmount", event => forEachWithin(event, selector, destroy));
+}
+
+/**
+ * Runs once the document is parsed and before the runtime boots: the runtime starts on the same
+ * event, and this module is imported before it.
+ */
+export function whenParsed(act: () => void): void {
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", act, { once: true });
+  else act();
 }
 
 /** Gives the plan an object it locates by name, through the queue an app's plugins use. */

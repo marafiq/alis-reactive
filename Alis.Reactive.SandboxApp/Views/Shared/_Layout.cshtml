@@ -59,7 +59,15 @@
 @Html.EJS().ScriptManager()
 @await RenderSectionAsync("Scripts", required: false)
 
-@Html.FusionConfirmDialog()
+@* A page may bring its own confirmation (section Confirm); every other page asks the Syncfusion one. *@
+@if (IsSectionDefined("Confirm"))
+{
+    @await RenderSectionAsync("Confirm")
+}
+else
+{
+    @Html.FusionConfirmDialog()
+}
 @Html.NativeLoader()
 @Html.NativeDrawer()
 <script src="~/js/sandbox-plugins.js" asp-append-version="true"></script>
