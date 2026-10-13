@@ -33,7 +33,7 @@ namespace Alis.Reactive.Builders
             where TSource : TProp
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            _draft.Set(ExpressionPathHelper.ToEventPath(field), source.ToValueExpression());
+            _draft.Set(ExpressionPathHelper.ToEventPath(field), source.Expression);
             return this;
         }
 

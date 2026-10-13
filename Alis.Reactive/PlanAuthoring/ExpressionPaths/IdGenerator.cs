@@ -31,7 +31,7 @@ namespace Alis.Reactive
         public static string For<TModel>(Expression<Func<TModel, object?>> expression)
         {
             var scope = TypeScope(typeof(TModel));
-            var elementId = ExpressionPathHelper.ToElementId<TModel>(expression);
+            var elementId = ExpressionPathHelper.ToElementId(expression);
             return scope + "__" + elementId;
         }
 
@@ -45,7 +45,7 @@ namespace Alis.Reactive
         public static string For<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
         {
             var scope = TypeScope(typeof(TModel));
-            var elementId = ExpressionPathHelper.ToElementId<TModel, TProp>(expression);
+            var elementId = ExpressionPathHelper.ToElementId(expression);
             return scope + "__" + elementId;
         }
 

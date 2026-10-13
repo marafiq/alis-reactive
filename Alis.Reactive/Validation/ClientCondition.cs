@@ -161,7 +161,7 @@ namespace Alis.Reactive.Validation
         }
 
         /// <summary>The condition with every member it reads relocated under <paramref name="prefix"/>.</summary>
-        internal abstract ClientCondition PrefixedBy(ValidationFieldPath prefix);
+        internal abstract ClientCondition PrefixedBy(string prefix);
 
         /// <summary>The members the condition reads, left to right.</summary>
         internal abstract IEnumerable<FieldReference> Fields { get; }
@@ -224,7 +224,7 @@ namespace Alis.Reactive.Validation
         {
             internal override bool IsAlways => true;
 
-            internal override ClientCondition PrefixedBy(ValidationFieldPath prefix) => this;
+            internal override ClientCondition PrefixedBy(string prefix) => this;
 
             internal override IEnumerable<FieldReference> Fields => Array.Empty<FieldReference>();
 
@@ -245,7 +245,7 @@ namespace Alis.Reactive.Validation
                 _value = value;
             }
 
-            internal override ClientCondition PrefixedBy(ValidationFieldPath prefix) =>
+            internal override ClientCondition PrefixedBy(string prefix) =>
                 new FieldTest(_field.PrefixedBy(prefix), _op, _value);
 
             internal override IEnumerable<FieldReference> Fields => new[] { _field };
@@ -267,7 +267,7 @@ namespace Alis.Reactive.Validation
                 _terms = terms;
             }
 
-            internal override ClientCondition PrefixedBy(ValidationFieldPath prefix) =>
+            internal override ClientCondition PrefixedBy(string prefix) =>
                 new AllTerms(_terms.Select(term => term.PrefixedBy(prefix)).ToArray());
 
             internal override IEnumerable<FieldReference> Fields => _terms.SelectMany(term => term.Fields);
@@ -285,7 +285,7 @@ namespace Alis.Reactive.Validation
                 _terms = terms;
             }
 
-            internal override ClientCondition PrefixedBy(ValidationFieldPath prefix) =>
+            internal override ClientCondition PrefixedBy(string prefix) =>
                 new AnyTerms(_terms.Select(term => term.PrefixedBy(prefix)).ToArray());
 
             internal override IEnumerable<FieldReference> Fields => _terms.SelectMany(term => term.Fields);
@@ -303,7 +303,7 @@ namespace Alis.Reactive.Validation
                 _term = term;
             }
 
-            internal override ClientCondition PrefixedBy(ValidationFieldPath prefix) => new NotTerm(_term.PrefixedBy(prefix));
+            internal override ClientCondition PrefixedBy(string prefix) => new NotTerm(_term.PrefixedBy(prefix));
 
             internal override IEnumerable<FieldReference> Fields => _term.Fields;
 
@@ -391,27 +391,39 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    /// <summary>A member of the validator's model, by its path and its value's shape.</summary>
+    /// <summary>
+    /// A member of the validator's model, by its path (<c>"Address.City"</c>, <c>"Lines[0].Qty"</c>) and its
+    /// value's shape.
+    /// </summary>
     internal sealed class FieldReference
     {
-        private FieldReference(ValidationFieldPath path, Shape shape)
+        private FieldReference(string path, Shape shape)
         {
             Path = path;
             Shape = shape;
         }
 
-        internal ValidationFieldPath Path { get; }
+        internal string Path { get; }
 
         internal Shape Shape { get; }
 
         internal static FieldReference Of(string path, Type type)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            return new FieldReference(ValidationFieldPath.Of(path), Shape.FromClrType(type));
+            return new FieldReference(NamedPath(path, nameof(path)), Shape.FromClrType(type));
         }
 
-        internal static FieldReference Of(ValidationFieldPath path, Shape shape) => new FieldReference(path, shape);
+        /// <summary>A path that names a member at every step: no empty path, no empty step.</summary>
+        internal static string NamedPath(string path, string parameter)
+        {
+            if (path == null) throw new ArgumentNullException(parameter);
+            if (path.Split('.').Any(string.IsNullOrWhiteSpace))
+                throw new ArgumentException($"Validation field path '{path}' must name a member at every step.", parameter);
+            return path;
+        }
 
-        internal FieldReference PrefixedBy(ValidationFieldPath prefix) => new FieldReference(prefix.Append(Path), Shape);
+        /// <summary>This member as the model that holds it under <paramref name="prefix"/> names it; an empty prefix is that model itself.</summary>
+        internal FieldReference PrefixedBy(string prefix) =>
+            prefix.Length == 0 ? this : new FieldReference(prefix + "." + Path, Shape);
     }
 }

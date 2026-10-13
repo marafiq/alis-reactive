@@ -55,7 +55,7 @@ namespace Alis.Reactive.Builders.Requests
             where TSource : TValue
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            return Assign(member, source.ToValueExpression());
+            return Assign(member, source.Expression);
         }
 
         /// <summary>Sets a nullable member of the request to a value read when the request is sent.</summary>
@@ -68,7 +68,7 @@ namespace Alis.Reactive.Builders.Requests
             where TValue : struct
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            return Assign(member, source.ToValueExpression());
+            return Assign(member, source.Expression);
         }
 
         /// <summary>Sets a collection member of the request, such as a <c>List&lt;T&gt;</c>, to an array read when the request is sent.</summary>
@@ -82,7 +82,7 @@ namespace Alis.Reactive.Builders.Requests
             where TSource : IEnumerable<TItem>
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            return Assign(member, source.ToValueExpression());
+            return Assign(member, source.Expression);
         }
 
         /// <summary>Sets a member of the request to a value fixed when the view renders.</summary>
@@ -151,7 +151,7 @@ namespace Alis.Reactive.Builders.Requests
             if (source == null) throw new ArgumentNullException(nameof(source));
             var header = HeaderName.Of(name);
             RequestScalarTarget.Header<TValue>(header);
-            _draft.AddHeader(header.Value, source.ToValueExpression());
+            _draft.AddHeader(header.Value, source.Expression);
             return this;
         }
 

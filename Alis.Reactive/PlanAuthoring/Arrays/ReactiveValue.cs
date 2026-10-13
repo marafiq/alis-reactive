@@ -20,6 +20,6 @@ namespace Alis.Reactive.Builders.Arrays
             _value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
-        internal override ValueExpression ToValueExpression() => _value;
+        internal override ValueExpression Expression => _value;
     }
 }

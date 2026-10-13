@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive
@@ -13,44 +14,62 @@ namespace Alis.Reactive
     // Only property chains and MVC-style constant indexers are valid.
     internal static class ExpressionPathHelper
     {
-
-        public static string ToEventPath<TPayload, TProp>(Expression<Func<TPayload, TProp>> expression)
-        {
-            var members = ExtractRuntimeMemberChain(expression.Body);
-            return ToRuntimePath(members);
-        }
-
         // A runtime path reads JSON: a response body, a dispatched or pushed payload, or a component's
         // event arguments. The framework and ASP.NET Core write members with System.Text.Json's camel-case
         // naming ("MRN" is "mrn"), and browser and component events already name theirs in camel case.
-        private static List<string> ExtractRuntimeMemberChain(Expression expr) => ExtractMemberChain(expr, JsonMemberName.Of);
+        internal static string ToEventPath(LambdaExpression expression) =>
+            string.Join(".", MemberChain(expression.Body, JsonMemberName.Of).Select(step => step.Trim('[', ']')));
 
-        // MVC binding names and element IDs are rebuilt from these by restoring the first letter.
-        private static List<string> ExtractMemberChain(Expression expr) => ExtractMemberChain(expr, LowerFirstLetter);
+        // A member chain rooted at the model parameter (a rule's lambda body, or part of a condition),
+        // named the way MVC binds it: "Address.City", "Lines[0].Sku".
+        internal static string ToMemberName(Expression memberChain)
+        {
+            if (memberChain == null) throw new ArgumentNullException(nameof(memberChain));
+            var name = new StringBuilder();
+            foreach (var step in MemberChain(memberChain, member => member))
+            {
+                var isIndex = step[0] == '[';
+                if (name.Length > 0 && !isIndex) name.Append('.');
+                name.Append(step);
+            }
+            return name.ToString();
+        }
 
-        private static List<string> ExtractMemberChain(Expression expr, Func<string, string> memberName)
+        // Component IDs match MVC's Html.IdFor(), including nested-property underscores.
+        internal static string ToElementId(LambdaExpression expression) => ToMvcElementId(ToMemberName(expression.Body));
+
+        internal static string ToMvcElementId(string propertyPath) =>
+            propertyPath
+                .Replace(".", "_")
+                .Replace("[", "_")
+                .Replace("]", "_");
+
+        internal static Type ToPropertyType(LambdaExpression expression)
+        {
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            return UnwrapConvert(expression.Body).Type;
+        }
+
+        // The steps from the parameter: each member by its name, each constant index as "[n]".
+        private static List<string> MemberChain(Expression expr, Func<string, string> memberName)
         {
             expr = UnwrapConvert(expr);
 
             if (expr is ParameterExpression)
                 return new List<string>();
 
-            if (expr is MemberExpression member)
+            if (expr is MemberExpression { Expression: { } owner } member)
             {
-                var members = ExtractMemberChain(member.Expression!, memberName);
-                members.Add(memberName(member.Member.Name));
-                return members;
+                var steps = MemberChain(owner, memberName);
+                steps.Add(memberName(member.Member.Name));
+                return steps;
             }
 
             if (TryIndexAccess(expr, out var collection, out var index))
             {
-                var members = ExtractMemberChain(collection, memberName);
-                var suffix = "[" + index.ToString(CultureInfo.InvariantCulture) + "]";
-                if (members.Count == 0)
-                    members.Add(suffix);
-                else
-                    members[members.Count - 1] += suffix;
-                return members;
+                var steps = MemberChain(collection, memberName);
+                steps.Add("[" + index.ToString(CultureInfo.InvariantCulture) + "]");
+                return steps;
             }
 
             throw UnsupportedExpression(expr);
@@ -79,8 +98,8 @@ namespace Alis.Reactive
             if (expr is ParameterExpression)
                 return Path.None;
 
-            if (expr is MemberExpression member)
-                return BodyPathOf(member.Expression!).Then(member.Member.Name);
+            if (expr is MemberExpression { Expression: { } owner } member)
+                return BodyPathOf(owner).Then(member.Member.Name);
 
             if (TryIndexAccess(expr, out var collection, out var index))
             {
@@ -110,91 +129,6 @@ namespace Alis.Reactive
             new InvalidOperationException(
                 $"ExpressionPathHelper only supports property-access chains and MVC indexer paths " +
                 $"(e.g. m => m.Address.City or m => m.Items[0].Sku). Got unsupported expression node: {expr.NodeType}.");
-
-        // HTTP gather needs MVC model-binding names such as "Address.City".
-        public static string ToPropertyName<TModel>(Expression<Func<TModel, object?>> expression)
-        {
-            var members = ExtractMemberChain(expression.Body);
-            return string.Join(".", members.ConvertAll(PascalRestore));
-        }
-
-        // A member chain rooted at the model parameter (a rule's lambda body, or part of a condition),
-        // named the way MVC binds it: "Address.City", "Lines[0].Sku".
-        internal static string ToMemberName(Expression memberChain)
-        {
-            if (memberChain == null) throw new ArgumentNullException(nameof(memberChain));
-            return string.Join(".", ExtractMemberChain(memberChain).ConvertAll(PascalRestore));
-        }
-
-        // True when the expression is a member chain rooted at a parameter: what ToMemberName names.
-        internal static bool IsMemberChain(Expression expression)
-        {
-            expression = UnwrapConvert(expression);
-            while (expression is MemberExpression member && member.Expression != null)
-                expression = UnwrapConvert(member.Expression);
-            return expression is ParameterExpression;
-        }
-
-        internal static Type ToPropertyType(LambdaExpression expression)
-        {
-            if (expression == null) throw new ArgumentNullException(nameof(expression));
-            return UnwrapConvert(expression.Body).Type;
-        }
-
-        public static string ToPropertyName<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
-        {
-            var members = ExtractMemberChain(expression.Body);
-            return string.Join(".", members.ConvertAll(PascalRestore));
-        }
-
-        // Component IDs must match MVC Html.IdFor(), including nested-property underscores.
-        public static string ToElementId<TModel>(Expression<Func<TModel, object?>> expression)
-        {
-            var members = ExtractMemberChain(expression.Body);
-            return ToMvcElementId(string.Join(".", members.ConvertAll(PascalRestore)));
-        }
-
-        public static string ToElementId<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
-        {
-            var members = ExtractMemberChain(expression.Body);
-            return ToMvcElementId(string.Join(".", members.ConvertAll(PascalRestore)));
-        }
-
-        internal static string ToMvcElementId(string propertyPath) =>
-            propertyPath
-                .Replace(".", "_")
-                .Replace("[", "_")
-                .Replace("]", "_");
-
-        private static string ToRuntimePath(List<string> members)
-        {
-            var segments = new List<string>();
-            foreach (var member in members)
-                AddRuntimePathSegments(member, segments);
-
-            return string.Join(".", segments);
-        }
-
-        private static void AddRuntimePathSegments(string member, List<string> segments)
-        {
-            var position = 0;
-            while (position < member.Length)
-            {
-                var bracket = member.IndexOf('[', position);
-                if (bracket < 0)
-                {
-                    segments.Add(member.Substring(position));
-                    return;
-                }
-
-                if (bracket > position)
-                    segments.Add(member.Substring(position, bracket - position));
-
-                var close = member.IndexOf(']', bracket + 1);
-                segments.Add(member.Substring(bracket + 1, close - bracket - 1));
-                position = close + 1;
-            }
-        }
 
         private static bool TryIndexAccess(
             Expression expr,
@@ -235,18 +169,6 @@ namespace Alis.Reactive
         {
             var value = Expression.Lambda(UnwrapConvert(expression)).Compile().DynamicInvoke();
             return Convert.ToInt32(value);
-        }
-
-        private static string PascalRestore(string camel)
-        {
-            if (string.IsNullOrEmpty(camel)) return camel;
-            return char.ToUpperInvariant(camel[0]) + camel.Substring(1);
-        }
-
-        private static string LowerFirstLetter(string name)
-        {
-            if (string.IsNullOrEmpty(name)) return name;
-            return char.ToLowerInvariant(name[0]) + name.Substring(1);
         }
 
         private static Expression UnwrapConvert(Expression expr)

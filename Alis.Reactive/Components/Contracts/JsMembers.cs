@@ -30,7 +30,7 @@ namespace Alis.Reactive
 
         internal ComponentProperty<TValue> Member { get; }
 
-        internal override ValueExpression ToValueExpression() => Owner.Binding.Read(Member, Shape);
+        internal override ValueExpression Expression => Owner.Binding.Read(Member, Shape);
 
         /// <summary>Reads into the property's value, which is data: a row, a slot, a record.</summary>
         /// <example><c>p.When(args.Slot.Get(s =&gt; s.Quiet)).Truthy()</c></example>
@@ -56,7 +56,7 @@ namespace Alis.Reactive
                 _path = path;
             }
 
-            internal override ValueExpression ToValueExpression() =>
+            internal override ValueExpression Expression =>
                 _property.Owner.Binding.ReadPath(_property.Member, _path, Shape);
         }
     }
@@ -84,8 +84,8 @@ namespace Alis.Reactive
         /// <summary>Writes a value fixed when the view renders.</summary>
         /// <param name="value">The value, written into the plan.</param>
         public void Set(TValue value) =>
-            Owner.Binding.Set(Member, value is IValueSource source
-                ? source.ToValueExpression()
+            Owner.Binding.Set(Member, value is Arg source
+                ? source.Expression
                 : ValueExpression.LiteralFor(value, Member.Shape));
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Alis.Reactive
         public void Set<TSource>(TypedSource<TSource> source) where TSource : TValue
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            Owner.Binding.Set(Member, source.ToValueExpression());
+            Owner.Binding.Set(Member, source.Expression);
         }
 
         internal void SetExpression(ValueExpression value) => Owner.Binding.Set(Member, value);
@@ -119,7 +119,7 @@ namespace Alis.Reactive
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
             if (source == null) throw new ArgumentNullException(nameof(source));
-            property.SetExpression(source.ToValueExpression());
+            property.SetExpression(source.Expression);
         }
     }
 
@@ -159,7 +159,7 @@ namespace Alis.Reactive
 
         // A literal, or a value read when the step runs, in the shape the declaration gives it.
         private protected static ValueExpression ExpressionOf(object? value, Shape shape) =>
-            value is IValueSource source ? source.ToValueExpression() : ValueExpression.LiteralFor(value, shape);
+            value is Arg source ? source.Expression : ValueExpression.LiteralFor(value, shape);
 
         private sealed class DeclaredArg : Arg
         {

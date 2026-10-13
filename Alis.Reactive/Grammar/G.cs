@@ -9,7 +9,6 @@ namespace Alis.Reactive.Grammar
     internal static class G
     {
         internal static readonly IReadOnlyList<string> NoPath = Array.Empty<string>();
-        internal static readonly IReadOnlyList<Expr> NoArgs = Array.Empty<Expr>();
         internal static readonly IReadOnlyList<Shape> NoShapes = Array.Empty<Shape>();
         internal static readonly IReadOnlyList<Statement> NoStatements = Array.Empty<Statement>();
 

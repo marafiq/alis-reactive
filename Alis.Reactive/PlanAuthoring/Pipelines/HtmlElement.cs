@@ -84,7 +84,7 @@ namespace Alis.Reactive
         public void Set<TValue>(TypedSource<TValue> source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            _element.Set(_property, source.ToValueExpression().AsArrived());
+            _element.Set(_property, source.Expression.AsArrived());
         }
     }
 

@@ -305,7 +305,6 @@ export interface NumberShape {
 export interface ObjectShape {
   kind: "object";
   fields: Record<string, Shape>;
-  additional: boolean;
 }
 
 export interface StringShape {

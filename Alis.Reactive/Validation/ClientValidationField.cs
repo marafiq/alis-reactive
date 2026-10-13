@@ -36,7 +36,7 @@ namespace Alis.Reactive.Validation
         }
 
         /// <summary>The member's path in the validator's model, for example <c>"Address.City"</c>.</summary>
-        public string FieldName => Reference.Path.Value;
+        public string FieldName => Reference.Path;
 
         /// <summary>The rules the browser checks on the member.</summary>
         public IReadOnlyList<ClientRule> Rules { get; }
@@ -47,7 +47,7 @@ namespace Alis.Reactive.Validation
 
         internal bool HasRules => Rules.Count > 0;
 
-        internal ClientValidationField PrefixedBy(ValidationFieldPath prefix, ClientCondition outer) =>
+        internal ClientValidationField PrefixedBy(string prefix, ClientCondition outer) =>
             new ClientValidationField(
                 Reference.PrefixedBy(prefix),
                 Rules.Select(rule => rule.PrefixedBy(prefix, outer)),
@@ -55,7 +55,7 @@ namespace Alis.Reactive.Validation
 
         // A collection item field rendered at itemPrefix: its own conditions take the item prefix,
         // its owner's condition does not.
-        internal ClientValidationField RenderedAt(ValidationFieldPath itemPrefix) =>
+        internal ClientValidationField RenderedAt(string itemPrefix) =>
             PrefixedBy(itemPrefix, _ownerCondition);
 
         // An item field whose owner declared it under a condition (When around RuleForEach).
@@ -63,7 +63,7 @@ namespace Alis.Reactive.Validation
             new ClientValidationField(Reference, Rules, ItemFields, ClientCondition.Combine(condition, _ownerCondition));
 
         // An item field whose collection's owner moves under prefix: its owner condition moves with it.
-        private ClientValidationField OwnedUnder(ValidationFieldPath prefix, ClientCondition condition) =>
+        private ClientValidationField OwnedUnder(string prefix, ClientCondition condition) =>
             new ClientValidationField(Reference, Rules, ItemFields, ClientCondition.Combine(condition, _ownerCondition.PrefixedBy(prefix)));
     }
 
@@ -131,7 +131,7 @@ namespace Alis.Reactive.Validation
             if (when == null) throw new ArgumentNullException(nameof(when));
 
             Ensure(when.Fields);
-            var prefix = owner.Length == 0 ? ValidationFieldPath.Empty : ValidationFieldPath.Of(owner);
+            var prefix = owner.Length == 0 ? owner : FieldReference.NamedPath(owner, nameof(owner));
             foreach (var field in fields)
             {
                 var target = field.PrefixedBy(prefix, when);
@@ -160,17 +160,17 @@ namespace Alis.Reactive.Validation
 
         private Entry Ensure(FieldReference field)
         {
-            if (_fields.TryGetValue(field.Path.Value, out var existing))
+            if (_fields.TryGetValue(field.Path, out var existing))
             {
                 if (!existing.Field.Shape.Equals(field.Shape))
                     throw new InvalidOperationException(
-                        $"Client validation field '{field.Path.Value}' was declared with conflicting shapes: " +
+                        $"Client validation field '{field.Path}' was declared with conflicting shapes: " +
                         $"'{existing.Field.Shape.Kind}' and '{field.Shape.Kind}'.");
                 return existing;
             }
 
             var entry = new Entry(field);
-            _fields.Add(field.Path.Value, entry);
+            _fields.Add(field.Path, entry);
             _order.Add(entry);
             return entry;
         }

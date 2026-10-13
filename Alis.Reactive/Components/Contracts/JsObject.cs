@@ -234,7 +234,7 @@ namespace Alis.Reactive
                 _args = args;
             }
 
-            internal override ValueExpression ToValueExpression() => _owner.Binding.Invoke(_method, _args, Shape);
+            internal override ValueExpression Expression => _owner.Binding.Invoke(_method, _args, Shape);
         }
     }
 }

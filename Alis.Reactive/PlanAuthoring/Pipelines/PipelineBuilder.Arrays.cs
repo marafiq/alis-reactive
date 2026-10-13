@@ -17,7 +17,7 @@ namespace Alis.Reactive.Builders
         /// <param name="source">Typed value source that produces the array value.</param>
         /// <returns>Reactive array builder for composing operations such as filtering and counting.</returns>
         public ReactiveArray<TElement> From<TElement>(TypedSource<TElement[]> source) =>
-            new ReactiveArray<TElement>(source.ToValueExpression(), Shape.FromClrType(typeof(TElement)));
+            new ReactiveArray<TElement>(source.Expression, Shape.FromClrType(typeof(TElement)));
 
         /// <summary>
         /// Begins a typed array transform over a list a component declares, e.g.
@@ -26,13 +26,13 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TElement">Element type carried through the transform chain.</typeparam>
         /// <param name="source">Typed value source that produces the list.</param>
         public ReactiveArray<TElement> From<TElement>(TypedSource<IReadOnlyList<TElement>> source) =>
-            new ReactiveArray<TElement>(source.ToValueExpression(), Shape.FromClrType(typeof(TElement)));
+            new ReactiveArray<TElement>(source.Expression, Shape.FromClrType(typeof(TElement)));
 
         /// <summary>Begins a typed array transform over a <c>List&lt;T&gt;</c> source, such as a response body list.</summary>
         /// <typeparam name="TElement">Element type carried through the transform chain.</typeparam>
         /// <param name="source">Typed value source that produces the list.</param>
         public ReactiveArray<TElement> From<TElement>(TypedSource<List<TElement>> source) =>
-            new ReactiveArray<TElement>(source.ToValueExpression(), Shape.FromClrType(typeof(TElement)));
+            new ReactiveArray<TElement>(source.Expression, Shape.FromClrType(typeof(TElement)));
 
     }
 }

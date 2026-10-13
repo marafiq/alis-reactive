@@ -175,7 +175,7 @@ namespace Alis.Reactive.Validation
         }
 
         /// <summary>The rule of a child validator's field, under the member that holds it and its condition.</summary>
-        internal ClientRule PrefixedBy(ValidationFieldPath prefix, ClientCondition outer) =>
+        internal ClientRule PrefixedBy(string prefix, ClientCondition outer) =>
             new ClientRule(
                 Name,
                 Message,

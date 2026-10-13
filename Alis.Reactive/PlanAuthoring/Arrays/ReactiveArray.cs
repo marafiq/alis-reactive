@@ -148,7 +148,7 @@ namespace Alis.Reactive.Builders.Arrays
                 ValueExpression.ArrayFind(_source, Predicate(predicate), Projection(selector), fieldShape));
         }
 
-        internal override ValueExpression ToValueExpression() => _source;
+        internal override ValueExpression Expression => _source;
 
         private static ConditionGraph Predicate(Expression<Func<TElement, bool>> predicate)
         {

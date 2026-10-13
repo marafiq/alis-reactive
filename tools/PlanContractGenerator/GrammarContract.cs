@@ -94,7 +94,7 @@ namespace Alis.Reactive.ContractGeneration
                     members.Append("  kind: \"").Append(kind).Append("\";\n");
                     if (kind == "array") members.Append("  item: Shape;\n");
                     if (kind == "nullable") members.Append("  inner: Shape;\n");
-                    if (kind == "object") members.Append("  fields: Record<string, Shape>;\n  additional: boolean;\n");
+                    if (kind == "object") members.Append("  fields: Record<string, Shape>;\n");
                     Declare(ShapeName(kind), "export interface " + ShapeName(kind) + " {\n" + members + "}");
                 }
             }

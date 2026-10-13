@@ -166,13 +166,9 @@ function asObjectOf(value: unknown, shape: Extract<Shape, { kind: "object" }>): 
     typeof value === "object" && value !== null && !Array.isArray(value) && !(value instanceof Date);
   if (!isPlainRecord) return value;
 
-  const fields = Object.entries(shape.fields);
-  const keepsTheRecordAsItIs = shape.additional && fields.length === 0;
-  if (keepsTheRecordAsItIs) return value;
-
   const record = value as Record<string, unknown>;
-  const output: Record<string, unknown> = shape.additional ? { ...record } : {};
-  for (const [name, fieldShape] of fields) {
+  const output: Record<string, unknown> = {};
+  for (const [name, fieldShape] of Object.entries(shape.fields)) {
     if (Object.prototype.hasOwnProperty.call(record, name)) output[name] = shaped(record[name], fieldShape);
   }
   return output;

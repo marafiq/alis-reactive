@@ -80,10 +80,10 @@ namespace Alis.Reactive.Validation
             string collectionPath,
             string itemFieldPath,
             string registeredPath,
-            out ValidationFieldPath itemPrefix,
+            out string itemPrefix,
             out bool isDirectField)
         {
-            itemPrefix = ValidationFieldPath.Empty;
+            itemPrefix = "";
             isDirectField = false;
 
             var openingBracket = collectionPath.Length;
@@ -100,7 +100,7 @@ namespace Alis.Reactive.Validation
                 registeredPath.StartsWith(renderedItemFieldPath + "[", StringComparison.Ordinal);
             if (!isDirectField && !nestedField) return false;
 
-            itemPrefix = ValidationFieldPath.Of(prefix);
+            itemPrefix = prefix;
             return true;
         }
     }
@@ -122,9 +122,9 @@ namespace Alis.Reactive.Validation
         }
 
         internal (string Id, Shape Shape) Resolve(FieldReference field) =>
-            _registeredInputs.TryGetValue(field.Path.Value, out var registration)
+            _registeredInputs.TryGetValue(field.Path, out var registration)
                 ? (registration.ComponentId, registration.Shape)
-                : (IdGenerator.For(_modelType, field.Path.Value), field.Shape);
+                : (IdGenerator.For(_modelType, field.Path), field.Shape);
 
         internal ValueExpression Value(FieldReference field)
         {

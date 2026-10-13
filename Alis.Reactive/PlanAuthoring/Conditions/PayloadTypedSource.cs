@@ -19,12 +19,15 @@ namespace Alis.Reactive.Builders.Conditions
 
         // The identity expression (x => x) selects no member: it reads the whole payload, for example
         // a response body that is itself the array a grid binds.
-        internal override ValueExpression ToValueExpression()
+        internal override ValueExpression Expression
         {
-            var payloadPath = ExpressionPathHelper.ToEventPath(_expression);
-            return payloadPath.Length == 0
-                ? ValueExpression.ReadWhole(_data, Shape)
-                : ValueExpression.Read(_data, G.PathOf(Path.Parse(payloadPath)), Shape);
+            get
+            {
+                var payloadPath = ExpressionPathHelper.ToEventPath(_expression);
+                return payloadPath.Length == 0
+                    ? ValueExpression.ReadWhole(_data, Shape)
+                    : ValueExpression.Read(_data, G.PathOf(Path.Parse(payloadPath)), Shape);
+            }
         }
     }
 }

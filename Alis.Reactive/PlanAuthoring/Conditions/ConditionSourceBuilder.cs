@@ -81,7 +81,7 @@ namespace Alis.Reactive.Builders.Conditions
         internal TNext CompareWith<TRight>(CompareOperator op, TypedSource<TRight> right)
         {
             if (right == null) throw new ArgumentNullException(nameof(right));
-            return _next(ConditionGraph.Binary(op, Left, right.ToValueExpression(), Shape));
+            return _next(ConditionGraph.Binary(op, Left, right.Expression, Shape));
         }
 
         internal TNext CompareWithText(CompareOperator op, string operand) =>
@@ -105,7 +105,7 @@ namespace Alis.Reactive.Builders.Conditions
             _next(ConditionGraph.CollectionItem(
                 CompareOperator.ArrayContains, Left, ValueExpression.LiteralRaw(item, _left.ElementShape), Shape, _left.ElementShape));
 
-        private ValueExpression Left => _left.ToValueExpression();
+        private ValueExpression Left => _left.Expression;
 
         private TNext Unary(CompareOperator op) => _next(ConditionGraph.Unary(op, Left, Shape));
 
