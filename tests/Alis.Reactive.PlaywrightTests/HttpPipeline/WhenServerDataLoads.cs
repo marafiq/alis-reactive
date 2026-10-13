@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline;
 
 [TestFixture]
@@ -398,10 +400,17 @@ public class WhenServerDataLoads : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // Cancel runs the link's Else, and the Else is all it runs: a delete sent anyway would set the
+    // status to "Deleting resident #42..." in the same turn.
     [Test]
     public async Task native_action_link_delete_with_confirm_does_not_delete_when_cancelled()
     {
         await WaitForDomReadyGet();
+        var deletes = new ConcurrentQueue<string>();
+        Page.Request += (_, request) =>
+        {
+            if (request.Url.Contains("/Sandbox/HttpPipeline/Http/ActionLinkDelete/")) deletes.Enqueue(request.Url);
+        };
 
         await Expect(Page.GetByTestId("native-action-link-row-42"))
             .ToContainTextAsync("Resident #42", new() { Timeout = 5000 });
@@ -412,8 +421,11 @@ public class WhenServerDataLoads : PlaywrightTestBase
         await Expect(cancelButton).ToBeVisibleAsync(new() { Timeout = 5000 });
         await ClickWhenStable(cancelButton);
 
+        await Expect(Page.Locator("#native-action-link-status"))
+            .ToHaveTextAsync("Cancelled delete for resident #42", new() { Timeout = 5000 });
         await Expect(Page.GetByTestId("native-action-link-row-42"))
             .ToContainTextAsync("Resident #42", new() { Timeout = 5000 });
+        Assert.That(deletes, Is.Empty, "A cancelled delete sends nothing.");
 
         AssertNoConsoleErrors();
     }

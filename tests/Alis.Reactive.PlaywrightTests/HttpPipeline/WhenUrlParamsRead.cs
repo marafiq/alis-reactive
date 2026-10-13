@@ -68,6 +68,21 @@ public class WhenUrlParamsRead : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The medications panel shows on both pages, so the page condition has run when it is checked.
+    [Test]
+    public async Task url_condition_numeric_gt_shows_prev_button_from_page_two_but_not_on_page_one()
+    {
+        await NavigateTo("/Sandbox/HttpPipeline/Http?tab=medications&page=1");
+        await WaitForTraceMessage("booted", 10000);
+        await Expect(Page.Locator("#url-cond-meds")).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#url-cond-prev")).ToBeHiddenAsync();
+
+        await NavigateTo("/Sandbox/HttpPipeline/Http?tab=medications&page=2");
+        await Expect(Page.Locator("#url-cond-meds")).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#url-cond-prev")).ToBeVisibleAsync();
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task url_param_displayed_in_element_text()
     {
@@ -141,12 +156,13 @@ public class WhenUrlParamsRead : PlaywrightTestBase
     }
 
     [Test]
-    public async Task missing_url_param_returns_null_condition_hides_panel()
+    public async Task missing_url_param_takes_the_else_branch_and_shows_the_overview()
     {
         await NavigateWithoutParams();
 
-        await Expect(Page.Locator("#url-cond-meds"))
-            .ToBeHiddenAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#url-cond-overview"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#url-cond-meds")).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 }

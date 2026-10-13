@@ -127,15 +127,16 @@ public class WhenRouteParamsResolve : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // Unencoded, the browser would end the path at "#" and the server would receive "John Doe ".
     [Test]
-    public async Task route_param_with_space_is_uri_encoded_and_decoded_by_server()
+    public async Task route_param_with_a_space_and_a_hash_reaches_the_server_whole()
     {
         await NavigateAndWaitForBoot();
 
         await ClickButton("Load Resident by Name");
 
         await Expect(Page.Locator("#route-encoded-name"))
-            .ToHaveTextAsync("John Doe", new() { Timeout = 5000 });
+            .ToHaveTextAsync("John Doe #2", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 }

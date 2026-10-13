@@ -30,8 +30,16 @@
     {
         var link = p.Url<HttpShowcaseQuery>();
         p.When(link.Get(q => q.Tab)).Eq("medications")
-         .Then(then => then.Element("url-cond-meds").Show())
-         .Else(els => els.Element("url-cond-meds").Hide());
+         .Then(then =>
+         {
+             then.Element("url-cond-meds").Show();
+             then.Element("url-cond-overview").Hide();
+         })
+         .Else(els =>
+         {
+             els.Element("url-cond-meds").Hide();
+             els.Element("url-cond-overview").Show();
+         });
 
         p.When(link.Get(q => q.Page)).Gt(1)
          .Then(then => then.Element("url-cond-prev").Show())
@@ -449,9 +457,10 @@
     <native-card>
     <native-card-body>
         <native-heading level="H2">20. URL Query in Conditions &rarr; DomReady Branch</native-heading>
-        <p class="text-sm text-text-secondary mb-3">On page load, branches based on ?tab and ?page URL params. Navigate with ?tab=medications&amp;page=3 to see results.</p>
+        <p class="text-sm text-text-secondary mb-3">On page load, branches based on ?tab and ?page URL params. Navigate with ?tab=medications&amp;page=3 to see results; without ?tab the overview shows.</p>
         <native-vstack gap="Xs" class="font-mono text-sm">
             <p id="url-cond-meds" hidden class="text-green-600">Medications panel visible (tab=medications)</p>
+            <p id="url-cond-overview" hidden class="text-text-secondary">Overview panel visible (no medications tab)</p>
             <p id="url-cond-prev" hidden class="text-blue-600">Previous button visible (page &gt; 1)</p>
         </native-vstack>
     </native-card-body>
@@ -634,13 +643,13 @@
     <native-card>
     <native-card-body>
         <native-heading level="H2">18. URI-Encoded Route Param</native-heading>
-        <p class="text-sm text-text-secondary mb-3">Route param &quot;John Doe&quot; is URI-encoded to &quot;John%20Doe&quot; in the URL path. Server URL-decodes it.</p>
+        <p class="text-sm text-text-secondary mb-3">Route param &quot;John Doe #2&quot; is URI-encoded to &quot;John%20Doe%20%232&quot; in the URL path, so the &quot;#&quot; does not end it. Server URL-decodes it.</p>
         @(Html.NativeButton("route-encoded-btn", "Load Resident by Name")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Get(Url.SandboxRouteTemplate("ResidentByName", "Http", "name"))
-                 .Gather<ResidentNameLookup>(g => g.Set(x => x.Name, "John Doe"))
+                 .Gather<ResidentNameLookup>(g => g.Set(x => x.Name, "John Doe #2"))
                  .Response(r => r
                     .OnSuccess<ResidentByNameResponse>((json, s) =>
                     {
