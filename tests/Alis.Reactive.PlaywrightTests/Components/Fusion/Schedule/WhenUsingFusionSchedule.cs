@@ -45,12 +45,18 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
     private ILocator ShiftsOf(string subject) =>
         Page.Locator("#shift-schedule .e-appointment").Filter(new() { HasText = subject });
 
-    // A shift by its subject, start and shift column, read from the name the schedule gives it for
-    // screen readers ("AM Shift"s event - Jane Blonde (CNA) Begin From Tuesday, October 13, 2026 at
-    // 4:00:00 PM ...").
+    // A shift by its subject and start, by the name the schedule gives it for screen readers ("AM
+    // Shift"s event - Jane Blonde (CNA) Begin From Tuesday, October 13, 2026 at 4:00:00 PM ..."), in a
+    // shift column. The space before AM or PM may be a narrow one, as newer browsers format times.
     private ILocator ShiftAt(string subject, DateTime start, int shiftColumn) =>
-        Page.Locator($"#shift-schedule .e-appointment[data-group-index='{shiftColumn}']" +
-            $"[aria-label*='{subject} Begin From {start.ToString("dddd, MMMM d, yyyy 'at' h:mm:ss tt", CultureInfo.InvariantCulture)}']");
+        Page.Locator($"#shift-schedule .e-appointment[data-group-index='{shiftColumn}']").And(
+            Page.Locator("#shift-schedule").GetByRole(AriaRole.Button, new()
+            {
+                NameRegex = new Regex(
+                    Regex.Escape($"{subject} Begin From {start.ToString("dddd, MMMM d, yyyy", CultureInfo.InvariantCulture)} at " +
+                                 start.ToString("h:mm:ss", CultureInfo.InvariantCulture)) +
+                    @"\W?" + start.ToString("tt", CultureInfo.InvariantCulture)),
+            }));
 
     // A work cell of the week's grid, by its start (data-date is the start's epoch milliseconds in the
     // browser's zone, the same zone the tests run in) and its shift column (0 = AM, 1 = PM, 2 = Night).
@@ -290,11 +296,13 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await ClickOpenHourToday();
         await Expect(NewAssignmentDialog).ToContainTextAsync("Staff Member", new() { Timeout = 10000 });
 
+        var janesShifts = await ShiftsOf("Jane Blonde (CNA)").CountAsync();
         await ChooseNewShiftStaff("Jane Blonde (CNA)");
         await ClickWhenStable(Page.Locator("#btn-create-assignment"));
 
         await Expect(NewAssignmentDialog).ToBeHiddenAsync(new() { Timeout = 10000 });
-        await Expect(ShiftAt("Jane Blonde (CNA)", OpenHourToday, shiftColumn: 0)).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(ShiftsOf("Jane Blonde (CNA)")).ToHaveCountAsync(janesShifts + 1, new() { Timeout = 10000 });
+        await Expect(ShiftAt("Jane Blonde (CNA)", OpenHourToday, shiftColumn: 0)).ToBeVisibleAsync();
         Assert.That(weekLoads, Is.EqualTo(0), "The new shift joins the week the schedule shows; the week is not reloaded.");
 
         // The shift was saved in this coordinator's schedule, so it is there after a reload.
