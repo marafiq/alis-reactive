@@ -46,7 +46,7 @@
             <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Optional values on native inputs: a blank community or daily rate is asked for, a blank length of stay is booked as open-ended, and an unanswered transport question stays undecided, never zero or "no"
+            Optional values on native inputs: a blank community or daily rate is asked for, a blank length of stay is booked as open-ended and needs a plan for how it ends, a planned stay needs its last-day pickup, and a community without a transport desk needs the transport answer
         </p>
     </a>
 
@@ -59,7 +59,7 @@
             <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Collection item rules under a condition on the parent: each contact's phone is required only when the resident has emergency contacts
+            Collection item rules under a condition on the parent: each contact's phone is required only when the resident has emergency contacts; Save Contacts checks only the contacts, and the server refuses the front desk's number beside the contact that gave it
         </p>
     </a>
 
@@ -72,7 +72,7 @@
             <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            A required yes/no question: "No" is an answer and saves, an unanswered question is asked for, and an attestation checkbox must still be ticked
+            A required yes/no question: "No" is an answer and saves, an unanswered question is asked for, an attestation checkbox must still be ticked, and the fall count, injury and neuro-check time agree with the answers
         </p>
     </a>
 
@@ -85,7 +85,7 @@
             <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Required means what the server means: a room name of only spaces is asked for, a blank or $0 monthly rate is no rate, and a $0 community fee is a waived fee
+            Required means what the server means: a room name of only spaces is asked for, a blank or $0 monthly rate is no rate, and a $0 community fee is a waived fee; the community's rate cap comes from its policy, the fee stays below the rate, and a suite needs its square footage
         </p>
     </a>
 
@@ -98,7 +98,7 @@
             <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            A refusal that belongs to no field on the form, a room another family already holds, is shown in the page's validation summary
+            A refusal that belongs to no field on the form, a room another family already holds, is shown in the page's validation summary; the family's agreement is asked for, and the reservations office's own rules run on the server only
         </p>
     </a>
 
@@ -111,7 +111,7 @@
             <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            One form whose steps load as partials: each step checks only the fields it shows, and a step that leaves takes its rules with it
+            One form whose steps load as partials: each step checks only the fields it shows, and a step that leaves takes its rules with it; the mobility questions arrive with the care level, and the nurse review checks care needs only once they are on the page
         </p>
     </a>
 
@@ -137,7 +137,7 @@
             <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Date picker fields with past/future constraints, date range validation, and relative date rules — pick dates to see validation fire in real time
+            A resident's stay: admission and discharge, and the care plan review, follow-up visit and move-out inspection booked inside it, each checked against a fixed date or the stay's own dates
         </p>
     </a>
 
