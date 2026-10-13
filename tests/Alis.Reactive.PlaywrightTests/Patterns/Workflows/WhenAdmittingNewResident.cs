@@ -171,19 +171,26 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // Typing a rate clears the message at once, while the admin is still in the field: leaving the
+    // field is not what clears it.
     [Test]
-    public async Task monthly_rate_error_clears_when_admin_enters_a_rate()
+    public async Task monthly_rate_error_clears_as_soon_as_the_admin_types_a_rate()
     {
         await NavigateAndBoot();
+        var monthlyRate = _plan.NumericTextBox(m => m.MonthlyRate);
 
         await SubmitBtn.ClickAsync();
         await Expect(_plan.ErrorFor(m => m.MonthlyRate))
             .ToContainTextAsync("required", new() { Timeout = 5000 });
 
-        await _plan.NumericTextBox(m => m.MonthlyRate).FillAndBlur("2500");
+        await monthlyRate.Fill("2500");
 
+        await Expect(monthlyRate.Input).ToBeFocusedAsync();
         await Expect(_plan.ErrorFor(m => m.MonthlyRate))
             .ToBeHiddenAsync(new() { Timeout = 5000 });
+
+        await monthlyRate.Blur();
+        await Expect(_plan.ErrorFor(m => m.MonthlyRate)).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
