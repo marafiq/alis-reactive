@@ -31,14 +31,6 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Injects <paramref name="onClick"/> directly into the <c>onclick</c> attribute; callers must ensure it is safe.
-        /// </summary>
-        internal static string Button(string text, string onClick, TemplateCss css)
-        {
-            return $"<button class=\"{css.AppendTo("e-btn")}\" onclick=\"{onClick}\">{text}</button>";
-        }
-
-        /// <summary>
         /// Renders a button whose click raises a document event with one payload member bound from the
         /// row. The template carries no script: the runtime raises the event named by
         /// <c>data-alis-raise</c> with the JSON in <c>data-alis-detail</c>. The detail's quotes are

@@ -23,7 +23,7 @@ namespace Alis.Reactive.Fusion.Templates
     /// <remarks>
     /// Rendered string is consumed by Syncfusion's template engine. It is not a
     /// Reactive Plan, and it does not mutate live DOM until Syncfusion renders it.
-    /// Caller-provided literal text, attributes, CSS classes, URLs, inline JavaScript,
+    /// Caller-provided literal text, attributes, CSS classes, URLs
     /// and raw HTML are emitted as supplied; use trusted developer-authored values.
     /// </remarks>
     /// <typeparam name="TModel">Object shape exposed by the Syncfusion template context.</typeparam>
@@ -215,73 +215,6 @@ namespace Alis.Reactive.Fusion.Templates
         private FusionTemplateBuilder<TModel> Icon(string iconName, TemplateCss css)
         {
             _childRenderers.Add(() => TemplateElements.Icon(iconName, css));
-            return this;
-        }
-
-        /// <summary>
-        /// Adds a button with a raw <c>onclick</c> expression.
-        /// </summary>
-        /// <param name="text">Button text.</param>
-        /// <param name="onClick">Raw <c>onclick</c> expression.</param>
-        /// <remarks>The <paramref name="onClick"/> value is emitted as supplied; do not pass untrusted input.</remarks>
-        public FusionTemplateBuilder<TModel> Button(string text, string onClick) =>
-            Button(text, onClick, TemplateCss.None);
-
-        /// <summary>
-        /// Adds a styled button with a raw <c>onclick</c> expression.
-        /// </summary>
-        /// <param name="text">Button text.</param>
-        /// <param name="onClick">Raw <c>onclick</c> expression.</param>
-        /// <param name="css">CSS class.</param>
-        /// <remarks>The <paramref name="onClick"/> value is emitted as supplied; do not pass untrusted input.</remarks>
-        public FusionTemplateBuilder<TModel> Button(string text, string onClick, string css) =>
-            Button(text, onClick, TemplateCss.Class(css));
-
-        private FusionTemplateBuilder<TModel> Button(string text, string onClick, TemplateCss css)
-        {
-            _childRenderers.Add(() => TemplateElements.Button(text, onClick, css));
-            return this;
-        }
-
-        /// <summary>
-        /// Adds a button that calls a JavaScript function with a bound model value.
-        /// </summary>
-        /// <param name="text">Button text.</param>
-        /// <param name="idProperty">Template model property passed as the JavaScript function argument.</param>
-        /// <param name="onClickFn">JavaScript function name written to <c>onclick</c>.</param>
-        /// <remarks>The function name is emitted into <c>onclick</c> as supplied; do not pass untrusted input.</remarks>
-        public FusionTemplateBuilder<TModel> ButtonFor<TProperty>(
-            string text,
-            Expression<Func<TModel, TProperty>> idProperty,
-            string onClickFn) =>
-            ButtonFor(text, idProperty, onClickFn, TemplateCss.None);
-
-        /// <summary>
-        /// Adds a styled button that calls a JavaScript function with a bound model value.
-        /// </summary>
-        /// <param name="text">Button text.</param>
-        /// <param name="idProperty">Template model property passed as the JavaScript function argument.</param>
-        /// <param name="onClickFn">JavaScript function name written to <c>onclick</c>.</param>
-        /// <param name="css">CSS class.</param>
-        /// <remarks>The function name is emitted into <c>onclick</c> as supplied; do not pass untrusted input.</remarks>
-        public FusionTemplateBuilder<TModel> ButtonFor<TProperty>(
-            string text,
-            Expression<Func<TModel, TProperty>> idProperty,
-            string onClickFn,
-            string css) =>
-            ButtonFor(text, idProperty, onClickFn, TemplateCss.Class(css));
-
-        private FusionTemplateBuilder<TModel> ButtonFor<TProperty>(
-            string text,
-            Expression<Func<TModel, TProperty>> idProperty,
-            string onClickFn,
-            TemplateCss css)
-        {
-            _childRenderers.Add(() =>
-            {
-                var idBinding = FusionTemplateExpression.ToBinding(idProperty);
-                return $"<button class=\"{css.AppendTo("e-btn")}\" onclick=\"{onClickFn}({idBinding})\">{text}</button>";
-            });
             return this;
         }
 

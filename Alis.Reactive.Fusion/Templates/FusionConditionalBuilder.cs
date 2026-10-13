@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.Templates
     /// Builds the content emitted inside a Syncfusion template conditional block.
     /// </summary>
     /// <remarks>
-    /// Caller-provided literal text, CSS classes, raw <c>onclick</c> values and raw HTML are
+    /// Caller-provided literal text, CSS classes and raw HTML are
     /// emitted as supplied; use trusted developer-authored values.
     /// </remarks>
     /// <typeparam name="TModel">Syncfusion template context shape.</typeparam>
@@ -135,31 +135,6 @@ namespace Alis.Reactive.Fusion.Templates
                 FusionTemplateExpression.ToBinding(srcProperty),
                 css,
                 TemplateAltText.None));
-            return this;
-        }
-
-        /// <summary>
-        /// Adds a button with a raw <c>onclick</c> expression.
-        /// </summary>
-        /// <param name="text">Button text.</param>
-        /// <param name="onClick">Raw <c>onclick</c> expression.</param>
-        /// <remarks>The <paramref name="onClick"/> value is emitted as supplied; do not pass untrusted input.</remarks>
-        public FusionConditionalBuilder<TModel> Button(string text, string onClick) =>
-            Button(text, onClick, TemplateCss.None);
-
-        /// <summary>
-        /// Adds a styled button with a raw <c>onclick</c> expression.
-        /// </summary>
-        /// <param name="text">Button text.</param>
-        /// <param name="onClick">Raw <c>onclick</c> expression.</param>
-        /// <param name="css">CSS class.</param>
-        /// <remarks>The <paramref name="onClick"/> value is emitted as supplied; do not pass untrusted input.</remarks>
-        public FusionConditionalBuilder<TModel> Button(string text, string onClick, string css) =>
-            Button(text, onClick, TemplateCss.Class(css));
-
-        private FusionConditionalBuilder<TModel> Button(string text, string onClick, TemplateCss css)
-        {
-            _childRenderers.Add(() => TemplateElements.Button(text, onClick, css));
             return this;
         }
 
