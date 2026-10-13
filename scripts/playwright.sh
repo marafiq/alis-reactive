@@ -479,8 +479,10 @@ fi
 # flaky list — visible in the output, in flaky-<stamp>.txt, and in the GitHub job summary.
 retries_done=0
 flaky=()
+flaky_annotations=""
 while [ "$status" -ne 0 ] && [ "$retries_done" -lt "$retry_failed" ]; do
-  failed_tests="$(node scripts/trx-failed-tests.mjs "$attempt_trx")"
+  failed_trx="$attempt_trx"
+  failed_tests="$(node scripts/trx-failed-tests.mjs "$failed_trx")"
   if [ -z "$failed_tests" ]; then
     echo "[playwright:retry] no failed test recorded in $attempt_trx (crash or hang?); not retrying"
     break
@@ -493,6 +495,7 @@ while [ "$status" -ne 0 ] && [ "$retries_done" -lt "$retry_failed" ]; do
   while IFS= read -r fqn; do
     [ -n "$fqn" ] && flaky+=("$fqn")
   done < <(node scripts/trx-failed-tests.mjs "$attempt_trx" passed)
+  flaky_annotations+="$(node scripts/trx-failed-tests.mjs "$failed_trx" flaky "$attempt_trx")"$'\n'
 done
 
 if [ "${#flaky[@]}" -gt 0 ]; then
@@ -510,9 +513,10 @@ if [ "${#flaky[@]}" -gt 0 ]; then
     } >> "$GITHUB_STEP_SUMMARY"
   fi
   # The job stays green, and nobody opens the summary of a green job: a warning annotation puts each
-  # flaky test on the pull request's checks, so a re-run never turns a failure into silence.
+  # flaky test on the pull request's checks with the start of the failure the re-run hid, so a
+  # re-run never turns a failure into silence, and the flake can be root-caused from the check.
   if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
-    sed 's/^/::warning title=Flaky test::/; s|$| failed, then passed on re-run (docs/CI.md, "Flaky tests")|' "$flaky_path"
+    printf '%s' "$flaky_annotations" | sed '/^$/d'
   fi
 fi
 

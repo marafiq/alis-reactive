@@ -6,47 +6,44 @@
 // start of its failure message, so a red shard names its failures on the pull request's checks.
 // With "summary" it prints one ::notice command naming each fixture and how many of its tests
 // passed, so a green shard says what it proved.
+// With "flaky" and the TRX of the re-run it prints one ::warning command per test that failed in
+// the first file and passed in the re-run, carrying the start of the failure the re-run hid, so a
+// flaky test's check says why it failed (the failure artifacts are uploaded only for a red job).
 //
 // Used by scripts/playwright.sh --retry-failed to re-run only what failed, to report which tests
-// then passed (the flaky list), and to annotate what still failed.
+// then passed (the flaky list) and why they failed, and to annotate what still failed.
 //
 //   node scripts/trx-failed-tests.mjs <file.trx> [failed|passed|annotations|summary]
+//   node scripts/trx-failed-tests.mjs <file.trx> flaky <rerun.trx>
 //
 // A missing file prints nothing and exits 0: a crashed or hung run has no results to re-run.
 import { existsSync, readFileSync } from "node:fs";
 
-const modes = ["failed", "passed", "annotations", "summary"];
-const [trxPath, mode = "failed"] = process.argv.slice(2);
-if (!trxPath || !modes.includes(mode)) {
-  console.error(`usage: node scripts/trx-failed-tests.mjs <file.trx> [${modes.join("|")}]`);
+const modes = ["failed", "passed", "annotations", "summary", "flaky"];
+const [trxPath, mode = "failed", rerunTrxPath] = process.argv.slice(2);
+if (!trxPath || !modes.includes(mode) || (mode === "flaky") !== Boolean(rerunTrxPath)) {
+  console.error(`usage: node scripts/trx-failed-tests.mjs <file.trx> [${modes.filter(m => m !== "flaky").join("|")}]`);
+  console.error("       node scripts/trx-failed-tests.mjs <file.trx> flaky <rerun.trx>");
   process.exit(2);
 }
 if (!existsSync(trxPath)) process.exit(0);
 
-const xml = readFileSync(trxPath, "utf8");
-
-const idToFqn = new Map();
-const unitTest = /<UnitTest\b[^>]*\bid="([^"]+)"[^>]*>([\s\S]*?)<\/UnitTest>/g;
-let match;
-while ((match = unitTest.exec(xml)) !== null) {
-  const method = /<TestMethod\b[^>]*\bclassName="([^"]+)"[^>]*\bname="([^"]+)"/.exec(match[2]);
-  if (method) idToFqn.set(match[1], `${method[1]}.${method[2]}`);
-}
-
 const neitherPassedNorFailed = new Set(["NotExecuted", "Inconclusive"]);
-const wanted = mode === "passed" || mode === "summary"
-  ? outcome => outcome === "Passed"
-  : outcome => outcome !== "Passed" && !neitherPassedNorFailed.has(outcome);
+const passed = outcome => outcome === "Passed";
+const failed = outcome => outcome !== "Passed" && !neitherPassedNorFailed.has(outcome);
 
-const selected = new Map();
-const result = /<UnitTestResult\b([^>]*?)(?:\/>|>([\s\S]*?)<\/UnitTestResult>)/g;
-while ((match = result.exec(xml)) !== null) {
-  const testId = /\btestId="([^"]+)"/.exec(match[1]);
-  const outcome = /\boutcome="([^"]+)"/.exec(match[1]);
-  const fqn = testId && idToFqn.get(testId[1]);
-  if (fqn && outcome && wanted(outcome[1])) selected.set(fqn, failureMessage(match[2] ?? ""));
+if (mode === "flaky") {
+  const failedFirst = results(trxPath, failed);
+  const passedOnRerun = results(rerunTrxPath, passed);
+  for (const fqn of [...failedFirst.keys()].sort()) {
+    if (passedOnRerun.has(fqn)) {
+      console.log(annotation("warning", "Flaky test", `${fqn} failed, then passed on re-run (docs/CI.md, "Flaky tests")`, failedFirst.get(fqn)));
+    }
+  }
+  process.exit(0);
 }
 
+const selected = results(trxPath, mode === "passed" || mode === "summary" ? passed : failed);
 const fqns = [...selected.keys()].sort();
 if (mode === "summary") {
   console.log(summary(fqns));
@@ -59,7 +56,31 @@ if (mode === "annotations" && fqns.length > annotationsShownPerStep) {
   console.log(`::error title=${fqns.length} failed tests::${fqns.join("%0A")}`);
 }
 for (const fqn of fqns) {
-  console.log(mode === "annotations" ? annotation(fqn, selected.get(fqn)) : fqn);
+  console.log(mode === "annotations" ? annotation("error", "Failed test", fqn, selected.get(fqn)) : fqn);
+}
+
+// Each test in the TRX whose outcome `wanted` accepts, with the message it failed with ("" if none).
+function results(path, wanted) {
+  const selected = new Map();
+  if (!existsSync(path)) return selected;
+  const xml = readFileSync(path, "utf8");
+
+  const idToFqn = new Map();
+  const unitTest = /<UnitTest\b[^>]*\bid="([^"]+)"[^>]*>([\s\S]*?)<\/UnitTest>/g;
+  let match;
+  while ((match = unitTest.exec(xml)) !== null) {
+    const method = /<TestMethod\b[^>]*\bclassName="([^"]+)"[^>]*\bname="([^"]+)"/.exec(match[2]);
+    if (method) idToFqn.set(match[1], `${method[1]}.${method[2]}`);
+  }
+
+  const result = /<UnitTestResult\b([^>]*?)(?:\/>|>([\s\S]*?)<\/UnitTestResult>)/g;
+  while ((match = result.exec(xml)) !== null) {
+    const testId = /\btestId="([^"]+)"/.exec(match[1]);
+    const outcome = /\boutcome="([^"]+)"/.exec(match[1]);
+    const fqn = testId && idToFqn.get(testId[1]);
+    if (fqn && outcome && wanted(outcome[1])) selected.set(fqn, failureMessage(match[2] ?? ""));
+  }
+  return selected;
 }
 
 function failureMessage(body) {
@@ -80,10 +101,10 @@ function unescapeXml(text) {
 
 // GitHub Actions workflow commands escape %, CR and LF in the message; the start of the failure
 // message is enough to name the defect, and the artifact carries the rest.
-function annotation(fqn, message) {
-  const text = `${fqn}${message ? ` — ${message.slice(0, 4000)}` : ""}`;
+function annotation(level, title, subject, message) {
+  const text = `${subject}${message ? ` — ${message.slice(0, 4000)}` : ""}`;
   const escaped = text.replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
-  return `::error title=Failed test::${escaped}`;
+  return `::${level} title=${title}::${escaped}`;
 }
 
 // "312 passed" and, one per line, each fixture with its passed count: WhenCoordinatorReviewsMoveIn (9).
