@@ -5,28 +5,17 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator
 {
     /// <summary>
-    /// The browser's form of a <c>When</c> condition: a condition over the fields of the model, and the
-    /// fields it reads. A C# condition has a browser form when every part of it is a comparison of a
-    /// model member with a value the condition fixes, joined by <c>&amp;&amp;</c>, <c>||</c> and <c>!</c>.
+    /// The browser's form of a <c>When</c> condition. A C# condition has a browser form when every part of it
+    /// is a test of a model member against a value the condition fixes, joined by <c>&amp;&amp;</c>,
+    /// <c>||</c> and <c>!</c>.
     /// </summary>
-    internal sealed class ClientCondition
+    internal static class BrowserCondition
     {
-        private ClientCondition(FieldCondition condition, IReadOnlyList<ClientValidationFieldReference> fields)
-        {
-            Condition = condition;
-            Fields = fields;
-        }
-
-        internal FieldCondition Condition { get; }
-
-        internal IReadOnlyList<ClientValidationFieldReference> Fields { get; }
-
         /// <summary>The condition's browser form, or null when part of it has none (it stays server-only).</summary>
         internal static ClientCondition? From(LambdaExpression predicate)
         {
@@ -34,41 +23,9 @@ namespace Alis.Reactive.FluentValidator
             return new Translator(predicate.Parameters[0]).Translate(predicate.Body);
         }
 
-        internal ClientCondition Negated() => new ClientCondition(FieldCondition.Not(Condition), Fields);
-
+        /// <summary>Every condition of a nested <c>When</c>, outermost first.</summary>
         internal static ClientCondition AllOf(IReadOnlyList<ClientCondition> conditions) =>
-            conditions.Count == 1
-                ? conditions[0]
-                : new ClientCondition(
-                    FieldCondition.All(conditions.Select(condition => condition.Condition).ToArray()),
-                    FieldsOf(conditions.SelectMany(condition => condition.Fields)));
-
-        private static ClientCondition Combine(ClientCondition left, ClientCondition right, Func<FieldCondition, FieldCondition, FieldCondition> join) =>
-            new ClientCondition(join(left.Condition, right.Condition), FieldsOf(left.Fields.Concat(right.Fields)));
-
-        private static ClientCondition Compare(ClientValidationFieldReference field, CompareOperator op, FieldComparisonValue value) =>
-            new ClientCondition(FieldCondition.Compare(field.Path, op, value), new[] { field });
-
-        // One reference per field; a field read with two shapes is a contradiction in the condition.
-        private static IReadOnlyList<ClientValidationFieldReference> FieldsOf(IEnumerable<ClientValidationFieldReference> fields)
-        {
-            var byPath = new Dictionary<string, ClientValidationFieldReference>(StringComparer.Ordinal);
-            foreach (var field in fields)
-            {
-                if (!byPath.TryGetValue(field.Path.Value, out var existing))
-                {
-                    byPath.Add(field.Path.Value, field);
-                    continue;
-                }
-
-                if (!existing.Shape.Equals(field.Shape))
-                    throw new InvalidOperationException(
-                        $"Validation condition field '{field.Path.Value}' is read with two shapes: " +
-                        $"'{existing.Shape.Kind}' and '{field.Shape.Kind}'.");
-            }
-
-            return byPath.Values.ToArray();
-        }
+            conditions.Count == 1 ? conditions[0] : ClientCondition.All(conditions.ToArray());
 
         private sealed class Translator
         {
@@ -84,9 +41,9 @@ namespace Alis.Reactive.FluentValidator
                 switch (expression.NodeType)
                 {
                     case ExpressionType.AndAlso:
-                        return Join((BinaryExpression)expression, (l, r) => FieldCondition.All(l, r));
+                        return Join((BinaryExpression)expression, (l, r) => ClientCondition.All(l, r));
                     case ExpressionType.OrElse:
-                        return Join((BinaryExpression)expression, (l, r) => FieldCondition.Any(l, r));
+                        return Join((BinaryExpression)expression, (l, r) => ClientCondition.Any(l, r));
                     case ExpressionType.Not:
                         return Negate(((UnaryExpression)expression).Operand);
                     case ExpressionType.Equal:
@@ -100,16 +57,16 @@ namespace Alis.Reactive.FluentValidator
                         return Call((MethodCallExpression)expression);
                     default:
                         if (IsHasValue(expression, out var nullable))
-                            return Compare(FieldOf(nullable), CompareOperator.NotNull, FieldComparisonValue.None);
-                        return IsField(expression) ? Truthy(expression) : null;
+                            return Is(nullable, ClientValueTest.NotNull);
+                        return IsField(expression) ? Is(expression, ClientValueTest.Truthy) : null;
                 }
             }
 
-            private ClientCondition? Join(BinaryExpression expression, Func<FieldCondition, FieldCondition, FieldCondition> join)
+            private ClientCondition? Join(BinaryExpression expression, Func<ClientCondition, ClientCondition, ClientCondition> join)
             {
                 var left = Translate(expression.Left);
                 var right = Translate(expression.Right);
-                return left == null || right == null ? null : Combine(left, right, join);
+                return left == null || right == null ? null : join(left, right);
             }
 
             // !x.Flag reads as falsy, !string.IsNullOrEmpty(x.Name) as not empty, and !set.Contains(x.Code)
@@ -117,18 +74,19 @@ namespace Alis.Reactive.FluentValidator
             private ClientCondition? Negate(Expression operand)
             {
                 if (IsField(operand))
-                    return Compare(FieldOf(operand), CompareOperator.Falsy, FieldComparisonValue.None);
+                    return Is(operand, ClientValueTest.Falsy);
 
                 if (operand is MethodCallExpression call)
                 {
                     if (IsStringMethod(call, nameof(string.IsNullOrEmpty)) && IsField(call.Arguments[0]))
-                        return Compare(FieldOf(call.Arguments[0]), CompareOperator.NotEmpty, FieldComparisonValue.None);
+                        return Is(call.Arguments[0], ClientValueTest.NotEmpty);
 
-                    if (TryMembership(call, out var field, out var values))
-                        return Compare(field, CompareOperator.NotIn, FieldComparisonValue.Array(values));
+                    if (TryMembership(call, out var member, out var values))
+                        return ClientCondition.Not(In(member, values));
                 }
 
-                return Translate(operand)?.Negated();
+                var translated = Translate(operand);
+                return translated == null ? null : ClientCondition.Not(translated);
             }
 
             private ClientCondition? Comparison(BinaryExpression expression)
@@ -138,53 +96,68 @@ namespace Alis.Reactive.FluentValidator
                 if (!fieldOnLeft && !fieldOnRight) return null;
 
                 var member = fieldOnLeft ? expression.Left : expression.Right;
-                var field = FieldOf(member);
-                var value = Literal(member, fieldOnLeft ? expression.Right : expression.Left);
+                var value = Evaluate(fieldOnLeft ? expression.Right : expression.Left);
                 var op = fieldOnLeft ? expression.NodeType : Mirrored(expression.NodeType);
 
                 if (value == null)
                 {
-                    if (op == ExpressionType.Equal) return Compare(field, CompareOperator.IsNull, FieldComparisonValue.None);
-                    if (op == ExpressionType.NotEqual) return Compare(field, CompareOperator.NotNull, FieldComparisonValue.None);
+                    if (op == ExpressionType.Equal) return Is(member, ClientValueTest.Null);
+                    if (op == ExpressionType.NotEqual) return Is(member, ClientValueTest.NotNull);
                     return null;
                 }
 
-                return Compare(field, OperatorOf(op), FieldComparisonValue.Literal(value));
+                var field = ModelMember(member);
+                return ClientCondition.Compare(PathOf(field), field.Type, ComparisonOf(op), value);
             }
 
             private ClientCondition? Call(MethodCallExpression call)
             {
                 if (IsStringMethod(call, nameof(string.IsNullOrEmpty)) && IsField(call.Arguments[0]))
-                    return Compare(FieldOf(call.Arguments[0]), CompareOperator.IsEmpty, FieldComparisonValue.None);
+                    return Is(call.Arguments[0], ClientValueTest.Empty);
 
-                if (TryText(call, out var textField, out var op, out var operand))
-                    return Compare(textField, op, FieldComparisonValue.Text(operand));
+                if (TryText(call, out var textField, out var test, out var operand))
+                {
+                    var field = ModelMember(textField);
+                    return ClientCondition.Text(PathOf(field), field.Type, test, operand);
+                }
 
-                if (TryMembership(call, out var field, out var values))
-                    return Compare(field, CompareOperator.In, FieldComparisonValue.Array(values));
+                if (TryMembership(call, out var member, out var values))
+                    return In(member, values);
 
-                if (TryCollectionContains(call, out var collection, out var item, out var itemShape))
-                    return Compare(collection, CompareOperator.ArrayContains, FieldComparisonValue.CollectionItem(item, itemShape));
+                if (TryCollectionContains(call, out var collection, out var item, out var itemType))
+                {
+                    var field = ModelMember(collection);
+                    return ClientCondition.Holds(PathOf(field), field.Type, item, itemType);
+                }
 
                 return null;
             }
 
-            private ClientCondition Truthy(Expression member) =>
-                Compare(FieldOf(member), CompareOperator.Truthy, FieldComparisonValue.None);
+            private ClientCondition Is(Expression member, ClientValueTest test)
+            {
+                var field = ModelMember(member);
+                return ClientCondition.Is(PathOf(field), field.Type, test);
+            }
+
+            private ClientCondition In(Expression member, IReadOnlyList<object?> values)
+            {
+                var field = ModelMember(member);
+                return ClientCondition.In(PathOf(field), field.Type, values);
+            }
 
             // x.Name.Contains("a"), x.Name.StartsWith("a"), x.Name.EndsWith("a"), Regex.IsMatch(x.Name, "a").
-            private bool TryText(MethodCallExpression call, out ClientValidationFieldReference field, out CompareOperator op, out string operand)
+            private bool TryText(MethodCallExpression call, out Expression field, out ClientTextTest test, out string operand)
             {
                 field = null!;
-                op = null!;
+                test = ClientTextTest.Contains;
                 operand = "";
 
                 var isRegex = call.Method.DeclaringType == typeof(Regex) && call.Method.Name == nameof(Regex.IsMatch)
                     && call.Object == null && call.Arguments.Count == 2;
                 if (isRegex && IsField(call.Arguments[0]) && IsFixed(call.Arguments[1]))
                 {
-                    field = FieldOf(call.Arguments[0]);
-                    op = CompareOperator.Matches;
+                    field = call.Arguments[0];
+                    test = ClientTextTest.Matches;
                     operand = (string)Evaluate(call.Arguments[1])!;
                     return true;
                 }
@@ -195,47 +168,46 @@ namespace Alis.Reactive.FluentValidator
 
                 switch (call.Method.Name)
                 {
-                    case nameof(string.Contains): op = CompareOperator.Contains; break;
-                    case nameof(string.StartsWith): op = CompareOperator.StartsWith; break;
-                    case nameof(string.EndsWith): op = CompareOperator.EndsWith; break;
+                    case nameof(string.Contains): test = ClientTextTest.Contains; break;
+                    case nameof(string.StartsWith): test = ClientTextTest.StartsWith; break;
+                    case nameof(string.EndsWith): test = ClientTextTest.EndsWith; break;
                     default: return false;
                 }
 
-                field = FieldOf(call.Object!);
+                field = call.Object!;
                 operand = (string)Evaluate(call.Arguments[0])!;
                 return true;
             }
 
             // values.Contains(x.Code): the field is one of a fixed set of values.
-            private bool TryMembership(MethodCallExpression call, out ClientValidationFieldReference field, out IReadOnlyList<object?> values)
+            private bool TryMembership(MethodCallExpression call, out Expression field, out IReadOnlyList<object?> values)
             {
                 field = null!;
                 values = Array.Empty<object?>();
                 if (!TryContains(call, out var source, out var candidate)) return false;
                 if (!IsFixed(source) || !IsField(candidate)) return false;
 
-                field = FieldOf(candidate);
-                var member = candidate;
-                values = ((IEnumerable)Evaluate(source)!).Cast<object?>().Select(value => LiteralOf(member, value)).ToArray();
+                field = candidate;
+                values = ((IEnumerable)Evaluate(source)!).Cast<object?>().ToArray();
                 return true;
             }
 
             // x.Tags.Contains("fall-risk"): a collection field holds a fixed item.
             private bool TryCollectionContains(
                 MethodCallExpression call,
-                out ClientValidationFieldReference collection,
+                out Expression collection,
                 out object? item,
-                out Shape itemShape)
+                out Type itemType)
             {
                 collection = null!;
                 item = null;
-                itemShape = Shape.None;
+                itemType = typeof(object);
                 if (!TryContains(call, out var source, out var candidate)) return false;
                 if (!IsField(source) || !IsFixed(candidate)) return false;
 
-                collection = FieldOf(source);
-                item = LiteralOf(candidate, Evaluate(candidate));
-                itemShape = Shape.FromClrType(StripConvert(candidate).Type);
+                collection = source;
+                item = Evaluate(candidate);
+                itemType = StripConvert(candidate).Type;
                 return true;
             }
 
@@ -321,30 +293,13 @@ namespace Alis.Reactive.FluentValidator
             // An expression that reads nothing of the model: a constant, or a captured variable.
             private bool IsFixed(Expression expression) => !new ModelReads(_model).Find(expression);
 
-            private ClientValidationFieldReference FieldOf(Expression member)
+            // The member's path in the validator's model: its members' names, joined by dots.
+            private static string PathOf(Expression member)
             {
-                var chain = ModelMember(member);
-                return ClientValidationFieldReference.Of(
-                    ValidationFieldPath.Of(ExpressionPathHelper.ToMemberName(chain)),
-                    Shape.FromClrType(chain.Type));
-            }
-
-            // The value a comparison fixes, as the member's own type: an enum compared through its number
-            // is its member again, so the browser compares names, which is how MVC binds an enum.
-            private static object? Literal(Expression member, Expression fixedSide) =>
-                LiteralOf(member, Evaluate(fixedSide));
-
-            private static object? LiteralOf(Expression member, object? value)
-            {
-                if (value == null) return null;
-
-                var memberType = StripConvert(member).Type;
-                var enumType = Nullable.GetUnderlyingType(memberType) ?? memberType;
-                var asMemberType = enumType.IsEnum && !value.GetType().IsEnum ? Enum.ToObject(enumType, value) : value;
-                var shape = Shape.FromClrType(asMemberType.GetType());
-                return asMemberType.GetType().IsEnum
-                    ? asMemberType.ToString()
-                    : ValidationDateLiteral.From(asMemberType, shape);
+                var names = new List<string>();
+                for (var current = StripConvert(member); current is MemberExpression chain && chain.Expression != null; current = StripConvert(chain.Expression))
+                    names.Insert(0, chain.Member.Name);
+                return string.Join(".", names);
             }
 
             private static object? Evaluate(Expression expression) =>
@@ -367,14 +322,14 @@ namespace Alis.Reactive.FluentValidator
                 _ => op,
             };
 
-            private static CompareOperator OperatorOf(ExpressionType op) => op switch
+            private static ClientComparison ComparisonOf(ExpressionType op) => op switch
             {
-                ExpressionType.Equal => CompareOperator.Eq,
-                ExpressionType.NotEqual => CompareOperator.Neq,
-                ExpressionType.GreaterThan => CompareOperator.Gt,
-                ExpressionType.GreaterThanOrEqual => CompareOperator.Gte,
-                ExpressionType.LessThan => CompareOperator.Lt,
-                _ => CompareOperator.Lte,
+                ExpressionType.Equal => ClientComparison.Equal,
+                ExpressionType.NotEqual => ClientComparison.NotEqual,
+                ExpressionType.GreaterThan => ClientComparison.GreaterThan,
+                ExpressionType.GreaterThanOrEqual => ClientComparison.GreaterThanOrEqual,
+                ExpressionType.LessThan => ClientComparison.LessThan,
+                _ => ClientComparison.LessThanOrEqual,
             };
         }
 

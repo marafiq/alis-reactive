@@ -164,12 +164,14 @@ namespace Alis.Reactive
             if (validated?.Validation is not { } validation)
                 return;
 
-            new ClientValidationRuleBinder(
-                    _context,
-                    _registeredInputComponents.Snapshot(),
-                    typeof(TModel),
-                    RequireClientValidationRuleSource(services, validation.Source, $"Request at '{validated.Url}'"))
-                .BindQueuedJobs();
+            var ruleSource = RequireClientValidationRuleSource(services, validation.Source, $"Request at '{validated.Url}'");
+            var registeredInputs = _registeredInputComponents.Snapshot();
+            foreach (var request in _context.ValidatedRequests)
+            {
+                if (!(request.Validation is { } form)) continue;
+                var fields = ruleSource.GetClientRules(form.Source);
+                _context.Check(form.Form, CheckedField.Bind(fields, registeredInputs, typeof(TModel)).ToList());
+            }
         }
 
         private static IClientValidationRuleSource RequireClientValidationRuleSource(
@@ -177,7 +179,6 @@ namespace Alis.Reactive
             Type validationSource,
             string requiredBy)
         {
-
             // ASP.NET Core flows the source through the per-request IServiceProvider.
             var source = services?.GetService(typeof(IClientValidationRuleSource)) as IClientValidationRuleSource;
 

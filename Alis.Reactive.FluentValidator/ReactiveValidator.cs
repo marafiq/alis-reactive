@@ -58,7 +58,7 @@ namespace Alis.Reactive.FluentValidator
         public IConditionBuilder When(Expression<Func<T, bool>> predicate, Action action)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-            var condition = ClientCondition.From(predicate);
+            var condition = BrowserCondition.From(predicate);
             return RecordedWhen(condition, predicate.Compile(), action);
         }
 
@@ -72,8 +72,8 @@ namespace Alis.Reactive.FluentValidator
         public IConditionBuilder Unless(Expression<Func<T, bool>> predicate, Action action)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-            var condition = ClientCondition.From(predicate)?.Negated();
-            return RecordedUnless(condition, predicate.Compile(), action);
+            var holds = BrowserCondition.From(predicate);
+            return RecordedUnless(holds == null ? null : ClientCondition.Not(holds), predicate.Compile(), action);
         }
     }
 }

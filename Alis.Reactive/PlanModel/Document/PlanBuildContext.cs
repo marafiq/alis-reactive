@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Alis.Reactive.Grammar;
+using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.PlanModel
 {
@@ -23,7 +24,7 @@ namespace Alis.Reactive.PlanModel
             new List<(Func<ObjectTable, string>, string, Block)>();
         private readonly HashSet<string> _plugins = new HashSet<string>(StringComparer.Ordinal);
         private readonly List<RequestStep> _validatedRequests = new List<RequestStep>();
-        private readonly Dictionary<string, ContainerScope> _forms = new Dictionary<string, ContainerScope>(StringComparer.Ordinal);
+        private readonly Dictionary<string, FormChecks> _forms = new Dictionary<string, FormChecks>(StringComparer.Ordinal);
 
         // The callbacks being built, innermost last: a step lands in the innermost one.
         private readonly Stack<Block> _blocks = new Stack<Block>();
@@ -116,12 +117,13 @@ namespace Alis.Reactive.PlanModel
 
         internal IReadOnlyList<RequestStep> ValidatedRequests => _validatedRequests;
 
-        /// <summary>The rules a request's validator gives the form's fields, merged into the form's rules.</summary>
-        internal void MergeValidations(string formId, IReadOnlyList<ComponentValidation> validations)
+        /// <summary>The inputs a request's validator checks on the form, merged into the form's checks.</summary>
+        internal void Check(string formId, IEnumerable<CheckedField> fields)
         {
             DeclareElement(formId);
-            var form = _forms.TryGetValue(formId, out var existing) ? existing : ContainerScope.Empty;
-            _forms[formId] = form.WithValidationRulesMerged(validations);
+            if (!_forms.TryGetValue(formId, out var form))
+                _forms.Add(formId, form = new FormChecks());
+            form.Merge(fields);
         }
 
         // ── writing ──────────────────────────────────────────────────────────────
@@ -141,7 +143,7 @@ namespace Alis.Reactive.PlanModel
             var forms = new FormWriter(Scope.ForHandler(plan, "$form"));
             foreach (var declared in _declared)
                 if (_forms.TryGetValue(declared.Id, out var form))
-                    objects.Form(declared.Id, forms.Form(form.ValidationRules));
+                    objects.Form(declared.Id, forms.Form(form.Fields));
 
             var handlers = _handlers
                 .Select(handler =>

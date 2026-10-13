@@ -82,27 +82,4 @@ namespace Alis.Reactive.Validation
         RequireNamedField,
         AllowRootField
     }
-
-    internal sealed class ValidationMessage : IEquatable<ValidationMessage>
-    {
-        private ValidationMessage(string value)
-        {
-            Value = value ?? throw new ArgumentNullException(nameof(value));
-        }
-
-        internal string Value { get; }
-
-        internal static ValidationMessage Of(string value) =>
-            new ValidationMessage(value);
-
-        public bool Equals(ValidationMessage? other) =>
-            other != null && string.Equals(Value, other.Value, StringComparison.Ordinal);
-
-        public override bool Equals(object? obj) => Equals(obj as ValidationMessage);
-
-        public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
-
-        public override string ToString() => Value;
-    }
-
 }

@@ -37,18 +37,14 @@ namespace Alis.Reactive.FluentValidator
                 : new ClientScope(outermostFirst.Select(condition => condition!).ToArray(), false);
         }
 
-        /// <summary>
-        /// The activation of a browser rule in this scope. The fields the conditions read join the rule
-        /// set first, so the browser can read them.
-        /// </summary>
-        internal ClientRuleActivation Activation(ClientValidationRuleSet rules)
+        /// <summary>The condition a browser rule in this scope applies under.</summary>
+        internal ClientCondition Condition
         {
-            if (IsServerOnly) throw new InvalidOperationException("A server-only rule has no browser activation.");
-            if (_conditions.Count == 0) return ClientRuleActivation.Always;
-
-            var condition = ClientCondition.AllOf(_conditions);
-            rules.EnsureFields(condition.Fields);
-            return ClientRuleActivation.When(condition.Condition);
+            get
+            {
+                if (IsServerOnly) throw new InvalidOperationException("A server-only rule has no browser condition.");
+                return _conditions.Count == 0 ? ClientCondition.Always : BrowserCondition.AllOf(_conditions);
+            }
         }
     }
 }

@@ -6,7 +6,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 using FluentValidation;
 using FluentValidation.Internal;
@@ -21,7 +20,7 @@ namespace Alis.Reactive.FluentValidator
     /// </summary>
     internal sealed class ClientRuleProjection
     {
-        private readonly ClientValidationRuleSet _rules = new ClientValidationRuleSet();
+        private readonly ClientRuleSet _rules = new ClientRuleSet();
         private readonly Func<IValidationRule, ClientScope> _scopeOf;
 
         private ClientRuleProjection(Func<IValidationRule, ClientScope> scopeOf)
@@ -39,7 +38,7 @@ namespace Alis.Reactive.FluentValidator
             var projection = new ClientRuleProjection(scopeOf);
             foreach (var rule in rules)
                 projection.Add(rule);
-            return projection._rules.ToFields();
+            return projection._rules.Fields;
         }
 
         private void Add(IValidationRule rule)
@@ -52,10 +51,8 @@ namespace Alis.Reactive.FluentValidator
 
             if (rule is IIncludeRule)
             {
-                if (children.Length == 0) return;
-                var activation = scope.Activation(_rules);
                 foreach (var child in children)
-                    _rules.AddRulesFrom(ChildFields(child), ValidationFieldPath.Empty, activation);
+                    _rules.Add(ChildFields(child), "", scope.Condition);
                 return;
             }
 
@@ -64,99 +61,72 @@ namespace Alis.Reactive.FluentValidator
             var field = FieldOf(rule);
             if (IsCollectionRule(rule))
             {
-                if (children.Length == 0) return;
-                var activation = scope.Activation(_rules);
                 foreach (var child in children)
-                    _rules.AddItemFields(field, ChildFields(child), activation);
+                    _rules.Add(field.Path, field.Type, ChildFields(child), scope.Condition);
                 return;
             }
 
-            AddProperty(rule, field, components, scope);
-        }
+            // The member's own checks, then the child validators' members under it.
+            foreach (var component in components)
+                foreach (var check in ChecksOf(rule, field, component))
+                    _rules.Add(field.Path, field.Type, check.When(scope.Condition));
 
-        private void AddProperty(IValidationRule rule, ClientValidationFieldReference field, IRuleComponent[] components, ClientScope scope)
-        {
-            var checks = components
-                .Select(component => (component, checks: ChecksOf(rule, field, component)))
-                .ToArray();
-            var hasChecks = checks.Any(entry => entry.checks.Count > 0);
-            var hasChildren = checks.Any(entry => entry.component.Validator is IChildValidatorAdaptor);
-            if (!hasChecks && !hasChildren) return;
-
-            var activation = scope.Activation(_rules);
-            if (hasChecks) _rules.EnsureField(field);
-            foreach (var (component, componentChecks) in checks)
-            {
-                if (component.Validator is IChildValidatorAdaptor child)
-                {
-                    _rules.AddRulesFrom(ChildFields(child), field.Path, activation);
-                    continue;
-                }
-
-                foreach (var check in componentChecks)
-                    _rules.AddRule(field, check.ToRule(activation));
-            }
+            foreach (var child in children)
+                _rules.Add(ChildFields(child), field.Path, scope.Condition);
         }
 
         // The browser checks one FluentValidation component stands for; none when it is server-only.
-        private static IReadOnlyList<BrowserCheck> ChecksOf(
-            IValidationRule rule,
-            ClientValidationFieldReference field,
-            IRuleComponent component)
+        private static IReadOnlyList<ClientRule> ChecksOf(IValidationRule rule, Member field, IRuleComponent component)
         {
-            if (!TryMessageTemplateOf(component, out var template)) return Array.Empty<BrowserCheck>();
+            if (!TryMessageTemplateOf(component, out var template)) return Array.Empty<ClientRule>();
 
             var message = new ClientMessage(template, () => DisplayNameOf(rule));
             switch (component.Validator)
             {
+                // A list has at least one item.
                 case INotEmptyValidator _:
-                    var isCollection = field.Shape.Kind == "array";
-                    return One(isCollection ? RuleName.AtLeastOne : RuleName.Required, message);
+                    return new[] { ClientRule.NotEmpty(message.Text) };
 
                 // A cleared input reaches the server as null (a JSON "" is sent as null; form data binds
                 // "" as null), so NotNull fails exactly when the input is empty. An empty collection is
                 // not null, so NotNull on a collection stays on the server.
-                case INotNullValidator _ when field.Shape.Kind != "array":
-                    return One(RuleName.Required, message);
+                case INotNullValidator _:
+                    return new[] { ClientRule.NotNull(message.Text) };
 
                 case IPropertyValidator validator when validator.Name == "EmptyValidator":
-                    return One(RuleName.Empty, message);
+                    return new[] { ClientRule.Empty(message.Text) };
 
                 case ILengthValidator length when BoundsReadFromModel(length):
-                    return Array.Empty<BrowserCheck>();
+                    return Array.Empty<ClientRule>();
 
                 case ILengthValidator length:
-                    var lengthMessage = message.With("MinLength", length.Min).With("MaxLength", length.Max);
-                    var checks = new List<BrowserCheck>();
-                    if (length.Min > 0)
-                        checks.Add(new BrowserCheck(RuleName.MinLength, lengthMessage, RuleOperand.Literal(length.Min, Shape.None), Shape.None));
-                    if (length.Max >= 0)
-                        checks.Add(new BrowserCheck(RuleName.MaxLength, lengthMessage, RuleOperand.Literal(length.Max, Shape.None), Shape.None));
+                    var lengthMessage = message.With("MinLength", length.Min).With("MaxLength", length.Max).Text;
+                    var checks = new List<ClientRule>();
+                    if (length.Min > 0) checks.Add(ClientRule.MinLength(length.Min, lengthMessage));
+                    if (length.Max >= 0) checks.Add(ClientRule.MaxLength(length.Max, lengthMessage));
                     return checks;
 
                 case IEmailValidator _:
-                    return One(RuleName.Email, message);
+                    return new[] { ClientRule.Email(message.Text) };
 
                 case IRegularExpressionValidator pattern:
                     return PatternCheck(pattern, message);
 
                 case ICreditCardValidator _:
-                    return One(RuleName.CreditCard, message);
+                    return new[] { ClientRule.CreditCard(message.Text) };
 
                 case IBrowserRule custom:
-                    return custom.Browser.Checks.Select(check => new BrowserCheck(check.Name, message, check.Operand, Shape.None)).ToList();
+                    return custom.Browser.Checks.Select(check => check(message.Text)).ToList();
 
                 case IComparisonValidator comparison:
                     return Comparison(rule, field, comparison, message);
 
                 case IBetweenValidator between:
-                    var bounds = ValidationRangeBounds.FromClientLiteral(between.From, between.To);
-                    var name = between is IInclusiveBetweenValidator ? RuleName.Range : RuleName.ExclusiveRange;
-                    var rangeMessage = message.With("From", between.From).With("To", between.To);
-                    return new[] { new BrowserCheck(name, rangeMessage, RuleOperand.Range(bounds), bounds.Shape) };
+                    var rangeMessage = message.With("From", between.From).With("To", between.To).Text;
+                    return new[] { ClientRule.Between(between.From, between.To, between is IInclusiveBetweenValidator, rangeMessage) };
 
                 default:
-                    return Array.Empty<BrowserCheck>();
+                    return Array.Empty<ClientRule>();
             }
         }
 
@@ -181,19 +151,19 @@ namespace Alis.Reactive.FluentValidator
         // The regex FluentValidation tests with, as a JavaScript pattern and flags. A pattern built from
         // the model (Matches(x => ...)) has no text until a model exists, and an option or syntax
         // JavaScript lacks would read the text differently: those stay on the server.
-        private static IReadOnlyList<BrowserCheck> PatternCheck(IRegularExpressionValidator validator, ClientMessage message)
+        private static IReadOnlyList<ClientRule> PatternCheck(IRegularExpressionValidator validator, ClientMessage message)
         {
             var builtFromModel = validator.Expression == null;
-            if (builtFromModel) return Array.Empty<BrowserCheck>();
+            if (builtFromModel) return Array.Empty<ClientRule>();
 
             var regex = FixedRegexOf(validator);
             var readsDifferently = (regex.Options & NoJavaScriptForm) != 0 || DotNetOnlySyntax.IsMatch(regex.ToString());
-            if (readsDifferently) return Array.Empty<BrowserCheck>();
+            if (readsDifferently) return Array.Empty<ClientRule>();
 
             var flags = (regex.Options.HasFlag(RegexOptions.IgnoreCase) ? "i" : "")
                 + (regex.Options.HasFlag(RegexOptions.Multiline) ? "m" : "")
                 + (regex.Options.HasFlag(RegexOptions.Singleline) ? "s" : "");
-            return new[] { new BrowserCheck(RuleName.Regex, message, RuleOperand.Pattern(regex.ToString(), flags), Shape.None) };
+            return new[] { ClientRule.Pattern(regex.ToString(), flags, message.Text) };
         }
 
         // The interface exposes the pattern's text, not its options. The validator keeps the regex in
@@ -210,54 +180,40 @@ namespace Alis.Reactive.FluentValidator
             return (Regex)regexOf.DynamicInvoke(new object?[] { null })!;
         }
 
-        private static IReadOnlyList<BrowserCheck> One(RuleName name, ClientMessage message) =>
-            new[] { new BrowserCheck(name, message, RuleOperand.None, Shape.None) };
-
-        private static IReadOnlyList<BrowserCheck> Comparison(
+        private static IReadOnlyList<ClientRule> Comparison(
             IValidationRule rule,
-            ClientValidationFieldReference field,
+            Member field,
             IComparisonValidator comparison,
             ClientMessage message)
         {
             if (comparison.MemberToCompare != null)
             {
-                var peer = PeerOf(rule, field, comparison.MemberToCompare);
-                var peerName = SplitPascalCase(comparison.MemberToCompare.Name);
-                var peerMessage = message.With("ComparisonValue", peerName).With("ComparisonProperty", peerName);
-                var name = comparison.Comparison == FluentValidation.Validators.Comparison.NotEqual
-                    ? RuleName.NotEqualTo
-                    : RuleNameOf(comparison.Comparison);
-                return new[] { new BrowserCheck(name, peerMessage, RuleOperand.PeerField(peer.Path, peer.Shape), peer.Shape) };
+                var peer = comparison.MemberToCompare;
+                var peerName = SplitPascalCase(peer.Name);
+                var peerMessage = message.With("ComparisonValue", peerName).With("ComparisonProperty", peerName).Text;
+                return new[] { ClientRule.CompareWith(ComparisonOf(comparison.Comparison), SiblingOf(rule, field, peer), MemberType(peer), peerMessage) };
             }
 
-            if (comparison.ValueToCompare == null) return Array.Empty<BrowserCheck>();
+            if (comparison.ValueToCompare == null) return Array.Empty<ClientRule>();
 
-            var literal = ClientValidationLiteral.From(comparison.ValueToCompare);
-            return new[]
-            {
-                new BrowserCheck(
-                    RuleNameOf(comparison.Comparison),
-                    message.With("ComparisonValue", comparison.ValueToCompare),
-                    RuleOperand.Literal(literal.Value, literal.Shape),
-                    literal.Shape),
-            };
+            var literalMessage = message.With("ComparisonValue", comparison.ValueToCompare).Text;
+            return new[] { ClientRule.Compare(ComparisonOf(comparison.Comparison), comparison.ValueToCompare, literalMessage) };
         }
 
         // FluentValidation keeps only a peer's member, so a peer is read as the rule's sibling. A peer
         // that is not a member of the rule's own owner cannot be located, and is refused here.
-        private static ClientValidationFieldReference PeerOf(IValidationRule rule, ClientValidationFieldReference field, MemberInfo peer)
+        private static string SiblingOf(IValidationRule rule, Member field, MemberInfo peer)
         {
             var owner = ((MemberExpression)StripConvert(rule.Expression.Body)).Expression?.Type;
             var isSibling = owner != null && peer.DeclaringType != null && peer.DeclaringType.IsAssignableFrom(owner);
             if (!isSibling)
                 throw new InvalidOperationException(
-                    $"The rule on '{field.Path.Value}' compares it with '{peer.Name}', which is not a member of the same object. " +
+                    $"The rule on '{field.Path}' compares it with '{peer.Name}', which is not a member of the same object. " +
                     "A browser rule compares a member with a sibling; declare the rule in the validator of the object that owns both, " +
                     "or end it with .ServerOnly() to run it on the server alone.");
 
-            var segments = field.Path.Value.Split('.');
-            var siblingPath = string.Join(".", segments.Take(segments.Length - 1).Concat(new[] { peer.Name }));
-            return ClientValidationFieldReference.Of(ValidationFieldPath.Of(siblingPath), Shape.FromClrType(MemberType(peer)));
+            var segments = field.Path.Split('.');
+            return string.Join(".", segments.Take(segments.Length - 1).Concat(new[] { peer.Name }));
         }
 
         private static Type MemberType(MemberInfo member) => member switch
@@ -267,14 +223,14 @@ namespace Alis.Reactive.FluentValidator
             _ => throw new InvalidOperationException($"A comparison peer '{member.Name}' must be a property or a field."),
         };
 
-        private static RuleName RuleNameOf(Comparison comparison) => comparison switch
+        private static ClientComparison ComparisonOf(Comparison comparison) => comparison switch
         {
-            FluentValidation.Validators.Comparison.Equal => RuleName.EqualTo,
-            FluentValidation.Validators.Comparison.NotEqual => RuleName.NotEqual,
-            FluentValidation.Validators.Comparison.GreaterThan => RuleName.Gt,
-            FluentValidation.Validators.Comparison.GreaterThanOrEqual => RuleName.Min,
-            FluentValidation.Validators.Comparison.LessThan => RuleName.Lt,
-            _ => RuleName.Max,
+            FluentValidation.Validators.Comparison.Equal => ClientComparison.Equal,
+            FluentValidation.Validators.Comparison.NotEqual => ClientComparison.NotEqual,
+            FluentValidation.Validators.Comparison.GreaterThan => ClientComparison.GreaterThan,
+            FluentValidation.Validators.Comparison.GreaterThanOrEqual => ClientComparison.GreaterThanOrEqual,
+            FluentValidation.Validators.Comparison.LessThan => ClientComparison.LessThan,
+            _ => ClientComparison.LessThanOrEqual,
         };
 
         // The fields of the child validator FluentValidation runs. SetValidator(validator), Include(validator)
@@ -337,10 +293,15 @@ namespace Alis.Reactive.FluentValidator
 
         // A rule reaches the browser only through a model member it names: RuleFor(x => x.A.B). A rule
         // over the whole object or a computed value (x => x.Name.Trim()) has no input to bind.
-        private static bool BindsAMember(IValidationRule rule) =>
-            rule.Expression != null
-            && StripConvert(rule.Expression.Body) is MemberExpression
-            && ExpressionPathHelper.IsMemberChain(rule.Expression.Body);
+        private static bool BindsAMember(IValidationRule rule)
+        {
+            if (rule.Expression == null || !(StripConvert(rule.Expression.Body) is MemberExpression)) return false;
+
+            var current = StripConvert(rule.Expression.Body);
+            while (current is MemberExpression member && member.Expression != null)
+                current = StripConvert(member.Expression);
+            return current is ParameterExpression;
+        }
 
         private static Expression StripConvert(Expression expression)
         {
@@ -350,11 +311,14 @@ namespace Alis.Reactive.FluentValidator
             return expression;
         }
 
-        private static ClientValidationFieldReference FieldOf(IValidationRule rule)
+        // The member a rule names: its path, its members' names joined by dots, and its type.
+        private static Member FieldOf(IValidationRule rule)
         {
-            return ClientValidationFieldReference.Of(
-                ValidationFieldPath.Of(ExpressionPathHelper.ToMemberName(rule.Expression.Body)),
-                Shape.FromClrType(ExpressionPathHelper.ToPropertyType(rule.Expression)));
+            var names = new List<string>();
+            var body = StripConvert(rule.Expression.Body);
+            for (var current = body; current is MemberExpression chain && chain.Expression != null; current = StripConvert(chain.Expression))
+                names.Insert(0, chain.Member.Name);
+            return new Member(string.Join(".", names), body.Type);
         }
 
         // The component's message template. A message written from the model (WithMessage(x => ...))
@@ -406,23 +370,17 @@ namespace Alis.Reactive.FluentValidator
             return text.ToString().Trim();
         }
 
-        private sealed class BrowserCheck
+        private readonly struct Member
         {
-            private readonly RuleName _name;
-            private readonly ClientMessage _message;
-            private readonly RuleOperand _operand;
-            private readonly Shape _shape;
-
-            internal BrowserCheck(RuleName name, ClientMessage message, RuleOperand operand, Shape shape)
+            internal Member(string path, Type type)
             {
-                _name = name;
-                _message = message;
-                _operand = operand;
-                _shape = shape;
+                Path = path;
+                Type = type;
             }
 
-            internal ClientRule ToRule(ClientRuleActivation activation) =>
-                new ClientRule(_name, ValidationMessage.Of(_message.Text), _operand, activation, _shape);
+            internal string Path { get; }
+
+            internal Type Type { get; }
         }
 
         // A message template, formatted with what is known when the page renders. A sentence that names a

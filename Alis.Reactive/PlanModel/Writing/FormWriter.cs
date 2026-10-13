@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Alis.Reactive.Grammar;
+using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.PlanModel
 {
@@ -24,51 +25,50 @@ namespace Alis.Reactive.PlanModel
             _scope = scope;
         }
 
-        internal FormPluginData Form(IReadOnlyList<ComponentValidation> validations) =>
-            new FormPluginData(SummaryId, validations.Select(Field).ToList());
+        internal FormPluginData Form(IReadOnlyList<CheckedField> fields) =>
+            new FormPluginData(SummaryId, fields.Select(Field).ToList());
 
         /// <summary>The element id of the plan's validation summary.</summary>
         private string SummaryId => _scope.PlanId.Replace('.', '_').Replace('+', '_') + "_validation_summary";
 
-        private FormField Field(ComponentValidation validation)
+        private FormField Field(CheckedField field)
         {
-            var fieldShape = validation.Value.OutputShape;
-            var tests = validation.Rules
-                .Select(rule => new FormTest(rule.Name, Check(rule, fieldShape), When(rule.Execution.Activation), rule.Message))
+            var tests = field.Rules
+                .Select(rule => new FormTest(rule.Name, Check(rule, field), When(rule, field.Values), rule.Message))
                 .ToList();
-            return new FormField(validation.Component, validation.ServerFieldName, validation.Value.Write(_scope), tests);
+            return new FormField(field.ComponentId, field.ServerName, field.Value.Write(_scope), tests);
         }
 
-        private Expr When(ValidationRuleActivation activation) =>
-            activation.TryGetCondition(out var condition) ? condition.Write(_scope) : G.True;
+        private Expr When(ClientRule rule, FormFieldValues values) =>
+            rule.Condition.IsAlways ? G.True : rule.Condition.ToGraph(values).Write(_scope);
 
         // ── checks: the rule's verdict on the field's value, as the server's rule decides it ─────
 
-        private FnExpr Check(ValidationRuleNode rule, Shape fieldShape)
+        private FnExpr Check(ClientRule rule, CheckedField field)
         {
-            var execution = rule.Execution;
+            var fieldShape = field.Shape;
             var v = G.Ref(Value);
-            var comparison = execution.ComparisonShape;
+            var comparison = rule.ComparisonShape;
             Expr passes;
             switch (rule.Name)
             {
                 case "required": passes = G.Not(BlankOrDefault(v, fieldShape)); break;
                 case "empty": passes = BlankOrDefault(v, fieldShape); break;
-                case "minLength": passes = G.Or(Absent(v), G.Op(Operator.Gte, TextLength(v), G.Lit(Constraint(execution)))); break;
-                case "maxLength": passes = G.Or(Absent(v), G.Op(Operator.Lte, TextLength(v), G.Lit(Constraint(execution)))); break;
+                case "minLength": passes = G.Or(Absent(v), G.Op(Operator.Gte, TextLength(v), G.Lit(Constraint(rule)))); break;
+                case "maxLength": passes = G.Or(Absent(v), G.Op(Operator.Lte, TextLength(v), G.Lit(Constraint(rule)))); break;
                 case "email": passes = G.Or(Absent(v), Matches(v, "^[^@]+@[^@]+$")); break;
-                case "regex": passes = G.Or(Absent(v), Pattern(v, execution)); break;
+                case "regex": passes = G.Or(Absent(v), Pattern(v, rule)); break;
                 case "url": passes = G.Or(Absent(v), Matches(v, "^https?:\\/\\/.+")); break;
                 case "creditCard": passes = G.Or(Absent(v), CardNumber(v)); break;
-                case "min": passes = Ordered(v, Target(execution), comparison, Operator.Gte); break;
-                case "max": passes = Ordered(v, Target(execution), comparison, Operator.Lte); break;
-                case "lt": passes = Ordered(v, Target(execution), comparison, Operator.Lt); break;
-                case "gt": passes = Ordered(v, Target(execution), comparison, Operator.Gt); break;
-                case "range": passes = Range(v, execution, comparison, Operator.Gte, Operator.Lte); break;
-                case "exclusiveRange": passes = Range(v, execution, comparison, Operator.Gt, Operator.Lt); break;
-                case "equalTo": passes = Same(v, Target(execution), comparison); break;
+                case "min": passes = Ordered(v, Target(rule, field.Values), comparison, Operator.Gte); break;
+                case "max": passes = Ordered(v, Target(rule, field.Values), comparison, Operator.Lte); break;
+                case "lt": passes = Ordered(v, Target(rule, field.Values), comparison, Operator.Lt); break;
+                case "gt": passes = Ordered(v, Target(rule, field.Values), comparison, Operator.Gt); break;
+                case "range": passes = Range(v, rule, comparison, Operator.Gte, Operator.Lte); break;
+                case "exclusiveRange": passes = Range(v, rule, comparison, Operator.Gt, Operator.Lt); break;
+                case "equalTo": passes = Same(v, Target(rule, field.Values), comparison); break;
                 case "notEqual":
-                case "notEqualTo": passes = G.Not(Same(v, Target(execution), comparison)); break;
+                case "notEqualTo": passes = G.Not(Same(v, Target(rule, field.Values), comparison)); break;
                 case "atLeastOne": passes = AtLeastOne(v, fieldShape); break;
                 default: throw new InvalidOperationException("No browser check for validation rule '" + rule.Name + "'.");
             }
@@ -76,15 +76,14 @@ namespace Alis.Reactive.PlanModel
             return G.Fn(passes, Value);
         }
 
-        private static object Constraint(ValidationRuleExecution execution) =>
-            execution.TryGetConstraint(out var constraint) && constraint.Value != null
-                ? constraint.Value
-                : throw new InvalidOperationException("The rule needs a constraint value.");
+        private static object Constraint(ClientRule rule) =>
+            rule.Constraint ?? throw new InvalidOperationException("The rule needs a constraint value.");
 
-        private Expr Target(ValidationRuleExecution execution) =>
-            execution.TryGetPeer(out var peer)
-                ? peer.Write(_scope)
-                : G.Lit(Constraint(execution));
+        // The sibling the rule compares with, or the value the rule fixes.
+        private Expr Target(ClientRule rule, FormFieldValues values) =>
+            rule.Peer != null
+                ? values.Value(rule.Peer).Write(_scope)
+                : G.Lit(Constraint(rule));
 
         // A bound value FluentValidation's null checks skip: nothing bound (blank text binds as null).
         private static Expr Absent(Expr v) => G.Eq(v, G.Null);
@@ -116,9 +115,9 @@ namespace Alis.Reactive.PlanModel
 
         private static Expr Matches(Expr v, string pattern) => G.Op(Operator.Matches, v, G.Lit(pattern), G.Lit(""));
 
-        private static Expr Pattern(Expr v, ValidationRuleExecution execution)
+        private static Expr Pattern(Expr v, ClientRule rule)
         {
-            var patternAndFlags = (object[])Constraint(execution);
+            var patternAndFlags = (object[])Constraint(rule);
             return G.Op(Operator.Matches, v, G.Lit(patternAndFlags[0]), G.Lit(patternAndFlags[1]));
         }
 
@@ -168,9 +167,9 @@ namespace Alis.Reactive.PlanModel
             return G.Or(Absent(v), compared);
         }
 
-        private Expr Range(Expr v, ValidationRuleExecution execution, Shape comparison, Operator lower, Operator upper)
+        private Expr Range(Expr v, ClientRule rule, Shape comparison, Operator lower, Operator upper)
         {
-            var bounds = Constraint(execution) as object[]
+            var bounds = Constraint(rule) as object[]
                 ?? throw new InvalidOperationException("A range rule needs its two bounds.");
             var a = _scope.Fresh("a");
             var low = _scope.Fresh("l");

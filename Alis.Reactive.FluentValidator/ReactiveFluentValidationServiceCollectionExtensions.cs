@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using FluentValidation;
@@ -21,17 +20,11 @@ namespace Alis.Reactive.FluentValidator
 
             // Transient: the browser's rules are read from the validator the request resolves, so a
             // scoped dependency, DateTime.Today or a captured setting is the one this request's server sees.
-            services.TryAddTransient<IClientValidationRuleSource, ClientValidationRuleSource>();
+            services.TryAddTransient<IClientValidationRuleSource, ReactiveValidatorRuleSource>();
 
             var builder = new ReactiveFluentValidationBuilder(services);
             configure(builder);
-            var clientMetadataTypes = builder.ClientMetadataTypes.ToArray();
-            if (clientMetadataTypes.Length != 0)
-            {
-                services.AddTransient<IClientValidationMetadataProvider>(provider =>
-                    new ReactiveValidatorClientMetadataProvider(provider, clientMetadataTypes));
-            }
-
+            services.AddSingleton(new ReactiveValidatorTypes(builder.ClientMetadataTypes.ToArray()));
             return services;
         }
     }
@@ -108,34 +101,39 @@ namespace Alis.Reactive.FluentValidator
                 .Where(type => type.GetGenericTypeDefinition() == typeof(IValidator<>));
     }
 
-    internal sealed class ReactiveValidatorClientMetadataProvider : IClientValidationMetadataProvider
+    // The validators one AddReactiveFluentValidation call registered as sources of browser rules.
+    internal sealed class ReactiveValidatorTypes
     {
-        private readonly IServiceProvider _services;
-        private readonly HashSet<Type> _validationSourceTypes;
-
-        public ReactiveValidatorClientMetadataProvider(
-            IServiceProvider services,
-            IEnumerable<Type> validationSourceTypes)
+        internal ReactiveValidatorTypes(IReadOnlyList<Type> types)
         {
-            _services = services ?? throw new ArgumentNullException(nameof(services));
-            if (validationSourceTypes == null) throw new ArgumentNullException(nameof(validationSourceTypes));
-            _validationSourceTypes = new HashSet<Type>(validationSourceTypes);
+            Types = types;
         }
 
-        // The rules of the validator this request resolves, read when the page renders.
-        public bool TryGetClientRules(
-            Type validationSourceType,
-            [NotNullWhen(true)]
-            out IReadOnlyList<ClientValidationField>? fields)
+        internal IReadOnlyList<Type> Types { get; }
+    }
+
+    // The browser rules of the validator this request resolves, read when the page renders.
+    internal sealed class ReactiveValidatorRuleSource : IClientValidationRuleSource
+    {
+        private readonly IServiceProvider _services;
+        private readonly HashSet<Type> _validators;
+
+        public ReactiveValidatorRuleSource(IServiceProvider services, IEnumerable<ReactiveValidatorTypes> registered)
+        {
+            _services = services ?? throw new ArgumentNullException(nameof(services));
+            _validators = new HashSet<Type>(registered.SelectMany(types => types.Types));
+        }
+
+        public IReadOnlyList<ClientValidationField> GetClientRules(Type validationSourceType)
         {
             if (validationSourceType == null) throw new ArgumentNullException(nameof(validationSourceType));
-
-            fields = null;
-            if (!_validationSourceTypes.Contains(validationSourceType)) return false;
+            if (!_validators.Contains(validationSourceType))
+                throw new InvalidOperationException(
+                    $"No Reactive Plan client validation metadata is registered for validation source '{validationSourceType.FullName}'. " +
+                    "Register its validator with services.AddReactiveFluentValidation(rules => rules.Add<TValidator>()).");
 
             var validator = (IClientValidationMetadataSource)_services.GetRequiredService(validationSourceType);
-            fields = validator.GetClientRules();
-            return true;
+            return validator.GetClientRules();
         }
     }
 }

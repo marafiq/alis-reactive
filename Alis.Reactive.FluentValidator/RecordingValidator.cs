@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Alis.Reactive.Validation;
 using FluentValidation;
 
 namespace Alis.Reactive.FluentValidator
@@ -83,7 +84,7 @@ namespace Alis.Reactive.FluentValidator
         {
             if (action == null) throw new ArgumentNullException(nameof(action));
             var otherwise = apply(() => Within(condition, action));
-            return new RecordedOtherwise(otherwise, condition?.Negated(), Within);
+            return new RecordedOtherwise(otherwise, condition == null ? null : ClientCondition.Not(condition), Within);
         }
 
         private void Within(ClientCondition? condition, Action action)
