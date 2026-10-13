@@ -17,10 +17,12 @@ public class WhenDomOpsTransformElements : PlaywrightTestBase
     public async Task counts_the_css_classes_of_a_dom_element()
     {
         await NavigateAndBoot();
-        await Expect(Page.Locator("#dom-total-classes")).ToHaveTextAsync("3", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#dom-total-classes")).ToHaveTextAsync("4", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
+    // The card also carries "fall-risk-reviewed", which holds "risk-" after its start: StartsWith counts
+    // risk-fall and risk-oxygen; a Contains in its place would count 3, an EndsWith 0.
     [Test]
     public async Task counts_risk_classes_by_prefix_filter_over_classList()
     {
@@ -54,6 +56,26 @@ public class WhenDomOpsTransformElements : PlaywrightTestBase
         await Page.Locator("#dom-add-risk-btn").ClickAsync();
 
         await Expect(Page.Locator("#dom-risk-count")).ToHaveTextAsync("3", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    // "low-sodium", "sodium-free", "reduced-sodium": Contains counts 3, where StartsWith would count 1 and
+    // EndsWith 2.
+    [Test]
+    public async Task counts_every_diet_that_mentions_sodium_anywhere_in_its_name()
+    {
+        await NavigateAndBoot();
+        await Expect(Page.Locator("#dom-sodium-diets")).ToHaveTextAsync("3", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    // EndsWith("sodium") counts the low and reduced sodium diets, 2, where Contains would count 3 and
+    // StartsWith 1 (sodium-free).
+    [Test]
+    public async Task counts_low_and_reduced_sodium_diets_by_how_their_names_end()
+    {
+        await NavigateAndBoot();
+        await Expect(Page.Locator("#dom-limited-sodium")).ToHaveTextAsync("2", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 

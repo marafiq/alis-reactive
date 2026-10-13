@@ -20,6 +20,31 @@
         p.When(alerts.Any(a => a.Severity == "critical" && !a.Acknowledged)).Truthy()
          .Then(then => then.Element("unack-warning").Show())
          .Else(els => els.Element("unack-clear").Show());
+
+        // Two or more unacknowledged critical alerts go to the charge nurse.
+        p.When(alerts.Count(a => a.Severity == "critical" && !a.Acknowledged)).Gte(2)
+         .Then(then => then.Element("charge-nurse-escalation").Show())
+         .Else(els => els.Element("charge-nurse-escalation").Hide());
+
+        // The open alerts' priorities add up to the shift's load; over 10 calls in a float nurse.
+        p.When(alerts.Where(a => !a.Acknowledged).Sum(a => a.Priority)).Gt(10)
+         .Then(then => then.Element("float-nurse").Show())
+         .Else(els => els.Element("float-nurse").Hide());
+
+        // The most urgent open alert decides whether the on-call physician is paged.
+        p.When(alerts.OrderByDescending(a => a.Priority).Find(a => !a.Acknowledged, a => a.Severity)).Eq("critical")
+         .Then(then => then.Element("page-physician").Show())
+         .Else(els => els.Element("page-physician").Hide());
+
+        // Any open urgent alert, whatever its priority, needs a follow-up this shift.
+        p.When(alerts.Where(a => a.Severity == "urgent" && !a.Acknowledged).Any()).Truthy()
+         .Then(then => then.Element("urgent-followup").Show())
+         .Else(els => els.Element("urgent-followup").Hide());
+
+        // Every alert acknowledged closes the shift's alert review.
+        p.When(alerts.All(a => a.Acknowledged)).Truthy()
+         .Then(then => then.Element("all-acknowledged").Show())
+         .Else(els => els.Element("all-acknowledged").Hide());
     }));
 
     Html.NativeButton("load-report-btn", "Generate Shift Report")
@@ -61,6 +86,11 @@
             <p>Top critical (by priority): <span id="top-critical">&mdash;</span></p>
             <p id="unack-warning" hidden class="text-red-600">&#9888; Unacknowledged critical alert present</p>
             <p id="unack-clear" hidden class="text-green-600">All critical alerts acknowledged</p>
+            <p id="charge-nurse-escalation" hidden class="text-red-600">Escalate to the charge nurse: two or more critical alerts are unacknowledged.</p>
+            <p id="float-nurse" hidden class="text-amber-600">The open alert load is high: call in a float nurse.</p>
+            <p id="page-physician" hidden class="text-red-600">Page the on-call physician: the most urgent open alert is critical.</p>
+            <p id="urgent-followup" hidden class="text-amber-600">Follow up on the urgent alerts this shift.</p>
+            <p id="all-acknowledged" hidden class="text-green-600">Every alert this shift is acknowledged.</p>
         </native-vstack>
     </native-card-body></native-card>
 </native-vstack>

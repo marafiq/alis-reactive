@@ -39,11 +39,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
             {
                 Residents = new[]
                 {
-                    new ResidentRow { Name = "Ada",  Status = "active",     Age = 71, Balance = 1200 },
-                    new ResidentRow { Name = "Bo",   Status = "discharged", Age = 64, Balance = 500 },
-                    new ResidentRow { Name = "Cy",   Status = "active",     Age = 80, Balance = 2000 },
-                    new ResidentRow { Name = "Di",   Status = "critical",   Age = 90, Balance = 3000 },
-                    new ResidentRow { Name = "Ed",   Status = "active",     Age = 55, Balance = 800 },
+                    // Ages sit on the roster's boundaries: Bo is 64, Ed 65, Cy 80; charges are dollars and cents.
+                    new ResidentRow { Name = "Ada",  Status = "active",     Age = 71, Balance = 1200, MonthlyCharges = 1200.50m, CareHours = 1.5 },
+                    new ResidentRow { Name = "Bo",   Status = "discharged", Age = 64, Balance = 500,  MonthlyCharges = 500m,     CareHours = 0 },
+                    new ResidentRow { Name = "Cy",   Status = "active",     Age = 80, Balance = 2000, MonthlyCharges = 2000.25m, CareHours = 2.25 },
+                    new ResidentRow { Name = "Di",   Status = "critical",   Age = 90, Balance = 3000, MonthlyCharges = 3000m,    CareHours = 6 },
+                    new ResidentRow { Name = "Ed",   Status = "active",     Age = 65, Balance = 800,  MonthlyCharges = 800m,     CareHours = 0.75 },
                 },
             });
         }

@@ -20,6 +20,15 @@
              s.Element("res-oldest-active").Text.Set(
                  residents.Where(x => x.Status == "active").OrderByDescending(x => x.Age).Find(x => true, x => x.Name));
 
+             // The roster's boundaries: Cy is 80 (not over 80), Ed is 65 (not under 65), Ed's charges are $800.
+             s.Element("res-over-80").Text.Set(residents.Count(x => x.Age > 80));
+             s.Element("res-under-65").Text.Set(residents.Count(x => x.Age < 65));
+             s.Element("res-low-charges").Text.Set(residents.Count(x => x.MonthlyCharges <= 800m));
+             s.Element("res-not-active").Text.Set(residents.Count(x => x.Status != "active"));
+             s.Element("res-active-charges").Text.Set(residents.Where(x => x.Status == "active").Sum(x => x.MonthlyCharges));
+             s.Element("res-active-care-hours").Text.Set(residents.Where(x => x.Status == "active").Sum(x => x.CareHours));
+             s.Element("res-first-critical").Text.Set(residents.Find(x => x.Status == "critical", x => x.Name));
+
              s.When(residents.Any(x => x.Status == "critical")).Truthy()
               .Then(then => then.Element("res-critical-yes").Show())
               .Else(els => els.Element("res-critical-no").Show());
@@ -46,6 +55,10 @@
             <p>Active seniors (65+): <span id="res-active-seniors">&mdash;</span></p>
             <p>Total age of active: <span id="res-active-age-sum">&mdash;</span></p>
             <p>Oldest active: <span id="res-oldest-active">&mdash;</span></p>
+            <p>Over 80: <span id="res-over-80">&mdash;</span> &middot; Under 65: <span id="res-under-65">&mdash;</span></p>
+            <p>Charges of $800 or less: <span id="res-low-charges">&mdash;</span> &middot; Not active: <span id="res-not-active">&mdash;</span></p>
+            <p>Active residents' monthly charges: $<span id="res-active-charges">&mdash;</span> &middot; weekly care hours: <span id="res-active-care-hours">&mdash;</span></p>
+            <p>Needs attention first: <span id="res-first-critical">&mdash;</span></p>
             <p id="res-critical-yes" hidden class="text-red-600">&#9888; Critical resident present</p>
             <p id="res-critical-no" hidden class="text-green-600">No critical residents</p>
         </native-vstack>

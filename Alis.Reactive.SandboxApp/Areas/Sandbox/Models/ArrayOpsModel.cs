@@ -19,5 +19,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string Status { get; set; } = string.Empty;
         public int Age { get; set; }
         public int Balance { get; set; }
+
+        /// <summary>This month's charges, in dollars and cents.</summary>
+        public decimal MonthlyCharges { get; set; }
+
+        /// <summary>Hours of personal care a week.</summary>
+        public double CareHours { get; set; }
     }
 }

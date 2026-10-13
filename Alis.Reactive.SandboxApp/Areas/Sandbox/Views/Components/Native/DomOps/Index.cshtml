@@ -20,6 +20,13 @@
         // RuntimePath.call invokes getAttribute at each DOM child element scope.
         p.Element("dom-high-risk-count").Text.Set(
             p.Element("risk-list").Children.Count(x => x.GetAttribute("data-risk") == "high"));
+
+        // Diets named for sodium: "low-sodium", "sodium-free" and "reduced-sodium" all mention it; only the
+        // first and last are limited-sodium diets, named so at their end.
+        p.Element("dom-sodium-diets").Text.Set(
+            p.Element("risk-list").Children.Count(x => x.GetAttribute("data-diet")!.Contains("sodium")));
+        p.Element("dom-limited-sodium").Text.Set(
+            p.Element("risk-list").Children.Count(x => x.GetAttribute("data-diet")!.EndsWith("sodium")));
     }));
 
     // Follow-up read observes the class added earlier in the same reaction.
@@ -40,12 +47,12 @@
     </native-text>
 
     <native-card><native-card-body>
-        <div id="dom-card" class="risk-fall risk-oxygen care-memory"></div>
+        <div id="dom-card" class="risk-fall risk-oxygen care-memory fall-risk-reviewed"></div>
         <ul id="dom-list" hidden><li>Physio</li><li>Dining</li><li>Social</li></ul>
         <ul id="risk-list" hidden>
-            <li data-risk="high">Mrs. A</li>
-            <li data-risk="low">Mr. B</li>
-            <li data-risk="high">Ms. C</li>
+            <li data-risk="high" data-diet="low-sodium">Mrs. A</li>
+            <li data-risk="low" data-diet="sodium-free">Mr. B</li>
+            <li data-risk="high" data-diet="reduced-sodium">Ms. C</li>
         </ul>
 
         <native-vstack gap="Sm" class="font-mono text-sm">
@@ -53,6 +60,7 @@
             <p>Risk flags (class starts with "risk-"): <span id="dom-risk-count">&mdash;</span></p>
             <p>List children: <span id="dom-child-count">&mdash;</span></p>
             <p>High-risk children (per-element <code>getAttribute</code>): <span id="dom-high-risk-count">&mdash;</span></p>
+            <p>Sodium-restricted diets: <span id="dom-sodium-diets">&mdash;</span> &middot; low or reduced sodium: <span id="dom-limited-sodium">&mdash;</span></p>
             <p id="dom-memory-yes" hidden class="text-amber-600">Memory-care class present</p>
             <p id="dom-memory-no" hidden class="text-green-600">No memory-care class</p>
         </native-vstack>
