@@ -50,14 +50,14 @@ namespace Alis.Reactive
 
         /// <summary>Declares a property the page reads.</summary>
         /// <typeparam name="TValue">The C# type of the value.</typeparam>
-        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased; a dotted path for a nested property.</param>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased; <c>items[].field</c> for a field of each item of a list. A member of an object the component holds belongs to that object's declaration (<see cref="Object{TObject}"/>).</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the property.</param>
         protected ReadOnly<TValue> ReadOnly<TValue>(string? name = null, [CallerMemberName] string declaredBy = "") =>
             new ReadOnly<TValue>(this, ComponentProperty<TValue>.At(JavaScriptPath(name, declaredBy)));
 
         /// <summary>Declares a property the page reads and writes.</summary>
         /// <typeparam name="TValue">The C# type of the value.</typeparam>
-        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased; a dotted path for a nested property.</param>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased; <c>items[].field</c> for a field of each item of a list. A member of an object the component holds belongs to that object's declaration (<see cref="Object{TObject}"/>).</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the property.</param>
         protected Prop<TValue> Prop<TValue>(string? name = null, [CallerMemberName] string declaredBy = "") =>
             new Prop<TValue>(this, ComponentProperty<TValue>.At(JavaScriptPath(name, declaredBy)));

@@ -28,13 +28,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Moves focus into the editor.</summary>
         public void SetFocus() => Call();
 
-        /// <summary>Adds a CSS class to the editor element.</summary>
-        /// <param name="token">The CSS class to add.</param>
-        public void AddClass(Arg<string> token) => Call(token, name: "element.classList.add");
-
-        /// <summary>Removes a CSS class from the editor element.</summary>
-        /// <param name="token">The CSS class to remove.</param>
-        public void RemoveClass(Arg<string> token) => Call(token, name: "element.classList.remove");
+        /// <summary>The editor's element: <c>editor.Element.ClassList.Add("alis-editor-saved")</c>.</summary>
+        public FusionInPlaceEditorElement Element => Object<FusionInPlaceEditorElement>();
 
         /// <summary>Raised before the editor opens.</summary>
         public TypedEvent<FusionInPlaceEditorBeginEditArgs> BeginEdit =>
@@ -66,6 +61,25 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Raised when the user clicks cancel.</summary>
         public TypedEvent<FusionInPlaceEditorCancelClickArgs> CancelClick =>
             Event<FusionInPlaceEditorCancelClickArgs>();
+    }
+
+    /// <summary>The element the in-place editor renders into.</summary>
+    public sealed class FusionInPlaceEditorElement : JsObject
+    {
+        /// <summary>The element's CSS classes.</summary>
+        public FusionInPlaceEditorClassList ClassList => Object<FusionInPlaceEditorClassList>();
+    }
+
+    /// <summary>The CSS classes of the in-place editor's element (the element's <c>classList</c>).</summary>
+    public sealed class FusionInPlaceEditorClassList : JsObject
+    {
+        /// <summary>Adds a CSS class.</summary>
+        /// <param name="tokens">The CSS class to add.</param>
+        public void Add(Arg<string> tokens) => Call(tokens);
+
+        /// <summary>Removes a CSS class.</summary>
+        /// <param name="tokens">The CSS class to remove.</param>
+        public void Remove(Arg<string> tokens) => Call(tokens);
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.BeginEdit"/>.</summary>

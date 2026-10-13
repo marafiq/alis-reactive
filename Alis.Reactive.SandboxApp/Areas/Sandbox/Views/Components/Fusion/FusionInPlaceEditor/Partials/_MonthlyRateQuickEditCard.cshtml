@@ -29,7 +29,7 @@
             .Model(new { format = "C0", min = 0, max = 25000, step = 50 }))
         .Reactive(evt => evt.BeginEdit, (args, p) =>
         {
-            p.Component<FusionInPlaceEditor>(m => m.Value).RemoveClass("alis-editor-saved");
+            p.Component<FusionInPlaceEditor>(m => m.Value).Element.ClassList.Remove("alis-editor-saved");
         })
         .Reactive(evt => evt.ActionSuccess, (args, p) =>
         {
@@ -40,7 +40,7 @@
                 .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
                 {
                     s.Element("card-monthly-rate-display").Text.Set(json.Get(x => x.DisplayValue));
-                    s.Component<FusionInPlaceEditor>(m => m.Value).AddClass("alis-editor-saved");
+                    s.Component<FusionInPlaceEditor>(m => m.Value).Element.ClassList.Add("alis-editor-saved");
                 })
                 .OnError(400, e => e.ValidationErrors("card-monthly-rate"))
                 .OnError<InPlaceEditorCommitError>((err, e) =>

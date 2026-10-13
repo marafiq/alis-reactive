@@ -89,7 +89,6 @@ The JavaScript name of a member is its C# name camel-cased, so `Capacity` is
 | a property the page reads and writes | `public Prop<int> Capacity => Prop<int>();` |
 | a property the page only reads | `public ReadOnly<int> Count => ReadOnly<int>();` |
 | a property that holds an object with members of its own | `public VisitPlannerLabels Labels => Object<VisitPlannerLabels>();`, where `VisitPlannerLabels : JsObject` declares `Empty`; the page writes `planner.Labels.Empty.Set(..)` |
-| one deeper property, by its path | `Prop<string>("labels.empty")` |
 | a field of each item of a list, to read | `Prop<IReadOnlyList<string>>("slots[].day")` |
 | a method | `public void Clear() => Call();` |
 | a method with arguments | `public void Book(Arg<string> slot, Arg<decimal> visitors, Arg<string> note) => Call(slot, visitors, note);` |
