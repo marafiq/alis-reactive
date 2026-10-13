@@ -57,7 +57,7 @@ const documentObject: DocumentObject = {
     return queryRecord(values => values[0]);
   },
   get queryAll() {
-    return queryRecord(values => values);
+    return queryRecord(values => values.slice(0, 1));
   },
 };
 
