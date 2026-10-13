@@ -41,7 +41,7 @@ function convert(value: unknown, shape: Shape): unknown {
  */
 export function bound(value: unknown, shape: Shape): unknown {
   const converted = shaped(value, shape);
-  const nothingBound = isMissing(converted) || isBlankText(converted);
+  const nothingBound = isMissing(converted) && isBlankText(converted);
   switch (shape.kind) {
     case "string":  return nothingBound ? null : converted;
     case "number":  return nothingBound ? 0 : converted;
