@@ -24,7 +24,8 @@
 <native-vstack gap="Lg">
     <native-heading level="H1">Care-Staff Column View</native-heading>
     <native-text color="Secondary">
-        Care staff hide non-essential columns, restore them, and move the risk column to the front for a shift.
+        Care staff hide non-essential columns, restore them, move the risk column to the front for a shift,
+        and call the wings neighborhoods where the community does.
     </native-text>
 
     <native-hstack gap="Sm" class="flex-wrap">
@@ -53,6 +54,14 @@
                 p.Component<FusionGrid>(GridId).ReorderColumns(Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel),
                             Field.Of((ResidentDirectoryGridItem x) => x.ResidentName));
                 p.Element("column-status").Text.Set("risk moved before resident");
+            }))
+        @(Html.NativeButton("name-wings-neighborhoods", "Call Wings Neighborhoods")
+            .CssClass(Button)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var grid = p.Component<FusionGrid>(GridId);
+                grid.GetColumnByField(Field.Of((ResidentDirectoryGridItem x) => x.Wing)).HeaderText.Set("Neighborhood");
+                grid.RefreshHeader();
             }))
     </native-hstack>
 

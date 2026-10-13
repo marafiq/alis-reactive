@@ -17,7 +17,7 @@ namespace Alis.Reactive
             Context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        protected PlanBuildContext Context { get; }
+        internal PlanBuildContext Context { get; }
 
         /// <summary>The object, found when the step runs.</summary>
         protected abstract Receiver Locate();
@@ -97,5 +97,26 @@ namespace Alis.Reactive
         }
 
         protected override Receiver Locate() => Receiver.Plugin(_plugin);
+    }
+
+    /// <summary>
+    /// The object one of another object's methods returns, such as a grid's column. Each use of it calls
+    /// the method again, where the use is written.
+    /// </summary>
+    internal sealed class ReturnedObjectBinding : ObjectBinding
+    {
+        private readonly ObjectBinding _owner;
+        private readonly ComponentMethod _method;
+        private readonly IReadOnlyList<ValueExpression> _args;
+
+        internal ReturnedObjectBinding(ObjectBinding owner, ComponentMethod method, IReadOnlyList<ValueExpression> args)
+            : base(owner.Context)
+        {
+            _owner = owner;
+            _method = method;
+            _args = args;
+        }
+
+        protected override Receiver Locate() => Receiver.Returned(_owner.Invoke(_method, _args, Shape.Any));
     }
 }

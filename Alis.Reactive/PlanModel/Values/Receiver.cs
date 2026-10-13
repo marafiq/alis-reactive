@@ -22,6 +22,9 @@ namespace Alis.Reactive.PlanModel
 
         internal static Receiver Item { get; } = new ItemReceiver();
 
+        /// <summary>The object a method call returns.</summary>
+        internal static Receiver Returned(ValueExpression call) => new ReturnedReceiver(call);
+
         /// <summary>Data a callback received rather than an object the page holds; shown as it arrived.</summary>
         internal virtual bool IsData => false;
 
@@ -85,6 +88,18 @@ namespace Alis.Reactive.PlanModel
             internal override bool IsData => true;
 
             internal override (Expr, IReadOnlyList<string>) Locate(Scope scope) => (G.Ref(scope.Item), G.NoPath);
+        }
+
+        private sealed class ReturnedReceiver : Receiver
+        {
+            private readonly ValueExpression _call;
+
+            internal ReturnedReceiver(ValueExpression call)
+            {
+                _call = call ?? throw new ArgumentNullException(nameof(call));
+            }
+
+            internal override (Expr, IReadOnlyList<string>) Locate(Scope scope) => (_call.Write(scope), G.NoPath);
         }
     }
 }

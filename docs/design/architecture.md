@@ -465,11 +465,13 @@ public sealed class FusionGridRowSelected<TRow> : JsObject      // a payload is 
   deleted. A member's own C# signature replaces them.
 - **As built (`f36f62e`; section 13 has the full list).** `Prop<T>`, `ReadOnly<T>`, `Call`,
   `CallAsync`, `Invoke<T>`, `InvokeAsync<T>`, `Fixed` and `name:` are as above; a method's result is a
-  `TypedSource<T>`, the one value type. Not built: `Object<T>` and `InvokeObject<T>` (a nested member is
-  a dotted `name:`, such as `"eventSettings.dataSource"`), the generic declaration `FusionGrid<TRow>`
-  (row-typed members stay generic methods with `Field.Of`/`Field<TValue>` arguments), and `Event` and
-  `Message<T>` (events stay `TypedEvent<T>`; data payloads are `Data<T>`). The plan still keys a member
-  by its C# name.
+  `TypedSource<T>`, the one value type. `Object<T>()` and `InvokeObject<T>(..)` are built (section 13):
+  a nested object shares its holder's binding and its members' paths start with the holder's property,
+  so `schedule.EventSettings.DataSource.Set(..)` writes the plan the dotted `"eventSettings.dataSource"`
+  wrote; a returned object is the `call` expression, which each use writes again. Not built: the
+  generic declaration `FusionGrid<TRow>` (row-typed members stay generic methods with
+  `Field.Of`/`Field<TValue>` arguments), and `Event` and `Message<T>` (events stay `TypedEvent<T>`;
+  data payloads are `Data<T>`). The plan carries each member's JavaScript path; no key names a member.
 
 ### 4.2 Inputs
 
@@ -1085,8 +1087,8 @@ built and what is not.
     pair overloads of conditions and arrays are gone; a `ReactiveArray<T>` is itself a source.
   - Each binding (component, event payload, plugin, element) writes into the active scope (4.4), so a
     write lands in the callback it is written in, whichever variable holds the object.
-  - Not built, as listed under 4.1: `Object<T>`, `InvokeObject<T>`, `FusionGrid<TRow>`, `Event`,
-    `Message<T>`, and paths as plan keys.
+  - Not built, as listed under 4.1: `FusionGrid<TRow>`, `Event` and `Message<T>`. `Object<T>`,
+    `InvokeObject<T>` and paths in place of plan keys were built later (below).
   - Every declaration (51 Fusion, the Native slices, the app objects, two brought components and the
     sandbox's plugins) and every view moved in one commit: 307 files, 192 of them views. Twenty
     harness pages rendered byte-identical plan JSON before and after, so the runtime did not change.
@@ -1152,6 +1154,15 @@ built and what is not.
     `InternalsVisibleTo` names only the contract generator.
   - shapes, paths and typed sources are each one small type (`d439302`); the open-object shape, which
     nothing produced, leaves the contract and the runtime.
+- **Built after step 0:**
+  - nested and returned objects (section 4.1): `Object<T>()` declares a property that holds an object
+    with members of its own (`schedule.EventSettings.DataSource`, `pivot.DataSourceSettings.DataSource`,
+    the visit planner's `Labels.Empty`), and `InvokeObject<T>(..)` a method that returns one
+    (`grid.GetColumnByField(..).HeaderText.Set("Neighborhood"); grid.RefreshHeader();` on the care
+    staff columns page). No runtime change: the grammar already reads, writes and calls on any
+    expression. The twenty harness pages rendered byte-identical plans with the nested labels.
+  - a chained request is given its parent's success body: `Chained<TResponse>((body, next) => ..)`.
+  - live validation rechecks a field against every container that holds it (grammar F7).
 - **Step 0, closed after the redesign** (`1ca7c9a` through `a1af1a2`; CI run 38366597452, 1,526
   Playwright tests passed). Step 0 (sections 10 and 12) was not done before the redesign. Its
   inventories were re-audited at `7c34a86`: of 155 rows still marked weak, plan-only or missing, 14 were

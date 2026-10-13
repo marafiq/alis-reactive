@@ -55,6 +55,23 @@ public class WhenUsingFusionGridColumns : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The grid hands back the wing column; its header is renamed on that column, then redrawn.
+    [Test]
+    public async Task calling_wings_neighborhoods_renames_the_wing_column()
+    {
+        await NavigateColumns();
+        await Expect(VisibleHeaders).ToHaveTextAsync(
+            new[] { "Resident", "Risk", "Primary Nurse", "Next Review", "Wing", "Care Level" },
+            new() { Timeout = 10000 });
+
+        await ClickWhenStable(Page.Locator("#name-wings-neighborhoods"));
+
+        await Expect(VisibleHeaders).ToHaveTextAsync(
+            new[] { "Resident", "Risk", "Primary Nurse", "Next Review", "Neighborhood", "Care Level" },
+            new() { Timeout = 10000 });
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task reordering_moves_risk_before_resident()
     {

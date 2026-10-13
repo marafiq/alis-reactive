@@ -36,7 +36,12 @@ namespace Alis.Reactive
     {
         private ObjectBinding? _binding;
 
-        internal ObjectBinding Binding => _binding ?? throw new InvalidOperationException(
+        // A nested object (Object<T>) is reached through the object that holds it: it shares that object's
+        // binding, and its members' JavaScript names start with the property that holds it.
+        private JsObject? _holder;
+        private string _pathPrefix = "";
+
+        internal ObjectBinding Binding => _binding ?? _holder?.Binding ?? throw new InvalidOperationException(
             $"'{GetType().Name}' is a declaration, not a live object. Reach one inside a callback: " +
             $"p.Component<{GetType().Name}>(..), the payload an event hands its callback, or a registered plugin.");
 
@@ -48,14 +53,52 @@ namespace Alis.Reactive
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased; a dotted path for a nested property.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the property.</param>
         protected ReadOnly<TValue> ReadOnly<TValue>(string? name = null, [CallerMemberName] string declaredBy = "") =>
-            new ReadOnly<TValue>(this, PropertyNamed<TValue>(name, declaredBy));
+            new ReadOnly<TValue>(this, ComponentProperty<TValue>.At(JavaScriptPath(name, declaredBy)));
 
         /// <summary>Declares a property the page reads and writes.</summary>
         /// <typeparam name="TValue">The C# type of the value.</typeparam>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased; a dotted path for a nested property.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the property.</param>
         protected Prop<TValue> Prop<TValue>(string? name = null, [CallerMemberName] string declaredBy = "") =>
-            new Prop<TValue>(this, PropertyNamed<TValue>(name, declaredBy));
+            new Prop<TValue>(this, ComponentProperty<TValue>.At(JavaScriptPath(name, declaredBy)));
+
+        /// <summary>
+        /// Declares a property that holds an object with members of its own, declared as its own class:
+        /// <c>public FusionScheduleEventSettings EventSettings =&gt; Object&lt;FusionScheduleEventSettings&gt;();</c>,
+        /// used as <c>schedule.EventSettings.DataSource.Set(..)</c>.
+        /// </summary>
+        /// <typeparam name="TObject">The declaration of the object the property holds.</typeparam>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the property.</param>
+        protected TObject Object<TObject>(string? name = null, [CallerMemberName] string declaredBy = "")
+            where TObject : JsObject, new() =>
+            new TObject { _holder = this, _pathPrefix = JavaScriptPath(name, declaredBy) + "." };
+
+        /// <summary>
+        /// Calls a method that returns an object with members of its own, declared as its own class:
+        /// <c>public CodeModel GetModel() =&gt; InvokeObject&lt;CodeModel&gt;();</c>. Each use of the returned object
+        /// calls the method again, where the use is written.
+        /// </summary>
+        /// <typeparam name="TObject">The declaration of the object the method returns.</typeparam>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
+        protected TObject InvokeObject<TObject>(string? name = null, [CallerMemberName] string declaredBy = "")
+            where TObject : JsObject, new() =>
+            Returned<TObject>(name, declaredBy);
+
+        /// <summary>
+        /// Calls a method that returns an object with members of its own, declared as its own class:
+        /// <c>public FusionGridColumn GetColumnByField(Field field) =&gt; InvokeObject&lt;FusionGridColumn&gt;(field);</c>,
+        /// used as <c>grid.GetColumnByField(..).HeaderText.Set(..)</c>. Each use of the returned object calls
+        /// the method again, where the use is written.
+        /// </summary>
+        /// <typeparam name="TObject">The declaration of the object the method returns.</typeparam>
+        /// <param name="first">The argument: a literal, or a value read when the step runs.</param>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
+        protected TObject InvokeObject<TObject>(Arg first, string? name = null, [CallerMemberName] string declaredBy = "")
+            where TObject : JsObject, new() =>
+            Returned<TObject>(name, declaredBy, first);
 
         /// <summary>Calls the method the C# member declares.</summary>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
@@ -202,11 +245,19 @@ namespace Alis.Reactive
         private TypedSource<TResult> Read<TResult>(string? name, string declaredBy, bool awaits, params Arg[] args) =>
             new MethodRead<TResult>(this, MethodNamed(name, declaredBy, awaits, args), Expressions(args));
 
-        private static ComponentProperty<TValue> PropertyNamed<TValue>(string? name, string declaredBy) =>
-            ComponentProperty<TValue>.At(name ?? JavaScriptNameOf(declaredBy));
+        private TObject Returned<TObject>(string? name, string declaredBy, params Arg[] args) where TObject : JsObject, new()
+        {
+            var returned = new TObject();
+            returned.BindTo(new ReturnedObjectBinding(Binding, MethodNamed(name, declaredBy, awaits: false, args), Expressions(args)));
+            return returned;
+        }
 
-        private static ComponentMethod MethodNamed(string? name, string declaredBy, bool awaits, Arg[] args) =>
-            ComponentMethod.Of(declaredBy, name ?? JavaScriptNameOf(declaredBy), args.Select(arg => arg.Shape).ToList(), awaits);
+        private ComponentMethod MethodNamed(string? name, string declaredBy, bool awaits, Arg[] args) =>
+            ComponentMethod.Of(declaredBy, JavaScriptPath(name, declaredBy), args.Select(arg => arg.Shape).ToList(), awaits);
+
+        // The member's JavaScript path from the object a page holds: the holder's property first for a
+        // nested object, then the declared name, or the C# name camel-cased.
+        private string JavaScriptPath(string? name, string declaredBy) => _pathPrefix + (name ?? JavaScriptNameOf(declaredBy));
 
         private static IReadOnlyList<ValueExpression> Expressions(Arg[] args) =>
             args.Select(arg => arg.Expression).ToList();

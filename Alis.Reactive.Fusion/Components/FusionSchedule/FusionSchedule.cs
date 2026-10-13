@@ -28,8 +28,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The date the view shows.</summary>
         public Prop<DateTime> SelectedDate => Prop<DateTime>();
 
-        /// <summary>The events; call <see cref="DataBind"/> after writing them.</summary>
-        public Prop<object> EventDataSource => Prop<object>("eventSettings.dataSource");
+        /// <summary>The events and how they are read; call <see cref="DataBind"/> after writing them.</summary>
+        public FusionScheduleEventSettings EventSettings => Object<FusionScheduleEventSettings>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
         public void DataBind() => Call();
@@ -240,6 +240,13 @@ namespace Alis.Reactive.Fusion.Components
     /// Editor action for schedule event operations. Mirrors the Syncfusion EJ2 Schedule
     /// <c>CurrentAction</c> values one-to-one; each name serializes to its EJ2 string.
     /// </summary>
+    /// <summary>The schedule's <c>eventSettings</c>: its events.</summary>
+    public sealed class FusionScheduleEventSettings : JsObject
+    {
+        /// <summary>The events.</summary>
+        public Prop<object> DataSource => Prop<object>();
+    }
+
     public enum ScheduleAction
     {
         /// <summary>Add a new event.</summary>

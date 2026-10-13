@@ -37,7 +37,7 @@
                      .Response(r => r.OnSuccess<PivotCensusResponse>((json, s) =>
                      {
                          var carePivot = s.Component<FusionPivotView>("care-pivot");
-                         carePivot.DataSource.Set(json.Get(x => x.Rows));
+                         carePivot.DataSourceSettings.DataSource.Set(json.Get(x => x.Rows));
                          carePivot.Refresh();
                          s.Element("data-status").Text.Set(json.Get(x => x.Message));
                      }));

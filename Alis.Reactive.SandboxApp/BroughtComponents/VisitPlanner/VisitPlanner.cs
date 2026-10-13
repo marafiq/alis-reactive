@@ -55,8 +55,8 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// <summary>The day of each offered time: every item of <c>slots</c>, read at <c>day</c>.</summary>
         public Prop<IReadOnlyList<string>> OfferedDays => Prop<IReadOnlyList<string>>("slots[].day");
 
-        /// <summary>What the planner says before any time is offered.</summary>
-        public Prop<string> EmptyMessage => Prop<string>("labels.empty");
+        /// <summary>What the planner says, such as before any time is offered.</summary>
+        public VisitPlannerLabels Labels => Object<VisitPlannerLabels>();
 
         /// <summary>How many times are booked.</summary>
         public ReadOnly<int> Count => ReadOnly<int>();
@@ -125,6 +125,13 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
 
         /// <summary>Raised when the week's times are offered.</summary>
         public TypedEvent<VisitPlannerSlotsLoadedArgs> SlotsLoaded => Event<VisitPlannerSlotsLoadedArgs>();
+    }
+
+    /// <summary>The planner's <c>labels</c>: what it says.</summary>
+    public sealed class VisitPlannerLabels : JsObject
+    {
+        /// <summary>What the planner says before any time is offered.</summary>
+        public Prop<string> Empty => Prop<string>();
     }
 
     /// <summary>A time the planner offers.</summary>

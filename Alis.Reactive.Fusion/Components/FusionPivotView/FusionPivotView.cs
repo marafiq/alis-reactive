@@ -15,15 +15,15 @@ namespace Alis.Reactive.Fusion.Components
     /// <remarks>
     /// Render it with <c>Html.FusionPivotView(plan, "care-pivot", b =&gt; ...)</c>, reach it with
     /// <c>var pivot = p.Component&lt;FusionPivotView&gt;("care-pivot");</c> and use its members directly:
-    /// <c>pivot.DataSource.Set(json.Get(x =&gt; x.Rows)); pivot.Refresh();</c>.
+    /// <c>pivot.DataSourceSettings.DataSource.Set(json.Get(x =&gt; x.Rows)); pivot.Refresh();</c>.
     /// </remarks>
     public sealed class FusionPivotView : FusionComponent
     {
         /// <summary>The shown view: <c>"Table"</c> or <c>"Chart"</c>.</summary>
         public Prop<string> CurrentView => Prop<string>();
 
-        /// <summary>The rows the pivot summarizes; call <see cref="Refresh"/> after writing it.</summary>
-        public Prop<object> DataSource => Prop<object>("dataSourceSettings.dataSource");
+        /// <summary>The rows the pivot summarizes and how; call <see cref="Refresh"/> after writing them.</summary>
+        public FusionPivotViewDataSourceSettings DataSourceSettings => Object<FusionPivotViewDataSourceSettings>();
 
         /// <summary>Re-renders the pivot from its data source.</summary>
         public void Refresh() => Call();
@@ -98,6 +98,13 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Whether the cell is a grand total.</summary>
         public bool IsGrandSum { get; set; }
+    }
+
+    /// <summary>The pivot's <c>dataSourceSettings</c>: the rows it summarizes.</summary>
+    public sealed class FusionPivotViewDataSourceSettings : JsObject
+    {
+        /// <summary>The rows.</summary>
+        public Prop<object> DataSource => Prop<object>();
     }
 
     /// <summary>

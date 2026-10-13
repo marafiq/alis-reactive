@@ -110,6 +110,13 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="key">The column to hide, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.PrimaryNurse)</c>.</param>
         public void HideColumn(Field key) => Call(key, Fixed("field"), name: "hideColumns");
 
+        /// <summary>A column, to read or change; call <see cref="RefreshHeader"/> after changing its header.</summary>
+        /// <param name="field">The column, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.Wing)</c>.</param>
+        public FusionGridColumn GetColumnByField(Field field) => InvokeObject<FusionGridColumn>(field);
+
+        /// <summary>Renders the column headers again, after a column's header changed.</summary>
+        public void RefreshHeader() => Call();
+
         /// <summary>Moves a column before another one.</summary>
         /// <param name="fromFName">The column to move, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.RiskLevel)</c>.</param>
         /// <param name="toFName">The column whose place it moves to, named by a member of your row class.</param>
@@ -293,6 +300,16 @@ namespace Alis.Reactive.Fusion.Components
     /// and <c>search</c> appear only on the trigger variants that emit them.
     /// Do not infer missing fields from another variant.
     /// </remarks>
+    /// <summary>A grid column, as <see cref="FusionGrid.GetColumnByField"/> returns it.</summary>
+    public sealed class FusionGridColumn : JsObject
+    {
+        /// <summary>The text of the column's header.</summary>
+        public Prop<string> HeaderText => Prop<string>();
+
+        /// <summary>Whether the column is shown.</summary>
+        public Prop<bool> Visible => Prop<bool>();
+    }
+
     public class FusionGridDataStateChangeArgs : JsObject
     {
         /// <summary>Syncfusion event name injected by the EJ2 event observer.</summary>

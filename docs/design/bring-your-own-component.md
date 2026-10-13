@@ -180,14 +180,15 @@ declaration passes it: `public void ShowColumn(Field key) => Call(key, Fixed("fi
 "showColumns");`, so the page passes only the field. Where the JavaScript method takes a wider type
 than the page's own list, `Pass<TDeclared, TSource>(items)` passes it (`UpdateData` above).
 
-Names are the component's own; `name:` takes a dotted path to reach a nested member
-(`"eventSettings.dataSource"`, `"dataset.target"`), and a plugin that is itself a function declares
-it with `name: ""`. Events are named like every other member, by the C# name camel-cased;
-where an event shares its name with a method, the event takes the past tense and names its
-JavaScript event (Tooltip's `Opened => Event<..>("open")` beside its `Open()` method). The C#
-member name keys the declaration, and a method's key also carries its argument shapes
-(`setCellValue(number,string,number)`), so two C# members can type two signatures of one
-JavaScript method and a generic member's type arguments never conflict. A brought vendor and its
+Names are the component's own: a member's JavaScript name is its C# name camel-cased, and `name:`
+gives another, or a path to one deeper member (`"dataset.target"`, or `"slots[].day"` to read each
+item's field); a plugin that is itself a function declares it with `name: ""`. A property that holds
+an object with members of its own is declared as that object, `Object<T>()`
+(`schedule.EventSettings.DataSource`), and a method that returns one as `InvokeObject<T>(..)`
+(`grid.GetColumnByField(..).HeaderText`). Events are named like every other member, by the C# name
+camel-cased (Tooltip's `AfterOpen` is EJ2's `afterOpen`). Every use of a member writes its
+JavaScript path into the plan, so two C# members can type two signatures of one JavaScript method
+and a generic member's type arguments never conflict. A brought vendor and its
 components live in the app's own assembly; nothing needs framework internals, and the Fusion and
 Native assemblies are built the same way.
 

@@ -60,7 +60,7 @@ public sealed class VisitPlanner : Component, IInputComponent
     public Prop<string> Wing => Prop<string>();
     public Prop<IReadOnlyList<VisitSlot>> Slots => Prop<IReadOnlyList<VisitSlot>>();
     public Prop<IReadOnlyList<string>> OfferedDays => Prop<IReadOnlyList<string>>("slots[].day");
-    public Prop<string> EmptyMessage => Prop<string>("labels.empty");
+    public VisitPlannerLabels Labels => Object<VisitPlannerLabels>();
     public ReadOnly<int> Count => ReadOnly<int>();
 
     public TypedSource<int> Remaining() => Invoke<int>();
@@ -88,11 +88,13 @@ The JavaScript name of a member is its C# name camel-cased, so `Capacity` is
 | --- | --- |
 | a property the page reads and writes | `public Prop<int> Capacity => Prop<int>();` |
 | a property the page only reads | `public ReadOnly<int> Count => ReadOnly<int>();` |
-| a nested property | `Prop<string>("labels.empty")` |
+| a property that holds an object with members of its own | `public VisitPlannerLabels Labels => Object<VisitPlannerLabels>();`, where `VisitPlannerLabels : JsObject` declares `Empty`; the page writes `planner.Labels.Empty.Set(..)` |
+| one deeper property, by its path | `Prop<string>("labels.empty")` |
 | a field of each item of a list, to read | `Prop<IReadOnlyList<string>>("slots[].day")` |
 | a method | `public void Clear() => Call();` |
 | a method with arguments | `public void Book(Arg<string> slot, Arg<decimal> visitors, Arg<string> note) => Call(slot, visitors, note);` |
 | a method that returns a value | `public TypedSource<bool> IsBooked(Arg<string> slot) => Invoke<bool>(slot);` |
+| a method that returns an object with members of its own | `public FusionGridColumn GetColumnByField(Field field) => InvokeObject<FusionGridColumn>(field);`; the page writes `grid.GetColumnByField(..).HeaderText.Set(..)`, and each use calls the method again |
 | a method that returns a promise | `CallAsync()`, `InvokeAsync<string>()` |
 | a method whose JavaScript name differs | `Call(fieldName, name: "autoFitColumns")` |
 | an argument the method always takes | `Call(key, Fixed("field"), name: "hideColumns")` |

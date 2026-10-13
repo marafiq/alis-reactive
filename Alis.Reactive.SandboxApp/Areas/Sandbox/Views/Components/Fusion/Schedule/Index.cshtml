@@ -59,7 +59,7 @@
          .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
          {
              var shiftSchedule = s.Component<FusionSchedule>("shift-schedule");
-             shiftSchedule.EventDataSource.Set(json.Get(j => j.Assignments));
+             shiftSchedule.EventSettings.DataSource.Set(json.Get(j => j.Assignments));
              shiftSchedule.DataBind();
              s.Element("status").Text.Set("Schedule loaded");
              s.Element("unassigned-count").Text.Set(json.Get(j => j.UnassignedCount));
@@ -93,7 +93,7 @@
                          .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                          {
                              var shiftSchedule = s.Component<FusionSchedule>("shift-schedule");
-                             shiftSchedule.EventDataSource.Set(json.Get(j => j.Assignments));
+                             shiftSchedule.EventSettings.DataSource.Set(json.Get(j => j.Assignments));
                              shiftSchedule.DataBind();
                              s.Element("status").Text.Set("Facility changed");
                              s.Element("unassigned-count").Text.Set(json.Get(j => j.UnassignedCount));
@@ -306,7 +306,7 @@
                       .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                       {
                           var shiftSchedule = s.Component<FusionSchedule>("shift-schedule");
-                          shiftSchedule.EventDataSource.Set(json.Get(j => j.Assignments));
+                          shiftSchedule.EventSettings.DataSource.Set(json.Get(j => j.Assignments));
                           shiftSchedule.DataBind();
                           s.Element("status").Text.Set("Refreshed after save");
                           s.Element("unassigned-count").Text.Set(json.Get(j => j.UnassignedCount));
@@ -329,7 +329,7 @@
                       .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                       {
                           var shiftSchedule = s.Component<FusionSchedule>("shift-schedule");
-                          shiftSchedule.EventDataSource.Set(json.Get(j => j.Assignments));
+                          shiftSchedule.EventSettings.DataSource.Set(json.Get(j => j.Assignments));
                           shiftSchedule.DataBind();
                           s.Element("status").Text.Set("View loaded");
                           s.Element("unassigned-count").Text.Set(json.Get(j => j.UnassignedCount));
@@ -346,7 +346,7 @@
                       .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                       {
                           var shiftSchedule = s.Component<FusionSchedule>("shift-schedule");
-                          shiftSchedule.EventDataSource.Set(json.Get(j => j.Assignments));
+                          shiftSchedule.EventSettings.DataSource.Set(json.Get(j => j.Assignments));
                           shiftSchedule.DataBind();
                           s.Element("status").Text.Set("Date loaded");
                           s.Element("unassigned-count").Text.Set(json.Get(j => j.UnassignedCount));

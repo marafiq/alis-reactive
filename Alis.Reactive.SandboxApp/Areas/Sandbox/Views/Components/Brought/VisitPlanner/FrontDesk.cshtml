@@ -45,7 +45,7 @@
                 })
                 .OnError<DeskMessage>(404, (unknown, e) =>
                 {
-                    planner.EmptyMessage.Set(unknown.Get(x => x.Message));
+                    planner.Labels.Empty.Set(unknown.Get(x => x.Message));
                     resident.Text.Set("Unknown resident");
                 })
                 // The holds are asked of the desk of the wing the week's answer names.

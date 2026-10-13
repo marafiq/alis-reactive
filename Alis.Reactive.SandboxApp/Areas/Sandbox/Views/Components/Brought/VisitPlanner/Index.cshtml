@@ -28,7 +28,7 @@
     };
 
     Html.On(plan, t => t.DomReady(p =>
-        p.Component<VisitPlanner>(m => m.VisitSlots).EmptyMessage.Set("Choose a resident to see this week's visit times.")));
+        p.Component<VisitPlanner>(m => m.VisitSlots).Labels.Empty.Set("Choose a resident to see this week's visit times.")));
 }
 
 <native-vstack gap="Lg">
