@@ -13,15 +13,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
     {
         [HttpGet("")]
         public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Validation/RoomHold/Index.cshtml",
-                new RoomHoldModel { RoomCode = RoomHoldValidator.HeldRoom });
+            View("~/Areas/Sandbox/Views/Validation/RoomHold/Index.cshtml", new RoomHoldModel());
 
         [HttpPost("Hold")]
-        public IActionResult Hold([FromBody] RoomHoldModel? hold)
+        public async Task<IActionResult> Hold([FromBody] RoomHoldModel? hold)
         {
             if (hold == null) return BadRequest();
 
-            var result = new RoomHoldValidator().Validate(hold);
+            // The availability rule asks the hold book asynchronously, so the server validates asynchronously.
+            var result = await new RoomHoldValidator().ValidateAsync(hold);
             if (!result.IsValid)
             {
                 var errors = result.Errors

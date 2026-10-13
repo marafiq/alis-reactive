@@ -16,9 +16,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             // FluentValidation's own message, named the way FluentValidation names the field.
             RuleFor(x => x.ResidentName).NotEmpty();
 
-            // A message written from the model can only be said by the server, so this rule runs there.
+            // A message written from the model can only be said by the server, so this rule runs there;
+            // so does the printer's letters-only check. A name can break both, and the server says both.
             RuleFor(x => x.ResidentName).MaximumLength(30)
-                .WithMessage(review => $"{review.ResidentName} is longer than the 30 characters a wristband prints.");
+                .WithMessage(review => $"{review.ResidentName} is longer than the 30 characters a wristband prints.")
+                .Must(name => name == null || !name.Any(char.IsDigit))
+                .WithMessage("A wristband prints letters only: remove the digits from the name.");
 
             RuleFor(x => x.FallRiskScore)
                 .NotNull().WithMessage("Score the resident's fall risk.")

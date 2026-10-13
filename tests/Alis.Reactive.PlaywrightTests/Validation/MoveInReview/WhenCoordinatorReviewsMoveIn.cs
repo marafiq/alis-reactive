@@ -83,6 +83,28 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
     }
 
     [Test]
+    public async Task a_name_the_wristband_cannot_print_is_refused_with_every_reason_the_server_gives()
+    {
+        const string NameWithDigits = "Margaret Elizabeth Hale-Worthington 2nd";
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, NameWithDigits);
+        await Write(m => m.FallRiskScore, "2");
+
+        await ClickWhenStable(SaveReview);
+
+        // The server refuses the name twice, too long and not letters only, and the page shows both reasons.
+        await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync(
+            $"{NameWithDigits} is longer than the 30 characters a wristband prints., " +
+            "A wristband prints letters only: remove the digits from the name.");
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1), "Both checks are the server's.");
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await ClickWhenStable(SaveReview);
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        Assert.That(_reviewsSent, Has.Count.EqualTo(2));
+        AssertNoConsoleErrorsExcept("400");
+    }
+
+    [Test]
     public async Task a_fall_risk_score_outside_zero_to_ten_is_refused()
     {
         await NavigateAndBoot();
