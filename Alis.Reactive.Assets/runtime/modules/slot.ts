@@ -34,11 +34,11 @@ function load(id: string, html: unknown): void {
 
   const host = document.createElement("div");
   host.innerHTML = html;
-  const plans = discoverPlans(host, true);
 
   announceUnmount(target);
   target.innerHTML = "";
   target.append(...Array.from(host.childNodes));
+  const plans = discoverPlans(host, true);
   runInsertedScripts(target);
   announceMount(target);
 
