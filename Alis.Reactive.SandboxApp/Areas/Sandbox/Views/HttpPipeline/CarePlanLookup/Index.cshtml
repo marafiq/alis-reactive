@@ -31,11 +31,13 @@
                         {
                             s.Element("care-plan-resident").Text.Set(json.Get(x => x.Resident));
                             s.Element("care-plan-summary").Text.Set(json.Get(x => x.Plan));
+                            s.Element("care-plan-alerts").Html.Set(json.Get(x => x.Alerts));
                         })
                         .OnError(404, e =>
                         {
                             e.Element("care-plan-resident").Text.Set("No care plan open.");
                             e.Element("care-plan-summary").Text.Set("No care plan is on file for this resident yet.");
+                            e.Element("care-plan-alerts").Html.Set("");
                         }))
                      .Finally(f => f.Component<NativeLoader>().Hide());
                 }))
@@ -46,6 +48,7 @@
         <native-vstack gap="Sm">
             <p class="text-sm">Resident: <span id="care-plan-resident" class="font-medium">No care plan open.</span></p>
             <p id="care-plan-summary" class="text-sm text-text-secondary"></p>
+            <p id="care-plan-alerts" class="text-sm text-danger"></p>
         </native-vstack>
     </native-card-body></native-card>
 </native-vstack>

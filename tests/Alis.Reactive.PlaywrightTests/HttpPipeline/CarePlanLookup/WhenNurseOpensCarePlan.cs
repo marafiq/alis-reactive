@@ -28,6 +28,7 @@ public class WhenNurseOpensCarePlan : PlaywrightTestBase
     private ILocator OpenCarePlan => Page.Locator("#open-care-plan-btn");
     private ILocator CarePlanResident => Page.Locator("#care-plan-resident");
     private ILocator CarePlanSummary => Page.Locator("#care-plan-summary");
+    private ILocator CarePlanAlerts => Page.Locator("#care-plan-alerts");
     private ILocator Loader => Page.Locator("#alis-loader");
 
     private async Task NavigateAndBoot()
@@ -63,6 +64,22 @@ public class WhenNurseOpensCarePlan : PlaywrightTestBase
         await Expect(CarePlanResident).ToHaveTextAsync("Helen Park");
         await Expect(CarePlanSummary).ToHaveTextAsync("Assisted living: morning medication round, physiotherapy on Tuesdays and Fridays.");
         await Expect(Loader).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // The care alerts arrive as HTML from the clinical record and are written as HTML: the label is a
+    // bold element and the line reads as words. Written as text, the line would show the raw tags and
+    // hold no bold label; not written at all, it would stay empty.
+    [Test]
+    public async Task a_residents_care_alerts_show_with_each_label_in_bold()
+    {
+        await NavigateAndBoot();
+        await Resident.Select("Helen Park");
+
+        await ClickWhenStable(OpenCarePlan);
+
+        await Expect(CarePlanAlerts).ToHaveTextAsync("Allergy: penicillin");
+        await Expect(CarePlanAlerts.Locator("strong")).ToHaveTextAsync("Allergy:");
         AssertNoConsoleErrors();
     }
 
@@ -107,12 +124,14 @@ public class WhenNurseOpensCarePlan : PlaywrightTestBase
         await Resident.Select("Helen Park");
         await ClickWhenStable(OpenCarePlan);
         await Expect(CarePlanResident).ToHaveTextAsync("Helen Park");
+        await Expect(CarePlanAlerts).ToHaveTextAsync("Allergy: penicillin");
         await Resident.Select("Rosa Diaz");
 
         await ClickWhenStable(OpenCarePlan);
 
         await Expect(CarePlanSummary).ToHaveTextAsync("No care plan is on file for this resident yet.");
         await Expect(CarePlanResident).ToHaveTextAsync("No care plan open.");
+        await Expect(CarePlanAlerts).ToHaveTextAsync("");
         await Expect(Loader).ToBeHiddenAsync();
         AssertNoConsoleErrorsExcept("the server responded with a status of 404");
     }

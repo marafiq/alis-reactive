@@ -19,6 +19,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     /// <summary>A resident the nurse can choose.</summary>
     public sealed record CarePlanResidentOption(string Id, string Name);
 
-    /// <summary>A resident's care plan, as the server sends it.</summary>
-    public sealed record CarePlanSummary(string Resident, string Plan);
+    /// <summary>
+    /// A resident's care plan, as the server sends it. <paramref name="Alerts"/> comes formatted from the
+    /// clinical record, as HTML: each alert's label in bold.
+    /// </summary>
+    public sealed record CarePlanSummary(string Resident, string Plan, string Alerts);
 }
