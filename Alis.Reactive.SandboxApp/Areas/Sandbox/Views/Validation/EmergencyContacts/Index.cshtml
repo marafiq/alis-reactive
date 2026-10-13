@@ -20,8 +20,8 @@
                 @{ Html.InputField(plan, m => m.HasContacts, o => o.Label("Resident has emergency contacts"))
                     .NativeCheckBox(b => b.CssClass("h-4 w-4 rounded border-border text-accent")); }
             </div>
-            @* The contacts can be saved on their own: Save Contacts checks only the fields in this section,
-               with the same validator Save Intake uses for the whole form. *@
+            @* The contacts can be saved on their own: Save Contacts, under the section, checks only the
+               fields in it, with the same validator Save Intake uses for the whole form. *@
             <div id="contacts-section" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 @for (var i = 0; i < Model.Contacts.Count; i++)
                 {
@@ -32,6 +32,21 @@
                     Html.InputField(plan, m => m.Contacts[contactIndex].Phone, o => o.Label($"Contact {contactNumber} Phone"))
                         .NativeTextBox(b => b.Type("tel").Placeholder("555-0100"));
                 }
+            </div>
+            <div class="mt-3">
+                @(Html.NativeButton("save-contacts-btn", "Save Contacts")
+                    .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Post(Url.SandboxRoute("SaveContacts", "EmergencyContacts")).Gather(g => g.Form())
+                         .Validate<EmergencyContactsValidator>("contacts-section")
+                         .Response(r => r
+                            .OnSuccess<EmergencyContactsConfirmation>((json, s) =>
+                            {
+                                s.Element("emergency-contacts-status").Text.Set(json.Get(x => x.Confirmation));
+                            })
+                            .OnError(400, e => e.ValidationErrors("contacts-section")));
+                    }))
             </div>
         </form>
         @(Html.NativeButton("save-emergency-contacts-btn", "Save Intake")
@@ -46,19 +61,6 @@
                         s.Element("emergency-contacts-status").Text.Set(json.Get(x => x.Confirmation));
                     })
                     .OnError(400, e => e.ValidationErrors("emergency-contacts-form")));
-            }))
-        @(Html.NativeButton("save-contacts-btn", "Save Contacts")
-            .CssClass("ml-2 rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Post(Url.SandboxRoute("SaveContacts", "EmergencyContacts")).Gather(g => g.Form())
-                 .Validate<EmergencyContactsValidator>("contacts-section")
-                 .Response(r => r
-                    .OnSuccess<EmergencyContactsConfirmation>((json, s) =>
-                    {
-                        s.Element("emergency-contacts-status").Text.Set(json.Get(x => x.Confirmation));
-                    })
-                    .OnError(400, e => e.ValidationErrors("contacts-section")));
             }))
         <p id="emergency-contacts-status" class="mt-3 text-sm text-text-muted">No intake saved yet.</p>
     </native-card-body>

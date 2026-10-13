@@ -10,7 +10,7 @@
 // F6 A message goes inline into {id}_error when that slot can render, else into the summary.
 // F7 At creation, and whenever HTML mounts (a field a partial loads): DOM `input` clears a field's
 //    message; DOM `blur` and alis:commit (the model re-raises each input's own commit event as it)
-//    revalidate it. Each element is wired once.
+//    revalidate it against every container that holds it. Each element is wired once.
 // F8 showErrors(problem) places server errors by exact binding name; without a record body it validates.
 // F9 A slot's load or unload removes exactly its own fields, then clears and hides the summary.
 
@@ -158,17 +158,34 @@ function validate(containerId: string): boolean {
   return valid;
 }
 
-function revalidate(containerId: string, fieldId: string): void {
-  const entries = entriesOf(containerId).filter(entry => entry.field.id === fieldId);
-  if (entries.length === 0) return;
-  const summary = summaryElement(entriesOf(containerId));
-  clearInline(fieldId);
-  removeSummaryError(summary, fieldId);
+interface Holder {
+  readonly container: HTMLElement;
+  readonly summary: HTMLElement | null;
+  readonly entries: readonly Entry[];
+}
 
-  const container = document.getElementById(containerId);
-  if (container === null) return;
-  for (const entry of entries) {
-    if (!evaluateField(entry, container, summary)) return;
+// Every validated container that holds the field's element, with the field's entries in it. A field can
+// sit in more than one: a section saved on its own, inside the whole form.
+function holdersOf(field: HTMLElement): Holder[] {
+  const holders: Holder[] = [];
+  for (const [containerId, entries] of formsByContainer) {
+    const own = entries.filter(entry => entry.field.id === field.id);
+    const container = own.length > 0 ? document.getElementById(containerId) : null;
+    if (container === null || !container.contains(field)) continue;
+    holders.push({ container, summary: summaryElement(entries), entries: own });
+  }
+  return holders;
+}
+
+// Leaving a field rechecks it against every container that holds it; the first failing test shows.
+function revalidate(field: HTMLElement): void {
+  const holders = holdersOf(field);
+  clearInline(field.id);
+  for (const { summary } of holders) removeSummaryError(summary, field.id);
+  for (const { container, summary, entries } of holders) {
+    for (const entry of entries) {
+      if (!evaluateField(entry, container, summary)) return;
+    }
   }
 }
 
@@ -208,13 +225,13 @@ function showErrors(containerId: string, problem: unknown): void {
 
 // ── live wiring ────────────────────────────────────────────────────────────
 
-function wireLive(containerId: string, entry: Entry): void {
+function wireLive(entry: Entry): void {
   const { field, owner } = entry;
   const element = document.getElementById(field.id);
   if (element === null || liveWiredElements.has(element)) return;
 
   const clear = (): void => clearInline(field.id);
-  const recheck = (): void => revalidate(containerId, field.id);
+  const recheck = (): void => revalidate(element);
   element.addEventListener("input", clear);
   element.addEventListener("blur", recheck);
   element.addEventListener(COMMIT_EVENT, recheck);
@@ -229,8 +246,8 @@ function wireLive(containerId: string, entry: Entry): void {
 
 // Fields a partial renders appear after their form was contributed: wire them when they mount.
 function wireMountedFields(): void {
-  for (const [containerId, entries] of formsByContainer) {
-    for (const entry of entries) wireLive(containerId, entry);
+  for (const entries of formsByContainer.values()) {
+    for (const entry of entries) wireLive(entry);
   }
 }
 
@@ -251,7 +268,7 @@ export const formModule: Module = {
     const added = data.fields.map(field => ({ field, world, summary: data.summary, owner }));
     entries.push(...added);
     if (owner.isSlot) clearAndHide(document.getElementById(data.summary));
-    for (const entry of added) wireLive(key, entry);
+    for (const entry of added) wireLive(entry);
     listenForMounts();
 
     owner.onDispose(() => {

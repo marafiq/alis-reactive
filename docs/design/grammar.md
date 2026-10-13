@@ -504,11 +504,13 @@ imports none of them. The obligations are numbered so that tests and code can ci
   entry per key, replaced and never duplicated.
 - **F7 Live.** At creation (boot or slot load):
   - the DOM `input` event on a field clears its inline message;
-  - DOM `blur` and `alis:commit` (M4) revalidate that one field. The form never names a
-    component's event, so the order in which the form and the input's plan start does not matter.
+  - DOM `blur` and `alis:commit` (M4) revalidate that one field, against every container that
+    holds it (a section saved on its own sits inside the whole form), and the first failing test
+    shows. The form never names a component's event, so the order in which the form and the
+    input's plan start does not matter, and neither does the order the containers were declared.
 - **F8 Server errors.** `showErrors(problem)` clears first.
-  - When `problem` is a record with `errors`, it joins each field's messages with `", "` and matches
-    a test field by its exact binding name. Anything else goes to the summary.
+  - When `problem` is a record with `errors`, it joins each field's messages with a space (each is a
+    sentence) and matches a test field by its exact binding name. Anything else goes to the summary.
   - When `problem` is not a record (an empty or non-JSON body), it runs `validate()` instead
     (`execute.ts:215-228`).
 - **F9 Composition.** Tests from plans that share a `planId` are joined per owner. A slot's load or

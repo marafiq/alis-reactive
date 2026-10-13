@@ -133,6 +133,31 @@ describe("live", () => {
     expect(errorText("Name")).toBe("Enter the resident's name.");
   });
 
+  // One validator serves a section saved on its own and the whole form: both containers list every
+  // field, and the section, contributed first, does not hold the resident's name.
+  it("revalidates a field against the container that holds it, whichever container was contributed first", () => {
+    render(`<form id="intake">${field("ResidentName")}<div id="contacts">${field("ContactPhone")}</div></form>`);
+    const fields = [
+      requiredField("ResidentName", "ResidentName", "Enter the resident's name."),
+      requiredField("ContactPhone", "ContactPhone", "Enter the contact's phone."),
+    ];
+    const objects = {
+      sectionForm: plugin("alis.form", "contacts", { kind: "form", summary: "Test_Plan_validation_summary", fields } as FormPluginData),
+      wholeForm: plugin("alis.form", "intake", { kind: "form", summary: "Test_Plan_validation_summary", fields } as FormPluginData),
+      ResidentName: element("ResidentName", "native"),
+      ContactPhone: element("ContactPhone", "native"),
+    };
+    startOwner(Owner.page(), [plan(objects, [])]);
+    const name = document.getElementById("ResidentName") as HTMLInputElement;
+
+    name.dispatchEvent(new Event("blur"));
+    expect(errorText("ResidentName")).toBe("Enter the resident's name.");
+
+    name.value = "Margaret Hale";
+    name.dispatchEvent(new Event("blur"));
+    expect(errorText("ResidentName")).toBe("");
+  });
+
   it("revalidates when the input commits, by whatever name its component raises the commit", () => {
     render(`<form id="admission"></form>`);
     const rating = fakeWidget("Rating", { value: 4 });

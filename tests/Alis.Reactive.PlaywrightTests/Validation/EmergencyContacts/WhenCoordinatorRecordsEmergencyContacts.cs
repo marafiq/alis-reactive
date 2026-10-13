@@ -112,6 +112,26 @@ public class WhenCoordinatorRecordsEmergencyContacts : PlaywrightTestBase
         AssertNoConsoleErrorsExcept("400");
     }
 
+    // Save Contacts, under the contacts section, comes before Save Intake, and the section does not hold
+    // the resident's name: leaving the name empty still asks for it, by the whole form's rule.
+    [Test]
+    public async Task leaving_the_residents_name_empty_asks_for_it_before_anything_is_saved()
+    {
+        await NavigateAndBoot();
+        await _plan.TextBox(m => m.ResidentName).Fill("Helen Park");
+        await _plan.TextBox(m => m.ResidentName).Fill("");
+        await Page.Keyboard.PressAsync("Tab");
+
+        await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync("Resident name is required.");
+
+        await _plan.TextBox(m => m.ResidentName).Fill("Helen Park");
+        await Page.Keyboard.PressAsync("Tab");
+        await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync("");
+        Assert.That(_intakesSent, Is.Empty, "Leaving a field sends nothing.");
+        Assert.That(_contactSavesSent, Is.Empty);
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task saving_the_contacts_alone_does_not_wait_for_the_residents_name()
     {
