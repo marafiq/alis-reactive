@@ -128,76 +128,91 @@ namespace Alis.Reactive
     /// </summary>
     public abstract class Arg
     {
-        private protected Arg(ValueExpression expression, Shape shape)
-        {
-            Expression = expression ?? throw new ArgumentNullException(nameof(expression));
-            Shape = shape ?? throw new ArgumentNullException(nameof(shape));
-        }
+        private protected Arg() { }
 
-        internal ValueExpression Expression { get; }
+        /// <summary>The value, read where the call is written.</summary>
+        internal abstract ValueExpression Expression { get; }
 
         /// <summary>The shape the method declares for this argument.</summary>
-        internal Shape Shape { get; }
+        internal abstract Shape Shape { get; }
 
         internal static Arg Fixed(object value)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
-            var shape = Shape.FromValue(value);
-            return new ExpressionArg(ValueExpression.LiteralFor(value, shape), shape);
+            return new DeclaredArg(value, Shape.FromValue(value));
         }
 
         internal static Arg Declared<TDeclared, TSource>(TypedSource<TSource> source)
             where TSource : TDeclared
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            return new ExpressionArg(source.ToValueExpression(), Shape.FromClrType(typeof(TDeclared)));
+            return new DeclaredArg(source, Shape.FromClrType(typeof(TDeclared)));
         }
 
-        private sealed class ExpressionArg : Arg
+        /// <summary>A field of the row, item or card class, named when the view renders.</summary>
+        /// <param name="field">The field, for example <c>Field.Of((Resident r) =&gt; r.OpenTasks)</c>.</param>
+        public static implicit operator Arg(Field field)
         {
-            internal ExpressionArg(ValueExpression expression, Shape shape)
-                : base(expression, shape)
+            if (field == null) throw new ArgumentNullException(nameof(field));
+            return new DeclaredArg(field, Shape.FromValue(field));
+        }
+
+        // A literal, or a value read when the step runs, in the shape the declaration gives it.
+        private protected static ValueExpression ExpressionOf(object? value, Shape shape) =>
+            value is IValueSource source ? source.ToValueExpression() : ValueExpression.LiteralFor(value, shape);
+
+        private sealed class DeclaredArg : Arg
+        {
+            private readonly object _value;
+
+            internal DeclaredArg(object value, Shape shape)
             {
+                _value = value;
+                Shape = shape;
             }
+
+            internal override ValueExpression Expression => ExpressionOf(_value, Shape);
+
+            internal override Shape Shape { get; }
         }
     }
 
     /// <summary>
-    /// One argument of a method: a literal, or a value read when the step runs. Write either one where
-    /// the method takes it; the conversion is implicit.
+    /// One argument of a method: a literal, or a value read when the step runs. A value read when the step
+    /// runs is an argument of its own type, so a generic method infers its type argument from it.
     /// </summary>
     /// <remarks>
-    /// A generic method names its type argument, because C# does not infer it through the conversion:
-    /// <c>kanban.AddCard&lt;CareCard&gt;(json.Get(x =&gt; x.Card), 0)</c>.
+    /// A literal converts implicitly; a generic method given only literals names its type argument:
+    /// <c>kanban.AddCard&lt;CareCard&gt;(card, 0)</c>.
     /// </remarks>
     /// <example>
     /// <code>
     /// planner.Book(args.Added, visitors.Value, "Bring the photo album");
-    /// kanban.AddCard&lt;CareCard&gt;(json.Get(x =&gt; x.Card), 0);
+    /// kanban.AddCard(json.Get(x =&gt; x.Card), 0);
     /// </code>
     /// </example>
     /// <typeparam name="T">The C# type the method declares for the argument.</typeparam>
-    public sealed class Arg<T> : Arg
+    public abstract class Arg<T> : Arg
     {
-        private Arg(ValueExpression expression)
-            : base(expression, Shape.FromClrType(typeof(T)))
-        {
-        }
+        private protected Arg() { }
+
+        internal override Shape Shape => Shape.FromClrType(typeof(T));
 
         /// <summary>A literal argument, written into the plan.</summary>
         /// <remarks>A parameter typed <c>object</c> takes any value read when the step runs, too.</remarks>
         /// <param name="value">The literal.</param>
-        public static implicit operator Arg<T>(T value) =>
-            new Arg<T>(value is IValueSource source
-                ? source.ToValueExpression()
-                : ValueExpression.LiteralFor(value, Shape.FromClrType(typeof(T))));
+        public static implicit operator Arg<T>(T value) => new Literal(value);
 
-        /// <summary>An argument read when the step runs.</summary>
-        /// <param name="source">The value: a property, a method's result, a payload, a response, the URL or an array.</param>
-        public static implicit operator Arg<T>(TypedSource<T> source)
+        private sealed class Literal : Arg<T>
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            return new Arg<T>(source.ToValueExpression());
+            private readonly T _value;
+
+            internal Literal(T value)
+            {
+                _value = value;
+            }
+
+            internal override ValueExpression Expression => ExpressionOf(_value, Shape);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Alis.Reactive
     /// and, through <see cref="Field{TValue}"/>, the value that goes with it:
     /// <code>
     /// grid.SortColumn(Field.Of((Resident r) =&gt; r.Name), FusionGridSortDirection.Descending, false);
-    /// grid.SetCellValue&lt;int&gt;(6001, Field.Of((Resident r) =&gt; r.OpenTasks), 4);
+    /// grid.SetCellValue(6001, Field.Of((Resident r) =&gt; r.OpenTasks), 4);
     /// </code>
     /// A nested member is a dotted name: <c>r =&gt; r.Address.City</c> is <c>"address.city"</c>.
     /// </remarks>

@@ -87,7 +87,7 @@
                     p.Post("/api/kanban/cards")
                      .Response(r => r.OnSuccess<KanbanCardMutationResponse>((json, s) =>
                      {
-                         s.Component<FusionKanban>("care-kanban").AddCard<KanbanTaskCard>(json.Get(x => x.Card), 0);
+                         s.Component<FusionKanban>("care-kanban").AddCard(json.Get(x => x.Card), 0);
                          s.Element("kanban-command-status").Text.Set(json.Get(x => x.Message));
                      }));
                 }))

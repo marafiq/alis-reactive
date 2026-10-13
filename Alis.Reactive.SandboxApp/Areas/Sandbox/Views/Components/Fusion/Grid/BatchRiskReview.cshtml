@@ -31,7 +31,7 @@
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).UpdateCell<string>(0, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), "Critical");
+                p.Component<FusionGrid>(GridId).UpdateCell(0, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), "Critical");
                 p.Element("batch-risk-status").Text.Set("updateCell string called");
             }))
         @(Html.NativeButton("batch-risk-gather", "Gather Changes")

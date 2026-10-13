@@ -54,7 +54,7 @@
             .CssClass(ButtonPrimary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(BatchGridId).UpdateCell<int>(0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 6);
+                p.Component<FusionGrid>(BatchGridId).UpdateCell(0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 6);
                 p.Element("batch-command-status").Text.Set("updateCell called");
             }))
         @(Html.NativeButton("batch-save-cell", "Save Cell")

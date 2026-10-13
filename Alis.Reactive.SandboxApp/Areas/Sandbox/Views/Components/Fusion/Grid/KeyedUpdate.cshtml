@@ -32,14 +32,14 @@
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).SetCellValue<int>(6000, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 99);
+                p.Component<FusionGrid>(GridId).SetCellValue(6000, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 99);
                 p.Element("keyed-status").Text.Set("setCellValue int called");
             }))
         @(Html.NativeButton("keyed-set-risk", "Quarantine Risk (6001)")
             .CssClass(Button)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Component<FusionGrid>(GridId).SetCellValue<string>(6001, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), "Quarantine");
+                p.Component<FusionGrid>(GridId).SetCellValue(6001, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), "Quarantine");
                 p.Element("keyed-status").Text.Set("setCellValue string called");
             }))
         @(Html.NativeButton("keyed-set-row", "Replace Row (6002)")

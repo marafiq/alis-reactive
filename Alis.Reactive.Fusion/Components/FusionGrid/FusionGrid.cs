@@ -74,7 +74,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="columnName">The column to sort by, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.Name)</c>.</param>
         /// <param name="direction">The sort direction.</param>
         /// <param name="isMultiSort"><see langword="true"/> to keep the sorts already applied; <see langword="false"/> to replace them.</param>
-        public void SortColumn(Arg<Field> columnName, Arg<FusionGridSortDirection> direction, Arg<bool> isMultiSort) => Call(columnName, direction, isMultiSort);
+        public void SortColumn(Field columnName, Arg<FusionGridSortDirection> direction, Arg<bool> isMultiSort) => Call(columnName, direction, isMultiSort);
 
         /// <summary>Clears every sort.</summary>
         public void ClearSorting() => Call();
@@ -87,41 +87,41 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="fieldName">The column to filter, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.Wing)</c>.</param>
         /// <param name="filterOperator">How the column's value is compared with the text.</param>
         /// <param name="filterValue">The text to filter by.</param>
-        public void FilterByColumn(Arg<Field> fieldName, Arg<FusionGridTextFilterOperator> filterOperator, Arg<string> filterValue) => Call(fieldName, filterOperator, filterValue);
+        public void FilterByColumn(Field fieldName, Arg<FusionGridTextFilterOperator> filterOperator, Arg<string> filterValue) => Call(fieldName, filterOperator, filterValue);
 
         /// <summary>Clears every filter.</summary>
         public void ClearFiltering() => Call();
 
         /// <summary>Groups the rows by a column.</summary>
         /// <param name="columnName">The column to group by, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.CareLevel)</c>.</param>
-        public void GroupColumn(Arg<Field> columnName) => Call(columnName);
+        public void GroupColumn(Field columnName) => Call(columnName);
 
         /// <summary>Removes the grouping by a column.</summary>
         /// <param name="columnName">The column to stop grouping by, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.CareLevel)</c>.</param>
-        public void UngroupColumn(Arg<Field> columnName) => Call(columnName);
+        public void UngroupColumn(Field columnName) => Call(columnName);
 
         /// <summary>Clears every grouping.</summary>
         public void ClearGrouping() => Call();
 
         /// <summary>Shows a hidden column.</summary>
         /// <param name="key">The column to show, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.PrimaryNurse)</c>.</param>
-        public void ShowColumn(Arg<Field> key) => Call(key, Fixed("field"), name: "showColumns");
+        public void ShowColumn(Field key) => Call(key, Fixed("field"), name: "showColumns");
 
         /// <summary>Hides a column.</summary>
         /// <param name="key">The column to hide, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.PrimaryNurse)</c>.</param>
-        public void HideColumn(Arg<Field> key) => Call(key, Fixed("field"), name: "hideColumns");
+        public void HideColumn(Field key) => Call(key, Fixed("field"), name: "hideColumns");
 
         /// <summary>Moves a column before another one.</summary>
         /// <param name="fromFName">The column to move, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.RiskLevel)</c>.</param>
         /// <param name="toFName">The column whose place it moves to, named by a member of your row class.</param>
-        public void ReorderColumns(Arg<Field> fromFName, Arg<Field> toFName) => Call(fromFName, toFName);
+        public void ReorderColumns(Field fromFName, Field toFName) => Call(fromFName, toFName);
 
         /// <summary>Fits every column to its content.</summary>
         public void AutoFitColumns() => Call();
 
         /// <summary>Fits one column to its content.</summary>
         /// <param name="fieldName">The column to fit, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.RiskLevel)</c>.</param>
-        public void AutoFitColumn(Arg<Field> fieldName) => Call(fieldName, name: "autoFitColumns");
+        public void AutoFitColumn(Field fieldName) => Call(fieldName, name: "autoFitColumns");
 
         /// <summary>Opens the column chooser.</summary>
         public void OpenColumnChooser() => Call();
@@ -166,12 +166,12 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="key">The row's primary key value.</param>
         /// <param name="field">The column, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.OpenTasks)</c>.</param>
         /// <param name="value">The cell's new value.</param>
-        public void SetCellValue<TValue>(Arg<int> key, Arg<Field<TValue>> field, Arg<TValue> value) => Call(key, field, value);
+        public void SetCellValue<TValue>(Arg<int> key, Field<TValue> field, Arg<TValue> value) => Call(key, field, value);
 
         /// <summary>Opens a cell for batch editing: the row's zero-based index, then the column.</summary>
         /// <param name="index">The zero-based index of the row.</param>
         /// <param name="field">The column, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.OpenTasks)</c>.</param>
-        public void EditCell(Arg<int> index, Arg<Field> field) => Call(index, field);
+        public void EditCell(Arg<int> index, Field field) => Call(index, field);
 
         /// <summary>Saves the cell being batch edited.</summary>
         public void SaveCell() => Call();
@@ -181,7 +181,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="rowIndex">The zero-based index of the row.</param>
         /// <param name="field">The column, named by a member of your row class, for example <c>Field.Of((ResidentRow r) =&gt; r.OpenTasks)</c>.</param>
         /// <param name="value">The cell's new value.</param>
-        public void UpdateCell<TValue>(Arg<int> rowIndex, Arg<Field<TValue>> field, Arg<TValue> value) => Call(rowIndex, field, value);
+        public void UpdateCell<TValue>(Arg<int> rowIndex, Field<TValue> field, Arg<TValue> value) => Call(rowIndex, field, value);
 
         /// <summary>The pending batch edits, typed by your row class.</summary>
         /// <typeparam name="TRow">Your row class.</typeparam>

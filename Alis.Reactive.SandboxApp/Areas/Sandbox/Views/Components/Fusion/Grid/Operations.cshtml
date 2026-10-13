@@ -164,14 +164,14 @@
                 .CssClass(ButtonAccent)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).SetCellValue<string>(6002, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), "Critical");
+                    p.Component<FusionGrid>(GridId).SetCellValue(6002, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), "Critical");
                     p.Element("keyed-update-status").Text.Set("resident 6002 risk flagged");
                 }))
             @(Html.NativeButton("ops-set-tasks-cell", "Set Tasks For 6003")
                 .CssClass(ButtonAccent)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(GridId).SetCellValue<int>(6003, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 7);
+                    p.Component<FusionGrid>(GridId).SetCellValue(6003, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 7);
                     p.Element("keyed-update-status").Text.Set("resident 6003 tasks updated");
                 }))
             @(Html.NativeButton("ops-server-patch-row", "Apply Server Patch To 6005")
@@ -182,7 +182,7 @@
                     .Gather(g => g.Form(m => m.PatchRiskLevel, m => m.PatchOpenTasks))
                     .Response(r => r.OnSuccess<ResidentGridOperationsResponse>((json, s) =>
                     {
-                        s.Component<FusionGrid>(GridId).SetRowData<ResidentDirectoryGridItem>(6005, json.Get(x => x.Row));
+                        s.Component<FusionGrid>(GridId).SetRowData(6005, json.Get(x => x.Row));
                         s.Element("keyed-update-status").Text.Set(json.Get(x => x.Summary));
                     }));
                 }))

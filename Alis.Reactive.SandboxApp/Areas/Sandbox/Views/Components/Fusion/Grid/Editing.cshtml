@@ -122,7 +122,7 @@
                     p.Post(Url.SandboxRoute("CreateEditResident", "Grid"))
                         .Response(r => r.OnSuccess<ResidentGridEditResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(InlineGridId).AddRecordAt<ResidentDirectoryGridItem>(json.Get(x => x.Row), 0);
+                            s.Component<FusionGrid>(InlineGridId).AddRecordAt(json.Get(x => x.Row), 0);
                             s.Element("inline-command-status").Text.Set(json.Get(x => x.Summary));
                         }));
                 }))
@@ -227,7 +227,7 @@
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(BatchGridId).UpdateCell<int>(0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 6);
+                    p.Component<FusionGrid>(BatchGridId).UpdateCell(0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 6);
                     p.Element("batch-command-status").Text.Set("updateCell called");
                 }))
             @(Html.NativeButton("batch-save-cell", "Save Cell")
@@ -426,7 +426,7 @@
                     .Response(r => r
                         .OnSuccess<ResidentGridEditResponse>((json, s) =>
                         {
-                            s.Component<FusionGrid>(InlineGridId).UpdateRow<ResidentDirectoryGridItem>(0, json.Get(x => x.Row));
+                            s.Component<FusionGrid>(InlineGridId).UpdateRow(0, json.Get(x => x.Row));
                             s.Component<FusionGrid>(InlineGridId).Refresh();
                             s.Element("validation-status").Text.Set(json.Get(x => x.Summary));
                             s.Element("validation-status").ClassList.Remove("text-red-600");

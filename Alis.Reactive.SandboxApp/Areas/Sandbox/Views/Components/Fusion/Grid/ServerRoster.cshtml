@@ -57,7 +57,7 @@
                 p.Post(Url.SandboxRoute("CreateEditResident", "Grid"))
                     .Response(r => r.OnSuccess<ResidentGridEditResponse>((json, s) =>
                     {
-                        s.Component<FusionGrid>(GridId).AddRecordAt<ResidentDirectoryGridItem>(json.Get(x => x.Row), 0);
+                        s.Component<FusionGrid>(GridId).AddRecordAt(json.Get(x => x.Row), 0);
                         s.Element("server-command").Text.Set("server resident admitted");
                     }));
             }))
@@ -68,7 +68,7 @@
                 p.Post(Url.SandboxRoute("UpdateFirstResidentRow", "Grid"))
                     .Response(r => r.OnSuccess<ResidentGridEditResponse>((json, s) =>
                     {
-                        s.Component<FusionGrid>(KeyedGridId).UpdateRow<ResidentDirectoryGridItem>(0, json.Get(x => x.Row));
+                        s.Component<FusionGrid>(KeyedGridId).UpdateRow(0, json.Get(x => x.Row));
                         s.Element("server-command").Text.Set("server row updated");
                     }));
             }))
@@ -79,7 +79,7 @@
                 p.Post(Url.SandboxRoute("PatchResidentRow", "Grid"))
                     .Response(r => r.OnSuccess<ResidentGridOperationsResponse>((json, s) =>
                     {
-                        s.Component<FusionGrid>(KeyedGridId).SetRowData<ResidentDirectoryGridItem>(6005, json.Get(x => x.Row));
+                        s.Component<FusionGrid>(KeyedGridId).SetRowData(6005, json.Get(x => x.Row));
                         s.Element("server-command").Text.Set("server row patched");
                     }));
             }))
