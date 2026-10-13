@@ -15,7 +15,7 @@ const log = logScope("execute");
 export type Completion = void | Promise<void>;
 
 export function executeBlock(statements: readonly Statement[], scope: Scope): Completion {
-  return runFrom(statements, 0, scope);
+  return Promise.resolve().then(() => runFrom(statements, 0, scope));
 }
 
 function runFrom(statements: readonly Statement[], start: number, scope: Scope): Completion {
