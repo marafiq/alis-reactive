@@ -23,6 +23,7 @@ public class WhenBookingMoveInEastOfUtc : PlaywrightTestBase
 
     private ILocator BookMoveIn => Page.Locator("#book-move-in-btn");
     private ILocator BookingStatus => Page.Locator("#booking-status");
+    private ILocator MoveInNote => Page.Locator("#move-in-note");
 
     public override BrowserNewContextOptions ContextOptions()
     {
@@ -76,6 +77,88 @@ public class WhenBookingMoveInEastOfUtc : PlaywrightTestBase
 
         await Expect(BookingStatus).ToHaveTextAsync(
             "Move-in booked for Sunday, October 11, 2026. The truck arrives at 05:30 UTC.");
+        AssertNoConsoleErrors();
+    }
+
+    // The picked day is midnight in Karachi and the Christmas literal must be read as that same local
+    // midnight: read as a UTC instant it is 05:00 on the 25th there, Eq misses, and Christmas Day falls
+    // through to the December rate. Christmas Eve shows Eq matches the one day, not all of December.
+    [Test]
+    public async Task christmas_day_is_refused_as_a_move_in_day_while_christmas_eve_gets_the_holiday_rate()
+    {
+        await NavigateAndBoot();
+        var moveInDay = _plan.DatePicker(m => m.MoveInDay);
+
+        await moveInDay.SelectDate(2026, 12, 25);
+        await Expect(MoveInNote).ToHaveTextAsync("The office is closed on Christmas Day; choose another move-in day.");
+
+        await moveInDay.SelectDate(2026, 12, 24);
+        await Expect(MoveInNote).ToHaveTextAsync("December move-ins get the holiday rate.");
+        AssertNoConsoleErrors();
+    }
+
+    // Between includes both ends: a Between that left out the first or the thirty-first would give
+    // either day the standard terms. January falls past the end and gets no December terms.
+    [Test]
+    public async Task december_move_ins_from_the_first_through_the_thirty_first_get_the_holiday_rate_and_january_does_not()
+    {
+        await NavigateAndBoot();
+        var moveInDay = _plan.DatePicker(m => m.MoveInDay);
+
+        await moveInDay.SelectDate(2026, 12, 1);
+        await Expect(MoveInNote).ToHaveTextAsync("December move-ins get the holiday rate.");
+
+        await moveInDay.SelectDate(2026, 12, 31);
+        await Expect(MoveInNote).ToHaveTextAsync("December move-ins get the holiday rate.");
+
+        await moveInDay.SelectDate(2027, 1, 4);
+        await Expect(MoveInNote).ToHaveTextAsync("Standard move-in.");
+        AssertNoConsoleErrors();
+    }
+
+    // Lt(November 1st) is strict: the 31st of October needs the director, the 1st of November does not.
+    // An Lt read as Lte would send the 1st to the director too.
+    [Test]
+    public async Task a_move_in_before_november_needs_the_directors_approval_and_one_on_the_first_does_not()
+    {
+        await NavigateAndBoot();
+        var moveInDay = _plan.DatePicker(m => m.MoveInDay);
+
+        await moveInDay.SelectDate(2026, 10, 31);
+        await Expect(MoveInNote).ToHaveTextAsync("A move-in before November needs the director's approval.");
+
+        await moveInDay.SelectDate(2026, 11, 1);
+        await Expect(MoveInNote).ToHaveTextAsync("November move-ins get a free first week of housekeeping.");
+        AssertNoConsoleErrors();
+    }
+
+    // Lte(November 30th) includes the 30th: an Lte read as Lt would give the last day of November the
+    // standard terms.
+    [Test]
+    public async Task a_move_in_on_the_last_day_of_november_still_gets_the_free_housekeeping_week()
+    {
+        await NavigateAndBoot();
+
+        await _plan.DatePicker(m => m.MoveInDay).SelectDate(2026, 11, 30);
+
+        await Expect(MoveInNote).ToHaveTextAsync("November move-ins get a free first week of housekeeping.");
+        AssertNoConsoleErrors();
+    }
+
+    // A cleared day has no terms: every comparison with a missing day is false, so without the IsNull
+    // branch the note would fall through to the standard terms.
+    [Test]
+    public async Task clearing_the_move_in_day_asks_for_one_again_instead_of_offering_terms()
+    {
+        await NavigateAndBoot();
+        var moveInDay = _plan.DatePicker(m => m.MoveInDay);
+        await moveInDay.SelectDate(2026, 12, 25);
+        await Expect(MoveInNote).ToHaveTextAsync("The office is closed on Christmas Day; choose another move-in day.");
+
+        await moveInDay.Clear();
+        await moveInDay.Blur();
+
+        await Expect(MoveInNote).ToHaveTextAsync("Choose the move-in day to see its terms.");
         AssertNoConsoleErrors();
     }
 }
