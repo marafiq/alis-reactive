@@ -56,9 +56,9 @@ namespace Alis.Reactive.PlanModel
                 case "empty": passes = BlankOrDefault(v, fieldShape); break;
                 case "minLength": passes = G.Or(Absent(v), G.Op(Operator.Gte, TextLength(v), G.Lit(Constraint(rule)))); break;
                 case "maxLength": passes = G.Or(Absent(v), G.Op(Operator.Lte, TextLength(v), G.Lit(Constraint(rule)))); break;
-                case "email": passes = G.Or(Absent(v), Matches(v, "^[^@]+@[^@]+$")); break;
-                case "regex": passes = G.Or(Absent(v), Pattern(v, rule)); break;
-                case "url": passes = G.Or(Absent(v), Matches(v, "^https?:\\/\\/.+")); break;
+                case "regex":
+                case "email":
+                case "url": passes = G.Or(Absent(v), Pattern(v, rule)); break;
                 case "creditCard": passes = G.Or(Absent(v), CardNumber(v)); break;
                 case "min": passes = Ordered(v, Target(rule, field.Values), comparison, Operator.Gte); break;
                 case "max": passes = Ordered(v, Target(rule, field.Values), comparison, Operator.Lte); break;

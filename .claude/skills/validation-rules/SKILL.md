@@ -53,7 +53,7 @@ that value. "Nothing bound" below is null: blank text, or an empty nullable inpu
 | `EmailAddress()`: one `@`, something on each side | `email` | passes |
 | `Matches(pattern)`, `Matches(pattern, options)` (`IgnoreCase`, `Multiline`, `Singleline` become flags; the browser runs it as a JavaScript `RegExp`, where `\w` is ASCII) | `regex` | passes |
 | `CreditCard()`: dashes and spaces dropped, digits only, Luhn | `creditCard` | passes |
-| `Url()`: absolute `http` or `https` | `url` | passes |
+| `Url()`: absolute `http` or `https`, the scheme in any case | `url` | passes |
 | `InclusiveBetween(a, b)`, `ExclusiveBetween(a, b)` | `range`, `exclusiveRange` | passes |
 | `GreaterThan`, `GreaterThanOrEqualTo`, `LessThan`, `LessThanOrEqualTo` (a value or another member; another member with nothing bound fails) | `gt`, `min`, `lt`, `max` | passes |
 | `Equal`, `NotEqual` (a value or another member) | `equalTo`, `notEqual` / `notEqualTo` | compared, not skipped |

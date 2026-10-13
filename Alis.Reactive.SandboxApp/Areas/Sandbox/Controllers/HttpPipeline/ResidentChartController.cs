@@ -16,6 +16,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             View("~/Areas/Sandbox/Views/HttpPipeline/ResidentChart/Index.cshtml",
                 new ResidentChartPageModel { ReviewChartMrn = "MRN-20417" });
 
+        [HttpGet("Floor")]
+        public IActionResult Floor() =>
+            Ok(new FloorCharts(new[]
+            {
+                new ResidentChart("Helen Park", "MRN-20417"),
+                new ResidentChart("Arthur Bell", null),
+                new ResidentChart("Rosa Diaz", "MRN-20533"),
+            }));
+
         [HttpGet("Chart/{resident}")]
         public IActionResult Chart(string resident) => resident switch
         {

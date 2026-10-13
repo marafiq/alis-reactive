@@ -8,6 +8,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     public class MoveInReviewModel
     {
         public string? ResidentName { get; set; }
+
+        /// <summary>The day the resident moves in.</summary>
+        public DateTime? MoveInDate { get; set; }
         public int? FallRiskScore { get; set; }
         public string? MobilityNotes { get; set; }
 
@@ -51,6 +54,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public string? Name { get; set; }
         public string? Phone { get; set; }
+
+        /// <summary>The day the pharmacy first delivers the resident's prescriptions.</summary>
+        public DateTime? FirstDelivery { get; set; }
 
         /// <summary>The network the community contracts; the page sends it with every review, beside the phone.</summary>
         public string? Network { get; set; }

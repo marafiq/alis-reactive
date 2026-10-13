@@ -30,6 +30,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     /// </summary>
     public sealed record ResidentChart(string Name, string? MRN);
 
+    /// <summary>The charts of every resident on the floor.</summary>
+    public sealed record FloorCharts(ResidentChart[] Charts);
+
     /// <summary>A chart flagged for the care team's review, named by its medical record number.</summary>
     public sealed class ChartFlagged
     {

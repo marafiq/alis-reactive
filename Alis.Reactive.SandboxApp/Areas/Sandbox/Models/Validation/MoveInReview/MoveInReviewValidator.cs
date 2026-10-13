@@ -32,9 +32,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                     RuleFor(x => x.MobilityNotes).MaximumLength(40).WithMessage("Keep mobility notes under 40 characters."));
 
             // A moderate score, 5 to 7, needs a plan for reassessing the resident. A condition written after
-            // a rule's checks conditions them in the browser too.
+            // a rule's checks conditions them in the browser too; a check written after the condition is
+            // not under it, so every plan is kept short.
             RuleFor(x => x.ReassessmentPlan).NotEmpty().WithMessage("A moderate fall risk needs a reassessment plan.")
-                .When(x => x.FallRiskScore >= 5 && x.FallRiskScore <= 7);
+                .When(x => x.FallRiskScore >= 5 && x.FallRiskScore <= 7)
+                .MaximumLength(120).WithMessage("Keep the reassessment plan under 120 characters.");
 
             // A long mobility plan goes to a therapist. A condition on a length has no browser form,
             // so the server alone checks this rule.
@@ -66,6 +68,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             // A pharmacy phone needs the pharmacy it reaches.
             Unless(x => string.IsNullOrEmpty(x.Pharmacy.Phone), () =>
                 RuleFor(x => x.Pharmacy.Name).NotEmpty().WithMessage("Name the pharmacy for this phone number."));
+
+            // The pharmacy delivers to the resident's room, so not before the move-in day. A comparison
+            // reads the other member by its path, here on the review itself.
+            When(x => x.MoveInDate.HasValue, () =>
+                RuleFor(x => x.Pharmacy.FirstDelivery)
+                    .GreaterThanOrEqualTo(x => x.MoveInDate).WithMessage("The pharmacy's first delivery cannot come before the move-in day."));
 
             // Rules for a nested object, written inline.
             RuleFor(x => x.Pharmacy).ChildRules(pharmacy =>

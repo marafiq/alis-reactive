@@ -674,9 +674,11 @@ of complex items has none. The decision is made at render and is deterministic.
 
 ### 7.6 Grid column rules
 
-The Fusion grid maps the same typed projection model to Syncfusion's column rules (`required`,
-`email`, `url`, `minLength`, `maxLength`, `regex`, `min`, `max`, `range`). It reads the projection,
-not the plan.
+The Fusion grid maps a validator's browser rules (`plan.ClientRules<TValidator>()`) to Syncfusion's
+column rules, keeping only those EJ2 decides as the server does: `required`, `minLength`,
+`maxLength`, numeric `min`, `max` and `range`, and one pattern per column. `EmailAddress()` and
+`Url()` reach the cell as EJ2's `regex` with the patterns the form tests them with (`ClientRule.TextPattern`),
+because EJ2's own `email` and `url` rules decide differently. It reads the rules, not the plan.
 
 ## 8. Decisions that change what a user can see
 

@@ -14,6 +14,16 @@
         .Render();
     var chartUrl = Url.SandboxRouteTemplate("Chart", "ResidentChart", "resident");
 
+    // The floor's charts count those linked to a medical record by each chart's "mrn".
+    Html.On(plan, t => t.DomReady(p =>
+        p.Get(Url.SandboxRoute("Floor", "ResidentChart"))
+         .Response(r => r.OnSuccess<FloorCharts>((json, s) =>
+         {
+             var charts = s.From(json.Get(x => x.Charts));
+             s.Element("linked-charts").Text.Set(charts.Count(chart => chart.MRN != null));
+             s.Element("floor-charts").Text.Set(charts.Count());
+         }))));
+
     Html.On(plan, t => t.CustomEvent<ChartFlagged>(ResidentChartEvents.ChartFlagged, (flag, p) =>
         p.Element("review-flag").Text.Set(flag.Get(x => x.MRN!))));
 }
@@ -21,6 +31,10 @@
 <native-vstack gap="Lg">
     <native-heading level="H1">Resident Charts</native-heading>
     <native-text color="Secondary">Maple Grove, second floor. Open a resident's chart summary.</native-text>
+    <p class="text-sm">
+        <span id="linked-charts" class="font-medium"></span> of <span id="floor-charts" class="font-medium"></span>
+        charts on this floor are linked to a medical record.
+    </p>
 
     <native-card><native-card-body>
         <native-hstack gap="Sm">

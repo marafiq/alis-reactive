@@ -1,5 +1,6 @@
 @model MoveInReviewModel
 @using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
 @{
     ViewData["Title"] = "Move-in Review";
     var plan = Html.ReactivePlan<MoveInReviewModel>();
@@ -16,6 +17,8 @@
         <form id="move-in-review-form" class="flex flex-col gap-4">
             @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident name"))
                 .NativeTextBox(b => b.Placeholder("Full name").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.MoveInDate, o => o.Label("Move-in day"))
+                .FusionDatePicker(b => b.Placeholder("Choose the move-in day")); }
             @{ Html.InputField(plan, m => m.FallRiskScore, o => o.Label("Fall risk score (0 to 10)"))
                 .NativeTextBox(b => b.Type("number").CssClass(Field)); }
             @{ Html.InputField(plan, m => m.MobilityNotes, o => o.Label("Mobility plan"))
@@ -44,6 +47,8 @@
                 .NativeTextBox(b => b.Placeholder("Pharmacy name").CssClass(Field)); }
             @{ Html.InputField(plan, m => m.Pharmacy.Phone, o => o.Label("Pharmacy phone"))
                 .NativeTextBox(b => b.Placeholder("555-0100").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.Pharmacy.FirstDelivery, o => o.Label("Pharmacy's first delivery"))
+                .FusionDatePicker(b => b.Placeholder("Choose the first delivery day")); }
             @{ Html.InputField(plan, m => m.IsReturning, o => o.Label("Returning resident"))
                 .NativeCheckBox(b => b.CssClass("rounded border-border")); }
             @{ Html.InputField(plan, m => m.PreviousRoom, o => o.Label("Previous room"))

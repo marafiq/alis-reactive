@@ -14,11 +14,13 @@ namespace Alis.Reactive.Fusion.Components
     /// runs the rule on cell save.
     /// </summary>
     /// <remarks>
-    /// Only the single-field rules that map directly to EJ2 FormValidator are emitted
-    /// (<c>required</c>, <c>minLength</c>, <c>maxLength</c>, <c>email</c>, <c>url</c>,
-    /// <c>regex</c>, <c>min</c>, <c>max</c>, numeric <c>range</c>). Conditional
-    /// (under <c>When</c>), cross-field, and exotic rules carry no EJ2 equivalent and stay
-    /// server-authoritative on save.
+    /// Only the single-field rules EJ2 FormValidator decides as the server does are emitted:
+    /// <c>required</c>, <c>minLength</c>, <c>maxLength</c>, <c>min</c>, <c>max</c>, numeric
+    /// <c>range</c>, and one pattern per column. An email or a URL rule goes to the cell as EJ2's
+    /// <c>regex</c> with the pattern the form tests it with, because EJ2's own <c>email</c> and
+    /// <c>url</c> rules decide differently (EJ2 refuses <c>o'brien@example.com</c>, which the server
+    /// accepts). Conditional (under <c>When</c>), cross-field, flagged-pattern, and other rules have no
+    /// EJ2 equivalent and are checked by the server on save.
     /// <code>
     /// var care = FusionGridValidation.From&lt;ResidentCareItem&gt;(plan.ClientRules&lt;ResidentCareItemValidator&gt;());
     /// new GridColumn { Field = "openTasks", EditType = "numericedit",
@@ -98,8 +100,7 @@ namespace Alis.Reactive.Fusion.Components
 
     /// <summary>
     /// Translates a field's client rules into the EJ2 FormValidator object shape
-    /// <c>{ rule: [value, message] }</c>. The validator rule names are already EJ2-shaped
-    /// (<c>required</c>, <c>minLength</c>, <c>range</c>, ...), so each maps by name.
+    /// <c>{ rule: [value, message] }</c>: each rule EJ2 decides as the server does, under EJ2's name.
     /// </summary>
     internal static class Ej2ColumnRules
     {
@@ -120,8 +121,6 @@ namespace Alis.Reactive.Fusion.Components
             switch (key)
             {
                 case "required":
-                case "email":
-                case "url":
                     rules[key] = new object[] { true, rule.Message };
                     break;
 
@@ -131,9 +130,12 @@ namespace Alis.Reactive.Fusion.Components
                         rules[key] = new object[] { length, rule.Message };
                     break;
 
+                // EJ2 tests one pattern per column, with no flags; a second pattern is the server's.
                 case "regex":
-                    if (rule.LiteralOperand is string pattern)
-                        rules[key] = new object[] { pattern, rule.Message };
+                case "email":
+                case "url":
+                    if (rule.TextPattern is string pattern && !rules.ContainsKey("regex"))
+                        rules["regex"] = new object[] { pattern, rule.Message };
                     break;
 
                 case "min":
@@ -148,8 +150,8 @@ namespace Alis.Reactive.Fusion.Components
                         rules["range"] = new object[] { new[] { bounds[0], bounds[1] }, rule.Message };
                     break;
 
-                // gt, lt, exclusiveRange, equalTo, notEqual, notEqualTo, creditCard,
-                // atLeastOne, empty: no EJ2 FormValidator equivalent — server-authoritative.
+                // gt, lt, exclusiveRange, equalTo, notEqual, notEqualTo, creditCard, atLeastOne,
+                // empty: no EJ2 FormValidator equivalent, so the server checks them on save.
             }
         }
 

@@ -138,23 +138,6 @@ namespace Alis.Reactive
             return GrammarSerializer.Serialize(_context.Write());
         }
 
-        /// <summary>Registers components, resolves validation, and serializes the Reactive Plan as indented JSON for debugging.</summary>
-        /// <returns>Indented Reactive Plan JSON for diagnostics or sandbox display.</returns>
-        public string RenderFormatted()
-        {
-            ResolveAll(_services);
-            return GrammarSerializer.SerializeFormatted(_context.Write());
-        }
-
-        /// <summary>Registers components, resolves validation with the supplied services, and serializes the Reactive Plan as indented JSON.</summary>
-        /// <param name="services">Services used to resolve validation rule sources required by queued validation rules.</param>
-        /// <returns>Indented Reactive Plan JSON for diagnostics or sandbox display.</returns>
-        public string RenderFormatted(IServiceProvider services)
-        {
-            ResolveAll(services);
-            return GrammarSerializer.SerializeFormatted(_context.Write());
-        }
-
         // Every rendered input joins the plan, then each validated form takes its validator's rules.
         private void ResolveAll(IServiceProvider? services)
         {

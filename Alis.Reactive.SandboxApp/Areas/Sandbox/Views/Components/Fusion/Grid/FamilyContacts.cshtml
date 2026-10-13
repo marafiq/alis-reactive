@@ -1,0 +1,60 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.FamilyContactsViewModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "Family Contacts";
+
+    const string GridId = "family-contacts-grid";
+
+    var plan = Html.ReactivePlan<FamilyContactsViewModel>();
+
+    // Each cell checks the rules FamilyContactValidator gives the browser; the server checks them all on save.
+    var contactRules = FusionGridValidation.From<FamilyContact>(plan.ClientRules<FamilyContactValidator>());
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Family Contacts</native-heading>
+    <native-text color="Secondary">
+        Maple Grove front desk. Double-click a cell to correct a family's contact, then save the changes together.
+    </native-text>
+
+    <native-card><native-card-body>
+        @(Html.FusionGrid<FamilyContactsViewModel, FamilyContact>(plan, GridId, b => b
+            .DataSource(Model.Contacts)
+            .EditSettings(new GridEditSettings { AllowEditing = true, Mode = EditMode.Batch, ShowConfirmDialog = false })
+            .Columns(new List<GridColumn>
+            {
+                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false },
+                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "150", AllowEditing = false },
+                new GridColumn { Field = "contactName", HeaderText = "Family contact", Width = "170", ValidationRules = contactRules.Field(c => c.ContactName) },
+                new GridColumn { Field = "phone", HeaderText = "Phone", Width = "120", ValidationRules = contactRules.Field(c => c.Phone) },
+                new GridColumn { Field = "email", HeaderText = "Email", Width = "230", ValidationRules = contactRules.Field(c => c.Email) },
+                new GridColumn { Field = "portalLink", HeaderText = "Family portal", Width = "280", ValidationRules = contactRules.Field(c => c.PortalLink) },
+                new GridColumn { Field = "visitsPerWeek", HeaderText = "Visits a week", Width = "130", TextAlign = TextAlign.Right, EditType = "numericedit", ValidationRules = contactRules.Field(c => c.VisitsPerWeek) }
+            })))
+
+        <native-hstack gap="Sm" align="Center" class="mt-4">
+            @(Html.NativeButton("save-family-contacts-btn", "Save Changes")
+                .CssClass("rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(GridId);
+                    grid.SaveCell();
+                    p.Post(Url.SandboxRoute("FamilyContactsSave", "Grid"))
+                        .Gather<FamilyContactsSaveRequest>(g => g.Set(x => x.BatchChanges, grid.GetBatchChanges<FamilyContact>()))
+                        .Response(r => r
+                            .OnSuccess<FamilyContactsSaved>((json, s) =>
+                            {
+                                s.Component<FusionGrid>(GridId).DataSource.Set(json.Get(x => x.Contacts));
+                                s.Element("family-contacts-status").Text.Set(json.Get(x => x.Summary));
+                            })
+                            .OnError<FamilyContactsSaved>(400, (json, e) =>
+                                e.Element("family-contacts-status").Text.Set(json.Get(x => x.Summary))));
+                }))
+            <p id="family-contacts-status" class="text-sm text-text-muted">No changes saved yet.</p>
+        </native-hstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

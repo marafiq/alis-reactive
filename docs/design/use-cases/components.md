@@ -192,7 +192,7 @@ Test names are under `Alis.Reactive.PlaywrightTests.`.
 | 103 | PROVEN (already at `7c34a86`) | `Components.Fusion.Grid.WhenUsingFusionGridCareOps.critical_chip_fast_filter_shows_only_critical_residents` |
 | 112 | PROVEN | `Components.Brought.VisitPlanner.WhenHoldingVisitsAtTheFrontDesk.booking_a_time_holds_it_for_the_family_at_the_wings_desk`, `…a_time_another_family_took_is_unbooked_with_the_desks_reason`, `Patterns.Workflows.WhenManagingTodoItems.saving_valid_todo_shows_success_message` |
 | 127 | PROVEN | `Components.Fusion.FileUpload.WhenFileUploaded.uploading_two_documents_adds_both_to_the_record` (files chosen on the file input, not built in `page.evaluate`) |
-| 128 | PROVEN | `HttpPipeline.ResidentChart.WhenCoordinatorOpensResidentChart.the_record_number_list_shows_each_charts_number_and_opens_the_chosen_chart` |
+| 128 | PROVEN | `HttpPipeline.ResidentChart.WhenCoordinatorOpensResidentChart.the_record_number_list_shows_each_charts_number_and_opens_the_chosen_chart` (text field and template), `…the_floor_counts_the_charts_linked_to_a_medical_record` (an array item's member); a `groupBy` field is exercised by MultiSelect only |
 
 ## Use cases added after the inventory
 

@@ -198,6 +198,26 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The length check is written after the moderate-risk condition, so it holds at every score.
+    [Test]
+    public async Task a_reassessment_plan_is_kept_short_whatever_the_fall_risk()
+    {
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "3");
+        await Write(m => m.ReassessmentPlan, new string('x', 121));
+
+        await ClickWhenStable(SaveReview);
+
+        await Expect(_plan.ErrorFor(m => m.ReassessmentPlan)).ToHaveTextAsync("Keep the reassessment plan under 120 characters.");
+        Assert.That(_reviewsSent, Is.Empty);
+        await Write(m => m.ReassessmentPlan, "Reassess in 30 days");
+        await Expect(_plan.ErrorFor(m => m.ReassessmentPlan)).ToBeHiddenAsync();
+        await ClickWhenStable(SaveReview);
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task a_long_mobility_plan_is_sent_and_the_server_asks_for_a_therapist_to_review_it()
     {
@@ -320,6 +340,22 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // A phone keyboard capitalizes the first letter; the server reads the address the same either way.
+    [Test]
+    public async Task a_family_portal_link_typed_with_a_capital_h_is_accepted()
+    {
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "2");
+        await Write(m => m.FamilyPortalLink, "Https://family.maplegrove.example/hale");
+
+        await ClickWhenStable(SaveReview);
+
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        await Expect(_plan.ErrorFor(m => m.FamilyPortalLink)).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task a_wristband_code_is_checked_the_way_the_communitys_printer_reads_it()
     {
@@ -414,6 +450,43 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         await ClickWhenStable(SaveReview);
         await Expect(ReviewStatus).ToHaveTextAsync(SavedWithPharmacy);
         Assert.That(_reviewsSent, Has.Count.EqualTo(1), "The review with a phone but no pharmacy name was not sent.");
+        AssertNoConsoleErrors();
+    }
+
+    // The delivery date is on the pharmacy; the move-in day it is compared with is on the review.
+    [Test]
+    public async Task the_pharmacys_first_delivery_cannot_come_before_the_move_in_day()
+    {
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "2");
+        await _plan.DatePicker(m => m.MoveInDate).FillAndBlur("11/10/2026");
+        await _plan.DatePicker(m => m.Pharmacy.FirstDelivery).FillAndBlur("11/09/2026");
+
+        await ClickWhenStable(SaveReview);
+
+        await Expect(_plan.ErrorFor(m => m.Pharmacy.FirstDelivery))
+            .ToHaveTextAsync("The pharmacy's first delivery cannot come before the move-in day.");
+        Assert.That(_reviewsSent, Is.Empty, "The page refused the delivery date, so nothing was sent.");
+        await _plan.DatePicker(m => m.Pharmacy.FirstDelivery).FillAndBlur("11/10/2026");
+        await Expect(_plan.ErrorFor(m => m.Pharmacy.FirstDelivery)).ToBeHiddenAsync();
+        await ClickWhenStable(SaveReview);
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_first_delivery_is_not_checked_until_the_move_in_day_is_chosen()
+    {
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "2");
+        await _plan.DatePicker(m => m.Pharmacy.FirstDelivery).FillAndBlur("11/09/2026");
+
+        await ClickWhenStable(SaveReview);
+
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        await Expect(_plan.ErrorFor(m => m.Pharmacy.FirstDelivery)).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 

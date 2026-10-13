@@ -16,15 +16,7 @@ namespace Alis.Reactive.Grammar
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Default,
         };
 
-        private static readonly JsonSerializerOptions Formatted = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true,
-        };
-
         internal static string Serialize(GrammarPlan plan) => JsonSerializer.Serialize(plan, Compact);
-
-        internal static string SerializeFormatted(GrammarPlan plan) => JsonSerializer.Serialize(plan, Formatted);
     }
 
     /// <summary>The TypeScript type of a node property when its CLR type does not say it exactly.</summary>

@@ -10,7 +10,8 @@ namespace Alis.Reactive.PlaywrightTests.HttpPipeline.ResidentChart;
 /// <remarks>
 /// The chart's MRN member is named in capitals; the server writes it as "mrn". The page shows it, tests
 /// it in a condition, and names a flagged chart by it in an event the page dispatches. The record-number
-/// list shows each chart's MRN through its row's "mrn" member, as its text field and in its item template.
+/// list shows each chart's MRN through its row's "mrn" member, as its text field and in its item template,
+/// and the floor counts the charts in the server's list whose "mrn" is set.
 /// </remarks>
 [TestFixture]
 public class WhenCoordinatorOpensResidentChart : PlaywrightTestBase
@@ -78,6 +79,17 @@ public class WhenCoordinatorOpensResidentChart : PlaywrightTestBase
         await Expect(byRecordNumber.Input).ToHaveValueAsync("MRN-20533", new() { Timeout = 5000 });
         await Expect(ChartName).ToHaveTextAsync("Rosa Diaz", new() { Timeout = 5000 });
         await Expect(ChartMrn).ToHaveTextAsync("MRN-20533");
+        AssertNoConsoleErrors();
+    }
+
+    // Arthur Bell, admitted today, has no medical record number yet.
+    [Test]
+    public async Task the_floor_counts_the_charts_linked_to_a_medical_record()
+    {
+        await NavigateAndBoot();
+
+        await Expect(Page.Locator("#linked-charts")).ToHaveTextAsync("2", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#floor-charts")).ToHaveTextAsync("3");
         AssertNoConsoleErrors();
     }
 

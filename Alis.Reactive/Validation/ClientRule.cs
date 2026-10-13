@@ -41,13 +41,17 @@ namespace Alis.Reactive.Validation
         /// <summary>Whether the rule always applies, rather than only when a condition holds.</summary>
         public bool IsUnconditional => Condition.IsAlways;
 
+        /// <summary>The rule's single operand, such as a length or a bound; <see langword="null"/> when it has none.</summary>
+        public object? LiteralOperand => Constraint is object[] ? null : Constraint;
+
         /// <summary>
-        /// The rule's single operand, such as a length, a bound or a pattern with no flags; <see langword="null"/>
-        /// when it has none.
+        /// The JavaScript pattern, with no flags, the browser tests the text with: a pattern rule's own, or the
+        /// one an email or a URL rule is decided by. <see langword="null"/> for any other rule, and for a
+        /// pattern with flags.
         /// </summary>
-        public object? LiteralOperand => Constraint is object[] pair
-            ? (Name == "regex" && (string)pair[1] == "" ? pair[0] : null)
-            : Constraint;
+        public string? TextPattern => IsPattern && Constraint is object[] pair && (string)pair[1] == ""
+            ? (string)pair[0]
+            : null;
 
         /// <summary>The rule's two bounds for a range; <see langword="null"/> for any other rule.</summary>
         public object[]? RangeOperand => IsRange ? (object[]?)Constraint : null;
@@ -82,11 +86,14 @@ namespace Alis.Reactive.Validation
 
         /// <summary>An email address, as <c>EmailAddress()</c> reads one: one @, neither first nor last.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
-        public static ClientRule Email(string message) => Plain("email", message);
+        public static ClientRule Email(string message) => PatternRule("email", EmailPattern, message);
 
-        /// <summary>An absolute <c>http</c> or <c>https</c> URL.</summary>
+        /// <summary>
+        /// An <c>http</c> or <c>https</c> URL, its scheme in any case, as the server's absolute URL reads it.
+        /// The browser checks the scheme; the server also checks the rest.
+        /// </summary>
         /// <param name="message">The message shown when the rule fails.</param>
-        public static ClientRule Url(string message) => Plain("url", message);
+        public static ClientRule Url(string message) => PatternRule("url", UrlPattern, message);
 
         /// <summary>A card number that passes the Luhn check.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
@@ -101,6 +108,16 @@ namespace Alis.Reactive.Validation
             if (string.IsNullOrEmpty(pattern)) throw new ArgumentException("A browser pattern needs its text.", nameof(pattern));
             return new ClientRule("regex", message, new object[] { pattern, flags ?? "" }, null, ClientCondition.Always, Shape.None, ShapeDependence.None);
         }
+
+        // One @, with something on each side: what EmailAddress() accepts.
+        private const string EmailPattern = "^[^@]+@[^@]+$";
+
+        // The scheme the server's absolute URL lower-cases, written without a flag so that a component
+        // testing a pattern with no flags tests the same one.
+        private const string UrlPattern = "^[Hh][Tt][Tt][Pp][Ss]?://.+";
+
+        private static ClientRule PatternRule(string name, string pattern, string message) =>
+            new ClientRule(name, message, new object[] { pattern, "" }, null, ClientCondition.Always, Shape.None, ShapeDependence.None);
 
         /// <summary>The value compares with a fixed value: <c>GreaterThanOrEqual</c> is a minimum, <c>LessThanOrEqual</c> a maximum.</summary>
         /// <param name="comparison">The comparison.</param>
@@ -162,6 +179,8 @@ namespace Alis.Reactive.Validation
         private ShapeDependence Dependence { get; }
 
         private bool IsRange => Name == "range" || Name == "exclusiveRange";
+
+        private bool IsPattern => Name == "regex" || Name == "email" || Name == "url";
 
         /// <summary>The rule a field of this shape has: a list has items or stays on the server for null.</summary>
         internal bool TryFor(Shape fieldShape, out ClientRule rule)
