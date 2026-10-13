@@ -273,6 +273,13 @@
                     p.Component<FusionGrid>(GridId).OpenColumnChooser();
                     p.Element("tool-status").Text.Set("column chooser opened");
                 }))
+            @(Html.NativeButton("billing-refresh-view", "Refresh View")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).Refresh();
+                    p.Element("tool-status").Text.Set("view refreshed");
+                }))
             @(Html.NativeButton("billing-autofit", "Auto-fit Columns")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -285,6 +292,7 @@
             <p>Status: <span id="billing-status" class="text-text-muted">waiting</span></p>
             <p>Summary: <span id="billing-summary" class="text-text-muted">waiting</span></p>
             <p>Tools: <span id="tool-status" class="text-text-muted">waiting</span></p>
+            <p>Refresh: <span id="billing-refresh-status" class="text-text-muted">waiting</span></p>
             <p>Toolbar: <span id="toolbar-status" class="text-text-muted">waiting</span></p>
             <p>Toolbar id: <span id="toolbar-item-id" class="text-text-muted">waiting</span></p>
             <p>Toolbar text: <span id="toolbar-item-text" class="text-text-muted">waiting</span></p>
@@ -342,7 +350,9 @@
                                 s.Element("billing-summary").Text.Set(json.Get(x => x.Summary));
                                 s.Element("billing-status").Text.Set("grid state sent to server");
                             }));
-                    });
+                    })
+                    // A refresh redraws the census already loaded; it does not ask the server again.
+                    .Else(kept => kept.Element("billing-refresh-status").Text.Set("census kept as loaded"));
             })
             .Reactive(evt => evt.ToolbarClick, (args, p) =>
             {

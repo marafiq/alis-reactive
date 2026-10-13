@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
@@ -26,6 +27,36 @@ public class WhenUsingFusionGridBilling : PlaywrightTestBase
             .ToHaveTextAsync("loaded current census", new() { Timeout = 10000 });
         await Expect(Page.Locator($"#{GridId} .e-row").First)
             .ToBeVisibleAsync(new() { Timeout = 10000 });
+    }
+
+    // The grid raises DataStateChange for a sort and for Refresh View. The guard NotEq(Refresh) sends a
+    // sort to the server and keeps the loaded census on a refresh: an always-false guard would not post
+    // the sort, an always-true one would post the refresh. The unbilled filter's own post comes last, so
+    // a refresh post, had there been one, has been counted by then.
+    [Test]
+    public async Task sorting_asks_the_server_for_the_census_but_refreshing_the_view_keeps_it()
+    {
+        var censusRequests = new ConcurrentQueue<string>();
+        Page.Request += (_, request) =>
+        {
+            if (request.Url.Contains("/Grid/BillingData")) censusRequests.Enqueue(request.Url);
+        };
+        await NavigateBilling();
+        var loads = censusRequests.Count;
+
+        await ClickWhenStable(Page.Locator($"#{GridId} .e-headercell").Filter(new() { HasText = "Resident" }));
+        await Expect(Page.Locator("#billing-status"))
+            .ToHaveTextAsync("grid state sent to server", new() { Timeout = 10000 });
+
+        await ClickWhenStable(Page.Locator("#billing-refresh-view"));
+        await Expect(Page.Locator("#billing-refresh-status"))
+            .ToHaveTextAsync("census kept as loaded", new() { Timeout = 10000 });
+
+        await ClickWhenStable(Page.Locator("#billing-quick-unbilled"));
+        await Expect(Page.Locator("#billing-status"))
+            .ToHaveTextAsync("showing unbilled residents", new() { Timeout = 10000 });
+        Assert.That(censusRequests, Has.Count.EqualTo(loads + 2), "The sort and the unbilled filter ask the server; the refresh does not.");
+        AssertNoConsoleErrors();
     }
 
     [Test]
