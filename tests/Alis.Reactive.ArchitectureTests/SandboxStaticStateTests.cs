@@ -36,6 +36,8 @@ public class SandboxStaticStateTests
         "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion.StepperController.ContactDrafts",
         "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion.StepperController.ReviewDrafts",
         "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline.RealTimeController.DrillWorlds",
+        "Alis.Reactive.SandboxApp.Hubs.ResidentStatusHub.DrillConnections",
+        "Alis.Reactive.SandboxApp.Hubs.ResidentStatusHub.BrokenDrills",
     ];
 
     [Test]
@@ -67,14 +69,14 @@ public class SandboxStaticStateTests
             + string.Join("\n", stale));
     }
 
+    // Every static field of every type the sandbox declares (its controllers, models, hubs and brought
+    // components alike), and the field behind each static auto-property, named as the property.
     private static IEnumerable<(FieldInfo Field, string FullName)> SandboxStaticFields()
     {
         var assembly = Assembly.Load("Alis.Reactive.SandboxApp");
 
         foreach (var type in assembly.GetTypes())
         {
-            if (type.Namespace?.Contains("Areas.Sandbox") != true)
-                continue;
             if (type.IsDefined(typeof(CompilerGeneratedAttribute), inherit: false))
                 continue;
 
@@ -85,13 +87,20 @@ public class SandboxStaticStateTests
             {
                 if (field.IsLiteral)
                     continue;
-                if (field.IsDefined(typeof(CompilerGeneratedAttribute), inherit: false))
+                var name = AutoPropertyName(field) ?? field.Name;
+                if (name == field.Name && field.IsDefined(typeof(CompilerGeneratedAttribute), inherit: false))
                     continue;
 
-                yield return (field, $"{type.FullName}.{field.Name}");
+                yield return (field, $"{type.FullName}.{name}");
             }
         }
     }
+
+    // "<Shifts>k__BackingField" is the field behind the auto-property Shifts.
+    private static string? AutoPropertyName(FieldInfo field) =>
+        field.Name.StartsWith('<') && field.Name.EndsWith(">k__BackingField", StringComparison.Ordinal)
+            ? field.Name[1..field.Name.IndexOf('>')]
+            : null;
 
     // Keyed lookups are stores: their content mutates per key across worlds,
     // readonly or not.

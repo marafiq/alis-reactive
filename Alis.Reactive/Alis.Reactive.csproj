@@ -57,7 +57,7 @@
                Text="alis-reactive.dev.js bundle not found. Run 'npm run build:all' from the repo root before packing." />
     </Target>
 
-    <!-- Bundle Roslyn analyzers so consumers get compile-time DSL checks (ALIS001-ALIS008) -->
+    <!-- Bundle Roslyn analyzers so consumers get compile-time DSL checks (ALIS001-ALIS009) -->
     <ItemGroup>
         <None Include="..\Alis.Reactive.Analyzers\bin\$(Configuration)\netstandard2.0\Alis.Reactive.Analyzers.dll"
               Pack="true"
