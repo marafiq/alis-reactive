@@ -172,7 +172,7 @@ function announceCommits(input: ModelInput, owner: Owner): void {
   if (element === null || announcing.has(element)) return;
 
   const announce = (): void => {
-    element.dispatchEvent(new CustomEvent(COMMIT_EVENT, { bubbles: true }));
+    element.ownerDocument.dispatchEvent(new CustomEvent(COMMIT_EVENT, { bubbles: true }));
   };
   try {
     input.world.subscribe(input.id, input.binding.committed, announce, owner);
