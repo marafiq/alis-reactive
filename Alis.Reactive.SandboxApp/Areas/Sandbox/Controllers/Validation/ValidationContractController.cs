@@ -41,6 +41,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             return PartialView("~/Areas/Sandbox/Views/Validation/Contract/_AddressPartial.cshtml", new ResidentModel());
         }
 
+        [HttpGet("EmergencyPartial")]
+        public IActionResult EmergencyPartial()
+        {
+            return PartialView("~/Areas/Sandbox/Views/Validation/Contract/_EmergencyPartial.cshtml", new ResidentModel());
+        }
+
         [HttpPost("Submit")]
         public IActionResult Submit([FromBody] ResidentModel? model)
         {

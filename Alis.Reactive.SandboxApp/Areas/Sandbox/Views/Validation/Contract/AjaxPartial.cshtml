@@ -16,6 +16,7 @@
     <native-text color="Secondary">
         Address fields load dynamically when "Custom Address" is selected.
         Before loading: unenriched validation fields. After loading: inline validation.
+        The emergency contact loads into a slot of its own, beside the address.
     </native-text>
 
     <form id="resident-form" class="rounded-lg border border-border bg-white p-6 shadow-sm space-y-4">
@@ -56,6 +57,18 @@
            }); }
 
         <div id="address-container" class="mt-4"></div>
+
+        <h2 class="text-base font-semibold mb-2 mt-6">Emergency Contact</h2>
+
+        @(Html.NativeButton("add-emergency-contact-btn", "Add Emergency Contact")
+            .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Get(Url.SandboxRoute("EmergencyPartial", "ValidationContract"))
+                 .Response(r => r.OnSuccess(s => s.Into("emergency-container")));
+            }))
+
+        <div id="emergency-container" class="mt-4"></div>
 
         <native-hstack gap="Base" class="mt-6">
             @(Html.NativeButton("submit-btn", "Submit Admission")
