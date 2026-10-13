@@ -19,7 +19,15 @@
                     .DataSource(aids)
                     .Fields<MobilityAidOption>(t => t.Name, v => v.Code)
                     .Placeholder("All residents")
-                    .Mode(VisualMode.Box)); }
+                    .Mode(VisualMode.Box))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    // A wheelchair boards only the bus with a lift.
+                    p.When(args.Value).ArrayContains("WHEELCHAIR")
+                        .Then(lift => lift.Element("lift-bus-note").Show())
+                        .Else(noLift => noLift.Element("lift-bus-note").Hide());
+                }); }
+            <p id="lift-bus-note" class="text-sm text-warning" hidden>A wheelchair boards only the lift bus: the garden trip takes the lift bus.</p>
             <native-hstack gap="Sm">
                 @(Html.NativeButton("find-residents-btn", "Find Residents")
                     .CssClass("rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors")
