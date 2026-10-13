@@ -91,7 +91,7 @@ export const streamModule: Module = {
       log.debug("message.received", { url, event });
       let payload: unknown;
       try {
-        payload = JSON.parse(message.data);
+        payload = message.data;
       } catch (error) {
         log.error("message.unreadable", { error: toJavaScriptString(error), url, event });
         return;
