@@ -77,7 +77,7 @@
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Button reads resident name via <code>When(comp.Value).IsEmpty()</code>
-            and shows a warning or confirmation.
+            and shows a warning or confirmation; a missing name gets the cursor (<code>Focus()</code>).
         </p>
         @(Html.NativeButton("check-name-btn", "Check Resident Name")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
@@ -85,7 +85,11 @@
             {
                 var comp = p.Component<NativeTextBox>(m => m.ResidentName);
                 p.When(comp.Value).IsEmpty()
-                    .Then(t => t.Element("name-warning").Text.Set("name is required"))
+                    .Then(t =>
+                    {
+                        t.Element("name-warning").Text.Set("name is required");
+                        t.Component<NativeTextBox>(m => m.ResidentName).Focus();
+                    })
                     .Else(e => e.Element("name-warning").Text.Set("name set"));
             }))
         <p class="font-mono text-sm mt-2">Warning: <span id="name-warning" class="text-text-muted">&mdash;</span></p>

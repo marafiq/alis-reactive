@@ -82,7 +82,7 @@
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Button reads care level via <code>When(comp.Value).NotEmpty()</code>
-            and shows a confirmation or warning.
+            and shows a confirmation or warning; a missing care level gets the cursor (<code>Focus()</code>).
         </p>
         @(Html.NativeButton("check-care-btn", "Check Care Level")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
@@ -91,7 +91,11 @@
                 var comp = p.Component<NativeDropDown>(m => m.CareLevel);
                 p.When(comp.Value).NotEmpty()
                     .Then(t => t.Element("care-confirmation").Text.Set("care level confirmed"))
-                    .Else(e => e.Element("care-confirmation").Text.Set("care level is required"));
+                    .Else(e =>
+                    {
+                        e.Element("care-confirmation").Text.Set("care level is required");
+                        e.Component<NativeDropDown>(m => m.CareLevel).Focus();
+                    });
             }))
         <p class="font-mono text-sm mt-2">Status: <span id="care-confirmation" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>

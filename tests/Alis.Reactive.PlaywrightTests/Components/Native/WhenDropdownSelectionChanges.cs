@@ -258,4 +258,19 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
             "Boot trace must be emitted — confirms runtime boot discovered and executed the plan");
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task checking_an_empty_care_level_puts_the_cursor_on_it()
+    {
+        await NavigateAndBoot();
+        var select = Page.Locator($"#{ModelIdPrefix}CareLevel");
+        await select.SelectOptionAsync("");
+
+        // The click moves focus to the button; the empty care level takes it back.
+        await Page.Locator("#check-care-btn").ClickAsync();
+
+        await Expect(Page.Locator("#care-confirmation")).ToHaveTextAsync("care level is required", new() { Timeout = 3000 });
+        await Expect(select).ToBeFocusedAsync();
+        AssertNoConsoleErrors();
+    }
 }

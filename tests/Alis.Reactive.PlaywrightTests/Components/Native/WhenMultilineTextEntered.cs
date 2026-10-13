@@ -99,4 +99,19 @@ public class WhenMultilineTextEntered : PlaywrightTestBase
         await Expect(warning).ToHaveTextAsync("notes recorded", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task checking_empty_care_notes_puts_the_cursor_in_them()
+    {
+        await NavigateAndBoot();
+        var textarea = Page.Locator($"#{ModelIdPrefix}CareNotes");
+        await textarea.ClearAsync();
+
+        // The click moves focus to the button; the empty notes take it back.
+        await Page.Locator("#check-notes-btn").ClickAsync();
+
+        await Expect(Page.Locator("#notes-warning")).ToHaveTextAsync("notes required", new() { Timeout = 3000 });
+        await Expect(textarea).ToBeFocusedAsync();
+        AssertNoConsoleErrors();
+    }
 }

@@ -143,4 +143,19 @@ public class WhenTextInputChanges : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task checking_an_empty_resident_name_puts_the_cursor_in_it()
+    {
+        await NavigateAndBoot();
+        var input = Page.Locator($"#{ModelIdPrefix}ResidentName");
+        await input.ClearAsync();
+
+        // The click moves focus to the button; the empty name takes it back.
+        await Page.Locator("#check-name-btn").ClickAsync();
+
+        await Expect(Page.Locator("#name-warning")).ToHaveTextAsync("name is required", new() { Timeout = 3000 });
+        await Expect(input).ToBeFocusedAsync();
+        AssertNoConsoleErrors();
+    }
 }

@@ -256,4 +256,19 @@ public class WhenCheckboxToggles : PlaywrightTestBase
             "Boot trace must be emitted — confirms runtime boot discovered and executed the plan");
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task checking_medication_with_none_on_record_puts_the_cursor_on_the_medication_box()
+    {
+        await NavigateAndBoot();
+        var medicationCheckbox = Page.Locator($"#{ModelIdPrefix}ReceivesMedication");
+        await Expect(medicationCheckbox).Not.ToBeCheckedAsync();
+
+        // The click moves focus to the button; the unchecked medication box takes it back.
+        await Page.Locator("#check-medication-btn").ClickAsync();
+
+        await Expect(Page.Locator("#medication-warning")).ToHaveTextAsync("no medication on record", new() { Timeout = 3000 });
+        await Expect(medicationCheckbox).ToBeFocusedAsync();
+        AssertNoConsoleErrors();
+    }
 }
