@@ -24,7 +24,10 @@ export function subscribeVendor(
   event: string,
   listener: Listener,
 ): () => void {
-  const vendorListener = (first: unknown): void => listener(payloadOf(vendor, first));
+  const vendorListener = (first: unknown): void => {
+    const payload = payloadOf(vendor, first);
+    queueMicrotask(() => listener(payload));
+  };
   call(root, [vendor.subscribe], [event, vendorListener], "checked", `${vendorName} ${vendor.subscribe}`);
   return () => {
     call(root, [vendor.unsubscribe], [event, vendorListener], "checked", `${vendorName} ${vendor.unsubscribe}`);
