@@ -379,8 +379,9 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The field keeps the nurse's recent medications; while the pharmacy is searched it offers none of
-    // them, so "Sterile saline flush" is never shown for "ster", and the pharmacy's answer replaces it.
+    // The field keeps the nurse's recent medications, offered by the down arrow before anything is
+    // typed. While the pharmacy is searched it offers none of them, so "Sterile saline flush" is not
+    // shown for "ster", and the pharmacy's answer replaces it.
     [Test]
     public async Task while_the_pharmacy_is_searched_the_recent_medications_are_not_offered()
     {
@@ -391,8 +392,15 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
             await route.ContinueAsync();
         });
         await NavigateAndBoot();
+        var input = Page.Locator($"#{MedicationId}");
+        await input.ClickAsync();
+        await input.PressAsync("ArrowDown");
+        await Expect(Medication.PopupItem("Sterile saline flush")).ToBeVisibleAsync();
+        await Expect(Medication.PopupItem("Acetaminophen")).ToBeVisibleAsync();
+        await input.PressAsync("Escape");
+        await Expect(Medication.PopupItem("Sterile saline flush")).ToBeHiddenAsync();
 
-        await TypeInMedication("ster");
+        await input.PressSequentiallyAsync("ster", new() { Delay = 50 });
 
         await Expect(FilterStatus).ToHaveTextAsync("Searching the pharmacy...", new() { Timeout = 10000 });
         await Expect(Medication.PopupItem("Sterile saline flush")).ToHaveCountAsync(0);

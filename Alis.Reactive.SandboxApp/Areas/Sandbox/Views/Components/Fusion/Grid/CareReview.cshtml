@@ -116,6 +116,8 @@
 
     <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
         @(Html.FusionGrid<GridOperationsModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+            .AllowPaging(true)
+            .PageSettings(new GridPageSettings { PageSize = 6 })
             .AllowSelection(true)
             .SelectionSettings(new GridSelectionSettings { Type = SelectionType.Multiple })
             .Columns(new List<GridColumn>

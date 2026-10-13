@@ -23,7 +23,7 @@ public class WhenUsingFusionGridReview : PlaywrightTestBase
         // CurrentViewRecords source gathered to the server.
         await ClickWhenStable(Page.Locator("#review-current-view"));
         await Expect(Page.Locator("#view-summary"))
-            .ToContainTextAsync("current view has 12 residents", new() { Timeout = 10000 });
+            .ToContainTextAsync("current view has 6 residents", new() { Timeout = 10000 });
 
         // RowIndexByPrimaryKey source gathered to the server.
         await ClickWhenStable(Page.Locator("#review-row-index"));
@@ -43,8 +43,9 @@ public class WhenUsingFusionGridReview : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The first twelve directory residents carry four High risk levels: Katherine Ortiz, Noah Walsh,
-    // Ruth Carter and Samuel Diaz (GridController.GenerateResidentDirectory).
+    // The roster loads twelve residents, six a page (GridController.GenerateResidentDirectory). Page one
+    // carries one High risk level (Katherine Ortiz) and page two three (Noah Walsh, Ruth Carter and
+    // Samuel Diaz); counting the whole roster would say four on either page.
     [Test]
     public async Task counting_high_risk_residents_counts_those_on_the_current_page()
     {
@@ -53,7 +54,12 @@ public class WhenUsingFusionGridReview : PlaywrightTestBase
         await ClickWhenStable(Page.Locator("#count-high-risk"));
 
         await Expect(Page.Locator("#high-risk-line")).ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Expect(Page.Locator("#high-risk-line")).ToHaveTextAsync("High-risk residents on this page: 4");
+        await Expect(Page.Locator("#high-risk-line")).ToHaveTextAsync("High-risk residents on this page: 1");
+
+        await ClickWhenStable(Page.Locator("#care-review-grid .e-pager .e-numericitem").Filter(new() { HasText = "2" }));
+        await Expect(Page.Locator("#care-review-grid .e-rowcell").Filter(new() { HasText = "Noah Walsh" })).ToBeVisibleAsync();
+        await ClickWhenStable(Page.Locator("#count-high-risk"));
+        await Expect(Page.Locator("#high-risk-line")).ToHaveTextAsync("High-risk residents on this page: 3");
         AssertNoConsoleErrors();
     }
 
