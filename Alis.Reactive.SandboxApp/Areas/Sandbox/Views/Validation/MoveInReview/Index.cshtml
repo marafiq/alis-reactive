@@ -20,12 +20,28 @@
                 .NativeTextBox(b => b.Type("number").CssClass(Field)); }
             @{ Html.InputField(plan, m => m.MobilityNotes, o => o.Label("Mobility plan"))
                 .NativeTextBox(b => b.Placeholder("Walker, two-person assist, ...").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.ReassessmentPlan, o => o.Label("Reassessment plan (moderate risk)"))
+                .NativeTextBox(b => b.Placeholder("Reassess in 30 days with physical therapy").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.TherapistReviewer, o => o.Label("Therapist reviewing the mobility plan"))
+                .NativeTextBox(b => b.Placeholder("Physical therapist").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.UsesWheelchair, o => o.Label("Uses a wheelchair"))
+                .NativeCheckBox(b => b.CssClass("rounded border-border")); }
+            @{ Html.InputField(plan, m => m.UsesOxygen, o => o.Label("Uses oxygen"))
+                .NativeCheckBox(b => b.CssClass("rounded border-border")); }
+            @{ Html.InputField(plan, m => m.EvacuationAssist, o => o.Label("Evacuation assistant"))
+                .NativeTextBox(b => b.Placeholder("Night shift aide, ...").CssClass(Field)); }
             @{ Html.InputField(plan, m => m.AssignedRoom, o => o.Label("Assigned room"))
                 .NativeTextBox(b => b.Placeholder("MA-214").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.SecuredUnitConsentBy, o => o.Label("Secured unit consent given by"))
+                .NativeTextBox(b => b.Placeholder("Family member's name").CssClass(Field)); }
             @{ Html.InputField(plan, m => m.FamilyPortalLink, o => o.Label("Family portal link"))
                 .NativeTextBox(b => b.Placeholder("https://").CssClass(Field)); }
             @{ Html.InputField(plan, m => m.WristbandCode, o => o.Label("Wristband code"))
                 .NativeTextBox(b => b.Placeholder("WB-104233").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.TemporaryBandReason, o => o.Label("Temporary wristband reason"))
+                .NativeTextBox(b => b.Placeholder("Band printer down, ...").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.Pharmacy.Name, o => o.Label("Pharmacy"))
+                .NativeTextBox(b => b.Placeholder("Pharmacy name").CssClass(Field)); }
             @{ Html.InputField(plan, m => m.Pharmacy.Phone, o => o.Label("Pharmacy phone"))
                 .NativeTextBox(b => b.Placeholder("555-0100").CssClass(Field)); }
             @{ Html.InputField(plan, m => m.IsReturning, o => o.Label("Returning resident"))

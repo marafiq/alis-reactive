@@ -10,11 +10,28 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? ResidentName { get; set; }
         public int? FallRiskScore { get; set; }
         public string? MobilityNotes { get; set; }
+
+        /// <summary>When and how a resident with a moderate fall risk is reassessed.</summary>
+        public string? ReassessmentPlan { get; set; }
+
+        /// <summary>The therapist who reviews a long mobility plan.</summary>
+        public string? TherapistReviewer { get; set; }
+        public bool UsesWheelchair { get; set; }
+        public bool UsesOxygen { get; set; }
+
+        /// <summary>Who helps the resident out of the building in an evacuation.</summary>
+        public string? EvacuationAssist { get; set; }
         public string? AssignedRoom { get; set; }
+
+        /// <summary>The family member who consented to a room on the secured memory care wing.</summary>
+        public string? SecuredUnitConsentBy { get; set; }
         public string? FamilyPortalLink { get; set; }
 
         /// <summary>The code the community's wristband printer prints: WB- and six digits.</summary>
         public string? WristbandCode { get; set; }
+
+        /// <summary>Why the resident wears a temporary wristband (codes WB-9 and five digits).</summary>
+        public string? TemporaryBandReason { get; set; }
         public bool IsReturning { get; set; }
         public string? PreviousRoom { get; set; }
 
@@ -32,6 +49,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     /// <summary>The pharmacy that fills the resident's prescriptions.</summary>
     public class PharmacyContact
     {
+        public string? Name { get; set; }
         public string? Phone { get; set; }
 
         /// <summary>The network the community contracts; the page sends it with every review, beside the phone.</summary>

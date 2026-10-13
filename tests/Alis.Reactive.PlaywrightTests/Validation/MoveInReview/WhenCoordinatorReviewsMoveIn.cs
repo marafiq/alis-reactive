@@ -160,6 +160,148 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
     }
 
     [Test]
+    public async Task a_moderate_fall_risk_of_five_needs_a_reassessment_plan()
+    {
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "5");
+
+        await ClickWhenStable(SaveReview);
+
+        await Expect(_plan.ErrorFor(m => m.ReassessmentPlan)).ToHaveTextAsync("A moderate fall risk needs a reassessment plan.");
+        Assert.That(_reviewsSent, Is.Empty);
+        await Write(m => m.ReassessmentPlan, "Reassess in 30 days with physical therapy");
+        await ClickWhenStable(SaveReview);
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1));
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_fall_risk_of_seven_needs_a_reassessment_plan_and_eight_does_not()
+    {
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "7");
+
+        await ClickWhenStable(SaveReview);
+
+        // Seven is the top of the moderate band, 5 to 7 inclusive.
+        await Expect(_plan.ErrorFor(m => m.ReassessmentPlan)).ToHaveTextAsync("A moderate fall risk needs a reassessment plan.");
+        Assert.That(_reviewsSent, Is.Empty);
+        await Write(m => m.FallRiskScore, "8");
+        await Write(m => m.MobilityNotes, "Walker at all times");
+        await ClickWhenStable(SaveReview);
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        await Expect(_plan.ErrorFor(m => m.ReassessmentPlan)).ToHaveTextAsync("");
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1));
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_long_mobility_plan_is_sent_and_the_server_asks_for_a_therapist_to_review_it()
+    {
+        const string LongPlan = "Walker at all times, two-person assist on stairs, gait belt for transfers";
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "9");
+        await Write(m => m.MobilityNotes, LongPlan);
+
+        await ClickWhenStable(SaveReview);
+
+        // A condition on the plan's length has no browser form, so only the server asks, in the summary.
+        await Expect(ValidationSummary).ToHaveTextAsync("A mobility plan this long needs a therapist to review it.");
+        await Expect(_plan.ErrorFor(m => m.TherapistReviewer)).ToHaveTextAsync("");
+        await Expect(ReviewStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1), "The page cannot decide this rule, so the server is asked.");
+
+        await Write(m => m.TherapistReviewer, "Dana Ortiz, PT");
+        await ClickWhenStable(SaveReview);
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        await Expect(ValidationSummary).ToBeHiddenAsync();
+        Assert.That(_reviewsSent, Has.Count.EqualTo(2));
+        AssertNoConsoleErrorsExcept("400");
+    }
+
+    [Test]
+    public async Task a_resident_in_a_wheelchair_needs_an_evacuation_assistant()
+    {
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "2");
+        await _plan.NativeCheckBox(m => m.UsesWheelchair).Check();
+
+        await ClickWhenStable(SaveReview);
+
+        await Expect(_plan.ErrorFor(m => m.EvacuationAssist)).ToHaveTextAsync("Name who helps the resident out in an evacuation.");
+        Assert.That(_reviewsSent, Is.Empty);
+        await Write(m => m.EvacuationAssist, "Night shift aide");
+        await ClickWhenStable(SaveReview);
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1));
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_resident_on_oxygen_needs_an_evacuation_assistant()
+    {
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "2");
+        await _plan.NativeCheckBox(m => m.UsesOxygen).Check();
+
+        await ClickWhenStable(SaveReview);
+
+        // Either need is enough; a resident with neither is saved without an assistant in every other test.
+        await Expect(_plan.ErrorFor(m => m.EvacuationAssist)).ToHaveTextAsync("Name who helps the resident out in an evacuation.");
+        Assert.That(_reviewsSent, Is.Empty);
+        await Write(m => m.EvacuationAssist, "Night shift aide");
+        await ClickWhenStable(SaveReview);
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1));
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_room_on_the_memory_care_wing_needs_the_familys_secured_unit_consent()
+    {
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "2");
+        await Write(m => m.AssignedRoom, "MC-104");
+
+        await ClickWhenStable(SaveReview);
+
+        await Expect(_plan.ErrorFor(m => m.SecuredUnitConsentBy))
+            .ToHaveTextAsync("Name the family member who consented to the secured unit.");
+        Assert.That(_reviewsSent, Is.Empty);
+        await Write(m => m.SecuredUnitConsentBy, "Ana Hale");
+        await ClickWhenStable(SaveReview);
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1), "A room on another wing, like MA-214, needs no consent.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_temporary_wristband_needs_the_reason_it_was_issued()
+    {
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "2");
+        await Write(m => m.WristbandCode, "WB-912345");
+
+        await ClickWhenStable(SaveReview);
+
+        await Expect(_plan.ErrorFor(m => m.TemporaryBandReason)).ToHaveTextAsync("Say why the resident wears a temporary wristband.");
+        Assert.That(_reviewsSent, Is.Empty);
+        await Write(m => m.TemporaryBandReason, "Band printer down at admission");
+        await ClickWhenStable(SaveReview);
+        await Expect(ReviewStatus).ToHaveTextAsync(Saved);
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1), "A permanent band, like WB-104233, needs no reason.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task a_family_portal_link_must_be_a_web_address_and_may_be_left_blank()
     {
         await NavigateAndBoot();
@@ -226,6 +368,7 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         await Write(m => m.ResidentName, "Margaret Hale");
         await Write(m => m.FallRiskScore, "2");
         await Write(m => m.Pharmacy.Phone, "5550100");
+        await Write(m => m.Pharmacy.Name, "Riverside Pharmacy");
 
         await ClickWhenStable(SaveReview);
 
@@ -245,11 +388,32 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         await Write(m => m.ResidentName, "Margaret Hale");
         await Write(m => m.FallRiskScore, "2");
         await Write(m => m.Pharmacy.Phone, "555-0100");
+        await Write(m => m.Pharmacy.Name, "Riverside Pharmacy");
 
         await ClickWhenStable(SaveReview);
 
         await Expect(ReviewStatus).ToHaveTextAsync(SavedWithPharmacy);
         Assert.That(_reviewsSent, Has.Count.EqualTo(1));
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_pharmacy_phone_needs_the_name_of_the_pharmacy_it_reaches()
+    {
+        await NavigateAndBoot();
+        await Write(m => m.ResidentName, "Margaret Hale");
+        await Write(m => m.FallRiskScore, "2");
+        await Write(m => m.Pharmacy.Phone, "555-0100");
+
+        await ClickWhenStable(SaveReview);
+
+        // The rule applies unless the phone is empty; the phone is given, so the pharmacy is asked for.
+        await Expect(_plan.ErrorFor(m => m.Pharmacy.Name)).ToHaveTextAsync("Name the pharmacy for this phone number.");
+        Assert.That(_reviewsSent, Is.Empty);
+        await Write(m => m.Pharmacy.Name, "Riverside Pharmacy");
+        await ClickWhenStable(SaveReview);
+        await Expect(ReviewStatus).ToHaveTextAsync(SavedWithPharmacy);
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1), "A review with no pharmacy phone needs no pharmacy name; the other saves prove it.");
         AssertNoConsoleErrors();
     }
 

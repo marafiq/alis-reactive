@@ -33,15 +33,40 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                 .Otherwise(() =>
                     RuleFor(x => x.MobilityNotes).MaximumLength(40).WithMessage("Keep mobility notes under 40 characters."));
 
+            // A moderate score, 5 to 7, needs a plan for reassessing the resident.
+            When(x => x.FallRiskScore >= 5 && x.FallRiskScore <= 7, () =>
+                RuleFor(x => x.ReassessmentPlan).NotEmpty().WithMessage("A moderate fall risk needs a reassessment plan."));
+
+            // A long mobility plan goes to a therapist. A condition on a length has no browser form,
+            // so the server alone checks this rule.
+            When(x => x.MobilityNotes != null && x.MobilityNotes.Length > 60, () =>
+                RuleFor(x => x.TherapistReviewer).NotEmpty().WithMessage("A mobility plan this long needs a therapist to review it."));
+
+            // Either need means someone must help the resident out in an evacuation.
+            When(x => x.UsesWheelchair || x.UsesOxygen, () =>
+                RuleFor(x => x.EvacuationAssist).NotEmpty().WithMessage("Name who helps the resident out in an evacuation."));
+
             // RegexOptions travel with the pattern: "ma-214" and "MA-214" are the same room.
             RuleFor(x => x.AssignedRoom)
                 .Matches(@"^[a-z]{2}-\d{3}$", RegexOptions.IgnoreCase).WithMessage("Enter the room as wing and number, like MA-214.");
+
+            // Rooms on the secured memory care wing are numbered MC-.
+            When(x => x.AssignedRoom != null && x.AssignedRoom.StartsWith("MC-"), () =>
+                RuleFor(x => x.SecuredUnitConsentBy).NotEmpty().WithMessage("Name the family member who consented to the secured unit."));
 
             Unless(x => string.IsNullOrEmpty(x.FamilyPortalLink), () =>
                 RuleFor(x => x.FamilyPortalLink).Url().WithMessage("The family portal link must be a web address."));
 
             // The community's own validator: it names the browser check that decides what it decides.
             RuleFor(x => x.WristbandCode).WristbandCode();
+
+            // Temporary wristbands are numbered WB-9 and five digits.
+            When(x => x.WristbandCode != null && Regex.IsMatch(x.WristbandCode, @"^WB-9\d{5}$"), () =>
+                RuleFor(x => x.TemporaryBandReason).NotEmpty().WithMessage("Say why the resident wears a temporary wristband."));
+
+            // A pharmacy phone needs the pharmacy it reaches.
+            Unless(x => string.IsNullOrEmpty(x.Pharmacy.Phone), () =>
+                RuleFor(x => x.Pharmacy.Name).NotEmpty().WithMessage("Name the pharmacy for this phone number."));
 
             // Rules for a nested object, written inline.
             RuleFor(x => x.Pharmacy).ChildRules(pharmacy =>
