@@ -1,3 +1,6 @@
+using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.ResidentChart;
 
 /// <summary>
@@ -6,7 +9,8 @@ namespace Alis.Reactive.PlaywrightTests.HttpPipeline.ResidentChart;
 /// </summary>
 /// <remarks>
 /// The chart's MRN member is named in capitals; the server writes it as "mrn". The page shows it, tests
-/// it in a condition, and names a flagged chart by it in an event the page dispatches.
+/// it in a condition, and names a flagged chart by it in an event the page dispatches. The record-number
+/// list shows each chart's MRN through its row's "mrn" member, as its text field and in its item template.
 /// </remarks>
 [TestFixture]
 public class WhenCoordinatorOpensResidentChart : PlaywrightTestBase
@@ -51,6 +55,29 @@ public class WhenCoordinatorOpensResidentChart : PlaywrightTestBase
         await Expect(ChartRecord).ToHaveTextAsync("No medical record yet: request one from admissions.");
         await Expect(ChartName).ToHaveTextAsync("Arthur Bell");
         await Expect(ChartMrn).ToHaveTextAsync("");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task the_record_number_list_shows_each_charts_number_and_opens_the_chosen_chart()
+    {
+        await NavigateAndBoot();
+        var plan = await PagePlan<ResidentChartPageModel>.FromPage(Page);
+        var byRecordNumber = plan.DropDownList(m => m.ChartByRecordNumber);
+
+        await byRecordNumber.Open();
+
+        // The item template shows each row's MRN and name.
+        await Expect(byRecordNumber.Popup.GetByText("MRN-20417", new() { Exact = true })).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(byRecordNumber.Popup.GetByText("MRN-20533", new() { Exact = true })).ToBeVisibleAsync();
+        await Expect(byRecordNumber.Popup.GetByText("Rosa Diaz", new() { Exact = true })).ToBeVisibleAsync();
+
+        await byRecordNumber.Popup.GetByText("MRN-20533", new() { Exact = true }).ClickAsync();
+
+        // The list's text field shows the chosen MRN; its value opens Rosa Diaz's chart.
+        await Expect(byRecordNumber.Input).ToHaveValueAsync("MRN-20533", new() { Timeout = 5000 });
+        await Expect(ChartName).ToHaveTextAsync("Rosa Diaz", new() { Timeout = 5000 });
+        await Expect(ChartMrn).ToHaveTextAsync("MRN-20533");
         AssertNoConsoleErrors();
     }
 

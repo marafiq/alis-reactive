@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 {
     /// <summary>
-    /// Resident charts: Helen Park's chart carries her medical record number; Arthur Bell, admitted today,
-    /// has none yet.
+    /// Resident charts: Helen Park's and Rosa Diaz's charts carry their medical record numbers; Arthur Bell,
+    /// admitted today, has none yet.
     /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/HttpPipeline/ResidentChart")]
@@ -21,6 +21,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         {
             "helen" => Ok(new ResidentChart("Helen Park", "MRN-20417")),
             "arthur" => Ok(new ResidentChart("Arthur Bell", null)),
+            "rosa" => Ok(new ResidentChart("Rosa Diaz", "MRN-20533")),
             _ => NotFound(),
         };
     }

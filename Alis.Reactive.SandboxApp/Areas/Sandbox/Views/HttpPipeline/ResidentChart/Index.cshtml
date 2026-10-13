@@ -1,9 +1,18 @@
 @model ResidentChartPageModel
 @using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Templates
 @{
     ViewData["Title"] = "Resident Charts";
     var plan = Html.ReactivePlan<ResidentChartPageModel>();
     var residents = new[] { (Key: "helen", Name: "Helen Park"), (Key: "arthur", Name: "Arthur Bell") };
+    var chartLinks = new List<ChartLink> { new("MRN-20417", "Helen Park", "helen"), new("MRN-20533", "Rosa Diaz", "rosa") };
+    var chartLinkItem = FusionTemplate.Create<ChartLink>()
+        .Class("flex justify-between gap-4")
+        .Span(link => link.MRN, "font-mono")
+        .Span(link => link.Name, "text-text-muted")
+        .Render();
+    var chartUrl = Url.SandboxRouteTemplate("Chart", "ResidentChart", "resident");
 
     Html.On(plan, t => t.CustomEvent<ChartFlagged>(ResidentChartEvents.ChartFlagged, (flag, p) =>
         p.Element("review-flag").Text.Set(flag.Get(x => x.MRN!))));
@@ -33,6 +42,25 @@
                     }))
             }
         </native-hstack>
+        <div class="mt-4 max-w-sm">
+            @{ Html.InputField(plan, m => m.ChartByRecordNumber, o => o.Label("Open a chart by medical record number"))
+                .FusionDropDownList(b => b
+                    .DataSource(chartLinks)
+                    .Fields<ChartLink>(t => t.MRN, v => v.Resident)
+                    .ItemTemplate(chartLinkItem)
+                    .Placeholder("Choose a record number"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.Get(chartUrl)
+                     .Gather<ChartQuery>(g => g.Set(x => x.Resident, args.Value))
+                     .Response(r => r.OnSuccess<ResidentChart>((json, s) =>
+                     {
+                         s.Element("chart-name").Text.Set(json.Get(x => x.Name));
+                         s.Element("chart-mrn").Text.Set(json.Get(x => x.MRN!));
+                         s.Element("chart-record").Text.Set("Chart linked to the medical record.");
+                     }));
+                }); }
+        </div>
     </native-card-body></native-card>
 
     <native-card><native-card-body>

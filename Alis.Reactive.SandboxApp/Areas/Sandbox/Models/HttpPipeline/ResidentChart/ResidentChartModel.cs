@@ -7,6 +7,21 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     public class ResidentChartPageModel
     {
         public string? ReviewChartMrn { get; set; }
+
+        /// <summary>The resident whose chart the coordinator opens by its medical record number.</summary>
+        public string? ChartByRecordNumber { get; set; }
+    }
+
+    /// <summary>
+    /// A chart the coordinator can open by its medical record number: MRN is named in capitals, and the
+    /// list shows it by the name the row carries ("mrn").
+    /// </summary>
+    public sealed record ChartLink(string MRN, string Name, string Resident);
+
+    /// <summary>The query of <c>GET ResidentChart/Chart/{resident}</c>: the resident whose chart opens.</summary>
+    public sealed class ChartQuery
+    {
+        public string? Resident { get; set; }
     }
 
     /// <summary>
