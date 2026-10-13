@@ -56,8 +56,10 @@ public class WhenResidentStatusUpdatesLive : PlaywrightTestBase
         await WaitForTraceMessage("connected {\"hubUrl\":\"/hubs/notifications\"}", 10000);
         await WaitForTraceMessage("connected {\"hubUrl\":\"/hubs/resident-status", 10000);
 
-        await ClickWhenStable(Page.Locator("#btn-break-hub"));
-        await WaitForTraceMessage("[alis:signalr] connection.reconnecting", 10000);
+        // Once the server has answered Break, it has dropped this page's resident hub connection.
+        await Page.RunAndWaitForResponseAsync(
+            async () => await ClickWhenStable(Page.Locator("#btn-break-hub")),
+            "**/RealTime/BreakResidentHub");
         await ClickWhenStable(Page.Locator("#btn-push-notification"));
 
         await Expect(Page.Locator("#notif-count")).ToHaveTextAsync("99", new() { Timeout = 5000 });

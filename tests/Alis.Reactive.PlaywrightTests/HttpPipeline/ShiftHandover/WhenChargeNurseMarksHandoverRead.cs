@@ -53,7 +53,8 @@ public class WhenChargeNurseMarksHandoverRead : PlaywrightTestBase
             if (request.Method == "POST" && request.Url.Contains("/ShiftHandover/MarkRead/")) markReads.Enqueue(request.Url);
         };
 
-        var noteTab = await Page.RunAndWaitForPopupAsync(async () =>
+        // A Ctrl or Cmd click opens a new tab, which has no opener: the context gains a page.
+        var noteTab = await Context.RunAndWaitForPageAsync(async () =>
         {
             await MarkRead("helen").ClickAsync(new() { Modifiers = new[] { KeyboardModifier.ControlOrMeta } });
         });

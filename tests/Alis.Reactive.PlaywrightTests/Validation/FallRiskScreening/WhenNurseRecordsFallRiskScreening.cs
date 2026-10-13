@@ -116,8 +116,10 @@ public class WhenNurseRecordsFallRiskScreening : PlaywrightTestBase
     {
         await NavigateAndBoot();
         await FellInLast90Days.Choose("No");
-        await _plan.TextBox(m => m.FallsCount).Fill("2");
         await ObservedWalkingInPerson.Check();
+        // Leaving the count may show its message at once, which moves what is below it, so the
+        // count is filled last.
+        await _plan.TextBox(m => m.FallsCount).FillAndBlur("2");
 
         await ClickWhenStable(SaveScreening);
 
