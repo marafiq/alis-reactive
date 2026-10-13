@@ -119,5 +119,24 @@ namespace Alis.Reactive.Builders.Requests
             Routes.ContinueWith(chained.Step);
             return this;
         }
+
+        /// <summary>
+        /// Adds one follow-up HTTP request that runs only after the current request succeeds, given the
+        /// body it succeeded with, so the follow-up can send what the first answer said.
+        /// </summary>
+        /// <typeparam name="TResponse">The current request's success body type.</typeparam>
+        /// <param name="request">
+        /// Builds the follow-up request, given the success body and the request:
+        /// <c>(week, holds) =&gt; holds.Get(url).Gather&lt;HoldsQuery&gt;(g =&gt; g.Set(x =&gt; x.Wing, week.Get(x =&gt; x.Wing)))</c>.
+        /// </param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this response already has a follow-up request.
+        /// </exception>
+        public ResponseBuilder<TModel> Chained<TResponse>(Action<Data<TResponse>, HttpRequestBuilder<TModel>> request)
+            where TResponse : class
+        {
+            var body = new Data<TResponse>(Receiver.Response(Routes.Handle));
+            return Chained(chained => request(body, chained));
+        }
     }
 }

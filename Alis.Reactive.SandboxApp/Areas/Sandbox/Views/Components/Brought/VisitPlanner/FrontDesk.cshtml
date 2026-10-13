@@ -32,15 +32,12 @@
         p.When(link.Get(q => q.Visitors)).NotNull()
             .Then(named => named.Component<FusionNumericTextBox>(m => m.Visitors).Value.Set(link.Get(q => q.Visitors)));
 
-        // The week's answer, read again by the holds request that follows it.
-        Data<ResidentWeekResponse>? answeredWeek = null;
         p.Get(weekUrl)
             .Gather<FrontDeskResident>(g => g.Set(x => x.ResidentId, link.Get(q => q.Resident)))
             .WhileLoading(l => loading.Show())
             .Response(r => r
                 .OnSuccess<ResidentWeekResponse>((week, s) =>
                 {
-                    answeredWeek = week;
                     planner.Wing.Set(week.Get(x => x.Wing));
                     planner.Capacity.Set(week.Get(x => x.WeeklyVisits));
                     planner.Slots.Set(week.Get(x => x.Slots));
@@ -51,11 +48,12 @@
                     planner.EmptyMessage.Set(unknown.Get(x => x.Message));
                     resident.Text.Set("Unknown resident");
                 })
-                .Chained(holds => holds.Get(holdsUrl)
+                // The holds are asked of the desk of the wing the week's answer names.
+                .Chained<ResidentWeekResponse>((week, holds) => holds.Get(holdsUrl)
                     .Gather<FrontDeskResident>(g => g
                         .Set(x => x.ResidentId, link.Get(q => q.Resident))
                         .Header("X-Family", link.Get(q => q.Family))
-                        .Header("X-Wing", answeredWeek!.Get(x => x.Wing)))
+                        .Header("X-Wing", week.Get(x => x.Wing)))
                     .Response(answer => answer.OnSuccess<FamilyHoldsResponse>((held, s) =>
                     {
                         planner.Value.Set(held.Get(x => x.Held));

@@ -378,6 +378,15 @@ p.Get(Url.SandboxRoute("Residents", "Http"))
 
 Chained fires **only on 2xx success** of the parent request. Can nest further.
 
+To send what the first answer said, take its body as the callback's first parameter (from
+`Components/Brought/VisitPlanner/FrontDesk.cshtml`):
+
+```csharp
+.Chained<ResidentWeekResponse>((week, holds) => holds.Get(holdsUrl)
+    .Gather<FrontDeskResident>(g => g.Header("X-Wing", week.Get(x => x.Wing)))
+    .Response(answer => answer.OnSuccess<FamilyHoldsResponse>((held, s) => ...)))
+```
+
 ## Parallel Requests
 
 From `HttpPipeline/Http/Index.cshtml`:
