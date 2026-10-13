@@ -228,7 +228,7 @@
                  .Gather<NewAssignmentQuery>(g => g
                      .Set(x => x.StartTime, args.StartTime)
                      .Set(x => x.EndTime, args.EndTime)
-                     .Set(x => x.ShiftId, args.GroupIndex)
+                     .Set(x => x.GroupIndex, args.GroupIndex)
                      .Form(m => m.SelectedFacilityId))
                  .Response(r => r.OnSuccess(s => s.Into("new-assignment-content")));
                 p.Component<FusionDialog>("new-assignment-dialog").Show();

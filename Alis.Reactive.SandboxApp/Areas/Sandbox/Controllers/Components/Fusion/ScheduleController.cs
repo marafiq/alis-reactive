@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
@@ -153,18 +154,19 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         /// <summary>
-        /// Loads the empty-cell assignment partial into the FusionDialog.
-        /// GroupIndex (0-based) is mapped to ShiftId (1-based).
+        /// Loads the empty-cell assignment partial into the FusionDialog. The cell's shift column (0-based)
+        /// is its shift (1-based). The query names the column for what it is: a query value bound under the
+        /// model's own name (<c>ShiftId</c>) is what MVC's hidden field sends, not the model's value.
         /// </summary>
         [HttpGet("NewAssignmentForm")]
-        public IActionResult NewAssignmentForm(string startTime, string endTime, int shiftId, string? selectedFacilityId)
+        public IActionResult NewAssignmentForm([FromQuery] NewAssignmentQuery query)
         {
             var model = new NewAssignmentModel
             {
-                StartTime = startTime,
-                EndTime = endTime,
-                ShiftId = shiftId + 1, // GroupIndex 0-based → ShiftId 1-based
-                FacilityId = selectedFacilityId ?? "mystery-manor",
+                StartTime = query.StartTime.ToString("s", CultureInfo.InvariantCulture),
+                EndTime = query.EndTime.ToString("s", CultureInfo.InvariantCulture),
+                ShiftId = query.GroupIndex + 1,
+                FacilityId = query.SelectedFacilityId ?? "mystery-manor",
             };
             return PartialView(
                 "~/Areas/Sandbox/Views/Components/Fusion/Schedule/_NewAssignmentForm.cshtml",

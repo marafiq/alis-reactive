@@ -112,12 +112,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public int AssignmentId { get; set; }
     }
 
-    /// <summary>The query of <c>GET Schedule/NewAssignmentForm</c>: the clicked cell's times and shift, and the facility.</summary>
+    /// <summary>
+    /// The query of <c>GET Schedule/NewAssignmentForm</c>: the clicked cell's times, the shift column it is
+    /// in (0-based, as the schedule numbers its groups), and the facility.
+    /// </summary>
     public sealed class NewAssignmentQuery
     {
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        public int ShiftId { get; set; }
+        public int GroupIndex { get; set; }
         public string? SelectedFacilityId { get; set; }
     }
 
