@@ -103,7 +103,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <native-text color="Secondary">
-            Button reads care level via <code>When(comp.Get(c =&gt; c.Value)).NotEmpty()</code>.
+            Button reads care level via <code>When(comp.Value).NotEmpty()</code>.
         </native-text>
 
         @(Html.NativeButton("check-care-btn", "Check Care Level")

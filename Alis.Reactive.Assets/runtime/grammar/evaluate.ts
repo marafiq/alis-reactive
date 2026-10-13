@@ -65,7 +65,7 @@ function invoke(expr: CallExpr, scope: Scope, mayReturnPromise: boolean): unknow
 
 function unawaitedPromise(label: string, path: readonly string[]): Error {
   const member = path.length === 0 ? label : `${label}.${path.join(".")}`;
-  return new Error(`[alis] ${member} returned a promise where the plan reads a value; declare the member Awaited`);
+  return new Error(`[alis] ${member} returned a promise where the plan reads a value; declare the method with CallAsync or InvokeAsync`);
 }
 
 function shapeArgument(value: unknown, shape: Shape | undefined): unknown {

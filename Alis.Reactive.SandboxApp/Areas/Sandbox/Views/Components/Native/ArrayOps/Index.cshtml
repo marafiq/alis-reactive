@@ -54,8 +54,8 @@
     <native-card><native-card-body>
         <native-heading level="H2">Activity selection (live count)</native-heading>
         <native-text color="Secondary">
-            The NativeCheckList <code>Changed</code> event delivers <code>e.Value</code> (a
-            <code>string[]</code>); <code>p.From(args, e =&gt; e.Value).Count()</code> updates on every change.
+            The NativeCheckList <code>Change</code> event delivers <code>args.Value</code> (a
+            <code>string[]</code>); <code>p.From(args.Value).Count()</code> updates on every change.
         </native-text>
 
         @{ Html.InputField(plan, m => m.SelectedActivities, o => o.Label("Activities"))

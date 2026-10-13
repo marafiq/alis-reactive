@@ -6,7 +6,7 @@
 
     var plan = Html.ReactivePlan<CommandOrderingModel>();
 
-    // Declaration order matters across condition boundaries; the final SetText must win.
+    // Declaration order matters across condition boundaries; the final Text.Set must win.
     Html.On(plan, t => t.CustomEvent<CommandOrderingPayload>(CommandOrderingEvents.OrderingTest, (args, p) =>
     {
         p.Element("proof").Text.Set("before");

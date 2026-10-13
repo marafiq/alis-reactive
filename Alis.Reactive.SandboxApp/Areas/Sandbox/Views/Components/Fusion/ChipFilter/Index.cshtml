@@ -54,7 +54,7 @@
     <native-heading level="H1">ChipFilter &mdash; multi-select chips as a filter</native-heading>
     <native-text color="Secondary">
         Pick care levels, then <strong>Apply</strong>. The array DSL operates on the selected chip
-        <em>objects</em> &mdash; <code>p.From(payload, x =&gt; x.Selection.Data).Any(c =&gt; c.Value == "memory")</code>
+        <em>objects</em> &mdash; <code>p.From(payload.Get(x =&gt; x.Selection.Data)).Any(c =&gt; c.Value == "memory")</code>
         &mdash; and the selected texts filter the grid server-side. No plugin, no hand-written JS.
     </native-text>
 

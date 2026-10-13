@@ -422,7 +422,7 @@
     <native-card>
     <native-card-body>
         <native-heading level="H2">4. Condition inside OnSuccess</native-heading>
-        <p class="text-sm text-text-secondary mb-3">POST &rarr; OnSuccess { SetText + When(active) + SetText }. Inner condition within response handler.</p>
+        <p class="text-sm text-text-secondary mb-3">POST &rarr; OnSuccess { Text.Set + When(active) + Text.Set }. Inner condition within response handler.</p>
         <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s4-btn-active", "active=true")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
@@ -476,7 +476,7 @@
     <native-card>
     <native-card-body>
         <native-heading level="H2">6. Multiple conditions after HTTP</native-heading>
-        <p class="text-sm text-text-secondary mb-3">POST &rarr; When(active) &rarr; When(category=="premium") &rarr; SetText.</p>
+        <p class="text-sm text-text-secondary mb-3">POST &rarr; When(active) &rarr; When(category=="premium") &rarr; Text.Set.</p>
         <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s6-btn-active-premium", "active, premium")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")

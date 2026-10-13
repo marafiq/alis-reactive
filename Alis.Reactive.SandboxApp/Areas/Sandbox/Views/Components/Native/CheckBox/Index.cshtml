@@ -79,7 +79,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            Button reads medication checkbox via <code>When(comp.Get(c =&gt; c.Checked)).Truthy()</code>
+            Button reads medication checkbox via <code>When(comp.Checked).Truthy()</code>
             and shows a confirmation or warning.
         </p>
         @(Html.NativeButton("check-medication-btn", "Check Medication Status")

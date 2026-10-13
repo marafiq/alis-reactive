@@ -33,7 +33,7 @@
     <native-heading level="H1">ArrayGrid &mdash; client-side transform into a grid data source</native-heading>
     <native-text color="Secondary">
         The array DSL is just value routing: <code>p.From(roster).Where(x =&gt; x.Status == "active").OrderBy(x =&gt; x.Name)</code>
-        flows into the grid's <code>dataSource</code> member via <code>Set(c =&gt; c.DataSource, source)</code>.
+        flows into the grid's <code>dataSource</code> member via <code>rosterGrid.DataSource.Set(source)</code>.
         The filter runs in the plan over element members &mdash; no HTTP round-trip, no per-row code.
     </native-text>
 

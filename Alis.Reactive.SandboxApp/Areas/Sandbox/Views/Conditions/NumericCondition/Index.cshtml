@@ -19,7 +19,7 @@
         <native-heading level="H2">1. Simple Condition — Gt(100)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Enter a heart rate. Values above 100 show a tachycardia warning.
-            Uses <code>When(comp.Get(c =&gt; c.Value)).Gt(100m)</code> as a component-read condition.
+            Uses <code>When(comp.Value).Gt(100m)</code> as a component-read condition.
         </p>
         <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.HeartRate, o => o.Label("Heart Rate (bpm)"))
@@ -66,7 +66,7 @@
         <native-heading level="H2">3. AND Compound — Normal Range</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Blood pressure field uses a compound condition:
-            <code>When(comp.Get(c =&gt; c.Value)).Gte(60m).And(comp.Get(c =&gt; c.Value)).Lte(120m)</code> shows "Normal range".
+            <code>When(comp.Value).Gte(60m).And(comp.Value).Lte(120m)</code> shows "Normal range".
             Outside that range shows "Out of range".
         </p>
         <native-grid cols="C2" gap="Base" class="mb-4">
@@ -95,7 +95,7 @@
         <native-heading level="H2">4. Cross-Component — Value vs Threshold</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Compares heart rate against a configurable threshold using source-vs-source:
-            <code>When(heartRate.Get(c =&gt; c.Value)).Gte(threshold.Get(c =&gt; c.Value))</code>.
+            <code>When(hr.Value).Gte(threshold.Value)</code>.
             Button-triggered so both components are read at click time.
         </p>
         <native-grid cols="C2" gap="Base" class="mb-4">
