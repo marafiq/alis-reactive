@@ -177,7 +177,7 @@ exactly whatever the zone of the browser or the server.
   makes it; a non-nullable number, boolean or date left empty is its type's default (0, `false`,
   0001-01-01), the value the property keeps when there is nothing to bind; a nullable one is `null`.
 - **Elsewhere** a read keeps its shape conversion alone, so `p.When(name.Value).IsEmpty()` still sees
-  `""`, and `model.valueOf(id)` reads another plan's field the way a direct read would.
+  `""`.
 
 ### 2.2 Operators
 
@@ -475,9 +475,9 @@ imports none of them. The obligations are numbered so that tests and code can ci
 - **M2 `fields`.** The same inputs, flat, keyed by MVC binding name.
 - **M3 `fill(record)`.** Writes the inputs of M1 into `record` at their body paths and returns it.
   A node already on the path keeps its other members; it is copied before it is written.
-- **M5 `valueOf(id)`, `boundValueOf(id)`.** One input's value, for a read of a field another plan of
-  the composition rendered; missing when none renders it. `valueOf` converts it to its shape, as a
-  direct read does; `boundValueOf` is the binding read every validation rule makes (2.1).
+- **M5 `boundValueOf(id)`.** One input's value as a binding read (2.1), for a validation rule or a
+  gathered `Form(m => ..)` field, wherever in the composition it was rendered; missing when no plan
+  renders it.
 - **M4 Commit.** Each input carries `committed`, the event its component declares as the one that
   commits a value (`ComponentInput.Of(Value, committedBy: ...)`). When the plan that renders the
   input starts, the model subscribes it and re-raises it on the input's element as the bubbling DOM
@@ -755,12 +755,17 @@ proves it is named in the pull request.
   the generated contract (`tools/PlanContractGenerator`), and the interpreter with its modules
   (`Alis.Reactive.Assets/runtime`). The runtime is 2,480 lines of TypeScript, down from 6,134, and
   the framework's own components add 452 in `components/`.
-- C# keeps its typed semantic model (`PlanModel`: reaction, condition, value, request and
-  validation graphs) as the builders' target, and a lowering pass (`Grammar/Lowering`) compiles it
-  into the grammar at render. The semantic model no longer serializes; only the grammar does.
+- C# has one model: the builders place steps (`PlanModel/Reactions/Steps.cs`,
+  `PlanModel/Requests/RequestStep.cs`) where they are written, and each step, value
+  (`ValueExpression`) and condition (`ConditionGraph`) writes its own productions in the scope it is
+  used in (`PlanModel/Writing/Scope.cs`). `PlanBuildContext.Write` writes the plan at render: the
+  objects, the model's inputs, each form's rules (`FormWriter`) and the handlers. There is no
+  separate semantic graph and no lowering pass.
 - Validation projection (section 7): rules are written once in FluentValidation's grammar on
   `ReactiveValidator<T>` and read from FluentValidation's descriptors (`ClientRuleProjection`).
-  `When`/`Unless`/`Otherwise` lambdas are recorded (`ClientCondition`); FluentValidation's own
+  `When`/`Unless`/`Otherwise` lambdas are recorded (`BrowserCondition`), and each rule reaches the
+  core as the public `ClientRule`, `ClientCondition` and `ClientRuleSet`, so the integration uses no
+  core internals; FluentValidation's own
   condition overloads sit on `RecordingValidator<T>`, so a method group or a context condition keeps
   its rules on the server even when nested. `SetValidator`, `RuleForEach(...).SetValidator`,
   `Include` and `ChildRules` read the child validator instance the rule holds; one a factory chooses
@@ -772,13 +777,13 @@ proves it is named in the pull request.
   keeps its component on the server. `.ServerOnly()` keeps a rule on the server. A peer must be a sibling; any other peer is refused when the page renders. The
   rules are read per request, from the validator that request resolves (7.1).
 
-- Promise-returning members (section 5): a method declared with `CallAsync` lowers a call to
-  `do await call(…)`, and a read of one declared with `InvokeAsync<T>` to `let r = await call(…)`
-  before the statement that reads it. A comparison
-  that reads one is lowered as its own `if`, so else-if order and short-circuit hold. Inside an array
+- Promise-returning members (section 5): a method declared with `CallAsync` writes a call as
+  `do await call(…)`, on a component, a plugin or an event's payload alike, and a read of one
+  declared with `InvokeAsync<T>` as `let r = await call(…)` before the statement that reads it. A
+  comparison that reads one is written as its own `if`, so else-if order and short-circuit hold. Inside an array
   operation's lambda or a validation rule such a read is refused at render.
 
-- List paths: a member path may read each item of a list, `filesData[].rawFile`, lowered to
+- List paths: a member path may read each item of a list, `filesData[].rawFile`, written as
   `get(o, ["filesData", "[]", "rawFile"])`; the runtime reads the rest of the path on each item, in
   the path's own mode (1.3). The uploader declares its value that way, so `alis.http` sends `File`
   objects and names no vendor. A list path can be read, not written, called or subscribed to, and

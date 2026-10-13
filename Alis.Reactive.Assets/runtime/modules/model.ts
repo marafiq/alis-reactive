@@ -7,9 +7,9 @@
 //    `fill(record)` writes the same values into a record a request authored, leaf by leaf, so an
 //    authored value beside them (Address.Verified next to Address.City) is kept.
 // M2 `fields`: the same inputs, flat, keyed by MVC binding name; `arrays` names those holding arrays.
-// M3 `valueOf(id)`: one input's value converted to its shape, for a plan that reads a field another
-//    plan rendered; missing when no plan of the composition rendered it. `boundValueOf(id)` is the
-//    same input as a binding read: what validation checks, so the browser judges what the server will.
+// M3 `boundValueOf(id)`: one input's value as a binding read, for a rule or a gather that reads a
+//    field any plan of the composition rendered: what validation checks, so the browser judges what
+//    the server will; missing when no plan rendered it.
 // M4 Each input's `committed` event is re-raised on its element as alis:commit, once per element and
 //    for as long as its owner lives. The plan that renders an input contributes it, so the widget
 //    exists by then, whenever the form that validates it was wired.
@@ -19,7 +19,7 @@ import type { Contribution, Module } from "../objects/modules";
 import type { PlanWorld } from "../objects/world";
 import { Environment } from "../grammar/environment";
 import { evaluate } from "../grammar/evaluate";
-import { bound, shaped } from "../grammar/shape";
+import { bound } from "../grammar/shape";
 import type { Owner } from "../objects/owner";
 import { COMMIT_EVENT } from "../plans/mount-events";
 import { scope } from "../diagnostics/trace";
@@ -45,9 +45,7 @@ export interface ModelObject {
   input(id: string): ModelInput | undefined;
   /** Whether the input's element is on the page. */
   isMounted(input: ModelInput): boolean;
-  /** The value of the input registered under an element id, converted to its shape; missing when none is. */
-  valueOf(id: string): unknown;
-  /** The same input's value as MVC binds it; missing when none is. */
+  /** The value of the input registered under an element id, as MVC binds it; missing when none is. */
   boundValueOf(id: string): unknown;
 }
 
@@ -64,10 +62,6 @@ function inputsOf(planId: string): Map<string, ModelInput> {
 
 function currentValue(input: ModelInput): unknown {
   return evaluate(input.binding.value, { env: Environment.root(), world: input.world });
-}
-
-function readInput(input: ModelInput): unknown {
-  return shaped(currentValue(input), input.binding.shape);
 }
 
 function bindInput(input: ModelInput): unknown {
@@ -112,10 +106,6 @@ function modelObject(planId: string): ModelObject {
     inputs: () => [...inputsOf(planId).values()],
     input: id => inputsOf(planId).get(id),
     isMounted,
-    valueOf(id: string) {
-      const input = mountedInput(planId, id);
-      return input === undefined ? undefined : readInput(input);
-    },
     boundValueOf(id: string) {
       const input = mountedInput(planId, id);
       return input === undefined ? undefined : bindInput(input);
