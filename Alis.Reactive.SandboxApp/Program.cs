@@ -24,6 +24,8 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(2));
 builder.Services.AddReactiveFluentValidation(validation =>
     validation.AddFromAssemblyContaining<Program>());
+// Maple Grove's rate policy: the rate sheet's validator takes it from DI, for the page and the server alike.
+builder.Services.AddSingleton(new Alis.Reactive.SandboxApp.Areas.Sandbox.Models.RateSheetPolicy("Maple Grove", 15000m));
 // The visit board's streams, keyed by session so browser worlds never hear each other.
 builder.Services.AddSingleton<Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought.VisitBoardStreams>();
 

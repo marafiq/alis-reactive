@@ -14,4 +14,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
     /// <summary>The confirmation the server returns once the room is on the rate sheet.</summary>
     public sealed record RoomRateConfirmation(string Confirmation);
+
+    /// <summary>The community's rate policy, registered with the app's services.</summary>
+    /// <param name="Community">The community whose rate sheet this is.</param>
+    /// <param name="MaxMonthlyRate">The most a room may cost a month.</param>
+    public sealed record RateSheetPolicy(string Community, decimal MaxMonthlyRate);
 }

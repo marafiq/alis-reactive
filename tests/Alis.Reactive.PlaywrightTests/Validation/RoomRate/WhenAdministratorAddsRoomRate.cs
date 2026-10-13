@@ -167,6 +167,56 @@ public class WhenAdministratorAddsRoomRate : PlaywrightTestBase
         AssertTheRoomWasSentOnce();
     }
 
+    // Maple Grove's rate policy is a service the app registers; the validator takes it from DI, and the
+    // page's rule comes from that same validator, so the cap and its wording are the policy's.
+    [Test]
+    public async Task a_monthly_rate_over_the_communitys_cap_is_asked_for_in_the_rate_policys_words()
+    {
+        await NavigateAndBoot();
+        await MonthlyRate.Fill("20000");
+        await RoomName.Fill("Maple 214");
+        await CommunityFee.Fill("1500");
+
+        await ClickWhenStable(AddRoom);
+
+        await Expect(_plan.ErrorFor(m => m.MonthlyRate)).ToHaveTextAsync("Maple Grove caps a room at $15,000 a month.");
+        await Expect(RoomRateStatus).ToHaveTextAsync("No room added yet.");
+
+        await MonthlyRate.Fill("15000");
+        await ClickWhenStable(AddRoom);
+        await Expect(RoomRateStatus).ToHaveTextAsync(
+            "Maple 214 added to the rate sheet at $15,000.00 a month, community fee $1,500.00.");
+        AssertTheRoomWasSentOnce();
+    }
+
+    [Test]
+    public async Task a_community_fee_that_is_not_less_than_the_monthly_rate_is_asked_for()
+    {
+        await NavigateAndBoot();
+        await CommunityFee.Fill("5000");
+        await RoomName.Fill("Maple 214");
+        await MonthlyRate.Fill("4200");
+
+        await ClickWhenStable(AddRoom);
+
+        await Expect(_plan.ErrorFor(m => m.CommunityFee)).ToHaveTextAsync("The community fee must be less than the monthly rate.");
+        await Expect(RoomRateStatus).ToHaveTextAsync("No room added yet.");
+
+        // A fee equal to the monthly rate is not less than it either: leaving the fee asks again.
+        await CommunityFee.Fill("4200");
+        await Expect(_plan.ErrorFor(m => m.CommunityFee)).ToHaveTextAsync("");
+        await RoomName.Fill("Maple 214");
+        await Expect(_plan.ErrorFor(m => m.CommunityFee)).ToHaveTextAsync("The community fee must be less than the monthly rate.");
+        await ClickWhenStable(AddRoom);
+        await Expect(RoomRateStatus).ToHaveTextAsync("No room added yet.");
+
+        await CommunityFee.Fill("1500");
+        await ClickWhenStable(AddRoom);
+        await Expect(RoomRateStatus).ToHaveTextAsync(
+            "Maple 214 added to the rate sheet at $4,200.00 a month, community fee $1,500.00.");
+        AssertTheRoomWasSentOnce();
+    }
+
     [Test]
     public async Task a_named_room_with_a_monthly_rate_is_added_to_the_rate_sheet()
     {
