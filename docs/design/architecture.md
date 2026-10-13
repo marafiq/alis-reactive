@@ -1038,7 +1038,7 @@ Grammar first, then the object model, then views area by area. While areas move,
 each plan by its `version`: grammar plans go to the interpreter and today's plans to today's
 executor. The switch is deleted with today's executor when the last area has moved.
 
-0. **Step 0 proof gaps.** The 162 rows, closed on the current code.
+0. **Step 0 proof gaps.** The 162 rows, closed on the current code. (Done after the redesign instead; see section 13.)
 1. **The grammar.** One C# node per production and the generated contract; the interpreter,
    locators, owners, discovery and composition.
 2. **The object model on it.** `JsObject` members, `Value<T>`, `Arg<T>`, the active-scope stack,
@@ -1150,3 +1150,28 @@ built and what is not.
   - a public browser-rule contract (`6ac4198`): `ClientRule`, `ClientCondition` and `ClientRuleSet`;
     the FluentValidation integration builds them with no core internals, and the core's
     `InternalsVisibleTo` names only the contract generator.
+  - shapes, paths and typed sources are each one small type (`d439302`); the open-object shape, which
+    nothing produced, leaves the contract and the runtime.
+- **Step 0, closed after the redesign** (`1ca7c9a` through `a1af1a2`; CI run 38366597452, 1,526
+  Playwright tests passed). Step 0 (sections 10 and 12) was not done before the redesign. Its
+  inventories were re-audited at `7c34a86`: of 155 rows still marked weak, plan-only or missing, 14 were
+  already proven, 9 were obsolete and 132 were open. Each open row now has a Playwright test that fails
+  when the behavior breaks, written against a real-app page and blind-reviewed (197 tests reviewed, 42
+  flagged and fixed); "Status at HEAD" at the end of each `use-cases/` file gives the test. Three rows
+  have no page that could show them (validation 81, http 53 and 121: render-time and analyzer
+  checks), and parts of components rows 54 and 88 stay open with the reason recorded there. The pass
+  found and fixed, each proven by its new test:
+  - a SignalR method declared without a payload never ran: the hub module dropped a call with no
+    argument (`1ca7c9a`);
+  - a server-push event declared without a payload needs a JSON data line, which its declaration now
+    says (`1ca7c9a`);
+  - FusionTooltip's after-open and after-close events subscribed to names EJ2 never raises; they are
+    `AfterOpen` and `AfterClose` (`f856951`);
+  - FusionFileUpload's selected payload declared members EJ2 does not send; it declares `FilesData`
+    and `Cancel` (`f856951`);
+  - NativeRadioGroup and NativeCheckList declared a `Focus` that could not move focus; it is removed
+    (`f856951`);
+  - several server messages for one field read "prints., A wristband"; they read as sentences
+    (`f856951`);
+  - four tests used `page.evaluate`; two of them dispatched PascalCase payload keys, so their reads
+    missed and the else branches ran whatever was sent (`1ca7c9a`).

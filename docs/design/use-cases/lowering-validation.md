@@ -141,7 +141,7 @@ FluentValidation source checked: tag `12.1.1` (net10) and branch `11.x` (= 11.12
 | 112 | radio group change revalidates (hidden root) | `NativeRadioGroup.Committed` = change | n/a | EXPRESSED |
 | 113 | Fusion DropDownList/DatePicker popup change revalidates | `Committed` = change | n/a | EXPRESSED |
 | 114 | Tom Select live validation | `Committed` = change | n/a | EXPRESSED |
-| 115 | wired from boot: leaving an invalid field before any submit shows it | n/a | n/a | GAP: needs O-LIVE (subscribe at boot), and a single `Committed` per input cannot carry the blur + change pair `195d3a1` wired on every field (`live-clear.ts`): an input whose `Committed` is `change` (112-114, architecture.md:916) no longer revalidates when left untouched. At `f36f62e` the form wires DOM `blur` on every field beside the input's re-raised `Committed` event (form.ts:209-226; model.ts:160-175), when the form is created (form.ts:246-253) |
+| 115 | wired from boot: leaving an invalid field before any submit shows it | n/a | n/a | GAP: needs O-LIVE (subscribe at boot), and a single `Committed` per input cannot carry the blur + change pair `195d3a1` wired on every field (`live-clear.ts`): an input whose `Committed` is `change` (112-114, architecture.md:916) no longer revalidates when left untouched. At `f36f62e` the form wires DOM `blur` on every field beside the input's re-raised `Committed` event (form.ts:211-228; model.ts:160-175), when the form is created (form.ts:248-255) |
 | 116 | grid column rules from the same validator block an in-cell edit | `RuleFor(r => r.OpenTasks).InclusiveBetween(0, 7).WithMessage(..)` | EJ2 `range: [[0,7], msg]` | RENDER: O-GRID |
 | 117 | grid mapping: only EJ2-equivalent rules; conditional rules never always-on | same | EJ2 `validationRules` | RENDER: O-GRID |
 
@@ -216,7 +216,7 @@ Counts: EXPRESSED 47, OBLIGATION 51, RENDER 8, GAP 11 (total 117).
   `when` that throws counts as false), skip it; otherwise the form is invalid and the summary gets one entry keyed by the field
   with the message of that field's first test in plan order, active or not (`orchestrator.ts` at `195d3a1`). At `f36f62e`
   the active tests run against the missing value, a length or pattern test passes on it, and the first that fails gives the
-  summary message (form.ts:125-137). Live wiring waits for the element (form.ts:228-239).
+  summary message (form.ts:125-137). Live wiring waits for the element (form.ts:230-241).
 - **O-DISPLAY.** Inline is renderable when `getElementById(id + "_error")` has a parent and neither the parent nor an
   ancestor has the `hidden` attribute or inline `style.display === "none"` (display.ts:57-64). Failing and
   renderable: slot text = message, remove `hidden`, clear `display`, add `alis-has-error` to `getElementById(id)`, remove the
@@ -228,17 +228,17 @@ Counts: EXPRESSED 47, OBLIGATION 51, RENDER 8, GAP 11 (total 117).
 - **O-SRV.** `showErrors(body)`: the same clearing first; body not an object → nothing; `body.errors` not an object → warn,
   nothing; per `[name, messages]`: message = array ? `join(", ")` : string; target = a test field of this form whose input
   `name === name` exactly; no target, no element or slot not renderable → summary entry keyed by `name`; else slot text and
-  `alis-has-error` on the element (form.ts:183-205; display.ts:66-79). At `f36f62e` a body that is not an object runs client
+  `alis-has-error` on the element (form.ts:183-207; display.ts:66-79). At `f36f62e` a body that is not an object runs client
   validation instead (form.ts:176-181).
 - **O-LIVE.** At form creation (boot or slot load, not first `validate()`), per test field with an element, once per element:
-  DOM `input` on `getElementById(id)` → clear its inline slot and class only (form.ts:214, 216); the input's `Committed`
+  DOM `input` on `getElementById(id)` → clear its inline slot and class only (form.ts:216, 218); the input's `Committed`
   event → revalidate: clear inline, remove its summary entry and hide an empty summary, stop if the container is missing, else
   evaluate that field's tests only (form.ts:161-173). Peers and dependants are not revalidated. At `f36f62e` DOM `blur`
-  revalidates too (form.ts:217).
+  revalidates too (form.ts:219).
 - **O-COMMIT.** Text-like inputs declare `Committed` = blur (Native DOM `blur`; EJ2 TextBox `blur`), since today's blur
   revalidation is what 110/111 show and `change` does not fire on leaving an unchanged field.
 - **O-OWN.** Composition concatenates `forms[k].tests` and `inputs` per owner; a slot unload removes exactly that slot's tests,
-  inputs and the form's subscriptions on them, and keeps boot-owned ones (slot.ts:54-60; form.ts:255-259; model.ts:149-153); a reload subscribes to the
+  inputs and the form's subscriptions on them, and keeps boot-owned ones (slot.ts:54-60; form.ts:257-261; model.ts:149-153); a reload subscribes to the
   new elements.
 - **O-GRID.** `FusionGridValidation` reads FV descriptors directly, not the form's tests: unconditional components only;
   NotEmpty → `required`, IEmailValidator → `email`, Url `IBrowserRule` → `url`, ILengthValidator → `minLength`/`maxLength`,

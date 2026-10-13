@@ -129,7 +129,7 @@ These are the dependencies the release inverts.
 - ~~Live clearing hard-codes `"change"` and silently skips a not-ready Fusion object~~: closed. Each input
   declares the event that commits it, the model re-raises it as `alis:commit` and logs a subscription it
   cannot make (`Alis.Reactive.Assets/runtime/modules/model.ts:160-175`); `input`/`blur` still go to the element
-  (`Alis.Reactive.Assets/runtime/modules/form/form.ts:209-226`).
+  (`Alis.Reactive.Assets/runtime/modules/form/form.ts:211-228`).
 - ~~Injection calls `ej.base.append(nodes, container, true)`~~: closed. A slot re-creates the inserted
   `<script>` nodes itself (`Alis.Reactive.Assets/runtime/modules/slot.ts:62-73`), and the RadioGroup and CheckList scripts became
   component code (`Alis.Reactive.Assets/components/native/radio-group.ts:6-14`, `Alis.Reactive.Assets/components/native/check-list.ts:10-20`).
@@ -147,10 +147,10 @@ sync the boxes~~: closed. The scripts are component code (`Alis.Reactive.Assets/
 ## 4. Proofs that are weaker than they look
 
 - HttpMixing else-path tests dispatch PascalCase keys through `Page.EvaluateAsync`
-  (`WhenTriggerDrivenConditionsMixWithHttp.cs:420,455`); payload paths are camelCase, so every read
+  (`WhenTriggerDrivenConditionsMixWithHttp.cs:420,454`); payload paths are camelCase, so every read
   is missing and the test would pass with true values too.
 - ArrayManager send test gathers `array.Count("items")`: the count of the string
-  `"items"` (5) happens to equal the resident count (`ArrayManager/Index.cshtml:44`).
+  `"items"` (5) happens to equal the resident count (`ArrayManager/Index.cshtml:93`).
 - AutoComplete/MultiSelect filtering tests (payload text set on the request) assert only the endpoint
   name in the URL.
 - The 422 summary text is hard-coded in the view; ColorPicker toggle asserts only echo text.
