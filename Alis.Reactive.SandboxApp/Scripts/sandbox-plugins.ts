@@ -52,6 +52,37 @@ registeredPlugins.push({
       .replace(/\s+/g, "-"),
 });
 
+// The visit board's activity list: each line recorded is added to #board-activity, and entries
+// says how many lines the list holds.
+const visitLogLines: string[] = [];
+
+registeredPlugins.push({
+  name: "visitLog",
+  instance: {
+    record: (line: unknown) => {
+      const text = String(line ?? "");
+      visitLogLines.push(text);
+      const list = document.getElementById("board-activity");
+      if (list === null) return;
+      const item = document.createElement("li");
+      item.textContent = text;
+      list.appendChild(item);
+    },
+    get entries(): number {
+      return visitLogLines.length;
+    },
+  },
+});
+
+// The visit board's spoken status line: the plugin is itself the function, and returns nothing.
+registeredPlugins.push({
+  name: "announce",
+  instance: (line: unknown) => {
+    const region = document.getElementById("board-announcer");
+    if (region !== null) region.textContent = String(line ?? "");
+  },
+});
+
 const orderMarks = new Map<string, string[]>();
 
 registeredPlugins.push({

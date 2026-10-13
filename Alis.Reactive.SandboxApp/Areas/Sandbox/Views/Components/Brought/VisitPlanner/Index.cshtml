@@ -111,6 +111,10 @@
                     p.When(planner.Count).Gt(0)
                         .Then(some => some.Element("plan-empty").Hide())
                         .Else(none => none.Element("plan-empty").Show());
+                    // Every visit the week allows is planned when the count meets the planner's capacity.
+                    p.When(args.Count).NotEq(planner.Capacity)
+                        .Then(open => open.Element("week-all-planned").Hide())
+                        .Else(planned => planned.Element("week-all-planned").Show());
                     p.When(args.Value).ArrayContains("sun-11")
                         .Then(brunch => brunch.Element("brunch-planned").Show())
                         .Else(none => none.Element("brunch-planned").Hide());
@@ -152,6 +156,7 @@
                 <p id="quiet-hours" class="text-sm text-warning" hidden><span id="quiet-slot"></span> is during quiet hours; choose another time.</p>
                 <p id="week-full" class="text-sm text-warning" hidden>This week is full: <span id="week-full-capacity"></span> visits.</p>
                 <p id="brunch-planned" class="text-sm text-success" hidden>Sunday brunch with the family is planned.</p>
+                <p id="week-all-planned" class="text-sm text-success" hidden>Every visit this week is planned.</p>
             </native-vstack>
 
             <native-hstack gap="Sm" class="flex-wrap">
@@ -173,7 +178,14 @@
                 @(Html.NativeButton("clear-week", "Clear the week")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
-                        p.Component<VisitPlanner>(m => m.VisitSlots).Clear()))
+                        // A locked week keeps its visits: it is cleared only while the lock is off.
+                        p.When(p.Component<NativeCheckBox>(m => m.LockWeek).Checked).Falsy()
+                            .Then(open =>
+                            {
+                                open.Component<VisitPlanner>(m => m.VisitSlots).Clear();
+                                open.Element("clear-status").Text.Set("");
+                            })
+                            .Else(locked => locked.Element("clear-status").Text.Set("Unlock the week before clearing it."))))
                 @(Html.NativeButton("share-week", "Share the week with the family")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -202,7 +214,7 @@
                     }))
             </native-hstack>
 
-            <native-text color="Secondary"><span id="brunch-status"></span></native-text>
+            <native-text color="Secondary"><span id="brunch-status"></span> <span id="clear-status"></span></native-text>
             <native-text><span id="share-status"></span> <span id="family-summary"></span></native-text>
             <native-text><span id="visit-confirmation"></span></native-text>
         </native-vstack>

@@ -51,6 +51,8 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
     private ILocator Confirmation => Page.Locator("#visit-confirmation");
     private ILocator CompanionPlanned => Page.Locator("#companion-planned");
     private ILocator CompanionHeld => Page.Locator("#companion-held");
+    private ILocator WeekAllPlanned => Page.Locator("#week-all-planned");
+    private ILocator ClearStatus => Page.Locator("#clear-status");
 
     private ILocator BookFirstOpen => Page.Locator("#book-first-open");
     private ILocator CheckBrunch => Page.Locator("#check-brunch");
@@ -346,6 +348,49 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
         await Expect(PlannedCount).ToHaveTextAsync("0");
         await Expect(VisitsLeft).ToHaveTextAsync("3");
         await Expect(PlanEmpty).ToBeVisibleAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // NotEq between two values read when the change happens: the change's count and the planner's
+    // capacity (3 for Margaret). At 3 of 3 they are equal and the note shows; one released, it hides. An
+    // Eq in its place, or a capacity never read, would never show it.
+    [Test]
+    public async Task every_visit_of_the_week_planned_is_noted_until_one_is_released()
+    {
+        await OpenPlanner();
+        await ChooseMargaret();
+        await Planner.Time("Mon 10:00 AM").ClickAsync();
+        await Planner.Time("Tue 3:00 PM").ClickAsync();
+
+        await Planner.Time("Sat 11:00 AM").ClickAsync();
+        await Expect(WeekAllPlanned).ToBeVisibleAsync();
+
+        await Planner.Time("Tue 3:00 PM").ClickAsync();
+        await Expect(PlannedCount).ToHaveTextAsync("2");
+        await Expect(WeekAllPlanned).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // Falsy over the lock box: the planner itself would clear a locked week, so only the guard keeps the
+    // visits. An always-true Falsy, or a Checked never read (missing is falsy), would clear them.
+    [Test]
+    public async Task a_locked_week_is_not_cleared_until_it_is_unlocked()
+    {
+        await OpenPlanner();
+        await ChooseMargaret();
+        await Planner.Time("Mon 10:00 AM").ClickAsync();
+        await Planner.Time("Sat 11:00 AM").ClickAsync();
+        await _plan.NativeCheckBox(m => m.LockWeek).Check();
+
+        await ClearWeek.ClickAsync();
+        await Expect(ClearStatus).ToHaveTextAsync("Unlock the week before clearing it.");
+        await Expect(Planner.Booked).ToHaveCountAsync(2);
+
+        await _plan.NativeCheckBox(m => m.LockWeek).Input.UncheckAsync();
+        await ClearWeek.ClickAsync();
+        await Expect(Planner.Booked).ToHaveCountAsync(0);
+        await Expect(PlannedCount).ToHaveTextAsync("0");
+        await Expect(ClearStatus).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
