@@ -64,10 +64,14 @@ function bind(name: string, expr: Expr, awaits: boolean, scope: Scope): Completi
 }
 
 function branch(statement: Extract<Statement, { kind: "if" }>, scope: Scope): Completion {
+  let matched = false;
+  let completion: Completion = undefined;
   for (const arm of statement.arms) {
-    if (evaluate(arm.when, scope)) return executeBlock(arm.then, childScope(scope));
+    if (!evaluate(arm.when, scope)) continue;
+    matched = true;
+    completion = executeBlock(arm.then, childScope(scope));
   }
-  return executeBlock(statement.else, childScope(scope));
+  return matched ? completion : executeBlock(statement.else, childScope(scope));
 }
 
 // Every block starts; the statement completes when all have settled. A failure is logged and does
