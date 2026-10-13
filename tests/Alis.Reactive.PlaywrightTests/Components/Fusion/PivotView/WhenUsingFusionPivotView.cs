@@ -118,6 +118,27 @@ public class WhenUsingFusionPivotView : PlaywrightTestBase
     }
 
     [Test]
+    public async Task saving_a_view_confirms_it_in_a_brief_toast_that_goes_away_by_itself()
+    {
+        var facility = "pinecrest-" + Guid.NewGuid().ToString("N")[..8];
+        await NavigateToAndWaitForBoot($"/Sandbox/Components/PivotView?facilityId={facility}");
+        await Expect(Page.Locator("#care-pivot")).ToContainTextAsync("Jan", new() { Timeout = 10000 });
+        // The layout's toast container holds one element per toast shown.
+        var toast = Page.Locator("#alisFusionToast .e-toast");
+
+        await Page.Locator("#save-view-btn").ClickAsync();
+
+        await Expect(toast).ToHaveCountAsync(1, new() { Timeout = 10000 });
+        await Expect(toast).ToContainTextAsync("View saved.");
+        await Expect(toast.Locator(".e-toast-progress")).ToHaveCountAsync(1);
+        await Expect(toast.Locator(".e-toast-close-icon")).ToHaveCountAsync(0);
+
+        // It counts down 2.5 seconds and fades; a toast left at the default five seconds would still show.
+        await Expect(toast).ToHaveCountAsync(0, new() { Timeout = 4500 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task returning_to_a_saved_view_brings_back_the_census_it_showed()
     {
         // A facility of this test's own, so the saved view is this test's alone.

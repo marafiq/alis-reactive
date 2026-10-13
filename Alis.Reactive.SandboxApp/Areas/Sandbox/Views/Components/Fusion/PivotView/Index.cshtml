@@ -1,6 +1,7 @@
 @model PivotViewModel
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.AppLevel
 @using Syncfusion.EJ2.PivotView
 @{
     ViewData["Title"] = "FusionPivotView";
@@ -78,7 +79,18 @@
                          .Set(x => x.FacilityId, p.Url<PivotViewQuery>().Get(q => q.FacilityId))
                          .Set(x => x.Layout, p.Component<FusionPivotView>("care-pivot").GetPersistData(false)))
                      .Response(r => r.OnSuccess<PivotLayoutResponse>((json, s) =>
-                         s.Element("view-status").Text.Set(json.Get(x => x.Message))));
+                     {
+                         s.Element("view-status").Text.Set(json.Get(x => x.Message));
+                         // A brief confirmation: it counts down and goes away by itself, so it needs no close button.
+                         var toast = s.Component<FusionToast>();
+                         toast.Title.Set("Census report");
+                         toast.Content.Set(json.Get(x => x.Message));
+                         toast.TimeOut.Set(2500);
+                         toast.ShowProgressBar.Set(true);
+                         toast.ShowCloseButton.Set(false);
+                         toast.Tone.Set(FusionToastTone.Success);
+                         toast.Show();
+                     }));
                 }))
 
             @(Html.NativeButton("restore-view-btn", "Return to Saved View")
