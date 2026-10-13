@@ -1,3 +1,7 @@
+using System.Text.RegularExpressions;
+using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Kanban;
 
 [TestFixture]
@@ -84,9 +88,6 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
             .ToContainTextAsync("Resident: Eleanor Reed", new() { Timeout = 5000 });
         await Expect(Page.Locator("#care-kanban"))
             .ToContainTextAsync("ESCALATED", new() { Timeout = 5000 });
-
-        var renderedSummary = await Page.Locator("#kanban-rendered-summary").TextContentAsync();
-        Assert.That(renderedSummary, Is.Not.EqualTo("none"));
 
         AssertNoConsoleErrors();
     }
@@ -226,7 +227,7 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
     }
 
     [Test]
-    public async Task column_spinner_and_dialog_methods_execute_against_kanban_object()
+    public async Task hiding_showing_adding_and_deleting_columns_changes_the_board()
     {
         await NavigateAndWaitForKanban();
 
@@ -253,16 +254,6 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
             .ToHaveTextAsync("blocked deleted", new() { Timeout = 5000 });
         await Expect(Page.Locator("#care-kanban .e-header-text").Filter(new() { HasTextString = "Blocked" }))
             .ToHaveCountAsync(0, new() { Timeout = 5000 });
-
-        await Page.Locator("#kanban-spinner-btn").ClickAsync();
-        await Expect(Page.Locator("#kanban-spinner-status"))
-            .ToHaveTextAsync("spinner toggled", new() { Timeout = 5000 });
-
-        await Page.Locator("#kanban-open-close-dialog-btn").ClickAsync();
-        await Expect(Page.Locator("#kanban-dialog-status"))
-            .ToHaveTextAsync("open close requested", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#care-kanban_dialog_wrapper.e-popup-open"))
-            .ToHaveCountAsync(0, new() { Timeout = 10000 });
 
         AssertNoConsoleErrors();
     }
@@ -385,4 +376,77 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task an_audit_shows_the_board_spinner_until_its_answer_arrives()
+    {
+        var auditReleased = new SemaphoreSlim(0);
+        await Page.RouteAsync("**/api/kanban/audit", async route =>
+        {
+            await auditReleased.WaitAsync(TimeSpan.FromSeconds(30));
+            await route.ContinueAsync();
+        });
+        await NavigateAndWaitForKanban();
+        var spinner = Page.Locator("#care-kanban > .e-spinner-pane");
+
+        await Page.Locator("#kanban-audit-btn").ClickAsync();
+
+        // ShowSpinner runs before the request; the audit is held, so the spinner stays up.
+        await Expect(spinner).ToHaveClassAsync(new Regex(@"\be-spin-show\b"), new() { Timeout = 5000 });
+
+        auditReleased.Release();
+
+        // HideSpinner runs in Finally once the answer is in.
+        await Expect(Page.Locator("#kanban-audit-summary"))
+            .ToHaveTextAsync("audit:2:1:2", new() { Timeout = 10000 });
+        await Expect(spinner).ToHaveClassAsync(new Regex(@"\be-spin-hide\b"), new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_card_another_coordinator_is_updating_closes_its_dialog_and_says_who_has_it()
+    {
+        var holdReleased = new SemaphoreSlim(0);
+        await Page.RouteAsync("**/api/kanban/cards/101/hold", async route =>
+        {
+            await holdReleased.WaitAsync(TimeSpan.FromSeconds(30));
+            await route.ContinueAsync();
+        });
+        await NavigateAndWaitForKanban();
+        var editDialog = Page.Locator("#care-kanban_dialog_wrapper.e-dialog.e-popup-open");
+
+        await Page.Locator("#care-kanban .e-card[data-id='101']").First.DblClickAsync();
+
+        // The edit dialog opens while the board asks who holds the card.
+        await Expect(editDialog).ToBeVisibleAsync(new() { Timeout = 10000 });
+
+        holdReleased.Release();
+
+        // Ruth holds card 101, so CloseDialog closes it and the board says so.
+        await Expect(Page.Locator("#kanban-lock-note"))
+            .ToHaveTextAsync("Ruth Alvarez is updating this task; try again when she is done.", new() { Timeout = 10000 });
+        await Expect(editDialog).ToHaveCountAsync(0, new() { Timeout = 10000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task the_board_flags_escalated_tasks_only_while_it_shows_some()
+    {
+        await NavigateAndWaitForKanban();
+
+        // Assisted Living's two tasks are escalated; each card's cardRendered payload says so.
+        await Expect(Page.Locator("#kanban-escalated"))
+            .ToHaveTextAsync("This board has escalated tasks.", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#kanban-escalated")).ToBeVisibleAsync();
+
+        await new DropDownListLocator(Page, FacilityId).Select("Memory Care");
+
+        // Memory Care's tasks render without the flag.
+        await Expect(Page.Locator("#care-kanban")).ToContainTextAsync("Care plan review", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#care-kanban")).ToContainTextAsync("Room transfer checklist");
+        await Expect(Page.Locator("#kanban-escalated")).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    private static readonly string FacilityId = IdGenerator.For<KanbanModel>(m => m.SelectedFacilityId);
 }

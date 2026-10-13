@@ -49,6 +49,19 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public int CardId { get; init; }
     }
 
+    /// <summary>A question about one card, <c>GET api/kanban/cards/{cardId}/hold</c>: who is updating it.</summary>
+    public sealed class KanbanCardHoldQuery
+    {
+        public int CardId { get; init; }
+    }
+
+    /// <summary>Who holds a card for an update; empty when no one does.</summary>
+    public sealed class KanbanCardHold
+    {
+        public string HeldBy { get; init; } = "";
+        public string Message { get; init; } = "";
+    }
+
     /// <summary>The body the page sends with <c>PUT api/kanban/cards/{cardId}</c>: where the update came from; the endpoint does not read it.</summary>
     public sealed class KanbanCardUpdateRequest
     {

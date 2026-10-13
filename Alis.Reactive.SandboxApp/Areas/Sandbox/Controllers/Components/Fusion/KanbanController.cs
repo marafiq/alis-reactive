@@ -154,6 +154,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
+        // Ruth Alvarez is updating the fall-risk assessment at another desk; no other card is held.
+        [HttpGet("~/api/kanban/cards/{cardId:int}/hold")]
+        public IActionResult Hold(int cardId)
+        {
+            return Ok(cardId == 101
+                ? new KanbanCardHold { HeldBy = "Ruth Alvarez", Message = "Ruth Alvarez is updating this task; try again when she is done." }
+                : new KanbanCardHold());
+        }
+
         [HttpGet("~/api/kanban/card/{cardId}/summary")]
         public IActionResult Summary(int cardId)
         {

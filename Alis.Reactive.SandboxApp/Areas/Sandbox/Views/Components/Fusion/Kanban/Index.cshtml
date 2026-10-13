@@ -55,6 +55,7 @@
                     .Reactive(evt => evt.Change, (args, p) =>
                     {
                         p.Element("kanban-status").Text.Set("loading");
+                        p.Element("kanban-escalated").Hide();
                         p.Get("/api/kanban/board")
                          .Gather<KanbanBoardQuery>(g => g.Form(m => m.SelectedFacilityId))
                          .Response(r => r.OnSuccess<KanbanBoardResponse>((json, s) =>
@@ -143,14 +144,6 @@
                     p.Component<FusionKanban>("care-kanban").DeleteColumn(2);
                     p.Element("kanban-column-status").Text.Set("blocked deleted");
                 }))
-            @(Html.NativeButton("kanban-spinner-btn", "Spinner")
-                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionKanban>("care-kanban").ShowSpinner();
-                    p.Component<FusionKanban>("care-kanban").HideSpinner();
-                    p.Element("kanban-spinner-status").Text.Set("spinner toggled");
-                }))
             @(Html.NativeButton("kanban-open-dialog-btn", "Open Dialog")
                 .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -163,19 +156,13 @@
                 {
                     p.Component<FusionKanban>("care-kanban").OpenDialog<KanbanTaskCard>("Edit", KanbanSeedData.UpdatedCard());
                 }))
-            @(Html.NativeButton("kanban-open-close-dialog-btn", "Open + Close Dialog")
-                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionKanban>("care-kanban").OpenDialog<KanbanTaskCard>("Add", KanbanSeedData.NewCard(951, "AL"));
-                    p.Component<FusionKanban>("care-kanban").CloseDialog();
-                    p.Element("kanban-dialog-status").Text.Set("open close requested");
-                }))
             @(Html.NativeButton("kanban-audit-btn", "Audit Board")
                 .CssClass("rounded-md bg-accent px-3 py-2 text-sm font-medium text-white")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var board = p.Component<FusionKanban>("care-kanban");
+                    // The board shows its spinner while the audit is out.
+                    board.ShowSpinner();
                     p.Post("/api/kanban/audit")
                      .Gather<KanbanAuditRequest>(g => g
                          .Set(x => x.Cards, board.Cards<KanbanTaskCard>())
@@ -187,14 +174,17 @@
                          s.Element("kanban-audit-total").Text.Set(json.Get(x => x.TotalCards));
                          s.Element("kanban-audit-open").Text.Set(json.Get(x => x.OpenCards));
                          s.Element("kanban-audit-al").Text.Set(json.Get(x => x.AssistedLivingCards));
-                     }));
+                     }))
+                     .Finally(f => f.Component<FusionKanban>("care-kanban").HideSpinner());
                 }))
         </native-hstack>
+
+        <p id="kanban-escalated" class="mt-4 text-sm font-medium text-danger" hidden>This board has escalated tasks.</p>
+        <p id="kanban-lock-note" class="mt-2 text-sm text-warning" hidden></p>
 
         <native-vstack gap="Xs" class="mt-4 font-mono text-sm">
             <p>Command: <span id="kanban-command-status">idle</span></p>
             <p>Column: <span id="kanban-column-status">idle</span></p>
-            <p>Spinner: <span id="kanban-spinner-status">idle</span></p>
             <p>Dialog: <span id="kanban-dialog-status">idle</span></p>
             <p>Dialog close: <span id="kanban-dialog-close-status">none</span></p>
             <p>Action begin: <span id="kanban-action-begin">none</span></p>
@@ -207,7 +197,6 @@
             <p>Move: <span id="kanban-move-status">none</span></p>
             <p>Clicked: <span id="kanban-clicked-summary">none</span></p>
             <p>Double clicked: <span id="kanban-double-clicked-summary">none</span></p>
-            <p>Rendered: <span id="kanban-rendered-summary">none</span></p>
             <p>Route summary: <span id="kanban-route-summary">none</span></p>
             <p>Audit: <span id="kanban-audit-summary">none</span></p>
             <p>Audit counts: <span id="kanban-audit-total">0</span>/<span id="kanban-audit-open">0</span>/<span id="kanban-audit-al">0</span></p>
@@ -277,7 +266,8 @@
             })
             .Reactive(evt => evt.CardRendered<KanbanTaskCard>(), (args, p) =>
             {
-                p.Element("kanban-rendered-summary").Text.Set(args.Data.Get(x => x.Summary));
+                p.When(args.Data.Get(x => x.IsEscalated)).Truthy()
+                 .Then(t => t.Element("kanban-escalated").Show());
             })
             .Reactive(evt => evt.DragStart<KanbanTaskCard>(), (args, p) =>
             {
@@ -324,6 +314,18 @@
             .Reactive(evt => evt.DialogOpen<KanbanTaskCard>(), (args, p) =>
             {
                 p.Element("kanban-dialog-status").Text.Set(args.RequestType);
+
+                // A card another coordinator is updating closes its dialog again and says who has it.
+                p.Get("/api/kanban/cards/{cardId}/hold")
+                 .Gather<KanbanCardHoldQuery>(g => g.Set(x => x.CardId, args.Data.Get(x => x.Id)))
+                 .Response(r => r.OnSuccess<KanbanCardHold>((hold, s) =>
+                     s.When(hold.Get(x => x.HeldBy)).NotEmpty()
+                      .Then(held =>
+                      {
+                          held.Component<FusionKanban>("care-kanban").CloseDialog();
+                          held.Element("kanban-lock-note").Text.Set(hold.Get(x => x.Message));
+                          held.Element("kanban-lock-note").Show();
+                      })));
             })
             .Reactive(evt => evt.DialogClose<KanbanTaskCard>(), (args, p) =>
             {
