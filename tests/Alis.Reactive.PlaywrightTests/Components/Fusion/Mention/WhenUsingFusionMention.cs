@@ -38,8 +38,11 @@ public class WhenUsingFusionMention : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The Change payload's value is the chosen item's markup: with Highlight on, the letters searched
+    // ("No") are wrapped in a highlight span. Html.Set builds that span, so the line reads "Nora Nurse"
+    // with "No" marked; written as text it would read the raw markup, and the span would not exist.
     [Test]
-    public async Task selecting_item_fires_typed_changed_event()
+    public async Task the_chosen_care_team_member_shows_with_the_searched_letters_marked()
     {
         await NavigateAndWaitForMention();
 
@@ -48,7 +51,8 @@ public class WhenUsingFusionMention : PlaywrightTestBase
         await Page.Locator(".e-popup .e-list-item").Filter(new() { HasTextString = "Nora Nurse" }).ClickAsync();
 
         await Expect(Page.Locator("#mention-value"))
-            .ToContainTextAsync("Nora Nurse", new() { Timeout = 10000 });
+            .ToHaveTextAsync("Nora Nurse", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#mention-value .e-highlight")).ToHaveTextAsync("No");
 
         AssertNoConsoleErrors();
     }
