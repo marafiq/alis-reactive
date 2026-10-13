@@ -30,6 +30,19 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         new(Page, IdGenerator.For<PointInTimeScheduleModel>(m => m.NeedsCoverageOnly));
     private DropDownListLocator Facility =>
         new(Page, IdGenerator.For<PointInTimeScheduleModel>(m => m.SelectedFacilityId));
+    private DropDownListLocator NewShiftStaff =>
+        new(Page, IdGenerator.For<NewAssignmentModel>(m => m.StaffId));
+
+    // The schedule's shifts for one staff member or label, as the schedule renders them.
+    private ILocator ShiftsOf(string subject) =>
+        Page.Locator("#shift-schedule .e-appointment").Filter(new() { HasText = subject });
+
+    // A shift by its subject, start and shift column, read from the name the schedule gives it for
+    // screen readers ("AM Shift"s event - Jane Blonde (CNA) Begin From Tuesday, October 13, 2026 at
+    // 4:00:00 PM ...").
+    private ILocator ShiftAt(string subject, DateTime start, int shiftColumn) =>
+        Page.Locator($"#shift-schedule .e-appointment[data-group-index='{shiftColumn}']" +
+            $"[aria-label*='{subject} Begin From {start.ToString("dddd, MMMM d, yyyy 'at' h:mm:ss tt", CultureInfo.InvariantCulture)}']");
 
     // A work cell of the week's grid, by its start (data-date is the start's epoch milliseconds in the
     // browser's zone, the same zone the tests run in) and its shift column (0 = AM, 1 = PM, 2 = Night).
@@ -186,11 +199,13 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
         // Pick a staff member from the radio group (pre-visible options, no popup),
         // then save.
+        var tomsShifts = await ShiftsOf("Tom Hardy (LPN)").CountAsync();
         await Page.Locator("#assignment-form").GetByText("Tom Hardy (LPN)").ClickAsync();
         await ClickWhenStable(Page.Locator("#btn-save-assignment"));
 
-        // The save persists server-side (POST /api/schedule/assign); the schedule
-        // reloads and one fewer shift needs coverage.
+        // The save persists server-side (POST /api/schedule/assign); the shift shows Tom Hardy where
+        // it is, the schedule reloads the week, and one fewer shift needs coverage.
+        await Expect(ShiftsOf("Tom Hardy (LPN)")).ToHaveCountAsync(tomsShifts + 1, new() { Timeout = 15000 });
         await Expect(openShifts).ToHaveTextAsync((before - 1).ToString(), new() { Timeout = 15000 });
 
         // Reload the whole page: the assignment is still there — it persisted on the
@@ -252,6 +267,56 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
         // The empty cell's own QuickInfo is cancelled in popupOpen, so only the dialog shows.
         await Expect(OpenQuickInfo).ToHaveCountAsync(0);
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task assigning_staff_to_an_open_hour_adds_the_shift_to_the_week()
+    {
+        await NavigateAndWaitForSchedule();
+        var weekLoads = 0;
+        Page.Request += (_, request) =>
+        {
+            if (request.Url.Contains("/api/schedule/assignments")) Interlocked.Increment(ref weekLoads);
+        };
+        await ClickOpenHourToday();
+        await Expect(NewAssignmentDialog).ToContainTextAsync("Staff Member", new() { Timeout = 10000 });
+
+        await NewShiftStaff.Select("Jane Blonde (CNA)");
+        await ClickWhenStable(Page.Locator("#btn-create-assignment"));
+
+        await Expect(NewAssignmentDialog).ToBeHiddenAsync(new() { Timeout = 10000 });
+        await Expect(ShiftAt("Jane Blonde (CNA)", OpenHourToday, shiftColumn: 0)).ToBeVisibleAsync(new() { Timeout = 10000 });
+        Assert.That(weekLoads, Is.EqualTo(0), "The new shift joins the week the schedule shows; the week is not reloaded.");
+
+        // The shift was saved in this coordinator's schedule, so it is there after a reload.
+        await Page.ReloadAsync();
+        await WaitForTraceMessage("booted", 10000);
+        await Expect(ShiftAt("Jane Blonde (CNA)", OpenHourToday, shiftColumn: 0)).ToBeVisibleAsync(new() { Timeout = 10000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task cancelling_a_shift_takes_it_off_the_week()
+    {
+        await NavigateAndWaitForSchedule();
+        await ClickOpenHourToday();
+        await Expect(NewAssignmentDialog).ToContainTextAsync("Staff Member", new() { Timeout = 10000 });
+        await NewShiftStaff.Select("Pat Night (CNA)");
+        await ClickWhenStable(Page.Locator("#btn-create-assignment"));
+        var patsShift = ShiftAt("Pat Night (CNA)", OpenHourToday, shiftColumn: 0);
+        await Expect(patsShift).ToBeVisibleAsync(new() { Timeout = 10000 });
+
+        await OpenShift(patsShift);
+        await Page.GetByText("Edit", new() { Exact = true }).ClickAsync();
+        await Expect(Page.Locator("#assignment-form")).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await ClickWhenStable(Page.Locator("#btn-cancel-shift"));
+
+        await Expect(patsShift).ToHaveCountAsync(0, new() { Timeout = 10000 });
+        await Page.ReloadAsync();
+        await WaitForTraceMessage("booted", 10000);
+        await Expect(StaffedShifts.First).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(patsShift).ToHaveCountAsync(0);
         AssertNoConsoleErrors();
     }
 

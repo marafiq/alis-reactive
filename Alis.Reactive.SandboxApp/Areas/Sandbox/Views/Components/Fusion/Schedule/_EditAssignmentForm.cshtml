@@ -33,14 +33,27 @@
                  .Gather<AssignStaffRequest>(g => g.Form(m => m.AssignmentId, m => m.StaffId))
                  .Validate<EditAssignmentValidator>("assignment-form")
                  .Response(r => r
-                     .OnSuccess(s =>
+                     .OnSuccess<ShiftAssignment>((shift, s) =>
                      {
-                         s.Element("edit-status").Text.Set("Saved successfully");
                          s.Component<NativeDrawer>().Close();
-                         // Parent plan listens for this event and refreshes the schedule after the save.
-                         s.Dispatch(PointInTimeScheduleEvents.ScheduleAssignmentSaved);
+                         // The shift shows its new staff where it is; the schedule then reloads the week
+                         // for the open-shift count, as after any change to an event.
+                         s.Component<FusionSchedule>("shift-schedule").SaveEvent(shift, ScheduleAction.Save);
                      })
                      .OnError(400, e => e.ValidationErrors("assignment-form")));
+            }))
+
+        @(Html.NativeButton("btn-cancel-shift", "Cancel Shift")
+            .CssClass("px-4 py-2 rounded-md border border-red-300 text-sm font-medium text-red-700 hover:bg-red-50")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/api/schedule/cancel-shift")
+                 .Gather<CancelShiftRequest>(g => g.Form(m => m.AssignmentId))
+                 .Response(r => r.OnSuccess<ShiftAssignment>((shift, s) =>
+                 {
+                     s.Component<NativeDrawer>().Close();
+                     s.Component<FusionSchedule>("shift-schedule").DeleteEvent(shift.Get(x => x.Id), ScheduleAction.Delete);
+                 }));
             }))
 
         @(Html.NativeButton("btn-cancel-assignment", "Cancel")
@@ -51,7 +64,6 @@
             }))
     </native-hstack>
 
-    <p id="edit-status" class="text-sm text-text-muted"></p>
     </form>
 </native-vstack>
 

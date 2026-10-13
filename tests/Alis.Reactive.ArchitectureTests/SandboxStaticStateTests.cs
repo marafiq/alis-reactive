@@ -40,9 +40,6 @@ public class SandboxStaticStateTests
 
         // -- Process-global debt: shared across browser worlds, real collision
         //    surface. Each names its removal trigger.
-        // Schedule pre-pattern store, keyed by facility id, not by world —
-        // remove with the Schedule journey-slice refactor.
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Models.FakeScheduleData.Store",
         // Deleted-row set shared across worlds — remove when the ActionLink
         // slice gets a per-world store.
         "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline.HttpController._deletedNativeActionLinkRows",

@@ -51,10 +51,11 @@
                          m => m.StartTime, m => m.EndTime, m => m.ShiftId, m => m.FacilityId, m => m.StaffId, m => m.Notes))
                      .Validate<NewAssignmentValidator>("new-assignment-form")
                      .Response(r => r
-                         .OnSuccess(s =>
+                         .OnSuccess<ShiftAssignment>((shift, s) =>
                          {
                              s.Component<FusionDialog>("new-assignment-dialog").Hide();
-                             s.Dispatch(PointInTimeScheduleEvents.ScheduleAssignmentSaved);
+                             // The new shift joins the week the schedule shows; the week is not reloaded.
+                             s.Component<FusionSchedule>("shift-schedule").AddEvent(shift);
                          })
                          .OnError(400, e => e.ValidationErrors("new-assignment-form")));
                 }))

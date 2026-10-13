@@ -39,8 +39,9 @@ namespace Alis.Reactive.Fusion.Components
         public TypedSource<TEvent[]> GetEvents<TEvent>() where TEvent : class => Invoke<TEvent[]>();
 
         /// <summary>Adds an event.</summary>
+        /// <typeparam name="TEvent">Your event class, or an array of it.</typeparam>
         /// <param name="data">The event to add, or an array of events.</param>
-        public void AddEvent(Arg<object> data) => Call(data);
+        public void AddEvent<TEvent>(Arg<TEvent> data) where TEvent : class => Call(data);
 
         /// <summary>Saves an edited event.</summary>
         /// <typeparam name="TEvent">Your event class.</typeparam>

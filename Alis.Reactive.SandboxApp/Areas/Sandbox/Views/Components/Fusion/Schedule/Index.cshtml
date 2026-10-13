@@ -31,24 +31,6 @@
                 .EventButton("Reassign", PointInTimeScheduleEvents.ScheduleReassign, e => e.Id, m => m.Id, "e-small"))
         .Render();
 
-    Html.On(plan, t => t.CustomEvent(PointInTimeScheduleEvents.ScheduleAssignmentSaved, p =>
-    {
-        p.Element("status").Text.Set("Refreshing after save...");
-        p.Get("/api/schedule/assignments")
-         .Gather<ScheduleAssignmentsQuery>(g => g
-             .Form(m => m.SelectedFacilityId)
-             .Set(x => x.CurrentView, p.Component<FusionSchedule>("shift-schedule").CurrentView)
-             .Set(x => x.CurrentDate, p.Component<FusionSchedule>("shift-schedule").SelectedDate))
-         .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
-         {
-             var shiftSchedule = s.Component<FusionSchedule>("shift-schedule");
-             shiftSchedule.EventDataSource.Set(json.Get(j => j.Assignments));
-             shiftSchedule.DataBind();
-             s.Element("status").Text.Set("Refreshed after assignment");
-             s.Element("unassigned-count").Text.Set(json.Get(j => j.UnassignedCount));
-         }));
-    }));
-
     // FusionTemplate.EventButton dispatches detail.id for the parent Active Plan to load the drawer form.
     Html.On(plan, t => t.CustomEvent<ScheduleActionPayload>(PointInTimeScheduleEvents.ScheduleEdit, (payload, p) =>
     {

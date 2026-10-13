@@ -165,6 +165,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? Notes { get; set; }
     }
 
+    /// <summary>The request of <c>POST api/schedule/cancel-shift</c>: the shift to take off the schedule.</summary>
+    public sealed class CancelShiftRequest
+    {
+        public int AssignmentId { get; set; }
+    }
+
     /// <summary>
     /// New-assignment form model loaded into FusionDialog via Into().
     /// CellClicked provides startTime/endTime/groupIndex — controller maps groupIndex to shiftId.
@@ -182,7 +188,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     /// <summary>The document events the PointInTimeSchedule page raises and hears.</summary>
     public static class PointInTimeScheduleEvents
     {
-        public static readonly AppEvent ScheduleAssignmentSaved = AppEvent.Named("schedule:assignment-saved");
         public static readonly AppEvent<ScheduleActionPayload> ScheduleEdit = AppEvent.Named<ScheduleActionPayload>("schedule:edit");
         public static readonly AppEvent<ScheduleActionPayload> ScheduleReassign = AppEvent.Named<ScheduleActionPayload>("schedule:reassign");
     }

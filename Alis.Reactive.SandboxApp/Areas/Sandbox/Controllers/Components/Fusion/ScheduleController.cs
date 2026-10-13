@@ -4,13 +4,15 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     /// <summary>
-    /// Point-in-Time Schedule sandbox — server-driven shift schedule.
-    /// Mutations persist in-memory so POST changes are visible on GET refresh.
+    /// Point-in-Time Schedule sandbox — server-driven shift schedule. Each browser's changes live in its
+    /// own <see cref="ScheduleWorld"/>, so a save is visible on the next GET and to no other browser.
     /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/Schedule")]
     public class ScheduleController : Controller
     {
+        private ScheduleWorld World => new(HttpContext.Session);
+
         [HttpGet("")]
         public IActionResult Index()
         {
@@ -35,7 +37,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 anchor = DateTime.Today;
 
             var (rangeStart, rangeEnd) = CalculateDateRange(anchor, currentView ?? "Week");
-            var data = FakeScheduleData.GetAssignments(facilityId, rangeStart, rangeEnd);
+            var data = World.GetAssignments(facilityId, rangeStart, rangeEnd);
             return Ok(data);
         }
 
@@ -103,7 +105,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         /// <summary>
-        /// Assigns staff to a shift slot in the in-memory schedule store.
+        /// Assigns staff to a shift slot in this browser's schedule.
         /// Subsequent data-source loads return the updated assignment.
         /// </summary>
         [HttpPost("~/api/schedule/assign")]
@@ -112,34 +114,19 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             if (request.StaffId == null)
                 return BadRequest(new { error = "Staff member is required." });
 
-            var updated = FakeScheduleData.AssignStaff(request.AssignmentId, request.StaffId.Value);
+            var updated = World.AssignStaff(request.AssignmentId, request.StaffId.Value);
             if (updated == null)
                 return NotFound(new { error = "Assignment or staff not found." });
 
-            return Ok(new
-            {
-                success = true,
-                message = $"{updated.StaffName} ({updated.StaffRole}) assigned.",
-                assignment = updated,
-            });
+            return Ok(updated);
         }
 
-        /// <summary>
-        /// Clears the staff assignment for a shift slot in the in-memory schedule store.
-        /// </summary>
-        [HttpPost("~/api/schedule/unassign")]
-        public IActionResult UnassignStaff([FromBody] AssignStaffRequest request)
+        /// <summary>Takes a shift off this browser's schedule and returns it.</summary>
+        [HttpPost("~/api/schedule/cancel-shift")]
+        public IActionResult CancelShift([FromBody] CancelShiftRequest request)
         {
-            var updated = FakeScheduleData.UnassignStaff(request.AssignmentId);
-            if (updated == null)
-                return NotFound(new { error = "Assignment not found." });
-
-            return Ok(new
-            {
-                success = true,
-                message = $"Slot unassigned. Needs coverage.",
-                assignment = updated,
-            });
+            var cancelled = World.CancelAssignment(request.AssignmentId);
+            return cancelled == null ? NotFound(new { error = "Assignment not found." }) : Ok(cancelled);
         }
 
         /// <summary>
@@ -149,7 +136,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         [HttpGet("EditForm")]
         public IActionResult EditForm(int assignmentId)
         {
-            var assignment = FakeScheduleData.FindAssignment(assignmentId);
+            var assignment = World.FindAssignment(assignmentId);
             var currentStaffId = assignment?.StaffName != null
                 ? FakeScheduleData.Staff.FirstOrDefault(s => s.Name == assignment.StaffName)?.Id
                 : null;
@@ -196,7 +183,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             if (string.IsNullOrEmpty(model.StartTime) || string.IsNullOrEmpty(model.EndTime))
                 return BadRequest(new { error = "Start and end time are required." });
 
-            var assignment = FakeScheduleData.CreateAssignment(
+            var assignment = World.CreateAssignment(
                 model.FacilityId ?? "mystery-manor",
                 DateTime.Parse(model.StartTime),
                 DateTime.Parse(model.EndTime),
@@ -206,12 +193,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             if (assignment == null)
                 return BadRequest(new { error = "Could not create assignment. Staff not found." });
 
-            return Ok(new
-            {
-                success = true,
-                message = $"{assignment.StaffName} ({assignment.StaffRole}) assigned.",
-                assignment,
-            });
+            return Ok(assignment);
         }
 
         /// <summary>
