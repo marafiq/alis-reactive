@@ -48,10 +48,9 @@ namespace Alis.Reactive.Grammar.Lowering
 
             var sentence = new List<Statement>();
             sentence.AddRange(_reactions.Block(request.WhileLoading, scope));
-            if (request.Finally.Count == 0)
-                sentence.AddRange(exchange);
-            else
-                sentence.Add(G.Try(exchange, _reactions.Block(request.Finally, scope)));
+            sentence.AddRange(exchange);
+            if (request.Finally.Count > 0)
+                sentence.Add(G.If(Ok(response), _reactions.Block(request.Finally, scope), G.NoStatements));
 
             if (request.Chain is FollowUpRequestChain chained)
                 sentence.Add(G.If(Ok(response), Request(chained.Next, routeScope), G.NoStatements));
