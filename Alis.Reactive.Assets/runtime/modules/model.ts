@@ -90,9 +90,10 @@ function describesArray(shape: Shape): boolean {
 
 function modelObject(planId: string): ModelObject {
   const mounted = (): ModelInput[] => [...inputsOf(planId).values()].filter(isMounted);
-  const fill = (record: Record<string, unknown>): Record<string, unknown> => {
-    for (const input of mounted()) assignAt(record, input.binding.body, bindInput(input));
-    return record;
+  const fill = (_record: Record<string, unknown>): Record<string, unknown> => {
+    const filled: Record<string, unknown> = {};
+    for (const input of mounted()) assignAt(filled, input.binding.body, bindInput(input));
+    return filled;
   };
   return {
     get values() {
