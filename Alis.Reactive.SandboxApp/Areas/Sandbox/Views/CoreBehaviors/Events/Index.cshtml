@@ -74,7 +74,7 @@ Html.On(plan, t =&gt; t.CustomEvent(EventsEvents.Test, p =&gt;
     p.Dispatch(EventsEvents.TestReceived);
 }));
 
-Html.On(plan, t =&gt; t.CustomEvent&lt;EventsViewModel&gt;("test-received", (payload, p) =&gt;
+Html.On(plan, t =&gt; t.CustomEvent&lt;EventsViewModel&gt;(EventsEvents.TestReceived, (payload, p) =&gt;
 {
     p.Element("step-3").ClassList.Add("text-green-600");
     p.Dispatch(EventsEvents.Final, new EventsViewModel { EventName = "done" });

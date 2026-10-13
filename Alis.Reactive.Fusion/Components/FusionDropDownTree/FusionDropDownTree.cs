@@ -40,7 +40,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the selection changes.</summary>
         public TypedEvent<FusionDropDownTreeChangeArgs> Change =>
-            Event<FusionDropDownTreeChangeArgs>("change");
+            Event<FusionDropDownTreeChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);

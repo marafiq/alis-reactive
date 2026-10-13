@@ -20,7 +20,7 @@ namespace Alis.Reactive.Native.Components
 
         /// <summary>Raised when the user checks or clears a box.</summary>
         public TypedEvent<NativeCheckListChangeArgs> Change =>
-            Event<NativeCheckListChangeArgs>("change");
+            Event<NativeCheckListChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);

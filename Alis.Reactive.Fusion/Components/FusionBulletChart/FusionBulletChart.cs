@@ -31,11 +31,11 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised before a tooltip renders.</summary>
         public TypedEvent<FusionBulletChartTooltipRenderArgs> TooltipRender =>
-            Event<FusionBulletChartTooltipRenderArgs>("tooltipRender");
+            Event<FusionBulletChartTooltipRenderArgs>();
 
         /// <summary>Raised when the user clicks the chart.</summary>
         public TypedEvent<FusionBulletChartMouseClickArgs> BulletChartMouseClick =>
-            Event<FusionBulletChartMouseClickArgs>("bulletChartMouseClick");
+            Event<FusionBulletChartMouseClickArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionBulletChart.TooltipRender"/>.</summary>

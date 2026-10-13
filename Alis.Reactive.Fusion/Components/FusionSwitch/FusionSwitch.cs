@@ -19,7 +19,7 @@ namespace Alis.Reactive.Fusion.Components
         public Prop<bool> Checked => Prop<bool>();
 
         /// <summary>Raised when the switch is turned on or off.</summary>
-        public TypedEvent<FusionSwitchChangeArgs> Change => Event<FusionSwitchChangeArgs>("change");
+        public TypedEvent<FusionSwitchChangeArgs> Change => Event<FusionSwitchChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Checked, committedBy: Change);

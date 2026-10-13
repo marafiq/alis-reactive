@@ -24,7 +24,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the content changes and focus leaves the editor.</summary>
         public TypedEvent<FusionRichTextEditorChangeArgs> Change =>
-            Event<FusionRichTextEditorChangeArgs>("change");
+            Event<FusionRichTextEditorChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);

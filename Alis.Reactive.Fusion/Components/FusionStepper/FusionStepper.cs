@@ -37,15 +37,15 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised after the active step changes.</summary>
         public TypedEvent<FusionStepperChangedArgs> StepChanged =>
-            Event<FusionStepperChangedArgs>("stepChanged");
+            Event<FusionStepperChangedArgs>();
 
         /// <summary>Raised before the active step changes.</summary>
         public TypedEvent<FusionStepperChangingArgs> StepChanging =>
-            Event<FusionStepperChangingArgs>("stepChanging");
+            Event<FusionStepperChangingArgs>();
 
         /// <summary>Raised when the user clicks a step.</summary>
         public TypedEvent<FusionStepperClickArgs> StepClick =>
-            Event<FusionStepperClickArgs>("stepClick");
+            Event<FusionStepperClickArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionStepper.StepChanged"/>.</summary>

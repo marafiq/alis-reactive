@@ -51,15 +51,15 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the progress starts.</summary>
         public TypedEvent<FusionProgressButtonProgressArgs> Begin =>
-            Event<FusionProgressButtonProgressArgs>("begin");
+            Event<FusionProgressButtonProgressArgs>();
 
         /// <summary>Raised as the progress advances.</summary>
         public TypedEvent<FusionProgressButtonProgressArgs> Progress =>
-            Event<FusionProgressButtonProgressArgs>("progress");
+            Event<FusionProgressButtonProgressArgs>();
 
         /// <summary>Raised when the progress completes.</summary>
         public TypedEvent<FusionProgressButtonProgressArgs> End =>
-            Event<FusionProgressButtonProgressArgs>("end");
+            Event<FusionProgressButtonProgressArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionProgressButton.Begin"/>, <see cref="FusionProgressButton.Progress"/> and <see cref="FusionProgressButton.End"/>.</summary>

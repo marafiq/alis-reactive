@@ -49,18 +49,18 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the selected value changes.</summary>
         public TypedEvent<FusionComboBoxChangeArgs> Change =>
-            Event<FusionComboBoxChangeArgs>("change");
+            Event<FusionComboBoxChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the input receives focus.</summary>
         public TypedEvent<FusionComboBoxFocusArgs> Focus =>
-            Event<FusionComboBoxFocusArgs>("focus");
+            Event<FusionComboBoxFocusArgs>();
 
         /// <summary>Raised when the input loses focus.</summary>
         public TypedEvent<FusionComboBoxBlurArgs> Blur =>
-            Event<FusionComboBoxBlurArgs>("blur");
+            Event<FusionComboBoxBlurArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionComboBox.Change"/>.</summary>

@@ -49,7 +49,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         public void Clear() => Call();
 
         /// <summary>Raised when the selection changes, by the user or by <see cref="SetValue"/>.</summary>
-        public TypedEvent<TomSelectChangeArgs> Change => Event<TomSelectChangeArgs>("change");
+        public TypedEvent<TomSelectChangeArgs> Change => Event<TomSelectChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);

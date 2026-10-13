@@ -22,7 +22,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the user selects files.</summary>
         public TypedEvent<FusionFileUploadSelectedArgs> Selected =>
-            Event<FusionFileUploadSelectedArgs>("selected");
+            Event<FusionFileUploadSelectedArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Files, committedBy: Selected);

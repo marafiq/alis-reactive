@@ -50,7 +50,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the user selects a popup item.</summary>
         public TypedEvent<FusionDropDownButtonSelectArgs> Select =>
-            Event<FusionDropDownButtonSelectArgs>("select");
+            Event<FusionDropDownButtonSelectArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionDropDownButton.Select"/>.</summary>

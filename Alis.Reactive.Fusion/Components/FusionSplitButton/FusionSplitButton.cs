@@ -46,11 +46,11 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the user clicks the primary button.</summary>
         public TypedEvent<FusionSplitButtonClickArgs> Click =>
-            Event<FusionSplitButtonClickArgs>("click");
+            Event<FusionSplitButtonClickArgs>();
 
         /// <summary>Raised when the user selects a popup item.</summary>
         public TypedEvent<FusionSplitButtonSelectArgs> Select =>
-            Event<FusionSplitButtonSelectArgs>("select");
+            Event<FusionSplitButtonSelectArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionSplitButton.Click"/>; carries no data.</summary>

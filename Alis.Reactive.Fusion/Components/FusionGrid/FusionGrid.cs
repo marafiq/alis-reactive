@@ -201,53 +201,53 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the grid needs data for a page, sort or filter, in custom binding.</summary>
         public TypedEvent<FusionGridDataStateChangeArgs> DataStateChange =>
-            Event<FusionGridDataStateChangeArgs>("dataStateChange");
+            Event<FusionGridDataStateChangeArgs>();
 
         /// <summary>Raised when the user clicks a toolbar item; branch on <c>args.Item.Id</c>.</summary>
         public TypedEvent<FusionGridToolbarClickArgs> ToolbarClick =>
-            Event<FusionGridToolbarClickArgs>("toolbarClick");
+            Event<FusionGridToolbarClickArgs>();
 
         /// <summary>Raised when the user clicks a row.</summary>
         /// <typeparam name="TRow">Your row class.</typeparam>
         public TypedEvent<FusionGridRecordClickArgs<TRow>> RecordClick<TRow>() where TRow : class =>
-            Event<FusionGridRecordClickArgs<TRow>>("recordClick");
+            Event<FusionGridRecordClickArgs<TRow>>();
 
         /// <summary>Raised after a row is selected.</summary>
         /// <typeparam name="TRow">Your row class.</typeparam>
         public TypedEvent<FusionGridRowSelectedArgs<TRow>> RowSelected<TRow>() where TRow : class =>
-            Event<FusionGridRowSelectedArgs<TRow>>("rowSelected");
+            Event<FusionGridRowSelectedArgs<TRow>>();
 
         /// <summary>Raised before an action such as edit, save, delete, sort, page or filter runs.</summary>
         /// <typeparam name="TRow">Your row class.</typeparam>
         public TypedEvent<FusionGridEditActionArgs<TRow>> ActionBegin<TRow>() where TRow : class =>
-            Event<FusionGridEditActionArgs<TRow>>("actionBegin");
+            Event<FusionGridEditActionArgs<TRow>>();
 
         /// <summary>Raised after an action such as edit, save, delete, sort, page or filter completes.</summary>
         /// <typeparam name="TRow">Your row class.</typeparam>
         public TypedEvent<FusionGridEditActionArgs<TRow>> ActionComplete<TRow>() where TRow : class =>
-            Event<FusionGridEditActionArgs<TRow>>("actionComplete");
+            Event<FusionGridEditActionArgs<TRow>>();
 
         /// <summary>Raised before a row enters edit mode.</summary>
         /// <typeparam name="TRow">Your row class.</typeparam>
         public TypedEvent<FusionGridBeginEditArgs<TRow>> BeginEdit<TRow>() where TRow : class =>
-            Event<FusionGridBeginEditArgs<TRow>>("beginEdit");
+            Event<FusionGridBeginEditArgs<TRow>>();
 
         /// <summary>Raised before a batch-edited cell is saved.</summary>
         /// <typeparam name="TRow">Your row class.</typeparam>
         /// <typeparam name="TValue">The type of the cell value.</typeparam>
         public TypedEvent<FusionGridCellSaveArgs<TRow, TValue>> CellSave<TRow, TValue>() where TRow : class =>
-            Event<FusionGridCellSaveArgs<TRow, TValue>>("cellSave");
+            Event<FusionGridCellSaveArgs<TRow, TValue>>();
 
         /// <summary>Raised after a batch-edited cell is saved.</summary>
         /// <typeparam name="TRow">Your row class.</typeparam>
         /// <typeparam name="TValue">The type of the cell value.</typeparam>
         public TypedEvent<FusionGridCellSavedArgs<TRow, TValue>> CellSaved<TRow, TValue>() where TRow : class =>
-            Event<FusionGridCellSavedArgs<TRow, TValue>>("cellSaved");
+            Event<FusionGridCellSavedArgs<TRow, TValue>>();
 
         /// <summary>Raised before the pending batch edits are saved.</summary>
         /// <typeparam name="TRow">Your row class.</typeparam>
         public TypedEvent<FusionGridBeforeBatchSaveArgs<TRow>> BeforeBatchSave<TRow>() where TRow : class =>
-            Event<FusionGridBeforeBatchSaveArgs<TRow>>("beforeBatchSave");
+            Event<FusionGridBeforeBatchSaveArgs<TRow>>();
     }
 
     /// <summary>Sort direction for <see cref="FusionGrid.SortColumn"/>.</summary>

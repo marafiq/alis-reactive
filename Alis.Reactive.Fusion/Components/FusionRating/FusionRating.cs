@@ -27,7 +27,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the rating changes.</summary>
         public TypedEvent<FusionRatingValueChangedArgs> ValueChanged =>
-            Event<FusionRatingValueChangedArgs>("valueChanged");
+            Event<FusionRatingValueChangedArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: ValueChanged);

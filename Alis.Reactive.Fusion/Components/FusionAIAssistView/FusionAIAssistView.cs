@@ -48,15 +48,15 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the user sends a prompt.</summary>
         public TypedEvent<FusionAIAssistViewPromptRequestArgs> PromptRequest =>
-            Event<FusionAIAssistViewPromptRequestArgs>("promptRequest");
+            Event<FusionAIAssistViewPromptRequestArgs>();
 
         /// <summary>Raised when the prompt text changes.</summary>
         public TypedEvent<FusionAIAssistViewPromptChangedArgs> PromptChanged =>
-            Event<FusionAIAssistViewPromptChangedArgs>("promptChanged");
+            Event<FusionAIAssistViewPromptChangedArgs>();
 
         /// <summary>Raised when the user stops a response.</summary>
         public TypedEvent<FusionAIAssistViewStopRespondingClickArgs> StopRespondingClick =>
-            Event<FusionAIAssistViewStopRespondingClickArgs>("stopRespondingClick");
+            Event<FusionAIAssistViewStopRespondingClickArgs>();
     }
 
     /// <summary>A prompt with its response, for <see cref="FusionAIAssistView.AddPromptResponseModel"/>.</summary>

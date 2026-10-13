@@ -35,11 +35,11 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised before the slide changes.</summary>
         public TypedEvent<FusionCarouselSlideChangingArgs> SlideChanging =>
-            Event<FusionCarouselSlideChangingArgs>("slideChanging");
+            Event<FusionCarouselSlideChangingArgs>();
 
         /// <summary>Raised after the slide changes.</summary>
         public TypedEvent<FusionCarouselSlideChangedArgs> SlideChanged =>
-            Event<FusionCarouselSlideChangedArgs>("slideChanged");
+            Event<FusionCarouselSlideChangedArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionCarousel.SlideChanging"/>.</summary>

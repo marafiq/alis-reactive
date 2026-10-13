@@ -25,7 +25,7 @@ namespace Alis.Reactive.Native.Components
 
         /// <summary>Raised when the user checks or clears the box.</summary>
         public TypedEvent<NativeCheckBoxChangeArgs> Change =>
-            Event<NativeCheckBoxChangeArgs>("change");
+            Event<NativeCheckBoxChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Checked, committedBy: Change);

@@ -113,19 +113,19 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// Raised when the booked times change, by the user or by a method. The planner names it its own
         /// way; as its input's commit event it is the event a form checks the field again on.
         /// </summary>
-        public TypedEvent<VisitPlannerWeekChangedArgs> WeekChanged => Event<VisitPlannerWeekChangedArgs>("weekChanged");
+        public TypedEvent<VisitPlannerWeekChangedArgs> WeekChanged => Event<VisitPlannerWeekChangedArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: WeekChanged);
 
         /// <summary>Raised instead of booking when the week is full.</summary>
-        public TypedEvent<VisitPlannerFullArgs> Full => Event<VisitPlannerFullArgs>("full");
+        public TypedEvent<VisitPlannerFullArgs> Full => Event<VisitPlannerFullArgs>();
 
         /// <summary>Raised before a time is booked; set <see cref="VisitPlannerBeforeBookArgs.Cancel"/> to refuse it.</summary>
-        public TypedEvent<VisitPlannerBeforeBookArgs> BeforeBook => Event<VisitPlannerBeforeBookArgs>("beforeBook");
+        public TypedEvent<VisitPlannerBeforeBookArgs> BeforeBook => Event<VisitPlannerBeforeBookArgs>();
 
         /// <summary>Raised when the week's times are offered.</summary>
-        public TypedEvent<VisitPlannerSlotsLoadedArgs> SlotsLoaded => Event<VisitPlannerSlotsLoadedArgs>("slotsLoaded");
+        public TypedEvent<VisitPlannerSlotsLoadedArgs> SlotsLoaded => Event<VisitPlannerSlotsLoadedArgs>();
     }
 
     /// <summary>A time the planner offers.</summary>

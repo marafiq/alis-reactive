@@ -41,7 +41,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the radio button becomes checked.</summary>
         public TypedEvent<FusionRadioButtonChangeArgs> Change =>
-            Event<FusionRadioButtonChangeArgs>("change");
+            Event<FusionRadioButtonChangeArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionRadioButton.Change"/>.</summary>

@@ -34,27 +34,27 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised before each item renders.</summary>
         public TypedEvent<FusionContextMenuBeforeItemRenderArgs> BeforeItemRender =>
-            Event<FusionContextMenuBeforeItemRenderArgs>("beforeItemRender");
+            Event<FusionContextMenuBeforeItemRenderArgs>();
 
         /// <summary>Raised before a menu level opens.</summary>
         public TypedEvent<FusionContextMenuBeforeOpenArgs> BeforeOpen =>
-            Event<FusionContextMenuBeforeOpenArgs>("beforeOpen");
+            Event<FusionContextMenuBeforeOpenArgs>();
 
         /// <summary>Raised after a menu level opens.</summary>
         public TypedEvent<FusionContextMenuOpenCloseArgs> OnOpen =>
-            Event<FusionContextMenuOpenCloseArgs>("onOpen");
+            Event<FusionContextMenuOpenCloseArgs>();
 
         /// <summary>Raised before a menu level closes.</summary>
         public TypedEvent<FusionContextMenuBeforeCloseArgs> BeforeClose =>
-            Event<FusionContextMenuBeforeCloseArgs>("beforeClose");
+            Event<FusionContextMenuBeforeCloseArgs>();
 
         /// <summary>Raised after a menu level closes.</summary>
         public TypedEvent<FusionContextMenuOpenCloseArgs> OnClose =>
-            Event<FusionContextMenuOpenCloseArgs>("onClose");
+            Event<FusionContextMenuOpenCloseArgs>();
 
         /// <summary>Raised when the user selects an item.</summary>
         public TypedEvent<FusionContextMenuSelectArgs> Select =>
-            Event<FusionContextMenuSelectArgs>("select");
+            Event<FusionContextMenuSelectArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionContextMenu.BeforeItemRender"/>.</summary>

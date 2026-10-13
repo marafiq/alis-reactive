@@ -45,11 +45,11 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised after the pivot renders its data.</summary>
         public TypedEvent<FusionPivotViewDataBoundArgs> DataBound =>
-            Event<FusionPivotViewDataBoundArgs>("dataBound");
+            Event<FusionPivotViewDataBoundArgs>();
 
         /// <summary>Raised when the user selects a cell.</summary>
         public TypedEvent<FusionPivotViewCellSelectingArgs> CellSelecting =>
-            Event<FusionPivotViewCellSelectingArgs>("cellSelecting");
+            Event<FusionPivotViewCellSelectingArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionPivotView.DataBound"/>; carries no data.</summary>

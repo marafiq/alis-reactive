@@ -28,7 +28,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the selected time changes.</summary>
         public TypedEvent<FusionTimePickerChangeArgs> Change =>
-            Event<FusionTimePickerChangeArgs>("change");
+            Event<FusionTimePickerChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);

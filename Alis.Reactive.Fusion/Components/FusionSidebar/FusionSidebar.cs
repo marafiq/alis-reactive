@@ -34,11 +34,11 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the sidebar opens.</summary>
         public TypedEvent<FusionSidebarTransitionArgs> Open =>
-            Event<FusionSidebarTransitionArgs>("open");
+            Event<FusionSidebarTransitionArgs>();
 
         /// <summary>Raised when the sidebar closes.</summary>
         public TypedEvent<FusionSidebarTransitionArgs> Close =>
-            Event<FusionSidebarTransitionArgs>("close");
+            Event<FusionSidebarTransitionArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionSidebar.Open"/> and <see cref="FusionSidebar.Close"/>.</summary>

@@ -35,7 +35,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised after an item expands or collapses.</summary>
         public TypedEvent<FusionAccordionExpandedArgs> Expanded =>
-            Event<FusionAccordionExpandedArgs>("expanded");
+            Event<FusionAccordionExpandedArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionAccordion.Expanded"/>.</summary>

@@ -20,7 +20,7 @@ namespace Alis.Reactive.Native.Components
 
         /// <summary>Raised when the user chooses an option.</summary>
         public TypedEvent<NativeRadioGroupChangeArgs> Change =>
-            Event<NativeRadioGroupChangeArgs>("change");
+            Event<NativeRadioGroupChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);

@@ -31,7 +31,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the color changes.</summary>
         public TypedEvent<FusionColorPickerChangeArgs> Change =>
-            Event<FusionColorPickerChangeArgs>("change");
+            Event<FusionColorPickerChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);

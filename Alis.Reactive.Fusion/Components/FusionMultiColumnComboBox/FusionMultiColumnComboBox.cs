@@ -43,7 +43,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the selection changes.</summary>
         public TypedEvent<FusionMultiColumnComboBoxChangeArgs> Change =>
-            Event<FusionMultiColumnComboBoxChangeArgs>("change");
+            Event<FusionMultiColumnComboBoxChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);

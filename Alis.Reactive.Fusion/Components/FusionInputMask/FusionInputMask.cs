@@ -24,7 +24,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the value changes.</summary>
         public TypedEvent<FusionInputMaskChangeArgs> Change =>
-            Event<FusionInputMaskChangeArgs>("change");
+            Event<FusionInputMaskChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);

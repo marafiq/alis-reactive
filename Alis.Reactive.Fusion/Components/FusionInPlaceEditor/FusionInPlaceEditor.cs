@@ -39,34 +39,34 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised before the editor opens.</summary>
         public TypedEvent<FusionInPlaceEditorBeginEditArgs> BeginEdit =>
-            Event<FusionInPlaceEditorBeginEditArgs>("beginEdit");
+            Event<FusionInPlaceEditorBeginEditArgs>();
 
         /// <summary>Raised before the editor closes.</summary>
         public TypedEvent<FusionInPlaceEditorEndEditArgs> EndEdit =>
-            Event<FusionInPlaceEditorEndEditArgs>("endEdit");
+            Event<FusionInPlaceEditorEndEditArgs>();
 
         /// <summary>Raised when the value changes.</summary>
         public TypedEvent<FusionInPlaceEditorChangeArgs> Change =>
-            Event<FusionInPlaceEditorChangeArgs>("change");
+            Event<FusionInPlaceEditorChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised before the value is submitted.</summary>
         public TypedEvent<FusionInPlaceEditorActionBeginArgs> ActionBegin =>
-            Event<FusionInPlaceEditorActionBeginArgs>("actionBegin");
+            Event<FusionInPlaceEditorActionBeginArgs>();
 
         /// <summary>Raised after the value is submitted.</summary>
         public TypedEvent<FusionInPlaceEditorActionSuccessArgs> ActionSuccess =>
-            Event<FusionInPlaceEditorActionSuccessArgs>("actionSuccess");
+            Event<FusionInPlaceEditorActionSuccessArgs>();
 
         /// <summary>Raised when the user clicks save.</summary>
         public TypedEvent<FusionInPlaceEditorSubmitClickArgs> SubmitClick =>
-            Event<FusionInPlaceEditorSubmitClickArgs>("submitClick");
+            Event<FusionInPlaceEditorSubmitClickArgs>();
 
         /// <summary>Raised when the user clicks cancel.</summary>
         public TypedEvent<FusionInPlaceEditorCancelClickArgs> CancelClick =>
-            Event<FusionInPlaceEditorCancelClickArgs>("cancelClick");
+            Event<FusionInPlaceEditorCancelClickArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.BeginEdit"/>.</summary>

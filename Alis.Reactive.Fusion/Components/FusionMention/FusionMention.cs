@@ -38,15 +38,15 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the user picks a suggestion.</summary>
         public TypedEvent<FusionMentionChangeArgs> Change =>
-            Event<FusionMentionChangeArgs>("change");
+            Event<FusionMentionChangeArgs>();
 
         /// <summary>Raised after the suggestion popup opens.</summary>
         public TypedEvent<FusionMentionPopupArgs> Opened =>
-            Event<FusionMentionPopupArgs>("opened");
+            Event<FusionMentionPopupArgs>();
 
         /// <summary>Raised after the suggestion popup closes.</summary>
         public TypedEvent<FusionMentionPopupArgs> Closed =>
-            Event<FusionMentionPopupArgs>("closed");
+            Event<FusionMentionPopupArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionMention.Change"/>.</summary>

@@ -30,22 +30,22 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised as a field changes while the user types.</summary>
         public TypedEvent<FusionOtpInputInputArgs> Input =>
-            Event<FusionOtpInputInputArgs>("input");
+            Event<FusionOtpInputInputArgs>();
 
         /// <summary>Raised when the complete passcode changes.</summary>
         public TypedEvent<FusionOtpInputValueChangedArgs> ValueChanged =>
-            Event<FusionOtpInputValueChangedArgs>("valueChanged");
+            Event<FusionOtpInputValueChangedArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: ValueChanged);
 
         /// <summary>Raised when a field receives focus.</summary>
         public TypedEvent<FusionOtpInputFocusArgs> Focus =>
-            Event<FusionOtpInputFocusArgs>("focus");
+            Event<FusionOtpInputFocusArgs>();
 
         /// <summary>Raised when a field loses focus.</summary>
         public TypedEvent<FusionOtpInputBlurArgs> Blur =>
-            Event<FusionOtpInputBlurArgs>("blur");
+            Event<FusionOtpInputBlurArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionOtpInput.Input"/>.</summary>

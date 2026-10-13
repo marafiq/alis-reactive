@@ -26,7 +26,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the user clicks a toolbar item.</summary>
         public TypedEvent<FusionToolbarClickedArgs> Clicked =>
-            Event<FusionToolbarClickedArgs>("clicked");
+            Event<FusionToolbarClickedArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionToolbar.Clicked"/>.</summary>

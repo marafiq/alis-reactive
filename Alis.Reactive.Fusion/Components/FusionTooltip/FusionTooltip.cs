@@ -32,11 +32,11 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised before the tooltip opens.</summary>
         public TypedEvent<FusionTooltipBeforeOpenArgs> BeforeOpen =>
-            Event<FusionTooltipBeforeOpenArgs>("beforeOpen");
+            Event<FusionTooltipBeforeOpenArgs>();
 
         /// <summary>Raised before the tooltip closes.</summary>
         public TypedEvent<FusionTooltipBeforeCloseArgs> BeforeClose =>
-            Event<FusionTooltipBeforeCloseArgs>("beforeClose");
+            Event<FusionTooltipBeforeCloseArgs>();
 
         /// <summary>Raised after the tooltip opens (the JavaScript <c>open</c> event).</summary>
         public TypedEvent<FusionTooltipOpenedArgs> Opened =>
@@ -48,7 +48,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised before the tooltip renders its content.</summary>
         public TypedEvent<FusionTooltipBeforeRenderArgs> BeforeRender =>
-            Event<FusionTooltipBeforeRenderArgs>("beforeRender");
+            Event<FusionTooltipBeforeRenderArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionTooltip.BeforeOpen"/>.</summary>

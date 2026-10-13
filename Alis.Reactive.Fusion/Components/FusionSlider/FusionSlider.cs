@@ -28,11 +28,11 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised as the handle moves.</summary>
         public TypedEvent<FusionSliderChangeArgs> Change =>
-            Event<FusionSliderChangeArgs>("change");
+            Event<FusionSliderChangeArgs>();
 
         /// <summary>Raised when the handle comes to rest.</summary>
         public TypedEvent<FusionSliderChangeArgs> Changed =>
-            Event<FusionSliderChangeArgs>("changed");
+            Event<FusionSliderChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Changed);

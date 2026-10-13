@@ -24,7 +24,7 @@ simply the first ones.
 
 2. **A component is declared once, by its own API.** One class names the object's members as C#
    members: `public Prop<decimal> Min => Prop<decimal>();`, `public void Increment() => Call();`,
-   `public TypedEvent<TArgs> Change => Event<TArgs>("change");`, and says which vendor it comes
+   `public TypedEvent<TArgs> Change => Event<TArgs>();`, and says which vendor it comes
    from. The JavaScript name is the C# name camel-cased unless `name:` gives another. Its event
    payloads are declarations too. Nothing else is written per component: no per-member extension
    methods, no events class, no reactive extension, no registration profile.
@@ -68,7 +68,7 @@ public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
     public void Increment() => Call();
     public void Decrement() => Call();
     public TypedEvent<FusionNumericTextBoxChangeArgs> Change =>
-        Event<FusionNumericTextBoxChangeArgs>("change");
+        Event<FusionNumericTextBoxChangeArgs>();
 
     ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 }
@@ -159,7 +159,7 @@ Vocabulary, by what the JavaScript object has:
 | method | `public void X(Arg<T1> a, ..) => Call(a, ..);` | `x.X(..)` |
 | method that returns | `public TypedSource<R> X(Arg<T1> a, ..) => Invoke<R>(a, ..);` | `x.X(..)` is a source |
 | method that returns a promise | `CallAsync(..)` or `InvokeAsync<R>(..)` | the steps after it wait; the source is the settled value |
-| event | `public TypedEvent<TArgs> X => Event<TArgs>("x");` | `.Reactive(evt => evt.X, (args, p) => ...)` |
+| event | `public TypedEvent<TArgs> X => Event<TArgs>();` | `.Reactive(evt => evt.X, (args, p) => ...)` |
 | payload field | `ReadOnly<T>`, or `Prop<T>` when the component reads it back (`Cancel`) | `p.When(args.F)`, `args.Cancel.Set(true)` |
 | payload method | a method on a payload that derives from `JsObject` | `args.EndEdit()` |
 | plugin | a class deriving `Plugin`, registered with `plan.RegisterPlugin<T>()` | `slug.Slug(name.Value)` |
@@ -187,8 +187,9 @@ than the page's own list, `Pass<TDeclared, TSource>(items)` passes it (`UpdateDa
 
 Names are the component's own; `name:` takes a dotted path to reach a nested member
 (`"eventSettings.dataSource"`, `"dataset.target"`), and a plugin that is itself a function declares
-it with `name: ""`. Events take their JavaScript name; where an event shares its name with a
-method, the event takes the past tense (Tooltip's `Opened` beside its `Open` method). The C#
+it with `name: ""`. Events are named like every other member, by the C# name camel-cased;
+where an event shares its name with a method, the event takes the past tense and names its
+JavaScript event (Tooltip's `Opened => Event<..>("open")` beside its `Open()` method). The C#
 member name keys the declaration, and a method's key also carries its argument shapes
 (`setCellValue(number,string,number)`), so two C# members can type two signatures of one
 JavaScript method and a generic member's type arguments never conflict. A brought vendor and its

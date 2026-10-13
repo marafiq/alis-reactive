@@ -36,7 +36,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when an item is selected.</summary>
         public TypedEvent<FusionListViewSelectArgs> Select =>
-            Event<FusionListViewSelectArgs>("select");
+            Event<FusionListViewSelectArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionListView.Select"/>.</summary>

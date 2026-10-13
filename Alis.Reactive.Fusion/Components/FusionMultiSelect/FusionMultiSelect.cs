@@ -33,14 +33,14 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the selection changes.</summary>
         public TypedEvent<FusionMultiSelectChangeArgs> Change =>
-            Event<FusionMultiSelectChangeArgs>("change");
+            Event<FusionMultiSelectChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised as the user types, before the popup filters its items.</summary>
         public TypedEvent<FusionMultiSelectFilteringArgs> Filtering =>
-            Event<FusionMultiSelectFilteringArgs>("filtering");
+            Event<FusionMultiSelectFilteringArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionMultiSelect.Change"/>.</summary>

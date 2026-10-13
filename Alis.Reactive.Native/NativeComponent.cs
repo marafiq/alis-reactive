@@ -12,7 +12,7 @@ namespace Alis.Reactive.Native
     /// {
     ///     public Prop&lt;bool&gt; Checked =&gt; Prop&lt;bool&gt;();
     ///     public void Focus() =&gt; Call();
-    ///     public TypedEvent&lt;NativeCheckBoxChangeArgs&gt; Change =&gt; Event&lt;NativeCheckBoxChangeArgs&gt;("change");
+    ///     public TypedEvent&lt;NativeCheckBoxChangeArgs&gt; Change =&gt; Event&lt;NativeCheckBoxChangeArgs&gt;();
     ///     ComponentInput IInputComponent.Input =&gt; ComponentInput.Of(Checked, committedBy: Change);
     /// }
     /// </code>

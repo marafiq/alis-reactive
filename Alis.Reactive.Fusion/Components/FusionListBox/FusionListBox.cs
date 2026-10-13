@@ -44,7 +44,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the selection changes.</summary>
         public TypedEvent<FusionListBoxChangeArgs> Change =>
-            Event<FusionListBoxChangeArgs>("change");
+            Event<FusionListBoxChangeArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionListBox.Change"/>.</summary>

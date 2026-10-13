@@ -23,8 +23,8 @@ public void Refresh() => Call();                                               /
 public void SelectRow(Arg<int> index) => Call(index);                          // a method with an argument
 public TypedSource<int[]> GetSelectedRowIndexes() => Invoke<int[]>();          // a method that returns a value
 public void HideColumn(Arg<Field> key) => Call(key, Fixed("field"), name: "hideColumns");
-public TypedEvent<FusionNumericTextBoxChangeArgs> Change =>
-    Event<FusionNumericTextBoxChangeArgs>("change");
+public TypedEvent<FusionNumericTextBoxChangeArgs> Change => Event<FusionNumericTextBoxChangeArgs>();   // an event
+public TypedEvent<FusionTooltipOpenedArgs> Opened => Event<FusionTooltipOpenedArgs>("open");     // beside an Open() method
 ```
 
 - `CallAsync()` and `InvokeAsync<T>()` declare a method that returns a promise; the steps after it

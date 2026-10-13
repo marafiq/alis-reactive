@@ -14,7 +14,7 @@ namespace Alis.Reactive
     /// {
     ///     public Prop&lt;double&gt; Value =&gt; Prop&lt;double&gt;();
     ///     public TypedEvent&lt;FusionRatingValueChangedArgs&gt; ValueChanged =&gt;
-    ///         Event&lt;FusionRatingValueChangedArgs&gt;("valueChanged");
+    ///         Event&lt;FusionRatingValueChangedArgs&gt;();
     ///
     ///     ComponentInput IInputComponent.Input =&gt; ComponentInput.Of(Value, committedBy: ValueChanged);
     /// }

@@ -36,7 +36,7 @@ namespace Alis.Reactive.Native.Components
         public override ComponentVendor Vendor => LinkVendor;
 
         /// <summary>Raised when the user clicks the link.</summary>
-        public TypedEvent<NativeActionLinkClickArgs> Click => Event<NativeActionLinkClickArgs>("click");
+        public TypedEvent<NativeActionLinkClickArgs> Click => Event<NativeActionLinkClickArgs>();
     }
 
     /// <summary>The DOM click a <see cref="NativeActionLink"/> receives.</summary>

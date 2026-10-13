@@ -34,23 +34,23 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised before the dialog opens.</summary>
         public TypedEvent<FusionDialogBeforeOpenArgs> BeforeOpen =>
-            Event<FusionDialogBeforeOpenArgs>("beforeOpen");
+            Event<FusionDialogBeforeOpenArgs>();
 
         /// <summary>Raised before the dialog closes.</summary>
         public TypedEvent<FusionDialogBeforeCloseArgs> BeforeClose =>
-            Event<FusionDialogBeforeCloseArgs>("beforeClose");
+            Event<FusionDialogBeforeCloseArgs>();
 
         /// <summary>Raised after the dialog opens.</summary>
         public TypedEvent<FusionDialogOpenArgs> Open =>
-            Event<FusionDialogOpenArgs>("open");
+            Event<FusionDialogOpenArgs>();
 
         /// <summary>Raised after the dialog closes.</summary>
         public TypedEvent<FusionDialogCloseArgs> Close =>
-            Event<FusionDialogCloseArgs>("close");
+            Event<FusionDialogCloseArgs>();
 
         /// <summary>Raised when the user clicks the modal overlay.</summary>
         public TypedEvent<FusionDialogOverlayClickArgs> OverlayClick =>
-            Event<FusionDialogOverlayClickArgs>("overlayClick");
+            Event<FusionDialogOverlayClickArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionDialog.BeforeOpen"/>.</summary>

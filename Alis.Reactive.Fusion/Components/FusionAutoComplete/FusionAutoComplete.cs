@@ -51,14 +51,14 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the selected value changes.</summary>
         public TypedEvent<FusionAutoCompleteChangeArgs> Change =>
-            Event<FusionAutoCompleteChangeArgs>("change");
+            Event<FusionAutoCompleteChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised as the user types, before the popup filters its items.</summary>
         public TypedEvent<FusionAutoCompleteFilteringArgs> Filtering =>
-            Event<FusionAutoCompleteFilteringArgs>("filtering");
+            Event<FusionAutoCompleteFilteringArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionAutoComplete.Change"/>.</summary>

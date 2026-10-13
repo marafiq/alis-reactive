@@ -67,11 +67,11 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the user clicks a chip.</summary>
         public TypedEvent<FusionChipListClickArgs> Click =>
-            Event<FusionChipListClickArgs>("click");
+            Event<FusionChipListClickArgs>();
 
         /// <summary>Raised after the user deletes a chip.</summary>
         public TypedEvent<FusionChipListDeletedArgs> Deleted =>
-            Event<FusionChipListDeletedArgs>("deleted");
+            Event<FusionChipListDeletedArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionChipList.Click"/>.</summary>

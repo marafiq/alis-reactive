@@ -34,7 +34,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised after a tab is selected.</summary>
         public TypedEvent<FusionTabSelectedArgs> Selected =>
-            Event<FusionTabSelectedArgs>("selected");
+            Event<FusionTabSelectedArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionTab.Selected"/>.</summary>

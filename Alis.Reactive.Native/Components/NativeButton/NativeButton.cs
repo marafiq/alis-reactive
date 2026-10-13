@@ -30,7 +30,7 @@ namespace Alis.Reactive.Native.Components
 
         /// <summary>Raised when the user clicks the button.</summary>
         public TypedEvent<NativeButtonClickArgs> Click =>
-            Event<NativeButtonClickArgs>("click");
+            Event<NativeButtonClickArgs>();
     }
 
     /// <summary>Payload of <see cref="NativeButton.Click"/>; carries no data.</summary>

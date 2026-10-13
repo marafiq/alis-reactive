@@ -33,7 +33,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the user clicks an item.</summary>
         public TypedEvent<FusionBreadcrumbItemClickArgs> ItemClick =>
-            Event<FusionBreadcrumbItemClickArgs>("itemClick");
+            Event<FusionBreadcrumbItemClickArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionBreadcrumb.ItemClick"/>.</summary>

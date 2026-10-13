@@ -85,40 +85,40 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the user clicks a cell.</summary>
         public TypedEvent<FusionScheduleCellClickArgs> CellClick =>
-            Event<FusionScheduleCellClickArgs>("cellClick");
+            Event<FusionScheduleCellClickArgs>();
 
         /// <summary>Raised when the user clicks an event.</summary>
         public TypedEvent<FusionScheduleEventClickArgs> EventClick =>
-            Event<FusionScheduleEventClickArgs>("eventClick");
+            Event<FusionScheduleEventClickArgs>();
 
         /// <summary>Raised before an action runs.</summary>
         public TypedEvent<FusionScheduleActionBeginArgs> ActionBegin =>
-            Event<FusionScheduleActionBeginArgs>("actionBegin");
+            Event<FusionScheduleActionBeginArgs>();
 
         /// <summary>Raised after an action completes.</summary>
         public TypedEvent<FusionScheduleActionCompleteArgs> ActionComplete =>
-            Event<FusionScheduleActionCompleteArgs>("actionComplete");
+            Event<FusionScheduleActionCompleteArgs>();
 
         /// <summary>Raised before the view or date changes.</summary>
         public TypedEvent<FusionScheduleNavigatingArgs> Navigating =>
-            Event<FusionScheduleNavigatingArgs>("navigating");
+            Event<FusionScheduleNavigatingArgs>();
 
         /// <summary>Raised before a popup opens.</summary>
         public TypedEvent<FusionSchedulePopupOpenArgs> PopupOpen =>
-            Event<FusionSchedulePopupOpenArgs>("popupOpen");
+            Event<FusionSchedulePopupOpenArgs>();
 
         /// <summary>Raised before a popup closes.</summary>
         public TypedEvent<FusionSchedulePopupCloseArgs> PopupClose =>
-            Event<FusionSchedulePopupCloseArgs>("popupClose");
+            Event<FusionSchedulePopupCloseArgs>();
 
         /// <summary>Raised after the schedule binds its events.</summary>
         public TypedEvent<FusionScheduleDataBoundArgs> DataBound =>
-            Event<FusionScheduleDataBoundArgs>("dataBound");
+            Event<FusionScheduleDataBoundArgs>();
 
         /// <summary>Raised after each event renders.</summary>
         /// <typeparam name="TEvent">Your event class; the payload's <c>Data</c> reads the rendered event as it.</typeparam>
         public TypedEvent<FusionScheduleEventRenderedArgs<TEvent>> EventRendered<TEvent>() where TEvent : class, new() =>
-            Event<FusionScheduleEventRenderedArgs<TEvent>>("eventRendered");
+            Event<FusionScheduleEventRenderedArgs<TEvent>>();
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.CellClick"/>.</summary>

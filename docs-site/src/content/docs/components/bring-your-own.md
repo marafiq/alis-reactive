@@ -73,8 +73,8 @@ public sealed class VisitPlanner : Component, IInputComponent
     public void PrepareSummary() => CallAsync();
     public TypedSource<string> Summary() => InvokeAsync<string>();
 
-    public TypedEvent<VisitPlannerWeekChangedArgs> WeekChanged => Event<VisitPlannerWeekChangedArgs>("weekChanged");
-    public TypedEvent<VisitPlannerBeforeBookArgs> BeforeBook => Event<VisitPlannerBeforeBookArgs>("beforeBook");
+    public TypedEvent<VisitPlannerWeekChangedArgs> WeekChanged => Event<VisitPlannerWeekChangedArgs>();
+    public TypedEvent<VisitPlannerBeforeBookArgs> BeforeBook => Event<VisitPlannerBeforeBookArgs>();
 
     ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: WeekChanged);
 
@@ -97,7 +97,7 @@ The JavaScript name of a member is its C# name camel-cased, so `Capacity` is
 | a method that returns a promise | `CallAsync()`, `InvokeAsync<string>()` |
 | a method whose JavaScript name differs | `Call(fieldName, name: "autoFitColumns")` |
 | an argument the method always takes | `Call(key, Fixed("field"), name: "hideColumns")` |
-| an event | `Event<VisitPlannerWeekChangedArgs>("weekChanged")` |
+| an event | `Event<VisitPlannerWeekChangedArgs>()` |
 | an input's value and commit event | `ComponentInput.Of(Value, committedBy: WeekChanged)` |
 
 Each `Arg<T>` parameter takes a literal or any value the page can read, in the

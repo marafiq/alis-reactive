@@ -28,7 +28,7 @@ namespace Alis.Reactive.Native.Components
 
         /// <summary>Raised when a script changes the value and raises <c>change</c>.</summary>
         public TypedEvent<NativeHiddenFieldChangeArgs> Change =>
-            Event<NativeHiddenFieldChangeArgs>("change");
+            Event<NativeHiddenFieldChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);

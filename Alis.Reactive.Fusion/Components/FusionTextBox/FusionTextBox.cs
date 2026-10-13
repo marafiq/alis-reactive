@@ -35,22 +35,22 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised on every edit while typing.</summary>
         public TypedEvent<FusionTextBoxInputArgs> Input =>
-            Event<FusionTextBoxInputArgs>("input");
+            Event<FusionTextBoxInputArgs>();
 
         /// <summary>Raised when the text changes and focus leaves the input.</summary>
         public TypedEvent<FusionTextBoxChangeArgs> Change =>
-            Event<FusionTextBoxChangeArgs>("change");
+            Event<FusionTextBoxChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the input receives focus.</summary>
         public TypedEvent<FusionTextBoxFocusArgs> Focus =>
-            Event<FusionTextBoxFocusArgs>("focus");
+            Event<FusionTextBoxFocusArgs>();
 
         /// <summary>Raised when the input loses focus.</summary>
         public TypedEvent<FusionTextBoxBlurArgs> Blur =>
-            Event<FusionTextBoxBlurArgs>("blur");
+            Event<FusionTextBoxBlurArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionTextBox.Input"/>.</summary>

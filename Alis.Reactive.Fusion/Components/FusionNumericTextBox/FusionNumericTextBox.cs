@@ -36,18 +36,18 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Raised when the value changes.</summary>
         public TypedEvent<FusionNumericTextBoxChangeArgs> Change =>
-            Event<FusionNumericTextBoxChangeArgs>("change");
+            Event<FusionNumericTextBoxChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the input receives focus.</summary>
         public TypedEvent<FusionNumericTextBoxFocusArgs> Focus =>
-            Event<FusionNumericTextBoxFocusArgs>("focus");
+            Event<FusionNumericTextBoxFocusArgs>();
 
         /// <summary>Raised when the input loses focus.</summary>
         public TypedEvent<FusionNumericTextBoxBlurArgs> Blur =>
-            Event<FusionNumericTextBoxBlurArgs>("blur");
+            Event<FusionNumericTextBoxBlurArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionNumericTextBox.Change"/>.</summary>
