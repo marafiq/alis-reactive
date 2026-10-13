@@ -22,21 +22,23 @@ simply the first ones.
    it wires a piece of HTML and `alis:unmount` before it removes one, so the app constructs and
    destroys at the right moment, including inside partials.
 
-2. **A component is declared once, by its own API.** One class names the object's members with
-   the JavaScript names: `Property<T>("min")`, `Method("increment")`, `Event<TArgs>("change")`,
-   and says which vendor it comes from. Its event payloads are plain classes. Nothing else is
-   written per component: no per-member extension methods, no events class, no reactive
-   extension, no registration profile.
+2. **A component is declared once, by its own API.** One class names the object's members as C#
+   members: `public Prop<decimal> Min => Prop<decimal>();`, `public void Increment() => Call();`,
+   `public TypedEvent<TArgs> Change => Event<TArgs>("change");`, and says which vendor it comes
+   from. The JavaScript name is the C# name camel-cased unless `name:` gives another. Its event
+   payloads are declarations too. Nothing else is written per component: no per-member extension
+   methods, no events class, no reactive extension, no registration profile.
 
 3. **Behavior hangs off `.Reactive`, where the component is rendered.** The render call returns a
    handle that knows the plan and the ID, so one core `.Reactive(evt => evt.Change, (args, p) =>
    ...)` serves every component, Fusion, Native or brought.
 
-4. **Three verbs touch any JavaScript object.** `Set`, `Call` and `Get` over declared members.
-   Every value is a literal or any typed source the DSL already has: another component, a payload
-   read, a response read, a URL parameter, a plugin, an array. A payload is a JavaScript object
-   too: `p.Payload(args).Set(a => a.PreventDefaultAction, true)`. Payload fields stay plain C#
-   properties, read as today with `p.When(args, x => x.Text)`.
+4. **A JavaScript object is used as the object.** `p.Component<T>(..)` returns the declaration,
+   live in the callback: `rate.Min.Set(0m)`, `grid.Refresh()`, `p.When(rate.Value).Gt(100m)`. A
+   payload is a JavaScript object too: `args.PreventDefaultAction.Set(true)`, `p.When(args.Text)`,
+   `args.UpdateData(json.Get(x => x.Items))`. Every value is a literal or any typed source the DSL
+   already has: another component's member, a method's result, a payload or response read, a URL
+   parameter, a plugin, an array.
 
 5. **The framework dictates identity.** Input IDs from `IdGenerator`, other IDs explicit, `name`
    is the binding path, errors render into `{id}_error`, app-level objects have fixed IDs, views
@@ -54,26 +56,30 @@ simply the first ones.
 
 ## The method
 
-What a developer writes to bring a component. Syncfusion's NumericTextBox, as it now ships:
+What a developer writes to bring a component. Syncfusion's NumericTextBox, as it now ships (an
+excerpt of `Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs`):
 
 ```csharp
+#nullable disable annotations
 public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
 {
-    public ComponentProperty<decimal> Value => Property<decimal>("value");
-    public ComponentProperty<decimal> Min => Property<decimal>("min");
-    public ComponentMethod Increment => Method("increment");
+    public Prop<decimal> Value => Prop<decimal>();
+    public Prop<decimal> Min => Prop<decimal>();
+    public void Increment() => Call();
+    public void Decrement() => Call();
     public TypedEvent<FusionNumericTextBoxChangeArgs> Change =>
         Event<FusionNumericTextBoxChangeArgs>("change");
 
     ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 }
 
-public class FusionNumericTextBoxChangeArgs
+public class FusionNumericTextBoxChangeArgs : JsObject
 {
-    public decimal Value { get; set; }
-    public decimal PreviousValue { get; set; }
-    public bool IsInteracted { get; set; }
+    public ReadOnly<decimal> Value => ReadOnly<decimal>();
+    public ReadOnly<decimal> PreviousValue => ReadOnly<decimal>();
+    public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
 }
+#nullable restore annotations
 
 // Render: the framework supplies the ID and name; the markup is the component's own.
 public static RenderedComponent<FusionNumericTextBox, TModel> FusionNumericTextBox<TModel, TProp>(
@@ -87,74 +93,101 @@ public static RenderedComponent<FusionNumericTextBox, TModel> FusionNumericTextB
 }
 ```
 
-What every view then has, with no further code from the component author:
+The declaration sits between `#nullable disable annotations` and `#nullable restore annotations`, so
+a page can pass values of either nullability (`int?` to `Arg<int?>`, `string` to `Arg<string?>`)
+without a warning. The render helper stays outside that region.
+
+What every view then has, with no further code from the component author
+(`Views/Components/Fusion/NumericTextBox/Index.cshtml`):
 
 ```csharp
-Html.InputField(plan, m => m.Rate)
-    .FusionNumericTextBox(b => b.Min(0))
+Html.InputField(plan, m => m.MealsPerWeek, o => o.Label("Catered meals per week"))
+    .FusionNumericTextBox(b => b
+        .Min(4).Max(21).Step(1).Value(Model.MealsPerWeek).ShowSpinButton(false))
     .Reactive(evt => evt.Change, (args, p) =>
     {
-        p.When(args, x => x.Value).Gt(100m)
-            .Then(t => t.Component<FusionNumericTextBox>(m => m.Ceiling).Set(c => c.Value, 100m));
-        p.Get("/rates").Gather(g => g.Form(m => m.Rate))
-            .Response(r => r.OnSuccess<RateResponse>((res, s) =>
-                s.Component<FusionNumericTextBox>(m => m.Ceiling).Set(c => c.Min, res.Read(x => x.Floor))));
+        p.Element("meals-summary").Text.Set(args.Value);
+        p.Element("meals-previous").Text.Set(args.PreviousValue);
+
+        p.When(args.IsInteracted).Truthy()
+            .Then(chosen => chosen.Element("meals-source")
+                .Text.Set("You entered this number of meals."))
+            .Else(applied => applied.Element("meals-source")
+                .Text.Set("This number of meals was applied from a plan template."));
+    });
+
+Html.NativeButton("meals-reduced-diet", "Allow a reduced-diet plan (fewer meals)")
+    .Reactive(plan, evt => evt.Click, (args, p) =>
+    {
+        p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Min.Set(2);
+        p.Element("meals-floor-note").Text.Set("A reduced-diet plan is now allowed — you can enter as few as 2 meals.");
     });
 ```
 
-A payload with behavior declares its methods the same way:
+A payload with behavior declares its methods the same way
+(`FusionAutoComplete.cs`, used by `Views/Components/Fusion/AutoComplete/Index.cshtml`):
 
 ```csharp
 public class FusionAutoCompleteFilteringArgs : JsObject
 {
-    public string Text { get; set; } = "";
-    public bool PreventDefaultAction { get; set; }
-    public ComponentMethod<IEnumerable<object>> UpdateData => Method<IEnumerable<object>>("updateData");
+    public ReadOnly<string> Text => ReadOnly<string>();
+    public Prop<bool> PreventDefaultAction => Prop<bool>();
+    public void UpdateData<TItems>(TypedSource<TItems> items) where TItems : IEnumerable<object> =>
+        Call(Pass<IEnumerable<object>, TItems>(items));
 }
 
 .Reactive(evt => evt.Filtering, (args, p) =>
 {
-    p.Payload(args).Set(a => a.PreventDefaultAction, true);
+    args.PreventDefaultAction.Set(true);
     p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
-     .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, p.Payload(args).Get(a => a.Text)))
+     .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, args.Text))
      .Response(r => r.OnSuccess<MedicationSearchResponse>((json, s) =>
-         s.Payload(args).Call(a => a.UpdateData, json.Read(j => j.Medications))));
+         args.UpdateData(json.Get(j => j.Medications))));
 })
 ```
 
+Each write or call is its own statement and lands in the callback it is written in, whichever
+variable holds the object: `args.UpdateData(..)` above runs in the success callback, after the
+response arrives, against the same payload object.
+
 Vocabulary, by what the JavaScript object has:
 
-| JavaScript | Declared as | Used with |
-|------------|-------------|-----------|
-| property | `ComponentProperty<T>` via `Property<T>("name")` | `Set(c => c.X, value or source)`, `Get(c => c.X)` |
-| method | `ComponentMethod`, `ComponentMethod<T1[, T2[, T3]]>` via `Method<..>("name")` | `Call(c => c.X, args...)` |
-| method that returns | `ComponentFunction<[T1, [T2,]] TResult>` via `Function<..>("name")` | `Get(c => c.X, args...)`; each argument a literal or a source |
-| method that returns a promise | `Method(..).Awaited()`, `Function<..>(..).Awaited()` | `Call` waits for it; `Get` is the settled value |
-| event | `TypedEvent<TArgs>` via `Event<TArgs>("name")` | `.Reactive(evt => evt.X, (args, p) => ...)` |
-| payload field | a plain C# property | `p.When(args, x => x.F)`, `p.Payload(args).Set(a => a.F, value)` |
-| payload method | `Method("name")` on a payload that derives from `JsObject` | `p.Payload(args).Call(a => a.EndEdit)` |
+| JavaScript | Declared as | Used as |
+|------------|-------------|---------|
+| property read and written | `public Prop<T> X => Prop<T>();` | `x.X.Set(value or source)`; `x.X` is a source |
+| property read | `public ReadOnly<T> X => ReadOnly<T>();` | `x.X` is a source; `x.X.Get(v => v.Member)` reads into its value |
+| method | `public void X(Arg<T1> a, ..) => Call(a, ..);` | `x.X(..)` |
+| method that returns | `public TypedSource<R> X(Arg<T1> a, ..) => Invoke<R>(a, ..);` | `x.X(..)` is a source |
+| method that returns a promise | `CallAsync(..)` or `InvokeAsync<R>(..)` | the steps after it wait; the source is the settled value |
+| event | `public TypedEvent<TArgs> X => Event<TArgs>("x");` | `.Reactive(evt => evt.X, (args, p) => ...)` |
+| payload field | `ReadOnly<T>`, or `Prop<T>` when the component reads it back (`Cancel`) | `p.When(args.F)`, `args.Cancel.Set(true)` |
+| payload method | a method on a payload that derives from `JsObject` | `args.EndEdit()` |
+| plugin | a class deriving `Plugin`, registered with `plan.RegisterPlugin<T>()` | `slug.Slug(name.Value)` |
 
-Arguments. A one-argument call takes a literal or a source. With two or three arguments each
-position is an `Argument<T>`, which a literal or a `TypedSource<T>` converts to, so literals and
-runtime values mix: `Call(c => c.AddRecordAt<Resident>(), json.Read(x => x.Row), 0)`. An enum
-literal is its member name, or the text its `[JsonStringEnumMemberName]` gives (`"notequal"`); a
-`DateTime` is ISO text; `json.Read(x => x)` reads the whole body.
+Arguments. Each parameter is an `Arg<T>`, which a literal or a `TypedSource<T>` converts to, so
+literals and runtime values mix: `planner.Book(args.Added, visitors.Value, "Bring the photo album")`.
+A generic method names its type argument, because C# does not infer it through that conversion:
+`kanban.AddCard<CareCard>(json.Get(x => x.Card), 0)`. An enum literal is its member name, or the
+text its `[JsonStringEnumMemberName]` gives (`"notequal"`); a `DateTime` is ISO text; a response
+`json` is itself the whole body. Name each parameter as the JavaScript API names it.
 
 Row and item members. `Field.Of((Resident r) => r.CareLevel)` is the camel-case name a
 component uses for a member (`"careLevel"`, nested `"address.city"`). `Field<TValue>` carries the
-member's type, so `Call(c => c.SetCellValue<int>(), 6001, Field.Of((Resident r) => r.OpenTasks), 4)`
-only compiles with a value of that type.
+member's type, so `grid.SetCellValue<int>(6001, Field.Of((Resident r) => r.OpenTasks), 4)` only
+compiles with a value of that type.
 
 Generic members. A member typed by the app's own class is a generic method of the declaration:
-`Get(c => c.GetSelectedRecords<Resident>())`, `.Reactive(evt => evt.RowSelected<Resident>(), ...)`,
-`Call(c => c.AddCard<CareCard>(), json.Read(x => x.Card), 0)`.
+`grid.GetSelectedRecords<Resident>()`, `.Reactive(evt => evt.RowSelected<Resident>(), ...)`,
+`kanban.AddCard<CareCard>(json.Get(x => x.Card), 0)`.
 
-Fixed arguments. When the JavaScript method always takes a mode after the typed arguments, the
-declaration fixes it: `Method<Field>("showColumns").Passing("field")`, so the call passes only the
-field.
+Fixed arguments. When the JavaScript method always takes a mode the page never chooses, the
+declaration passes it: `public void ShowColumn(Arg<Field> key) => Call(key, Fixed("field"), name:
+"showColumns");`, so the page passes only the field. Where the JavaScript method takes a wider type
+than the page's own list, `Pass<TDeclared, TSource>(items)` passes it (`UpdateData` above).
 
-Names are the component's own; dotted paths reach nested members (`"eventSettings.dataSource"`,
-`"dataset.target"`). Events take their JavaScript name; where an event shares its name with a
+Names are the component's own; `name:` takes a dotted path to reach a nested member
+(`"eventSettings.dataSource"`, `"dataset.target"`), and a plugin that is itself a function declares
+it with `name: ""`. Events take their JavaScript name; where an event shares its name with a
 method, the event takes the past tense (Tooltip's `Opened` beside its `Open` method). The C#
 member name keys the declaration, and a method's key also carries its argument shapes
 (`setCellValue(number,string,number)`), so two C# members can type two signatures of one
@@ -178,8 +211,9 @@ Each lands on this branch, proven by the Playwright suites named, and leaves CI 
 (`gate / test`, five Playwright shards, `verify-net48`).
 
 **D1. The method, in C#.** `JsObject`, `Component`, the member types the two components below
-use, `Set`/`Call`/`Get` with literals and sources, `p.Payload(args)`, the render handle with the
-core `.Reactive`.
+use, writes, calls and reads with literals and sources, payloads as objects, the render handle
+with the core `.Reactive`. (D1 shipped it as three verbs over descriptors, `Set(c => c.Min, 0m)`;
+the handle model below replaced them with the members themselves.)
 FusionNumericTextBox and FusionAutoComplete are brought with it: one file each, their per-member
 extensions, events classes and reactive extensions deleted, their views moved to the verbs.
 Plan JSON keeps its shape; no runtime change. Proof: the NumericTextBox and AutoComplete suites
@@ -242,9 +276,18 @@ the core C# and the runtime name no vendor and no component. Proof: the full sui
   with no failed or flaky-test annotations; `verify-net48` green (net48 build and pack without
   `InternalsVisibleTo`, IIS Express boot).
 - The method grew, as the slices needed it: arguments that mix literals and sources,
-  `Field`, generic members, `Passing`, signature keys, `plan.Render`, hidden fields.
+  `Field`, generic members, fixed arguments, signature keys, `plan.Render`, hidden fields.
 - **A widget the sandbox wrote itself** (`532b2fa` onward): the visit planner
   (`Scripts/visit-planner.ts`, `BroughtComponents/VisitPlanner`) has properties of every shape, functions,
-  methods of zero to three arguments, awaited members, and events with nested and cancelable payloads.
-  Its Family Visits journey drives each through the generic grammar. It added two capabilities to the
-  method, both generic: function reads take source arguments, and `.Awaited()` members.
+  methods of zero to three arguments, members that return a promise, and events with nested and
+  cancelable payloads. Its Family Visits journey drives each through the generic grammar. It added two
+  capabilities to the method, both generic: function reads take source arguments, and promise-returning
+  members (`CallAsync`, `InvokeAsync<T>`).
+- **The handle model** (`f36f62e`): a declaration's members are real C# members (`Prop<T>`,
+  `ReadOnly<T>`, methods with `Arg<T>` parameters that call `Call`, `CallAsync`, `Invoke<T>` or
+  `InvokeAsync<T>`), and `p.Component<T>(..)` returns the declaration live in the callback. Event
+  payloads, response and custom-event data (`Data<T>`), elements (`HtmlElement`) and plugins are used
+  the same way. The descriptor types (`ComponentProperty<T>`, `ComponentMethod`, `ComponentFunction`)
+  and the verbs over them (`Set(c => ..)`, `Call(c => ..)`, `Get(c => ..)`, `p.Payload(args)`,
+  `p.Plugin(..)`, `.Passing`, `.Awaited()`) are gone. The plan did not change: 20 harness pages
+  rendered byte-identical plan JSON before and after.

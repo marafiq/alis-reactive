@@ -3,7 +3,8 @@
 Proposal (v6) on `feature/component-redesign`. Section 0 is the spine; every later section is
 vocabulary on it. The exact specification (syntax, value semantics, operators, static checks,
 lowering, and what each built-in object must do) is [`grammar.md`](grammar.md), checked against all
-531 use cases; where the two differ, `grammar.md` governs. What is already built is described in
+531 use cases; where the two differ, `grammar.md` governs. Section 13 records what of this proposal
+was built and what was not; the component method as built is
 [`bring-your-own-component.md`](bring-your-own-component.md).
 
 The constraints:
@@ -287,7 +288,7 @@ Every kind of value the DSL touches is one of these two.
 
 ## 3. Three ways to type an object in C#
 
-**A. Descriptors plus verbs** (shipped in D1 to D4):
+**A. Descriptors plus verbs** (shipped in D1 to D4; replaced by C in `f36f62e`):
 
 ```csharp
 rate.Set(c => c.Min, 0m);
@@ -460,8 +461,15 @@ public sealed class FusionGridRowSelected<TRow> : JsObject      // a payload is 
 }
 ```
 
-- `Field.Of`, `Field<TValue>`, `.Passing`, `ComponentMethod<T1..T3>`, `ComponentFunction<..>`,
-  `Argument<T>` and `PayloadRef` are all deleted. A member's own C# signature replaces them.
+- `.Passing`, `ComponentMethod<T1..T3>`, `ComponentFunction<..>`, `Argument<T>` and `PayloadRef` are
+  deleted. A member's own C# signature replaces them.
+- **As built (`f36f62e`; section 13 has the full list).** `Prop<T>`, `ReadOnly<T>`, `Call`,
+  `CallAsync`, `Invoke<T>`, `InvokeAsync<T>`, `Fixed` and `name:` are as above; a method's result is a
+  `TypedSource<T>`, the one value type. Not built: `Object<T>` and `InvokeObject<T>` (a nested member is
+  a dotted `name:`, such as `"eventSettings.dataSource"`), the generic declaration `FusionGrid<TRow>`
+  (row-typed members stay generic methods with `Field.Of`/`Field<TValue>` arguments), and `Event` and
+  `Message<T>` (events stay `TypedEvent<T>`; data payloads are `Data<T>`). The plan still keys a member
+  by its C# name.
 
 ### 4.2 Inputs
 
@@ -604,8 +612,7 @@ p.Post(url)
     view model as the request. `Set` takes any value source or a literal. A source's type must be the
     member's type or derive from it, so an `int?` value cannot fill an `int` member; a `T[]` fills `T[]`,
     `List<T>` or `IEnumerable<T>`; a nullable member is left empty with a typed null.
-  - An event payload member is read with `p.Payload(args).Get(a => a.M)`, since the handle model of
-    section 3 is not built (section 13).
+  - An event payload member is the payload's own member: `g.Set(x => x.Q, args.Text)`.
   - Rendering checks that every placeholder is filled, that a member is set once, and that a
     `Form(m => m.X)` field is a member of `TRequest` of a type its value binds to.
   - In ASP.NET Core an action that binds a JSON body takes its route values as parameters beside the
@@ -769,23 +776,26 @@ public sealed class AdmissionValidator : ReactiveValidator<Admission>
   - Empty input follows the property's CLR type, as model binding and FluentValidation do on the
     server. A non-nullable number reads an empty input as its default, so `GreaterThan(0)` fails on
     empty. A nullable property's comparison passes on empty.
-    - Today the browser fails `gt` on empty but passes `min`, `max`, `lt` and ranges
-      (`rule-engine.ts:185-215`).
+    - Before this redesign the browser failed `gt` on empty but passed `min`, `max`, `lt` and
+      ranges (the deleted `rule-engine.ts`).
     - A frozen journey that depended on that difference fails at the validation step and comes to
       the owner for a decision; it is not edited.
   - Messages keep today's browser text through `.WithMessage`, because FluentValidation's defaults
     differ. For example, its default `'Age' must be greater than '0'.` differs from today's
     `'Age' must be greater than 0.`.
   - Dates compare as timestamps.
-  - Regex patterns are checked at render against JavaScript's dialect, so a .NET-only construct
-    fails in C#.
+  - A regex pattern reaches the browser only when JavaScript reads it the same way. A pattern built
+    from the model, with an option JavaScript lacks, or with .NET-only syntax stays on the server
+    (`ClientRuleProjection.cs`, `PatternCheck`).
 - **The form is an object.** `plugin("alis.form", id)` holds the projected tests and the inputs bound to
   it. `Validate()`, `ShowErrors(problem)` and `Values` are its members, and live clearing and
   revalidation happen inside it. Each test is `{ field, check, when, message }`, where `check` and
   `when` are expressions (section 0.5).
 - **Deleted:** `ClientRule` and its builders, the 18 `WhenField*` methods and `WhenFields`, the
-  field-condition builders, the operand and activation types, three interfaces,
-  `AddReactiveClientValidation`, and the whole runtime rule engine.
+  field-condition builders, the operand and activation types, `AddReactiveClientValidation`, and the
+  whole runtime rule engine. `IClientValidationRuleSource` stays: it is how a plan reaches the
+  validators registered through DI, and the grid's row validation reads its rules through it
+  (`FusionGridValidation.cs`).
 
 ## 5. Authoring rules: one parameter order everywhere
 
@@ -796,7 +806,8 @@ Six rules, for developers and for agents:
    `.Reactive(c => c.Event, callback)`.
 2. **A callback's parameters are the payload or result, then the scope:** `(args, p)`,
    `(res, s)`, `(msg, p)`, `(e, p)`, or just `(p)`.
-3. **One source is one argument,** an `IValue<T>`. There are no `(source, x => x.Path)` pairs.
+3. **One source is one argument,** an `IValue<T>` (built as `TypedSource<T>`). There are no
+   `(source, x => x.Path)` pairs.
 4. **A literal and a runtime value take the same position** (`Arg<T>`).
 5. **Names come from types** wherever a C# type exists: the request class, the query class, the
    event value, the hub interface, members.
@@ -805,23 +816,25 @@ Six rules, for developers and for agents:
    - `Set` writes.
    - `Get` reads a data path.
 
-| Today | Proposed |
+As built (`f36f62e`, section 13):
+
+| Before | Now |
 |---|---|
 | `p.When(args, x => x.Value).Gt(100m)` | `p.When(args.Value).Gt(100m)` |
 | `p.Component<FusionNumericTextBox>(m => m.Rate).Set(c => c.Min, 0m)` | `rate.Min.Set(0m)` |
 | `grid.Call(c => c.SelectRow, 2)` | `grid.SelectRow(2)` |
 | `p.Payload(args).Set(a => a.PreventDefaultAction, true)` | `args.PreventDefaultAction.Set(true)` |
 | `s.Payload(args).Call(a => a.UpdateData, res.Read(x => x.Items))` | `args.UpdateData(res.Get(x => x.Items))` |
-| `g.Include(grid.Get(c => c.GetSelectedRecords<R>()), "selectedRecords")` | `g.Set(x => x.SelectedRecords, grid.GetSelectedRecords())` |
+| `g.Include(grid.Get(c => c.GetSelectedRecords<R>()), "selectedRecords")` | `g.Set(x => x.SelectedRecords, grid.GetSelectedRecords<R>())` |
 | `g.RouteParam("cardId", args, x => x.Data.Id)` | `g.Set(x => x.CardId, args.Data.Get(d => d.Id))` |
 | `g.FromEvent(args, x => x.Text, "q")` | `g.Set(x => x.Q, args.Text)` |
-| `g.FromUrl("facilityId")` | `g.Set(x => x.FacilityId, url.Get(q => q.FacilityId))` |
+| `g.FromUrl("facilityId")` | `g.Set(x => x.FacilityId, p.Url<FacilityQuery>().Get(q => q.FacilityId))` |
 | `.Header("X-Category", args, x => x.Category)` | `g.Header("X-Category", args.Category)` |
-| `p.When(p.FromUrl<int>("page")).Gt(1)` | `p.When(url.Get(q => q.Page)).Gt(1)` |
+| `p.When(p.FromUrl<int>("page")).Gt(1)` | `p.When(p.Url<PageQuery>().Get(q => q.Page)).Gt(1)` |
 | `p.FromDom("dom-card", "classList").Count()` | `p.Element("dom-card").ClassList.Items.Count()` |
 | `p.Plugin(tools.Count).Arg(items).Arg("status")` | `tools.Count(items, "status")` |
-| `NativeActionLink(text, url, p => p.Post(url)..)` | `NativeActionLink(text, url, link => link.Post(r => ..))` |
-| `DispatchWith<T>("flagged", d => ..)` + `CustomEvent<T>("flagged", ..)` | `Dispatch(CareEvents.Flagged, e => ..)` + `On(CareEvents.Flagged, ..)` |
+| `NativeActionLink(text, url, p => p.Post(url)..)` | `Html.NativeActionLink(id, text, url, link => link.Post()..)` |
+| `DispatchWith<T>("flagged", d => ..)` + `CustomEvent<T>("flagged", ..)` | `p.Dispatch(CareEvents.Flagged, e => e.Set(..))` + `t.CustomEvent(CareEvents.Flagged, (e, p) => ..)` |
 | `ClientRule(x => x.Age).GreaterThan(0m, "msg")` + `RuleFor(x => x.Age).GreaterThan(0m)` | `RuleFor(x => x.Age).GreaterThan(0m).WithMessage("msg")` |
 
 ## 6. One expression compiler
@@ -843,7 +856,9 @@ How it works:
   are read and written (section 2.1); explicit C# casts become conversion operators.
 - **Members** of `string`, `DateTime`, `IEnumerable<T>` and declared objects map through the one
   member table (`grammar.md` section 2.3). A new member is one table row and no runtime change.
-- **Anything else** fails at render, naming the construct. An analyzer reports it at compile time.
+- **Anything else** fails at render, naming the construct. In a validator's `When` or `Unless`,
+  a condition the browser cannot evaluate keeps the rules inside it on the server instead
+  (`ClientScope.cs`).
 
 ## 7. Component onboarding, inverted
 
@@ -1046,21 +1061,39 @@ behave as before.
 ## 13. Decisions after the audit of October 2026
 
 An audit of every claim above against the code found the grammar, the plan document and the runtime
-built as written, and the C# object model of step 2 not built. These decisions settle what of it is
+built as written, and the C# object model of step 2 not yet built. These decisions settle what of it is
 built and what is not.
 
-- **The handle model (sections 3, 4.0, 4.1, 4.3 values, rules 3, 4 and 6 of section 5) is not built.**
-  The owner keeps the typed fluent API of descriptors and verbs (`p.Component<T>(..).Set(c => c.X, v)`,
-  `.Get(c => c.X)`, `p.Payload(args).Get(a => a.X)`, the `(source, x => x.Path)` pairs). It reaches
-  every member of every object, shipped or brought, with the compiler checking each one; the handle
-  model would rewrite 70 declarations and about 2,000 call sites for the same reach. Approach A of
-  section 11 is therefore what ships, with its defects removed (below).
+- **The handle model (sections 3, 4.0, 4.1, 4.3 values, rules 3, 4 and 6 of section 5) is built**
+  (`f36f62e`), after the audit first kept descriptors and verbs. Choice C of section 3 is what ships: a
+  declaration's members are real C# members, and a page uses the object as the object.
+  - Declarations: `public Prop<decimal> Min => Prop<decimal>();`, `public ReadOnly<bool> IsInteracted =>
+    ReadOnly<bool>();`, `public void SelectRow(Arg<int> index) => Call(index);`, `public
+    TypedSource<int[]> GetSelectedRowIndexes() => Invoke<int[]>();`, `CallAsync` and `InvokeAsync<T>` for
+    a promise, `Fixed(..)` for an argument the declaration fixes, `Pass<TDeclared, TSource>(..)` for a
+    wider declared type, and `name:` where the JavaScript name is not the C# name camel-cased (`""`
+    for a plugin that is itself a function).
+  - Pages: `p.Component<T>(..)` returns the declaration, live in the callback (`rate.Min.Set(0m)`,
+    `grid.Refresh()`, `p.When(rate.Value).Gt(100m)`); an event payload is a declaration bound to the
+    handler's parameter (`args.Cancel.Set(true)`, `args.UpdateData(json.Get(x => x.Items))`); a
+    response, custom-event or push payload is `Data<T>` (`json.Get(x => x.Name)`, and `json` itself is
+    the whole body); `p.Element(id)` is an `HtmlElement` (`Text.Set`, `Html.Set`, `ClassList.Add`,
+    `Children`, `Show`, `Hide`); a plugin is a declaration `plan.RegisterPlugin<T>()` returns.
+  - One source is one argument: the `(source, x => x.Path)` pairs, `DispatchWith`, `AsSource` and the
+    pair overloads of conditions and arrays are gone; a `ReactiveArray<T>` is itself a source.
+  - Each binding (component, event payload, plugin, element) writes into the active scope (4.4), so a
+    write lands in the callback it is written in, whichever variable holds the object.
+  - Not built, as listed under 4.1: `Object<T>`, `InvokeObject<T>`, `FusionGrid<TRow>`, `Event`,
+    `Message<T>`, and paths as plan keys.
+  - Every declaration (51 Fusion, the Native slices, the app objects, two brought components and the
+    sandbox's plugins) and every view moved in one commit: 307 files, 192 of them views. Twenty
+    harness pages rendered byte-identical plan JSON before and after, so the runtime did not change.
 - **Built from the audit:**
   - typed gather and `p.Url<TQuery>()` (section 4.6, as built).
   - the active-scope stack (section 4.4). Every callback is built by `PipelineBuilder.Build`, which
     makes its pipeline the active scope while the callback runs; every step, through any pipeline
-    variable or handle (`ComponentRef`, `ElementBuilder`, `PayloadRef`, a plugin call), lands in the
-    active scope. A handle declared at the top of a trigger and used inside `OnSuccess` writes into
+    variable or object (a component, an element, an event payload, a plugin), lands in the active
+    scope. A handle declared at the top of a trigger and used inside `OnSuccess` writes into
     `OnSuccess`; a step written outside any callback throws at render. The FrontDesk journey declares
     its planner, resident and loading handles once and uses them in every route.
   - typed conditions (section 4.5). An operator returns a `GuardBuilder` (one comparison: `And`, `Or`,
@@ -1075,8 +1108,9 @@ built and what is not.
     surface is deleted: `plan.RegisterPlugin(name, b => ..)`, `PluginTypeBuilder`, and
     `p.Plugin<T>(name, member)`, `p.Plugin<T>(name)`, `p.PluginProperty<T>(name, member)`,
     `p.Plugin(name, member)`, `p.Plugin(name)`. A `Plugin` subclass names the plugin and declares each
-    member with its types (`Function<T>`, `Property<T>`, `Command`); `plan.RegisterPlugin<TPlugin>()`
-    adds it to the plan, and `p.Plugin(plugin.Member)` reads or calls a member. The `[Plugin]`
+    member as any declaration does (`public TypedSource<string> Slug(Arg<string> text) =>
+    Invoke<string>(text, name: "");`); `plan.RegisterPlugin<TPlugin>()` adds it to the plan and returns
+    it, and the page calls its members (`slugify.Slug(args.Get(x => x.Category))`). The `[Plugin]`
     attribute form of section 4.8 is not built: the base-class constructor names the plugin.
   - links (section 4.6): `Html.NativeActionLink(id, text, url, link => link.Post()..)`. The id is the
     developer's; the generated counter id is gone. The callback's `NativeActionLinkRequest` offers

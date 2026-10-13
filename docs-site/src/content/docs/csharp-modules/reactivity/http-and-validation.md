@@ -16,7 +16,7 @@ When the action binds the view model, gather the form:
 p.Post("/Todo/Save").Gather(g => g.Form())
  .Response(r => r.OnSuccess(s =>
  {
-     s.Element("status").SetText("Saved");
+     s.Element("status").Text.Set("Saved");
  }));
 ```
 
@@ -42,11 +42,12 @@ member you set, the input wins.
 ## What if the action binds another class?
 
 Name that class with `Gather<TRequest>`. Each member is a typed lambda over
-`TRequest`, so there is no parameter name to misspell:
+`TRequest`, so there is no parameter name to misspell. Inside an AutoComplete's
+`Filtering` event, `args.Text` is the text typed so far:
 
 ```csharp
 p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
- .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, p.Payload(args).Get(a => a.Text)))
+ .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, args.Text))
 ```
 
 `Form(m => ..)` works here too. Each input you name must also be a member of
@@ -64,9 +65,10 @@ Set the member named like the URL's `{placeholder}`; case does not matter:
 
 ```csharp
 var rateUrl = Url.SandboxRouteTemplate("Rate", "TomSelect", "suiteType");
+var suite = p.Component<TomSelect>(m => m.SuiteType);
 
 quote.Get(rateUrl)
-    .Gather<SuiteQuery>(g => g.Set(x => x.SuiteType, suite.Get(x => x.Value)))
+    .Gather<SuiteQuery>(g => g.Set(x => x.SuiteType, suite.Value))
 ```
 
 Every placeholder must be filled. A placeholder no member fills fails when the
@@ -89,14 +91,17 @@ public sealed class HoldVisitRequest : HoldRequest
 }
 ```
 
+From the front desk page, when the visit planner's week changes (`args` is that
+event's payload, and `args.Added` the time just booked):
+
 ```csharp
 added.Post(holdUrl)
     .Gather<HoldVisitRequest>(g => g
-        .Set(x => x.SlotId, p.Payload(args).Get(a => a.Added))
-        .Set(x => x.VisitsThisWeek, added.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.Count))
+        .Set(x => x.SlotId, args.Added)
+        .Set(x => x.VisitsThisWeek, added.Component<VisitPlanner>(m => m.VisitSlots).Count)
         .Set(x => x.Family, p.Url<FrontDeskQuery>().Get(q => q.Family))
         .Set(x => x.Source, "front-desk")
-        .Header("X-Wing", added.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.Wing)))
+        .Header("X-Wing", added.Component<VisitPlanner>(m => m.VisitSlots).Wing))
 ```
 
 `SlotId` fills `{slotId}` in the path, the other members are the JSON body, and
@@ -104,10 +109,10 @@ added.Post(holdUrl)
 
 ## What can a member be set from?
 
-A literal, or any value: a component member, the event's payload
-(`p.Payload(args).Get(..)`), the page's URL query (`p.Url<TQuery>().Get(..)`),
-a success body (in a request nested in `OnSuccess`), a plugin, or an array
-value. `Header(name, value)` takes a literal or a value too.
+A literal, or any value: a component member (`suite.Value`), the event's
+payload (`args.Added`), the page's URL query (`p.Url<TQuery>().Get(..)`), a
+success body (`json.Get(..)`, in a request nested in `OnSuccess`), a plugin, or
+an array value. `Header(name, value)` takes a literal or a value too.
 
 The compiler keeps the types honest: an `int?` value cannot fill an `int`
 member, and an array fills an array, `List<T>` or `IEnumerable<T>` member.
@@ -129,8 +134,8 @@ Use `WhileLoading(...)` for the in-flight state and `Finally(...)` for cleanup.
 
 ```csharp
 p.Post("/Todo/Save").Gather(g => g.Form())
- .WhileLoading(l => l.Component<NativeLoader>().Call(c => c.Show))
- .Finally(f => f.Component<NativeLoader>().Call(c => c.Hide));
+ .WhileLoading(l => l.Component<NativeLoader>().Show())
+ .Finally(f => f.Component<NativeLoader>().Hide());
 ```
 
 `Finally(...)` runs after success, error, or network failure.
@@ -150,12 +155,13 @@ public sealed class SaveResponse
 p.Post("/Todo/Save").Gather(g => g.Form())
  .Response(r => r.OnSuccess<SaveResponse>((body, s) =>
  {
-     s.Element("status").SetText(body, x => x.Message);
+     s.Element("status").Text.Set(body.Get(x => x.Message));
  }));
 ```
 
-Use `body.Read(...)` when the response value must feed a condition or another
-value-consuming primitive.
+`body.Get(x => x.Message)` reads one member of the body, and `body` itself is
+the whole body. Either one is a value wherever the pipeline takes one: a
+condition, a component property, a request member.
 
 ## Route Errors
 
@@ -165,7 +171,7 @@ Use exact status routes when a status has a known meaning.
 p.Post("/Todo/Save").Gather(g => g.Form())
  .Response(r => r
     .OnError(400, e => e.ValidationErrors("todo-form"))
-    .OnError(e => e.Element("status").SetText("Save failed.")));
+    .OnError(e => e.Element("status").Text.Set("Save failed.")));
 ```
 
 Exact status routes run before general error routes.
@@ -178,7 +184,7 @@ Exact status routes run before general error routes.
 p.Post("/Todo/Save").Gather(g => g.Form())
  .Validate<TodoValidator>("todo-form")
  .Response(r => r
-    .OnSuccess(s => s.Element("status").SetText("Saved"))
+    .OnSuccess(s => s.Element("status").Text.Set("Saved"))
     .OnError(400, e => e.ValidationErrors("todo-form")));
 ```
 
@@ -256,7 +262,7 @@ Parallel branches start together.
 p.Parallel(
     a => a.Get("/lookups/units"),
     b => b.Get("/lookups/care-levels"))
- .OnAllSettled(done => done.Element("status").SetText("Lookups loaded"));
+ .OnAllSettled(done => done.Element("status").Text.Set("Lookups loaded"));
 ```
 
 Use this when the branches are independent.

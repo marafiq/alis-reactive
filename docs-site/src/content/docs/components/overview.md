@@ -36,36 +36,38 @@ Component `.Reactive(...)` attaches a typed event to the rendered component.
 ```csharp
 .Reactive(evt => evt.Change, (args, p) =>
 {
-    p.When(args, x => x.Value).Eq("memory")
+    p.When(args.Value).Eq("memory")
      .Then(t => t.Element("memory-care-panel").Show())
      .Else(e => e.Element("memory-care-panel").Hide());
 })
 ```
 
-The payload type belongs to the selected event. IntelliSense shows the payload
-members for that event.
+`args` is the object the selected event hands you, typed for that event.
+IntelliSense shows its members.
 
 ## Target
 
-Use `p.Component<TComponent>(...)` to work with the component later.
+Use `p.Component<TComponent>(...)` to work with the component later. It returns
+the component itself, so hold it in a variable named for its role:
 
 ```csharp
-p.Component<FusionDropDownList>(m => m.CareLevel)
- .Set(c => c.Value, "assisted")
- .Call(c => c.DataBind);
+var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
+careLevel.Value.Set("assisted");
+careLevel.DataBind();
 ```
 
-`Set`, `Call` and `Get` reach every member the component's class declares, by
-the name its JavaScript API uses.
+Every member the component's class declares, by the name its JavaScript API
+uses, is a member of that variable: a property you write or read, a method you
+call. Each write or call is its own statement.
 
 ## Read
 
-Readable members return typed sources.
+A property is itself a typed value, and so is a method that returns one.
 
 ```csharp
-var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel).Get(c => c.Value);
+var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
 
-p.When(careLevel).Eq("memory")
+p.When(careLevel.Value).Eq("memory")
  .Then(t => t.Element("memory-care-panel").Show());
 ```
 
@@ -83,13 +85,13 @@ arguments.
 App-level components are targeted without a model expression:
 
 ```csharp
-p.Component<FusionToast>()
- .Set(c => c.Content, "Saved")
- .Set(c => c.Tone, FusionToastTone.Success)
- .Call(c => c.Show);
+var toast = p.Component<FusionToast>();
+toast.Content.Set("Saved");
+toast.Tone.Set(FusionToastTone.Success);
+toast.Show();
 ```
 
 Do not learn Alis.Reactive by memorizing every component. Learn the object
 model. A new component should still read as event, payload, property, method,
 and one the framework does not ship is brought the same way: declare its class,
-render it, and every verb works with it.
+render it, and its members work like those of any shipped component.

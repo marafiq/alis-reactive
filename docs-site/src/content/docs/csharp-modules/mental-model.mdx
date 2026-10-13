@@ -33,7 +33,7 @@ is the executor.
 | `Html.InputField(plan, m => m.Field)` | Renders and registers a model-bound input. |
 | `.Reactive(plan, evt => evt.Event, ...)` | Adds a component event trigger. |
 | `p.Element("id")` | Updates a normal DOM element by ID. |
-| `p.Component<TComponent>(...)` | Reads, writes, or calls a component member. |
+| `p.Component<TComponent>(...)` | Returns the component; you read, write, and call its members. |
 | `p.When(source)` | Branches on a typed value source. |
 | `p.Get(...)`, `p.Post(...)`, `p.Put(...)`, `p.Delete(...)` | Adds an async HTTP reaction. |
 | `p.Dispatch(...)` | Raises a declared `AppEvent` as a document `CustomEvent`. |
@@ -43,8 +43,8 @@ The grammar stays small because components share one object model.
 ## Components Are Browser Objects
 
 Every component is a JavaScript object with events, properties, and methods. Its
-C# class declares them by the names its own API uses, and three verbs touch any
-of them.
+C# class declares them by the names its own API uses, as real C# members, and
+`p.Component<T>(...)` returns the component itself.
 
 Events start pipelines:
 
@@ -55,23 +55,20 @@ Events start pipelines:
 Properties can be written:
 
 ```csharp
-p.Component<FusionDropDownList>(m => m.UnitId)
- .Set(c => c.Value, "north-wing");
+var unit = p.Component<FusionDropDownList>(m => m.UnitId);
+unit.Value.Set("north-wing");
 ```
 
 Methods can be called:
 
 ```csharp
-p.Component<FusionDropDownList>(m => m.UnitId)
- .Call(c => c.ShowPopup);
+unit.ShowPopup();
 ```
 
-Properties, and methods that return a value, can be read as value sources:
+Properties, and methods that return a value, are value sources:
 
 ```csharp
-var unit = p.Component<FusionDropDownList>(m => m.UnitId).Get(c => c.Value);
-
-p.When(unit).Eq("memory-care")
+p.When(unit.Value).Eq("memory-care")
  .Then(t => t.Element("memory-care-note").Show());
 ```
 
@@ -84,11 +81,11 @@ The same value-source idea appears across the DSL.
 
 | Source | Example |
 | --- | --- |
-| Event payload | `p.When(args, x => x.Checked)` |
-| Component member | `p.Component<FusionDropDownList>(m => m.UnitId).Get(c => c.Value)` |
+| Event payload | `p.When(args.Checked)` |
+| Component member | `p.Component<FusionDropDownList>(m => m.UnitId).Value` |
 | URL query string | `p.Url<HttpShowcaseQuery>().Get(q => q.ResidentId)` |
-| Response body | `body.Read(x => x.Message)` |
-| Plugin return value | `s.Plugin(slugify.Slug).Arg(planner.Get(c => c.Wing))` |
+| Response body | `body.Get(x => x.Message)`, or `body` itself |
+| Plugin return value | `slugify.Slug(planner.Wing)` |
 
 If a DSL primitive needs a value, it should use this shared path.
 

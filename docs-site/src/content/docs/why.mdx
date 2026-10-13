@@ -15,7 +15,7 @@ Alis.Reactive keeps that behavior in the public C# DSL.
 You describe what should happen:
 
 ```csharp
-p.When(args, x => x.Checked).Truthy()
+p.When(args.Checked).Truthy()
  .Then(t => t.Element("details").Show())
  .Else(e => e.Element("details").Hide());
 ```
@@ -28,8 +28,8 @@ browser.
 | Concern | Usual view-script path | Alis.Reactive path |
 | --- | --- | --- |
 | Event wiring | JavaScript selectors | `.Reactive(evt => evt.Change, ...)` |
-| Payload reads | `event.detail.someValue` strings | `p.When(args, x => x.SomeValue)` |
-| Component updates | Vendor object calls in JS | `p.Component<T>(...).Set(c => c.Value, ...)` |
+| Payload reads | `event.detail.someValue` strings | `p.When(args.Checked)` |
+| Component updates | Vendor object calls in JS | `p.Component<T>(...).Value.Set(...)` |
 | HTTP payloads | Manually assembled JSON | `.Gather(g => g.Form())` |
 | Client validation | Separate client rule system | The same FluentValidation `RuleFor(...)` rules |
 

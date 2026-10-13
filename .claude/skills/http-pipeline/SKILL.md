@@ -1,13 +1,14 @@
 ---
 name: http-pipeline
-description: Use when building HTTP requests in the reactive plan — Get/Post/Put/Delete, Gather (the typed request the endpoint binds - Set, Form, Header, route members), the URL query (p.Url<TQuery>()) and event payload (p.Payload(args).Get) sources, Response (OnSuccess/OnError), Chained requests, Parallel requests, WhileLoading, Finally, and Validate. The HTTP pipeline grammar for Alis.Reactive.
+description: Use when building HTTP requests in the reactive plan — Get/Post/Put/Delete, Gather (the typed request the endpoint binds - Set, Form, Header, route members), the URL query (p.Url<TQuery>()) and event payload (args.Member) sources, Response (OnSuccess/OnError), Chained requests, Parallel requests, WhileLoading, Finally, and Validate. The HTTP pipeline grammar for Alis.Reactive.
 ---
 
 # HTTP Pipeline Grammar
 
 Source of truth: `Alis.Reactive/PlanAuthoring/Requests/` (`HttpRequestBuilder.cs`, `GatherBuilder.cs`,
-`GatherInputDraft.cs`, `RequestRouteTemplate.cs`, `RequestMembers.cs`) and
-`Alis.Reactive/PlanAuthoring/Pipelines/` (`PipelineBuilder.Http.cs`, `UrlQuery.cs`, `PayloadRef.cs`).
+`GatherInputDraft.cs`, `RequestRouteTemplate.cs`, `RequestMembers.cs`, `ResponseBuilder.cs`),
+`Alis.Reactive/PlanAuthoring/Pipelines/` (`PipelineBuilder.Http.cs`, `UrlQuery.cs`) and
+`Alis.Reactive/PlanAuthoring/Events/Data.cs`.
 Every example below is copied from a sandbox view under `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/`.
 
 ## Entry Points
@@ -48,11 +49,11 @@ parameter name comes from a typed member; there are no string parameter names.
 
 | The action binds | Write | Sandbox source |
 |------------------|-------|----------------|
-| the view model, `Reserve([FromBody] SuiteAssignmentModel assignment)` | `.Gather(g => g.Form())` | `Components/Brought/TomSelect/Index.cshtml:87` |
+| the view model, `Reserve([FromBody] SuiteAssignmentModel assignment)` | `.Gather(g => g.Form())` | `Components/Brought/TomSelect/Index.cshtml:85` |
 | a query class, `Medications([FromQuery] MedicationSearchQuery query)` | `.Gather<MedicationSearchQuery>(g => ..)` | `Components/Fusion/AutoComplete/Index.cshtml:138` |
 | a route value, `Rate(string suiteType)` | `.Gather<SuiteQuery>(g => g.Set(x => x.SuiteType, ..))` | `Components/Brought/TomSelect/Index.cshtml:44` |
 | a body class, `AlertHypertension([FromBody] AlertHypertensionRequest? request)` | `.Gather<AlertHypertensionRequest>(g => ..)` | `Conditions/AdmissionAssessment/_CardiacAssessment.cshtml:31` |
-| route values and a JSON body (ASP.NET Core), `HoldVisit(string slotId, [FromBody] HoldRequest? hold)` | `.Gather<HoldVisitRequest>(g => ..)` where `HoldVisitRequest : HoldRequest { SlotId }` | `Components/Brought/VisitPlanner/FrontDesk.cshtml:81` |
+| route values and a JSON body (ASP.NET Core), `HoldVisit(string slotId, [FromBody] HoldRequest? hold)` | `.Gather<HoldVisitRequest>(g => ..)` where `HoldVisitRequest : HoldRequest { SlotId }` | `Components/Brought/VisitPlanner/FrontDesk.cshtml:83` |
 
 In ASP.NET Core an action that binds a JSON body takes its route values as their own parameters.
 The page's request class is then the body class plus the route members:
@@ -87,12 +88,12 @@ GATHER_ITEM :=
   | Header("X-Name", source)
 
 source :=
-  | p.Component<T>(m => m.X).Get(c => c.Member)     -- component property or returning method
-  | p.Payload(args).Get(a => a.Member)              -- the triggering event's payload
+  | p.Component<T>(m => m.X).Member                 -- a component property, or a method that returns: .Member(..)
+  | args.Member                                     -- the triggering event's payload
   | p.Url<TQuery>().Get(q => q.Member)              -- the page's URL query string
-  | json.Read(x => x.Member)                        -- a success body, in a request nested in OnSuccess
-  | p.Plugin(..)                                    -- a plugin value
-  | an array value                                  -- e.g. a Count over an array plugin
+  | json.Get(x => x.Member)                         -- a success body, in a request nested in OnSuccess
+  | plugin.Member(..)                               -- a registered plugin's member
+  | an array value                                  -- e.g. p.From(planner.Slots).Count(..)
 ```
 
 `x` walks `TRequest`; `m` walks the view model. Nested members work on both sides:
@@ -135,27 +136,28 @@ cannot fill a member that may not be missing. A `T[]` source fills a `T[]`, `Lis
 
 ### Examples
 
-Route value from a brought component (`Components/Brought/TomSelect/Index.cshtml:43-44`):
+Route value from a brought component (`Components/Brought/TomSelect/Index.cshtml:41-44`):
 
 ```csharp
+var suite = p.Component<TomSelect>(m => m.SuiteType);
 quote.Get(rateUrl)   // rateUrl = Url.SandboxRouteTemplate("Rate", "TomSelect", "suiteType")
-    .Gather<SuiteQuery>(g => g.Set(x => x.SuiteType, suite.Get(x => x.Value)))
+    .Gather<SuiteQuery>(g => g.Set(x => x.SuiteType, suite.Value))
 ```
 
-Route value, body members and a header in one request (`Components/Brought/VisitPlanner/FrontDesk.cshtml:80-86`;
+Route value, body members and a header in one request (`Components/Brought/VisitPlanner/FrontDesk.cshtml:82-88`;
 `holdUrl` is `.../FrontDesk/Hold/{slotId}`):
 
 ```csharp
 added.Post(holdUrl)
     .Gather<HoldVisitRequest>(g => g
-        .Set(x => x.SlotId, p.Payload(args).Get(a => a.Added))
-        .Set(x => x.VisitsThisWeek, added.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.Count))
+        .Set(x => x.SlotId, args.Added)
+        .Set(x => x.VisitsThisWeek, added.Component<VisitPlanner>(m => m.VisitSlots).Count)
         .Set(x => x.Family, p.Url<FrontDeskQuery>().Get(q => q.Family))
         .Set(x => x.Source, "front-desk")
-        .Header("X-Wing", added.Component<VisitPlanner>(m => m.VisitSlots).Get(c => c.Wing)))
+        .Header("X-Wing", added.Component<VisitPlanner>(m => m.VisitSlots).Wing))
 ```
 
-Every input of the form, plus one member the form does not carry (`Validation/MoveInReview/Index.cshtml:40`):
+Every input of the form, plus one member the form does not carry (`Validation/MoveInReview/Index.cshtml:42`):
 
 ```csharp
 p.Post(Url.SandboxRoute("Save", "MoveInReview")).Gather(g => g.Form().Set(x => x.Pharmacy.Network, "Riverside Health"))
@@ -168,7 +170,7 @@ then.Post(alertHypertensionUrl)
  .Gather<AlertHypertensionRequest>(g => g.Form(m => m.SystolicBP, m => m.ResidentName))
 ```
 
-Literal members and one input (`Components/Fusion/Grid/Index.cshtml:125-129`):
+Literal members and one input (`Components/Fusion/Grid/Index.cshtml:124-128`):
 
 ```csharp
 p.Post(Url.SandboxRoute("Data", "Grid"))
@@ -200,7 +202,7 @@ p.Post(Url.SandboxRoute("Echo", "FileUpload"))
 
 `TQuery` is the class the page's action binds with `[FromQuery]`. A member reads the query key of its
 binding name, matched ignoring case. A scalar member reads the key's first value; an array member reads
-every value of the key. The result is a source like any other: conditions, `SetText`, `Set`, `Header`.
+every value of the key. The result is a source like any other: conditions, `Text.Set`, `Set`, `Header`.
 
 ```csharp
 // Models/HttpPipeline/Http/HttpShowcaseModel.cs
@@ -215,7 +217,7 @@ public sealed class HttpShowcaseQuery
 ```
 
 ```csharp
-// HttpPipeline/Http/Index.cshtml:31-36, 43-46 (two DomReady handlers in the view)
+// HttpPipeline/Http/Index.cshtml:31-38, 43-46 (two DomReady handlers in the view)
 var link = p.Url<HttpShowcaseQuery>();
 p.When(link.Get(q => q.Tab)).Eq("medications")
  .Then(then => then.Element("url-cond-meds").Show())
@@ -225,7 +227,7 @@ p.When(link.Get(q => q.Page)).Gt(1)
  .Then(then => then.Element("url-cond-prev").Show())
  .Else(els => els.Element("url-cond-prev").Hide());
 
-p.Element("url-display-wings").SetText(link.Get(q => q.Wing));     // every ?wing= value
+p.Element("url-display-wings").Text.Set(link.Get(q => q.Wing));     // every ?wing= value
 ```
 
 URL members fill a route value, a header and a query member of another request
@@ -240,20 +242,19 @@ p.Get(Url.SandboxRouteTemplate("ComposeEcho", "Http", "id"))
      .Set(x => x.Facility, link.Get(q => q.FacilityId)))
 ```
 
-## Event Payload Members: `p.Payload(args).Get(..)`
+## Event Payload Members: `args.Member`
 
-`p.Payload(args)` is the handle for the object the event handed its callback; `Get` reads one of its
-members as a source (`Components/Fusion/Grid/Index.cshtml:169-184`):
+`args` is the object the event handed its callback, declared as a `JsObject`. Each of its members is a
+source; a member whose value is data reads further with `Get` (`Components/Fusion/Grid/Index.cshtml:167-181`):
 
 ```csharp
-var dataState = t.Payload(args);
 t.Post(Url.SandboxRoute("Data", "Grid"))
  .Gather<GridDataRequest>(g => g
-     .Set(x => x.EventName, dataState.Get(a => a.Name))
-     .Set(x => x.Skip, dataState.Get(a => a.Skip))
-     .Set(x => x.Take, dataState.Get(a => a.Take))
-     .Set(x => x.ActionCurrentPage, dataState.Get(a => a.Action.CurrentPage))
-     .Set(x => x.Sorted, dataState.Get(a => a.Sorted))
+     .Set(x => x.EventName, args.Name)
+     .Set(x => x.Skip, args.Skip)
+     .Set(x => x.Take, args.Take)
+     .Set(x => x.ActionCurrentPage, args.Action.Get(x => x.CurrentPage))
+     .Set(x => x.Sorted, args.Sorted)
      .Form(m => m.MinAge))
 ```
 
@@ -271,7 +272,7 @@ p.Get(Url.SandboxRouteTemplate("ResidentById", "Http", "id"))
         s.Get(Url.SandboxRouteTemplate("FacilityResident", "Http", "facilityId", "residentId"))
          .Gather<FacilityResidentLookup>(g => g
             .Set(x => x.FacilityId, s.Url<HttpShowcaseQuery>().Get(q => q.FacilityId))
-            .Set(x => x.ResidentId, json.Read(x => x.ResidentId)))
+            .Set(x => x.ResidentId, json.Get(x => x.ResidentId)))
          ...
 ```
 
@@ -282,14 +283,15 @@ p.Get(Url.SandboxRouteTemplate("ResidentById", "Http", "id"))
     r.OnSuccess(HANDLER);                    -- untyped (any 2xx)
     r.OnSuccess<TResponse>(TYPED_HANDLER);   -- typed JSON response
     r.OnError(STATUS, HANDLER);              -- status-specific error
+    r.OnError<TError>(STATUS, TYPED_HANDLER); -- status-specific error with a typed body
     r.Chained(CHAINED_REQUEST);              -- sequential follow-up
 })
 
 HANDLER := (s => { PIPELINE_COMMANDS })
 
 TYPED_HANDLER := ((json, s) => {
-    s.Element("x").SetText(json, x => x.Property);  -- "responseBody.property"
-    s.Component<T>(m => m.Y).Set(c => c.DataSource, json.Read(x => x.Items));
+    s.Element("x").Text.Set(json.Get(x => x.Property));
+    s.Component<FusionDropDownList>(m => m.City).DataSource.Set(json.Get(j => j.Cities));
 })
 
 CHAINED_REQUEST := (c => c.VERB(url).CHAIN)     -- full request chain
@@ -297,20 +299,25 @@ CHAINED_REQUEST := (c => c.VERB(url).CHAIN)     -- full request chain
 
 **Response pipeline `s`** is a full `PipelineBuilder` — supports Element, Component, Dispatch, When, nested HTTP, etc.
 
-## Typed Response (ResponseBody&lt;T&gt;)
+## Typed Response (`Data<T>`)
+
+`json` is `Data<TResponse>`: `json.Get(x => x.Member)` reads a member, and `json` itself is the whole
+body (`HttpPipeline/Http/Index.cshtml`, `Components/Fusion/Grid/Index.cshtml`):
 
 ```csharp
-.OnSuccess<ApiResponse>((json, s) =>
+.OnSuccess<ResidentsResponse>((json, s) =>
 {
-    // json is ResponseBody<ApiResponse> — phantom for compile-time path inference
-    s.Element("name").SetText(json, x => x.Data.Name);     // → "responseBody.data.name"
-    s.Element("count").SetText(json, x => x.TotalCount);   // → "responseBody.totalCount"
-    s.Payload(args).Call(a => a.UpdateData, json.Read(j => j.Items));  // → "responseBody.items"
-    s.Component<FusionGrid>("roster").Set(c => c.DataSource, json.Read(x => x.Rows)); // x => x is the whole body
+    s.Element("load-first").Text.Set(json.Get(x => x.First));
+    s.Element("load-count").Text.Set(json.Get(x => x.Count));
+})
+
+.OnSuccess<ResidentGridResponse>((json, s) =>
+{
+    s.Component<FusionGrid>("residents-grid").DataSource.Set(json);   // the whole body
 })
 ```
 
-`TResponse` must be `class, new()`. Properties map to camelCase dot-paths. Runtime walks `responseBody.path` in the execution context.
+A member reads by its camel-case JSON name. `TResponse` must be a class.
 
 ## Error Handling
 
@@ -318,10 +325,19 @@ CHAINED_REQUEST := (c => c.VERB(url).CHAIN)     -- full request chain
 .Response(r => r
     .OnSuccess<T>((json, s) => { ... })
     .OnError(400, e => e.ValidationErrors("formId"))    // display field errors
-    .OnError(500, e => e.Element("error").SetText("Server error")))
+    .OnError(500, e => e.Element("error").Text.Set("Server error")))
 ```
 
 Multiple `OnError` handlers allowed (one per status code). `ValidationErrors("formId")` maps server 400 response to field-level error display.
+A typed error body reads like a success body (`Components/Brought/VisitPlanner/FrontDesk.cshtml`):
+
+```csharp
+.OnError<DeskConflict>(409, (conflict, e) =>
+{
+    e.Component<VisitPlanner>(m => m.VisitSlots).Value.Set(conflict.Get(x => x.Held));
+    e.Element("desk-status").Text.Set(conflict.Get(x => x.Message));
+})
+```
 
 ## WhileLoading
 
@@ -330,12 +346,12 @@ p.Get("/api/data")
  .WhileLoading(l =>
  {
      l.Element("spinner").Show();
-     l.Element("btn").AddClass("disabled");
+     l.Element("btn").ClassList.Add("disabled");
  })
  .Response(r => r.OnSuccess(s =>
  {
      s.Element("spinner").Hide();
-     s.Element("btn").RemoveClass("disabled");
+     s.Element("btn").ClassList.Remove("disabled");
  }))
 ```
 
@@ -343,18 +359,20 @@ Commands execute before the HTTP request fires. **Sequential commands only** —
 
 ## Chained Requests
 
+From `HttpPipeline/Http/Index.cshtml`:
+
 ```csharp
-p.Get("/api/residents")
+p.Get(Url.SandboxRoute("Residents", "Http"))
  .Response(r => r
     .OnSuccess<ResidentsResponse>((json, s) =>
     {
-        s.Element("residents").SetText(json, x => x.First);
+        s.Element("chain-resident-first").Text.Set(json.Get(x => x.First));
     })
     .Chained(c => c
-        .Get("/api/facilities")
+        .Get(Url.SandboxRoute("Facilities", "Http"))
         .Response(r2 => r2.OnSuccess<FacilitiesResponse>((json2, s2) =>
         {
-            s2.Element("facilities").SetText(json2, x => x.First);
+            s2.Element("chain-facility-first").Text.Set(json2.Get(x => x.First));
         }))))
 ```
 
@@ -362,20 +380,21 @@ Chained fires **only on 2xx success** of the parent request. Can nest further.
 
 ## Parallel Requests
 
+From `HttpPipeline/Http/Index.cshtml`:
+
 ```csharp
-p.Element("spinner").Show();
+p.Element("parallel-spinner").Show();
 p.Parallel(
-    a => a.Get("/api/residents")
-          .Response(r => r.OnSuccess<ResResponse>((json, s) =>
-              s.Element("r1").SetText(json, x => x.First))),
-    b => b.Get("/api/facilities")
-          .Response(r => r.OnSuccess<FacResponse>((json, s) =>
-              s.Element("r2").SetText(json, x => x.First)))
-)
-.OnAllSettled(s =>
+    a => a.Get(Url.SandboxRoute("Residents", "Http"))
+          .Response(ra => ra.OnSuccess<ResidentsResponse>((json, sa) =>
+              sa.Element("parallel-resident-first").Text.Set(json.Get(x => x.First)))),
+    b => b.Get(Url.SandboxRoute("Facilities", "Http"))
+          .Response(rb => rb.OnSuccess<FacilitiesResponse>((json, sb) =>
+              sb.Element("parallel-facility-first").Text.Set(json.Get(x => x.First))))
+).OnAllSettled(s =>
 {
-    s.Element("spinner").Hide();
-    s.Element("status").SetText("All loaded");
+    s.Element("parallel-spinner").Hide();
+    s.Element("parallel-all").Text.Set("All parallel requests completed!");
 });
 ```
 
@@ -389,14 +408,14 @@ Source: `Components/Fusion/AutoComplete/Index.cshtml:134-145`; the action binds 
 ```csharp
 .Reactive(evt => evt.Filtering, (args, p) =>
 {
-    p.Payload(args).Set(a => a.PreventDefaultAction, true);
+    args.PreventDefaultAction.Set(true);
     p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
-     .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, p.Payload(args).Get(a => a.Text)))
+     .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, args.Text))
      .Response(r => r
         .OnSuccess<MedicationSearchResponse>((json, s) =>
         {
-            s.Payload(args).Call(a => a.UpdateData, json.Read(j => j.Medications));
-            s.Element("filter-status").SetText("results loaded");
+            args.UpdateData(json.Get(j => j.Medications));
+            s.Element("filter-status").Text.Set("results loaded");
         }));
 })
 ```
@@ -409,17 +428,17 @@ p.Post(Url.SandboxRoute("Save", "Todo")).Gather(g => g.Form())
  .Response(r => r
     .OnSuccess(s =>
     {
-        s.Component<FusionToast>()
-            .Set(c => c.Title, "Todo")
-            .Set(c => c.Content, "Todo saved successfully")
-            .Set(c => c.Tone, FusionToastTone.Success)
-            .Call(c => c.Show);
+        var toast = s.Component<FusionToast>();
+        toast.Title.Set("Todo");
+        toast.Content.Set("Todo saved successfully");
+        toast.Tone.Set(FusionToastTone.Success);
+        toast.Show();
     })
     .OnError(400, e => e.ValidationErrors("todo-form")));
 ```
 
 **Pattern 3: Cascade (parent change populates child)**
-Source: `Patterns/Cascading/Index.cshtml:43-52`; the action binds `[FromQuery] string? Country`, and
+Source: `Patterns/Cascading/Index.cshtml:43-59`; the action binds `[FromQuery] string? Country`, and
 `CityLookupQuery { string? Country }` names that query for the page.
 ```csharp
 .Reactive(evt => evt.Change, (args, p) =>
@@ -429,9 +448,9 @@ Source: `Patterns/Cascading/Index.cshtml:43-52`; the action binds `[FromQuery] s
      .Response(r => r
         .OnSuccess<CityLookupResponse>((json, s) =>
         {
-            s.Component<FusionDropDownList>(m => m.City)
-                .Set(c => c.DataSource, json.Read(j => j.Cities))
-                .Call(c => c.DataBind);
+            var city = s.Component<FusionDropDownList>(m => m.City);
+            city.DataSource.Set(json.Get(j => j.Cities));
+            city.DataBind();
         }));
 })
 ```
@@ -441,7 +460,7 @@ Source: `Patterns/Cascading/Index.cshtml:43-52`; the action binds `[FromQuery] s
 - **Gather names the class the endpoint binds** — `Gather<TRequest>`, or `Gather(..)` when the action binds the view model; no string parameter names
 - **A `{placeholder}` is filled by the member of its name** — every placeholder must be filled; the rest goes to the query (GET) or the body
 - **Form() for the form's inputs** — `Form()` sends every input, `Form(m => ..)` the named ones, each by its binding name
-- **The payload for filtering** — `Set(x => x.M, p.Payload(args).Get(a => a.Text))` sends the text typed during the keystroke
+- **The payload for filtering** — `Set(x => x.M, args.Text)` sends the text typed during the keystroke
 - **updateData for filtering** — the ONLY correct SF API for async filtered data
 - **Call DataBind after setting DataSource** — needed for cascade patterns (not needed after a payload's UpdateData)
 - **PreventDefault before async HTTP** — suppresses SF "No records found" flash

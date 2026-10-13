@@ -17,16 +17,15 @@ Use `.Reactive(...)` on a rendered component.
     .NativeCheckBox(b => b.CssClass("h-4 w-4 rounded border-border text-accent"))
     .Reactive(evt => evt.Change, (args, p) =>
     {
-        p.When(args, x => x.Checked).Truthy()
-         .Then(t => t.Element("due-date").Show())
-         .Else(e => e.Element("due-date").Hide());
+        p.When(args.Checked).Truthy()
+            .Then(t => t.Element("due-date-section").Show())
+            .Else(e => e.Element("due-date-section").Hide());
     }); }
 ```
 
-`evt => evt.Change` selects the component's `change` event. `args` is the typed
-payload for that event.
-
-The runtime reads the browser payload. The C# placeholder only records the path.
+`evt => evt.Change` selects the component's `change` event. `args` is the
+object that event hands you, typed: `args.Checked` is its `checked` value, read
+in the browser when the event fires.
 
 ## Page and Document Events
 
@@ -36,40 +35,46 @@ Use `Html.On(...)` for triggers that are not attached to one rendered component.
 @{
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Element("status").SetText("Ready");
+        p.Element("status").Text.Set("Ready");
     }));
 }
 ```
 
 Custom events can carry a typed payload. Declare the event once, with its name and payload, so
-the page that raises it and the page that hears it cannot disagree on either.
+the page that raises it and the page that hears it cannot disagree on either. From the visit
+board page:
 
 ```csharp
-public sealed class UnitChangedPayload
+public sealed class BoardChange
 {
-    public string? UnitId { get; set; }
+    public string Summary { get; set; } = "";
+
+    public int Booked { get; set; }
 }
 
-public static class UnitEvents
+public static class VisitBoardEvents
 {
-    public static readonly AppEvent<UnitChangedPayload> UnitChanged =
-        AppEvent.Named<UnitChangedPayload>("unitChanged");
+    public static readonly AppEvent<BoardChange> BoardChanged = AppEvent.Named<BoardChange>("board-changed");
 }
 ```
 
 ```csharp
-Html.On(plan, t => t.CustomEvent(UnitEvents.UnitChanged, (payload, p) =>
+Html.On(plan, t => t.CustomEvent<BoardChange>(VisitBoardEvents.BoardChanged, (change, p) =>
 {
-    p.Element("selected-unit").SetText(payload, x => x.UnitId);
+    p.Element("board-log").Text.Set(change.Get(x => x.Summary));
+    p.Element("board-log-booked").Text.Set(change.Get(x => x.Booked));
 }));
 ```
 
-Pipelines raise the same event.
+`change.Get(x => x.Summary)` reads one member of the payload. Pipelines raise
+the same event, filling each member from a value. The board raises it when
+another desk takes a time; `taken` is that server message and `planner` the
+page's visit planner:
 
 ```csharp
-p.DispatchWith(UnitEvents.UnitChanged, d => d
-    .Set(x => x.UnitId,
-        p.Component<FusionDropDownList>(m => m.UnitId).Get(c => c.Value)));
+p.Dispatch<BoardChange>(VisitBoardEvents.BoardChanged, change => change
+    .Set(x => x.Summary, taken.Get(x => x.Message))
+    .Set(x => x.Booked, planner.Count));
 ```
 
 An event with no payload is `AppEvent.Named("name")`, heard with `t.CustomEvent(evt, p => ...)` and
@@ -81,14 +86,13 @@ server sends, by the names it sends them under, and the server writes each under
 ```csharp
 public sealed class ResidentStatusFeed : SignalRHub
 {
-    public SignalRMessage<ResidentStatusPayload> StatusChanged =>
-        Message<ResidentStatusPayload>("StatusChanged");
+    public SignalRMessage<ResidentStatusPayload> StatusChanged => Message<ResidentStatusPayload>("StatusChanged");
 }
 
 Html.On(plan, t => t.SignalR(SignalRHub.At<ResidentStatusFeed>("/hubs/resident-status"),
     h => h.StatusChanged, (payload, p) =>
     {
-        p.Element("resident-status").SetText(payload, x => x.Status);
+        p.Element("resident-status").Text.Set(payload.Get(x => x.Status));
     }));
 
 // On the server:
@@ -100,87 +104,93 @@ A stream is `ServerPushStream` with `Message<T>("event-name")` members, used wit
 
 ## Element Members
 
-`p.Element("id")` targets a normal DOM element by ID.
+`p.Element("id")` is a normal DOM element, found by its ID.
 
 ```csharp
-p.Element("summary").SetText("Saved");
+p.Element("summary").Text.Set("Saved");
 p.Element("details").Show();
-p.Element("banner").AddClass("is-active");
+p.Element("banner").ClassList.Add("is-active");
 ```
 
-The element API is intentionally small: text, HTML, class changes, and hidden
-state.
+The element API is intentionally small: `Text`, `Html`, `ClassList` (`Add`,
+`Remove`, `Toggle`), `Show()` and `Hide()`. Text and HTML take a literal or
+any value, shown as it arrives.
 
 ## Components
 
 A component is a JavaScript object. Its C# class declares the properties,
-methods and events its own API has, by their JavaScript names. Three verbs
-touch any declared member, and `c` is the declaration:
+methods and events its own API has, and you use them as members of the object.
+`p.Component<T>(..)` returns the component itself, so hold it in a variable
+named for its role. From the cascading page, in a request's success route
+(`s`, with the response body `json`):
 
 ```csharp
-var unit = p.Component<FusionDropDownList>(m => m.UnitId);
-
-unit.Set(c => c.Value, "north")      // write a property
-    .Call(c => c.DataBind);          // call a method
-
-unit.Call(c => c.ShowPopup);
-unit.Call(c => c.FocusIn);
+var city = s.Component<FusionDropDownList>(m => m.City);
+city.DataSource.Set(json.Get(j => j.Cities));   // write a property
+city.DataBind();                                // call a method
 ```
 
-A write takes a literal or any value source: another component, an event
-payload, a response body, a URL parameter.
+Each write and each call is its own statement, and it runs in the callback
+you write it in. A write takes a literal or any value: another component, an
+event payload, a response body, a URL parameter.
 
 ```csharp
-s.Component<FusionDropDownList>(m => m.City)
-    .Set(c => c.DataSource, json.Read(j => j.Cities))
-    .Call(c => c.DataBind);
+p.Component<FusionDropDownList>(m => m.Category).Value.Set("Books");
+p.Component<FusionDropDownList>(m => m.Category).ShowPopup();
 ```
 
 Each component offers exactly the members its class declares.
 
 ## Component Reads
 
-`Get` reads a property, or what a method returns, as a typed value source.
+A property is itself a value, and so is a method that returns one.
 
 ```csharp
-var unitId = p.Component<FusionDropDownList>(m => m.UnitId).Get(c => c.Value);
+var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
 
-p.When(unitId).NotEmpty()
- .Then(t => t.Element("unit-warning").Hide());
+p.Element("s1-current-level").Text.Set(careLevel.Value);
+p.When(careLevel.Value).Eq("Memory Care")
+    .Then(then => then.Component<FusionDropDownList>(m => m.Protocol).Value.Set("Enhanced Monitoring"));
 ```
 
-The runtime reads the browser object when the pipeline runs.
+The value is read in the browser when the step runs.
 
 ## Event Payloads
 
-Payload fields are plain C# properties. When the payload also has methods, its
-class declares them, and `p.Payload(args)` writes, calls and reads them:
+The object an event hands you is used as the object. Its members are values,
+a member the component reads back can be written, and its methods can be
+called:
 
 ```csharp
 .Reactive(evt => evt.Filtering, (args, p) =>
 {
-    p.Payload(args).Set(a => a.PreventDefaultAction, true);
+    args.PreventDefaultAction.Set(true);
     p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
-     .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, p.Payload(args).Get(a => a.Text)))
-     .Response(r => r.OnSuccess<MedicationSearchResponse>((json, s) =>
-         s.Payload(args).Call(a => a.UpdateData, json.Read(j => j.Medications))));
+     .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, args.Text))
+     .Response(r => r
+        .OnSuccess<MedicationSearchResponse>((json, s) =>
+        {
+            args.UpdateData(json.Get(j => j.Medications));
+            s.Element("filter-status").Text.Set("results loaded");
+        }));
 })
 ```
 
-`p.Payload(args).Get(a => a.Text)` reads a payload member as a value, here the
-text typed so far, sent as the request's `MedicationType`.
+`args.Text` is the text typed so far, sent as the request's `MedicationType`.
+`args.UpdateData(..)` hands the results to the popup.
 
 ## Value Sources
 
-The same source shape is reused everywhere.
+The same values are reused everywhere.
 
 ```csharp
-p.When(args, x => x.Value).Eq("north");
-p.When(p.Url<HttpShowcaseQuery>().Get(q => q.Tab)).Eq("medications");
-p.Element("message").SetText(body, x => x.Message);
+p.Element("change-value").Text.Set(args.Value);
+p.When(p.Url<HttpShowcaseQuery>().Get(q => q.Tab)).Eq("medications")
+ .Then(then => then.Element("url-cond-meds").Show());
+s.Element("load-first").Text.Set(json.Get(x => x.First));
 ```
 
-Use sources for conditions, element text, request members (route values
+Use them for conditions, element text, request members (route values
 included), headers, dispatch payloads, and plugin arguments.
 
 ## How do I combine conditions?
@@ -190,12 +200,12 @@ chain uses one of them; to mix them, put the inner part in a group, so the order
 written where you read it. From the escalation routing page:
 
 ```csharp
-p.When(assessment.Get(c => c.Value)).Gte(85m)
-    .And(cs => cs.When(supervisorOverride.Get(c => c.Checked)).Truthy()
-        .Or(careTrack.Get(c => c.Value)).Eq("memory"))
+p.When(assessment.Value).Gte(85m)
+    .And(cs => cs.When(supervisorOverride.Checked).Truthy()
+        .Or(careTrack.Value).Eq("memory"))
     .Then(then => then.Dispatch(EscalationRoutingEvents.ComponentRouteIsolation))
-    .ElseIf(assessment.Get(c => c.Value)).Gte(60m)
-    .And(cs => cs.When(supervisorOverride.Get(c => c.Checked)).Truthy().Not())
+    .ElseIf(assessment.Value).Gte(60m)
+    .And(cs => cs.When(supervisorOverride.Checked).Truthy().Not())
     .Then(then => then.Dispatch(EscalationRoutingEvents.ComponentRouteMonitor));
 ```
 
@@ -226,7 +236,7 @@ p.When(link.Get(q => q.Page)).Gt(1)
  .Then(then => then.Element("url-cond-prev").Show())
  .Else(els => els.Element("url-cond-prev").Hide());
 
-p.Element("url-display-wings").SetText(link.Get(q => q.Wing));
+p.Element("url-display-wings").Text.Set(link.Get(q => q.Wing));
 ```
 
 Each member reads the key of its name, ignoring case. A single-value member reads
@@ -245,19 +255,21 @@ public sealed class VisitBoardSlugPlugin : Plugin
     public VisitBoardSlugPlugin()
         : base("slugify")
     {
-        Slug = Function<string>().Arg<string>();
     }
 
-    public PluginFunction<string> Slug { get; }
+    /// <summary>The plugin is itself the function: it takes text and returns its slug.</summary>
+    public TypedSource<string> Slug(Arg<string> text) => Invoke<string>(text, name: "");
 }
 ```
 
 ```csharp
 var slugify = plan.RegisterPlugin<VisitBoardSlugPlugin>();
 
-TypedPluginSource<string> boardCode = s.Plugin(slugify.Slug).Arg(planner.Get(c => c.Wing));
+TypedSource<string> boardCode = slugify.Slug(planner.Wing);
+s.Element("board-code").Text.Set(boardCode);
 ```
 
-`Function<T>(..)` declares a member that returns a value, `Property<T>(..)` one that is read,
-and `Command(..)` one that is called for its effect (`p.Plugin(plugin.Command).Arg(..).Fire()`).
-The plugin's name and its members' JavaScript names are the only strings; every use is typed.
+A plugin declares its members the way a component does: `Invoke<T>(..)` for a member that returns
+a value (`name: ""` when the plugin is itself the function), `ReadOnly<T>()` for one that is read,
+and `Call(..)` for one that is called for its effect. The plugin's name is its only string; every
+use is typed.

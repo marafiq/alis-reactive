@@ -1,4 +1,6 @@
 > Lowering of `validation.md` into the grammar, read at `195d3a1`. The verdicts were recorded before [`../grammar.md`](../grammar.md) settled the gaps and ambiguities; that file's sections 8 and 9 give the decisions and the final counts. Each table was produced by one reader against the code and spot-checked.
+>
+> References re-anchored at `f36f62e`. The validation rework (`b966c57`) implemented this lowering, so verdicts and obligations stay as recorded at `195d3a1` and each now cites the code that carries it: `ClientRuleProjection.cs` and `ClientCondition.cs` read the FluentValidation rules and the `When` lambdas (O-ID, O-WHEN, O-PFX, O-IDX, O-CHILD), `FormLowering.cs` lowers each rule to an `alis.form` test, and `Alis.Reactive.Assets/runtime/modules/form/form.ts` runs the tests; where the outcome changed, the row says how. The deleted rule engine (`rule-engine.ts`, `compare-engine.ts`, `orchestrator.ts`, `live-clear.ts`, `error-display.ts`) and C# builders (`ReactiveClientRuleBuilder.cs`, `FieldConditionBuilder.cs`, the app-level builders) are named without line numbers. Validation does not pass through `ObjectBinding`: a rule reads each input as MVC binds it, through `alis.model` (LoweringContext.cs:198-202; ValueLowering.cs:122-128), not through a component's members.
 
 # Validation use cases lowered into architecture.md (v6)
 
@@ -12,7 +14,7 @@ FluentValidation source checked: tag `12.1.1` (net10) and branch `11.x` (= 11.12
 
 ## Notation
 
-- `v`: the checked input's value after the CLR-type empty rule (architecture.md:741-743): string, empty → `null`;
+- `v`: the checked input's value after the CLR-type empty rule (architecture.md:769-771): string, empty → `null`;
   non-nullable number, empty → `0`; `Nullable<T>`, empty → `null`; `bool`, unchecked → `false`; `bool?`, unanswered → `null`;
   `DateTime?`, empty → `null`; a collection with nothing selected → `[]`.
 - `m.a.b`: a read of `form.values` (the model). `T(x)` = `toTime`, `N(x)` = `toNumber`.
@@ -41,67 +43,67 @@ FluentValidation source checked: tag `12.1.1` (net10) and branch `11.x` (= 11.12
 | 14 | email | `RuleFor(x => x.Email).EmailAddress().WithMessage(…)` | `v == null or matches(v, ^[^\s@]+@[^\s@]+\.[^\s@]+$)` | OBLIGATION O-ID (IEmailValidator is a marker with no pattern; FV default is AspNetCoreCompatible, EmailValidator.cs:68-85) |
 | 15 | url (http/https) | `RuleFor(x => x.Website).Url().WithMessage(…)` (framework `IBrowserRule`) | `v == null or matches(v, ^https?://.+)` | OBLIGATION O-BROWSER |
 | 16 | creditCard (Luhn) | `RuleFor(x => x.CardNumber).CreditCard().WithMessage(…)` | `v == null or luhn(v)` | OBLIGATION O-LUHN |
-| 17 | at least one (CheckList, MultiSelect, FileUpload) | `RuleFor(x => x.DietaryNeeds).NotEmpty().WithMessage("Select at least one …")` | `v != null && v.length > 0` | EXPRESSED (architecture.md:729; uploader value = files, :473) |
+| 17 | at least one (CheckList, MultiSelect, FileUpload) | `RuleFor(x => x.DietaryNeeds).NotEmpty().WithMessage("Select at least one …")` | `v != null && v.length > 0` | EXPRESSED (architecture.md:757; uploader value = files, :486) |
 | 18 | minLength | `RuleFor(x => x.Password).MinimumLength(8)…` | `v == null or v.length >= Min` (ILengthValidator Min=8, Max=-1) | EXPRESSED |
 | 19 | maxLength | `RuleFor(x => x.Nickname).MaximumLength(50)…` | `v == null or v.length <= Max` | EXPRESSED |
-| 20 | regex | `RuleFor(x => x.Phone).Matches(@"^\d{3}-\d{3}-\d{4}$")…` | `v == null or matches(v, Expression)` | EXPRESSED (JS dialect checked at render, :752) |
+| 20 | regex | `RuleFor(x => x.Phone).Matches(@"^\d{3}-\d{3}-\d{4}$")…` | `v == null or matches(v, Expression)` | EXPRESSED (JS dialect checked at render, architecture.md:780; at `f36f62e` a pattern JavaScript reads differently stays on the server instead, ClientRuleProjection.cs:169-191) |
 | 21 | inclusive range on numbers | `RuleFor(x => x.Age).InclusiveBetween(0, 120)…` | `v == null or (N(v) >= From && N(v) <= To)` | EXPRESSED |
-| 22 | exclusiveRange | `RuleFor(x => x.Score).ExclusiveBetween(0m, 100m)…` | `v == null or (N(v) > From && N(v) < To)` | GAP: `Score` is `decimal` (NewRuleTypesModel.cs:6): empty reads 0 and fails; today empty passes (rule-engine.ts:209). Also O-ID (no interface) |
+| 22 | exclusiveRange | `RuleFor(x => x.Score).ExclusiveBetween(0m, 100m)…` | `v == null or (N(v) > From && N(v) < To)` | GAP: `Score` is `decimal` (NewRuleTypesModel.cs:6): empty reads 0 and fails; at `195d3a1` empty passed (`rule-engine.ts`). At `f36f62e` an empty `decimal` binds as 0 (shape.ts:42-53) and the range fails on it, as on the server (FormLowering.cs:170-187). Also O-ID (no interface) |
 | 23 | min literal on a number | `RuleFor(x => x.Salary).GreaterThanOrEqualTo(0m)…` (`decimal?`) | `v == null or N(v) >= 0` | EXPRESSED |
 | 24 | min date literal | `RuleFor(x => x.AdmissionDate).GreaterThanOrEqualTo(new DateTime(2020,1,1))…` | `v == null or T(v) >= T("2020-01-01")` | EXPRESSED |
 | 25 | max literal on a number | `RuleFor(x => x.Salary).LessThanOrEqualTo(500000m)…` | `v == null or N(v) <= 500000` | EXPRESSED |
 | 26 | max date literal (today / now) | `RuleFor(x => x.AdmissionDate).LessThanOrEqualTo(DateTime.Today)…`; `…(DateTime.UtcNow)` | `v == null or T(v) <= T(lit)` | OBLIGATION O-DATE |
-| 27 | gt literal, `decimal`: empty fails | `RuleFor(x => x.MonthlyRate).GreaterThan(0m)…` | `N(v) > 0` (v never null; empty → 0) | EXPRESSED (:742-743) |
-| 28 | gt date literal | `GreaterThan(<date>)` on `DateTime?` | `v == null or T(v) > T(lit)` | GAP: nullable empty now passes; today `gt` fails on empty (rule-engine.ts:193-196). Design-accepted (:744-747); no sandbox use |
+| 27 | gt literal, `decimal`: empty fails | `RuleFor(x => x.MonthlyRate).GreaterThan(0m)…` | `N(v) > 0` (v never null; empty → 0) | EXPRESSED (architecture.md:770-771) |
+| 28 | gt date literal | `GreaterThan(<date>)` on `DateTime?` | `v == null or T(v) > T(lit)` | GAP: nullable empty now passes; at `195d3a1` `gt` failed on empty (`rule-engine.ts`). Design-accepted (architecture.md:772-775); no sandbox use. At `f36f62e` an ordered rule passes on nothing bound (FormLowering.cs:158-168) |
 | 29 | lt literal, equal fails | `RuleFor(x => x.MaxDeposit).LessThan(1000000m)…` (`decimal`) | `N(v) < 1000000` (empty → 0 passes, as today) | EXPRESSED |
 | 30 | lt date literal (before today) | `RuleFor(x => x.Value).LessThan(DateTime.Today)…` (`DateTime?`) | `v == null or T(v) < T(lit)` | OBLIGATION O-DATE |
-| 31 | gt peer date; equal fails | `RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate)…` | `v == null or (m.admissionDate != null && T(v) > T(m.admissionDate))` (FV fails on a null peer, AbstractComparisonValidator.cs:77) | EXPRESSED (empty v is caught first by NotEmpty, DateValidationValidator.cs:13-14) |
+| 31 | gt peer date; equal fails | `RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate)…` | `v == null or (m.admissionDate != null && T(v) > T(m.admissionDate))` (FV fails on a null peer, AbstractComparisonValidator.cs:77) | EXPRESSED (empty v is caught first by NotEmpty, DateValidationValidator.cs:12-13) |
 | 32 | ordered peer, numbers | `GreaterThan(x => x.Other)` on numbers | `v == null or (m.other != null && N(v) > N(m.other))` | EXPRESSED |
-| 33 | lt/min/max/equalTo/notEqualTo against peer dates | `LessThan(x => x.R)`, `GreaterThanOrEqualTo(x => x.A)`, `LessThanOrEqualTo(x => x.R)`, `Equal(x => x.A)`, `NotEqual(x => x.R)` | ordered as 31; Equal `T(v) === T(m.a)` (null equals null); NotEqual negated | GAP: FV Equal/NotEqual do not skip null (EqualValidator.cs:47-58, NotEqualValidator.cs:44-54): empty v vs a set peer now fails Equal; both empty now fails NotEqual. Today both skip when nothing is entered (rule-engine.ts:251, 271-273) |
-| 34 | equalTo literal | `Equal(5)` | `N(v) === 5` | GAP: empty now fails; today skipped (rule-engine.ts:251) |
+| 33 | lt/min/max/equalTo/notEqualTo against peer dates | `LessThan(x => x.R)`, `GreaterThanOrEqualTo(x => x.A)`, `LessThanOrEqualTo(x => x.R)`, `Equal(x => x.A)`, `NotEqual(x => x.R)` | ordered as 31; Equal `T(v) === T(m.a)` (null equals null); NotEqual negated | GAP: FV Equal/NotEqual do not skip null (EqualValidator.cs:47-58, NotEqualValidator.cs:44-54): empty v vs a set peer now fails Equal; both empty now fails NotEqual. At `195d3a1` both skipped when nothing was entered (`rule-engine.ts`); at `f36f62e` Equal and NotEqual compare with no skip, as FluentValidation does (FormLowering.cs:216-220) |
+| 34 | equalTo literal | `Equal(5)` | `N(v) === 5` | GAP: empty now fails; skipped at `195d3a1` (`rule-engine.ts`), compared with no skip at `f36f62e` (FormLowering.cs:216-220) |
 | 35 | equalTo peer text (confirm email) | `RuleFor(x => x.ConfirmEmail).NotEmpty()…` then `.Equal(x => x.Email).WithMessage(…)` | `v === m.email` | EXPRESSED (NotEmpty precedes, so empty never reaches Equal) |
 | 36 | equalTo peer in a nested child | `RuleFor(x => x.Address).SetValidator(new NestedBugAddressValidator())`; child `RuleFor(x => x.ConfirmCity).Equal(x => x.City)` | field `…__Address_ConfirmCity`; `v === m.address.city` | OBLIGATION O-PEER, O-PFX (both-empty: null equals null, unchanged) |
-| 37 | equalTo peer inside a collection item | `RuleForEach(x => x.Lines).SetValidator(new ValidationOrderLineValidator())`; item `RuleFor(x => x.ConfirmSku).Equal(x => x.Sku)` | per rendered i: field `…Lines_i__ConfirmSku`; `v === m.lines[i].sku` | GAP: ConfirmSku has no NotEmpty (ValidationShowcaseValidator.cs:143-144): Sku set + ConfirmSku empty now fails; today passes (rule-engine.ts:251). Needs O-IDX, O-PEER |
+| 37 | equalTo peer inside a collection item | `RuleForEach(x => x.Lines).SetValidator(new ValidationOrderLineValidator())`; item `RuleFor(x => x.ConfirmSku).Equal(x => x.Sku)` | per rendered i: field `…Lines_i__ConfirmSku`; `v === m.lines[i].sku` | GAP: ConfirmSku has no NotEmpty (ValidationShowcaseValidator.cs:130): Sku set + ConfirmSku empty now fails; passed at `195d3a1` (`rule-engine.ts`), fails at `f36f62e` (FormLowering.cs:216-220). Needs O-IDX, O-PEER |
 | 38 | notEqual literal text | `RuleFor(x => x.Status).NotEqual("deleted")…` | `v !== "deleted"` (null passes in FV too) | EXPRESSED |
-| 39 | notEqualTo peer text | `RuleFor(x => x.AlternateEmail).NotEqual(x => x.Email)…` | `v !== m.email` | GAP: both empty now fails (FV `Equals(null,null)`); today passes (rule-engine.ts:271-273); NewRuleTypesValidator.cs:24-25 |
+| 39 | notEqualTo peer text | `RuleFor(x => x.AlternateEmail).NotEqual(x => x.Email)…` | `v !== m.email` | GAP: both empty now fails (FV `Equals(null,null)`); passed at `195d3a1` (`rule-engine.ts`), fails at `f36f62e` (FormLowering.cs:69-70, 216-220); NewRuleTypesValidator.cs:20 |
 | 40 | non-required rules skip empty | `Matches`, `GreaterThanOrEqualTo`, `LessThanOrEqualTo` on `string?`/`decimal?` | every such check starts `v == null or …` | EXPRESSED |
 | 41 | first failing rule per field wins | two `RuleFor(x => x.DischargeDate)` statements | tests in rule order × component order | OBLIGATION O-FIRST |
-| 42 | `WhenField(bool)` | `When(x => x.IsEmployed, () => RuleFor(x => x.JobTitle).NotEmpty()…)` | when `m.conditional.isEmployed` (via O-PFX) | EXPRESSED |
-| 43 | `WhenField(field, value)` | `When(x => x.CareLevel == "Memory Care", …)` | when `m.careLevel === "Memory Care"` | EXPRESSED |
-| 44 | `WhenFieldNot(bool)` | `Unless(x => x.HasEmergencyContact, …)` | when `!m.hasEmergencyContact` | EXPRESSED |
-| 45 | `WhenFieldNot(field, value)` | `When(x => x.CareLevel != "Independent", …)` | when `m.careLevel !== "Independent"` (null → true, as today) | EXPRESSED |
-| 46 | `WhenFieldGt` | `When(x => x.F > k, …)` | when `m.f > k` | OBLIGATION O-LIFT |
-| 47 | `WhenFieldGte` (`int Age`) | `When(x => x.Age >= 18, …)` | when `m.age >= 18` (empty → 0 → false, as today) | EXPRESSED |
-| 48 | `WhenFieldLt` (`int Age`) | `When(x => x.Age < 18, …)` | when `m.age < 18` | GAP: `int Age` (OperatorConditionModels.cs:5) reads 0 when empty, so the rule fires on an empty Age; today a missing value compares false (compare-engine.ts:344, 386). Frozen tests still pass (WhenNewOperatorConditionsWork.cs fills Age where asserted) |
-| 49 | `WhenFieldLte` | `When(x => x.F <= k, …)` | when `m.f <= k` | OBLIGATION O-LIFT |
-| 50 | `WhenFieldNull` | `When(x => x.F == null, …)` | when `m.f == null` (loose) | OBLIGATION O-LIFT |
-| 51 | `WhenFieldNotNull` | `When(x => x.F != null, …)` | when `m.f != null` (loose) | OBLIGATION O-LIFT |
-| 52 | `WhenFieldEmpty` | `When(x => string.IsNullOrEmpty(x.F), …)` | when `m.f == null or m.f === ""` | OBLIGATION O-STR |
-| 53 | `WhenFieldNotEmpty` (top level and nested) | `When(x => !string.IsNullOrEmpty(x.Email), …)`; in `NestedBugAddressValidator` `When(x => !string.IsNullOrEmpty(x.City), …)` | when `!(m.email == null or m.email === "")`; nested `m.address.city` | OBLIGATION O-STR, O-PFX |
-| 54 | `WhenFieldIn` | `When(x => new[] { "memory-care", "skilled-nursing" }.Contains(x.CareLevel), …)` | when `["memory-care","skilled-nursing"].includes(m.careLevel)` | OBLIGATION O-STR |
-| 55 | `WhenFieldNotIn` | `When(x => !new[] { … }.Contains(x.F), …)` | negation of 54 | OBLIGATION O-STR |
-| 56 | `WhenFieldBetween` | `When(x => x.F >= lo && x.F <= hi, …)` | when `m.f >= lo && m.f <= hi` | OBLIGATION O-LIFT |
-| 57 | `WhenFieldContains` | `When(x => x.Notes != null && x.Notes.Contains("urgent"), …)` | when `m.notes != null && m.notes.includes("urgent")` | EXPRESSED (§6 string table; the null guard is now the author's: today null-safe on both sides, FieldConditionBuilder.cs:111-118) |
-| 58 | `WhenFieldStartsWith` | `When(x => x.F != null && x.F.StartsWith(p), …)` | `startsWith` | EXPRESSED |
-| 59 | `WhenFieldEndsWith` | `When(x => x.F != null && x.F.EndsWith(s), …)` | `endsWith` | EXPRESSED |
-| 60 | `WhenFieldMatches` | `When(x => x.F != null && Regex.IsMatch(x.F, p), …)` | when `matches(m.f, p)` | OBLIGATION O-STR |
-| 61 | `WhenFieldMinLength` | `When(x => x.F != null && x.F.Length >= n, …)` | when `m.f.length >= n` | EXPRESSED |
-| 62 | `WhenFieldArrayContains` | `When(x => x.Tags != null && x.Tags.Contains("fall-risk"), …)` | when `m.tags.includes("fall-risk")` | EXPRESSED (§4.3 `Contains`) |
-| 63 | `WhenFields(..).And` | `When(x => x.TakesPainMedication && x.PainLevel > 7m, …)` | when `m.takesPainMedication && m.painLevel > 7` (`decimal`, empty → 0, as today) | EXPRESSED |
-| 64 | `.Or` / `.Not` | `When(x => a or b, …)`, `When(x => !(…), …)` | `op` | EXPRESSED |
+| 42 | `When(x => x.Flag)` | `When(x => x.IsEmployed, () => RuleFor(x => x.JobTitle).NotEmpty()…)` | when `m.conditional.isEmployed` (via O-PFX) | EXPRESSED |
+| 43 | `When(x => x.Field == value)` | `When(x => x.CareLevel == "Memory Care", …)` | when `m.careLevel === "Memory Care"` | EXPRESSED |
+| 44 | `When(x => !x.Flag)` | `Unless(x => x.HasEmergencyContact, …)` | when `!m.hasEmergencyContact` | EXPRESSED |
+| 45 | `When(x => x.Field != value)` | `When(x => x.CareLevel != "Independent", …)` | when `m.careLevel !== "Independent"` (null → true, as today) | EXPRESSED |
+| 46 | `When(x => x.Field > value)` | `When(x => x.F > k, …)` | when `m.f > k` | OBLIGATION O-LIFT |
+| 47 | `When(x => x.Field >= value)` (`int Age`) | `When(x => x.Age >= 18, …)` | when `m.age >= 18` (empty → 0 → false, as today) | EXPRESSED |
+| 48 | `When(x => x.Field < value)` (`int Age`) | `When(x => x.Age < 18, …)` | when `m.age < 18` | GAP: `int Age` (OperatorConditionModels.cs:5) reads 0 when empty, so the rule fires on an empty Age; at `195d3a1` a missing value compared false (`compare-engine.ts`). At `f36f62e` a condition reads its members as bound (LoweringContext.cs:198-202), so an empty `int Age` is 0 (shape.ts:47) and the rule fires, as on the server. Frozen tests still pass (WhenNewOperatorConditionsWork.cs fills Age where asserted) |
+| 49 | `When(x => x.Field <= value)` | `When(x => x.F <= k, …)` | when `m.f <= k` | OBLIGATION O-LIFT |
+| 50 | `When(x => x.Field == null)` | `When(x => x.F == null, …)` | when `m.f == null` (loose) | OBLIGATION O-LIFT |
+| 51 | `When(x => x.Field != null)` | `When(x => x.F != null, …)` | when `m.f != null` (loose) | OBLIGATION O-LIFT |
+| 52 | `When(x => string.IsNullOrEmpty(x.Field))` | `When(x => string.IsNullOrEmpty(x.F), …)` | when `m.f == null or m.f === ""` | OBLIGATION O-STR |
+| 53 | `When(x => !string.IsNullOrEmpty(x.Field))` (top level and nested) | `When(x => !string.IsNullOrEmpty(x.Email), …)`; in `NestedBugAddressValidator` `When(x => !string.IsNullOrEmpty(x.City), …)` | when `!(m.email == null or m.email === "")`; nested `m.address.city` | OBLIGATION O-STR, O-PFX |
+| 54 | in a fixed set (`values.Contains(x.Field)`) | `When(x => new[] { "memory-care", "skilled-nursing" }.Contains(x.CareLevel), …)` | when `["memory-care","skilled-nursing"].includes(m.careLevel)` | OBLIGATION O-STR |
+| 55 | not in a fixed set | `When(x => !new[] { … }.Contains(x.F), …)` | negation of 54 | OBLIGATION O-STR |
+| 56 | between (`>=` and `<=` joined by `&&`) | `When(x => x.F >= lo && x.F <= hi, …)` | when `m.f >= lo && m.f <= hi` | OBLIGATION O-LIFT |
+| 57 | text contains | `When(x => x.Notes != null && x.Notes.Contains("urgent"), …)` | when `m.notes != null && m.notes.includes("urgent")` | EXPRESSED (§6 string table; the null guard is now the author's, as OperatorConditionValidators.cs:25 writes it; `WhenFieldContains` was null-safe on both sides at `195d3a1`, in `FieldConditionBuilder.cs`, deleted at `b966c57`) |
+| 58 | text starts with | `When(x => x.F != null && x.F.StartsWith(p), …)` | `startsWith` | EXPRESSED |
+| 59 | text ends with | `When(x => x.F != null && x.F.EndsWith(s), …)` | `endsWith` | EXPRESSED |
+| 60 | text matches a pattern | `When(x => x.F != null && Regex.IsMatch(x.F, p), …)` | when `matches(m.f, p)` | OBLIGATION O-STR |
+| 61 | a length condition (`WhenFieldMinLength` at `195d3a1`) | `When(x => x.F != null && x.F.Length >= n, …)` | when `m.f.length >= n` | EXPRESSED. At `f36f62e` `x.F.Length` is a member .NET defines, not a field the page binds, so the condition has no browser form and its rules stay on the server (ClientCondition.cs:281-296; ClientScope.cs:29-33) |
+| 62 | a collection field holds an item | `When(x => x.Tags != null && x.Tags.Contains("fall-risk"), …)` | when `m.tags.includes("fall-risk")` | EXPRESSED (§4.3 `Contains`) |
+| 63 | conditions joined with `&&` | `When(x => x.TakesPainMedication && x.PainLevel > 7m, …)` | when `m.takesPainMedication && m.painLevel > 7` (`decimal`, empty → 0, as today) | EXPRESSED |
+| 64 | conditions joined with `or`, or negated with `!` | `When(x => a or b, …)`, `When(x => !(…), …)` | `op` | EXPRESSED |
 | 65 | section hidden by a reaction, rule on the same flag | `When(x => x.IsVeteran, () => RuleFor(x => x.VeteranId).NotEmpty()…)` | when `m.isVeteran` | EXPRESSED |
 | 66 | activation re-evaluated every validation | n/a | `when(m)` evaluated per evaluation | OBLIGATION O-EVAL |
 | 67 | parent condition around child with its own condition | `When(x => x.ParentFlag, () => RuleFor(x => x.Child).SetValidator(new ChildSectionValidator()))`; child `When(x => x.ChildFlag, …)` | when `m.parentFlag && m.child.childFlag` | OBLIGATION O-WHEN, O-PFX |
-| 68 | rules under FV `When`/`Unless`/`WhenAsync` stay server-only | `When(model => model.ServerFlag, () => RuleFor(..).NotEmpty())` (harness :257); `When(x => x.CareLevel == "Memory Care", …)` (FusionStepperWizardModels.cs:109) | now projected: when `m.serverFlag` / `m.careLevel === "Memory Care"` | GAP: an expression `When` projects any translatable predicate, so today's server-only rules reach the browser (ServerFlag has no input → `undefined`; `!x.ServerFlag` would fire in the browser). Server-only now needs `WhenAsync` or the `(x, ctx)` overload; an untranslatable `When` fails at render (:822) instead of staying server-only (:731) |
-| 69 | `ClientRule` inside FV `When` throws with guidance | n/a (no `ClientRule`) | none | RENDER: §6 render-time failure naming an untranslatable construct; analyzer on rule-level `.When` (:731-733) |
+| 68 | rules under FV `When`/`Unless`/`WhenAsync` stay server-only | `When(model => model.ServerFlag, () => RuleFor(..).NotEmpty())` (the plan harness at `195d3a1`; `When(IsServerFlagged, ..)` at ClientValidationRulePlanHarness.cs:245 at `f36f62e`); `When(x => x.CareLevel == "Memory Care", …)` (FusionStepperWizardModels.cs:100) | now projected: when `m.serverFlag` / `m.careLevel === "Memory Care"` | GAP: an expression `When` projects any translatable predicate, so the rules `195d3a1` kept on the server reach the browser (ServerFlag has no input → `undefined`; `!x.ServerFlag` would fire in the browser). Server-only then needed `WhenAsync` or the `(x, ctx)` overload, and an untranslatable `When` was to fail at render (architecture.md:846) instead of staying server-only (architecture.md:759-761). At `f36f62e` a method group, a context or an asynchronous condition keeps its rules on the server (RecordingValidator.cs:30-60), and so does a lambda with no browser form (ClientScope.cs:29-33); nothing fails at render |
+| 69 | `ClientRule` inside FV `When` throws with guidance | n/a (no `ClientRule`) | none | RENDER: §6 render-time failure naming an untranslatable construct; analyzer on rule-level `.When` (architecture.md:759-761). At `f36f62e` an untranslatable construct stays on the server (ClientScope.cs:29-33) and ALIS006 warns on a rule-level `.When` (ServerOnlyConditionAnalyzer.cs:17-22) |
 | 70 | child validator, prefixed paths | `RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator())` | fields `…__Address_Street` etc.; checks as rows 1/20 | OBLIGATION O-CHILD, O-PFX |
 | 71 | `RuleForEach..SetValidator` onto every rendered item | `RuleForEach(x => x.Lines).SetValidator(new ValidationOrderLineValidator())` | one test set per rendered item i | RENDER: O-IDX expansion over rendered item inputs |
 | 72 | nested `RuleForEach` in an item validator + per-item condition | item `When(x => x.GiftWrapped, …)`, `RuleForEach(x => x.Deliveries).SetValidator(..)`; delivery `When(x => x.RequiresAccessCode, …)` | when `m.lines[i].giftWrapped`; `m.lines[i].deliveries[j].requiresAccessCode` | OBLIGATION O-IDX (nested), O-WHEN |
 | 73 | `RuleForEach` inside a condition | `When(x => x.HasContacts, () => RuleForEach(x => x.Contacts).SetValidator(new EmergencyContactValidator()))` | item tests, when `m.hasContacts` | OBLIGATION O-WHEN, O-IDX |
-| 74 | at least one on the collection itself | `RuleFor(x => x.Contacts).NotEmpty()` | needs `m.contacts.length > 0`, but a test is keyed by an input (`field`, `value`) | GAP: a collection of complex items has no input (architecture.md:756-757, :893-896); the only lowering is an always-unmounted field that blocks with a summary entry, which is today's same defect (ReactiveClientRuleBuilder.cs:60-65 binds to a nonexistent `…__Contacts` id) |
+| 74 | at least one on the collection itself | `RuleFor(x => x.Contacts).NotEmpty()` | needs `m.contacts.length > 0`, but a test is keyed by an input (`field`, `value`) | GAP: a collection of complex items has no input (architecture.md:784-785, 913-916); the only lowering is an always-unmounted field that blocks with a summary entry, which was the same defect at `195d3a1` (`ReactiveClientRuleBuilder.cs` bound it to a nonexistent `…__Contacts` id). At `f36f62e` the rule projects `atLeastOne` onto the collection's own id (ClientRuleProjection.cs:112-114), which no element carries, so the form judges it as an unmounted field (form.ts:125-137): the gap stands |
 | 75 | same-type rules imported inside a condition | `When(x => x.IsEmployed, () => Include(new SharedEmploymentRulesValidator()))` | included tests, when `m.isEmployed` | OBLIGATION O-CHILD (IncludeRule), O-WHEN |
-| 76 | rules imported from a base-type validator | `Include(new BasicSectionValidator())` (`IValidator<in T>`; `AllRulesSection : BasicSection`) | Name/Email tests at the section prefix | OBLIGATION O-CHILD; the server now also enforces them (today `ClientRulesFrom<TSource>` adds no server rule, ReactiveValidator.cs:92-101) |
-| 77 | app-level rules via `AddReactiveClientValidation` | none: deleted (:758-760) | none | GAP: removed; rules must be rewritten as a `ReactiveValidator<T>`, and client validation without FluentValidation disappears (ReactiveClientValidationServiceCollectionExtensions.cs:13, ClientValidationRulesBuilder.cs:34) |
+| 76 | rules imported from a base-type validator | `Include(new BasicSectionValidator())` (`IValidator<in T>`; `AllRulesSection : BasicSection`) | Name/Email tests at the section prefix | OBLIGATION O-CHILD; the server now also enforces them (at `195d3a1` `ClientRulesFrom<TSource>` added no server rule; at `f36f62e` the statement is `Include(new BasicSectionValidator())`, ValidationShowcaseValidator.cs:40, which FluentValidation runs on the server too) |
+| 77 | app-level rules via `AddReactiveClientValidation` | none: deleted (architecture.md:786-788) | none | GAP: removed (`ReactiveClientValidationServiceCollectionExtensions.cs` and `ClientValidationRulesBuilder.cs` were deleted at `b966c57`); rules must be rewritten as a `ReactiveValidator<T>` registered through `AddReactiveFluentValidation` (ReactiveFluentValidationServiceCollectionExtensions.cs:15), and client validation without FluentValidation disappears |
 | 78 | assembly-scanned validators resolved through DI | `AddReactiveFluentValidation(..)` | none | RENDER: `Validate<TValidator>` resolves TValidator from DI at render and projects it |
 | 79 | DI validator with an injected service | same | none | RENDER: same resolution, children through O-CHILD |
 | 80 | registrations merge; plain `AbstractValidator` stays server-only | same | none | RENDER: only `ReactiveValidator<T>` is projected (a plain validator's descriptors are equally readable, so the restriction must be explicit) |
@@ -139,7 +141,7 @@ FluentValidation source checked: tag `12.1.1` (net10) and branch `11.x` (= 11.12
 | 112 | radio group change revalidates (hidden root) | `NativeRadioGroup.Committed` = change | n/a | EXPRESSED |
 | 113 | Fusion DropDownList/DatePicker popup change revalidates | `Committed` = change | n/a | EXPRESSED |
 | 114 | Tom Select live validation | `Committed` = change | n/a | EXPRESSED |
-| 115 | wired from boot: leaving an invalid field before any submit shows it | n/a | n/a | GAP: needs O-LIVE (subscribe at boot), and a single `Committed` per input cannot carry today's blur + change pair on every field (live-clear.ts:85-86, 99-105): an input whose `Committed` is `change` (112-114, architecture.md:893) no longer revalidates when left untouched |
+| 115 | wired from boot: leaving an invalid field before any submit shows it | n/a | n/a | GAP: needs O-LIVE (subscribe at boot), and a single `Committed` per input cannot carry the blur + change pair `195d3a1` wired on every field (`live-clear.ts`): an input whose `Committed` is `change` (112-114, architecture.md:914) no longer revalidates when left untouched. At `f36f62e` the form wires DOM `blur` on every field beside the input's re-raised `Committed` event (form.ts:209-226; model.ts:170-185), when the form is created (form.ts:246-253) |
 | 116 | grid column rules from the same validator block an in-cell edit | `RuleFor(r => r.OpenTasks).InclusiveBetween(0, 7).WithMessage(..)` | EJ2 `range: [[0,7], msg]` | RENDER: O-GRID |
 | 117 | grid mapping: only EJ2-equivalent rules; conditional rules never always-on | same | EJ2 `validationRules` | RENDER: O-GRID |
 
@@ -155,39 +157,51 @@ Counts: EXPRESSED 47, OBLIGATION 51, RENDER 8, GAP 11 (total 117).
   (ExclusiveBetweenValidator.cs:26 has no interface); framework `IBrowserRule<T>`; anything else → not projected.
   Message = `IRuleComponent.GetUnformattedErrorMessage()`.
 - **O-BROWSER.** `IBrowserRule<TProperty>` exposes its check as an expression the §6 compiler lowers (Url:
-  `v == null or matches(v, "^https?://.+")`, rule-engine.ts:164); the server half stays `IsEmptyOrHttpUrl`
-  (ReactiveClientRuleBuilder.cs:374-379).
+  `v == null or matches(v, "^https?://.+")`, from `rule-engine.ts` at `195d3a1`); the server half stays `IsEmptyOrHttpUrl`
+  (`ReactiveClientRuleBuilder.cs` at `195d3a1`). At `f36f62e` a non-generic `IBrowserRule` names a `BrowserRule`
+  (BrowserRule.cs:23-40); `Url()` is one validator for both halves (ReactiveRuleBuilderExtensions.cs:15-19, 36-47), and its
+  `url` check lowers to that expression (FormLowering.cs:60).
 - **O-LUHN.** `ICreditCardValidator` projects to one fixed expression: `d = v.split("").filter(c => c >= "0" && c <= "9")`,
   `d.length >= 13 && d.reverse().reduce((s, c, i) => s + (i % 2 ? (2*N(c) > 9 ? 2*N(c) - 9 : 2*N(c)) : N(c)), 0) % 10 === 0`
-  (rule-engine.ts:168-171, 280-296; no operator does Luhn).
+  (`rule-engine.ts` at `195d3a1`; no operator does Luhn). At `f36f62e` FormLowering.cs:126-156 builds it as FluentValidation
+  checks a card: dashes and spaces dropped, every other character a digit, the Luhn sum a multiple of ten.
 - **O-DATE.** A date literal is `ValueToCompare` as captured when the validator was constructed, serialized exactly as
-  `ValidationDateLiteral` does (`yyyy-MM-dd` at midnight, else `"s"` with no offset; ValidationDateLiteral.cs:18-34). When
-  projection runs must be stated: today it is once per app (singleton,
-  ReactiveFluentValidationServiceCollectionExtensions.cs:136-146), so `DateTime.Today` is frozen at first resolve.
+  `ValidationDateLiteral` does (`yyyy-MM-dd` at midnight, else `"s"` with no offset; ValidationDateLiteral.cs:18-35). When
+  projection runs must be stated: at `195d3a1` it was once per app (a singleton), so `DateTime.Today` was frozen at
+  first resolve. At `f36f62e` the rules are read from the validator resolved when the page renders
+  (ReactiveFluentValidationServiceCollectionExtensions.cs:125-139), and validators are registered transient
+  (ReactiveFluentValidationServiceCollectionExtensions.cs:94-100).
 - **O-PEER.** Peer read = rule prefix (including concrete item indexes) + `MemberToCompare.Name`; render throws when
   `MemberToCompare.DeclaringType` is not assignable from the validator's `T` (a `MemberInfo` carries no path,
-  AbstractComparisonValidator.cs:114). Ordered comparison fails when the peer is null (FV, :77).
+  AbstractComparisonValidator.cs:114). Ordered comparison fails when the peer is null (FV, :77). At `f36f62e`
+  ClientRuleProjection.cs:246-261 reads the peer as a sibling and refuses any other at render.
 - **O-FIRST.** Tests are emitted in validator rule order (an `Include`/`SetValidator` inlined at its position), then component
   order. Per field: skip tests whose `when(m)` is false; the first whose `check(v, m)` is false decides and later tests are not
-  evaluated (orchestrator.ts:303-316).
+  evaluated (form.ts:109-121 at `f36f62e`).
 - **O-WHEN.** `ReactiveValidator<T>` declares `When(Expression<Func<T,bool>>, Action)` and `Unless(..)`, pushes the expression
   during `action`, overrides `OnRuleAdded(IValidationRule<T>)` (AbstractValidator.cs:393-399, present in 11.12 and 12.1.1) to
   tag each rule with the AND of the stack, and calls `base.When(compiled, action)` for the server. Projection skips a rule with
   `HasAsyncCondition`, a rule with `HasCondition` and no tag, and any component with `HasCondition`/`HasAsyncCondition`
-  (rule-level delegate). Today's `new When(Func…)` overloads (ReactiveValidator.cs:189-219) must go, or a lambda is
-  ambiguous between them (CS0121; not compiled here).
+  (rule-level delegate). The `new When(Func…)` overloads `ReactiveValidator<T>` declared at `195d3a1` must go, or a lambda is
+  ambiguous between them (CS0121; not compiled here). At `f36f62e` those overloads live on the base class
+  (RecordingValidator.cs:30-60), so a lambda binds to ReactiveValidator.cs:58-63 (C# prefers the most derived method,
+  RecordingValidator.cs:15-18), and the projection's skips are ClientRuleProjection.cs:320-332.
 - **O-PFX.** A child reached through `SetValidator`/`Include` at member path p: field id = `IdGenerator.For(rootModel, p.path)`;
   each `x.M` read in check, when or peer becomes `m.<p>.m`; the test's when = AND of every enclosing when, outer first.
 - **O-IDX.** `RuleForEach(x => x.C).SetValidator(V)`: recognized by `rule.Expression.ReturnType != rule.TypeToValidate`
-  (CollectionPropertyRule.cs:66); for each input in the render whose binding name starts with `C[i]`
-  (ClientValidationFieldBinding.cs:108-134), emit V's tests with prefix `C[i]` (O-PFX), recursively; the index is literal in
+  (CollectionPropertyRule.cs:66; at `f36f62e` ClientRuleProjection.cs:334-336); for each input in the render whose binding name starts with `C[i]`
+  (ClientValidationFieldBinding.cs:107-133), emit V's tests with prefix `C[i]` (O-PFX), recursively; the index is literal in
   the field id and in every model path.
 - **O-CHILD.** For `IChildValidatorAdaptor` (it exposes only `ValidatorType`, ChildValidatorAdaptor.cs:8-13), resolve
   `ValidatorType` from the request's `IServiceProvider` (validators are registered transient by concrete type,
   ReactiveFluentValidationServiceCollectionExtensions.cs:94-100); unresolvable → render throws naming it. `IIncludeRule`'s one
-  component is a `ChildValidatorAdaptor`; prefix "".
+  component is a `ChildValidatorAdaptor`; prefix "". At `f36f62e` the child validator is read as `SetValidator` or `Include`
+  holds it, with no service lookup, and one a factory chooses per model stays on the server instead of failing the render
+  (ClientRuleProjection.cs:280-318).
 - **O-LIFT.** If an operand's C# type is `Nullable<T>`, `a < b` (and `<=`, `>`, `>=`) lowers to `a != null && b != null && a < b`
-  (JavaScript gives `null >= 0 === true`). `== null`/`!= null` are loose (null and undefined, as compare-engine.ts:280-284).
+  (JavaScript gives `null >= 0 === true`). `== null`/`!= null` are loose (null and undefined, as `compare-engine.ts` was at
+  `195d3a1`). At `f36f62e` the operator table gives both answers: an ordering against a missing value is false and a
+  missing value equals only another (operators.ts:1-3, 9-13, 29-38).
 - **O-STR.** Compiler entries missing from §6: `string.IsNullOrEmpty(s)` → `s == null or s === ""`;
   `Regex.IsMatch(s, constant)` → `matches`; `Enumerable.Contains` on a closure-rooted `new[] {…}` → literal `.includes(x)`.
 - **O-EVAL.** `when(m)` and `check(v, m)` are evaluated against current values on every `validate()` and every field
@@ -196,35 +210,39 @@ Counts: EXPRESSED 47, OBLIGATION 51, RENDER 8, GAP 11 (total 117).
   (WhenAdmittingNewResident.cs:154).
 - **O-SCOPE.** Form k's tests = `forms[k].tests` of every composed plan. Its model `m` = values of all inputs of the composed
   plan by binding name (not only inputs tagged `form: k`, which a partial cannot know). `validate()`, revalidation and live
-  wiring apply a test only when its field element is inside `getElementById(k)` (orchestrator.ts:233). `validate()` returns
-  false when `getElementById(k)` is null and the form has tests (orchestrator.ts:95-103).
+  wiring apply a test only when its field element is inside `getElementById(k)` (form.ts:102-105). `validate()` returns
+  false when `getElementById(k)` is null and the form has tests (form.ts:140-147).
 - **O-MOUNT.** A test field with no input or no element at evaluation: if every test of that field has a false `when(m)` (a
   `when` that throws counts as false), skip it; otherwise the form is invalid and the summary gets one entry keyed by the field
-  with the message of that field's first test in plan order, active or not (orchestrator.ts:250-287). Live wiring waits for
-  the element.
+  with the message of that field's first test in plan order, active or not (`orchestrator.ts` at `195d3a1`). At `f36f62e`
+  the active tests run against the missing value, a length or pattern test passes on it, and the first that fails gives the
+  summary message (form.ts:125-137). Live wiring waits for the element (form.ts:228-239).
 - **O-DISPLAY.** Inline is renderable when `getElementById(id + "_error")` has a parent and neither the parent nor an
-  ancestor has the `hidden` attribute or inline `style.display === "none"` (orchestrator.ts:294-301, 414-422). Failing and
+  ancestor has the `hidden` attribute or inline `style.display === "none"` (display.ts:57-64). Failing and
   renderable: slot text = message, remove `hidden`, clear `display`, add `alis-has-error` to `getElementById(id)`, remove the
   field's summary entry. Failing and not renderable: summary entry (one `div[data-valmsg-summary-for=key]` per key, replaced,
   appended) and summary shown. Summary = `getElementById(planId with "." and "+" → "_" + "_validation_summary")` of the plan
-  that declared the form (error-display.ts:57-60; PlanExtensions.cs:155-156); missing summary is a no-op. `validate()` first
-  clears every test field's inline slot and class, then empties and hides the summary (orchestrator.ts:394-402); it evaluates
+  that declared the form (form.ts:62-65; PlanExtensions.cs:170-171); missing summary is a no-op. `validate()` first
+  clears every test field's inline slot and class, then empties and hides the summary (form.ts:149-151); it evaluates
   every field and returns the AND.
 - **O-SRV.** `showErrors(body)`: the same clearing first; body not an object → nothing; `body.errors` not an object → warn,
   nothing; per `[name, messages]`: message = array ? `join(", ")` : string; target = a test field of this form whose input
   `name === name` exactly; no target, no element or slot not renderable → summary entry keyed by `name`; else slot text and
-  `alis-has-error` on the element (orchestrator.ts:132-182, 434-454; error-display.ts:62-75).
+  `alis-has-error` on the element (form.ts:183-205; display.ts:66-79). At `f36f62e` a body that is not an object runs client
+  validation instead (form.ts:176-181).
 - **O-LIVE.** At form creation (boot or slot load, not first `validate()`), per test field with an element, once per element:
-  DOM `input` on `getElementById(id)` → clear its inline slot and class only (live-clear.ts:62, 85); the input's `Committed`
+  DOM `input` on `getElementById(id)` → clear its inline slot and class only (form.ts:214, 216); the input's `Committed`
   event → revalidate: clear inline, remove its summary entry and hide an empty summary, stop if the container is missing, else
-  evaluate that field's tests only (orchestrator.ts:184-220). Peers and dependants are not revalidated.
+  evaluate that field's tests only (form.ts:161-173). Peers and dependants are not revalidated. At `f36f62e` DOM `blur`
+  revalidates too (form.ts:217).
 - **O-COMMIT.** Text-like inputs declare `Committed` = blur (Native DOM `blur`; EJ2 TextBox `blur`), since today's blur
   revalidation is what 110/111 show and `change` does not fire on leaving an unchanged field.
 - **O-OWN.** Composition concatenates `forms[k].tests` and `inputs` per owner; a slot unload removes exactly that slot's tests,
-  inputs and the form's subscriptions on them, and keeps boot-owned ones (applied-plans.ts:55-100); a reload subscribes to the
+  inputs and the form's subscriptions on them, and keeps boot-owned ones (slot.ts:54-60; form.ts:255-259; model.ts:159-163); a reload subscribes to the
   new elements.
 - **O-GRID.** `FusionGridValidation` reads FV descriptors directly, not the form's tests: unconditional components only;
   NotEmpty → `required`, IEmailValidator → `email`, Url `IBrowserRule` → `url`, ILengthValidator → `minLength`/`maxLength`,
   IRegularExpressionValidator → `regex`, GreaterThanOrEqual/LessThanOrEqual literal numbers → `min`/`max`,
-  IInclusiveBetweenValidator numbers → `range`; the rest emit nothing (FusionGridValidation.cs:104-154). Its source today,
-  `IClientValidationRuleSource`, is deleted by :758-760.
+  IInclusiveBetweenValidator numbers → `range`; the rest emit nothing (FusionGridValidation.cs:110-160). Its source at `195d3a1`,
+  `IClientValidationRuleSource`, was to be deleted (architecture.md:786-788); at `f36f62e` it remains, and
+  `FusionGridValidation.From` reads the projected rules through it (FusionGridValidation.cs:38; IClientValidationRuleSource.cs:9-12).

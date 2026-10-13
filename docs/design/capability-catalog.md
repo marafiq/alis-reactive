@@ -1,7 +1,8 @@
 # Capability catalog: the release's behavior contract
 
 Read from the Playwright suites, the sandbox views they drive and the source at `a2c497b`
-(2026-10-11). Every capability lists where a browser proves it. "Plan-only" means an NUnit fixture
+(2026-10-11); DSL names and `file:line` references updated at `f36f62e`, where a component, a payload
+and a plugin are used as the objects they are (`rate.Value.Set(..)`, `grid.Refresh()`, `args.Cancel.Set(true)`). Every capability lists where a browser proves it. "Plan-only" means an NUnit fixture
 inside the Playwright project asserts plan JSON without opening a browser; under the release rule
 (Playwright is the only verification) that is not proof.
 
@@ -10,14 +11,16 @@ inside the Playwright project asserts plan JSON without opening a browser; under
 | Object | How it is reached | Members used |
 |--------|-------------------|--------------|
 | Component | `p.Component<T>(m => m.X)`; `Component<T, TOtherModel>(m => ..)` (another view model, e.g. a partial writing the shell's field); `Component<T>("id")`; `Component<T>()` app-level by fixed id | properties read/write, methods with typed args, returning methods, events |
-| Event payload | the args parameter of a reaction | nested and indexed reads (`BatchChanges.ChangedRecords[0].OpenTasks`, `Data[0].Summary`); writes (`cancel` in 10 slices, `preventDefaultAction`, BulletChart `text`); void calls after an async gap (`updateData(response)`, Kanban `endEdit()`) |
-| Response body | `OnSuccess<T>((res, p) => ..)`, `OnError<T>(status, ..)` | typed reads, nested paths, arrays, whole body |
-| Plugin | `p.Plugin(...)`; registered by the app bundle on `window.__alisPlugins` | typed properties, functions with args, commands |
-| Element | `p.Element("id")` | text, html, classes, show/hide |
-| Array element | `p.From(...)`, `p.FromDom(...)` | per-element method reads (`GetAttribute`, `StartsWith`) |
+| Event payload | the args parameter of a reaction, a declared object (`args.Value`, `args.Cancel.Set(true)`) | nested and indexed reads (`args.BatchChanges.Get(x => x.ChangedRecords[0].OpenTasks)`, `Data[0].Summary`); writes (`Cancel` in 10 slices, `PreventDefaultAction`, BulletChart `Text`); void calls after an async gap (`args.UpdateData(json.Get(..))`, Kanban `args.EndEdit()`) |
+| Response body | `OnSuccess<T>((json, s) => ..)`, `OnError<T>(status, ..)`; `json` is the body (`Data<T>`) | typed reads (`json.Get(x => x.Name)`), nested paths, arrays, whole body (`json`) |
+| Plugin | a `Plugin` declaration, `plan.RegisterPlugin<T>()`; registered by the app bundle on `window.__alisPlugins` | typed properties (`ReadOnly<T>`), functions with args (`slugify.Slug(..)`), commands (`analytics.Track(..)`) |
+| Element | `p.Element("id")` | `Text.Set`, `Html.Set`, `ClassList.Add/Remove/Toggle`, `Show`/`Hide` |
+| Array element | `p.From(...)`, `p.Element(id).Children`, `p.Element(id).ClassList.Items` | per-element method reads (`GetAttribute`, `StartsWith`) |
 
-The plan and runtime already treat components and plugins alike: both resolve to `RuntimeObject`
-through the same `types` contracts (`runtime-plan.ts:70-76`). Event payloads are read by path.
+The plan and runtime treat components and plugins alike: the runtime locates either as a plan object
+(`Alis.Reactive.Assets/runtime/objects/world.ts:14-18`), and in C# both are `JsObject` declarations bound through
+`ComponentBinding` and `PluginBinding` (`Alis.Reactive/Components/Contracts/ObjectBinding.cs:40-84, 112-159`). Event payloads are read by path,
+through `EventPayloadBinding` (`Alis.Reactive/Components/Contracts/ObjectBinding.cs:88-109`).
 
 ## 2. Capabilities and their proofs
 
@@ -26,22 +29,22 @@ through the same `types` contracts (`runtime-plan.ts:70-76`). Event payloads are
 - Property write from a response: Grid, Kanban, Schedule, Pivot data sources; Schedule and Pivot
   write nested mapped paths (`eventSettings.dataSource`, `dataSourceSettings.dataSource`).
 - Property write from a payload into another component: Grid BatchChangeReview.
-- Property write from another component's read through arrays: ArrayGrid (`Data()` → `Where` →
-  `SetDataSource`).
+- Property write from another component's read through arrays: ArrayGrid (`Rows<T>()` → `Where` →
+  `DataSource.Set`).
 - Method with typed literal or object args: Grid `AddRecord(new Row)`, Mention `Search(s, x, y)`,
-  ListBox `selectItems([..], bool, bool)`, Kanban `AddColumn`.
-- Method with field-expression args (typed columns): Grid `SortBy`, `FilterTextBy`, `GroupBy`,
+  ListBox `SelectItems([..], bool, bool)`, Kanban `AddColumn`.
+- Method with field-expression args (typed columns): Grid `SortColumn`, `FilterByColumn`, `GroupColumn`,
   `EditCell`, `SetCellValue`.
-- Method args from a response: Grid ServerRoster (`AddRecord(json, x => x.Row)`, `UpdateRow`,
-  `SetRowData`), Kanban add/update/delete, Pivot `LoadPersistedLayout`.
-- Returning method as a source: RadioButton `SelectedValue()` into text, `Eq` and gather; Grid
-  `SelectedRecords<TModel, TRow>()`, `CurrentViewRecords`, `RowIndexByPrimaryKey`, `BatchChanges`
-  into gather; Schedule `GetEvents()`, `CurrentView()`; ChipList `SelectedChips()` into
-  `DispatchWith` then `p.From().Any/Count`; BulletChart `GetActualIndex` into text.
+- Method args from a response: Grid ServerRoster (`AddRecordAt(json.Get(x => x.Row), 0)`, `UpdateRow`,
+  `SetRowData`), Kanban add/update/delete, Pivot `LoadPersistData`.
+- Returning method as a source: RadioButton `GetSelectedValue()` into text, `Eq` and gather; Grid
+  `GetSelectedRecords<TRow>()`, `GetCurrentViewRecords<TRow>()`, `GetRowIndexByPrimaryKey(..)`, `GetBatchChanges<TRow>()`
+  into gather; Schedule `GetEvents<T>()`, `CurrentView`; ChipList `GetSelectedChips()` into a
+  `Dispatch` payload then `p.From(..).Any/Count`; BulletChart `GetActualIndex(..)` into text.
 - Programmatic writes fire change with `IsInteracted = false` and journeys branch on it
   (TimePicker, TextBox, TextArea, Numeric, Slider, OtpInput, Rating `Reset`).
 - A component calls its own method inside its own handler (OtpInput Focus → FocusOut).
-- Write then read in one branch (CheckBox `SetDisabled(false)` then `Disabled()`).
+- Write then read in one branch (CheckBox `Disabled.Set(false)` then `Disabled`).
 
 **Event payloads**
 - Reads, nested, indexed, nullable, typed `TRow` (Grid `RecordClick<TRow>`, Kanban `<TCard>`).
@@ -50,7 +53,7 @@ through the same `types` contracts (`runtime-plan.ts:70-76`). Event payloads are
 - Void method with an argument from the HTTP response, called after the response returns:
   AutoComplete `filtering_response_populates_autocomplete_dropdown`, MultiSelect.
 - Reactions stay synchronous so payload writes land before the vendor reads them
-  (`trigger.ts:15`, `execute.ts:43`).
+  (`Alis.Reactive.Assets/runtime/grammar/execute.ts:17-26`; `Alis.Reactive.Assets/runtime/plans/start.ts:46-58`).
 - Native payload is the element (`event.currentTarget`), so any element property is readable;
   CustomEvent payload is `detail`; Fusion payload is the args object, `{}` when absent.
 
@@ -58,7 +61,7 @@ through the same `types` contracts (`runtime-plan.ts:70-76`). Event payloads are
 - GET/POST/PUT/DELETE; JSON default, form data with files; GET writes gather to the query string.
 - Gather builds the typed request the endpoint binds (`Gather<TRequest>`, or `Gather(..)` for the view
   model): `Form()` and `Form(m => ..)` send the form's inputs by binding name; `Set(x => x.Member, ..)`
-  takes a literal or any source (component member, event payload `p.Payload(args).Get(..)`, URL query
+  takes a literal or any source (component member `rate.Value`, event payload `args.Value`, URL query
   `p.Url<TQuery>().Get(..)`, previous response, plugin, array value); `Header(name, ..)`. A member
   named like a `{placeholder}` fills the route.
 - Typed success and error by exact status, then any status; network failure only reaches
@@ -79,8 +82,9 @@ through the same `types` contracts (`runtime-plan.ts:70-76`). Event payloads are
   dispatch, HTTP, parallel, chained and plugin steps. The comparison engine has no vendor code.
 
 **Validation**
-- Rule kinds and shapes (Required differs by shape and nullability), peers, `WhenField(s)`,
-  nested validators and `ClientRuleEach` over rendered items, hidden fields routed to the summary,
+- Rule kinds and shapes (Required differs by shape and nullability), peers, conditions (`WhenField(s)` at
+  `a2c497b`, FluentValidation's `When(x => ..)` at `f36f62e`), nested validators and `ClientRuleEach`
+  (`RuleForEach(..).SetValidator(..)` at `f36f62e`) over rendered items, hidden fields routed to the summary,
   live clear on `input` and revalidate on `blur` and the component's change event, submit-time
   validation, server errors inline or in the summary, rules for fields a later partial renders,
   DI-resolved validators, grid column rules from the same validator.
@@ -88,7 +92,7 @@ through the same `types` contracts (`runtime-plan.ts:70-76`). Event payloads are
 **Arrays, dispatch, plugins, app-level**
 - Arrays over payloads, responses, DOM collections and component reads; `Where`, `Count`, `Any`,
   `Sum`, `OrderByDescending`, `Find` proven; `Select`, `OrderBy`, `All` not browser-proven.
-- `Dispatch`, typed `Dispatch<T>`, `DispatchWith` from component values, `CustomEvent<T>`.
+- `Dispatch(appEvent)`, `Dispatch(appEvent, payload)`, `Dispatch(appEvent, d => d.Set(..))` from component values, `CustomEvent<T>`.
 - Plugins: functions over response arrays, plugin source in conditions and gather.
 - Drawer, Loader, Toast, Confirm by fixed id; NativeActionLink carries its own plan.
 - C#-authored templates (`FusionTemplate` with `EventButton` → CustomEvent), grid edit templates.
@@ -98,42 +102,53 @@ through the same `types` contracts (`runtime-plan.ts:70-76`). Event payloads are
 These are the dependencies the release inverts.
 
 **C# core**
-- Declaration APIs are internal; Fusion and Native reach them through `InternalsVisibleTo`
-  (`Alis.Reactive.csproj:69`); 24 slice files hand-write payload members with `ReactionGraph`.
+- ~~Declaration APIs are internal; Fusion and Native reach them through `InternalsVisibleTo`; 24 slice
+  files hand-write payload members with `ReactionGraph`~~: closed. A declaration is a public `JsObject`
+  (`Alis.Reactive/Components/Contracts/JsObject.cs:35`), a payload member is a `ReadOnly<T>` or `Prop<T>`
+  (`Alis.Reactive/Components/Contracts/JsMembers.cs:21, 77`), no slice names `ReactionGraph`, and
+  `InternalsVisibleTo` names only the validator and the contract generator (`Alis.Reactive/Alis.Reactive.csproj:69-70`).
 - ~~An input's value must be one named property: `IInputComponent.ValueMember` feeds registration,
   gather, validation~~: closed. An input declares `ComponentInput` (its value property and the
   event that commits it); fields another plan renders still read the literal `"value"` member.
-- `RegisteredInputValueRead.ForFusionInPlaceEditorValueRead` (`RegisteredInputValueRead.cs:28`).
+- ~~`RegisteredInputValueRead.ForFusionInPlaceEditorValueRead`~~: closed; one `ForGatherValueRead(componentId, valueMember)`
+  serves every component (`RegisteredInputValueRead.cs:28`).
 - ~~`ComponentVendor.Fusion` token~~: closed by D2 (`FusionComponent.FusionVendor` declares it);
-  EJ2-specific projections remain in `ClientRule.cs:21-26`.
+  the EJ2 projections left `ClientRule`, which is read-only rule data (`Alis.Reactive/Validation/ClientRule.cs:10-14`),
+  for the grid's own slice (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs:123-156`).
 - ~~`Include<TComponent>` reads the input's declared value; `NativeGatherExtensions` assumes NativeTextBox~~:
   closed; both were deleted with the typed request, and `Form(m => ..)` sends an input by its binding name.
 - Method contracts are keyed per component instance, so two arities of one member on one grid
-  throw (`BrowserObjectContract.cs:257-268`); `Mapped` aliases dodge it.
+  throw (`BrowserObjectContract.cs:257-268`); a member keys by its own C# name, so two C# members
+  typing one JS method do not collide (`Alis.Reactive/Components/Contracts/JsObject.cs:214-221`).
 
 **Runtime**
 - ~~Two hard-coded drivers and two event adapters~~: closed by D2; vendors are plan data and one
   driver follows them.
-- `live-clear.ts:102` hard-codes `"change"`; `input`/`blur` go to the element; a not-ready
-  Fusion object silently skips change wiring (`live-clear.ts:107-117`).
-- `inject.ts:31-35` calls `ej.base.append(nodes, container, true)`; the inline scripts in the
-  Native RadioGroup and CheckList builders, and Syncfusion's partial scripts, depend on it.
-- `request-payload-writer.ts:163` unwraps Syncfusion's uploader `rawFile`.
-- `p.Confirm()` needs `window.alis.confirm`, installed by the Syncfusion Dialog module
-  (`confirm.ts:103`); `root.ts` statically imports confirm, action link, drawer, loader.
-- The drawer clears its content on `transitionend` without unloading the slot (`drawer.ts:25-30`).
+- ~~Live clearing hard-codes `"change"` and silently skips a not-ready Fusion object~~: closed. Each input
+  declares the event that commits it, the model re-raises it as `alis:commit` and logs a subscription it
+  cannot make (`Alis.Reactive.Assets/runtime/modules/model.ts:170-185`); `input`/`blur` still go to the element
+  (`Alis.Reactive.Assets/runtime/modules/form/form.ts:209-226`).
+- ~~Injection calls `ej.base.append(nodes, container, true)`~~: closed. A slot re-creates the inserted
+  `<script>` nodes itself (`Alis.Reactive.Assets/runtime/modules/slot.ts:62-73`), and the RadioGroup and CheckList scripts became
+  component code (`Alis.Reactive.Assets/components/native/radio-group.ts:6-14`, `Alis.Reactive.Assets/components/native/check-list.ts:10-20`).
+- ~~The request writer unwraps Syncfusion's uploader `rawFile`~~: closed; the uploader declares its files at
+  `filesData[].rawFile` (`Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:21`).
+- ~~`p.Confirm()` needs `window.alis.confirm`; `root.ts` statically imports confirm, action link, drawer,
+  loader~~: closed. `alis.confirm` is a plugin the Fusion component code provides (`Alis.Reactive.Assets/components/fusion/confirm.ts:101-106`),
+  and `root.ts` registers only the runtime's own modules (`Alis.Reactive.Assets/runtime/root.ts:32-38`).
+- The drawer clears its content on `transitionend` without unloading the slot (`Alis.Reactive.Assets/components/native/drawer.ts:48-55, 71-75`).
 
-**Native builders** emit inline `<script>` (`NativeRadioGroupBuilder.cs:196`,
-`NativeCheckListBuilder.cs:200`), against "views carry no JavaScript"; their `SetValue` does not
-sync the boxes.
+~~**Native builders** emit inline `<script>`, against "views carry no JavaScript"; their `SetValue` does not
+sync the boxes~~: closed. The scripts are component code (`Alis.Reactive.Assets/components/native/radio-group.ts:6-14`,
+`Alis.Reactive.Assets/components/native/check-list.ts:10-20`), and neither declaration has a `SetValue`.
 
 ## 4. Proofs that are weaker than they look
 
 - HttpMixing else-path tests dispatch PascalCase keys through `Page.EvaluateAsync`
   (`WhenTriggerDrivenConditionsMixWithHttp.cs:420,455`); payload paths are camelCase, so every read
   is missing and the test would pass with true values too.
-- ArrayManager send test gathers `p.Plugin(array.Count).Arg("items")`: the count of the string
-  `"items"` (5) happens to equal the resident count (`ArrayManager/Index.cshtml:50`).
+- ArrayManager send test gathers `array.Count("items")`: the count of the string
+  `"items"` (5) happens to equal the resident count (`ArrayManager/Index.cshtml:44`).
 - AutoComplete/MultiSelect filtering tests (payload text set on the request) assert only the endpoint
   name in the URL.
 - The 422 summary text is hard-coded in the view; ColorPicker toggle asserts only echo text.

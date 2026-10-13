@@ -350,7 +350,8 @@ A failing handler is logged and stops no other handler.
 
 ## 5. Lowering: each fluent method, as productions
 
-The owner's fluent API keeps its shape. Every method lowers to fixed productions.
+The owner's fluent API uses each object as the object (`rate.Min.Set(0m)`, `grid.Refresh()`). Every
+form lowers to fixed productions.
 
 | Fluent API | Lowers to |
 |---|---|
@@ -358,16 +359,18 @@ The owner's fluent API keeps its shape. Every method lowers to fixed productions
 | `t.DomReady(p => …)` | `on(document, "ready", _)` |
 | `t.CustomEvent(appEvent, (e, p) => …)` | `on(document, name, e)`; the payload is `detail`, or the event when it has none |
 | `t.ServerPush(ServerPushStream.At<S>(url), s => s.M, …)`, `t.SignalR(SignalRHub.At<H>(url), h => h.M, …)` | `on(stream, name, e)`, `on(hub, name, e)` |
-| `p.Component<C>(…).Set(c => c.P, v)` | `set(o, ["p"], shape, v)` |
-| `….Call(c => c.M, a, b)`, a void member | `do(call(o, ["m"], [a, b]))` |
-| `….Get(c => c.F, a)`, a member returning a value | `call(o, ["f"], [a], shape)` |
-| a member declared `.Awaited()` | `let t = await call(…)` where it is called; the value is `ref t` |
-| `p.Payload(args).Get(x => x.A.B)`, `json.Read(x => x.A.B)` | `get(v, ["a", "b"], shape)` |
-| `p.Element(id).SetText(v)` | `set(el, ["textContent"], text, v)` |
-| `SetHtml(v)` | `set(el, ["innerHTML"], text, v)` |
+| `var c = p.Component<C>(…); c.P.Set(v)`, a `Prop<T>` | `set(o, ["p"], shape, v)` |
+| `c.M(a, b)`, a method declared with `Call` | `do(call(o, ["m"], [a, b]))` |
+| `c.P`, a `ReadOnly<T>` or `Prop<T>` read | `get(o, ["p"], shape)` |
+| `c.F(a)`, a method declared with `Invoke<T>` | `call(o, ["f"], [a], shape)` |
+| a method declared with `CallAsync` or `InvokeAsync<T>` | `do await call(…)`; a read is `let t = await call(…)` where it is called, and the value is `ref t` |
+| `args.A.Get(x => x.B)`, `json.Get(x => x.A.B)` | `get(v, ["a", "b"], shape)` |
+| `args.Cancel.Set(true)`, `args.UpdateData(items)` | `set(v, ["cancel"], ..)`, `do(call(v, ["updateData"], [..]))` on the handler's parameter |
+| `p.Element(id).Text.Set(v)` | `set(el, ["textContent"], text, v)` |
+| `Html.Set(v)` | `set(el, ["innerHTML"], text, v)` |
 | `Show()`, `Hide()` | `set(el, ["hidden"], boolean, false)` and `true` |
-| `AddClass`, `RemoveClass`, `ToggleClass` | `do(call(el, ["classList", "add"], [..]))`, and so on |
-| `p.Dispatch(appEvent, payload)`, `p.DispatchWith(appEvent, d => d.Set(..))` | `do(call(document, ["raise"], [lit name, record]))` |
+| `ClassList.Add`, `ClassList.Remove`, `ClassList.Toggle` | `do(call(el, ["classList", "add"], [..]))`, and so on |
+| `p.Dispatch(appEvent, payload)`, `p.Dispatch(appEvent, d => d.Set(..))` | `do(call(document, ["raise"], [lit name, record]))` |
 | `p.When(v).Op(x)…Then(..).ElseIf(..).Else(..)` | `if(op(..), …)`; `And`/`Or` become `&&`/`\|\|`; `Not(g)` becomes `!` |
 | `p.Confirm(m).Then(t).Else(e)` | `let ok = await confirm.ask(m); if (ok) t else e` |
 | `p.Get/Post/Put/Delete(url)` | see 5.1 |
@@ -375,7 +378,7 @@ The owner's fluent API keeps its shape. Every method lowers to fixed productions
 | `p.ValidationErrors(container)` | in a response route: `do(call(form, ["showErrors"], [ref res.body]))`; elsewhere: `do(call(form, ["validate"]))` |
 | `p.Parallel(a, b).OnAllSettled(c)` | `all(a, b); c` |
 | `p.Url<TQuery>().Get(q => q.X)` | `get(get(document, ["query"]), ["X"], shape)`, keyed by the member's binding name; an array member reads `queryAll` |
-| `p.Plugin(tools.Count).Arg(items).Arg("status")`, a plugin member | `call(plugin, ["count"], [..], shape)` |
+| `tools.Count(items, "status")`, a member of a plugin from `plan.RegisterPlugin<T>()` | `call(plugin, ["count"], [..], shape)` |
 | `Html.NativeActionLink(id, text, url, link => link.Post()…)` | the anchor plus its own plan script: `on(link, "click", e) { if (!modified(e)) { e.preventDefault(); … } }` |
 
 ### 5.1 A request
@@ -769,8 +772,9 @@ proves it is named in the pull request.
   keeps its component on the server. `.ServerOnly()` keeps a rule on the server. A peer must be a sibling; any other peer is refused when the page renders. The
   rules are read per request, from the validator that request resolves (7.1).
 
-- Awaited members (section 5): `Method(..).Awaited()` lowers a call to `do await call(…)`, and a read of
-  `Function(..).Awaited()` to `let r = await call(…)` before the statement that reads it. A comparison
+- Promise-returning members (section 5): a method declared with `CallAsync` lowers a call to
+  `do await call(…)`, and a read of one declared with `InvokeAsync<T>` to `let r = await call(…)`
+  before the statement that reads it. A comparison
   that reads one is lowered as its own `if`, so else-if order and short-circuit hold. Inside an array
   operation's lambda or a validation rule such a read is refused at render.
 

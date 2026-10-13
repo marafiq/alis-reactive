@@ -143,7 +143,7 @@ the end.
         .NativeCheckBox()
         .Reactive(evt => evt.Change, (args, p) =>
         {
-            p.When(args, x => x.Checked).Truthy()
+            p.When(args.Checked).Truthy()
              .Then(t => t.Element("due-date").Show())
              .Else(e => e.Element("due-date").Hide());
         }); }
@@ -161,11 +161,11 @@ the end.
              .Response(r => r
                 .OnSuccess(s =>
                 {
-                    s.Component<FusionToast>()
-                     .Set(c => c.Title, "Todo")
-                     .Set(c => c.Content, "Todo saved.")
-                     .Set(c => c.Tone, FusionToastTone.Success)
-                     .Call(c => c.Show);
+                    var toast = s.Component<FusionToast>();
+                    toast.Title.Set("Todo");
+                    toast.Content.Set("Todo saved.");
+                    toast.Tone.Set(FusionToastTone.Success);
+                    toast.Show();
                 })
                 .OnError(400, e => e.ValidationErrors("todo-form")));
         }))
@@ -188,5 +188,5 @@ the end.
 binding name, so `Save([FromBody] TodoModel model)` receives each one. The
 `Validate<TValidator>(...)` call runs client validation before the request.
 
-`Response(...)` routes success and error outcomes. The success path writes to
-the app-level `FusionToast`. The error path displays server validation errors.
+`Response(...)` routes success and error outcomes. The success path writes the
+app-level `FusionToast`'s title, content and tone, then calls its `Show()`. The error path displays server validation errors.

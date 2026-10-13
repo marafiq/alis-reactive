@@ -27,24 +27,34 @@ pipeline don't interfere — they produce separate conditional reactions in the 
 
 ```
 SOURCE :=
-  -- Event args (inside .Reactive or CustomEvent<T> handler)
-  | args, x => x.Property                              -- TProp inferred from property type
+  -- Event payload (inside .Reactive): args is the event's object, its members are sources
+  | args.Value                                           -- TProp from the member's ReadOnly<T>/Prop<T>
+  | args.Slot.Get(x => x.Quiet)                          -- a member whose value is data, read further
 
-  -- Component read (anywhere — pipeline, response handler, DomReady)
-  | comp.Get(c => c.Value)                              -- TypedComponentSource<T>, any declared property
-  | comp.Get(c => c.StartDate)                          -- DateRangePicker
-  | comp.Get(c => c.GetSelectedRowIndexes)              -- a method that returns, e.g. FusionGrid
+  -- Data a callback received (CustomEvent<T>, ServerPush, SignalR, OnSuccess<T>, OnError<T>)
+  | payload.Get(x => x.Score)                            -- Data<T>: a member by its camel-case JSON name
+  | json.Get(j => j.Status)                              -- a response body
 
--- Getting a component reference:
+  -- Component read (anywhere: pipeline, response handler, DomReady)
+  | comp.Value                                           -- any declared property
+  | comp.StartDate                                       -- DateRangePicker
+  | grid.GetSelectedRowIndexes()                         -- a method that returns, e.g. FusionGrid
+
+  -- The page's URL, plugins and arrays
+  | p.Url<TQuery>().Get(q => q.Tab)
+  | slugify.Slug(planner.Wing)
+  | p.Element("dom-card").ClassList.Items.Any(x => x == "care-memory")
+
+-- Getting a component:
 var comp = p.Component<FusionNumericTextBox>(m => m.Amount);
 var comp = p.Component<FusionAutoComplete>(m => m.Name);
 var comp = s.Component<FusionSwitch>(m => m.IsActive);    -- 's' in response handler
 ```
 
-**`ResponseBody<T>` as source: supported.** Inside a response route,
-`s.When(json, x => x.Prop)` starts a condition on the response body
-(`ConditionStart.cs:33`), and guards compose with `.And(json, x => x.Prop)`
-/ `.Or(json, x => x.Prop)`.
+**A response body as source: supported.** Inside a response route, `json` is `Data<T>`:
+`s.When(json.Get(j => j.Status)).Eq("approved")` starts a condition on the response body, and guards
+compose with `.And(json.Get(j => j.Count)).Gt(0)` / `.Or(..)`
+(`Conditions/ResponseConditions/Index.cshtml`).
 
 ## Operator — What to Check
 
@@ -170,12 +180,11 @@ Each branch body is a full pipeline — Element, Component, Dispatch, HTTP, nest
 
 ## No Per-Command Guard
 
-There is no per-command `.When()` — `ElementBuilder` has no `When` member
-(`ElementBuilder.cs`). Guards are pipeline-level only: wrap the commands in a
-`p.When(SOURCE).OPERATOR.Then(...)` branch. To guard a single `SetText`, put
-that one command inside the branch body.
+There is no per-command `.When()`: `HtmlElement` and a component's members have no `When`.
+Guards are pipeline-level only: wrap the steps in a `p.When(SOURCE).OPERATOR.Then(...)` branch.
+To guard a single `Text.Set`, put that one step inside the branch body.
 
-For guarding Show/Hide/AddClass, use full `When/Then`:
+For guarding Show/Hide/ClassList.Add, use full `When/Then`:
 ```
 p.When(SOURCE).OPERATOR.Then(t => t.Element("id").Show());
 ```
@@ -192,56 +201,63 @@ Only in user-initiated pipelines (Click). Never in DomReady.
 
 ## Source-vs-Source
 
-```
-var left = p.Component<FusionNumericTextBox>(m => m.Rate);
-var right = p.Component<FusionNumericTextBox>(m => m.Budget);
+From `Conditions/NumericCondition/Index.cshtml`:
 
-p.When(left.Get(c => c.Value)).Gt(right.Get(c => c.Value))
- .Then(t => t.Element("warning").Show())
- .Else(e => e.Element("warning").Hide());
+```
+var hr = p.Component<FusionNumericTextBox>(m => m.HeartRate);
+var threshold = p.Component<FusionNumericTextBox>(m => m.ThresholdValue);
+p.When(hr.Value).Gte(threshold.Value)
+    .Then(t => t.Element("threshold-result").Text.Set("Above threshold"))
+    .Else(e => e.Element("threshold-result").Text.Set("Below threshold"));
 ```
 
 Both sides must be `TypedSource<TProp>` with same `TProp`.
 
 ## Recipes — Common Patterns
 
+In `Conditions/Guards/Index.cshtml` the payload is a custom event's (`CustomEvent<ScorePayload>`),
+so `args` is `Data<ScorePayload>` and a member reads with `args.Get(x => x.Score)`. Inside a
+component's `.Reactive`, the payload's members are read directly: `args.Value`.
+
 **ElseIf chain (multi-tier):**
 ```
-p.When(args, x => x.Score).Gte(90)
- .Then(t => t.Element("grade").SetText("A"))
- .ElseIf(args, x => x.Score).Gte(80)
- .Then(t => t.Element("grade").SetText("B"))
- .ElseIf(args, x => x.Score).Gte(70)
- .Then(t => t.Element("grade").SetText("C"))
- .Else(e => e.Element("grade").SetText("F"));
+p.When(args.Get(x => x.Score)).Gte(90)
+    .Then(then => then.Element("grade").Text.Set("A"))
+    .ElseIf(args.Get(x => x.Score)).Gte(80)
+    .Then(then => then.Element("grade").Text.Set("B"))
+    .Else(else_ => else_.Element("grade").Text.Set("F"))
 ```
 
-**And + Or (mixed — needs lambda):**
+**And + Or (mixed — needs a group)** from `Conditions/EscalationRouting/Index.cshtml`:
 ```
-p.When(args, x => x.Score).Gte(90)
- .And(cs => cs.When(args, x => x.Role).Eq("admin")
-              .Or(args, x => x.Role).Eq("nurse"))
- .Then(t => t.Element("badge").Show());
+p.When(assessment.Value).Gte(85m)
+    .And(cs => cs.When(supervisorOverride.Checked).Truthy()
+        .Or(careTrack.Value).Eq("memory"))
+    .Then(then => then.Dispatch(EscalationRoutingEvents.ComponentRouteIsolation))
 ```
 
-**Multiple independent conditions in one pipeline:**
+**Multiple independent conditions in one pipeline** from `Components/Fusion/DropDownList/Index.cshtml`:
 ```
-p.When(args, x => x.Value).Eq("smith")
- .Then(t => t.Element("name-match").Show())
- .Else(e => e.Element("name-match").Hide());
-
-p.When(comp.Get(c => c.Value)).NotNull()
- .Then(t => t.Element("has-value").Show())
- .Else(e => e.Element("has-value").Hide());
+p.When(args.Value).Eq("Electronics")
+    .Then(t => t.Element("args-condition").Text.Set("electronics selected"))
+    .Else(e => e.Element("args-condition").Text.Set("other category"));
+var comp = p.Component<FusionDropDownList>(m => m.Category);
+p.When(comp.Value).NotNull()
+    .Then(then => then.Element("selected-indicator").Show())
+    .Else(else_ => else_.Element("selected-indicator").Hide());
 ```
 These are independent — both evaluate, neither blocks the other.
 
-**Condition inside HTTP response (body or component source):**
+**Condition inside HTTP response (body or component source)** from `Conditions/ResponseConditions/Index.cshtml`:
 ```
-.OnSuccess<TResp>((json, s) =>
+.OnSuccess<ApprovalResponse>((json, s) =>
 {
-    s.Element("name").SetText(json, x => x.Name);       -- SetText reads ResponseBody
-    s.When(json, x => x.Active).Truthy()                 -- When reads ResponseBody too
-     .Then(t => t.Element("status").SetText("Active"));
+    s.When(json.Get(j => j.Status)).Eq("approved")
+     .Then(then =>
+     {
+         then.Element("s1-badge").Show();
+         then.Element("s1-result").Text.Set("approved");
+     })
+     .Else(el => el.Element("s1-result").Text.Set("not approved"));
 })
 ```

@@ -4,11 +4,14 @@ description: Declare any browser component once and every Alis.Reactive feature 
 ---
 
 Any component that already works in the browser can join a plan. You install,
-bundle and construct it as usual. You declare it once in C#, and the framework
-gives it the same typed API every shipped component has: `.Reactive`, `Set`,
-`Call`, `Get`, gather, validation and partials.
+bundle and construct it as usual. You declare it once in C#: one class whose
+members are the object's own properties, methods and events. Every view then
+uses it the way it uses a shipped component: `.Reactive`, its members, gather,
+validation and partials. No framework JavaScript changes.
 
-This page brings [Tom Select](https://tom-select.js.org), as the sandbox does.
+This page brings the sandbox's visit planner, a widget the sandbox wrote itself
+with no knowledge of Alis.Reactive. Its declaration is
+`BroughtComponents/VisitPlanner/VisitPlanner.cs`.
 
 ## 1. Construct It in Your Bundle
 
@@ -17,77 +20,132 @@ of HTML (the page at boot, a partial when it is injected) and `alis:unmount`
 before it removes one, so you construct and destroy at the right moment.
 
 ```ts
-import TomSelect from "tom-select";
+import { VisitPlanner, visitPlannerHosts } from "./visit-planner";
 
 document.addEventListener("alis:mount", event => {
-  const { root } = (event as CustomEvent<{ root: HTMLElement }>).detail;
-  for (const host of root.querySelectorAll<HTMLSelectElement & { tomselect?: TomSelect }>("select.tom-select")) {
-    if (host.tomselect === undefined) new TomSelect(host, { dropdownParent: "body" });
+  const { root } = (event as CustomEvent<MountEventDetail>).detail;
+  for (const host of visitPlannerHosts(root)) {
+    if (host.visitPlanner === undefined) new VisitPlanner(host);
   }
 });
 
 document.addEventListener("alis:unmount", event => {
-  const { root } = (event as CustomEvent<{ root: HTMLElement }>).detail;
-  for (const host of root.querySelectorAll<HTMLSelectElement & { tomselect?: TomSelect }>("select.tom-select")) {
-    host.tomselect?.destroy();
+  const { root } = (event as CustomEvent<MountEventDetail>).detail;
+  for (const host of visitPlannerHosts(root)) {
+    host.visitPlanner?.destroy();
   }
 });
 ```
 
 ## 2. Declare It
 
-One class names the object's members by the names its JavaScript API uses, and
-says where the object lives. The vendor tells the framework how to find the
-object on its element, how to subscribe to events, and what a listener receives.
+One class, deriving `Component`, says where the object lives and declares each of
+its members as a C# member. The vendor tells the framework how to find the object
+on its element, how to subscribe to events, and what a listener receives.
 
 ```csharp
-public sealed class TomSelect : Component, IInputComponent
+#nullable disable annotations
+public sealed class VisitPlanner : Component, IInputComponent
 {
-    public static ComponentVendor TomSelectVendor { get; } = ComponentVendor.Define(
-        "tomselect",
-        objectPath: "tomselect",
+    public static ComponentVendor VisitPlannerVendor { get; } = ComponentVendor.Define(
+        "visitplanner",
+        objectPath: "visitPlanner",
         subscribe: "on",
         unsubscribe: "off",
         payload: VendorEventPayload.Argument);
 
-    public override ComponentVendor Vendor => TomSelectVendor;
+    public override ComponentVendor Vendor => VisitPlannerVendor;
 
-    public ComponentProperty<string> Value => Property<string>("input.value");
-    public ComponentMethod<string> SetValue => Method<string>("setValue");
-    public ComponentMethod Clear => Method("clear");
-    public TypedEvent<TomSelectChangeArgs> Change => Event<TomSelectChangeArgs>("change");
+    public Prop<IReadOnlyList<string>> Value => Prop<IReadOnlyList<string>>();
+    public Prop<int> Capacity => Prop<int>();
+    public Prop<string> Wing => Prop<string>();
+    public Prop<IReadOnlyList<VisitSlot>> Slots => Prop<IReadOnlyList<VisitSlot>>();
+    public Prop<IReadOnlyList<string>> OfferedDays => Prop<IReadOnlyList<string>>("slots[].day");
+    public Prop<string> EmptyMessage => Prop<string>("labels.empty");
+    public ReadOnly<int> Count => ReadOnly<int>();
 
-    // What makes it an input: the value a form posts, gather reads and validation checks,
-    // and the event that commits it. A form checks the field again whenever that event fires.
-    ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
-}
+    public TypedSource<int> Remaining() => Invoke<int>();
+    public TypedSource<bool> IsBooked(Arg<string> slot) => Invoke<bool>(slot);
+    public TypedSource<string> FirstOpen() => Invoke<string>();
+    public void Select(Arg<string> slot) => Call(slot);
+    public void Clear() => Call();
+    public void Book(Arg<string> slot, Arg<decimal> visitors, Arg<string> note) => Call(slot, visitors, note);
+    public void PrepareSummary() => CallAsync();
+    public TypedSource<string> Summary() => InvokeAsync<string>();
 
-public class TomSelectChangeArgs
-{
+    public TypedEvent<VisitPlannerWeekChangedArgs> WeekChanged => Event<VisitPlannerWeekChangedArgs>("weekChanged");
+    public TypedEvent<VisitPlannerBeforeBookArgs> BeforeBook => Event<VisitPlannerBeforeBookArgs>("beforeBook");
+
+    ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: WeekChanged);
+
+    // ... the full class declares more members of each kind
 }
 ```
 
+The JavaScript name of a member is its C# name camel-cased, so `Capacity` is
+`capacity` and `IsBooked` is `isBooked`. Give a name only when it differs.
+
 | JavaScript | Declared as |
 | --- | --- |
-| property, including a nested one | `Property<T>("name")`, `Property<T>("labels.empty")` |
-| a field of each item of a list | `Property<IReadOnlyList<T>>("slots[].day")` (read only) |
-| method | `Method("name")`, `Method<T1, T2>("name")` |
-| method that returns a value | `Function<TResult>("name")`, `Function<TArg, TResult>("name")` |
-| method that returns a promise | `Method("name").Awaited()`, `Function<TResult>("name").Awaited()` |
-| event | `Event<TArgs>("name")` |
-| an input's value and commit event | `ComponentInput.Of(Value, committedBy: ValueChanged)` |
+| a property the page reads and writes | `public Prop<int> Capacity => Prop<int>();` |
+| a property the page only reads | `public ReadOnly<int> Count => ReadOnly<int>();` |
+| a nested property | `Prop<string>("labels.empty")` |
+| a field of each item of a list, to read | `Prop<IReadOnlyList<string>>("slots[].day")` |
+| a method | `public void Clear() => Call();` |
+| a method with arguments | `public void Book(Arg<string> slot, Arg<decimal> visitors, Arg<string> note) => Call(slot, visitors, note);` |
+| a method that returns a value | `public TypedSource<bool> IsBooked(Arg<string> slot) => Invoke<bool>(slot);` |
+| a method that returns a promise | `CallAsync()`, `InvokeAsync<string>()` |
+| a method whose JavaScript name differs | `Call(fieldName, name: "autoFitColumns")` |
+| an argument the method always takes | `Call(key, Fixed("field"), name: "hideColumns")` |
+| an event | `Event<VisitPlannerWeekChangedArgs>("weekChanged")` |
+| an input's value and commit event | `ComponentInput.Of(Value, committedBy: WeekChanged)` |
 
-The commit event is whatever the component raises when a value is settled:
+Each `Arg<T>` parameter takes a literal or any value the page can read, in the
+method's own order. `Fixed(..)` is for an argument the page never chooses, such
+as the `"field"` key the grid's column methods always take.
+
+`IInputComponent.Input`, implemented explicitly, is what makes it an input: the
+value a form posts, gather reads and validation checks, and the event that
+commits it. A form checks the field again whenever that event fires. The commit
+event is whatever the component raises when a value is settled:
 `change` for most, `valueChanged` for a rating, `selected` for an uploader, or a
-name of your own. The framework never assumes one.
+name of your own, as `weekChanged` is here. The framework never assumes one.
 
-An awaited method holds the steps after its call until its promise settles, and a
-read of an awaited function is the value it settles with. A member that returns a
-promise but is not declared awaited fails where the page reads it, with a message
-that names the member, instead of reading the promise as a value. An event payload is a
-plain class; a handler can write a field back (`p.Payload(args).Set(a => a.Cancel, true)`),
-and the component reads it once the handler returns, as long as nothing in the
-handler waited before the write.
+An awaited method (`CallAsync`) holds the steps after its call until its promise
+settles, and an awaited read (`InvokeAsync<T>`) is the value it settles with. A
+member that returns a promise but is not declared awaited fails where the page
+reads it, with a message that names the member, instead of reading the promise as
+a value.
+
+### Event payloads
+
+An event payload is declared the same way, as a class deriving `JsObject`: what
+it carries is `ReadOnly<T>`, what the component reads back after the handler is
+`Prop<T>`, and what it can do is a method.
+
+```csharp
+public class VisitPlannerFullArgs : JsObject
+{
+    public ReadOnly<int> Capacity => ReadOnly<int>();
+    public ReadOnly<string> Attempted => ReadOnly<string>();   // the time that could not be booked
+    public void Waitlist() => Call();                          // puts that time on the waitlist
+}
+
+public class VisitPlannerBeforeBookArgs : JsObject
+{
+    public ReadOnly<VisitSlot> Slot => ReadOnly<VisitSlot>();
+    public Prop<bool> Cancel => Prop<bool>();                  // the planner reads it back
+}
+#nullable restore annotations
+```
+
+A handler can write a member back (`args.Cancel.Set(true)`), and the component
+reads it once the handler returns, as long as nothing in the handler waited
+before the write.
+
+The declaration and its payloads sit between `#nullable disable annotations` and
+`#nullable restore annotations`, so a page can pass values of either nullability
+to its members.
 
 ## 3. Render It
 
@@ -95,18 +153,18 @@ The render helper writes the component's own markup with the ID and name the
 framework gives the field, and registers it as the field's input.
 
 ```csharp
-public static RenderedComponent<TomSelect, TModel> TomSelect<TModel, TProp>(
-    this InputBoundField<TModel, TProp> field,
-    IEnumerable<TomSelectOption> options,
-    string placeholder)
+public static RenderedComponent<VisitPlanner, TModel> VisitPlanner<TModel>(
+    this InputBoundField<TModel, List<string>> field,
+    int capacity)
     where TModel : class
 {
     var html = new StringBuilder()
-        .Append("<select class=\"tom-select\" id=\"").Append(Encode(field.ElementId))
-        .Append("\" name=\"").Append(Encode(field.BindingPath)).Append("\">");
-    // ... one <option> per suite ...
-    html.Append("</select>");
-    return field.Render<TomSelect>(new HtmlString(html.ToString()));
+        .Append("<div class=\"visit-planner\" id=\"").Append(Encode(field.ElementId))
+        .Append("\" data-name=\"").Append(Encode(field.BindingPath))
+        .Append("\" data-capacity=\"").Append(capacity)
+        .Append("\" data-value=\"").Append(Encode(string.Join(",", Booked(field))))
+        .Append("\"></div>");
+    return field.Render<VisitPlanner>(new HtmlString(html.ToString()));
 }
 ```
 
@@ -115,43 +173,61 @@ choose: `plan.Render<TComponent>("my-id", markup)`.
 
 ## 4. Use It
 
-Every view now has the whole DSL for it, with no further code:
+Every view now has the whole DSL for it, with no further code. From the Family
+Visits page:
 
 ```csharp
-@{ Html.InputField(plan, m => m.SuiteType, o => o.Required().Label("Suite type"))
-    .TomSelect(suites, "Choose a suite type")
-    .Reactive(evt => evt.Change, (args, p) =>
+@{ Html.InputField(plan, m => m.VisitSlots, o => o.Required().Label("Visit times"))
+    .VisitPlanner(capacity: 1)
+    .Reactive(evt => evt.BeforeBook, (args, p) =>
+        p.When(args.Slot.Get(x => x.Quiet)).Truthy()
+            .Then(quiet =>
+            {
+                args.Cancel.Set(true);
+                quiet.Element("quiet-slot").Text.Set(args.Slot.Get(x => x.Label));
+                quiet.Element("quiet-hours").Show();
+            })
+            .Else(open => open.Element("quiet-hours").Hide()))
+    .Reactive(evt => evt.WeekChanged, (args, p) =>
     {
-        var suite = p.Component<TomSelect>(m => m.SuiteType);
-        p.When(suite.Get(x => x.Value)).NotEmpty()
-            .Then(quote => quote.Get(rateUrl)
-                .Gather<SuiteQuery>(g => g.Set(x => x.SuiteType, suite.Get(x => x.Value)))
-                .Response(r => r.OnSuccess<SuiteRateResponse>((rate, s) =>
-                    s.Component<FusionNumericTextBox>(m => m.MonthlyRate)
-                        .Set(x => x.Value, rate.Read(x => x.MonthlyRate)))));
+        var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
+        p.Element("planned-count").Text.Set(args.Count);
+        p.Element("visits-left").Text.Set(planner.Remaining());
     }); }
 ```
 
-`rateUrl` holds a `{suiteType}` placeholder, and `SuiteQuery.SuiteType` fills it
-with the brought component's value.
-
-```csharp
-s.Component<TomSelect>(m => m.SuiteType).Call(c => c.SetValue, recommendation.Read(x => x.SuiteType));
-```
-
-Arguments are literals or anything the DSL can read, and a function's result is
-itself a source:
+`p.Component<VisitPlanner>(..)` returns the planner itself. Its properties are
+values and its methods are called directly; each argument is a literal or
+anything the DSL can read, and a method's result is itself a value:
 
 ```csharp
 var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
-planner.Call(c => c.Select, planner.Get(c => c.FirstOpen));
-p.When(planner.Get(c => c.IsBooked, requested.Get(c => c.Value))).Truthy()
-    .Then(t => t.Element("requested-status").SetText("That time is already booked."));
-planner.Call(c => c.Book, p.Payload(args).Get(x => x.Added), visitors.Get(c => c.Value), note.Get(c => c.Value));
+planner.Select(planner.FirstOpen());
+
+p.When(p.Component<VisitPlanner>(m => m.VisitSlots).IsBooked("sun-11")).Truthy()
+    .Then(t => t.Element("brunch-status").Text.Set("Sunday brunch is booked."));
+
+p.When(args.Added).NotEmpty()
+    .Then(added => added.Component<VisitPlanner>(m => m.VisitSlots).Book(args.Added,
+        added.Component<FusionNumericTextBox>(m => m.Visitors).Value,
+        added.Component<NativeTextBox>(m => m.Note).Value));
+```
+
+A response fills its properties like any other value:
+
+```csharp
+.OnSuccess<ResidentWeekResponse>((week, s) =>
+{
+    var visitSlots = s.Component<VisitPlanner>(m => m.VisitSlots);
+    visitSlots.Wing.Set(week.Get(x => x.Wing));
+    visitSlots.Capacity.Set(week.Get(x => x.WeeklyVisits));
+    visitSlots.Slots.Set(week.Get(x => x.Slots));
+})
 ```
 
 The Syncfusion and native components that ship with Alis.Reactive are declared
 exactly this way, against the same public surface, and the ones that need
 JavaScript of their own (the native check list, the smart text area, the
-confirm dialog) are constructed on `alis:mount` as in step 1. The sandbox's Family Visits
-page brings a visit planner it wrote itself, with every kind of member above.
+confirm dialog) are constructed on `alis:mount` as in step 1. The sandbox also
+brings [Tom Select](https://tom-select.js.org), an npm package, the same way
+(`BroughtComponents/TomSelect/TomSelect.cs`).

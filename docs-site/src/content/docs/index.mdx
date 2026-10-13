@@ -38,10 +38,12 @@ The last step is always explicit: render the plan once with
         p.Post("/Todo/Save").Gather(g => g.Form())
          .Validate<TodoValidator>("todo-form")
          .Response(r => r.OnSuccess(s =>
-             s.Component<FusionToast>()
-              .SetContent("Saved")
-              .Success()
-              .Show()));
+         {
+             var toast = s.Component<FusionToast>();
+             toast.Content.Set("Saved");
+             toast.Tone.Set(FusionToastTone.Success);
+             toast.Show();
+         }));
     }))
 
 @Html.RenderPlan(plan)

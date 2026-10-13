@@ -5,6 +5,11 @@ description: Use when writing C# reactive plan code in .cshtml views — Html.On
 
 # Reactive DSL Grammar
 
+Source of truth: `Alis.Reactive/Components/Contracts/JsObject.cs`, `JsMembers.cs`,
+`Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs`, `HtmlElement.cs`,
+`Alis.Reactive/PlanAuthoring/Events/Data.cs`. Every example below is copied from a sandbox view under
+`Alis.Reactive.SandboxApp/Areas/Sandbox/Views/`.
+
 ## View
 
 ```
@@ -84,7 +89,8 @@ public sealed class ResidentStatusFeed : SignalRHub          // SignalR: client 
 ```
 
 The server writes the same declaration's `.Name` (`SendAsync(new ResidentStatusFeed().StatusChanged.Name, ..)`).
-`TPayload` must be `class, new()`. Payload is a phantom — properties become `evt.` dot-paths.
+`TPayload` must be `class, new()`. `payload` is `Data<TPayload>`: `payload.Get(x => x.Member)` reads a
+member by its camel-case JSON name, and `payload` itself is a value too.
 ServerPush and SignalR are remote triggers — the async lane.
 
 Component events use `.Reactive()` on the rendered component, not `Html.On`. `evt` is the
@@ -98,6 +104,9 @@ EVENT := Change | Filtering | Select | Focus | Blur | Created | ...    -- the co
        | RowSelected<TRow>() | CardClick<TCard>() | ...                 -- events typed by the app's class
 ```
 
+`args` is the object the event hands its callback, used as the object: `args.Value` is a source,
+`args.Cancel.Set(true)` writes back, `args.UpdateData(..)` calls one of its methods.
+
 ## Pipeline
 
 ```
@@ -105,10 +114,10 @@ PIPELINE :=
   | p.Element("id").ELEMENT_ACTION
   | p.Dispatch(EVT)                                  -- AppEvent
   | p.Dispatch(EVT, payload)                         -- AppEvent<T>, payload fixed at render
-  | p.DispatchWith(EVT, d => d.Set(x => x.F, SOURCE)) -- AppEvent<T>, payload read when it runs
-  | p.Component<TComp>(m => m.Prop).COMP_ACTION     -- model-bound
-  | p.Component<TComp>("refId").COMP_ACTION          -- string ref
-  | p.Component<TComp>().COMP_ACTION                 -- app-level singleton
+  | p.Dispatch<T>(EVT, d => d.Set(x => x.F, SOURCE)) -- AppEvent<T>, payload read when it runs
+  | var c = p.Component<TComp>(m => m.Prop); c.MEMBER_USE   -- model-bound
+  | var c = p.Component<TComp>("refId"); c.MEMBER_USE        -- explicit id
+  | var c = p.Component<TComp>(); c.MEMBER_USE              -- app-level singleton
   | p.When(SOURCE).OPERATOR.BRANCH                   -- → conditions-dsl
   | p.Confirm("msg").Then(t => { PIPELINE })         -- async halt
   | p.HTTP_REQUEST                                    -- → http-pipeline
@@ -117,17 +126,28 @@ PIPELINE :=
   | p.Into("elementId")
 ```
 
+Statements, not chains: each write or call is its own statement. `p.Component<T>(..)` returns `T`
+itself, so hold it in a variable named for its role (`rate`, `grid`, `toast`).
+
 **Where a step lands.** A step lands in the callback it is written in, whichever pipeline
-variable or handle writes it. Declare a handle once at the top of a trigger and use it in any
-route (FrontDesk.cshtml):
+variable or object writes it. Declare an object once at the top of a trigger and use it in any
+route (`Components/Brought/VisitPlanner/FrontDesk.cshtml`):
 
 ```csharp
+var link = p.Url<FrontDeskQuery>();
 var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
+var resident = p.Element("desk-resident");
 var loading = p.Element("desk-loading");
 p.Get(weekUrl)
+    .Gather<FrontDeskResident>(g => g.Set(x => x.ResidentId, link.Get(q => q.Resident)))
     .WhileLoading(l => loading.Show())
-    .Response(r => r.OnSuccess<ResidentWeekResponse>((week, s) =>
-        planner.Set(c => c.Wing, week.Read(x => x.Wing))))
+    .Response(r => r
+        .OnSuccess<ResidentWeekResponse>((week, s) =>
+        {
+            planner.Wing.Set(week.Get(x => x.Wing));
+            planner.Capacity.Set(week.Get(x => x.WeeklyVisits));
+            resident.Text.Set(week.Get(x => x.ResidentName));
+        }))
     .Finally(f => loading.Hide());
 ```
 
@@ -135,91 +155,103 @@ A step written outside any callback throws when the view renders.
 
 ## Element Actions
 
+`p.Element("id")` is the element the view rendered with that id (`HtmlElement`).
+
 ```
 p.Element("id").ACTION
 
 ACTION :=
-  -- Class (→ PipelineBuilder)
-  | .AddClass("class")
-  | .RemoveClass("class")
-  | .ToggleClass("class")
+  | .Text.Set("static")                 -- textContent
+  | .Text.Set(SOURCE)                   -- any value read when the step runs: number, date or text
+  | .Html.Set("static")                 -- innerHTML
+  | .Html.Set(SOURCE)
+  | .ClassList.Add("class")             -- each takes a literal or a string source
+  | .ClassList.Remove("class")
+  | .ClassList.Toggle("class")
+  | .Show()                             -- removes the hidden attribute
+  | .Hide()                             -- sets the hidden attribute
 
-  -- Text (→ PipelineBuilder)
-  | .SetText("static")
-  | .SetText(payload, x => x.Prop)                     -- event/response phantom
-  | .SetText(responseBody, x => x.Prop)                -- typed HTTP response
-
-  -- Text (→ ElementBuilder)
-  | .SetText(bindSource)
-  | .SetText(typedSource)                              -- comp.Get(c => c.Value)
-
-  -- HTML (→ PipelineBuilder)
-  | .SetHtml("static")
-  | .SetHtml(payload, x => x.Prop)
-
-  -- HTML (→ ElementBuilder)
-  | .SetHtml(bindSource)
-  | .SetHtml(typedSource)
-
-  -- Visibility (→ PipelineBuilder)
-  | .Show()
-  | .Hide()
+READ :=                                 -- arrays, usable wherever a source goes
+  | p.Element("id").ClassList.Items     -- the classes, ReactiveArray<string>
+  | p.Element("id").Children            -- the child elements, ReactiveArray<ChildElement>
 ```
 
-**Return type matters.** `→ PipelineBuilder` chains to next command.
+From `Components/Native/DomOps/Index.cshtml` and `Components/Brought/VisitPlanner/VisitBoard.cshtml`:
 
-## Component Actions
+```csharp
+p.Element("dom-risk-count").Text.Set(
+    p.Element("dom-card").ClassList.Items.Where(x => x.StartsWith("risk-")).Count());
+p.Element("dom-high-risk-count").Text.Set(
+    p.Element("risk-list").Children.Count(x => x.GetAttribute("data-risk") == "high"));
+p.Element("board-legend").ClassList.Toggle("hidden");
+p.Element("board-legend").Html.Set("<strong>Taken</strong> times belong to another desk's family; <em>dashed</em> times are quiet hours.");
+```
 
-A component is a JavaScript object declared once (`Alis.Reactive.Fusion.Components`,
-`Alis.Reactive.Native.Components`, or the app's own assembly). Three verbs touch any declared
-member; `c` is the declaration:
+## Component Members
+
+A component is a JavaScript object declared once as a C# class (`Alis.Reactive.Fusion.Components`,
+`Alis.Reactive.Native.Components`, or the app's own assembly). Each of its members is a real C#
+member, used directly:
 
 ```
-COMP_ACTION :=
-  | .Set(c => c.PROPERTY, literal | typedSource)           -- write a property
-  | .Call(c => c.METHOD)                                   -- call a method
-  | .Call(c => c.METHOD, arg)                              -- one argument: literal or typedSource
-  | .Call(c => c.METHOD, arg1, arg2[, arg3])               -- each argument a literal or a typedSource
-  | .Get(c => c.PROPERTY)        → TypedComponentSource<T> -- read, for SetText, conditions, gather
-  | .Get(c => c.FUNCTION[, args]) → TypedComponentSource<T> -- read what a method returns
+MEMBER_USE :=
+  | c.PROPERTY.Set(literal)               -- Prop<T>: write a value fixed at render
+  | c.PROPERTY.Set(SOURCE)                -- Prop<T>: write a value read when the step runs
+  | c.PROPERTY                            -- Prop<T> or ReadOnly<T>: a source
+  | c.PROPERTY.Get(x => x.Member)         -- read into a property whose value is data (a row, a slot)
+  | c.METHOD()                            -- call
+  | c.METHOD(arg1[, arg2, ...])           -- each argument a literal or a SOURCE, in the declared order
+  | c.FUNCTION([args])                    -- a method that returns a value: a source
 
-typedSource := json.Read(x => x.Items)                     -- response body (x => x is the whole body)
-             | p.Payload(args).Get(a => a.Field)            -- event payload
-             | p.Component<T>(m => m.Other).Get(c => c.Value)
-             | p.Url<TQuery>().Get(q => q.Member)           -- the page's URL query string
-             | plugin and array sources
+SOURCE := json.Get(x => x.Items) | json      -- a response body (json itself is the whole body)
+        | payload.Get(x => x.Field)          -- a custom event's payload or a message
+        | args.Field                         -- the event's payload object
+        | p.Component<T>(m => m.Other).Value -- another component's property
+        | p.Url<TQuery>().Get(q => q.Member) -- the page's URL query string
+        | plugin.Member(..)                  -- a registered plugin's member
+        | p.From(source).Count(..), p.Element("id").Children, ...  -- arrays
 ```
 
 Examples, each from a sandbox view:
 
-```
-p.Component<FusionDropDownList>(m => m.Protocol).Set(c => c.Value, "Full Clinical")
-s.Component<FusionDropDownList>(m => m.City).Set(c => c.DataSource, json.Read(j => j.Cities)).Call(c => c.DataBind)
-p.When(p.Component<FusionDropDownList>(m => m.CareLevel).Get(c => c.Value)).Eq("Memory Care")
-grid.Call(c => c.HideColumn, Field.Of((ResidentDirectoryGridItem x) => x.PrimaryNurse))
-grid.Call(c => c.SetCellValue<string>(), 6002, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), "Critical")
-.Gather<ResidentSelectionRecordsRequest>(g => g.Set(x => x.SelectedRecords, grid.Get(c => c.GetSelectedRecords<ResidentDirectoryGridItem>())))
+```csharp
+p.Component<FusionDropDownList>(m => m.Category).Value.Set("Books");          // DropDownList/Index.cshtml
+var city = s.Component<FusionDropDownList>(m => m.City);                      // Patterns/Cascading/Index.cshtml
+city.DataSource.Set(json.Get(j => j.Cities));
+city.DataBind();
+p.When(careLevel.Value).Eq("Memory Care")                                     // Conditions/CareLevelCascade/Index.cshtml
+grid.HideColumn(Field.Of((ResidentDirectoryGridItem x) => x.PrimaryNurse));   // Grid/Operations.cshtml
+p.Component<FusionGrid>(GridId).SetCellValue<string>(6002, Field.Of((ResidentDirectoryGridItem x) => x.RiskLevel), "Critical");
+.Gather<ResidentSelectionRecordsRequest>(g => g.Set(x => x.SelectedRecords, grid.GetSelectedRecords<ResidentDirectoryGridItem>()))
+s.Component<FusionGrid>("residents-grid").DataSource.Set(json);              // Grid/Index.cshtml: the body is the rows
 ```
 
 - A member typed by the app's class is a generic method of the declaration:
-  `c.GetSelectedRecords<TRow>()`, `c.AddRecordAt<TRow>()`, `evt.RowSelected<TRow>()`.
+  `grid.GetSelectedRecords<TRow>()`, `grid.AddRecordAt<TRow>(..)`, `evt.RowSelected<TRow>()`.
 - `Field.Of((TRow r) => r.Member)` names a row or item member the way the component does
   (`"member"`); `Field<TValue>` makes a cell value match the column's type.
 - An enum literal is its member name or its `[JsonStringEnumMemberName]` text.
-- A payload with behavior: `p.Payload(args).Set(a => a.Cancel, true)`, `p.Payload(args).Call(a => a.UpdateData, json.Read(x => x.Items))`.
+- An event payload with behavior is used the same way: `args.PreventDefaultAction.Set(true)`,
+  `args.UpdateData(json.Get(j => j.Medications))`, `args.Waitlist()`.
 
-App-level objects are referenced without an ID and use the same verbs:
+App-level objects are referenced without an ID (`Components/AppLevel/Drawer/Index.cshtml`,
+`Components/AppLevel/Loader/Index.cshtml`, `Patterns/Todo/Index.cshtml`):
 
-```
-p.Component<NativeDrawer>().Set(c => c.Size, DrawerSize.Md).Call(c => c.Open)
-p.Component<NativeDrawer>().Call(c => c.Close)
-l.Component<NativeLoader>().Set(c => c.Target, "incident-report-form").Call(c => c.Show)
-s.Component<NativeLoader>().Call(c => c.Hide)
-s.Component<FusionToast>()
-    .Set(c => c.Title, "Todo")
-    .Set(c => c.Content, "Todo saved successfully")
-    .Set(c => c.Tone, FusionToastTone.Success)
-    .Call(c => c.Show)
+```csharp
+var drawer = p.Component<NativeDrawer>();
+drawer.Size.Set(DrawerSize.Md);
+drawer.Open();
+
+var loader = l.Component<NativeLoader>();
+loader.Timeout.Set(3000);
+loader.Show();
+s.Component<NativeLoader>().Hide();
+
+var toast = s.Component<FusionToast>();
+toast.Title.Set("Todo");
+toast.Content.Set("Todo saved successfully");
+toast.Tone.Set(FusionToastTone.Success);
+toast.Show();
 ```
 
 ## InputField
@@ -278,7 +310,7 @@ HIDDEN := @Html.HiddenFieldFor(plan, m => m.Prop)
 ```
 
 A hidden InputField: no label or message wrapper, still registered for gather. Set its value with
-`p.Component<NativeHiddenField>(m => m.Prop).Set(c => c.Value, "v")`.
+`p.Component<NativeHiddenField>(m => m.Prop).Value.Set("v")`.
 
 ## Dispatch
 
@@ -286,38 +318,52 @@ A hidden InputField: no label or message wrapper, still registered for gather. S
 DISPATCH :=
   | p.Dispatch(CareEvents.Refreshed)
   | p.Dispatch(CareEvents.Flagged, new ResidentFlagged { ... })
-  | p.DispatchWith(CareEvents.Flagged, d => d.Set(x => x.ResidentId, SOURCE))
+  | p.Dispatch<ResidentFlagged>(CareEvents.Flagged, d => d.Set(x => x.ResidentId, SOURCE))
+```
+
+From `CoreBehaviors/DispatchSource/Index.cshtml`:
+
+```csharp
+p.Dispatch<DispatchSourceModel>(DispatchSourceEvents.Transfer, d => d
+    .Set(x => x.Name, p.Component<NativeTextBox>(m => m.Name).Value)
+    .Set(x => x.Status, "active")
+    .Set(x => x.Address.City, p.Component<NativeTextBox>(m => m.Address.City).Value)
+);
 ```
 
 ## Event Payloads with Behavior (Filtering)
 
 Source: `Areas/Sandbox/Views/Components/Fusion/AutoComplete/Index.cshtml`
-```
+```csharp
 .Reactive(evt => evt.Filtering, (args, p) =>
 {
-    p.Payload(args).Set(a => a.PreventDefaultAction, true);           -- suppress the client filter
+    args.PreventDefaultAction.Set(true);                                          // suppress the client filter
     p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
-     .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, p.Payload(args).Get(a => a.Text)))    -- event payload → query member
+     .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, args.Text))  // event payload → query member
      .Response(r => r
         .OnSuccess<MedicationSearchResponse>((json, s) =>
         {
-            s.Payload(args).Call(a => a.UpdateData, json.Read(j => j.Medications));  -- feed the popup
+            args.UpdateData(json.Get(j => j.Medications));                         // feed the popup
+            s.Element("filter-status").Text.Set("results loaded");
         }));
 })
 ```
 
-A payload's fields are plain C# properties; its methods are declared on a payload that derives
-from `JsObject`. `p.Payload(args)` is the handle that writes, calls and reads them.
+An event payload is declared as a `JsObject`: `ReadOnly<T>` members for what it carries, `Prop<T>`
+for what the component reads back (`Cancel`, `PreventDefaultAction`), and methods for what it can do.
+`args` is that object, live in the callback.
 
-## Expression Path Resolution
+## Member Path Resolution
 
 ```
-| payload, x => x.Text          → "evt.text"
-| payload, x => x.Address.City  → "evt.address.city"
-| responseBody, x => x.Data     → "responseBody.data"
-| m => m.Address.City (ID)      → "Namespace_Model__Address_City"
-| m => m.Address.City (binding) → "Address.City"
+| payload.Get(x => x.Text)          → the payload's "text"
+| payload.Get(x => x.Address.City)  → the payload's "address.city"
+| json.Get(x => x.Data)             → the response body's "data"
+| m => m.Address.City (ID)          → "Namespace_Model__Address_City"
+| m => m.Address.City (binding)     → "Address.City"
 ```
+
+A data member reads by its camel-case JSON name: `x => x.MRN` reads `mrn`.
 
 ## Key Rules
 
@@ -333,7 +379,7 @@ from `JsObject`. `p.Payload(args)` is the handle that writes, calls and reads th
 
 ## Canonical Reference — Verified Patterns from Sandbox Views
 
-These patterns are extracted from 127 real sandbox views. Use exactly these forms.
+These patterns are copied from real sandbox views. Use exactly these forms.
 
 **Most common: .Reactive() on the rendered component**
 Source: `Areas/Sandbox/Views/Components/Fusion/DropDownList/Index.cshtml`
@@ -344,67 +390,68 @@ Source: `Areas/Sandbox/Views/Components/Fusion/DropDownList/Index.cshtml`
         .Placeholder("Select a category"))
     .Reactive(evt => evt.Change, (args, p) =>
     {
-        p.Element("change-value").SetText(args, x => x.Value);
+        p.Element("change-value").Text.Set(args.Value);
     }); }
 ```
 
-**DomReady with HTTP (36 uses)**
+**DomReady with HTTP**
 Source: `Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml`
 ```csharp
 Html.On(plan, t => t.DomReady(p =>
-    p.Get("/Sandbox/HttpPipeline/Http/Residents")
+    p.Get(Url.SandboxRoute("Residents", "Http"))
      .WhileLoading(l => l.Element("load-spinner").Show())
-     .Response(r => r.OnSuccess<ResidentsResponse>((json, s) =>
-     {
-         s.Element("load-spinner").Hide();
-         s.Element("load-first").SetText(json, x => x.First);
-     }))));
+     .Response(r => r
+        .OnSuccess<ResidentsResponse>((json, s) =>
+        {
+            s.Element("load-spinner").Hide();
+            s.Element("load-first").Text.Set(json.Get(x => x.First));
+        }))));
 ```
 
-**Button + POST + Validate (34 uses)**
+**Button + POST + Validate**
 Source: `Areas/Sandbox/Views/Validation/Contract/Index.cshtml`
 ```csharp
-@(Html.NativeButton("submit-btn", "Submit")
+@(Html.NativeButton("submit-btn", "Submit Admission")
     .Reactive(plan, evt => evt.Click, (args, p) =>
     {
         p.Post(Url.SandboxRoute("Submit", "ValidationContract")).Gather(g => g.Form())
          .Validate<ResidentValidator>("resident-form")
          .Response(r => r
-            .OnSuccess(s => s.Element("result").SetText("Saved"))
+            .OnSuccess(s => s.Element("result").Text.Set("Admission saved"))
             .OnError(400, e => e.ValidationErrors("resident-form")));
     }))
 ```
 
-**Conditions with component reads (150+ uses)**
-Source: `Areas/Sandbox/Views/Conditions/CareLevelCascade/Index.cshtml:37-51`
+**Conditions with component reads**
+Source: `Areas/Sandbox/Views/Conditions/CareLevelCascade/Index.cshtml`
 ```csharp
 var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
 
-p.Element("s1-current-level").SetText(careLevel.Get(c => c.Value));
+p.Element("s1-current-level").Text.Set(careLevel.Value);
 
-p.When(careLevel.Get(c => c.Value)).Eq("Memory Care")
- .Then(then =>
- {
-     then.Component<FusionDropDownList>(m => m.Protocol).Set(c => c.Value, "Enhanced Monitoring");
- })
- .ElseIf(careLevel.Get(c => c.Value)).Eq("Skilled Nursing")
- .Then(then =>
- {
-     then.Component<FusionDropDownList>(m => m.Protocol).Set(c => c.Value, "Full Clinical");
- })
- .Else(else_ =>
- {
-     else_.Component<FusionDropDownList>(m => m.Protocol).Set(c => c.Value, "");
- });
+p.When(careLevel.Value).Eq("Memory Care")
+    .Then(then =>
+    {
+        then.Component<FusionDropDownList>(m => m.Protocol).Value.Set("Enhanced Monitoring");
+    })
+    .ElseIf(careLevel.Value).Eq("Skilled Nursing")
+    .Then(then =>
+    {
+        then.Component<FusionDropDownList>(m => m.Protocol).Value.Set("Full Clinical");
+    })
+    .Else(else_ =>
+    {
+        else_.Component<FusionDropDownList>(m => m.Protocol).Value.Set("");
+    });
 ```
 
-**CustomEvent with typed payload (26 uses)**
+**CustomEvent with typed payload**
 Source: `Areas/Sandbox/Views/CoreBehaviors/Payload/Index.cshtml`
 ```csharp
 Html.On(plan, t => t.CustomEvent<PayloadShowcaseModel>(PayloadShowcaseEvents.PayloadTest, (payload, p) =>
 {
-    p.Element("int-value").SetText(payload, x => x.IntValue);
-    p.Element("address-street").SetText(payload, x => x.Address!.Street);
+    p.Element("int-value").Text.Set(payload.Get(x => x.IntValue));
+    p.Element("address-street").Text.Set(payload.Get(x => x.Address!.Street));
 }));
 ```
 - One .Reactive() per event — multiple events chain on same builder
