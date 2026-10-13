@@ -1,3 +1,5 @@
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
 [TestFixture]
@@ -5,6 +7,12 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/CareOps";
     private const string GridId = "careops-grid";
+    private const string OpenTasksColumnIndex = "8";
+
+    private ILocator OpenTasksCells => Page.Locator($"#{GridId} td[aria-colindex='{OpenTasksColumnIndex}']");
+    private ILocator OpenTasksEditor => Page.Locator("#careops-gridopenTasks");
+    private ILocator SaveAllCareEdits => Page.Locator("#careops-save-all");
+    private ILocator CareSummary => Page.Locator("#careops-summary");
 
     private async Task NavigateCareOps()
     {
@@ -88,8 +96,10 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The flag raises one refresh event, and the page has two listeners for it: one reloads the
+    // action list, the other the census grid.
     [Test]
-    public async Task per_row_flag_critical_action_link_updates_the_row_and_reinjects_the_list()
+    public async Task flagging_a_resident_critical_refreshes_both_the_action_list_and_the_census()
     {
         await NavigateCareOps();
         await Expect(Page.Locator("#careops-action-rows a").First)
@@ -102,6 +112,8 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
             .ToContainTextAsync("flagged critical", new() { Timeout = 10000 });
         await Expect(Page.Locator("[data-testid^='careops-action-row-']").First)
             .ToContainTextAsync("Critical risk", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#careops-status"))
+            .ToHaveTextAsync("census updated", new() { Timeout = 10000 });
 
         AssertNoConsoleErrors();
     }
@@ -157,5 +169,50 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
             .ToBeVisibleAsync(new() { Timeout = 10000 });
 
         AssertNoConsoleErrors();
+    }
+
+    // Starts an edit of a resident's open tasks: the grid focuses its numeric editor a moment after
+    // showing it and rewrites "6.00" to "6"; a fill before then lands after the number.
+    private async Task EditOpenTasks(int row, string current, string value)
+    {
+        await OpenTasksCells.Nth(row).DblClickAsync();
+        await Expect(OpenTasksEditor).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(OpenTasksEditor).ToHaveValueAsync(current, new() { Timeout = 10000 });
+        await OpenTasksEditor.FillAsync(value);
+    }
+
+    // Only a critical-risk resident must keep an open task. A grid column's rule holds for every row,
+    // so that rule is not the cell's: a high-risk resident's tasks can drop to 0 and be saved.
+    [Test]
+    public async Task a_resident_who_is_not_critical_can_be_left_with_no_open_tasks()
+    {
+        await NavigateCareOps();
+        // The second row is Amina Patel at high risk, with 6 open tasks.
+        await EditOpenTasks(1, "6", "0");
+
+        await ClickWhenStable(SaveAllCareEdits);
+
+        await Expect(CareSummary).ToHaveTextAsync("saved care-plan updates for 1 resident(s)", new() { Timeout = 10000 });
+        await Expect(OpenTasksCells.Nth(1)).ToHaveTextAsync("0");
+        await Expect(Page.GetByText(ResidentCareItemValidator.CriticalNeedsAnOpenTask)).ToHaveCountAsync(0);
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_critical_resident_left_with_no_open_tasks_is_refused_when_the_edits_are_saved()
+    {
+        await NavigateCareOps();
+        // The fourth row is Clara Hoffman at critical risk, with 6 open tasks.
+        await EditOpenTasks(3, "6", "0");
+
+        await ClickWhenStable(SaveAllCareEdits);
+
+        // The cell let the edit through; the server checks the critical-risk rule and keeps the census.
+        await Expect(CareSummary).ToHaveTextAsync(
+            $"Clara Hoffman: {ResidentCareItemValidator.CriticalNeedsAnOpenTask}", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#careops-status")).ToHaveTextAsync("care edits refused");
+
+        AssertNoConsoleErrorsExcept("400");
     }
 }

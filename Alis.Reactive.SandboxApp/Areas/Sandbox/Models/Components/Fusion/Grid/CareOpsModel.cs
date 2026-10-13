@@ -87,9 +87,17 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     /// </summary>
     public class ResidentCareItemValidator : ReactiveValidator<ResidentCareItem>
     {
+        public const string CriticalNeedsAnOpenTask =
+            "A critical-risk resident keeps at least one open task: the daily safety check.";
+
         public ResidentCareItemValidator()
         {
             RuleFor(r => r.OpenTasks).InclusiveBetween(0, 7).WithMessage("Open tasks must be between 0 and 7.");
+
+            // A grid column's rule holds for every row, so this one, which holds only for critical-risk
+            // rows, is checked when the edits are saved.
+            When(r => r.RiskLevel == "Critical", () =>
+                RuleFor(r => r.OpenTasks).GreaterThanOrEqualTo(1).WithMessage(CriticalNeedsAnOpenTask));
         }
     }
 

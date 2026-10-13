@@ -82,7 +82,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             var overrides = changed.GroupBy(r => r.ResidentId).ToDictionary(g => g.Key, g => g.Last());
 
             var census = GetCareCensus();
-            foreach (var row in census.Where(r => overrides.ContainsKey(r.ResidentId)))
+            var edited = census.Where(r => overrides.ContainsKey(r.ResidentId)).ToList();
+            foreach (var row in edited)
             {
                 var edit = overrides[row.ResidentId];
                 row.CareLevel = string.IsNullOrWhiteSpace(edit.CareLevel) ? row.CareLevel : edit.CareLevel;
@@ -90,6 +91,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 row.PrimaryNurse = string.IsNullOrWhiteSpace(edit.PrimaryNurse) ? row.PrimaryNurse : edit.PrimaryNurse;
                 row.OpenTasks = edit.OpenTasks;
                 row.NextReview = string.IsNullOrWhiteSpace(edit.NextReview) ? row.NextReview : edit.NextReview;
+            }
+
+            // Every edited row answers to the whole validator, including the rules the grid's cells
+            // cannot check; one refused row keeps the census as it was.
+            var validator = new ResidentCareItemValidator();
+            foreach (var row in edited)
+            {
+                var result = validator.Validate(row);
+                if (!result.IsValid)
+                    return BadRequest(new CareOpsResponse { Summary = $"{row.ResidentName}: {result.Errors[0].ErrorMessage}" });
             }
             SaveCareCensus(census);
 

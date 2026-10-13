@@ -200,12 +200,18 @@
                     grid.SaveCell();
                     p.Post(Url.SandboxRoute("CareOpsSave", "Grid"))
                         .Gather<CareOpsSaveRequest>(g => g.Set(x => x.BatchChanges, grid.GetBatchChanges<ResidentCareItem>()))
-                        .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
-                        {
-                            s.Component<FusionGrid>(GridId).DataSource.Set(json);
-                            s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
-                            s.Element("careops-status").Text.Set("care edits saved");
-                        }));
+                        .Response(r => r
+                            .OnSuccess<CareOpsResponse>((json, s) =>
+                            {
+                                s.Component<FusionGrid>(GridId).DataSource.Set(json);
+                                s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
+                                s.Element("careops-status").Text.Set("care edits saved");
+                            })
+                            .OnError<CareOpsResponse>(400, (json, e) =>
+                            {
+                                e.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
+                                e.Element("careops-status").Text.Set("care edits refused");
+                            }));
                 }))
             @(Html.NativeButton("careops-reassign", "Reassign Selected To Night Float")
                 .CssClass(ButtonPrimary)
