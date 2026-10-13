@@ -6,16 +6,16 @@ namespace Alis.Reactive.Builders.Requests
 {
     internal sealed class RequestRouteTemplate
     {
-        private readonly RequestUrl _url;
+        private readonly string _url;
         private readonly IReadOnlyList<string> _placeholders;
 
-        private RequestRouteTemplate(RequestUrl url, IReadOnlyList<string> placeholders)
+        private RequestRouteTemplate(string url, IReadOnlyList<string> placeholders)
         {
             _url = url ?? throw new ArgumentNullException(nameof(url));
             _placeholders = placeholders ?? throw new ArgumentNullException(nameof(placeholders));
         }
 
-        internal static RequestRouteTemplate For(RequestUrl url) =>
+        internal static RequestRouteTemplate For(string url) =>
             new RequestRouteTemplate(
                 url ?? throw new ArgumentNullException(nameof(url)),
                 ReadPlaceholders(url));
@@ -44,15 +44,15 @@ namespace Alis.Reactive.Builders.Requests
                 if (filledNames.Contains(placeholder)) continue;
 
                 throw new InvalidOperationException(
-                    $"URL template '{_url.Value}' has placeholder '{{{placeholder}}}', but the gathered request sets " +
+                    $"URL template '{_url}' has placeholder '{{{placeholder}}}', but the gathered request sets " +
                     $"no member named '{placeholder}'. Gather<TRequest>(g => g.Set(x => x.{char.ToUpperInvariant(placeholder[0])}{placeholder.Substring(1)}, ..)) fills it.");
             }
         }
 
-        private static IReadOnlyList<string> ReadPlaceholders(RequestUrl url)
+        private static IReadOnlyList<string> ReadPlaceholders(string url)
         {
             var names = new List<string>();
-            var text = url.Value;
+            var text = url;
             for (var index = 0; index < text.Length; index++)
             {
                 var current = text[index];
@@ -69,9 +69,9 @@ namespace Alis.Reactive.Builders.Requests
             return names;
         }
 
-        private static int ReadPlaceholderAt(RequestUrl url, int startIndex, List<string> names)
+        private static int ReadPlaceholderAt(string url, int startIndex, List<string> names)
         {
-            var text = url.Value;
+            var text = url;
             var endIndex = text.IndexOf('}', startIndex + 1);
             if (endIndex < 0)
                 throw InvalidTemplate(url, "missing closing brace '}'");
@@ -92,12 +92,12 @@ namespace Alis.Reactive.Builders.Requests
             return endIndex;
         }
 
-        private static InvalidOperationException InvalidTemplate(RequestUrl url, string reason) =>
+        private static InvalidOperationException InvalidTemplate(string url, string reason) =>
             InvalidTemplate(url, reason, null);
 
-        private static InvalidOperationException InvalidTemplate(RequestUrl url, string reason, Exception? inner) =>
+        private static InvalidOperationException InvalidTemplate(string url, string reason, Exception? inner) =>
             new InvalidOperationException(
-                $"URL template '{url.Value}' is invalid: {reason}.",
+                $"URL template '{url}' is invalid: {reason}.",
                 inner);
     }
 }

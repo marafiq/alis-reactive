@@ -4,9 +4,8 @@ using Alis.Reactive.Builders;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Shared component event onboarding path for vertical slices.
-    /// Vertical slice selects a typed event and a rendered component id; this helper builds the
-    /// reaction pipeline and wires the event against the plan-registered component.
+    /// Runs a callback each time a rendered component raises one of its declared events; the callback is
+    /// handed the event's payload, live.
     /// </summary>
     internal static class ComponentEventOnboarding
     {
@@ -25,15 +24,14 @@ namespace Alis.Reactive
             if (typedEvent == null) throw new ArgumentNullException(nameof(typedEvent));
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
 
-            var target = ComponentObjectTarget.For(componentId, vendor);
+            var context = plan.Context;
             var args = typedEvent.Args;
-            args.BindTo(new EventPayloadBinding(plan.Context));
-            var reaction = PipelineBuilder<TModel>.Build(plan.Context, p => pipeline(args, p));
-            plan.Context.WireComponentEvent(
-                target.ComponentId.Value,
-                target.Vendor,
-                typedEvent.ObjectEvent,
-                reaction);
+            args.BindTo(new EventPayloadBinding(context));
+            var body = PipelineBuilder<TModel>.Build(context, p => pipeline(args, p));
+
+            // The component joins the plan after the elements its own callback names.
+            context.DeclareComponent(componentId, vendor);
+            context.On(objects => objects.Element(componentId), typedEvent.ObjectEvent, body);
         }
     }
 }

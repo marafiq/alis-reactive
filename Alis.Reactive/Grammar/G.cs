@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Alis.Reactive.PlanModel;
 
-namespace Alis.Reactive.Grammar.Lowering
+namespace Alis.Reactive.Grammar
 {
-    /// <summary>Short constructors for grammar nodes, so a lowering reads like the sentence it writes.</summary>
+    /// <summary>Short constructors for grammar nodes, so a step, a value or a condition reads like the sentence it writes.</summary>
     internal static class G
     {
         internal static readonly IReadOnlyList<string> NoPath = Array.Empty<string>();

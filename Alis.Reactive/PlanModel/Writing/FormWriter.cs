@@ -1,33 +1,34 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.Grammar;
 
-namespace Alis.Reactive.Grammar.Lowering
+namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// Lowers a validation container's rules to <c>alis.form</c> data: per field its value read, the
+    /// Writes a validation container's rules as <c>alis.form</c> data: per field its value read, the
     /// name the server reports errors under, and one test per rule. A test's check is a lambda of the
     /// field's value that is true when the value passes. Every input a rule reads is read as MVC binds
     /// it, and each check is FluentValidation's own verdict on that value (grammar.md 7.3).
     /// </summary>
-    internal sealed class FormLowering
+    internal sealed class FormWriter
     {
         private const string Value = "v";
         private const string NetWhitespace = "\\t\\n\\v\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000";
 
-        private readonly LoweringContext _context;
-        private readonly ValueLowering _values;
-        private readonly LoweringScope _scope = LoweringScope.ForValidation("$form");
+        // A rule's reads wait for no promise: it is checked on every keystroke, where nothing waits.
+        private readonly Scope _scope;
 
-        internal FormLowering(LoweringContext context, ValueLowering values)
+        internal FormWriter(Scope scope)
         {
-            _context = context;
-            _values = values;
+            _scope = scope;
         }
 
         internal FormPluginData Form(IReadOnlyList<ComponentValidation> validations) =>
-            new FormPluginData(_context.SummaryId, validations.Select(Field).ToList());
+            new FormPluginData(SummaryId, validations.Select(Field).ToList());
+
+        /// <summary>The element id of the plan's validation summary.</summary>
+        private string SummaryId => _scope.PlanId.Replace('.', '_').Replace('+', '_') + "_validation_summary";
 
         private FormField Field(ComponentValidation validation)
         {
@@ -35,11 +36,11 @@ namespace Alis.Reactive.Grammar.Lowering
             var tests = validation.Rules
                 .Select(rule => new FormTest(rule.Name, Check(rule, fieldShape), When(rule.Execution.Activation), rule.Message))
                 .ToList();
-            return new FormField(validation.Component, validation.ServerFieldName, _values.Value(validation.Value, _scope), tests);
+            return new FormField(validation.Component, validation.ServerFieldName, validation.Value.Write(_scope), tests);
         }
 
         private Expr When(ValidationRuleActivation activation) =>
-            activation.TryGetCondition(out var condition) ? _values.Condition(condition, _scope) : G.True;
+            activation.TryGetCondition(out var condition) ? condition.Write(_scope) : G.True;
 
         // ── checks: the rule's verdict on the field's value, as the server's rule decides it ─────
 
@@ -82,7 +83,7 @@ namespace Alis.Reactive.Grammar.Lowering
 
         private Expr Target(ValidationRuleExecution execution) =>
             execution.TryGetPeer(out var peer)
-                ? _values.Value(peer, _scope)
+                ? peer.Write(_scope)
                 : G.Lit(Constraint(execution));
 
         // A bound value FluentValidation's null checks skip: nothing bound (blank text binds as null).
@@ -127,11 +128,11 @@ namespace Alis.Reactive.Grammar.Lowering
         // the Luhn sum a multiple of ten.
         private Expr CardNumber(Expr v)
         {
-            var digits = _context.Fresh("d");
-            var character = _context.Fresh("c");
-            var sum = _context.Fresh("s");
-            var digit = _context.Fresh("c");
-            var index = _context.Fresh("i");
+            var digits = _scope.Fresh("d");
+            var character = _scope.Fresh("c");
+            var sum = _scope.Fresh("s");
+            var digit = _scope.Fresh("c");
+            var index = _scope.Fresh("i");
 
             var separator = G.Or(G.Eq(G.Ref(character), G.Lit("-")), G.Eq(G.Ref(character), G.Lit(" ")));
             var withoutSeparators = G.Call(
@@ -160,8 +161,8 @@ namespace Alis.Reactive.Grammar.Lowering
         // cannot be compared (a peer with nothing bound) fails.
         private Expr Ordered(Expr v, Expr target, Shape comparison, Operator op)
         {
-            var a = _context.Fresh("a");
-            var b = _context.Fresh("b");
+            var a = _scope.Fresh("a");
+            var b = _scope.Fresh("b");
             var holds = G.And(IsNumber(G.Ref(a)), IsNumber(G.Ref(b)), G.Op(op, G.Ref(a), G.Ref(b)));
             var compared = G.Apply(G.Fn(holds, a, b), Comparable(v, comparison), Comparable(target, comparison));
             return G.Or(Absent(v), compared);
@@ -171,9 +172,9 @@ namespace Alis.Reactive.Grammar.Lowering
         {
             var bounds = Constraint(execution) as object[]
                 ?? throw new InvalidOperationException("A range rule needs its two bounds.");
-            var a = _context.Fresh("a");
-            var low = _context.Fresh("l");
-            var high = _context.Fresh("h");
+            var a = _scope.Fresh("a");
+            var low = _scope.Fresh("l");
+            var high = _scope.Fresh("h");
             var inRange = G.And(
                 IsNumber(G.Ref(a)), IsNumber(G.Ref(low)), IsNumber(G.Ref(high)),
                 G.Op(lower, G.Ref(a), G.Ref(low)),

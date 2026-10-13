@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.Grammar.Lowering;
 using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
@@ -45,8 +44,7 @@ namespace Alis.Reactive
             _planId = planId ?? throw new ArgumentNullException(nameof(planId));
             _scope = scope;
             _services = services;
-            var planIdentity = _scope.CreateIdentity(_planId);
-            _context = new PlanBuildContext(planIdentity, _registeredInputComponents);
+            _context = new PlanBuildContext(_planId.Value, _registeredInputComponents);
         }
 
         /// <summary>The plan's identifier: the model type's full name, or the element's id for an element plan.</summary>
@@ -65,7 +63,7 @@ namespace Alis.Reactive
             where TPlugin : Plugin, new()
         {
             var plugin = new TPlugin();
-            _context.RegisterPlugin(plugin.ToContract());
+            _context.RegisterPlugin(plugin.Name);
             plugin.BindTo(new PluginBinding(plugin.Name, _context));
             return plugin;
         }
@@ -116,7 +114,7 @@ namespace Alis.Reactive
         public string Render()
         {
             ResolveAll(_services);
-            return GrammarSerializer.Serialize(PlanLowering.Lower(_context.BuildPlan()));
+            return GrammarSerializer.Serialize(_context.Write());
         }
 
         /// <summary>Registers components, resolves validation with the supplied services, and serializes the Reactive Plan as compact JSON.</summary>
@@ -125,7 +123,7 @@ namespace Alis.Reactive
         public string Render(IServiceProvider services)
         {
             ResolveAll(services);
-            return GrammarSerializer.Serialize(PlanLowering.Lower(_context.BuildPlan()));
+            return GrammarSerializer.Serialize(_context.Write());
         }
 
         /// <summary>Registers components, resolves validation, and serializes the Reactive Plan as indented JSON for debugging.</summary>
@@ -133,7 +131,7 @@ namespace Alis.Reactive
         public string RenderFormatted()
         {
             ResolveAll(_services);
-            return GrammarSerializer.SerializeFormatted(PlanLowering.Lower(_context.BuildPlan()));
+            return GrammarSerializer.SerializeFormatted(_context.Write());
         }
 
         /// <summary>Registers components, resolves validation with the supplied services, and serializes the Reactive Plan as indented JSON.</summary>
@@ -142,29 +140,32 @@ namespace Alis.Reactive
         public string RenderFormatted(IServiceProvider services)
         {
             ResolveAll(services);
-            return GrammarSerializer.SerializeFormatted(PlanLowering.Lower(_context.BuildPlan()));
+            return GrammarSerializer.SerializeFormatted(_context.Write());
         }
 
+        // Every rendered input joins the plan, then each validated form takes its validator's rules.
         private void ResolveAll(IServiceProvider? services)
         {
-            _context.RegisterInputComponents();
+            _context.DeclareRegisteredInputs();
 
-            if (_context.ValidationJobs.Count == 0)
+            var validated = _context.ValidatedRequests;
+            if (validated.Count == 0)
                 return;
 
             new ClientValidationRuleBinder(
                     _context,
                     _registeredInputComponents.Snapshot(),
                     typeof(TModel),
-                    RequireClientValidationRuleSource(services, _context.ValidationJobs[0]))
+                    RequireClientValidationRuleSource(services, validated[0]))
                 .BindQueuedJobs();
         }
 
         private static IClientValidationRuleSource RequireClientValidationRuleSource(
             IServiceProvider? services,
-            ValidationJob job)
+            RequestStep request)
         {
-            if (job == null) throw new ArgumentNullException(nameof(job));
+            var validation = request.Validation
+                ?? throw new InvalidOperationException("A validated request names its validation source.");
 
             // ASP.NET Core flows the source through the per-request IServiceProvider.
             var source = services?.GetService(typeof(IClientValidationRuleSource)) as IClientValidationRuleSource;
@@ -180,13 +181,13 @@ namespace Alis.Reactive
 
 #if NET48
             throw new InvalidOperationException(
-                $"Request at '{job.RequestUrl}' specifies validation source '{job.ValidationSourceType.Name}', " +
+                $"Request at '{request.Url}' specifies validation source '{validation.Source.Name}', " +
                 "but no IClientValidationRuleSource could be resolved. " +
                 "Register the FluentValidation integration with AddReactiveFluentValidation(...) and bridge it to " +
                 "MVC5 by calling DependencyResolver.SetResolver(...) in Application_Start.");
 #else
             throw new InvalidOperationException(
-                $"Request at '{job.RequestUrl}' specifies validation source '{job.ValidationSourceType.Name}', " +
+                $"Request at '{request.Url}' specifies validation source '{validation.Source.Name}', " +
                 "but no IClientValidationRuleSource is registered in DI. " +
                 "Register the FluentValidation integration with services.AddReactiveFluentValidation(...), " +
                 "or register your own IClientValidationRuleSource.");
@@ -208,8 +209,6 @@ namespace Alis.Reactive
         internal abstract bool IsPartial { get; }
 
         internal abstract bool RendersValidationSummary { get; }
-
-        internal abstract PlanIdentity CreateIdentity(PlanId planId);
     }
 
     internal sealed class RootViewPlanScope : ReactivePlanScope
@@ -217,12 +216,6 @@ namespace Alis.Reactive
         internal override bool IsPartial => false;
 
         internal override bool RendersValidationSummary => true;
-
-        internal override PlanIdentity CreateIdentity(PlanId planId)
-        {
-            if (planId == null) throw new ArgumentNullException(nameof(planId));
-            return PlanIdentity.Root(planId);
-        }
     }
 
     internal sealed class PartialViewPlanScope : ReactivePlanScope
@@ -230,12 +223,6 @@ namespace Alis.Reactive
         internal override bool IsPartial => true;
 
         internal override bool RendersValidationSummary => false;
-
-        internal override PlanIdentity CreateIdentity(PlanId planId)
-        {
-            if (planId == null) throw new ArgumentNullException(nameof(planId));
-            return PlanIdentity.Partial(planId);
-        }
     }
 
     // A plan of its own for one element (a link in a row template): it composes with no other plan
@@ -245,11 +232,5 @@ namespace Alis.Reactive
         internal override bool IsPartial => false;
 
         internal override bool RendersValidationSummary => false;
-
-        internal override PlanIdentity CreateIdentity(PlanId planId)
-        {
-            if (planId == null) throw new ArgumentNullException(nameof(planId));
-            return PlanIdentity.Root(planId);
-        }
     }
 }

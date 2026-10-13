@@ -76,56 +76,49 @@ namespace Alis.Reactive.Builders.Conditions
         internal Shape Shape => _left.Shape;
 
         internal TNext CompareWith(CompareOperator op, object? literal) =>
-            Compare(op, ComparisonOperands.Binary(Left, ValueExpression.LiteralRaw(literal, Shape), Shape));
+            _next(ConditionGraph.Binary(op, Left, ValueExpression.LiteralRaw(literal, Shape), Shape));
 
         internal TNext CompareWith<TRight>(CompareOperator op, TypedSource<TRight> right)
         {
             if (right == null) throw new ArgumentNullException(nameof(right));
-            return Compare(op, ComparisonOperands.Binary(Left, right.ToValueExpression(), Shape));
+            return _next(ConditionGraph.Binary(op, Left, right.ToValueExpression(), Shape));
         }
 
         internal TNext CompareWithText(CompareOperator op, string operand) =>
-            Compare(op, ComparisonOperands.Binary(Left, ValueExpression.LiteralRaw(operand, PlanModel.Shape.String), Shape));
+            _next(ConditionGraph.Binary(op, Left, ValueExpression.LiteralRaw(operand, PlanModel.Shape.String), Shape));
 
         internal TNext CompareWithLength(int length)
         {
             var minimum = MinimumTextLength.From(length, nameof(length));
-            return Compare(
-                CompareOperator.MinLength,
-                ComparisonOperands.Binary(Left, ValueExpression.LiteralRaw(minimum.Value, PlanModel.Shape.Number), Shape));
+            return _next(ConditionGraph.Binary(
+                CompareOperator.MinLength, Left, ValueExpression.LiteralRaw(minimum.Value, PlanModel.Shape.Number), Shape));
         }
 
         internal TNext CompareWithRange(object low, object high)
         {
             var endpoints = new List<ValueExpression> { ValueExpression.LiteralRaw(low, Shape), ValueExpression.LiteralRaw(high, Shape) };
-            return Compare(
-                CompareOperator.Between,
-                ComparisonOperands.Binary(Left, ValueExpression.Array(endpoints, PlanModel.Shape.ArrayOf(ItemShape(Shape))), Shape));
+            return _next(ConditionGraph.Binary(
+                CompareOperator.Between, Left, ValueExpression.Array(endpoints, PlanModel.Shape.ArrayOf(ItemShape(Shape))), Shape));
         }
 
         internal TNext ContainsItem(object? item) =>
-            Compare(
-                CompareOperator.ArrayContains,
-                ComparisonOperands.CollectionItem(Left, ValueExpression.LiteralRaw(item, _left.ElementShape), Shape, _left.ElementShape));
+            _next(ConditionGraph.CollectionItem(
+                CompareOperator.ArrayContains, Left, ValueExpression.LiteralRaw(item, _left.ElementShape), Shape, _left.ElementShape));
 
         private ValueExpression Left => _left.ToValueExpression();
 
-        private TNext Unary(CompareOperator op) => Compare(op, ComparisonOperands.Unary(Left, Shape));
+        private TNext Unary(CompareOperator op) => _next(ConditionGraph.Unary(op, Left, Shape));
 
         private TNext Among(CompareOperator op, TProp[] values)
         {
             if (values == null) throw new ArgumentNullException(nameof(values));
+            var left = Left;
             var items = new List<ValueExpression>();
             foreach (var value in values)
                 items.Add(ValueExpression.LiteralRaw(value, Shape));
 
-            return Compare(
-                op,
-                ComparisonOperands.Binary(Left, ValueExpression.Array(items, PlanModel.Shape.ArrayOf(ItemShape(Shape))), Shape));
+            return _next(ConditionGraph.Binary(op, left, ValueExpression.Array(items, PlanModel.Shape.ArrayOf(ItemShape(Shape))), Shape));
         }
-
-        private TNext Compare(CompareOperator op, ComparisonOperands operands) =>
-            _next(ConditionGraph.Compare(op, operands));
 
         private static Shape ItemShape(Shape shape) => shape.IsNone ? PlanModel.Shape.Any : shape;
     }

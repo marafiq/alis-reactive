@@ -15,48 +15,24 @@ namespace Alis.Reactive.Builders
     /// Reactions execute in declaration order.
     /// </remarks>
     /// <typeparam name="TModel">View model that owns model-bound component IDs and validation/gather fields.</typeparam>
-    public partial class PipelineBuilder<TModel> : IReactionEmitter where TModel : class
+    public partial class PipelineBuilder<TModel> where TModel : class
     {
         internal PlanBuildContext Context { get; }
-
-        private readonly ReactionPipelineDraft<TModel> _draft = new ReactionPipelineDraft<TModel>();
 
         internal PipelineBuilder(PlanBuildContext context)
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        /// <inheritdoc />
-        void IReactionEmitter.AddStep(ReactionGraph step) => AddStep(step);
-
-        /// <inheritdoc />
-        PlanBuildContext IReactionEmitter.BuildContext => Context;
-
-        // A step lands in the callback being built, whichever pipeline variable or handle wrote it: a
-        // handle declared in a trigger and used inside OnSuccess writes into OnSuccess.
-        private PipelineBuilder<TModel> Active => Context.ActiveScope<PipelineBuilder<TModel>>();
-
-        internal void AddStep(ReactionGraph step)
-        {
-            Active._draft.AddReaction(step);
-        }
-
-        /// <summary>Builds a callback's reactions with its pipeline as the active scope.</summary>
-        internal static ReactionGraph Build(PlanBuildContext context, Action<PipelineBuilder<TModel>> reactions)
+        /// <summary>
+        /// Builds a callback's steps. A step lands in the callback being built, whichever pipeline variable
+        /// or handle wrote it: a handle declared in a trigger and used inside OnSuccess writes into OnSuccess.
+        /// </summary>
+        internal static Block Build(PlanBuildContext context, Action<PipelineBuilder<TModel>> reactions)
         {
             if (reactions == null) throw new ArgumentNullException(nameof(reactions));
             var pipeline = new PipelineBuilder<TModel>(context);
-            context.EnterScope(pipeline);
-            try
-            {
-                reactions(pipeline);
-            }
-            finally
-            {
-                context.ExitScope();
-            }
-
-            return pipeline.BuildReaction();
+            return context.Build(() => reactions(pipeline));
         }
 
         /// <summary>Raises a declared document event with no payload.</summary>
@@ -65,7 +41,7 @@ namespace Alis.Reactive.Builders
         public PipelineBuilder<TModel> Dispatch(AppEvent appEvent)
         {
             if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
-            AddStep(ReactionGraph.Dispatch(appEvent.Name));
+            Context.AddStep(new DispatchStep(appEvent.Name, payload: null));
             return this;
         }
 
@@ -77,7 +53,7 @@ namespace Alis.Reactive.Builders
             where TPayload : class, new()
         {
             if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
-            AddStep(ReactionGraph.Dispatch(appEvent.Name));
+            Context.AddStep(new DispatchStep(appEvent.Name, payload: null));
             return this;
         }
 
@@ -90,7 +66,7 @@ namespace Alis.Reactive.Builders
             where TPayload : class, new()
         {
             if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
-            AddStep(ReactionGraph.Dispatch(
+            Context.AddStep(new DispatchStep(
                 appEvent.Name,
                 ValueExpression.LiteralRaw(payload, Shape.FromClrType(typeof(TPayload)))));
             return this;
@@ -114,7 +90,7 @@ namespace Alis.Reactive.Builders
             if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
             var builder = new DispatchPayloadBuilder<TPayload, TModel>();
             configure(builder);
-            AddStep(ReactionGraph.Dispatch(appEvent.Name, builder.Build()));
+            Context.AddStep(new DispatchStep(appEvent.Name, builder.Build()));
             return this;
         }
 
@@ -177,7 +153,7 @@ namespace Alis.Reactive.Builders
         /// <returns>This pipeline builder.</returns>
         public PipelineBuilder<TModel> ValidationErrors(string formId)
         {
-            AddStep(ReactionGraph.ShowValidationErrors(formId));
+            Context.AddStep(new ShowErrorsStep(formId));
             return this;
         }
 
@@ -188,20 +164,9 @@ namespace Alis.Reactive.Builders
         public PipelineBuilder<TModel> Into(string elementId)
         {
             Context.DeclareElement(elementId);
-            var responseBody = ValueExpression.ReadWholePayload(PayloadSource.Success());
-            AddStep(ReactionGraph.Inject(elementId, responseBody));
+            var responseBody = ValueExpression.ReadWhole(Receiver.Response(ResponseHandle.Innermost), Shape.None);
+            Context.AddStep(new InjectStep(elementId, responseBody));
             return this;
         }
-
-        internal void SetConditionalBranches(List<BranchCase> branches)
-        {
-            _draft.SetConditionalBranches(branches);
-        }
-
-        internal ReactionGraph BuildReaction()
-        {
-            return _draft.BuildReaction();
-        }
-
     }
 }

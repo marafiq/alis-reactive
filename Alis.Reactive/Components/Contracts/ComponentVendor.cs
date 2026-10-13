@@ -1,5 +1,6 @@
 using System;
 using System.Text.RegularExpressions;
+using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive
@@ -85,10 +86,13 @@ namespace Alis.Reactive
                 payload);
         }
 
-        internal string Value => Name;
-
-        internal VendorContract Contract =>
-            new VendorContract(_objectPath, _subscribe.Value, _unsubscribe.Value, VendorContract.PayloadToken(_payload));
+        /// <summary>The vendor as the plan carries it; a DOM event hands the listener the element that raised it.</summary>
+        internal Vendor ToGrammar() =>
+            new Vendor(
+                G.PathOf(_objectPath),
+                _subscribe.Value,
+                _unsubscribe.Value,
+                _payload == VendorEventPayload.Argument ? Vendor.ArgumentPayload : Vendor.ElementPayload);
 
         /// <inheritdoc />
         public bool Equals(ComponentVendor? other) =>

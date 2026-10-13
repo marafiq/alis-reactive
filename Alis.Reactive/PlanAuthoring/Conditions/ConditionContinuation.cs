@@ -43,11 +43,12 @@ namespace Alis.Reactive.Builders.Conditions
         }
     }
 
-    // Where Then puts its branch: the pipeline that started the condition, or the branch an ElseIf continues.
+    // Where Then puts its branch: in the callback the condition was started in, where Then is written, or
+    // as the next arm of the branch an ElseIf continues.
     internal abstract class ConditionContinuation<TModel> where TModel : class
     {
-        internal static ConditionContinuation<TModel> ForPipeline(PipelineBuilder<TModel> pipeline) =>
-            new PipelineConditionContinuation<TModel>(pipeline);
+        internal static ConditionContinuation<TModel> InCallback(PlanBuildContext context) =>
+            new CallbackConditionContinuation<TModel>(context, context.ActiveBlock);
 
         internal static ConditionContinuation<TModel> ForBranch(BranchBuilder<TModel> branch) =>
             new BranchConditionContinuation<TModel>(branch);
@@ -57,24 +58,25 @@ namespace Alis.Reactive.Builders.Conditions
             Action<PipelineBuilder<TModel>> pipeline);
     }
 
-    internal sealed class PipelineConditionContinuation<TModel> : ConditionContinuation<TModel>
+    internal sealed class CallbackConditionContinuation<TModel> : ConditionContinuation<TModel>
         where TModel : class
     {
-        private readonly PipelineBuilder<TModel> _pipeline;
+        private readonly PlanBuildContext _context;
+        private readonly Block _callback;
 
-        internal PipelineConditionContinuation(PipelineBuilder<TModel> pipeline)
+        internal CallbackConditionContinuation(PlanBuildContext context, Block callback)
         {
-            _pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _callback = callback ?? throw new ArgumentNullException(nameof(callback));
         }
 
         internal override BranchBuilder<TModel> Then(
             ConditionGraph condition,
             Action<PipelineBuilder<TModel>> pipeline)
         {
-            var branchCase = BranchCase.Of(condition, PipelineBuilder<TModel>.Build(_pipeline.Context, pipeline));
-            var cases = new List<BranchCase> { branchCase };
-            _pipeline.SetConditionalBranches(cases);
-            return new BranchBuilder<TModel>(_pipeline, cases);
+            var branch = new BranchStep(condition, PipelineBuilder<TModel>.Build(_context, pipeline));
+            _callback.Add(branch);
+            return new BranchBuilder<TModel>(_context, branch);
         }
     }
 
@@ -92,7 +94,7 @@ namespace Alis.Reactive.Builders.Conditions
             ConditionGraph condition,
             Action<PipelineBuilder<TModel>> pipeline)
         {
-            _branch.AddBranch(BranchCase.Of(condition, PipelineBuilder<TModel>.Build(_branch.Pipeline.Context, pipeline)));
+            _branch.AddArm(condition, pipeline);
             return _branch;
         }
     }

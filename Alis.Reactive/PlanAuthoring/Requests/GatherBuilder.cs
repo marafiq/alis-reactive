@@ -123,7 +123,7 @@ namespace Alis.Reactive.Builders.Requests
                 var fieldType = ExpressionPathHelper.ToPropertyType(field);
                 RequestMembers.Require(typeof(TRequest), binding.Value, fieldType);
                 var shape = Shape.FromClrType(fieldType);
-                _draft.Add(binding, ValueExpression.ReadFormField(IdGenerator.For(field), shape));
+                _draft.Add(binding, ValueExpression.ReadBound(IdGenerator.For(field), shape));
             }
 
             return this;
@@ -138,7 +138,7 @@ namespace Alis.Reactive.Builders.Requests
                 throw new ArgumentNullException(nameof(value),
                     $"Header '{name}' needs a value. A value read at runtime takes the source overload.");
 
-            _draft.AddHeader(HeaderName.Of(name), ValueExpression.Literal(value));
+            _draft.AddHeader(HeaderName.Of(name).Value, ValueExpression.Literal(value));
             return this;
         }
 
@@ -151,7 +151,7 @@ namespace Alis.Reactive.Builders.Requests
             if (source == null) throw new ArgumentNullException(nameof(source));
             var header = HeaderName.Of(name);
             RequestScalarTarget.Header<TValue>(header);
-            _draft.AddHeader(header, source.ToValueExpression());
+            _draft.AddHeader(header.Value, source.ToValueExpression());
             return this;
         }
 

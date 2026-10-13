@@ -7,16 +7,12 @@ using Alis.Reactive.Validation;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Binds client-side validation rules declared by request validation gates
-    /// into the plan's component-level validation rules.
+    /// Gives each validated form the browser rules of its request's validator.
     /// <para>
-    /// Each <see cref="ValidationJob"/> names a form and a validation source type. The registered
-    /// <see cref="IClientValidationRuleSource"/> returns the deterministic client rules for
-    /// that source. This binder maps each model field to the component that
-    /// renders it, or to the deterministic component id a partial will render later, and
-    /// attaches the resulting <see cref="ComponentValidation"/> rules to the form's
-    /// <see cref="ContainerScope"/>. Normal validator execution is separate; this binder
-    /// handles only the client-side rules.
+    /// A request that calls <c>Validate&lt;T&gt;(formId)</c> names a form and a validation source. The registered
+    /// <see cref="IClientValidationRuleSource"/> returns the source's browser rules; this binder maps each
+    /// model field to the component that renders it, or to the id a partial will render it under, and
+    /// merges the resulting <see cref="ComponentValidation"/> rules into the form's.
     /// </para>
     /// </summary>
     internal sealed class ClientValidationRuleBinder
@@ -40,15 +36,14 @@ namespace Alis.Reactive
 
         internal void BindQueuedJobs()
         {
-            foreach (var validationJob in _context.ValidationJobs)
-                BindJob(validationJob);
+            foreach (var request in _context.ValidatedRequests)
+                if (request.Validation is { } validation)
+                    Bind(validation.Source, validation.Form);
         }
 
-        private void BindJob(ValidationJob job)
+        private void Bind(Type source, string form)
         {
-            var container = job.Container;
-
-            var fields = _ruleSource.GetClientRules(job.ValidationSourceType);
+            var fields = _ruleSource.GetClientRules(source);
             var bindings = new ClientValidationFieldBinder(_registeredInputs, _modelType, fields);
             var ruleBinding = ValidationPlanBinding.For(bindings);
 
@@ -56,11 +51,7 @@ namespace Alis.Reactive
                 .SelectMany(field => bindings.ResolveAll(field, ruleBinding))
                 .ToList();
 
-            // Validation metadata belongs on the same component contract declared
-            // by p.Element(...), not on a validation-only component concept.
-            var containerKey = _context.DeclareElement(container);
-            var containerObject = _context.GetBrowserObject(containerKey);
-            _context.SetBrowserObject(containerKey, containerObject.WithValidationRulesMerged(componentValidations));
+            _context.MergeValidations(form, componentValidations);
         }
     }
 

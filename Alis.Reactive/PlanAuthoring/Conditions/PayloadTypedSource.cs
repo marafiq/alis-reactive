@@ -1,5 +1,6 @@
 using System;
 using System.Linq.Expressions;
+using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
@@ -7,12 +8,12 @@ namespace Alis.Reactive.Builders.Conditions
     /// <summary>A member of data a callback received: an event's payload, a response body, a message.</summary>
     internal sealed class PayloadTypedSource<TPayload, TProp> : TypedSource<TProp>
     {
-        private readonly PayloadSource _source;
+        private readonly Receiver _data;
         private readonly Expression<Func<TPayload, TProp>> _expression;
 
-        internal PayloadTypedSource(PayloadSource source, Expression<Func<TPayload, TProp>> expression)
+        internal PayloadTypedSource(Receiver data, Expression<Func<TPayload, TProp>> expression)
         {
-            _source = source;
+            _data = data;
             _expression = expression;
         }
 
@@ -22,8 +23,8 @@ namespace Alis.Reactive.Builders.Conditions
         {
             var payloadPath = ExpressionPathHelper.ToEventPath(_expression);
             return payloadPath.Length == 0
-                ? ValueExpression.ReadWholePayload(_source, Shape)
-                : ValueExpression.ReadPayload(_source, payloadPath, Shape);
+                ? ValueExpression.ReadWhole(_data, Shape)
+                : ValueExpression.Read(_data, G.PathOf(Path.Parse(payloadPath)), Shape);
         }
     }
 }

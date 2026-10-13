@@ -203,21 +203,21 @@ namespace Alis.Reactive
             new MethodRead<TResult>(this, MethodNamed(name, declaredBy, awaits, args), Expressions(args));
 
         private static ComponentProperty<TValue> PropertyNamed<TValue>(string? name, string declaredBy) =>
-            ComponentProperty<TValue>.Mapped(KeyOf(declaredBy), name ?? JsonMemberName.Of(declaredBy));
+            ComponentProperty<TValue>.At(name ?? JavaScriptNameOf(declaredBy));
 
         private static ComponentMethod MethodNamed(string? name, string declaredBy, bool awaits, Arg[] args) =>
-            ComponentMethod.Of(KeyOf(declaredBy), name ?? JsonMemberName.Of(declaredBy), args.Select(arg => arg.Shape).ToList(), awaits);
+            ComponentMethod.Of(declaredBy, name ?? JavaScriptNameOf(declaredBy), args.Select(arg => arg.Shape).ToList(), awaits);
 
         private static IReadOnlyList<ValueExpression> Expressions(Arg[] args) =>
             args.Select(arg => arg.Expression).ToList();
 
-        // The plan keys a member by its C# name, camel-cased.
-        private static string KeyOf(string declaredBy)
+        // A member is named by its C# name, camel-cased, unless the declaration names it.
+        private static string JavaScriptNameOf(string declaredBy)
         {
             if (string.IsNullOrEmpty(declaredBy))
                 throw new ArgumentException("Declare a member as a C# property or method, for example public void Show() => Call();", nameof(declaredBy));
 
-            return char.ToLowerInvariant(declaredBy[0]) + declaredBy.Substring(1);
+            return JsonMemberName.Of(declaredBy);
         }
 
         // A method's result is read where the value is used, in the callback that uses it.

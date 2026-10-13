@@ -147,13 +147,11 @@ namespace Alis.Reactive
     internal sealed class ValidationFieldBinding
     {
         private readonly ComponentId _componentId;
-        private readonly string _valueMember;
         private readonly Shape _shape;
 
-        private ValidationFieldBinding(ComponentId componentId, string valueMember, Shape shape)
+        private ValidationFieldBinding(ComponentId componentId, Shape shape)
         {
             _componentId = componentId;
-            _valueMember = valueMember;
             _shape = shape;
         }
 
@@ -161,16 +159,12 @@ namespace Alis.Reactive
 
         internal Shape ShapeForValidation => _shape;
 
-        internal ValueExpression ReadValue() =>
-            ValueExpression.Read(
-                ComponentSource.Of(ComponentId),
-                _valueMember,
-                shape: ShapeForValidation);
+        // A rule reads every input as MVC binds it, through the model every plan of the composition
+        // joins, so the browser judges the value the server will (grammar.md 2.1).
+        internal ValueExpression ReadValue() => ValueExpression.ReadBound(ComponentId, ShapeForValidation);
 
         internal FieldComparisonTarget ReadConditionTarget() =>
-            FieldComparisonTarget.ForComponentValue(
-                ValueExpression.Read(ComponentSource.Of(ComponentId), _valueMember),
-                ShapeForValidation);
+            FieldComparisonTarget.ForComponentValue(ValueExpression.ReadBound(ComponentId, Shape.None), ShapeForValidation);
 
         internal ComponentValidation ToComponentValidation(
             ClientValidationField field,
@@ -189,16 +183,13 @@ namespace Alis.Reactive
 
         internal static ValidationFieldBinding Registered(ComponentRegistration registration)
         {
-            return new ValidationFieldBinding(
-                Alis.Reactive.PlanModel.ComponentId.Of(registration.ComponentId),
-                registration.ValueContract.ValueMember,
-                registration.Shape);
+            return new ValidationFieldBinding(Alis.Reactive.PlanModel.ComponentId.Of(registration.ComponentId), registration.Shape);
         }
 
         internal static ValidationFieldBinding ModelField(ModelFieldInput field)
         {
-            // Another plan renders the field; its value is read through the model, by the canonical member.
-            return new ValidationFieldBinding(field.ComponentId, InputValueContract.CanonicalValueMember.Value, field.Shape);
+            // Another plan renders the field; its value is read through the model all the same.
+            return new ValidationFieldBinding(field.ComponentId, field.Shape);
         }
     }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Arrays
@@ -78,18 +79,15 @@ namespace Alis.Reactive.Builders.Arrays
                         "String operation arguments (Contains/StartsWith/EndsWith) must be constants or captured " +
                         "values, not element-scope reads — the runtime text operand requires a literal. Got: " + argument);
 
-                return ConditionGraph.Compare(
+                return ConditionGraph.Binary(
                     textOperator,
-                    ComparisonOperands.Binary(
-                        CompileValue(Unwrap(call.Object), element),
-                        CompileValue(argument, element),
-                        Shape.String));
+                    CompileValue(Unwrap(call.Object), element),
+                    CompileValue(argument, element),
+                    Shape.String);
             }
 
             if (body.Type == typeof(bool))
-                return ConditionGraph.Compare(
-                    CompareOperator.Truthy,
-                    ComparisonOperands.Unary(CompileValue(body, element), Shape.Boolean));
+                return ConditionGraph.Unary(CompareOperator.Truthy, CompileValue(body, element), Shape.Boolean);
 
             throw new InvalidOperationException(
                 "Array predicate supports comparisons (== != > >= < <=), logical (&& || !), " +
@@ -118,9 +116,8 @@ namespace Alis.Reactive.Builders.Arrays
 
             var shape = Shape.FromClrType(memberOperand.Type);
 
-            return ConditionGraph.Compare(
-                CompareOperatorFor(binary.NodeType),
-                ComparisonOperands.Binary(CompileValue(left, element), CompileValue(right, element), shape));
+            return ConditionGraph.Binary(
+                CompareOperatorFor(binary.NodeType), CompileValue(left, element), CompileValue(right, element), shape);
         }
 
         private static ValueExpression CompileValue(Expression expression, ParameterExpression element)
@@ -131,8 +128,8 @@ namespace Alis.Reactive.Builders.Arrays
             {
                 var shape = Shape.FromClrType(node.Type);
                 return path.Length == 0
-                    ? ValueExpression.ReadWholeElement(shape)
-                    : ValueExpression.ReadPayload(PayloadSource.Element(), path, shape);
+                    ? ValueExpression.ReadWhole(Receiver.Item, shape)
+                    : ValueExpression.Read(Receiver.Item, G.PathOf(Path.Parse(path)), shape);
             }
 
             // Per-element method call (x => x.GetDay(), x => x.Address.GetFormatted()) — the receiver must
@@ -150,7 +147,9 @@ namespace Alis.Reactive.Builders.Arrays
                 foreach (var methodArgument in call.Arguments)
                     methodArgs.Add(CompileValue(Unwrap(methodArgument), element));
 
-                return ValueExpression.InvokeElement(receiverPath, methodName, Shape.FromClrType(node.Type), methodArgs);
+                var methodPath = string.IsNullOrEmpty(receiverPath) ? methodName : receiverPath + "." + methodName;
+                return ValueExpression.Invoke(
+                    Receiver.Item, G.PathOf(Path.Parse(methodPath)), methodArgs, G.NoShapes, Shape.FromClrType(node.Type), awaits: false, methodName);
             }
 
             if (ReferencesParameter(node, element))

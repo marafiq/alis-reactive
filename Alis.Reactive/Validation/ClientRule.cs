@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Validation
 {
     /// <summary>
-    /// One client validation rule a developer records. Lowers to a plan
+    /// One client validation rule a developer records. Becomes a plan
     /// <see cref="ValidationRuleNode"/> at render time.
     /// </summary>
     /// <remarks>

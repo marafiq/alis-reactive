@@ -3,42 +3,10 @@ using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.PlanModel
 {
-    internal abstract class ValidationContainerBinding
-    {
-        private protected ValidationContainerBinding() { }
-
-        internal static ValidationContainerBinding None { get; } =
-            new NoValidationContainer();
-
-        internal static ValidationContainerBinding Scoped(ContainerScope scope) =>
-            new ScopedValidationContainer(scope);
-
-
-        internal abstract ValidationContainerBinding WithValidationRulesMerged(IReadOnlyList<ComponentValidation> incoming);
-    }
-
-    internal sealed class NoValidationContainer : ValidationContainerBinding
-    {
-
-        internal override ValidationContainerBinding WithValidationRulesMerged(IReadOnlyList<ComponentValidation> incoming) =>
-            Scoped(ContainerScope.Empty.WithValidationRulesMerged(incoming));
-    }
-
-    internal sealed class ScopedValidationContainer : ValidationContainerBinding
-    {
-        private readonly ContainerScope _scope;
-
-        internal ScopedValidationContainer(ContainerScope scope)
-        {
-            _scope = scope ?? throw new System.ArgumentNullException(nameof(scope));
-        }
-
-        public IReadOnlyList<ComponentValidation> ValidationRules => _scope.ValidationRules;
-
-        internal override ValidationContainerBinding WithValidationRulesMerged(IReadOnlyList<ComponentValidation> incoming) =>
-            Scoped(_scope.WithValidationRulesMerged(incoming));
-    }
-
+    /// <summary>
+    /// The validation rules of one form, by component; a second request that validates the same form
+    /// replaces a component's rules and adds the components it newly names.
+    /// </summary>
     internal sealed class ContainerScope
     {
         private readonly ContainerValidations _validations;

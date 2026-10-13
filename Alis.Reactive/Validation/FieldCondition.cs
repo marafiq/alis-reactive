@@ -83,7 +83,7 @@ namespace Alis.Reactive.Validation
         internal static FieldComparisonValue None { get; } =
             new UnaryFieldComparisonValue();
 
-        internal abstract ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape);
+        internal abstract ConditionGraph Compare(CompareOperator op, ValueExpression left, Shape fieldShape);
 
         internal static FieldComparisonValue Literal(object? value)
         {
@@ -106,8 +106,8 @@ namespace Alis.Reactive.Validation
 
         private sealed class UnaryFieldComparisonValue : FieldComparisonValue
         {
-            internal override ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape) =>
-                ComparisonOperands.Unary(left, fieldShape);
+            internal override ConditionGraph Compare(CompareOperator op, ValueExpression left, Shape fieldShape) =>
+                ConditionGraph.Unary(op, left, fieldShape);
         }
 
         private sealed class LiteralFieldComparisonValue : FieldComparisonValue
@@ -119,8 +119,8 @@ namespace Alis.Reactive.Validation
                 _value = value;
             }
 
-            internal override ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape) =>
-                ComparisonOperands.Binary(left, ValueExpression.LiteralRaw(_value, fieldShape), fieldShape);
+            internal override ConditionGraph Compare(CompareOperator op, ValueExpression left, Shape fieldShape) =>
+                ConditionGraph.Binary(op, left, ValueExpression.LiteralRaw(_value, fieldShape), fieldShape);
         }
 
         private sealed class ShapedLiteralFieldComparisonValue : FieldComparisonValue
@@ -134,8 +134,8 @@ namespace Alis.Reactive.Validation
                 _literalShape = literalShape;
             }
 
-            internal override ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape) =>
-                ComparisonOperands.Binary(left, ValueExpression.LiteralRaw(_value, _literalShape), fieldShape);
+            internal override ConditionGraph Compare(CompareOperator op, ValueExpression left, Shape fieldShape) =>
+                ConditionGraph.Binary(op, left, ValueExpression.LiteralRaw(_value, _literalShape), fieldShape);
         }
 
         private sealed class ArrayFieldComparisonValue : FieldComparisonValue
@@ -147,12 +147,13 @@ namespace Alis.Reactive.Validation
                 _items = items.ToArray();
             }
 
-            internal override ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape)
+            internal override ConditionGraph Compare(CompareOperator op, ValueExpression left, Shape fieldShape)
             {
                 var values = new List<ValueExpression>(_items.Count);
                 foreach (var item in _items)
                     values.Add(ValueExpression.LiteralRaw(item, fieldShape));
-                return ComparisonOperands.Binary(
+                return ConditionGraph.Binary(
+                    op,
                     left,
                     ValueExpression.Array(values, Shape.ArrayOf(fieldShape.IsNone ? Shape.Any : fieldShape)),
                     fieldShape);
@@ -170,12 +171,8 @@ namespace Alis.Reactive.Validation
                 _itemShape = itemShape;
             }
 
-            internal override ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape) =>
-                ComparisonOperands.CollectionItem(
-                    left,
-                    ValueExpression.LiteralRaw(_value, _itemShape),
-                    fieldShape,
-                    _itemShape);
+            internal override ConditionGraph Compare(CompareOperator op, ValueExpression left, Shape fieldShape) =>
+                ConditionGraph.CollectionItem(op, left, ValueExpression.LiteralRaw(_value, _itemShape), fieldShape, _itemShape);
         }
     }
 
@@ -297,7 +294,7 @@ namespace Alis.Reactive.Validation
 
         internal ConditionGraph Compare(CompareOperator op, FieldComparisonValue value)
         {
-            return ConditionGraph.Compare(op, value.BuildOperands(_left, _shape));
+            return value.Compare(op, _left, _shape);
         }
     }
 }

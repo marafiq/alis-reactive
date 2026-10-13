@@ -8,7 +8,7 @@ namespace Alis.Reactive.Grammar
 {
     /// <summary>
     /// An expression of the plan's grammar (grammar.md 1.2). Nine productions; the runtime evaluates
-    /// each synchronously. Nodes are immutable and may be shared, so the lowering can repeat a block.
+    /// each synchronously. Nodes are immutable and may be shared, so a step can write a block twice.
     /// </summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<Expr>))]
     internal abstract class Expr

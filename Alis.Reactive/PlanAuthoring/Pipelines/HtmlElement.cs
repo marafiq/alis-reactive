@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Generic;
 using Alis.Reactive.Builders.Arrays;
 using Alis.Reactive.Builders.Conditions;
+using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive
@@ -22,13 +22,12 @@ namespace Alis.Reactive
     {
         private readonly PlanBuildContext _context;
         private readonly string _id;
-        private readonly ComponentKey _key;
 
         internal HtmlElement(PlanBuildContext context, string id)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _id = id ?? throw new ArgumentNullException(nameof(id));
-            _key = context.DeclareElement(id);
+            context.DeclareElement(id);
             Text = new ElementContent(this, BrowserElementMembers.Text);
             Html = new ElementContent(this, BrowserElementMembers.Html);
             ClassList = new ElementClassList(this);
@@ -46,7 +45,7 @@ namespace Alis.Reactive
         /// <summary>The element's child elements (<c>children</c>), for counting and testing:
         /// <c>p.Element("risk-list").Children.Count(x =&gt; x.GetAttribute("data-risk") == "high")</c>.</summary>
         public ReactiveArray<ChildElement> Children =>
-            new ReactiveArray<ChildElement>(ValueExpression.ReadDom(_id, "children", Shape.None), Shape.FromClrType(typeof(ChildElement)));
+            new ReactiveArray<ChildElement>(Read("children"), Shape.FromClrType(typeof(ChildElement)));
 
         /// <summary>Shows the element: removes its <c>hidden</c> attribute.</summary>
         public void Show() => Set(BrowserElementMembers.Hidden, ValueExpression.Literal(false));
@@ -54,21 +53,13 @@ namespace Alis.Reactive
         /// <summary>Hides the element: sets its <c>hidden</c> attribute.</summary>
         public void Hide() => Set(BrowserElementMembers.Hidden, ValueExpression.Literal(true));
 
-        internal string Id => _id;
+        internal ValueExpression Read(string member) => ValueExpression.Read(Receiver.Element(_id), new[] { member }, Shape.None);
 
-        internal void Set<TValue>(ComponentProperty<TValue> property, ValueExpression value)
-        {
-            _context.DeclareProperty(_key, property.ContractFor(MemberAccess.Write));
-            Emit(ReactionGraph.Set(ComponentSource.Of(_key), property.Member, value));
-        }
+        internal void Set<TValue>(ComponentProperty<TValue> property, ValueExpression value) =>
+            _context.AddStep(new SetStep(Receiver.Element(_id), G.PathOf(property.Path), property.Shape, value));
 
-        internal void Call(ComponentMethod method, ValueExpression argument)
-        {
-            _context.DeclareMethod(_key, method.ContractReturning(Shape.None));
-            Emit(ReactionGraph.Call(ComponentSource.Of(_key), method.Member, new List<ValueExpression> { argument }));
-        }
-
-        private void Emit(ReactionGraph step) => _context.ActiveScope<Builders.IReactionEmitter>().AddStep(step);
+        internal void Call(ComponentMethod method, ValueExpression argument) =>
+            _context.AddStep(new CallStep(Receiver.Element(_id), G.PathOf(method.Path), new[] { argument }, method.ArgumentShapes, method.Awaits));
     }
 
     /// <summary>An element's text or HTML: set to a literal, or to a value read when the step runs, shown as it arrives.</summary>
@@ -109,7 +100,7 @@ namespace Alis.Reactive
 
         /// <summary>The classes the element has, for counting and testing.</summary>
         public ReactiveArray<string> Items =>
-            new ReactiveArray<string>(ValueExpression.ReadDom(_element.Id, "classList", Shape.None), Shape.String);
+            new ReactiveArray<string>(_element.Read("classList"), Shape.String);
 
         /// <summary>Adds a class.</summary>
         /// <param name="name">The class, or a value read when the step runs.</param>

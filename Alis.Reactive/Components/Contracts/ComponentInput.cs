@@ -22,19 +22,14 @@ namespace Alis.Reactive
     /// </example>
     public sealed class ComponentInput
     {
-        private ComponentInput(MemberName valueMember, Path valuePath, Shape valueShape, EventName committedBy)
+        private ComponentInput(Path valuePath, EventName committedBy)
         {
-            ValueMember = valueMember;
             ValuePath = valuePath;
-            ValueShape = valueShape;
             CommittedBy = committedBy;
         }
 
-        internal MemberName ValueMember { get; }
+        /// <summary>The path from the component's object to its value; the model reads the value in the model's type.</summary>
         internal Path ValuePath { get; }
-
-        /// <summary>The value's type as the component holds it; the model's type is applied where the model reads it.</summary>
-        internal Shape ValueShape { get; }
 
         internal EventName CommittedBy { get; }
 
@@ -48,15 +43,13 @@ namespace Alis.Reactive
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
             if (committedBy == null) throw new ArgumentNullException(nameof(committedBy));
-            var member = value.Member;
-            return new ComponentInput(MemberName.Of(member.Member), member.Path, member.Shape, EventName.Of(committedBy.ObjectEvent));
+            return new ComponentInput(value.Member.Path, EventName.Of(committedBy.ObjectEvent));
         }
 
         internal bool Matches(ComponentInput other) =>
-            ValueMember.Equals(other.ValueMember)
-            && ValuePath.ToString() == other.ValuePath.ToString()
+            ValuePath.ToString() == other.ValuePath.ToString()
             && CommittedBy.Equals(other.CommittedBy);
 
-        internal string Describe() => $"{ValueMember.Value} ({ValuePath}), committed by {CommittedBy.Value}";
+        internal string Describe() => $"{ValuePath}, committed by {CommittedBy.Value}";
     }
 }

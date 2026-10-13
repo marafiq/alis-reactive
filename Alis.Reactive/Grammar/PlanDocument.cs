@@ -51,10 +51,6 @@ namespace Alis.Reactive.Grammar
             Payload = payload;
         }
 
-        /// <summary>The DOM itself, for a link that reads the click's modifier keys.</summary>
-        internal static Vendor Dom { get; } =
-            new Vendor(Array.Empty<string>(), "addEventListener", "removeEventListener", EventPayload);
-
         public IReadOnlyList<string> ObjectPath { get; }
         public string Subscribe { get; }
         public string Unsubscribe { get; }

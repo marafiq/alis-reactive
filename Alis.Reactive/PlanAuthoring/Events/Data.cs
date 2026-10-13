@@ -24,14 +24,14 @@ namespace Alis.Reactive
     /// <typeparam name="TData">The data's type, typically the server's own class.</typeparam>
     public sealed class Data<TData> : TypedSource<TData>
     {
-        internal Data(PayloadSource scope)
+        private readonly Receiver _data;
+
+        internal Data(Receiver data)
         {
-            Scope = scope ?? throw new ArgumentNullException(nameof(scope));
+            _data = data ?? throw new ArgumentNullException(nameof(data));
         }
 
-        internal PayloadSource Scope { get; }
-
-        internal override ValueExpression ToValueExpression() => ValueExpression.ReadWholePayload(Scope, Shape);
+        internal override ValueExpression ToValueExpression() => ValueExpression.ReadWhole(_data, Shape);
 
         /// <summary>Reads a member of the data, for example <c>x =&gt; x.Address.City</c> or <c>x =&gt; x.Items[0].Name</c>.</summary>
         /// <typeparam name="TResult">The member's type.</typeparam>
@@ -39,7 +39,7 @@ namespace Alis.Reactive
         public TypedSource<TResult> Get<TResult>(Expression<Func<TData, TResult>> path)
         {
             if (path == null) throw new ArgumentNullException(nameof(path));
-            return new PayloadTypedSource<TData, TResult>(Scope, path);
+            return new PayloadTypedSource<TData, TResult>(_data, path);
         }
     }
 }

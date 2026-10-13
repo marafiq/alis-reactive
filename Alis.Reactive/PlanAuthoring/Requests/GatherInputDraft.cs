@@ -6,12 +6,12 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Requests
 {
     // The members a gather sets, by binding name, and its headers. Where a member goes is decided when the
-    // request is built, because only then is the URL known: MVC's route-value rule sends a member named like
+    // request is written, because only then is the URL known: MVC's route-value rule sends a member named like
     // a {placeholder} to the path, and every other member to the query or body.
     internal sealed class GatherInputDraft
     {
         private readonly List<(BindingPath Member, ValueExpression Value)> _members = new List<(BindingPath, ValueExpression)>();
-        private readonly List<RequestInputAssignment> _headers = new List<RequestInputAssignment>();
+        private readonly List<(string Name, ValueExpression Value)> _headers = new List<(string, ValueExpression)>();
         private bool _includesForm;
 
         internal void Add(BindingPath member, ValueExpression value)
@@ -19,13 +19,13 @@ namespace Alis.Reactive.Builders.Requests
             var setTwice = _members.Any(existing => string.Equals(existing.Member.Value, member.Value, StringComparison.OrdinalIgnoreCase));
             if (setTwice)
                 throw new InvalidOperationException($"The request member '{member.Value}' is gathered twice; set each member once.");
-
             _members.Add((member, value));
         }
 
-        internal void AddHeader(HeaderName name, ValueExpression value)
+        internal void AddHeader(string name, ValueExpression value)
         {
-            _headers.Add(RequestInputAssignment.Header(name, value));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Header name required.", nameof(name));
+            _headers.Add((name, value));
         }
 
         internal void IncludeForm()
@@ -33,33 +33,52 @@ namespace Alis.Reactive.Builders.Requests
             _includesForm = true;
         }
 
-        internal RequestInput BuildRequestInput(RequestBodyFormat bodyFormat, RequestUrl url)
+        internal GatheredInput Resolve(string url)
         {
             var template = RequestRouteTemplate.For(url);
-            var assignments = new List<RequestInputAssignment>();
-            var filled = new List<string>();
-
+            var payload = new List<(BindingPath, ValueExpression)>();
+            var route = new List<(string, ValueExpression)>();
             foreach (var (member, value) in _members)
             {
                 var placeholder = template.PlaceholderFor(member);
                 if (placeholder == null)
                 {
-                    assignments.Add(RequestInputAssignment.Payload(member, value));
+                    payload.Add((member, value));
                     continue;
                 }
 
                 RequestScalarTarget.RouteParameter(placeholder, value.OutputShape);
-                assignments.Add(RequestInputAssignment.RouteParameter(RouteParameterName.Of(placeholder), value));
-                filled.Add(placeholder);
+                route.Add((placeholder, value));
             }
 
-            template.RequireEveryPlaceholderFilled(filled);
-            assignments.AddRange(_headers);
-
-            if (assignments.Count == 0 && !_includesForm)
-                return RequestInput.None;
-
-            return GatherRequestInput.From(assignments, bodyFormat, _includesForm);
+            template.RequireEveryPlaceholderFilled(route.Select(member => member.Item1));
+            return new GatheredInput(payload, route, _headers, _includesForm);
         }
+    }
+
+    /// <summary>A gather resolved against its URL: body or query members, route values and headers.</summary>
+    internal sealed class GatheredInput
+    {
+        internal GatheredInput(
+            IReadOnlyList<(BindingPath Name, ValueExpression Value)> payload,
+            IReadOnlyList<(string Name, ValueExpression Value)> route,
+            IReadOnlyList<(string Name, ValueExpression Value)> headers,
+            bool includesForm)
+        {
+            Payload = payload;
+            Route = route;
+            Headers = headers;
+            IncludesForm = includesForm;
+        }
+
+        internal IReadOnlyList<(BindingPath Name, ValueExpression Value)> Payload { get; }
+
+        internal IReadOnlyList<(string Name, ValueExpression Value)> Route { get; }
+
+        internal IReadOnlyList<(string Name, ValueExpression Value)> Headers { get; }
+
+        internal bool IncludesForm { get; }
+
+        internal bool IsEmpty => Payload.Count == 0 && Route.Count == 0 && Headers.Count == 0 && !IncludesForm;
     }
 }

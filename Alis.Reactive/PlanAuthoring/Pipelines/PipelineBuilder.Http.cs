@@ -10,7 +10,7 @@ namespace Alis.Reactive.Builders
         /// <returns>Request builder for route values, validation, loading/finally reactions, and response routing.</returns>
         public HttpRequestBuilder<TModel> Get(string url)
         {
-            return Active._draft.BeginHttp(Context).Get(url);
+            return Request().Get(url);
         }
 
         /// <summary>Appends an async HTTP POST reaction to this Reactive Plan pipeline.</summary>
@@ -18,7 +18,7 @@ namespace Alis.Reactive.Builders
         /// <returns>Request builder for gathered input, validation, loading/finally reactions, and response routing.</returns>
         public HttpRequestBuilder<TModel> Post(string url)
         {
-            return Active._draft.BeginHttp(Context).Post(url);
+            return Request().Post(url);
         }
 
         /// <summary>Appends an async HTTP PUT reaction to this Reactive Plan pipeline.</summary>
@@ -26,7 +26,7 @@ namespace Alis.Reactive.Builders
         /// <returns>Request builder for gathered input, validation, loading/finally reactions, and response routing.</returns>
         public HttpRequestBuilder<TModel> Put(string url)
         {
-            return Active._draft.BeginHttp(Context).Put(url);
+            return Request().Put(url);
         }
 
         /// <summary>Appends an async HTTP DELETE reaction to this Reactive Plan pipeline.</summary>
@@ -34,7 +34,7 @@ namespace Alis.Reactive.Builders
         /// <returns>Request builder for route values, validation, loading/finally reactions, and response routing.</returns>
         public HttpRequestBuilder<TModel> Delete(string url)
         {
-            return Active._draft.BeginHttp(Context).Delete(url);
+            return Request().Delete(url);
         }
 
         /// <summary>Appends an async reaction whose HTTP request branches execute concurrently.</summary>
@@ -42,9 +42,18 @@ namespace Alis.Reactive.Builders
         /// <returns>Parallel request builder for configuring the optional all-settled reaction.</returns>
         public ParallelBuilder<TModel> Parallel(params Action<HttpRequestBuilder<TModel>>[] branches)
         {
-            var builder = Active._draft.BeginParallel(Context);
+            var builder = new ParallelBuilder<TModel>(Context);
+            Context.AddStep(builder.Step);
             foreach (var branch in branches)
                 builder.AddBranch(branch);
+            return builder;
+        }
+
+        // A request is placed where it is written and configured until the plan is written.
+        private HttpRequestBuilder<TModel> Request()
+        {
+            var builder = new HttpRequestBuilder<TModel>(Context);
+            Context.AddStep(builder.Step);
             return builder;
         }
     }

@@ -26,8 +26,7 @@ namespace Alis.Reactive.Builders
         /// <param name="pipeline">Builds the reaction graph for the <c>DomReady</c> trigger.</param>
         public TriggerBuilder<TModel> DomReady(Action<PipelineBuilder<TModel>> pipeline)
         {
-            AddBehavior(StartsWhen.PageReady(), PipelineBuilder<TModel>.Build(_context, pipeline));
-            return this;
+            return On(objects => objects.Document(), "ready", pipeline);
         }
 
         /// <summary>Runs a pipeline each time a declared document event is raised.</summary>
@@ -36,7 +35,7 @@ namespace Alis.Reactive.Builders
         public TriggerBuilder<TModel> CustomEvent(AppEvent appEvent, Action<PipelineBuilder<TModel>> pipeline)
         {
             if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
-            return On(StartsWhen.DocumentEvent(appEvent.Name), pipeline);
+            return On(objects => objects.Document(), appEvent.Name, pipeline);
         }
 
         /// <summary>Runs a pipeline each time a declared document event is raised, reading its payload.</summary>
@@ -48,7 +47,7 @@ namespace Alis.Reactive.Builders
             where TPayload : class, new()
         {
             if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
-            return On(StartsWhen.DocumentEvent(appEvent.Name), pipeline);
+            return On(objects => objects.Document(), appEvent.Name, pipeline);
         }
 
         /// <summary>Runs a pipeline each time a declared document event is raised, without reading its payload.</summary>
@@ -60,7 +59,7 @@ namespace Alis.Reactive.Builders
             where TPayload : class, new()
         {
             if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
-            return On(StartsWhen.DocumentEvent(appEvent.Name), pipeline);
+            return On(objects => objects.Document(), appEvent.Name, pipeline);
         }
 
         /// <summary>Runs a pipeline for each message of one kind a declared server-sent event stream sends.</summary>
@@ -75,7 +74,8 @@ namespace Alis.Reactive.Builders
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
             if (message == null) throw new ArgumentNullException(nameof(message));
-            return On(StartsWhen.ServerPush(stream.Url, message(stream.Stream).Name), pipeline);
+            var url = stream.Url;
+            return On(objects => objects.Stream(url), message(stream.Stream).Name, pipeline);
         }
 
         /// <summary>Runs a pipeline for each message of one kind a declared server-sent event stream sends, reading its data.</summary>
@@ -92,7 +92,8 @@ namespace Alis.Reactive.Builders
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
             if (message == null) throw new ArgumentNullException(nameof(message));
-            return On(StartsWhen.ServerPush(stream.Url, message(stream.Stream).Name), pipeline);
+            var url = stream.Url;
+            return On(objects => objects.Stream(url), message(stream.Stream).Name, pipeline);
         }
 
         /// <summary>Runs a pipeline each time a declared hub's server calls one of its client methods.</summary>
@@ -107,7 +108,8 @@ namespace Alis.Reactive.Builders
         {
             if (hub == null) throw new ArgumentNullException(nameof(hub));
             if (message == null) throw new ArgumentNullException(nameof(message));
-            return On(StartsWhen.SignalR(hub.Url, message(hub.Hub).Name), pipeline);
+            var url = hub.Url;
+            return On(objects => objects.Hub(url), message(hub.Hub).Name, pipeline);
         }
 
         /// <summary>Runs a pipeline each time a declared hub's server calls one of its client methods, reading the argument.</summary>
@@ -124,25 +126,21 @@ namespace Alis.Reactive.Builders
         {
             if (hub == null) throw new ArgumentNullException(nameof(hub));
             if (message == null) throw new ArgumentNullException(nameof(message));
-            return On(StartsWhen.SignalR(hub.Url, message(hub.Hub).Name), pipeline);
+            var url = hub.Url;
+            return On(objects => objects.Hub(url), message(hub.Hub).Name, pipeline);
         }
 
-        private TriggerBuilder<TModel> On(StartsWhen trigger, Action<PipelineBuilder<TModel>> pipeline)
+        private TriggerBuilder<TModel> On(Func<ObjectTable, string> on, string eventName, Action<PipelineBuilder<TModel>> pipeline)
         {
-            AddBehavior(trigger, PipelineBuilder<TModel>.Build(_context, pipeline));
+            _context.On(on, eventName, PipelineBuilder<TModel>.Build(_context, pipeline));
             return this;
         }
 
-        private TriggerBuilder<TModel> On<TPayload>(StartsWhen trigger, Action<Data<TPayload>, PipelineBuilder<TModel>> pipeline)
+        private TriggerBuilder<TModel> On<TPayload>(Func<ObjectTable, string> on, string eventName, Action<Data<TPayload>, PipelineBuilder<TModel>> pipeline)
         {
-            var payload = new Data<TPayload>(PayloadSource.Event());
-            AddBehavior(trigger, PipelineBuilder<TModel>.Build(_context, p => pipeline(payload, p)));
+            var payload = new Data<TPayload>(Receiver.Event);
+            _context.On(on, eventName, PipelineBuilder<TModel>.Build(_context, p => pipeline(payload, p)));
             return this;
-        }
-
-        private void AddBehavior(StartsWhen trigger, ReactionGraph reaction)
-        {
-            _context.AddBehavior(Behavior.On(trigger, reaction));
         }
     }
 }

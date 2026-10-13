@@ -1,4 +1,3 @@
-using System;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive
@@ -35,9 +34,5 @@ namespace Alis.Reactive
 
         /// <summary>The name the page registers the plugin under.</summary>
         public string Name => _name.Value;
-
-        // The plugin's members are declared where they are used: each read or call adds its own.
-        internal PluginContract ToContract() =>
-            PluginContract.Create(_name, Array.Empty<PluginPropertyContract>(), Array.Empty<PluginOperationContract>());
     }
 }

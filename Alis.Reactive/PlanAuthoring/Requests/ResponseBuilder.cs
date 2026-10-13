@@ -15,20 +15,20 @@ namespace Alis.Reactive.Builders.Requests
     public class ResponseBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
-        private readonly ResponseRoutingDraft _draft = new ResponseRoutingDraft();
 
         internal ResponseBuilder(PlanBuildContext context)
         {
             _context = context;
         }
 
-        internal ResponseRoutingDraft Draft => _draft;
+        /// <summary>The routes this builder configures, written where the request is.</summary>
+        internal ResponseRoutes Routes { get; } = new ResponseRoutes();
 
         /// <summary>Adds route for any successful 2xx HTTP response.</summary>
         /// <param name="pipeline">Builds the reaction graph to execute on success.</param>
         public ResponseBuilder<TModel> OnSuccess(Action<PipelineBuilder<TModel>> pipeline)
         {
-            _draft.AddSuccessRoute(PipelineBuilder<TModel>.Build(_context, pipeline));
+            Routes.OnSuccess(PipelineBuilder<TModel>.Build(_context, pipeline));
             return this;
         }
 
@@ -45,8 +45,8 @@ namespace Alis.Reactive.Builders.Requests
             Action<Data<TResponse>, PipelineBuilder<TModel>> pipeline)
             where TResponse : class
         {
-            var body = new Data<TResponse>(PayloadSource.Success(_draft.Handle));
-            _draft.AddSuccessRoute(PipelineBuilder<TModel>.Build(_context, p => pipeline(body, p)));
+            var body = new Data<TResponse>(Receiver.Response(Routes.Handle));
+            Routes.OnSuccess(PipelineBuilder<TModel>.Build(_context, p => pipeline(body, p)));
             return this;
         }
 
@@ -54,7 +54,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="pipeline">Builds the reaction graph to execute for the error route.</param>
         public ResponseBuilder<TModel> OnError(Action<PipelineBuilder<TModel>> pipeline)
         {
-            _draft.AddErrorRoute(PipelineBuilder<TModel>.Build(_context, pipeline));
+            Routes.OnError(PipelineBuilder<TModel>.Build(_context, pipeline));
             return this;
         }
 
@@ -63,7 +63,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="pipeline">Builds the reaction graph to execute for the matching status code.</param>
         public ResponseBuilder<TModel> OnError(int statusCode, Action<PipelineBuilder<TModel>> pipeline)
         {
-            _draft.AddErrorRoute(statusCode, PipelineBuilder<TModel>.Build(_context, pipeline));
+            Routes.OnError(statusCode, PipelineBuilder<TModel>.Build(_context, pipeline));
             return this;
         }
 
@@ -80,8 +80,8 @@ namespace Alis.Reactive.Builders.Requests
             Action<Data<TError>, PipelineBuilder<TModel>> pipeline)
             where TError : class
         {
-            var body = new Data<TError>(PayloadSource.Error(_draft.Handle));
-            _draft.AddErrorRoute(PipelineBuilder<TModel>.Build(_context, p => pipeline(body, p)));
+            var body = new Data<TError>(Receiver.Response(Routes.Handle));
+            Routes.OnError(PipelineBuilder<TModel>.Build(_context, p => pipeline(body, p)));
             return this;
         }
 
@@ -99,8 +99,8 @@ namespace Alis.Reactive.Builders.Requests
             Action<Data<TError>, PipelineBuilder<TModel>> pipeline)
             where TError : class
         {
-            var body = new Data<TError>(PayloadSource.Error(_draft.Handle));
-            _draft.AddErrorRoute(statusCode, PipelineBuilder<TModel>.Build(_context, p => pipeline(body, p)));
+            var body = new Data<TError>(Receiver.Response(Routes.Handle));
+            Routes.OnError(statusCode, PipelineBuilder<TModel>.Build(_context, p => pipeline(body, p)));
             return this;
         }
 
@@ -114,9 +114,9 @@ namespace Alis.Reactive.Builders.Requests
         /// </exception>
         public ResponseBuilder<TModel> Chained(Action<HttpRequestBuilder<TModel>> request)
         {
-            var chainedBuilder = new HttpRequestBuilder<TModel>(_context);
-            request(chainedBuilder);
-            _draft.ContinueWith(chainedBuilder.BuildRequest());
+            var chained = new HttpRequestBuilder<TModel>(_context);
+            request(chained);
+            Routes.ContinueWith(chained.Step);
             return this;
         }
     }

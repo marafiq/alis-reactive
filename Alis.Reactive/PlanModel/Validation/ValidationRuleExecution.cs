@@ -58,11 +58,8 @@ namespace Alis.Reactive.PlanModel
             ValidationRuleActivation activation,
             Shape comparisonShape)
         {
-            if (peer is not ReadExpression read)
-                throw new System.ArgumentException("Validation rule peer values must read another field value.", nameof(peer));
-
             return new PeerValidationRuleExecution(
-                read,
+                peer,
                 activation,
                 comparisonShape);
         }
@@ -104,18 +101,16 @@ namespace Alis.Reactive.PlanModel
 
         private sealed class PeerValidationRuleExecution : ValidationRuleExecution
         {
-            private readonly ReadExpression _value;
+            private readonly ValueExpression _value;
 
             internal PeerValidationRuleExecution(
-                ReadExpression value,
+                ValueExpression value,
                 ValidationRuleActivation activation,
                 Shape comparisonShape)
                 : base(activation, comparisonShape)
             {
                 _value = value ?? throw new System.ArgumentNullException(nameof(value));
             }
-
-            public ReadExpression Value => _value;
 
             internal override bool TryGetPeer(out ValueExpression peer)
             {
