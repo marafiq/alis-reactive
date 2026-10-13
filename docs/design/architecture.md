@@ -1171,6 +1171,17 @@ built and what is not.
     board and the action-link rows (`494a0ca`). The schedule then gained add, save, cancel and
     "Cover the next open shift" through `AddEvent`, `SaveEvent`, `DeleteEvent` and `OpenEditor`
     (`ab3d381`, `a632922`, `edde975`).
+- **Built after an independent review of the vision** (at `a9302a2`):
+  - no framework API and no sandbox page writes JavaScript into the HTML (`984a427`): the template
+    builders' `onclick` buttons are gone; `EventButton` raises a declared event.
+  - an object a component holds is declared as an object (`cb16542`): the in-place editor's
+    `Element.ClassList` and Tom Select's `Input.Value`, which used dotted names. A field of each item
+    of a list (`items[].field`) still has only its string form.
+  - the vendor payload no declaration could produce (`"event"`) is gone from the contract and the
+    runtime (`96304ad`).
+  - `p.Confirm` no longer needs Syncfusion (`3dbacfc`): the Fusion confirm answers only on a page
+    that renders its dialog, and a page may give `alis.confirm` from its own code (the sandbox's
+    Room Holds page answers with a native `<dialog>`).
 - **Step 0, closed after the redesign** (`1ca7c9a` through `a1af1a2`; CI run 38366597452, 1,526
   Playwright tests passed). Step 0 (sections 10 and 12) was not done before the redesign. Its
   inventories were re-audited at `7c34a86`: of 155 rows still marked weak, plan-only or missing, 14 were
