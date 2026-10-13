@@ -60,6 +60,20 @@ public class WhenFileUploaded : PlaywrightTestBase
     }
 
     [Test]
+    public async Task choosing_documents_prompts_to_upload_them()
+    {
+        await NavigateAndBoot();
+        var prompt = Page.Locator("#documents-ready");
+        await Expect(prompt).ToBeHiddenAsync();
+
+        await ChooseFiles(("care-plan.pdf", "%PDF-mock", "application/pdf"));
+
+        await Expect(prompt).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(prompt).ToHaveTextAsync("Documents chosen. Press Upload to add them to the resident's record.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task selecting_files_and_submitting_sends_to_server()
     {
         await NavigateAndBoot();

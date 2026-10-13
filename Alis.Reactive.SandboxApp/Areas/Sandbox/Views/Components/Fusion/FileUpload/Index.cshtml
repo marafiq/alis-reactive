@@ -27,8 +27,10 @@
                     .Placeholder("Enter resident name")
                     .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
             @{ Html.InputField(plan, m => m.Documents, o => o.Required().Label("Documents"))
-                .FusionFileUpload(b => b.AllowedExtensions(".pdf,.jpg,.png,.txt").Multiple(true)); }
+                .FusionFileUpload(b => b.AllowedExtensions(".pdf,.jpg,.png,.txt").Multiple(true))
+                .Reactive(evt => evt.Selected, (args, p) => p.Element("documents-ready").Show()); }
         </form>
+        <p id="documents-ready" class="mt-2 text-sm text-text-secondary" hidden>Documents chosen. Press Upload to add them to the resident's record.</p>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
