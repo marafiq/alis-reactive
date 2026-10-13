@@ -9,6 +9,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? Nickname { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string? Allergies { get; set; }
+        public bool ProfileLocked { get; set; }
     }
 
     public class DateOfBirthQuickEdit

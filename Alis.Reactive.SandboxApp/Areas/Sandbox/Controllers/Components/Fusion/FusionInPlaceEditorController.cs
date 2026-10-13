@@ -35,7 +35,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             {
                 Name          = "Eleanor Vance",
                 CareLevelId   = "assisted",
-                AdmissionDate = DateTime.Today.AddYears(-2),
+                AdmissionDate = DateTime.Today.AddMonths(-1),
                 MonthlyRate   = 4500m,
                 Nickname      = "Ellie",
                 DateOfBirth   = new DateTime(1942, 6, 14),

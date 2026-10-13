@@ -46,7 +46,18 @@
                 .FusionInPlaceEditor(b => b
                     .Type(SfInPlace.InputType.Text)
                     .Mode(SfInPlace.RenderMode.Inline)
-                    .EditableOn(SfInPlace.EditableType.Click)); }
+                    .EditableOn(SfInPlace.EditableType.Click))
+                .Reactive(evt => evt.BeginEdit, (args, p) =>
+                {
+                    // A profile under review keeps its nickname: the edit does not open.
+                    p.When(p.Component<NativeCheckBox>(m => m.ProfileLocked).Checked).Truthy()
+                        .Then(locked =>
+                        {
+                            args.Cancel.Set(true);
+                            locked.Element("profile-locked-note").Show();
+                        })
+                        .Else(open => open.Element("profile-locked-note").Hide());
+                }); }
 
             @{ Html.InputField(plan, m => m.DateOfBirth, o => o.Label("Date of Birth"))
                 .FusionInPlaceEditor(b => b
@@ -65,7 +76,17 @@
                     })); }
         </native-grid>
 
-        <native-hstack gap="None" justify="Start">
+        <native-vstack gap="Sm" class="mb-4">
+            @{ Html.InputField(plan, m => m.ProfileLocked, o => o.Label("Lock this profile for care review"))
+                .NativeCheckBox(b => b.CssClass("rounded border-border")); }
+            <p id="profile-locked-note" class="text-sm text-warning" hidden>This profile is locked for care review; unlock it to change the nickname.</p>
+        </native-vstack>
+
+        <native-hstack gap="Sm" justify="Start">
+            @(Html.NativeButton("clear-nickname", "Clear nickname")
+                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Component<FusionInPlaceEditor>(m => m.Nickname).Value.Set(null)))
             @(Html.NativeButton("submit-profile", "Save Profile")
                 .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>

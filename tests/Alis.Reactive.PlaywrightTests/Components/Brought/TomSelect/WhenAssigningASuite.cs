@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using System.Text.Json;
 using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought;
@@ -58,6 +59,21 @@ public class WhenAssigningASuite : PlaywrightTestBase
         await Expect(Availability).ToHaveTextAsync("2 memory care suites are open in the Garden wing.", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
+
+    // The field wrapper writes the label and, for a required field, its "*" marker. The label is the
+    // sibling before the field's message slot, so it is found the same way whatever the input renders.
+    [Test]
+    public async Task the_suite_type_is_marked_required_and_the_monthly_rate_is_not()
+    {
+        await OpenAssignment();
+
+        await Expect(LabelOf(m => m.SuiteType)).ToHaveTextAsync("Suite type *");
+        await Expect(LabelOf(m => m.MonthlyRate)).ToHaveTextAsync("Monthly rate ($)");
+        AssertNoConsoleErrors();
+    }
+
+    private ILocator LabelOf(Expression<Func<SuiteAssignmentModel, object?>> field)
+        => _plan.ErrorFor(field).Locator("xpath=preceding-sibling::label");
 
     [Test]
     public async Task taking_the_recommended_suite_selects_it_and_quotes_it()
