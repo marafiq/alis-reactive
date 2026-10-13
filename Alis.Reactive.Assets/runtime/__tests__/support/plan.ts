@@ -14,6 +14,7 @@ export const s = {
   none: { kind: "none" } as Shape,
   array: (item: Shape): Shape => ({ kind: "array", item }),
   nullable: (inner: Shape): Shape => ({ kind: "nullable", inner }),
+  object: (fields: Record<string, Shape>): Shape => ({ kind: "object", fields }),
 };
 
 export const e = {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -151,13 +152,25 @@ namespace Alis.Reactive.PlanModel
 
         // ── from CLR types ───────────────────────────────────────────────────────
 
-        internal static Shape FromClrType(Type type)
+        internal static Shape FromClrType(Type type) => Of(type, enclosingRecords: null);
+
+        /// <summary>
+        /// The shape a method declares for an argument of this type: as <see cref="FromClrType"/>, except
+        /// that a class of the app's own data (a server's class, a row, an event) is an object of its
+        /// members by their JSON names, so a date member reaches the method as a <c>Date</c> (grammar.md
+        /// 1.4, 2.1: a call argument converts to the shape the member declares).
+        /// </summary>
+        internal static Shape OfArgument(Type type) => Of(type, enclosingRecords: new HashSet<Type>());
+
+        // With enclosingRecords, a data class is a record of its members; the set holds the classes being
+        // described, so a class that contains itself is any where it recurs.
+        private static Shape Of(Type type, HashSet<Type>? enclosingRecords)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
 
             var underlying = System.Nullable.GetUnderlyingType(type);
             if (underlying != null)
-                return Nullable(FromClrType(underlying));
+                return Nullable(Of(underlying, enclosingRecords));
 
             if (type == typeof(string)) return String;
             if (type == typeof(bool)) return Boolean;
@@ -167,14 +180,44 @@ namespace Alis.Reactive.PlanModel
             if (IsStringSerializedType(type)) return String;
             if (type.IsEnum) return String;
 
-            if (TryGetCollectionItemShape(type, out var itemShape))
+            if (TryGetCollectionItemShape(type, enclosingRecords, out var itemShape))
                 return ArrayOf(itemShape);
 
-            return Any;
+            var isRecord = enclosingRecords != null && IsDataClass(type) && enclosingRecords.Add(type);
+            return isRecord ? RecordOf(type, enclosingRecords!) : Any;
+        }
+
+        private static Shape RecordOf(Type type, HashSet<Type> enclosingRecords)
+        {
+            var fields = new Dictionary<string, Shape>(StringComparer.Ordinal);
+            foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                var serialized = property.GetIndexParameters().Length == 0
+                    && property.GetMethod != null
+                    && property.GetCustomAttribute<JsonIgnoreAttribute>() == null;
+                if (serialized) fields[JsonMemberName.Of(property.Name)] = Of(property.PropertyType, enclosingRecords);
+            }
+            enclosingRecords.Remove(type);
+            return ObjectOf(fields);
+        }
+
+        // Data the app defines: not a live JavaScript object (a declaration), not a framework or library
+        // type, not a dictionary (JSON of any keys).
+        private static bool IsDataClass(Type type)
+        {
+            var ns = type.Namespace ?? "";
+            return type.IsClass
+                   && type != typeof(object)
+                   && !type.IsAbstract
+                   && !typeof(JsObject).IsAssignableFrom(type)
+                   && !typeof(Delegate).IsAssignableFrom(type)
+                   && !IsDictionaryLike(type)
+                   && !ns.StartsWith("System", StringComparison.Ordinal)
+                   && !ns.StartsWith("Microsoft", StringComparison.Ordinal);
         }
 
         internal static Shape CollectionItemShapeOrNone(Type type) =>
-            TryGetCollectionItemShape(type, out var itemShape) ? itemShape : None;
+            TryGetCollectionItemShape(type, enclosingRecords: null, out var itemShape) ? itemShape : None;
 
         internal static Shape FromValue(object? value) =>
             value == null ? None : FromClrType(value.GetType());
@@ -201,13 +244,13 @@ namespace Alis.Reactive.PlanModel
                ;
 
         // Text and dictionaries enumerate, but MVC binds neither as a list.
-        private static bool TryGetCollectionItemShape(Type type, out Shape itemShape)
+        private static bool TryGetCollectionItemShape(Type type, HashSet<Type>? enclosingRecords, out Shape itemShape)
         {
             itemShape = None;
             var bindsAsList = type != typeof(string) && !IsDictionaryLike(type);
             if (!bindsAsList || !TryGetItemType(type, out var itemType)) return false;
 
-            itemShape = FromClrType(itemType);
+            itemShape = Of(itemType, enclosingRecords);
             return true;
         }
 

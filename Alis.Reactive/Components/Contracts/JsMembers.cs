@@ -146,7 +146,7 @@ namespace Alis.Reactive
             where TSource : TDeclared
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            return new DeclaredArg(source, Shape.FromClrType(typeof(TDeclared)));
+            return new DeclaredArg(source, Shape.OfArgument(typeof(TDeclared)));
         }
 
         /// <summary>A field of the row, item or card class, named when the view renders.</summary>
@@ -196,7 +196,7 @@ namespace Alis.Reactive
     {
         private protected Arg() { }
 
-        internal override Shape Shape => Shape.FromClrType(typeof(T));
+        internal override Shape Shape => Shape.OfArgument(typeof(T));
 
         /// <summary>A literal argument, written into the plan.</summary>
         /// <remarks>A parameter typed <c>object</c> takes any value read when the step runs, too.</remarks>

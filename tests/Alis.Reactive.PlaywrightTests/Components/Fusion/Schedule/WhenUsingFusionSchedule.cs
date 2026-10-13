@@ -33,6 +33,14 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
     private DropDownListLocator NewShiftStaff =>
         new(Page, IdGenerator.For<NewAssignmentModel>(m => m.StaffId));
 
+    // The list opens from its own button; a click outside the modal dialog would close the dialog.
+    private async Task ChooseNewShiftStaff(string staff)
+    {
+        await NewShiftStaff.Open();
+        await NewShiftStaff.Popup.GetByText(staff, new() { Exact = true }).ClickAsync();
+        await Expect(NewShiftStaff.Popup).ToBeHiddenAsync();
+    }
+
     // The schedule's shifts for one staff member or label, as the schedule renders them.
     private ILocator ShiftsOf(string subject) =>
         Page.Locator("#shift-schedule .e-appointment").Filter(new() { HasText = subject });
@@ -282,7 +290,7 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await ClickOpenHourToday();
         await Expect(NewAssignmentDialog).ToContainTextAsync("Staff Member", new() { Timeout = 10000 });
 
-        await NewShiftStaff.Select("Jane Blonde (CNA)");
+        await ChooseNewShiftStaff("Jane Blonde (CNA)");
         await ClickWhenStable(Page.Locator("#btn-create-assignment"));
 
         await Expect(NewAssignmentDialog).ToBeHiddenAsync(new() { Timeout = 10000 });
@@ -302,7 +310,7 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await NavigateAndWaitForSchedule();
         await ClickOpenHourToday();
         await Expect(NewAssignmentDialog).ToContainTextAsync("Staff Member", new() { Timeout = 10000 });
-        await NewShiftStaff.Select("Pat Night (CNA)");
+        await ChooseNewShiftStaff("Pat Night (CNA)");
         await ClickWhenStable(Page.Locator("#btn-create-assignment"));
         var patsShift = ShiftAt("Pat Night (CNA)", OpenHourToday, shiftColumn: 0);
         await Expect(patsShift).ToBeVisibleAsync(new() { Timeout = 10000 });

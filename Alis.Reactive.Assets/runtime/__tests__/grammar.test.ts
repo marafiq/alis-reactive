@@ -53,6 +53,33 @@ describe("values convert at the boundary, by shape", () => {
     expect(value(e.lit(null, s.number))).toBeNull();
     expect(value(e.lit(undefined, s.string))).toBeUndefined();
   });
+
+  // A server's class handed to a method: its date members become Dates, the rest stays as it arrived.
+  it("passes a record argument with its date members as Dates and every other member kept", () => {
+    const shift = { id: 7, subject: "Jane Blonde (CNA)", startTime: "2026-10-13T16:00:00", guid: "kept" };
+    let received: Record<string, unknown> | undefined;
+    const schedule = { saveEvent: (data: Record<string, unknown>) => { received = data; } };
+    const shiftShape = s.object({ id: s.number, subject: s.string, startTime: s.date });
+
+    value(e.call(e.obj("schedule"), ["saveEvent"], [e.lit(shift)], s.none, [shiftShape]), scopeWith({ schedule }));
+
+    expect(received!["startTime"]).toBeInstanceOf(Date);
+    expect((received!["startTime"] as Date).getHours()).toBe(16);
+    expect(received!["subject"]).toBe("Jane Blonde (CNA)");
+    expect(received!["guid"]).toBe("kept");
+    expect(shift.startTime).toBe("2026-10-13T16:00:00");
+  });
+
+  it("passes a record argument that needs no conversion as the same object", () => {
+    const card = { id: 101, summary: "Assess fall risk", isEscalated: false };
+    let received: unknown;
+    const kanban = { addCard: (data: unknown) => { received = data; } };
+    const cardShape = s.object({ id: s.number, summary: s.string, isEscalated: s.boolean });
+
+    value(e.call(e.obj("kanban"), ["addCard"], [e.lit(card)], s.none, [cardShape]), scopeWith({ kanban }));
+
+    expect(received).toBe(card);
+  });
 });
 
 describe("operators answer as C#'s lifted operators do", () => {

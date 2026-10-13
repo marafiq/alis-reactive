@@ -161,17 +161,23 @@ function asArrayOf(value: unknown, item: Shape): unknown {
   return [shaped(value, item)];
 }
 
+// An object's declared members convert by their shapes; its other members stay as they arrived. When no
+// member changes, the object itself passes, so a library that keeps it by reference still has it.
 function asObjectOf(value: unknown, shape: Extract<Shape, { kind: "object" }>): unknown {
   const isPlainRecord =
     typeof value === "object" && value !== null && !Array.isArray(value) && !(value instanceof Date);
   if (!isPlainRecord) return value;
 
   const record = value as Record<string, unknown>;
-  const output: Record<string, unknown> = {};
+  let converted: Record<string, unknown> | undefined;
   for (const [name, fieldShape] of Object.entries(shape.fields)) {
-    if (Object.prototype.hasOwnProperty.call(record, name)) output[name] = shaped(record[name], fieldShape);
+    if (!Object.prototype.hasOwnProperty.call(record, name)) continue;
+    const member = shaped(record[name], fieldShape);
+    if (member === record[name]) continue;
+    converted ??= { ...record };
+    converted[name] = member;
   }
-  return output;
+  return converted ?? record;
 }
 
 // A nullable shape is a CLR Nullable<T>. Blank text is no number, boolean or date: MVC binds it as

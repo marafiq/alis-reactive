@@ -106,14 +106,20 @@ Where a path is rooted decides how it is read; the runtime decides nothing else.
 
 ### 1.4 Shapes
 
-A shape is the C# type's view of a JavaScript value:
+A shape is the C# type's view of a JavaScript value. The generated contract (`plan.ts`) has these
+kinds:
 
-`text`, `number`, `boolean`, `date`, `instant`, `enum`, `file`, `array(shape)`, `record`,
-`object`, `nullable(shape)`, `none`.
+`string`, `number`, `boolean`, `date`, `instant`, `array(shape)`, `nullable(shape)`,
+`object(fields)`, `any`, `none`.
 
-- `object` is a live JavaScript object and is never converted.
-- `record` is JSON-shaped data.
-- `enum` values are their names, which is how MVC binds them.
+- `any` is a value taken as it is: a live JavaScript object, or data whose members the plan does not
+  name. It is never converted.
+- `object(fields)` is JSON-shaped data whose members the plan names: a record the DSL builds, and an
+  argument of a method typed by the app's own class (a server's class, a row, an event), whose
+  public members, by their JSON names, are its fields. A class that contains itself is `any` where it
+  recurs; a declaration (`JsObject`), a dictionary and a framework type are `any`.
+- An enum is `string`: its member name, which is how MVC binds it. A `Guid`, a `TimeSpan` and a
+  `TimeOnly` are `string` too.
 - `date` values are JavaScript `Date` objects. `DateTime` and `DateOnly` are `date`.
 - `instant` values are `Date` objects too, for a `DateTimeOffset`: a moment, not a calendar day.
 
@@ -142,7 +148,7 @@ Literals are emitted already in their shape. Nothing else converts.
 | `boolean` | text | false only for `""`, `"false"` in any case, and `"0"` |
 | | number | false only for 0 and NaN |
 | | array | `length > 0` |
-| `text` | number or boolean | `${v}` |
+| `string` | number or boolean | `${v}` |
 | | instant | the moment in UTC: `YYYY-MM-DDTHH:mm:ss.fffZ` |
 | | other `Date` | local calendar text: `YYYY-MM-DD` at midnight, else `YYYY-MM-DDTHH:mm:ss[.fff]`, no offset |
 | | array | `String(a)` |
@@ -153,16 +159,16 @@ Literals are emitted already in their shape. Nothing else converts.
 | | missing | stays missing |
 | `nullable(s)` | missing, or text that is empty or whitespace | `null` |
 | | otherwise | converted to `s` |
-| `enum` | any | as `text` |
-| `file` | `File` | itself |
-| | `FileList` | `Array.from` |
+| `object(fields)` | an object | each named member converted to its shape, every other member kept; the object itself when no member changed (a library that keeps it by reference still has it) |
+| | otherwise | kept |
+| `any`, `none` | any | itself |
 
 - A missing value (`null` or `undefined`) passes through unchanged, except for `nullable`, where it
   becomes `null`.
 - A value that cannot be converted is kept as it is.
 
-These are today's rules (`shape-convert.ts:45-269`), with one change: a date value is a `Date`, not
-a timestamp. So text, JSON and form data see the local day and time picked, with no offset, as
+These rules are `runtime/grammar/shape.ts`. Against the runtime the grammar replaced
+(`shape-convert.ts`), a date value is a `Date`, not a timestamp. So text, JSON and form data see the local day and time picked, with no offset, as
 an HTML form posts a date (a UTC instant would move a day picked east of UTC to the day before, and
 a `DateOnly` member cannot bind a time), and every comparison sees the time (2.2). An instant is
 the exception: a `DateTimeOffset` names a moment, so it is sent as that moment in UTC, which binds
