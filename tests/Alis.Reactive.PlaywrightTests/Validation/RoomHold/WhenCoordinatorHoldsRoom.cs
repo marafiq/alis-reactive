@@ -12,6 +12,7 @@ namespace Alis.Reactive.PlaywrightTests.Validation.RoomHold;
 /// The room travels in a hidden field, so neither the page's own "choose a room" check nor the
 /// server's refusal has a message slot beside an input; the page's validation summary is where both
 /// show. Which rooms are held is known only to the server's hold book, which it asks asynchronously.
+/// The reservations office's own validator, registered by its module, never reaches the page either.
 /// </remarks>
 [TestFixture]
 public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
@@ -88,6 +89,31 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
 
         await Expect(RoomHoldStatus).ToHaveTextAsync("Maple 216 is held for Jane Smith.");
         await Expect(ValidationSummary).ToBeHiddenAsync();
+        Assert.That(_holdsSent, Has.Count.EqualTo(2));
+        AssertNoConsoleErrorsExcept("400");
+    }
+
+    // The office's one-hold-per-prospect rule is a plain FluentValidation rule the browser could check,
+    // but a plain validator gives the page no rules: the hold is sent and the server answers by the name.
+    [Test]
+    public async Task a_prospect_who_already_holds_a_room_is_refused_by_the_reservations_office()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(ChooseMaple216);
+        await WriteProspectName(ReservationsOfficeValidator.ProspectWithHold);
+        await HoldTermsAgreed.Check();
+
+        await ClickWhenStable(PlaceHold);
+
+        await Expect(_plan.ErrorFor(m => m.ProspectName))
+            .ToHaveTextAsync("Ruth Carter already holds Maple 218. Release that hold before placing another.");
+        await Expect(RoomHoldStatus).ToHaveTextAsync("No room held yet.");
+        Assert.That(_holdsSent, Has.Count.EqualTo(1), "The office's rule is the server's alone, so the hold is sent.");
+
+        await WriteProspectName("Jane Smith");
+        await ClickWhenStable(PlaceHold);
+        await Expect(RoomHoldStatus).ToHaveTextAsync("Maple 216 is held for Jane Smith.");
+        await Expect(_plan.ErrorFor(m => m.ProspectName)).ToBeHiddenAsync();
         Assert.That(_holdsSent, Has.Count.EqualTo(2));
         AssertNoConsoleErrorsExcept("400");
     }
