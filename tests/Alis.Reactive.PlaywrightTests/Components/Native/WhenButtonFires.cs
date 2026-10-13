@@ -54,6 +54,19 @@ public class WhenButtonFires : PlaywrightTestBase
     }
 
     [Test]
+    public async Task focus_discharge_moves_keyboard_focus_to_the_discharge_button()
+    {
+        await NavigateAndBoot();
+        var discharge = Page.Locator("#btn-discharge");
+        await Expect(discharge).Not.ToBeFocusedAsync();
+
+        await Page.Locator("#btn-focus-trigger").ClickAsync();
+
+        await Expect(discharge).ToBeFocusedAsync(new() { Timeout = 3000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task clicking_multiple_buttons_then_reclicking_admit_updates_status_again()
     {
         await NavigateAndBoot();
@@ -65,8 +78,8 @@ public class WhenButtonFires : PlaywrightTestBase
         await Page.Locator("#btn-transfer").ClickAsync();
         var transferStatus = Page.Locator("#transfer-status");
         await Expect(transferStatus).ToHaveTextAsync("transfer confirmed", new() { Timeout = 3000 });
+        await Expect(admitStatus).ToHaveTextAsync("—");
 
-        await admitStatus.EvaluateAsync("el => el.textContent = 'reset'");
         await Page.Locator("#btn-admit").ClickAsync();
         await Expect(admitStatus).ToHaveTextAsync("Admit Resident clicked", new() { Timeout = 3000 });
 

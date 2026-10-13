@@ -417,8 +417,7 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.EvaluateAsync(
-            "() => document.dispatchEvent(new CustomEvent('s12-ordered-mixed-modules', { detail: { Active: false, Category: 'standard', Count: 0 } }))");
+        await Page.Locator("#s12-btn-run-inactive").ClickAsync();
 
         await Expect(Page.Locator("#s12-http-done")).ToHaveTextAsync("done", new() { Timeout = 5000 });
         await Expect(Page.Locator("#s12-plugin")).ToHaveTextAsync("after-http");
@@ -452,8 +451,7 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.EvaluateAsync(
-            "() => document.dispatchEvent(new CustomEvent('s13-ordered-parallel-mix', { detail: { Active: false, Category: 'standard', Count: 0 } }))");
+        await Page.Locator("#s13-btn-run-inactive").ClickAsync();
 
         await Expect(Page.Locator("#s13-a")).ToHaveTextAsync("Parallel A", new() { Timeout = 5000 });
         await Expect(Page.Locator("#s13-b")).ToHaveTextAsync("audited:parallel-b", new() { Timeout = 5000 });

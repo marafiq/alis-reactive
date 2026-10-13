@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
+using System.Threading.Channels;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 using Alis.Reactive.SandboxApp.Hubs;
 using Microsoft.AspNetCore.Mvc;
@@ -68,17 +69,45 @@ public class RealTimeController : Controller
 
         var streamKey = Guid.NewGuid();
         using var lifetime = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        var outbox = Channel.CreateUnbounded<string>();
         drillWorld.Streams[streamKey] = lifetime;
+        drillWorld.Outboxes[streamKey] = outbox;
         try
         {
             // retry: 300 keeps the browser's reconnect delay short so outage drills observe
             // the permanent failure quickly instead of waiting on the ~3s browser default.
             await Response.WriteAsync($"retry: 300\nevent: {new FacilityAlertStream().Alert.Name}\ndata: {alert}\n\n", lifetime.Token);
             await Response.Body.FlushAsync(lifetime.Token);
-            await Task.Delay(Timeout.Infinite, lifetime.Token);
+            await foreach (var message in outbox.Reader.ReadAllAsync(lifetime.Token))
+            {
+                await Response.WriteAsync(message, lifetime.Token);
+                await Response.Body.FlushAsync(lifetime.Token);
+            }
         }
         catch (OperationCanceledException) { }
-        finally { drillWorld.Streams.TryRemove(streamKey, out _); }
+        finally
+        {
+            drillWorld.Streams.TryRemove(streamKey, out _);
+            drillWorld.Outboxes.TryRemove(streamKey, out _);
+        }
+    }
+
+    // The all-clear carries no payload the page reads; its data line is still JSON.
+    [HttpPost("SoundAllClear")]
+    public IActionResult SoundAllClear([FromBody] OutageDrillRequest payload)
+    {
+        foreach (var outbox in DrillWorldFor(payload.DrillId).Outboxes.Values)
+            outbox.Writer.TryWrite($"event: {new FacilityAlertStream().AllClear.Name}\ndata: {{}}\n\n");
+        return Ok();
+    }
+
+    // Called with no argument, on this page's connections only.
+    [HttpPost("ClearResidentBoard")]
+    public async Task<IActionResult> ClearResidentBoard([FromBody] OutageDrillRequest payload)
+    {
+        await _residentHub.Clients.Clients(ResidentStatusHub.ConnectionsOf(payload.DrillId))
+            .SendAsync(new ResidentStatusFeed().BoardCleared.Name);
+        return Ok();
     }
 
     // Outage drill state is scoped per page load: the view embeds a fresh drill id in the
@@ -88,6 +117,7 @@ public class RealTimeController : Controller
     {
         public volatile bool Broken;
         public readonly ConcurrentDictionary<Guid, CancellationTokenSource> Streams = new();
+        public readonly ConcurrentDictionary<Guid, Channel<string>> Outboxes = new();
     }
 
     private static readonly ConcurrentDictionary<string, FacilityDrillWorld> DrillWorlds = new();

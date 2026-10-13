@@ -149,11 +149,14 @@ export const hubModule: Module = {
       return;
     }
 
+    // A method the page declares without a payload is called with no argument; one declared with a
+    // payload, with one object.
     const handler = (...args: unknown[]): void => {
       log.debug("method.received", { hubUrl: url, method: event });
       const payload = args[0];
-      const isSingleObject = args.length === 1 && typeof payload === "object" && payload !== null && !Array.isArray(payload);
-      if (!isSingleObject) {
+      const sentNothing = args.length === 0;
+      const sentOneObject = args.length === 1 && typeof payload === "object" && payload !== null && !Array.isArray(payload);
+      if (!sentNothing && !sentOneObject) {
         log.error("method.payload-unexpected", { hubUrl: url, method: event, count: args.length });
         return;
       }

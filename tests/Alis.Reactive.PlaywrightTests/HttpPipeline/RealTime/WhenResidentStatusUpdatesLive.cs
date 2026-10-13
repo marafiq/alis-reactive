@@ -28,6 +28,24 @@ public class WhenResidentStatusUpdatesLive : PlaywrightTestBase
     }
 
     [Test]
+    public async Task clearing_the_board_at_shift_change_empties_the_resident_card()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 10000);
+        await PushStatusBtn.ClickAsync();
+        await Expect(ResidentName).ToContainTextAsync("Helen Martinez",
+            new() { Timeout = 5000 });
+
+        await Page.Locator("#btn-clear-board").ClickAsync();
+
+        await Expect(Page.Locator("#resident-board-note"))
+            .ToHaveTextAsync("The board was cleared at shift change.", new() { Timeout = 5000 });
+        await Expect(ResidentName).ToHaveTextAsync("—");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task two_hubs_operate_independently()
     {
         await NavigateTo(Path);

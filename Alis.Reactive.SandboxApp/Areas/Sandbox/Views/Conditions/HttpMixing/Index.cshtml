@@ -557,6 +557,10 @@
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                     p.Dispatch(HttpMixingEvents.S12OrderedMixedModules, new HttpMixingPayload { Active = true, Category = "premium" })))
+            @(Html.NativeButton("s12-btn-run-inactive", "run ordered mix, inactive standard")
+                .CssClass("rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch(HttpMixingEvents.S12OrderedMixedModules, new HttpMixingPayload { Active = false, Category = "standard" })))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>HTTP: <span id="s12-http-done">&mdash;</span></p>
@@ -578,6 +582,10 @@
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                     p.Dispatch(HttpMixingEvents.S13OrderedParallelMix, new HttpMixingPayload { Active = true, Category = "premium", Count = 7 })))
+            @(Html.NativeButton("s13-btn-run-inactive", "run parallel mix, inactive with no count")
+                .CssClass("rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch(HttpMixingEvents.S13OrderedParallelMix, new HttpMixingPayload { Active = false, Category = "standard", Count = 0 })))
         </native-hstack>
         <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>A: <span id="s13-a">&mdash;</span></p>

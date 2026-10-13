@@ -1,7 +1,7 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.FileUpload;
 
-// File injection uses DataTransfer on the native input so Syncfusion populates
-// filesData[].rawFile; the uploader declares that path as its value, so gather sends the Files.
+// Files are chosen on the uploader's file input, as the file dialog does; Syncfusion populates
+// filesData[].rawFile, the uploader declares that path as its value, so gather sends the files.
 [TestFixture]
 public class WhenFileUploaded : PlaywrightTestBase
 {
@@ -14,22 +14,14 @@ public class WhenFileUploaded : PlaywrightTestBase
         await NavigateToAndWaitForVisibleSignal(PagePath, ".e-upload");
     }
 
-    private async Task SetFilesThroughDataTransfer(params (string Name, string Content, string MimeType)[] files)
-    {
-        var fileSpecs = files.Select(f => new { f.Name, f.Content, f.MimeType }).ToArray();
-        await Page.EvaluateAsync(
-            @"(args) => {
-                const { elementId, files } = args;
-                const el = document.getElementById(elementId);
-                const dt = new DataTransfer();
-                for (const f of files) {
-                    dt.items.add(new File([f.Content], f.Name, { type: f.MimeType }));
-                }
-                el.files = dt.files;
-                el.dispatchEvent(new Event('change', { bubbles: true }));
-            }",
-            new { elementId = DocumentsInputId, files = fileSpecs });
-    }
+    // The documents a coordinator picks in the uploader's file dialog.
+    private Task ChooseFiles(params (string Name, string Content, string MimeType)[] files) =>
+        Page.Locator($"#{DocumentsInputId}").SetInputFilesAsync(files.Select(file => new FilePayload
+        {
+            Name = file.Name,
+            MimeType = file.MimeType,
+            Buffer = System.Text.Encoding.UTF8.GetBytes(file.Content),
+        }));
 
     [Test]
     public async Task page_loads_without_errors()
@@ -72,7 +64,7 @@ public class WhenFileUploaded : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await SetFilesThroughDataTransfer(
+        await ChooseFiles(
             ("medical-record.txt", "Patient vitals: BP 120/80", "text/plain"),
             ("consent-form.pdf", "%PDF-mock", "application/pdf"));
 
@@ -92,7 +84,7 @@ public class WhenFileUploaded : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await SetFilesThroughDataTransfer(("photo.jpg", "fake-jpeg", "image/jpeg"));
+        await ChooseFiles(("photo.jpg", "fake-jpeg", "image/jpeg"));
 
         await Page.Locator("#upload-btn").ClickAsync();
 
@@ -114,7 +106,7 @@ public class WhenFileUploaded : PlaywrightTestBase
         await nameInput.ClearAsync();
         await nameInput.FillAsync("Eleanor Vance");
 
-        await SetFilesThroughDataTransfer(("intake-form.txt", "Intake data", "text/plain"));
+        await ChooseFiles(("intake-form.txt", "Intake data", "text/plain"));
 
         await Page.Locator("#upload-btn").ClickAsync();
 

@@ -22,6 +22,14 @@
         p.Element("alert-status").Text.Set("Connected");
     }));
 
+    // The all-clear carries no payload: the page writes what it means.
+    Html.On(plan, t => t.ServerPush(ServerPushStream.At<FacilityAlertStream>($"/api/facility-alerts?drill={drillId}"), s => s.AllClear,
+        p =>
+    {
+        p.Element("alert-message").Text.Set("All clear: the facility check found nothing to act on.");
+        p.Element("alert-level").Text.Set("clear");
+    }));
+
     Html.On(plan, t => t.SignalR(SignalRHub.At<NotificationFeed>("/hubs/notifications"), h => h.ReceiveNotification,
         (payload, p) =>
     {
@@ -36,6 +44,16 @@
         p.Element("resident-name").Text.Set(payload.Get(x => x.ResidentName));
         p.Element("resident-status").Text.Set(payload.Get(x => x.Status));
         p.Element("resident-care-level").Text.Set(payload.Get(x => x.CareLevel));
+    }));
+
+    // The server calls BoardCleared with no argument at shift change.
+    Html.On(plan, t => t.SignalR(SignalRHub.At<ResidentStatusFeed>($"/hubs/resident-status?drill={drillId}"), h => h.BoardCleared,
+        p =>
+    {
+        p.Element("resident-name").Text.Set("—");
+        p.Element("resident-status").Text.Set("—");
+        p.Element("resident-care-level").Text.Set("—");
+        p.Element("resident-board-note").Text.Set("The board was cleared at shift change.");
     }));
 }
 
@@ -86,6 +104,14 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("RestoreFacilityStream", "RealTime"))
+                         .Gather<RealTimeController.OutageDrillRequest>(g => g.Set(x => x.DrillId, drillId))
+                         .Response(r => r.OnSuccess(s => { }));
+                    }))
+                @(Html.NativeButton("btn-all-clear", "Sound All Clear")
+                    .CssClass("px-4 py-2 rounded-lg bg-success text-white text-sm font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Post(Url.SandboxRoute("SoundAllClear", "RealTime"))
                          .Gather<RealTimeController.OutageDrillRequest>(g => g.Set(x => x.DrillId, drillId))
                          .Response(r => r.OnSuccess(s => { }));
                     }))
@@ -146,6 +172,7 @@
                 <native-vstack gap="None"><dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Care Level</dt>
                     <dd id="resident-care-level" class="mt-1 text-sm text-text-primary">—</dd></native-vstack>
             </native-grid>
+            <p id="resident-board-note" class="text-sm text-text-secondary">Live resident updates appear here.</p>
             <native-divider />
             <native-text color="Secondary" size="Sm">
                 Outage drill: Break aborts this page's hub connection and refuses its reconnect
@@ -167,6 +194,14 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("RestoreResidentHub", "RealTime"))
+                         .Gather<RealTimeController.OutageDrillRequest>(g => g.Set(x => x.DrillId, drillId))
+                         .Response(r => r.OnSuccess(s => { }));
+                    }))
+                @(Html.NativeButton("btn-clear-board", "Clear Board")
+                    .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Post(Url.SandboxRoute("ClearResidentBoard", "RealTime"))
                          .Gather<RealTimeController.OutageDrillRequest>(g => g.Set(x => x.DrillId, drillId))
                          .Response(r => r.OnSuccess(s => { }));
                     }))

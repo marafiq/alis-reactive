@@ -26,6 +26,10 @@ namespace Alis.Reactive
             new ServerPushSource<TStream>(DeclaredName.RequiredUrl(url), new TStream());
 
         /// <summary>Declares an event the stream sends with no payload the page reads.</summary>
+        /// <remarks>
+        /// The server still writes a data line, as JSON (<c>data: {}</c>): a browser drops an event that
+        /// has no data, and the page reads every event's data as JSON.
+        /// </remarks>
         /// <param name="eventType">The SSE event name the server writes.</param>
         protected static ServerPushMessage Message(string eventType) =>
             new ServerPushMessage(DeclaredName.Required(eventType));

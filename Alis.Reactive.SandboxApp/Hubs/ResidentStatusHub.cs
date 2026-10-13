@@ -44,6 +44,10 @@ public class ResidentStatusHub : Hub
 
     public static void RestoreDrill(string drillId) => BrokenDrills[drillId] = false;
 
+    /// <summary>The connections of one page load, so a send reaches that page alone.</summary>
+    public static IReadOnlyList<string> ConnectionsOf(string drillId) =>
+        DrillConnections.TryGetValue(drillId, out var connections) ? connections.Keys.ToList() : [];
+
     private static string DrillIdFor(HubCallerContext context) =>
         context.GetHttpContext()?.Request.Query["drill"].ToString() ?? "";
 }
@@ -52,6 +56,9 @@ public class ResidentStatusHub : Hub
 public sealed class ResidentStatusFeed : SignalRHub
 {
     public SignalRMessage<ResidentStatusPayload> StatusChanged => Message<ResidentStatusPayload>("StatusChanged");
+
+    /// <summary>The board was cleared at shift change: called with no argument.</summary>
+    public SignalRMessage BoardCleared => Message("BoardCleared");
 }
 
 public class ResidentStatusPayload
