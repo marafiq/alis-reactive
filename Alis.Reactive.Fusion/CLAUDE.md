@@ -39,9 +39,6 @@ public TypedEvent<FusionTooltipOpenedArgs> Opened => Event<FusionTooltipOpenedAr
 - An event payload is a class deriving `JsObject`: `ReadOnly<T>` for what it carries, `Prop<T>` for
   what EJ2 reads back after the handler (`Cancel`, `PreventDefaultAction`), and methods for what it
   can do (`UpdateData`). Plain data inside a payload (a row, an action) stays a plain class.
-- The declaration and its payload classes sit between `#nullable disable annotations` and
-  `#nullable restore annotations`, so a page can pass values of either nullability. The render
-  helper stays outside that region.
 
 The method in full: `docs/design/bring-your-own-component.md`.
 

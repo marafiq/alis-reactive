@@ -9,7 +9,6 @@ using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion Stepper, declared by the names its JavaScript API uses.
     /// </summary>
@@ -86,7 +85,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Index of the clicked step.</summary>
         public ReadOnly<int> ActiveStep => ReadOnly<int>();
     }
-#nullable restore annotations
 
     /// <summary>
     /// Renders the component for a plan, ready for <c>.Reactive(...)</c>.

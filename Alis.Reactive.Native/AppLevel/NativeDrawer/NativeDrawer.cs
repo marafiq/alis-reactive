@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Native.AppLevel
 {
-#nullable disable annotations
     /// <summary>
     /// The page's slide-out drawer, declared by the members its element carries.
     /// </summary>
@@ -40,7 +39,6 @@ namespace Alis.Reactive.Native.AppLevel
         /// <summary>Slides the drawer out; its content and heading clear when it has closed.</summary>
         public void Close() => Call();
     }
-#nullable restore annotations
 
     /// <summary>The width of the <see cref="NativeDrawer"/> panel.</summary>
     public enum DrawerSize

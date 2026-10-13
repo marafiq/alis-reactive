@@ -5,7 +5,6 @@ using Syncfusion.EJ2.Inputs;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion Uploader, declared by the names its JavaScript API uses.
     /// </summary>
@@ -37,7 +36,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Whether user interaction made the selection.</summary>
         public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
-#nullable restore annotations
 
     /// <summary>
     /// Renders the file upload component inside a bound input field.

@@ -9,7 +9,6 @@ using Syncfusion.EJ2.Buttons;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion ChipList, declared by the names its JavaScript API uses.
     /// </summary>
@@ -96,7 +95,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Zero-based index the chip had.</summary>
         public ReadOnly<int> Index => ReadOnly<int>();
     }
-#nullable restore annotations
 
     /// <summary>A chip as <see cref="FusionChipList.Find"/> returns it.</summary>
     public class FusionChipData

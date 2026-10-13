@@ -2,7 +2,6 @@ using System;
 
 namespace Alis.Reactive.Native.Components
 {
-#nullable disable annotations
     /// <summary>
     /// A native list of checkboxes whose value is the checked values, declared by the names its element uses.
     /// </summary>
@@ -32,7 +31,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>The checked values after the change.</summary>
         public ReadOnly<string[]> Value => ReadOnly<string[]>();
     }
-#nullable restore annotations
 
     /// <summary>Renders a <see cref="NativeCheckList"/> for a model-bound field.</summary>
     public static class NativeCheckListHtmlExtensions

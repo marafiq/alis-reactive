@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Native.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The native HTML <c>&lt;input type="hidden"&gt;</c>, declared by the names its JavaScript API uses.
     /// </summary>
@@ -40,7 +39,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>The hidden value after the change.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
     }
-#nullable restore annotations
 
     /// <summary>
     /// Factory extension for rendering model-bound hidden fields directly in a Razor view.

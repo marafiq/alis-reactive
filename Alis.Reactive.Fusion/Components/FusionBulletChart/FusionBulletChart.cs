@@ -9,7 +9,6 @@ using Syncfusion.EJ2.Charts;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion BulletChart, declared by the names its JavaScript API uses.
     /// </summary>
@@ -70,7 +69,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Vertical position of the click in the chart.</summary>
         public ReadOnly<double> Y => ReadOnly<double>();
     }
-#nullable restore annotations
 
     /// <summary>
     /// Renders the component for a plan, ready for <c>.Reactive(...)</c>.

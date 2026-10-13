@@ -9,7 +9,6 @@ using Syncfusion.EJ2.Lists;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion ListView, declared by the names its JavaScript API uses.
     /// </summary>
@@ -57,7 +56,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
-#nullable restore annotations
 
     /// <summary>
     /// Creates a FusionListView with Syncfusion MVC builder-owned static configuration.

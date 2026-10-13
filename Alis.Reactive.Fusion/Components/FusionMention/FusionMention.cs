@@ -13,7 +13,6 @@ using Syncfusion.EJ2.DropDowns;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion Mention, declared by the names its JavaScript API uses.
     /// </summary>
@@ -63,7 +62,6 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionMentionPopupArgs : JsObject
     {
     }
-#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionMention"/> for a plan and maps its fields.</summary>
     public static class FusionMentionHtmlExtensions

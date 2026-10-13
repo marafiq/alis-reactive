@@ -2,7 +2,6 @@ using System;
 
 namespace Alis.Reactive.Native.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The native HTML checkbox, declared by the names its JavaScript API uses.
     /// </summary>
@@ -37,7 +36,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>Whether the box is checked after the change.</summary>
         public ReadOnly<bool?> Checked => ReadOnly<bool?>();
     }
-#nullable restore annotations
 
     /// <summary>Renders a <see cref="NativeCheckBox"/> for a model-bound field.</summary>
     public static class NativeCheckBoxHtmlExtensions

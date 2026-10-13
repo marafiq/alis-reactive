@@ -5,7 +5,6 @@ using Syncfusion.EJ2.Calendars;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion DateTimePicker, declared by the names its JavaScript API uses.
     /// </summary>
@@ -47,7 +46,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Whether user interaction triggered the change.</summary>
         public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
-#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionDateTimePicker"/> for a model-bound field.</summary>
     public static class FusionDateTimePickerHtmlExtensions

@@ -9,7 +9,6 @@ using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion Sidebar, declared by the names its JavaScript API uses.
     /// </summary>
@@ -47,7 +46,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Whether user interaction caused the transition.</summary>
         public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
-#nullable restore annotations
 
     /// <summary>
     /// Renders the component for a plan, ready for <c>.Reactive(...)</c>.

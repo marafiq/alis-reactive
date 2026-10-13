@@ -9,7 +9,6 @@ using Syncfusion.EJ2.Buttons;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion RadioButton, declared by the names its JavaScript API uses.
     /// </summary>
@@ -50,7 +49,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Value of the checked radio button.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
     }
-#nullable restore annotations
 
     /// <summary>
     /// Creates a FusionRadioButton with Syncfusion MVC builder-owned initial render.

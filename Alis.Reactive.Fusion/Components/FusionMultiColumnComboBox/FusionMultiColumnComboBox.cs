@@ -6,7 +6,6 @@ using Syncfusion.EJ2.MultiColumnComboBox;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion MultiColumnComboBox, declared by the names its JavaScript API uses.
     /// </summary>
@@ -58,7 +57,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Whether user interaction made the change.</summary>
         public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
-#nullable restore annotations
 
     /// <summary>
     /// Adds typed field mapping and rendering helpers for <see cref="FusionMultiColumnComboBox"/>.

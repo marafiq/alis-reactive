@@ -5,7 +5,6 @@ using Syncfusion.EJ2.DropDowns;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion DropDownTree, declared by the names its JavaScript API uses.
     /// </summary>
@@ -58,7 +57,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Whether user interaction made the change.</summary>
         public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
-#nullable restore annotations
 
     /// <summary>
     /// Creates a FusionDropDownTree inside a field wrapper, bound to a model property.

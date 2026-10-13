@@ -2,7 +2,6 @@ using System;
 
 namespace Alis.Reactive.Native.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The native HTML <c>&lt;textarea&gt;</c>, declared by the names its JavaScript API uses.
     /// </summary>
@@ -36,7 +35,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>The textarea value after the change.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
     }
-#nullable restore annotations
 
     /// <summary>Renders a <see cref="NativeTextArea"/> for a model-bound field.</summary>
     public static class NativeTextAreaHtmlExtensions

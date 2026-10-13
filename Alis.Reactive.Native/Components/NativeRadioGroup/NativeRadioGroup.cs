@@ -2,7 +2,6 @@ using System;
 
 namespace Alis.Reactive.Native.Components
 {
-#nullable disable annotations
     /// <summary>
     /// A native group of radio buttons whose value is the chosen option, declared by the names its element uses.
     /// </summary>
@@ -32,7 +31,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>The chosen option value after the change.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
     }
-#nullable restore annotations
 
     /// <summary>Renders a <see cref="NativeRadioGroup"/> for a model-bound field.</summary>
     public static class NativeRadioGroupHtmlExtensions

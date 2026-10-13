@@ -9,7 +9,6 @@ using Syncfusion.EJ2.Popups;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion Tooltip, declared by the names its JavaScript API uses.
     /// </summary>
@@ -81,7 +80,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
-#nullable restore annotations
 
     /// <summary>
     /// Renders the component for a plan, ready for <c>.Reactive(...)</c>.

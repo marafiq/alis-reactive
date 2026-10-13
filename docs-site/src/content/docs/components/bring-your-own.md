@@ -44,7 +44,6 @@ its members as a C# member. The vendor tells the framework how to find the objec
 on its element, how to subscribe to events, and what a listener receives.
 
 ```csharp
-#nullable disable annotations
 public sealed class VisitPlanner : Component, IInputComponent
 {
     public static ComponentVendor VisitPlannerVendor { get; } = ComponentVendor.Define(
@@ -136,16 +135,11 @@ public class VisitPlannerBeforeBookArgs : JsObject
     public ReadOnly<VisitSlot> Slot => ReadOnly<VisitSlot>();
     public Prop<bool> Cancel => Prop<bool>();                  // the planner reads it back
 }
-#nullable restore annotations
 ```
 
 A handler can write a member back (`args.Cancel.Set(true)`), and the component
 reads it once the handler returns, as long as nothing in the handler waited
 before the write.
-
-The declaration and its payloads sit between `#nullable disable annotations` and
-`#nullable restore annotations`, so a page can pass values of either nullability
-to its members.
 
 ## 3. Render It
 

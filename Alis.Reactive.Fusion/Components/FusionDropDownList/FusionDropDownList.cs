@@ -6,7 +6,6 @@ using Syncfusion.EJ2.DropDowns;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion DropDownList, declared by the names its JavaScript API uses.
     /// </summary>
@@ -82,7 +81,6 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionDropDownListBlurArgs : JsObject
     {
     }
-#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionDropDownList"/> for a model-bound field.</summary>
     public static class FusionDropDownListHtmlExtensions

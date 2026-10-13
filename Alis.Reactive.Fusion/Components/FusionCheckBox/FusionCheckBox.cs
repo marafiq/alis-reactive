@@ -5,7 +5,6 @@ using Syncfusion.EJ2.Buttons;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion CheckBox, declared by the names its JavaScript API uses.
     /// </summary>
@@ -53,7 +52,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Whether the box is checked after the change.</summary>
         public ReadOnly<bool> Checked => ReadOnly<bool>();
     }
-#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionCheckBox"/> for a model-bound field.</summary>
     public static class FusionCheckBoxHtmlExtensions

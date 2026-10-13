@@ -9,7 +9,6 @@ using Syncfusion.EJ2.InteractiveChat;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion AIAssistView, declared by the names its JavaScript API uses.
     /// </summary>
@@ -101,7 +100,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Index of the prompt in the conversation.</summary>
         public ReadOnly<int> DataIndex => ReadOnly<int>();
     }
-#nullable restore annotations
 
     /// <summary>
     /// Factory extension for rendering Syncfusion AIAssistView with reactive event support.

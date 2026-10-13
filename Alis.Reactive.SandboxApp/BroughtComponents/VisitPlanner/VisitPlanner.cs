@@ -11,7 +11,6 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     // against the framework's public surface only: where its object lives, its members by their
     // JavaScript names, its event payloads, and a render helper.
 
-#nullable disable annotations
     /// <summary>A week of family visit times for one resident; its value is the booked time ids.</summary>
     /// <remarks>
     /// Each member is declared by the planner's own JavaScript name. A page reaches the planner and uses
@@ -195,7 +194,6 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// <summary>The wing the planner names in its heading.</summary>
         public ReadOnly<string> Wing => ReadOnly<string>();
     }
-#nullable restore annotations
 
     /// <summary>Renders a <see cref="VisitPlanner"/> for a model-bound list of time ids.</summary>
     public static class VisitPlannerHtmlExtensions

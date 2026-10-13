@@ -10,7 +10,6 @@ using Syncfusion.EJ2.Kanban;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion Kanban, declared by the names its JavaScript API uses.
     /// </summary>
@@ -305,7 +304,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Reverts the change.</summary>
         public void CancelEdit() => Call();
     }
-#nullable restore annotations
 
     /// <summary>A column for <see cref="FusionKanban.AddColumn"/>.</summary>
     public class FusionKanbanColumn

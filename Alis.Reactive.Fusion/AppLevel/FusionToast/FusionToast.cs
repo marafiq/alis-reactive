@@ -11,7 +11,6 @@ using Syncfusion.EJ2.Notifications;
 
 namespace Alis.Reactive.Fusion.AppLevel
 {
-#nullable disable annotations
     /// <summary>
     /// The page's Syncfusion Toast, declared by the names its JavaScript API uses.
     /// </summary>
@@ -57,7 +56,6 @@ namespace Alis.Reactive.Fusion.AppLevel
         /// <summary>Hides the toast.</summary>
         public void Hide() => Call();
     }
-#nullable restore annotations
 
     /// <summary>The look of a <see cref="FusionToast"/>, by Syncfusion's toast classes.</summary>
     public enum FusionToastTone

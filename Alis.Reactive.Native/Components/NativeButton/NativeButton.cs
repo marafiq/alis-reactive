@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Native.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The native HTML <c>&lt;button&gt;</c>, declared by the names its JavaScript API uses.
     /// </summary>
@@ -37,7 +36,6 @@ namespace Alis.Reactive.Native.Components
     public class NativeButtonClickArgs : JsObject
     {
     }
-#nullable restore annotations
 
     /// <summary>
     /// Factory extension for rendering explicit-ID native buttons directly in a Razor view.

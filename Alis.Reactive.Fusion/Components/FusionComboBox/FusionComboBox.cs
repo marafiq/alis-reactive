@@ -5,7 +5,6 @@ using Syncfusion.EJ2.DropDowns;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion ComboBox, declared by the names its JavaScript API uses.
     /// </summary>
@@ -83,7 +82,6 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionComboBoxBlurArgs : JsObject
     {
     }
-#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionComboBox"/> for a model-bound field.</summary>
     public static class FusionComboBoxHtmlExtensions

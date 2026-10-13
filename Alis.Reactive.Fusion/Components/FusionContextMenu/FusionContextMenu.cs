@@ -10,7 +10,6 @@ using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion ContextMenu, declared by the names its JavaScript API uses.
     /// </summary>
@@ -115,7 +114,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The selected item.</summary>
         public ReadOnly<FusionContextMenuItem> Item => ReadOnly<FusionContextMenuItem>();
     }
-#nullable restore annotations
 
     /// <summary>A menu item as the <see cref="FusionContextMenu"/> payloads report it.</summary>
     public class FusionContextMenuItem

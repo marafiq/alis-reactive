@@ -10,7 +10,6 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     // alis:mount. This file is everything the framework needs, written against its public surface
     // only: the vendor, the members by Tom Select's own names, and a render helper.
 
-#nullable disable annotations
     /// <summary>A Tom Select dropdown, declared by the names its JavaScript API uses.</summary>
     /// <remarks>
     /// A page reaches the dropdown and uses its members directly, one statement each:
@@ -63,7 +62,6 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     public class TomSelectChangeArgs : JsObject
     {
     }
-#nullable restore annotations
 
     /// <summary>One option a <see cref="TomSelect"/> offers.</summary>
     public sealed class TomSelectOption

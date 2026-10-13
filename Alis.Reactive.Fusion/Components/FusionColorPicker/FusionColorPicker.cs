@@ -5,7 +5,6 @@ using Syncfusion.EJ2.Inputs;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion ColorPicker, declared by the names its JavaScript API uses.
     /// </summary>
@@ -44,7 +43,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Color after the change, as a hex string with alpha such as <c>#1dc7e1ff</c>.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
     }
-#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionColorPicker"/> for a model-bound field.</summary>
     public static class FusionColorPickerHtmlExtensions

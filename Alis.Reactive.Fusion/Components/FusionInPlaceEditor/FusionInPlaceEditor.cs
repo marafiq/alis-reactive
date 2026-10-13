@@ -5,7 +5,6 @@ using Syncfusion.EJ2.InPlaceEditor;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion InPlaceEditor, declared by the names its JavaScript API uses.
     /// </summary>
@@ -150,7 +149,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The field name.</summary>
         public ReadOnly<string> Name => ReadOnly<string>();
     }
-#nullable restore annotations
 
     /// <summary>
     /// Renders the in-place editor component inside a bound input field.

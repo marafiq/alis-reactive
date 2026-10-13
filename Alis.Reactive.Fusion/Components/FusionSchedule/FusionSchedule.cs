@@ -9,7 +9,6 @@ using Syncfusion.EJ2.Schedule;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion Schedule, declared by the names its JavaScript API uses.
     /// </summary>
@@ -235,7 +234,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Where the event renders.</summary>
         public ReadOnly<string> Type => ReadOnly<string>();
     }
-#nullable restore annotations
 
     /// <summary>
     /// Editor action for schedule event operations. Mirrors the Syncfusion EJ2 Schedule

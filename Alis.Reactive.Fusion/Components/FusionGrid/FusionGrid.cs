@@ -11,7 +11,6 @@ using Syncfusion.EJ2.Grids;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion Grid, declared by the names its JavaScript API uses.
     /// </summary>
@@ -638,7 +637,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Set to <see langword="true"/> to cancel the save.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
-#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionGrid"/> against a plan.</summary>
     public static class FusionGridHtmlExtensions

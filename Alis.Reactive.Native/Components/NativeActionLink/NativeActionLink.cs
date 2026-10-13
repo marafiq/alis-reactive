@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Native.Components
 {
-#nullable disable annotations
     /// <summary>
     /// A native <c>&lt;a&gt;</c> whose unmodified left click runs a request pipeline instead of
     /// navigating, declared by the names its JavaScript API uses.
@@ -63,7 +62,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>Stops the browser from following the link.</summary>
         public void PreventDefault() => Call();
     }
-#nullable restore annotations
 
     /// <summary>
     /// HTML helper extensions for links that execute reactive request pipelines.

@@ -1,6 +1,5 @@
 namespace Alis.Reactive.Fusion
 {
-#nullable disable annotations
     /// <summary>
     /// Base type for all Syncfusion-backed components.
     /// </summary>
@@ -26,5 +25,4 @@ namespace Alis.Reactive.Fusion
         /// <inheritdoc />
         public sealed override ComponentVendor Vendor => FusionVendor;
     }
-#nullable restore annotations
 }

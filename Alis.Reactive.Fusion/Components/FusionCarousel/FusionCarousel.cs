@@ -9,7 +9,6 @@ using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion Carousel, declared by the names its JavaScript API uses.
     /// </summary>
@@ -76,7 +75,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary><c>"Next"</c> or <c>"Previous"</c>.</summary>
         public ReadOnly<string> SlideDirection => ReadOnly<string>();
     }
-#nullable restore annotations
 
     /// <summary>
     /// Renders the component for a plan, ready for <c>.Reactive(...)</c>.

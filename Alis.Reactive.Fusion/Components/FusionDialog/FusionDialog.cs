@@ -9,7 +9,6 @@ using Syncfusion.EJ2.Popups;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion Dialog, declared by the names its JavaScript API uses.
     /// </summary>
@@ -84,7 +83,6 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionDialogOverlayClickArgs : JsObject
     {
     }
-#nullable restore annotations
 
     /// <summary>
     /// Renders the component for a plan, ready for <c>.Reactive(...)</c>.

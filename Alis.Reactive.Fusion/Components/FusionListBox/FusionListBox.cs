@@ -9,7 +9,6 @@ using Syncfusion.EJ2.DropDowns;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion ListBox, declared by the names its JavaScript API uses.
     /// </summary>
@@ -53,7 +52,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Selected values after the change.</summary>
         public ReadOnly<string[]> Value => ReadOnly<string[]>();
     }
-#nullable restore annotations
 
     /// <summary>
     /// Creates a FusionListBox with Syncfusion MVC builder-owned static configuration.

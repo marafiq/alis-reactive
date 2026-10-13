@@ -5,7 +5,6 @@ using Syncfusion.EJ2.Inputs;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion Slider, declared by the names its JavaScript API uses.
     /// </summary>
@@ -56,7 +55,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Whether user interaction made the move.</summary>
         public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
-#nullable restore annotations
 
     /// <summary>
     /// Creates a FusionSlider inside a field wrapper, bound to a model property.

@@ -6,7 +6,6 @@ using Syncfusion.EJ2.DropDowns;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion AutoComplete, declared by the names its JavaScript API uses.
     /// </summary>
@@ -101,7 +100,6 @@ namespace Alis.Reactive.Fusion.Components
         public void UpdateData<TItems>(TypedSource<TItems> items) where TItems : IEnumerable<object> =>
             Call(Pass<IEnumerable<object>, TItems>(items));
     }
-#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionAutoComplete"/> for a model-bound field.</summary>
     public static class FusionAutoCompleteHtmlExtensions

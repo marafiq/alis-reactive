@@ -9,7 +9,6 @@ using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion Toolbar, declared by the names its JavaScript API uses.
     /// </summary>
@@ -36,7 +35,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The clicked item.</summary>
         public ReadOnly<FusionToolbarItem> Item => ReadOnly<FusionToolbarItem>();
     }
-#nullable restore annotations
 
     /// <summary>A toolbar item as the <see cref="FusionToolbar.Clicked"/> payload reports it.</summary>
     public class FusionToolbarItem

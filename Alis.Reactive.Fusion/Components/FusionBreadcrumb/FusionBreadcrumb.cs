@@ -9,7 +9,6 @@ using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion Breadcrumb, declared by the names its JavaScript API uses.
     /// </summary>
@@ -42,7 +41,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The clicked item.</summary>
         public ReadOnly<FusionBreadcrumbItem> Item => ReadOnly<FusionBreadcrumbItem>();
     }
-#nullable restore annotations
 
     /// <summary>A breadcrumb item as the <see cref="FusionBreadcrumb.ItemClick"/> payload reports it.</summary>
     public class FusionBreadcrumbItem

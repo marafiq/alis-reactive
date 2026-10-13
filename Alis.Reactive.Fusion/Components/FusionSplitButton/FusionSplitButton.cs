@@ -9,7 +9,6 @@ using Syncfusion.EJ2.SplitButtons;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion SplitButton, declared by the names its JavaScript API uses.
     /// </summary>
@@ -64,7 +63,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The selected item.</summary>
         public ReadOnly<FusionSplitButtonItem> Item => ReadOnly<FusionSplitButtonItem>();
     }
-#nullable restore annotations
 
     /// <summary>A popup item as the <see cref="FusionSplitButton.Select"/> payload reports it.</summary>
     public class FusionSplitButtonItem

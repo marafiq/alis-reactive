@@ -14,9 +14,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
     /// <summary>Pushed to every other desk when a family takes a time.</summary>
     public sealed class SlotTaken
     {
-        public string? Slot { get; set; }
+        public string Slot { get; set; } = "";
 
-        public string? Family { get; set; }
+        public string Family { get; set; } = "";
 
         public string Message { get; set; } = "";
     }

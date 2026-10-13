@@ -60,7 +60,6 @@ What a developer writes to bring a component. Syncfusion's NumericTextBox, as it
 excerpt of `Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs`):
 
 ```csharp
-#nullable disable annotations
 public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
 {
     public Prop<decimal> Value => Prop<decimal>();
@@ -79,7 +78,6 @@ public class FusionNumericTextBoxChangeArgs : JsObject
     public ReadOnly<decimal> PreviousValue => ReadOnly<decimal>();
     public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
 }
-#nullable restore annotations
 
 // Render: the framework supplies the ID and name; the markup is the component's own.
 public static RenderedComponent<FusionNumericTextBox, TModel> FusionNumericTextBox<TModel, TProp>(
@@ -92,10 +90,6 @@ public static RenderedComponent<FusionNumericTextBox, TModel> FusionNumericTextB
     return field.Render<FusionNumericTextBox>(builder.Render());
 }
 ```
-
-The declaration sits between `#nullable disable annotations` and `#nullable restore annotations`, so
-a page can pass values of either nullability (`int?` to `Arg<int?>`, `string` to `Arg<string?>`)
-without a warning. The render helper stays outside that region.
 
 What every view then has, with no further code from the component author
 (`Views/Components/Fusion/NumericTextBox/Index.cshtml`):

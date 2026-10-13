@@ -9,7 +9,6 @@ using Syncfusion.EJ2.SplitButtons;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion ProgressButton, declared by the names its JavaScript API uses.
     /// </summary>
@@ -74,7 +73,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Progress step, in percent.</summary>
         public ReadOnly<double> Step => ReadOnly<double>();
     }
-#nullable restore annotations
 
     /// <summary>
     /// Creates a FusionProgressButton with Syncfusion MVC builder-owned initial render.

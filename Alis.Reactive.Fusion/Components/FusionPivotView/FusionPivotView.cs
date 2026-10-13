@@ -9,7 +9,6 @@ using Syncfusion.EJ2.PivotView;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion PivotView, declared by the names its JavaScript API uses.
     /// </summary>
@@ -63,7 +62,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The selected cell.</summary>
         public ReadOnly<FusionPivotViewCellData> Data => ReadOnly<FusionPivotViewCellData>();
     }
-#nullable restore annotations
 
     /// <summary>A pivot cell as the <see cref="FusionPivotView.CellSelecting"/> payload reports it.</summary>
     public class FusionPivotViewCellData

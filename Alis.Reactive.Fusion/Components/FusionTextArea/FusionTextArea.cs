@@ -5,7 +5,6 @@ using Syncfusion.EJ2.Inputs;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion TextArea, declared by the names its JavaScript API uses.
     /// </summary>
@@ -84,7 +83,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Text when the textarea loses focus.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
     }
-#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionTextArea"/> for a model-bound field.</summary>
     public static class FusionTextAreaHtmlExtensions

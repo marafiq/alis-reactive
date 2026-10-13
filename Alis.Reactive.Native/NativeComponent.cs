@@ -1,6 +1,5 @@
 namespace Alis.Reactive.Native
 {
-#nullable disable annotations
     /// <summary>
     /// Base for native HTML elements declared as components: the element itself is the JavaScript
     /// object, so its members are the element's own properties, methods and DOM events.
@@ -28,5 +27,4 @@ namespace Alis.Reactive.Native
         /// <inheritdoc />
         public sealed override ComponentVendor Vendor => ComponentVendor.Native;
     }
-#nullable restore annotations
 }

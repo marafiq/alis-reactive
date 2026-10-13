@@ -5,7 +5,6 @@ using Syncfusion.EJ2.Inputs;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion NumericTextBox, declared by the names its JavaScript API uses.
     /// </summary>
@@ -73,7 +72,6 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionNumericTextBoxBlurArgs : JsObject
     {
     }
-#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionNumericTextBox"/> for a model-bound field.</summary>
     public static class FusionNumericTextBoxHtmlExtensions

@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Html;
 
 namespace Alis.Reactive.Fusion.Components
 {
-#nullable disable annotations
     /// <summary>
     /// The Syncfusion SmartTextArea, declared by the names its JavaScript API uses.
     /// </summary>
@@ -72,7 +71,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The inserted suggestion.</summary>
         public ReadOnly<string> InsertedText => ReadOnly<string>();
     }
-#nullable restore annotations
 
     /// <summary>Renders a <see cref="FusionSmartTextArea"/> for a model-bound field.</summary>
     public static class FusionSmartTextAreaHtmlExtensions
