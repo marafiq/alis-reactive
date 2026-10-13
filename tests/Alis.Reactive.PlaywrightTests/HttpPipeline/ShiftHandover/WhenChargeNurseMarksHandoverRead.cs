@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.ShiftHandover;
 
@@ -59,8 +60,8 @@ public class WhenChargeNurseMarksHandoverRead : PlaywrightTestBase
             await MarkRead("helen").ClickAsync(new() { Modifiers = new[] { KeyboardModifier.ControlOrMeta } });
         });
 
-        await noteTab.WaitForLoadStateAsync();
-        Assert.That(noteTab.Url, Does.EndWith("/Sandbox/HttpPipeline/ShiftHandover/MarkRead/helen"));
+        // The tab may report about:blank before it navigates, so its address is awaited, not read once.
+        await Expect(noteTab).ToHaveURLAsync(new Regex("/Sandbox/HttpPipeline/ShiftHandover/MarkRead/helen$"), new() { Timeout = 10000 });
         await Expect(noteTab.Locator("body")).ToContainTextAsync("Helen Park's handover note is open.", new() { Timeout = 10000 });
         await Expect(HandoverStatus).ToHaveTextAsync("No note marked read yet.");
         Assert.That(markReads, Is.Empty, "A Ctrl or Cmd click sends no request from the page.");
