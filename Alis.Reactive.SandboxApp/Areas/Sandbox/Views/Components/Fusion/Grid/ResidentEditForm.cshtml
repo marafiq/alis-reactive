@@ -11,6 +11,8 @@
 
     var plan = Html.ReactivePlan<ResidentGridEditingModel>();
 
+    var columns = FusionGridColumns.Of<ResidentDirectoryGridItem>();
+
     var careLevelOptions = new List<string> { "Independent", "Assisted Living", "Memory Care", "Skilled Nursing" };
     var riskOptions = new List<string> { "Low", "Moderate", "High" };
     var nursePairs = new[]
@@ -24,24 +26,24 @@
     // Inline column editors: 2-arg Select, typed 4-arg Select, native DateInput.
     List<GridColumn> InlineColumns() => new List<GridColumn>
     {
-        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
-        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "180" },
-        new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "170",
+        new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
+        new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "180" },
+        new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "170",
             EditTemplate = FusionGridEditTemplates.Select((ResidentDirectoryGridItem r) => r.CareLevel, careLevelOptions) },
-        new GridColumn { Field = "primaryNurse", HeaderText = "Primary Nurse", Width = "180",
+        new GridColumn { Field = columns.Field(r => r.PrimaryNurse), HeaderText = "Primary Nurse", Width = "180",
             EditTemplate = FusionGridEditTemplates.Select((ResidentDirectoryGridItem r) => r.PrimaryNurse, nursePairs, n => n.Name, n => n.Code) },
-        new GridColumn { Field = "nextReviewDate", HeaderText = "Next Review", Width = "150",
+        new GridColumn { Field = columns.Field(r => r.NextReviewDate), HeaderText = "Next Review", Width = "150",
             EditTemplate = FusionGridEditTemplates.DateInput((ResidentDirectoryGridItem r) => r.NextReviewDate) }
     };
 
     // Dialog form editors: labeled Text, Number, Date, 3-arg Select.
     List<GridColumn> DialogColumns() => new List<GridColumn>
     {
-        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
-        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "180" },
-        new GridColumn { Field = "openTasks", HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right },
-        new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "140" },
-        new GridColumn { Field = "nextReviewDate", HeaderText = "Next Review", Width = "150" }
+        new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
+        new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "180" },
+        new GridColumn { Field = columns.Field(r => r.OpenTasks), HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right },
+        new GridColumn { Field = columns.Field(r => r.RiskLevel), HeaderText = "Risk", Width = "140" },
+        new GridColumn { Field = columns.Field(r => r.NextReviewDate), HeaderText = "Next Review", Width = "150" }
     };
 
     var dialogTemplate = FusionGridEditTemplates.DialogForm<ResidentDirectoryGridItem>(d => d

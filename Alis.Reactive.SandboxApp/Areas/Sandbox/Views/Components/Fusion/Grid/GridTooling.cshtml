@@ -10,6 +10,8 @@
 
     var plan = Html.ReactivePlan<GridOperationsModel>();
 
+    var columns = FusionGridColumns.Of<ResidentDirectoryGridItem>();
+
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("OperationRows", "Grid"))
             .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
@@ -51,10 +53,10 @@
             .PageSettings(new GridPageSettings { PageSize = 4 })
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", IsPrimaryKey = true, TextAlign = TextAlign.Right, Visible = false },
-                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "240" },
-                new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "150" },
-                new GridColumn { Field = "openTasks", HeaderText = "Open Tasks", Width = "130", TextAlign = TextAlign.Right }
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", IsPrimaryKey = true, TextAlign = TextAlign.Right, Visible = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "240" },
+                new GridColumn { Field = columns.Field(r => r.RiskLevel), HeaderText = "Risk", Width = "150" },
+                new GridColumn { Field = columns.Field(r => r.OpenTasks), HeaderText = "Open Tasks", Width = "130", TextAlign = TextAlign.Right }
             })))
     </section>
 </native-vstack>

@@ -6,6 +6,8 @@
 
     var plan = Html.ReactivePlan<GridModel>();
 
+    var columns = FusionGridColumns.Of<ResidentGridItem>();
+
     var demoGroups = new (string Group, (string Action, string Label, string Description)[] Links)[]
     {
         ("Boards", new[]
@@ -142,10 +144,10 @@
             .PageSettings(new GridPageSettings { PageSize = 10 })
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "name", HeaderText = "Name", Width = "180" },
-                new GridColumn { Field = "age", HeaderText = "Age", Width = "80" },
-                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "150" },
-                new GridColumn { Field = "wing", HeaderText = "Wing", Width = "100" },
+                new GridColumn { Field = columns.Field(r => r.Name), HeaderText = "Name", Width = "180" },
+                new GridColumn { Field = columns.Field(r => r.Age), HeaderText = "Age", Width = "80" },
+                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "150" },
+                new GridColumn { Field = columns.Field(r => r.Wing), HeaderText = "Wing", Width = "100" },
             }))
             .Reactive(evt => evt.DataStateChange, (args, p) =>
             {

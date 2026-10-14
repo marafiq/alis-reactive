@@ -9,6 +9,8 @@
 
     var plan = Html.ReactivePlan<FamilyContactsViewModel>();
 
+    var columns = FusionGridColumns.Of<FamilyContact>();
+
     // Each cell checks the rules FamilyContactValidator gives the browser; the server checks them all on save.
     var contactRules = FusionGridValidation.From<FamilyContact>(plan.ClientRules<FamilyContactValidator>());
 }
@@ -25,13 +27,13 @@
             .EditSettings(new GridEditSettings { AllowEditing = true, Mode = EditMode.Batch, ShowConfirmDialog = false })
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false },
-                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "150", AllowEditing = false },
-                new GridColumn { Field = "contactName", HeaderText = "Family contact", Width = "170", ValidationRules = contactRules.Field(c => c.ContactName) },
-                new GridColumn { Field = "phone", HeaderText = "Phone", Width = "120", ValidationRules = contactRules.Field(c => c.Phone) },
-                new GridColumn { Field = "email", HeaderText = "Email", Width = "230", ValidationRules = contactRules.Field(c => c.Email) },
-                new GridColumn { Field = "portalLink", HeaderText = "Family portal", Width = "280", ValidationRules = contactRules.Field(c => c.PortalLink) },
-                new GridColumn { Field = "visitsPerWeek", HeaderText = "Visits a week", Width = "130", TextAlign = TextAlign.Right, EditType = "numericedit", ValidationRules = contactRules.Field(c => c.VisitsPerWeek) }
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "150", AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.ContactName), HeaderText = "Family contact", Width = "170", ValidationRules = contactRules.Field(c => c.ContactName) },
+                new GridColumn { Field = columns.Field(r => r.Phone), HeaderText = "Phone", Width = "120", ValidationRules = contactRules.Field(c => c.Phone) },
+                new GridColumn { Field = columns.Field(r => r.Email), HeaderText = "Email", Width = "230", ValidationRules = contactRules.Field(c => c.Email) },
+                new GridColumn { Field = columns.Field(r => r.PortalLink), HeaderText = "Family portal", Width = "280", ValidationRules = contactRules.Field(c => c.PortalLink) },
+                new GridColumn { Field = columns.Field(r => r.VisitsPerWeek), HeaderText = "Visits a week", Width = "130", TextAlign = TextAlign.Right, EditType = "numericedit", ValidationRules = contactRules.Field(c => c.VisitsPerWeek) }
             })))
 
         <native-hstack gap="Sm" align="Center" class="mt-4">

@@ -11,17 +11,19 @@
 
     var plan = Html.ReactivePlan<ResidentGridEditingModel>();
 
+    var columns = FusionGridColumns.Of<ResidentDirectoryGridItem>();
+
     List<GridColumn> Columns() => new List<GridColumn>
     {
-        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
-        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "170" },
-        new GridColumn { Field = "age", HeaderText = "Age", Width = "90", TextAlign = TextAlign.Right },
-        new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "150" },
-        new GridColumn { Field = "wing", HeaderText = "Wing", Width = "110" },
-        new GridColumn { Field = "suite", HeaderText = "Suite", Width = "110" },
-        new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "120" },
-        new GridColumn { Field = "openTasks", HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right },
-        new GridColumn { Field = "primaryNurse", HeaderText = "Primary Nurse", Width = "150" }
+        new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
+        new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "170" },
+        new GridColumn { Field = columns.Field(r => r.Age), HeaderText = "Age", Width = "90", TextAlign = TextAlign.Right },
+        new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "150" },
+        new GridColumn { Field = columns.Field(r => r.Wing), HeaderText = "Wing", Width = "110" },
+        new GridColumn { Field = columns.Field(r => r.Suite), HeaderText = "Suite", Width = "110" },
+        new GridColumn { Field = columns.Field(r => r.RiskLevel), HeaderText = "Risk", Width = "120" },
+        new GridColumn { Field = columns.Field(r => r.OpenTasks), HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right },
+        new GridColumn { Field = columns.Field(r => r.PrimaryNurse), HeaderText = "Primary Nurse", Width = "150" }
     };
 
     Html.On(plan, t => t.DomReady(p =>

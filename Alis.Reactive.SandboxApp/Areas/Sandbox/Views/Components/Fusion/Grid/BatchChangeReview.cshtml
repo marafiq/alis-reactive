@@ -13,11 +13,13 @@
 
     var plan = Html.ReactivePlan<ResidentGridEditingModel>();
 
+    var columns = FusionGridColumns.Of<ResidentDirectoryGridItem>();
+
     List<GridColumn> Columns() => new List<GridColumn>
     {
-        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false },
-        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "200" },
-        new GridColumn { Field = "openTasks", HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right, EditType = "numericedit" }
+        new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false },
+        new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "200" },
+        new GridColumn { Field = columns.Field(r => r.OpenTasks), HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right, EditType = "numericedit" }
     };
 
     Html.On(plan, t => t.DomReady(p =>

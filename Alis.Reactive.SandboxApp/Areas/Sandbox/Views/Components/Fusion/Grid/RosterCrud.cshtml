@@ -10,6 +10,8 @@
 
     var plan = Html.ReactivePlan<ResidentGridEditingModel>();
 
+    var columns = FusionGridColumns.Of<ResidentDirectoryGridItem>();
+
     // Focused scenario: a care lead adds a resident, updates the top row, then deletes it.
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("EditingRows", "Grid"))
@@ -91,9 +93,9 @@
             })
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", IsPrimaryKey = true, AllowEditing = false, Visible = false },
-                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "240" },
-                new GridColumn { Field = "openTasks", HeaderText = "Open Tasks", Width = "140", TextAlign = TextAlign.Right }
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", IsPrimaryKey = true, AllowEditing = false, Visible = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "240" },
+                new GridColumn { Field = columns.Field(r => r.OpenTasks), HeaderText = "Open Tasks", Width = "140", TextAlign = TextAlign.Right }
             })))
     </section>
 </native-vstack>

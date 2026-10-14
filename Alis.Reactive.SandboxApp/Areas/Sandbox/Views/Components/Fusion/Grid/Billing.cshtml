@@ -14,6 +14,8 @@
     const string ButtonAccent = "rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90";
 
     var plan = Html.ReactivePlan<ResidentBillingViewModel>();
+
+    var columns = FusionGridColumns.Of<ResidentBillingItem>();
     var careLevels = (List<string>)ViewBag.CareLevels;
     var wings = (List<string>)ViewBag.Wings;
     var statuses = (List<string>)ViewBag.Statuses;
@@ -324,14 +326,14 @@
             })
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "70", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false },
-                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "170", AllowEditing = false },
-                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "150", AllowEditing = false },
-                new GridColumn { Field = "wing", HeaderText = "Wing", Width = "90", AllowEditing = false },
-                new GridColumn { Field = "monthlyRate", HeaderText = "Monthly Rate", Width = "140", Format = "C0", TextAlign = TextAlign.Right, EditType = "numericedit" },
-                new GridColumn { Field = "addOnCharges", HeaderText = "Add-ons", Width = "120", Format = "C0", TextAlign = TextAlign.Right, EditType = "numericedit" },
-                new GridColumn { Field = "balanceDue", HeaderText = "Balance Due", Width = "140", Format = "C0", TextAlign = TextAlign.Right, AllowEditing = false },
-                new GridColumn { Field = "billingStatus", HeaderText = "Status", Width = "120", AllowEditing = false, Template = statusTemplate }
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "70", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "170", AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "150", AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.Wing), HeaderText = "Wing", Width = "90", AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.MonthlyRate), HeaderText = "Monthly Rate", Width = "140", Format = "C0", TextAlign = TextAlign.Right, EditType = "numericedit" },
+                new GridColumn { Field = columns.Field(r => r.AddOnCharges), HeaderText = "Add-ons", Width = "120", Format = "C0", TextAlign = TextAlign.Right, EditType = "numericedit" },
+                new GridColumn { Field = columns.Field(r => r.BalanceDue), HeaderText = "Balance Due", Width = "140", Format = "C0", TextAlign = TextAlign.Right, AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.BillingStatus), HeaderText = "Status", Width = "120", AllowEditing = false, Template = statusTemplate }
             }))
             .Reactive(evt => evt.DataStateChange, (args, p) =>
             {

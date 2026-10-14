@@ -11,12 +11,14 @@
 
     var plan = Html.ReactivePlan<ResidentGridEditingModel>();
 
+    var columns = FusionGridColumns.Of<ResidentDirectoryGridItem>();
+
     List<GridColumn> RosterColumns() => new List<GridColumn>
     {
-        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
-        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "200" },
-        new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "160" },
-        new GridColumn { Field = "wing", HeaderText = "Wing", Width = "120" }
+        new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
+        new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "200" },
+        new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "160" },
+        new GridColumn { Field = columns.Field(r => r.Wing), HeaderText = "Wing", Width = "120" }
     };
 
     Html.On(plan, t => t.DomReady(p =>

@@ -7,6 +7,8 @@
 
     var plan = Html.ReactivePlan<ArrayGridModel>();
 
+    var columns = FusionGridColumns.Of<ResidentRow>();
+
     // HTTP array flows through ReactiveArray ordering before binding the grid dataSource.
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("Residents", "ArrayGrid"))
@@ -41,10 +43,10 @@
         @(Html.FusionGrid<ArrayGridModel, ResidentRow>(plan, "roster-grid", b => b
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "name", HeaderText = "Name", Width = "160" },
-                new GridColumn { Field = "status", HeaderText = "Status", Width = "130" },
-                new GridColumn { Field = "age", HeaderText = "Age", Width = "80" },
-                new GridColumn { Field = "balance", HeaderText = "Balance", Width = "110" },
+                new GridColumn { Field = columns.Field(r => r.Name), HeaderText = "Name", Width = "160" },
+                new GridColumn { Field = columns.Field(r => r.Status), HeaderText = "Status", Width = "130" },
+                new GridColumn { Field = columns.Field(r => r.Age), HeaderText = "Age", Width = "80" },
+                new GridColumn { Field = columns.Field(r => r.Balance), HeaderText = "Balance", Width = "110" },
             })))
 
         <div class="mt-4 flex items-center gap-3">

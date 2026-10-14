@@ -14,6 +14,8 @@
     const string ButtonAccent = "rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90";
 
     var plan = Html.ReactivePlan<GridOperationsModel>();
+
+    var columns = FusionGridColumns.Of<ResidentDirectoryGridItem>();
     var riskLevels = (List<string>)ViewBag.RiskLevels;
 
     var residentTemplate = FusionTemplate.Create<ResidentDirectoryGridItem>()
@@ -208,14 +210,14 @@
             .SelectionSettings(new GridSelectionSettings { Type = SelectionType.Multiple })
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", IsPrimaryKey = true, TextAlign = TextAlign.Right, Visible = false },
-                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "240", Template = residentTemplate },
-                new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "130", Template = riskTemplate },
-                new GridColumn { Field = "openTasks", HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right },
-                new GridColumn { Field = "primaryNurse", HeaderText = "Primary Nurse", Width = "160" },
-                new GridColumn { Field = "nextReviewDate", HeaderText = "Next Review", Width = "130" },
-                new GridColumn { Field = "wing", HeaderText = "Wing", Width = "100" },
-                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "150" },
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", IsPrimaryKey = true, TextAlign = TextAlign.Right, Visible = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "240", Template = residentTemplate },
+                new GridColumn { Field = columns.Field(r => r.RiskLevel), HeaderText = "Risk", Width = "130", Template = riskTemplate },
+                new GridColumn { Field = columns.Field(r => r.OpenTasks), HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right },
+                new GridColumn { Field = columns.Field(r => r.PrimaryNurse), HeaderText = "Primary Nurse", Width = "160" },
+                new GridColumn { Field = columns.Field(r => r.NextReviewDate), HeaderText = "Next Review", Width = "130" },
+                new GridColumn { Field = columns.Field(r => r.Wing), HeaderText = "Wing", Width = "100" },
+                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "150" },
                 new GridColumn { HeaderText = "Action", Width = "120", Template = actionTemplate }
             })))
     </section>

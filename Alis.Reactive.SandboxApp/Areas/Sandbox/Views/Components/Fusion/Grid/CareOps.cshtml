@@ -16,6 +16,8 @@
 
     var plan = Html.ReactivePlan<CareOpsViewModel>();
 
+    var columns = FusionGridColumns.Of<ResidentCareItem>();
+
     // The grid's cell editor checks the rules ResidentCareItemValidator gives the browser.
     var careValidation = FusionGridValidation.From<ResidentCareItem>(plan.ClientRules<ResidentCareItemValidator>());
 
@@ -281,14 +283,14 @@
             .Columns(new List<GridColumn>
             {
                 new GridColumn { Type = "checkbox", Width = "50", AllowEditing = false, Freeze = FreezeDirection.Left },
-                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "90", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false, Freeze = FreezeDirection.Left },
-                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "190", AllowEditing = false, Freeze = FreezeDirection.Left },
-                new GridColumn { Field = "wing", HeaderText = "Wing", Width = "120", AllowEditing = false },
-                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "180", EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.CareLevel, careLevelEditOptions) },
-                new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "150", Template = riskTemplate, EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.RiskLevel, riskEditOptions) },
-                new GridColumn { Field = "primaryNurse", HeaderText = "Primary Nurse", Width = "200", EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.PrimaryNurse, nurseEditOptions) },
-                new GridColumn { Field = "openTasks", HeaderText = "Open Tasks", Width = "130", TextAlign = TextAlign.Right, EditType = "numericedit", ValidationRules = careValidation.Field(r => r.OpenTasks) },
-                new GridColumn { Field = "nextReview", HeaderText = "Next Review", Width = "150", EditTemplate = FusionGridEditTemplates.DateInput((ResidentCareItem r) => r.NextReview) }
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "90", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false, Freeze = FreezeDirection.Left },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "190", AllowEditing = false, Freeze = FreezeDirection.Left },
+                new GridColumn { Field = columns.Field(r => r.Wing), HeaderText = "Wing", Width = "120", AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "180", EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.CareLevel, careLevelEditOptions) },
+                new GridColumn { Field = columns.Field(r => r.RiskLevel), HeaderText = "Risk", Width = "150", Template = riskTemplate, EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.RiskLevel, riskEditOptions) },
+                new GridColumn { Field = columns.Field(r => r.PrimaryNurse), HeaderText = "Primary Nurse", Width = "200", EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.PrimaryNurse, nurseEditOptions) },
+                new GridColumn { Field = columns.Field(r => r.OpenTasks), HeaderText = "Open Tasks", Width = "130", TextAlign = TextAlign.Right, EditType = "numericedit", ValidationRules = careValidation.Field(r => r.OpenTasks) },
+                new GridColumn { Field = columns.Field(r => r.NextReview), HeaderText = "Next Review", Width = "150", EditTemplate = FusionGridEditTemplates.DateInput((ResidentCareItem r) => r.NextReview) }
             }))
             .Reactive(evt => evt.DataStateChange, (args, p) =>
             {

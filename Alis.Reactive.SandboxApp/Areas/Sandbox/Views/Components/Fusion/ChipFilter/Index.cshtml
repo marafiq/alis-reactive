@@ -8,6 +8,8 @@
 
     var plan = Html.ReactivePlan<ChipFilterModel>();
 
+    var columns = FusionGridColumns.Of<CareResident>();
+
     var careChips = new List<ChipCollection>
     {
         new() { Text = "Independent", Value = "independent" },
@@ -78,8 +80,8 @@
         @(Html.FusionGrid<ChipFilterModel, CareResident>(plan, "care-grid", b => b
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "name", HeaderText = "Resident", Width = "160" },
-                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "180" },
+                new GridColumn { Field = columns.Field(r => r.Name), HeaderText = "Resident", Width = "160" },
+                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "180" },
             })))
     </native-card-body></native-card>
 </native-vstack>

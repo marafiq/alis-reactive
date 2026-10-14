@@ -10,6 +10,7 @@
     const string GridId = "resident-directory-grid";
     const string VirtualGridId = "resident-virtual-grid";
     var plan = Html.ReactivePlan<ResidentDirectoryModel>();
+    var columns = FusionGridColumns.Of<ResidentDirectoryGridItem>();
     var careLevels = (List<string>)ViewBag.CareLevels;
     var riskLevels = (List<string>)ViewBag.RiskLevels;
 
@@ -259,15 +260,15 @@
             })
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowFiltering = false },
-                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "180" },
-                new GridColumn { Field = "age", HeaderText = "Age", Width = "90", TextAlign = TextAlign.Right, AllowFiltering = false },
-                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "160" },
-                new GridColumn { Field = "wing", HeaderText = "Wing", Width = "110" },
-                new GridColumn { Field = "suite", HeaderText = "Suite", Width = "110" },
-                new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "120" },
-                new GridColumn { Field = "openTasks", HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right, AllowFiltering = false },
-                new GridColumn { Field = "primaryNurse", HeaderText = "Primary Nurse", Width = "160" }
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowFiltering = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "180" },
+                new GridColumn { Field = columns.Field(r => r.Age), HeaderText = "Age", Width = "90", TextAlign = TextAlign.Right, AllowFiltering = false },
+                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "160" },
+                new GridColumn { Field = columns.Field(r => r.Wing), HeaderText = "Wing", Width = "110" },
+                new GridColumn { Field = columns.Field(r => r.Suite), HeaderText = "Suite", Width = "110" },
+                new GridColumn { Field = columns.Field(r => r.RiskLevel), HeaderText = "Risk", Width = "120" },
+                new GridColumn { Field = columns.Field(r => r.OpenTasks), HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right, AllowFiltering = false },
+                new GridColumn { Field = columns.Field(r => r.PrimaryNurse), HeaderText = "Primary Nurse", Width = "160" }
             }))
             .Reactive(evt => evt.DataStateChange, (args, p) =>
             {
@@ -358,13 +359,13 @@
             .PageSettings(new GridPageSettings { PageSize = 24 })
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true },
-                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "180" },
-                new GridColumn { Field = "age", HeaderText = "Age", Width = "90", TextAlign = TextAlign.Right },
-                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "160" },
-                new GridColumn { Field = "wing", HeaderText = "Wing", Width = "110" },
-                new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "120" },
-                new GridColumn { Field = "primaryNurse", HeaderText = "Primary Nurse", Width = "160" }
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "180" },
+                new GridColumn { Field = columns.Field(r => r.Age), HeaderText = "Age", Width = "90", TextAlign = TextAlign.Right },
+                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "160" },
+                new GridColumn { Field = columns.Field(r => r.Wing), HeaderText = "Wing", Width = "110" },
+                new GridColumn { Field = columns.Field(r => r.RiskLevel), HeaderText = "Risk", Width = "120" },
+                new GridColumn { Field = columns.Field(r => r.PrimaryNurse), HeaderText = "Primary Nurse", Width = "160" }
             }))
             .Reactive(evt => evt.DataStateChange, (args, p) =>
             {

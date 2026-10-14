@@ -22,8 +22,9 @@ namespace Alis.Reactive.Fusion.Components
     /// accepts). Conditional (under <c>When</c>), cross-field, flagged-pattern, and other rules have no
     /// EJ2 equivalent and are checked by the server on save.
     /// <code>
+    /// var columns = FusionGridColumns.Of&lt;ResidentCareItem&gt;();
     /// var care = FusionGridValidation.From&lt;ResidentCareItem&gt;(plan.ClientRules&lt;ResidentCareItemValidator&gt;());
-    /// new GridColumn { Field = "openTasks", EditType = "numericedit",
+    /// new GridColumn { Field = columns.Field(r =&gt; r.OpenTasks), EditType = "numericedit",
     ///     ValidationRules = care.Field(r =&gt; r.OpenTasks) }
     /// </code>
     /// </remarks>
