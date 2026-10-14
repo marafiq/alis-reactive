@@ -2,100 +2,73 @@
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
-    ViewData["Title"] = "FusionDatePicker";
+    ViewData["Title"] = "Admission Booking";
+
+    const string ButtonPrimary = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
 
     var plan = Html.ReactivePlan<FusionDatePickerModel>();
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        p.Component<FusionDatePicker>(m => m.AdmissionDate).Value.Set(new DateTime(2026, 6, 15));
-        var comp = p.Component<FusionDatePicker>(m => m.AdmissionDate);
-        p.Element("value-echo").Text.Set(comp.Value);
-    }));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionDatePicker — Full API</native-heading>
-    <native-text color="Secondary">
-        Exercises all supported FusionDatePicker API: property writes, property reads,
-        events with typed conditions, and component-read conditions.
-        Senior living domain: resident admission and discharge dates.
-    </native-text>
+    <div>
+        <native-heading level="H1">Admission Booking</native-heading>
+        <native-text color="Secondary">
+            Dorothy Klein moves into Maple 118, Assisted Living. The room is ready from Monday, November 2, and
+            held for her through Monday, November 30. The admissions office admits on weekdays.
+        </native-text>
+    </div>
 
     <native-card><native-card-body>
-        <native-heading level="H2">1. Property Write (Set)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, sets admission date to 2026-06-15 via structured prop on the Syncfusion ej2 instance.
-        </p>
-        <native-grid cols="C2" gap="Base">
-            @{ Html.InputField(plan, m => m.AdmissionDate, o => o.Label("Admission Date"))
-                .FusionDatePicker(b => b
-                    .Placeholder("Select admission date"))
-                .Reactive(evt => evt.Change, (args, p) =>
-                {
-                    p.Element("change-value").Text.Set(args.Value);
-                    p.When(args.Value).NotNull()
-                        .Then(t => t.Element("args-condition").Text.Set("date selected"))
-                        .Else(e => e.Element("args-condition").Text.Set("no date"));
-                    var comp = p.Component<FusionDatePicker>(m => m.AdmissionDate);
-                    p.When(comp.Value).NotNull()
-                        .Then(then =>
-                        {
-                            then.Element("selected-indicator").Show();
-                            then.Element("selected-indicator").Text.Set("admission set");
-                        })
-                        .Else(else_ =>
-                        {
-                            else_.Element("selected-indicator").Hide();
-                        });
-                }); }
-        </native-grid>
-    </native-card-body></native-card>
+        <div id="admission-form">
+            <native-grid cols="C2" gap="Base">
+                @{ Html.InputField(plan, m => m.AdmissionDay, o => o.Required().Label("Admission day"))
+                    .FusionDatePicker(b => b.Placeholder("Choose the admission day"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                        // The care team reviews a new resident's plan two weeks after admission.
+                        p.When(args.Value).NotNull()
+                            .Then(chosen => chosen.Get(Url.SandboxRoute("ProposeCarePlanReview", "FusionDatePicker"))
+                                .Gather<CarePlanReviewQuery>(g => g.Set(x => x.AdmissionDay, args.Value))
+                                .Response(r => r.OnSuccess<CarePlanReviewProposal>((proposal, s) =>
+                                {
+                                    s.Component<FusionDatePicker>(m => m.FirstCarePlanReview).Value.Set(proposal.Get(x => x.ReviewDay));
 
-    <native-card><native-card-body>
-        <native-heading level="H2">2. Property Read (Value as Source)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, reads the admission date component's <code>value</code> property and displays it in a text element.
-        </p>
-        <p class="font-mono text-sm">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
+                                    // A day inside the hold is settled, so the keyboard goes away. A day outside
+                                    // it keeps the cursor in the field, beside the message that says why.
+                                    var admission = s.Component<FusionDatePicker>(m => m.AdmissionDay);
+                                    s.When(admission.Value).Between(FusionDatePickerModel.RoomReady, FusionDatePickerModel.HoldEnds)
+                                        .Then(settled => settled.Component<FusionDatePicker>(m => m.AdmissionDay).FocusOut());
+                                })))); }
+                <div>
+                    @{ Html.InputField(plan, m => m.FirstCarePlanReview, o => o.Label("First care-plan review"))
+                        .FusionDatePicker(b => b.Placeholder("Proposed from the admission day"))
+                        .Reactive(evt => evt.Change, (args, p) =>
+                            p.When(args.IsInteracted).Truthy()
+                                .Then(moved => moved.Element("review-note").Text.Set("You moved the review from the day proposed."))
+                                .Else(proposed => proposed.Element("review-note").Text.Set("Proposed two weeks after the admission day."))); }
+                    <p id="review-note" class="mt-1 text-xs text-text-muted">The care team reviews the plan two weeks after admission.</p>
+                </div>
+            </native-grid>
+        </div>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">3. Events (Changed + Typed Condition)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            The admission date field wires a Changed event. Change shows the new value.
-            <code>When(args, x =&gt; x.Value).NotNull()</code> tests typed event-args condition.
-        </p>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
-            <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
-            <p>Selected: <span id="selected-indicator" hidden class="text-emerald-600">&mdash;</span></p>
-        </native-vstack>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">4. Component Value Condition (Discharge Date)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Button reads discharge date via <code>When(comp.Value).IsEmpty()</code>
-            and shows a warning or confirmation.
-        </p>
-        @{ Html.InputField(plan, m => m.DischargeDate, o => o.Label("Discharge Date"))
-            .FusionDatePicker(b => b
-                .Placeholder("Select discharge date")); }
-        <native-hstack gap="None" class="mt-3">
-            @(Html.NativeButton("check-discharge-btn", "Check Discharge Date")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var comp = p.Component<FusionDatePicker>(m => m.DischargeDate);
-                    p.When(comp.Value).IsEmpty()
-                        .Then(t => t.Element("discharge-warning").Text.Set("discharge date is required"))
-                        .Else(e => e.Element("discharge-warning").Text.Set("discharge date set"));
-                }))
+        <native-hstack gap="Sm" align="Center" class="mt-4 flex-wrap">
+            @(Html.NativeButton("book-admission-btn", "Book Admission")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                    p.Post(Url.SandboxRoute("BookAdmission", "FusionDatePicker"))
+                        .Gather(g => g.Form())
+                        .Validate<AdmissionDayValidator>("admission-form")
+                        .Response(r => r
+                            .OnSuccess<AdmissionBooked>((booked, s) =>
+                                s.Element("admission-status").Text.Set(booked.Get(x => x.Confirmation)))
+                            .OnError(400, e =>
+                            {
+                                // The admissions office refused the day: the cursor goes back to it.
+                                e.ValidationErrors("admission-form");
+                                e.Component<FusionDatePicker>(m => m.AdmissionDay).FocusIn();
+                            }))))
+            <p id="admission-status" class="text-sm text-text-muted">Not booked yet.</p>
         </native-hstack>
-        <p class="font-mono text-sm mt-2">Warning: <span id="discharge-warning" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
-
 </native-vstack>
 
 @Html.RenderPlan(plan)

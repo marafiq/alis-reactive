@@ -1,120 +1,112 @@
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Mention
 @model MentionModel
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Native.Components
 @{
-    ViewData["Title"] = "Mention";
+    ViewData["Title"] = "Shift Handoff Note";
+
+    const string NoteMentionId = "shift-note-mention";
+    const string HandoffMentionId = "handoff-mention";
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
+    const string InputCss = "w-full rounded-md border border-border p-3 text-sm";
 
     var plan = Html.ReactivePlan<MentionModel>();
-    var careTeam = (List<MentionPerson>)ViewBag.CareTeam;
+    var noteId = IdGenerator.For<MentionModel>(m => m.ShiftNote);
+    var nextNurseId = IdGenerator.For<MentionModel>(m => m.NextNurse);
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionMention</native-heading>
+    <native-heading level="H1">Shift Handoff Note</native-heading>
+    <native-text color="Secondary">
+        Maple wing, night shift. Margaret Hale, Maple 214. Type @@ in the note to notify someone on her care team.
+    </native-text>
 
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <native-vstack gap="Base">
-            <label for="care-note" class="text-sm font-medium text-text-primary">Care note target</label>
-            <textarea id="care-note" rows="4" class="w-full rounded-md border border-border p-3 text-sm">No</textarea>
+    <native-grid cols="C2" gap="Lg">
+        <native-card><native-card-body>
+            <native-vstack gap="Sm">
+                @{ Html.InputField(plan, m => m.ShiftNote, o => o.Label("Shift note"))
+                    .NativeTextArea(b => b.Rows(5).CssClass(InputCss).Placeholder("What happened on the shift")); }
 
-            @(Html.FusionMention(plan, "care-mention", b => b
-                .Target("#care-note")
-                .DataSource(careTeam)
-                .Fields<MentionPerson>(x => x.Name, x => x.Id)
-                .MentionChar('@')
-                .MinLength(0)
-                .RequireLeadingSpace(false)
-                .ShowMentionChar(true)
-                .Highlight(true)
-                .PopupWidth("280px"))
-                .Reactive(evt => evt.Opened, (args, p) =>
-                {
-                    p.Element("mention-popup-status").Text.Set("opened");
-                })
-                .Reactive(evt => evt.Closed, (args, p) =>
-                {
-                    p.Element("mention-popup-status").Text.Set("closed");
-                })
-                .Reactive(evt => evt.Change, (args, p) =>
-                {
-                    p.Element("mention-value").Html.Set(args.Value);
-                }))
-
-            <native-hstack gap="Sm">
-                @(Html.NativeButton("mention-search-btn", "Search Nora")
-                    .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                @(Html.FusionMention(plan, NoteMentionId, b => b
+                    .Target("#" + noteId)
+                    .DataSource(Model.CareTeam)
+                    .Fields<CareTeamMember>(x => x.Name, x => x.Id)
+                    .ShowMentionChar(true)
+                    .PopupWidth("260px"))
+                    .Reactive(evt => evt.Opened, (_, p) =>
                     {
-                        p.Component<FusionMention>("care-mention").Search("No", 96, 160);
-                        p.Element("mention-command-status").Text.Set("search called");
-                    }))
-                @(Html.NativeButton("mention-show-btn", "Show")
-                    .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                        p.Element("mention-hint").Show();
+                        p.Element("finish-mention").Hide();
+                    })
+                    .Reactive(evt => evt.Closed, (_, p) =>
                     {
-                        p.Component<FusionMention>("care-mention").ShowPopup();
-                        p.Element("mention-command-status").Text.Set("show called");
+                        // A list closed without a pick leaves the @ waiting; the nurse can open the list again.
+                        p.Element("mention-hint").Hide();
+                        p.Element("finish-mention").Show();
+                    })
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.Element("finish-mention").Hide();
+                        p.Element("notified-none").Hide();
+                        foreach (var member in Model.CareTeam)
+                        {
+                            p.When(args.Value).Eq(member.Name).Then(t => t.Element("notified-" + member.Id).Show());
+                        }
                     }))
-            </native-hstack>
 
-            <native-vstack gap="Xs" class="font-mono text-sm">
-                <p>Command: <span id="mention-command-status">idle</span></p>
-                <p>Popup: <span id="mention-popup-status">idle</span></p>
-                <p>Value: <span id="mention-value">none</span></p>
+                <p id="mention-hint" hidden class="text-xs text-text-muted">
+                    Choose who to notify with the arrow keys and Enter, or click a name. Esc keeps typing.
+                </p>
+                <div id="finish-mention" hidden>
+                    @(Html.NativeButton("choose-who-to-notify-btn", "Choose who to notify")
+                        .CssClass(Button)
+                        .Reactive(plan, evt => evt.Click, (_, p) => p.Component<FusionMention>(NoteMentionId).ShowPopup()))
+                </div>
             </native-vstack>
-        </native-vstack>
-    </section>
+        </native-card-body></native-card>
 
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <native-vstack gap="Base">
-            <label for="auto-hide-note" class="text-sm font-medium text-text-primary">Auto-hide target</label>
-            <textarea id="auto-hide-note" rows="2" class="w-full rounded-md border border-border p-3 text-sm">No</textarea>
+        <native-card><native-card-body>
+            <native-heading level="H2">Notified</native-heading>
+            <p id="notified-none" class="text-sm text-text-muted mt-2">No one is notified yet.</p>
+            <ul class="mt-2 space-y-1 text-sm">
+                @foreach (var member in Model.CareTeam)
+                {
+                    <li id="notified-@member.Id" hidden>@member.Name, @member.Role</li>
+                }
+            </ul>
+        </native-card-body></native-card>
+    </native-grid>
 
-            @(Html.FusionMention(plan, "auto-hide-mention", b => b
-                .Target("#auto-hide-note")
-                .DataSource(careTeam)
-                .Fields<MentionPerson>(x => x.Name, x => x.Id)
-                .MentionChar('@')
-                .MinLength(0)
-                .RequireLeadingSpace(false)
-                .ShowMentionChar(true)
-                .PopupWidth("280px"))
-                .Reactive(evt => evt.Opened, (args, p) =>
+    <native-card><native-card-body>
+        <native-heading level="H2">Hand off to</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Type part of a day nurse's name and find them on the day shift.</p>
+        <native-hstack gap="Sm" align="End" class="flex-wrap">
+            @{ Html.InputField(plan, m => m.NextNurse, o => o.Label("Day nurse"))
+                .NativeTextBox(b => b.CssClass("rounded-md border border-border px-3 py-1.5 text-sm")); }
+
+            @Html.FusionMention(plan, HandoffMentionId, b => b
+                .Target("#" + nextNurseId)
+                .DataSource(Model.DayShift)
+                .Fields<CareTeamMember>(x => x.Name, x => x.Id)
+                .PopupWidth("220px"))
+
+            @(Html.NativeButton("find-day-nurse-btn", "Find")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Element("mention-auto-hide-popup-status").Text.Set("opened");
-                })
-                .Reactive(evt => evt.Closed, (args, p) =>
-                {
-                    p.Element("mention-auto-hide-popup-status").Text.Set("closed");
+                    // EJ2 lists the day nurses whose names hold the typed word, at the point of the page it is given.
+                    var nextNurse = p.Component<NativeTextBox>(m => m.NextNurse);
+                    p.Component<FusionMention>(HandoffMentionId).Search(nextNurse.Value, 64, 640);
                 }))
-
-            @* HidePopup runs from its own gesture, never inside Opened: Syncfusion raises Opened before it
-               finishes opening, and from 33.1 its open sequence throws when a handler has already hidden
-               the popup (setHeight reads the detached list's parent). *@
-            <native-hstack gap="Sm">
-                @(Html.NativeButton("mention-auto-hide-btn", "Open")
-                    .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                    {
-                        p.Component<FusionMention>("auto-hide-mention").Search("No", 96, 160);
-                        p.Element("mention-auto-hide-command-status").Text.Set("search called");
-                    }))
-                @(Html.NativeButton("mention-hide-btn", "Hide")
-                    .CssClass("rounded-md border border-border px-4 py-2 text-sm font-medium")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                    {
-                        p.Component<FusionMention>("auto-hide-mention").HidePopup();
-                        p.Element("mention-hide-status").Text.Set("hide called");
-                    }))
-            </native-hstack>
-
-            <native-vstack gap="Xs" class="font-mono text-sm">
-                <p>Auto-hide command: <span id="mention-auto-hide-command-status">idle</span></p>
-                <p>Hide: <span id="mention-hide-status">idle</span></p>
-                <p>Auto-hide popup: <span id="mention-auto-hide-popup-status">idle</span></p>
-            </native-vstack>
-        </native-vstack>
-    </section>
-
+            @(Html.NativeButton("clear-day-nurse-btn", "Clear")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Component<NativeTextBox>(m => m.NextNurse).Value.Set("");
+                    p.Component<FusionMention>(HandoffMentionId).HidePopup();
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

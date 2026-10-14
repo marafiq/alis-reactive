@@ -7,6 +7,13 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Dialog;
 /// As a care coordinator, I review a resident's discharge in a dialog that opens only when no care
 /// task is still open, loads the discharge summary when it opens, and closes only on a choice.
 /// </summary>
+/// <remarks>
+/// The review can be dragged aside by its title so the coordinator can read the page beneath it; a click
+/// outside it brings it back to the middle of the window and asks for the choice. Only a dragged review
+/// shows what <c>RefreshPosition</c> does: a modal dialog's container centers it with CSS as it grows, and a
+/// drag takes that centering away until the position is refreshed. Where the review sits is the outcome,
+/// so that test reads it from the review's own box. The open, close and overlay-click events carry no data.
+/// </remarks>
 [TestFixture]
 public class WhenCoordinatorReviewsADischarge : PlaywrightTestBase
 {
@@ -17,6 +24,10 @@ public class WhenCoordinatorReviewsADischarge : PlaywrightTestBase
     private ILocator ChooseHint => Page.Locator("#discharge-choose");
     private ILocator ReviewStatus => Page.Locator("#discharge-status");
     private ILocator ReviewDischarge => Page.Locator("#review-discharge");
+    private ILocator Overlay => Page.Locator("#discharge-dialog + .e-dlg-overlay");
+
+    // The review's title bar, where the coordinator takes hold of it to drag it.
+    private ILocator ReviewTitle => Dialog.Locator(".e-dlg-header");
 
     private NativeCheckBoxLocator CareTasksOpen =>
         new(Page, IdGenerator.For<DialogModel>(m => m.CareTasksOpen));
@@ -26,6 +37,24 @@ public class WhenCoordinatorReviewsADischarge : PlaywrightTestBase
         await NavigateToAndWaitForVisibleSignal(Path, "#review-discharge");
         await ReviewDischarge.ClickAsync();
         await Expect(Summary).ToContainTextAsync("goes home with her daughter", new() { Timeout = 10000 });
+    }
+
+    private async Task DragTheReviewAside()
+    {
+        var title = await ReviewTitle.BoundingBoxAsync();
+        var x = title!.X + title.Width / 2;
+        var y = title.Y + title.Height / 2;
+        await Page.Mouse.MoveAsync(x, y);
+        await Page.Mouse.DownAsync();
+        await Page.Mouse.MoveAsync(x - 300, y - 200, new() { Steps = 12 });
+        await Page.Mouse.UpAsync();
+    }
+
+    // The horizontal middle of the review, in the window.
+    private async Task<float> ReviewMiddle()
+    {
+        var box = await Dialog.BoundingBoxAsync();
+        return box!.X + box.Width / 2;
     }
 
     [Test]
@@ -77,11 +106,25 @@ public class WhenCoordinatorReviewsADischarge : PlaywrightTestBase
     {
         await OpenTheReview();
 
-        await Page.Locator("#discharge-dialog + .e-dlg-overlay")
-            .ClickAsync(new() { Position = new() { X = 5, Y = 5 } });
+        await Overlay.ClickAsync(new() { Position = new() { X = 5, Y = 5 } });
 
         await Expect(ChooseHint).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(Dialog).ToBeVisibleAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task clicking_outside_a_review_dragged_aside_brings_it_back_to_the_middle()
+    {
+        await OpenTheReview();
+        var middle = await ReviewMiddle();
+        await DragTheReviewAside();
+        Assert.That(await ReviewMiddle(), Is.LessThan(middle - 200), "the review was dragged aside");
+
+        await Overlay.ClickAsync(new() { Position = new() { X = 5, Y = 5 } });
+
+        await Expect(ChooseHint).ToBeVisibleAsync(new() { Timeout = 5000 });
+        Assert.That(await ReviewMiddle(), Is.EqualTo(middle).Within(2));
         AssertNoConsoleErrors();
     }
 

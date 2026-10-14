@@ -1,85 +1,54 @@
 using Alis.Reactive.Playwright.Extensions;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.AutoComplete;
 
 namespace Alis.Reactive.PlaywrightTests.Patterns.FormPatterns;
 
-// Model expressions are the join key between view components and test locators.
+/// <summary>
+/// As a test author, I want a page's inputs found from the model members they are bound to, so that a test
+/// names the physician field as <c>m =&gt; m.Physician</c> and a renamed member breaks the test at compile time.
+/// </summary>
+/// <remarks>
+/// Uses the Notify Physician page: a Syncfusion AutoComplete bound to <c>Physician</c> and a native text
+/// box bound to <c>Concern</c>.
+/// </remarks>
 [TestFixture]
 public class WhenPlanDrivesComponentDiscovery : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/AutoComplete";
 
-    private PagePlan<AutoCompleteModel> _plan = null!;
+    private PagePlan<FusionAutoCompleteModel> _plan = null!;
 
     private async Task NavigateAndBoot()
     {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
-        _plan = await PagePlan<AutoCompleteModel>.FromPage(Page);
+        await NavigateToAndWaitForBoot(Path);
+        _plan = await PagePlan<FusionAutoCompleteModel>.FromPage(Page);
     }
 
     [Test]
-    public async Task plan_discovers_components_by_model_expression()
+    public async Task the_plan_finds_each_input_by_the_model_member_it_is_bound_to()
     {
         await NavigateAndBoot();
 
         var physician = _plan.FindComponent(m => m.Physician);
+        var concern = _plan.FindComponent(m => m.Concern);
+
         Assert.That(physician, Is.Not.Null);
         Assert.That(physician!.Vendor, Is.EqualTo("fusion"));
-        Assert.That(physician.TypeKey, Does.StartWith("fusion."));
-
-        var medication = _plan.FindComponent(m => m.MedicationType);
-        Assert.That(medication, Is.Not.Null);
-
+        Assert.That(concern, Is.Not.Null);
+        Assert.That(concern!.Vendor, Is.EqualTo("native"));
+        await Expect(Page.Locator($"#{physician.ElementId}")).ToBeEditableAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task selecting_physician_updates_echo()
+    public async Task a_field_found_through_the_plan_takes_the_nurses_typing()
     {
         await NavigateAndBoot();
-
         var physician = _plan.AutoComplete(m => m.Physician);
 
-        await Page.Locator("#show-popup-btn").ClickAsync();
-        await physician.SelectItem("Dr. Johnson");
+        await physician.Type("oka");
 
-        await Expect(_plan.Element("change-value"))
-            .ToContainTextAsync("johnson", new() { Timeout = 5000 });
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task filtering_medication_populates_popup()
-    {
-        await NavigateAndBoot();
-
-        var medication = _plan.AutoComplete(m => m.MedicationType);
-
-        await medication.Type("anti");
-
-        await Expect(_plan.Element("filter-status"))
-            .ToHaveTextAsync("results loaded", new() { Timeout = 10000 });
-        await Expect(medication.PopupItems.First)
-            .ToBeVisibleAsync(new() { Timeout = 5000 });
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task smith_condition_fires_then_branch()
-    {
-        await NavigateAndBoot();
-
-        var physician = _plan.AutoComplete(m => m.Physician);
-
-        await Page.Locator("#show-popup-btn").ClickAsync();
-        await physician.SelectItem("Dr. Smith");
-
-        await Expect(_plan.Element("args-condition"))
-            .ToHaveTextAsync("dr smith selected", new() { Timeout = 5000 });
-
+        await Expect(physician.PopupItem("Dr. James Okafor")).ToBeVisibleAsync(new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
 }

@@ -1,235 +1,44 @@
-using System.Text.Json;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
+/// <summary>
+/// As a developer looking for a grid behavior, I want the components page to lead to the grid page and the
+/// grid page to list each grid journey as a card that opens it, so that every journey can be reached.
+/// </summary>
+/// <remarks>
+/// The grid page carries no grid of its own: each journey is its own page with its own fixture.
+/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGrid : PlaywrightTestBase
 {
-    private const string Path = "/Sandbox/Components/Grid";
+    private const string ComponentsPath = "/Sandbox/Components";
+    private const string GridPath = "/Sandbox/Components/Grid";
 
-    private async Task NavigateAndWaitForInitialLoad()
-    {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
-        await Expect(Page.Locator("#load-status"))
-            .ToHaveTextAsync("initial data loaded", new() { Timeout = 10000 });
-    }
+    private ILocator JourneyCard(string label) => Page.GetByRole(AriaRole.Link).Filter(new() { HasText = label });
 
     [Test]
-    public async Task page_loads_with_initial_data()
+    public async Task the_components_page_leads_to_the_grid_journeys()
     {
-        await NavigateAndWaitForInitialLoad();
+        await NavigateTo(ComponentsPath);
 
-        var gridRows = Page.Locator("#residents-grid .e-row");
-        await Expect(gridRows.First).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await ClickWhenStable(Page.Locator("a:has(h3:text-is('Grid'))"));
 
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "FusionGrid", Level = 1 })).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(JourneyCard("Clinical updates")).ToBeVisibleAsync();
+        await Expect(JourneyCard("Wing care reviews")).ToBeVisibleAsync();
+        await Expect(JourneyCard("Huddle sheet")).ToBeVisibleAsync();
+        await Expect(JourneyCard("Census by age")).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task grid_displays_ten_rows_per_page()
+    public async Task the_census_by_age_card_opens_the_census()
     {
-        await NavigateAndWaitForInitialLoad();
+        await NavigateTo(GridPath);
 
-        var gridRows = Page.Locator("#residents-grid .e-row");
-        await Expect(gridRows)
-            .ToHaveCountAsync(10, new() { Timeout = 10000 });
-        AssertNoConsoleErrors();
-    }
+        await ClickWhenStable(JourneyCard("Census by age"));
 
-    [Test]
-    public async Task sorting_a_column_fetches_sorted_data_and_echoes_action()
-    {
-        await NavigateAndWaitForInitialLoad();
-        var nameHeader = Page.Locator("#residents-grid .e-headercell").Filter(new() { HasText = "Name" });
-        await Expect(nameHeader).ToBeVisibleAsync(new() { Timeout = 5000 });
-        var response = await Page.RunAndWaitForResponseAsync(
-            async () => await nameHeader.ClickAsync(),
-            observed => observed.Url.Contains("/Sandbox/Components/Grid/Data")
-                && observed.Request.Method == "POST");
-        var requestBody = response.Request.PostData ?? "";
-
-        Assert.That(requestBody, Does.Contain("\"EventName\":\"dataStateChange\""));
-        Assert.That(requestBody, Does.Contain("\"RequiresCounts\":true"));
-        Assert.That(requestBody, Does.Contain("\"ActionName\":\"actionBegin\""));
-        Assert.That(requestBody, Does.Contain("\"ActionType\":\"actionBegin\""));
-        Assert.That(requestBody, Does.Contain("\"ActionCancel\":false"));
-        Assert.That(requestBody, Does.Contain("\"Sorted\""));
-        Assert.That(requestBody, Does.Contain("\"name\":\"name\""));
-        Assert.That(requestBody, Does.Contain("\"direction\":\"ascending\""));
-        using (var requestJson = JsonDocument.Parse(requestBody))
-        {
-            var root = requestJson.RootElement;
-            Assert.That(root.TryGetProperty("where", out _), Is.False);
-            Assert.That(root.TryGetProperty("search", out _), Is.False);
-            Assert.That(root.TryGetProperty("group", out _), Is.False);
-        }
-
-        Assert.That(response.Status, Is.EqualTo(200));
-        using var responseJson = JsonDocument.Parse(await response.TextAsync());
-        var responseRoot = responseJson.RootElement;
-        Assert.That(responseRoot.TryGetProperty("result", out var result), Is.True);
-        Assert.That(responseRoot.TryGetProperty("count", out var count), Is.True);
-        Assert.That(result.ValueKind, Is.EqualTo(JsonValueKind.Array));
-        Assert.That(result.GetArrayLength(), Is.EqualTo(10));
-        Assert.That(count.GetInt32(), Is.EqualTo(200));
-        var firstReturnedName = result[0].GetProperty("name").GetString() ?? "";
-        Assert.That(firstReturnedName, Is.Not.Empty);
-
-        await Expect(Page.Locator("#action-status"))
-            .ToHaveTextAsync("data refreshed", new() { Timeout = 10000 });
-
-        await Expect(Page.Locator("#residents-grid .e-row")).ToHaveCountAsync(10, new() { Timeout = 10000 });
-        await Expect(Page.Locator("#residents-grid .e-row").First.Locator(".e-rowcell").First)
-            .ToHaveTextAsync(firstReturnedName, new() { Timeout = 5000 });
-        await Expect(Page.Locator("#residents-grid .e-parentmsgbar"))
-            .ToContainTextAsync("200 items", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-action-type"))
-            .ToHaveTextAsync("sorting", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-name"))
-            .ToHaveTextAsync("dataStateChange", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-requires-counts"))
-            .ToHaveTextAsync("true", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-action-name"))
-            .ToHaveTextAsync("actionBegin", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-action-event-type"))
-            .ToHaveTextAsync("actionBegin", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-action-cancel"))
-            .ToHaveTextAsync("false", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-action-column"))
-            .ToHaveTextAsync("name", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-action-direction"))
-            .ToHaveTextAsync("Ascending", new() { Timeout = 5000 });
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task paging_fetches_next_page_with_correct_skip()
-    {
-        await NavigateAndWaitForInitialLoad();
-
-        var pager = Page.Locator("#residents-grid .e-pagercontainer");
-        await Expect(pager).ToBeVisibleAsync(new() { Timeout = 5000 });
-
-        var page2 = Page.Locator("#residents-grid .e-numericitem:has-text('2')");
-        await Expect(page2).ToBeVisibleAsync(new() { Timeout = 5000 });
-        var request = await Page.RunAndWaitForRequestAsync(
-            async () => await page2.ClickAsync(),
-            observed => observed.Url.Contains("/Sandbox/Components/Grid/Data")
-                && observed.Method == "POST");
-        var requestBody = request.PostData ?? "";
-
-        Assert.That(requestBody, Does.Contain("\"EventName\":\"dataStateChange\""));
-        Assert.That(requestBody, Does.Contain("\"Skip\":10"));
-        Assert.That(requestBody, Does.Contain("\"Take\":10"));
-        Assert.That(requestBody, Does.Contain("\"RequiresCounts\":true"));
-        Assert.That(requestBody, Does.Contain("\"ActionName\":\"actionBegin\""));
-        Assert.That(requestBody, Does.Contain("\"ActionType\":\"actionBegin\""));
-        Assert.That(requestBody, Does.Contain("\"ActionCancel\":false"));
-        Assert.That(requestBody, Does.Contain("\"ActionRequestType\":\"paging\""));
-        Assert.That(requestBody, Does.Contain("\"ActionCurrentPage\":2"));
-        Assert.That(requestBody, Does.Contain("\"ActionPreviousPage\":1"));
-        Assert.That(requestBody, Does.Contain("\"ActionPageSize\":10"));
-        using (var requestJson = JsonDocument.Parse(requestBody))
-        {
-            var root = requestJson.RootElement;
-            Assert.That(root.TryGetProperty("where", out _), Is.False);
-            Assert.That(root.TryGetProperty("search", out _), Is.False);
-            Assert.That(root.TryGetProperty("group", out _), Is.False);
-            Assert.That(root.TryGetProperty("Sorted", out _), Is.False);
-            Assert.That(root.TryGetProperty("actionPreviousPageSize", out _), Is.False);
-            Assert.That(root.TryGetProperty("actionRows", out _), Is.False);
-            Assert.That(root.TryGetProperty("actionTarget", out _), Is.False);
-        }
-
-        await Expect(Page.Locator("#action-status"))
-            .ToHaveTextAsync("data refreshed", new() { Timeout = 10000 });
-
-        await Expect(Page.Locator("#evt-skip"))
-            .ToHaveTextAsync("10", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-action-type"))
-            .ToHaveTextAsync("paging", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-name"))
-            .ToHaveTextAsync("dataStateChange", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-take"))
-            .ToHaveTextAsync("10", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-requires-counts"))
-            .ToHaveTextAsync("true", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-action-name"))
-            .ToHaveTextAsync("actionBegin", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-action-event-type"))
-            .ToHaveTextAsync("actionBegin", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-action-cancel"))
-            .ToHaveTextAsync("false", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-action-page"))
-            .ToHaveTextAsync("2", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-action-previous-page"))
-            .ToHaveTextAsync("1", new() { Timeout = 5000 });
-
-        await Expect(Page.Locator("#evt-action-page-size"))
-            .ToHaveTextAsync("10", new() { Timeout = 5000 });
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task external_filter_reloads_grid_with_fewer_results()
-    {
-        await NavigateAndWaitForInitialLoad();
-
-        var numericInput = Page.Locator("input[id$='__MinAge']");
-        await Expect(numericInput).ToBeVisibleAsync(new() { Timeout = 5000 });
-        await numericInput.ClickAsync();
-        await numericInput.FillAsync("90");
-        await numericInput.PressAsync("Tab");
-
-        await Expect(Page.Locator("#filter-status"))
-            .ToHaveTextAsync("filtered", new() { Timeout = 10000 });
-
-        var gridRows = Page.Locator("#residents-grid .e-row");
-        await Expect(gridRows.First).ToBeVisibleAsync(new() { Timeout = 5000 });
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task sorting_then_paging_reports_paging_action()
-    {
-        await NavigateAndWaitForInitialLoad();
-
-        var ageHeader = Page.Locator("#residents-grid .e-headercell").Filter(new() { HasText = "Age" });
-        await ClickWhenStable(ageHeader);
-        await Expect(Page.Locator("#action-status"))
-            .ToHaveTextAsync("data refreshed", new() { Timeout = 10000 });
-
-        var page2 = Page.Locator("#residents-grid .e-numericitem:has-text('2')");
-        await Expect(page2).ToBeVisibleAsync(new() { Timeout = 5000 });
-        await page2.ClickAsync();
-
-        await Expect(Page.Locator("#evt-skip"))
-            .ToHaveTextAsync("10", new() { Timeout = 10000 });
-
-        await Expect(Page.Locator("#evt-action-type"))
-            .ToHaveTextAsync("paging", new() { Timeout = 5000 });
-
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Census by Age", Level = 1 })).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Page.Locator("#census-summary")).ToHaveTextAsync("Showing 1–10 of 45 residents.", new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
 }

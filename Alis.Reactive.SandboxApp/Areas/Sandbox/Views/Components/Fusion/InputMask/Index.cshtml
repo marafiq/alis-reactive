@@ -1,99 +1,76 @@
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InputMask
 @model InputMaskModel
-@using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
 @{
-    ViewData["Title"] = "FusionInputMask";
+    ViewData["Title"] = "Family Phone Numbers";
+
+    const string FormId = "family-phones-form";
+    const string PhoneMask = "(000) 000-0000";
+    const string PrimaryButton = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
 
     var plan = Html.ReactivePlan<InputMaskModel>();
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        p.Component<FusionInputMask>(m => m.PhoneNumber).Value.Set("(555) 123-4567");
-        var comp = p.Component<FusionInputMask>(m => m.PhoneNumber);
-        p.Element("value-echo").Text.Set(comp.Value);
-    }));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionInputMask — Full API</native-heading>
+    <native-heading level="H1">Family Phone Numbers</native-heading>
     <native-text color="Secondary">
-        Exercises all supported FusionInputMask API: property writes, property reads,
-        events with typed conditions, and component-read conditions.
-        Senior living domain: phone numbers, SSN, insurance IDs.
+        Maple Grove front desk. Margaret Hale, Maple 214. Her son Daniel O'Brien is her family contact; the desk keeps a number only when all ten digits are in.
     </native-text>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">1. Property Write (Set)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, sets phone number to (555) 123-4567 via structured prop on the Syncfusion ej2 instance.
-        </p>
-        <native-grid cols="C2" gap="Base">
-            @{ Html.InputField(plan, m => m.PhoneNumber, o => o.Label("Phone Number"))
-                .FusionInputMask(b => b
-                    .Mask("(000) 000-0000")
-                    .Placeholder("Enter phone number"))
+    <native-card><native-card-body id="@FormId">
+        <native-vstack gap="Base">
+            @{ Html.InputField(plan, m => m.FamilyPhone, o => o.Required().Label("Daniel O'Brien's phone"))
+                .FusionInputMask(b => b.Mask(PhoneMask)); }
+
+            @{ Html.InputField(plan, m => m.EmergencyIsFamily, o => o.Label("Daniel is also her emergency contact"))
+                .NativeCheckBox(b => b.CssClass("rounded border-border"))
                 .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("change-value").Text.Set(args.Value);
-                    p.When(args.Value).NotEmpty()
-                        .Then(t => t.Element("args-condition").Text.Set("phone entered"))
-                        .Else(e => e.Element("args-condition").Text.Set("no phone"));
-                    var comp = p.Component<FusionInputMask>(m => m.PhoneNumber);
-                    p.When(comp.Value).NotEmpty()
-                        .Then(then =>
+                    var family = p.Component<FusionInputMask>(m => m.FamilyPhone);
+                    var emergency = p.Component<FusionInputMask>(m => m.EmergencyPhone);
+                    p.When(args.Checked).Truthy()
+                        .Then(same => emergency.Value.Set(family.Value))
+                        .Else(someoneElse =>
                         {
-                            then.Element("selected-indicator").Show();
-                            then.Element("selected-indicator").Text.Set("phone on file");
-                        })
-                        .Else(else_ =>
-                        {
-                            else_.Element("selected-indicator").Hide();
+                            // Someone else: the copied number goes, and the desk types the other person's.
+                            emergency.Value.Set("");
+                            emergency.FocusIn();
                         });
                 }); }
-        </native-grid>
-    </native-card-body></native-card>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">2. Property Read (Value as Source)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, reads the phone number component's <code>value</code> property and displays it in a text element.
-        </p>
-        <p class="font-mono text-sm">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
+            @{ Html.InputField(plan, m => m.EmergencyPhone, o => o.Required().Label("Emergency contact's phone"))
+                .FusionInputMask(b => b.Mask(PhoneMask))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    // A whole number the page copied, not one the desk typed.
+                    p.When(args.IsInteracted).Falsy().And(args.Value).Matches(@"^\d{10}$")
+                        .Then(copied => copied.Element("emergency-copied").Show())
+                        .Else(typed => typed.Element("emergency-copied").Hide());
+                }); }
+            <p id="emergency-copied" hidden class="text-xs text-text-muted">Copied from Daniel's phone.</p>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">3. Events (Changed + Typed Condition)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            The phone number field wires a Changed event. Change shows the new value.
-            <code>When(args, x =&gt; x.Value).NotEmpty()</code> tests typed event-args condition.
-        </p>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
-            <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
-            <p>On file: <span id="selected-indicator" hidden class="text-emerald-600">&mdash;</span></p>
+            <native-hstack gap="Sm" align="Center" class="mt-2">
+                @(Html.NativeButton("save-phones-btn", "Save numbers")
+                    .CssClass(PrimaryButton)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
+                    {
+                        var family = p.Component<FusionInputMask>(m => m.FamilyPhone);
+                        var emergency = p.Component<FusionInputMask>(m => m.EmergencyPhone);
+                        p.Post(Url.SandboxRoute("Save", "InputMask"))
+                            .Gather<InputMaskModel>(g => g
+                                .Set(x => x.FamilyPhone, family.Value)
+                                .Set(x => x.EmergencyPhone, emergency.Value))
+                            .Validate<FamilyPhoneNumbersValidator>(FormId)
+                            .Response(r => r
+                                .OnSuccess<FamilyPhoneNumbersSaved>((saved, s) =>
+                                    s.Element("phones-status").Text.Set(saved.Get(x => x.Message)))
+                                .OnError(400, e => e.ValidationErrors(FormId)));
+                    }))
+                <p id="phones-status" class="text-sm">Not saved yet.</p>
+            </native-hstack>
         </native-vstack>
     </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">4. Component Value Condition</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Button reads phone number via <code>When(comp.Value).IsEmpty()</code>
-            and shows a warning or confirmation.
-        </p>
-        <native-hstack gap="None" class="mt-3">
-            @(Html.NativeButton("check-phone-btn", "Check Phone Number")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var comp = p.Component<FusionInputMask>(m => m.PhoneNumber);
-                    p.When(comp.Value).IsEmpty()
-                        .Then(t => t.Element("phone-warning").Text.Set("phone number is required"))
-                        .Else(e => e.Element("phone-warning").Text.Set("phone number set"));
-                }))
-        </native-hstack>
-        <p class="font-mono text-sm mt-2">Warning: <span id="phone-warning" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
-
 </native-vstack>
 
 @Html.RenderPlan(plan)

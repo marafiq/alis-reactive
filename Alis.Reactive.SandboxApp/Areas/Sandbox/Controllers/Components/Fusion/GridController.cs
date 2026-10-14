@@ -1,6 +1,5 @@
 using Alis.Reactive.FluentValidator;
 using Microsoft.AspNetCore.Mvc;
-using Alis.Reactive.Fusion.Components;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
@@ -15,7 +14,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         [HttpGet("")]
         public IActionResult Index()
         {
-            return View("~/Areas/Sandbox/Views/Components/Fusion/Grid/Index.cshtml", new GridModel());
+            return View("~/Areas/Sandbox/Views/Components/Fusion/Grid/Index.cshtml");
         }
 
         [HttpGet("Editing")]
@@ -40,36 +39,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/BeginEditNormal.cshtml",
                 new ResidentGridEditingModel());
-        }
-
-        [HttpGet("Operations")]
-        public IActionResult Operations()
-        {
-            ViewBag.RiskLevels = new List<string> { "", "Low", "Moderate", "High" };
-
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/Operations.cshtml",
-                new GridOperationsModel
-                {
-                    PatchRiskLevel = "High",
-                    PatchOpenTasks = 6
-                });
-        }
-
-        [HttpGet("CareStaffColumns")]
-        public IActionResult CareStaffColumns()
-        {
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/CareStaffColumns.cshtml",
-                new GridOperationsModel());
-        }
-
-        [HttpGet("CareReview")]
-        public IActionResult CareReview()
-        {
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/CareReview.cshtml",
-                new GridOperationsModel());
         }
 
         [HttpGet("ResidentEditForm")]
@@ -110,149 +79,17 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Ok(ResidentDirectory.Take(16).Select(ToGridItem).ToList());
         }
 
-        [HttpGet("OperationRows")]
-        public IActionResult OperationRows()
-        {
-            return Ok(ResidentDirectory.Take(12).Select(ToGridItem).ToList());
-        }
-
         /// <summary>
-        /// Server-side grid data endpoint. Accepts the full grid state:
-        /// skip/take for paging, sorted[] for multi-column sort, minAge for filtering.
-        /// Response shape is {result, count} for Syncfusion Grid custom binding.
+        /// The remote adaptor roster's data endpoint: the page the grid's DataManager asks for, as
+        /// <c>{result, count}</c>.
         /// </summary>
         [HttpPost("Data")]
         public IActionResult Data([FromBody] GridDataRequest? request)
         {
             request ??= new GridDataRequest();
-            var query = AllResidents.AsEnumerable();
+            var paged = AllResidents.Skip(request.Skip).Take(request.Take > 0 ? request.Take : 10).ToList();
 
-            if (request.MinAge.HasValue)
-                query = query.Where(r => r.Age >= (int)request.MinAge.Value);
-
-            if (request.Sorted != null)
-            {
-                var first = true;
-                foreach (var sort in request.Sorted)
-                {
-                    var prop = typeof(ResidentGridItem).GetProperty(
-                        sort.Name,
-                        System.Reflection.BindingFlags.IgnoreCase
-                        | System.Reflection.BindingFlags.Public
-                        | System.Reflection.BindingFlags.Instance);
-
-                    if (prop == null) continue;
-
-                    if (first)
-                    {
-                        query = sort.Direction == "descending"
-                            ? query.OrderByDescending(r => prop.GetValue(r))
-                            : query.OrderBy(r => prop.GetValue(r));
-                        first = false;
-                    }
-                    else
-                    {
-                        var ordered = (IOrderedEnumerable<ResidentGridItem>)query;
-                        query = sort.Direction == "descending"
-                            ? ordered.ThenByDescending(r => prop.GetValue(r))
-                            : ordered.ThenBy(r => prop.GetValue(r));
-                    }
-                }
-            }
-
-            var total = query.Count();
-            var paged = query.Skip(request.Skip).Take(request.Take > 0 ? request.Take : 10).ToList();
-
-            return Ok(new ResidentGridResponse { Result = paged, Count = total });
-        }
-
-        [HttpPost("SelectionIndexes")]
-        public IActionResult SelectionIndexes([FromBody] ResidentSelectionIndexesRequest request)
-        {
-            var indexes = request.SelectedRowIndexes ?? new List<int>();
-            return Ok(new ResidentDirectorySelectionResponse
-            {
-                Summary = indexes.Count == 0
-                    ? "no selected row indexes"
-                    : $"selected row indexes: {string.Join(", ", indexes)}"
-            });
-        }
-
-        [HttpPost("SelectionRecords")]
-        public IActionResult SelectionRecords([FromBody] ResidentSelectionRecordsRequest request)
-        {
-            var records = request.SelectedRecords ?? new List<ResidentDirectoryGridItem>();
-            return Ok(new ResidentDirectorySelectionResponse
-            {
-                Summary = records.Count == 0
-                    ? "no selected records"
-                    : $"selected records: {string.Join(", ", records.Select(r => r.ResidentName))}"
-            });
-        }
-
-        [HttpPost("CurrentViewSummary")]
-        public IActionResult CurrentViewSummary([FromBody] ResidentCurrentViewRequest request)
-        {
-            var records = request.Records ?? new List<ResidentDirectoryGridItem>();
-            var highRisk = records.Count(r => r.RiskLevel.Equals("High", StringComparison.OrdinalIgnoreCase));
-            var lead = records.FirstOrDefault()?.ResidentName ?? "no residents";
-
-            return Ok(new ResidentDirectorySelectionResponse
-            {
-                Summary = records.Count == 0
-                    ? "current view has no residents"
-                    : $"current view has {records.Count} residents, {highRisk} high risk; first is {lead}"
-            });
-        }
-
-        [HttpPost("RowIndexSummary")]
-        public IActionResult RowIndexSummary([FromBody] ResidentRowIndexRequest request)
-        {
-            return Ok(new ResidentDirectorySelectionResponse
-            {
-                Summary = request.RowIndex < 0
-                    ? "resident 6005 is not visible"
-                    : $"resident 6005 is visible at row index {request.RowIndex}"
-            });
-        }
-
-        [HttpPost("ReviewResident")]
-        public IActionResult ReviewResident([FromBody] GridTemplateActionPayload request)
-        {
-            var resident = ResidentDirectory.FirstOrDefault(r => r.ResidentId == request.Id);
-            return Ok(new ResidentDirectorySelectionResponse
-            {
-                ResidentName = resident?.ResidentName ?? "",
-                Summary = resident == null
-                    ? $"resident {request.Id} was not found"
-                    : $"review started for {resident.ResidentName} in suite {resident.Suite}"
-            });
-        }
-
-        [HttpPost("PatchResidentRow")]
-        public IActionResult PatchResidentRow([FromBody] GridOperationsModel? request)
-        {
-            request ??= new GridOperationsModel();
-            var source = ResidentDirectory[5];
-            var risk = string.IsNullOrWhiteSpace(request.PatchRiskLevel)
-                ? "High"
-                : request.PatchRiskLevel;
-            var tasks = request.PatchOpenTasks.HasValue
-                ? (int)request.PatchOpenTasks.Value
-                : 6;
-
-            var row = ToGridItem(source);
-            row.ResidentName = "Lena Server Patch";
-            row.RiskLevel = risk!;
-            row.OpenTasks = tasks;
-            row.PrimaryNurse = "Clinical Review Team";
-            row.NextReviewDate = "2026-06-30";
-
-            return Ok(new ResidentGridOperationsResponse
-            {
-                Row = row,
-                Summary = $"{row.ResidentName} changed to {row.RiskLevel} risk with {row.OpenTasks} tasks"
-            });
+            return Ok(new ResidentGridResponse { Result = paged, Count = AllResidents.Count });
         }
 
         private static List<ResidentGridItem> GenerateResidents()

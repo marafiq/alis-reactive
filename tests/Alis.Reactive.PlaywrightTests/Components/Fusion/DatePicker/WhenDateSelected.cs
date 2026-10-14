@@ -3,19 +3,37 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DatePicker;
 
-// DatePickerLocator uses calendar popup gestures so Syncfusion updates ej2.value.
+/// <summary>
+/// As an admissions coordinator, I want to book the day a new resident moves in while her room is held for
+/// her and the admissions office is open, with her first care-plan review proposed from that day, so that she
+/// moves in on a day the community is ready for her and the care team reviews her plan on time.
+/// </summary>
+/// <remarks>
+/// Dorothy Klein moves into Maple 118, ready from Monday, November 2 and held for her through Monday,
+/// November 30. The page and the server check the hold; only the server checks the weekday. A day the page
+/// refuses is never sent: the server would refuse it too, with a 400 the console reports and the tests refuse.
+/// Each admission day picked asks the server for the first care-plan review, which it proposes two weeks
+/// later; a day inside the hold is then settled and the field lets the keyboard go. The browser runs in
+/// America/Los_Angeles, west of UTC: a day sent, answered or shown as a UTC instant would read as the day
+/// before. Change's IsInteracted is read on the first review, the date both the server and the coordinator
+/// fill in.
+/// Not exercised: the render helper without a build step, since every date on the page shows a placeholder.
+/// </remarks>
 [TestFixture]
 public class WhenDateSelected : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/FusionDatePicker";
 
-    private static readonly string AdmissionDateId = IdGenerator.For<FusionDatePickerModel>(m => m.AdmissionDate);
-    private static readonly string DischargeDateId = IdGenerator.For<FusionDatePickerModel>(m => m.DischargeDate);
+    private PagePlan<FusionDatePickerModel> _plan = null!;
 
-    private DatePickerLocator AdmissionDate => new(Page, AdmissionDateId);
-    private DatePickerLocator DischargeDate => new(Page, DischargeDateId);
+    private DatePickerLocator AdmissionDay => _plan.DatePicker(m => m.AdmissionDay);
+    private DatePickerLocator FirstReview => _plan.DatePicker(m => m.FirstCarePlanReview);
+    private ILocator AdmissionDayMessage => _plan.ErrorFor(m => m.AdmissionDay);
+    private ILocator ReviewNote => Page.Locator("#review-note");
+    private ILocator BookAdmission => Page.Locator("#book-admission-btn");
+    private ILocator Status => Page.Locator("#admission-status");
 
-    // Runs west of UTC: on a UTC machine a date shifted by the time zone would still show the right day.
+    // West of UTC: a day read or written as a UTC instant would show and book as the day before.
     public override BrowserNewContextOptions ContextOptions()
     {
         // The NUnit base returns null when no options are configured; a zone needs an options object.
@@ -26,146 +44,119 @@ public class WhenDateSelected : PlaywrightTestBase
 
     private async Task NavigateAndBoot()
     {
-        await NavigateToAndWaitForTextSignal(Path, "#value-echo");
+        await NavigateToAndWaitForBoot(Path);
+        _plan = await PagePlan<FusionDatePickerModel>.FromPage(Page);
+        await Expect(AdmissionDay.CalendarIcon).ToBeVisibleAsync(new() { Timeout = 5000 });
     }
 
     [Test]
-    public async Task page_loads_without_errors()
+    public async Task the_admission_day_picked_and_its_first_review_are_the_days_booked()
     {
         await NavigateAndBoot();
-        await Expect(Page).ToHaveTitleAsync("FusionDatePicker — Alis.Reactive Sandbox");
+        await AdmissionDay.SelectDate(2026, 11, 9);
+        await Expect(FirstReview.Input).ToHaveValueAsync("11/23/2026");
+
+        await ClickWhenStable(BookAdmission);
+
+        await Expect(Status).ToHaveTextAsync(
+            "Dorothy Klein moves into Maple 118 on Monday, November 9, 2026. Her first care-plan review is on Monday, November 23, 2026.");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task admission_date_opens_set_to_june_15_2026()
+    public async Task picking_the_admission_day_proposes_the_first_review_two_weeks_later()
     {
         await NavigateAndBoot();
 
-        await Expect(AdmissionDate.Input).ToHaveValueAsync("6/15/2026");
-        await AdmissionDate.CalendarIcon.ClickWhenStableAsync(Page);
-        await Expect(AdmissionDate.Popup.Locator("td.e-selected"))
-            .ToHaveAttributeAsync("aria-label", "Monday, June 15, 2026");
+        await AdmissionDay.SelectDate(2026, 11, 16);
 
+        await Expect(FirstReview.Input).ToHaveValueAsync("11/30/2026");
+        await Expect(ReviewNote).ToHaveTextAsync("Proposed two weeks after the admission day.");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task domready_reads_value_into_echo()
+    public async Task a_review_moved_by_hand_is_noted_as_moved()
     {
         await NavigateAndBoot();
-        var echo = Page.Locator("#value-echo");
-        await Expect(echo).Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
+        await AdmissionDay.SelectDate(2026, 11, 9);
+        await Expect(FirstReview.Input).ToHaveValueAsync("11/23/2026");
+
+        await FirstReview.SelectDate(2026, 11, 24);
+
+        await Expect(FirstReview.Input).ToHaveValueAsync("11/24/2026");
+        await Expect(ReviewNote).ToHaveTextAsync("You moved the review from the day proposed.");
+        AssertNoConsoleErrors();
+    }
+
+    // Typing keeps the cursor in the field, and Enter does not move it; only the page lets it go.
+    [Test]
+    public async Task an_admission_day_typed_inside_the_hold_is_settled_and_the_keyboard_goes_away()
+    {
+        await NavigateAndBoot();
+        await AdmissionDay.Fill("11/9/2026");
+
+        await AdmissionDay.Input.PressAsync("Enter");
+
+        await Expect(FirstReview.Input).ToHaveValueAsync("11/23/2026");
+        await Expect(AdmissionDay.Input).Not.ToBeFocusedAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // The message comes as the day is picked, while the cursor is still in the field: the field is checked
+    // when the date picker commits its day, not when the coordinator leaves it or books.
+    [Test]
+    public async Task a_day_before_the_room_is_ready_is_refused_as_it_is_picked_and_the_cursor_stays_to_correct_it()
+    {
+        await NavigateAndBoot();
+
+        await AdmissionDay.SelectDate(2026, 10, 30);
+
+        await Expect(FirstReview.Input).ToHaveValueAsync("11/13/2026");
+        await Expect(AdmissionDayMessage).ToHaveTextAsync("Maple 118 is ready from Monday, November 2.");
+        await Expect(AdmissionDay.Input).ToBeFocusedAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task changed_event_displays_new_value()
+    public async Task a_day_after_the_hold_ends_is_not_booked()
     {
         await NavigateAndBoot();
+        await AdmissionDay.SelectDate(2026, 12, 1);
 
-        await AdmissionDate.SelectDate(2026, 7, 4);
+        await ClickWhenStable(BookAdmission);
 
-        await Expect(Page.Locator("#change-value"))
-            .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
+        await Expect(AdmissionDayMessage).ToHaveTextAsync("Maple 118 is held for Dorothy through Monday, November 30.");
+        await Expect(Status).ToHaveTextAsync("Not booked yet.");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task event_args_condition_matches_when_value_not_null()
+    public async Task booking_without_an_admission_day_asks_for_one()
     {
         await NavigateAndBoot();
 
-        await AdmissionDate.SelectDate(2026, 7, 4);
+        await ClickWhenStable(BookAdmission);
 
-        await Expect(Page.Locator("#args-condition"))
-            .ToHaveTextAsync("date selected", new() { Timeout = 5000 });
+        await Expect(AdmissionDayMessage).ToHaveTextAsync("Choose the admission day.");
+        await Expect(Status).ToHaveTextAsync("Not booked yet.");
         AssertNoConsoleErrors();
     }
 
+    // Saturday, November 7 is inside the hold, so only the server refuses it. Booking moves the cursor to the
+    // button; the refusal brings it back to the admission day.
     [Test]
-    public async Task component_condition_shows_indicator_when_value_not_null()
+    public async Task a_weekend_admission_is_refused_by_the_admissions_office_and_the_cursor_returns_to_the_day()
     {
         await NavigateAndBoot();
+        await AdmissionDay.SelectDate(2026, 11, 7);
+        await Expect(FirstReview.Input).ToHaveValueAsync("11/21/2026");
 
-        await AdmissionDate.SelectDate(2026, 7, 4);
+        await ClickWhenStable(BookAdmission);
 
-        await Expect(Page.Locator("#selected-indicator"))
-            .ToBeVisibleAsync(new() { Timeout = 5000 });
-        await Expect(Page.Locator("#selected-indicator"))
-            .ToHaveTextAsync("admission set", new() { Timeout = 3000 });
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task component_value_condition_shows_warning_when_empty()
-    {
-        await NavigateAndBoot();
-
-        await Page.Locator("#check-discharge-btn").ClickAsync();
-
-        var warning = Page.Locator("#discharge-warning");
-        await Expect(warning).ToHaveTextAsync("discharge date is required", new() { Timeout = 3000 });
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task component_value_condition_confirms_when_filled()
-    {
-        await NavigateAndBoot();
-
-        await DischargeDate.SelectDate(2026, 8, 1);
-
-        await Page.Locator("#check-discharge-btn").ClickAsync();
-
-        var warning = Page.Locator("#discharge-warning");
-        await Expect(warning).ToHaveTextAsync("discharge date set", new() { Timeout = 3000 });
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task changing_date_multiple_times_fires_condition_each_time()
-    {
-        await NavigateAndBoot();
-
-        var argsCondition = Page.Locator("#args-condition");
-        var selectedIndicator = Page.Locator("#selected-indicator");
-
-        await AdmissionDate.SelectDate(2026, 7, 4);
-        await Expect(argsCondition).ToHaveTextAsync("date selected", new() { Timeout = 5000 });
-        await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await Expect(selectedIndicator).ToHaveTextAsync("admission set", new() { Timeout = 3000 });
-
-        await AdmissionDate.SelectDate(2026, 12, 25);
-        await Expect(argsCondition).ToHaveTextAsync("date selected", new() { Timeout = 5000 });
-        await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
-
-        await Expect(Page.Locator("#change-value"))
-            .Not.ToHaveTextAsync("\u2014", new() { Timeout = 3000 });
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task clearing_then_refilling_date_updates_condition_both_ways()
-    {
-        await NavigateAndBoot();
-
-        var checkDischargeButton = Page.Locator("#check-discharge-btn");
-        var warning = Page.Locator("#discharge-warning");
-
-        await checkDischargeButton.ClickAsync();
-        await Expect(warning).ToHaveTextAsync("discharge date is required", new() { Timeout = 3000 });
-
-        await DischargeDate.SelectDate(2026, 9, 15);
-        await checkDischargeButton.ClickAsync();
-        await Expect(warning).ToHaveTextAsync("discharge date set", new() { Timeout = 3000 });
-
-        await DischargeDate.Clear();
-        await DischargeDate.Blur();
-        await checkDischargeButton.ClickAsync();
-        await Expect(warning).ToHaveTextAsync("discharge date is required", new() { Timeout = 3000 });
-
-        AssertNoConsoleErrors();
+        await Expect(AdmissionDayMessage).ToHaveTextAsync("The admissions office admits on weekdays only.");
+        await Expect(AdmissionDay.Input).ToBeFocusedAsync();
+        await Expect(Status).ToHaveTextAsync("Not booked yet.");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 }

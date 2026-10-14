@@ -1,19 +1,12 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.GridModel
-@using Alis.Reactive.Fusion.Components
-@using Syncfusion.EJ2.Grids
 @{
     ViewData["Title"] = "FusionGrid";
-
-    var plan = Html.ReactivePlan<GridModel>();
-
-    var columns = FusionGridColumns.Of<ResidentGridItem>();
 
     var demoGroups = new (string Group, (string Action, string Label, string Description)[] Links)[]
     {
         ("Boards", new[]
         {
             ("Directory", "Resident directory", "Find residents by name, wing, care level, risk or nurse; open their card and step through tonight's rounds"),
-            ("Operations", "Operations board", "Column show/hide/reorder, keyed cell and row updates, view and selection queries, and typed template actions"),
+            ("Operations", "Clinical updates", "Apply the pharmacy's and therapy's updates to a resident's row, and record the clinical review team's decision for the resident picked on the board"),
             ("Billing", "Billing board", "Server-side paging, sorting, batch rate edits, multi-select bulk increases, validated dialog admits, custom toolbar, and exports"),
             ("CareOps", "Care-ops board", "Batch cell editing with dropdown, date, and numeric editors, checkbox bulk selection, chip filters, and validation-backed care updates"),
         }),
@@ -42,8 +35,8 @@
             ("RosterCrud", "Cedar wing front desk", "Admit into a free suite in suite order, move a resident to another suite, and record today's move-outs as the server answers"),
             ("KeyedUpdate", "Evening rounds", "Record a task done or a fall for the resident picked on the board, or bring in their chart; the answer changes that row by key"),
             ("RosterSelection", "Botanical garden outing", "Seat the first four to sign up or the resident turned away last time, clear the bus, and book it; the server names who goes"),
-            ("CareReview", "Care review", "Multi-row selection with typed grid method calls gathering current-view, row-index, and selected-record summaries from the server"),
-            ("CareStaffColumns", "Care staff columns", "Hiding, restoring, and reordering grid columns via typed method calls, with reorderable headers and DomReady-loaded data"),
+            ("CareReview", "Wing care reviews", "Go through the wing a page at a time, put the residents you pick on the care conference agenda, and start a resident's review from their row"),
+            ("CareStaffColumns", "Huddle sheet", "Arrange the morning huddle sheet before it prints: leave columns off or put them back, lead with risk, and name the wing column"),
         }),
         ("Columns, tooling & print", new[]
         {
@@ -57,28 +50,15 @@
             ("ServerRoster", "Resident roster", "Bring today's changes from the record onto the roster: an arrival placed by suite, a new care level, an approved suite move, and wing tabs"),
             ("BuilderRoster", "Builder-owned roster", "Server-rendered fixed roster bound directly through the grid builder's own data source with selectable rows, no fetch"),
             ("RemoteAdaptorRoster", "Remote DataManager adaptor", "Remote DataManager URL-adaptor binding that fetches the paged {result, count} roster itself, with paging and row selection"),
+            ("Census", "Census by age", "List the residents at or over an age, sort by any column and page through the census, with the server answering every page"),
         }),
     };
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        p.Post(Url.SandboxRoute("Data", "Grid"))
-         .Gather<GridDataRequest>(g => g
-             .Set(x => x.Skip, 0)
-             .Set(x => x.Take, 10))
-         .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
-         {
-             s.Component<FusionGrid>("residents-grid").DataSource.Set(json);
-             s.Element("load-status").Text.Set("initial data loaded");
-         }));
-    }));
 }
 
 <native-vstack gap="Lg">
     <native-heading level="H1">FusionGrid</native-heading>
     <native-text color="Secondary">
-        A data grid is a complex vertical slice, so each behavior is its own isolated demo below.
-        The live server-driven grid (sort, paging, and an external filter) runs at the bottom of the page.
+        A data grid is a complex vertical slice, so each behavior is its own journey below.
     </native-text>
 
     @foreach (var group in demoGroups)
@@ -107,110 +87,4 @@
             </div>
         </section>
     }
-
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">1. Grid with Server-Side Sort, Paging &amp; External Filter</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            Every sort or page action fires <code>dataStateChange</code> which POSTs the full grid state
-            + current filter value to the server. Response is <code>{result, count}</code>.
-        </p>
-
-        <div class="mb-4 p-4 rounded-md bg-slate-50 border border-border/50">
-            <native-grid cols="C3" gap="Base">
-                @{ Html.InputField(plan, m => m.MinAge, o => o.Label("Min Age Filter"))
-                    .FusionNumericTextBox(b => b
-                        .Format("n0")
-                        .Min(0).Max(100)
-                        .Placeholder("e.g. 80"))
-                    .Reactive(evt => evt.Change, (args, p) =>
-                    {
-                        p.Element("filter-status").Text.Set("filtering...");
-                        p.Post(Url.SandboxRoute("Data", "Grid"))
-                         .Gather<GridDataRequest>(g => g
-                             .Set(x => x.Skip, 0)
-                             .Set(x => x.Take, 10)
-                             .Form(m => m.MinAge))
-                         .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
-                         {
-                             s.Component<FusionGrid>("residents-grid").DataSource.Set(json);
-                             s.Element("filter-status").Text.Set("filtered");
-                         }));
-                    }); }
-            </native-grid>
-        </div>
-
-        @(Html.FusionGrid<GridModel, ResidentGridItem>(plan, "residents-grid", b => b
-            .AllowSorting(true)
-            .AllowPaging(true)
-            .PageSettings(new GridPageSettings { PageSize = 10 })
-            .Columns(new List<GridColumn>
-            {
-                new GridColumn { Field = columns.Field(r => r.Name), HeaderText = "Name", Width = "180" },
-                new GridColumn { Field = columns.Field(r => r.Age), HeaderText = "Age", Width = "80" },
-                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "150" },
-                new GridColumn { Field = columns.Field(r => r.Wing), HeaderText = "Wing", Width = "100" },
-            }))
-            .Reactive(evt => evt.DataStateChange, (args, p) =>
-            {
-                p.When(args.Action.Get(x => x.RequestType)).NotEq(FusionGridAction.Refresh)
-                    .Then(t =>
-                    {
-                        t.Element("evt-name").Text.Set(args.Name);
-                        t.Element("evt-skip").Text.Set(args.Skip);
-                        t.Element("evt-take").Text.Set(args.Take);
-                        t.Element("evt-requires-counts").Text.Set(args.RequiresCounts);
-                        t.Element("evt-action-name").Text.Set(args.Action.Get(x => x.Name));
-                        t.Element("evt-action-event-type").Text.Set(args.Action.Get(x => x.Type));
-                        t.Element("evt-action-cancel").Text.Set(args.Action.Get(x => x.Cancel));
-                        t.Element("evt-action-type").Text.Set(args.Action.Get(x => x.RequestType));
-                        t.Element("evt-action-column").Text.Set(args.Action.Get(x => x.ColumnName));
-                        t.Element("evt-action-direction").Text.Set(args.Action.Get(x => x.Direction));
-                        t.Element("evt-action-page").Text.Set(args.Action.Get(x => x.CurrentPage));
-                        t.Element("evt-action-previous-page").Text.Set(args.Action.Get(x => x.PreviousPage));
-                        t.Element("evt-action-page-size").Text.Set(args.Action.Get(x => x.PageSize));
-                        t.Post(Url.SandboxRoute("Data", "Grid"))
-                         .Gather<GridDataRequest>(g => g
-                             .Set(x => x.EventName, args.Name)
-                             .Set(x => x.Skip, args.Skip)
-                             .Set(x => x.Take, args.Take)
-                             .Set(x => x.RequiresCounts, args.RequiresCounts)
-                             .Set(x => x.ActionName, args.Action.Get(x => x.Name))
-                             .Set(x => x.ActionType, args.Action.Get(x => x.Type))
-                             .Set(x => x.ActionCancel, args.Action.Get(x => x.Cancel))
-                             .Set(x => x.ActionRequestType, args.Action.Get(x => x.RequestType))
-                             .Set(x => x.ActionCurrentPage, args.Action.Get(x => x.CurrentPage))
-                             .Set(x => x.ActionPreviousPage, args.Action.Get(x => x.PreviousPage))
-                             .Set(x => x.ActionPageSize, args.Action.Get(x => x.PageSize))
-                             .Set(x => x.Sorted, args.Sorted)
-                             .Form(m => m.MinAge))
-                         .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
-                         {
-                             s.Component<FusionGrid>("residents-grid").DataSource.Set(json);
-                             s.Element("action-status").Text.Set("data refreshed");
-                         }));
-                    });
-            }))
-
-        <native-vstack gap="Xs" class="font-mono text-sm mt-4">
-            <p>Load status: <span id="load-status" class="text-text-muted">&mdash;</span></p>
-            <p>Filter status: <span id="filter-status" class="text-text-muted">&mdash;</span></p>
-            <p>Action status: <span id="action-status" class="text-text-muted">&mdash;</span></p>
-            <p>Event name: <span id="evt-name" class="text-text-muted">&mdash;</span></p>
-            <p>Event skip: <span id="evt-skip" class="text-text-muted">&mdash;</span></p>
-            <p>Event take: <span id="evt-take" class="text-text-muted">&mdash;</span></p>
-            <p>Event requiresCounts: <span id="evt-requires-counts" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.name: <span id="evt-action-name" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.type: <span id="evt-action-event-type" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.cancel: <span id="evt-action-cancel" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.requestType: <span id="evt-action-type" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.columnName: <span id="evt-action-column" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.direction: <span id="evt-action-direction" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.currentPage: <span id="evt-action-page" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.previousPage: <span id="evt-action-previous-page" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.pageSize: <span id="evt-action-page-size" class="text-text-muted">&mdash;</span></p>
-        </native-vstack>
-    </section>
-
 </native-vstack>
-
-@Html.RenderPlan(plan)

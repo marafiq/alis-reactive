@@ -1,99 +1,198 @@
+using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Mention;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Mention;
 
+/// <summary>
+/// As a night nurse, I want to name the people my shift handoff note is for with @ and see who it notifies,
+/// and to find the day nurse I hand the resident to, so that the right people read about Margaret Hale's night.
+/// </summary>
+/// <remarks>
+/// The note is Margaret Hale's; her care team is Dr. Amir Patel, Rosa Reyes, Nora Lind and Omar Haddad, and the
+/// day shift is Karen Holt, Luis Ortega, Kalani Brooks and Meera Shah. EJ2 opens the note's list when @ is typed;
+/// the page shows how to pick while it is open and offers to open it again when it closes without a pick. The
+/// hand-off field finds day nurses by the word typed in it (Search), at the point of the page the page names.
+/// Clear is pressed from the keyboard: EJ2 closes a Mention's list on any mousedown outside it, so a mouse click
+/// would close it even if HidePopup did nothing.
+/// Change's IsInteracted is not proven: EJ2 raises Change only for a pick made with a key or a click, so it is
+/// always true (mention.js:1231, 1553). Opened and Closed carry no data.
+/// </remarks>
 [TestFixture]
 public class WhenUsingFusionMention : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Mention";
 
-    private async Task NavigateAndWaitForMention()
+    private PagePlan<MentionModel> _plan = null!;
+
+    private ILocator Note => _plan.TextBox(m => m.ShiftNote).Input;
+    private ILocator DayNurse => _plan.TextBox(m => m.NextNurse).Input;
+    private FusionMentionLocator CareTeam => new(Page, _plan.FindComponent(m => m.ShiftNote)!.ElementId);
+    private FusionMentionLocator DayShift => new(Page, _plan.FindComponent(m => m.NextNurse)!.ElementId);
+    private ILocator Hint => Page.Locator("#mention-hint");
+    private ILocator ChooseWhoToNotify => Page.Locator("#choose-who-to-notify-btn");
+    private ILocator NoOneNotified => Page.Locator("#notified-none");
+    private ILocator NotifiedPhysician => Page.Locator("#notified-s-101");
+    private ILocator NotifiedChargeNurse => Page.Locator("#notified-s-114");
+    private ILocator Find => Page.Locator("#find-day-nurse-btn");
+
+    private async Task NavigateAndBoot()
     {
         await NavigateToAndWaitForBoot(Path);
-        await Expect(Page.Locator("#care-note"))
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
+        _plan = await PagePlan<MentionModel>.FromPage(Page);
     }
 
-    // Puts the caret after the "No" the note starts with, the way a coordinator would: click into
-    // the note beside its text. Search reads the text before the caret. No key is pressed: Mention's
-    // keyup handler runs for every key, End included, and after it Search opens an empty list.
-    private async Task PlaceCaretAtEndOf(string noteId)
+    // The Mention reads each key as it is released, so the note is typed key by key.
+    private async Task TypeInTheNote(string text)
     {
-        await Page.Locator($"#{noteId}").ClickAsync();
+        await Note.ClickAsync();
+        await Note.PressSequentiallyAsync(text, new() { Delay = 30 });
+    }
+
+    // Typed after @, a name's first letters narrow the list to that person; the pick waits for the narrowed list.
+    private async Task MentionByFirstLetters(string letters, string name)
+    {
+        await Note.PressSequentiallyAsync("@" + letters, new() { Delay = 30 });
+        await Expect(CareTeam.Items).ToHaveCountAsync(1, new() { Timeout = 5000 });
+        await CareTeam.Item(name).ClickAsync();
+    }
+
+    private async Task FindDayNurses(string word)
+    {
+        await DayNurse.ClickAsync();
+        await DayNurse.PressSequentiallyAsync(word, new() { Delay = 30 });
+        await Find.ClickAsync();
+        await Expect(DayShift.Popup).ToBeVisibleAsync(new() { Timeout = 5000 });
     }
 
     [Test]
-    public async Task search_method_opens_popup_with_matching_care_team_member()
+    public async Task typing_an_at_sign_in_the_note_lists_her_care_team_and_says_how_to_pick()
     {
-        await NavigateAndWaitForMention();
+        await NavigateAndBoot();
 
-        await PlaceCaretAtEndOf("care-note");
-        await Page.Locator("#mention-search-btn").ClickAsync();
+        await TypeInTheNote("Refused her 9pm dose. @");
 
-        await Expect(Page.Locator("#mention-command-status"))
-            .ToHaveTextAsync("search called", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#mention-popup-status"))
-            .ToHaveTextAsync("opened", new() { Timeout = 5000 });
-        await Expect(Page.Locator(".e-popup .e-list-item").Filter(new() { HasTextString = "Nora Nurse" }))
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
-
-        AssertNoConsoleErrors();
-    }
-
-    // The Change payload's value is the chosen item's markup: with Highlight on, the letters searched
-    // ("No") are wrapped in a highlight span. Html.Set builds that span, so the line reads "Nora Nurse"
-    // with "No" marked; written as text it would read the raw markup, and the span would not exist.
-    [Test]
-    public async Task the_chosen_care_team_member_shows_with_the_searched_letters_marked()
-    {
-        await NavigateAndWaitForMention();
-
-        await PlaceCaretAtEndOf("care-note");
-        await Page.Locator("#mention-search-btn").ClickAsync();
-        await Page.Locator(".e-popup .e-list-item").Filter(new() { HasTextString = "Nora Nurse" }).ClickAsync();
-
-        await Expect(Page.Locator("#mention-value"))
-            .ToHaveTextAsync("Nora Nurse", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#mention-value .e-highlight")).ToHaveTextAsync("No");
-
+        await Expect(CareTeam.Items).ToHaveTextAsync(new[] { "Dr. Amir Patel", "Rosa Reyes", "Nora Lind", "Omar Haddad" }, new() { Timeout = 5000 });
+        await Expect(Hint).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task show_and_hide_methods_drive_popup_lifecycle_events()
+    public async Task picking_the_physician_lists_him_as_notified()
     {
-        await NavigateAndWaitForMention();
+        await NavigateAndBoot();
+        await TypeInTheNote("Refused her 9pm dose. ");
 
-        await Page.Locator("#mention-show-btn").ClickAsync();
-        await Expect(Page.Locator("#mention-command-status"))
-            .ToHaveTextAsync("show called", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#mention-popup-status"))
-            .ToHaveTextAsync("opened", new() { Timeout = 10000 });
+        await MentionByFirstLetters("Pat", "Dr. Amir Patel");
 
-        await PlaceCaretAtEndOf("auto-hide-note");
-        await Page.Locator("#mention-auto-hide-btn").ClickAsync();
-        await Expect(Page.Locator("#mention-auto-hide-command-status"))
-            .ToHaveTextAsync("search called", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#mention-auto-hide-popup-status"))
-            .ToHaveTextAsync("opened", new() { Timeout = 10000 });
+        await Expect(Note).ToHaveValueAsync("Refused her 9pm dose. @Dr. Amir Patel");
+        await Expect(NotifiedPhysician).ToHaveTextAsync("Dr. Amir Patel, attending physician", new() { Timeout = 5000 });
+        await Expect(NotifiedChargeNurse).ToBeHiddenAsync();
+        await Expect(NoOneNotified).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
 
-        // Hide is pressed from the keyboard on purpose: EJ2 Mention closes its popup on any mousedown
-        // outside it, so a mouse click would close the popup even if HidePopup did nothing.
-        await Page.Locator("#mention-hide-btn").FocusAsync();
+    [Test]
+    public async Task mentioning_the_physician_and_the_charge_nurse_lists_both_as_notified()
+    {
+        await NavigateAndBoot();
+        await TypeInTheNote("Refused her 9pm dose. ");
+        await MentionByFirstLetters("Pat", "Dr. Amir Patel");
+
+        await Note.PressSequentiallyAsync(" and ", new() { Delay = 30 });
+        await MentionByFirstLetters("Ros", "Rosa Reyes");
+
+        await Expect(Note).ToHaveValueAsync("Refused her 9pm dose. @Dr. Amir Patel and @Rosa Reyes");
+        await Expect(NotifiedPhysician).ToBeVisibleAsync();
+        await Expect(NotifiedChargeNurse).ToHaveTextAsync("Rosa Reyes, charge nurse", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task pressing_escape_closes_the_list_and_offers_to_choose_who_to_notify()
+    {
+        await NavigateAndBoot();
+        await TypeInTheNote("Please review @");
+        await Expect(CareTeam.Popup).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        await Note.PressAsync("Escape");
+
+        await Expect(CareTeam.Popup).ToBeHiddenAsync(new() { Timeout = 5000 });
+        await Expect(Hint).ToBeHiddenAsync();
+        await Expect(ChooseWhoToNotify).ToBeVisibleAsync();
+        await Expect(Note).ToHaveValueAsync("Please review @");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task choosing_who_to_notify_after_escape_finishes_the_mention()
+    {
+        await NavigateAndBoot();
+        await TypeInTheNote("Please review @");
+        await Expect(CareTeam.Popup).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Note.PressAsync("Escape");
+        await Expect(CareTeam.Popup).ToBeHiddenAsync(new() { Timeout = 5000 });
+
+        await ChooseWhoToNotify.ClickAsync();
+        await Expect(CareTeam.Items).ToHaveCountAsync(4, new() { Timeout = 5000 });
+        await CareTeam.Item("Rosa Reyes").ClickAsync();
+
+        await Expect(Note).ToHaveValueAsync("Please review @Rosa Reyes");
+        await Expect(NotifiedChargeNurse).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(ChooseWhoToNotify).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task finding_a_day_nurse_lists_only_the_nurses_whose_names_hold_the_typed_word()
+    {
+        await NavigateAndBoot();
+
+        await FindDayNurses("ka");
+
+        await Expect(DayShift.Items).ToHaveTextAsync(new[] { "Karen Holt", "Kalani Brooks" }, new() { Timeout = 5000 });
+        // EJ2 places the list at the point of the page the Find button names: 64 pixels across, 640 down.
+        await Expect(DayShift.Popup).ToHaveCSSAsync("left", "64px");
+        await Expect(DayShift.Popup).ToHaveCSSAsync("top", "640px");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task picking_the_day_nurse_found_hands_the_resident_to_her()
+    {
+        await NavigateAndBoot();
+        await FindDayNurses("ka");
+
+        await DayShift.Item("Karen Holt").ClickAsync();
+
+        await Expect(DayNurse).ToHaveValueAsync("Karen Holt", new() { Timeout = 5000 });
+        await Expect(DayShift.Popup).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task clearing_the_hand_off_from_the_keyboard_closes_the_list_of_day_nurses()
+    {
+        await NavigateAndBoot();
+        await FindDayNurses("ka");
+
+        // From Find, Tab reaches Clear; Enter presses it without a click that would close the list itself.
+        await Page.Keyboard.PressAsync("Tab");
+        await Expect(Page.Locator("#clear-day-nurse-btn")).ToBeFocusedAsync();
+        await Expect(DayShift.Popup).ToBeVisibleAsync();
         await Page.Keyboard.PressAsync("Enter");
-        await Expect(Page.Locator("#mention-hide-status"))
-            .ToHaveTextAsync("hide called", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#mention-auto-hide-popup-status"))
-            .ToHaveTextAsync("closed", new() { Timeout = 10000 });
 
+        await Expect(DayShift.Popup).ToBeHiddenAsync(new() { Timeout = 5000 });
+        await Expect(DayNurse).ToHaveValueAsync("");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task component_index_links_to_mention_sandbox()
+    public async Task the_components_index_links_to_the_shift_handoff_note()
     {
         await NavigateTo("/Sandbox/Components");
+
         await Expect(Page.Locator("a[href='/Sandbox/Components/Mention/Index']"))
             .ToBeVisibleAsync(new() { Timeout = 10000 });
-
         AssertNoConsoleErrors();
     }
 }

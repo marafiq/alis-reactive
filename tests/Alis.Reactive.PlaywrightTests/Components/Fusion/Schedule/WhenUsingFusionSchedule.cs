@@ -5,6 +5,15 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Schedule;
 
+/// <summary>
+/// As a scheduling coordinator, I staff, change and cancel the week's shifts where the schedule shows them,
+/// in the assignment drawer and the new-assignment dialog, so that every shift has someone on it.
+/// </summary>
+/// <remarks>
+/// <c>CloseEditor</c> is not exercised: Syncfusion's own event editor never opens on this page. Its
+/// <c>PopupOpen</c> cancels every popup of type "Editor" and opens the assignment drawer instead, and
+/// Syncfusion then destroys the editor's dialog, so <c>closeEditor</c> has nothing to close.
+/// </remarks>
 [TestFixture]
 public class WhenUsingFusionSchedule : PlaywrightTestBase
 {

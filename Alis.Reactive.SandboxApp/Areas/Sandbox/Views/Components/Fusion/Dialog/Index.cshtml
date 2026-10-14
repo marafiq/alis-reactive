@@ -31,7 +31,7 @@
     </native-card-body></native-card>
 
     @* The review asks for an explicit choice: Escape, the close icon and a click outside do not
-       dismiss it; "Not yet" does. *@
+       dismiss it; "Not yet" does. The coordinator can drag it aside by its title to read the page. *@
     @(Html.FusionDialog(plan, "discharge-dialog", b =>
     {
         b.Header("Confirm discharge");
@@ -40,6 +40,7 @@
         b.Width("460px");
         b.ShowCloseIcon(true);
         b.CloseOnEscape(true);
+        b.AllowDragging(true);
         b.Visible(false);
     })
     .Reactive(evt => evt.BeforeOpen, (args, p) =>
@@ -69,7 +70,11 @@
     .Reactive(evt => evt.Close, (args, p) =>
         p.Element("discharge-status").Text.Set("closed"))
     .Reactive(evt => evt.OverlayClick, (args, p) =>
-        p.Element("discharge-choose").Show()))
+    {
+        // A click outside brings a review dragged aside back to the middle, asking for the choice.
+        p.Element("discharge-choose").Show();
+        p.Component<FusionDialog>("discharge-dialog").RefreshPosition();
+    }))
 </native-vstack>
 
 @Html.RenderPlan(plan)
