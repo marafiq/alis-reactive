@@ -44,7 +44,12 @@ namespace Alis.Reactive.Fusion.Components
             Event<FusionInPlaceEditorChangeArgs>();
 
         /// <inheritdoc />
-        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
+        /// <remarks>
+        /// Committed by <see cref="EndEdit"/>, not <see cref="Change"/>: EJ2's save moves focus off the inner
+        /// input, which raises the editor's change, before it stores the new value (inplace-editor.js:1196-1201);
+        /// endEdit follows the store (1203-1204), so the form checks the value the person entered.
+        /// </remarks>
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: EndEdit);
 
         /// <summary>Raised before the value is submitted.</summary>
         public TypedEvent<FusionInPlaceEditorActionBeginArgs> ActionBegin =>
@@ -94,7 +99,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The edit mode.</summary>
         public ReadOnly<string> Mode => ReadOnly<string>();
 
-        /// <summary>The field name.</summary>
+        /// <summary>The event's own name, which EJ2 sets on every payload; the edited field's name is not sent.</summary>
         public ReadOnly<string> Name => ReadOnly<string>();
     }
 
@@ -110,7 +115,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The edit mode.</summary>
         public ReadOnly<string> Mode => ReadOnly<string>();
 
-        /// <summary>The field name.</summary>
+        /// <summary>The event's own name, which EJ2 sets on every payload; the edited field's name is not sent.</summary>
         public ReadOnly<string> Name => ReadOnly<string>();
     }
 
@@ -123,7 +128,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The value before the change.</summary>
         public ReadOnly<string> PreviousValue => ReadOnly<string>();
 
-        /// <summary>The field name.</summary>
+        /// <summary>The event's own name, which EJ2 sets on every payload; the edited field's name is not sent.</summary>
         public ReadOnly<string> Name => ReadOnly<string>();
     }
 
@@ -146,21 +151,21 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The submitted value.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
 
-        /// <summary>The field name.</summary>
+        /// <summary>The event's own name, which EJ2 sets on every payload; the edited field's name is not sent.</summary>
         public ReadOnly<string> Name => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.SubmitClick"/>.</summary>
     public class FusionInPlaceEditorSubmitClickArgs : JsObject
     {
-        /// <summary>The field name.</summary>
+        /// <summary>The event's own name, which EJ2 sets on every payload; the edited field's name is not sent.</summary>
         public ReadOnly<string> Name => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.CancelClick"/>.</summary>
     public class FusionInPlaceEditorCancelClickArgs : JsObject
     {
-        /// <summary>The field name.</summary>
+        /// <summary>The event's own name, which EJ2 sets on every payload; the edited field's name is not sent.</summary>
         public ReadOnly<string> Name => ReadOnly<string>();
     }
 
