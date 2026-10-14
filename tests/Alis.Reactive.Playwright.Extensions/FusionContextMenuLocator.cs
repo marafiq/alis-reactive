@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
@@ -21,5 +22,10 @@ public sealed class FusionContextMenuLocator
     public ILocator Lists => Root.Locator("xpath=..");
 
     /// <summary>The item with this text, in the top list or in an open submenu.</summary>
-    public ILocator Item(string text) => Lists.GetByRole(AriaRole.Menuitem, new() { Name = text, Exact = true });
+    /// <remarks>
+    /// Matched by its text, not its accessible name: a ContextMenu gives its items no label, so an item's name
+    /// also carries its icon's glyph.
+    /// </remarks>
+    public ILocator Item(string text) =>
+        Lists.GetByRole(AriaRole.Menuitem).Filter(new() { HasTextRegex = new Regex($@"^\s*{Regex.Escape(text)}\s*$") });
 }
