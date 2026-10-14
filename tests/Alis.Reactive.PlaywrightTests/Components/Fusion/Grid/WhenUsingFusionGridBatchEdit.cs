@@ -167,6 +167,21 @@ public class WhenUsingFusionGridBatchEdit : PlaywrightTestBase
     }
 
     [Test]
+    public async Task choosing_a_resident_after_being_asked_marks_their_tasks_done_and_takes_the_request_away()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(AllTasksDone);
+        await Expect(ChooseFirst).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await ChooseResident("Henry Liu");
+
+        await ClickWhenStable(AllTasksDone);
+
+        await Expect(Cell("Henry Liu", OpenTasksColumn)).ToHaveTextAsync("0", new() { Timeout = 10000 });
+        await Expect(ChooseFirst).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task handing_over_an_unchanged_board_says_the_evening_starts_from_the_record()
     {
         await NavigateAndBoot();

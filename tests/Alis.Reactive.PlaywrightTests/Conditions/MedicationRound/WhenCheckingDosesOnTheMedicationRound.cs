@@ -507,6 +507,20 @@ public class WhenCheckingDosesOnTheMedicationRound : PlaywrightTestBase
     }
 
     [Test]
+    public async Task rescanning_the_plain_label_after_a_controlled_one_takes_the_witness_note_away()
+    {
+        await NavigateAndBoot();
+        await PharmacyLabel.FillAndBlur("MGP-C2-104233");
+        await Expect(ControlledNote).ToBeVisibleAsync();
+
+        await PharmacyLabel.FillAndBlur("MGP-104233");
+
+        await Expect(LabelCheck).ToHaveTextAsync("Label read.");
+        await Expect(ControlledNote).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task a_pharmacy_label_missing_a_digit_is_scanned_again()
     {
         await NavigateAndBoot();

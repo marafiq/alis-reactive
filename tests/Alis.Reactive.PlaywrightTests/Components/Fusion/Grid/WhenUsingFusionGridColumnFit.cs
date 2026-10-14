@@ -9,7 +9,9 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 /// hydrochloride 10 mg tablet are cut short in the first row. The resident and medication columns cut a name
 /// that does not fit with an ellipsis and show it whole in a tooltip on hover; the grid opens that tooltip
 /// only when the text is wider than its cell (grid.js:5621-5644, 5655-5676), so no tooltip on hover means
-/// the name fits. The ellipsis itself is painted text, which a test cannot read.
+/// the name fits. The ellipsis itself is painted text, which a test cannot read. Fitting runs in the click's
+/// own pipeline, so the fitted cells are measured wider right after the click; that the tooltip stays shut
+/// then reads the name as whole. A tooltip already open on another cell closes when the pointer leaves it.
 /// Not exercised: fitting also narrows a column wider than its content (resize.js:157); a narrower column
 /// shows the aide nothing new, so the tests assert names shown in full.
 /// </remarks>
@@ -64,13 +66,16 @@ public class WhenUsingFusionGridColumnFit : PlaywrightTestBase
     public async Task showing_full_medication_names_widens_only_the_medication_column()
     {
         await NavigateAndBoot();
+        var cutShort = await Cell(0, MedicationCell).BoundingBoxAsync();
 
         await ClickWhenStable(ShowFullMedicationNames);
 
-        await Cell(0, MedicationCell).HoverAsync();
-        await Expect(FullName).ToHaveCountAsync(0);
+        var fitted = await Cell(0, MedicationCell).BoundingBoxAsync();
+        Assert.That(fitted!.Width, Is.GreaterThan(cutShort!.Width), "the medication column is wider");
         await Cell(0, ResidentCell).HoverAsync();
         await Expect(FullName).ToHaveTextAsync("Margaret Abernathy-Whitfield", new() { Timeout = 10000 });
+        await Cell(0, MedicationCell).HoverAsync();
+        await Expect(FullName).ToHaveCountAsync(0);
         AssertNoConsoleErrors();
     }
 
@@ -78,9 +83,15 @@ public class WhenUsingFusionGridColumnFit : PlaywrightTestBase
     public async Task fitting_every_column_shows_every_name_in_full()
     {
         await NavigateAndBoot();
+        var residentCutShort = await Cell(0, ResidentCell).BoundingBoxAsync();
+        var medicationCutShort = await Cell(0, MedicationCell).BoundingBoxAsync();
 
         await ClickWhenStable(FitEveryColumn);
 
+        Assert.That((await Cell(0, ResidentCell).BoundingBoxAsync())!.Width, Is.GreaterThan(residentCutShort!.Width),
+            "the resident column is wider");
+        Assert.That((await Cell(0, MedicationCell).BoundingBoxAsync())!.Width, Is.GreaterThan(medicationCutShort!.Width),
+            "the medication column is wider");
         await Cell(0, ResidentCell).HoverAsync();
         await Expect(FullName).ToHaveCountAsync(0);
         await Cell(0, MedicationCell).HoverAsync();
