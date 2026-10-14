@@ -67,6 +67,22 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // A pasted number reaches the mask as one input event (Fill sends the same), and the mask commits it from
+    // its own input handler (mask-base.js:491-521); the refusal it shows stays on screen.
+    [Test]
+    public async Task a_number_pasted_without_all_ten_digits_is_refused_at_once()
+    {
+        await NavigateAndBoot();
+
+        await FamilyPhone.Fill("617555");
+
+        await Expect(FamilyPhone.Input).ToHaveValueAsync("(617) 555-____");
+        await Expect(_plan.ErrorFor(m => m.FamilyPhone))
+            .ToHaveTextAsync("Enter all ten digits of the family member's phone number.", new() { Timeout = 5000 });
+        await Expect(_plan.ErrorFor(m => m.FamilyPhone)).ToBeVisibleAsync();
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task typing_the_last_digits_clears_the_refusal()
     {

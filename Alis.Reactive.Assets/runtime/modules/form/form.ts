@@ -232,12 +232,15 @@ function wireLive(entry: Entry): void {
 
   const clear = (): void => clearInline(field.id);
   const recheck = (): void => revalidate(element);
-  element.addEventListener("input", clear);
+  // Typing clears the message before the component hears the keystroke (capture runs first), so a
+  // commit the component raises from that same input event (EJ2's MaskedTextBox on a paste) re-checks
+  // the field after the clear and its message stays.
+  element.addEventListener("input", clear, true);
   element.addEventListener("blur", recheck);
   element.addEventListener(COMMIT_EVENT, recheck);
   liveWiredElements.add(element);
   owner.onDispose(() => {
-    element.removeEventListener("input", clear);
+    element.removeEventListener("input", clear, true);
     element.removeEventListener("blur", recheck);
     element.removeEventListener(COMMIT_EVENT, recheck);
     liveWiredElements.delete(element);

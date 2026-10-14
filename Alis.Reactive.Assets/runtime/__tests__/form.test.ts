@@ -186,4 +186,33 @@ describe("live", () => {
     rating.widget.trigger("valueChanged", { value: 0 });
     expect(errorText("Rating")).toBe("Rate the visit.");
   });
+
+  // EJ2's MaskedTextBox commits from its own input handler when a value is pasted; the clear that typing
+  // brings must not undo the check that commit just made.
+  it("keeps the message a commit raised by the same input event shows", () => {
+    render(`<form id="admission"></form>`);
+    const phone = fakeWidget("Phone", { value: "" });
+    phone.addEventListener("input", () => phone.widget.trigger("valueChanged", {}));
+    document.getElementById("admission")!.append(phone, Object.assign(document.createElement("span"), { id: "Phone_error" }));
+    const required: FormField = {
+      id: "Phone",
+      name: "Phone",
+      value: e.get(e.obj("Phone"), ["value"], s.string),
+      tests: [{ rule: "required", check: e.fn(["v"], e.op("not", e.op("empty", e.ref("v")))) as never, when: e.lit(true), message: "Enter the family phone." }],
+    };
+    const model: ModelPluginData = {
+      kind: "model",
+      inputs: { Phone: { name: "Phone", body: ["Phone"], value: required.value, shape: s.string, committed: "valueChanged" } },
+    };
+    const form: FormPluginData = { kind: "form", summary: "Test_Plan_validation_summary", fields: [required] };
+    startOwner(Owner.page(), [plan({
+      Phone: element("Phone", "fake"),
+      model: plugin("alis.model", "Test.Plan", model),
+      form: plugin("alis.form", "admission", form),
+    }, [])]);
+
+    phone.dispatchEvent(new Event("input", { bubbles: true }));
+
+    expect(errorText("Phone")).toBe("Enter the family phone.");
+  });
 });
