@@ -133,8 +133,8 @@ These are the dependencies the release inverts.
 - ~~Injection calls `ej.base.append(nodes, container, true)`~~: closed. A slot re-creates the inserted
   `<script>` nodes itself (`Alis.Reactive.Assets/runtime/modules/slot.ts:62-73`), and the RadioGroup and CheckList scripts became
   component code (`Alis.Reactive.Assets/components/native/radio-group.ts:6-14`, `Alis.Reactive.Assets/components/native/check-list.ts:10-20`).
-- ~~The request writer unwraps Syncfusion's uploader `rawFile`~~: closed; the uploader declares its files at
-  `filesData[].rawFile` (`Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:20`).
+- ~~The request writer unwraps Syncfusion's uploader `rawFile`~~: closed; the uploader declares its files as
+  `FilesData.Each(file => file.RawFile)`, read at `filesData[].rawFile` (`Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:19`).
 - ~~`p.Confirm()` needs `window.alis.confirm`; `root.ts` statically imports confirm, action link, drawer,
   loader~~: closed. `alis.confirm` is a plugin the Fusion component code provides (`Alis.Reactive.Assets/components/fusion/confirm.ts:101-106`),
   and `root.ts` registers only the runtime's own modules (`Alis.Reactive.Assets/runtime/root.ts:32-38`).

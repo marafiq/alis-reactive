@@ -16,8 +16,10 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionFileUpload : FusionComponent, IInputComponent
     {
         /// <summary>The selected files, as the browser's <c>File</c> objects a form-data request sends.</summary>
-        /// <remarks>The uploader lists its files as items that each carry the browser's file as <c>rawFile</c>.</remarks>
-        public Prop<IReadOnlyList<object>> Files => Prop<IReadOnlyList<object>>("filesData[].rawFile");
+        public ReadOnly<IReadOnlyList<object>> Files => FilesData.Each(file => file.RawFile!);
+
+        // The uploader lists its files as items that each carry the browser's file.
+        private ReadOnly<IReadOnlyList<FusionUploaderFile>> FilesData => ReadOnly<IReadOnlyList<FusionUploaderFile>>();
 
         /// <summary>Raised when the user selects files.</summary>
         public TypedEvent<FusionFileUploadSelectedArgs> Selected =>
@@ -48,6 +50,10 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>The file's extension, without the dot.</summary>
         public string Type { get; set; } = "";
+
+        /// <summary>The browser's own <c>File</c>, which a form-data request sends.</summary>
+        /// <remarks>Only the browser holds it; a server-side copy of the item has none, so it may be null.</remarks>
+        public object? RawFile { get; set; }
     }
 
     /// <summary>

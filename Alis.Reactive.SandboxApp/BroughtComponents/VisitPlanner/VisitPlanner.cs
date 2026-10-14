@@ -52,8 +52,8 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// <summary>The times offered this week. Setting them raises <see cref="SlotsLoaded"/>.</summary>
         public Prop<IReadOnlyList<VisitSlot>> Slots => Prop<IReadOnlyList<VisitSlot>>();
 
-        /// <summary>The day of each offered time: every item of <c>slots</c>, read at <c>day</c>.</summary>
-        public Prop<IReadOnlyList<string>> OfferedDays => Prop<IReadOnlyList<string>>("slots[].day");
+        /// <summary>The day of each offered time.</summary>
+        public ReadOnly<IReadOnlyList<string>> OfferedDays => Slots.Each(slot => slot.Day);
 
         /// <summary>What the planner says, such as before any time is offered.</summary>
         public VisitPlannerLabels Labels => Object<VisitPlannerLabels>();

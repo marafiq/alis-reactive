@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.PlanModel;
@@ -105,6 +106,33 @@ namespace Alis.Reactive
         }
 
         internal void SetExpression(ValueExpression value) => Owner.Binding.Set(Member, value);
+    }
+
+    /// <summary>Reads a field of every item of a list property.</summary>
+    public static class ListPropertyExtensions
+    {
+        /// <summary>
+        /// Declares the field of each item of a list property, read as a list of its own:
+        /// <c>public ReadOnly&lt;IReadOnlyList&lt;string&gt;&gt; OfferedDays =&gt; Slots.Each(slot =&gt; slot.Day);</c>
+        /// reads every slot's <c>day</c>.
+        /// </summary>
+        /// <typeparam name="TItem">The class each item of the list is, by the names its JavaScript uses.</typeparam>
+        /// <typeparam name="TField">The type of the field read from each item.</typeparam>
+        /// <param name="list">The list property, declared on the same object.</param>
+        /// <param name="field">The field of an item, for example <c>slot =&gt; slot.Day</c>.</param>
+        public static ReadOnly<IReadOnlyList<TField>> Each<TItem, TField>(
+            this ReadOnly<IReadOnlyList<TItem>> list,
+            Expression<Func<TItem, TField>> field)
+        {
+            if (list == null) throw new ArgumentNullException(nameof(list));
+            if (field == null) throw new ArgumentNullException(nameof(field));
+            var fieldPath = ExpressionPathHelper.ToEventPath(field);
+            if (fieldPath.Length == 0)
+                throw new ArgumentException("Select a field of the item, for example slot => slot.Day.", nameof(field));
+            return new ReadOnly<IReadOnlyList<TField>>(
+                list.Owner,
+                ComponentProperty<IReadOnlyList<TField>>.At(list.Member.JavaScriptPath + "[]." + fieldPath));
+        }
     }
 
     /// <summary>Writes to properties whose value may be missing.</summary>

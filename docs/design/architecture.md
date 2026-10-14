@@ -1177,7 +1177,8 @@ built and what is not.
     builders' `onclick` buttons are gone; `EventButton` raises a declared event.
   - an object a component holds is declared as an object (`cb16542`): the in-place editor's
     `Element.ClassList` and Tom Select's `Input.Value`, which used dotted names. A field of each item
-    of a list (`items[].field`) still has only its string form.
+    of a list is read through the list property, typed by its items (`Slots.Each(slot => slot.Day)`,
+    the uploader's `FilesData.Each(file => file.RawFile)`); a declared name holds no path.
   - the vendor payload no declaration could produce (`"event"`) is gone from the contract and the
     runtime (`96304ad`).
   - `p.Confirm` no longer needs Syncfusion (`3dbacfc`): the Fusion confirm answers only on a page

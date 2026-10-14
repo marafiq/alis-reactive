@@ -59,7 +59,7 @@ public sealed class VisitPlanner : Component, IInputComponent
     public Prop<int> Capacity => Prop<int>();
     public Prop<string> Wing => Prop<string>();
     public Prop<IReadOnlyList<VisitSlot>> Slots => Prop<IReadOnlyList<VisitSlot>>();
-    public Prop<IReadOnlyList<string>> OfferedDays => Prop<IReadOnlyList<string>>("slots[].day");
+    public ReadOnly<IReadOnlyList<string>> OfferedDays => Slots.Each(slot => slot.Day);
     public VisitPlannerLabels Labels => Object<VisitPlannerLabels>();
     public ReadOnly<int> Count => ReadOnly<int>();
 
@@ -89,7 +89,7 @@ The JavaScript name of a member is its C# name camel-cased, so `Capacity` is
 | a property the page reads and writes | `public Prop<int> Capacity => Prop<int>();` |
 | a property the page only reads | `public ReadOnly<int> Count => ReadOnly<int>();` |
 | a property that holds an object with members of its own | `public VisitPlannerLabels Labels => Object<VisitPlannerLabels>();`, where `VisitPlannerLabels : JsObject` declares `Empty`; the page writes `planner.Labels.Empty.Set(..)` |
-| a field of each item of a list, to read | `Prop<IReadOnlyList<string>>("slots[].day")` |
+| a field of each item of a list, to read | `public ReadOnly<IReadOnlyList<string>> OfferedDays => Slots.Each(slot => slot.Day);`, where `Slots` is the list property, typed by its items (`VisitSlot` declares `Day`) |
 | a method | `public void Clear() => Call();` |
 | a method with arguments | `public void Book(Arg<string> slot, Arg<decimal> visitors, Arg<string> note) => Call(slot, visitors, note);` |
 | a method that returns a value | `public TypedSource<bool> IsBooked(Arg<string> slot) => Invoke<bool>(slot);` |

@@ -50,14 +50,14 @@ namespace Alis.Reactive
 
         /// <summary>Declares a property the page reads.</summary>
         /// <typeparam name="TValue">The C# type of the value.</typeparam>
-        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased; <c>items[].field</c> for a field of each item of a list. A member of an object the component holds belongs to that object's declaration (<see cref="Object{TObject}"/>).</param>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased. A member of an object the component holds belongs to that object's declaration (<see cref="Object{TObject}"/>); a field of each item of a list is read with <see cref="ListPropertyExtensions.Each{TItem, TField}"/>.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the property.</param>
         protected ReadOnly<TValue> ReadOnly<TValue>(string? name = null, [CallerMemberName] string declaredBy = "") =>
             new ReadOnly<TValue>(this, ComponentProperty<TValue>.At(JavaScriptPath(name, declaredBy)));
 
         /// <summary>Declares a property the page reads and writes.</summary>
         /// <typeparam name="TValue">The C# type of the value.</typeparam>
-        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased; <c>items[].field</c> for a field of each item of a list. A member of an object the component holds belongs to that object's declaration (<see cref="Object{TObject}"/>).</param>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased. A member of an object the component holds belongs to that object's declaration (<see cref="Object{TObject}"/>); a field of each item of a list is read with <see cref="ListPropertyExtensions.Each{TItem, TField}"/>.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the property.</param>
         protected Prop<TValue> Prop<TValue>(string? name = null, [CallerMemberName] string declaredBy = "") =>
             new Prop<TValue>(this, ComponentProperty<TValue>.At(JavaScriptPath(name, declaredBy)));
@@ -260,16 +260,17 @@ namespace Alis.Reactive
         private string JavaScriptPath(string? name, string declaredBy) =>
             _pathPrefix + (name == null ? JavaScriptNameOf(declaredBy) : OwnName(name, declaredBy));
 
-        // A declared name is one JavaScript name, or items[].field for a field of each item of a list. A
-        // member of an object the component holds is declared on that object (Object<T>()): one way to
-        // reach it, which the compiler checks.
+        // A declared name is one JavaScript name. A member of an object the component holds is declared on
+        // that object (Object<T>()), and a field of each item of a list is read with Each(..): one way to
+        // reach either, which the compiler checks.
         private string OwnName(string name, string declaredBy)
         {
-            var reachesIntoAnObject = name.Replace("[].", "").IndexOf('.') >= 0;
+            var reachesIntoAnObject = name.IndexOf('.') >= 0 || name.IndexOf('[') >= 0;
             return reachesIntoAnObject
                 ? throw new ArgumentException(
-                    $"'{GetType().Name}.{declaredBy}' is named '{name}', a path into an object it holds. " +
-                    "Declare that object with Object<T>() and the member on it.", nameof(name))
+                    $"'{GetType().Name}.{declaredBy}' is named '{name}', a path into an object or a list it holds. " +
+                    "Declare the object with Object<T>() and the member on it, or read a field of each item " +
+                    "with the list's Each(item => item.Field).", nameof(name))
                 : name;
         }
 

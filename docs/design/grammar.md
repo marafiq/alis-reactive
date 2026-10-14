@@ -820,7 +820,8 @@ proves it is named in the pull request.
 
 - List paths: a member path may read each item of a list, `filesData[].rawFile`, written as
   `get(o, ["filesData", "[]", "rawFile"])`; the runtime reads the rest of the path on each item, in
-  the path's own mode (1.3). The uploader declares its value that way, so `alis.http` sends `File`
+  the path's own mode (1.3). The uploader declares its value that way (`FilesData.Each(file =>
+  file.RawFile)` writes the path), so `alis.http` sends `File`
   objects and names no vendor. A list path can be read, not written, called or subscribed to, and
   reads at most one list.
 

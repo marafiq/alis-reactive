@@ -182,8 +182,9 @@ declaration passes it: `public void ShowColumn(Field key) => Call(key, Fixed("fi
 than the page's own list, `Pass<TDeclared, TSource>(items)` passes it (`UpdateData` above).
 
 Names are the component's own: a member's JavaScript name is its C# name camel-cased, and `name:`
-gives another, or a path to one deeper member (`"dataset.target"`, or `"slots[].day"` to read each
-item's field); a plugin that is itself a function declares it with `name: ""`. A property that holds
+gives another, one JavaScript name; a plugin that is itself a function declares it with `name: ""`.
+A field of each item of a list is read through the list property, typed by its items:
+`OfferedDays => Slots.Each(slot => slot.Day)` reads every slot's `day`. A property that holds
 an object with members of its own is declared as that object, `Object<T>()`
 (`schedule.EventSettings.DataSource`), and a method that returns one as `InvokeObject<T>(..)`
 (`grid.GetColumnByField(..).HeaderText`). Events are named like every other member, by the C# name
