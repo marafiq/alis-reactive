@@ -1,5 +1,4 @@
 @model Step2ClinicalModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -18,48 +17,44 @@
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.SystolicBP, o => o.Label("Systolic BP (mmHg)"))
             .FusionNumericTextBox(b => b
-                .Min(0).Max(300).Step(1)
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var comp = p.Component<FusionNumericTextBox>(m => m.SystolicBP);
-                    p.Element("bp-echo").SetText(comp.Value());
-
-                    p.When(comp.Value()).Gt(140m)
-                        .Then(then =>
-                        {
-                            then.Element("hypertension-spinner").Show();
-                            then.Post(alertHypertensionUrl,
-                                g => g.Include<FusionNumericTextBox, Step2ClinicalModel>(m => m.SystolicBP)
-                                      .Include<NativeHiddenField, Step2ClinicalModel>(m => m.ResidentName))
-                             .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
-                             {
-                                 s.Element("hypertension-result").SetText(json, x => x.Message);
-                                 s.Element("hypertension-result").Show();
-                                 s.Element("hypertension-spinner").Hide();
-                             }));
-                        })
-                        .Else(e =>
-                        {
-                            e.Element("hypertension-result").SetText("Normal");
-                            e.Element("hypertension-result").Show();
-                        });
-                })); }
+                .Min(0).Max(300).Step(1))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var comp = p.Component<FusionNumericTextBox>(m => m.SystolicBP);
+                p.When(comp.Value).Gt(140m)
+                    .Then(then =>
+                    {
+                        then.Element("hypertension-spinner").Show();
+                        then.Post(alertHypertensionUrl)
+                         .Gather<AlertHypertensionRequest>(g => g.Form(m => m.SystolicBP, m => m.ResidentName))
+                         .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
+                         {
+                             s.Element("hypertension-result").Text.Set(json.Get(x => x.Message));
+                             s.Element("hypertension-result").Show();
+                             s.Element("hypertension-spinner").Hide();
+                         }));
+                    })
+                    .Else(e =>
+                    {
+                        e.Element("hypertension-result").Text.Set("Systolic 140 or under: no cardiology referral.");
+                        e.Element("hypertension-result").Show();
+                    });
+            }); }
 
         @{ Html.InputField(plan, m => m.HasPacemaker, o => o.Label("Has Pacemaker"))
-            .FusionSwitch(b => b
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var pm = p.Component<FusionSwitch>(m => m.HasPacemaker);
-                    p.When(pm.Value()).Truthy()
-                        .Then(t => t.Element("pacemaker-details").Show())
-                        .Else(e => e.Element("pacemaker-details").Hide());
-                })); }
+            .FusionSwitch()
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var pm = p.Component<FusionSwitch>(m => m.HasPacemaker);
+                p.When(pm.Checked).Truthy()
+                    .Then(t => t.Element("pacemaker-details").Show())
+                    .Else(e => e.Element("pacemaker-details").Hide());
+            }); }
     </native-grid>
 
-    <native-vstack gap="Xs" class="font-mono text-sm mb-4">
-        <p>BP: <span id="bp-echo" class="text-text-muted">&mdash;</span></p>
-        <p><span id="hypertension-spinner" hidden class="text-accent">Sending alert...</span></p>
-        <div id="hypertension-result" hidden class="rounded-md bg-rose-50 border border-rose-200 px-3 py-2 text-sm text-rose-700"></div>
+    <native-vstack gap="Xs" class="mb-4">
+        <p id="hypertension-spinner" hidden class="text-sm text-accent">Sending alert...</p>
+        <p id="hypertension-result" hidden class="text-sm font-medium"></p>
     </native-vstack>
 
     <div id="pacemaker-details" hidden>

@@ -1,0 +1,226 @@
+@model FrontDeskHoldsModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.AppLevel
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.AppLevel
+@using Alis.Reactive.SandboxApp.BroughtComponents
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
+@{
+    ViewData["Title"] = "Front Desk Holds";
+
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+
+    var plan = Html.ReactivePlan<FrontDeskHoldsModel>();
+    var weekUrl = Url.SandboxRouteTemplate("FrontDeskWeek", "VisitPlanner", "residentId");
+    var holdsUrl = Url.SandboxRouteTemplate("FrontDeskHolds", "VisitPlanner", "residentId");
+    var holdUrl = Url.SandboxRouteTemplate("HoldVisit", "VisitPlanner", "slotId");
+    var releaseEveryUrl = Url.SandboxRouteTemplate("ReleaseEveryHold", "VisitPlanner", "residentId");
+    var badgeUrl = Url.SandboxRouteTemplate("PrintBadge", "VisitPlanner", "slotId");
+    var arrivalUrl = Url.SandboxRouteTemplate("Arrival", "VisitPlanner", "slotId");
+
+    // The link names the resident and the family, and may name how many visitors are coming and how
+    // many the family's visitor pass allows: ?resident=margaret&family=hale&visitors=3&maxVisitors=4.
+    // The week comes first; the family's holds follow it, asked of the desk of the wing the week names.
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        // Declared once; each write lands in the callback it is written in.
+        var link = p.Url<FrontDeskQuery>();
+        var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
+        var resident = p.Element("desk-resident");
+        var loading = p.Element("desk-loading");
+
+        p.When(link.Get(q => q.Visitors)).NotNull()
+            .Then(named => named.Component<FusionNumericTextBox>(m => m.Visitors).Value.Set(link.Get(q => q.Visitors)));
+
+        p.Get(weekUrl)
+            .Gather<FrontDeskResident>(g => g.Set(x => x.ResidentId, link.Get(q => q.Resident)))
+            .WhileLoading(l => loading.Show())
+            .Response(r => r
+                .OnSuccess<ResidentWeekResponse>((week, s) =>
+                {
+                    planner.Wing.Set(week.Get(x => x.Wing));
+                    planner.Capacity.Set(week.Get(x => x.WeeklyVisits));
+                    planner.Slots.Set(week.Get(x => x.Slots));
+                    resident.Text.Set(week.Get(x => x.ResidentName));
+                })
+                .OnError<DeskMessage>(404, (unknown, e) =>
+                {
+                    planner.Labels.Empty.Set(unknown.Get(x => x.Message));
+                    resident.Text.Set("Unknown resident");
+                })
+                // The holds are asked of the desk of the wing the week's answer names.
+                .Chained<ResidentWeekResponse>((week, holds) => holds.Get(holdsUrl)
+                    .Gather<FrontDeskResident>(g => g
+                        .Set(x => x.ResidentId, link.Get(q => q.Resident))
+                        .Header("X-Family", link.Get(q => q.Family))
+                        .Header("X-Wing", week.Get(x => x.Wing)))
+                    .Response(answer => answer.OnSuccess<FamilyHoldsResponse>((held, s) =>
+                    {
+                        planner.Value.Set(held.Get(x => x.Held));
+                        s.Element("desk-family").Text.Set(held.Get(x => x.Family));
+                        s.Element("desk-name").Text.Set(held.Get(x => x.Desk));
+                        s.Element("desk-held").Text.Set(planner.Count);
+                    }))))
+            .Finally(f => loading.Hide());
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Front Desk Holds</native-heading>
+        <native-text color="Secondary">
+            Each time you book is held at the front desk for the family; each time you unbook is released.
+        </native-text>
+    </div>
+
+    <div id="desk-card">
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-text>
+                <span id="desk-resident">Resident</span> · <span id="desk-family">Family</span> · held at the <span id="desk-name">front desk</span>: <span id="desk-held">0</span>
+            </native-text>
+            <p id="desk-loading" class="text-sm text-text-secondary" hidden>Asking the front desk for the week...</p>
+
+            @{ Html.InputField(plan, m => m.VisitSlots, o => o.Label("Visit times held at the front desk"))
+                .VisitPlanner(capacity: 1)
+                .Reactive(evt => evt.WeekChanged, (args, p) =>
+                {
+                    // A time booked: hold it, under the wing's desk and for the family in the link.
+                    p.When(args.Added).NotEmpty()
+                        .Then(added => added.Post(holdUrl)
+                            .Gather<HoldVisitRequest>(g => g
+                                .Set(x => x.SlotId, args.Added)
+                                .Set(x => x.VisitsThisWeek, added.Component<VisitPlanner>(m => m.VisitSlots).Count)
+                                .Set(x => x.Family, p.Url<FrontDeskQuery>().Get(q => q.Family))
+                                .Set(x => x.Source, "front-desk")
+                                .Header("X-Wing", added.Component<VisitPlanner>(m => m.VisitSlots).Wing))
+                            .AsJson()
+                            .Response(r => r
+                                .OnSuccess<DeskHoldResponse>((hold, s) =>
+                                {
+                                    s.Element("desk-status").Text.Set(hold.Get(x => x.Message));
+                                    s.When(hold.Get(x => x.Status)).Eq("held")
+                                        .Then(held =>
+                                        {
+                                            var toast = held.Component<FusionToast>();
+                                            toast.Title.Set("Front desk");
+                                            toast.Content.Set(hold.Get(x => x.Message));
+                                            toast.Tone.Set(FusionToastTone.Success);
+                                            toast.Show();
+                                        })
+                                        .ElseIf(hold.Get(x => x.Status)).Eq("tentative")
+                                        .Then(tentative => tentative.Element("desk-awaiting").Show())
+                                        .Else(other => other.Element("desk-awaiting").Hide());
+                                })
+                                .OnError<DeskConflict>(409, (conflict, e) =>
+                                {
+                                    e.Component<VisitPlanner>(m => m.VisitSlots).Value.Set(conflict.Get(x => x.Held));
+                                    e.Element("desk-status").Text.Set(conflict.Get(x => x.Message));
+                                    var toast = e.Component<FusionToast>();
+                                    toast.Title.Set("Time not held");
+                                    toast.Content.Set(conflict.Get(x => x.Message));
+                                    toast.Tone.Set(FusionToastTone.Danger);
+                                    toast.Show();
+                                })
+                                .OnError(e => e.Element("desk-status")
+                                    .Text.Set("The front desk is not answering; the time is booked here but not held."))));
+
+                    // A time unbooked: release it at the desk.
+                    p.When(args.Removed).NotEmpty()
+                        .Then(removed => removed.Delete(holdUrl)
+                            .Gather<FrontDeskSlot>(g => g.Set(x => x.SlotId, args.Removed))
+                            .Response(r => r.OnSuccess<DeskMessage>((released, s) =>
+                                s.Element("desk-status").Text.Set(released.Get(x => x.Message)))));
+
+                    p.Element("desk-held").Text.Set(args.Count);
+                }); }
+
+            @{ Html.InputField(plan, m => m.Visitors, o => o.Label("Visitors at the earliest visit"))
+                .FusionNumericTextBox(b => b.Min(1).Max(6).Format("n0"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
+                    p.When(planner.FirstBooked()).NotEmpty()
+                        .Then(earliest => earliest.Put(holdUrl)
+                            .Gather<ChangeVisitorsRequest>(g => g
+                                .Set(x => x.SlotId, earliest.Component<VisitPlanner>(m => m.VisitSlots).FirstBooked())
+                                .Set(x => x.Visitors, earliest.Component<FusionNumericTextBox>(m => m.Visitors).Value))
+                            .Response(r => r.OnSuccess<DeskMessage>((changed, s) =>
+                                s.Element("desk-status").Text.Set(changed.Get(x => x.Message)))));
+
+                    // The family's visitor pass, named in the link, caps how many may come.
+                    p.When(args.Value).Gt(p.Url<FrontDeskQuery>().Get(q => q.MaxVisitors))
+                        .Then(over => over.Element("desk-visitor-limit").Show())
+                        .Else(within => within.Element("desk-visitor-limit").Hide());
+                }); }
+            <p id="desk-visitor-limit" class="text-sm text-warning" hidden>More visitors than the family's visitor pass allows.</p>
+
+            <native-vstack gap="Xs">
+                <native-text><span id="desk-status">The desk has not been asked yet.</span></native-text>
+                <p id="desk-awaiting" class="text-sm text-warning" hidden>Waiting for the family to confirm a held time.</p>
+            </native-vstack>
+
+            @(Html.NativeButton("release-every-hold", "Release every hold")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    // Asked only when something is held; the release tells the desk which family let go.
+                    var link = p.Url<FrontDeskQuery>();
+                    p.When(p.Component<VisitPlanner>(m => m.VisitSlots).Count).Gt(0)
+                        .And(ask => ask.Confirm("Release every hold for this week?"))
+                        .Then(release => release.Delete(releaseEveryUrl)
+                            .Gather<ReleaseEveryHoldRequest>(g => g
+                                .Set(x => x.ResidentId, link.Get(q => q.Resident))
+                                .Set(x => x.Family, link.Get(q => q.Family)))
+                            .Response(r => r.OnSuccess<DeskMessage>((released, s) =>
+                            {
+                                s.Component<VisitPlanner>(m => m.VisitSlots).Clear();
+                                s.Element("desk-status").Text.Set(released.Get(x => x.Message));
+                            })))
+                        .Else(keep => keep.Element("desk-status").Text.Set("No hold was released."));
+                }))
+
+            @(Html.NativeButton("prepare-arrival", "Prepare arrival")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    // The earliest held visit: its badge prints at the greeter's desk while its arrival
+                    // card loads, side by side, with the desk covered; the drawer opens once both are done,
+                    // whether the badge printed or not.
+                    var earliestTime = p.Component<VisitPlanner>(m => m.VisitSlots).FirstBooked();
+                    p.When(earliestTime).NotEmpty()
+                        .Then(arrival =>
+                        {
+                            var loader = arrival.Component<NativeLoader>();
+                            loader.Target.Set("desk-card");
+                            loader.Show();
+                            arrival.Parallel(
+                                    badge => badge.Post(badgeUrl)
+                                        .Gather<HoldVisitRequest>(g => g
+                                            .Set(x => x.SlotId, earliestTime)
+                                            .Set(x => x.Family, arrival.Url<FrontDeskQuery>().Get(q => q.Family)))
+                                        .Response(r => r
+                                            .OnSuccess<DeskMessage>((printed, s) =>
+                                                s.Element("desk-status").Text.Set(printed.Get(x => x.Message)))
+                                            .OnError(failed => failed.Element("desk-status")
+                                                .Text.Set("The badge printer did not answer; write the family's badge by hand."))),
+                                    card => card.Get(arrivalUrl)
+                                        .Gather<FrontDeskSlot>(g => g.Set(x => x.SlotId, earliestTime))
+                                        .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content"))))
+                                .OnAllSettled(done =>
+                                {
+                                    done.Component<NativeLoader>().Hide();
+                                    done.Element("alis-drawer-title").Text.Set("Arrival");
+                                    var drawer = done.Component<NativeDrawer>();
+                                    drawer.Size.Set(DrawerSize.Md);
+                                    drawer.Open();
+                                });
+                        })
+                        .Else(none => none.Element("desk-status").Text.Set("Hold a time first; an arrival is prepared from a hold."));
+                }))
+        </native-vstack>
+    </native-card-body></native-card>
+    </div>
+</native-vstack>
+
+@Html.RenderPlan(plan)

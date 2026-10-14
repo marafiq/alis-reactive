@@ -29,9 +29,11 @@ namespace Alis.Reactive.InputField
         /// <summary>Field wrapper options used for label and required markup.</summary>
         public InputFieldOptions Options { get; }
 
-        internal string ElementId => _componentSlot.ElementId;
+        /// <summary>The element ID the framework derives from the model expression. Render the component with it.</summary>
+        public string ElementId => _componentSlot.ElementId;
 
-        internal string BindingPath => _componentSlot.BindingName;
+        /// <summary>The binding path; render it as the component's <c>name</c> so the value posts back.</summary>
+        public string BindingPath => _componentSlot.BindingName;
 
         internal InputComponentRenderTarget RenderTarget => _componentSlot.RenderTarget;
 
@@ -62,7 +64,7 @@ namespace Alis.Reactive.InputField
 
         /// <summary>
         /// Renders the field wrapper (label + validation error elements) around content
-        /// written by the callback. Throws if the component was not registered via
+        /// written by the callback, or the content alone for a hidden field. Throws if the component was not registered via
         /// <c>RegisterInputComponent</c>: unregistered components are invisible to validation
         /// and gather, causing silent failures.
         /// </summary>
@@ -73,6 +75,12 @@ namespace Alis.Reactive.InputField
                     $"Input field '{BindingPath}' rendered without registering an input component. " +
                     "Validation and gather depend on the registered input contract. " +
                     "Call setup.RegisterInputComponent(...) in the component HtmlExtension before rendering the component.");
+
+            if (Options.IsHidden)
+            {
+                writeContent();
+                return;
+            }
 
             var fieldMarkup = new InputFieldBuilder(Writer, BindingPath).ForInputId(ElementId);
             if (Options.LabelText != null) fieldMarkup.Label(Options.LabelText);

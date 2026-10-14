@@ -4,6 +4,12 @@ namespace Alis.Reactive.SandboxApp.Hubs;
 
 public class NotificationHub : Hub { }
 
+/// <summary>The client methods <see cref="NotificationHub"/> calls on a page.</summary>
+public sealed class NotificationFeed : SignalRHub
+{
+    public SignalRMessage<NotificationPayload> ReceiveNotification => Message<NotificationPayload>("ReceiveNotification");
+}
+
 public class NotificationPayload
 {
     public int Count { get; set; }

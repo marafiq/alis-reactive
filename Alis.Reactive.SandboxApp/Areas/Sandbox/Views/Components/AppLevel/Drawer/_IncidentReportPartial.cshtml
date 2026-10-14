@@ -1,5 +1,4 @@
 @model IncidentReportModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.AppLevel
 @{
@@ -14,14 +13,19 @@
         .CssClass("self-start rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {
-            p.Post(Url.SandboxRoute("FileIncidentReport", "Drawer"), g => g.IncludeAll())
+            p.Post(Url.SandboxRoute("FileIncidentReport", "Drawer")).Gather(g => g.Form())
              .Validate<IncidentReportValidator>("incident-report-form")
-             .WhileLoading(l => l.Component<NativeLoader>().SetTarget("incident-report-form").Show())
+             .WhileLoading(l =>
+             {
+                 var loader = l.Component<NativeLoader>();
+                 loader.Target.Set("incident-report-form");
+                 loader.Show();
+             })
              .Response(r => r
                 .OnSuccess<IncidentReportFiled>((json, s) =>
                 {
                     s.Component<NativeLoader>().Hide();
-                    s.Element("incident-status").SetText(json, x => x.Confirmation);
+                    s.Element("incident-status").Text.Set(json.Get(x => x.Confirmation));
                 })
                 .OnError(400, e =>
                 {

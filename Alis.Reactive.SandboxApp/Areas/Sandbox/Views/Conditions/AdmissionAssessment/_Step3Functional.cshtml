@@ -1,5 +1,4 @@
 @model Step3FunctionalModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -32,14 +31,14 @@
         @{ Html.InputField(plan, m => m.FallHistory, o => o.Label("Fall History"))
             .FusionDropDownList(b => b
                 .DataSource(fallOptions)
-                .Placeholder("Select fall history")
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var hist = p.Component<FusionDropDownList>(m => m.FallHistory);
-                    p.When(hist.Value()).In("1-2 falls", "3+ falls")
-                        .Then(t => t.Element("fall-details").Show())
-                        .Else(e => e.Element("fall-details").Hide());
-                })); }
+                .Placeholder("Select fall history"))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var hist = p.Component<FusionDropDownList>(m => m.FallHistory);
+                p.When(hist.Value).In("1-2 falls", "3+ falls")
+                    .Then(t => t.Element("fall-details").Show())
+                    .Else(e => e.Element("fall-details").Hide());
+            }); }
 
         @{ Html.InputField(plan, m => m.FallRiskScore, o => o.Label("Fall Risk Score"))
             .FusionNumericTextBox(b => b.Min(0).Max(10).Step(1)); }
@@ -53,16 +52,16 @@
                 var fallRisk = p.Component<FusionNumericTextBox>(m => m.FallRiskScore);
                 var age = p.Component<FusionNumericTextBox>(m => m.Age);
 
-                p.When(fallRisk.Value()).Gte(7m).And(age.Value()).Gte(80m)
+                p.When(fallRisk.Value).Gte(7m).And(age.Value).Gte(80m)
                     .Then(t =>
                     {
-                        t.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Continuous");
-                        t.Element("fallrisk-result").SetText("Continuous monitoring required");
+                        t.Component<NativeHiddenField>(m => m.MonitoringLevel).Value.Set("Continuous");
+                        t.Element("fallrisk-result").Text.Set("Continuous monitoring required");
                         t.Element("fallrisk-result").Show();
                     })
                     .Else(e =>
                     {
-                        e.Element("fallrisk-result").SetText("Standard monitoring");
+                        e.Element("fallrisk-result").Text.Set("Standard monitoring");
                         e.Element("fallrisk-result").Show();
                     });
             }))
@@ -73,41 +72,40 @@
         @{ Html.InputField(plan, m => m.MobilityAid, o => o.Label("Mobility Aid"))
             .FusionDropDownList(b => b
                 .DataSource(mobilityAids)
-                .Placeholder("Select mobility aid")
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var aid = p.Component<FusionDropDownList>(m => m.MobilityAid);
+                .Placeholder("Select mobility aid"))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var aid = p.Component<FusionDropDownList>(m => m.MobilityAid);
 
-                    p.When(aid.Value()).In("Walker", "Wheelchair")
-                        .Then(t => t.Element("escort-indicator").Show())
-                        .Else(e => e.Element("escort-indicator").Hide());
+                p.When(aid.Value).In("Walker", "Wheelchair")
+                    .Then(t => t.Element("escort-indicator").Show())
+                    .Else(e => e.Element("escort-indicator").Hide());
 
-                    p.When(aid.Value()).Eq("Wheelchair")
-                        .Then(then =>
-                        {
-                            then.Element("room-spinner").Show();
-                            then.Post(requestRoomSetupUrl,
-                                g => g.Include<FusionDropDownList, Step3FunctionalModel>(m => m.MobilityAid)
-                                      .Include<NativeHiddenField, Step3FunctionalModel>(m => m.ResidentName))
-                             .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
-                             {
-                                 s.Element("room-result").SetText(json, x => x.Message);
-                                 s.Element("room-result").Show();
-                                 s.Element("room-spinner").Hide();
-                             }));
-                        });
-                })); }
+                p.When(aid.Value).Eq("Wheelchair")
+                    .Then(then =>
+                    {
+                        then.Element("room-spinner").Show();
+                        then.Post(requestRoomSetupUrl)
+                         .Gather<RequestRoomSetupRequest>(g => g.Form(m => m.MobilityAid, m => m.ResidentName))
+                         .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
+                         {
+                             s.Element("room-result").Text.Set(json.Get(x => x.Message));
+                             s.Element("room-result").Show();
+                             s.Element("room-spinner").Hide();
+                         }));
+                    });
+            }); }
 
         @{ Html.InputField(plan, m => m.MedicationCount, o => o.Label("Medication Count"))
             .FusionNumericTextBox(b => b
-                .Min(0).Max(50).Step(1)
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var meds = p.Component<FusionNumericTextBox>(m => m.MedicationCount);
-                    p.When(meds.Value()).Gt(10m)
-                        .Then(t => t.Element("polypharmacy-warning").Show())
-                        .Else(e => e.Element("polypharmacy-warning").Hide());
-                })); }
+                .Min(0).Max(50).Step(1))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var meds = p.Component<FusionNumericTextBox>(m => m.MedicationCount);
+                p.When(meds.Value).Gt(10m)
+                    .Then(t => t.Element("polypharmacy-warning").Show())
+                    .Else(e => e.Element("polypharmacy-warning").Hide());
+            }); }
     </native-grid>
 
     <native-vstack gap="Xs" class="font-mono text-sm mb-4">
@@ -123,24 +121,24 @@
 
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.TakesBloodThinners, o => o.Label("Takes Blood Thinners"))
-            .FusionSwitch(b => b
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var bt = p.Component<FusionSwitch>(m => m.TakesBloodThinners);
-                    p.When(bt.Value()).Truthy()
-                        .Then(t => t.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Enhanced"))
-                        .Else(e => e.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Standard"));
-                })); }
+            .FusionSwitch()
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var bt = p.Component<FusionSwitch>(m => m.TakesBloodThinners);
+                p.When(bt.Checked).Truthy()
+                    .Then(t => t.Component<NativeHiddenField>(m => m.MonitoringLevel).Value.Set("Enhanced"))
+                    .Else(e => e.Component<NativeHiddenField>(m => m.MonitoringLevel).Value.Set("Standard"));
+            }); }
 
         @{ Html.InputField(plan, m => m.TakesPainMedication, o => o.Label("Takes Pain Medication"))
-            .FusionSwitch(b => b
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var pm = p.Component<FusionSwitch>(m => m.TakesPainMedication);
-                    p.When(pm.Value()).Truthy()
-                        .Then(t => t.Element("pain-section").Show())
-                        .Else(e => e.Element("pain-section").Hide());
-                })); }
+            .FusionSwitch()
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var pm = p.Component<FusionSwitch>(m => m.TakesPainMedication);
+                p.When(pm.Checked).Truthy()
+                    .Then(t => t.Element("pain-section").Show())
+                    .Else(e => e.Element("pain-section").Hide());
+            }); }
     </native-grid>
 
     <div id="fall-details" hidden>
@@ -158,27 +156,27 @@
             {
                 p.Element("step-3").Hide();
                 p.Element("step-2").Show();
-                p.Element("step-ind-3").RemoveClass("font-bold");
-                p.Element("step-ind-3").RemoveClass("text-accent");
-                p.Element("step-ind-2").AddClass("font-bold");
-                p.Element("step-ind-2").AddClass("text-accent");
+                p.Element("step-ind-3").ClassList.Remove("font-bold");
+                p.Element("step-ind-3").ClassList.Remove("text-accent");
+                p.Element("step-ind-2").ClassList.Add("font-bold");
+                p.Element("step-ind-2").ClassList.Add("text-accent");
             }))
         @(Html.NativeButton("next-3", "Next: Review \u2192")
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(saveStep3Url,
-                    g => g.IncludeAll())
+                p.Post(saveStep3Url)
+                 .Gather(g => g.Form())
                  .Validate<Step3Validator>("step3-form")
                  .Response(r => r
                     .OnSuccess<SaveStepResponse>((json, s) =>
                     {
                         s.Element("step-3").Hide();
                         s.Element("step-4").Show();
-                        s.Element("step-ind-3").RemoveClass("font-bold");
-                        s.Element("step-ind-3").RemoveClass("text-accent");
-                        s.Element("step-ind-4").AddClass("font-bold");
-                        s.Element("step-ind-4").AddClass("text-accent");
+                        s.Element("step-ind-3").ClassList.Remove("font-bold");
+                        s.Element("step-ind-3").ClassList.Remove("text-accent");
+                        s.Element("step-ind-4").ClassList.Add("font-bold");
+                        s.Element("step-ind-4").ClassList.Add("text-accent");
                     })
                     .OnError(400, e =>
                     {

@@ -1,34 +1,33 @@
 using System;
 using System.Linq.Expressions;
+using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
 {
-    /// <summary>
-    /// Reads a typed value from a Reactive Plan payload scope such as event,
-    /// success, error, or dispatch.
-    /// </summary>
-    public sealed class PayloadTypedSource<TPayload, TProp> : TypedSource<TProp>
+    /// <summary>A member of data a callback received: an event's payload, a response body, a message.</summary>
+    internal sealed class PayloadTypedSource<TPayload, TProp> : TypedSource<TProp>
     {
-        private readonly PayloadSource _source;
+        private readonly Receiver _data;
         private readonly Expression<Func<TPayload, TProp>> _expression;
 
-        internal PayloadTypedSource(PayloadSource source, Expression<Func<TPayload, TProp>> expression)
+        internal PayloadTypedSource(Receiver data, Expression<Func<TPayload, TProp>> expression)
         {
-            _source = source;
+            _data = data;
             _expression = expression;
         }
 
-        internal static PayloadTypedSource<TPayload, TProp> FromEvent(
-            Expression<Func<TPayload, TProp>> expression) =>
-            new PayloadTypedSource<TPayload, TProp>(
-                PayloadSource.Event(),
-                expression);
-
-        internal override ValueExpression ToValueExpression()
+        // The identity expression (x => x) selects no member: it reads the whole payload, for example
+        // a response body that is itself the array a grid binds.
+        internal override ValueExpression Expression
         {
-            var payloadPath = ExpressionPathHelper.ToEventPath(_expression);
-            return ValueExpression.ReadPayload(_source, payloadPath, Shape);
+            get
+            {
+                var payloadPath = ExpressionPathHelper.ToEventPath(_expression);
+                return payloadPath.Length == 0
+                    ? ValueExpression.ReadWhole(_data, Shape)
+                    : ValueExpression.Read(_data, G.PathOf(Path.Parse(payloadPath)), Shape);
+            }
         }
     }
 }

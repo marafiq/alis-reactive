@@ -112,18 +112,9 @@ public class IntakeController : Controller
                 }
             });
 
-        var validator = new IntakeValidator();
-        var validationResult = validator.Validate(model);
-
-        if (!validationResult.IsValid)
-        {
-            var errors = validationResult.Errors
-                .GroupBy(e => e.PropertyName)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(e => e.ErrorMessage).ToArray());
-            return BadRequest(new { errors });
-        }
+        var result = new IntakeValidator().Validate(model);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
 
         return Ok(new { message = "Intake saved successfully" });
     }

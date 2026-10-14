@@ -8,13 +8,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
     }
 
-    /// <summary>How the family is reached: "text" or "email".</summary>
+    /// <summary>How the family is reached: "text", "email" or "phone".</summary>
     public class FamilyNoticeRequest
     {
         public string? Channel { get; set; }
     }
 
-    /// <summary>The server's answer to a discharge.</summary>
+    /// <summary>The server's answer to a discharge, or its reason for refusing one.</summary>
     public sealed record DischargeResult(string Message);
 
     /// <summary>The server's answer to a family notice; the same message envelope as every answer.</summary>

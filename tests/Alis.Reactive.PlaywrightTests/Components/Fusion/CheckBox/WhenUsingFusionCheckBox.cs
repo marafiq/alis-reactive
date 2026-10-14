@@ -207,9 +207,9 @@ public class WhenUsingFusionCheckBox : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"agreementAccepted\":true"),
+        Assert.That(body, Does.Contain("\"AgreementAccepted\":true"),
             "the gather must carry the agreement Checked() source under its declared key");
-        Assert.That(body, Does.Contain("\"housekeepingNeedsFollowUp\":true"),
+        Assert.That(body, Does.Contain("\"HousekeepingNeedsFollowUp\":true"),
             "the gather must carry the housekeeping Indeterminate() source under its declared key");
 
         AssertNoConsoleErrors();

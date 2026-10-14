@@ -23,12 +23,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 
             var result = new FallRiskScreeningValidator().Validate(screening);
             if (!result.IsValid)
-            {
-                var errors = result.Errors
-                    .GroupBy(error => error.PropertyName)
-                    .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).ToArray());
-                return BadRequest(new { errors });
-            }
+                return BadRequest(new { errors = result.ErrorsByField });
 
             // The validator requires the fall answer.
             var fall = screening.FellInLast90Days!.Value ? "a fall" : "no fall";

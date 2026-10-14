@@ -16,7 +16,7 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
 
         await Expect(Page.Locator($"#nested-form span[data-valmsg-for='Address.ConfirmCity']"))
             .Not.ToContainTextAsync("required when city");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -46,7 +46,7 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
 
         await Expect(Page.Locator($"#parent-child-form span[data-valmsg-for='Child.ChildName']"))
             .Not.ToContainTextAsync("required");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -59,7 +59,7 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
 
         await Expect(Page.Locator($"#parent-child-form span[data-valmsg-for='Child.ChildName']"))
             .Not.ToContainTextAsync("required");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]

@@ -1,80 +1,91 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.GridOperationsModel
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.KeyedUpdateModel
+@using Alis.Reactive.Builders
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @{
-    ViewData["Title"] = "Care-Ops Keyed Resident Update";
+    ViewData["Title"] = "Evening Rounds";
 
-    const string GridId = "keyed-update-grid";
+    const string BoardId = "evening-rounds";
     const string Button = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
 
-    var plan = Html.ReactivePlan<GridOperationsModel>();
+    var plan = Html.ReactivePlan<KeyedUpdateModel>();
 
-    // Focused scenario: update a resident's cell and whole row by primary key (no row index).
+    var columns = FusionGridColumns.Of<EveningRoundsResident>();
+
+    // The nurse's entry for the resident picked on the board; the answer names that resident by key.
+    HttpRequestBuilder<KeyedUpdateModel> Record(PipelineBuilder<KeyedUpdateModel> p, string endpoint) =>
+        p.Post(Url.SandboxRoute(endpoint, "Grid"))
+            .Gather<EveningRoundsRequest>(g => g.Set(x => x.Residents,
+                p.Component<FusionGrid>(BoardId).GetSelectedRecords<EveningRoundsResident>()));
+
+    void ShowRefusal(Data<EveningRoundsRefusal> refused, PipelineBuilder<KeyedUpdateModel> e) =>
+        e.Element("rounds-status").Text.Set(refused.Get(x => x.Summary));
+
     Html.On(plan, t => t.DomReady(p =>
-        p.Get(Url.SandboxRoute("OperationRows", "Grid"))
-            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
-            {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
-                s.Element("keyed-status").SetText("loaded");
-            }))));
+        p.Get(Url.SandboxRoute("KeyedUpdateBoard", "Grid"))
+            .Response(r => r.OnSuccess<List<EveningRoundsResident>>((residents, s) =>
+                s.Component<FusionGrid>(BoardId).DataSource.Set(residents)))));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Care-Ops Keyed Resident Update</native-heading>
-    <native-text color="Secondary">
-        Flag a resident's task count, quarantine their risk, and replace a resident row by primary key.
-    </native-text>
+    <div>
+        <native-heading level="H1">Evening Rounds</native-heading>
+        <native-text color="Secondary">
+            @Model.Wing wing, 3–11 shift, @Model.Nurse. Pick a resident on the board, then record what you did or
+            bring in what their chart says now.
+        </native-text>
+    </div>
 
-    <native-hstack gap="Sm" class="flex-wrap">
-        @(Html.NativeButton("keyed-set-tasks", "Flag Tasks (6000)")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).SetCellValue(6000, (ResidentDirectoryGridItem x) => x.OpenTasks, 99);
-                p.Element("keyed-status").SetText("setCellValue int called");
-            }))
-        @(Html.NativeButton("keyed-set-risk", "Quarantine Risk (6001)")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).SetCellValue(6001, (ResidentDirectoryGridItem x) => x.RiskLevel, "Quarantine");
-                p.Element("keyed-status").SetText("setCellValue string called");
-            }))
-        @(Html.NativeButton("keyed-set-row", "Replace Row (6002)")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).SetRowData(6002, new ResidentDirectoryGridItem
-                {
-                    ResidentId = 6002,
-                    ResidentName = "Keyed Row",
-                    Age = 88,
-                    CareLevel = "Skilled Nursing",
-                    Wing = "East",
-                    Suite = "E-202",
-                    RiskLevel = "High",
-                    PrimaryNurse = "Dana Cole",
-                    OpenTasks = 4,
-                    NextReviewDate = "2026-06-25"
-                });
-                p.Element("keyed-status").SetText("setRowData called");
-            }))
-    </native-hstack>
+    <native-card><native-card-body>
+        <native-hstack gap="Sm" class="mb-4 flex-wrap">
+            @(Html.NativeButton("mark-task-done", "Mark a task done")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    Record(p, "KeyedUpdateTaskDone").Response(r => r
+                        .OnSuccess<EveningRoundsTaskCount>((count, s) =>
+                        {
+                            s.Component<FusionGrid>(BoardId).SetCellValue(
+                                count.Get(x => x.ResidentId), Field.Of((EveningRoundsResident x) => x.OpenTasks), count.Get(x => x.OpenTasks));
+                            s.Element("rounds-status").Text.Set(count.Get(x => x.Summary));
+                        })
+                        .OnError<EveningRoundsRefusal>(400, ShowRefusal))))
+            @(Html.NativeButton("record-fall", "Record a fall")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    Record(p, "KeyedUpdateFall").Response(r => r
+                        .OnSuccess<EveningRoundsFallRisk>((risk, s) =>
+                        {
+                            s.Component<FusionGrid>(BoardId).SetCellValue(
+                                risk.Get(x => x.ResidentId), Field.Of((EveningRoundsResident x) => x.FallRisk), risk.Get(x => x.FallRisk));
+                            s.Element("rounds-status").Text.Set(risk.Get(x => x.Summary));
+                        })
+                        .OnError<EveningRoundsRefusal>(400, ShowRefusal))))
+            @(Html.NativeButton("refresh-from-chart", "Refresh from the chart")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    Record(p, "KeyedUpdateChart").Response(r => r
+                        .OnSuccess<EveningRoundsChart>((chart, s) =>
+                        {
+                            s.Component<FusionGrid>(BoardId).SetRowData(chart.Get(x => x.Resident.ResidentId), chart.Get(x => x.Resident));
+                            s.Element("rounds-status").Text.Set(chart.Get(x => x.Summary));
+                        })
+                        .OnError<EveningRoundsRefusal>(400, ShowRefusal))))
+        </native-hstack>
 
-    <p class="font-mono text-sm">Status: <span id="keyed-status" class="text-text-muted">waiting</span></p>
-
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        @(Html.FusionGrid<GridOperationsModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+        @(Html.FusionGrid<KeyedUpdateModel, EveningRoundsResident>(plan, BoardId, b => b
+            .AllowSelection(true)
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", IsPrimaryKey = true, TextAlign = TextAlign.Right, Visible = false },
-                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "240" },
-                new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "150" },
-                new GridColumn { Field = "openTasks", HeaderText = "Open Tasks", Width = "130", TextAlign = TextAlign.Right }
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", IsPrimaryKey = true, Visible = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "200" },
+                new GridColumn { Field = columns.Field(r => r.Room), HeaderText = "Room", Width = "100" },
+                new GridColumn { Field = columns.Field(r => r.FallRisk), HeaderText = "Fall risk", Width = "120" },
+                new GridColumn { Field = columns.Field(r => r.OpenTasks), HeaderText = "Open tasks", Width = "120", TextAlign = TextAlign.Right }
             })))
-    </section>
+
+        <p id="rounds-status" class="mt-4 text-sm font-medium">Pick a resident, then record what you did.</p>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

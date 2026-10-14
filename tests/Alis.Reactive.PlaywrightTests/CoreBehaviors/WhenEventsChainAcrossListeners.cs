@@ -68,9 +68,9 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
         var statusClasses = await status.GetAttributeAsync("class") ?? "";
 
         Assert.That(statusClasses, Does.Contain("text-green-600"),
-            "AddClass('text-green-600') must have applied");
+            "ClassList.Add('text-green-600') must have applied");
         Assert.That(statusClasses, Does.Not.Contain("text-text-muted"),
-            "RemoveClass('text-text-muted') must have removed the initial muted class");
+            "ClassList.Remove('text-text-muted') must have removed the initial muted class");
 
         AssertNoConsoleErrors();
     }
@@ -128,7 +128,7 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
         var statusClasses = await chainStatus.GetAttributeAsync("class") ?? "";
 
         Assert.That(statusClasses, Does.Not.Contain("text-text-muted"),
-            "RemoveClass('text-text-muted') must have executed on #chain-status — " +
+            "ClassList.Remove('text-text-muted') must have executed on #chain-status — " +
             "proves the 'final' event arrived AND the element update pipeline ran in order");
 
         AssertNoConsoleErrors();
@@ -146,11 +146,11 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
         Assert.Multiple(() =>
         {
             Assert.That(statusClasses, Does.Contain("text-green-600"),
-                "AddClass('text-green-600') must have applied — success color after full 3-hop chain");
+                "ClassList.Add('text-green-600') must have applied — success color after full 3-hop chain");
             Assert.That(statusClasses, Does.Contain("font-semibold"),
-                "AddClass('font-semibold') must have applied — emphasis after full 3-hop chain");
+                "ClassList.Add('font-semibold') must have applied — emphasis after full 3-hop chain");
             Assert.That(statusClasses, Does.Not.Contain("text-text-muted"),
-                "RemoveClass('text-text-muted') must have stripped the initial muted class — " +
+                "ClassList.Remove('text-text-muted') must have stripped the initial muted class — " +
                 "stale class would cause conflicting green+muted styles");
         });
 

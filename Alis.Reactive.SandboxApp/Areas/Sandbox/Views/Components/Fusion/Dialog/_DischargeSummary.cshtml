@@ -1,0 +1,25 @@
+@model DischargeSummaryModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    var plan = Html.ReactivePlan<DischargeSummaryModel>();
+}
+
+<native-vstack gap="Base">
+    <native-text>Margaret Hale goes home with her daughter on Friday at 10:00 AM. Her medications and care notes go with her.</native-text>
+    <native-hstack gap="Sm">
+        @(Html.NativeButton("discharge-confirm", "Confirm discharge")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Component<FusionDialog>("discharge-dialog").Hide();
+                p.Element("discharge-decision").Text.Set("Margaret Hale's discharge is confirmed.");
+            }))
+        @(Html.NativeButton("discharge-not-yet", "Not yet")
+            .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+                p.Component<FusionDialog>("discharge-dialog").Hide()))
+    </native-hstack>
+</native-vstack>
+
+@Html.RenderPlan(plan)

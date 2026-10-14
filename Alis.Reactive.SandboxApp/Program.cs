@@ -24,6 +24,14 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(2));
 builder.Services.AddReactiveFluentValidation(validation =>
     validation.AddFromAssemblyContaining<Program>());
+// The reservations office registers its own validators, as a module from its own assembly would; the
+// registrations merge with the app's, and its hold-book rule runs on the server alone.
+builder.Services.AddReactiveFluentValidation(validation =>
+    validation.Add<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ReservationsOfficeValidator>());
+// Maple Grove's rate policy: the rate sheet's validator takes it from DI, for the page and the server alike.
+builder.Services.AddSingleton(new Alis.Reactive.SandboxApp.Areas.Sandbox.Models.RateSheetPolicy("Maple Grove", 15000m));
+// The visit board's streams, keyed by session so browser worlds never hear each other.
+builder.Services.AddSingleton<Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought.VisitBoardStreams>();
 
 // Disable demo broadcasts in Playwright so realtime tests control their own events.
 if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ALIS_NO_BROADCAST")))

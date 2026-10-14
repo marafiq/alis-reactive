@@ -1,61 +1,51 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper.FusionStepperWizardContactModel
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper
+@model AdmissionContacts
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
-@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper
 @{
-    const string StepperId = "stepper-wizard";
-    const string FormId = "stepper-wizard-contact-form";
-    var saveUrl = Url.Action("SaveContact", "Stepper", new { area = "Sandbox" })
-        ?? throw new InvalidOperationException("Could not resolve Stepper.SaveContact.");
+    const string StepsId = "admission-steps";
+    const string StatusId = "admission-status";
+    const string FormId = "admission-contacts";
 
-    var plan = Html.ReactivePlan<FusionStepperWizardContactModel>();
+    var plan = Html.ReactivePlan<AdmissionContacts>();
 }
 
 <native-card><native-card-body id="@FormId">
-    <native-heading level="H2">Step 3: Responsible Party</native-heading>
-    <p class="text-sm text-text-secondary mb-4">
-        Contact fields use Syncfusion textbox primitives and framework regex/email validation.
-    </p>
+    <native-heading level="H2">Responsible party</native-heading>
+    <native-text color="Secondary">The family member Maple Grove calls first.</native-text>
 
-    @Html.HiddenFieldFor(plan, m => m.WizardId)
+    @Html.HiddenFieldFor(plan, m => m.AdmissionId)
 
-    <native-grid cols="C3" gap="Base" class="mb-4">
-        @{ Html.InputField(plan, m => m.ResponsibleParty, o => o.Required().Label("Responsible Party"))
-            .FusionTextBox(b => b.Placeholder("Primary contact").ShowClearButton(true)); }
+    <native-grid cols="C3" gap="Base" class="mt-4">
+        @{ Html.InputField(plan, m => m.ResponsibleParty, o => o.Required().Label("Responsible party"))
+            .FusionTextBox(b => b.Placeholder("Full name")); }
 
         @{ Html.InputField(plan, m => m.Phone, o => o.Required().Label("Phone"))
-            .FusionTextBox(b => b.Placeholder("123-456-7890").ShowClearButton(true)); }
+            .FusionTextBox(b => b.Placeholder("555-142-0188")); }
 
         @{ Html.InputField(plan, m => m.Email, o => o.Required().Label("Email"))
-            .FusionTextBox(b => b.Placeholder("contact@example.com").ShowClearButton(true)); }
+            .FusionTextBox(b => b.Placeholder("name@example.com")); }
     </native-grid>
 
-    <native-hstack gap="Sm" justify="Between" class="mt-6 flex-wrap">
-        @(Html.NativeButton("stepper-wizard-back-contact", "Back: Care")
-            .CssClass("rounded-md bg-surface px-5 py-2 text-sm font-medium text-text hover:bg-surface-2 transition-colors")
+    <native-hstack gap="Sm" justify="Between" class="mt-6">
+        @(Html.NativeButton("contacts-back", "Back to Care")
+            .CssClass("rounded-md border border-border bg-white px-5 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
             .Reactive(plan, evt => evt.Click, (_, p) =>
-            {
-                p.Component<FusionStepper>(StepperId).SetActiveStep(1);
-                p.Element("stepper-wizard-status").SetText("returned to care");
-            }))
+                p.Component<FusionStepper>(StepsId).PreviousStep()))
 
-        @(Html.NativeButton("stepper-wizard-next-contact", "Next: Review")
+        @(Html.NativeButton("contacts-continue", "Continue to Review")
             .CssClass("rounded-md bg-accent px-5 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (_, p) =>
-            {
-                p.Post(saveUrl, g => g.IncludeAll())
-                    .Validate<FusionStepperWizardContactValidator>(FormId)
+                p.Post(Url.SandboxRoute("SaveContact", "Stepper"))
+                    .Gather(g => g.Form())
+                    .Validate<AdmissionContactsValidator>(FormId)
                     .Response(r => r
-                        .OnSuccess<FusionStepperWizardSaveResponse>((json, s) =>
+                        .OnSuccess<AdmissionStepSaved>((saved, s) =>
                         {
-                            s.Component<NativeHiddenField>(m => m.WizardId).SetValue(json, x => x.WizardId);
-                            s.Component<NativeHiddenField, FusionStepperWizardShellModel>(m => m.MaxUnlockedStep).SetValue("3");
-                            s.Component<FusionStepper>(StepperId).SetActiveStep(3);
-                            s.Element("stepper-wizard-status").SetText(json, x => x.Message);
+                            s.Element(StatusId).Text.Set(saved.Get(x => x.Message));
+                            s.Component<FusionStepper>(StepsId).NextStep();
                         })
-                        .OnError(400, e => e.ValidationErrors(FormId)));
-            }))
+                        .OnError(400, e => e.ValidationErrors(FormId)))))
     </native-hstack>
 </native-card-body></native-card>
 

@@ -1,8 +1,8 @@
-using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
+/// <summary>A Syncfusion ListView by its component ID: its items, which are selected and which are checked.</summary>
 public sealed class FusionListViewLocator
 {
     private readonly IPage _page;
@@ -21,18 +21,19 @@ public sealed class FusionListViewLocator
         Root.GetByText(text, new() { Exact = true })
             .Locator("xpath=ancestor::li[contains(@class,'e-list-item')][1]");
 
-    public ILocator CheckedIcon(string text) => Item(text).Locator(".e-check");
+    /// <summary>The items the list shows as selected (checked items of a checkbox list included).</summary>
+    public ILocator SelectedItems => Root.Locator("li.e-list-item.e-active");
+
+    /// <summary>The check mark of the item with this text, present only while the item is checked.</summary>
+    public ILocator CheckMark(string text) => Item(text).Locator(".e-check");
+
+    /// <summary>Every check mark in a checkbox list.</summary>
+    public ILocator CheckMarks => Root.Locator("li.e-list-item .e-check");
 
     public async Task ClickItem(string text, int timeoutMs = 15000)
     {
         var item = Item(text);
         await item.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = timeoutMs });
         await item.ClickWhenStableAsync(_page, timeoutMs);
-    }
-
-    public async Task<bool> IsSelected(string text)
-    {
-        var className = await Item(text).GetAttributeAsync("class");
-        return Regex.IsMatch(className ?? string.Empty, @"\be-active\b");
     }
 }

@@ -1,5 +1,4 @@
 @model ResidentPanelModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.SandboxApp.Hubs
 @{
     var plan = Html.ReactivePlan<ResidentPanelModel>();
@@ -8,11 +7,17 @@
     // existing SignalR connection (same URL = same pooled connection).
     var drillId = (string?)ViewData["DrillId"] ?? "";
 
-    Html.On(plan, t => t.SignalR<ResidentStatusPayload>($"/hubs/resident-status?drill={drillId}", "StatusChanged",
+    Html.On(plan, t => t.DomReady(p => p.Element("panel-summary").Text.Set("Resident panel open.")));
+
+    // The page's summary line is written first: once the panel is closed, its handler is gone and
+    // the line keeps saying so.
+    Html.On(plan, t => t.SignalR(SignalRHub.At<ResidentStatusFeed>($"/hubs/resident-status?drill={drillId}"), h => h.StatusChanged,
         (payload, p) =>
     {
-        p.Element("panel-resident-name").SetText(payload, x => x.ResidentName);
-        p.Element("panel-resident-status").SetText(payload, x => x.Status);
+        p.Element("panel-summary").Text.Set("Resident panel updated live.");
+        p.Element("panel-resident-name").Text.Set(payload.Get(x => x.ResidentName));
+        p.Element("panel-resident-status").Text.Set(payload.Get(x => x.Status));
+        p.Element("panel-connections").Text.Set(payload.Get(x => x.Connections));
     }));
 }
 
@@ -35,6 +40,7 @@
                 <dd id="panel-resident-status" class="mt-1 text-sm text-text-primary">—</dd>
             </native-vstack>
         </native-grid>
+        <p class="mt-2 text-xs text-text-muted">Live connections on this screen: <span id="panel-connections">—</span></p>
     </native-card-body>
 </native-card>
 

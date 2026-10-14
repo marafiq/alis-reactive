@@ -181,14 +181,10 @@ public class WhenTimeSelected : PlaywrightTestBase
         await ScheduleButton.ClickAsync();
 
         // The Value() source fed the gather body; the server echoes the scheduled
-        // time as HH:mm. The exact hour is timezone-shifted by the runtime's
-        // toISOString gather serialization, so the assertion proves a real time
-        // round-tripped (not the "an unscheduled time" null fallback) without
-        // pinning the runner's offset.
+        // time as HH:mm. The time is sent as picked, with no offset, so the server
+        // reads 10:30 in any time zone.
         await Expect(ScheduleConfirmation)
-            .ToHaveTextAsync(new System.Text.RegularExpressions.Regex(
-                @"^Morning medication scheduled for \d{2}:\d{2}\.$"),
-                new() { Timeout = 10000 });
+            .ToHaveTextAsync("Morning medication scheduled for 10:30.", new() { Timeout = 10000 });
 
         AssertNoConsoleErrors();
     }
@@ -212,13 +208,12 @@ public class WhenTimeSelected : PlaywrightTestBase
         var body = request.PostData ?? "";
 
         // The Value() source must reach the body under its declared key, carrying
-        // the picker's Date (rendered ISO by the runtime). The ISO date proves the
-        // source yielded the component's value; if Value() broke, no ISO date would
-        // appear. Timezone-portable: the date is stable while the hour is UTC-shifted.
-        Assert.That(body, Does.Contain("medicationTime"),
+        // the picker's Date as the local date and time picked. The date proves the
+        // source yielded the component's value; if Value() broke, no date would appear.
+        Assert.That(body, Does.Contain("MedicationTime"),
             "the gather pipeline must carry the medication time under its declared key");
         Assert.That(body, Does.Contain("2026-01-01T"),
-            "the gather pipeline must carry the medication time Value() source as an ISO date-time");
+            "the gather pipeline must carry the medication time Value() source as a date and time");
 
         AssertNoConsoleErrors();
     }

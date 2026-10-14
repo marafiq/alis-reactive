@@ -1,0 +1,138 @@
+@model ResidentRegisterModel
+@using Alis.Reactive.Native.Components
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Resident Register";
+
+    const string Button = "self-start rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+
+    var plan = Html.ReactivePlan<ResidentRegisterModel>();
+    var residents = new List<SelectListItem>
+    {
+        new SelectListItem("Helen Park", "1042"),
+        new SelectListItem("Arthur Bell", "1043"),
+        new SelectListItem("Rosa Diaz", "1044"),
+    };
+
+    // The register's counts load with the page.
+    Html.On(plan, t => t.DomReady(p =>
+        p.Get(Url.SandboxRoute("Summary", "ResidentRegister"))
+         .WhileLoading(l => l.Element("register-loading").Show())
+         .Response(r => r.OnSuccess<RegisterSummary>((summary, s) =>
+         {
+             s.Element("register-loading").Hide();
+             s.Element("register-record-count").Text.Set(summary.Get(x => x.Records));
+             s.Element("register-resident-count").Text.Set(summary.Get(x => x.Residents));
+             s.Element("register-newest").Text.Set(summary.Get(x => x.NewestResident));
+         }))));
+
+    // A record removed or a resident moved: the list of records is reloaded from the register.
+    Html.On(plan, t => t.CustomEvent(ResidentRegisterEvents.RegisterChanged, p =>
+        p.Get(Url.SandboxRoute("Records", "ResidentRegister"))
+         .Response(r => r.OnSuccess(s => s.Into("register-records")))));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Resident Register</native-heading>
+    <native-text color="Secondary">
+        Maple wing front desk. Keep the register right before the fire drill: one record per resident, each
+        in the room the resident lives in.
+    </native-text>
+    <p id="register-loading" class="text-sm text-text-secondary" hidden>Loading the register...</p>
+    <p class="text-sm">
+        <span id="register-record-count" class="font-medium">—</span> records for
+        <span id="register-resident-count" class="font-medium">—</span> residents. Newest resident:
+        <span id="register-newest" class="font-medium">—</span>.
+    </p>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            <native-heading level="H2">Find a resident</native-heading>
+            @{ Html.InputField(plan, m => m.SearchName, o => o.Label("Name"))
+                .NativeTextBox(b => b.Placeholder("Part of a name").CssClass(Field)); }
+            @(Html.NativeButton("find-resident-btn", "Find")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Get(Url.SandboxRoute("Find", "ResidentRegister"))
+                     .Gather<RegisterSearch>(g => g.Set(x => x.Name, p.Component<NativeTextBox>(m => m.SearchName).Value))
+                     .Response(r => r.OnSuccess<RegisterMatches>((found, s) =>
+                     {
+                         s.Element("search-count").Text.Set(found.Get(x => x.Count));
+                         s.Element("search-matches").Text.Set(found.Get(x => x.Records));
+                     }));
+                }))
+            <p class="text-sm">Matching records: <span id="search-count" class="font-medium">—</span></p>
+            <p id="search-matches" class="text-sm text-text-secondary"></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            <native-heading level="H2">Move a resident</native-heading>
+            @{ Html.InputField(plan, m => m.MoveResidentId, o => o.Label("Resident"))
+                .NativeDropDown(b => b.Items(residents).Placeholder("-- Choose a resident --").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.MoveToRoom, o => o.Label("New room"))
+                .NativeTextBox(b => b.Placeholder("e.g. Maple 220").CssClass(Field)); }
+            @(Html.NativeButton("move-resident-btn", "Move Resident")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Put(Url.SandboxRoute("MoveRoom", "ResidentRegister"))
+                     .Gather<RegisterRoomMove>(g => g
+                         .Set(x => x.ResidentId, p.Component<NativeDropDown>(m => m.MoveResidentId).Value)
+                         .Set(x => x.Room, p.Component<NativeTextBox>(m => m.MoveToRoom).Value))
+                     .Response(r => r
+                        .OnSuccess<RegisterRoomMoved>((moved, s) =>
+                        {
+                            s.Element("move-status").Text.Set(moved.Get(x => x.Message));
+                            s.Element("move-status").ClassList.Remove("text-danger");
+                            s.Dispatch(ResidentRegisterEvents.RegisterChanged);
+                        })
+                        .OnError(422, e =>
+                        {
+                            e.Element("move-status").Text.Set("Choose a resident and the room they move to.");
+                            e.Element("move-status").ClassList.Add("text-danger");
+                        })
+                        .OnError<RegisterRoomTaken>(409, (taken, e) =>
+                        {
+                            e.Element("move-status").Text.Set(taken.Get(x => x.Reason));
+                            e.Element("move-status").ClassList.Add("text-danger");
+                        }));
+                }))
+            <p id="move-status" class="text-sm">No room change yet.</p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            <native-heading level="H2">Records</native-heading>
+            <native-text color="Secondary">A record without a care plan is a duplicate entered by mistake.</native-text>
+            <div id="register-records">
+                @await Html.PartialAsync("~/Areas/Sandbox/Views/HttpPipeline/ResidentRegister/_RegisterRecords.cshtml", Model.Records)
+            </div>
+            <p id="register-status" class="text-sm text-text-muted">No record removed yet.</p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            <native-heading level="H2">Fire-drill roster</native-heading>
+            @(Html.NativeActionLink("prepare-roster-link", "Prepare the Maple wing roster", Url.SandboxRoute("Roster", "ResidentRegister"), link => link
+                .Post()
+                .Gather<RegisterRosterRequest>(g => g.Set(x => x.Wing, "Maple"))
+                .WhileLoading(l => l.Element("roster-status").Text.Set("Preparing the Maple wing roster..."))
+                .Response(r => r.OnSuccess(s =>
+                {
+                    s.Into("roster-sheet");
+                    s.Element("roster-status").Text.Set("The Maple wing roster is ready to print.");
+                })))
+                .CssClass("self-start text-sm font-medium text-accent hover:underline"))
+            <p id="roster-status" class="text-sm text-text-muted">No roster prepared yet.</p>
+            <div id="roster-sheet"></div>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

@@ -15,7 +15,6 @@ namespace Alis.Reactive.Builders.Requests
     public class ParallelBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
-        private readonly ParallelDraft _draft = new ParallelDraft();
 
         internal ParallelBuilder(PlanBuildContext context)
         {
@@ -28,8 +27,11 @@ namespace Alis.Reactive.Builders.Requests
 
             var builder = new HttpRequestBuilder<TModel>(_context);
             request(builder);
-            _draft.AddBranch(builder.BuildRequest());
+            Step.Add(builder.Step);
         }
+
+        /// <summary>The requests this builder configures, written where <c>Parallel</c> is.</summary>
+        internal ParallelStep Step { get; } = new ParallelStep();
 
         /// <summary>
         /// Runs a reaction after every parallel request branch has settled.
@@ -39,16 +41,8 @@ namespace Alis.Reactive.Builders.Requests
         {
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
 
-            var reactionPipeline = new PipelineBuilder<TModel>(_context);
-            pipeline(reactionPipeline);
-            var reaction = reactionPipeline.BuildReaction();
-            _draft.RunWhenAllSettled(reaction);
+            Step.OnAllSettled(PipelineBuilder<TModel>.Build(_context, pipeline));
             return this;
-        }
-
-        internal ReactionGraph BuildReaction()
-        {
-            return _draft.ToReaction();
         }
     }
 }

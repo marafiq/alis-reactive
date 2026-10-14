@@ -28,28 +28,37 @@ public sealed class PagePlan<TModel> where TModel : class
             "[data-reactive-plan]",
             "el => el.textContent");
 
-        var doc = JsonDocument.Parse(json);
+        using var doc = JsonDocument.Parse(json);
         var components = new Dictionary<string, BoundComponent>(StringComparer.OrdinalIgnoreCase);
-        var root = doc.RootElement;
+        var objects = doc.RootElement.GetProperty("objects");
 
-        if (root.TryGetProperty("components", out var componentMap))
+        // Every element the plan locates, keyed by the member path its generated id ends with.
+        foreach (var entry in objects.EnumerateObject())
         {
-            foreach (var componentProperty in componentMap.EnumerateObject())
+            var locator = entry.Value;
+            if (locator.GetProperty("kind").GetString() != "element") continue;
+
+            var id = locator.GetProperty("id").GetString()!;
+            var vendor = locator.GetProperty("vendor").GetString()!;
+            var bindingPath = ExtractBindingPath(id);
+            components[bindingPath] = new BoundComponent(id, bindingPath, id, vendor, vendor + ".component." + id);
+        }
+
+        // The model's inputs also answer to their MVC binding name ("Address.City").
+        foreach (var entry in objects.EnumerateObject())
+        {
+            var locator = entry.Value;
+            var isModel = locator.GetProperty("kind").GetString() == "plugin"
+                && locator.GetProperty("name").GetString() == "alis.model"
+                && locator.GetProperty("data").GetProperty("kind").GetString() == "model";
+            if (!isModel) continue;
+
+            foreach (var input in locator.GetProperty("data").GetProperty("inputs").EnumerateObject())
             {
-                var componentKey = componentProperty.Name;
-                var component = componentProperty.Value;
-                var id = component.GetProperty("id").GetString()!;
-                var vendor = component.GetProperty("vendor").GetString()!;
-                var typeKey = component.GetProperty("type").GetString()!;
-
-                var bindingPath = ExtractBindingPath(componentKey);
-
-                components[bindingPath] = new BoundComponent(
-                    ElementId: id,
-                    BindingPath: bindingPath,
-                    ComponentKey: componentKey,
-                    Vendor: vendor,
-                    TypeKey: typeKey);
+                var bindingPath = input.Value.GetProperty("name").GetString()!;
+                if (!components.Values.Any(component => component.ElementId == input.Name)) continue;
+                var element = components.Values.First(component => component.ElementId == input.Name);
+                components[bindingPath] = element with { BindingPath = bindingPath };
             }
         }
 

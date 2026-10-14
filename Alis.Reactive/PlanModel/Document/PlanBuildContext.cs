@@ -1,88 +1,209 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using Alis.Reactive.Grammar;
+using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// Construction boundary used by the public DSL builders.
-    /// It delegates domain decisions to the plan authoring state and only exposes the
-    /// narrow authoring operations the DSL needs while building a Reactive Plan.
+    /// The plan a view is building: the elements it names, the handlers its triggers start, the forms
+    /// its requests validate and the callback a step lands in. <see cref="Write"/> writes the grammar
+    /// the runtime runs.
     /// </summary>
     internal sealed class PlanBuildContext
     {
-        private readonly PlanIdentity _identity;
-        private readonly BrowserObjectContracts _objectContracts;
-        private readonly BrowserObjects _browserObjects;
-        private readonly BehaviorGraph _behaviors;
-        private readonly List<ValidationJob> _validationJobs = new List<ValidationJob>();
+        private const string EventParam = "e";
 
-        internal PlanBuildContext(
-            PlanIdentity identity,
-            RegisteredInputComponents registrations)
+        private readonly string _planId;
+        private readonly RegisteredInputComponents _registrations;
+        private readonly List<DeclaredObject> _declared = new List<DeclaredObject>();
+        private readonly Dictionary<string, DeclaredObject> _declaredById = new Dictionary<string, DeclaredObject>(StringComparer.Ordinal);
+        private readonly List<(Func<ObjectTable, string> On, string Event, Block Body)> _handlers =
+            new List<(Func<ObjectTable, string>, string, Block)>();
+        private readonly HashSet<string> _plugins = new HashSet<string>(StringComparer.Ordinal);
+        private readonly List<RequestStep> _validatedRequests = new List<RequestStep>();
+        private readonly Dictionary<string, FormChecks> _forms = new Dictionary<string, FormChecks>(StringComparer.Ordinal);
+
+        // The callbacks being built, innermost last: a step lands in the innermost one.
+        private readonly Stack<Block> _blocks = new Stack<Block>();
+
+        internal PlanBuildContext(string planId, RegisteredInputComponents registrations)
         {
-            _identity = identity ?? throw new ArgumentNullException(nameof(identity));
-            _objectContracts = new BrowserObjectContracts();
-            _browserObjects = new BrowserObjects(_objectContracts, registrations);
-            _behaviors = new BehaviorGraph(_browserObjects);
+            _planId = planId ?? throw new ArgumentNullException(nameof(planId));
+            _registrations = registrations ?? throw new ArgumentNullException(nameof(registrations));
         }
 
-        internal PlanDocument BuildPlan() =>
-            new PlanDocument(
-                _identity,
-                _objectContracts.Snapshot(),
-                _browserObjects.Snapshot(),
-                _behaviors.Snapshot());
+        // ── callbacks ────────────────────────────────────────────────────────────
 
-        internal BrowserObject GetBrowserObject(ComponentKey key) => _browserObjects.Get(key);
-
-        internal void SetBrowserObject(ComponentKey key, BrowserObject browserObject) =>
-            _browserObjects.Set(key, browserObject);
-
-        internal void RegisterValidationJob(RequestPlan request, ComponentId container, Type validationSourceType) =>
-            _validationJobs.Add(new ValidationJob(request.Url, container, validationSourceType));
-
-        internal IReadOnlyList<ValidationJob> ValidationJobs => _validationJobs;
-
-        internal ComponentKey DeclareElement(string elementId) => _browserObjects.DeclareElement(elementId);
-
-        internal ComponentKey DeclareObjectTarget(string componentId, string vendor) =>
-            _browserObjects.DeclareObjectTarget(componentId, vendor);
-
-        internal ComponentKey DeclareLayoutObject(string componentId, string vendor) =>
-            _browserObjects.DeclareLayoutObject(componentId, vendor);
-
-        internal ComponentRegistration RequireRegistrationById(
-            string componentId,
-            RegisteredInputValueRead valueRead) =>
-            _browserObjects.RequireRegistrationById(componentId, valueRead);
-
-        internal ComponentKey DeclareInputComponent(InputComponentPlanBinding binding) =>
-            _browserObjects.DeclareInputComponent(binding);
-
-        internal void DeclareProperty(ComponentKey componentKey, ObjectPropertyContract contract) =>
-            _browserObjects.DeclareProperty(componentKey, contract);
-
-        internal ObjectMethod DeclareMethod(ComponentKey componentKey, ObjectMethodContract contract) =>
-            _browserObjects.DeclareMethod(componentKey, contract);
-
-        internal void RegisterPlugin(PluginContract contract) =>
-            _objectContracts.RegisterPlugin(contract);
-
-        internal MethodSignature DeclarePluginMethod(PluginMethodRequirement requirement) =>
-            _objectContracts.DeclarePluginMethod(requirement);
-
-        internal void DeclarePluginProperty(PluginPropertyRequirement requirement) =>
-            _objectContracts.DeclarePluginProperty(requirement);
-
-        internal void RegisterInputComponents() => _browserObjects.RegisterInputComponents();
-
-        internal void WireComponentEvent(string componentId, string vendor, string eventName, ReactionGraph reaction)
+        /// <summary>Builds a callback: every step written while it runs lands in the returned block.</summary>
+        internal Block Build(Action callback)
         {
-            DeclareObjectTarget(componentId, vendor);
-            var trigger = StartsWhen.ComponentEvent(componentId, eventName);
-            AddBehavior(Behavior.On(trigger, reaction));
+            var block = new Block();
+            _blocks.Push(block);
+            try
+            {
+                callback();
+            }
+            finally
+            {
+                _blocks.Pop();
+            }
+
+            return block;
         }
 
-        internal void AddBehavior(Behavior behavior) => _behaviors.Add(behavior);
+        /// <summary>The callback being built, where a step written now lands.</summary>
+        internal Block ActiveBlock
+        {
+            get
+            {
+                if (_blocks.Count == 0)
+                    throw new InvalidOperationException(
+                        "A reaction step was written outside any callback. Write it inside a trigger, a component's " +
+                        ".Reactive, Then, Else, OnSuccess, OnError, WhileLoading, Finally or OnAllSettled callback.");
+                return _blocks.Peek();
+            }
+        }
+
+        internal void AddStep(Step step) => ActiveBlock.Add(step);
+
+        /// <summary>Runs <paramref name="body"/> each time an object the plan names raises <paramref name="eventName"/>.</summary>
+        internal void On(Func<ObjectTable, string> on, string eventName, Block body) =>
+            _handlers.Add((on, eventName, body));
+
+        // ── objects ──────────────────────────────────────────────────────────────
+
+        /// <summary>An element the view rendered with this id, found by the browser itself unless a component claims it.</summary>
+        internal void DeclareElement(string elementId)
+        {
+            if (string.IsNullOrWhiteSpace(elementId)) throw new ArgumentException("Element ID required.", nameof(elementId));
+            if (!_declaredById.ContainsKey(elementId)) Add(new DeclaredObject(elementId, ComponentVendor.Native));
+        }
+
+        /// <summary>A component on the element with this id, from one vendor for the whole plan.</summary>
+        internal void DeclareComponent(string componentId, ComponentVendor vendor)
+        {
+            if (string.IsNullOrWhiteSpace(componentId)) throw new ArgumentException("Component ID required.", nameof(componentId));
+            if (_declaredById.TryGetValue(componentId, out var existing))
+            {
+                if (existing.Vendor.Name != vendor.Name)
+                    throw new InvalidOperationException(
+                        $"Component '{componentId}' registered as vendor '{existing.Vendor.Name}' " +
+                        $"but re-referenced as '{vendor.Name}'. A component cannot change vendor.");
+                return;
+            }
+
+            Add(new DeclaredObject(componentId, vendor));
+        }
+
+        internal void RegisterPlugin(string name)
+        {
+            if (!_plugins.Add(name))
+                throw new InvalidOperationException($"Plugin '{name}' is already registered.");
+        }
+
+        private void Add(DeclaredObject declared)
+        {
+            _declared.Add(declared);
+            _declaredById.Add(declared.Id, declared);
+        }
+
+        // ── validation ───────────────────────────────────────────────────────────
+
+        /// <summary>A request that checks its form first; the form's rules are bound when the plan is written.</summary>
+        internal void ValidateBefore(RequestStep request) => _validatedRequests.Add(request);
+
+        internal IReadOnlyList<RequestStep> ValidatedRequests => _validatedRequests;
+
+        /// <summary>The inputs a request's validator checks on the form, merged into the form's checks.</summary>
+        internal void Check(string formId, IEnumerable<CheckedField> fields)
+        {
+            DeclareElement(formId);
+            if (!_forms.TryGetValue(formId, out var form))
+                _forms.Add(formId, form = new FormChecks());
+            form.Merge(fields);
+        }
+
+        // ── writing ──────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Writes the plan: every element by id and vendor, the inputs <c>alis.model</c> binds, each
+        /// validated form's rules as <c>alis.form</c> data, then each handler.
+        /// </summary>
+        internal GrammarPlan Write()
+        {
+            var objects = new ObjectTable(_planId, _declared);
+            var plan = new PlanWriter(_planId, objects);
+
+            var inputs = ModelInputs(objects);
+            if (inputs.Count > 0) objects.Model(new ModelPluginData(inputs));
+
+            var forms = new FormWriter(Scope.ForHandler(plan, "$form"));
+            foreach (var declared in _declared)
+                if (_forms.TryGetValue(declared.Id, out var form))
+                    objects.Form(declared.Id, forms.Form(form.Fields));
+
+            var handlers = _handlers
+                .Select(handler =>
+                {
+                    var body = handler.Body.Write(Scope.ForHandler(plan, EventParam));
+                    return new Handler(handler.On(objects), handler.Event, EventParam, body);
+                })
+                .ToList();
+
+            return new GrammarPlan(_planId, objects.Vendors(), objects.Snapshot(), handlers);
+        }
+
+        /// <summary>Every input the view rendered is an element of the plan, after the elements its steps name.</summary>
+        internal void DeclareRegisteredInputs()
+        {
+            foreach (var registration in _registrations.Entries)
+                DeclareComponent(registration.Value.ComponentId, registration.Value.ComponentVendor);
+        }
+
+        // Each input this plan rendered: its MVC name, its JSON body path, its value read in the model's
+        // type and the event its component commits a value with.
+        private IReadOnlyDictionary<string, InputBinding> ModelInputs(ObjectTable objects)
+        {
+            var inputs = new Dictionary<string, InputBinding>(StringComparer.Ordinal);
+            foreach (var declared in _declared)
+            {
+                if (!_registrations.TryFindForComponent(ComponentId.Of(declared.Id), out var registration)) continue;
+
+                var input = registration.Input;
+                var value = G.Get(
+                    G.Obj(objects.Element(declared.Id)),
+                    input.ValuePath.Segments.Select(segment => segment.ToPathText()).ToList(),
+                    registration.Shape);
+                inputs.Add(
+                    declared.Id,
+                    new InputBinding(registration.BindingPath, BodyPath(registration.RegisteredBindingPath.Path), value, registration.Shape, input.CommittedBy.Value));
+            }
+
+            return inputs;
+        }
+
+        private static IReadOnlyList<object> BodyPath(Path path) =>
+            path.Segments
+                .Select(segment => segment.Kind == "index"
+                    ? (object)int.Parse(segment.ToPathText(), CultureInfo.InvariantCulture)
+                    : segment.ToPathText())
+                .ToList();
+    }
+
+    /// <summary>An element the plan names, with the vendor whose object it holds.</summary>
+    internal sealed class DeclaredObject
+    {
+        internal DeclaredObject(string id, ComponentVendor vendor)
+        {
+            Id = id;
+            Vendor = vendor;
+        }
+
+        internal string Id { get; }
+
+        internal ComponentVendor Vendor { get; }
     }
 }

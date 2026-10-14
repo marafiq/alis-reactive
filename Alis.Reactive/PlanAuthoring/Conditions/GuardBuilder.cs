@@ -1,158 +1,185 @@
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
 {
+    /// <summary>A condition built so far: what a group callback returns.</summary>
+    /// <typeparam name="TModel">View model that owns the condition.</typeparam>
+    public abstract class Condition<TModel> where TModel : class
+    {
+        private protected Condition(ConditionGraph graph)
+        {
+            Graph = graph ?? throw new ArgumentNullException(nameof(graph));
+        }
+
+        internal ConditionGraph Graph { get; }
+    }
+
     /// <summary>
-    /// Represents a completed condition expression that can be composed further or attached to a branch.
+    /// One comparison in a pipeline: continue with <c>And</c> or <c>Or</c>, negate it with <c>Not</c>,
+    /// or run reactions with <c>Then</c>.
     /// </summary>
     /// <remarks>
-    /// Created after a comparison operator, for example
-    /// <c>p.When(source).Gt(5).Then(...).Else(...)</c>.
+    /// <c>And</c> and <c>Or</c> do not mix in one chain: after <c>And</c> only <c>And</c> follows, and
+    /// after <c>Or</c> only <c>Or</c>. A mixed condition takes a group, so its precedence is written:
+    /// <c>p.When(a).Eq(1).And(g =&gt; g.When(b).Gt(2).Or(c).Truthy()).Then(..)</c>.
     /// </remarks>
-    /// <typeparam name="TModel">View model that owns the pipeline being guarded.</typeparam>
-    public sealed class GuardBuilder<TModel> where TModel : class
+    /// <typeparam name="TModel">View model that owns the guarded pipeline.</typeparam>
+    public sealed class GuardBuilder<TModel> : Condition<TModel> where TModel : class
     {
-        internal ConditionGraph ConditionGraph { get; }
-
         private readonly ConditionContinuation<TModel> _continuation;
 
-        internal GuardBuilder(ConditionGraph condition, PipelineBuilder<TModel> pipeline)
-            : this(condition, ConditionContinuation<TModel>.ForPipeline(pipeline))
+        internal GuardBuilder(ConditionGraph graph, ConditionContinuation<TModel> continuation) : base(graph)
         {
-        }
-
-        internal GuardBuilder(ConditionGraph condition, BranchBuilder<TModel> branchBuilder)
-            : this(condition, ConditionContinuation<TModel>.ForBranch(branchBuilder))
-        {
-        }
-
-        internal GuardBuilder(ConditionGraph condition)
-            : this(condition, ConditionContinuation<TModel>.Standalone)
-        {
-        }
-
-        internal GuardBuilder(ConditionGraph condition, ConditionContinuation<TModel> continuation)
-        {
-            ConditionGraph = condition ?? throw new ArgumentNullException(nameof(condition));
             _continuation = continuation ?? throw new ArgumentNullException(nameof(continuation));
         }
 
-        /// <summary>Adds an all-of comparison against the triggering event payload.</summary>
-        /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
-        /// <typeparam name="TProp">Selected event-payload value type.</typeparam>
-        /// <param name="payload">Trigger payload placeholder.</param>
-        /// <param name="path">Payload value compared at runtime.</param>
-        public ConditionSourceBuilder<TModel, TProp> And<TPayload, TProp>(
-            TPayload payload, Expression<Func<TPayload, TProp>> path)
-        {
-            var source = PayloadTypedSource<TPayload, TProp>.FromEvent(path);
-            return new ConditionSourceBuilder<TModel, TProp>(
-                source, _continuation, ConditionComposition.All(ConditionGraph));
-        }
+        /// <summary>Also requires a comparison of a value read when the condition runs.</summary>
+        public ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>> And<TProp>(TypedSource<TProp> source) =>
+            new ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>>(
+                source, next => new AllGuard<TModel>(ConditionComposition.All(Graph, next), _continuation));
 
-        /// <summary>Adds an all-of comparison against the active HTTP response body.</summary>
-        /// <typeparam name="TResponse">Response body contract for the active response route.</typeparam>
-        /// <typeparam name="TProp">Selected response-body value type.</typeparam>
-        /// <param name="responseBody">Response body placeholder supplied by the response route callback.</param>
-        /// <param name="path">Selects the response value to compare at runtime.</param>
-        public ConditionSourceBuilder<TModel, TProp> And<TResponse, TProp>(
-            ResponseBody<TResponse> responseBody, Expression<Func<TResponse, TProp>> path)
-            where TResponse : class
-        {
-            var source = responseBody.Read(path);
-            return new ConditionSourceBuilder<TModel, TProp>(
-                source, _continuation, ConditionComposition.All(ConditionGraph));
-        }
+        /// <summary>Also requires a group, whose own <c>And</c> and <c>Or</c> are evaluated first.</summary>
+        public AllGuard<TModel> And(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
+            new AllGuard<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)), _continuation);
 
-        /// <summary>Adds an any-of comparison against the triggering event payload.</summary>
-        /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
-        /// <typeparam name="TProp">Selected event-payload value type.</typeparam>
-        /// <param name="payload">Trigger payload placeholder.</param>
-        /// <param name="path">Payload value compared at runtime.</param>
-        public ConditionSourceBuilder<TModel, TProp> Or<TPayload, TProp>(
-            TPayload payload, Expression<Func<TPayload, TProp>> path)
-        {
-            var source = PayloadTypedSource<TPayload, TProp>.FromEvent(path);
-            return new ConditionSourceBuilder<TModel, TProp>(
-                source, _continuation, ConditionComposition.Any(ConditionGraph));
-        }
+        /// <summary>Alternatively accepts a comparison of a value read when the condition runs.</summary>
+        public ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>> Or<TProp>(TypedSource<TProp> source) =>
+            new ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>>(
+                source, next => new AnyGuard<TModel>(ConditionComposition.Any(Graph, next), _continuation));
 
-        /// <summary>Adds an any-of comparison against the active HTTP response body.</summary>
-        /// <typeparam name="TResponse">Response body contract for the active response route.</typeparam>
-        /// <typeparam name="TProp">Selected response-body value type.</typeparam>
-        /// <param name="responseBody">Response body placeholder supplied by the response route callback.</param>
-        /// <param name="path">Selects the response value to compare at runtime.</param>
-        public ConditionSourceBuilder<TModel, TProp> Or<TResponse, TProp>(
-            ResponseBody<TResponse> responseBody, Expression<Func<TResponse, TProp>> path)
-            where TResponse : class
-        {
-            var source = responseBody.Read(path);
-            return new ConditionSourceBuilder<TModel, TProp>(
-                source, _continuation, ConditionComposition.Any(ConditionGraph));
-        }
+        /// <summary>Alternatively accepts a group, whose own <c>And</c> and <c>Or</c> are evaluated first.</summary>
+        public AnyGuard<TModel> Or(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
+            new AnyGuard<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)), _continuation);
 
-        /// <summary>Adds an all-of comparison against a typed value source.</summary>
-        /// <typeparam name="TProp">Source value type.</typeparam>
-        /// <param name="source">Typed condition value source.</param>
-        public ConditionSourceBuilder<TModel, TProp> And<TProp>(TypedSource<TProp> source)
-        {
-            return new ConditionSourceBuilder<TModel, TProp>(
-                source, _continuation, ConditionComposition.All(ConditionGraph));
-        }
+        /// <summary>Negates this one comparison.</summary>
+        public GuardBuilder<TModel> Not() => new GuardBuilder<TModel>(ConditionGraph.Not(Graph), _continuation);
 
-        /// <summary>Adds an any-of comparison against a typed value source.</summary>
-        /// <typeparam name="TProp">Source value type.</typeparam>
-        /// <param name="source">Typed condition value source.</param>
-        public ConditionSourceBuilder<TModel, TProp> Or<TProp>(TypedSource<TProp> source)
-        {
-            return new ConditionSourceBuilder<TModel, TProp>(
-                source, _continuation, ConditionComposition.Any(ConditionGraph));
-        }
-
-        /// <summary>Composes this guard with a grouped all-of condition.</summary>
-        /// <param name="inner">Builds the grouped condition to compose with this guard.</param>
-        public GuardBuilder<TModel> And(
-            Func<ConditionStart<TModel>, GuardBuilder<TModel>> inner)
-        {
-            var innerResult = inner(new ConditionStart<TModel>());
-            var terms = new List<ConditionGraph>();
-            ConditionComposition.FlattenAll(ConditionGraph, terms);
-            ConditionComposition.FlattenAll(innerResult.ConditionGraph, terms);
-            return WrapCondition(PlanModel.ConditionGraph.All(terms.ToArray()));
-        }
-
-        /// <summary>Composes this guard with a grouped any-of condition.</summary>
-        /// <param name="inner">Builds the grouped condition to compose with this guard.</param>
-        public GuardBuilder<TModel> Or(
-            Func<ConditionStart<TModel>, GuardBuilder<TModel>> inner)
-        {
-            var innerResult = inner(new ConditionStart<TModel>());
-            var terms = new List<ConditionGraph>();
-            ConditionComposition.FlattenAny(ConditionGraph, terms);
-            ConditionComposition.FlattenAny(innerResult.ConditionGraph, terms);
-            return WrapCondition(PlanModel.ConditionGraph.Any(terms.ToArray()));
-        }
-
-        /// <summary>Negates the current condition.</summary>
-        public GuardBuilder<TModel> Not()
-        {
-            return WrapCondition(PlanModel.ConditionGraph.Not(ConditionGraph));
-        }
-
-        /// <summary>Starts the branch that runs when this guard matches.</summary>
-        /// <param name="pipeline">Builds the reactions for the matching branch.</param>
+        /// <summary>Runs <paramref name="pipeline"/> when the condition holds.</summary>
+        /// <param name="pipeline">The reactions of the branch.</param>
         public BranchBuilder<TModel> Then(Action<PipelineBuilder<TModel>> pipeline)
         {
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
-            return _continuation.Then(ConditionGraph, pipeline);
+            return _continuation.Then(Graph, pipeline);
+        }
+    }
+
+    /// <summary>Comparisons that must all hold: continue with <c>And</c>, or run reactions with <c>Then</c>.</summary>
+    /// <typeparam name="TModel">View model that owns the guarded pipeline.</typeparam>
+    public sealed class AllGuard<TModel> : Condition<TModel> where TModel : class
+    {
+        private readonly ConditionContinuation<TModel> _continuation;
+
+        internal AllGuard(ConditionGraph graph, ConditionContinuation<TModel> continuation) : base(graph)
+        {
+            _continuation = continuation;
         }
 
-        internal GuardBuilder<TModel> WrapCondition(ConditionGraph combined)
+        /// <summary>Also requires a comparison of a value read when the condition runs.</summary>
+        public ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>> And<TProp>(TypedSource<TProp> source) =>
+            new ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>>(
+                source, next => new AllGuard<TModel>(ConditionComposition.All(Graph, next), _continuation));
+
+        /// <summary>Also requires a group, whose own <c>And</c> and <c>Or</c> are evaluated first.</summary>
+        public AllGuard<TModel> And(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
+            new AllGuard<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)), _continuation);
+
+        /// <summary>Runs <paramref name="pipeline"/> when every comparison holds.</summary>
+        /// <param name="pipeline">The reactions of the branch.</param>
+        public BranchBuilder<TModel> Then(Action<PipelineBuilder<TModel>> pipeline)
         {
-            return _continuation.Wrap(combined);
+            if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
+            return _continuation.Then(Graph, pipeline);
         }
+    }
+
+    /// <summary>Comparisons of which one must hold: continue with <c>Or</c>, or run reactions with <c>Then</c>.</summary>
+    /// <typeparam name="TModel">View model that owns the guarded pipeline.</typeparam>
+    public sealed class AnyGuard<TModel> : Condition<TModel> where TModel : class
+    {
+        private readonly ConditionContinuation<TModel> _continuation;
+
+        internal AnyGuard(ConditionGraph graph, ConditionContinuation<TModel> continuation) : base(graph)
+        {
+            _continuation = continuation;
+        }
+
+        /// <summary>Alternatively accepts a comparison of a value read when the condition runs.</summary>
+        public ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>> Or<TProp>(TypedSource<TProp> source) =>
+            new ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>>(
+                source, next => new AnyGuard<TModel>(ConditionComposition.Any(Graph, next), _continuation));
+
+        /// <summary>Alternatively accepts a group, whose own <c>And</c> and <c>Or</c> are evaluated first.</summary>
+        public AnyGuard<TModel> Or(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
+            new AnyGuard<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)), _continuation);
+
+        /// <summary>Runs <paramref name="pipeline"/> when any comparison holds.</summary>
+        /// <param name="pipeline">The reactions of the branch.</param>
+        public BranchBuilder<TModel> Then(Action<PipelineBuilder<TModel>> pipeline)
+        {
+            if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
+            return _continuation.Then(Graph, pipeline);
+        }
+    }
+
+    /// <summary>One comparison inside a group: continue with <c>And</c> or <c>Or</c>, or negate it with <c>Not</c>. A group has no <c>Then</c>.</summary>
+    /// <typeparam name="TModel">View model that owns the condition.</typeparam>
+    public sealed class GroupCondition<TModel> : Condition<TModel> where TModel : class
+    {
+        internal GroupCondition(ConditionGraph graph) : base(graph) { }
+
+        /// <summary>Also requires a comparison of a value read when the condition runs.</summary>
+        public ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>> And<TProp>(TypedSource<TProp> source) =>
+            new ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>>(
+                source, next => new GroupAll<TModel>(ConditionComposition.All(Graph, next)));
+
+        /// <summary>Also requires a nested group.</summary>
+        public GroupAll<TModel> And(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
+            new GroupAll<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)));
+
+        /// <summary>Alternatively accepts a comparison of a value read when the condition runs.</summary>
+        public ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>> Or<TProp>(TypedSource<TProp> source) =>
+            new ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>>(
+                source, next => new GroupAny<TModel>(ConditionComposition.Any(Graph, next)));
+
+        /// <summary>Alternatively accepts a nested group.</summary>
+        public GroupAny<TModel> Or(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
+            new GroupAny<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)));
+
+        /// <summary>Negates this one comparison.</summary>
+        public GroupCondition<TModel> Not() => new GroupCondition<TModel>(ConditionGraph.Not(Graph));
+    }
+
+    /// <summary>Comparisons inside a group that must all hold: continue with <c>And</c>.</summary>
+    /// <typeparam name="TModel">View model that owns the condition.</typeparam>
+    public sealed class GroupAll<TModel> : Condition<TModel> where TModel : class
+    {
+        internal GroupAll(ConditionGraph graph) : base(graph) { }
+
+        /// <summary>Also requires a comparison of a value read when the condition runs.</summary>
+        public ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>> And<TProp>(TypedSource<TProp> source) =>
+            new ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>>(
+                source, next => new GroupAll<TModel>(ConditionComposition.All(Graph, next)));
+
+        /// <summary>Also requires a nested group.</summary>
+        public GroupAll<TModel> And(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
+            new GroupAll<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)));
+    }
+
+    /// <summary>Comparisons inside a group of which one must hold: continue with <c>Or</c>.</summary>
+    /// <typeparam name="TModel">View model that owns the condition.</typeparam>
+    public sealed class GroupAny<TModel> : Condition<TModel> where TModel : class
+    {
+        internal GroupAny(ConditionGraph graph) : base(graph) { }
+
+        /// <summary>Alternatively accepts a comparison of a value read when the condition runs.</summary>
+        public ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>> Or<TProp>(TypedSource<TProp> source) =>
+            new ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>>(
+                source, next => new GroupAny<TModel>(ConditionComposition.Any(Graph, next)));
+
+        /// <summary>Alternatively accepts a nested group.</summary>
+        public GroupAny<TModel> Or(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
+            new GroupAny<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)));
     }
 }

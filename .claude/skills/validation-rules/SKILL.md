@@ -1,181 +1,144 @@
 ---
 name: validation-rules-alis-reactive
-description: Guides validators for Alis.Reactive — server rules via FluentValidation, client rules recorded in the same call through ReactiveValidator<T>'s ClientRule(...), WhenField conditions, Shape inference, cross-property, dates. Use this skill when adding or modifying validators, validation views, or validation tests.
+description: Guides validators for Alis.Reactive — rules written once in FluentValidation's grammar on ReactiveValidator<T> (the framework implements the grammar; no FluentValidation package), run on the server and in the browser; When/Unless lambdas as browser conditions; children, collections, includes, peers, dates. Use this skill when adding or modifying validators, validation views, or validation tests.
 ---
 
 # Validation Rules for Alis.Reactive
 
 ## When to Use This Skill
 
-Use when:
-- Creating a new FluentValidation validator for a model
+- Creating or changing a validator for a model
 - Adding validation to a form view
 - Writing Playwright tests for validation behavior
-- Debugging why a validation rule doesn't fire in the browser
+- Debugging why a rule does or does not run in the browser
 
-## Base Classes
+## Written once
 
-| Need | Use | Import |
-|------|-----|--------|
-| Server-only rules | `AbstractValidator<T>` | `using FluentValidation;` |
-| Client rules (`ClientRule(...)`) and WhenField conditions | `ReactiveValidator<T>` | `using Alis.Reactive.FluentValidator;` + `using FluentValidation;` |
-
-## Client Rules — Quick Reference
-
-> Client validation is recorded, not extracted. `ClientRule(x => x.Prop)`
-> registers the server FluentValidation rule AND the client metadata in one
-> call (`ReactiveValidator.ClientRule` wraps `RuleFor`; the extensions live in
-> `ReactiveClientRuleBuilder.cs`). A plain `RuleFor(...)` is server-only by
-> construction — nothing reaches the browser from it. Every extension takes
-> the error message explicitly.
-
-### Text (shape: "string", automatic)
+A validator derives from `ReactiveValidator<T>` (`using Alis.Reactive.FluentValidator;`) and is
+registered through DI with `services.AddReactiveFluentValidation(v => v.AddFromAssemblyContaining<Program>())`.
+Its rules are written in FluentValidation's grammar, which the framework implements itself: there is
+no FluentValidation package. Each check defines what the server decides and, when the browser can
+decide it the same way, the rule the page's plan carries (`Checks.cs`). The server runs every rule;
+the browser runs every rule it can evaluate. There is no second vocabulary.
 
 ```csharp
-ClientRule(x => x.Name).Required("Name is required.");             // required — fails when empty
-ClientRule(x => x.Name).MinLength(2, "Min 2 characters.");         // minLength — skips empty
-ClientRule(x => x.Name).MaxLength(100, "Max 100 characters.");     // maxLength — skips empty
-ClientRule(x => x.Email).Email("Enter a valid email.");            // email — skips empty
-ClientRule(x => x.Phone).Regex(@"^\d{3}-\d{4}$", "Bad format.");   // regex — skips empty
-ClientRule(x => x.Card).CreditCard("Enter a valid card.");         // creditCard — skips empty
-ClientRule(x => x.Site).Url("Enter a valid URL.");                 // url — skips empty
-ClientRule(x => x.Nickname).Empty("Must be empty.");               // empty — passes when empty
-ClientRule(x => x.Status).NotEqual("deleted", "Already deleted."); // notEqual — skips empty
+public sealed class AdmissionValidator : ReactiveValidator<Admission>
+{
+    public AdmissionValidator()
+    {
+        RuleFor(x => x.ResidentName)
+            .NotEmpty().WithMessage("'Resident Name' is required.")
+            .MaximumLength(100).WithMessage("'Resident Name' must be at most 100 characters.");
+        RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate);
+        When(x => x.IsVeteran, () => RuleFor(x => x.ServiceNumber).NotEmpty());
+        RuleFor(x => x.Address).SetValidator(new AddressValidator());
+        RuleForEach(x => x.Contacts).SetValidator(new ContactValidator());
+        Include(new SharedRules());
+    }
+}
 ```
 
-### Numeric (shape.kind: "number", automatic from int/decimal/etc.)
+## What the browser evaluates
+
+The browser reads each input as MVC binds it (blank text is null; an empty non-nullable number,
+boolean or date is its default: 0, false, 0001-01-01) and gives the server's own verdict on
+that value. "Nothing bound" below is null: blank text, or an empty nullable input.
+
+| Check | Browser rule | Nothing bound |
+|---|---|---|
+| `NotEmpty()` | `required` (`atLeastOne` on a collection); also fails on the type's default | fails |
+| `NotNull()`, not on a collection | `required` | fails |
+| `Empty()` | `empty` | passes |
+| `MinimumLength(n)`, `MaximumLength(n)`, `Length(a, b)` | `minLength`, `maxLength` | passes |
+| `EmailAddress()`: one `@`, something on each side | `email` | passes |
+| `Matches(pattern)`, `Matches(pattern, options)` (`IgnoreCase`, `Multiline`, `Singleline` become flags; the browser runs it as a JavaScript `RegExp`, where `\w` is ASCII) | `regex` | passes |
+| `CreditCard()`: dashes and spaces dropped, digits only, Luhn | `creditCard` | passes |
+| `Url()`: absolute `http` or `https`, the scheme in any case | `url` | passes |
+| `InclusiveBetween(a, b)`, `ExclusiveBetween(a, b)` | `range`, `exclusiveRange` | passes |
+| `GreaterThan`, `GreaterThanOrEqualTo`, `LessThan`, `LessThanOrEqualTo` (a value or another member; another member with nothing bound fails) | `gt`, `min`, `lt`, `max` | passes |
+| `Equal`, `NotEqual` (a value or another member) | `equalTo`, `notEqual` / `notEqualTo` | compared, not skipped |
+| `SetValidator(child)`, `RuleForEach(...).SetValidator(child)`, `Include(v)`, `ChildRules(...)` | the child's rules, prefixed | |
+
+An empty non-nullable number is 0, not nothing: `ExclusiveBetween(0, 100)` and `GreaterThan(0)` on
+a `decimal` fail when it is left empty, as on the server.
+
+Messages come from `.WithMessage(...)` or the default template (FluentValidation's English wording).
+The server fills every placeholder (`{PropertyName}`, `{PropertyValue}`, `{ComparisonValue}`,
+`{MaxLength}`, `{From}`, ..., with `{Name:format}`); the browser fills those known at render and drops
+a sentence that names the entered value. A message with nothing else to say keeps its check on the
+server.
+
+An app's own check is an extension method that composes the checks above, so both sides run it
+(MoveInReviewValidator.cs, `WristbandCode`):
 
 ```csharp
-ClientRule(x => x.Age).Range(0, 120, "0–120.");                    // range — boundaries included
-ClientRule(x => x.Score).ExclusiveRange(0m, 100m, "0–100 excl."); // exclusiveRange — boundaries excluded
-ClientRule(x => x.Salary).Min(0m, "No negatives.");                // min — skips empty
-ClientRule(x => x.Salary).Max(500_000m, "Too high.");              // max — skips empty
-ClientRule(x => x.Rate).GreaterThan(0m, "Must be positive.");      // gt — FAILS when empty (implies required)
-ClientRule(x => x.Deposit).LessThan(1_000_000m, "Too high.");      // lt — skips empty
+public static IRuleBuilderOptions<T, string?> WristbandCode<T>(this IRuleBuilder<T, string?> rule) =>
+    rule.Matches(@"^WB-\d{6}$").WithMessage("Enter the wristband code as WB- and six digits, like WB-104233.");
 
-// Common pattern: required + range-bounded
-ClientRule(x => x.Age).Required("Age is required.")
-                      .Range(18, 120, "18–120.");
+RuleFor(x => x.WristbandCode).WristbandCode();
 ```
 
-### Date (shape.kind: "date", automatic from DateTime/DateOnly/DateTimeOffset)
+A comparison with another member (`GreaterThan(x => x.AdmissionDate)`) reads that member by its path
+from the model, so it may be on another object (`x => x.Stay.AdmitDate`).
+
+## Stays on the server
+
+Nothing is listed: a rule stays on the server by what it is.
+
+- `Must` and `MustAsync`: C# (a lookup, a service) the browser cannot run (analyzer ALIS005 notes it).
+  A validator with a `MustAsync` rule validates with `ValidateAsync`; `Validate` refuses it.
+- rules under a condition the browser cannot test: one that calls a method (`When(x => IsReturning(x), ..)`)
+  or reads anything but members and fixed values
+- a check whose message is written from the model (`WithMessage(x => $"... {x.Name}")`): the server says it
+- patterns with `IgnorePatternWhitespace` or `RightToLeft`, and patterns with syntax JavaScript reads differently (`\A`, `\z`, `\G`, inline `(?i)`, `(?>...)`, `(?#...)`, `\p{..}`, class subtraction)
+- a rule on a computed value (`RuleFor(x => x.Name.Trim())`): it has no input
+- the checks before `.ServerOnly()`: use it for a member the page does not render
+
+A browser rule on a member with no input on the page checks a missing value, as the server does
+when the request does not carry the member: a required rule blocks the form and shows its message
+in the validation summary (the rule may belong to a partial that has not loaded); a length or a
+pattern passes. Mark a required rule `.ServerOnly()` when the server fills the member in. A peer or a `When` member with no input reads as empty, as the
+server binds a member the request does not carry; render it as a hidden field (`o.Hidden()`) when
+its value matters.
+
+## Conditions
+
+Write the condition as a lambda over the model; the browser applies the same one. A condition after a
+rule's checks applies to the checks written before it.
 
 ```csharp
-ClientRule(x => x.Admission).Min(new DateTime(2020, 1, 1), "Too early.");   // min date
-ClientRule(x => x.Discharge).GreaterThan(x => x.Admission, "After admission."); // gt cross-property
+When(x => x.IsVeteran && new[] { "Memory Care", "Skilled Nursing" }.Contains(x.CareLevel), () => { ... });
+When(x => x.Score > 7, () => { ... }).Otherwise(() => { ... });
+Unless(x => string.IsNullOrEmpty(x.Portal), () => RuleFor(x => x.Portal).Url());
+When(x => x.Notes != null && x.Notes.Contains("urgent"), () => { ... });
+When(x => x.Tags.Contains("fall-risk"), () => { ... });
+RuleFor(x => x.ReassessmentPlan).NotEmpty().When(x => x.FallRiskScore >= 5 && x.FallRiskScore <= 7);
 ```
 
-> **WARNING: `DateTime.Today` / `DateTime.Now` freezes at construction time.** The constraint value is captured when the validator constructor runs. If the validator is registered as a singleton in DI, the date is frozen at app startup. Use fixed dates (e.g., `new DateTime(2020, 1, 1)`) for client-side rules. For dynamic date constraints (e.g., "must be after today"), use server-only `.When()` guards instead.
+Understood: `==`, `!=`, `<`, `<=`, `>`, `>=` between a member and a fixed value (constants and
+captured variables); a bool member alone; `== null`, `!= null`; `string.IsNullOrEmpty`;
+`Contains`, `StartsWith`, `EndsWith`, `Regex.IsMatch`; a fixed set's `Contains(member)`; a
+collection member's `Contains(value)`; a nullable member's `HasValue` and `Value`; `&&`, `||`, `!`.
+Enums compare by name. Anything else, including members of .NET's own values (`x.Name.Length`,
+`x.Tags.Count`), keeps the enclosed rules on the server.
 
-### Cross-Property (peer auto-included in the plan)
+> **Rules are read when the page renders,** from the validator the request resolves: a scoped
+> dependency, a captured setting or `DateTime.Today` is the one that request's server sees. A page
+> left open past midnight keeps the date it rendered with.
+
+## On the server
 
 ```csharp
-ClientRule(x => x.ConfirmEmail).EqualTo(x => x.Email, "Must match email.");      // equalTo — skips empty
-ClientRule(x => x.AltEmail).NotEqualTo(x => x.Email, "Must differ.");            // notEqualTo — skips empty
-ClientRule(x => x.End).GreaterThanOrEqualTo(x => x.Start, "After start.");       // min cross-property
-ClientRule(x => x.End).GreaterThan(x => x.Start, "Strictly after start.");       // gt cross-property
-ClientRule(x => x.Start).LessThan(x => x.End, "Before end.");                    // lt cross-property
-ClientRule(x => x.Start).LessThanOrEqualTo(x => x.End, "Not after end.");        // max cross-property
+var result = new MyValidator().Validate(model);       // ValidateAsync when a rule is MustAsync
+if (!result.IsValid)
+    return BadRequest(new { errors = result.ErrorsByField });
 ```
 
-### Server-Only
+`ErrorsByField` groups the messages by the field's path (`Address.City`, `Lines[0].Qty`), the shape
+`ValidationErrors(formId)` shows beside each field. To validate one model against two validators,
+compose them: `var rules = new InlineValidator<T>(); rules.Include(a); rules.Include(b);`.
 
-A plain `RuleFor(...)` rule is server-only by construction — nothing reaches
-the browser unless `ClientRule(...)` records it. Rules with no client-side
-equivalent stay `RuleFor`-only:
-
-| Rule | Why server-only |
-|------|-----------------|
-| `Null()` | No client-side equivalent |
-| `PrecisionScale()` | No client-side equivalent |
-| `IsInEnum()` | No client-side equivalent |
-| `IsEnumName()` | No client-side equivalent |
-| `MustAsync()` / DB lookups | Async and server state stay on the server |
-
-## Conditional Rules
-
-Uses `FieldCondition` — a tree type supporting all CompareOp operators and boolean composition (All/Any/Not). Requires `ReactiveValidator<T>` base class.
-
-### Equality / Presence (original 4)
-
-```csharp
-WhenField(x => x.IsEmployed, () => { ... });                // truthy
-WhenFieldNot(x => x.IsEmployed, () => { ... });             // falsy
-WhenField(x => x.CareLevel, "Memory Care", () => { ... });  // eq
-WhenFieldNot(x => x.CareLevel, "Independent", () => { ... }); // neq
-```
-
-### Ordering
-
-```csharp
-WhenFieldGt(x => x.Age, 18, () => { ... });          // gt
-WhenFieldGte(x => x.Salary, 50000m, () => { ... });  // gte
-WhenFieldLt(x => x.Age, 18, () => { ... });          // lt
-WhenFieldLte(x => x.Salary, 0m, () => { ... });      // lte
-```
-
-### Presence (null/empty)
-
-```csharp
-WhenFieldNull(x => x.MiddleName, () => { ... });     // is-null
-WhenFieldNotNull(x => x.MiddleName, () => { ... });  // not-null
-WhenFieldEmpty(x => x.Email, () => { ... });          // is-empty
-WhenFieldNotEmpty(x => x.Notes, () => { ... });       // not-empty
-```
-
-### Membership
-
-```csharp
-WhenFieldIn(x => x.CareLevel, new[] { "memory-care", "skilled-nursing" }, () => { ... });  // in
-WhenFieldNotIn(x => x.CareLevel, new[] { "independent", "assisted" }, () => { ... });      // not-in
-WhenFieldBetween(x => x.Age, 18, 65, () => { ... });  // between (inclusive)
-```
-
-### Text
-
-```csharp
-WhenFieldContains(x => x.Notes, "urgent", () => { ... });       // contains
-WhenFieldStartsWith(x => x.Name, "Dr.", () => { ... });         // starts-with
-WhenFieldEndsWith(x => x.Email, "@hospital.org", () => { ... });// ends-with
-WhenFieldMatches(x => x.Phone, @"^\d{3}-", () => { ... });      // matches (regex)
-WhenFieldMinLength(x => x.Notes, 10, () => { ... });            // min-length
-```
-
-### Array
-
-```csharp
-WhenFieldArrayContains(x => x.Tags, "urgent", () => { ... });   // array-contains
-```
-
-### Composition (And / Or / Not)
-
-```csharp
-WhenFields(c => c.Field(x => x.IsEmployed).Truthy()
-                  .And(c.Field(x => x.Age).Gte(18)),
-    () => { ClientRule(x => x.JobTitle).Required("Required when employed."); });
-
-WhenFields(c => c.Field(x => x.CareLevel).Eq("memory-care")
-                  .Or(c.Field(x => x.CareLevel).Eq("skilled-nursing")),
-    () => { ClientRule(x => x.Notes).Required("Notes are required."); });
-
-WhenFields(c => c.Field(x => x.IsEmployed).Truthy().Not(),
-    () => { ClientRule(x => x.Notes).Required("Notes are required."); });
-
-// Complex: (employed AND salary > 50k) OR age >= 65
-WhenFields(c =>
-    c.Field(x => x.IsEmployed).Truthy()
-     .And(c.Field(x => x.Salary).Gt(50000m))
-     .Or(c.Field(x => x.Age).Gte(65)),
-    () => { ClientRule(x => x.Email).Required("Email is required."); });
-```
-
-> **Dual purpose:** Every WhenField* method registers a server-side FV `.When()` predicate and scopes the client-side `FieldCondition` onto the `ClientRule(...)` rules declared inside it. Plain `RuleFor` inside a WhenField stays server-only. FV's `.When()` still works for server-only conditions (DB lookups, service calls).
-
-> **Case sensitivity:** WhenField value comparison is case-sensitive. The condition value must exactly match what the component gathers.
-
-> **Date serialization:** WhenField date condition values serialize as Unix milliseconds (via `ToUnixTimeMilliseconds()`), while rule constraint values use ISO `"yyyy-MM-dd"` format. Specify `DateTimeKind.Utc` explicitly to avoid timezone drift.
-
-## Wiring in View
+## Wiring in a view
 
 ```csharp
 @{ var plan = Html.ReactivePlan<MyModel>(); }
@@ -190,53 +153,25 @@ WhenFields(c =>
     {
         p.Post("/Save")
          .Validate<MyValidator>("my-form")
-         .Response(r => r.OnSuccess(s => { /* success */ }));
+         .Response(r => r
+            .OnSuccess(s => { /* success */ })
+            .OnError(400, e => e.ValidationErrors("my-form")));
     }))
 
 @Html.RenderPlan(plan)
 ```
 
-For a root plan, `RenderPlan` also writes the page's validation summary. It shows the errors that have no
-message slot beside an input: a server error for a hidden field or a field not on the page, and a rule
-for a partial's field that has not loaded yet. Do not hand-write a `data-reactive-validation-summary`
-div; the page finds the summary by the id `RenderPlan` gives it.
-
-## DO NOT
-
-| Wrong | Right | Why |
-|-------|-------|-----|
-| `RuleFor(x).Empty()` alone | `ClientRule(x).Empty(message)` | client metadata is recorded through `ClientRule` (`ReactiveClientRuleBuilder.cs:89`), not extracted from FV |
-| `RuleFor(x).ExclusiveBetween(a,b)` alone | `ClientRule(x).ExclusiveRange(a,b,message)` | same — `ReactiveClientRuleBuilder.cs:158` records server rule and client metadata together |
-| `.When(x => x.Bool)` | `WhenField(x => x.Bool, () => {})` | `.When()` is server-only |
-| Manual `min` rule without shape | Let adapter set it | Runtime throws without shape |
-| `p.Element("input-id")` for inputs | `Html.InputField(plan, m => m.Prop)` | Element() is for display, not input |
-
-## Empty Behavior
-
-| Rule | When empty | Why |
-|------|-----------|-----|
-| `required` | **Fails** | That's the point |
-| `empty` | **Passes** | Empty is the valid state |
-| `gt` | **Fails** | gt implies required |
-| All others | **Skips** | Use `required` separately for emptiness |
-
-> **Nullable fields with `gt` become effectively required.** Because `gt` fails on empty, applying `ClientRule(x => x.End).GreaterThan(x => x.Start, ...)` to an optional `DateTime?` field makes it required on the client even if the model allows null. There is NO extractable mechanism for "validate only when the field has a value" — `.When(x => x.Field.HasValue, ...)` is server-only and not extracted. Workaround: use a different validation strategy for optional cross-property date fields (e.g., validate server-side only, or redesign the form so the field is always required when visible via `WhenField`).
-
-## Fail-Closed
-
-Nothing silently passes. Unknown rules block. Missing shape throws. Unresolvable peers block. Unenriched fields go to summary.
+For a root plan, `RenderPlan` also writes the page's validation summary. It shows the errors that
+have no message slot beside an input: a server error for a hidden field or a field not on the page,
+and a rule for a partial's field that has not loaded yet.
 
 ## Verification
 
-After adding or modifying validation rules:
-
-1. **Contract + build**: `npm run typecheck && dotnet build` — the rule's plan model regenerates `runtime/types/plan.ts` and compiles cleanly (no separate C# unit/schema harness exists)
-2. **Build assets**: `npm run build:all` — confirm the browser bundles build with no errors
-3. **Browser**: Open the form, submit invalid data, confirm rules fire client-side
-4. **Playwright**: Run `scripts/playwright.sh` — confirm the BDD tests prove the validation behavior in the browser
-
-If a rule does not fire in the browser but passes C# tests, check: (a) shape is set for numeric/date fields, (b) the form id passed to `.Validate<TValidator>(...)` matches the form element, (c) the input was created with `Html.InputField()` not raw HTML.
-
-## Full Guide
-
-See the docs-site page `csharp-modules/reactivity/validation.md` for complete walkthrough with models, views, controllers, plan JSON examples, and date handling details.
+Playwright is the proof: open the form, submit invalid data, see the message; then pin it with a
+BDD test through `scripts/playwright.sh`. The worked example is `/Sandbox/Validation/MoveInReview`:
+one validator with a default message, `When`/`Otherwise`, `Unless`, a rule's own `.When`, a
+condition that calls a method, a composed check and `.ServerOnly()`, pinned by
+`WhenCoordinatorReviewsMoveIn`. If a rule does not run in the browser, check: it is one
+the table lists; its condition is a lambda the browser understands; the form id passed to
+`.Validate<TValidator>(...)` matches the form element; the input was created with
+`Html.InputField()`.

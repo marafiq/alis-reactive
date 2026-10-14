@@ -23,7 +23,7 @@ If you use the design system directly, add:
 
 ## Register Validation
 
-Register the FluentValidation bridge in `Program.cs`.
+Register your validators in `Program.cs`.
 
 ```csharp
 using Alis.Reactive.FluentValidator;
@@ -62,8 +62,9 @@ public sealed class TodoModel
 
 ## Create the Validator
 
-`ClientRule(...)` records metadata for browser validation and also adds the
-server-side FluentValidation rule.
+Write the rules once, in FluentValidation's grammar. The server runs them, and the browser runs
+every rule it can evaluate, under the same conditions. You do not install FluentValidation: the
+framework implements its grammar.
 
 ```csharp
 using Alis.Reactive.FluentValidator;
@@ -72,26 +73,24 @@ public sealed class TodoValidator : ReactiveValidator<TodoModel>
 {
     public TodoValidator()
     {
-        ClientRule(x => x.Title)
-            .Required("'Title' is required.")
-            .MaxLength(200, "'Title' must be at most 200 characters.");
+        RuleFor(x => x.Title)
+            .NotEmpty().WithMessage("'Title' is required.")
+            .MaximumLength(200).WithMessage("'Title' must be at most 200 characters.");
 
-        WhenField(x => x.IsUrgent, () =>
+        When(x => x.IsUrgent, () =>
         {
-            ClientRule(x => x.DueDate)
-                .Required("Urgent todos need a due date.");
+            RuleFor(x => x.DueDate).NotEmpty().WithMessage("Urgent todos need a due date.");
         });
     }
 }
 ```
 
-Plain `RuleFor(...)` is server-only. Use `ClientRule(...)` for rules that must
-be in the Reactive Plan.
+`Must` and `MustAsync` stay on the server, and so does a rule followed by `.ServerOnly()`.
 
 ## Add the Endpoint
 
 ```csharp
-using FluentValidation;
+using Alis.Reactive.FluentValidator;
 using Microsoft.AspNetCore.Mvc;
 
 public sealed class TodoController(IValidator<TodoModel> validator) : Controller
@@ -102,17 +101,8 @@ public sealed class TodoController(IValidator<TodoModel> validator) : Controller
     public IActionResult Save([FromBody] TodoModel model)
     {
         var result = validator.Validate(model);
-
         if (!result.IsValid)
-        {
-            var errors = result.Errors
-                .GroupBy(e => e.PropertyName)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(e => e.ErrorMessage).ToArray());
-
-            return BadRequest(new { errors });
-        }
+            return BadRequest(new { errors = result.ErrorsByField });
 
         return Ok(new { message = "Todo saved." });
     }
@@ -126,7 +116,7 @@ the end.
 
 ```csharp
 @model TodoModel
-@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.AppLevel
@@ -140,12 +130,13 @@ the end.
         .NativeTextBox(b => b.Placeholder("What needs to be done?")); }
 
     @{ Html.InputField(plan, m => m.IsUrgent, o => o.Label("Urgent"))
-        .NativeCheckBox(b => b.Reactive(plan, evt => evt.Changed, (args, p) =>
+        .NativeCheckBox()
+        .Reactive(evt => evt.Change, (args, p) =>
         {
-            p.When(args, x => x.Checked).Truthy()
+            p.When(args.Checked).Truthy()
              .Then(t => t.Element("due-date").Show())
              .Else(e => e.Element("due-date").Hide());
-        })); }
+        }); }
 
     <div id="due-date" hidden>
         @{ Html.InputField(plan, m => m.DueDate, o => o.Label("Due Date"))
@@ -155,16 +146,16 @@ the end.
     @(Html.NativeButton("save-btn", "Save")
         .Reactive(plan, evt => evt.Click, (_, p) =>
         {
-            p.Post("/Todo/Save", g => g.IncludeAll())
+            p.Post("/Todo/Save").Gather(g => g.Form())
              .Validate<TodoValidator>("todo-form")
              .Response(r => r
                 .OnSuccess(s =>
                 {
-                    s.Component<FusionToast>()
-                     .SetTitle("Todo")
-                     .SetContent("Todo saved.")
-                     .Success()
-                     .Show();
+                    var toast = s.Component<FusionToast>();
+                    toast.Title.Set("Todo");
+                    toast.Content.Set("Todo saved.");
+                    toast.Tone.Set(FusionToastTone.Success);
+                    toast.Show();
                 })
                 .OnError(400, e => e.ValidationErrors("todo-form")));
         }))
@@ -177,14 +168,15 @@ the end.
 
 `Html.ReactivePlan<TModel>()` creates the plan for this view.
 
-`Html.InputField(...)` registers each model-bound input. The runtime later uses
-those registrations for gather and validation.
+`Html.InputField(...)` registers each model-bound input. Those inputs are what
+`Form()` sends and what validation checks.
 
 `.Reactive(...)` wires a typed component event. The checkbox payload exposes
 `Checked`, so the condition reads `args.Checked`.
 
-`p.Post(...).Gather(...)` sends values read from registered inputs. The
+`p.Post(...).Gather(g => g.Form())` sends every input of the form under its
+binding name, so `Save([FromBody] TodoModel model)` receives each one. The
 `Validate<TValidator>(...)` call runs client validation before the request.
 
-`Response(...)` routes success and error outcomes. The success path writes to
-the app-level `FusionToast`. The error path displays server validation errors.
+`Response(...)` routes success and error outcomes. The success path writes the
+app-level `FusionToast`'s title, content and tone, then calls its `Show()`. The error path displays server validation errors.

@@ -16,19 +16,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new FusionBulletChartModel());
         }
 
-        [HttpPost("ClickAudit")]
-        public IActionResult ClickAudit([FromBody] FusionBulletChartClickAuditRequest request)
+        // A wing's bar and its budget line end with the wing's place in the chart, as EJ2 names them.
+        [HttpPost("WingShifts")]
+        public IActionResult WingShifts([FromBody] WingShiftsRequest request)
         {
-            var wing = request.Target.Contains("FeatureMeasure_0", StringComparison.Ordinal)
-                ? "North Wing"
-                : "Unknown wing";
+            var place = request.Bar[(request.Bar.LastIndexOf('_') + 1)..];
+            if (!int.TryParse(place, out var index) || index < 0 || index >= StaffingWeek.Nursing.Count)
+                return NotFound();
 
-            return Ok(new FusionBulletChartClickAuditResponse
-            {
-                Wing = wing,
-                Coordinates = $"{Math.Round(request.X)},{Math.Round(request.Y)}",
-                Message = $"Opened readiness drilldown for {wing}"
-            });
+            var wing = StaffingWeek.Nursing[index].Wing;
+            return Ok(new WingShifts { Wing = wing, Summary = StaffingWeek.ShiftNotes[wing] });
         }
     }
 }

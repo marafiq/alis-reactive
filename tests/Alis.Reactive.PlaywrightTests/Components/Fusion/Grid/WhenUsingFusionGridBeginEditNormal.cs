@@ -1,113 +1,130 @@
-using Alis.Reactive.Fusion.Components;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
+/// <summary>
+/// As the Maple wing wellness nurse, I want to open each resident's review form from the care review list and
+/// have a record on hold stay closed with the reason, so that I never change a record the hospital transfer
+/// team holds, and the server knows which record I have open.
+/// </summary>
+/// <remarks>
+/// The list is Amina Patel, Grace Bennett (on hold for a hospital transfer to Mercy General), Henry Liu and
+/// Irene Morgan. The nurse selects a resident and presses Open review; the review form saves with its own Save
+/// and Cancel buttons. Opening a review checks the record out on the server, which names the resident's census
+/// line.
+/// The review form's Risk level list opens on its first choice, Low, not on the resident's risk: the form's
+/// select field carries no value of the row (FusionGridEditTemplates DialogForm), so the nurse chooses the risk
+/// the review sets, and the tests do too.
+/// Not exercised:
+/// BeginEdit's Type: EJ2 sends "edit" on every beginEdit (normal-edit.js:110), so it carries nothing a page
+/// could show.
+/// BeginEdit's Cancel as a value read: the page writes it, and EJ2 reads it back (normal-edit.js:151).
+/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridBeginEditNormal : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/BeginEditNormal";
+    private const string ReviewListId = "care-review-grid";
 
-    private async Task NavigateProofView()
+    // The list numbers its columns from 1.
+    private const int ResidentColumn = 2;
+    private const int RiskColumn = 4;
+    private const int OpenTasksColumn = 5;
+
+    private ILocator Rows => Page.Locator($"#{ReviewListId} .e-row");
+    private ILocator Cell(string resident, int column) =>
+        Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{column}']");
+    private ILocator ReviewForm => Page.Locator($"#{ReviewListId}_dialogEdit_wrapper");
+    private ILocator ReviewField(string field) => ReviewForm.Locator($"[name='{field}']");
+    private ILocator ReviewButton(string text) => ReviewForm.Locator(".e-footer-content button", new() { HasText = text });
+    private ILocator OpenReview => Page.Locator("#open-review");
+    private ILocator Checkout => Page.Locator("#review-checkout");
+    private ILocator HoldNotice => Page.Locator("#hold-notice");
+    private ILocator ReviewSaved => Page.Locator("#review-saved");
+
+    private async Task NavigateAndBoot()
     {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
-        await Expect(Page.Locator("#begin-edit-load-status"))
-            .ToHaveTextAsync("loaded beginEdit rows", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#grid-begin-edit-normal .e-row").First)
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
+        await NavigateToAndWaitForBoot(Path);
+        await Expect(Rows).ToHaveCountAsync(4, new() { Timeout = 10000 });
+    }
+
+    private async Task OpenReviewOf(string resident)
+    {
+        await Cell(resident, ResidentColumn).ClickAsync();
+        await ClickWhenStable(OpenReview);
     }
 
     [Test]
-    public async Task begin_edit_normal_reads_row_data_and_can_cancel_edit()
+    public async Task opening_a_review_shows_the_residents_name_and_open_tasks_in_the_form()
     {
-        Assert.That(
-            typeof(FusionGridBeginEditArgs<ResidentDirectoryGridItem>).GetProperty("Row"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridBeginEditArgs<ResidentDirectoryGridItem>).GetProperty("ForeignKeyData"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridBeginEditArgs<ResidentDirectoryGridItem>).GetProperty("IsScroll"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridBeginEditArgs<ResidentDirectoryGridItem>).GetProperty("Name"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridBeginEditArgs<ResidentDirectoryGridItem>).GetProperty("PrimaryKey"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridBeginEditArgs<ResidentDirectoryGridItem>).GetProperty("PrimaryKeyValue"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridBeginEditArgs<ResidentDirectoryGridItem>).GetProperty("RequestType"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridBeginEditArgs<ResidentDirectoryGridItem>).GetProperty("Target"),
-            Is.Null);
+        await NavigateAndBoot();
 
-        await NavigateProofView();
+        await OpenReviewOf("Henry Liu");
 
-        await ClickWhenStable(Page.Locator("#begin-edit-select-normal"));
-        await ClickWhenStable(Page.Locator("#begin-edit-start-normal"));
-
-        await Expect(Page.Locator("#begin-edit-resident"))
-            .ToHaveTextAsync("Amina Patel", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#begin-edit-row"))
-            .ToHaveTextAsync("0", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#begin-edit-type"))
-            .ToHaveTextAsync("edit", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#begin-edit-cancel"))
-            .ToHaveTextAsync("false", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#grid-begin-edit-normal .e-editedrow"))
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
-
-        await ClickWhenStable(Page.Locator("#begin-edit-close"));
-        await Expect(Page.Locator("#grid-begin-edit-normal .e-editedrow"))
-            .ToHaveCountAsync(0, new() { Timeout = 10000 });
-
-        await ClickWhenStable(Page.Locator("#begin-edit-select-locked"));
-        await ClickWhenStable(Page.Locator("#begin-edit-start-locked"));
-
-        await Expect(Page.Locator("#begin-edit-resident"))
-            .ToHaveTextAsync("Grace Bennett", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#begin-edit-row"))
-            .ToHaveTextAsync("1", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#begin-edit-type"))
-            .ToHaveTextAsync("edit", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#begin-edit-cancel"))
-            .ToHaveTextAsync("false", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#begin-edit-cancelled"))
-            .ToHaveTextAsync("edit cancelled", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#grid-begin-edit-normal .e-editedrow"))
-            .ToHaveCountAsync(0, new() { Timeout = 10000 });
-
+        await Expect(ReviewForm).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(ReviewField("residentName")).ToHaveValueAsync("Henry Liu");
+        await Expect(ReviewField("openTasks")).ToHaveValueAsync("6");
+        // The risk list opens on Henry's moderate risk, so a review saved untouched keeps it.
+        await Expect(ReviewField("riskLevel")).ToHaveValueAsync("Moderate");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task begin_edit_dialog_reads_match_the_normal_edit_variant()
+    public async Task opening_a_review_checks_the_record_out_on_its_census_line()
     {
-        await NavigateProofView();
-        await Expect(Page.Locator("#grid-begin-edit-dialog .e-row").First)
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
+        await NavigateAndBoot();
 
-        await ClickWhenStable(Page.Locator("#begin-edit-select-dialog"));
-        await ClickWhenStable(Page.Locator("#begin-edit-start-dialog"));
+        await OpenReviewOf("Henry Liu");
 
-        // Dialog editor opens (mode is Dialog, not the inline edited row).
-        // The dialog wrapper id is derived deterministically from the grid id.
-        await Expect(Page.Locator("#grid-begin-edit-dialog_dialogEdit_wrapper"))
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Checkout).ToHaveTextAsync(
+            "Henry Liu's record is checked out to you for review (census line 3).", new() { Timeout = 10000 });
+        AssertNoConsoleErrors();
+    }
 
-        // The typed beginEdit payload reads identically to the normal-mode variant.
-        await Expect(Page.Locator("#begin-edit-dialog-resident"))
-            .ToHaveTextAsync("Amina Patel", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#begin-edit-dialog-row"))
-            .ToHaveTextAsync("0", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#begin-edit-dialog-type"))
-            .ToHaveTextAsync("edit", new() { Timeout = 10000 });
+    [Test]
+    public async Task a_record_on_hold_stays_closed_and_says_why()
+    {
+        await NavigateAndBoot();
 
+        await OpenReviewOf("Grace Bennett");
+
+        await Expect(HoldNotice).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(HoldNotice).ToHaveTextAsync(
+            "Grace Bennett's record is on hold (Hospital transfer to Mercy General). Lift the hold to open the review.");
+        await Expect(ReviewForm).ToHaveCountAsync(0);
+        await Expect(Checkout).ToHaveTextAsync("No review open.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task saving_a_review_sets_the_residents_risk_and_open_tasks()
+    {
+        await NavigateAndBoot();
+        await OpenReviewOf("Henry Liu");
+        await Expect(ReviewField("openTasks")).ToHaveValueAsync("6", new() { Timeout = 10000 });
+        await ReviewField("riskLevel").SelectOptionAsync("High");
+        await ReviewField("openTasks").FillAsync("4");
+
+        await ClickWhenStable(ReviewButton("Save"));
+
+        await Expect(ReviewForm).ToBeHiddenAsync(new() { Timeout = 10000 });
+        await Expect(Cell("Henry Liu", RiskColumn)).ToHaveTextAsync("High");
+        await Expect(Cell("Henry Liu", OpenTasksColumn)).ToHaveTextAsync("4");
+        await Expect(ReviewSaved).ToHaveTextAsync("Review saved for Henry Liu: High risk, 4 open tasks.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task cancelling_a_review_leaves_the_resident_as_they_were()
+    {
+        await NavigateAndBoot();
+        await OpenReviewOf("Henry Liu");
+        await Expect(ReviewField("openTasks")).ToHaveValueAsync("6", new() { Timeout = 10000 });
+        await ReviewField("openTasks").FillAsync("9");
+
+        await ClickWhenStable(ReviewButton("Cancel"));
+
+        await Expect(ReviewForm).ToBeHiddenAsync(new() { Timeout = 10000 });
+        await Expect(Cell("Henry Liu", OpenTasksColumn)).ToHaveTextAsync("6");
+        await Expect(ReviewSaved).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 }

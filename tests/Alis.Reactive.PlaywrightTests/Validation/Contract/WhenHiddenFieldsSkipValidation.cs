@@ -38,7 +38,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -100,7 +100,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         await Expect(ErrorFor("PhysicianName")).Not.ToBeVisibleAsync();
         await Expect(ErrorFor("MemoryAssessmentScore")).Not.ToBeVisibleAsync();
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]

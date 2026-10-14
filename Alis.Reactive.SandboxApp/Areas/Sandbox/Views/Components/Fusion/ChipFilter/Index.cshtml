@@ -1,13 +1,14 @@
 @model ChipFilterModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Buttons
 @using Syncfusion.EJ2.Grids
 @{
-    ViewData["Title"] = "ChipFilter";
+    ViewData["Title"] = "Residents by Care Level";
 
     var plan = Html.ReactivePlan<ChipFilterModel>();
+
+    var columns = FusionGridColumns.Of<CareResident>();
 
     var careChips = new List<ChipCollection>
     {
@@ -17,46 +18,34 @@
         new() { Text = "Skilled Nursing", Value = "skilled" },
     };
 
-    // Custom event carries selected chip objects for ReactiveArray guards and selected texts for server filtering.
-    Html.On(plan, t => t.CustomEvent<ChipFilterPayload>("filters-applied", (payload, p) =>
+    // Applying the filters announces the selected chips: their data say whether Memory Care is listed, their
+    // texts filter the roster on the server.
+    Html.On(plan, t => t.CustomEvent<ChipFilterPayload>(ChipFilterEvents.FiltersApplied, (payload, p) =>
     {
-        var selected = p.From(payload, x => x.Selection.Data);
+        var selected = p.From(payload.Get(x => x.Selection.Data));
 
-        p.Element("filter-count").SetText(selected.Count());
+        p.Element("filter-count").Text.Set(selected.Count());
 
         p.When(selected.Any(c => c.Value == "memory")).Truthy()
-         .Then(then => then.Element("memory-on").Show())
-         .Else(els => els.Element("memory-off").Show());
+         .Then(then => then.Element("memory-care-visits").Show())
+         .Else(els => els.Element("memory-care-visits").Hide());
 
         p.Post(Url.SandboxRoute("Filter", "ChipFilter"))
-         .Gather(g => g.FromEvent(payload, x => x.Selection.Texts, "careLevels"))
+         .Gather<CareFilterRequest>(g => g.Set(x => x.CareLevels, payload.Get(a => a.Selection.Texts)))
          .Response(r => r.OnSuccess<CareResidentResponse>((json, s) =>
-         {
-             s.Component<FusionGrid>("care-grid").SetDataSource(json, x => x.Residents);
-             s.Element("filter-status").SetText("filtered");
-         }));
+             s.Component<FusionGrid>("care-grid").DataSource.Set(json.Get(x => x.Residents))));
     }));
 
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("Residents", "ChipFilter"))
          .Response(r => r.OnSuccess<CareResidentResponse>((json, s) =>
-         {
-             s.Component<FusionGrid>("care-grid").SetDataSource(json, x => x.Residents);
-             s.Element("filter-status").SetText("all residents");
-         }))));
-
-    Html.NativeButton("apply-filters-btn", "Apply Filters")
-        .Reactive(plan, evt => evt.Click, (args, p) =>
-            p.DispatchWith<ChipFilterPayload>("filters-applied", b =>
-                b.Set(x => x.Selection, p.Component<FusionChipList>("care-filters").SelectedChips())));
+             s.Component<FusionGrid>("care-grid").DataSource.Set(json.Get(x => x.Residents))))));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">ChipFilter &mdash; multi-select chips as a filter</native-heading>
+    <native-heading level="H1">Residents by Care Level</native-heading>
     <native-text color="Secondary">
-        Pick care levels, then <strong>Apply</strong>. The array DSL operates on the selected chip
-        <em>objects</em> &mdash; <code>p.From(payload, x =&gt; x.Selection.Data).Any(c =&gt; c.Value == "memory")</code>
-        &mdash; and the selected texts filter the grid server-side. No plugin, no hand-written JS.
+        Front desk. Pick the care levels to list, then apply the filters.
     </native-text>
 
     <native-card><native-card-body>
@@ -66,21 +55,24 @@
 
         <div class="mt-4 flex items-center gap-3">
             @(Html.NativeButton("apply-filters-btn", "Apply Filters")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"))
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                    p.Dispatch<ChipFilterPayload>(ChipFilterEvents.FiltersApplied, b =>
+                        b.Set(x => x.Selection, p.Component<FusionChipList>("care-filters").GetSelectedChips()))))
         </div>
 
-        <native-vstack gap="Xs" class="font-mono text-sm my-3">
+        <native-vstack gap="Xs" class="text-sm my-3">
             <p>Care levels selected: <span id="filter-count">&mdash;</span></p>
-            <p id="memory-on" hidden class="text-amber-600">&#9679; Memory Care included</p>
-            <p id="memory-off" hidden class="text-text-muted">&#9675; Memory Care not included</p>
-            <p>Status: <span id="filter-status" class="text-text-muted">&mdash;</span></p>
+            <p id="memory-care-visits" hidden class="text-amber-700">
+                Memory Care residents are listed: visits to them go through the secured wing's desk.
+            </p>
         </native-vstack>
 
         @(Html.FusionGrid<ChipFilterModel, CareResident>(plan, "care-grid", b => b
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "name", HeaderText = "Resident", Width = "160" },
-                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "180" },
+                new GridColumn { Field = columns.Field(r => r.Name), HeaderText = "Resident", Width = "160" },
+                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "180" },
             })))
     </native-card-body></native-card>
 </native-vstack>

@@ -19,42 +19,55 @@ Model-bound components start with `Html.InputField(...)`.
 The model expression gives the component a deterministic ID. The same expression
 targets the component later.
 
-## React
-
-Component `.Reactive(...)` attaches a typed event.
+A component that is not a form input renders against the plan with an ID you
+choose, and the same ID targets it:
 
 ```csharp
-.Reactive(plan, evt => evt.Changed, (args, p) =>
+@(Html.FusionGrid<DirectoryViewModel, DirectoryResident>(plan, "resident-directory-grid", b => b
+    .AllowSelection(true)
+    .Columns(Columns()))
+    .Reactive(evt => evt.RowSelected<DirectoryResident>(), (args, p) => { ... }))
+```
+
+## React
+
+Component `.Reactive(...)` attaches a typed event to the rendered component.
+
+```csharp
+.Reactive(evt => evt.Change, (args, p) =>
 {
-    p.When(args, x => x.Value).Eq("memory")
+    p.When(args.Value).Eq("memory")
      .Then(t => t.Element("memory-care-panel").Show())
      .Else(e => e.Element("memory-care-panel").Hide());
 })
 ```
 
-The payload type belongs to the selected event. IntelliSense shows the payload
-members for that event.
+`args` is the object the selected event hands you, typed for that event.
+IntelliSense shows its members.
 
 ## Target
 
-Use `p.Component<TComponent>(...)` to work with the component later.
+Use `p.Component<TComponent>(...)` to work with the component later. It returns
+the component itself, so hold it in a variable named for its role:
 
 ```csharp
-p.Component<FusionDropDownList>(m => m.CareLevel)
- .SetValue("assisted")
- .DataBind();
+var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
+careLevel.Value.Set("assisted");
+careLevel.DataBind();
 ```
 
-Each extension method maps to a real browser member.
+Every member the component's class declares, by the name its JavaScript API
+uses, is a member of that variable: a property you write or read, a method you
+call. Each write or call is its own statement.
 
 ## Read
 
-Readable members return typed sources.
+A property is itself a typed value, and so is a method that returns one.
 
 ```csharp
-var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel).Value();
+var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
 
-p.When(careLevel).Eq("memory")
+p.When(careLevel.Value).Eq("memory")
  .Then(t => t.Element("memory-care-panel").Show());
 ```
 
@@ -72,11 +85,13 @@ arguments.
 App-level components are targeted without a model expression:
 
 ```csharp
-p.Component<FusionToast>()
- .SetContent("Saved")
- .Success()
- .Show();
+var toast = p.Component<FusionToast>();
+toast.Content.Set("Saved");
+toast.Tone.Set(FusionToastTone.Success);
+toast.Show();
 ```
 
 Do not learn Alis.Reactive by memorizing every component. Learn the object
-model. A new component should still read as event, payload, property, method.
+model. A new component should still read as event, payload, property, method,
+and one the framework does not ship is brought the same way: declare its class,
+render it, and its members work like those of any shipped component.

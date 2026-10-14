@@ -183,11 +183,11 @@ public class WhenSwitchToggles : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"receiveCareAlerts\":true"),
+        Assert.That(body, Does.Contain("\"ReceiveCareAlerts\":true"),
             "the gather pipeline must carry the master switch Value() under its declared key");
-        Assert.That(body, Does.Contain("\"emailReminders\":false"),
+        Assert.That(body, Does.Contain("\"EmailReminders\":false"),
             "the gather pipeline must carry the email switch Value() (toggled off) under its declared key");
-        Assert.That(body, Does.Contain("\"textMessageAlerts\":false"),
+        Assert.That(body, Does.Contain("\"TextMessageAlerts\":false"),
             "the gather pipeline must carry the text switch Value() under its declared key");
 
         AssertNoConsoleErrors();

@@ -1,185 +1,186 @@
-@model ArrayManagerModel
-@using Alis.Reactive
-@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Plugins.ArrayManager
+@model WardDeskModel
+@using Alis.Reactive.Builders
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Builders.Conditions
 @{
-    ViewData["Title"] = "Array Plugin";
+    ViewData["Title"] = "Ward Desk";
 
-    var plan = Html.ReactivePlan<ArrayManagerModel>();
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
+    const string Figure = "flex justify-between gap-4 border-b border-border/60 py-1.5";
+    const string InResidence = "in residence";
+
+    var plan = Html.ReactivePlan<WardDeskModel>();
 
     var array = plan.RegisterPlugin<ArrayPlugin>();
-    var analytics = plan.RegisterPlugin<AnalyticsPlugin>();
     var slugify = plan.RegisterPlugin<SlugifyPlugin>();
+    var community = plan.RegisterPlugin<CommunityPlugin>();
+    var visitorPass = plan.RegisterPlugin<VisitorPassPlugin>();
+    var birchUrl = Url.SandboxRoute("Residents", "ArrayManager");
+
+    // A ward's census, read through the array plugin: who is on it, who is in residence and their care
+    // hours, where the round starts, whether anyone is critical (a plugin result in a condition) and
+    // whether the ward fills its beds (a plugin result against the community plugin's beds per ward).
+    void ShowWard(PipelineBuilder<WardDeskModel> s, Data<WardCensusResponse> ward)
+    {
+        var residents = ward.Get(x => x.Residents);
+        TypedSource<object> inResidence = array.Filter(residents, "status", InResidence);
+
+        s.Element("ward-name").Text.Set(ward.Get(x => x.Ward));
+        s.Element("ward-code").Text.Set(slugify.Slug(ward.Get(x => x.Ward)));
+        s.Element("ward-census").Text.Set(array.Count(residents));
+        s.Element("ward-in-residence").Text.Set(array.Count(inResidence));
+        s.Element("ward-care-hours").Text.Set(array.Sum(inResidence, "careHours"));
+        s.Element("ward-first-round").Text.Set(array.Pluck(inResidence, 0, "name"));
+
+        s.When(array.Some(residents, "condition", "critical")).Truthy()
+            .Then(critical =>
+            {
+                critical.Element("ward-critical").Show();
+                critical.Element("ward-none-critical").Hide();
+            })
+            .Else(stable =>
+            {
+                stable.Element("ward-none-critical").Show();
+                stable.Element("ward-critical").Hide();
+            });
+
+        s.When(array.Count(residents)).Eq(community.BedsPerWard)
+            .Then(full =>
+            {
+                full.Element("ward-full").Show();
+                full.Element("ward-beds-open").Hide();
+            })
+            .Else(open =>
+            {
+                open.Element("ward-beds-open").Show();
+                open.Element("ward-full").Hide();
+            });
+    }
 
     Html.On(plan, t => t.DomReady(p =>
-        p.Get(Url.SandboxRoute("Residents", "ArrayManager"))
-         .Response(r => r.OnSuccess<ResidentsListResponse>((json, s) =>
-         {
-             TypedPluginSource<int> countSrc = p.Plugin(array.Count).Arg(json, x => x.Items);
-             s.Element("arr-total").SetText(countSrc);
-
-             TypedPluginSource<object> pluckSrc = p.Plugin(array.Pluck)
-                 .Arg(json, x => x.Items).Arg(0).Arg("name");
-             s.Element("arr-first-name").SetText(pluckSrc);
-
-             TypedPluginSource<object> filtered = p.Plugin(array.Filter)
-                 .Arg(json, x => x.Items).Arg("status").Arg("active");
-             TypedPluginSource<int> activeCount = p.Plugin(array.Count).Arg(filtered);
-             s.Element("arr-active-count").SetText(activeCount);
-
-             TypedPluginSource<int> sumSrc = p.Plugin(array.Sum)
-                 .Arg(json, x => x.Items).Arg("age");
-             s.Element("arr-total-age").SetText(sumSrc);
-
-             TypedPluginSource<bool> someSrc = p.Plugin(array.Some)
-                 .Arg(json, x => x.Items).Arg("status").Arg("critical");
-             s.When(someSrc).Truthy()
-              .Then(then => then.Element("arr-has-critical").Show())
-              .Else(els => els.Element("arr-no-critical").Show());
-
-             TypedPluginSource<string> slugSrc = p.Plugin(slugify.Slug).Arg("John Doe");
-             s.Element("arr-root-slug").SetText(slugSrc);
-
-             s.Element("arr-results").AddClass("text-green-600");
-         }))));
-
-    Html.NativeButton("arr-send-btn", "Send to Server")
-        .Reactive(plan, evt => evt.Click, (args, p) =>
-        {
-            TypedPluginSource<int> countForGather = p.Plugin(array.Count).Arg("items");
-            p.Get(Url.SandboxRoute("PluginEcho", "ArrayManager"))
-             .Gather(g => g
-                 .Header("X-Array-Count", countForGather)
-                 .Plugin(countForGather, "count"))
-             .Response(r => r
-                .OnSuccess<PluginArrayEchoResponse>((json, s) =>
-                {
-                    s.Element("arr-echo-count").SetText(json, x => x.ReceivedCount);
-                    s.Element("arr-echo-header").SetText(json, x => x.ReceivedHeader);
-                    s.Element("arr-echo-result").AddClass("text-green-600");
-                    s.Plugin(analytics.Track).Arg("array-sent").Fire();
-                }));
-        });
-
-    Html.NativeButton("arr-filter-btn", "Filter Active & Inspect")
-        .Reactive(plan, evt => evt.Click, (args, p) =>
-        {
-            p.Get(Url.SandboxRoute("Residents", "ArrayManager"))
-             .Response(r => r.OnSuccess<ResidentsListResponse>((json, s) =>
-             {
-                 TypedPluginSource<object> active = p.Plugin(array.Filter)
-                     .Arg(json, x => x.Items).Arg("status").Arg("active");
-
-                 TypedPluginSource<int> activeCount = p.Plugin(array.Count).Arg(active);
-                 s.Element("arr-f-count").SetText(activeCount);
-
-                 TypedPluginSource<int> activeAgeSum = p.Plugin(array.Sum).Arg(active).Arg("age");
-                 s.Element("arr-f-age-sum").SetText(activeAgeSum);
-
-                 TypedPluginSource<object> firstName = p.Plugin(array.Pluck)
-                     .Arg(active).Arg(0).Arg("name");
-                 s.Element("arr-f-first").SetText(firstName);
-
-                 TypedPluginSource<bool> allActive = p.Plugin(array.Some)
-                     .Arg(active).Arg("status").Arg("active");
-                 s.Element("arr-f-some").SetText(allActive);
-
-                 s.Element("arr-f-result").AddClass("text-green-600");
-
-                 s.Plugin(analytics.Track).Arg("filter-inspect").Fire();
-             }));
-        });
-
+        p.Get(birchUrl).Response(r => r.OnSuccess<WardCensusResponse>((ward, s) => ShowWard(s, ward)))));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Array Plugin</native-heading>
+    <native-heading level="H1">Ward Desk</native-heading>
     <native-text color="Secondary">
-        Native JS array methods exposed to the DSL via plugin. Proves typed method, command, nested read, and root function patterns.
+        Night supervisor's desk. Birch ward's census opens with the desk; the memory-care ward is one click away.
     </native-text>
 
-    <native-card>
-    <native-card-body>
-        <native-heading level="H2">DomReady: Array Operations on Server Data</native-heading>
-        <native-vstack gap="Sm" id="arr-results" class="font-mono text-sm text-text-muted">
-            <p>Total: <span id="arr-total">—</span></p>
-            <p>First Name: <span id="arr-first-name">—</span></p>
-            <p>Active Count: <span id="arr-active-count">—</span></p>
-            <p>Total Age: <span id="arr-total-age">—</span></p>
-            <p>Root Function: <span id="arr-root-slug">—</span></p>
-            <p id="arr-has-critical" hidden class="text-red-600">Critical residents found!</p>
-            <p id="arr-no-critical" hidden class="text-green-600">No critical residents ✓</p>
-        </native-vstack>
-    </native-card-body>
-    </native-card>
+    <native-card><native-card-body>
+        <native-hstack justify="Between" align="Center" class="flex-wrap gap-2">
+            <native-heading level="H2"><span id="ward-name">Loading the census</span></native-heading>
+            @(Html.NativeButton("memory-ward-btn", "Open the Memory-Care Ward")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                    p.Get(Url.SandboxRoute("MemoryWard", "ArrayManager"))
+                        .Response(r => r.OnSuccess<WardCensusResponse>((ward, s) => ShowWard(s, ward)))))
+        </native-hstack>
+        <p class="text-sm text-text-secondary">Ward code <span id="ward-code" class="font-mono"></span></p>
 
-    <native-card>
-    <native-card-body>
-        <native-heading level="H2">HTTP: Plugin Values in Gather + Header</native-heading>
-        @(Html.NativeButton("arr-send-btn", "Send to Server")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"))
-        <native-vstack gap="Sm" id="arr-echo-result" class="mt-3 font-mono text-sm text-text-muted">
-            <p>Count: <span id="arr-echo-count">—</span></p>
-            <p>Header: <span id="arr-echo-header">—</span></p>
-        </native-vstack>
-    </native-card-body>
-    </native-card>
+        <p id="ward-critical" hidden class="mt-3 rounded-md bg-red-50 px-4 py-3 text-sm font-medium text-red-800">
+            A resident on this ward is critical: read the nurse's notes before the round.
+        </p>
+        <p id="ward-none-critical" hidden class="mt-3 text-sm text-text-secondary">No resident on this ward is critical.</p>
+        <p id="ward-full" hidden class="mt-1 text-sm text-amber-800">Every bed on the ward is filled.</p>
+        <p id="ward-beds-open" hidden class="mt-1 text-sm text-text-secondary">Beds are open on the ward.</p>
 
+        <dl class="mt-4 grid grid-cols-1 gap-x-10 text-sm md:grid-cols-2">
+            <div class="@Figure"><dt>Residents on the census</dt><dd id="ward-census" class="font-medium">&mdash;</dd></div>
+            <div class="@Figure"><dt>In residence</dt><dd id="ward-in-residence" class="font-medium">&mdash;</dd></div>
+            <div class="@Figure"><dt>Care hours today, residents in residence</dt><dd id="ward-care-hours" class="font-medium">&mdash;</dd></div>
+            <div class="@Figure"><dt>The morning round starts with</dt><dd id="ward-first-round" class="font-medium">&mdash;</dd></div>
+        </dl>
+    </native-card-body></native-card>
 
-    <native-card>
-    <native-card-body>
-        <native-heading level="H2">Button: Filter Active — All 5 Methods + Conditions</native-heading>
-        @(Html.NativeButton("arr-filter-btn", "Filter Active & Inspect")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"))
-        <native-vstack gap="Sm" id="arr-f-result" class="mt-3 font-mono text-sm text-text-muted">
-            <p>Active Count: <span id="arr-f-count">—</span></p>
-            <p>Active Age Sum: <span id="arr-f-age-sum">—</span></p>
-            <p>First Active Name: <span id="arr-f-first">—</span></p>
-            <p>Some Active: <span id="arr-f-some">—</span></p>
-        </native-vstack>
-    </native-card-body>
-    </native-card>
+    <native-card><native-card-body>
+        <native-heading level="H2">Tonight's staffing, Birch ward</native-heading>
+        <p class="text-sm text-text-secondary">The staffing service plans the night from the ward's census and the residents in residence.</p>
+        @(Html.NativeButton("request-staffing-btn", "Request Tonight's Staffing")
+            .CssClass(Button + " mt-3")
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+                p.Get(birchUrl)
+                    .Response(r => r.OnSuccess<WardCensusResponse>((ward, s) =>
+                    {
+                        var residents = ward.Get(x => x.Residents);
+                        TypedSource<int> inResidence = array.Count(array.Filter(residents, "status", InResidence));
+                        s.Get(Url.SandboxRoute("Staffing", "ArrayManager"))
+                            .Gather<WardStaffingQuery>(g => g
+                                .Header("X-Ward-Census", array.Count(residents))
+                                .Set(x => x.InResidence, inResidence))
+                            .Response(staffing => staffing.OnSuccess<WardStaffingPlan>((answer, a) =>
+                                a.Element("staffing-plan").Text.Set(answer.Get(x => x.Plan))));
+                    }))))
+        <p id="staffing-plan" class="mt-3 text-sm">Not requested yet tonight.</p>
+    </native-card-body></native-card>
 
-    <native-card>
-    <native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </native-card-body>
-    </native-card>
+    <native-card><native-card-body>
+        <native-heading level="H2">Visitor pass</native-heading>
+        <p class="text-sm text-text-secondary">
+            Daniel Reed visits his father, Thomas Reed, on Saturday 14 November; an aide walks him up to Birch ward.
+        </p>
+        @(Html.NativeButton("print-pass-btn", "Print Daniel Reed's Pass")
+            .CssClass(Button + " mt-3")
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+            {
+                // The desk issues his pass: escorted, its number, the day, the parking fee and the visit's hours.
+                p.Element("pass-heading").Text.Set(visitorPass.Heading(true, 4000000001L, new DateTime(2026, 11, 14)));
+                p.Element("pass-charges").Text.Set(visitorPass.Charges(12.50m, 1.5));
+                p.Element("visitor-pass").Show();
+            }))
+        <div id="visitor-pass" hidden class="mt-3 rounded-md border border-border px-4 py-3 text-sm">
+            <p class="font-medium">Daniel Reed, visiting Thomas Reed</p>
+            <p id="pass-heading"></p>
+            <p id="pass-charges"></p>
+        </div>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)
 
 @functions {
+    // The sandbox's array plugin (Scripts/sandbox-plugins.ts): each member reads a list of plain objects by field name.
     private sealed class ArrayPlugin : Plugin
     {
         public ArrayPlugin()
             : base("array")
         {
-            Count = Function<int>("count").Arg<object>();
-            Pluck = Function<object>("pluck").Arg<object>().Arg<int>().Arg<string>();
-            Filter = Function<object>("filter").Arg<object>().Arg<string>().Arg<string>();
-            Sum = Function<int>("sum").Arg<object>().Arg<string>();
-            Some = Function<bool>("some").Arg<object>().Arg<string>().Arg<string>();
         }
 
-        public PluginFunction<int> Count { get; }
-        public PluginFunction<object> Pluck { get; }
-        public PluginFunction<object> Filter { get; }
-        public PluginFunction<int> Sum { get; }
-        public PluginFunction<bool> Some { get; }
+        public TypedSource<int> Count(Arg<object> items) => Invoke<int>(items);
+
+        public TypedSource<object> Pluck(Arg<object> items, Arg<int> index, Arg<string> field) => Invoke<object>(items, index, field);
+
+        public TypedSource<object> Filter(Arg<object> items, Arg<string> field, Arg<string> value) => Invoke<object>(items, field, value);
+
+        public TypedSource<int> Sum(Arg<object> items, Arg<string> field) => Invoke<int>(items, field);
+
+        public TypedSource<bool> Some(Arg<object> items, Arg<string> field, Arg<string> value) => Invoke<bool>(items, field, value);
     }
 
-    private sealed class AnalyticsPlugin : Plugin
+    private sealed class CommunityPlugin : Plugin
     {
-        public AnalyticsPlugin()
-            : base("analytics")
+        public CommunityPlugin()
+            : base("community")
         {
-            Track = Command("track").Arg<string>();
         }
 
-        public PluginCommand Track { get; }
+        /// <summary>How many beds each ward holds.</summary>
+        public ReadOnly<int> BedsPerWard => ReadOnly<int>();
+    }
+
+    private sealed class VisitorPassPlugin : Plugin
+    {
+        public VisitorPassPlugin()
+            : base("visitorPass")
+        {
+        }
+
+        /// <summary>The pass's heading: whether the visitor is escorted, the pass number and the day of the visit.</summary>
+        public TypedSource<string> Heading(Arg<bool> escorted, Arg<long> number, Arg<DateTime> day) => Invoke<string>(escorted, number, day);
+
+        /// <summary>The pass's charges: the parking fee and how many hours the visit lasts.</summary>
+        public TypedSource<string> Charges(Arg<decimal> parking, Arg<double> hours) => Invoke<string>(parking, hours);
     }
 
     private sealed class SlugifyPlugin : Plugin
@@ -187,9 +188,8 @@
         public SlugifyPlugin()
             : base("slugify")
         {
-            Slug = Function<string>().Arg<string>();
         }
 
-        public PluginFunction<string> Slug { get; }
+        public TypedSource<string> Slug(Arg<string> text) => Invoke<string>(text, name: "");
     }
 }

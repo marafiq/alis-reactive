@@ -1,5 +1,4 @@
 @model CarePlanReviewModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.AppLevel
 @{
@@ -25,23 +24,28 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Get(Url.SandboxRoute("Census", "Loader"))
-                     .WhileLoading(l => l.Component<NativeLoader>().SetTimeout(3000).Show())
+                     .WhileLoading(l =>
+                     {
+                         var loader = l.Component<NativeLoader>();
+                         loader.Timeout.Set(3000);
+                         loader.Show();
+                     })
                      .Response(r => r.OnSuccess<CensusSummary>((json, s) =>
                      {
                          s.Component<NativeLoader>().Hide();
-                         s.Element("census-status").SetText(json, x => x.Summary);
+                         s.Element("census-status").Text.Set(json.Get(x => x.Summary));
                      }));
                 }))
             @(Html.NativeButton("save-care-plan-btn", "Save Care Plan")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post(Url.SandboxRoute("SaveCarePlan", "Loader"), g => g.IncludeAll())
+                    p.Post(Url.SandboxRoute("SaveCarePlan", "Loader")).Gather(g => g.Form())
                      .WhileLoading(l => l.Component<NativeLoader>().Show())
                      .Response(r => r.OnSuccess<CarePlanSaved>((json, s) =>
                      {
                          s.Component<NativeLoader>().Hide();
-                         s.Element("care-plan-status").SetText(json, x => x.Confirmation);
+                         s.Element("care-plan-status").Text.Set(json.Get(x => x.Confirmation));
                      }));
                 }))
         </native-hstack>

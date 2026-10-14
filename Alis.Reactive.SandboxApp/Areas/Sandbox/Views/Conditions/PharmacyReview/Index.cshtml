@@ -1,0 +1,182 @@
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.PharmacyReview
+@model PharmacyReviewModel
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Native.Components
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Pharmacy Review";
+
+    const string Button = "self-start rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+
+    var plan = Html.ReactivePlan<PharmacyReviewModel>();
+    var residents = new List<SelectListItem>
+    {
+        new("Helen Park, Maple 214", "helen"),
+        new("Arthur Bell, Maple 216", "arthur"),
+        new("Rosa Diaz, Maple 218", "rosa"),
+        new("Walter Cho, Maple 220", "walter"),
+    };
+    var profileUrl = Url.SandboxRouteTemplate("Profile", "PharmacyReview", "residentId");
+    var formularyUrl = Url.SandboxRoute("Formulary", "PharmacyReview");
+    var reviewUrl = Url.SandboxRouteTemplate("Review", "PharmacyReview", "residentId");
+    var pageUrl = Url.SandboxRoute("PagePhysician", "PharmacyReview");
+
+    // Hold the order off the MAR, or release it.
+    void Hold(PipelineBuilder<PharmacyReviewModel> p, bool held) =>
+        p.Component<NativeCheckBox>(m => m.HoldOrder).Checked.Set(held);
+
+    // Where the order stands on the MAR: held off it, or ready for the next pass.
+    void ShowMarStatus(PipelineBuilder<PharmacyReviewModel> p) =>
+        p.When(p.Component<NativeCheckBox>(m => m.HoldOrder).Checked).Truthy()
+            .Then(held => held.Element("mar-status").Text.Set("Held: not given until the hold is lifted."))
+            .Else(ready => ready.Element("mar-status").Text.Set("Ready: on the MAR for the next medication pass."));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Pharmacy Review</native-heading>
+    <native-text color="Secondary">
+        Maple Grove, second floor. Enter the physician's new order and check it with Riverside Pharmacy
+        before it goes on the MAR.
+    </native-text>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            <native-heading level="H2">New order</native-heading>
+            @{ Html.InputField(plan, m => m.ResidentId, o => o.Label("Resident"))
+                .NativeDropDown(b => b.Items(residents).Placeholder("-- Choose a resident --")
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    // The pharmacy's profile of the chosen resident; choosing no resident clears it.
+                    p.When(args.Value).IsEmpty()
+                        .Then(none => none.Element("resident-profile").Text.Set(""))
+                        .Else(chosen => chosen.Get(profileUrl)
+                            .Gather<PharmacyProfileRequest>(g => g.Set(x => x.ResidentId, args.Value))
+                            .Response(r => r.OnSuccess<PharmacyProfile>((profile, s) =>
+                                s.Element("resident-profile").Text.Set(profile.Get(x => x.Summary)))));
+                }); }
+            <p id="resident-profile" class="text-sm text-text-secondary"></p>
+            @{ Html.InputField(plan, m => m.Medication, o => o.Label("Medication"))
+                .NativeTextBox(b => b.Placeholder("Generic or brand name"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.Get(formularyUrl)
+                        .Gather<FormularyLookup>(g => g.Set(x => x.Medication, args.Value))
+                        .Response(r => r
+                            .OnSuccess<FormularyEntry>((entry, s) =>
+                            {
+                                s.Element("formulary-dispensed").Text.Set(entry.Get(x => x.Dispensed));
+                                s.Element("formulary-form").Text.Set(entry.Get(x => x.Form));
+                                // The name typed is the one the pharmacy dispenses, or it dispenses the medication under another.
+                                s.When(args.Value).Eq(entry.Get(x => x.Dispensed))
+                                    .Then(same => same.Element("formulary-note").Text.Set("On the formulary:"))
+                                    .Else(other => other.Element("formulary-note").Text.Set("The pharmacy dispenses it as:"));
+                            })
+                            .OnError(404, unknown =>
+                            {
+                                unknown.Element("formulary-dispensed").Text.Set("");
+                                unknown.Element("formulary-form").Text.Set("");
+                                // Four letters or more name a medication the formulary lacks; fewer are a fragment.
+                                unknown.When(args.Value).MinLength(4)
+                                    .Then(unlisted => unlisted.Element("formulary-note").Text.Set("Not on the formulary: the pharmacy orders it specially."))
+                                    .Else(fragment => fragment.Element("formulary-note").Text.Set("Type the medication's full name to look it up."));
+                            }));
+                }); }
+            <p class="text-sm text-text-secondary">
+                <span id="formulary-note">Type a medication to look it up.</span>
+                <span id="formulary-dispensed" class="font-medium text-text"></span>
+                <span id="formulary-form"></span>
+            </p>
+            @(Html.NativeButton("check-order-btn", "Check with Riverside Pharmacy")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var resident = p.Component<NativeDropDown>(m => m.ResidentId);
+                    var medication = p.Component<NativeTextBox>(m => m.Medication);
+
+                    // The pharmacy reviews an order only for a chosen resident and a named medication.
+                    p.When(resident.Value).IsEmpty().Or(medication.Value).IsEmpty()
+                        .Then(ask =>
+                        {
+                            ask.Element("review-finding").Text.Set("Choose the resident and type the medication first.");
+                            ask.Element("review-detail").Text.Set("");
+                        })
+                        .Else(check =>
+                        {
+                            check.Element("review-finding").Text.Set("Asking Riverside Pharmacy...");
+                            check.Element("review-detail").Text.Set("");
+                            check.Post(reviewUrl)
+                                .Gather<PharmacyReviewRequest>(g => g
+                                    .Set(x => x.ResidentId, resident.Value)
+                                    .Set(x => x.Medication, medication.Value))
+                                .Response(r => r
+                                    .OnSuccess<PharmacyReviewAnswer>((answer, s) =>
+                                    {
+                                        s.Element("review-detail").Text.Set(answer.Get(x => x.Detail));
+                                        s.When(answer.Get(x => x.Finding)).Eq("interaction")
+                                            .Then(interaction =>
+                                            {
+                                                interaction.Element("review-finding").Text.Set("Interaction found");
+                                                Hold(interaction, true);
+                                            })
+                                            .ElseIf(answer.Get(x => x.Finding)).Eq("duplicate")
+                                            .Then(duplicate =>
+                                            {
+                                                duplicate.Element("review-finding").Text.Set("Duplicate therapy");
+                                                Hold(duplicate, true);
+                                            })
+                                            .Else(clear =>
+                                            {
+                                                clear.Element("review-finding").Text.Set("No concerns");
+                                                Hold(clear, false);
+                                            });
+
+                                        // A major interaction, 7 of 10 or worse, pages the physician with the pharmacy's words.
+                                        s.Element("physician-page").Text.Set("No physician page needed.");
+                                        s.When(answer.Get(x => x.Finding)).Eq("interaction").And(answer.Get(x => x.Severity)).Gte(7)
+                                            .Then(major =>
+                                            {
+                                                major.Element("physician-page").Text.Set("Paging the physician...");
+                                                major.Post(pageUrl)
+                                                    .Gather<PhysicianPageRequest>(g => g
+                                                        .Set(x => x.ResidentId, resident.Value)
+                                                        .Set(x => x.Reason, answer.Get(x => x.Detail)))
+                                                    .Response(page => page
+                                                        .OnSuccess<PhysicianPaged>((paged, sent) =>
+                                                            sent.Element("physician-page").Text.Set(paged.Get(x => x.Message)))
+                                                        .OnError(failed =>
+                                                            failed.Element("physician-page").Text.Set("The page did not go through: call the physician directly.")));
+                                            });
+                                    })
+                                    .OnError<PharmacyRefusal>((refusal, e) =>
+                                    {
+                                        e.Element("review-detail").Text.Set(refusal.Get(x => x.Reason));
+                                        e.Element("physician-page").Text.Set("Call the physician about this order.");
+                                        Hold(e, true);
+                                        e.When(refusal.Get(x => x.Code)).Eq("allergy")
+                                            .Then(allergy => allergy.Element("review-finding").Text.Set("Allergy: do not give"))
+                                            .Else(unreviewed => unreviewed.Element("review-finding").Text.Set("Not reviewed"));
+                                    }));
+
+                            // Written after the pharmacy's answer and any physician page, so it reads the hold they set.
+                            ShowMarStatus(check);
+                        });
+                }))
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            <native-heading level="H2">Pharmacy review</native-heading>
+            <p class="text-sm">Pharmacy: <span id="review-finding" class="font-medium">Not checked with the pharmacy yet.</span></p>
+            <p id="review-detail" class="text-sm text-text-secondary"></p>
+            @{ Html.InputField(plan, m => m.HoldOrder, o => o.Label("Hold this order"))
+                .NativeCheckBox(b => b.CssClass("rounded border-border"))
+                .Reactive(evt => evt.Change, (args, p) => ShowMarStatus(p)); }
+            <p class="text-sm">MAR: <span id="mar-status" class="font-medium">Not on the MAR yet.</span></p>
+            <p class="text-sm">Physician: <span id="physician-page">No physician paged.</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

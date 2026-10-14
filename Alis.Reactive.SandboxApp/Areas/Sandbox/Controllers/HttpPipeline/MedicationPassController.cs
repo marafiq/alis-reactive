@@ -6,7 +6,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
     /// <summary>
     /// Medication pass: the nurse ticks each resident whose dose was given and records the pass
     /// as JSON. Doses are keyed by resident id, so the confirmation lists the residents the
-    /// server received as given, and a dose lost between the page and the server shows up.
+    /// server received as given, and a dose lost between the page and the server shows up. The page
+    /// then has the pharmacy order refills, and only once they are ordered does it give the next
+    /// pass's time, which the pass confirmation carried.
     /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/HttpPipeline/MedicationPass")]
@@ -31,8 +33,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         {
             if (pass == null) return BadRequest();
 
-            return Ok(new MedicationPassConfirmation(ConfirmationFor(pass)));
+            return Ok(new MedicationPassConfirmation(ConfirmationFor(pass), "Next pass at 8:00 PM."));
         }
+
+        [HttpGet("Refills")]
+        public IActionResult Refills() => Ok(new RefillOrder("Refills ordered from Maple Pharmacy."));
 
         private static string ConfirmationFor(MedicationPassModel pass)
         {

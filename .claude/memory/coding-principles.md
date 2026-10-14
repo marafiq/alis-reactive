@@ -11,7 +11,7 @@ type: reference
 The public API surface does not change without explicit user approval and full downstream
 analysis. A single parameter rename cascaded across 170+ files in 6 commits.
 
-- No live hook blocks API surface edits (hookify templates are disabled) — review manually.
+- No hook blocks API surface edits — review manually.
 - Before any change: grep all call sites, read every affected file, present evidence.
 - `internal` to `public` is strictly forbidden. Internal members protect the surface deliberately.
 - Fusion HtmlExtension methods use the `Fusion` prefix (e.g., `.FusionDropDownList()`).
@@ -28,7 +28,7 @@ Callback parameter naming convention (locked):
 | `Action<GatherBuilder>` | `gather` |
 | `Action<ResponseBuilder>` | `response` |
 | `Action<HttpRequestBuilder>` | `request` |
-| `Func<ConditionStart<TModel>, GuardBuilder<TModel>>` | `inner` |
+| `Func<ConditionStart<TModel>, Condition<TModel>>` | `group` |
 
 ## Fail-Fast, Not Fallback
 
@@ -89,7 +89,7 @@ a missing secret, mention the possibility without reading the secret store.
 ### Schema Principles
 - `shape` on ValidationRule is derived from the comparison operand's CLR type during rule extraction (via `Shape.FromClrType()`). Non-comparison rules (required, email, regex) carry `Shape.None`; component shape comes from `Shape.FromClrType(typeof(TProp))` at registration time.
 - `field` on ValidationRule for cross-property comparisons uses the same deterministic ID system as everything else: TModel, prop expression, known type, predictable ID.
-- Schema must be deterministic — no fallbacks, no silent drops. Every FluentValidation rule either extracts to a client rule or is explicitly documented as server-only.
+- Schema must be deterministic — no fallbacks, no silent drops. Every validation rule either reaches the browser or is server-only by what it is (a C# predicate, a message built from the model, a condition with no browser form, `.ServerOnly()`).
 - `Empty()` and `Null()` are extractable. PrecisionScale, IsInEnum, IsEnumName are server-only.
 
 ### Cross-Property Comparisons
@@ -97,7 +97,7 @@ a missing secret, mention the possibility without reading the secret store.
 - Cross-property reads use the same mechanism: binding path, enriched fieldId, resolveRoot, walk(readExpr). No scanning, no new concepts.
 
 ### Date Handling
-- `shape: "date"` uses `toDate()` from `core/shape-convert.ts` — handles Date objects (SF), ISO strings, date-only strings with timezone safety.
+- `shape: "date"` uses `toDate()` from `runtime/grammar/operators.ts` — handles Date objects (SF), ISO strings, date-only strings with timezone safety.
 - DateTime constraints serialize as `"yyyy-MM-dd"` (C# format string) when time is midnight — parsed as local midnight, timezone-safe.
 - Facility timezone is the application's responsibility.
 
@@ -107,8 +107,9 @@ a missing secret, mention the possibility without reading the secret store.
 - Verify the extracted field list in the plan JSON.
 
 ### Live Re-Validation
-- Industry standard: clear on input, re-validate on blur/change.
-- `validateContainer()` handles submit; `revalidateField()` handles blur. Both use the same rule evaluation logic.
+- Industry standard: clear on input, re-validate on blur and on the input's commit event.
+- Submit, blur and commit use the same rule evaluation (`runtime/modules/form/form.ts`, `wireLive`).
+- Typing clears the message in the capture phase, before the component hears the keystroke, so a commit the component raises from that same input event (EJ2's MaskedTextBox on a paste) re-checks after the clear and its message stays.
 
 ## Validation Session Mistake Patterns
 
@@ -128,7 +129,8 @@ These patterns are forbidden. Each was learned the hard way.
 
 ## Code Hygiene — Worked Examples
 
-Root CLAUDE.md Rule 11 states the principles; these are the worked examples.
+Revealing names, variables close to use, no nesting, no dead code, small single-purpose methods.
+These are the worked examples.
 
 **Revealing names over complex conditions.** Extract boolean expressions into named
 variables that explain intent. The name is the documentation.

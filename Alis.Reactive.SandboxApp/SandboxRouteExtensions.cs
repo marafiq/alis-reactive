@@ -5,9 +5,13 @@ namespace Alis.Reactive.SandboxApp
     /// <summary>
     /// Resolves Sandbox controller endpoints through MVC routing instead of hard-coded URL
     /// strings. Reactive-plan calls still receive a string, but it is a resolved one: route
-    /// template changes flow through automatically, and an unresolved route fails loudly at
-    /// render time rather than 404-ing silently at runtime.
+    /// template changes flow through automatically.
     /// </summary>
+    /// <remarks>
+    /// Name the action exactly as its controller does (the method name, or its <c>ActionName</c>).
+    /// An action name no attribute route matches still resolves through the area's conventional
+    /// route to a URL the attribute-routed controller does not serve, so the request 404s.
+    /// </remarks>
     public static class SandboxRouteExtensions
     {
         /// <summary>Resolves a parameterless Sandbox-area action URL.</summary>
@@ -27,7 +31,8 @@ namespace Alis.Reactive.SandboxApp
 
         /// <summary>
         /// Resolves a Sandbox-area route as a reactive-plan URL template, keeping the named
-        /// <c>{param}</c> placeholders the runtime substitutes (via <c>RouteParam(...)</c>).
+        /// <c>{param}</c> placeholders that the gathered request member of the same name fills
+        /// (<c>Gather&lt;TRequest&gt;(g =&gt; g.Set(x =&gt; x.Param, ...))</c>).
         /// The route prefix is still MVC-resolved, so template changes flow through, but the
         /// placeholders survive. Sentinel values satisfy <c>{id:int}</c>-style constraints.
         /// </summary>

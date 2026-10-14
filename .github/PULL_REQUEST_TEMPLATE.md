@@ -4,12 +4,11 @@
 
 ## Definition of done
 
-The bar is `.claude/rules/definition-of-done.md`. Each box carries its evidence (the command and one
-line of its output), or the gap is named instead of ticked.
+Playwright is the proof (`CLAUDE.md`). Each box carries its evidence (the command and one line of
+its output), or the gap is named instead of ticked.
 
-- [ ] Focused behavior tests pass:
+- [ ] Behavior proven by a Playwright test that fails when it breaks (`scripts/playwright.sh` output line), or N/A
 - [ ] `runtime/types/plan.ts` regenerated and `npm run typecheck` clean, or plan shape unchanged
-- [ ] Page-visible change seen in a real browser (gesture and what the page showed), then pinned by a Playwright slice, or N/A
 - [ ] `git diff --stat` inspected: no dead code, drift markers, or new null markers
 - [ ] Labelled for the release notes (`.github/release.yml`): `enhancement`, `bug`, `refactor`, `documentation`, `breaking-change`, or `chore` / `skip-changelog` to leave it out
 

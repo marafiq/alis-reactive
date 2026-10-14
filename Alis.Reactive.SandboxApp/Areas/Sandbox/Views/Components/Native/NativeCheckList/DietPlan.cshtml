@@ -1,5 +1,4 @@
 @model DietPlanModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "Diet Plan";
@@ -23,10 +22,10 @@
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post(Url.SandboxRoute("SaveDietPlan", "NativeCheckList"), g => g.IncludeAll())
+                    p.Post(Url.SandboxRoute("SaveDietPlan", "NativeCheckList")).Gather(g => g.Form())
                      .Response(r => r.OnSuccess<DietPlanSaved>((json, s) =>
                      {
-                         s.Element("diet-plan-status").SetText(json, x => x.Confirmation);
+                         s.Element("diet-plan-status").Text.Set(json.Get(x => x.Confirmation));
                      }));
                 }))
             <p id="diet-plan-status" class="text-sm text-text-muted"></p>

@@ -59,6 +59,8 @@ check_browser_assets_are_fresh() {
     "runtime bundle" \
     "Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js" \
     Alis.Reactive.Assets/runtime \
+    Alis.Reactive.Assets/components \
+    Alis.Reactive.Assets/bundle.ts \
     Alis.Reactive.Assets/esbuild.config.mjs \
     Alis.Reactive.Assets/package.json \
     Alis.Reactive.Assets/tsconfig.json
@@ -80,6 +82,13 @@ check_browser_assets_are_fresh() {
   check_asset_output_is_fresh \
     "sandbox plugin bundle" \
     "Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js" \
+    Alis.Reactive.SandboxApp/Scripts \
+    Alis.Reactive.SandboxApp/esbuild.config.mjs \
+    Alis.Reactive.SandboxApp/package.json
+
+  check_asset_output_is_fresh \
+    "sandbox components bundle" \
+    "Alis.Reactive.SandboxApp/wwwroot/js/sandbox-components.js" \
     Alis.Reactive.SandboxApp/Scripts \
     Alis.Reactive.SandboxApp/esbuild.config.mjs \
     Alis.Reactive.SandboxApp/package.json
@@ -459,13 +468,21 @@ run_attempt() {
 
 if run_attempt "" "$filter"; then status=0; else status=$?; fi
 
+# On GitHub Actions a notice names each fixture and how many of its tests passed on the first
+# attempt, so a green shard's check says what it proved.
+if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+  node scripts/trx-failed-tests.mjs "$attempt_trx" summary
+fi
+
 # Re-run only what failed, up to --retry-failed times. Every attempt keeps its own log, TRX and
 # diagnostics; the final exit code is the last attempt's. Tests that fail and then pass are the
 # flaky list — visible in the output, in flaky-<stamp>.txt, and in the GitHub job summary.
 retries_done=0
 flaky=()
+flaky_annotations=""
 while [ "$status" -ne 0 ] && [ "$retries_done" -lt "$retry_failed" ]; do
-  failed_tests="$(node scripts/trx-failed-tests.mjs "$attempt_trx")"
+  failed_trx="$attempt_trx"
+  failed_tests="$(node scripts/trx-failed-tests.mjs "$failed_trx")"
   if [ -z "$failed_tests" ]; then
     echo "[playwright:retry] no failed test recorded in $attempt_trx (crash or hang?); not retrying"
     break
@@ -478,6 +495,7 @@ while [ "$status" -ne 0 ] && [ "$retries_done" -lt "$retry_failed" ]; do
   while IFS= read -r fqn; do
     [ -n "$fqn" ] && flaky+=("$fqn")
   done < <(node scripts/trx-failed-tests.mjs "$attempt_trx" passed)
+  flaky_annotations+="$(node scripts/trx-failed-tests.mjs "$failed_trx" flaky "$attempt_trx")"$'\n'
 done
 
 if [ "${#flaky[@]}" -gt 0 ]; then
@@ -495,10 +513,17 @@ if [ "${#flaky[@]}" -gt 0 ]; then
     } >> "$GITHUB_STEP_SUMMARY"
   fi
   # The job stays green, and nobody opens the summary of a green job: a warning annotation puts each
-  # flaky test on the pull request's checks, so a re-run never turns a failure into silence.
+  # flaky test on the pull request's checks with the start of the failure the re-run hid, so a
+  # re-run never turns a failure into silence, and the flake can be root-caused from the check.
   if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
-    sed 's/^/::warning title=Flaky test::/; s|$| failed, then passed on re-run (docs/CI.md, "Flaky tests")|' "$flaky_path"
+    printf '%s' "$flaky_annotations" | sed '/^$/d'
   fi
+fi
+
+# A red run names each test that still fails, with the start of its message, as an error
+# annotation on the pull request's checks: the failure is readable without opening the log.
+if [ "$status" -ne 0 ] && [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+  node scripts/trx-failed-tests.mjs "$attempt_trx" annotations
 fi
 
 exit "$status"

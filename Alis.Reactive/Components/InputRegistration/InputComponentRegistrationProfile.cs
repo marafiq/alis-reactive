@@ -13,14 +13,10 @@ namespace Alis.Reactive
             _componentType = componentType;
         }
 
-        internal string Vendor => _component.Vendor;
-
-        internal string ValueMember => _component.ValueMember;
-
         internal ComponentRegistration Register(ModelBoundInputComponentSlot slot)
         {
-            var identity = RegisteredComponentIdentity.For(slot.ComponentId, ComponentVendor.From(_component.Vendor));
-            var binding = RegisteredInputBinding.For(slot.BindingPath, MemberName.Of(_component.ValueMember));
+            var identity = RegisteredComponentIdentity.For(slot.ComponentId, _component.Vendor);
+            var binding = RegisteredInputBinding.For(slot.BindingPath, _component.Input);
             return ComponentRegistration.RegisteredInput(identity, binding, _componentType, slot.ValueShape);
         }
 
@@ -28,5 +24,9 @@ namespace Alis.Reactive
             IInputComponent component,
             string componentType) =>
             new InputComponentRegistrationProfile(component, ComponentKind.Of(componentType));
+
+        internal static InputComponentRegistrationProfile For<TComponent>()
+            where TComponent : IInputComponent, new() =>
+            new InputComponentRegistrationProfile(new TComponent(), ComponentKind.Of(typeof(TComponent).Name));
     }
 }

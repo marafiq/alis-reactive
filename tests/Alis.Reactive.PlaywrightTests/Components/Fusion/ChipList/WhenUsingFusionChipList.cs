@@ -1,193 +1,251 @@
+using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ChipList;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.ChipList;
 
+/// <summary>
+/// As the activities coordinator, I want to tag the next outing with the residents' interests, sign up the
+/// residents who asked to go, keep the bus to its four seats with a wait list, and set the days the outing
+/// repeats, so that the residents who would enjoy it are invited and everyone on the bus can board.
+/// </summary>
+/// <remarks>
+/// The tags are Gardening, Music, Art, Walking and History. The Garden Center suits Gardening and Walking and
+/// runs on Thursdays; the Symphony Matinee suits Music and runs on Sundays. Ava Stone, Leah Kim, Nora Gray,
+/// Mateo Reed and Walter Chen are on the bus in that order, so Walter Chen waits for a seat; Nora Gray and
+/// Mateo Reed use the wheelchair lift. Edith Moreau, Harold Price and Ruth Alvarez asked to go.
+/// Not exercised: each selected chip's data <c>Text</c>, as the page reads the selected chips' names from
+/// <c>Texts</c>, which carries the same strings.
+/// </remarks>
 [TestFixture]
 public class WhenUsingFusionChipList : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/ChipList";
 
-    private async Task NavigateAndWaitForChipList()
+    private PagePlan<ChipListModel> _plan = null!;
+
+    private FusionChipListLocator Interests => new(Page, "trip-interests");
+    private FusionChipListLocator AskedToGo => new(Page, "trip-asked-to-go");
+    private FusionChipListLocator Riders => new(Page, "trip-riders");
+    private FusionChipListLocator RepeatDays => new(Page, "trip-repeat-days");
+    private NativeDropDownLocator Destination => _plan.NativeDropDown(m => m.Destination);
+    private ILocator TagChange => Page.Locator("#tag-change");
+    private ILocator Invitees => Page.Locator("#invitees");
+    private ILocator SeatTaken => Page.Locator("#seat-taken");
+    private ILocator SeatOpen => Page.Locator("#seat-open");
+    private ILocator WaitListLeft => Page.Locator("#wait-list-left");
+    private ILocator MarkLiftRiders => Page.Locator("#mark-lift-riders-btn");
+    private ILocator LiftOutOfService => Page.Locator("#lift-out-of-service-btn");
+    private ILocator AddWeekends => Page.Locator("#add-weekends-btn");
+    private ILocator PostToCalendar => Page.Locator("#post-outing-btn");
+    private ILocator PostStatus => Page.Locator("#post-status");
+
+    private async Task NavigateAndBoot()
     {
         await NavigateToAndWaitForBoot(Path);
-        await Expect(Page.Locator("#care-tags.e-chip-list"))
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
+        _plan = await PagePlan<ChipListModel>.FromPage(Page);
+        await Expect(Riders.Chips).ToHaveCountAsync(5, new() { Timeout = 10000 });
+    }
+
+    private async Task TagMusic()
+    {
+        await ClickWhenStable(Interests.Chip("Music"));
+        await Expect(Invitees).ToHaveTextAsync("Music: invite Leah Kim and Mateo Reed.", new() { Timeout = 5000 });
+    }
+
+    private async Task ChooseGardenCenter()
+    {
+        await Destination.Select("Garden Center");
+        await Expect(RepeatDays.SelectedChips).ToHaveTextAsync(new[] { "Thu" }, new() { Timeout = 5000 });
     }
 
     [Test]
-    public async Task add_method_appends_new_visible_chip()
+    public async Task tagging_an_interest_says_it_was_added_to_the_trip()
     {
-        await NavigateAndWaitForChipList();
+        await NavigateAndBoot();
 
-        await Page.Locator("#add-chip-btn").ClickAsync();
+        await ClickWhenStable(Interests.Chip("Music"));
 
-        await Expect(Page.Locator("#chip-command-status"))
-            .ToHaveTextAsync("add called", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#care-tags"))
-            .ToContainTextAsync("Wound Care", new() { Timeout = 5000 });
-
+        await Expect(TagChange).ToHaveTextAsync("Music added to the trip's tags.", new() { Timeout = 5000 });
+        await Expect(Interests.SelectedChips).ToHaveTextAsync(new[] { "Music" });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task select_by_index_method_selects_existing_chip()
+    public async Task untagging_an_interest_says_it_came_off_the_trip_and_its_residents_are_no_longer_invited()
     {
-        await NavigateAndWaitForChipList();
+        await NavigateAndBoot();
+        await TagMusic();
 
-        await Page.Locator("#select-index-chip-btn").ClickAsync();
+        await ClickWhenStable(Interests.Chip("Music"));
 
-        await Expect(Page.Locator("#chip-command-status"))
-            .ToHaveTextAsync("select index called", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#care-tags .e-chip").Nth(1))
-            .ToHaveClassAsync(new System.Text.RegularExpressions.Regex("e-active"), new() { Timeout = 5000 });
-
+        await Expect(TagChange).ToHaveTextAsync("Music taken off the trip's tags.", new() { Timeout = 5000 });
+        await Expect(Invitees).ToHaveTextAsync("Tag the trip to see whom to invite.", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task select_by_indexes_method_selects_multiple_existing_chips()
+    public async Task the_trips_tags_name_the_residents_to_invite()
     {
-        await NavigateAndWaitForChipList();
+        await NavigateAndBoot();
+        await TagMusic();
 
-        await Page.Locator("#select-indexes-chip-btn").ClickAsync();
+        await ClickWhenStable(Interests.Chip("Art"));
 
-        await Expect(Page.Locator("#index-chip-command-status"))
-            .ToHaveTextAsync("select indexes called", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#index-tags .e-chip").Nth(0))
-            .ToHaveClassAsync(new System.Text.RegularExpressions.Regex("e-active"), new() { Timeout = 5000 });
-        await Expect(Page.Locator("#index-tags .e-chip").Nth(2))
-            .ToHaveClassAsync(new System.Text.RegularExpressions.Regex("e-active"), new() { Timeout = 5000 });
-
+        await Expect(Invitees).ToHaveTextAsync("Music and Art: invite Leah Kim, Mateo Reed and Edith Moreau.", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task select_by_text_and_return_sources_read_selected_and_found_chips()
+    public async Task choosing_the_destination_tags_the_trip_with_what_it_suits_in_place_of_earlier_tags()
     {
-        await NavigateAndWaitForChipList();
+        await NavigateAndBoot();
+        await TagMusic();
 
-        await Page.Locator("#select-text-chip-btn").ClickAsync();
+        await Destination.Select("Garden Center");
 
-        await Expect(Page.Locator("#chip-command-status"))
-            .ToHaveTextAsync("select text called", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#selected-chip-texts"))
-            .ToContainTextAsync("Hydration", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#selected-chip-texts"))
-            .ToContainTextAsync("Wound Care", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#found-chip-text"))
-            .ToHaveTextAsync("Hydration", new() { Timeout = 5000 });
-
+        await Expect(Interests.SelectedChips).ToHaveTextAsync(new[] { "Gardening", "Walking" }, new() { Timeout = 5000 });
+        await Expect(Invitees).ToHaveTextAsync("Gardening and Walking: invite Ava Stone, Nora Gray and Walter Chen.", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task selected_chip_values_property_can_be_read_after_selection()
+    public async Task choosing_the_destination_repeats_the_trip_on_the_day_it_runs()
     {
-        await NavigateAndWaitForChipList();
+        await NavigateAndBoot();
 
-        await Page.Locator("#read-selected-values-btn").ClickAsync();
+        await Destination.Select("Garden Center");
 
-        await Expect(Page.Locator("#chip-command-status"))
-            .ToHaveTextAsync("selected values read", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#selected-chip-values"))
-            .ToHaveTextAsync("hydration,meds", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#care-tags .e-chip").Nth(1))
-            .ToHaveClassAsync(new System.Text.RegularExpressions.Regex("e-active"), new() { Timeout = 5000 });
-        await Expect(Page.Locator("#care-tags .e-chip").Nth(2))
-            .ToHaveClassAsync(new System.Text.RegularExpressions.Regex("e-active"), new() { Timeout = 5000 });
-
+        await Expect(RepeatDays.SelectedChips).ToHaveTextAsync(new[] { "Thu" }, new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task selected_chip_values_can_drive_quick_filter_payload()
+    public async Task choosing_another_destination_moves_the_repeat_day_to_its_day()
     {
-        await NavigateAndWaitForChipList();
+        await NavigateAndBoot();
+        await ChooseGardenCenter();
 
-        await Page.Locator("#care-tags .e-chip").Filter(new() { HasTextString = "Fall Risk" }).ClickAsync();
-        await Page.Locator("#care-tags .e-chip").Filter(new() { HasTextString = "Medication Review" }).ClickAsync();
+        await Destination.Select("Symphony Matinee");
 
-        var request = await Page.RunAndWaitForRequestAsync(
-            async () => await Page.Locator("#apply-chip-filters-btn").ClickAsync(),
-            "**/Sandbox/Components/ChipList/QuickFilter");
-
-        var body = request.PostData ?? "";
-        Assert.That(body, Does.Contain("fall"), $"Quick filter payload must include fall but was '{body}'");
-        Assert.That(body, Does.Contain("meds"), $"Quick filter payload must include meds but was '{body}'");
-
-        await Expect(Page.Locator("#chip-command-status"))
-            .ToHaveTextAsync("filters applied", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#quick-filter-values"))
-            .ToHaveTextAsync("fall,meds", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#quick-filter-count"))
-            .ToHaveTextAsync("3", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#quick-filter-names"))
-            .ToHaveTextAsync("Ava Stone,Mateo Reed,Nora Gray", new() { Timeout = 5000 });
-
+        await Expect(RepeatDays.SelectedChips).ToHaveTextAsync(new[] { "Sun" }, new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task selected_chip_indexes_property_can_be_set_and_read()
+    public async Task adding_weekends_repeats_the_trip_on_sunday_and_saturday()
     {
-        await NavigateAndWaitForChipList();
+        await NavigateAndBoot();
 
-        await Page.Locator("#set-selected-indexes-btn").ClickAsync();
+        await ClickWhenStable(AddWeekends);
 
-        await Expect(Page.Locator("#index-chip-command-status"))
-            .ToHaveTextAsync("selected indexes set", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#selected-chip-indexes"))
-            .ToHaveTextAsync("0,2", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#index-tags .e-chip").Nth(0))
-            .ToHaveClassAsync(new System.Text.RegularExpressions.Regex("e-active"), new() { Timeout = 5000 });
-        await Expect(Page.Locator("#index-tags .e-chip").Nth(2))
-            .ToHaveClassAsync(new System.Text.RegularExpressions.Regex("e-active"), new() { Timeout = 5000 });
-
+        await Expect(RepeatDays.SelectedChips).ToHaveTextAsync(new[] { "Sun", "Sat" }, new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task click_and_remove_events_surface_typed_payloads()
+    public async Task clicking_a_resident_who_asked_to_go_puts_them_on_the_bus()
     {
-        await NavigateAndWaitForChipList();
+        await NavigateAndBoot();
 
-        await Page.Locator("#care-tags .e-chip").Filter(new() { HasTextString = "Hydration" }).ClickAsync();
-        await Expect(Page.Locator("#chip-clicked"))
-            .ToHaveTextAsync("Hydration", new() { Timeout = 5000 });
+        await ClickWhenStable(AskedToGo.Chip("Harold Price"));
 
-        await Page.Locator("#remove-chip-btn").ClickAsync();
-        await Expect(Page.Locator("#chip-command-status"))
-            .ToHaveTextAsync("remove called", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#chip-deleted"))
-            .ToHaveTextAsync("Fall Risk", new() { Timeout = 5000 });
-
+        await Expect(Riders.Chips).ToHaveTextAsync(
+            new[] { "Ava Stone", "Leah Kim", "Nora Gray", "Mateo Reed", "Walter Chen", "Harold Price" }, new() { Timeout = 5000 });
+        await Expect(AskedToGo.Chips).ToHaveTextAsync(new[] { "Edith Moreau", "Ruth Alvarez" });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task remove_by_indexes_method_removes_multiple_chips()
+    public async Task a_seated_rider_who_cancels_gives_the_seat_to_the_first_on_the_wait_list()
     {
-        await NavigateAndWaitForChipList();
+        await NavigateAndBoot();
 
-        await Page.Locator("#remove-indexes-chip-btn").ClickAsync();
+        await ClickWhenStable(Riders.DeleteIcon("Leah Kim"));
 
-        await Expect(Page.Locator("#index-chip-command-status"))
-            .ToHaveTextAsync("remove indexes called", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#index-tags"))
-            .Not.ToContainTextAsync("Routine", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#index-tags"))
-            .Not.ToContainTextAsync("Follow Up", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#index-tags"))
-            .ToContainTextAsync("Urgent", new() { Timeout = 5000 });
-
+        await Expect(SeatTaken).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(SeatTaken).ToHaveTextAsync("Leah Kim is off the bus. Walter Chen comes off the wait list.");
+        await Expect(Riders.Chips).ToHaveTextAsync(new[] { "Ava Stone", "Nora Gray", "Mateo Reed", "Walter Chen" });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task component_index_links_to_chiplist_sandbox()
+    public async Task a_resident_who_leaves_the_wait_list_frees_no_seat()
     {
-        await NavigateTo("/Sandbox/Components");
-        await Expect(Page.Locator("a[href='/Sandbox/Components/ChipList/Index']"))
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
+        await NavigateAndBoot();
 
+        await ClickWhenStable(Riders.DeleteIcon("Walter Chen"));
+
+        await Expect(WaitListLeft).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(WaitListLeft).ToHaveTextAsync("Walter Chen leaves the wait list.");
+        await Expect(SeatTaken).ToBeHiddenAsync();
+        await Expect(SeatOpen).ToBeHiddenAsync();
         AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_rider_who_cancels_with_nobody_waiting_leaves_a_seat_open()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(Riders.DeleteIcon("Walter Chen"));
+        await Expect(WaitListLeft).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        await ClickWhenStable(Riders.DeleteIcon("Ava Stone"));
+
+        await Expect(SeatOpen).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(SeatOpen).ToHaveTextAsync("Ava Stone is off the bus. A seat is open.");
+        await Expect(SeatTaken).ToBeHiddenAsync();
+        await Expect(WaitListLeft).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task marking_lift_riders_highlights_the_residents_who_use_the_lift()
+    {
+        await NavigateAndBoot();
+
+        await ClickWhenStable(MarkLiftRiders);
+
+        await Expect(Riders.SelectedChips).ToHaveTextAsync(new[] { "Nora Gray", "Mateo Reed" }, new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task with_the_lift_out_of_service_its_riders_come_off_the_bus()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(MarkLiftRiders);
+        await Expect(Riders.SelectedChips).ToHaveTextAsync(new[] { "Nora Gray", "Mateo Reed" }, new() { Timeout = 5000 });
+
+        await ClickWhenStable(LiftOutOfService);
+
+        await Expect(Riders.Chips).ToHaveTextAsync(new[] { "Ava Stone", "Leah Kim", "Walter Chen" }, new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task posting_the_trip_puts_its_destination_tags_and_repeat_days_on_the_calendar()
+    {
+        await NavigateAndBoot();
+        await ChooseGardenCenter();
+        await ClickWhenStable(AddWeekends);
+        await Expect(RepeatDays.SelectedChips).ToHaveTextAsync(new[] { "Sun", "Thu", "Sat" }, new() { Timeout = 5000 });
+
+        await ClickWhenStable(PostToCalendar);
+
+        await Expect(PostStatus).ToHaveTextAsync(
+            "Posted the Garden Center trip to the activities calendar, tagged gardening and walking, every Sunday, Thursday and Saturday.",
+            new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task posting_without_a_destination_asks_where_the_trip_goes()
+    {
+        await NavigateAndBoot();
+
+        await ClickWhenStable(PostToCalendar);
+
+        await Expect(PostStatus).ToHaveTextAsync("Choose where the trip goes before posting it.", new() { Timeout = 5000 });
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 }

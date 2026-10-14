@@ -1,102 +1,138 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.RosterCrudModel
+@using Alis.Reactive.Builders
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @{
-    ViewData["Title"] = "Care-Ops Roster CRUD";
+    ViewData["Title"] = "Cedar Wing Front Desk";
 
-    const string GridId = "roster-crud-grid";
+    const string RosterId = "cedar-roster";
     const string Button = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+    const string PrimaryButton = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
+    const string InputCss = "rounded-md border border-border px-3 py-1.5 text-sm";
 
-    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+    var plan = Html.ReactivePlan<RosterCrudModel>();
 
-    // Focused scenario: a care lead adds a resident, updates the top row, then deletes it.
-    Html.On(plan, t => t.DomReady(p =>
-        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
-            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
+    var columns = FusionGridColumns.Of<CedarResident>();
+
+    // Every answer the desk gets, kept or refused, is the line under the roster.
+    void ShowRefusal(ResponseBuilder<RosterCrudModel> r, int status) =>
+        r.OnError<CedarDeskRefusal>(status, (refused, e) => e.Element("desk-status").Text.Set(refused.Get(x => x.Summary)));
+
+    // A move-out the business office cleared takes the resident's row off the roster.
+    void RecordMoveOut(PipelineBuilder<RosterCrudModel> p, CedarMovingOut leaving) =>
+        p.Post(Url.SandboxRoute("RosterCrudMoveOut", "Grid"))
+            .Gather<CedarMoveOut>(g => g.Set(x => x.ResidentId, leaving.ResidentId))
+            .Response(r =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
-                s.Element("crud-status").SetText("loaded");
-            }))));
+                r.OnSuccess<CedarMovedOut>((movedOut, s) =>
+                {
+                    var roster = s.Component<FusionGrid>(RosterId);
+                    roster.SelectRow(roster.GetRowIndexByPrimaryKey(movedOut.Get(x => x.ResidentId)));
+                    roster.DeleteRecord();
+                    s.Element($"moving-out-{leaving.ResidentId}").Hide();
+                    s.Element("desk-status").Text.Set(movedOut.Get(x => x.Summary));
+                });
+                ShowRefusal(r, 409);
+            });
+
+    Html.On(plan, t => t.DomReady(p =>
+        p.Get(Url.SandboxRoute("RosterCrudRoster", "Grid"))
+            .Response(r => r.OnSuccess<List<CedarResident>>((residents, s) =>
+                s.Component<FusionGrid>(RosterId).DataSource.Set(residents)))));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Care-Ops Roster CRUD</native-heading>
-    <native-text color="Secondary">
-        Add a new resident at the top, replace the top row, then delete the selected resident.
-    </native-text>
+    <div>
+        <native-heading level="H1">Cedar Wing Front Desk</native-heading>
+        <native-text color="Secondary">
+            Keep the wing's roster in suite order: admit residents into free suites, move a resident to another suite,
+            and record today's move-outs.
+        </native-text>
+    </div>
 
-    <native-hstack gap="Sm" class="flex-wrap">
-        @(Html.NativeButton("crud-add", "Add Resident")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).AddRecord(new ResidentDirectoryGridItem
-                {
-                    ResidentId = 7100,
-                    ResidentName = "Zara Inline",
-                    Age = 81,
-                    CareLevel = "Memory Care",
-                    Wing = "North",
-                    Suite = "N-710",
-                    RiskLevel = "High",
-                    PrimaryNurse = "Nora Ellis",
-                    OpenTasks = 5,
-                    NextReviewDate = "2026-06-22"
-                }, 0);
-                p.Element("crud-status").SetText("addRecord called");
-            }))
-        @(Html.NativeButton("crud-update", "Replace Top Row")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).UpdateRow(0, new ResidentDirectoryGridItem
-                {
-                    ResidentId = 7100,
-                    ResidentName = "Amina Updated",
-                    Age = 91,
-                    CareLevel = "Skilled Nursing",
-                    Wing = "West",
-                    Suite = "W-118",
-                    RiskLevel = "Moderate",
-                    PrimaryNurse = "Malik Stone",
-                    OpenTasks = 3,
-                    NextReviewDate = "2026-06-19"
-                });
-                p.Element("crud-status").SetText("updateRow called");
-            }))
-        @(Html.NativeButton("crud-delete", "Delete Top Resident")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var grid = p.Component<FusionGrid>(GridId);
-                grid.SelectRow(0);
-                grid.DeleteSelectedRecord();
-                p.Element("crud-status").SetText("deleteRecord called");
-            }))
-    </native-hstack>
-
-    <p class="font-mono text-sm">Status: <span id="crud-status" class="text-text-muted">waiting</span></p>
-
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+    <native-card><native-card-body>
+        @(Html.FusionGrid<RosterCrudModel, CedarResident>(plan, RosterId, b => b
             .AllowSelection(true)
             .EditSettings(new GridEditSettings
             {
                 AllowAdding = true,
                 AllowEditing = true,
                 AllowDeleting = true,
+                AllowEditOnDblClick = false,
                 Mode = EditMode.Normal,
-                ShowConfirmDialog = false
+                ShowDeleteConfirmDialog = false
             })
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", IsPrimaryKey = true, AllowEditing = false, Visible = false },
-                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "240" },
-                new GridColumn { Field = "openTasks", HeaderText = "Open Tasks", Width = "140", TextAlign = TextAlign.Right }
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", IsPrimaryKey = true, Visible = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "200" },
+                new GridColumn { Field = columns.Field(r => r.Suite), HeaderText = "Suite", Width = "100" },
+                new GridColumn { Field = columns.Field(r => r.MovedIn), HeaderText = "Moved in", Width = "140" }
             })))
-    </section>
+
+        <native-hstack gap="Sm" align="End" class="mt-4 flex-wrap">
+            @{ Html.InputField(plan, m => m.NewSuite, o => o.Label("New suite for the resident picked above"))
+                .NativeTextBox(b => b.Placeholder("118").CssClass(InputCss)); }
+            @(Html.NativeButton("move-to-suite", "Move to suite")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Post(Url.SandboxRoute("RosterCrudMove", "Grid"))
+                        .Gather<CedarSuiteChange>(g => g
+                            .Set(x => x.Residents, p.Component<FusionGrid>(RosterId).GetSelectedRecords<CedarResident>())
+                            .Form(m => m.NewSuite))
+                        .Response(r =>
+                        {
+                            r.OnSuccess<CedarResidentMoved>((moved, s) =>
+                            {
+                                var roster = s.Component<FusionGrid>(RosterId);
+                                roster.UpdateRow(roster.GetRowIndexByPrimaryKey(moved.Get(x => x.Resident.ResidentId)), moved.Get(x => x.Resident));
+                                s.Element("desk-status").Text.Set(moved.Get(x => x.Summary));
+                            });
+                            ShowRefusal(r, 400);
+                        })))
+        </native-hstack>
+        <p id="desk-status" class="mt-4 text-sm font-medium">No changes at the desk yet today.</p>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Admit a resident</native-heading>
+        <native-hstack gap="Sm" align="End" class="mt-2 flex-wrap">
+            @{ Html.InputField(plan, m => m.AdmitName, o => o.Label("Resident's name"))
+                .NativeTextBox(b => b.Placeholder("Full name").CssClass(InputCss)); }
+            @{ Html.InputField(plan, m => m.AdmitSuite, o => o.Label("Suite"))
+                .NativeTextBox(b => b.Placeholder("110").CssClass(InputCss)); }
+            @(Html.NativeButton("admit-resident", "Admit")
+                .CssClass(PrimaryButton)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Post(Url.SandboxRoute("RosterCrudAdmit", "Grid"))
+                        .Gather(g => g.Form(m => m.AdmitName, m => m.AdmitSuite))
+                        .Response(r =>
+                        {
+                            r.OnSuccess<CedarAdmitted>((admitted, s) =>
+                            {
+                                s.Component<FusionGrid>(RosterId).AddRecordAt(admitted.Get(x => x.Resident), admitted.Get(x => x.Position));
+                                s.Element("desk-status").Text.Set(admitted.Get(x => x.Summary));
+                            });
+                            ShowRefusal(r, 400);
+                        })))
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Moving out today</native-heading>
+        <ul class="mt-2 space-y-2 text-sm">
+            @foreach (var leaving in Model.MovingOutToday)
+            {
+                <li id="moving-out-@leaving.ResidentId" class="flex flex-wrap items-center gap-3">
+                    <span>@leaving.ResidentName, suite @leaving.Suite</span>
+                    @(Html.NativeButton($"record-move-out-{leaving.ResidentId}", $"Record {leaving.ResidentName}'s move-out")
+                        .CssClass(Button)
+                        .Reactive(plan, evt => evt.Click, (args, p) => RecordMoveOut(p, leaving)))
+                </li>
+            }
+        </ul>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

@@ -1,70 +1,83 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.GridOperationsModel
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.RosterSelectionModel
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @{
-    ViewData["Title"] = "Care-Staff Roster Selection";
+    ViewData["Title"] = "Botanical Garden Outing";
 
-    const string GridId = "roster-selection-grid";
+    const string SignUpsId = "outing-sign-ups";
     const string Button = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+    const string PrimaryButton = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
 
-    var plan = Html.ReactivePlan<GridOperationsModel>();
+    var plan = Html.ReactivePlan<RosterSelectionModel>();
 
-    // Focused scenario: care staff select one resident, then a range, then clear the selection.
+    var columns = FusionGridColumns.Of<GardenOutingSignUp>();
+
     Html.On(plan, t => t.DomReady(p =>
-        p.Get(Url.SandboxRoute("OperationRows", "Grid"))
-            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
-            {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
-                s.Element("selection-status").SetText("loaded");
-            }))));
+        p.Get(Url.SandboxRoute("RosterSelectionSignUps", "Grid"))
+            .Response(r => r.OnSuccess<List<GardenOutingSignUp>>((signUps, s) =>
+                s.Component<FusionGrid>(SignUpsId).DataSource.Set(signUps)))));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Care-Staff Roster Selection</native-heading>
-    <native-text color="Secondary">
-        Select a single resident, select a range, then clear the selection.
-    </native-text>
+    <div>
+        <native-heading level="H1">Botanical Garden Outing</native-heading>
+        <native-text color="Secondary">
+            Thursday, 10:00 from the front entrance. These residents asked to go, in the order they signed up;
+            the bus seats @Model.BusSeats.
+        </native-text>
+    </div>
 
-    <native-hstack gap="Sm" class="flex-wrap">
-        @(Html.NativeButton("select-first", "Select First Resident")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).SelectRow(0);
-                p.Element("selection-status").SetText("selectRow called");
-            }))
-        @(Html.NativeButton("select-range", "Select Residents 2-4")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).SelectRowsByRange(1, 3);
-                p.Element("selection-status").SetText("selectRowsByRange called");
-            }))
-        @(Html.NativeButton("clear-selection", "Clear Selection")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).ClearSelection();
-                p.Element("selection-status").SetText("clearSelection called");
-            }))
-    </native-hstack>
+    <native-card><native-card-body>
+        <native-hstack gap="Sm" class="mb-2 flex-wrap">
+            @(Html.NativeButton("seat-first-signed-up", $"Seat the first {Model.BusSeats} to sign up")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Component<FusionGrid>(SignUpsId).SelectRowsByRange(0, Model.BusSeats - 1)))
+            @(Html.NativeButton("seat-turned-away-first", $"Start with {Model.TurnedAwayResidentName}")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var signUps = p.Component<FusionGrid>(SignUpsId);
+                    signUps.SelectRow(signUps.GetRowIndexByPrimaryKey(Model.TurnedAwayResidentId));
+                }))
+            @(Html.NativeButton("clear-the-bus", "Clear the bus")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Component<FusionGrid>(SignUpsId).ClearSelection()))
+        </native-hstack>
+        <p class="mb-4 text-sm text-text-muted">
+            The bus was full when @Model.TurnedAwayResidentName asked to go in September. Ctrl-click a resident to
+            seat them or take them off the bus.
+        </p>
 
-    <p class="font-mono text-sm">Status: <span id="selection-status" class="text-text-muted">waiting</span></p>
-
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        @(Html.FusionGrid<GridOperationsModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+        @(Html.FusionGrid<RosterSelectionModel, GardenOutingSignUp>(plan, SignUpsId, b => b
             .AllowSelection(true)
             .SelectionSettings(new GridSelectionSettings { Type = SelectionType.Multiple })
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", IsPrimaryKey = true, TextAlign = TextAlign.Right, Visible = false },
-                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "240" },
-                new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "130" },
-                new GridColumn { Field = "openTasks", HeaderText = "Open Tasks", Width = "130", TextAlign = TextAlign.Right }
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", IsPrimaryKey = true, Visible = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "200" },
+                new GridColumn { Field = columns.Field(r => r.Wing), HeaderText = "Wing", Width = "110" },
+                new GridColumn { Field = columns.Field(r => r.Mobility), HeaderText = "Mobility", Width = "130" },
+                new GridColumn { Field = columns.Field(r => r.SignedUp), HeaderText = "Signed up", Width = "130" }
             })))
-    </section>
+
+        <native-hstack gap="Sm" align="Center" class="mt-4">
+            @(Html.NativeButton("book-the-bus", "Book the bus")
+                .CssClass(PrimaryButton)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Post(Url.SandboxRoute("RosterSelectionBook", "Grid"))
+                        .Gather<GardenOutingBooking>(g => g.Set(x => x.Riders,
+                            p.Component<FusionGrid>(SignUpsId).GetSelectedRecords<GardenOutingSignUp>()))
+                        .Response(r => r
+                            .OnSuccess<GardenOutingBooked>((booked, s) =>
+                                s.Element("outing-status").Text.Set(booked.Get(x => x.Summary)))
+                            .OnError<GardenOutingBooked>(400, (refused, e) =>
+                                e.Element("outing-status").Text.Set(refused.Get(x => x.Summary))))))
+            <p id="outing-status" class="text-sm text-text-muted">The bus is not booked yet.</p>
+        </native-hstack>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

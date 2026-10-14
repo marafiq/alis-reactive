@@ -2,6 +2,7 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
+/// <summary>A Syncfusion ProgressButton: the button, the words on it, and the bar that fills while its progress runs.</summary>
 public sealed class FusionProgressButtonLocator
 {
     private readonly IPage _page;
@@ -15,18 +16,9 @@ public sealed class FusionProgressButtonLocator
 
     public ILocator Button => _page.Locator($"#{_componentId}");
 
+    /// <summary>The words on the button.</summary>
     public ILocator Content => Button.Locator(".e-btn-content");
 
-    public ILocator Progress => Button.Locator(".e-progress");
-
-    public async Task<string> ClassAttribute() =>
-        await Button.GetAttributeAsync("class") ?? string.Empty;
-
-    public async Task<bool> HasClass(string className)
-    {
-        var classes = await ClassAttribute();
-        return classes.Split(' ').Contains(className);
-    }
-
-    public async Task<bool> IsProgressActive() => await HasClass("e-progress-active");
+    /// <summary>The bar a button that shows progress fills as it runs; a button that only spins has none.</summary>
+    public ILocator ProgressBar => Button.Locator(".e-progress");
 }

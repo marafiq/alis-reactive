@@ -1,163 +1,143 @@
-@model MultiSelectModel
-@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.MultiSelect
+@model FusionMultiSelectModel
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
+@using Microsoft.AspNetCore.Mvc.Rendering
 @using Syncfusion.EJ2.DropDowns
 @{
-    ViewData["Title"] = "MultiSelect";
+    ViewData["Title"] = "Diet Order";
 
-    var plan = Html.ReactivePlan<MultiSelectModel>();
-    var allergies = (List<AllergyItem>)ViewBag.Allergies;
-    var dietaryRestrictions = (List<DietaryItem>)ViewBag.DietaryRestrictions;
+    const string FormId = "diet-order-form";
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
+    const string PrimaryButton = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+    const string SelectInput = "rounded-md border border-border px-3 py-1.5 text-sm";
 
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        var comp = p.Component<FusionMultiSelect>(m => m.Allergies);
-        p.Element("value-echo").SetText(comp.Value());
-    }));
-
-    Html.On(plan, t => t.CustomEvent("do-gather", p =>
-    {
-        p.Post(Url.SandboxRoute("Echo", "MultiSelect"), g =>
-            g.Include<FusionMultiSelect, MultiSelectModel>(m => m.Allergies))
-         .Response(r => r
-            .OnSuccess(s =>
-            {
-                s.Element("gather-result").SetText("gathered");
-            }));
-    }));
+    var plan = Html.ReactivePlan<FusionMultiSelectModel>();
+    var textures = Model.Textures.Select(texture => new SelectListItem(texture.Name, texture.Id, texture.Id == Model.Texture)).ToList();
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionMultiSelect — Full API</native-heading>
-    <native-text color="Secondary">
-        Exercises FusionMultiSelect API: events, conditions, gather, and typed Fields
-        with optional GroupBy. Senior living domain — resident allergies and dietary restrictions.
-    </native-text>
+    <native-heading level="H1">Diet Order</native-heading>
+    <native-text color="Secondary">Margaret Hale, Maple 214. Update her diet order; the kitchen prints her tray ticket from it.</native-text>
 
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">1. Allergies (Fields with GroupBy)</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            Uses <code>Fields&lt;AllergyItem&gt;(t =&gt; t.Text, v =&gt; v.Value, g =&gt; g.Category)</code>
-            with GroupBy for categorized display. Pre-selects "peanuts" via SF builder Value().
-        </p>
-        <native-grid cols="C2" gap="Base">
-            @{ Html.InputField(plan, m => m.Allergies, o => o.Label("Allergies (SF MultiSelect)"))
-                .FusionMultiSelect(b => b
-                    .DataSource(allergies)
-                    .Fields<AllergyItem>(t => t.Text, v => v.Value, g => g.Category)
-                    .Placeholder("Select allergies")
-                    .Mode(VisualMode.Box)
-                    .Value(new string[] { "peanuts" })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+    <native-grid cols="C2" gap="Lg">
+        <native-card><native-card-body id="@FormId">
+            <native-vstack gap="Base">
+                @{ Html.InputField(plan, m => m.Allergies, o => o.Required().Label("Allergies"))
+                    .FusionMultiSelect(b => b
+                        .DataSource(Model.AllergyList)
+                        .Fields<AllergyChoice>(t => t.Name, v => v.Id, g => g.Kind)
+                        .Value(Model.Allergies)
+                        .Mode(VisualMode.Box)
+                        .Placeholder("Record her allergies"))
+                    .Reactive(evt => evt.Change, (args, p) =>
                     {
-                        p.Element("change-value").SetText(args, x => x.Value);
-                        var comp = p.Component<FusionMultiSelect>(m => m.Allergies);
-                        p.When(comp.Value()).NotNull()
-                            .Then(then =>
+                        // The tray ticket prints the allergies the order now holds, and the page says where
+                        // they came from.
+                        p.Get(Url.SandboxRoute("TrayTicket", "MultiSelect"))
+                            .Gather<TrayTicketQuery>(g => g.Set(x => x.Allergies, args.Value))
+                            .Response(r => r.OnSuccess<TrayTicketLine>((ticket, s) =>
+                                s.Element("tray-ticket").Text.Set(ticket.Get(x => x.Line))));
+                        p.When(args.IsInteracted).Truthy()
+                            .Then(byHand => byHand.Element("allergy-source").Text.Set("Changed by you."))
+                            .Else(copied => copied.Element("allergy-source").Text.Set("From her hospital discharge summary."));
+                    }); }
+                <p id="allergy-source" class="text-sm text-text-muted">From her chart.</p>
+
+                @{ Html.InputField(plan, m => m.Texture, o => o.Label("Texture"))
+                    .NativeDropDown(b => b.Items(textures).CssClass(SelectInput))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                        // The snacks list fills with what the new texture allows and opens for the dietitian.
+                        p.Get(Url.SandboxRoute("Snacks", "MultiSelect"))
+                            .Gather<SnackQuery>(g => g.Set(x => x.Texture, args.Value))
+                            .Response(r => r.OnSuccess<TextureSnacks>((allowed, s) =>
                             {
-                                then.Element("selected-indicator").Show();
-                                then.Element("selected-indicator").SetText("selected");
+                                var snacks = s.Component<FusionMultiSelect>(m => m.Snacks);
+                                snacks.DataSource.Set(allowed.Get(x => x.Snacks));
+                                snacks.DataBind();
+                                snacks.ShowPopup();
+                            }))); }
+
+                @{ Html.InputField(plan, m => m.Snacks, o => o.Label("Snacks between meals"))
+                    .FusionMultiSelect(b => b
+                        .DataSource(Model.SnackList)
+                        .Fields<MenuChoice>(t => t.Name, v => v.Id)
+                        .Mode(VisualMode.CheckBox)
+                        .ShowSelectAll(true)
+                        .Placeholder("Choose her snacks")); }
+
+                @{ Html.InputField(plan, m => m.Dislikes, o => o.Label("Dishes she will not eat"))
+                    .FusionMultiSelect(b => b
+                        .DataSource(Model.Menu)
+                        .Fields<MenuChoice>(t => t.Name, v => v.Id)
+                        .Mode(VisualMode.CheckBox)
+                        .MaximumSelectionLength(3)
+                        .ChangeOnBlur(false)
+                        .Placeholder("Up to three dishes"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        // The kitchen substitutes up to three dishes: the third closes the list and says so.
+                        p.When(p.From(args.Value).Count()).Gte(3)
+                            .Then(full =>
+                            {
+                                full.Component<FusionMultiSelect>(m => m.Dislikes).HidePopup();
+                                full.Element("dislike-limit").Show();
                             })
-                            .Else(else_ =>
-                            {
-                                else_.Element("selected-indicator").Hide();
-                            });
-                    })); }
-        </native-grid>
-    </section>
+                            .Else(room => room.Element("dislike-limit").Hide());
+                    }); }
+                <p id="dislike-limit" hidden class="text-sm text-amber-700">The kitchen substitutes up to three dishes. Remove one to choose another.</p>
 
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">2. Dietary Restrictions (Fields without GroupBy)</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            Uses <code>Fields&lt;DietaryItem&gt;(t =&gt; t.Text, v =&gt; v.Value)</code>
-            without GroupBy — flat list display.
-        </p>
-        <native-grid cols="C2" gap="Base">
-            @{ Html.InputField(plan, m => m.DietaryRestrictions, o => o.Label("Dietary Restrictions (SF MultiSelect)"))
-                .FusionMultiSelect(b => b
-                    .DataSource(dietaryRestrictions)
-                    .Fields<DietaryItem>(t => t.Text, v => v.Value)
-                    .Placeholder("Select dietary restrictions")
-                    .Mode(VisualMode.Box)
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                @{ Html.InputField(plan, m => m.Supplements, o => o.Label("Supplements"))
+                    .FusionMultiSelect(b => b
+                        .DataSource(Model.UsualSupplements)
+                        .Fields<MenuChoice>(t => t.Name, v => v.Id)
+                        .Mode(VisualMode.Box)
+                        .AllowFiltering(true)
+                        .DebounceDelay(300)
+                        .Placeholder("Type to search the catalog"))
+                    .Reactive(evt => evt.Filtering, (args, p) =>
                     {
-                        p.Element("dietary-change-value").SetText(args, x => x.Value);
-                    })); }
-        </native-grid>
-    </section>
-
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">3. Property Read (Value as Source)</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, reads the Allergies component's <code>value</code> property and displays it in a text element.
-        </p>
-        <p class="font-mono text-sm">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-    </section>
-
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">4. Events (Changed)</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            The Allergies and Dietary Restrictions fields wire the Changed event. Change shows the new value.
-        </p>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>Change value (allergies): <span id="change-value" class="text-text-muted">&mdash;</span></p>
-            <p>Change value (dietary): <span id="dietary-change-value" class="text-text-muted">&mdash;</span></p>
-            <p>Selected: <span id="selected-indicator" hidden class="text-emerald-600">&mdash;</span></p>
-        </native-vstack>
-    </section>
-
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">5. Gather (Include in POST)</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            Click to POST the Allergies value gathered from the Syncfusion component via
-            <code>Include&lt;FusionMultiSelect&gt;</code>.
-        </p>
-        @(Html.NativeButton("gather-btn", "Gather Allergies")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mb-3")
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Dispatch("do-gather");
-            }))
-        <p class="font-mono text-sm">Gather result: <span id="gather-result" class="text-text-muted">not gathered</span></p>
-    </section>
-
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">6. Filtering Event (Server-Filtered HTTP)</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            Type to search supplies. The Filtering event fires on each keystroke (debounced 300ms),
-            sends the typed text to the server via HTTP GET, and updates the dropdown DataSource from the response.
-            Requires <code>AllowFiltering(true)</code> on SF MultiSelect.
-        </p>
-        <native-grid cols="C2" gap="Base">
-            @{ Html.InputField(plan, m => m.Supplies, o => o.Label("Supplies (Server-Filtered)"))
-                .FusionMultiSelect(b => b
-                    .Fields<SupplyItem>(t => t.Text, v => v.Value)
-                    .Placeholder("Type to search supplies...")
-                    .AllowFiltering(true)
-                    .Mode(VisualMode.Box)
-                    .Reactive(plan, evt => evt.Filtering, (args, p) =>
-                    {
-                        args.PreventDefault(p);
-                        p.Get(Url.SandboxRoute("Supplies", "MultiSelect"))
-                         .Gather(g => g.FromEvent(args, x => x.Text, "Supplies"))
-                         .Response(r => r
-                            .OnSuccess<SupplySearchResponse>((json, s) =>
+                        // The catalog answers for what was typed; until it does, the list keeps the usual supplements.
+                        args.PreventDefaultAction.Set(true);
+                        p.Get(Url.SandboxRoute("Supplements", "MultiSelect"))
+                            .Gather<SupplementSearch>(g => g.Set(x => x.Name, args.Text))
+                            .WhileLoading(l => l.Element("supplement-status").Text.Set("Searching the kitchen's catalog..."))
+                            .Response(r => r.OnSuccess<SupplementMatches>((found, s) =>
                             {
-                                args.UpdateData(s, json, j => j.Supplies);
-                                s.Element("filter-status").SetText("results loaded");
+                                args.UpdateData(found.Get(x => x.Supplements));
+                                s.Element("supplement-status").Text.Set(found.Get(x => x.Summary));
                             }));
-                    })); }
-        </native-grid>
-        <native-vstack gap="Xs" class="font-mono text-sm mt-2">
-            <p>Filter status: <span id="filter-status" class="text-text-muted">&mdash;</span></p>
-        </native-vstack>
-    </section>
+                    }); }
+                <p id="supplement-status" class="text-sm text-text-muted">Type part of a name to search the kitchen's catalog.</p>
+            </native-vstack>
+        </native-card-body></native-card>
 
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </section>
+        @* The tray ticket and the commands sit beside the order, where its lists cannot cover them. *@
+        <native-card><native-card-body>
+            <native-vstack gap="Base">
+                <native-heading level="H2">Tray ticket</native-heading>
+                <p id="tray-ticket" class="text-sm font-medium">@Model.TrayTicket</p>
+                <native-hstack gap="Sm" class="flex-wrap">
+                    @(Html.NativeButton("copy-discharge-btn", "Copy From Discharge Summary")
+                        .CssClass(Button)
+                        .Reactive(plan, evt => evt.Click, (_, p) =>
+                            p.Get(Url.SandboxRoute("Discharge", "MultiSelect"))
+                                .Response(r => r.OnSuccess<DischargeAllergies>((discharge, s) =>
+                                    s.Component<FusionMultiSelect>(m => m.Allergies).Value.Set(discharge.Get(x => x.Allergies))))))
+                    @(Html.NativeButton("save-diet-order-btn", "Save Diet Order")
+                        .CssClass(PrimaryButton)
+                        .Reactive(plan, evt => evt.Click, (_, p) =>
+                            p.Post(Url.SandboxRoute("Save", "MultiSelect"))
+                                .Gather(g => g.Form())
+                                .Validate<DietOrderValidator>(FormId)
+                                .Response(r => r
+                                    .OnSuccess<DietOrderSaved>((saved, s) => s.Element("save-status").Text.Set(saved.Get(x => x.Message)))
+                                    .OnError(400, e => e.ValidationErrors(FormId)))))
+                </native-hstack>
+                <p id="save-status" class="text-sm">Not saved yet.</p>
+            </native-vstack>
+        </native-card-body></native-card>
+    </native-grid>
 </native-vstack>
 
 @Html.RenderPlan(plan)

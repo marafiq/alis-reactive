@@ -68,8 +68,8 @@ Sandbox pages must use framework primitives. Never work around the framework.
 - `Html.InputField(plan, m => m.Name).NativeTextBox(...)` -- never raw `<input type="text">`
 - `Html.NativeButton("id", "text").Reactive(plan, evt => evt.Click, ...)` -- never raw onclick
 - `.Validate<TValidator>("form-id")` -- never manual validation logic
-- `p.Element("id").SetText(...)` -- never raw DOM manipulation
-- `.Gather(g => g.IncludeAll())` -- never manual form serialization
+- `p.Element("id").Text.Set(...)` -- never raw DOM manipulation
+- `.Gather(g => g.Form())` -- never manual form serialization
 - `Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))` -- never raw label/input combos
 
 Tests must also use the public DSL, not internal constructors. Arrange with `Html.On`,
@@ -118,10 +118,10 @@ Every input component test covers all seven:
 
 | Element | Pattern | Example |
 |---------|---------|---------|
-| Folder | `PascalCase` concern | `AllModulesTogether/Cascading/` |
-| Test class | `When{BehaviorHappens}` | `WhenParentSelectionFiltersDependentList` |
-| Test method | `snake_case_scenario_with_outcome` | `empty_veteran_id_shows_required_error_when_veteran_checked` |
-| No vendor prefix | Folder conveys vendor | `Components/Fusion/WhenDateSelected.cs` |
+| Folder | `PascalCase` concern | `Patterns/BedAssignment/` |
+| Test class | `When{BehaviorHappens}` | `WhenCoordinatorAssignsABed` |
+| Test method | `snake_case_scenario_with_outcome` | `a_number_pasted_without_all_ten_digits_is_refused_at_once` |
+| No vendor prefix | Folder conveys vendor | `Components/Fusion/DatePicker/WhenDateSelected.cs` |
 
 ## No-Hack Rules
 

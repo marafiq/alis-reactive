@@ -1,47 +1,36 @@
-@model MedicalRecordNumberQuickEdit
-@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InPlaceEditor
+@model MedicalRecordNumberCorrection
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using SfInPlace = Syncfusion.EJ2.InPlaceEditor
 @{
-    var plan = Html.ReactivePlan<MedicalRecordNumberQuickEdit>();
-    var updateUrl = Url.Action("UpdateMedicalRecordNumber", "FusionInPlaceEditor", new { area = "Sandbox" })
-        ?? throw new InvalidOperationException("Could not resolve FusionInPlaceEditor.UpdateMedicalRecordNumber.");
+    var plan = Html.ReactivePlan<MedicalRecordNumberCorrection>();
 }
 
-<section id="card-mrn" class="rounded-lg border border-border bg-white p-6 shadow-sm mb-4">
-    <h3 class="text-sm font-semibold mb-3">Quick-edit: MRN — Mask inner type (format-constrained string)</h3>
-    <p class="text-xs text-text-secondary mb-2">Mask <code>LLL-0000</code> is a display formatter — Syncfusion stores the raw 7 characters (<code>MRN1234</code>) in the outer <code>value</code> and renders them as <code>MRN-1234</code> through the mask. FluentValidator regex <code>^[A-Z]{3}\d{4}$</code> proves the raw format on commit.</p>
-
+<div id="card-mrn" class="border-t border-border pt-3">
     @Html.HiddenFieldFor(plan, m => m.ResidentId)
 
-    @{ Html.InputField(plan, m => m.Value, o => o.Label("Medical Record Number"))
+    @{ Html.InputField(plan, m => m.Value, o => o.Label("Medical record number"))
         .FusionInPlaceEditor(b => b
             .Type(SfInPlace.InputType.Mask)
             .Mode(SfInPlace.RenderMode.Inline)
             .EditableOn(SfInPlace.EditableType.Click)
-            .Model(new { mask = "LLL-0000", placeholder = "MRN-0000" })
-            .Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
-            {
-                p.Post(updateUrl)
-                 .Gather(g => g
-                     .Include<FusionInPlaceEditor, MedicalRecordNumberQuickEdit>(m => m.Value)
-                     .Include<NativeHiddenField, MedicalRecordNumberQuickEdit>(m => m.ResidentId))
-                 .Validate<MedicalRecordNumberQuickEditValidator>("card-mrn")
-                 .Response(r => r
-                    .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
-                    {
-                        s.Element("card-mrn-display").SetText(json, x => x.DisplayValue);
-                    })
-                    .OnError(400, e => e.ValidationErrors("card-mrn"))
-                    .OnError<InPlaceEditorCommitError>((err, e) =>
-                    {
-                        e.Element("card-mrn-error").SetText(err, x => x.Message);
-                    }));
-            })); }
+            .Model(new { mask = "LLL-0000", placeholder = "ABC-0000" }))
+        .Reactive(evt => evt.ActionSuccess, (args, p) =>
+        {
+            // The editor reports the number it committed without the mask's dash.
+            p.Post(Url.SandboxRoute("UpdateMedicalRecordNumber", "FusionInPlaceEditor"))
+             .Gather<MedicalRecordNumberCorrection>(g => g.Form(m => m.ResidentId).Set(x => x.Value, args.Value))
+             .Validate<MedicalRecordNumberCorrectionValidator>("card-mrn")
+             .Response(r => r
+                .OnSuccess<CorrectionSaved>((saved, s) =>
+                    s.Element("card-mrn-status").Text.Set(saved.Get(x => x.Message)))
+                .OnError(400, e => e.ValidationErrors("card-mrn"))
+                .OnError<CorrectionRefused>((refused, e) =>
+                    e.Element("card-mrn-status").Text.Set(refused.Get(x => x.Message))));
+        }); }
 
-    <p class="text-sm mt-3">Display: <span id="card-mrn-display" class="font-mono text-text-muted">unchanged</span></p>
-    <p class="text-sm">Error: <span id="card-mrn-error" class="text-red-600"></span></p>
-</section>
+    <p id="card-mrn-status" class="text-sm text-text-secondary"></p>
+</div>
 
 @Html.RenderPlan(plan)

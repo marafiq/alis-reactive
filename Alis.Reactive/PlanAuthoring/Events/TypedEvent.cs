@@ -10,12 +10,13 @@ namespace Alis.Reactive
     /// </remarks>
     /// <typeparam name="TArgs">Event payload type available to the reaction pipeline.</typeparam>
     public sealed class TypedEvent<TArgs>
+        where TArgs : JsObject
     {
         /// <summary>Event name emitted into the Reactive Plan.</summary>
         public string ObjectEvent { get; }
 
-        /// <summary>Placeholder used to author reads from the event payload.</summary>
-        public TArgs Args { get; }
+        /// <summary>The payload's declaration; a callback receives it live, bound to the event.</summary>
+        internal TArgs Args { get; }
 
         internal TypedEvent(string jsEvent, TArgs args)
         {

@@ -1,0 +1,138 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ShiftTaskTallyModel
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "Shift Task Tally";
+
+    const string TallyId = "shift-tally-grid";
+    const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+
+    var plan = Html.ReactivePlan<ShiftTaskTallyModel>();
+
+    var columns = FusionGridColumns.Of<ShiftTallyResident>();
+    var openTasks = columns.Field(r => r.OpenTasks);
+    var prnDoses = columns.Field(r => r.PrnDoses);
+
+    // Names the count a saved cell holds, as the tally's note reads it.
+    void NameCount(PipelineBuilder<ShiftTaskTallyModel> p, TypedSource<string> column) =>
+        p.When(column).Eq(openTasks).Then(t => t.Element("tally-note-count").Text.Set("open tasks"))
+            .ElseIf(column).Eq(prnDoses).Then(t => t.Element("tally-note-count").Text.Set("PRN doses"));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Shift Task Tally</native-heading>
+        <native-text color="Secondary">
+            Maple wing, evening to night shift. Update each resident's open tasks and PRN doses, review the changes and
+            send them to the night shift. A resident left with ten or more open tasks needs the night supervisor's word first.
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-hstack gap="Sm" class="mb-4 flex-wrap">
+            @(Html.NativeButton("tally-start", "Start tally")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Component<FusionGrid>(TallyId).EditCell(0, Field.Of((ShiftTallyResident r) => r.OpenTasks))))
+            @(Html.NativeButton("tally-emar-sync", "Sync med-pass tasks from the eMAR")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Get(Url.SandboxRoute("ShiftTaskTallyEmar", "Grid"))
+                        .Response(r => r.OnSuccess<EmarTaskCount>((count, s) =>
+                        {
+                            var tally = s.Component<FusionGrid>(TallyId);
+                            tally.UpdateCell(tally.GetRowIndexByPrimaryKey(count.Get(x => x.ResidentId)), Field.Of((ShiftTallyResident r) => r.OpenTasks), count.Get(x => x.OpenTasks));
+                            s.Element("tally-emar").Text.Set(count.Get(x => x.Summary));
+                        }))))
+            @(Html.NativeButton("tally-review", "Review tally")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var tally = p.Component<FusionGrid>(TallyId);
+                    tally.SaveCell();
+                    p.Post(Url.SandboxRoute("ShiftTaskTallyReview", "Grid"))
+                        .Gather<ShiftTallyChanges>(g => g.Set(x => x.BatchChanges, tally.GetBatchChanges<ShiftTallyResident>()))
+                        .Response(r => r.OnSuccess<ShiftTallySummary>((review, s) =>
+                            s.Element("tally-review-summary").Text.Set(review.Get(x => x.Summary))));
+                }))
+            @(Html.NativeButton("tally-send", "Send to the night shift")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Component<FusionGrid>(TallyId).EndEdit()))
+        </native-hstack>
+
+        @(Html.FusionGrid<ShiftTaskTallyModel, ShiftTallyResident>(plan, TallyId, b => b
+            .DataSource(Model.Residents)
+            .EditSettings(new GridEditSettings { AllowEditing = true, Mode = EditMode.Batch, ShowConfirmDialog = false })
+            .Columns(new List<GridColumn>
+            {
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "170", AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.Suite), HeaderText = "Suite", Width = "90", AllowEditing = false },
+                new GridColumn { Field = openTasks, HeaderText = "Open tasks", Width = "120", TextAlign = TextAlign.Right },
+                new GridColumn { Field = prnDoses, HeaderText = "PRN doses", Width = "120", TextAlign = TextAlign.Right }
+            }))
+            .Reactive(evt => evt.CellSave<ShiftTallyResident, int>(), (args, p) =>
+            {
+                // More than 12 open tasks is a slip of the keyboard: no resident carries that many into a shift.
+                p.When(args.ColumnName).Eq(openTasks).And(args.Value).Gt(12)
+                    .Then(t =>
+                    {
+                        args.Cancel.Set(true);
+                        t.Element("tally-refused-resident").Text.Set(args.RowData.Get(x => x.ResidentName));
+                        t.Element("tally-refused-count").Text.Set(args.Value);
+                        t.Element("tally-refused-kept").Text.Set(args.PreviousValue);
+                        t.Element("tally-refused").Show();
+                    })
+                    .Else(e => e.Element("tally-refused").Hide());
+            })
+            .Reactive(evt => evt.CellSaved<ShiftTallyResident, int>(), (args, p) =>
+            {
+                p.Element("tally-note-resident").Text.Set(args.RowData.Get(x => x.ResidentName));
+                NameCount(p, args.ColumnName);
+                p.Element("tally-note-from").Text.Set(args.PreviousValue);
+                p.Element("tally-note-to").Text.Set(args.Value);
+                p.Element("tally-note").Show();
+            })
+            .Reactive(evt => evt.BeforeBatchSave<ShiftTallyResident>(), (args, p) =>
+            {
+                // Ten or more open tasks for one resident needs the night supervisor's word before the tally goes out.
+                var changed = p.From(args.BatchChanges.Get(x => x.ChangedRecords));
+                p.When(changed.Any(r => r.OpenTasks >= 10)).Truthy()
+                    .Then(t =>
+                    {
+                        args.Cancel.Set(true);
+                        t.Element("tally-held-resident").Text.Set(changed.Find(r => r.OpenTasks >= 10, r => r.ResidentName));
+                        t.Element("tally-held-count").Text.Set(changed.Find(r => r.OpenTasks >= 10, r => r.OpenTasks));
+                        t.Element("tally-held").Show();
+                    })
+                    .Else(e =>
+                    {
+                        e.Element("tally-held").Hide();
+                        e.Post(Url.SandboxRoute("ShiftTaskTallySend", "Grid"))
+                            .Gather<ShiftTallyChanges>(g => g.Set(x => x.BatchChanges, args.BatchChanges))
+                            .Response(r => r.OnSuccess<ShiftTallySummary>((sent, s) =>
+                                s.Element("tally-sent").Text.Set(sent.Get(x => x.Summary))));
+                    });
+            }))
+
+        <native-vstack gap="Xs" class="mt-4 text-sm">
+            <p id="tally-note" hidden>
+                Last change: <span id="tally-note-resident"></span>'s <span id="tally-note-count"></span> from <span id="tally-note-from"></span> to <span id="tally-note-to"></span>.
+            </p>
+            <p id="tally-refused" hidden class="text-red-700">
+                <span id="tally-refused-resident"></span> cannot carry <span id="tally-refused-count"></span> open tasks into one shift; the tally keeps <span id="tally-refused-kept"></span>.
+            </p>
+            <p id="tally-held" hidden class="text-red-700">
+                Call the night supervisor before sending: <span id="tally-held-resident"></span> has <span id="tally-held-count"></span> open tasks.
+            </p>
+            <p id="tally-emar" class="text-text-muted">No eMAR sync this shift.</p>
+            <p id="tally-review-summary" class="text-text-muted">Review the tally before you send it.</p>
+            <p id="tally-sent" class="font-medium">Not sent to the night shift yet.</p>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

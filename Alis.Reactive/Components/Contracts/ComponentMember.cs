@@ -1,143 +1,83 @@
 using System;
+using System.Collections.Generic;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive
 {
-    /// <summary>
-    /// Describes a readable or writable JavaScript property on a reactive component.
-    /// Component onboarding uses these members to declare the Reactive Plan contract
-    /// that the runtime can read or update.
-    /// </summary>
+    /// <summary>A declared property: its JavaScript path and the shape of its value.</summary>
+    /// <typeparam name="TValue">The C# type of the property value.</typeparam>
     internal sealed class ComponentProperty<TValue>
     {
-        private readonly MemberName _member;
-        private readonly Path _path;
-        private readonly Shape _shape;
-
-        private ComponentProperty(string member, string pathExpression, Shape shape)
+        private ComponentProperty(string pathExpression)
         {
-            _member = MemberName.Of(member);
             if (string.IsNullOrWhiteSpace(pathExpression))
-            {
                 throw new ArgumentException("Property path required.", nameof(pathExpression));
-            }
 
-            _path = Path.Parse(pathExpression);
-            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
+            JavaScriptPath = pathExpression;
+            Path = Path.Parse(pathExpression);
+            Shape = Shape.FromClrType(typeof(TValue));
         }
 
-        private ComponentProperty(MemberName member, Path path, Shape shape)
-        {
-            _member = member ?? throw new ArgumentNullException(nameof(member));
-            _path = path ?? throw new ArgumentNullException(nameof(path));
-            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
-        }
+        /// <summary>The property's name on its object, a dotted path for a nested one.</summary>
+        internal string JavaScriptPath { get; }
 
-        internal string Member => _member.Value;
+        internal Path Path { get; }
 
-        internal Shape Shape => _shape;
+        internal Shape Shape { get; }
 
-        internal ObjectPropertyContract ContractFor(MemberAccess access)
-        {
-            if (access == null) throw new ArgumentNullException(nameof(access));
-            return ObjectPropertyContract.Create(_member, _path, _shape, access);
-        }
-
-        /// <summary>Declares a property whose plan member and JavaScript path are the same.</summary>
-        internal static ComponentProperty<TValue> Named(string member) =>
-            new ComponentProperty<TValue>(member, member, Shape.FromClrType(typeof(TValue)));
-
-        /// <summary>Declares a property whose plan member maps to a different JavaScript path.</summary>
-        internal static ComponentProperty<TValue> Mapped(string member, string pathExpression) =>
-            new ComponentProperty<TValue>(member, pathExpression, Shape.FromClrType(typeof(TValue)));
-
-        /// <summary>Specializes the property shape when render-time registration discovered it.</summary>
-        internal ComponentProperty<TValue> WithShape(Shape shape) =>
-            new ComponentProperty<TValue>(_member, _path, shape);
+        internal static ComponentProperty<TValue> At(string pathExpression) => new ComponentProperty<TValue>(pathExpression);
     }
 
     /// <summary>
-    /// Describes a JavaScript method on a reactive component.
+    /// A declared method: the C# member that declares it, its JavaScript path, the shapes its arguments are
+    /// converted to, and whether it returns a promise the steps after it wait for.
     /// </summary>
     internal sealed class ComponentMethod
     {
-        private readonly MemberName _member;
-        private readonly Path _path;
-        private readonly MethodArgumentContract _arguments;
-
-        private ComponentMethod(string member, string pathExpression, MethodArgumentContract arguments)
+        private ComponentMethod(string name, string pathExpression, IReadOnlyList<Shape> argumentShapes, bool awaits)
         {
-            _member = MemberName.Of(member);
-            if (string.IsNullOrWhiteSpace(pathExpression))
-            {
-                throw new ArgumentException("Method path required.", nameof(pathExpression));
-            }
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Method name required.", nameof(name));
 
-            _path = Path.Parse(pathExpression);
-            _arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
+            Name = name;
+            JavaScriptName = pathExpression ?? throw new ArgumentNullException(nameof(pathExpression));
+            Path = Path.Parse(pathExpression);
+            ArgumentShapes = argumentShapes ?? throw new ArgumentNullException(nameof(argumentShapes));
+            Awaits = awaits;
         }
 
-        private ComponentMethod(MemberName member, Path path, MethodArgumentContract arguments)
-        {
-            _member = member ?? throw new ArgumentNullException(nameof(member));
-            _path = path ?? throw new ArgumentNullException(nameof(path));
-            _arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
-        }
+        /// <summary>The C# member that declares the method, named in errors.</summary>
+        internal string Name { get; }
 
-        internal string Member => _member.Value;
+        /// <summary>The JavaScript name the method has on its object; empty for a plugin that is itself a function.</summary>
+        internal string JavaScriptName { get; }
 
-        internal ObjectMethodContract ContractReturning(Shape returns)
-        {
-            if (returns == null) throw new ArgumentNullException(nameof(returns));
-            return ObjectMethodContract.Create(
-                _member,
-                _path,
-                MethodSignature.WithArguments(_arguments, returns));
-        }
+        internal Path Path { get; }
 
-        /// <summary>Declares a method whose plan member and JavaScript path are the same.</summary>
-        internal static ComponentMethod Named(string member) =>
-            new ComponentMethod(member, member, MethodArgumentContract.NoArguments);
+        internal IReadOnlyList<Shape> ArgumentShapes { get; }
 
-        /// <summary>Declares a method whose plan member maps to a different JavaScript path.</summary>
-        internal static ComponentMethod Mapped(string member, string pathExpression) =>
-            new ComponentMethod(member, pathExpression, MethodArgumentContract.NoArguments);
+        internal bool Awaits { get; }
 
-        internal ComponentMethod WithArgs<T1>() =>
-            WithArgs(Shape.FromClrType(typeof(T1)));
-
-        internal ComponentMethod WithArgs<T1, T2>() =>
-            WithArgs(Shape.FromClrType(typeof(T1)), Shape.FromClrType(typeof(T2)));
-
-        internal ComponentMethod WithArgs<T1, T2, T3>() =>
-            WithArgs(Shape.FromClrType(typeof(T1)), Shape.FromClrType(typeof(T2)), Shape.FromClrType(typeof(T3)));
-
-        private ComponentMethod WithArgs(params Shape[] args) =>
-            new ComponentMethod(_member, _path, MethodArgumentContract.Exact(args));
+        /// <summary>A method taking arguments of the given shapes.</summary>
+        internal static ComponentMethod Of(string name, string pathExpression, IReadOnlyList<Shape> argumentShapes, bool awaits) =>
+            new ComponentMethod(name, pathExpression, argumentShapes, awaits);
     }
 
-    /// <summary>
-    /// DOM element contract used by <c>p.Element(...)</c>.
-    /// Native DOM onboarding stays explicit without changing the public DSL.
-    /// </summary>
+    /// <summary>The members of an element <c>p.Element(...)</c> reaches: its text, HTML, hidden attribute and class list.</summary>
     internal static class BrowserElementMembers
     {
-        internal static ComponentMethod AddClass { get; } =
-            ComponentMethod.Mapped("classAdd", "classList.add").WithArgs<string>();
+        private static readonly IReadOnlyList<Shape> OneText = new[] { Shape.String };
 
-        internal static ComponentMethod RemoveClass { get; } =
-            ComponentMethod.Mapped("classRemove", "classList.remove").WithArgs<string>();
+        internal static ComponentMethod AddClass { get; } = ComponentMethod.Of("ClassList.Add", "classList.add", OneText, awaits: false);
 
-        internal static ComponentMethod ToggleClass { get; } =
-            ComponentMethod.Mapped("classToggle", "classList.toggle").WithArgs<string>();
+        internal static ComponentMethod RemoveClass { get; } = ComponentMethod.Of("ClassList.Remove", "classList.remove", OneText, awaits: false);
 
-        internal static ComponentProperty<string> Text { get; } =
-            ComponentProperty<string>.Mapped("text", "textContent");
+        internal static ComponentMethod ToggleClass { get; } = ComponentMethod.Of("ClassList.Toggle", "classList.toggle", OneText, awaits: false);
 
-        internal static ComponentProperty<string> Html { get; } =
-            ComponentProperty<string>.Mapped("html", "innerHTML");
+        internal static ComponentProperty<string> Text { get; } = ComponentProperty<string>.At("textContent");
 
-        internal static ComponentProperty<bool> Hidden { get; } =
-            ComponentProperty<bool>.Named("hidden");
+        internal static ComponentProperty<string> Html { get; } = ComponentProperty<string>.At("innerHTML");
+
+        internal static ComponentProperty<bool> Hidden { get; } = ComponentProperty<bool>.At("hidden");
     }
 }

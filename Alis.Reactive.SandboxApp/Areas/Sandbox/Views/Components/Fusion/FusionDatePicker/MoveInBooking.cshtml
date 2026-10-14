@@ -1,0 +1,57 @@
+@model MoveInBookingModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "Move-in Booking";
+    var plan = Html.ReactivePlan<MoveInBookingModel>();
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Move-in Booking</native-heading>
+    <native-text color="Secondary">
+        Book the day the resident moves in, the day of the family's welcome visit if they want one, and
+        when the moving truck arrives.
+    </native-text>
+
+    <native-card><native-card-body>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.MoveInDay, o => o.Label("Move-in day"))
+                .FusionDatePicker(b => b.Placeholder("Choose the move-in day"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    // The terms a move-in day carries: the office is closed on Christmas Day, December
+                    // is billed at the holiday rate, an early move-in needs the director, and November
+                    // comes with a free first week of housekeeping.
+                    p.When(args.Value).IsNull()
+                        .Then(none => none.Element("move-in-note").Text.Set("Choose the move-in day to see its terms."))
+                        .ElseIf(args.Value).Eq(new DateTime(2026, 12, 25))
+                        .Then(closed => closed.Element("move-in-note").Text.Set("The office is closed on Christmas Day; choose another move-in day."))
+                        .ElseIf(args.Value).Between(new DateTime(2026, 12, 1), new DateTime(2026, 12, 31))
+                        .Then(holiday => holiday.Element("move-in-note").Text.Set("December move-ins get the holiday rate."))
+                        .ElseIf(args.Value).Lt(new DateTime(2026, 11, 1))
+                        .Then(early => early.Element("move-in-note").Text.Set("A move-in before November needs the director's approval."))
+                        .ElseIf(args.Value).Lte(new DateTime(2026, 11, 30))
+                        .Then(november => november.Element("move-in-note").Text.Set("November move-ins get a free first week of housekeeping."))
+                        .Else(standard => standard.Element("move-in-note").Text.Set("Standard move-in."));
+                }); }
+            @{ Html.InputField(plan, m => m.WelcomeVisit, o => o.Label("Welcome visit"))
+                .FusionDatePicker(b => b.Placeholder("Choose the visit day")); }
+            @{ Html.InputField(plan, m => m.TruckArrives, o => o.Label("Moving truck arrives"))
+                .FusionDateTimePicker(b => b.Placeholder("Choose when the truck arrives")); }
+        </native-grid>
+        <p id="move-in-note" class="mt-3 text-sm text-text-secondary">Choose the move-in day to see its terms.</p>
+        @(Html.NativeButton("book-move-in-btn", "Book Move-in")
+            .CssClass("mt-4 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("BookMoveIn", "FusionDatePicker"))
+                 .Gather(g => g.Form())
+                 .Response(r => r
+                    .OnSuccess<MoveInBooked>((json, s) => s.Element("booking-status").Text.Set(json.Get(x => x.Confirmation)))
+                    .OnError(400, e => e.Element("booking-status").Text.Set("The move-in day could not be booked.")));
+            }))
+        <p id="booking-status" class="mt-3 text-sm text-text-muted">Not booked yet.</p>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

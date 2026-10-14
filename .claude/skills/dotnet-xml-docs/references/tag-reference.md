@@ -129,7 +129,7 @@ Source: [Microsoft Learn — Recommended XML tags](https://learn.microsoft.com/e
 /// <code>
 /// Html.On(plan, t => t.DomReady(p =>
 /// {
-///     p.Element("status").AddClass("active");
+///     p.Element("status").ClassList.Add("active");
 /// }));
 /// </code>
 /// </remarks>
@@ -144,7 +144,7 @@ Source: [Microsoft Learn — Recommended XML tags](https://learn.microsoft.com/e
 /// <example>
 /// Dispatch a custom event from a DomReady trigger:
 /// <code>
-/// p.Dispatch("data-loaded");
+/// p.Dispatch(CareEvents.DataLoaded);
 /// </code>
 /// </example>
 ```
@@ -156,8 +156,8 @@ Source: [Microsoft Learn — Recommended XML tags](https://learn.microsoft.com/e
 
 ```xml
 /// <list type="bullet">
-/// <item><description>AddClass — adds a CSS class</description></item>
-/// <item><description>RemoveClass — removes a CSS class</description></item>
+/// <item><description>ClassList.Add: adds a CSS class</description></item>
+/// <item><description>ClassList.Remove: removes a CSS class</description></item>
 /// </list>
 ```
 
@@ -198,7 +198,7 @@ Source: [Microsoft Learn — Recommended XML tags](https://learn.microsoft.com/e
 
 ```xml
 /// <see cref="ReactivePlan{TModel}"/>
-/// <see cref="PipelineBuilder{TModel}.Dispatch(string)">Dispatch</see>
+/// <see cref="PipelineBuilder{TModel}.Dispatch(AppEvent)">Dispatch</see>
 /// <see langword="null"/>
 /// <see href="https://learn.microsoft.com/dotnet">Link text</see>
 ```

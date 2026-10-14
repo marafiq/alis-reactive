@@ -1,206 +1,289 @@
+using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
+/// <summary>
+/// As the move-in coordinator, I want to record Dorothy Price's care level, room type and meal plan before
+/// her move-in day, take her care level from her hospital referral, be warned at once about a choice the
+/// community cannot honour, and have the office record what I chose, so that the care team, housekeeping
+/// and the kitchen are ready when she arrives.
+/// </summary>
+/// <remarks>
+/// The memory care floor has no suites: the page warns as soon as the two are chosen together, and only
+/// the office refuses them when the preferences are saved. A radio group raises change when the
+/// coordinator picks an option (HTML, the radio input's input and change events, which the group raises
+/// again on its own element). "Use the referral's care level" writes the server's answer to the care
+/// level group's <c>Value</c>: the referral's option is the one checked, the page reads the group back
+/// for the summary and the assessment notice, and saving sends it. Not exercised: a write of empty text,
+/// which clears every option; no step on this page clears a choice.
+/// </remarks>
 [TestFixture]
 public class WhenRadioOptionSelected : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/NativeRadioGroup";
-    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NativeRadioGroupModel__";
+    private const string Refused = "the server responded with a status of 400";
+
+    private PagePlan<NativeRadioGroupModel> _plan = null!;
+
+    private NativeRadioGroupLocator CareLevel => _plan.NativeRadioGroup(m => m.CareLevel);
+    private NativeRadioGroupLocator RoomType => _plan.NativeRadioGroup(m => m.RoomType);
+    private NativeRadioGroupLocator MealPlan => _plan.NativeRadioGroup(m => m.MealPlan);
+    private ILocator CareLevelError => _plan.ErrorFor(m => m.CareLevel);
+    private ILocator RoomTypeError => _plan.ErrorFor(m => m.RoomType);
+    private ILocator MealPlanError => _plan.ErrorFor(m => m.MealPlan);
+    private ILocator AssessmentNotice => Page.Locator("#assessment-notice");
+    private ILocator SuiteWarning => Page.Locator("#suite-warning");
+    private ILocator SummaryCare => Page.Locator("#summary-care");
+    private ILocator SummaryRoom => Page.Locator("#summary-room");
+    private ILocator SummaryMeals => Page.Locator("#summary-meals");
+    private ILocator SavePreferences => Page.Locator("#save-preferences-btn");
+    private ILocator UseReferralCareLevel => Page.Locator("#use-referral-care-level-btn");
+    private ILocator Status => Page.Locator("#preferences-status");
 
     private async Task NavigateAndBoot()
     {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await NavigateToAndWaitForBoot(Path);
+        _plan = await PagePlan<NativeRadioGroupModel>.FromPage(Page);
     }
 
     [Test]
-    public async Task page_loads_without_errors()
+    public async Task choosing_a_meal_plan_puts_it_on_the_move_in_summary()
     {
         await NavigateAndBoot();
-        await Expect(Page).ToHaveTitleAsync("NativeRadioGroup — Alis.Reactive Sandbox");
+        await Expect(SummaryMeals).ToHaveTextAsync("Not chosen");
+
+        await MealPlan.Choose("Vegetarian");
+
+        await Expect(SummaryMeals).ToHaveTextAsync("Vegetarian");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task text_only_radio_selects_and_echoes_value()
+    public async Task choosing_a_care_level_puts_it_on_the_move_in_summary()
     {
         await NavigateAndBoot();
+        await Expect(SummaryCare).ToHaveTextAsync("Not chosen");
 
-        await Page.Locator($"#{ModelIdPrefix}MealPlan_r1").ClickAsync();
+        await CareLevel.Choose("Assisted Living");
 
-        var echo = Page.Locator("#meal-echo");
-        await Expect(echo).ToHaveTextAsync("Vegetarian", new() { Timeout = 3000 });
+        await Expect(SummaryCare).ToHaveTextAsync("Assisted Living");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task text_only_hidden_input_syncs_on_click()
+    public async Task choosing_a_room_type_puts_it_on_the_move_in_summary()
     {
         await NavigateAndBoot();
+        await Expect(SummaryRoom).ToHaveTextAsync("Not chosen");
 
-        await Page.Locator($"#{ModelIdPrefix}MealPlan_r2").ClickAsync();
+        await RoomType.Choose("Private room");
 
-        var hidden = Page.Locator($"input[type='hidden']#{ModelIdPrefix}MealPlan");
-        await Expect(hidden).ToHaveValueAsync("Diabetic", new() { Timeout = 3000 });
+        await Expect(SummaryRoom).ToHaveTextAsync("Private room");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task description_radio_shows_condition_match()
+    public async Task memory_care_books_an_assessment_before_move_in_day()
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{ModelIdPrefix}CareLevel_r1").ClickAsync();
+        await CareLevel.Choose("Memory Care");
 
-        var notice = Page.Locator("#care-notice");
-        await Expect(notice).ToHaveTextAsync("Memory Care selected — assessment score required", new() { Timeout = 3000 });
+        await Expect(AssessmentNotice).ToHaveTextAsync("A memory care assessment is booked before move-in day.");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task description_radio_shows_else_for_non_match()
+    public async Task other_care_levels_need_no_assessment()
     {
         await NavigateAndBoot();
+        await CareLevel.Choose("Memory Care");
+        await Expect(AssessmentNotice).ToHaveTextAsync("A memory care assessment is booked before move-in day.");
 
-        await Page.Locator($"#{ModelIdPrefix}CareLevel_r2").ClickAsync();
+        await CareLevel.Choose("Assisted Living");
 
-        var notice = Page.Locator("#care-notice");
-        await Expect(notice).ToHaveTextAsync("Standard admission process", new() { Timeout = 3000 });
+        await Expect(AssessmentNotice).ToHaveTextAsync("No assessment is needed before move-in.");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task form_validation_blocks_empty_submit()
+    public async Task a_suite_chosen_for_memory_care_is_warned_against_at_once()
     {
         await NavigateAndBoot();
+        await CareLevel.Choose("Memory Care");
 
-        await Page.Locator("#submit-btn").ClickAsync();
+        await RoomType.Choose("Private suite");
 
-        var nameError = Page.Locator($"[data-valmsg-for='ResidentName']");
-        await Expect(nameError).ToContainTextAsync("required", new() { Timeout = 3000 });
+        await Expect(SuiteWarning).ToHaveTextAsync("The memory care floor has no suites.");
+        await Expect(SuiteWarning).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task form_submit_succeeds_with_valid_data()
+    public async Task memory_care_chosen_after_a_suite_is_warned_against_at_once()
     {
         await NavigateAndBoot();
+        await RoomType.Choose("Private suite");
 
-        var nameInput = Page.Locator($"#{ModelIdPrefix}ResidentName");
-        await nameInput.FillAsync("Margaret Thompson");
+        await CareLevel.Choose("Memory Care");
 
-        await Page.Locator($"#{ModelIdPrefix}RoomType_r1").ClickAsync();
-
-        await Page.Locator("#submit-btn").ClickAsync();
-
-        var result = Page.Locator("#result");
-        await Expect(result).ToHaveTextAsync("Preferences saved", new() { Timeout = 3000 });
+        await Expect(SuiteWarning).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task component_value_condition_confirms_when_set()
+    public async Task choosing_a_private_room_after_the_suite_warning_takes_the_warning_away()
     {
         await NavigateAndBoot();
+        await CareLevel.Choose("Memory Care");
+        await RoomType.Choose("Private suite");
+        await Expect(SuiteWarning).ToBeVisibleAsync();
 
-        await Page.Locator($"#{ModelIdPrefix}CareLevel_r0").ClickAsync();
+        await RoomType.Choose("Private room");
 
-        await Page.Locator("#check-care-btn").ClickAsync();
-
-        var status = Page.Locator("#care-confirmation");
-        await Expect(status).ToHaveTextAsync("care level confirmed", new() { Timeout = 3000 });
+        await Expect(SuiteWarning).ToBeHiddenAsync();
+        await Expect(SummaryRoom).ToHaveTextAsync("Private room");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task component_value_condition_warns_when_empty()
+    public async Task choosing_assisted_living_after_the_suite_warning_takes_the_warning_away()
     {
         await NavigateAndBoot();
+        await CareLevel.Choose("Memory Care");
+        await RoomType.Choose("Private suite");
+        await Expect(SuiteWarning).ToBeVisibleAsync();
 
-        await Page.Locator("#check-care-btn").ClickAsync();
+        await CareLevel.Choose("Assisted Living");
 
-        var status = Page.Locator("#care-confirmation");
-        await Expect(status).ToHaveTextAsync("care level is required", new() { Timeout = 3000 });
+        await Expect(SuiteWarning).ToBeHiddenAsync();
+        await Expect(SummaryCare).ToHaveTextAsync("Assisted Living");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task changing_selection_multiple_times_updates_each_time()
+    public async Task a_suite_for_assisted_living_is_not_warned_against()
     {
         await NavigateAndBoot();
+        await CareLevel.Choose("Assisted Living");
 
-        var notice = Page.Locator("#care-notice");
+        await RoomType.Choose("Private suite");
 
-        await Page.Locator($"#{ModelIdPrefix}CareLevel_r1").ClickAsync();
-        await Expect(notice).ToHaveTextAsync("Memory Care selected — assessment score required", new() { Timeout = 3000 });
-
-        await Page.Locator($"#{ModelIdPrefix}CareLevel_r0").ClickAsync();
-        await Expect(notice).ToHaveTextAsync("Standard admission process", new() { Timeout = 3000 });
-
-        await Page.Locator($"#{ModelIdPrefix}CareLevel_r1").ClickAsync();
-        await Expect(notice).ToHaveTextAsync("Memory Care selected — assessment score required", new() { Timeout = 3000 });
-
+        await Expect(SuiteWarning).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task hidden_inputs_render_for_all_groups()
+    public async Task memory_care_in_a_private_room_is_not_warned_against()
     {
         await NavigateAndBoot();
+        await RoomType.Choose("Private room");
 
-        await Expect(Page.Locator($"input[type='hidden']#{ModelIdPrefix}CareLevel")).ToHaveCountAsync(1);
-        await Expect(Page.Locator($"input[type='hidden']#{ModelIdPrefix}MealPlan")).ToHaveCountAsync(1);
-        await Expect(Page.Locator($"input[type='hidden']#{ModelIdPrefix}RoomType")).ToHaveCountAsync(1);
+        await CareLevel.Choose("Memory Care");
+
+        await Expect(AssessmentNotice).ToHaveTextAsync("A memory care assessment is booked before move-in day.");
+        await Expect(SuiteWarning).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // The referral's care level takes the place of the one chosen before; one option stays checked.
+    [Test]
+    public async Task the_referrals_care_level_is_chosen_in_place_of_the_one_picked_before()
+    {
+        await NavigateAndBoot();
+        await CareLevel.Choose("Assisted Living");
+
+        await ClickWhenStable(UseReferralCareLevel);
+
+        await Expect(CareLevel.Option("Memory Care")).ToBeCheckedAsync(new() { Timeout = 10000 });
+        await Expect(CareLevel.Option("Assisted Living")).Not.ToBeCheckedAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task care_level_has_four_radio_options()
+    public async Task the_referrals_memory_care_books_an_assessment_before_move_in_day()
     {
         await NavigateAndBoot();
-        await Expect(Page.Locator($"input[type='radio'][name='CareLevel']")).ToHaveCountAsync(4);
+
+        await ClickWhenStable(UseReferralCareLevel);
+
+        await Expect(AssessmentNotice).ToHaveTextAsync("A memory care assessment is booked before move-in day.", new() { Timeout = 10000 });
+        await Expect(SummaryCare).ToHaveTextAsync("Memory Care");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task meal_plan_has_four_radio_options()
+    public async Task saving_after_using_the_referral_records_its_care_level()
     {
         await NavigateAndBoot();
-        await Expect(Page.Locator($"input[type='radio'][name='MealPlan']")).ToHaveCountAsync(4);
+        await ClickWhenStable(UseReferralCareLevel);
+        await Expect(CareLevel.Option("Memory Care")).ToBeCheckedAsync(new() { Timeout = 10000 });
+        await RoomType.Choose("Private room");
+        await MealPlan.Choose("Standard");
+
+        await ClickWhenStable(SavePreferences);
+
+        await Expect(Status).ToHaveTextAsync("Move-in preferences saved for Dorothy Price: Memory Care, Private room, Standard meals.", new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task room_type_has_three_radio_options()
+    public async Task saving_the_preferences_tells_the_coordinator_what_the_office_recorded()
     {
         await NavigateAndBoot();
-        await Expect(Page.Locator($"input[type='radio'][name='RoomType']")).ToHaveCountAsync(3);
+        await CareLevel.Choose("Assisted Living");
+        await RoomType.Choose("Private room");
+        await MealPlan.Choose("Vegetarian");
+
+        await ClickWhenStable(SavePreferences);
+
+        await Expect(Status).ToHaveTextAsync("Move-in preferences saved for Dorothy Price: Assisted Living, Private room, Vegetarian meals.");
+        AssertNoConsoleErrors();
+    }
+
+    // Refused in the browser: preferences sent to the server would answer 400, a console error.
+    [Test]
+    public async Task saving_with_nothing_chosen_says_what_is_missing()
+    {
+        await NavigateAndBoot();
+
+        await ClickWhenStable(SavePreferences);
+
+        await Expect(CareLevelError).ToHaveTextAsync("Choose the care level.");
+        await Expect(RoomTypeError).ToHaveTextAsync("Choose the room type.");
+        await Expect(MealPlanError).ToHaveTextAsync("Choose the meal plan.");
+        await Expect(Status).ToHaveTextAsync("");
+        AssertNoConsoleErrors();
+    }
+
+    // A radio never reaches the group's own element with input or blur; only the group's change rechecks it.
+    [Test]
+    public async Task choosing_a_room_type_clears_its_refusal_without_saving_again()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(SavePreferences);
+        await Expect(RoomTypeError).ToHaveTextAsync("Choose the room type.");
+
+        await RoomType.Choose("Private room");
+
+        await Expect(RoomTypeError).ToBeHiddenAsync();
+        await Expect(MealPlanError).ToHaveTextAsync("Choose the meal plan.");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task plan_carries_native_vendor()
+    public async Task the_office_refuses_a_suite_on_the_memory_care_floor()
     {
         await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"vendor\": \"native\""));
-        AssertNoConsoleErrors();
-    }
+        await CareLevel.Choose("Memory Care");
+        await RoomType.Choose("Private suite");
+        await MealPlan.Choose("Diabetic");
 
-    [Test]
-    public async Task plan_carries_value_value_member()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"member\": \"value\""));
-        AssertNoConsoleErrors();
-    }
+        await ClickWhenStable(SavePreferences);
 
-    [Test]
-    public async Task boot_trace_is_emitted()
-    {
-        await NavigateAndBoot();
-        var hasBootTrace = _consoleMessages.Any(m => m.Contains("booted"));
-        Assert.That(hasBootTrace, Is.True);
-        AssertNoConsoleErrors();
+        await Expect(RoomTypeError).ToHaveTextAsync("The memory care floor has no suites. Choose a private or shared room.");
+        await Expect(Status).ToHaveTextAsync("");
+        AssertNoConsoleErrorsExcept(Refused);
     }
 }

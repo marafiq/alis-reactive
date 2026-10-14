@@ -1,153 +1,182 @@
+using System.Text.Json;
 using Alis.Reactive.FluentValidator;
-using FluentValidation;
+using Microsoft.AspNetCore.Http;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper
 {
-    public sealed record FusionStepperWizardShellModel
+    /// <summary>
+    /// A new resident's admission at Maple Grove, taken in four steps: intake, care plan, contacts and review.
+    /// The page loads one step at a time from the server; the admission's id keys every step it saves.
+    /// </summary>
+    public sealed record AdmissionWizardModel
     {
-        public string? WizardId { get; init; }
-        public string MaxUnlockedStep { get; init; } = "0";
+        public string AdmissionId { get; init; } = "";
     }
 
-    public sealed record FusionStepperWizardLoadStepRequest
+    /// <summary>Asks for one step of an admission, by its index on the stepper (0 is the intake).</summary>
+    public sealed record AdmissionStepRequest
     {
-        public string? WizardId { get; init; }
+        public string AdmissionId { get; init; } = "";
         public int Step { get; init; }
     }
 
-    public sealed record FusionStepperWizardIntakeModel
+    /// <summary>The intake: who is moving in, and how.</summary>
+    public sealed record AdmissionIntake
     {
-        public string? WizardId { get; init; }
+        public string AdmissionId { get; init; } = "";
         public string? ResidentName { get; init; }
         public decimal? Age { get; init; }
         public string? AdmissionType { get; init; }
     }
 
-    public sealed record FusionStepperWizardCareModel
+    /// <summary>The care plan the resident moves in with.</summary>
+    public sealed record AdmissionCare
     {
-        public string? WizardId { get; init; }
-        public string? ResidentName { get; init; }
+        public string AdmissionId { get; init; } = "";
+
+        /// <summary>The resident the intake named; the step shows it and does not post it.</summary>
+        public string ResidentName { get; init; } = "";
+
         public string? CareLevel { get; init; }
         public string? PrimaryDiagnosis { get; init; }
-        public string? MemoryAssessment { get; init; }
         public decimal? FallRiskScore { get; init; }
+        public string? MemoryAssessment { get; init; }
     }
 
-    public sealed record FusionStepperWizardContactModel
+    /// <summary>The family member responsible for the resident.</summary>
+    public sealed record AdmissionContacts
     {
-        public string? WizardId { get; init; }
+        public string AdmissionId { get; init; } = "";
         public string? ResponsibleParty { get; init; }
         public string? Phone { get; init; }
         public string? Email { get; init; }
     }
 
-    public sealed record FusionStepperWizardReviewModel
+    /// <summary>The whole admission as the coordinator reviews it, and who signs it off.</summary>
+    public sealed record AdmissionReview
     {
-        public string? WizardId { get; init; }
-        public string? ResidentName { get; init; }
-        public string? AdmissionType { get; init; }
-        public string? CareLevel { get; init; }
-        public string? PrimaryDiagnosis { get; init; }
-        public string? ResponsibleParty { get; init; }
-        public string? Phone { get; init; }
+        public string AdmissionId { get; init; } = "";
+        public string ResidentName { get; init; } = "";
+        public string AdmissionType { get; init; } = "";
+        public string CareLevel { get; init; } = "";
+        public string PrimaryDiagnosis { get; init; } = "";
+        public string ResponsibleParty { get; init; } = "";
+        public string Phone { get; init; } = "";
         public string? AdmissionCoordinator { get; init; }
     }
 
-    public sealed record FusionStepperWizardSaveResponse
+    /// <summary>What the server says when it saves a step or submits the admission.</summary>
+    public sealed record AdmissionStepSaved
     {
-        public string WizardId { get; init; } = "";
         public string Message { get; init; } = "";
     }
 
-    public sealed record FusionStepperWizardSubmitResponse
+    /// <summary>Who already lives at Maple Grove, and who signs admissions off.</summary>
+    public static class MapleGroveAdmissions
     {
-        public string WizardId { get; init; } = "";
-        public string Message { get; init; } = "";
-        public string CareSummary { get; init; } = "";
-        public string ContactSummary { get; init; } = "";
+        public static readonly IReadOnlyList<string> CurrentResidents = ["Margaret Hale", "Arthur Bell", "Helen Park"];
+
+        public static readonly IReadOnlyList<string> AdmissionsTeam = ["Nora Jensen", "Luis Ortega"];
+
+        /// <summary>Maple Grove has no Skilled Nursing bed open this month.</summary>
+        public const string FullCareLevel = "Skilled Nursing";
     }
 
-    public sealed class FusionStepperWizardIntakeValidator : ReactiveValidator<FusionStepperWizardIntakeModel>
+    /// <summary>
+    /// The admissions this browser has started: each step's last saved form, kept in the browser's session and
+    /// keyed by the admission, so no other browser sees them.
+    /// </summary>
+    public sealed class AdmissionDrafts
     {
-        public FusionStepperWizardIntakeValidator()
+        private readonly ISession _session;
+
+        public AdmissionDrafts(ISession session)
         {
-            RuleFor(x => x.ResidentName).NotEmpty().MinimumLength(2);
-            ClientRule(x => x.ResidentName)
-                .Required("'Resident Name' is required.")
-                .MinLength(2, "'Resident Name' must have a minimum length of 2.");
+            _session = session;
+        }
 
-            RuleFor(x => x.Age).NotNull().InclusiveBetween(55m, 120m);
-            ClientRule(x => x.Age)
-                .Required("'Age' is required.")
-                .GreaterThanOrEqualTo(55m, "'Age' must be at least 55.")
-                .LessThanOrEqualTo(120m, "'Age' must be at most 120.");
+        /// <summary>The step as last saved, or an empty one.</summary>
+        public T Load<T>(string admissionId) where T : new() =>
+            _session.GetString(Key<T>(admissionId)) is { } json ? JsonSerializer.Deserialize<T>(json) ?? new T() : new T();
 
-            RuleFor(x => x.AdmissionType).NotEmpty();
-            ClientRule(x => x.AdmissionType)
-                .Required("'Admission Type' is required.");
+        public void Save<T>(string admissionId, T step) =>
+            _session.SetString(Key<T>(admissionId), JsonSerializer.Serialize(step));
+
+        private static string Key<T>(string admissionId) => $"admission:{admissionId}:{typeof(T).Name}";
+    }
+
+    public sealed class AdmissionIntakeValidator : ReactiveValidator<AdmissionIntake>
+    {
+        public AdmissionIntakeValidator()
+        {
+            RuleFor(x => x.ResidentName)
+                .NotEmpty().WithMessage("Enter the resident's full name.")
+                .MinimumLength(2).WithMessage("Enter the resident's full name.");
+
+            // Only the server knows who lives here now.
+            RuleFor(x => x.ResidentName)
+                .Must(name => !MapleGroveAdmissions.CurrentResidents.Contains(name))
+                .WithMessage(intake => $"{intake.ResidentName} already lives at Maple Grove.");
+
+            RuleFor(x => x.Age)
+                .NotEmpty().WithMessage("Enter the resident's age.")
+                .GreaterThanOrEqualTo(55m).WithMessage("Maple Grove admits residents aged 55 and over.")
+                .LessThanOrEqualTo(120m).WithMessage("Check the resident's age.");
+
+            RuleFor(x => x.AdmissionType).NotEmpty().WithMessage("Choose the admission type.");
         }
     }
 
-    public sealed class FusionStepperWizardCareValidator : ReactiveValidator<FusionStepperWizardCareModel>
+    public sealed class AdmissionCareValidator : ReactiveValidator<AdmissionCare>
     {
-        public FusionStepperWizardCareValidator()
+        public AdmissionCareValidator()
         {
-            RuleFor(x => x.CareLevel).NotEmpty();
-            ClientRule(x => x.CareLevel)
-                .Required("'Care Level' is required.");
+            RuleFor(x => x.CareLevel).NotEmpty().WithMessage("Choose the care level.");
 
-            RuleFor(x => x.PrimaryDiagnosis).NotEmpty();
-            ClientRule(x => x.PrimaryDiagnosis)
-                .Required("'Primary Diagnosis' is required.");
+            // Bed availability changes daily; only the server knows it.
+            RuleFor(x => x.CareLevel)
+                .Must(level => level != MapleGroveAdmissions.FullCareLevel)
+                .WithMessage("No Skilled Nursing bed is open at Maple Grove. Choose Assisted Living or Memory Care.");
 
-            RuleFor(x => x.FallRiskScore).NotNull().InclusiveBetween(0m, 10m);
-            ClientRule(x => x.FallRiskScore)
-                .Required("'Fall Risk Score' is required.")
-                .GreaterThanOrEqualTo(0m, "'Fall Risk Score' must be at least 0.")
-                .LessThanOrEqualTo(10m, "'Fall Risk Score' must be at most 10.");
+            RuleFor(x => x.PrimaryDiagnosis).NotEmpty().WithMessage("Choose the primary diagnosis.");
+
+            RuleFor(x => x.FallRiskScore)
+                .NotEmpty().WithMessage("Score the resident's fall risk.")
+                .InclusiveBetween(0m, 10m).WithMessage("Fall risk is scored 0 to 10.");
 
             When(x => x.CareLevel == "Memory Care", () =>
-            {
-                RuleFor(x => x.MemoryAssessment).NotEmpty();
-            });
-
-            WhenField(x => x.CareLevel, "Memory Care", () =>
-            {
-                ClientRule(x => x.MemoryAssessment)
-                    .Required("'Memory Assessment' is required for Memory Care.");
-            });
+                RuleFor(x => x.MemoryAssessment).NotEmpty().WithMessage("Write the memory assessment for a Memory Care admission."));
         }
     }
 
-    public sealed class FusionStepperWizardContactValidator : ReactiveValidator<FusionStepperWizardContactModel>
+    public sealed class AdmissionContactsValidator : ReactiveValidator<AdmissionContacts>
     {
-        public FusionStepperWizardContactValidator()
+        public AdmissionContactsValidator()
         {
-            RuleFor(x => x.ResponsibleParty).NotEmpty().MinimumLength(2);
-            ClientRule(x => x.ResponsibleParty)
-                .Required("'Responsible Party' is required.")
-                .MinLength(2, "'Responsible Party' must have a minimum length of 2.");
+            RuleFor(x => x.ResponsibleParty)
+                .NotEmpty().WithMessage("Name the resident's responsible party.")
+                .MinimumLength(2).WithMessage("Name the resident's responsible party.");
 
-            RuleFor(x => x.Phone).NotEmpty().Matches(@"^\d{3}-\d{3}-\d{4}$");
-            ClientRule(x => x.Phone)
-                .Required("'Phone' is required.")
-                .Regex(@"^\d{3}-\d{3}-\d{4}$", "'Phone' must match 123-456-7890.");
+            RuleFor(x => x.Phone)
+                .NotEmpty().WithMessage("Enter the responsible party's phone.")
+                .Matches(@"^\d{3}-\d{3}-\d{4}$").WithMessage("Enter the phone as 555-142-0188.");
 
-            RuleFor(x => x.Email).NotEmpty().EmailAddress();
-            ClientRule(x => x.Email)
-                .Required("'Email' is required.")
-                .Email("'Email' must be a valid email address.");
+            RuleFor(x => x.Email)
+                .NotEmpty().WithMessage("Enter the responsible party's email.")
+                .EmailAddress().WithMessage("Enter an email address the family reads.");
         }
     }
 
-    public sealed class FusionStepperWizardReviewValidator : ReactiveValidator<FusionStepperWizardReviewModel>
+    public sealed class AdmissionReviewValidator : ReactiveValidator<AdmissionReview>
     {
-        public FusionStepperWizardReviewValidator()
+        public AdmissionReviewValidator()
         {
-            RuleFor(x => x.AdmissionCoordinator).NotEmpty().MinimumLength(2);
-            ClientRule(x => x.AdmissionCoordinator)
-                .Required("'Admission Coordinator' is required.")
-                .MinLength(2, "'Admission Coordinator' must have a minimum length of 2.");
+            RuleFor(x => x.AdmissionCoordinator).NotEmpty().WithMessage("Name the coordinator who signs off the admission.");
+
+            // The admissions team is the server's to know.
+            RuleFor(x => x.AdmissionCoordinator)
+                .Must(name => name == null || MapleGroveAdmissions.AdmissionsTeam.Contains(name))
+                .WithMessage(review => $"{review.AdmissionCoordinator} is not on Maple Grove's admissions team.");
         }
     }
 }

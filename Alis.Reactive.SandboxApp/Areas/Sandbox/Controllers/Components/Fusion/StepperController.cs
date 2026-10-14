@@ -1,7 +1,5 @@
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Concurrent;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
@@ -11,10 +9,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     {
         private const string ViewBase = "~/Areas/Sandbox/Views/Components/Fusion/Stepper/";
 
-        private static readonly ConcurrentDictionary<string, FusionStepperWizardIntakeModel> IntakeDrafts = new();
-        private static readonly ConcurrentDictionary<string, FusionStepperWizardCareModel> CareDrafts = new();
-        private static readonly ConcurrentDictionary<string, FusionStepperWizardContactModel> ContactDrafts = new();
-        private static readonly ConcurrentDictionary<string, FusionStepperWizardReviewModel> ReviewDrafts = new();
+        private AdmissionDrafts Drafts => new(HttpContext.Session);
 
         [HttpGet("")]
         [HttpGet("Index")]
@@ -25,165 +20,104 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new FusionStepperModel());
         }
 
+        /// <summary>A new admission; its steps load one at a time from <see cref="LoadWizardStep"/>.</summary>
         [HttpGet("Wizard")]
-        public IActionResult Wizard()
-        {
-            return View(
-                ViewBase + "Wizard.cshtml",
-                new FusionStepperWizardShellModel { WizardId = NewWizardId() });
-        }
+        public IActionResult Wizard() =>
+            View(ViewBase + "Wizard.cshtml", new AdmissionWizardModel { AdmissionId = Guid.NewGuid().ToString("N") });
 
+        /// <summary>One step of the admission, holding what was last saved for it.</summary>
         [HttpPost("Wizard/LoadStep")]
-        public IActionResult LoadWizardStep([FromBody] FusionStepperWizardLoadStepRequest request)
+        public IActionResult LoadWizardStep([FromBody] AdmissionStepRequest request)
         {
-            var wizardId = request.WizardId ?? NewWizardId();
+            var id = request.AdmissionId;
+            if (id.Length == 0) return BadRequest();
 
+            var drafts = Drafts;
             return request.Step switch
             {
-                1 => StepPartial("_WizardIntakeStep.cshtml", GetDraft(IntakeDrafts, wizardId) with { WizardId = wizardId }),
-                2 => StepPartial("_WizardCareStep.cshtml", BuildCareStep(wizardId)),
-                3 => StepPartial("_WizardContactStep.cshtml", GetDraft(ContactDrafts, wizardId) with { WizardId = wizardId }),
-                4 => StepPartial("_WizardReviewStep.cshtml", BuildReviewStep(wizardId)),
-                _ => BadRequest("Invalid wizard step")
+                0 => StepPartial("_WizardIntakeStep.cshtml", drafts.Load<AdmissionIntake>(id) with { AdmissionId = id }),
+                1 => StepPartial("_WizardCareStep.cshtml", drafts.Load<AdmissionCare>(id) with
+                {
+                    AdmissionId = id,
+                    ResidentName = drafts.Load<AdmissionIntake>(id).ResidentName ?? ""
+                }),
+                2 => StepPartial("_WizardContactStep.cshtml", drafts.Load<AdmissionContacts>(id) with { AdmissionId = id }),
+                3 => StepPartial("_WizardReviewStep.cshtml", Review(drafts, id)),
+                _ => BadRequest()
             };
         }
 
         [HttpPost("Wizard/SaveIntake")]
-        public IActionResult SaveIntake([FromBody] FusionStepperWizardIntakeModel model)
+        public IActionResult SaveIntake([FromBody] AdmissionIntake intake)
         {
-            model = model with { WizardId = EnsureWizardId(model.WizardId) };
-            if (!TryValidate(new FusionStepperWizardIntakeValidator(), model, out var error)) return error;
+            var result = new AdmissionIntakeValidator().Validate(intake);
+            if (!result.IsValid) return BadRequest(new { errors = result.ErrorsByField });
 
-            IntakeDrafts[model.WizardId] = model;
-            return Ok(new FusionStepperWizardSaveResponse
-            {
-                WizardId = model.WizardId,
-                Message = $"Intake saved for {model.ResidentName}"
-            });
+            Drafts.Save(intake.AdmissionId, intake);
+            return Ok(new AdmissionStepSaved { Message = $"Saved {intake.ResidentName}'s intake." });
         }
 
         [HttpPost("Wizard/SaveCare")]
-        public IActionResult SaveCare([FromBody] FusionStepperWizardCareModel model)
+        public IActionResult SaveCare([FromBody] AdmissionCare care)
         {
-            model = model with { WizardId = EnsureWizardId(model.WizardId) };
-            if (!TryValidate(new FusionStepperWizardCareValidator(), model, out var error)) return error;
+            var result = new AdmissionCareValidator().Validate(care);
+            if (!result.IsValid) return BadRequest(new { errors = result.ErrorsByField });
 
-            CareDrafts[model.WizardId] = model;
-            return Ok(new FusionStepperWizardSaveResponse
-            {
-                WizardId = model.WizardId,
-                Message = $"Care plan saved for {model.CareLevel}"
-            });
+            var drafts = Drafts;
+            drafts.Save(care.AdmissionId, care);
+            var resident = drafts.Load<AdmissionIntake>(care.AdmissionId).ResidentName;
+            return Ok(new AdmissionStepSaved { Message = $"Saved {resident}'s care plan: {care.CareLevel}." });
         }
 
         [HttpPost("Wizard/SaveContact")]
-        public IActionResult SaveContact([FromBody] FusionStepperWizardContactModel model)
+        public IActionResult SaveContact([FromBody] AdmissionContacts contacts)
         {
-            model = model with { WizardId = EnsureWizardId(model.WizardId) };
-            if (!TryValidate(new FusionStepperWizardContactValidator(), model, out var error)) return error;
+            var drafts = Drafts;
+            var resident = drafts.Load<AdmissionIntake>(contacts.AdmissionId).ResidentName;
+            var errors = new Dictionary<string, string[]>(new AdmissionContactsValidator().Validate(contacts).ErrorsByField);
 
-            ContactDrafts[model.WizardId] = model;
-            return Ok(new FusionStepperWizardSaveResponse
-            {
-                WizardId = model.WizardId,
-                Message = $"Contact saved for {model.ResponsibleParty}"
-            });
-        }
-
-        [HttpPost("Wizard/Submit")]
-        public IActionResult SubmitWizard([FromBody] FusionStepperWizardReviewModel model)
-        {
-            model = model with { WizardId = EnsureWizardId(model.WizardId) };
-
-            var errors = new Dictionary<string, string[]>();
-            CollectErrors(new FusionStepperWizardReviewValidator().Validate(model), errors);
-
-            if (!IntakeDrafts.TryGetValue(model.WizardId, out var intake))
-                errors["ResidentName"] = ["Complete intake before submitting."];
-
-            if (!CareDrafts.TryGetValue(model.WizardId, out var care))
-                errors["CareLevel"] = ["Complete care planning before submitting."];
-
-            if (!ContactDrafts.TryGetValue(model.WizardId, out var contact))
-                errors["ResponsibleParty"] = ["Complete contacts before submitting."];
+            // The responsible party is someone other than the resident the intake names.
+            if (resident is not null && string.Equals(contacts.ResponsibleParty, resident, StringComparison.OrdinalIgnoreCase))
+                errors[nameof(AdmissionContacts.ResponsibleParty)] = [$"{resident} is the resident. Name someone else as the responsible party."];
 
             if (errors.Count > 0) return BadRequest(new { errors });
 
-            ReviewDrafts[model.WizardId] = model;
-            return Ok(new FusionStepperWizardSubmitResponse
-            {
-                WizardId = model.WizardId,
-                Message = $"Admission packet submitted for {intake!.ResidentName}",
-                CareSummary = $"{care!.CareLevel} / {care.PrimaryDiagnosis}",
-                ContactSummary = $"{contact!.ResponsibleParty} ({contact.Phone})"
-            });
+            drafts.Save(contacts.AdmissionId, contacts);
+            return Ok(new AdmissionStepSaved { Message = $"Saved {contacts.ResponsibleParty} as {resident}'s responsible party." });
         }
 
-        private static string NewWizardId() => $"WIZ-{DateTime.UtcNow:yyyyMMddHHmmssffff}";
+        [HttpPost("Wizard/Submit")]
+        public IActionResult SubmitWizard([FromBody] AdmissionReview review)
+        {
+            var result = new AdmissionReviewValidator().Validate(review);
+            if (!result.IsValid) return BadRequest(new { errors = result.ErrorsByField });
 
-        private static string EnsureWizardId(string? wizardId) =>
-            string.IsNullOrWhiteSpace(wizardId) ? NewWizardId() : wizardId;
-
-        private static T GetDraft<T>(ConcurrentDictionary<string, T> store, string wizardId) where T : new() =>
-            !string.IsNullOrEmpty(wizardId) && store.TryGetValue(wizardId, out var draft) ? draft : new T();
-
-        private static IActionResult ValidationError(Dictionary<string, string[]> errors) =>
-            new BadRequestObjectResult(new { errors });
+            var admission = Review(Drafts, review.AdmissionId);
+            return Ok(new AdmissionStepSaved
+            {
+                Message = $"Submitted {admission.ResidentName}'s admission for {admission.CareLevel}. {review.AdmissionCoordinator} is the coordinator."
+            });
+        }
 
         private IActionResult StepPartial<T>(string view, T model) =>
             PartialView(ViewBase + view, model);
 
-        private FusionStepperWizardCareModel BuildCareStep(string wizardId)
+        private static AdmissionReview Review(AdmissionDrafts drafts, string admissionId)
         {
-            var model = GetDraft(CareDrafts, wizardId) with { WizardId = wizardId };
-            if (IntakeDrafts.TryGetValue(wizardId, out var intake) && string.IsNullOrWhiteSpace(model.ResidentName))
-                model = model with { ResidentName = intake.ResidentName };
-            return model;
-        }
+            var intake = drafts.Load<AdmissionIntake>(admissionId);
+            var care = drafts.Load<AdmissionCare>(admissionId);
+            var contacts = drafts.Load<AdmissionContacts>(admissionId);
 
-        private FusionStepperWizardReviewModel BuildReviewStep(string wizardId)
-        {
-            var intake = GetDraft(IntakeDrafts, wizardId);
-            var care = GetDraft(CareDrafts, wizardId);
-            var contact = GetDraft(ContactDrafts, wizardId);
-            var review = GetDraft(ReviewDrafts, wizardId);
-
-            return review with
+            return new AdmissionReview
             {
-                WizardId = wizardId,
-                ResidentName = intake.ResidentName,
-                AdmissionType = intake.AdmissionType,
-                CareLevel = care.CareLevel,
-                PrimaryDiagnosis = care.PrimaryDiagnosis,
-                ResponsibleParty = contact.ResponsibleParty,
-                Phone = contact.Phone
+                AdmissionId = admissionId,
+                ResidentName = intake.ResidentName ?? "",
+                AdmissionType = intake.AdmissionType ?? "",
+                CareLevel = care.CareLevel ?? "",
+                PrimaryDiagnosis = care.PrimaryDiagnosis ?? "",
+                ResponsibleParty = contacts.ResponsibleParty ?? "",
+                Phone = contacts.Phone ?? ""
             };
-        }
-
-        private static bool TryValidate<T>(IValidator<T> validator, T model, out IActionResult error)
-        {
-            var result = validator.Validate(model);
-            if (result.IsValid)
-            {
-                error = null!;
-                return true;
-            }
-
-            var errors = new Dictionary<string, string[]>();
-            CollectErrors(result, errors);
-            error = ValidationError(errors);
-            return false;
-        }
-
-        private static void CollectErrors(FluentValidation.Results.ValidationResult result, Dictionary<string, string[]> errors)
-        {
-            foreach (var failure in result.Errors)
-            {
-                if (!errors.TryGetValue(failure.PropertyName, out var existing))
-                    errors[failure.PropertyName] = [failure.ErrorMessage];
-                else
-                    errors[failure.PropertyName] = [.. existing, failure.ErrorMessage];
-            }
         }
     }
 }

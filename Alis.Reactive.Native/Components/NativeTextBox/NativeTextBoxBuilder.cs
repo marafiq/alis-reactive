@@ -46,24 +46,21 @@ namespace Alis.Reactive.Native.Components
         internal NativeTextBoxBuilder(
             HtmlHelper<TModel> html,
             Expression<Func<TModel, TProp>> expression,
-            InputComponentRenderTarget target)
+            string elementId,
+            string bindingPath)
 #else
         internal NativeTextBoxBuilder(
             IHtmlHelper<TModel> html,
             Expression<Func<TModel, TProp>> expression,
-            InputComponentRenderTarget target)
+            string elementId,
+            string bindingPath)
 #endif
         {
             _html = html;
             _expression = expression;
-            if (target == null) throw new ArgumentNullException(nameof(target));
-            _elementId = target.ElementId;
-            _bindingPath = target.BindingName;
+            _elementId = elementId;
+            _bindingPath = bindingPath;
         }
-
-        internal string ElementId => _elementId;
-
-        internal string BindingPath => _bindingPath;
 
         /// <summary>
         /// Selects the HTML input type, such as <c>"email"</c> or <c>"password"</c>.

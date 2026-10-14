@@ -37,13 +37,6 @@ registeredPlugins.push({
 });
 
 registeredPlugins.push({
-  name: "analytics",
-  instance: {
-    track: (_event: string) => undefined,
-  }
-});
-
-registeredPlugins.push({
   name: "slugify",
   instance: (value: unknown) =>
     String(value ?? "")
@@ -52,15 +45,64 @@ registeredPlugins.push({
       .replace(/\s+/g, "-"),
 });
 
-const orderMarks = new Map<string, string[]>();
+// The community's fixed facts: how many beds each ward holds.
+registeredPlugins.push({
+  name: "community",
+  instance: {
+    bedsPerWard: 5,
+  },
+});
+
+const twoDigits = (value: number): string => String(value).padStart(2, "0");
+
+// A visitor pass's lines. Each argument is shown only when it arrives as its declared kind (a boolean,
+// a number, a Date), so a literal sent in the wrong shape reads "?".
+registeredPlugins.push({
+  name: "visitorPass",
+  instance: {
+    heading: (escorted: unknown, passNumber: unknown, day: unknown) => {
+      const who = typeof escorted === "boolean" ? (escorted ? "Escorted visitor" : "Visitor") : "?";
+      const pass = typeof passNumber === "number" ? String(passNumber) : "?";
+      const date = day instanceof Date
+        ? `${day.getFullYear()}-${twoDigits(day.getMonth() + 1)}-${twoDigits(day.getDate())}`
+        : "?";
+      return `${who} · pass ${pass} · ${date}`;
+    },
+    charges: (parking: unknown, hours: unknown) => {
+      const fee = typeof parking === "number" ? parking.toFixed(2) : "?";
+      const length = typeof hours === "number" ? String(hours) : "?";
+      return `Parking $${fee} · ${length} hours`;
+    },
+  },
+});
+
+// The visit board's activity list: each line recorded is added to #board-activity, and entries
+// says how many lines the list holds.
+const visitLogLines: string[] = [];
 
 registeredPlugins.push({
-  name: "order",
-  instance: (key: unknown, mark: unknown) => {
-    const sequenceKey = String(key ?? "");
-    const marks = orderMarks.get(sequenceKey) ?? [];
-    marks.push(String(mark ?? ""));
-    orderMarks.set(sequenceKey, marks);
-    return marks.join(">");
+  name: "visitLog",
+  instance: {
+    record: (line: unknown) => {
+      const text = String(line ?? "");
+      visitLogLines.push(text);
+      const list = document.getElementById("board-activity");
+      if (list === null) return;
+      const item = document.createElement("li");
+      item.textContent = text;
+      list.appendChild(item);
+    },
+    get entries(): number {
+      return visitLogLines.length;
+    },
+  },
+});
+
+// The visit board's spoken status line: the plugin is itself the function, and returns nothing.
+registeredPlugins.push({
+  name: "announce",
+  instance: (line: unknown) => {
+    const region = document.getElementById("board-announcer");
+    if (region !== null) region.textContent = String(line ?? "");
   },
 });

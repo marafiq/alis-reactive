@@ -1,135 +1,72 @@
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.PivotView
 @model PivotViewModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.AppLevel
 @using Syncfusion.EJ2.PivotView
 @{
-    ViewData["Title"] = "FusionPivotView";
+    ViewData["Title"] = "Occupancy and Care Hours";
+
+    const string ReportId = "occupancy-report";
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
 
     var plan = Html.ReactivePlan<PivotViewModel>();
+    var saveSnapshotUrl = Url.SandboxRouteTemplate("SaveSnapshot", "PivotView", "community");
+    var openSnapshotUrl = Url.SandboxRouteTemplate("Snapshot", "PivotView", "community");
+    var boardPacketUrl = Url.SandboxRouteTemplate("AddToBoardPacket", "PivotView", "community", "currentView");
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionPivotView</native-heading>
-    <native-text color="Secondary">
-        Syncfusion builder owns report setup. Reactive owns post-render data refresh,
-        layout persistence, typed value sources, and typed PivotView event payloads.
-    </native-text>
+    <native-heading level="H1">Occupancy and Care Hours</native-heading>
+    <p class="text-text-secondary">
+        @Model.CommunityName: residents at month end and care hours given, by wing and care level, for <span id="report-period">@Model.Period</span>.
+    </p>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Runtime Commands</native-heading>
-        <native-hstack gap="Sm" class="mt-4" wrap="true">
-            @(Html.NativeButton("read-pivot-btn", "Read View + Layout")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+        <native-hstack gap="Sm" class="mb-4 flex-wrap">
+            @(Html.NativeButton("load-october-btn", "Load October Census")
+                .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    var pivot = p.Component<FusionPivotView>("care-pivot");
-                    p.Element("current-view").SetText(pivot.CurrentView());
-                    p.Element("layout-json").SetText(pivot.PersistedLayout());
-                }))
-
-            @(Html.NativeButton("load-march-btn", "Load March Census")
-                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
-                .Reactive(plan, evt => evt.Click, (_, p) =>
-                {
-                    p.Get("/api/pivot/census")
-                     .Gather(g => g.FromUrl("facilityId"))
-                     .Response(r => r.OnSuccess<PivotCensusResponse>((json, s) =>
+                    p.Get(Url.SandboxRoute("Census", "PivotView"))
+                     .Gather<OccupancyCensusQuery>(g => g.Set(x => x.Community, p.Url<OccupancyReportQuery>().Get(q => q.Community)))
+                     .Response(r => r.OnSuccess<OccupancyCensus>((json, s) =>
                      {
-                         s.Component<FusionPivotView>("care-pivot")
-                             .SetDataSource(json, x => x.Rows);
-                         s.Element("data-status").SetText(json, x => x.Message);
+                         s.Component<FusionPivotView>(ReportId).DataSourceSettings.DataSource.Set(json.Get(x => x.Rows));
+                         s.Element("report-period").Text.Set(json.Get(x => x.Period));
                      }));
                 }))
-
-            @(Html.NativeButton("refresh-pivot-btn", "Refresh")
-                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
-                .Reactive(plan, evt => evt.Click, (_, p) =>
-                {
-                    p.Component<FusionPivotView>("care-pivot").Refresh();
-                    p.Element("refresh-status").SetText("refresh called");
-                }))
-
-            @(Html.NativeButton("audit-pivot-btn", "Audit Layout")
-                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
-                .Reactive(plan, evt => evt.Click, (_, p) =>
-                {
-                    var pivot = p.Component<FusionPivotView>("care-pivot");
-                    p.Post("/api/pivot/{currentView}/audit")
-                     .Gather(g => g
-                         .RouteParam("currentView", pivot.CurrentView())
-                         .FromUrl("facilityId")
-                         .Include(pivot.CurrentView(), "currentView")
-                         .Include(pivot.PersistedLayout(), "layout"))
-                     .Response(r => r.OnSuccess<PivotAuditResponse>((json, s) =>
-                     {
-                         s.Element("audit-summary").SetText(json, x => x.Summary);
-                         s.Element("layout-length").SetText(json, x => x.LayoutLength);
-                     }));
-                }))
-
-            @(Html.NativeButton("load-layout-btn", "Round Trip Layout")
-                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
-                .Reactive(plan, evt => evt.Click, (_, p) =>
-                {
-                    var pivot = p.Component<FusionPivotView>("care-pivot");
-                    p.Post("/api/pivot/layout/echo")
-                     .Gather(g => g.Include(pivot.PersistedLayout(), "layout"))
-                     .Response(r => r.OnSuccess<PivotLayoutResponse>((json, s) =>
-                     {
-                         s.Component<FusionPivotView>("care-pivot")
-                             .LoadPersistedLayout(json, x => x.Layout);
-                         s.Element("layout-status").SetText(json, x => x.Message);
-                     }));
-                }))
-
-            @(Html.NativeButton("formatting-dialog-btn", "Formatting Dialog")
-                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
-                .Reactive(plan, evt => evt.Click, (_, p) =>
-                {
-                    p.Component<FusionPivotView>("care-pivot").ShowConditionalFormattingDialog();
-                    p.Element("dialog-status").SetText("conditional formatting opened");
-                }))
-
-            @(Html.NativeButton("calculated-dialog-btn", "Calculated Field Dialog")
-                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
-                .Reactive(plan, evt => evt.Click, (_, p) =>
-                {
-                    p.Component<FusionPivotView>("care-pivot").CreateCalculatedFieldDialog();
-                    p.Element("dialog-status").SetText("calculated field opened");
-                }))
+            @(Html.NativeButton("refresh-report-btn", "Refresh")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) => p.Component<FusionPivotView>(ReportId).Refresh()))
+            @(Html.NativeButton("highlight-figures-btn", "Highlight Figures")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) => p.Component<FusionPivotView>(ReportId).ShowConditionalFormattingDialog()))
+            @(Html.NativeButton("add-measure-btn", "Add a Measure")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) => p.Component<FusionPivotView>(ReportId).CreateCalculatedFieldDialog()))
         </native-hstack>
 
-        <native-vstack gap="Xs" class="font-mono text-sm mt-4">
-            <p>Current view: <span id="current-view" class="text-text-muted">-</span></p>
-            <p>Data status: <span id="data-status" class="text-text-muted">-</span></p>
-            <p>Refresh: <span id="refresh-status" class="text-text-muted">-</span></p>
-            <p>Data bound: <span id="data-bound-status" class="text-text-muted">-</span></p>
-            <p>Audit: <span id="audit-summary" class="text-text-muted">-</span></p>
-            <p>Layout length: <span id="layout-length" class="text-text-muted">-</span></p>
-            <p>Layout status: <span id="layout-status" class="text-text-muted">-</span></p>
-            <p>Dialog: <span id="dialog-status" class="text-text-muted">-</span></p>
-        </native-vstack>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Care Census Pivot</native-heading>
-        @(Html.FusionPivotView(plan, "care-pivot", b =>
+        @(Html.FusionPivotView(plan, ReportId, b =>
         {
-            b.Height("420px");
+            b.Height("480px");
             b.Width("100%");
-            b.ShowGroupingBar(true);
+            b.ShowToolbar(true);
+            b.Toolbar(new List<string> { "Grid", "Chart" });
+            b.DisplayOption(new PivotViewDisplayOption { View = global::Syncfusion.EJ2.PivotView.View.Both });
             b.AllowConditionalFormatting(true);
             b.AllowCalculatedField(true);
             b.DataSourceSettings(new PivotViewDataSourceSettings
             {
-                DataSource = Model.InitialRows,
+                DataSource = Model.Census,
                 ExpandAll = true,
-                EnableSorting = true,
+                EnableSorting = false,
+                ShowColumnGrandTotals = false,
+                ValueSortSettings = new PivotViewValueSortSettings { HeaderDelimiter = " · " },
                 Rows = new List<PivotViewRow>
                 {
                     new PivotViewRow { Name = "wing", Caption = "Wing" },
-                    new PivotViewRow { Name = "careLevel", Caption = "Care Level" }
+                    new PivotViewRow { Name = "careLevel", Caption = "Care level" }
                 },
                 Columns = new List<PivotViewRow>
                 {
@@ -138,43 +75,121 @@
                 Values = new List<PivotViewRow>
                 {
                     new PivotViewRow { Name = "residents", Caption = "Residents", Type = SummaryTypes.Sum },
-                    new PivotViewRow { Name = "revenue", Caption = "Revenue", Type = SummaryTypes.Sum }
+                    new PivotViewRow { Name = "careHours", Caption = "Care hours", Type = SummaryTypes.Sum }
                 }
             });
         })
         .Reactive(evt => evt.DataBound, (_, p) =>
         {
-            p.Element("data-bound-status").SetText("dataBound fired");
+            // A report drawn again may no longer hold the figure that was picked.
+            p.Element("selected-figure").Hide();
+            p.Element("figure-hint").Show();
         })
         .Reactive(evt => evt.CellSelecting, (args, p) =>
         {
-            p.Element("cell-axis").SetText(args, x => x.Data.Axis);
-            p.Element("cell-text").SetText(args, x => x.Data.FormattedText);
-            p.Element("cell-row").SetText(args, x => x.Data.RowHeaders);
-            p.Element("cell-column").SetText(args, x => x.Data.ColumnHeaders);
-            p.Element("cell-value").SetText(args, x => x.Data.Value);
+            var cell = args.Data;
+            p.When(cell.Get(x => x.Axis)).Eq("value")
+                .Then(figure =>
+                {
+                    figure.When(cell.Get(x => x.IsGrandSum)).Truthy()
+                        .Then(all =>
+                        {
+                            all.Element("figure-where").Text.Set("All wings");
+                            all.Element("figure-scope").Text.Set("");
+                        })
+                        .ElseIf(cell.Get(x => x.IsSum)).Truthy()
+                        .Then(wing =>
+                        {
+                            wing.Element("figure-where").Text.Set(cell.Get(x => x.RowHeaders));
+                            wing.Element("figure-scope").Text.Set(" wing");
+                        })
+                        .Else(unit =>
+                        {
+                            unit.Element("figure-where").Text.Set(cell.Get(x => x.RowHeaders));
+                            unit.Element("figure-scope").Text.Set("");
+                        });
+                    figure.Element("figure-month").Text.Set(cell.Get(x => x.ColumnHeaders));
+                    figure.Element("figure-amount").Text.Set(cell.Get(x => x.FormattedText));
+                    figure.When(cell.Get(x => x.ActualText)).Eq("careHours")
+                        .Then(hours => hours.Element("figure-unit").Text.Set("care hours"))
+                        .ElseIf(cell.Get(x => x.Value)).Eq(1m)
+                        .Then(one => one.Element("figure-unit").Text.Set("resident"))
+                        .Else(many => many.Element("figure-unit").Text.Set("residents"));
+                    figure.Element("figure-hint").Hide();
+                    figure.Element("selected-figure").Show();
+                })
+                .Else(heading =>
+                {
+                    heading.Element("selected-figure").Hide();
+                    heading.Element("figure-hint").Show();
+                });
         }))
+
+        <p id="figure-hint" class="mt-4 text-sm text-text-muted">Pick a figure to see what it counts.</p>
+        <p id="selected-figure" hidden class="mt-4 text-sm font-medium"><span id="figure-where"></span><span id="figure-scope"></span> in <span id="figure-month"></span>: <span id="figure-amount"></span> <span id="figure-unit"></span></p>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Cell Event</native-heading>
-        <native-vstack gap="Xs" class="font-mono text-sm mt-4">
-            <p>Axis: <span id="cell-axis" class="text-text-muted">-</span></p>
-            <p>Formatted: <span id="cell-text" class="text-text-muted">-</span></p>
-            <p>Row: <span id="cell-row" class="text-text-muted">-</span></p>
-            <p>Column: <span id="cell-column" class="text-text-muted">-</span></p>
-            <p>Value: <span id="cell-value" class="text-text-muted">-</span></p>
-        </native-vstack>
-    </native-card-body></native-card>
+        <native-heading level="H2">Board Meeting</native-heading>
+        <p class="mt-1 text-sm text-text-secondary">
+            A snapshot keeps the report with today's figures. The board packet takes the report's layout, as a table or a chart, and pulls the figures on the day of the meeting.
+        </p>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">Persisted Layout</native-heading>
-        <pre id="layout-json" class="text-xs overflow-auto max-h-40">-</pre>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("save-snapshot-btn", "Save Snapshot")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Post(saveSnapshotUrl)
+                     .Gather<OccupancySnapshotRequest>(g => g
+                         .Set(x => x.Community, p.Url<OccupancyReportQuery>().Get(q => q.Community))
+                         .Set(x => x.Layout, p.Component<FusionPivotView>(ReportId).GetPersistData(false)))
+                     .Response(r => r
+                         .OnSuccess<BoardReply>((json, s) =>
+                         {
+                             // A brief confirmation: it counts down and goes away by itself, so it needs no close button.
+                             var toast = s.Component<FusionToast>();
+                             toast.Title.Set("Board snapshot");
+                             toast.Content.Set(json.Get(x => x.Message));
+                             toast.TimeOut.Set(2500);
+                             toast.ShowProgressBar.Set(true);
+                             toast.ShowCloseButton.Set(false);
+                             toast.Tone.Set(FusionToastTone.Success);
+                             toast.Show();
+                         })
+                         .OnError<BoardReply>(400, (json, e) => e.Element("board-status").Text.Set(json.Get(x => x.Message))));
+                }))
+            @(Html.NativeButton("open-snapshot-btn", "Open Snapshot")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Get(openSnapshotUrl)
+                     .Gather<OccupancySnapshotLookup>(g => g.Set(x => x.Community, p.Url<OccupancyReportQuery>().Get(q => q.Community)))
+                     .Response(r => r
+                         .OnSuccess<OccupancySnapshot>((json, s) =>
+                         {
+                             s.Component<FusionPivotView>(ReportId).LoadPersistData(json.Get(x => x.Layout));
+                             s.Element("report-period").Text.Set(json.Get(x => x.Period));
+                             s.Element("board-status").Text.Set(json.Get(x => x.Message));
+                         })
+                         .OnError<BoardReply>(404, (json, e) => e.Element("board-status").Text.Set(json.Get(x => x.Message))));
+                }))
+            @(Html.NativeButton("add-to-board-packet-btn", "Add to Board Packet")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    var report = p.Component<FusionPivotView>(ReportId);
+                    p.Post(boardPacketUrl)
+                     .Gather<BoardPacketRequest>(g => g
+                         .Set(x => x.Community, p.Url<OccupancyReportQuery>().Get(q => q.Community))
+                         .Set(x => x.CurrentView, report.CurrentView)
+                         .Set(x => x.Layout, report.GetPersistData(true)))
+                     .Response(r => r
+                         .OnSuccess<BoardReply>((json, s) => s.Element("board-status").Text.Set(json.Get(x => x.Message)))
+                         .OnError<BoardReply>(400, (json, e) => e.Element("board-status").Text.Set(json.Get(x => x.Message))));
+                }))
+        </native-hstack>
+        <p id="board-status" class="mt-4 text-sm"></p>
     </native-card-body></native-card>
 </native-vstack>
 

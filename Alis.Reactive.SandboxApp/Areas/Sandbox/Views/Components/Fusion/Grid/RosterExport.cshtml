@@ -1,69 +1,79 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.GridOperationsModel
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.RosterExportModel
+@using Alis.Reactive.Builders
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
+@using Microsoft.AspNetCore.Mvc.Rendering
 @using Syncfusion.EJ2.Grids
 @{
-    ViewData["Title"] = "Care-Ops Roster Export";
+    ViewData["Title"] = "Monthly Census";
 
-    const string GridId = "roster-export-grid";
+    const string CensusId = "monthly-census";
     const string Button = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+    const string InputCss = "rounded-md border border-border px-3 py-1.5 text-sm";
 
-    var plan = Html.ReactivePlan<GridOperationsModel>();
+    var plan = Html.ReactivePlan<RosterExportModel>();
 
-    Html.On(plan, t => t.DomReady(p =>
-        p.Get(Url.SandboxRoute("OperationRows", "Grid"))
-            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
-            {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
-                s.Element("export-status").SetText("loaded");
-            }))));
+    var columns = FusionGridColumns.Of<MonthlyCensusResident>();
+    var months = new List<SelectListItem>
+    {
+        new("September 2026", "2026-09"),
+        new("October 2026", "2026-10"),
+        new("November 2026", "2026-11")
+    };
+
+    // The month's census fills the grid the downloads are made from; a month still open is refused.
+    void ShowCensus(PipelineBuilder<RosterExportModel> p, TypedSource<string> month) =>
+        p.Get(Url.SandboxRoute("RosterExportCensus", "Grid"))
+            .Gather<MonthlyCensusQuery>(g => g.Set(x => x.Month, month))
+            .Response(r => r
+                .OnSuccess<MonthlyCensus>((census, s) =>
+                {
+                    s.Component<FusionGrid>(CensusId).DataSource.Set(census.Get(x => x.Residents));
+                    s.Element("census-summary").Text.Set(census.Get(x => x.Summary));
+                })
+                .OnError<MonthlyCensus>(409, (open, e) =>
+                    e.Element("census-summary").Text.Set(open.Get(x => x.Summary))));
+
+    Html.On(plan, t => t.DomReady(p => ShowCensus(p, p.Component<NativeDropDown>(m => m.Month).Value)));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Care-Ops Roster Export</native-heading>
-    <native-text color="Secondary">
-        Export the resident roster as CSV, Excel, or PDF for reporting.
-    </native-text>
+    <div>
+        <native-heading level="H1">Monthly Census</native-heading>
+        <native-text color="Secondary">
+            Business office. Review a closed month's census, then download it for the state report and the month's billing.
+        </native-text>
+    </div>
 
-    <native-hstack gap="Sm" class="flex-wrap">
-        @(Html.NativeButton("export-csv", "Export CSV")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).CsvExport();
-                p.Element("export-status").SetText("csvExport called");
-            }))
-        @(Html.NativeButton("export-excel", "Export Excel")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).ExcelExport();
-                p.Element("export-status").SetText("excelExport called");
-            }))
-        @(Html.NativeButton("export-pdf", "Export PDF")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).PdfExport();
-                p.Element("export-status").SetText("pdfExport called");
-            }))
-    </native-hstack>
+    <native-card><native-card-body>
+        <native-hstack gap="Base" align="End" class="mb-4 flex-wrap">
+            @{ Html.InputField(plan, m => m.Month, o => o.Label("Census month"))
+                .NativeDropDown(b => b.Items(months).CssClass(InputCss))
+                .Reactive(evt => evt.Change, (args, p) => ShowCensus(p, args.Value)); }
+            @(Html.NativeButton("download-census-excel", "Download Excel")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Component<FusionGrid>(CensusId).ExcelExport()))
+            @(Html.NativeButton("download-census-csv", "Download CSV")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Component<FusionGrid>(CensusId).CsvExport()))
+            @(Html.NativeButton("download-census-pdf", "Download PDF")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Component<FusionGrid>(CensusId).PdfExport()))
+        </native-hstack>
+        <p id="census-summary" class="mb-4 text-sm font-medium">Loading the census…</p>
 
-    <p class="font-mono text-sm">Status: <span id="export-status" class="text-text-muted">waiting</span></p>
-
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        @(Html.FusionGrid<GridOperationsModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+        @(Html.FusionGrid<RosterExportModel, MonthlyCensusResident>(plan, CensusId, b => b
             .AllowExcelExport(true)
             .AllowPdfExport(true)
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", IsPrimaryKey = true, TextAlign = TextAlign.Right, Visible = false },
-                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "240" },
-                new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "150" },
-                new GridColumn { Field = "openTasks", HeaderText = "Open Tasks", Width = "130", TextAlign = TextAlign.Right }
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", IsPrimaryKey = true, Visible = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "200" },
+                new GridColumn { Field = columns.Field(r => r.Suite), HeaderText = "Suite", Width = "100" },
+                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care level", Width = "170" },
+                new GridColumn { Field = columns.Field(r => r.CensusDays), HeaderText = "Census days", Width = "130", TextAlign = TextAlign.Right }
             })))
-    </section>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

@@ -113,7 +113,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("ConfirmEmail")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -126,7 +126,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -159,7 +159,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -175,7 +175,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("MemoryAssessmentScore")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -241,7 +241,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("PhysicianName")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -306,7 +306,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("ReasonForNoContact")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -437,6 +437,25 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await Expect(ErrorFor("Email")).ToContainTextAsync("valid email");
         await Expect(Input("Email")).ToHaveClassAsync(new Regex("alis-has-error"));
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // The email rule asks for one @ with something on each side, not a dot after it;
+    // the browser asks the same, and the server saves the admission.
+    [Test]
+    public async Task an_email_with_no_dot_after_the_at_is_accepted_as_the_server_accepts_it()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        await FillAllRequired();
+        await Input("Email").FillAsync("jane@sunnyacres");
+        await Input("ConfirmEmail").FillAsync("jane@sunnyacres");
+        await Input("ReasonForNoContact").FillAsync("No relatives nearby");
+        await SubmitBtn.ClickAsync();
+
+        await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
+        await Expect(ErrorFor("Email")).Not.ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
@@ -575,6 +594,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("MemoryAssessmentScore")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 }

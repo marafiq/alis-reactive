@@ -1,155 +1,177 @@
 using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Rating;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Rating;
 
-// Journey: a resident reviews and updates their Monthly Care Satisfaction Survey.
-// The survey carries over last month's rating; the resident rates by clicking stars,
-// can restore last month's score, can clear it, then submits.
+/// <summary>
+/// As a resident answering the monthly care satisfaction survey, I want to rate October's care in stars, say what
+/// made the month harder when I lower my rating, and send it, so that the community hears how its care is going and
+/// I see how my month compares with everyone else's.
+/// </summary>
+/// <remarks>
+/// Margaret Hale rated September 3 stars. The survey starts unrated; four or five stars is thanked, three or fewer
+/// brings a call from the care manager, and lowering the rating asks what made October harder. The community
+/// answers a sent rating with October's average over its other 23 residents' ratings (95 stars) and hers.
+/// Not exercised: <c>DataBind</c>, because a rating written by the page is readable at once (the property setter
+/// stores it, ej2-base notify-property-change.js:70-77) and EJ2 raises no <c>valueChanged</c> for it
+/// (rating.js:499-506, 709-714), so no later step of the same pipeline can tell whether it was applied; only the
+/// stars repaint a tick later.
+/// </remarks>
 [TestFixture]
 public class WhenUsingFusionRating : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Rating";
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_RatingModel";
-    private const string SatisfactionScoreId = GeneratedTypeScope + "__SatisfactionScore";
+    private const string Unrated = "Choose the stars that match October's care.";
+    private const string ChooseAStar = "Choose at least one star to rate October's care.";
 
-    private FusionRatingLocator SatisfactionRating => new(Page, SatisfactionScoreId);
-    private ILocator ScoreText => Page.Locator("#survey-rating");
-    private ILocator SentimentText => Page.Locator("#survey-sentiment");
-    private ILocator ChangeNoteText => Page.Locator("#survey-change-note");
-    private ILocator ReadinessText => Page.Locator("#survey-readiness");
-    private ILocator Confirmation => Page.Locator("#survey-confirmation");
-    private ILocator RestoreButton => Page.Locator("#restore-rating");
-    private ILocator ClearButton => Page.Locator("#clear-rating");
-    private ILocator SubmitButton => Page.Locator("#survey-submit");
+    private PagePlan<SatisfactionSurveyModel> _plan = null!;
 
-    private async Task OpenSurvey()
+    private FusionRatingLocator Rating => new(Page, _plan.FindComponent(m => m.SatisfactionScore)!.ElementId);
+    private ILocator Reply => Page.Locator("#survey-reply");
+    private ILocator WhatChanged => Page.Locator("#what-changed");
+    private ILocator Recorded => Page.Locator("#survey-recorded");
+    private ILocator SameAsSeptember => Page.Locator("#same-as-last-month-btn");
+    private ILocator ClearMyRating => Page.Locator("#clear-rating-btn");
+    private ILocator SendMyRating => Page.Locator("#send-survey-btn");
+
+    private async Task OpenTheSurvey()
     {
         await NavigateToAndWaitForBoot(Path);
-        await Expect(SatisfactionRating.RatingList).ToBeVisibleAsync(new() { Timeout = 10000 });
+        _plan = await PagePlan<SatisfactionSurveyModel>.FromPage(Page);
+        await Expect(Rating.Star(5)).ToBeVisibleAsync(new() { Timeout = 10000 });
     }
 
-    // RENDERS — the FusionRating builder renders the rating bound to the carried-over model value.
-    [Test]
-    public async Task survey_opens_showing_the_rating_carried_over_from_last_month()
+    private async Task Rate(int stars)
     {
-        await OpenSurvey();
+        await Rating.RateStars(stars);
+        await Expect(Rating.RatingList).ToHaveAttributeAsync("aria-valuenow", stars.ToString(), new() { Timeout = 5000 });
+    }
 
-        await Expect(SatisfactionRating.Star(1)).ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Expect(SatisfactionRating.RatingList).ToHaveAttributeAsync("aria-valuenow", "3");
-        await Expect(ScoreText).ToHaveTextAsync("3");
+    [Test]
+    public async Task the_survey_opens_unrated()
+    {
+        await OpenTheSurvey();
 
+        await Expect(Rating.RatingList).ToHaveAttributeAsync("aria-valuenow", "0");
+        await Expect(Reply).ToHaveTextAsync(Unrated);
+        await Expect(WhatChanged).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
-    // INTERACTS — clicking a star fires ValueChanged through the .Reactive wiring; the
-    // FusionRatingValueChangedArgs payload carries the new Value into the visible response.
     [Test]
-    public async Task rating_their_care_shows_the_score_and_a_matching_message()
+    public async Task rating_october_five_stars_says_the_community_is_glad()
     {
-        await OpenSurvey();
+        await OpenTheSurvey();
 
-        await SatisfactionRating.RateStars(5);
+        await Rate(5);
 
-        await Expect(SatisfactionRating.RatingList).ToHaveAttributeAsync("aria-valuenow", "5");
-        await Expect(ScoreText).ToHaveTextAsync("5");
-        await Expect(SentimentText).ToHaveTextAsync("We're so glad your care is meeting your expectations.");
-
+        await Expect(Reply).ToHaveTextAsync("We're glad October's care went well.", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
-    // Lowering the rating proves FusionRatingValueChangedArgs.PreviousValue carries the value
-    // before the change, and the mid-score branch over args.Value routes the follow-up message.
     [Test]
-    public async Task lowering_their_rating_records_what_it_changed_from()
+    public async Task rating_october_two_stars_brings_a_call_from_the_care_manager()
     {
-        await OpenSurvey();
+        await OpenTheSurvey();
 
-        await SatisfactionRating.RateStars(2);
+        await Rate(2);
 
-        await Expect(ScoreText).ToHaveTextAsync("2");
-        await Expect(ChangeNoteText).ToHaveTextAsync("3");
-        await Expect(SentimentText).ToHaveTextAsync("Thank you. A care manager will follow up to see how we can improve.");
-
+        await Expect(Reply).ToHaveTextAsync(
+            "Thank you for telling us. Maple wing's care manager will call you this week.", new() { Timeout = 5000 });
+        await Expect(WhatChanged).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
-    // Clearing proves Reset() returns the rating to unrated, and FusionRatingValueChangedArgs.IsInteracted
-    // distinguishes a rating the resident chose (true) from a programmatic clear (false).
     [Test]
-    public async Task clearing_a_rating_the_resident_chose_marks_it_unrated()
+    public async Task lowering_the_rating_asks_what_made_october_harder()
     {
-        await OpenSurvey();
+        await OpenTheSurvey();
+        await Rate(4);
+        await Expect(WhatChanged).ToBeHiddenAsync();
 
-        await SatisfactionRating.RateStars(4);
-        await Expect(ReadinessText)
-            .ToHaveTextAsync("Thank you for rating your care yourself — your rating is ready to submit.");
+        await Rate(2);
 
-        await ClearButton.ClickAsync();
-
-        await Expect(SatisfactionRating.RatingList).ToHaveAttributeAsync("aria-valuenow", "0");
-        await Expect(ScoreText).ToHaveTextAsync("0");
-        await Expect(ReadinessText)
-            .ToHaveTextAsync("Your rating was cleared. Please rate your care to continue.");
-
+        await Expect(Reply).ToHaveTextAsync("You lowered your rating. Tell us what made October harder.", new() { Timeout = 5000 });
+        await Expect(WhatChanged).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
-    // Restoring proves SetValue() writes the given value back onto the rating, and the Value() source
-    // reads the restored value back out for display.
     [Test]
-    public async Task restoring_brings_back_the_rating_submitted_last_month()
+    public async Task clearing_the_rating_says_it_is_cleared_and_asks_for_a_star_again()
     {
-        await OpenSurvey();
+        await OpenTheSurvey();
+        await Rate(4);
+        await Rate(2);
+        await Expect(WhatChanged).ToBeVisibleAsync();
 
-        await SatisfactionRating.RateStars(5);
-        await Expect(SatisfactionRating.RatingList).ToHaveAttributeAsync("aria-valuenow", "5");
+        await ClickWhenStable(ClearMyRating);
 
-        await RestoreButton.ClickAsync();
-
-        await Expect(SatisfactionRating.RatingList).ToHaveAttributeAsync("aria-valuenow", "3");
-        await Expect(ScoreText).ToHaveTextAsync("3");
-
+        await Expect(Rating.RatingList).ToHaveAttributeAsync("aria-valuenow", "0", new() { Timeout = 5000 });
+        await Expect(Reply).ToHaveTextAsync("Your rating is cleared. Choose the stars that match October's care.");
+        await Expect(WhatChanged).ToBeHiddenAsync();
+        await Expect(_plan.ErrorFor(m => m.SatisfactionScore)).ToHaveTextAsync(ChooseAStar);
         AssertNoConsoleErrors();
     }
 
-    // SUBMITS — the Value() source feeds the gather body; the server confirmation the resident sees
-    // reflects the submitted score.
     [Test]
-    public async Task submitting_sends_the_rating_and_confirms_it()
+    public async Task rating_the_same_as_september_gives_three_stars()
     {
-        await OpenSurvey();
+        await OpenTheSurvey();
 
-        await SatisfactionRating.RateStars(5);
-        await SubmitButton.ClickAsync();
+        await ClickWhenStable(SameAsSeptember);
 
-        await Expect(Confirmation)
-            .ToHaveTextAsync("Thank you. We recorded your satisfaction rating of 5 of 5 stars.",
-                new() { Timeout = 10000 });
+        await Expect(Rating.RatingList).ToHaveAttributeAsync("aria-valuenow", "3", new() { Timeout = 5000 });
+        await Expect(Reply).ToHaveTextAsync("The same as September.");
 
+        await ClickWhenStable(SendMyRating);
+        await Expect(Recorded).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Recorded).ToHaveTextAsync(
+            "Thank you, Margaret. We recorded 3 stars for October. Maple Grove's October average is now 4.1 stars from 24 residents.");
         AssertNoConsoleErrors();
     }
 
-    // GATHERS — the framework gather pipeline carries the Value() source into the POST body under the
-    // declared key. (Framework gather test: asserts request.PostData.)
     [Test]
-    public async Task submitting_posts_the_rating_score_to_the_server()
+    public async Task sending_an_unrated_survey_asks_for_a_star_and_choosing_one_clears_the_request()
     {
-        await OpenSurvey();
+        await OpenTheSurvey();
 
-        await SatisfactionRating.RateStars(5);
+        await ClickWhenStable(SendMyRating);
+        await Expect(_plan.ErrorFor(m => m.SatisfactionScore)).ToHaveTextAsync(ChooseAStar, new() { Timeout = 5000 });
 
-        var requestTask = Page.WaitForRequestAsync(request =>
-            request.Url.Contains("/Sandbox/Components/Rating/Echo") && request.Method == "POST",
-            new() { Timeout = 10000 });
+        await Rate(4);
 
-        await SubmitButton.ClickAsync();
+        await Expect(_plan.ErrorFor(m => m.SatisfactionScore)).ToBeHiddenAsync(new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
 
-        var request = await requestTask;
-        var body = request.PostData ?? "";
+    [Test]
+    public async Task sending_five_stars_records_them_and_answers_with_octobers_average()
+    {
+        await OpenTheSurvey();
+        await Rate(5);
+        await Expect(Recorded).ToBeHiddenAsync();
 
-        Assert.That(body, Does.Contain("\"satisfactionScore\":5"),
-            "the gather pipeline must carry the rating Value() source under its declared key");
+        await ClickWhenStable(SendMyRating);
 
+        await Expect(Recorded).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Recorded).ToHaveTextAsync(
+            "Thank you, Margaret. We recorded 5 stars for October. Maple Grove's October average is now 4.2 stars from 24 residents.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task sending_a_lowered_rating_passes_what_changed_to_the_care_manager()
+    {
+        await OpenTheSurvey();
+        await Rate(4);
+        await Rate(2);
+        await Page.Locator($"#{_plan.FindComponent(m => m.WhatChanged)!.ElementId}").FillAsync("Call bells took a long time at night.");
+
+        await ClickWhenStable(SendMyRating);
+
+        await Expect(Recorded).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Recorded).ToHaveTextAsync(
+            "Thank you, Margaret. We recorded 2 stars for October. Maple Grove's October average is now 4.0 stars from 24 residents. Your note goes to Maple wing's care manager.");
         AssertNoConsoleErrors();
     }
 }

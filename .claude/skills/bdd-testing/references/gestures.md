@@ -19,12 +19,14 @@ Reads the plan JSON from the page. Model renames break tests at compile time.
 **2. `ComponentScope` — string-based, when model expressions aren't available**
 
 ```csharp
-var scope = new ComponentScope(Page, "Alis_Reactive_SandboxApp_Models_ResidentModel");
-var rate = scope.NumericTextBox("MonthlyRate");
+var scope = new ComponentScope(Page, "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentModel__");
+var score = scope.NumericTextBox("MemoryAssessmentScore");
 ```
 
-Uses the IdGenerator pattern (`{TypeScope}__{PropertyName}`). For tests whose
-project does not reference the model type, and for multi-scope pages.
+Uses the IdGenerator pattern (`{TypeScope}__{PropertyName}`): the string is the
+prefix including its `__`; `new ComponentScope(Page, typeof(TModel))` builds it
+from the model type. For tests whose project does not reference the model type,
+and for multi-scope pages.
 
 **3. Direct `Page.Locator` — for explicit-ID elements not model-bound**
 
@@ -37,21 +39,21 @@ private ILocator SubmitBtn => Page.Locator("#submit-btn");
 ```
 COMPONENT (via PagePlan or ComponentScope):
   | .AutoComplete("Prop")     -- Type, SelectItem, TypeAndSelect, Clear, Focus, Blur
-  | .DropDownList("Prop")     -- Select("text"), Open, Focus
+  | .DropDownList("Prop")     -- Select("text"), Choose, Pick, Open, Focus
   | .NumericTextBox("Prop")   -- Fill, FillAndBlur, Clear, Focus, Blur
   | .Switch("Prop")           -- Toggle
   | .TextBox("Prop")          -- Fill, FillAndBlur, Clear, Focus, Blur
-  | .DatePicker("Prop")       -- FillAndBlur, SelectDate, Clear, Focus, Blur
-  | .TimePicker("Prop")       -- FillAndBlur, Clear, Focus, Blur
-  | .DateTimePicker("Prop")   -- FillAndBlur, Clear, Focus, Blur
-  NOTE: DatePicker/TimePicker/DateTimePicker — SelectDate (popup gesture) is reliable.
-        FillAndBlur (text gesture) may not set ej2.value. Prefer SelectDate when available.
-        See DatePickerLocator.cs: "typed input does NOT always update the instance."
-  | .DateRangePicker("Prop")  -- FillAndBlur, Clear, Focus, Blur
-  | .MultiColumnComboBox("Prop") -- Select, Focus
-  | .InputMask("Prop")        -- Fill, FillAndBlur, Clear, Focus, Blur
-  | .RichTextEditor("Prop")   -- Fill, Clear, Focus, Blur
-  | .MultiSelect("Prop")      -- Open, Select, Clear, Focus, Blur
+  | .DatePicker("Prop")       -- Fill, FillAndBlur, SelectDate, Clear, Focus, Blur
+  | .TimePicker("Prop")       -- Fill, FillAndBlur, SelectTime, Clear, Focus, Blur
+  | .DateTimePicker("Prop")   -- Fill, FillAndBlur, Select, SelectDate, SelectTime, Clear, Focus, Blur
+  NOTE: DatePicker/TimePicker/DateTimePicker — the popup gestures (SelectDate, SelectTime) are reliable.
+        FillAndBlur (text gesture) may not set ej2.value. Prefer the popup gesture when available.
+        See DatePickerLocator.cs: "typed text does not always update Syncfusion ej2.value."
+  | .DateRangePicker("Prop")  -- Fill, FillAndBlur, SelectRange, Clear, Focus, Blur
+  | .MultiColumnComboBox("Prop") -- Select, Choose, Pick, Open, Focus
+  | .InputMask("Prop")        -- Fill, FillAndBlur, Type, Clear, Focus, Blur
+  | .RichTextEditor("Prop")   -- Fill, FillAndBlur, Clear, Focus, Blur
+  | .MultiSelect("Prop")      -- Open, SelectItem, SelectItems, RemoveItem, Blur
 
 SURFACE :=
   | _plan.Element("explicit-id")        -- explicit-ID page elements

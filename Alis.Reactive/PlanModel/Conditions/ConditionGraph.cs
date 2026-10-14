@@ -1,253 +1,290 @@
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Alis.Reactive.Serialization;
+using System.Linq;
+using Alis.Reactive.Grammar;
 
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// Wire base for Reactive Plan predicates authored through condition builders.
+    /// A condition over values: a comparison, all of, any of, not, or a question the user answers. It
+    /// writes itself as an expression where it is synchronous, and as the guard of an <c>if</c> where it
+    /// waits: a question is asked, or a promise settles, only when the condition reaches it.
     /// </summary>
-    [JsonConverter(typeof(PlanNodeDiscriminator<ConditionGraph>))]
     internal abstract class ConditionGraph
     {
         private protected ConditionGraph() { }
 
-        internal static ConditionGraph Compare(CompareOperator op, ComparisonOperands operands) =>
-            new CompareCondition(op, operands);
+        internal static ConditionGraph Unary(CompareOperator op, ValueExpression left, Shape shape) =>
+            new UnaryCondition(op, left, shape);
 
-        internal static ConditionGraph All(params ConditionGraph[] terms) =>
-            new AllCondition(OrderedTerms(terms));
+        internal static ConditionGraph Binary(CompareOperator op, ValueExpression left, ValueExpression right, Shape shape) =>
+            new BinaryCondition(op, left, right, shape, Shape.None);
 
-        internal static ConditionGraph Any(params ConditionGraph[] terms) =>
-            new AnyCondition(OrderedTerms(terms));
+        /// <summary>A collection compared with one item: <c>ArrayContains</c>.</summary>
+        internal static ConditionGraph CollectionItem(CompareOperator op, ValueExpression left, ValueExpression item, Shape collectionShape, Shape itemShape) =>
+            new BinaryCondition(op, left, item, collectionShape, itemShape);
 
-        internal static ConditionGraph Not(ConditionGraph term) =>
-            new NotCondition(term);
+        internal static ConditionGraph All(params ConditionGraph[] terms) => new AllCondition(terms.ToList());
 
-        internal static ConditionGraph Confirm(string message) =>
-            new ConfirmCondition(message);
+        internal static ConditionGraph Any(params ConditionGraph[] terms) => new AnyCondition(terms.ToList());
 
-        private static IReadOnlyList<ConditionGraph> OrderedTerms(IEnumerable<ConditionGraph> terms)
-        {
-            return new List<ConditionGraph>(terms);
-        }
+        internal static ConditionGraph Not(ConditionGraph term) => new NotCondition(term);
+
+        internal static ConditionGraph Confirm(string message) => new ConfirmCondition(message);
+
+        internal virtual bool IsSynchronous => true;
+
+        internal abstract Expr Write(Scope scope);
+
+        /// <summary>The statements that run <paramref name="then"/> when the condition holds and <paramref name="otherwise"/> when not.</summary>
+        internal virtual IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
+            new[] { G.If(Write(scope), then, otherwise) };
     }
 
-    /// <summary>Compares two values using a relational operator.</summary>
-    [JsonConverter(typeof(CompareConditionJsonConverter))]
-    internal sealed class CompareCondition : ConditionGraph
+    /// <summary>A comparison with nothing on its right: truthy, null, empty and their negations.</summary>
+    internal sealed class UnaryCondition : ConditionGraph
     {
         private readonly CompareOperator _op;
-        private readonly ComparisonOperands _operands;
+        private readonly ValueExpression _left;
+        private readonly Shape _shape;
 
-        /// <summary>JSON discriminator for comparison conditions. Always <c>"compare"</c>.</summary>
-        public string Kind => "compare";
-        /// <summary>Left-hand value expression evaluated before comparison.</summary>
-        public ValueExpression Left => _operands.Left;
-        /// <summary>Comparison operator: <c>eq</c>, <c>neq</c>, <c>gt</c>, <c>gte</c>, etc.</summary>
-        public string Op => _op.Value;
-        /// <summary>Declared comparison shape, or <see cref="PlanModel.Shape.None"/> when not specified.</summary>
-        public Shape Shape => _operands.ShapeForJson;
-        /// <summary>Declared collection item shape for operators such as <c>contains</c>; otherwise <see cref="PlanModel.Shape.None"/>.</summary>
-        public Shape ItemShape => _operands.ItemShapeForJson;
-
-        internal ComparisonRightOperand RightOperand => _operands.Right;
-
-        internal CompareCondition(CompareOperator op, ComparisonOperands operands)
+        internal UnaryCondition(CompareOperator op, ValueExpression left, Shape shape)
         {
             _op = op;
-            _operands = operands;
+            _left = left ?? throw new ArgumentNullException(nameof(left));
+            _shape = shape;
         }
-    }
 
-    internal sealed class CompareConditionJsonConverter : JsonConverter<CompareCondition>
-    {
-        public override void Write(Utf8JsonWriter writer, CompareCondition value, JsonSerializerOptions options)
+        internal override bool IsSynchronous => !_left.ReadsAwaited;
+
+        // The value is read, then converted to the condition's shape; null and empty test it unconverted.
+        internal override Expr Write(Scope scope)
         {
-            writer.WriteStartObject();
-            writer.WriteString("kind", value.Kind);
-            PlanJsonWriter.WriteProperty(writer, options, "left", value.Left);
-            writer.WriteString("op", value.Op);
-            PlanJsonWriter.WriteProperty(writer, options, "right", value.RightOperand);
-            PlanJsonWriter.WriteProperty(writer, options, "shape", value.Shape);
-            PlanJsonWriter.WriteProperty(writer, options, "itemShape", value.ItemShape);
-            writer.WriteEndObject();
+            var raw = _left.Write(scope);
+            var left = G.As(raw, _shape);
+            if (_op == CompareOperator.Truthy) return G.Op(Operator.Truthy, left);
+            if (_op == CompareOperator.Falsy) return G.Not(G.Op(Operator.Truthy, left));
+            if (_op == CompareOperator.IsNull) return G.Eq(raw, G.Null);
+            if (_op == CompareOperator.NotNull) return G.Op(Operator.Neq, raw, G.Null);
+            if (_op == CompareOperator.IsEmpty) return G.Op(Operator.Empty, raw);
+            if (_op == CompareOperator.NotEmpty) return G.Not(G.Op(Operator.Empty, raw));
+            throw new InvalidOperationException("Comparison '" + _op + "' needs a right operand.");
         }
 
-        public override CompareCondition Read(
-            ref Utf8JsonReader reader,
-            Type typeToConvert,
-            JsonSerializerOptions options) =>
-            throw new NotSupportedException("Plan types are write-only.");
+        // A comparison that reads a promise: its awaited reads settle, then the `if` runs.
+        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
+            IsSynchronous ? base.Guard(then, otherwise, scope) : scope.WithAwaitedReads(() => base.Guard(then, otherwise, scope));
     }
 
-    internal sealed class ComparisonOperands
+    /// <summary>
+    /// A comparison with a right operand: a value, a list (membership, a range), literal text (text tests,
+    /// a pattern) or, for <c>ArrayContains</c>, one item of the collection on the left.
+    /// </summary>
+    internal sealed class BinaryCondition : ConditionGraph
     {
-        private readonly ComparisonRightOperand _right;
+        private readonly CompareOperator _op;
+        private readonly ValueExpression _left;
+        private readonly ValueExpression _right;
+        private readonly Shape _shape;
+        private readonly Shape _itemShape;
 
-        private ComparisonOperands(
-            ValueExpression left,
-            ComparisonRightOperand right,
-            Shape shape,
-            Shape itemShape)
+        internal BinaryCondition(CompareOperator op, ValueExpression left, ValueExpression right, Shape shape, Shape itemShape)
         {
-            Left = left;
-            _right = right;
-            ShapeForJson = shape;
-            ItemShapeForJson = itemShape;
+            _op = op;
+            _left = left ?? throw new ArgumentNullException(nameof(left));
+            _right = right ?? throw new ArgumentNullException(nameof(right));
+            _shape = shape;
+            _itemShape = itemShape;
         }
 
-        internal ValueExpression Left { get; }
-        internal ComparisonRightOperand Right => _right;
-        internal Shape ShapeForJson { get; }
-        internal Shape ItemShapeForJson { get; }
+        internal override bool IsSynchronous => !_left.ReadsAwaited && !_right.ReadsAwaited;
 
-        internal static ComparisonOperands Unary(ValueExpression left, Shape shape) =>
-            new ComparisonOperands(
-                left,
-                ComparisonRightOperand.Absent,
-                shape,
-                Shape.None);
-
-        internal static ComparisonOperands Binary(ValueExpression left, ValueExpression right, Shape shape) =>
-            new ComparisonOperands(
-                left,
-                ComparisonRightOperand.Present(right),
-                shape,
-                Shape.None);
-
-        internal static ComparisonOperands CollectionItem(
-            ValueExpression left,
-            ValueExpression right,
-            Shape collectionShape,
-            Shape itemShape) =>
-            new ComparisonOperands(
-                left,
-                ComparisonRightOperand.Present(right),
-                collectionShape,
-                itemShape);
-    }
-
-    [JsonConverter(typeof(ComparisonRightOperandJsonConverter))]
-    internal abstract class ComparisonRightOperand
-    {
-        internal static ComparisonRightOperand Absent { get; } =
-            new AbsentComparisonRightOperand();
-
-        internal static ComparisonRightOperand Present(ValueExpression value) =>
-            new PresentComparisonRightOperand(value);
-
-        public abstract string Kind { get; }
-
-        internal abstract void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options);
-    }
-
-    internal sealed class PresentComparisonRightOperand : ComparisonRightOperand
-    {
-        private readonly ValueExpression _value;
-
-        internal PresentComparisonRightOperand(ValueExpression value)
+        // The left value is read, then converted to the condition's shape; a literal on the right is written
+        // in that shape. A missing value stays missing on both sides (grammar.md 2.2).
+        internal override Expr Write(Scope scope)
         {
-            _value = value;
+            var left = G.As(_left.Write(scope), _shape);
+            if (_op == CompareOperator.Eq) return G.Eq(left, Right(_shape, scope));
+            if (_op == CompareOperator.Neq) return G.Op(Operator.Neq, left, Right(_shape, scope));
+            if (_op == CompareOperator.Gt) return G.Op(Operator.Gt, left, Right(_shape, scope));
+            if (_op == CompareOperator.Gte) return G.Op(Operator.Gte, left, Right(_shape, scope));
+            if (_op == CompareOperator.Lt) return G.Op(Operator.Lt, left, Right(_shape, scope));
+            if (_op == CompareOperator.Lte) return G.Op(Operator.Lte, left, Right(_shape, scope));
+            if (_op == CompareOperator.In) return Membership(left, scope);
+            if (_op == CompareOperator.NotIn) return G.Not(Membership(left, scope));
+            if (_op == CompareOperator.Between) return Between(left, scope);
+            if (_op == CompareOperator.ArrayContains) return ArrayContains(left, scope);
+            if (_op == CompareOperator.Contains) return TextMethod(left, "includes");
+            if (_op == CompareOperator.StartsWith) return TextMethod(left, "startsWith");
+            if (_op == CompareOperator.EndsWith) return TextMethod(left, "endsWith");
+            if (_op == CompareOperator.Matches) return G.Op(Operator.Matches, left, G.Lit(LiteralText()), G.Lit(""));
+            if (_op == CompareOperator.MinLength)
+                return G.Op(Operator.Gte, G.Get(G.Op(Operator.ToText, left), new[] { "length" }, Shape.None), G.Lit(LiteralNumber()));
+            throw new InvalidOperationException("Comparison '" + _op + "' takes no right operand.");
         }
 
-        internal ValueExpression Value => _value;
+        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
+            IsSynchronous ? base.Guard(then, otherwise, scope) : scope.WithAwaitedReads(() => base.Guard(then, otherwise, scope));
 
-        public override string Kind => "value";
+        private Expr Right(Shape shape, Scope scope) =>
+            _right is LiteralExpression literal ? G.Lit(literal.Value, shape) : G.As(_right.Write(scope), shape);
 
-        internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
-            PlanJsonWriter.WriteProperty(writer, options, "value", _value);
-    }
-
-    internal sealed class AbsentComparisonRightOperand : ComparisonRightOperand
-    {
-        public override string Kind => "none";
-
-        internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options)
+        private IReadOnlyList<Expr> RightItems(Scope scope)
         {
+            var items = _right is ArrayExpression array
+                ? array.Items
+                : throw new InvalidOperationException("Comparison '" + _op + "' needs a list of values.");
+            return items
+                .Select(item => item is LiteralExpression literal ? G.Lit(literal.Value, _shape) : G.As(item.Write(scope), _shape))
+                .ToList();
         }
-    }
 
-    internal sealed class ComparisonRightOperandJsonConverter : JsonConverter<ComparisonRightOperand>
-    {
-        public override void Write(
-            Utf8JsonWriter writer,
-            ComparisonRightOperand value,
-            JsonSerializerOptions options)
+        // The left value is read once and compared with each item, as C#'s Contains does.
+        private Expr Membership(Expr left, Scope scope)
         {
-            writer.WriteStartObject();
-            writer.WriteString("kind", value.Kind);
-            value.WritePayload(writer, options);
-            writer.WriteEndObject();
+            var value = scope.Fresh("v");
+            var item = scope.Fresh("i");
+            var items = G.List(RightItems(scope));
+            var some = G.Call(items, new[] { "some" }, new Expr[] { G.Fn(G.Eq(G.Ref(item), G.Ref(value)), item) }, G.NoShapes, Shape.Boolean);
+            return G.Apply(G.Fn(some, value), left);
         }
 
-        public override ComparisonRightOperand Read(
-            ref Utf8JsonReader reader,
-            Type typeToConvert,
-            JsonSerializerOptions options) =>
-            throw new NotSupportedException("Plan types are write-only.");
+        private Expr Between(Expr left, Scope scope)
+        {
+            var bounds = RightItems(scope);
+            if (bounds.Count != 2) throw new InvalidOperationException("Between needs a lower and an upper bound.");
+            var value = scope.Fresh("v");
+            var inRange = G.And(
+                G.Op(Operator.Gte, G.Ref(value), bounds[0]),
+                G.Op(Operator.Lte, G.Ref(value), bounds[1]));
+            return G.Apply(G.Fn(inRange, value), left);
+        }
+
+        private Expr ArrayContains(Expr left, Scope scope)
+        {
+            var items = scope.Fresh("c");
+            var item = scope.Fresh("i");
+            var right = Right(_itemShape, scope);
+            var matches = G.Fn(G.Eq(G.As(G.Ref(item), _itemShape), right), item);
+            var some = G.Call(G.Ref(items), new[] { "some" }, new Expr[] { matches }, G.NoShapes, Shape.None);
+            return G.Apply(G.Fn(G.Op(Operator.Truthy, some), items), left);
+        }
+
+        private Expr TextMethod(Expr left, string method) =>
+            G.Op(Operator.Truthy, G.Call(G.Op(Operator.ToText, left), new[] { method }, new Expr[] { G.Lit(LiteralText()) }, G.NoShapes, Shape.None));
+
+        private string LiteralText() =>
+            _right is LiteralExpression literal && literal.Value is string text
+                ? text
+                : throw new InvalidOperationException("Comparison '" + _op + "' needs literal text.");
+
+        private object LiteralNumber() =>
+            _right is LiteralExpression literal && literal.Value != null
+                ? literal.Value
+                : throw new InvalidOperationException("Comparison '" + _op + "' needs a literal number.");
     }
 
-    /// <summary>Logical AND: all child conditions must be true.</summary>
     internal sealed class AllCondition : ConditionGraph
     {
-        private readonly IReadOnlyList<ConditionGraph> _terms;
-
-        /// <summary>JSON discriminator for logical AND conditions. Always <c>"all"</c>.</summary>
-        public string Kind => "all";
-        /// <summary>Child conditions that must all evaluate to true.</summary>
-        public IReadOnlyList<ConditionGraph> Terms => _terms;
-
         internal AllCondition(IReadOnlyList<ConditionGraph> terms)
         {
-            _terms = terms;
+            Terms = terms;
+        }
+
+        internal IReadOnlyList<ConditionGraph> Terms { get; }
+
+        internal override bool IsSynchronous => Terms.All(term => term.IsSynchronous);
+
+        internal override Expr Write(Scope scope) => G.And(Terms.Select(term => term.Write(scope)).ToList());
+
+        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
+            IsSynchronous ? base.Guard(then, otherwise, scope) : AllOf(0, then, otherwise, scope);
+
+        // Consecutive synchronous terms share one `if`; a term that waits guards the rest.
+        private IReadOnlyList<Statement> AllOf(int start, IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
+        {
+            if (start >= Terms.Count) return then;
+            var synchronous = Terms.Skip(start).TakeWhile(term => term.IsSynchronous).ToList();
+            if (synchronous.Count > 0)
+            {
+                var guard = G.And(synchronous.Select(term => term.Write(scope)).ToList());
+                return new[] { G.If(guard, AllOf(start + synchronous.Count, then, otherwise, scope), otherwise) };
+            }
+
+            return Terms[start].Guard(AllOf(start + 1, then, otherwise, scope), otherwise, scope);
         }
     }
 
-    /// <summary>Logical OR: at least one child condition must be true.</summary>
     internal sealed class AnyCondition : ConditionGraph
     {
-        private readonly IReadOnlyList<ConditionGraph> _terms;
-
-        /// <summary>JSON discriminator for logical OR conditions. Always <c>"any"</c>.</summary>
-        public string Kind => "any";
-        /// <summary>Child conditions where at least one must evaluate to true.</summary>
-        public IReadOnlyList<ConditionGraph> Terms => _terms;
-
         internal AnyCondition(IReadOnlyList<ConditionGraph> terms)
         {
-            _terms = terms;
+            Terms = terms;
+        }
+
+        internal IReadOnlyList<ConditionGraph> Terms { get; }
+
+        internal override bool IsSynchronous => Terms.All(term => term.IsSynchronous);
+
+        internal override Expr Write(Scope scope) => G.Or(Terms.Select(term => term.Write(scope)).ToList());
+
+        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
+            IsSynchronous ? base.Guard(then, otherwise, scope) : AnyOf(0, then, otherwise, scope);
+
+        private IReadOnlyList<Statement> AnyOf(int start, IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
+        {
+            if (start >= Terms.Count) return otherwise;
+            var synchronous = Terms.Skip(start).TakeWhile(term => term.IsSynchronous).ToList();
+            if (synchronous.Count > 0)
+            {
+                var guard = G.Or(synchronous.Select(term => term.Write(scope)).ToList());
+                return new[] { G.If(guard, then, AnyOf(start + synchronous.Count, then, otherwise, scope)) };
+            }
+
+            return Terms[start].Guard(then, AnyOf(start + 1, then, otherwise, scope), scope);
         }
     }
 
-    /// <summary>Logical NOT: inverts a single child condition.</summary>
     internal sealed class NotCondition : ConditionGraph
     {
-        /// <summary>JSON discriminator for logical NOT conditions. Always <c>"not"</c>.</summary>
-        public string Kind => "not";
-        /// <summary>Condition whose result is inverted.</summary>
-        public ConditionGraph Term { get; }
+        private readonly ConditionGraph _term;
 
         internal NotCondition(ConditionGraph term)
         {
-            Term = term;
+            _term = term ?? throw new ArgumentNullException(nameof(term));
         }
+
+        internal override bool IsSynchronous => _term.IsSynchronous;
+
+        internal override Expr Write(Scope scope) => G.Not(_term.Write(scope));
+
+        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
+            IsSynchronous ? base.Guard(then, otherwise, scope) : _term.Guard(otherwise, then, scope);
     }
 
-    /// <summary>Prompts the user for confirmation before the reaction proceeds.</summary>
+    /// <summary>A question the user answers in the confirm dialog: the steps after it wait for the answer.</summary>
     internal sealed class ConfirmCondition : ConditionGraph
     {
-        /// <summary>JSON discriminator for async confirmation conditions. Always <c>"confirm"</c>.</summary>
-        public string Kind => "confirm";
-        /// <summary>Confirmation message shown at the user-decision boundary.</summary>
-        public string Message { get; }
+        private readonly string _message;
 
         internal ConfirmCondition(string message)
         {
-            Message = message;
+            _message = message ?? throw new ArgumentNullException(nameof(message));
+        }
+
+        internal override bool IsSynchronous => false;
+
+        internal override Expr Write(Scope scope) =>
+            throw new InvalidOperationException("A user decision cannot be part of a synchronous condition.");
+
+        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
+        {
+            var accepted = scope.Fresh("ok");
+            return new[]
+            {
+                G.Let(accepted, G.CallTyped(G.Obj(scope.Objects.Confirm()), "ask", Shape.Boolean, G.Lit(_message)), awaits: true),
+                G.If(G.Ref(accepted), then, otherwise),
+            };
         }
     }
-
 }

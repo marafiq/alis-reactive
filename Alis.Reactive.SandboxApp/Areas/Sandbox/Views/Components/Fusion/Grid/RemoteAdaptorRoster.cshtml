@@ -1,5 +1,4 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @{
@@ -8,6 +7,8 @@
     const string GridId = "remote-adaptor-grid";
 
     var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+
+    var columns = FusionGridColumns.Of<ResidentGridItem>();
 
     // DataManager adaptor dataSource: the grid binds to a remote URL through a Syncfusion
     // DataManager + UrlAdaptor and fetches the {result, count} page itself on load.
@@ -32,10 +33,10 @@
             .AllowSelection(true)
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "name", HeaderText = "Resident", Width = "200" },
-                new GridColumn { Field = "age", HeaderText = "Age", Width = "90", TextAlign = TextAlign.Right },
-                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "160" },
-                new GridColumn { Field = "wing", HeaderText = "Wing", Width = "120" }
+                new GridColumn { Field = columns.Field(r => r.Name), HeaderText = "Resident", Width = "200" },
+                new GridColumn { Field = columns.Field(r => r.Age), HeaderText = "Age", Width = "90", TextAlign = TextAlign.Right },
+                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "160" },
+                new GridColumn { Field = columns.Field(r => r.Wing), HeaderText = "Wing", Width = "120" }
             })))
     </section>
 </native-vstack>

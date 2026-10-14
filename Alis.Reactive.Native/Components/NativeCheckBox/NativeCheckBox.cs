@@ -1,19 +1,68 @@
+using System;
+
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Native HTML checkbox component for model-bound Boolean values.
+    /// The native HTML checkbox, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use with <see cref="InputBoundField{TModel,TProp}"/> via the
-    /// <c>.NativeCheckBox()</c> factory to create a model-bound checkbox with
-    /// label, validation, and Reactive Plan event support.
+    /// Render it with <c>Html.InputField(plan, m =&gt; m.Ambulatory).NativeCheckBox(b =&gt; ...)</c>; reach it with
+    /// <c>p.Component&lt;NativeCheckBox&gt;(m =&gt; m.Ambulatory)</c> and use its members directly:
+    /// <code>
+    /// var ambulatory = p.Component&lt;NativeCheckBox&gt;(m =&gt; m.Ambulatory);
+    /// ambulatory.Checked.Set(true);
+    /// p.When(ambulatory.Checked).Truthy().Then(..);
+    /// </code>
     /// </remarks>
     public sealed class NativeCheckBox : NativeComponent, IInputComponent
     {
-        internal static InputComponentRegistrationProfile Registration { get; } =
-            InputComponentRegistrationProfile.For(new NativeCheckBox(), "checkbox");
+        /// <summary>Whether the box is checked.</summary>
+        public Prop<bool> Checked => Prop<bool>();
+
+        /// <summary>Moves focus to the element.</summary>
+        public void Focus() => Call();
+
+        /// <summary>Raised when the user checks or clears the box.</summary>
+        public TypedEvent<NativeCheckBoxChangeArgs> Change =>
+            Event<NativeCheckBoxChangeArgs>();
 
         /// <inheritdoc />
-        public string ValueMember => "checked";
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Checked, committedBy: Change);
+    }
+
+    /// <summary>Payload of <see cref="NativeCheckBox.Change"/>, read from the element.</summary>
+    public class NativeCheckBoxChangeArgs : JsObject
+    {
+        /// <summary>Whether the box is checked after the change.</summary>
+        public ReadOnly<bool?> Checked => ReadOnly<bool?>();
+    }
+
+    /// <summary>Renders a <see cref="NativeCheckBox"/> for a model-bound field.</summary>
+    public static class NativeCheckBoxHtmlExtensions
+    {
+        /// <summary>Renders a NativeCheckBox with its defaults; see the overload that takes <c>build</c>.</summary>
+        /// <typeparam name="TModel">The view's model.</typeparam>
+        public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeCheckBox, TModel> NativeCheckBox<TModel>(
+            this InputBoundField<TModel, bool> field)
+            where TModel : class
+            => field.NativeCheckBox(_ => { });
+
+        /// <summary>
+        /// Renders a NativeCheckBox bound to the field's model property, with the framework's element ID and
+        /// binding name.
+        /// </summary>
+        /// <typeparam name="TModel">The view's model.</typeparam>
+        /// <param name="field">The model-bound field the checkbox renders into.</param>
+        /// <param name="build">Configures the checkbox, for example <c>b =&gt; b.CssClass("...")</c>.</param>
+        /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
+        public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeCheckBox, TModel> NativeCheckBox<TModel>(
+            this InputBoundField<TModel, bool> field,
+            Action<NativeCheckBoxBuilder<TModel, bool>> build)
+            where TModel : class
+        {
+            var builder = new NativeCheckBoxBuilder<TModel, bool>(field.Helper, field.Expression, field.ElementId, field.BindingPath);
+            build(builder);
+            return field.Render<global::Alis.Reactive.Native.Components.NativeCheckBox>(builder);
+        }
     }
 }

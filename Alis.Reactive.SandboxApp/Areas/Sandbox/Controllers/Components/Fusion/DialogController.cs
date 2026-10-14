@@ -15,5 +15,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 "~/Areas/Sandbox/Views/Components/Fusion/Dialog/Index.cshtml",
                 new DialogModel());
         }
+
+        [HttpGet("DischargeSummary")]
+        public IActionResult DischargeSummary()
+        {
+            return PartialView(
+                "~/Areas/Sandbox/Views/Components/Fusion/Dialog/_DischargeSummary.cshtml",
+                new DischargeSummaryModel());
+        }
     }
 }

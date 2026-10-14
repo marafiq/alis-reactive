@@ -49,13 +49,15 @@ namespace Alis.Reactive.InputField
                 _writer.Write("</label>");
             }
 
+            // The message slot renders hidden, as clearing a message leaves it: leaving a field must not
+            // move the page under a click that is already on its way to the next control.
             var closingHtml = "";
             if (_bindingPath != null)
             {
                 var validationMessageIdAttribute =
                     _inputElementId != null ? $" id=\"{WebUtility.HtmlEncode(_inputElementId)}_error\"" : "";
                 closingHtml +=
-                    $"<span{validationMessageIdAttribute} data-valmsg-for=\"{WebUtility.HtmlEncode(_bindingPath)}\" class=\"text-[11px] text-danger\"></span>";
+                    $"<span{validationMessageIdAttribute} data-valmsg-for=\"{WebUtility.HtmlEncode(_bindingPath)}\" class=\"text-[11px] text-danger\" hidden></span>";
             }
             closingHtml += "</div>";
 

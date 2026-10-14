@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
@@ -16,58 +15,59 @@ namespace Alis.Reactive.Builders.Requests
     public class HttpRequestBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
-        private RequestEndpoint? _endpoint;
-        private GatherInputDraft _requestInput = new GatherInputDraft();
-        private RequestBodyFormat _bodyFormat = RequestBodyFormat.Json;
-        private readonly List<ReactionGraph> _whileLoading = new List<ReactionGraph>();
-        private readonly List<ReactionGraph> _finally = new List<ReactionGraph>();
-        private ResponseBuilder<TModel> _response;
-        private ClientValidationBeforeRequest? _validation;
 
         internal HttpRequestBuilder(PlanBuildContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _response = new ResponseBuilder<TModel>(_context);
         }
+
+        /// <summary>The request this builder configures, written where the request was started.</summary>
+        internal RequestStep Step { get; } = new RequestStep();
 
         /// <summary>Selects GET for this request endpoint.</summary>
         /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        public HttpRequestBuilder<TModel> Get(string url) { SelectEndpoint(HttpMethodName.Get, url); return this; }
+        public HttpRequestBuilder<TModel> Get(string url) { Step.To("GET", url); return this; }
         /// <summary>Selects POST for this request endpoint.</summary>
         /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        public HttpRequestBuilder<TModel> Post(string url) { SelectEndpoint(HttpMethodName.Post, url); return this; }
+        public HttpRequestBuilder<TModel> Post(string url) { Step.To("POST", url); return this; }
         /// <summary>Selects PUT for this request endpoint.</summary>
         /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        public HttpRequestBuilder<TModel> Put(string url) { SelectEndpoint(HttpMethodName.Put, url); return this; }
+        public HttpRequestBuilder<TModel> Put(string url) { Step.To("PUT", url); return this; }
         /// <summary>Selects DELETE for this request endpoint.</summary>
         /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        public HttpRequestBuilder<TModel> Delete(string url) { SelectEndpoint(HttpMethodName.Delete, url); return this; }
+        public HttpRequestBuilder<TModel> Delete(string url) { Step.To("DELETE", url); return this; }
 
-        /// <summary>Configures request body fields, headers, and route template parameters.</summary>
-        /// <param name="gather">Builds the values to resolve immediately before the request is sent.</param>
-        public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> gather)
+        /// <summary>Builds the request from the view model's own members, for an endpoint that binds the view model.</summary>
+        /// <param name="gather">Sets the members, the form's inputs and the headers sent.</param>
+        public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel, TModel>> gather) =>
+            Gather<TModel>(gather);
+
+        /// <summary>
+        /// Builds the request the endpoint binds: a member named like a URL <c>{placeholder}</c> fills the path,
+        /// and the others go to the query string for GET and to the body otherwise.
+        /// </summary>
+        /// <typeparam name="TRequest">The class the endpoint binds.</typeparam>
+        /// <param name="gather">Sets the members, the form's inputs and the headers sent.</param>
+        public HttpRequestBuilder<TModel> Gather<TRequest>(Action<GatherBuilder<TRequest, TModel>> gather)
+            where TRequest : class
         {
+            if (gather == null) throw new ArgumentNullException(nameof(gather));
             var draft = new GatherInputDraft();
-            var builder = new GatherBuilder<TModel>(_context, draft);
-            gather(builder);
-            _requestInput = draft;
+            gather(new GatherBuilder<TRequest, TModel>(draft));
+            Step.Gather = draft;
             return this;
         }
 
         /// <summary>Serializes gathered body fields as JSON. This is the default body format.</summary>
-        public HttpRequestBuilder<TModel> AsJson() { _bodyFormat = RequestBodyFormat.Json; return this; }
+        public HttpRequestBuilder<TModel> AsJson() { Step.Format("json"); return this; }
         /// <summary>Serializes gathered body fields as <c>FormData</c>, including <c>File</c> and <c>FileList</c> values.</summary>
-        public HttpRequestBuilder<TModel> AsFormData() { _bodyFormat = RequestBodyFormat.FormData; return this; }
+        public HttpRequestBuilder<TModel> AsFormData() { Step.Format("form-data"); return this; }
 
         /// <summary>Runs a reaction before the HTTP request is sent.</summary>
         /// <param name="pipeline">Builds the pre-request reaction graph, such as showing a spinner.</param>
         public HttpRequestBuilder<TModel> WhileLoading(Action<PipelineBuilder<TModel>> pipeline)
         {
-            var reactionPipeline = new PipelineBuilder<TModel>(_context);
-            pipeline(reactionPipeline);
-            var reaction = reactionPipeline.BuildReaction();
-            _whileLoading.Clear();
-            _whileLoading.Add(reaction);
+            Step.WhileLoading = PipelineBuilder<TModel>.Build(_context, pipeline);
             return this;
         }
 
@@ -86,11 +86,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="pipeline">Builds the cleanup reaction graph to run after the request settles.</param>
         public HttpRequestBuilder<TModel> Finally(Action<PipelineBuilder<TModel>> pipeline)
         {
-            var reactionPipeline = new PipelineBuilder<TModel>(_context);
-            pipeline(reactionPipeline);
-            var reaction = reactionPipeline.BuildReaction();
-            _finally.Clear();
-            _finally.Add(reaction);
+            Step.Finally = PipelineBuilder<TModel>.Build(_context, pipeline);
             return this;
         }
 
@@ -100,9 +96,10 @@ namespace Alis.Reactive.Builders.Requests
         public HttpRequestBuilder<TModel> Validate<TValidationSource>(string formId)
             where TValidationSource : class
         {
-            _validation = ClientValidationBeforeRequest.Using(
-                typeof(TValidationSource),
-                ComponentId.Of(formId));
+            if (string.IsNullOrWhiteSpace(formId)) throw new ArgumentException("Form ID required.", nameof(formId));
+            var firstValidation = Step.Validation == null;
+            Step.Validation = (typeof(TValidationSource), formId);
+            if (firstValidation) _context.ValidateBefore(Step);
             return this;
         }
 
@@ -112,66 +109,8 @@ namespace Alis.Reactive.Builders.Requests
         {
             var builder = new ResponseBuilder<TModel>(_context);
             response(builder);
-            _response = builder;
+            Step.Routes = builder.Routes;
             return this;
         }
-
-        internal RequestPlan BuildRequest()
-        {
-            var endpoint = _endpoint ?? throw new InvalidOperationException(
-                "HTTP request endpoint was not selected. Call Get, Post, Put, or Delete before the request is built.");
-            var requestInput = ResolveInput(endpoint.Url);
-            var validation = _validation;
-
-            var request = RequestPlan.Create(
-                endpoint,
-                requestInput,
-                RequestReactions.From(_whileLoading, _finally),
-                _response.Draft.BuildRouting(),
-                validation.HasValue
-                    ? validation.Value.Target
-                    : RequestValidationTarget.None);
-
-            if (validation.HasValue)
-                validation.Value.Register(_context, request);
-
-            return request;
-        }
-
-        private void SelectEndpoint(HttpMethodName method, string url)
-        {
-            _endpoint = RequestEndpoint.To(method, RequestUrl.Of(url));
-        }
-
-        private RequestInput ResolveInput(RequestUrl url)
-        {
-            return _requestInput.BuildRequestInput(_bodyFormat, url);
-        }
-
     }
-
-    internal readonly struct ClientValidationBeforeRequest
-    {
-        private readonly Type _sourceType;
-        private readonly ComponentId _container;
-
-        private ClientValidationBeforeRequest(Type sourceType, ComponentId container)
-        {
-            _sourceType = sourceType ?? throw new ArgumentNullException(nameof(sourceType));
-            _container = container ?? throw new ArgumentNullException(nameof(container));
-        }
-
-        internal RequestValidationTarget Target =>
-            RequestValidationTarget.DisplayIn(_container);
-
-        internal static ClientValidationBeforeRequest Using(Type sourceType, ComponentId container) =>
-            new ClientValidationBeforeRequest(sourceType, container);
-
-        internal void Register(PlanBuildContext context, RequestPlan request)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-            context.RegisterValidationJob(request, _container, _sourceType);
-        }
-    }
-
 }

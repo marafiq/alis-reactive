@@ -2,6 +2,7 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
+/// <summary>A Syncfusion Stepper: its steps, the one it has open, and the tooltip it shows on hover.</summary>
 public sealed class FusionStepperLocator
 {
     private readonly IPage _page;
@@ -15,33 +16,18 @@ public sealed class FusionStepperLocator
 
     public ILocator Root => _page.Locator($"#{_componentId}");
 
-    public ILocator ValidationRoot => _page.Locator("#resident-stepper-validation");
+    /// <summary>Every step, in order.</summary>
+    public ILocator Steps => Root.Locator(".e-step-container");
 
-    public ILocator ValidationStepItems => ValidationRoot.Locator(".e-step-container");
+    /// <summary>The step with this label.</summary>
+    public ILocator Step(string label) => Steps.Filter(new() { HasText = label });
 
-    public ILocator NextButton => _page.Locator("#next-step-btn");
+    /// <summary>The label of the step with this label, where a click on the step lands.</summary>
+    public ILocator StepLabel(string label) => Root.GetByText(label, new() { Exact = true });
 
-    public ILocator PreviousButton => _page.Locator("#previous-step-btn");
+    /// <summary>The step the stepper has open.</summary>
+    public ILocator OpenStep => Root.Locator(".e-step-container.e-step-selected");
 
-    public ILocator ResetButton => _page.Locator("#reset-step-btn");
-
-    public ILocator SetReviewButton => _page.Locator("#set-review-step-btn");
-
-    public ILocator SetCompleteButton => _page.Locator("#set-complete-step-btn");
-
-    public ILocator SetIntakeButton => _page.Locator("#set-intake-step-btn");
-
-    public ILocator RefreshButton => _page.Locator("#refresh-step-btn");
-
-    public ILocator ReviewStep => Root.GetByText("Review");
-
-    public ILocator CompleteStep => Root.GetByText("Complete");
-
-    public ILocator ValidationIntakeStep => ValidationStepItems.Nth(0);
-
-    public ILocator ValidationReviewStep => ValidationStepItems.Nth(1);
-
-    public ILocator ValidationCompleteStep => ValidationStepItems.Nth(2);
-
-    public ILocator ValidationTooltip => _page.Locator(".e-tooltip-wrap.e-stepper-tooltip");
+    /// <summary>The tooltip a stepper with tooltips shows over the step under the pointer.</summary>
+    public ILocator Tooltip => _page.Locator(".e-tooltip-wrap.e-stepper-tooltip");
 }

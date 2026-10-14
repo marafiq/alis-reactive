@@ -1,3 +1,6 @@
+using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
+
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.ShiftHandover;
 
 /// <summary>
@@ -37,6 +40,32 @@ public class WhenChargeNurseMarksHandoverRead : PlaywrightTestBase
             await _markReadReleased.WaitAsync();
             await route.ContinueAsync();
         });
+    }
+
+    // A Ctrl or Cmd click is the browser's: the link's address opens in a new tab, and the page sends
+    // nothing and marks nothing read.
+    [Test]
+    public async Task a_ctrl_click_opens_the_note_in_a_new_tab_and_marks_nothing_read()
+    {
+        await NavigateAndBoot();
+        var markReads = new ConcurrentQueue<string>();
+        Page.Request += (_, request) =>
+        {
+            if (request.Method == "POST" && request.Url.Contains("/ShiftHandover/MarkRead/")) markReads.Enqueue(request.Url);
+        };
+
+        // A Ctrl or Cmd click opens a new tab, which has no opener: the context gains a page.
+        var noteTab = await Context.RunAndWaitForPageAsync(async () =>
+        {
+            await MarkRead("helen").ClickAsync(new() { Modifiers = new[] { KeyboardModifier.ControlOrMeta } });
+        });
+
+        // The tab may report about:blank before it navigates, so its address is awaited, not read once.
+        await Expect(noteTab).ToHaveURLAsync(new Regex("/Sandbox/HttpPipeline/ShiftHandover/MarkRead/helen$"), new() { Timeout = 10000 });
+        await Expect(noteTab.Locator("body")).ToContainTextAsync("Helen Park's handover note is open.", new() { Timeout = 10000 });
+        await Expect(HandoverStatus).ToHaveTextAsync("No note marked read yet.");
+        Assert.That(markReads, Is.Empty, "A Ctrl or Cmd click sends no request from the page.");
+        AssertNoConsoleErrors();
     }
 
     [Test]

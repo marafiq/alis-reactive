@@ -1,95 +1,93 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.GridOperationsModel
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.WingReviewViewModel
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Templates
 @using Syncfusion.EJ2.Grids
 @{
-    ViewData["Title"] = "Care-Staff Roster Review";
+    ViewData["Title"] = "Wing Care Reviews";
 
-    const string GridId = "care-review-grid";
+    const string GridId = "wing-reviews";
     const string Button = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
 
-    var plan = Html.ReactivePlan<GridOperationsModel>();
+    var plan = Html.ReactivePlan<WingReviewViewModel>();
 
-    Html.On(plan, t => t.DomReady(p =>
-        p.Get(Url.SandboxRoute("OperationRows", "Grid"))
-            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
-            {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
-                s.Element("review-status").SetText("loaded");
-            }))));
+    var columns = FusionGridColumns.Of<WingReviewResident>();
+
+    var startReview = FusionTemplate.Create<WingReviewResident>()
+        .EventButton("Start review", WingReviewEvents.StartReview, e => e.ResidentId, m => m.ResidentId, "e-small")
+        .Render();
+
+    Html.On(plan, t => t
+        .DomReady(p =>
+            p.Get(Url.SandboxRoute("WingReviewResidents", "Grid"))
+                .Response(r => r.OnSuccess<List<WingReviewResident>>((residents, s) =>
+                    s.Component<FusionGrid>(GridId).DataSource.Set(residents))))
+        .CustomEvent(WingReviewEvents.StartReview, (start, p) =>
+            p.Post(Url.SandboxRoute("WingReviewStart", "Grid"))
+                .Gather<WingReviewStart>(g => g.Set(x => x.ResidentId, start.Get(x => x.ResidentId)))
+                .Response(r => r
+                    .OnSuccess<WingReviewStarted>((started, s) =>
+                    {
+                        s.Component<FusionGrid>(GridId).SetCellValue(
+                            started.Get(x => x.ResidentId), Field.Of((WingReviewResident x) => x.Review), started.Get(x => x.Review));
+                        s.Element("review-status").Text.Set(started.Get(x => x.Summary));
+                    })
+                    .OnError<WingReviewRefusal>(400, (refused, e) =>
+                        e.Element("review-status").Text.Set(refused.Get(x => x.Summary))))));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Care-Staff Roster Review</native-heading>
-    <native-text color="Secondary">
-        Summarize the current view, locate a resident, and review the selected residents.
-    </native-text>
+    <div>
+        <native-heading level="H1">Wing Care Reviews</native-heading>
+        <native-text color="Secondary">
+            @Model.Wing wing, @Model.Director, director of nursing. Go through the wing a page at a time, put the
+            residents you pick on Thursday's care conference agenda, and start a resident's review from their row.
+        </native-text>
+    </div>
 
-    <native-hstack gap="Sm" class="flex-wrap">
-        @(Html.NativeButton("review-current-view", "Summarize Current View")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var grid = p.Component<FusionGrid>(GridId);
-                p.Post(Url.SandboxRoute("CurrentViewSummary", "Grid"))
-                    .Gather(g => g.Include(grid.CurrentViewRecords<GridOperationsModel, ResidentDirectoryGridItem>(), "records"))
-                    .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
-                        s.Element("view-summary").SetText(json, x => x.Summary)));
-            }))
-        @(Html.NativeButton("review-row-index", "Find Resident 6005")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var grid = p.Component<FusionGrid>(GridId);
-                p.Post(Url.SandboxRoute("RowIndexSummary", "Grid"))
-                    .Gather(g => g.Include(grid.RowIndexByPrimaryKey(6005), "rowIndex"))
-                    .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
-                        s.Element("index-summary").SetText(json, x => x.Summary)));
-            }))
-        @(Html.NativeButton("review-selected", "Review Selected")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var grid = p.Component<FusionGrid>(GridId);
-                grid.SelectRowsByRange(0, 1);
-                p.Post(Url.SandboxRoute("SelectionRecords", "Grid"))
-                    .Gather(g => g.Include(grid.SelectedRecords<GridOperationsModel, ResidentDirectoryGridItem>(), "selectedRecords"))
-                    .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
-                        s.Element("selected-summary").SetText(json, x => x.Summary)));
-            }))
-        @(Html.NativeButton("review-indexes", "Selected Indexes")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var grid = p.Component<FusionGrid>(GridId);
-                grid.SelectRowsByRange(0, 1);
-                p.Post(Url.SandboxRoute("SelectionIndexes", "Grid"))
-                    .Gather(g => g.Include(grid.SelectedRowIndexes<GridOperationsModel>(), "selectedRowIndexes"))
-                    .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
-                        s.Element("indexes-summary").SetText(json, x => x.Summary)));
-            }))
-    </native-hstack>
+    <native-card><native-card-body>
+        <native-hstack gap="Sm" align="Center" class="mb-4 flex-wrap">
+            @(Html.NativeButton("pick-this-page", "Pick everyone on this page")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                    p.Component<FusionGrid>(GridId).SelectRowsByRange(0, Model.PageSize - 1)))
+            @(Html.NativeButton("add-to-conference", "Add the picked residents to the care conference")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    var reviews = p.Component<FusionGrid>(GridId);
+                    p.When(reviews.GetSelectedRowIndexes()).NotEmpty()
+                        .Then(picked => picked.Post(Url.SandboxRoute("WingReviewConference", "Grid"))
+                            .Gather<WingReviewConference>(g => g.Set(x => x.Residents, reviews.GetSelectedRecords<WingReviewResident>()))
+                            .Response(r => r.OnSuccess<WingReviewAgenda>((agenda, s) =>
+                                s.Element("review-status").Text.Set(agenda.Get(x => x.Summary)))))
+                        .Else(nobody => nobody.Element("review-status").Text.Set("Pick the residents for the care conference first."));
+                }))
+        </native-hstack>
 
-    <native-grid cols="C1" gap="Base" class="mt-4 font-mono text-sm">
-        <p>Load: <span id="review-status" class="text-text-muted">waiting</span></p>
-        <p>View: <span id="view-summary" class="text-text-muted">waiting</span></p>
-        <p>Index: <span id="index-summary" class="text-text-muted">waiting</span></p>
-        <p>Selected: <span id="selected-summary" class="text-text-muted">waiting</span></p>
-        <p>Indexes: <span id="indexes-summary" class="text-text-muted">waiting</span></p>
-    </native-grid>
+        <p class="mb-2 text-sm">High risk on this page: <span id="high-risk-on-page" class="font-semibold"></span></p>
 
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        @(Html.FusionGrid<GridOperationsModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+        @(Html.FusionGrid<WingReviewViewModel, WingReviewResident>(plan, GridId, b => b
+            .AllowPaging(true)
+            .PageSettings(new GridPageSettings { PageSize = Model.PageSize })
             .AllowSelection(true)
             .SelectionSettings(new GridSelectionSettings { Type = SelectionType.Multiple })
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", IsPrimaryKey = true, TextAlign = TextAlign.Right, Visible = false },
-                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "240" },
-                new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "150" }
-            })))
-    </section>
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", IsPrimaryKey = true, Visible = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "180" },
+                new GridColumn { Field = columns.Field(r => r.Suite), HeaderText = "Suite", Width = "90" },
+                new GridColumn { Field = columns.Field(r => r.RiskLevel), HeaderText = "Risk", Width = "110" },
+                new GridColumn { Field = columns.Field(r => r.ReviewDue), HeaderText = "Review due", Width = "120" },
+                new GridColumn { Field = columns.Field(r => r.Review), HeaderText = "Review", Width = "120" },
+                new GridColumn { HeaderText = "", Width = "140", Template = startReview }
+            }))
+            .Reactive(evt => evt.ActionComplete<WingReviewResident>(), (_, p) =>
+                p.Element("high-risk-on-page").Text.Set(
+                    p.From(p.Component<FusionGrid>(GridId).GetCurrentViewRecords<WingReviewResident>()).Count(r => r.RiskLevel == "High"))))
+
+        <p id="review-status" class="mt-4 text-sm font-medium">Ctrl-click residents to pick them, or start a review from a resident's row.</p>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

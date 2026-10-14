@@ -10,7 +10,7 @@ namespace Alis.Reactive.Builders
         /// <returns>Request builder for route values, validation, loading/finally reactions, and response routing.</returns>
         public HttpRequestBuilder<TModel> Get(string url)
         {
-            return _draft.BeginHttp(Context).Get(url);
+            return Request().Get(url);
         }
 
         /// <summary>Appends an async HTTP POST reaction to this Reactive Plan pipeline.</summary>
@@ -18,25 +18,15 @@ namespace Alis.Reactive.Builders
         /// <returns>Request builder for gathered input, validation, loading/finally reactions, and response routing.</returns>
         public HttpRequestBuilder<TModel> Post(string url)
         {
-            return _draft.BeginHttp(Context).Post(url);
+            return Request().Post(url);
         }
 
-        /// <summary>Appends an async HTTP POST reaction and configures gathered input inline.</summary>
+        /// <summary>Appends an async HTTP PUT reaction to this Reactive Plan pipeline.</summary>
         /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        /// <param name="gather">Collects request body, header, or route-template values before the request is sent.</param>
-        /// <returns>HTTP request builder for configuring validation and response routing.</returns>
-        public HttpRequestBuilder<TModel> Post(string url, Action<GatherBuilder<TModel>> gather)
+        /// <returns>Request builder for gathered input, validation, loading/finally reactions, and response routing.</returns>
+        public HttpRequestBuilder<TModel> Put(string url)
         {
-            return _draft.BeginHttp(Context).Post(url).Gather(gather);
-        }
-
-        /// <summary>Appends an async HTTP PUT reaction and configures gathered input inline.</summary>
-        /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        /// <param name="gather">Collects request body, header, or route-template values before the request is sent.</param>
-        /// <returns>HTTP request builder for configuring validation and response routing.</returns>
-        public HttpRequestBuilder<TModel> Put(string url, Action<GatherBuilder<TModel>> gather)
-        {
-            return _draft.BeginHttp(Context).Put(url).Gather(gather);
+            return Request().Put(url);
         }
 
         /// <summary>Appends an async HTTP DELETE reaction to this Reactive Plan pipeline.</summary>
@@ -44,7 +34,7 @@ namespace Alis.Reactive.Builders
         /// <returns>Request builder for route values, validation, loading/finally reactions, and response routing.</returns>
         public HttpRequestBuilder<TModel> Delete(string url)
         {
-            return _draft.BeginHttp(Context).Delete(url);
+            return Request().Delete(url);
         }
 
         /// <summary>Appends an async reaction whose HTTP request branches execute concurrently.</summary>
@@ -52,9 +42,18 @@ namespace Alis.Reactive.Builders
         /// <returns>Parallel request builder for configuring the optional all-settled reaction.</returns>
         public ParallelBuilder<TModel> Parallel(params Action<HttpRequestBuilder<TModel>>[] branches)
         {
-            var builder = _draft.BeginParallel(Context);
+            var builder = new ParallelBuilder<TModel>(Context);
+            Context.AddStep(builder.Step);
             foreach (var branch in branches)
                 builder.AddBranch(branch);
+            return builder;
+        }
+
+        // A request is placed where it is written and configured until the plan is written.
+        private HttpRequestBuilder<TModel> Request()
+        {
+            var builder = new HttpRequestBuilder<TModel>(Context);
+            Context.AddStep(builder.Step);
             return builder;
         }
     }

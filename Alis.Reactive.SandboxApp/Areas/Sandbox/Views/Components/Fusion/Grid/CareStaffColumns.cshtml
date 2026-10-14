@@ -1,79 +1,94 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.GridOperationsModel
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.HuddleSheetViewModel
+@using Alis.Reactive.Builders
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @{
-    ViewData["Title"] = "Care-Staff Column View";
+    ViewData["Title"] = "Huddle Sheet";
 
-    const string GridId = "care-staff-columns-grid";
+    const string SheetId = "huddle-sheet";
     const string Button = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
 
-    var plan = Html.ReactivePlan<GridOperationsModel>();
+    var plan = Html.ReactivePlan<HuddleSheetViewModel>();
 
-    // Focused scenario: care staff personalize which resident columns are visible and their order.
+    var columns = FusionGridColumns.Of<HuddleSheetResident>();
+    var resident = Field.Of((HuddleSheetResident r) => r.ResidentName);
+    var nextReview = Field.Of((HuddleSheetResident r) => r.NextReview);
+    var risk = Field.Of((HuddleSheetResident r) => r.RiskLevel);
+    var wing = Field.Of((HuddleSheetResident r) => r.Wing);
+
+    // A column the sheet can go without: the sheet's own column says whether it shows now.
+    void LeaveOffOrPutBack(PipelineBuilder<HuddleSheetViewModel> p, Field column) =>
+        p.When(p.Component<FusionGrid>(SheetId).GetColumnByField(column).Visible).Truthy()
+            .Then(shown => shown.Component<FusionGrid>(SheetId).HideColumn(column))
+            .Else(left => left.Component<FusionGrid>(SheetId).ShowColumn(column));
+
     Html.On(plan, t => t.DomReady(p =>
-        p.Get(Url.SandboxRoute("OperationRows", "Grid"))
-            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
-            {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
-                s.Element("column-status").SetText("loaded");
-            }))));
+        p.Get(Url.SandboxRoute("HuddleSheetResidents", "Grid"))
+            .Response(r => r.OnSuccess<List<HuddleSheetResident>>((residents, s) =>
+                s.Component<FusionGrid>(SheetId).DataSource.Set(residents)))));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Care-Staff Column View</native-heading>
-    <native-text color="Secondary">
-        Care staff hide non-essential columns, restore them, and move the risk column to the front for a shift.
-    </native-text>
+    <div>
+        <native-heading level="H1">Huddle Sheet</native-heading>
+        <native-text color="Secondary">
+            Maple Grove morning huddle. Arrange the sheet before it prints: the columns it carries, the one it
+            leads with, and what the wing column is called.
+        </native-text>
+    </div>
 
-    <native-hstack gap="Sm" class="flex-wrap">
-        @(Html.NativeButton("hide-care-columns", "Hide Care Columns")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var grid = p.Component<FusionGrid>(GridId);
-                grid.HideColumn((ResidentDirectoryGridItem x) => x.PrimaryNurse);
-                grid.HideColumn((ResidentDirectoryGridItem x) => x.NextReviewDate);
-                p.Element("column-status").SetText("care columns hidden");
-            }))
-        @(Html.NativeButton("show-care-columns", "Show Care Columns")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var grid = p.Component<FusionGrid>(GridId);
-                grid.ShowColumn((ResidentDirectoryGridItem x) => x.PrimaryNurse);
-                grid.ShowColumn((ResidentDirectoryGridItem x) => x.NextReviewDate);
-                p.Element("column-status").SetText("care columns shown");
-            }))
-        @(Html.NativeButton("reorder-risk-first", "Move Risk Before Resident")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId)
-                    .ReorderColumnBefore(
-                        (ResidentDirectoryGridItem x) => x.RiskLevel,
-                        (ResidentDirectoryGridItem x) => x.ResidentName);
-                p.Element("column-status").SetText("risk moved before resident");
-            }))
-    </native-hstack>
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <div>
+                <p class="mb-1 text-xs font-medium uppercase tracking-wide text-text-muted">Columns to leave off or put back</p>
+                <native-hstack gap="Sm" class="flex-wrap">
+                    @(Html.NativeButton("primary-nurse-column", "Primary nurse")
+                        .CssClass(Button)
+                        .Reactive(plan, evt => evt.Click, (_, p) =>
+                            LeaveOffOrPutBack(p, Field.Of((HuddleSheetResident r) => r.PrimaryNurse))))
+                    @(Html.NativeButton("next-review-column", "Next review")
+                        .CssClass(Button)
+                        .Reactive(plan, evt => evt.Click, (_, p) =>
+                            LeaveOffOrPutBack(p, Field.Of((HuddleSheetResident r) => r.NextReview))))
+                </native-hstack>
+            </div>
 
-    <p class="font-mono text-sm">Status: <span id="column-status" class="text-text-muted">waiting</span></p>
+            @* EJ2 moves a column into the other's place: risk into the resident's, then back into the next review's. *@
+            @{ Html.InputField(plan, m => m.LeadWithRisk, o => o.Label("Lead with risk"))
+                .NativeCheckBox(b => b.CssClass("rounded border-border"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                    p.When(args.Checked).Truthy()
+                        .Then(first => first.Component<FusionGrid>(SheetId).ReorderColumns(risk, resident))
+                        .Else(after => after.Component<FusionGrid>(SheetId).ReorderColumns(risk, nextReview))); }
 
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        @(Html.FusionGrid<GridOperationsModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+            <div class="max-w-xs">
+                @{ Html.InputField(plan, m => m.WingHeading, o => o.Label("Wing column heading"))
+                    .FusionTextBox(b => b.Placeholder("What the community calls a wing"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        var sheet = p.Component<FusionGrid>(SheetId);
+                        sheet.GetColumnByField(wing).HeaderText.Set(args.Value);
+                        sheet.RefreshHeader();
+                    }); }
+            </div>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        @(Html.FusionGrid<HuddleSheetViewModel, HuddleSheetResident>(plan, SheetId, b => b
             .AllowReordering(true)
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", IsPrimaryKey = true, TextAlign = TextAlign.Right, Visible = false },
-                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "200" },
-                new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "130" },
-                new GridColumn { Field = "primaryNurse", HeaderText = "Primary Nurse", Width = "160" },
-                new GridColumn { Field = "nextReviewDate", HeaderText = "Next Review", Width = "140" },
-                new GridColumn { Field = "wing", HeaderText = "Wing", Width = "110" },
-                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "150" }
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", IsPrimaryKey = true, Visible = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "180" },
+                new GridColumn { Field = columns.Field(r => r.PrimaryNurse), HeaderText = "Primary nurse", Width = "150" },
+                new GridColumn { Field = columns.Field(r => r.NextReview), HeaderText = "Next review", Width = "130" },
+                new GridColumn { Field = columns.Field(r => r.RiskLevel), HeaderText = "Risk", Width = "110" },
+                new GridColumn { Field = columns.Field(r => r.Wing), HeaderText = "Wing", Width = "110" },
+                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care level", Width = "150" }
             })))
-    </section>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

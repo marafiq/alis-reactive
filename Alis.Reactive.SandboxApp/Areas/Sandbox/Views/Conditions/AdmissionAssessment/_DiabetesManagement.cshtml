@@ -1,5 +1,4 @@
 @model Step2ClinicalModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @{
     var plan = Html.ResolvePlan<Step2ClinicalModel>();
@@ -22,50 +21,46 @@
 
         @{ Html.InputField(plan, m => m.A1cLevel, o => o.Label("A1C Level (%)"))
             .FusionNumericTextBox(b => b
-                .Min(0).Max(20).Step(0.1)
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var comp = p.Component<FusionNumericTextBox>(m => m.A1cLevel);
-                    p.Element("a1c-echo").SetText(comp.Value());
-
-                    p.When(comp.Value()).Gt(9m)
-                        .Then(then =>
-                        {
-                            then.Element("uncontrolled-spinner").Show();
-                            then.Post(alertUncontrolledUrl,
-                                g => g.Include<FusionNumericTextBox, Step2ClinicalModel>(m => m.A1cLevel)
-                                      .Include<FusionDropDownList, Step2ClinicalModel>(m => m.DiabetesType))
-                             .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
-                             {
-                                 s.Element("uncontrolled-result").SetText(json, x => x.Message);
-                                 s.Element("uncontrolled-result").Show();
-                                 s.Element("uncontrolled-spinner").Hide();
-                             }));
-                        })
-                        .Else(e =>
-                        {
-                            e.Element("uncontrolled-result").SetText("Controlled");
-                            e.Element("uncontrolled-result").Show();
-                        });
-                })); }
+                .Min(0).Max(20).Step(0.1))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var comp = p.Component<FusionNumericTextBox>(m => m.A1cLevel);
+                p.When(comp.Value).Gt(9m)
+                    .Then(then =>
+                    {
+                        then.Element("uncontrolled-spinner").Show();
+                        then.Post(alertUncontrolledUrl)
+                         .Gather<AlertUncontrolledRequest>(g => g.Form(m => m.A1cLevel, m => m.DiabetesType))
+                         .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
+                         {
+                             s.Element("uncontrolled-result").Text.Set(json.Get(x => x.Message));
+                             s.Element("uncontrolled-result").Show();
+                             s.Element("uncontrolled-spinner").Hide();
+                         }));
+                    })
+                    .Else(e =>
+                    {
+                        e.Element("uncontrolled-result").Text.Set("A1C at 9% or under: no endocrinology referral.");
+                        e.Element("uncontrolled-result").Show();
+                    });
+            }); }
     </native-grid>
 
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.InsulinDependent, o => o.Label("Insulin Dependent"))
-            .FusionSwitch(b => b
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var sw = p.Component<FusionSwitch>(m => m.InsulinDependent);
-                    p.When(sw.Value()).Truthy()
-                        .Then(t => t.Element("insulin-details").Show())
-                        .Else(e => e.Element("insulin-details").Hide());
-                })); }
+            .FusionSwitch()
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var sw = p.Component<FusionSwitch>(m => m.InsulinDependent);
+                p.When(sw.Checked).Truthy()
+                    .Then(t => t.Element("insulin-details").Show())
+                    .Else(e => e.Element("insulin-details").Hide());
+            }); }
     </native-grid>
 
-    <native-vstack gap="Xs" class="font-mono text-sm mb-4">
-        <p>A1C: <span id="a1c-echo" class="text-text-muted">&mdash;</span></p>
-        <p><span id="uncontrolled-spinner" hidden class="text-accent">Sending alert...</span></p>
-        <div id="uncontrolled-result" hidden class="rounded-md bg-rose-50 border border-rose-200 px-3 py-2 text-sm text-rose-700"></div>
+    <native-vstack gap="Xs" class="mb-4">
+        <p id="uncontrolled-spinner" hidden class="text-sm text-accent">Sending alert...</p>
+        <p id="uncontrolled-result" hidden class="text-sm font-medium"></p>
     </native-vstack>
 
     <div id="insulin-details" hidden>

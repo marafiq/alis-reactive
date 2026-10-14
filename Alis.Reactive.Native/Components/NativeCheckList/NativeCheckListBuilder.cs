@@ -51,26 +51,21 @@ namespace Alis.Reactive.Native.Components
         internal NativeCheckListBuilder(
             HtmlHelper<TModel> html,
             Expression<Func<TModel, TProp>> expression,
-            InputComponentRenderTarget target)
+            string elementId,
+            string bindingPath)
 #else
         internal NativeCheckListBuilder(
             IHtmlHelper<TModel> html,
             Expression<Func<TModel, TProp>> expression,
-            InputComponentRenderTarget target)
+            string elementId,
+            string bindingPath)
 #endif
         {
             _html = html;
             _expression = expression;
-            if (target == null) throw new ArgumentNullException(nameof(target));
-            _elementId = target.ElementId;
-            _bindingPath = target.BindingName;
+            _elementId = elementId;
+            _bindingPath = bindingPath;
         }
-
-        internal string ElementId => _elementId;
-
-        internal string BindingPath => _bindingPath;
-
-        internal IReadOnlyList<RadioButtonItem> Options => _options;
 
         /// <summary>
         /// Adds checkbox options supplied outside the fluent builder, such as
@@ -162,10 +157,11 @@ namespace Alis.Reactive.Native.Components
 
             var encodedId = encoder.Encode(_elementId);
 
-            // Container is the Reactive Plan component target and exposes string[] value semantics.
-            writer.Write($"<div id=\"{encodedId}\" class=\"{encoder.Encode(_cssClass)}\">");
+            // The container is the component: the framework's check-list code (constructed on alis:mount,
+            // like an app's widget) gives it a value that reads the checked boxes and checks them when written.
+            writer.Write($"<div id=\"{encodedId}\" class=\"{encoder.Encode(_cssClass)}\" data-alis-check-list>");
 
-            // Hidden input keeps MVC form submission as CSV; it is not the component target.
+            // Hidden input keeps MVC form submission as CSV, in step with the checked boxes; it is not the component target.
             writer.Write($"<input type=\"hidden\" name=\"{encoder.Encode(_bindingPath)}\" value=\"{encoder.Encode(modelValue)}\" />");
 
             for (int i = 0; i < _options.Count; i++)
@@ -194,10 +190,6 @@ namespace Alis.Reactive.Native.Components
             }
 
             writer.Write("</div>");
-
-            // Inline initialization works on page load and partial injection without DOM scanning.
-            // It keeps the container string[] value and hidden input CSV in sync.
-            writer.Write($@"<script>(function(){{var c=document.getElementById(""{encodedId}"");var h=c.querySelector(""input[type=hidden]"");var init=h.value.split("","").filter(Boolean);c.value=init;c.isInteracted=false;c.addEventListener(""change"",function(e){{if(e.target.type!==""checkbox"")return;var v=[];var cbs=c.querySelectorAll(""input[type=checkbox]"");for(var i=0;i<cbs.length;i++)if(cbs[i].checked)v.push(cbs[i].value);c.value=v;h.value=v.join("","");c.isInteracted=true;}});}})();</script>");
         }
 
         // The property holds the checked values as a collection (string[], List<string>, ...) or, for a

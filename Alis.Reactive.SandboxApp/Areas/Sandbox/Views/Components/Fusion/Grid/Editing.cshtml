@@ -1,162 +1,115 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
 @using Alis.Reactive.Builders
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @{
-    ViewData["Title"] = "FusionGrid Editing Workflows";
+    ViewData["Title"] = "Maple Wing Roster";
 
-    const string InlineGridId = "resident-inline-edit-grid";
-    const string BatchGridId = "resident-batch-edit-grid";
-    const string DialogGridId = "resident-dialog-edit-grid";
-    const string ValidationFormId = "grid-edit-validation-form";
+    const string RosterId = "maple-roster";
+    const string CorrectionFormId = "maple-correction-form";
+    const string MemoryCare = "Memory Care";
     const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
     const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
-    const string ButtonAccent = "rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90";
+    const string ButtonLink = "rounded-md px-2 py-1 text-sm font-medium text-primary underline-offset-2 hover:underline";
 
     var plan = Html.ReactivePlan<ResidentGridEditingModel>();
-    var riskLevels = (List<string>)ViewBag.RiskLevels;
 
-    List<GridColumn> EditColumns() => new List<GridColumn>
+    var columns = FusionGridColumns.Of<MapleRosterResident>();
+    var riskLevels = new List<string> { "Low", "Moderate", "High" };
+
+    // This week's respite booking: Walter Kim stays in suite 120 while his daughter travels.
+    var respiteGuest = new MapleRosterResident
     {
-        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
-        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "170" },
-        new GridColumn { Field = "age", HeaderText = "Age", Width = "90", TextAlign = TextAlign.Right },
-        new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "150" },
-        new GridColumn { Field = "wing", HeaderText = "Wing", Width = "110" },
-        new GridColumn { Field = "suite", HeaderText = "Suite", Width = "110" },
-        new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "120" },
-        new GridColumn { Field = "openTasks", HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right },
-        new GridColumn { Field = "primaryNurse", HeaderText = "Primary Nurse", Width = "150" }
+        ResidentId = 7301,
+        ResidentName = "Walter Kim",
+        CareLevel = "Respite",
+        Suite = "120",
+        RiskLevel = "Low",
+        OpenTasks = 1,
+        PrimaryNurse = "Nora Ellis"
     };
 
-    void LoadEditingGrids(PipelineBuilder<ResidentGridEditingModel> p)
+    // The roster's status line: what the coordinator just did, and to whom.
+    void ShowStatus(PipelineBuilder<ResidentGridEditingModel> p, string action, TypedSource<string> resident, string ending)
     {
-        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
-            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
-            {
-                s.Component<FusionGrid>(InlineGridId).SetDataSource(json);
-                s.Component<FusionGrid>(BatchGridId).SetDataSource(json);
-                s.Component<FusionGrid>(DialogGridId).SetDataSource(json);
-                s.Element("editing-load-status").SetText("loaded editing rows");
-            }));
+        p.Element("roster-status-action").Text.Set(action);
+        p.Element("roster-status-resident").Text.Set(resident);
+        p.Element("roster-status-ending").Text.Set(ending);
     }
 
-    Html.On(plan, t => t.DomReady(p => LoadEditingGrids(p)));
+    // A resident due for review: their row is selected wherever it sits on the roster, then opened.
+    void Review(PipelineBuilder<ResidentGridEditingModel> p, int residentId)
+    {
+        var roster = p.Component<FusionGrid>(RosterId);
+        roster.SelectRow(roster.GetRowIndexByPrimaryKey(residentId));
+        roster.StartEdit();
+    }
+
+    Html.On(plan, t => t.DomReady(p =>
+        p.Get(Url.SandboxRoute("EditingRoster", "Grid"))
+            .Response(r => r.OnSuccess<List<MapleRosterResident>>((residents, s) =>
+                s.Component<FusionGrid>(RosterId).DataSource.Set(residents)))));
 }
 
 <native-vstack gap="Lg">
-    <native-hstack justify="Between" align="Center" class="flex-wrap gap-3">
-        <div>
-            <native-heading level="H1">FusionGrid Editing Workflows</native-heading>
-            <native-text color="Secondary">
-                Inline, batch, dialog-template, method-return, event payload, and validation-backed editing paths.
-            </native-text>
-        </div>
-        <a asp-area="Sandbox" asp-controller="Grid" asp-action="Directory"
-           class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
-            Directory grid
-        </a>
-    </native-hstack>
+    <div>
+        <native-heading level="H1">Maple Wing Roster</native-heading>
+        <native-text color="Secondary">
+            Resident services. Keep the roster the nurses work from in step with who lives on the wing: correct a
+            resident's details, admit from the waiting list, and move residents out.
+        </native-text>
+    </div>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Editing Data</native-heading>
-        <p class="mt-2 font-mono text-sm">Load status: <span id="editing-load-status" class="text-text-muted">waiting</span></p>
+        <native-heading level="H2">Due for review today</native-heading>
+        <native-hstack gap="Sm" class="mt-2 flex-wrap">
+            @(Html.NativeButton("review-henry-liu", "Henry Liu, suite 108")
+                .CssClass(ButtonLink)
+                .Reactive(plan, evt => evt.Click, (args, p) => Review(p, 6103)))
+            @(Html.NativeButton("review-irene-morgan", "Irene Morgan, suite 112")
+                .CssClass(ButtonLink)
+                .Reactive(plan, evt => evt.Click, (args, p) => Review(p, 6104)))
+        </native-hstack>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Inline Editing</native-heading>
-        <native-hstack gap="Sm" class="mt-4 flex-wrap">
-            @(Html.NativeButton("inline-select-first", "Select Row 1")
+        <native-hstack gap="Sm" class="mb-4 flex-wrap">
+            @(Html.NativeButton("roster-edit", "Edit")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Component<FusionGrid>(RosterId).StartEdit()))
+            @(Html.NativeButton("roster-save", "Save")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Component<FusionGrid>(RosterId).EndEdit()))
+            @(Html.NativeButton("roster-cancel", "Cancel")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Component<FusionGrid>(RosterId).CloseEdit()))
+            @(Html.NativeButton("roster-move-out", "Move out")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionGrid>(InlineGridId).SelectRow(0);
-                    p.Element("inline-command-status").SetText("inline row selected");
-                }))
-            @(Html.NativeButton("inline-start-edit", "Start Edit")
-                .CssClass(ButtonPrimary)
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionGrid>(InlineGridId).StartEdit();
-                    p.Element("inline-command-status").SetText("startEdit called");
-                }))
-            @(Html.NativeButton("inline-end-edit", "End Edit")
-                .CssClass(ButtonPrimary)
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionGrid>(InlineGridId).EndEdit();
-                    p.Element("inline-command-status").SetText("endEdit called");
-                }))
-            @(Html.NativeButton("inline-close-edit", "Close Edit")
-                .CssClass(ButtonSecondary)
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionGrid>(InlineGridId).CloseEdit();
-                    p.Element("inline-command-status").SetText("closeEdit called");
-                }))
-            @(Html.NativeButton("inline-add-literal", "Add Literal Row")
-                .CssClass(ButtonAccent)
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionGrid>(InlineGridId).AddRecord(new ResidentDirectoryGridItem
+                    var roster = p.Component<FusionGrid>(RosterId);
+                    var leaving = p.From(roster.GetSelectedRecords<MapleRosterResident>());
+                    p.When(leaving.Any()).Truthy().Then(t =>
                     {
-                        ResidentId = 7100,
-                        ResidentName = "Zara Inline",
-                        Age = 81,
-                        CareLevel = "Memory Care",
-                        Wing = "North",
-                        Suite = "N-710",
-                        RiskLevel = "High",
-                        PrimaryNurse = "Nora Ellis",
-                        OpenTasks = 5,
-                        NextReviewDate = "2026-06-22"
-                    }, 0);
-                    p.Element("inline-command-status").SetText("literal addRecord called");
-                }))
-            @(Html.NativeButton("inline-add-server", "Add Server Row")
-                .CssClass(ButtonAccent)
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Post(Url.SandboxRoute("CreateEditResident", "Grid"))
-                        .Response(r => r.OnSuccess<ResidentGridEditResponse>((json, s) =>
-                        {
-                            s.Component<FusionGrid>(InlineGridId).AddRecord(json, x => x.Row, 0);
-                            s.Element("inline-command-status").SetText(json, x => x.Summary);
-                        }));
-                }))
-            @(Html.NativeButton("inline-update-row", "Update Row 1")
-                .CssClass(ButtonPrimary)
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionGrid>(InlineGridId).UpdateRow(0, new ResidentDirectoryGridItem
-                    {
-                        ResidentId = 6000,
-                        ResidentName = "Amina Updated",
-                        Age = 91,
-                        CareLevel = "Skilled Nursing",
-                        Wing = "West",
-                        Suite = "W-118",
-                        RiskLevel = "Moderate",
-                        PrimaryNurse = "Malik Stone",
-                        OpenTasks = 3,
-                        NextReviewDate = "2026-06-19"
+                        ShowStatus(t, "Moved out ", leaving.Find(r => true, r => r.ResidentName), ".");
+                        roster.DeleteRecord();
                     });
-                    p.Element("inline-command-status").SetText("updateRow called");
                 }))
-            @(Html.NativeButton("inline-delete-selected", "Delete Selected")
+            @(Html.NativeButton("roster-add-respite", "Add Walter Kim's respite stay")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionGrid>(InlineGridId).DeleteSelectedRecord();
-                    p.Element("inline-command-status").SetText("deleteRecord called");
-                }))
+                    p.Component<FusionGrid>(RosterId).AddRecordAt<MapleRosterResident>(respiteGuest, 0)))
+            @(Html.NativeButton("roster-admit", "Admit next from the waiting list")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Post(Url.SandboxRoute("EditingAdmission", "Grid"))
+                        .Response(r => r.OnSuccess<MapleRosterResident>((admitted, s) =>
+                            s.Component<FusionGrid>(RosterId).AddRecordAt(admitted, 0)))))
         </native-hstack>
 
-        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, InlineGridId, b => b
+        @(Html.FusionGrid<ResidentGridEditingModel, MapleRosterResident>(plan, RosterId, b => b
             .AllowSelection(true)
-            .Toolbar(new List<string> { "Add", "Edit", "Update", "Cancel", "Delete" })
             .EditSettings(new GridEditSettings
             {
                 AllowAdding = true,
@@ -166,243 +119,56 @@
                 Mode = EditMode.Normal,
                 ShowDeleteConfirmDialog = false
             })
-            .Columns(EditColumns()))
-            .Reactive(evt => evt.BeginEdit<ResidentDirectoryGridItem>(), (args, p) =>
+            .Columns(new List<GridColumn>
             {
-                p.Element("inline-begin-row").SetText(args, x => x.RowIndex);
-                p.Element("inline-begin-resident").SetText(args, x => x.RowData.ResidentName);
-            })
-            .Reactive(evt => evt.ActionBegin<ResidentDirectoryGridItem>(), (args, p) =>
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "170" },
+                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care level", Width = "150" },
+                new GridColumn { Field = columns.Field(r => r.Suite), HeaderText = "Suite", Width = "90" },
+                new GridColumn { Field = columns.Field(r => r.RiskLevel), HeaderText = "Risk", Width = "110" },
+                new GridColumn { Field = columns.Field(r => r.OpenTasks), HeaderText = "Open tasks", Width = "110", TextAlign = TextAlign.Right },
+                new GridColumn { Field = columns.Field(r => r.PrimaryNurse), HeaderText = "Primary nurse", Width = "150" }
+            }))
+            .Reactive(evt => evt.BeginEdit<MapleRosterResident>(), (args, p) =>
+                ShowStatus(p, "Editing ", args.RowData.Get(x => x.ResidentName), "."))
+            .Reactive(evt => evt.ActionBegin<MapleRosterResident>(), (args, p) =>
             {
-                p.Element("inline-action-begin").SetText(args, x => x.RequestType);
-                p.Element("inline-action-begin-action").SetText(args, x => x.Action);
-                p.Element("inline-action-begin-type").SetText(args, x => x.Type);
-                p.Element("inline-action-begin-event").SetText(args, x => x.Name);
-                p.Element("inline-action-begin-cancel").SetText(args, x => x.Cancel);
-                p.Element("inline-action-begin-row").SetText(args, x => x.RowIndex);
-                p.Element("inline-action-begin-selected-row").SetText(args, x => x.SelectedRow);
-                p.When(args, x => x.RequestType).Eq("save")
+                // A move into memory care is a transfer to Willow wing, booked by the transfer team, not a roster edit.
+                p.When(args.RequestType).Eq("save")
+                    .And(args.Action).Eq("edit")
+                    .And(args.Data.Get(x => x.CareLevel)).Eq(MemoryCare)
+                    .And(args.PreviousData.Get(x => x.CareLevel)).NotEq(MemoryCare)
                     .Then(t =>
                     {
-                        t.Element("inline-action-begin-resident").SetText(args, x => x.Data.ResidentName);
-                        t.Element("inline-action-begin-previous-resident").SetText(args, x => x.PreviousData.ResidentName);
-                    });
+                        args.Cancel.Set(true);
+                        t.Element("transfer-warning-resident").Text.Set(args.PreviousData.Get(x => x.ResidentName));
+                        t.Element("transfer-warning").Show();
+                    })
+                    .Else(e => e.Element("transfer-warning").Hide());
             })
-            .Reactive(evt => evt.ActionComplete<ResidentDirectoryGridItem>(), (args, p) =>
+            .Reactive(evt => evt.ActionComplete<MapleRosterResident>(), (args, p) =>
             {
-                p.Element("inline-action-complete").SetText(args, x => x.RequestType);
-                p.When(args, x => x.RequestType).Eq("save")
-                    .Then(t => t.Element("inline-complete-resident").SetText(args, x => x.Data.ResidentName));
+                p.When(args.RequestType).Eq("save").And(args.Action).Eq("add")
+                    .Then(t => ShowStatus(t, "Added ", args.Data.Get(x => x.ResidentName), " to the roster."))
+                    .ElseIf(args.RequestType).Eq("save")
+                    .Then(t => ShowStatus(t, "Saved ", args.Data.Get(x => x.ResidentName), "."))
+                    .ElseIf(args.RequestType).Eq("cancel")
+                    .Then(t => ShowStatus(t, "Discarded the changes to ", args.Data.Get(x => x.ResidentName), "."));
             }))
 
-        <native-grid cols="C4" gap="Base" class="mt-4 font-mono text-sm">
-            <p>Status: <span id="inline-command-status" class="text-text-muted">waiting</span></p>
-            <p>Begin row: <span id="inline-begin-row" class="text-text-muted">waiting</span></p>
-            <p>Begin resident: <span id="inline-begin-resident" class="text-text-muted">waiting</span></p>
-            <p>Action begin: <span id="inline-action-begin" class="text-text-muted">waiting</span></p>
-            <p>Action begin action: <span id="inline-action-begin-action" class="text-text-muted">waiting</span></p>
-            <p>Action begin type: <span id="inline-action-begin-type" class="text-text-muted">waiting</span></p>
-            <p>Action begin event: <span id="inline-action-begin-event" class="text-text-muted">waiting</span></p>
-            <p>Action begin cancel: <span id="inline-action-begin-cancel" class="text-text-muted">waiting</span></p>
-            <p>Action begin row: <span id="inline-action-begin-row" class="text-text-muted">waiting</span></p>
-            <p>Action begin selected row: <span id="inline-action-begin-selected-row" class="text-text-muted">waiting</span></p>
-            <p>Action begin resident: <span id="inline-action-begin-resident" class="text-text-muted">waiting</span></p>
-            <p>Action begin previous: <span id="inline-action-begin-previous-resident" class="text-text-muted">waiting</span></p>
-            <p>Action complete: <span id="inline-action-complete" class="text-text-muted">waiting</span></p>
-            <p>Saved resident: <span id="inline-complete-resident" class="text-text-muted">waiting</span></p>
-        </native-grid>
+        <p id="roster-status" class="mt-4 text-sm font-medium"><span id="roster-status-action">The roster matches the wing</span><span id="roster-status-resident"></span><span id="roster-status-ending">.</span></p>
+        <p id="transfer-warning" hidden class="mt-1 text-sm text-red-700">
+            <span id="transfer-warning-resident"></span> moves to memory care through a transfer to Willow wing, not a roster edit.
+        </p>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Batch Editing</native-heading>
-        <native-hstack gap="Sm" class="mt-4 flex-wrap">
-            @(Html.NativeButton("batch-edit-cell", "Edit Tasks Cell")
-                .CssClass(ButtonSecondary)
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionGrid>(BatchGridId)
-                        .EditCell(0, (ResidentDirectoryGridItem x) => x.OpenTasks);
-                    p.Element("batch-command-status").SetText("editCell called");
-                }))
-            @(Html.NativeButton("batch-update-cell", "Set Tasks To 6")
-                .CssClass(ButtonPrimary)
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionGrid>(BatchGridId)
-                        .UpdateCell(0, (ResidentDirectoryGridItem x) => x.OpenTasks, 6);
-                    p.Element("batch-command-status").SetText("updateCell called");
-                }))
-            @(Html.NativeButton("batch-save-cell", "Save Cell")
-                .CssClass(ButtonSecondary)
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionGrid>(BatchGridId).SaveCell();
-                    p.Element("batch-command-status").SetText("saveCell called");
-                }))
-            @(Html.NativeButton("batch-gather-changes", "Gather Changes")
-                .CssClass(ButtonAccent)
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var grid = p.Component<FusionGrid>(BatchGridId);
-                    p.Post(Url.SandboxRoute("BatchSummary", "Grid"))
-                        .Gather(g => g.Include(grid.BatchChanges<ResidentGridEditingModel, ResidentDirectoryGridItem>(), "batchChanges"))
-                        .Response(r => r.OnSuccess<ResidentGridBatchSummaryResponse>((json, s) =>
-                        {
-                            s.Element("batch-summary").SetText(json, x => x.Summary);
-                        }));
-                }))
-            @(Html.NativeButton("batch-end-edit", "Commit Batch")
-                .CssClass(ButtonPrimary)
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionGrid>(BatchGridId).EndEdit();
-                    p.Element("batch-command-status").SetText("endEdit called");
-                }))
-        </native-hstack>
-
-        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, BatchGridId, b => b
-            .AllowSelection(true)
-            .Toolbar(new List<string> { "Update", "Cancel" })
-            .EditSettings(new GridEditSettings
-            {
-                AllowEditing = true,
-                AllowEditOnDblClick = false,
-                Mode = EditMode.Batch,
-                ShowConfirmDialog = false
-            })
-            .Columns(EditColumns()))
-            .Reactive(evt => evt.CellSave<ResidentDirectoryGridItem, int>(), (args, p) =>
-            {
-                p.Element("batch-cell-save-column").SetText(args, x => x.ColumnName);
-                p.Element("batch-cell-save-value").SetText(args, x => x.Value);
-                p.Element("batch-cell-save-previous").SetText(args, x => x.PreviousValue);
-                p.Element("batch-cell-save-resident").SetText(args, x => x.RowData.ResidentName);
-                p.Element("batch-cell-save-cancel").SetText(args, x => x.Cancel);
-                p.When(args, x => x.Value).Eq(99)
-                    .Then(t =>
-                    {
-                        args.Cancel(t);
-                        t.Element("batch-cell-save-cancelled").SetText("blocked 99");
-                    });
-            })
-            .Reactive(evt => evt.CellSaved<ResidentDirectoryGridItem, int>(), (args, p) =>
-            {
-                p.Element("batch-cell-saved-column").SetText(args, x => x.ColumnName);
-                p.Element("batch-cell-saved-value").SetText(args, x => x.Value);
-                p.Element("batch-cell-saved-previous").SetText(args, x => x.PreviousValue);
-                p.Element("batch-cell-saved-resident").SetText(args, x => x.RowData.ResidentName);
-            })
-            .Reactive(evt => evt.BeforeBatchSave<ResidentDirectoryGridItem>(), (args, p) =>
-            {
-                p.Element("batch-before-save-resident").SetText(args, x => x.BatchChanges.ChangedRecords[0].ResidentName);
-                p.Element("batch-before-save-tasks").SetText(args, x => x.BatchChanges.ChangedRecords[0].OpenTasks);
-                p.Element("batch-before-save-cancel").SetText(args, x => x.Cancel);
-                p.When(args, x => x.BatchChanges.ChangedRecords[0].OpenTasks).Eq(8)
-                    .Then(t =>
-                    {
-                        args.Cancel(t);
-                        t.Element("batch-before-save-cancelled").SetText("blocked batch 8");
-                        t.Element("batch-action-complete").SetText("waiting after cancelled batch");
-                    });
-            })
-            .Reactive(evt => evt.ActionComplete<ResidentDirectoryGridItem>(), (args, p) =>
-            {
-                p.Element("batch-action-complete").SetText(args, x => x.RequestType);
-            }))
-
-        <native-grid cols="C4" gap="Base" class="mt-4 font-mono text-sm">
-            <p>Status: <span id="batch-command-status" class="text-text-muted">waiting</span></p>
-            <p>Cell column: <span id="batch-cell-save-column" class="text-text-muted">waiting</span></p>
-            <p>Cell value: <span id="batch-cell-save-value" class="text-text-muted">waiting</span></p>
-            <p>Cell previous: <span id="batch-cell-save-previous" class="text-text-muted">waiting</span></p>
-            <p>Cell resident: <span id="batch-cell-save-resident" class="text-text-muted">waiting</span></p>
-            <p>Cell cancel: <span id="batch-cell-save-cancel" class="text-text-muted">waiting</span></p>
-            <p>Cell blocked: <span id="batch-cell-save-cancelled" class="text-text-muted">not blocked</span></p>
-            <p>Cell saved column: <span id="batch-cell-saved-column" class="text-text-muted">waiting</span></p>
-            <p>Cell saved: <span id="batch-cell-saved-value" class="text-text-muted">waiting</span></p>
-            <p>Cell saved previous: <span id="batch-cell-saved-previous" class="text-text-muted">waiting</span></p>
-            <p>Cell saved resident: <span id="batch-cell-saved-resident" class="text-text-muted">waiting</span></p>
-            <p>Batch resident: <span id="batch-before-save-resident" class="text-text-muted">waiting</span></p>
-            <p>Batch tasks: <span id="batch-before-save-tasks" class="text-text-muted">waiting</span></p>
-            <p>Batch cancel: <span id="batch-before-save-cancel" class="text-text-muted">waiting</span></p>
-            <p>Batch blocked: <span id="batch-before-save-cancelled" class="text-text-muted">not blocked</span></p>
-            <p>Batch action: <span id="batch-action-complete" class="text-text-muted">waiting</span></p>
-            <p>Batch summary: <span id="batch-summary" class="text-text-muted">not gathered</span></p>
-        </native-grid>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Dialog Template Editing</native-heading>
-        <native-hstack gap="Sm" class="mt-4 flex-wrap">
-            @(Html.NativeButton("dialog-select-first", "Select Row 1")
-                .CssClass(ButtonSecondary)
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionGrid>(DialogGridId).SelectRow(0);
-                    p.Element("dialog-command-status").SetText("dialog row selected");
-                }))
-            @(Html.NativeButton("dialog-start-edit", "Open Dialog")
-                .CssClass(ButtonPrimary)
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionGrid>(DialogGridId).StartEdit();
-                    p.Element("dialog-command-status").SetText("dialog startEdit called");
-                }))
-            @(Html.NativeButton("dialog-end-edit", "Save Dialog")
-                .CssClass(ButtonPrimary)
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionGrid>(DialogGridId).EndEdit();
-                    p.Element("dialog-command-status").SetText("dialog endEdit called");
-                }))
-            @(Html.NativeButton("dialog-close-edit", "Close Dialog")
-                .CssClass(ButtonSecondary)
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionGrid>(DialogGridId).CloseEdit();
-                    p.Element("dialog-command-status").SetText("dialog closeEdit called");
-                }))
-        </native-hstack>
-
-        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, DialogGridId, b => b
-            .AllowSelection(true)
-            .Toolbar(new List<string> { "Edit", "Update", "Cancel" })
-            .EditSettings(new GridEditSettings
-            {
-                AllowEditing = true,
-                AllowEditOnDblClick = false,
-                Mode = EditMode.Dialog,
-                Template = FusionGridEditTemplates.DialogForm<ResidentDirectoryGridItem>(d => d
-                    .Text(m => m.ResidentName, "Resident")
-                    .Select(m => m.RiskLevel, "Risk", riskLevels)
-                    .Number(m => m.OpenTasks, "Open tasks"))
-            })
-            .Columns(EditColumns()))
-            .Reactive(evt => evt.BeginEdit<ResidentDirectoryGridItem>(), (args, p) =>
-            {
-                p.Element("dialog-begin-resident").SetText(args, x => x.RowData.ResidentName);
-            })
-            .Reactive(evt => evt.ActionComplete<ResidentDirectoryGridItem>(), (args, p) =>
-            {
-                p.Element("dialog-action-complete").SetText(args, x => x.RequestType);
-                p.When(args, x => x.RequestType).Eq("save")
-                    .Then(t => t.Element("dialog-saved-resident").SetText(args, x => x.Data.ResidentName));
-            }))
-
-        <native-grid cols="C4" gap="Base" class="mt-4 font-mono text-sm">
-            <p>Status: <span id="dialog-command-status" class="text-text-muted">waiting</span></p>
-            <p>Begin resident: <span id="dialog-begin-resident" class="text-text-muted">waiting</span></p>
-            <p>Action complete: <span id="dialog-action-complete" class="text-text-muted">waiting</span></p>
-            <p>Saved resident: <span id="dialog-saved-resident" class="text-text-muted">waiting</span></p>
-        </native-grid>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Validation Backed Grid Update</native-heading>
-        <form id="@ValidationFormId" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <native-heading level="H2">Correct from the handoff note</native-heading>
+        <native-text color="Secondary">Enter a resident's risk and open tasks as the night nurse's handoff note gives them.</native-text>
+        <form id="@CorrectionFormId" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
             @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident"))
                 .FusionTextBox(b => b
-                    .Placeholder("Resident name")
+                    .Placeholder("Resident's full name")
                     .ShowClearButton(true)); }
             @{ Html.InputField(plan, m => m.RiskLevel, o => o.Required().Label("Risk level"))
                 .FusionDropDownList(b => b
@@ -417,38 +183,25 @@
                     .Placeholder("0 to 7")); }
         </form>
 
-        <native-hstack gap="Sm" class="mt-4 flex-wrap">
-            @(Html.NativeButton("validation-save-grid-row", "Validate And Update Grid")
+        <native-hstack gap="Sm" align="Center" class="mt-4 flex-wrap">
+            @(Html.NativeButton("apply-correction", "Apply correction")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post(Url.SandboxRoute("ValidateEditDraft", "Grid"), g =>
-                    {
-                        g.Include<FusionTextBox, ResidentGridEditingModel>(m => m.ResidentName);
-                        g.Include<FusionDropDownList, ResidentGridEditingModel>(m => m.RiskLevel);
-                        g.Include<FusionNumericTextBox, ResidentGridEditingModel>(m => m.OpenTasks);
-                    })
-                    .Validate<ResidentGridEditingValidator>(ValidationFormId)
-                    .Response(r => r
-                        .OnSuccess<ResidentGridEditResponse>((json, s) =>
-                        {
-                            s.Component<FusionGrid>(InlineGridId).UpdateRow(0, json, x => x.Row);
-                            s.Component<FusionGrid>(InlineGridId).Refresh();
-                            s.Element("validation-status").SetText(json, x => x.Summary);
-                            s.Element("validation-status").RemoveClass("text-red-600");
-                            s.Element("validation-status").AddClass("text-green-700");
-                        })
-                        .OnError(400, e =>
-                        {
-                            e.Element("validation-status").SetText("validation errors returned");
-                            e.Element("validation-status").RemoveClass("text-green-700");
-                            e.Element("validation-status").AddClass("text-red-600");
-                            e.ValidationErrors(ValidationFormId);
-                        }));
+                    p.Post(Url.SandboxRoute("EditingCorrection", "Grid"))
+                        .Gather(g => g.Form(m => m.ResidentName, m => m.RiskLevel, m => m.OpenTasks))
+                        .Validate<MapleRosterCorrectionValidator>(CorrectionFormId)
+                        .Response(r => r
+                            .OnSuccess<MapleRosterCorrected>((corrected, s) =>
+                            {
+                                var roster = s.Component<FusionGrid>(RosterId);
+                                roster.UpdateRow(roster.GetRowIndexByPrimaryKey(corrected.Get(x => x.Resident.ResidentId)), corrected.Get(x => x.Resident));
+                                s.Element("correction-status").Text.Set(corrected.Get(x => x.Summary));
+                            })
+                            .OnError(400, e => e.ValidationErrors(CorrectionFormId)));
                 }))
+            <p id="correction-status" class="text-sm text-text-muted">No corrections applied yet.</p>
         </native-hstack>
-
-        <p class="mt-3 font-mono text-sm">Validation status: <span id="validation-status" class="text-text-muted">waiting</span></p>
     </native-card-body></native-card>
 </native-vstack>
 

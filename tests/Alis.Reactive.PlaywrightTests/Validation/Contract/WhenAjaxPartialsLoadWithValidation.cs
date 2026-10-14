@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace Alis.Reactive.PlaywrightTests.Validation.Contract;
 
 [TestFixture]
@@ -29,6 +31,24 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         await Input("Email").FillAsync("jane@care.com");
         await Input("ConfirmEmail").FillAsync("jane@care.com");
     }
+
+    private async Task AddEmergencyContact()
+    {
+        await ClickWhenStable(Page.Locator("#add-emergency-contact-btn"));
+        await Expect(Input("EmergencyName")).ToBeVisibleAsync(new() { Timeout = 5000 });
+    }
+
+    private async Task FillCustomAddress()
+    {
+        await Input("Address_Street").FillAsync("123 Sunrise Blvd");
+        await Input("Address_City").FillAsync("Palm Springs");
+        await Input("Address_ZipCode").FillAsync("92262");
+    }
+
+    private Task<IRequest> SubmitAndCaptureRequest() =>
+        Page.RunAndWaitForRequestAsync(
+            () => ClickWhenStable(SubmitBtn),
+            request => request.Method == "POST" && request.Url.Contains("/SubmitAjaxPartial"));
 
     [Test]
     public async Task full_ajax_partial_lifecycle()
@@ -116,7 +136,7 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("ConfirmEmail")).Not.ToBeVisibleAsync();
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -161,6 +181,80 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
 
         var status = Page.Locator("#zipcode-status");
         await Expect(status).ToContainTextAsync("Zip validated", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    // Choosing the facility address empties the address container without unloading its slot, so its
+    // inputs stay registered while they are off the page; Form() sends only the inputs on the page.
+    [Test]
+    public async Task address_fields_cleared_by_choosing_the_facility_address_are_not_saved()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await FillParentFields();
+        await SelectCustomAddress();
+        await Input("Address_Street").FillAsync("Old St");
+
+        await Input("AddressType").SelectOptionAsync("Facility Address");
+        await Expect(Input("Address_Street")).ToHaveCountAsync(0, new() { Timeout = 5000 });
+        var submit = await SubmitAndCaptureRequest();
+
+        using (var body = JsonDocument.Parse(submit.PostData ?? "{}"))
+        {
+            Assert.That(body.RootElement.TryGetProperty("Address", out _), Is.False, submit.PostData);
+            Assert.That(body.RootElement.GetProperty("AddressType").GetString(), Is.EqualTo("Facility Address"), submit.PostData);
+        }
+        await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    // The address and the emergency contact are partials of the page's own plan, loaded into two slots;
+    // the inputs of both are the form's, and Submit sends them together.
+    [Test]
+    public async Task an_emergency_contact_loaded_beside_the_address_is_saved_with_it()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await FillParentFields();
+        await SelectCustomAddress();
+        await AddEmergencyContact();
+        await FillCustomAddress();
+        await Input("EmergencyName").FillAsync("Ruth Hale");
+
+        var submit = await SubmitAndCaptureRequest();
+
+        using (var body = JsonDocument.Parse(submit.PostData ?? "{}"))
+        {
+            Assert.That(body.RootElement.GetProperty("Address").GetProperty("Street").GetString(), Is.EqualTo("123 Sunrise Blvd"), submit.PostData);
+            Assert.That(body.RootElement.GetProperty("EmergencyName").GetString(), Is.EqualTo("Ruth Hale"), submit.PostData);
+        }
+        await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    // Reloading the address replaces only the address slot: the emergency contact's inputs stay the form's.
+    [Test]
+    public async Task reloading_the_address_keeps_the_emergency_contact_loaded_beside_it()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await FillParentFields();
+        await SelectCustomAddress();
+        await AddEmergencyContact();
+        await Input("EmergencyName").FillAsync("Ruth Hale");
+
+        await Input("AddressType").SelectOptionAsync("Facility Address");
+        await Expect(Input("Address_Street")).ToHaveCountAsync(0, new() { Timeout = 5000 });
+        await SelectCustomAddress();
+        await FillCustomAddress();
+        var submit = await SubmitAndCaptureRequest();
+
+        using (var body = JsonDocument.Parse(submit.PostData ?? "{}"))
+        {
+            Assert.That(body.RootElement.GetProperty("EmergencyName").GetString(), Is.EqualTo("Ruth Hale"), submit.PostData);
+            Assert.That(body.RootElement.GetProperty("Address").GetProperty("Street").GetString(), Is.EqualTo("123 Sunrise Blvd"), submit.PostData);
+        }
+        await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 }

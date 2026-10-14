@@ -235,13 +235,13 @@ public class WhenUsingFusionButton : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"action\":\"Begin check-in for Eleanor Whitfield\""),
+        Assert.That(body, Does.Contain("\"Action\":\"Begin check-in for Eleanor Whitfield\""),
             "the gather pipeline must carry the Content() source under its declared key");
-        Assert.That(body, Does.Contain("\"priority\":\"e-warning urgent-visit\""),
+        Assert.That(body, Does.Contain("\"Priority\":\"e-warning urgent-visit\""),
             "the gather pipeline must carry the CssClass() source under its declared key");
-        Assert.That(body, Does.Contain("\"recommended\":true"),
+        Assert.That(body, Does.Contain("\"Recommended\":true"),
             "the gather pipeline must carry the IsPrimary() source under its declared key");
-        Assert.That(body, Does.Contain("\"followUp\":true"),
+        Assert.That(body, Does.Contain("\"FollowUp\":true"),
             "the gather pipeline must carry the IsToggle() source under its declared key");
 
         AssertNoConsoleErrors();

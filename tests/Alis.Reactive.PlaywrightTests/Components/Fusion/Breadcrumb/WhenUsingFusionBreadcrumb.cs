@@ -121,13 +121,13 @@ public class WhenUsingFusionBreadcrumb : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"text\":\"Eleanor Hughes\""),
+        Assert.That(body, Does.Contain("\"Text\":\"Eleanor Hughes\""),
             "the gather pipeline must carry the clicked crumb's Item.Text under its declared key");
-        Assert.That(body, Does.Contain("\"id\":\"resident\""),
+        Assert.That(body, Does.Contain("\"Id\":\"resident\""),
             "the gather pipeline must carry the clicked crumb's Item.Id under its declared key");
-        Assert.That(body, Does.Contain("\"url\":\"/residents/eleanor-hughes\""),
+        Assert.That(body, Does.Contain("\"Url\":\"/residents/eleanor-hughes\""),
             "the gather pipeline must carry the clicked crumb's Item.Url under its declared key");
-        Assert.That(body, Does.Contain("\"disabled\":false"),
+        Assert.That(body, Does.Contain("\"Disabled\":false"),
             "the gather pipeline must carry the clicked crumb's Item.Disabled under its declared key");
 
         AssertNoConsoleErrors();

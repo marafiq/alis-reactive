@@ -1,7 +1,9 @@
+using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
+/// <summary>A Syncfusion ContextMenu: its top list, the lists it has open, and an item by its text.</summary>
 public sealed class FusionContextMenuLocator
 {
     private readonly IPage _page;
@@ -13,30 +15,17 @@ public sealed class FusionContextMenuLocator
         _componentId = componentId;
     }
 
+    /// <summary>The menu's top list; it shows while the menu is open.</summary>
     public ILocator Root => _page.Locator($"#{_componentId}");
 
-    public ILocator Target => _page.Locator("#resident-context-target");
+    /// <summary>The menu's wrapper, which holds the top list and every submenu list the menu has open.</summary>
+    public ILocator Lists => Root.Locator("xpath=..");
 
-    public ILocator OpenButton => _page.Locator("#open-context-menu-btn");
-
-    public ILocator CloseButton => _page.Locator("#close-context-menu-btn");
-
-    public ILocator Item(string text) => _page.GetByRole(AriaRole.Menuitem, new() { Name = text });
-
-    /// <summary>
-    /// Right-clicks the target and retries once if the menu does not appear —
-    /// on slow machines the first right-click can land before EJ2 wires its handler.
-    /// </summary>
-    public async Task RightClickTarget()
-    {
-        await Target.ClickAsync(new() { Button = MouseButton.Right });
-        try
-        {
-            await Root.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 2000 });
-        }
-        catch (TimeoutException)
-        {
-            await Target.ClickAsync(new() { Button = MouseButton.Right });
-        }
-    }
+    /// <summary>The item with this text, in the top list or in an open submenu.</summary>
+    /// <remarks>
+    /// Matched by its text, not its accessible name: a ContextMenu gives its items no label, so an item's name
+    /// also carries its icon's glyph.
+    /// </remarks>
+    public ILocator Item(string text) =>
+        Lists.GetByRole(AriaRole.Menuitem).Filter(new() { HasTextRegex = new Regex($@"^\s*{Regex.Escape(text)}\s*$") });
 }

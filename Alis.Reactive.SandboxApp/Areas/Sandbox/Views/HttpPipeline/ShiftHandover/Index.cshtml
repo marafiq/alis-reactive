@@ -1,5 +1,4 @@
 @model ShiftHandoverPageModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.AppLevel
 @{
@@ -28,14 +27,14 @@
                         <span class="font-medium text-text">@note.Name</span>
                         <span class="text-text-secondary"> - @note.Note</span>
                     </div>
-                    @(Html.NativeActionLink("Mark Read", markReadUrl, p => p
-                        .Post(markReadUrl)
+                    @(Html.NativeActionLink($"mark-read-{note.Key}", "Mark Read", markReadUrl, link => link
+                        .Post()
                         .Gather(g => g.Header("X-Shift", "Night"))
                         .WhileLoading(l => l.Component<NativeLoader>().Show())
                         .Response(r => r
-                            .OnSuccess<HandoverNoteRead>((json, s) => s.Element("handover-status").SetText(json, x => x.Message))
-                            .OnError<HandoverNoteRead>(400, (json, e) => e.Element("handover-status").SetText(json, x => x.Message))
-                            .OnError<HandoverNoteRead>(409, (json, e) => e.Element("handover-status").SetText(json, x => x.Message)))
+                            .OnSuccess<HandoverNoteRead>((json, s) => s.Element("handover-status").Text.Set(json.Get(x => x.Message)))
+                            .OnError<HandoverNoteRead>(400, (json, e) => e.Element("handover-status").Text.Set(json.Get(x => x.Message)))
+                            .OnError<HandoverNoteRead>(409, (json, e) => e.Element("handover-status").Text.Set(json.Get(x => x.Message))))
                         .Finally(f => f.Component<NativeLoader>().Hide()))
                         .CssClass("text-sm font-medium text-accent hover:text-accent/80")
                         .Attr("data-testid", $"mark-read-{note.Key}"))

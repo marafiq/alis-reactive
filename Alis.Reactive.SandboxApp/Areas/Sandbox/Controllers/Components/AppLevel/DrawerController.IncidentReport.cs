@@ -27,12 +27,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.AppLevel
 
             var result = new IncidentReportValidator().Validate(report);
             if (!result.IsValid)
-            {
-                var errors = result.Errors
-                    .GroupBy(error => error.PropertyName)
-                    .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).ToArray());
-                return BadRequest(new { errors });
-            }
+                return BadRequest(new { errors = result.ErrorsByField });
 
             await Task.Delay(FilingTime);
             return Ok(new IncidentReportFiled($"Incident report filed: {report.Summary}"));

@@ -33,47 +33,47 @@ is the executor.
 | `Html.InputField(plan, m => m.Field)` | Renders and registers a model-bound input. |
 | `.Reactive(plan, evt => evt.Event, ...)` | Adds a component event trigger. |
 | `p.Element("id")` | Updates a normal DOM element by ID. |
-| `p.Component<TComponent>(...)` | Reads, writes, or calls a component member. |
+| `p.Component<TComponent>(...)` | Returns the component; you read, write, and call its members. |
 | `p.When(source)` | Branches on a typed value source. |
 | `p.Get(...)`, `p.Post(...)`, `p.Put(...)`, `p.Delete(...)` | Adds an async HTTP reaction. |
-| `p.Dispatch(...)` | Emits a document `CustomEvent`. |
+| `p.Dispatch(...)` | Raises a declared `AppEvent` as a document `CustomEvent`. |
 
 The grammar stays small because components share one object model.
 
 ## Components Are Browser Objects
 
-Every component exposes events, properties, and methods.
+Every component is a JavaScript object with events, properties, and methods. Its
+C# class declares them by the names its own API uses, as real C# members, and
+`p.Component<T>(...)` returns the component itself.
 
 Events start pipelines:
 
 ```csharp
-.Reactive(plan, evt => evt.Changed, (args, p) => { ... })
+.Reactive(evt => evt.Change, (args, p) => { ... })
 ```
 
 Properties can be written:
 
 ```csharp
-p.Component<FusionDropDownList>(m => m.UnitId)
- .SetValue("north-wing");
+var unit = p.Component<FusionDropDownList>(m => m.UnitId);
+unit.Value.Set("north-wing");
 ```
 
 Methods can be called:
 
 ```csharp
-p.Component<FusionDropDownList>(m => m.UnitId)
- .ShowPopup();
+unit.ShowPopup();
 ```
 
-Properties can be read as value sources:
+Properties, and methods that return a value, are value sources:
 
 ```csharp
-var unit = p.Component<FusionDropDownList>(m => m.UnitId).Value();
-
-p.When(unit).Eq("memory-care")
+p.When(unit.Value).Eq("memory-care")
  .Then(t => t.Element("memory-care-note").Show());
 ```
 
-That pattern is more important than any single component page.
+That pattern is more important than any single component page. A component the
+framework does not ship works the same way once its class is declared.
 
 ## Values Use One Path
 
@@ -81,11 +81,11 @@ The same value-source idea appears across the DSL.
 
 | Source | Example |
 | --- | --- |
-| Event payload | `p.When(args, x => x.Checked)` |
-| Component property | `p.Component<FusionDropDownList>(m => m.UnitId).Value()` |
-| URL query string | `p.FromUrl<int>("residentId")` |
-| Response body | `body.Read(x => x.Message)` |
-| Plugin return value | `p.Plugin<string>("clipboard", "readText")` |
+| Event payload | `p.When(args.Checked)` |
+| Component member | `p.Component<FusionDropDownList>(m => m.UnitId).Value` |
+| URL query string | `p.Url<ShiftEmailLinkQuery>().Get(q => q.Resident)` |
+| Response body | `body.Get(x => x.Message)`, or `body` itself |
+| Plugin return value | `slugify.Slug(planner.Wing)` |
 
 If a DSL primitive needs a value, it should use this shared path.
 

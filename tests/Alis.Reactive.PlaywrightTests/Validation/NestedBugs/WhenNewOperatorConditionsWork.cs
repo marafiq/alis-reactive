@@ -33,7 +33,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("JobTitle")).Not.ToContainTextAsync("Adults");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -42,6 +42,19 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await NavigateToAndWaitForBoot(Path);
 
         await Input("Age").FillAsync("15");
+        await ClickWhenStable(SubmitBtn);
+
+        await Expect(ErrorFor("Name")).ToContainTextAsync("Guardian name required");
+        AssertNoConsoleErrors();
+    }
+
+    // An int left empty binds as 0 on the server, where "Age < 18" then holds; the browser reads the
+    // age the same way, so it asks for the guardian before the form is sent.
+    [Test]
+    public async Task an_age_left_empty_counts_as_a_minor_as_the_server_binds_it()
+    {
+        await NavigateToAndWaitForBoot(Path);
+
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("Name")).ToContainTextAsync("Guardian name required");
@@ -57,7 +70,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("Name")).Not.ToContainTextAsync("Guardian");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -81,7 +94,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("Notes")).Not.ToContainTextAsync("high-acuity");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -105,7 +118,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("Phone")).Not.ToContainTextAsync("urgent");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -129,6 +142,6 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("Name")).Not.ToContainTextAsync("email provided");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 }

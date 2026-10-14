@@ -6,11 +6,10 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 ## Facts this design rests on
 
 - **The local full gate is the release-grade browser proof.** `scripts/test.sh` runs typecheck,
-  assets, vitest, the gate-script self-tests, `dotnet build`, the non-Playwright dotnet tests, the
-  whole Playwright suite, and the behavioral-coverage gate (0b). `scripts/test.sh --parallel` runs
-  the Playwright leg as the five CI shards side by side (each with its own sandbox) and hands every
-  shard's TRX to 0b: about 20 minutes instead of about 60 on a 12-core machine. CI runs the same
-  scripts; it never defines a second gate.
+  assets, vitest, the consistency checks, `dotnet build`, the non-Playwright dotnet tests, and the
+  whole Playwright suite. `scripts/test.sh --parallel` runs the Playwright leg as the five CI
+  shards side by side (each with its own sandbox): about 20 minutes instead of about 60 on a
+  12-core machine. CI runs the same scripts; it never defines a second gate.
 - **CI Playwright is single-worker.** `tests/Alis.Reactive.PlaywrightTests/GlobalUsings.cs:4-5`
   declares `[assembly: Parallelizable(ParallelScope.Fixtures)]` and
   `[assembly: LevelOfParallelism(1)]`; one Kestrel sandbox per test assembly run
@@ -42,8 +41,8 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 
 | Workflow | Trigger | Jobs | Gates | Publishes |
 |----------|---------|------|-------|-----------|
-| `gate.yml` (reusable, `workflow_call`) | called by the three below | `test`; `playwright (<shard>)` x5; `behavioral coverage (0b)` over all shards' TRX | the one gate definition | never |
-| `ci.yml` | every pull request; pushes to `main` / `release/*` (path-filtered); manual | `gate` -> `gate / test`, `gate / playwright (...)`, `gate / behavioral coverage (0b)` | PR merge (required: `gate / test`) | never |
+| `gate.yml` (reusable, `workflow_call`) | called by the three below | `test`; `playwright (<shard>)` x5 | the one gate definition | never |
+| `ci.yml` | every pull request; pushes to `main` / `release/*` (path-filtered); manual | `gate` -> `gate / test`, `gate / playwright (...)` | PR merge (required: `gate / test`) | never |
 | `nightly.yml` | 03:30 UTC Mon-Fri on `main`; manual | `gate`; `report-failure` | the watched browser signal: opens/updates issue `ci-nightly-failure` on red | never |
 | `nuget-publish.yml` | push of a `v*` tag; manual runs gate only | `verify-tag` -> `gate` -> `pack-and-publish` | the release: tag shape, both suites, six packages | nuget.org + GitHub Release |
 | `verify-net48.yml` | pushes and PRs to `main` / `release/*`; manual | net48 build+pack on Windows; IIS Express boot proof | PR merge (both required) | never |
@@ -62,20 +61,9 @@ uses the same action, so a toolchain bump is one edit. Every job still runs the 
 (`scripts/test.sh --no-e2e`, `scripts/build.sh`, `scripts/playwright.sh`), so local and CI stay
 one entry point.
 
-Check names on a pull request are `gate / test`, `gate / playwright (<shard>)` and
-`gate / behavioral coverage (0b)` (GitHub names a reusable workflow's jobs
-`<caller job> / <called job>`); confirm with `gh pr checks <n>` before wiring required checks.
-
-The 0b job runs only when all five shards are green. Each shard uploads its TRX files (the first
-attempt and any `-retryN` attempt) as `trx-<shard>`; the job downloads them all and runs
-`verify-behavioral-coverage.mjs --all --trx <every file>`. For each test the highest attempt's
-outcome stands. A lost shard cannot shrink the proof: the job only starts when every shard passed
-(`needs`), each shard's upload fails when it finds no TRX (`if-no-files-found: error`), and a test
-a coverage map names but no TRX contains is reported "not found" and turns 0b red. (The gate's own
-exit 2 for a listed-but-missing file or an empty list guards local callers.) Because
-`nuget-publish.yml` needs the whole gate, a release is blocked by 0b too.
-The gate's own behavior is proven by `verify-behavioral-coverage.selftest.mjs`, which
-`scripts/test.sh` runs in every `gate / test` job.
+Check names on a pull request are `gate / test` and `gate / playwright (<shard>)` (GitHub names a
+reusable workflow's jobs `<caller job> / <called job>`); confirm with `gh pr checks <n>` before
+wiring required checks.
 
 ## Playwright on GitHub-hosted runners: designed for choppiness
 
@@ -136,8 +124,10 @@ complement shard, then re-run the partition proof above.
 `FullyQualifiedName=<fqn>|...`). The gate passes `retry-failed: 1` on PRs, nightly and releases.
 Every attempt keeps its own log, TRX and diag file. Tests that fail and then pass are the **flaky
 list**: `[playwright:flaky]` lines, `TestResults/observable/flaky-<stamp>.txt`, a block in the
-GitHub job summary, and, under GitHub Actions, one `::warning` annotation per flaky test. The
-annotation shows on the pull request's checks, so a green job can't hide a re-run. The
+GitHub job summary, and, under GitHub Actions, one `::warning` annotation per flaky test carrying
+the start of the failure the re-run hid (`scripts/trx-failed-tests.mjs <trx> flaky <rerun.trx>`).
+The annotation shows on the pull request's checks, so a green job can't hide a re-run, and the
+flake can be root-caused from the check: a green job uploads no failure artifacts. The
 `if: failure()` artifact upload carries logs, TRX, diagnostics, and the
 traces and screenshots `PlaywrightTestBase` saved for the failed tests. This is the
 Playwright-recommended shape (retry in CI, keep the trace of the failure:
@@ -166,7 +156,18 @@ commit of `v3.0.0`, `reporter: dotnet-trx`, `use-actions-summary: true`, `fail-o
 because the test step already carries the verdict). The job needs `checks: write`
 ([job summaries](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#adding-a-job-summary),
 [dorny/test-reporter](https://github.com/dorny/test-reporter)). The wrapper appends the flaky list
-to the same summary.
+to the same summary. When the last attempt is still red, the wrapper also prints one
+`::error title=Failed test::` annotation per failing test with the start of its failure message
+(`scripts/trx-failed-tests.mjs <trx> annotations`), so the pull request's checks, and the
+check-run annotations API, name the failures without opening the log or the artifact. The
+annotation, like the flaky warning, also carries the page console the failed test wrote to its
+output (`PlaywrightTestBase` writes it on failure): its error lines, then its last thirty lines.
+Every shard also prints one `::notice` naming each fixture and how many of its tests passed on
+the first attempt (`scripts/trx-failed-tests.mjs <trx> summary`), so a green shard's check-run
+annotations say what it proved.
+The deterministic gate (`scripts/test.sh`) does the same for its own steps: a failing step prints
+`::error title=Gate step failed::<step>`, and a failing test in a non-Playwright test project
+prints the same per-test `::error` annotation from its TRX.
 
 ### Flaky tests: quarantine is temporary
 
@@ -174,7 +175,7 @@ A test that fails and passes on re-run is flaky. A test that fails twice in a ro
 until proven otherwise. The convention:
 
 1. Open an issue with the trace, name the root cause hypothesis, and fix the wait strategy or the
-   test. Widening a timeout is not a fix (CLAUDE.md Rule 9).
+   test. Widening a timeout is not a fix (CLAUDE.md, Rules: root cause, not patch).
 2. If it cannot be fixed within the PR, quarantine it: add `[Category("Quarantine")]`
    ([NUnit Category](https://docs.nunit.org/articles/nunit/writing-tests/attributes/category.html)),
    add the shard exclusion `&TestCategory!=Quarantine` to every `shard_filter()` case and a sixth,
@@ -203,13 +204,13 @@ until proven otherwise. The convention:
 - **Tag releases: the browser shards block publishing.** Recommendation and the workflow agree
   (`nuget-publish.yml`: `pack-and-publish` needs `gate`, which includes all five shards). Evidence:
   (1) ten consecutive green legs since the license fix (2026-06-10 to 2026-07-11) plus the
-  `v1.0.0-rc.2` publish leg, which meets the repo's own re-arm criterion (`high-quality-bar-tasks.md`
-  T10/T14: three consecutive green runs); (2) sharding plus one in-shard re-run changes the cost of
+  `v1.0.0-rc.2` publish leg, which meets the repo's re-arm criterion (three consecutive green
+  runs); (2) sharding plus one in-shard re-run changes the cost of
   a flake from an 80-minute re-run to a 20-minute re-run of the failed shard
   (`gh run rerun <run-id> --failed`); (3) publishing is idempotent (`--skip-duplicate`), so a re-run
   after a flake never double-ships; (4) the alternative, "the local gate is the proof", leaves no
-  recorded evidence next to the GitHub Release, which the Definition of Done
-  (`.claude/rules/definition-of-done.md`) does not accept. What would justify going back to
+  recorded evidence next to the GitHub Release, which `CLAUDE.md` ("Playwright is the proof") does
+  not accept. What would justify going back to
   non-blocking: a shard that fails on two consecutive releases with no test at fault and a
   documented runner-side cause. Until then, red means stop.
 
@@ -307,8 +308,7 @@ the check names.
 
 ## Open decisions (owner)
 
-- `npm run lint` as a blocking step in `gate / test` (`high-quality-bar-tasks.md` T7; the ledger
-  records lint clean on 2026-06-09).
+- `npm run lint` as a blocking step in `gate / test` (lint was clean on 2026-06-09).
 - `verify-net48.yml` packs and asserts the fixture version `1.0.0-rc.1` (`verify-net48.yml`,
   `examples/net48-mvc-smoke/Net48MvcSmoke.csproj:84`, `_Layout.cshtml:10,18`); rename to a fixture
   version such as `0.0.0-net48smoke` in a separate PR so CI logs stop reading like a release.

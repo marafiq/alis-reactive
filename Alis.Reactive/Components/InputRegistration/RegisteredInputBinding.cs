@@ -4,19 +4,19 @@ namespace Alis.Reactive
 {
     internal sealed class RegisteredInputBinding
     {
-        private RegisteredInputBinding(BindingPath bindingPath, MemberName valueMember)
+        private RegisteredInputBinding(BindingPath bindingPath, ComponentInput input)
         {
             BindingPath = bindingPath;
-            ValueMember = valueMember;
+            Input = input;
         }
 
         internal BindingPath BindingPath { get; }
-        internal MemberName ValueMember { get; }
+        internal ComponentInput Input { get; }
 
         internal bool Matches(RegisteredInputBinding other) =>
-            BindingPath.Equals(other.BindingPath) && ValueMember.Equals(other.ValueMember);
+            BindingPath.Equals(other.BindingPath) && Input.Matches(other.Input);
 
-        internal static RegisteredInputBinding For(BindingPath bindingPath, MemberName valueMember) =>
-            new RegisteredInputBinding(bindingPath, valueMember);
+        internal static RegisteredInputBinding For(BindingPath bindingPath, ComponentInput input) =>
+            new RegisteredInputBinding(bindingPath, input);
     }
 }

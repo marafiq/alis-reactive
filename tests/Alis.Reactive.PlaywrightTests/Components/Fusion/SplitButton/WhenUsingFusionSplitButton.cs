@@ -1,193 +1,195 @@
+using System.Text.RegularExpressions;
 using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.SplitButton;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.SplitButton;
 
+/// <summary>
+/// As a care coordinator, I want to write a care note, sign it, and save it to the resident's chart, telling her
+/// family or the nurse in the same step when it matters, so that a family hears about a fall the day it happens.
+/// </summary>
+/// <remarks>
+/// The note is for Margaret Hale in Maple 214; her daughter Susan Hale gets the family's texts. Save stays
+/// locked until the coordinator signs the note; signing unlocks it and puts the keyboard on it. A disabled
+/// button takes no focus, so the unlock is applied with DataBind before FocusIn; without DataBind the button
+/// is still disabled when FocusIn runs and never gets the keyboard. A new note about a fall (Save still reads
+/// Save note) is never saved quietly: Save opens its menu on the family's option instead.
+/// Not exercised: reading Disabled and CssClass back (no step here needs the button's own state or classes;
+/// the writes below prove the same JavaScript members); Toggle closing an open menu (every gesture that
+/// reaches the page while the menu is open closes it on its own, a click outside or on an item); RemoveItems
+/// by text (the same EJ2 removeItems as by ID, differing only in the field it compares; exercised by text on
+/// the DropDownButton page); Select's Item.Disabled (a disabled item cannot be clicked or reached by the arrow
+/// keys, so every Select the coordinator can raise carries false and nothing on the page could differ).
+/// </remarks>
 [TestFixture]
 public class WhenUsingFusionSplitButton : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/FusionSplitButton";
-    private const string MenuId = "resident-split-actions";
+    private const string OnTheChart = "Saved to Margaret Hale's chart.";
+    private const string WhatHappened = "Helped Margaret shower and dress before breakfast.";
 
-    private FusionSplitButtonLocator Menu => new(Page, MenuId);
+    private PagePlan<FusionSplitButtonModel> _plan = null!;
+
+    private FusionSplitButtonLocator Save => new(Page, "care-note-save");
+    private ILocator Note => Page.Locator($"#{_plan.FindComponent(m => m.Note)!.ElementId}");
+    private ILocator Status => Page.Locator("#care-note-status");
+    private ILocator LastAction => Page.Locator("#care-note-last-action-line");
 
     private async Task NavigateAndBoot()
     {
-        await NavigateToAndWaitForTextSignal(Path, "#content-echo");
+        await NavigateToAndWaitForBoot(Path);
+        _plan = await PagePlan<FusionSplitButtonModel>.FromPage(Page);
+        await Expect(Save.Primary).ToHaveTextAsync("Save note", new() { Timeout = 5000 });
+    }
+
+    private async Task Sign()
+    {
+        await _plan.NativeCheckBox(m => m.Signed).Check();
+        await Expect(Save.Primary).ToBeEnabledAsync(new() { Timeout = 5000 });
+    }
+
+    private async Task WriteAndSign(string whatHappened)
+    {
+        await Note.FillAsync(whatHappened);
+        await Sign();
     }
 
     [Test]
-    public async Task page_loads_without_errors()
+    public async Task save_is_locked_until_the_note_is_signed()
     {
         await NavigateAndBoot();
-        await Expect(Page).ToHaveTitleAsync("FusionSplitButton — Alis.Reactive Sandbox");
+
+        await Expect(Save.Primary).ToBeDisabledAsync();
+        await Expect(Save.Secondary).ToBeDisabledAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task plan_json_contains_typed_split_button_members()
+    public async Task signing_the_note_unlocks_save_with_the_keyboard_on_it()
     {
         await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
 
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""));
-        Assert.That(planJson, Does.Contain(MenuId));
-        Assert.That(planJson, Does.Contain("\"content\""));
-        Assert.That(planJson, Does.Contain("\"disabled\""));
-        Assert.That(planJson, Does.Contain("\"cssClass\""));
-        Assert.That(planJson, Does.Contain("\"dataBind\""));
-        Assert.That(planJson, Does.Contain("\"toggle\""));
-        Assert.That(planJson, Does.Contain("\"focusIn\""));
-        Assert.That(planJson, Does.Contain("\"removeItems\""));
-        Assert.That(planJson, Does.Contain("\"click\""));
-        Assert.That(planJson, Does.Contain("\"select\""));
+        await _plan.NativeCheckBox(m => m.Signed).Check();
+
+        await Expect(Save.Primary).ToBeEnabledAsync(new() { Timeout = 5000 });
+        await Expect(Save.Primary).ToBeFocusedAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task domready_sets_visible_content_and_reads_content_source()
+    public async Task taking_the_signature_back_locks_save_again()
     {
         await NavigateAndBoot();
+        await Sign();
 
-        await Expect(Menu.Primary).ToContainTextAsync("Ready Review", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#content-echo")).ToHaveTextAsync("Ready Review", new() { Timeout = 5000 });
+        await _plan.NativeCheckBox(m => m.Signed).Input.UncheckAsync();
+
+        await Expect(Save.Primary).ToBeDisabledAsync(new() { Timeout = 5000 });
+        await Expect(Save.Secondary).ToBeDisabledAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task primary_click_event_runs_notification_pipeline()
+    public async Task saving_a_signed_note_puts_it_on_the_chart()
     {
         await NavigateAndBoot();
+        await WriteAndSign(WhatHappened);
 
-        await Menu.Primary.ClickAsync();
+        await ClickWhenStable(Save.Primary);
 
-        await Expect(Page.Locator("#primary-click-state")).ToHaveTextAsync("primary clicked", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#command-state")).ToHaveTextAsync("primary clicked", new() { Timeout = 5000 });
+        await Expect(Status).ToHaveTextAsync(OnTheChart, new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task set_content_and_disabled_update_visible_state_sources_and_condition()
+    public async Task a_saved_note_is_saved_again_as_changes()
     {
         await NavigateAndBoot();
+        await WriteAndSign(WhatHappened);
 
-        await Page.Locator("#set-content-btn").ClickAsync();
-        await Expect(Menu.Primary).ToContainTextAsync("Discharge Review", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#content-echo")).ToHaveTextAsync("Discharge Review", new() { Timeout = 5000 });
+        await ClickWhenStable(Save.Primary);
 
-        await Page.Locator("#check-disabled-btn").ClickAsync();
-        await Expect(Page.Locator("#disabled-state")).ToHaveTextAsync("enabled", new() { Timeout = 5000 });
-
-        await Page.Locator("#disable-split-btn").ClickAsync();
-        await Expect(Menu.Primary).ToBeDisabledAsync(new() { Timeout = 5000 });
-        await Expect(Menu.Secondary).ToBeDisabledAsync(new() { Timeout = 5000 });
-        await Expect(Page.Locator("#disabled-echo")).ToHaveTextAsync("true", new() { Timeout = 5000 });
-
-        await Page.Locator("#check-disabled-btn").ClickAsync();
-        await Expect(Page.Locator("#disabled-state")).ToHaveTextAsync("disabled", new() { Timeout = 5000 });
-
-        await Page.Locator("#enable-split-btn").ClickAsync();
-        await Expect(Menu.Primary).ToBeEnabledAsync(new() { Timeout = 5000 });
-        await Expect(Menu.Secondary).ToBeEnabledAsync(new() { Timeout = 5000 });
-        await Expect(Page.Locator("#disabled-echo")).ToHaveTextAsync("false", new() { Timeout = 5000 });
+        await Expect(Save.Primary).ToHaveTextAsync("Save changes", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task set_css_class_updates_buttons_wrapper_popup_and_css_source()
+    public async Task an_empty_note_is_not_saved()
     {
         await NavigateAndBoot();
+        await Sign();
 
-        await Page.Locator("#set-css-btn").ClickAsync();
+        await ClickWhenStable(Save.Primary);
 
-        Assert.That(await Menu.PrimaryHasClass("e-success"), Is.True);
-        Assert.That(await Menu.PrimaryHasClass("extra-class"), Is.True);
-        Assert.That(await Menu.SecondaryHasClass("e-success"), Is.True);
-        Assert.That(await Menu.SecondaryHasClass("extra-class"), Is.True);
-        Assert.That(await Menu.WrapperHasClass("e-success"), Is.True);
-        Assert.That(await Menu.WrapperHasClass("extra-class"), Is.True);
-        await Expect(Page.Locator("#css-echo")).ToHaveTextAsync("e-success extra-class", new() { Timeout = 5000 });
+        await Expect(Status).ToHaveTextAsync("Write what happened before saving.", new() { Timeout = 5000 });
+        await Expect(Save.Primary).ToHaveTextAsync("Save note");
+        AssertNoConsoleErrors();
+    }
 
-        await Page.Locator("#toggle-split-btn").ClickAsync();
-        Assert.That(await Menu.IsPopupOpen(), Is.True);
-        Assert.That(await Menu.PopupHasClass("e-success"), Is.True);
-        Assert.That(await Menu.PopupHasClass("extra-class"), Is.True);
+    // Save itself never opens the menu; only the page does.
+    [Test]
+    public async Task saving_a_fall_opens_the_save_menu_on_the_familys_option()
+    {
+        await NavigateAndBoot();
+        await _plan.NativeDropDown(m => m.Kind).Select("Fall");
+        await WriteAndSign("Margaret slipped getting out of bed at 2 PM. No injury.");
+
+        await ClickWhenStable(Save.Primary);
+
+        await Expect(Status).ToHaveTextAsync("A fall is shared with the family. Choose Save and notify family.", new() { Timeout = 5000 });
+        await Expect(Save.Item("Save and notify family")).ToBeVisibleAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task toggle_method_opens_and_closes_secondary_popup()
+    public async Task a_note_about_a_fall_marks_the_save_button()
     {
         await NavigateAndBoot();
 
-        await Page.Locator("#toggle-split-btn").ClickAsync();
-        await Expect(Page.Locator("#toggle-state")).ToHaveTextAsync("toggle called", new() { Timeout = 5000 });
-        Assert.That(await Menu.IsPopupOpen(), Is.True);
+        await _plan.NativeDropDown(m => m.Kind).Select("Fall");
 
-        await Page.Locator("#toggle-split-btn").DispatchEventAsync("click");
-        Assert.That(await Menu.IsPopupOpen(), Is.False);
+        await Expect(Save.Primary).ToHaveClassAsync(new Regex(@"\be-warning\b"), new() { Timeout = 5000 });
+        await Expect(Save.Primary).Not.ToHaveClassAsync(new Regex(@"\be-primary\b"));
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task focusin_method_focuses_primary_button()
+    public async Task save_and_notify_family_says_the_family_was_texted()
     {
         await NavigateAndBoot();
+        await WriteAndSign(WhatHappened);
 
-        await Page.Locator("#focus-split-btn").ClickAsync();
+        await Save.Choose("Save and notify family");
 
-        await Expect(Page.Locator("#focus-state")).ToHaveTextAsync("focus called", new() { Timeout = 5000 });
-        await Expect(Menu.Primary).ToBeFocusedAsync(new() { Timeout = 5000 });
+        await Expect(Status).ToHaveTextAsync(OnTheChart + " Susan Hale, her daughter, was sent a text.", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task remove_items_methods_remove_popup_items_by_text_and_id()
+    public async Task the_last_action_names_the_save_chosen_from_the_menu()
     {
         await NavigateAndBoot();
+        await WriteAndSign(WhatHappened);
 
-        await Page.Locator("#remove-schedule-btn").ClickAsync();
-        await Expect(Page.Locator("#remove-state")).ToHaveTextAsync("schedule removed", new() { Timeout = 5000 });
-        await Menu.Secondary.ClickAsync();
-        await Expect(Menu.Item("Schedule visit")).ToHaveCountAsync(0, new() { Timeout = 5000 });
-        await Expect(Menu.Item("Place hold")).ToHaveCountAsync(1, new() { Timeout = 5000 });
+        await Save.Choose("Save and flag for the nurse");
 
-        await Page.Locator("#remove-hold-btn").ClickAsync();
-        await Expect(Page.Locator("#remove-state")).ToHaveTextAsync("hold removed", new() { Timeout = 5000 });
-        await Menu.Secondary.ClickAsync();
-        await Expect(Menu.Item("Place hold")).ToHaveCountAsync(0, new() { Timeout = 5000 });
-        await Expect(Menu.Item("Assign nurse")).ToHaveCountAsync(1, new() { Timeout = 5000 });
+        await Expect(Status).ToHaveTextAsync(OnTheChart + " Nurse Okafor will review it.", new() { Timeout = 5000 });
+        await Expect(LastAction).ToHaveTextAsync("Last action: Save and flag for the nurse");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task select_event_reads_typed_item_payload_and_condition()
+    public async Task once_the_family_is_notified_the_menu_no_longer_offers_it()
     {
         await NavigateAndBoot();
+        await WriteAndSign(WhatHappened);
+        await Save.Choose("Save and notify family");
+        await Expect(Status).ToHaveTextAsync(OnTheChart + " Susan Hale, her daughter, was sent a text.", new() { Timeout = 5000 });
 
-        await Menu.Secondary.ClickAsync();
-        await Menu.Item("Assign nurse").ClickAsync();
+        await ClickWhenStable(Save.Secondary);
 
-        await Expect(Page.Locator("#selected-id")).ToHaveTextAsync("assign", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#selected-text")).ToHaveTextAsync("Assign nurse", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#selected-disabled")).ToHaveTextAsync("false", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#selected-condition")).ToHaveTextAsync("assign selected", new() { Timeout = 5000 });
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task gather_consumes_split_button_sources()
-    {
-        await NavigateAndBoot();
-
-        await Page.Locator("#set-content-btn").ClickAsync();
-        await Page.Locator("#set-css-btn").ClickAsync();
-        await Page.Locator("#disable-split-btn").ClickAsync();
-        await Page.Locator("#gather-btn").ClickAsync();
-
-        await Expect(Page.Locator("#gather-content")).ToHaveTextAsync("Discharge Review", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#gather-disabled")).ToHaveTextAsync("true", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#gather-css")).ToHaveTextAsync("e-success extra-class", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#gather-summary")).ToHaveTextAsync("Discharge Review:True:e-success extra-class", new() { Timeout = 5000 });
+        await Expect(Save.Item("Save and flag for the nurse")).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Save.Item("Save and notify family")).ToHaveCountAsync(0);
         AssertNoConsoleErrors();
     }
 }

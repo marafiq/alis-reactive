@@ -1,218 +1,217 @@
+using System.Globalization;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using Alis.Reactive.Fusion.Components;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     /// <summary>
-    /// Month-end resident billing board: server-side filter/sort/page, bulk batch save,
-    /// bulk rate increase, mark-billed, and templated-dialog add. State is per browser
-    /// session (seeded on first access), so edits persist across saves and page refreshes
-    /// while each browser/test context stays isolated.
+    /// Month-end billing: the business office pages, sorts and filters the month's charges on the server,
+    /// corrects rates in the grid, raises the rates of the residents it picks, marks them billed, opens a
+    /// new resident's charges and emails the families their statements. The charges live in the browser
+    /// session (seeded on first visit), so each browser keeps its own month while its changes persist.
     /// </summary>
     public partial class GridController
     {
         private const string BillingSessionKey = "billingCensus";
 
-        private static readonly List<string> BillingCareLevels = new()
-        {
-            "", "Independent", "Assisted Living", "Memory Care", "Skilled Nursing"
-        };
-
-        private static readonly List<string> BillingWings = new() { "", "North", "East", "West", "South" };
-        private static readonly List<string> BillingStatuses = new() { "", "Pending", "Billed", "Paid" };
-
-        private List<ResidentBillingItem> GetBillingCensus()
-        {
-            var json = HttpContext.Session.GetString(BillingSessionKey);
-            if (string.IsNullOrEmpty(json))
-            {
-                var seed = GenerateBilling();
-                HttpContext.Session.SetString(BillingSessionKey, JsonSerializer.Serialize(seed));
-                return seed;
-            }
-            return JsonSerializer.Deserialize<List<ResidentBillingItem>>(json)!;
-        }
-
-        private void SaveBillingCensus(List<ResidentBillingItem> census) =>
-            HttpContext.Session.SetString(BillingSessionKey, JsonSerializer.Serialize(census));
-
         [HttpGet("Billing")]
         public IActionResult Billing()
         {
-            GetBillingCensus(); // seed the session on first visit
-            ViewBag.CareLevels = BillingCareLevels;
-            ViewBag.Wings = BillingWings;
-            ViewBag.Statuses = BillingStatuses;
-
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/Billing.cshtml",
-                new ResidentBillingViewModel());
+            GetBillingCensus();
+            return View("~/Areas/Sandbox/Views/Components/Fusion/Grid/Billing.cshtml", new ResidentBillingViewModel());
         }
 
         [HttpPost("BillingData")]
-        public IActionResult BillingData([FromBody] BillingDataRequest? request)
+        public IActionResult BillingData([FromBody] BillingDataRequest request)
         {
-            request ??= new BillingDataRequest();
-            var rows = FilterBilling(GetBillingCensus(), request).ToList();
-            rows = SortBilling(rows, request.Sorted).ToList();
-
-            var total = rows.Count;
-            var skip = Math.Max(request.Skip, 0);
-            var take = request.Take > 0 ? request.Take : 12;
-
+            var rows = SortBilling(FilterBilling(GetBillingCensus(), request.FilterCareLevel, request.FilterWing, request.FilterStatus), request.Sorted).ToList();
             return Ok(new ResidentBillingResponse
             {
-                Result = rows.Skip(skip).Take(take).ToList(),
-                Count = total,
-                Summary = BuildFilterSummary(rows, total, request)
+                Result = rows.Skip(request.Skip).Take(request.Take).ToList(),
+                Count = rows.Count,
+                Summary = BillingBoardSummary(rows, request.FilterCareLevel, request.FilterWing, request.FilterStatus)
             });
         }
 
         [HttpPost("BillingSave")]
-        public IActionResult BillingSave([FromBody] BillingSaveRequest? request)
+        public IActionResult BillingSave([FromBody] BillingSaveRequest request)
         {
-            var changed = request?.BatchChanges?.ChangedRecords ?? new List<ResidentBillingItem>();
-            var overrides = changed
+            var edits = (request.BatchChanges?.ChangedRecords ?? new List<ResidentBillingItem>())
                 .GroupBy(r => r.ResidentId)
                 .ToDictionary(g => g.Key, g => g.Last());
 
             var census = GetBillingCensus();
-            decimal adjusted = 0m;
-            foreach (var row in census)
+            var saved = census.Where(r => edits.ContainsKey(r.ResidentId)).ToList();
+            foreach (var row in saved)
             {
-                if (!overrides.TryGetValue(row.ResidentId, out var edit)) continue;
-                adjusted += (edit.MonthlyRate + edit.AddOnCharges) - (row.MonthlyRate + row.AddOnCharges);
-                row.MonthlyRate = edit.MonthlyRate;
-                row.AddOnCharges = edit.AddOnCharges;
-                row.BalanceDue = Recompute(row);
+                row.MonthlyRate = edits[row.ResidentId].MonthlyRate;
+                row.AddOnCharges = edits[row.ResidentId].AddOnCharges;
                 row.BillingStatus = "Pending";
+                row.BalanceDue = BillingBalance(row);
             }
             SaveBillingCensus(census);
 
-            return Ok(new ResidentBillingResponse
+            return Ok(new BillingAnswer
             {
-                Result = SortBilling(census, null).Take(12).ToList(),
-                Count = census.Count,
-                Summary = overrides.Count == 0
-                    ? "no pending charge edits to save"
-                    : $"saved {overrides.Count} resident charge(s); net adjustment {adjusted:C0}"
+                Summary = saved.Count switch
+                {
+                    0 => "There are no rate changes to save.",
+                    1 => $"Saved {saved[0].ResidentName}'s charges: {BillingDollars(saved[0].MonthlyRate)} a month and {BillingDollars(saved[0].AddOnCharges)} in add-ons, {BillingDollars(saved[0].BalanceDue)} due.",
+                    _ => $"Saved new charges for {saved.Count} residents."
+                }
             });
         }
 
         [HttpPost("BillingBulkIncrease")]
-        public IActionResult BillingBulkIncrease([FromBody] BillingBulkRequest? request)
+        public IActionResult BillingBulkIncrease([FromBody] BillingBulkRequest request)
         {
-            var percent = request?.Percent ?? 5m;
-            var ids = (request?.SelectedRecords ?? new()).Select(r => r.ResidentId).ToHashSet();
-
+            var picked = BillingPicked(request);
             var census = GetBillingCensus();
-            foreach (var row in census.Where(r => ids.Contains(r.ResidentId)))
+            var raised = census.Where(r => picked.Contains(r.ResidentId)).ToList();
+            foreach (var row in raised)
             {
-                row.MonthlyRate = Math.Round(row.MonthlyRate * (1 + percent / 100m), 2);
-                row.BalanceDue = Recompute(row);
+                row.MonthlyRate = Math.Round(row.MonthlyRate * (1 + request.Percent / 100m), 0);
                 row.BillingStatus = "Pending";
+                row.BalanceDue = BillingBalance(row);
             }
             SaveBillingCensus(census);
 
-            return Ok(new ResidentBillingResponse
+            var percent = request.Percent.ToString("0.#", CultureInfo.InvariantCulture);
+            return Ok(new BillingAnswer
             {
-                Result = SortBilling(census, null).Take(12).ToList(),
-                Count = census.Count,
-                Summary = ids.Count == 0
-                    ? "select residents first, then apply the increase"
-                    : $"applied {percent:0.#}% increase to {ids.Count} resident(s)"
+                Summary = raised.Count switch
+                {
+                    0 => "Select the residents whose rate goes up, then apply the increase.",
+                    1 => $"Raised {raised[0].ResidentName}'s monthly rate {percent}% to {BillingDollars(raised[0].MonthlyRate)}.",
+                    _ => $"Raised {raised.Count} residents' monthly rates {percent}%."
+                }
             });
         }
 
+        // Only a charge still pending goes out on this month's bill; a billed or paid one is already out.
         [HttpPost("BillingMarkBilled")]
-        public IActionResult BillingMarkBilled([FromBody] BillingBulkRequest? request)
+        public IActionResult BillingMarkBilled([FromBody] BillingBulkRequest request)
         {
-            var ids = (request?.SelectedRecords ?? new()).Select(r => r.ResidentId).ToHashSet();
-
+            var picked = BillingPicked(request);
             var census = GetBillingCensus();
-            foreach (var row in census.Where(r => ids.Contains(r.ResidentId)))
+            var billed = census.Where(r => picked.Contains(r.ResidentId) && r.BillingStatus == "Pending").ToList();
+            foreach (var row in billed)
                 row.BillingStatus = "Billed";
             SaveBillingCensus(census);
 
-            return Ok(new ResidentBillingResponse
+            return Ok(new BillingAnswer
             {
-                Result = SortBilling(census, null).Take(12).ToList(),
-                Count = census.Count,
-                Summary = ids.Count == 0
-                    ? "select residents first, then mark billed"
-                    : $"marked {ids.Count} resident(s) as billed"
+                Summary = (picked.Count, billed.Count) switch
+                {
+                    (0, _) => "Select the residents to mark billed first.",
+                    (_, 0) => "None of the selected residents is waiting to be billed.",
+                    (_, 1) => $"Marked {billed[0].ResidentName} billed.",
+                    _ => $"Marked {billed.Count} residents billed."
+                }
             });
         }
 
+        // A resident has one set of charges a month; a second is refused as the dialog's own field error.
         [HttpPost("BillingAddCharge")]
-        public IActionResult BillingAddCharge([FromBody] ResidentBillingViewModel? request)
+        public IActionResult BillingAddCharge([FromBody] ResidentBillingViewModel request)
         {
-            if (request == null)
-                return ValidationError(new Dictionary<string, string[]> { ["NewResidentName"] = ["Request body is required."] });
-
             if (!TryValidate(new ResidentBillingAddValidator(), request, out var error))
                 return error;
 
             var census = GetBillingCensus();
+            var name = request.NewResidentName!.Trim();
+            if (census.Any(r => r.ResidentName.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                return ValidationError(new Dictionary<string, string[]>
+                {
+                    [nameof(ResidentBillingViewModel.NewResidentName)] = [$"{name} already has charges this month."]
+                });
+
+            // New residents move in to the North wing's move-in suites.
             var row = new ResidentBillingItem
             {
-                ResidentId = census.Count == 0 ? 9000 : census.Max(r => r.ResidentId) + 1,
-                ResidentName = request.NewResidentName!,
+                ResidentId = census.Max(r => r.ResidentId) + 1,
+                ResidentName = name,
                 CareLevel = request.NewCareLevel!,
                 Wing = "North",
                 MonthlyRate = request.NewMonthlyRate!.Value,
                 AddOnCharges = request.NewAddOnCharges!.Value,
                 BillingStatus = "Pending"
             };
-            row.BalanceDue = Recompute(row);
-            census.Insert(0, row);
+            row.BalanceDue = BillingBalance(row);
+            census.Add(row);
             SaveBillingCensus(census);
 
-            return Ok(new ResidentBillingResponse
+            return Ok(new BillingAnswer
             {
-                Result = SortBilling(census, null).Take(12).ToList(),
-                Count = census.Count,
-                Summary = $"added {row.ResidentName} at {row.MonthlyRate:C0}/mo ({row.BalanceDue:C0} due)"
+                Summary = $"Opened {row.ResidentName}'s charges: {BillingDollars(row.MonthlyRate)} a month and {BillingDollars(row.AddOnCharges)} in add-ons, {BillingDollars(row.BalanceDue)} due."
             });
         }
 
-        private static IEnumerable<ResidentBillingItem> FilterBilling(
-            IEnumerable<ResidentBillingItem> source, BillingDataRequest request)
+        // Every family on the board who owes this month gets a statement; a paid-up family gets none.
+        [HttpPost("BillingEmailStatements")]
+        public IActionResult BillingEmailStatements([FromBody] BillingStatementsRequest request)
         {
-            var query = source;
-            if (!string.IsNullOrWhiteSpace(request.FilterCareLevel))
-                query = query.Where(r => r.CareLevel.Equals(request.FilterCareLevel, StringComparison.OrdinalIgnoreCase));
-            if (!string.IsNullOrWhiteSpace(request.FilterWing))
-                query = query.Where(r => r.Wing.Equals(request.FilterWing, StringComparison.OrdinalIgnoreCase));
-            if (!string.IsNullOrWhiteSpace(request.FilterStatus))
-                query = query.Where(r => r.BillingStatus.Equals(request.FilterStatus, StringComparison.OrdinalIgnoreCase));
-            return query;
-        }
-
-        private static IEnumerable<ResidentBillingItem> SortBilling(
-            IEnumerable<ResidentBillingItem> source, List<GridSortRequest>? sorted)
-        {
-            if (sorted == null || sorted.Count == 0)
-                return source.OrderBy(r => r.ResidentName);
-
-            IOrderedEnumerable<ResidentBillingItem>? ordered = null;
-            foreach (var sort in sorted.Where(s => !string.IsNullOrWhiteSpace(s.Name)))
+            var owing = FilterBilling(GetBillingCensus(), request.FilterCareLevel, request.FilterWing, request.FilterStatus)
+                .Count(r => r.BalanceDue > 0);
+            return Ok(new BillingAnswer
             {
-                var desc = sort.Direction.Equals("descending", StringComparison.OrdinalIgnoreCase);
-                ordered = ordered == null
-                    ? desc ? source.OrderByDescending(r => ReadBillingSort(r, sort.Name))
-                           : source.OrderBy(r => ReadBillingSort(r, sort.Name))
-                    : desc ? ordered.ThenByDescending(r => ReadBillingSort(r, sort.Name))
-                           : ordered.ThenBy(r => ReadBillingSort(r, sort.Name));
-            }
-            return ordered ?? source.OrderBy(r => r.ResidentName);
+                Summary = owing switch
+                {
+                    0 => "Every family on the board is paid up; there are no statements to send.",
+                    1 => "Emailed a statement to the 1 family with a balance due.",
+                    _ => $"Emailed statements to the {owing} families with a balance due."
+                }
+            });
         }
 
-        private static object ReadBillingSort(ResidentBillingItem r, string field) => field switch
+        private List<ResidentBillingItem> GetBillingCensus()
+        {
+            var json = HttpContext.Session.GetString(BillingSessionKey);
+            if (!string.IsNullOrEmpty(json))
+                return JsonSerializer.Deserialize<List<ResidentBillingItem>>(json)!;
+
+            var seed = BillingChargesOnFile();
+            SaveBillingCensus(seed);
+            return seed;
+        }
+
+        private void SaveBillingCensus(List<ResidentBillingItem> census) =>
+            HttpContext.Session.SetString(BillingSessionKey, JsonSerializer.Serialize(census));
+
+        private static HashSet<int> BillingPicked(BillingBulkRequest request) =>
+            (request.SelectedRecords ?? new List<ResidentBillingItem>()).Select(r => r.ResidentId).ToHashSet();
+
+        private static IEnumerable<ResidentBillingItem> FilterBilling(
+            IEnumerable<ResidentBillingItem> source, string? careLevel, string? wing, string? status) =>
+            source
+                .Where(r => string.IsNullOrWhiteSpace(careLevel) || r.CareLevel.Equals(careLevel, StringComparison.OrdinalIgnoreCase))
+                .Where(r => string.IsNullOrWhiteSpace(wing) || r.Wing.Equals(wing, StringComparison.OrdinalIgnoreCase))
+                .Where(r => string.IsNullOrWhiteSpace(status) || r.BillingStatus.Equals(status, StringComparison.OrdinalIgnoreCase));
+
+        // The grid's sort, column by column; a board with no sort lists residents by name.
+        private static IEnumerable<ResidentBillingItem> SortBilling(
+            IEnumerable<ResidentBillingItem> source, List<FusionGridSortColumn>? sorted)
+        {
+            IOrderedEnumerable<ResidentBillingItem>? ordered = null;
+            foreach (var sort in sorted ?? new List<FusionGridSortColumn>())
+            {
+                var descending = sort.Direction.Equals("descending", StringComparison.OrdinalIgnoreCase);
+                ordered = (ordered, descending) switch
+                {
+                    (null, false) => source.OrderBy(r => ReadBillingSort(r, sort.Name)),
+                    (null, true) => source.OrderByDescending(r => ReadBillingSort(r, sort.Name)),
+                    (_, false) => ordered.ThenBy(r => ReadBillingSort(r, sort.Name)),
+                    _ => ordered.ThenByDescending(r => ReadBillingSort(r, sort.Name))
+                };
+            }
+            return ordered ?? source.OrderBy(r => r.ResidentName, StringComparer.Ordinal);
+        }
+
+        private static IComparable ReadBillingSort(ResidentBillingItem r, string field) => field switch
         {
             "residentId" => r.ResidentId,
-            "residentName" => r.ResidentName,
             "careLevel" => r.CareLevel,
             "wing" => r.Wing,
             "monthlyRate" => r.MonthlyRate,
@@ -222,31 +221,34 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             _ => r.ResidentName
         };
 
-        private static string BuildFilterSummary(
-            List<ResidentBillingItem> filteredRows, int total, BillingDataRequest request)
+        // "36 residents: $151,975 outstanding.", or with the board's filters in brackets.
+        private static string BillingBoardSummary(List<ResidentBillingItem> rows, string? careLevel, string? wing, string? status)
         {
-            var parts = new List<string>();
-            if (!string.IsNullOrWhiteSpace(request.FilterCareLevel)) parts.Add(request.FilterCareLevel!);
-            if (!string.IsNullOrWhiteSpace(request.FilterWing)) parts.Add($"{request.FilterWing} wing");
-            if (!string.IsNullOrWhiteSpace(request.FilterStatus)) parts.Add(request.FilterStatus!);
-            var outstanding = filteredRows.Sum(r => r.BillingStatus == "Paid" ? 0 : r.BalanceDue);
-            var scope = parts.Count == 0 ? "all residents" : string.Join(", ", parts);
-            return $"{total} resident(s) — {scope}; {outstanding:C0} outstanding";
+            var filters = new[] { careLevel, string.IsNullOrWhiteSpace(wing) ? null : $"{wing} wing", status }
+                .Where(f => !string.IsNullOrWhiteSpace(f))
+                .ToList();
+            var residents = rows.Count == 1 ? "1 resident" : $"{rows.Count} residents";
+            var scope = filters.Count == 0 ? "" : $" ({string.Join(", ", filters)})";
+            return $"{residents}{scope}: {BillingDollars(rows.Sum(r => r.BalanceDue))} outstanding.";
         }
 
-        private static decimal Recompute(ResidentBillingItem r) =>
+        private static decimal BillingBalance(ResidentBillingItem r) =>
             r.BillingStatus == "Paid" ? 0m : r.MonthlyRate + r.AddOnCharges;
 
-        private static List<ResidentBillingItem> GenerateBilling()
+        private static string BillingDollars(decimal amount) => "$" + amount.ToString("N0", CultureInfo.InvariantCulture);
+
+        // The month's charges, by name: care levels in turn, a third each pending, billed and paid.
+        private static List<ResidentBillingItem> BillingChargesOnFile()
         {
             var names = new[]
             {
-                "Amina Patel", "Grace Bennett", "Henry Liu", "Irene Morgan",
-                "Jonah Reed", "Katherine Ortiz", "Leo Simmons", "Mara Thompson",
-                "Noah Walsh", "Priya Shah", "Ruth Carter", "Samuel Diaz",
-                "Tara Novak", "Victor Chen", "Wendy Price", "Yara Ahmed"
+                "Abigail Moore", "Amina Patel", "Arthur Bell", "Beatrice Lane", "Bernard Cole", "Clara Hoffman",
+                "Daniel Reyes", "Dorothy Fleming", "Edith Morris", "Eleanor Price", "Frank Delgado", "Grace Bennett",
+                "Harold Chen", "Helen Park", "Henry Liu", "Irene Morgan", "Jonah Reed", "Katherine Ortiz",
+                "Leo Simmons", "Lucia Romero", "Mara Thompson", "Margaret Hale", "Noah Walsh", "Oscar Flynn",
+                "Priya Shah", "Rosa Diaz", "Ruth Carter", "Samuel Diaz", "Tara Novak", "Theodore Banks",
+                "Vera Lindqvist", "Victor Chen", "Walter Grant", "Wendy Price", "Yara Ahmed", "Yusuf Haddad"
             };
-            var careLevels = new[] { "Independent", "Assisted Living", "Memory Care", "Skilled Nursing" };
             var baseRates = new Dictionary<string, decimal>
             {
                 ["Independent"] = 3200m,
@@ -254,30 +256,23 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 ["Memory Care"] = 6500m,
                 ["Skilled Nursing"] = 8200m
             };
-            var wings = new[] { "North", "East", "West", "South" };
-            var statuses = new[] { "Pending", "Billed", "Paid" };
 
-            var rows = new List<ResidentBillingItem>();
-            for (var i = 0; i < 36; i++)
+            return names.Select((name, i) =>
             {
-                var careLevel = careLevels[i % careLevels.Length];
-                var status = statuses[i % statuses.Length];
-                var rate = baseRates[careLevel] + (i % 5) * 75m;
-                var addOns = 120m + (i % 7) * 60m;
-                var item = new ResidentBillingItem
+                var careLevel = MonthEndBillingOptions.CareLevels[i % 4];
+                var row = new ResidentBillingItem
                 {
                     ResidentId = 6000 + i,
-                    ResidentName = names[i % names.Length],
+                    ResidentName = name,
                     CareLevel = careLevel,
-                    Wing = wings[(i / 2) % wings.Length],
-                    MonthlyRate = rate,
-                    AddOnCharges = addOns,
-                    BillingStatus = status
+                    Wing = MonthEndBillingOptions.Wings[i / 2 % 4],
+                    MonthlyRate = baseRates[careLevel] + i % 5 * 75m,
+                    AddOnCharges = 120m + i % 7 * 60m,
+                    BillingStatus = MonthEndBillingOptions.Statuses[i % 3]
                 };
-                item.BalanceDue = Recompute(item);
-                rows.Add(item);
-            }
-            return rows;
+                row.BalanceDue = BillingBalance(row);
+                return row;
+            }).ToList();
         }
     }
 }

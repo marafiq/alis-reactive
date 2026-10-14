@@ -1,0 +1,48 @@
+@model HoldReleaseModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
+@{
+    ViewData["Title"] = "Room Holds";
+
+    const string ButtonPrimary = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+
+    var plan = Html.ReactivePlan<HoldReleaseModel>();
+}
+
+<native-vstack gap="Base">
+    <native-heading level="H1">Room Holds</native-heading>
+    <native-text color="Secondary">
+        A hold keeps a room for a resident who is moving in. Releasing one opens the room to the waiting list,
+        so the community asks first, in its own confirmation.
+    </native-text>
+
+    <section class="rounded-lg border border-border bg-white p-4 shadow-sm">
+        <native-vstack gap="Sm">
+            <p id="hold-status" class="text-sm font-medium text-text-primary">Room @Model.Room is held for Ruth Alvarez until Friday.</p>
+            <div>
+                @(Html.NativeButton("release-hold", "Release the hold")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Confirm($"Release Ruth Alvarez's hold on room {Model.Room}?")
+                         .Then(then => then.Element("hold-status").Text.Set($"Room {Model.Room} is open for the waiting list."));
+                    }))
+            </div>
+        </native-vstack>
+    </section>
+</native-vstack>
+
+@section Confirm {
+    <dialog id="house-confirm" class="rounded-lg border border-border bg-white p-6 shadow-lg">
+        <form method="dialog" class="space-y-4">
+            <p id="house-confirm-message" class="text-sm text-text-primary"></p>
+            <div class="flex justify-end gap-2">
+                <button value="no" class="@ButtonSecondary">Cancel</button>
+                <button value="yes" class="@ButtonPrimary">Confirm</button>
+            </div>
+        </form>
+    </dialog>
+}
+
+@Html.RenderPlan(plan)

@@ -288,7 +288,7 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await Expect(serverResult).ToContainTextAsync("Server returned validation errors", new() { Timeout = 5000 });
         await Expect(serverResult).ToHaveClassAsync(new Regex("text-red-600"));
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -451,7 +451,7 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await Expect(ErrorFor("Db_Name")).ToContainTextAsync("reserved", new() { Timeout = 2000 });
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -470,7 +470,7 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await Expect(ErrorFor("Db_Email")).ToContainTextAsync("already registered", new() { Timeout = 2000 });
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]

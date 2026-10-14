@@ -1,5 +1,4 @@
 @model Step2ClinicalModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -18,82 +17,73 @@
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.CognitiveScore, o => o.Label("Cognitive Score (MMSE)"))
             .FusionNumericTextBox(b => b
-                .Min(0).Max(30).Step(1)
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var comp = p.Component<FusionNumericTextBox>(m => m.CognitiveScore);
-                    p.Element("score-echo").SetText(comp.Value());
-
-                    p.When(comp.Value()).Lt(15m)
-                        .Then(t =>
-                        {
-                            t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Memory Care");
-                            t.Element("cognitive-status").SetText("Severe Impairment — Memory Care");
-                        })
-                        .ElseIf(comp.Value()).Lt(25m)
-                        .Then(t =>
-                        {
-                            t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Assisted Living with Memory Support");
-                            t.Element("cognitive-status").SetText("Moderate Impairment — Assisted Living + Memory");
-                        })
-                        .Else(e =>
-                        {
-                            e.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Standard Assisted Living");
-                            e.Element("cognitive-status").SetText("Mild/Normal — Standard");
-                        });
-
-                    p.Element("cognitive-scored").SetText("scored");
-                })); }
+                .Min(0).Max(30).Step(1))
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var comp = p.Component<FusionNumericTextBox>(m => m.CognitiveScore);
+                p.When(comp.Value).Lt(15m)
+                    .Then(t =>
+                    {
+                        t.Component<NativeHiddenField>(m => m.CareUnit).Value.Set("Memory Care");
+                        t.Element("cognitive-status").Text.Set("Severe Impairment — Memory Care");
+                    })
+                    .ElseIf(comp.Value).Lt(25m)
+                    .Then(t =>
+                    {
+                        t.Component<NativeHiddenField>(m => m.CareUnit).Value.Set("Assisted Living with Memory Support");
+                        t.Element("cognitive-status").Text.Set("Moderate Impairment — Assisted Living + Memory");
+                    })
+                    .Else(e =>
+                    {
+                        e.Component<NativeHiddenField>(m => m.CareUnit).Value.Set("Standard Assisted Living");
+                        e.Element("cognitive-status").Text.Set("Mild/Normal — Standard");
+                    });
+            }); }
 
         @{ Html.InputField(plan, m => m.Wanders, o => o.Label("Wanders"))
-            .FusionSwitch(b => b
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    var sw = p.Component<FusionSwitch>(m => m.Wanders);
-                    p.When(sw.Value()).Truthy()
-                        .Then(t => t.Element("wander-details").Show())
-                        .Else(e => e.Element("wander-details").Hide());
-                })); }
+            .FusionSwitch()
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var sw = p.Component<FusionSwitch>(m => m.Wanders);
+                p.When(sw.Checked).Truthy()
+                    .Then(t => t.Element("wander-details").Show())
+                    .Else(e => e.Element("wander-details").Hide());
+            }); }
     </native-grid>
 
-    <native-vstack gap="Xs" class="font-mono text-sm mb-4">
-        <p>Score: <span id="score-echo" class="text-text-muted">&mdash;</span></p>
-        <p>Status: <span id="cognitive-status" class="text-text-muted">&mdash;</span></p>
-        <p>Scored: <span id="cognitive-scored" class="text-text-muted">&mdash;</span></p>
-    </native-vstack>
+    <p class="text-sm mb-4">Assessment: <span id="cognitive-status" class="font-medium">enter the score</span></p>
 
     <div id="wander-details" hidden>
         <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.WanderFrequency, o => o.Label("Wander Frequency"))
                 .FusionDropDownList(b => b
                     .DataSource(new[] { "Rarely", "Occasionally", "Frequently" })
-                    .Placeholder("Select frequency")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        var freq = p.Component<FusionDropDownList>(m => m.WanderFrequency);
-                        p.When(freq.Value()).Eq("Frequently")
-                            .Then(then =>
-                            {
-                                then.Element("elopement-spinner").Show();
-                                then.Post(alertElopementUrl,
-                                    g => g.Include<FusionDropDownList, Step2ClinicalModel>(m => m.WanderFrequency)
-                                          .Include<NativeHiddenField, Step2ClinicalModel>(m => m.ResidentName))
-                                 .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
-                                 {
-                                     s.Element("elopement-result").SetText(json, x => x.Message);
-                                     s.Element("elopement-result").Show();
-                                     s.Element("elopement-spinner").Hide();
-                                 }));
-                            })
-                            .Else(e =>
-                            {
-                                e.Element("elopement-result").Hide();
-                            });
-                    })); }
+                    .Placeholder("Select frequency"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    var freq = p.Component<FusionDropDownList>(m => m.WanderFrequency);
+                    p.When(freq.Value).Eq("Frequently")
+                        .Then(then =>
+                        {
+                            then.Element("elopement-spinner").Show();
+                            then.Post(alertElopementUrl)
+                             .Gather<AlertElopementRequest>(g => g.Form(m => m.WanderFrequency, m => m.ResidentName))
+                             .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
+                             {
+                                 s.Element("elopement-result").Text.Set(json.Get(x => x.Message));
+                                 s.Element("elopement-result").Show();
+                                 s.Element("elopement-spinner").Hide();
+                             }));
+                        })
+                        .Else(e =>
+                        {
+                            e.Element("elopement-result").Hide();
+                        });
+                }); }
         </native-grid>
 
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p><span id="elopement-spinner" hidden class="text-accent">Sending alert...</span></p>
+        <native-vstack gap="Xs">
+            <p id="elopement-spinner" hidden class="text-sm text-accent">Sending alert...</p>
             <div id="elopement-result" hidden class="rounded-md bg-rose-50 border border-rose-200 px-3 py-2 text-sm text-rose-700"></div>
         </native-vstack>
     </div>

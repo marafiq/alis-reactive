@@ -1,59 +1,31 @@
+using System.Globalization;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.VitalsAlert;
 using Microsoft.AspNetCore.Mvc;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 
+/// <summary>
+/// Walter Cho's heart rate check on the evening round. A reading is recorded at 72 bpm until the nurse
+/// enters another. A critical reading pages the rapid response team; a high one alerts the charge nurse,
+/// Dana Ortiz. Each answer names the heart rate it was sent.
+/// </summary>
 [Area("Sandbox")]
 [Route("Sandbox/Conditions/VitalsAlert")]
 public class VitalsAlertController : Controller
 {
     [HttpGet("")]
-    public IActionResult Index()
-    {
-        return View("~/Areas/Sandbox/Views/Conditions/VitalsAlert/Index.cshtml", new VitalsAlertModel
-        {
-            HeartRate = 72
-        });
-    }
+    public IActionResult Index() =>
+        View("~/Areas/Sandbox/Views/Conditions/VitalsAlert/Index.cshtml", new VitalsAlertModel { HeartRate = 72 });
 
-    /// <summary>Creates the high-rate alert response used by the condition-gated HTTP branch.</summary>
-    [HttpPost("Alert")]
-    public IActionResult Alert([FromBody] AlertRequest? request)
-    {
-        return Ok(new
-        {
-            message = $"Alert sent for HR {request?.HeartRate ?? 0}",
-            timestamp = DateTime.UtcNow.ToString("HH:mm:ss"),
-            level = "high"
-        });
-    }
+    [HttpPost("RapidResponse")]
+    public IActionResult RapidResponse([FromBody] HeartRateReading reading) =>
+        Ok(new HeartRateAlert("Rapid response team paged",
+            $"The rapid response team is on its way to room 118: Walter Cho's heart rate is {Bpm(reading)} bpm."));
 
-    /// <summary>Creates the crisis-tier response for heart rates at or above 180.</summary>
-    [HttpPost("Critical")]
-    public IActionResult Critical([FromBody] AlertRequest? request)
-    {
-        return Ok(new
-        {
-            message = $"CRITICAL: HR {request?.HeartRate ?? 0} — code blue dispatched",
-            timestamp = DateTime.UtcNow.ToString("HH:mm:ss"),
-            level = "critical"
-        });
-    }
+    [HttpPost("ChargeNurse")]
+    public IActionResult ChargeNurse([FromBody] HeartRateReading reading) =>
+        Ok(new HeartRateAlert("Charge nurse alerted",
+            $"Dana Ortiz will recheck Walter Cho within 15 minutes: his heart rate is {Bpm(reading)} bpm."));
 
-    /// <summary>Creates the elevated-tier response for heart rates from 140 through 179.</summary>
-    [HttpPost("Warning")]
-    public IActionResult Warning([FromBody] AlertRequest? request)
-    {
-        return Ok(new
-        {
-            message = $"WARNING: HR {request?.HeartRate ?? 0} — nurse notified",
-            timestamp = DateTime.UtcNow.ToString("HH:mm:ss"),
-            level = "warning"
-        });
-    }
-
-    public class AlertRequest
-    {
-        public decimal HeartRate { get; set; }
-    }
+    private static string Bpm(HeartRateReading reading) => reading.HeartRate.ToString("0", CultureInfo.InvariantCulture);
 }

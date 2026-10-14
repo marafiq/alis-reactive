@@ -2,6 +2,7 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
+/// <summary>A Syncfusion OTP Input: one field for each character of the code.</summary>
 public sealed class FusionOtpInputLocator
 {
     private readonly IPage _page;
@@ -15,23 +16,15 @@ public sealed class FusionOtpInputLocator
 
     public ILocator Host => _page.Locator($"#{_componentId}");
 
-    /// <summary>Hidden input Syncfusion submits as the component value.</summary>
-    public ILocator HiddenInput => Host.Locator("input[type='hidden']");
-
-    /// <summary>Visible OTP field at zero-based index.</summary>
+    /// <summary>The field for the character at this zero-based place in the code.</summary>
     public ILocator Field(int index) => Host.Locator("input.e-otp-input-field").Nth(index);
 
-    public async Task<string> HiddenValue() => await HiddenInput.InputValueAsync();
-
-    public async Task<string> FieldValue(int index) => await Field(index).InputValueAsync();
-
-    public async Task FillCode(string value)
+    /// <summary>Types the code into the fields from the first, one character each, as a person keys it in.</summary>
+    public async Task TypeCode(string code)
     {
-        for (var index = 0; index < value.Length; index++)
+        for (var index = 0; index < code.Length; index++)
         {
-            await Field(index).FillAsync(value[index].ToString());
+            await Field(index).FillAsync(code[index].ToString());
         }
     }
-
-    public async Task Focus() => await Field(0).ClickAsync();
 }

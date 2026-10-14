@@ -1,5 +1,4 @@
 @model RoomHoldModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "Room Holds";
@@ -22,8 +21,8 @@
                     .CssClass(ChooseButton)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<NativeHiddenField>(m => m.RoomCode).SetValue("Maple 214");
-                        p.Element("selected-room").SetText("Maple 214");
+                        p.Component<NativeHiddenField>(m => m.RoomCode).Value.Set("Maple 214");
+                        p.Element("selected-room").Text.Set("Maple 214");
                     }))
             </native-vstack>
             <native-vstack gap="Sm">
@@ -33,8 +32,8 @@
                     .CssClass(ChooseButton)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<NativeHiddenField>(m => m.RoomCode).SetValue("Maple 216");
-                        p.Element("selected-room").SetText("Maple 216");
+                        p.Component<NativeHiddenField>(m => m.RoomCode).Value.Set("Maple 216");
+                        p.Element("selected-room").Text.Set("Maple 216");
                     }))
             </native-vstack>
         </native-hstack>
@@ -42,21 +41,23 @@
 
     <native-card><native-card-body>
         <form id="room-hold-form" class="flex flex-col gap-4">
-            <p class="text-sm text-text-secondary">Room: <span id="selected-room" class="font-medium">Maple 214</span></p>
+            <p class="text-sm text-text-secondary">Room: <span id="selected-room" class="font-medium">none chosen yet</span></p>
             @Html.HiddenFieldFor(plan, m => m.RoomCode)
             @{ Html.InputField(plan, m => m.ProspectName, o => o.Required().Label("Prospective resident"))
                 .NativeTextBox(b => b.Placeholder("Full name")); }
+            @{ Html.InputField(plan, m => m.FamilyAgreedToHoldTerms, o => o.Required().Label("The family agrees the hold lapses after 48 hours"))
+                .NativeCheckBox(b => b.CssClass("h-4 w-4 rounded border-border text-accent")); }
         </form>
         @(Html.NativeButton("place-hold-btn", "Place Hold")
             .CssClass("mt-4 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("Hold", "RoomHold"), g => g.IncludeAll())
+                p.Post(Url.SandboxRoute("Hold", "RoomHold")).Gather(g => g.Form())
                  .Validate<RoomHoldValidator>("room-hold-form")
                  .Response(r => r
                     .OnSuccess<RoomHoldConfirmation>((json, s) =>
                     {
-                        s.Element("room-hold-status").SetText(json, x => x.Confirmation);
+                        s.Element("room-hold-status").Text.Set(json.Get(x => x.Confirmation));
                     })
                     .OnError(400, e => e.ValidationErrors("room-hold-form")));
             }))

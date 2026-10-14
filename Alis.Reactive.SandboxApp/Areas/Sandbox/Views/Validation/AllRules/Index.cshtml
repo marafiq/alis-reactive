@@ -1,5 +1,4 @@
 @model ValidationShowcaseModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "Validation";
@@ -53,9 +52,9 @@
                  .Validate<AllRulesFormValidator>("all-rules-form")
                  .Response(r => r.OnSuccess(s =>
                  {
-                     s.Element("all-rules-result").SetText("All fields passed client-side validation!");
-                     s.Element("all-rules-result").AddClass("text-green-600");
-                     s.Element("all-rules-result").RemoveClass("text-text-muted");
+                     s.Element("all-rules-result").Text.Set("All fields passed client-side validation!");
+                     s.Element("all-rules-result").ClassList.Add("text-green-600");
+                     s.Element("all-rules-result").ClassList.Remove("text-text-muted");
                  }));
             }))
         <p id="all-rules-result" class="mt-3 text-sm text-text-muted">Click to validate</p>
@@ -79,18 +78,18 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("Save", "Validation"), g => g.Include(m => m.Server!.Name).Include(m => m.Server!.Email))
+                p.Post(Url.SandboxRoute("Save", "Validation")).Gather(g => g.Form(m => m.Server.Name, m => m.Server.Email))
                  .Validate<ServerFormValidator>("server-form")
                  .Response(r => r
                     .OnSuccess(s =>
                     {
-                        s.Element("server-result").SetText("Server accepted!");
-                        s.Element("server-result").AddClass("text-green-600");
+                        s.Element("server-result").Text.Set("Server accepted!");
+                        s.Element("server-result").ClassList.Add("text-green-600");
                     })
                     .OnError(400, e =>
                     {
-                        e.Element("server-result").SetText("Server returned validation errors");
-                        e.Element("server-result").AddClass("text-red-600");
+                        e.Element("server-result").Text.Set("Server returned validation errors");
+                        e.Element("server-result").ClassList.Add("text-red-600");
                         e.ValidationErrors("server-form");
                     }));
             }))
@@ -118,8 +117,8 @@
                  .Validate<ConditionalFormValidator>("conditional-form")
                  .Response(r => r.OnSuccess(s =>
                  {
-                     s.Element("conditional-result").SetText("Conditional validation passed!");
-                     s.Element("conditional-result").AddClass("text-green-600");
+                     s.Element("conditional-result").Text.Set("Conditional validation passed!");
+                     s.Element("conditional-result").ClassList.Add("text-green-600");
                  }));
             }))
         <p id="conditional-result" class="mt-3 text-sm text-text-muted">Click to validate</p>
@@ -136,13 +135,13 @@
                    .Placeholder("Required")); }
             @{ Html.InputField(plan, m => m.Hidden!.ShowExtras, o => o.Label("Show Extra Fields"))
                .NativeCheckBox(b => b
-                   .CssClass("h-4 w-4 rounded border-border text-accent")
-                   .Reactive(plan, evt => evt.Changed, (args, p) =>
-                   {
-                       p.When(args, a => a.Checked).Truthy()
-                        .Then(t => t.Element("hf_extras").Show())
-                        .Else(e => e.Element("hf_extras").Hide());
-                   })); }
+                   .CssClass("h-4 w-4 rounded border-border text-accent"))
+               .Reactive(evt => evt.Change, (args, p) =>
+               {
+                   p.When(args.Checked).Truthy()
+                    .Then(t => t.Element("hf_extras").Show())
+                    .Else(e => e.Element("hf_extras").Hide());
+               }); }
             <div id="hf_extras" hidden class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 @{ Html.InputField(plan, m => m.Hidden!.Phone, o => o.Label("Phone (hidden)"))
                    .NativeTextBox(b => b
@@ -163,29 +162,27 @@
                  .Validate<HiddenFieldsFormValidator>("hidden-fields-form")
                  .Response(r => r.OnSuccess(s =>
                  {
-                     s.Element("hidden-result").SetText("Validation passed!");
-                     s.Element("hidden-result").AddClass("text-green-600");
+                     s.Element("hidden-result").Text.Set("Validation passed!");
+                     s.Element("hidden-result").ClassList.Add("text-green-600");
                  }));
             }))
         @(Html.NativeButton("hidden-submit-btn", "Submit Profile")
             .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("SaveProfile", "Validation"), g => g
-                    .Include(m => m.Hidden!.Name)
-                    .Include(m => m.Hidden!.Phone)
-                    .Include(m => m.Hidden!.Salary))
+                p.Post(Url.SandboxRoute("SaveProfile", "Validation"))
+                 .Gather(g => g.Form(m => m.Hidden.Name, m => m.Hidden.Phone, m => m.Hidden.Salary))
                  .Validate<HiddenFieldsFormValidator>("hidden-fields-form")
                  .Response(r => r
                     .OnSuccess(s =>
                     {
-                        s.Element("hidden-result").SetText("Profile saved!");
-                        s.Element("hidden-result").AddClass("text-green-600");
+                        s.Element("hidden-result").Text.Set("Profile saved!");
+                        s.Element("hidden-result").ClassList.Add("text-green-600");
                     })
                     .OnError(400, e =>
                     {
-                        e.Element("hidden-result").SetText("Server validation errors");
-                        e.Element("hidden-result").AddClass("text-red-600");
+                        e.Element("hidden-result").Text.Set("Server validation errors");
+                        e.Element("hidden-result").ClassList.Add("text-red-600");
                         e.ValidationErrors("hidden-fields-form");
                     }));
             }))
@@ -210,18 +207,18 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("SaveWithDbCheck", "Validation"), g => g.Include(m => m.Db!.Name).Include(m => m.Db!.Email))
+                p.Post(Url.SandboxRoute("SaveWithDbCheck", "Validation")).Gather(g => g.Form(m => m.Db.Name, m => m.Db.Email))
                  .Validate<DbFormValidator>("db-form")
                  .Response(r => r
                     .OnSuccess(s =>
                     {
-                        s.Element("db-result").SetText("Saved to database!");
-                        s.Element("db-result").AddClass("text-green-600");
+                        s.Element("db-result").Text.Set("Saved to database!");
+                        s.Element("db-result").ClassList.Add("text-green-600");
                     })
                     .OnError(400, e =>
                     {
-                        e.Element("db-result").SetText("Database validation failed");
-                        e.Element("db-result").AddClass("text-red-600");
+                        e.Element("db-result").Text.Set("Database validation failed");
+                        e.Element("db-result").ClassList.Add("text-red-600");
                         e.ValidationErrors("db-form");
                     }));
             }))
@@ -284,20 +281,14 @@
                  .Validate<OrderLinesFormValidator>("order-lines-form")
                  .Response(r => r.OnSuccess(s =>
                  {
-                     s.Element("order-lines-result").SetText("Line validation passed!");
-                     s.Element("order-lines-result").AddClass("text-green-600");
+                     s.Element("order-lines-result").Text.Set("Line validation passed!");
+                     s.Element("order-lines-result").ClassList.Add("text-green-600");
                  }));
             }))
         <p id="order-lines-result" class="mt-3 text-sm text-text-muted">Click to validate</p>
     </native-card-body>
     </native-card>
 
-    <native-card>
-    <native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </native-card-body>
-    </native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

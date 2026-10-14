@@ -7,11 +7,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Alis.Reactive.Analyzers.TypedDsl
 {
     /// <summary>
-    /// Blocks untyped public API from creeping into Fusion/Native component slices.
-    /// The DSL is typed by design: developers never author a raw <c>object</c>, a member/method
-    /// selector string, or a plan wire type. They were told C# has no language feature to forbid
-    /// this; this analyzer is that feature. Plugin name is the only sanctioned string, and it lives
-    /// at the plugin boundary in core authoring, never in a component slice.
+    /// Blocks untyped public API from creeping into any component: a shipped Fusion/Native slice, or
+    /// one an application brings. A component is a declaration (a <c>Component</c> or <c>JsObject</c>
+    /// subtype) and its render helpers (methods that return <c>RenderedComponent&lt;,&gt;</c> or extend
+    /// <c>InputBoundField&lt;,&gt;</c>), wherever they live. The DSL is typed by design: developers never
+    /// author a raw <c>object</c>, a member/method selector string, or a plan wire type. Plugin name is
+    /// the only sanctioned string, and it lives at the plugin boundary, never in a component.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class UntypedComponentApiAnalyzer : DiagnosticAnalyzer
@@ -20,12 +21,12 @@ namespace Alis.Reactive.Analyzers.TypedDsl
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
-            title: "Component slice public API must be typed",
+            title: "Component public API must be typed",
             messageFormat: "Public component API '{0}' exposes untyped '{1}'. Onboard a typed DSL (typed source/value/enum) and keep wire types in private overloads; developers never author raw object, member strings, or plan wire types.",
             category: "Alis.Reactive",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "Fusion/Native component slices expose typed DSL only. A bare object, a member/method/action selector string, or a plan wire type in a public component signature is an onboarding defect that lets JS-style untyped access creep into views.",
+            description: "Components, shipped or brought, expose typed DSL only. A bare object, a member/method/action selector string, or a plan wire type in a public component signature lets JS-style untyped access creep into views.",
             helpLinkUri: null);
 
         // string parameters named like API selectors are stringly APIs, not typed values.
@@ -53,7 +54,7 @@ namespace Alis.Reactive.Analyzers.TypedDsl
                 return;
             if (method.MethodKind != MethodKind.Ordinary)
                 return;
-            if (!IsComponentSlice(method.ContainingType))
+            if (!IsComponentApi(method))
                 return;
             if (HasTypedDslExemption(method))
                 return;
@@ -84,13 +85,34 @@ namespace Alis.Reactive.Analyzers.TypedDsl
             return false;
         }
 
-        private static bool IsComponentSlice(INamedTypeSymbol containingType)
+        // A component's public surface, wherever it is declared: the shipped slices' namespaces, a
+        // declaration class, and the render helpers that put a component on a page.
+        private static bool IsComponentApi(IMethodSymbol method)
         {
+            var containingType = method.ContainingType;
             var ns = containingType.ContainingNamespace?.ToDisplayString();
-            return ns != null
+            var inShippedSlice = ns != null
                 && (ns.StartsWith("Alis.Reactive.Fusion.Components", StringComparison.Ordinal)
                     || ns.StartsWith("Alis.Reactive.Native.Components", StringComparison.Ordinal));
+            return inShippedSlice
+                || DerivesFrom(containingType, "Alis.Reactive.JsObject")
+                || IsNamed(method.ReturnType, "Alis.Reactive.RenderedComponent<TComponent, TModel>")
+                || (method.IsExtensionMethod
+                    && IsNamed(method.Parameters[0].Type, "Alis.Reactive.InputBoundField<TModel, TProp>"));
         }
+
+        private static bool DerivesFrom(INamedTypeSymbol type, string baseName)
+        {
+            for (var current = type.BaseType; current != null; current = current.BaseType)
+            {
+                if (current.ToDisplayString() == baseName) return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsNamed(ITypeSymbol type, string definitionName) =>
+            type is INamedTypeSymbol named && named.OriginalDefinition.ToDisplayString() == definitionName;
 
         // Bare object / object? — the untyped value that "lets things slip".
         // Accurate by construction: Expression&lt;Func&lt;T, object?&gt;&gt; selectors are NOT flagged because the

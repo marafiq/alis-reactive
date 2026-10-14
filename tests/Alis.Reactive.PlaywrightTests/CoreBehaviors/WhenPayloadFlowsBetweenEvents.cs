@@ -72,7 +72,7 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task all_properties_resolved_shows_success_status()
     {
-        // Status SetText reaction runs after every source binding. If any SetText throws on a bad path,
+        // Status Text.Set reaction runs after every source binding. If any Text.Set throws on a bad path,
         // the sequence aborts before this element turns green.
         await NavigateTo(PayloadPath);
         await WaitForTraceMessage("booted", 5000);
@@ -84,7 +84,7 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
 
         var statusClasses = await status.GetAttributeAsync("class") ?? "";
         Assert.That(statusClasses, Does.Not.Contain("text-text-muted"),
-            "RemoveClass('text-text-muted') must have removed the initial styling");
+            "ClassList.Remove('text-text-muted') must have removed the initial styling");
 
         AssertNoConsoleErrors();
     }
@@ -114,11 +114,11 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
         var statusClasses = await status.GetAttributeAsync("class") ?? "";
 
         Assert.That(statusClasses, Does.Contain("text-green-600"),
-            "AddClass('text-green-600') must have applied — success color");
+            "ClassList.Add('text-green-600') must have applied — success color");
         Assert.That(statusClasses, Does.Contain("font-semibold"),
-            "AddClass('font-semibold') must have applied — emphasis styling");
+            "ClassList.Add('font-semibold') must have applied — emphasis styling");
         Assert.That(statusClasses, Does.Not.Contain("text-text-muted"),
-            "RemoveClass('text-text-muted') must have removed the initial muted class — " +
+            "ClassList.Remove('text-text-muted') must have removed the initial muted class — " +
             "proves the remove+add+add class update chain executed in correct order");
 
         AssertNoConsoleErrors();
@@ -136,11 +136,11 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
         Assert.Multiple(() =>
         {
             Assert.That(statusClasses, Does.Contain("text-green-600"),
-                "AddClass('text-green-600') must have applied — success color after payload resolution");
+                "ClassList.Add('text-green-600') must have applied — success color after payload resolution");
             Assert.That(statusClasses, Does.Contain("font-semibold"),
-                "AddClass('font-semibold') must have applied — emphasis after payload resolution");
+                "ClassList.Add('font-semibold') must have applied — emphasis after payload resolution");
             Assert.That(statusClasses, Does.Not.Contain("text-text-muted"),
-                "RemoveClass('text-text-muted') must have stripped the initial muted class — " +
+                "ClassList.Remove('text-text-muted') must have stripped the initial muted class — " +
                 "stale class would cause conflicting green+muted styles");
         });
 

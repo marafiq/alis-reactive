@@ -5,8 +5,8 @@ namespace Alis.Reactive
     /// </summary>
     public interface IComponent
     {
-        /// <summary>Vendor key used to resolve the component implementation at runtime.</summary>
-        string Vendor { get; }
+        /// <summary>Where the component's JavaScript object lives on its element and how it raises events.</summary>
+        ComponentVendor Vendor { get; }
     }
 
     /// <summary>
@@ -15,9 +15,11 @@ namespace Alis.Reactive
     public interface IInputComponent : IComponent
     {
         /// <summary>
-        /// Component member read by gather and validation for model-bound inputs.
+        /// The property that holds the input's value and the event that commits it. Implement it
+        /// explicitly, so it stays off the members a page reads and calls:
+        /// <c>ComponentInput IInputComponent.Input =&gt; ComponentInput.Of(Value, committedBy: Change);</c>
         /// </summary>
-        string ValueMember { get; }
+        ComponentInput Input { get; }
     }
 
     /// <summary>

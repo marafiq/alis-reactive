@@ -1,4 +1,4 @@
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ProgressButton;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
@@ -8,22 +8,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     public sealed class ProgressButtonController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index()
-        {
-            return View("~/Areas/Sandbox/Views/Components/Fusion/ProgressButton/Index.cshtml", new FusionProgressButtonModel());
-        }
+        public IActionResult Index() =>
+            View("~/Areas/Sandbox/Views/Components/Fusion/ProgressButton/Index.cshtml", new FusionProgressButtonModel());
 
-        [HttpPost("Echo")]
-        public IActionResult Echo([FromBody] FusionProgressButtonEchoRequest request)
+        // Riverside's system confirms the moment it has the report; Lakeside confirms once the upload
+        // finishes; County takes the pass by fax.
+        [HttpPost("Send")]
+        public IActionResult Send([FromBody] MedicationPassSendRequest request) => request.Pharmacy switch
         {
-            return Ok(new FusionProgressButtonEchoResponse
-            {
-                Content = request.Content,
-                Disabled = request.Disabled,
-                CssClass = request.CssClass,
-                ProgressEnabled = request.ProgressEnabled,
-                Summary = request.Content + ":" + request.Disabled + ":" + request.CssClass + ":" + request.ProgressEnabled
-            });
-        }
+            "Lakeside" => Ok(new MedicationPassSendReply { Reply = "Lakeside Pharmacy confirms once the upload finishes." }),
+            "Riverside" => Ok(new MedicationPassSendReply { ConfirmedOnReceipt = true, Reply = "Riverside Pharmacy confirmed it has the report." }),
+            "County" => Ok(new MedicationPassSendReply { Reply = "County Pharmacy confirms faxes by phone." }),
+            _ => BadRequest()
+        };
     }
 }

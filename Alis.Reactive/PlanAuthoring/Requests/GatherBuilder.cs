@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.PlanModel;
@@ -6,296 +7,159 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Requests
 {
     /// <summary>
-    /// Configures HTTP request input: body fields, headers, and route template
-    /// parameters.
+    /// Builds the request an endpoint binds, member by member, from values read when the request is sent.
     /// </summary>
     /// <remarks>
-    /// Obtained from request builders through <c>.Gather(g =&gt; ...)</c>.
+    /// <para>
+    /// <typeparamref name="TRequest"/> is the class the action binds, so every parameter name comes from a
+    /// typed member. Where a member goes follows MVC's rule for route values: a member whose name matches a
+    /// <c>{placeholder}</c> in the URL fills the path; the others go to the query string for GET, and to the
+    /// JSON or form-data body otherwise.
+    /// </para>
+    /// <code>
+    /// p.Get("/suites/{suiteType}/rate")
+    ///  .Gather&lt;SuiteRateQuery&gt;(g =&gt; g.Set(x =&gt; x.SuiteType, suite.Value));
+    ///
+    /// p.Post("/discharge")
+    ///  .Gather&lt;DischargeRequest&gt;(g =&gt; g
+    ///      .Form()
+    ///      .Set(x =&gt; x.FacilityId, p.Url&lt;CensusQuery&gt;().Get(q =&gt; q.FacilityId))
+    ///      .Header("X-Category", args.Category));
+    /// </code>
     /// </remarks>
-    /// <typeparam name="TModel">View model that owns model-bound component IDs.</typeparam>
-    public class GatherBuilder<TModel> where TModel : class
+    /// <typeparam name="TRequest">The class the endpoint binds.</typeparam>
+    /// <typeparam name="TModel">The view model whose inputs <see cref="Form()"/> reads.</typeparam>
+    public sealed class GatherBuilder<TRequest, TModel>
+        where TRequest : class
+        where TModel : class
     {
-        private readonly PlanBuildContext _context;
         private readonly GatherInputDraft _draft;
 
-        internal GatherBuilder(PlanBuildContext context, GatherInputDraft draft)
+        internal GatherBuilder(GatherInputDraft draft)
         {
-            _context = context;
             _draft = draft;
         }
 
-        /// <summary>
-        /// Selects all registered input components for the request body. Only
-        /// mounted registered inputs are read at runtime.
-        /// </summary>
-        public GatherBuilder<TModel> IncludeAll()
+        /// <summary>Sets a member of the request to a value read when the request is sent.</summary>
+        /// <remarks>
+        /// The value's type must be the member's type or derive from it, so a value that may be missing
+        /// (<c>int?</c>) cannot fill a member that may not (<c>int</c>).
+        /// </remarks>
+        /// <typeparam name="TValue">The member's type.</typeparam>
+        /// <typeparam name="TSource">The value's type.</typeparam>
+        /// <param name="member">The request member, for example <c>x =&gt; x.ResidentId</c> or <c>x =&gt; x.Address.City</c>.</param>
+        /// <param name="source">A component member, response body, event payload, URL, plugin or array value.</param>
+        public GatherBuilder<TRequest, TModel> Set<TValue, TSource>(
+            Expression<Func<TRequest, TValue>> member,
+            TypedSource<TSource> source)
+            where TSource : TValue
         {
-            _draft.IncludeAllRegisteredInputs();
-            return this;
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            return Assign(member, source.Expression);
         }
 
-        /// <summary>Adds literal request body field.</summary>
-        /// <param name="param">Request body field that receives the literal value.</param>
-        /// <param name="value">Literal body value captured into the generated request plan.</param>
-        public GatherBuilder<TModel> Static(string param, object value)
+        /// <summary>Sets a nullable member of the request to a value read when the request is sent.</summary>
+        /// <typeparam name="TValue">The member's underlying type.</typeparam>
+        /// <param name="member">The nullable request member.</param>
+        /// <param name="source">A value of the member's underlying type.</param>
+        public GatherBuilder<TRequest, TModel> Set<TValue>(
+            Expression<Func<TRequest, TValue?>> member,
+            TypedSource<TValue> source)
+            where TValue : struct
         {
-            var bodyPath = BindingPath.Of(param);
-            _draft.AddPayload(
-                bodyPath,
-                ValueExpression.LiteralFromValue(value));
-            return this;
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            return Assign(member, source.Expression);
         }
 
-        /// <summary>Adds triggering event payload value to the request body.</summary>
-        /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
-        /// <typeparam name="TProp">Selected event-payload body value type.</typeparam>
-        /// <param name="args">Trigger payload placeholder.</param>
-        /// <param name="path">Event payload path.</param>
-        /// <param name="param">Request body field that receives the payload value.</param>
-        public GatherBuilder<TModel> FromEvent<TPayload, TProp>(
-            TPayload args,
-            Expression<Func<TPayload, TProp>> path,
-            string param)
+        /// <summary>Sets a collection member of the request, such as a <c>List&lt;T&gt;</c>, to an array read when the request is sent.</summary>
+        /// <typeparam name="TItem">The collection's item type.</typeparam>
+        /// <typeparam name="TSource">The source's collection type, for example <c>TItem[]</c>.</typeparam>
+        /// <param name="member">The collection member.</param>
+        /// <param name="source">A value whose items are <typeparamref name="TItem"/>.</param>
+        public GatherBuilder<TRequest, TModel> Set<TItem, TSource>(
+            Expression<Func<TRequest, IEnumerable<TItem>>> member,
+            TypedSource<TSource> source)
+            where TSource : IEnumerable<TItem>
         {
-            var bodyPath = BindingPath.Of(param);
-            var payloadPath = ExpressionPathHelper.ToEventPath(path);
-            var shape = Shape.FromClrType(typeof(TProp));
-            _draft.AddPayload(
-                bodyPath,
-                ValueExpression.ReadPayload(PayloadSource.Event(), payloadPath, shape));
-            return this;
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            return Assign(member, source.Expression);
         }
 
-        /// <summary>Adds literal string header to the HTTP request.</summary>
-        /// <param name="name">HTTP header name.</param>
-        /// <param name="value">Non-null header value serialized into the generated plan.</param>
-        public GatherBuilder<TModel> Header(string name, string value)
+        /// <summary>Sets a member of the request to a value fixed when the view renders.</summary>
+        /// <remarks>A nullable member is left empty with a typed null: <c>Set(x =&gt; x.FacilityId, (int?)null)</c>.</remarks>
+        /// <typeparam name="TValue">The member's type.</typeparam>
+        /// <param name="member">The request member.</param>
+        /// <param name="value">The value, written into the plan.</param>
+        public GatherBuilder<TRequest, TModel> Set<TValue>(
+            Expression<Func<TRequest, TValue>> member,
+            TValue value)
         {
-            var header = HeaderName.Of(name);
-            if (value == null)
-                throw new System.ArgumentNullException(nameof(value),
-                    $"Header '{name}' value must not be null. Literal headers require a concrete value. " +
-                    "Use the TypedSource<T> or event-payload overload for dynamic/nullable values.");
-            _draft.AddHeader(header, ValueExpression.Literal(value));
-            return this;
-        }
-
-        /// <summary>Adds scalar HTTP header value from a typed source.</summary>
-        /// <typeparam name="TProp">Source value type.</typeparam>
-        /// <param name="name">HTTP header name.</param>
-        /// <param name="source">Typed value source evaluated before the request is sent.</param>
-        public GatherBuilder<TModel> Header<TProp>(string name, TypedSource<TProp> source)
-        {
-            var header = HeaderName.Of(name);
-            if (source == null) throw new System.ArgumentNullException(nameof(source));
-            RequestScalarTarget.Header<TProp>(header);
-            _draft.AddHeader(header, source.ToValueExpression());
-            return this;
-        }
-
-        /// <summary>Adds scalar HTTP header value from the triggering event payload.</summary>
-        /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
-        /// <typeparam name="TProp">Selected event-payload header value type.</typeparam>
-        /// <param name="name">HTTP header name.</param>
-        /// <param name="args">Trigger payload placeholder.</param>
-        /// <param name="path">Event payload header path.</param>
-        public GatherBuilder<TModel> Header<TPayload, TProp>(
-            string name,
-            TPayload args,
-            Expression<Func<TPayload, TProp>> path)
-        {
-            var header = HeaderName.Of(name);
-            var shape = RequestScalarTarget.Header<TProp>(header);
-            var payloadPath = ExpressionPathHelper.ToEventPath(path);
-            _draft.AddHeader(header, ValueExpression.ReadPayload(PayloadSource.Event(), payloadPath, shape));
-            return this;
-        }
-
-        /// <summary>Binds a route template parameter to an int literal.</summary>
-        /// <param name="paramName">Route template placeholder name without braces.</param>
-        /// <param name="value">Route value captured into the generated request plan.</param>
-        public GatherBuilder<TModel> RouteParam(string paramName, int value)
-        {
-            var routeParam = RouteParameterName.Of(paramName);
-            _draft.AddRouteParameter(routeParam, ValueExpression.Literal(value));
-            return this;
-        }
-
-        /// <summary>Binds a route template parameter to a non-null string literal.</summary>
-        /// <param name="paramName">Route template placeholder name without braces.</param>
-        /// <param name="value">Route value captured into the generated request plan.</param>
-        public GatherBuilder<TModel> RouteParam(string paramName, string value)
-        {
-            var routeParam = RouteParameterName.Of(paramName);
-            if (value == null)
-                throw new System.ArgumentNullException(nameof(value),
-                    $"Route param '{paramName}' value must not be null. Literal route params require a concrete value. " +
-                    "Use the TypedSource<T> or event-payload overload for dynamic/nullable values.");
-            _draft.AddRouteParameter(routeParam, ValueExpression.Literal(value));
-            return this;
-        }
-
-        /// <summary>Binds a route template parameter to a long literal.</summary>
-        /// <param name="paramName">Route template placeholder name without braces.</param>
-        /// <param name="value">Route value captured into the generated request plan.</param>
-        public GatherBuilder<TModel> RouteParam(string paramName, long value)
-        {
-            var routeParam = RouteParameterName.Of(paramName);
-            _draft.AddRouteParameter(routeParam, ValueExpression.Literal(value));
-            return this;
-        }
-
-        /// <summary>Binds a route template parameter to a scalar typed source.</summary>
-        /// <typeparam name="TProp">Source value type.</typeparam>
-        /// <param name="paramName">Route template placeholder name without braces.</param>
-        /// <param name="source">Typed value source evaluated before the request is sent.</param>
-        public GatherBuilder<TModel> RouteParam<TProp>(string paramName, TypedSource<TProp> source)
-        {
-            var routeParam = RouteParameterName.Of(paramName);
-            if (source == null) throw new System.ArgumentNullException(nameof(source));
-            RequestScalarTarget.RouteParameter<TProp>(routeParam);
-            _draft.AddRouteParameter(routeParam, source.ToValueExpression());
-            return this;
-        }
-
-        /// <summary>Binds a route template parameter to a scalar value from the triggering event payload.</summary>
-        /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
-        /// <typeparam name="TProp">Selected event-payload route value type.</typeparam>
-        /// <param name="paramName">Route template placeholder name without braces.</param>
-        /// <param name="args">Trigger payload placeholder.</param>
-        /// <param name="path">Event payload route path.</param>
-        public GatherBuilder<TModel> RouteParam<TPayload, TProp>(
-            string paramName,
-            TPayload args,
-            Expression<Func<TPayload, TProp>> path)
-        {
-            var routeParam = RouteParameterName.Of(paramName);
-            var shape = RequestScalarTarget.RouteParameter<TProp>(routeParam);
-            var payloadPath = ExpressionPathHelper.ToEventPath(path);
-            _draft.AddRouteParameter(routeParam, ValueExpression.ReadPayload(PayloadSource.Event(), payloadPath, shape));
-            return this;
-        }
-
-        /// <summary>Reads URL query parameter into a request body field with the same name.</summary>
-        /// <param name="paramName">URL query parameter and request body field.</param>
-        public GatherBuilder<TModel> FromUrl(string paramName)
-        {
-            var urlParam = UrlParameterName.Of(paramName);
-            var bodyPath = BindingPath.Of(urlParam.Value);
-            var urlValue = ValueExpression.ReadUrl(urlParam.Value);
-            _draft.AddAssignment(RequestInputAssignment.Payload(bodyPath, urlValue));
-            return this;
-        }
-
-        /// <summary>Reads URL query parameter into an explicit request body field.</summary>
-        /// <param name="paramName">URL query parameter name to read.</param>
-        /// <param name="asParam">Request body field that receives the URL value.</param>
-        public GatherBuilder<TModel> FromUrl(string paramName, string asParam)
-        {
-            var urlParam = UrlParameterName.Of(paramName);
-            var bodyPath = BindingPath.Of(asParam);
-            var urlValue = ValueExpression.ReadUrl(urlParam.Value);
-            _draft.AddAssignment(RequestInputAssignment.Payload(bodyPath, urlValue));
-            return this;
-        }
-
-        /// <summary>Reads typed URL query parameter into a request body field with the same name.</summary>
-        /// <param name="paramName">URL query parameter and request body field.</param>
-        public GatherBuilder<TModel> FromUrl<T>(string paramName)
-        {
-            var urlParam = UrlParameterName.Of(paramName);
-            var bodyPath = BindingPath.Of(urlParam.Value);
-            var shape = RequestScalarTarget.UrlQueryParameter<T>(urlParam);
-            var urlValue = ValueExpression.ReadUrl(urlParam.Value, shape);
-            _draft.AddAssignment(RequestInputAssignment.Payload(bodyPath, urlValue));
-            return this;
-        }
-
-        /// <summary>Reads typed URL query parameter into an explicit request body field.</summary>
-        /// <param name="paramName">URL query parameter name to read.</param>
-        /// <param name="asParam">Request body field that receives the typed URL value.</param>
-        public GatherBuilder<TModel> FromUrl<T>(string paramName, string asParam)
-        {
-            var urlParam = UrlParameterName.Of(paramName);
-            var bodyPath = BindingPath.Of(asParam);
-            var shape = RequestScalarTarget.UrlQueryParameter<T>(urlParam);
-            var urlValue = ValueExpression.ReadUrl(urlParam.Value, shape);
-            _draft.AddAssignment(RequestInputAssignment.Payload(bodyPath, urlValue));
-            return this;
-        }
-
-        /// <summary>Adds plan-registered plugin method result to the request body.</summary>
-        /// <typeparam name="T">CLR type returned by the plugin call.</typeparam>
-        /// <param name="source">Typed plugin value source, including configured arguments.</param>
-        /// <param name="paramName">Request body field that receives the plugin result.</param>
-        public GatherBuilder<TModel> Plugin<T>(Conditions.TypedPluginSource<T> source, string paramName)
-        {
-            if (source == null) throw new System.ArgumentNullException(nameof(source));
-            var bodyPath = BindingPath.Of(paramName);
-            _draft.AddAssignment(RequestInputAssignment.Payload(bodyPath, source.ToValueExpression()));
-            return this;
+            return Assign(member, ValueExpression.LiteralFor(value, Shape.FromClrType(typeof(TValue))));
         }
 
         /// <summary>
-        /// Includes a specific component's value in the gather.
-        /// Used by vendor extension methods (Fusion, Native).
+        /// Sends every input of the form, by its binding name, as MVC binds it: the inputs this view and the
+        /// partials that compose with it rendered through <c>Html.InputField</c>, while they are on the page.
         /// </summary>
-        internal GatherBuilder<TModel> Include(string componentId, string vendor, string propertyName, string valueMember)
+        /// <remarks>
+        /// A member set with <c>Set</c> is sent beside the inputs; an input bound to the same name wins.
+        /// </remarks>
+        public GatherBuilder<TRequest, TModel> Form()
         {
-            var valueRead = RegisteredInputValueRead.ForGatherValueRead(componentId, valueMember);
-            var registration = _context.RequireRegistrationById(componentId, valueRead);
-            var valueContract = registration.RequireValueContract(
-                valueRead.ValueMember);
-            return Include(componentId, vendor, BindingPath.Of(propertyName), valueContract);
-        }
-
-        internal GatherBuilder<TModel> Include(
-            string componentId,
-            string vendor,
-            BindingPath bodyField,
-            string valueMember,
-            Shape shape)
-        {
-            if (shape == null) throw new System.ArgumentNullException(nameof(shape));
-            return Include(
-                componentId,
-                vendor,
-                bodyField,
-                InputValueContract.For(valueMember, shape));
-        }
-
-        private GatherBuilder<TModel> Include(
-            string componentId,
-            string vendor,
-            BindingPath bodyField,
-            InputValueContract valueContract)
-        {
-            if (valueContract == null) throw new System.ArgumentNullException(nameof(valueContract));
-            var componentIdentity = RegisteredComponentIdentity.For(componentId, vendor);
-            var componentValue = ValueExpression.Read(
-                ComponentSource.Of(componentIdentity.ComponentId.Value),
-                valueContract.ValueMember,
-                shape: valueContract.Shape);
-            var planBinding = InputComponentPlanBinding.For(
-                componentIdentity.ComponentId,
-                componentIdentity.Vendor,
-                bodyField,
-                valueContract);
-            _context.DeclareInputComponent(planBinding);
-            _draft.AddAssignment(RequestInputAssignment.Payload(bodyField, componentValue));
+            _draft.IncludeForm();
             return this;
         }
 
-        internal GatherBuilder<TModel> Include<TProp>(
-            TypedComponentSource<TProp> source,
-            string paramName)
+        /// <summary>Sends the named inputs of the form, each by its binding name, as MVC binds it.</summary>
+        /// <param name="fields">The view model members whose inputs are sent, for example <c>m =&gt; m.Name, m =&gt; m.Address.City</c>.</param>
+        public GatherBuilder<TRequest, TModel> Form(params Expression<Func<TModel, object?>>[] fields)
         {
-            if (source == null) throw new System.ArgumentNullException(nameof(source));
-            var bodyPath = BindingPath.Of(paramName);
-            _draft.AddAssignment(RequestInputAssignment.Payload(bodyPath, source.ToValueExpression()));
+            if (fields == null || fields.Length == 0)
+                throw new ArgumentException("Form(..) takes at least one field; Form() sends every input.", nameof(fields));
+
+            foreach (var field in fields)
+            {
+                var binding = ExpressionPathHelper.ToMemberBindingPath(field);
+                var fieldType = ExpressionPathHelper.ToPropertyType(field);
+                RequestMembers.Require(typeof(TRequest), binding.Value, fieldType);
+                var shape = Shape.FromClrType(fieldType);
+                _draft.Add(binding, ValueExpression.ReadBound(IdGenerator.For(field), shape));
+            }
+
             return this;
         }
 
+        /// <summary>Sends an HTTP header with a fixed value.</summary>
+        /// <param name="name">The header name.</param>
+        /// <param name="value">The header value.</param>
+        public GatherBuilder<TRequest, TModel> Header(string name, string value)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value),
+                    $"Header '{name}' needs a value. A value read at runtime takes the source overload.");
+
+            _draft.AddHeader(HeaderName.Of(name).Value, ValueExpression.Literal(value));
+            return this;
+        }
+
+        /// <summary>Sends an HTTP header whose value is read when the request is sent.</summary>
+        /// <typeparam name="TValue">A scalar value type.</typeparam>
+        /// <param name="name">The header name.</param>
+        /// <param name="source">The value source.</param>
+        public GatherBuilder<TRequest, TModel> Header<TValue>(string name, TypedSource<TValue> source)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            var header = HeaderName.Of(name);
+            RequestScalarTarget.Header<TValue>(header);
+            _draft.AddHeader(header.Value, source.Expression);
+            return this;
+        }
+
+        private GatherBuilder<TRequest, TModel> Assign(LambdaExpression member, ValueExpression value)
+        {
+            if (member == null) throw new ArgumentNullException(nameof(member));
+            _draft.Add(ExpressionPathHelper.ToMemberBindingPath(member), value);
+            return this;
+        }
     }
-
 }

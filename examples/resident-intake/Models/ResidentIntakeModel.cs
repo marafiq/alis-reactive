@@ -1,3 +1,5 @@
+using Alis.Reactive;
+
 namespace ResidentIntake.Models;
 
 public class ResidentIntakeModel
@@ -21,4 +23,11 @@ public class ResidentIntakeModel
 
     public string? RoomPreference { get; set; }
     public decimal? DepositAmount { get; set; }
+}
+
+/// <summary>The document events the intake page raises and hears.</summary>
+public static class IntakeEvents
+{
+    /// <summary>Raised once the intake is saved; the page then loads its summary.</summary>
+    public static readonly AppEvent IntakeSaved = AppEvent.Named("intake-saved");
 }

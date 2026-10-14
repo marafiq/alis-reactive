@@ -6,7 +6,7 @@ using System.Web.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Native.Extensions
+namespace Alis.Reactive
 {
     /// <summary>
     /// Razor view extensions for adding behavior to a Reactive Plan.
@@ -27,7 +27,7 @@ namespace Alis.Reactive.Native.Extensions
         ///
         ///     Html.On(plan, trigger: t =&gt; t.DomReady(pipeline: p =&gt;
         ///     {
-        ///         p.Element("status").SetText("Ready");
+        ///         p.Element("status").Text.Set("Ready");
         ///     }));
         /// }
         /// @Html.RenderPlan(plan)
@@ -44,6 +44,7 @@ namespace Alis.Reactive.Native.Extensions
         /// </para>
         /// </remarks>
         /// <typeparam name="TModel">View model used to author typed expression paths.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan that receives the trigger declarations.</param>
         /// <param name="trigger">
         /// Configures one or more triggers via the fluent <see cref="TriggerBuilder{TModel}"/> API.

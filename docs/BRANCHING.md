@@ -8,7 +8,7 @@ One long-lived branch, short-lived everything else, releases by tag. The release
 | Ref | Purpose | Rules |
 |-----|---------|-------|
 | `main` | the trunk **and** the release line | moves by pull request only; required checks green; no force-push; no deletion |
-| `feature/*`, `fix/*`, `chore/*`, `docs/*` | one change each | branched from `main` in a worktree (CLAUDE.md Rule 14); landed by PR within days; deleted on merge |
+| `feature/*`, `fix/*`, `chore/*`, `docs/*` | one change each | branched from `main` in a worktree (CLAUDE.md, Workflow); landed by PR within days; deleted on merge |
 | `release/X.Y` | post-GA stabilization only | created from tag `vX.Y.0` only when a hotfix must ship without `main`'s newer work; PRs into it; hotfix tags `vX.Y.Z` on it; every fix forward-ported to `main` |
 | `vX.Y.Z[-rc.N]` tags | the only release trigger | annotated; immutable; commit on `main` or `release/X.Y` |
 

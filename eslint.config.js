@@ -19,7 +19,7 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
 
   {
-    files: ["Alis.Reactive.Assets/runtime/**/*.ts"],
+    files: ["Alis.Reactive.Assets/runtime/**/*.ts", "Alis.Reactive.Assets/components/**/*.ts", "Alis.Reactive.Assets/bundle.ts"],
     ignores: [
       "Alis.Reactive.Assets/runtime/__tests__/**", // test files relaxed below
     ],
@@ -69,6 +69,10 @@ export default tseslint.config(
     ],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
     },
   },
 );

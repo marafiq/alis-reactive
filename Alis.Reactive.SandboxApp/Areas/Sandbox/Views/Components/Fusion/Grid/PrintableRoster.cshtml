@@ -1,6 +1,5 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @{
@@ -10,6 +9,8 @@
     const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
 
     var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+
+    var columns = FusionGridColumns.Of<ResidentDirectoryGridItem>();
 
     var roster = new List<ResidentDirectoryGridItem>
     {
@@ -32,7 +33,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Component<FusionGrid>(GridId).Print();
-                p.Element("print-status").SetText("print issued");
+                p.Element("print-status").Text.Set("print issued");
             }))
     </native-hstack>
 
@@ -42,10 +43,10 @@
             .AllowSelection(true)
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true },
-                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "200" },
-                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "160" },
-                new GridColumn { Field = "wing", HeaderText = "Wing", Width = "120" }
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "200" },
+                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "160" },
+                new GridColumn { Field = columns.Field(r => r.Wing), HeaderText = "Wing", Width = "120" }
             })))
         <p class="mt-4 font-mono text-sm">Print: <span id="print-status" class="text-text-muted">waiting</span></p>
     </section>

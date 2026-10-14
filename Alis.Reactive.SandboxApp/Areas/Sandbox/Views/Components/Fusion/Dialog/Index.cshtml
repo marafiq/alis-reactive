@@ -1,106 +1,80 @@
 @model DialogModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
-    ViewData["Title"] = "FusionDialog";
+    ViewData["Title"] = "Discharge Review";
 
     var plan = Html.ReactivePlan<DialogModel>();
+    var summaryUrl = Url.SandboxRoute("DischargeSummary", "Dialog");
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionDialog — Full API</native-heading>
-    <native-text color="Secondary">
-        Non-input modal component. Exercises Show / Hide methods and BeforeOpen, Opened,
-        BeforeClose, Closed, OverlayClick events. Senior living domain: confirming a resident discharge.
-    </native-text>
+    <div>
+        <native-heading level="H1">Discharge Review</native-heading>
+        <native-text color="Secondary">Margaret Hale · Room 214 · Assisted Living</native-text>
+    </div>
 
     <native-card><native-card-body>
-        <native-heading level="H2">1. Open the Dialog (Show method)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Click the button to call <code>Component&lt;FusionDialog&gt;("discharge-dialog").Show()</code>.
-        </p>
+        <native-vstack gap="Base">
+            @{ Html.InputField(plan, m => m.CareTasksOpen, o => o.Label("Care tasks are still open"))
+                .NativeCheckBox(b => b.CssClass("rounded border-border")); }
 
-        @(Html.NativeButton("open-dialog-btn", "Confirm Discharge")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-            .Reactive(plan, evt => evt.Click, (_, p) =>
-            {
-                p.Component<FusionDialog>("discharge-dialog").Show();
-            }))
-    </native-card-body></native-card>
+            @(Html.NativeButton("review-discharge", "Review discharge")
+                .CssClass("self-start rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Component<FusionDialog>("discharge-dialog").Show()))
 
-    <native-card><native-card-body>
-        <native-heading level="H2">2. Dialog Component</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Modal dialog with a header, content, and a close icon. The reactive wiring updates the
-            event log when each lifecycle event fires.
-        </p>
-
-        @(Html.FusionDialog(plan, "discharge-dialog", b =>
-        {
-            b.Header("Confirm Discharge");
-            b.Content("<p>Are you sure you want to discharge this resident? This action cannot be undone.</p>");
-            b.IsModal(true);
-            b.Width("420px");
-            b.ShowCloseIcon(true);
-            b.CloseOnEscape(true);
-            b.Visible(false);
-        })
-        .Reactive(evt => evt.BeforeOpen, (_, p) =>
-        {
-            p.Element("dialog-before-open").SetText("beforeOpen fired");
-        })
-        .Reactive(evt => evt.Opened, (_, p) =>
-        {
-            p.Element("dialog-opened").SetText("opened");
-        })
-        .Reactive(evt => evt.BeforeClose, (_, p) =>
-        {
-            p.Element("dialog-before-close").SetText("beforeClose fired");
-        })
-        .Reactive(evt => evt.Closed, (_, p) =>
-        {
-            p.Element("dialog-closed").SetText("closed");
-        })
-        .Reactive(evt => evt.OverlayClick, (_, p) =>
-        {
-            p.Element("dialog-overlay-click").SetText("overlay clicked");
-            p.Component<FusionDialog>("discharge-dialog").Hide();
-        }))
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">3. Hide the Dialog (Hide method)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Calls <code>Component&lt;FusionDialog&gt;("discharge-dialog").Hide()</code>.
-        </p>
-
-        @(Html.NativeButton("close-dialog-btn", "Cancel Discharge")
-            .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
-            .Reactive(plan, evt => evt.Click, (_, p) =>
-            {
-                p.Component<FusionDialog>("discharge-dialog").Hide();
-            }))
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">4. Event Log</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Each lifecycle event updates its own status line as the dialog opens and closes.
-        </p>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>BeforeOpen:   <span id="dialog-before-open" class="text-text-muted">&mdash;</span></p>
-            <p>Opened:       <span id="dialog-opened" class="text-text-muted">&mdash;</span></p>
-            <p>BeforeClose:  <span id="dialog-before-close" class="text-text-muted">&mdash;</span></p>
-            <p>Closed:       <span id="dialog-closed" class="text-text-muted">&mdash;</span></p>
-            <p>OverlayClick: <span id="dialog-overlay-click" class="text-text-muted">&mdash;</span></p>
+            <p id="discharge-blocked" class="text-sm text-warning" hidden>Close Margaret's open care tasks before reviewing her discharge.</p>
+            <native-text>Discharge review: <span id="discharge-status">not started</span></native-text>
+            <native-text><span id="discharge-decision"></span></native-text>
         </native-vstack>
     </native-card-body></native-card>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>
-    </native-card-body></native-card>
+    @* The review asks for an explicit choice: Escape, the close icon and a click outside do not
+       dismiss it; "Not yet" does. The coordinator can drag it aside by its title to read the page. *@
+    @(Html.FusionDialog(plan, "discharge-dialog", b =>
+    {
+        b.Header("Confirm discharge");
+        b.Content("<div id='discharge-summary'></div><p id='discharge-choose' class='mt-3 text-sm text-warning' hidden>Choose Confirm discharge or Not yet.</p>");
+        b.IsModal(true);
+        b.Width("460px");
+        b.ShowCloseIcon(true);
+        b.CloseOnEscape(true);
+        b.AllowDragging(true);
+        b.Visible(false);
+    })
+    .Reactive(evt => evt.BeforeOpen, (args, p) =>
+    {
+        p.When(p.Component<NativeCheckBox>(m => m.CareTasksOpen).Checked).Truthy()
+            .Then(blocked =>
+            {
+                args.Cancel.Set(true);
+                blocked.Element("discharge-blocked").Show();
+            })
+            .Else(clear => clear.Element("discharge-blocked").Hide());
+    })
+    .Reactive(evt => evt.Open, (args, p) =>
+    {
+        p.Element("discharge-status").Text.Set("in progress");
+        p.Get(summaryUrl).Response(r => r.OnSuccess(s => s.Into("discharge-summary")));
+    })
+    .Reactive(evt => evt.BeforeClose, (args, p) =>
+    {
+        p.When(args.IsInteracted).Truthy()
+            .Then(asked =>
+            {
+                args.Cancel.Set(true);
+                asked.Element("discharge-choose").Show();
+            });
+    })
+    .Reactive(evt => evt.Close, (args, p) =>
+        p.Element("discharge-status").Text.Set("closed"))
+    .Reactive(evt => evt.OverlayClick, (args, p) =>
+    {
+        // A click outside brings a review dragged aside back to the middle, asking for the choice.
+        p.Element("discharge-choose").Show();
+        p.Component<FusionDialog>("discharge-dialog").RefreshPosition();
+    }))
 </native-vstack>
 
 @Html.RenderPlan(plan)

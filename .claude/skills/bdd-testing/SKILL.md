@@ -46,15 +46,17 @@ key across the four trees — given any one file, the rest of the slice is one
 glob away.
 
 A component with many use cases fans out into many journeys, each a full
-slice. Grid carries about thirty — Billing, CareOps, Directory,
-PrintableRoster — thirty views, thirty fixtures. Billing and CareOps own
-their model files and controller partials; the older Grid journeys share
-`GridModel.cs` and predate the full pattern — they migrate as touched.
+slice. Grid carries over thirty — Billing, CareOps, Directory, Census —
+each with its own view and fixture, and nearly all with their own model file
+and controller partial (`CensusModel.cs`, `GridController.Census.cs`). Six
+older pages (Editing, ActionCompleteSaveEdit, BeginEditNormal, BuilderRoster,
+PrintableRoster, RemoteAdaptorRoster) still take `ResidentGridEditingModel`
+from the shared `GridModel.cs` as their page model; they migrate as touched.
 Never one view or one fixture for everything.
 
 - The model belongs to the journey and speaks domain language: residents,
   care levels, wings, monthly rates. Similar shapes across journeys stay
-  separate types (root Rule 4: duplication over abstraction).
+  separate types (root CLAUDE.md: duplication over abstraction).
 - The view is the journey's own page. Dialog and drawer flows on a page
   belong to that page's journey.
 - The data is the journey's own, seeded per browser context; no shared

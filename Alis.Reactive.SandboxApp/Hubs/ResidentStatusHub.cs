@@ -44,12 +44,28 @@ public class ResidentStatusHub : Hub
 
     public static void RestoreDrill(string drillId) => BrokenDrills[drillId] = false;
 
+    /// <summary>The connections of one page load, so a send reaches that page alone.</summary>
+    public static IReadOnlyList<string> ConnectionsOf(string drillId) =>
+        DrillConnections.TryGetValue(drillId, out var connections) ? connections.Keys.ToList() : [];
+
     private static string DrillIdFor(HubCallerContext context) =>
         context.GetHttpContext()?.Request.Query["drill"].ToString() ?? "";
 }
 
+/// <summary>The client methods <see cref="ResidentStatusHub"/> calls on a page.</summary>
+public sealed class ResidentStatusFeed : SignalRHub
+{
+    public SignalRMessage<ResidentStatusPayload> StatusChanged => Message<ResidentStatusPayload>("StatusChanged");
+
+    /// <summary>The board was cleared at shift change: called with no argument.</summary>
+    public SignalRMessage BoardCleared => Message("BoardCleared");
+}
+
 public class ResidentStatusPayload
 {
+    /// <summary>How many live connections the page that pushed the status holds to this hub.</summary>
+    public int Connections { get; set; }
+
     public string ResidentName { get; set; } = "";
     public string Status { get; set; } = "";
     public string CareLevel { get; set; } = "";

@@ -1,66 +1,84 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
 {
+    // The members a gather sets, by binding name, and its headers. Where a member goes is decided when the
+    // request is written, because only then is the URL known: MVC's route-value rule sends a member named like
+    // a {placeholder} to the path, and every other member to the query or body.
     internal sealed class GatherInputDraft
     {
-        private readonly List<RequestInputAssignment> _assignments = new List<RequestInputAssignment>();
+        private readonly List<(BindingPath Member, ValueExpression Value)> _members = new List<(BindingPath, ValueExpression)>();
+        private readonly List<(string Name, ValueExpression Value)> _headers = new List<(string, ValueExpression)>();
+        private bool _includesForm;
 
-        internal RegisteredInputSelection RegisteredInputs { get; private set; } =
-            RegisteredInputSelection.ExplicitAssignments;
-
-        internal RequestInput BuildRequestInput(RequestBodyFormat bodyFormat, RequestUrl url)
+        internal void Add(BindingPath member, ValueExpression value)
         {
-            RequestRouteTemplate
-                .For(url)
-                .RequireRouteParameters(RouteParameterNames());
-
-            var hasGatheredInput =
-                _assignments.Count > 0
-                || RegisteredInputs.SelectsRegisteredInputs;
-            if (!hasGatheredInput)
-                return RequestInput.None;
-
-            return GatherRequestInput.From(
-                _assignments,
-                bodyFormat,
-                RegisteredInputs);
+            var setTwice = _members.Any(existing => string.Equals(existing.Member.Value, member.Value, StringComparison.OrdinalIgnoreCase));
+            if (setTwice)
+                throw new InvalidOperationException($"The request member '{member.Value}' is gathered twice; set each member once.");
+            _members.Add((member, value));
         }
 
-        internal void IncludeAllRegisteredInputs()
+        internal void AddHeader(string name, ValueExpression value)
         {
-            RegisteredInputs = RegisteredInputSelection.AllRegisteredInputs;
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Header name required.", nameof(name));
+            _headers.Add((name, value));
         }
 
-        internal void AddAssignment(RequestInputAssignment assignment)
+        internal void IncludeForm()
         {
-            _assignments.Add(assignment);
+            _includesForm = true;
         }
 
-        internal void AddPayload(BindingPath path, ValueExpression value)
+        internal GatheredInput Resolve(string url)
         {
-            _assignments.Add(RequestInputAssignment.Payload(path, value));
-        }
-
-        internal void AddHeader(HeaderName name, ValueExpression value)
-        {
-            _assignments.Add(RequestInputAssignment.Header(name, value));
-        }
-
-        internal void AddRouteParameter(RouteParameterName name, ValueExpression value)
-        {
-            _assignments.Add(RequestInputAssignment.RouteParameter(name, value));
-        }
-
-        private IEnumerable<string> RouteParameterNames()
-        {
-            foreach (var assignment in _assignments)
+            var template = RequestRouteTemplate.For(url);
+            var payload = new List<(BindingPath, ValueExpression)>();
+            var route = new List<(string, ValueExpression)>();
+            foreach (var (member, value) in _members)
             {
-                if (assignment.Target is RequestRouteParameterTarget routeParameter)
-                    yield return routeParameter.Name;
+                var placeholder = template.PlaceholderFor(member);
+                if (placeholder == null)
+                {
+                    payload.Add((member, value));
+                    continue;
+                }
+
+                RequestScalarTarget.RouteParameter(placeholder, value.OutputShape);
+                route.Add((placeholder, value));
             }
+
+            template.RequireEveryPlaceholderFilled(route.Select(member => member.Item1));
+            return new GatheredInput(payload, route, _headers, _includesForm);
+        }
+    }
+
+    /// <summary>A gather resolved against its URL: body or query members, route values and headers.</summary>
+    internal sealed class GatheredInput
+    {
+        internal GatheredInput(
+            IReadOnlyList<(BindingPath Name, ValueExpression Value)> payload,
+            IReadOnlyList<(string Name, ValueExpression Value)> route,
+            IReadOnlyList<(string Name, ValueExpression Value)> headers,
+            bool includesForm)
+        {
+            Payload = payload;
+            Route = route;
+            Headers = headers;
+            IncludesForm = includesForm;
         }
 
+        internal IReadOnlyList<(BindingPath Name, ValueExpression Value)> Payload { get; }
+
+        internal IReadOnlyList<(string Name, ValueExpression Value)> Route { get; }
+
+        internal IReadOnlyList<(string Name, ValueExpression Value)> Headers { get; }
+
+        internal bool IncludesForm { get; }
+
+        internal bool IsEmpty => Payload.Count == 0 && Route.Count == 0 && Headers.Count == 0 && !IncludesForm;
     }
 }

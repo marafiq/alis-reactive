@@ -102,7 +102,7 @@ public class WhenUsingFusionCarousel : PlaywrightTestBase
     }
 
     // SlideChanging guards the move before it happens: a step back onto the medications
-    // section (NextIndex 0) is cancelled by PreventTransition (the payload Cancel write),
+    // section (NextIndex 0) is cancelled by the payload write Set(a => a.Cancel, true),
     // so the carousel stays put; SlideChanging.SlideDirection and IsSwiped explain the block.
     [Test]
     public async Task the_medications_signoff_stays_locked_when_stepping_back_to_it()
@@ -114,7 +114,7 @@ public class WhenUsingFusionCarousel : PlaywrightTestBase
 
         await PreviousButton.ClickAsync();             // Therapy Goals -> (would be) Medications: blocked
 
-        // PreventTransition cancelled the move: the carousel never left Therapy Goals.
+        // The payload Cancel write cancelled the move: the carousel never left Therapy Goals.
         await Expect(Review.ActiveSectionTitle).ToHaveTextAsync("Therapy Goals");
         await Expect(Position).ToHaveTextAsync("Section 2 of 3: Therapy Goals");
         // The nurse is told the medications sign-off is locked, and why the move was rejected.
@@ -143,13 +143,13 @@ public class WhenUsingFusionCarousel : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"sectionIndex\":1"),
+        Assert.That(body, Does.Contain("\"SectionIndex\":1"),
             "the gather pipeline must carry SlideChanged.CurrentIndex under its declared key");
-        Assert.That(body, Does.Contain("\"cameFromIndex\":0"),
+        Assert.That(body, Does.Contain("\"CameFromIndex\":0"),
             "the gather pipeline must carry SlideChanged.PreviousIndex under its declared key");
-        Assert.That(body, Does.Contain("\"direction\":\"Next\""),
+        Assert.That(body, Does.Contain("\"Direction\":\"Next\""),
             "the gather pipeline must carry SlideChanged.SlideDirection under its declared key");
-        Assert.That(body, Does.Contain("\"bySwipe\":false"),
+        Assert.That(body, Does.Contain("\"BySwipe\":false"),
             "the gather pipeline must carry SlideChanged.IsSwiped under its declared key");
 
         AssertNoConsoleErrors();

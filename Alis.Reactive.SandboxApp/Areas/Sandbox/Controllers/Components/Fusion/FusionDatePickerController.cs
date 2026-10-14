@@ -5,7 +5,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     [Area("Sandbox")]
     [Route("Sandbox/Components/FusionDatePicker")]
-    public class FusionDatePickerController : Controller
+    public partial class FusionDatePickerController : Controller
     {
         [HttpGet("")]
         public IActionResult Index()

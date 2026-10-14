@@ -1,5 +1,6 @@
+using System.Globalization;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InPlaceEditor;
 using Microsoft.AspNetCore.Mvc;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
@@ -7,183 +8,110 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     [Route("Sandbox/Components/FusionInPlaceEditor")]
     public class FusionInPlaceEditorController : Controller
     {
-        private static readonly DateTime ServerErrorTrigger = new DateTime(1900, 1, 1);
+        private const string ResidentId = "resident-42";
 
-        private static List<InPlaceEditorCareLevelOption> CareLevelsData() => new()
-        {
-            new InPlaceEditorCareLevelOption { Id = "independent",  Label = "Independent Living" },
-            new InPlaceEditorCareLevelOption { Id = "assisted",     Label = "Assisted Living" },
-            new InPlaceEditorCareLevelOption { Id = "memory-care",  Label = "Memory Care" },
-            new InPlaceEditorCareLevelOption { Id = "skilled",      Label = "Skilled Nursing" }
-        };
+        // Another Maple Grove resident's medical record number: a face sheet cannot take it.
+        private const string WalterGrantsRecordNumber = "WGT4321";
 
-        private static List<AllergyOption> AllergiesData() => new()
-        {
-            new AllergyOption { Code = "none",       Name = "None" },
-            new AllergyOption { Code = "penicillin", Name = "Penicillin" },
-            new AllergyOption { Code = "latex",      Name = "Latex" },
-            new AllergyOption { Code = "peanuts",    Name = "Peanuts" }
-        };
+        private static readonly CultureInfo English = CultureInfo.GetCultureInfo("en-US");
 
         [HttpGet("")]
         public IActionResult Index()
         {
-            ViewBag.CareLevels = CareLevelsData();
-            ViewBag.Allergies  = AllergiesData();
-
-            var profile = new ResidentProfile
+            ViewBag.ResidentId = ResidentId;
+            return View("~/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Index.cshtml", new ResidentProfileModel
             {
-                Name          = "Eleanor Vance",
-                CareLevelId   = "assisted",
-                AdmissionDate = DateTime.Today.AddYears(-2),
-                MonthlyRate   = 4500m,
-                Nickname      = "Ellie",
-                DateOfBirth   = new DateTime(1942, 6, 14),
-                Allergies     = "penicillin"
-            };
-
-            return View("~/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Index.cshtml", profile);
-        }
-
-        [HttpGet("CareLevels")]
-        public IActionResult GetCareLevels() => Ok(CareLevelsData());
-
-        [HttpGet("Allergies")]
-        public IActionResult GetAllergies() => Ok(AllergiesData());
-
-        [HttpPost("UpdateProfile")]
-        public IActionResult UpdateProfile([FromBody] ResidentProfile profile)
-        {
-            if (profile == null) return BadRequest(new InPlaceEditorCommitError { Message = "Profile required." });
-            return Ok(new InPlaceEditorUpdateResponse
-            {
-                DisplayValue = profile.Name ?? "",
-                Saved        = true
+                Name = "Eleanor Vance",
+                AdmissionDate = DateTime.Today.AddMonths(-1),
+                PreferredName = "Ellie"
             });
         }
 
-        [HttpPost("UpdateDateOfBirth")]
-        public IActionResult UpdateDateOfBirth([FromBody] DateOfBirthQuickEdit body)
+        [HttpPost("UpdateProfile")]
+        public IActionResult UpdateProfile([FromBody] ResidentProfileModel profile)
         {
-            if (body?.Value == ServerErrorTrigger)
-                return StatusCode(500, new InPlaceEditorCommitError { Message = "Server refused that date of birth." });
-            if (body?.Value == null)
-                return BadRequest(new InPlaceEditorCommitError { Message = "Date of birth required." });
-            if (string.IsNullOrWhiteSpace(body.ResidentId))
-                return BadRequest(new InPlaceEditorCommitError { Message = "ResidentId missing from commit payload." });
-            return Ok(new InPlaceEditorUpdateResponse
+            var result = new ResidentProfileModelValidator().Validate(profile);
+            if (!result.IsValid)
+                return BadRequest(new { errors = result.ErrorsByField });
+
+            var preferredName = string.IsNullOrWhiteSpace(profile.PreferredName)
+                ? "She has no preferred name."
+                : $"Preferred name: {profile.PreferredName}.";
+            return Ok(new ProfileSaved { Message = $"Saved {profile.Name}'s profile. {preferredName}" });
+        }
+
+        [HttpPost("UpdateDateOfBirth")]
+        public IActionResult UpdateDateOfBirth([FromBody] DateOfBirthCorrection correction)
+        {
+            var result = new DateOfBirthCorrectionValidator().Validate(correction);
+            if (!result.IsValid || correction.ResidentId != ResidentId)
+                return BadRequest(new { errors = result.ErrorsByField });
+
+            return Ok(new CorrectionSaved
             {
-                DisplayValue = $"{body.Value.Value:yyyy-MM-dd} (resident={body.ResidentId})",
-                Saved = true
+                Message = $"Date of birth saved: {correction.Value!.Value.ToString("MMMM d, yyyy", English)}."
             });
         }
 
         [HttpPost("UpdateCareLevel")]
-        public IActionResult UpdateCareLevel([FromBody] CareLevelQuickEdit body)
+        public IActionResult UpdateCareLevel([FromBody] CareLevelCorrection correction)
         {
-            if (string.IsNullOrWhiteSpace(body?.ResidentId))
-                return BadRequest(new InPlaceEditorCommitError { Message = "ResidentId missing from commit payload." });
-            var match = CareLevelsData().Find(c => c.Id == body.Value);
-            return Ok(new InPlaceEditorUpdateResponse
+            var result = new CareLevelCorrectionValidator().Validate(correction);
+            var level = CareLevelChoice.All.FirstOrDefault(choice => choice.Name == correction.Value);
+            if (!result.IsValid || level == null || correction.ResidentId != ResidentId)
+                return BadRequest(new { errors = result.ErrorsByField });
+
+            return Ok(new CorrectionSaved
             {
-                DisplayValue = $"{match?.Label ?? body.Value ?? ""} (resident={body.ResidentId})",
-                Saved        = match != null
+                Message = $"Care level saved: {level.Name}, {level.MonthlyRate.ToString("C0", English)} a month."
             });
         }
 
+        // The editor's own commit data carries the new rate as text under "value".
         [HttpPost("UpdateMonthlyRate")]
-        public IActionResult UpdateMonthlyRate([FromBody] MonthlyRateQuickEdit? body)
+        public IActionResult UpdateMonthlyRate([FromBody] MonthlyRateChange change)
         {
-            if (body == null)
-                return BadRequest(new { errors = new Dictionary<string, string[]> { ["Value"] = new[] { "Request body is required." } } });
-
-            // Same FluentValidator used client-side. Server runs it; on failure returns the framework's standard
-            // { errors: { fieldName: [msg] } } shape so .OnError(400, e => e.ValidationErrors(formId)) on the
-            // client writes each message into its per-field validation slot. No custom rules, no Syncfusion channel.
-            var result = new MonthlyRateQuickEditValidator().Validate(body);
-            if (!result.IsValid)
+            var sent = change.Change != null && change.Change.TryGetValue("value", out var value) ? value?.ToString() : null;
+            var rate = decimal.TryParse(sent, NumberStyles.Number, CultureInfo.InvariantCulture, out var parsed) ? parsed : 0m;
+            var result = new MonthlyRateCorrectionValidator().Validate(new MonthlyRateCorrection
             {
-                var errors = new Dictionary<string, string[]>();
-                foreach (var failure in result.Errors)
-                {
-                    if (errors.TryGetValue(failure.PropertyName, out var existing))
-                    {
-                        var extended = new string[existing.Length + 1];
-                        existing.CopyTo(extended, 0);
-                        extended[existing.Length] = failure.ErrorMessage;
-                        errors[failure.PropertyName] = extended;
-                    }
-                    else
-                    {
-                        errors[failure.PropertyName] = new[] { failure.ErrorMessage };
-                    }
-                }
-                return BadRequest(new { errors });
-            }
+                ResidentId = change.ResidentId,
+                Value = rate,
+                CustomRate = true
+            });
+            if (!result.IsValid || change.ResidentId != ResidentId)
+                return BadRequest(new { errors = result.ErrorsByField });
 
-            return Ok(new InPlaceEditorUpdateResponse
+            return Ok(new MonthlyRateSaved
             {
-                DisplayValue = $"{body.Value:C} (resident={body.ResidentId})",
-                Saved = true
+                Rate = rate.ToString(CultureInfo.InvariantCulture),
+                Message = $"Monthly rate saved: {rate.ToString("C0", English)}."
             });
         }
 
-        [HttpPost("UpdateNickname")]
-        public IActionResult UpdateNickname([FromBody] NicknameQuickEdit body)
+        [HttpPost("UpdateLastHospitalStay")]
+        public IActionResult UpdateLastHospitalStay([FromBody] LastHospitalStayCorrection correction)
         {
-            if (string.Equals(body?.Value, "boom", StringComparison.OrdinalIgnoreCase))
-                return StatusCode(500, new InPlaceEditorCommitError { Message = "Nickname rejected by server." });
-            if (string.IsNullOrWhiteSpace(body?.Value))
-                return BadRequest(new InPlaceEditorCommitError { Message = "Nickname required." });
-            if (string.IsNullOrWhiteSpace(body.ResidentId))
-                return BadRequest(new InPlaceEditorCommitError { Message = "ResidentId missing from commit payload." });
-            return Ok(new InPlaceEditorUpdateResponse
-            {
-                DisplayValue = $"{body.Value} (resident={body.ResidentId})",
-                Saved = true
-            });
-        }
+            var result = new LastHospitalStayCorrectionValidator().Validate(correction);
+            if (!result.IsValid || correction.ResidentId != ResidentId)
+                return BadRequest(new { errors = result.ErrorsByField });
 
-        [HttpPost("UpdateAllergies")]
-        public IActionResult UpdateAllergies([FromBody] AllergiesQuickEdit body)
-        {
-            if (body?.Value == null || body.Value.Length == 0)
-                return BadRequest(new InPlaceEditorCommitError { Message = "Select at least one allergy." });
-            if (string.IsNullOrWhiteSpace(body.ResidentId))
-                return BadRequest(new InPlaceEditorCommitError { Message = "ResidentId missing from commit payload." });
-            return Ok(new InPlaceEditorUpdateResponse
+            return Ok(new CorrectionSaved
             {
-                DisplayValue = $"{string.Join(", ", body.Value)} (resident={body.ResidentId})",
-                Saved = true
-            });
-        }
-
-        [HttpPost("UpdateLastAdmission")]
-        public IActionResult UpdateLastAdmission([FromBody] LastAdmissionQuickEdit body)
-        {
-            if (body?.Value == null)
-                return BadRequest(new InPlaceEditorCommitError { Message = "Admission timestamp required." });
-            if (string.IsNullOrWhiteSpace(body.ResidentId))
-                return BadRequest(new InPlaceEditorCommitError { Message = "ResidentId missing from commit payload." });
-            return Ok(new InPlaceEditorUpdateResponse
-            {
-                DisplayValue = $"{body.Value.Value:yyyy-MM-dd HH:mm} (resident={body.ResidentId})",
-                Saved = true
+                Message = $"Last hospital stay saved: {correction.Value!.Value.ToString("MMMM d, yyyy 'at' h:mm tt", English)}."
             });
         }
 
         [HttpPost("UpdateMedicalRecordNumber")]
-        public IActionResult UpdateMedicalRecordNumber([FromBody] MedicalRecordNumberQuickEdit body)
+        public IActionResult UpdateMedicalRecordNumber([FromBody] MedicalRecordNumberCorrection correction)
         {
-            if (string.IsNullOrWhiteSpace(body?.Value))
-                return BadRequest(new InPlaceEditorCommitError { Message = "Medical record number required." });
-            if (string.IsNullOrWhiteSpace(body.ResidentId))
-                return BadRequest(new InPlaceEditorCommitError { Message = "ResidentId missing from commit payload." });
-            return Ok(new InPlaceEditorUpdateResponse
-            {
-                DisplayValue = $"{body.Value} (resident={body.ResidentId})",
-                Saved = true
-            });
+            var result = new MedicalRecordNumberCorrectionValidator().Validate(correction);
+            if (!result.IsValid || correction.ResidentId != ResidentId)
+                return BadRequest(new { errors = result.ErrorsByField });
+            if (correction.Value == WalterGrantsRecordNumber)
+                return Conflict(new CorrectionRefused { Message = $"{WalterGrantsRecordNumber} is Walter Grant's medical record number." });
+
+            return Ok(new CorrectionSaved { Message = $"Medical record number saved: {correction.Value}." });
         }
     }
 }
