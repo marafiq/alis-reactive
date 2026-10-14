@@ -22,10 +22,14 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public sealed class NativeHiddenField : NativeComponent, IInputComponent
     {
-        /// <summary>The hidden value.</summary>
+        /// <summary>The hidden value. Writing a new value raises <see cref="Change"/>.</summary>
         public Prop<string> Value => Prop<string>();
 
-        /// <summary>Raised when a script changes the value and raises <c>change</c>.</summary>
+        /// <summary>
+        /// Raised when the value is written with a new value, by the plan or a script, so a value the page
+        /// writes commits as one the user changes does: the field's rules check it again at once. Writing
+        /// the value the field already holds raises nothing.
+        /// </summary>
         public TypedEvent<NativeHiddenFieldChangeArgs> Change =>
             Event<NativeHiddenFieldChangeArgs>();
 

@@ -59,6 +59,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Native.Hidden
         public string ResidentName { get; set; } = "";
     }
 
+    /// <summary>A resident whose night care the nurse looks up.</summary>
+    public sealed class NightCareQuery
+    {
+        public string ResidentId { get; set; } = "";
+    }
+
+    /// <summary>What the care plan asks of the night shift for one resident.</summary>
+    public sealed class NightCareNote
+    {
+        public string Note { get; set; } = "";
+    }
+
     /// <summary>What the server says once a room check is recorded.</summary>
     public sealed class RoomCheckRecorded
     {
@@ -70,6 +82,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Native.Hidden
         public NightRoomCheckValidator()
         {
             RuleFor(x => x.Room).NotEmpty().WithMessage("Choose the room you checked.");
+            RuleFor(x => x.ResidentId).NotEmpty().WithMessage("The check names no resident yet: the room you choose names who sleeps there.");
             RuleFor(x => x.Finding).NotEmpty().WithMessage("Say how you found the resident.");
         }
     }

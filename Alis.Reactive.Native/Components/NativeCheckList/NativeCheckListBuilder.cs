@@ -158,10 +158,10 @@ namespace Alis.Reactive.Native.Components
             var encodedId = encoder.Encode(_elementId);
 
             // The container is the component: the framework's check-list code (constructed on alis:mount,
-            // like an app's widget) gives it the checked values as its value.
+            // like an app's widget) gives it a value that reads the checked boxes and checks them when written.
             writer.Write($"<div id=\"{encodedId}\" class=\"{encoder.Encode(_cssClass)}\" data-alis-check-list>");
 
-            // Hidden input keeps MVC form submission as CSV; it is not the component target.
+            // Hidden input keeps MVC form submission as CSV, in step with the checked boxes; it is not the component target.
             writer.Write($"<input type=\"hidden\" name=\"{encoder.Encode(_bindingPath)}\" value=\"{encoder.Encode(modelValue)}\" />");
 
             for (int i = 0; i < _options.Count; i++)

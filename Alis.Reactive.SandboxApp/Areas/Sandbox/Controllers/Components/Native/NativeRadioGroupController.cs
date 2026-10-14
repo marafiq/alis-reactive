@@ -6,7 +6,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
 {
     /// <summary>
     /// Move-in preferences: the move-in coordinator records Dorothy Price's care level, room type and meal
-    /// plan before her move-in day, and the office records them.
+    /// plan before her move-in day, taking the care level from her hospital referral when she wants, and
+    /// the office records them.
     /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/NativeRadioGroup")]
@@ -27,6 +28,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
             ViewBag.RoomTypes = RoomTypes;
             return View("~/Areas/Sandbox/Views/Components/Native/NativeRadioGroup/Index.cshtml", new NativeRadioGroupModel { ResidentId = DorothyPriceId });
         }
+
+        [HttpGet("Referral")]
+        public IActionResult Referral() => Ok(new MoveInReferral { CareLevel = "Memory Care" });
 
         [HttpPost("Save")]
         public IActionResult Save([FromBody] NativeRadioGroupModel? preferences)

@@ -5,17 +5,18 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
 /// As the move-in coordinator, I want to record Dorothy Price's care level, room type and meal plan before
-/// her move-in day, be warned at once about a choice the community cannot honour, and have the office
-/// record what I chose, so that the care team, housekeeping and the kitchen are ready when she arrives.
+/// her move-in day, take her care level from her hospital referral, be warned at once about a choice the
+/// community cannot honour, and have the office record what I chose, so that the care team, housekeeping
+/// and the kitchen are ready when she arrives.
 /// </summary>
 /// <remarks>
 /// The memory care floor has no suites: the page warns as soon as the two are chosen together, and only
 /// the office refuses them when the preferences are saved. A radio group raises change when the
 /// coordinator picks an option (HTML, the radio input's input and change events, which the group raises
-/// again on its own element). Not exercised: writing the group's value. The old page never wrote it, and a
-/// write lands on the group's hidden input without checking a radio (the group's script follows only the
-/// radios' own change events), so the radios would go on showing the old choice while the group reads and
-/// sends the written one.
+/// again on its own element). "Use the referral's care level" writes the server's answer to the care
+/// level group's <c>Value</c>: the referral's option is the one checked, the page reads the group back
+/// for the summary and the assessment notice, and saving sends it. Not exercised: a write of empty text,
+/// which clears every option; no step on this page clears a choice.
 /// </remarks>
 [TestFixture]
 public class WhenRadioOptionSelected : PlaywrightTestBase
@@ -33,8 +34,10 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     private ILocator MealPlanError => _plan.ErrorFor(m => m.MealPlan);
     private ILocator AssessmentNotice => Page.Locator("#assessment-notice");
     private ILocator SuiteWarning => Page.Locator("#suite-warning");
+    private ILocator SummaryCare => Page.Locator("#summary-care");
     private ILocator SummaryMeals => Page.Locator("#summary-meals");
     private ILocator SavePreferences => Page.Locator("#save-preferences-btn");
+    private ILocator UseReferralCareLevel => Page.Locator("#use-referral-care-level-btn");
     private ILocator Status => Page.Locator("#preferences-status");
 
     private async Task NavigateAndBoot()
@@ -126,6 +129,47 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
 
         await Expect(AssessmentNotice).ToHaveTextAsync("A memory care assessment is booked before move-in day.");
         await Expect(SuiteWarning).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // The referral's care level takes the place of the one chosen before; one option stays checked.
+    [Test]
+    public async Task the_referrals_care_level_is_chosen_in_place_of_the_one_picked_before()
+    {
+        await NavigateAndBoot();
+        await CareLevel.Choose("Assisted Living");
+
+        await ClickWhenStable(UseReferralCareLevel);
+
+        await Expect(CareLevel.Option("Memory Care")).ToBeCheckedAsync(new() { Timeout = 10000 });
+        await Expect(CareLevel.Option("Assisted Living")).Not.ToBeCheckedAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task the_referrals_memory_care_books_an_assessment_before_move_in_day()
+    {
+        await NavigateAndBoot();
+
+        await ClickWhenStable(UseReferralCareLevel);
+
+        await Expect(AssessmentNotice).ToHaveTextAsync("A memory care assessment is booked before move-in day.", new() { Timeout = 10000 });
+        await Expect(SummaryCare).ToHaveTextAsync("Memory Care");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task saving_after_using_the_referral_records_its_care_level()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(UseReferralCareLevel);
+        await Expect(CareLevel.Option("Memory Care")).ToBeCheckedAsync(new() { Timeout = 10000 });
+        await RoomType.Choose("Private room");
+        await MealPlan.Choose("Standard");
+
+        await ClickWhenStable(SavePreferences);
+
+        await Expect(Status).ToHaveTextAsync("Move-in preferences saved for Dorothy Price: Memory Care, Private room, Standard meals.", new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
 

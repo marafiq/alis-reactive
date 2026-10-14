@@ -5,17 +5,19 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
 /// As a night nurse, I want the fall-prevention round to open with the resident's fall risk factors on
-/// file, to call for hourly checks while a recent fall is ticked, and to refuse a round without the
-/// precautions she needs, so that no resident at risk of falling is left unprotected tonight.
+/// file, to call for hourly checks while a recent fall is ticked, to repeat last night's precautions in
+/// one step, and to refuse a round without the precautions she needs, so that no resident at risk of
+/// falling is left unprotected tonight.
 /// </summary>
 /// <remarks>
 /// Edith Morales's round opens with "Fell in the last 30 days" and "Takes a sedative at night" on file.
 /// The hourly-checks banner reads the risk factor list when the round opens (its <c>Value</c>) and as the
 /// nurse ticks it (its <c>Change</c>, whose <c>Value</c> carries every box ticked). Unticking the last
-/// precaution asks for one at once: the list's change is its commit, which checks it again. Only the
-/// server knows that a recent fall needs the bed alarm on. Not exercised: writing the list's <c>Value</c>
-/// from a plan, because the list keeps no setter, so neither its boxes nor the CSV it keeps for a plain
-/// form post would follow the write; that CSV input itself, which only a form posted without the plan reads.
+/// precaution asks for one at once: the list's change is its commit, which checks it again. "Same
+/// precautions as last night" writes the server's answer to the precaution list's <c>Value</c>: the
+/// boxes show exactly last night's, and a box the nurse ticks after it adds to them in what is sent.
+/// Only the server knows that a recent fall needs the bed alarm on. Not exercised: the CSV input the
+/// list keeps for a form posted without the plan, which no page posts.
 /// </remarks>
 [TestFixture]
 public class WhenNurseRecordsFallPreventionRound : PlaywrightTestBase
@@ -24,6 +26,9 @@ public class WhenNurseRecordsFallPreventionRound : PlaywrightTestBase
     private const string RecentFall = "Fell in the last 30 days";
     private const string BedAlarm = "Bed alarm on";
     private const string CallLight = "Call light within reach";
+    private const string LowBed = "Bed in its lowest position";
+    private const string NonSlipSocks = "Non-slip socks on";
+    private const string NightLight = "Night light on";
 
     private PagePlan<FallPreventionRound> _plan = null!;
 
@@ -31,6 +36,7 @@ public class WhenNurseRecordsFallPreventionRound : PlaywrightTestBase
     private NativeCheckListLocator Precautions => new(Page, _plan.FindComponent(m => m.Precautions)!.ElementId);
     private ILocator HourlyChecks => Page.Locator("#hourly-checks");
     private ILocator RecordRound => Page.Locator("#record-fall-round-btn");
+    private ILocator SameAsLastNight => Page.Locator("#same-as-last-night-btn");
     private ILocator Status => Page.Locator("#fall-round-status");
 
     private async Task NavigateAndBoot()
@@ -158,6 +164,42 @@ public class WhenNurseRecordsFallPreventionRound : PlaywrightTestBase
         await Expect(Status).ToHaveTextAsync(
             "Round recorded for Edith Morales by JO. Precautions: Call light within reach, Bed alarm on. "
             + "Risk factors: Fell in the last 30 days, Takes a sedative at night.",
+            new() { Timeout = 10000 });
+        AssertNoConsoleErrors();
+    }
+
+    // A precaution ticked before is cleared: the list shows last night's and nothing else.
+    [Test]
+    public async Task same_precautions_as_last_night_ticks_exactly_last_nights()
+    {
+        await NavigateAndBoot();
+        await Precautions.Tick(NonSlipSocks);
+
+        await ClickWhenStable(SameAsLastNight);
+
+        await Expect(Precautions.Box(BedAlarm)).ToBeCheckedAsync(new() { Timeout = 10000 });
+        await Expect(Precautions.Box(LowBed)).ToBeCheckedAsync();
+        await Expect(Precautions.Box(CallLight)).ToBeCheckedAsync();
+        await Expect(Precautions.Box(NonSlipSocks)).Not.ToBeCheckedAsync();
+        await Expect(Precautions.Box(NightLight)).Not.ToBeCheckedAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // What is sent is what the boxes show: last night's precautions and the one the nurse adds tonight.
+    [Test]
+    public async Task recording_after_repeating_last_night_sends_last_nights_precautions_with_tonights_addition()
+    {
+        await NavigateAndBoot();
+        await SignAs("JO");
+        await ClickWhenStable(SameAsLastNight);
+        await Expect(Precautions.Box(BedAlarm)).ToBeCheckedAsync(new() { Timeout = 10000 });
+        await Precautions.Tick(NightLight);
+
+        await ClickWhenStable(RecordRound);
+
+        await Expect(Status).ToHaveTextAsync(
+            "Round recorded for Edith Morales by JO. Precautions: Bed in its lowest position, Call light within reach, "
+            + "Bed alarm on, Night light on. Risk factors: Fell in the last 30 days, Takes a sedative at night.",
             new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }

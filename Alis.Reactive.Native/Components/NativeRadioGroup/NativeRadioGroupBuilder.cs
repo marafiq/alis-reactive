@@ -153,7 +153,8 @@ namespace Alis.Reactive.Native.Components
             writer.Write($"<div class=\"{encoder.Encode(_cssClass)}\">");
 
             // The hidden input is the component and has no name: the radios post the value. The framework's
-            // radio-group code (constructed on alis:mount) keeps the picked value on it and raises change.
+            // radio-group code (constructed on alis:mount) keeps the picked value on it and raises change, and
+            // checks the radio a write to its value names.
             writer.Write($"<input type=\"hidden\" id=\"{encodedId}\" value=\"{encoder.Encode(selectedValue)}\" data-alis-radio-group />");
 
             for (int i = 0; i < _options.Count; i++)

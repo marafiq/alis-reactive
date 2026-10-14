@@ -33,6 +33,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Native.CheckL
         public const string NightLight = "Night light on";
     }
 
+    /// <summary>The precautions recorded on the resident's round last night.</summary>
+    public sealed class LastNightPrecautions
+    {
+        public string[] Precautions { get; set; } = Array.Empty<string>();
+    }
+
     /// <summary>What the server says once the round is recorded.</summary>
     public sealed class FallRoundRecorded
     {

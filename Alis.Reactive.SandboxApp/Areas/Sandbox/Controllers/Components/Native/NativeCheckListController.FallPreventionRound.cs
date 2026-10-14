@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
 {
     /// <summary>
-    /// Fall prevention round: Edith Morales's risk factors open as they are on file, and the round is
-    /// recorded with the precautions the night nurse ticked.
+    /// Fall prevention round: Edith Morales's risk factors open as they are on file, last night's
+    /// precautions are there to repeat, and the round is recorded with the precautions the night nurse
+    /// ticked.
     /// </summary>
     public partial class NativeCheckListController
     {
@@ -18,6 +19,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
             };
             return View("~/Areas/Sandbox/Views/Components/Native/NativeCheckList/Index.cshtml", roundOnFile);
         }
+
+        [HttpGet("FallRound/LastNight")]
+        public IActionResult LastNightRound() => Ok(new LastNightPrecautions
+        {
+            Precautions = new[] { FallPrevention.LowBed, FallPrevention.CallLight, FallPrevention.BedAlarm },
+        });
 
         [HttpPost("FallRound/Record")]
         public IActionResult RecordFallRound([FromBody] FallPreventionRound? round)

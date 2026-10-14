@@ -5,7 +5,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
 {
     /// <summary>
     /// Night room checks on Maple wing: the server stamps the start of the round, names the resident in
-    /// each room, and records each check with the wing, the round and the resident the page sends.
+    /// each room with their night care, and records each check with the wing, the round and the resident
+    /// the page sends.
     /// </summary>
     public partial class NativeHiddenFieldController
     {
@@ -16,6 +17,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
             ["Maple 110"] = new RoomOccupant { ResidentId = "3104", ResidentName = "Arthur Pell" },
             ["Maple 112"] = new RoomOccupant { ResidentId = "3107", ResidentName = "Lillian Ford" },
             ["Maple 114"] = new RoomOccupant { ResidentId = "3111", ResidentName = "Samuel Ortiz" },
+        };
+
+        private static readonly IReadOnlyDictionary<string, string> NightCareByResident = new Dictionary<string, string>
+        {
+            ["3104"] = "Oxygen at 2 litres overnight; check the tubing is not kinked.",
+            ["3107"] = "Bed alarm on; walk her to the bathroom if she is up.",
+            ["3111"] = "Turn him at 02:00 and 04:00.",
         };
 
         [HttpGet(""), ActionName("Index")]
@@ -40,6 +48,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
         public IActionResult Occupant([FromQuery] RoomOccupantQuery query)
         {
             return OccupantByRoom.TryGetValue(query.Room, out var occupant) ? Ok(occupant) : NotFound();
+        }
+
+        [HttpGet("NightRound/NightCare")]
+        public IActionResult NightCare([FromQuery] NightCareQuery query)
+        {
+            return NightCareByResident.TryGetValue(query.ResidentId, out var note) ? Ok(new NightCareNote { Note = note }) : NotFound();
         }
 
         [HttpPost("NightRound/Record")]

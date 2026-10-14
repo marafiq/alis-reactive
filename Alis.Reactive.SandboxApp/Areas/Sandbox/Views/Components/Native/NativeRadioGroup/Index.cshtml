@@ -1,4 +1,5 @@
 @model NativeRadioGroupModel
+@using Alis.Reactive.Builders
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "Move-in Preferences";
@@ -9,6 +10,19 @@
 
     var plan = Html.ReactivePlan<NativeRadioGroupModel>();
     var roomTypes = (IReadOnlyList<RadioButtonItem>)ViewBag.RoomTypes;
+
+    // What a care level brings, chosen by the coordinator or taken from the referral: the summary, the
+    // assessment before move-in, and the warning that the memory care floor has no suites.
+    void CareLevelChosen(PipelineBuilder<NativeRadioGroupModel> p, ReadOnly<string> careLevel)
+    {
+        p.Element("summary-care").Text.Set(careLevel);
+        p.When(careLevel).Eq(MemoryCare)
+            .Then(memory => memory.Element("assessment-notice").Text.Set("A memory care assessment is booked before move-in day."))
+            .Else(other => other.Element("assessment-notice").Text.Set("No assessment is needed before move-in."));
+        p.When(careLevel).Eq(MemoryCare).And(p.Component<NativeRadioGroup>(m => m.RoomType).Value).Eq(Suite)
+            .Then(warn => warn.Element("suite-warning").Show())
+            .Else(clear => clear.Element("suite-warning").Hide());
+    }
 }
 
 <native-vstack gap="Lg">
@@ -28,16 +42,17 @@
                         .Option("Assisted Living", "Assisted Living", "Daily help with meals, bathing and medication")
                         .Option(MemoryCare, MemoryCare, "A secure floor for residents living with dementia")
                         .Option("Skilled Nursing", "Skilled Nursing", "Licensed nursing around the clock"))
-                    .Reactive(evt => evt.Change, (args, p) =>
-                    {
-                        p.Element("summary-care").Text.Set(args.Value);
-                        p.When(args.Value).Eq(MemoryCare)
-                            .Then(memory => memory.Element("assessment-notice").Text.Set("A memory care assessment is booked before move-in day."))
-                            .Else(other => other.Element("assessment-notice").Text.Set("No assessment is needed before move-in."));
-                        p.When(args.Value).Eq(MemoryCare).And(p.Component<NativeRadioGroup>(m => m.RoomType).Value).Eq(Suite)
-                            .Then(warn => warn.Element("suite-warning").Show())
-                            .Else(clear => clear.Element("suite-warning").Hide());
-                    }); }
+                    .Reactive(evt => evt.Change, (args, p) => CareLevelChosen(p, args.Value)); }
+                @(Html.NativeButton("use-referral-care-level-btn", "Use the referral's care level")
+                    .CssClass("self-start rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                        p.Get(Url.SandboxRoute("Referral", "NativeRadioGroup"))
+                         .Response(r => r.OnSuccess<MoveInReferral>((referral, s) =>
+                         {
+                             var careLevel = s.Component<NativeRadioGroup>(m => m.CareLevel);
+                             careLevel.Value.Set(referral.Get(x => x.CareLevel));
+                             CareLevelChosen(s, careLevel.Value);
+                         }))))
                 <p id="assessment-notice" class="text-sm text-text-secondary">Choose a care level to see what happens before move-in.</p>
 
                 @{ Html.InputField(plan, m => m.RoomType, o => o.Required().Label("Room type"))

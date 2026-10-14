@@ -11,7 +11,11 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public sealed class NativeRadioGroup : NativeComponent, IInputComponent
     {
-        /// <summary>The chosen option value; empty text when none is chosen.</summary>
+        /// <summary>
+        /// The chosen option value; empty text when none is chosen. Writing it checks the option with that
+        /// value and no other, or none for empty text, and raises no event, as a write to any native input
+        /// raises none.
+        /// </summary>
         public Prop<string> Value => Prop<string>();
 
         /// <summary>Raised when the user chooses an option.</summary>

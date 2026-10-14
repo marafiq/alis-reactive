@@ -11,7 +11,10 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public sealed class NativeCheckList : NativeComponent, IInputComponent
     {
-        /// <summary>The checked values.</summary>
+        /// <summary>
+        /// The checked values. Writing them checks exactly the boxes whose values they hold and raises no
+        /// event, as a write to any native input raises none.
+        /// </summary>
         public Prop<string[]> Value => Prop<string[]>();
 
         /// <summary>Raised when the user checks or clears a box.</summary>

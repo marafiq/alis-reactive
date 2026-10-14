@@ -23,7 +23,15 @@
         <form id="@FormId" class="flex flex-col gap-4">
             @Html.HiddenFieldFor(plan, m => m.Wing)
             @Html.HiddenFieldFor(plan, m => m.RoundStartedAt)
-            @Html.HiddenFieldFor(plan, m => m.ResidentId)
+            @{ Html.HiddenFieldFor(plan, m => m.ResidentId)
+                .Reactive(evt => evt.Change, (args, p) =>
+                    p.Get(Url.SandboxRoute("NightCare", "NativeHiddenField"))
+                     .Gather<NightCareQuery>(g => g.Set(x => x.ResidentId, args.Value))
+                     .Response(r => r.OnSuccess<NightCareNote>((care, s) =>
+                     {
+                         s.Element("resident-night-care-note").Text.Set(care.Get(x => x.Note));
+                         s.Element("resident-night-care").Show();
+                     }))); }
 
             <native-hstack gap="Base" align="Center">
                 @(Html.NativeButton("start-round-btn", "Start Round")
@@ -66,6 +74,7 @@
                          }));
                     }); }
                 <p class="text-sm">Resident: <span id="room-resident" class="font-medium">Choose the room you checked.</span></p>
+                <p id="resident-night-care" hidden class="text-sm text-text-secondary">Night care: <span id="resident-night-care-note"></span></p>
 
                 @{ Html.InputField(plan, m => m.Finding, o => o.Required().Label("How you found the resident"))
                     .NativeDropDown(b => b.Items(findings).Placeholder("-- Choose --")); }

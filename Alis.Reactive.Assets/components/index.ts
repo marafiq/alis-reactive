@@ -3,6 +3,7 @@
 
 import "./native/check-list";
 import "./native/radio-group";
+import "./native/hidden-field";
 import "./native/drawer";
 import "./native/loader";
 import "./fusion/confirm";

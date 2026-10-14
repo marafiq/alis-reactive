@@ -51,6 +51,13 @@
                     .Option(FallPrevention.BedAlarm)
                     .Option(FallPrevention.NightLight)); }
 
+            @(Html.NativeButton("same-as-last-night-btn", "Same precautions as last night")
+                .CssClass("rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Get(Url.SandboxRoute("LastNightRound", "NativeCheckList"))
+                     .Response(r => r.OnSuccess<LastNightPrecautions>((lastNight, s) =>
+                        s.Component<NativeCheckList>(m => m.Precautions).Value.Set(lastNight.Get(x => x.Precautions))))))
+
             @{ Html.InputField(plan, m => m.CheckedBy, o => o.Required().Label("Checked by"))
                 .NativeTextBox(b => b.Placeholder("Your initials")); }
         </form>

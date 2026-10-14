@@ -5,23 +5,24 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
 /// As a night nurse, I want each room check I record to carry the wing, the start of the round and the
-/// resident in the room, without my typing them, so that the morning report shows who was checked on
-/// which round.
+/// resident in the room, without my typing them, and to see the night care of the resident I am about to
+/// check, so that the morning report shows who was checked on which round and nobody's care is missed.
 /// </summary>
 /// <remarks>
 /// The page keeps three hidden fields: the wing the server writes when the page opens, the start time the
 /// server answers when the round starts, and the resident the server names for the room chosen (each a
 /// <c>Value</c> write from a response). Starting the round again reads the start time back (a <c>Value</c>
-/// read). Every check is sent with all three, and the server's answer is built from them. Not exercised:
-/// the hidden field's <c>Change</c> and its <c>Value</c>, because nothing on a sandbox page raises
-/// <c>change</c> on a hidden input. A plan's <c>Value</c> write sets the property and raises no event, and
-/// HTML fires neither input nor change for a hidden input; only a script that writes the field and
-/// dispatches <c>change</c> would, and the sandbox has none.
+/// read). Every check is sent with all three, and the server's answer is built from them. Writing the
+/// resident raises the hidden field's <c>Change</c>: its reaction asks for the night care of the resident
+/// its <c>Value</c> names, and, as the field's commit, it checks the field's rule again, so the summary's
+/// "no resident" message clears as soon as the server names one. Not exercised: a write of the value the
+/// field already holds, which raises nothing; no step on the page writes the same resident twice.
 /// </remarks>
 [TestFixture]
 public class WhenNurseRecordsNightRoomChecks : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/NativeHiddenField";
+    private const string NoResident = "The check names no resident yet: the room you choose names who sleeps there.";
 
     private PagePlan<NightRoomCheck> _plan = null!;
 
@@ -32,6 +33,8 @@ public class WhenNurseRecordsNightRoomChecks : PlaywrightTestBase
     private ILocator RoundUnderway => Page.Locator("#round-underway");
     private ILocator RoomChecks => Page.Locator("#room-check-panel");
     private ILocator RoomResident => Page.Locator("#room-resident");
+    private ILocator NightCare => Page.Locator("#resident-night-care");
+    private ILocator ValidationSummary => Page.Locator("[data-reactive-validation-summary]");
     private ILocator RecordCheck => Page.Locator("#record-room-check-btn");
     private ILocator CheckStatus => Page.Locator("#room-check-status");
 
@@ -90,6 +93,40 @@ public class WhenNurseRecordsNightRoomChecks : PlaywrightTestBase
         await Room.Select("Maple 112");
 
         await Expect(RoomResident).ToHaveTextAsync("Lillian Ford", new() { Timeout = 10000 });
+        AssertNoConsoleErrors();
+    }
+
+    // The resident the server names for the room brings their night care; another room, another resident's.
+    [Test]
+    public async Task the_night_care_shown_is_that_of_the_resident_in_the_room_chosen()
+    {
+        await NavigateAndBoot();
+        await StartTheRound();
+        await Expect(NightCare).ToBeHiddenAsync();
+
+        await ChooseRoom("Maple 112", "Lillian Ford");
+        await Expect(NightCare).ToHaveTextAsync("Night care: Bed alarm on; walk her to the bathroom if she is up.", new() { Timeout = 10000 });
+
+        await ChooseRoom("Maple 114", "Samuel Ortiz");
+        await Expect(NightCare).ToHaveTextAsync("Night care: Turn him at 02:00 and 04:00.", new() { Timeout = 10000 });
+        AssertNoConsoleErrors();
+    }
+
+    // The resident travels in a hidden field with no message slot, so its message is in the summary. The
+    // server naming the resident clears it at once, before the check is recorded again.
+    [Test]
+    public async Task choosing_the_room_clears_the_missing_resident_from_the_summary_at_once()
+    {
+        await NavigateAndBoot();
+        await StartTheRound();
+        await ClickWhenStable(RecordCheck);
+        await Expect(ValidationSummary).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(ValidationSummary).ToHaveTextAsync(NoResident);
+
+        await ChooseRoom("Maple 112", "Lillian Ford");
+
+        await Expect(ValidationSummary).ToBeHiddenAsync();
+        await Expect(CheckStatus).ToHaveTextAsync("No rooms checked yet.");
         AssertNoConsoleErrors();
     }
 
