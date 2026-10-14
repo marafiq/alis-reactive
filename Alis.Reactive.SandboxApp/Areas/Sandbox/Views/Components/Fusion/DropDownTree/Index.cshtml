@@ -60,9 +60,9 @@
                         })
                         .Else(e => e.Element("selected-indicator").Hide());
                 }); }
-        </native-grid>
 
-        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+        @* The commands sit beside the tree, so its popup never covers them. *@
+        <native-hstack gap="Sm" class="flex-wrap content-start">
             @(Html.NativeButton("set-value-btn", "Set Value")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -114,6 +114,7 @@
                         .Else(e => e.Element("selected-indicator").Hide());
                 }))
         </native-hstack>
+        </native-grid>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
