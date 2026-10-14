@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Native.CheckList;
 
@@ -39,8 +40,16 @@ public class WhenNurseRecordsFallPreventionRound : PlaywrightTestBase
     private ILocator SameAsLastNight => Page.Locator("#same-as-last-night-btn");
     private ILocator Status => Page.Locator("#fall-round-status");
 
+    // Every round the page sends the server to record.
+    private ConcurrentQueue<string> _roundsSent = null!;
+
     private async Task NavigateAndBoot()
     {
+        _roundsSent = new ConcurrentQueue<string>();
+        Page.Request += (_, request) =>
+        {
+            if (request.Url.Contains($"{Path}/FallRound/Record")) _roundsSent.Enqueue(request.Url);
+        };
         await NavigateToAndWaitForBoot(Path);
         _plan = await PagePlan<FallPreventionRound>.FromPage(Page);
     }
@@ -110,6 +119,7 @@ public class WhenNurseRecordsFallPreventionRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // Recording the round afterwards is the server's later answer: a round sent on the tick would come first.
     [Test]
     public async Task ticking_a_precaution_clears_the_request_without_recording_again()
     {
@@ -121,7 +131,12 @@ public class WhenNurseRecordsFallPreventionRound : PlaywrightTestBase
         await Precautions.Tick(BedAlarm);
 
         await Expect(_plan.ErrorFor(m => m.Precautions)).ToBeHiddenAsync(new() { Timeout = 5000 });
-        await Expect(Status).ToHaveTextAsync("The round is not recorded yet.");
+        await ClickWhenStable(RecordRound);
+        await Expect(Status).ToHaveTextAsync(
+            "Round recorded for Edith Morales by JO. Precautions: Bed alarm on. "
+            + "Risk factors: Fell in the last 30 days, Takes a sedative at night.",
+            new() { Timeout = 10000 });
+        Assert.That(_roundsSent, Has.Count.EqualTo(1));
         AssertNoConsoleErrors();
     }
 

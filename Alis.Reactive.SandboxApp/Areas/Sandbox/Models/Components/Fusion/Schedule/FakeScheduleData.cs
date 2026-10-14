@@ -35,6 +35,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         /// <summary>The staff educator who teaches the in-services.</summary>
         public const string StaffEducator = "Dana Whitfield";
 
+        /// <summary>The facility whose roster is full: every shift of its weeks starts with someone on it.</summary>
+        private const string FullyStaffedFacilityId = "oak-ridge";
+
         private static readonly string[][] ResidentGroups = new[]
         {
             new[] { "Adams, Baker, Clark" },
@@ -91,8 +94,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
         /// <summary>
         /// The week a facility starts with, the same on every run, machine and CI shard: three shifts a day,
-        /// and two in-services the AM staff attend after their shift, on Tuesday and Thursday. The staff
-        /// educator has Thursday's open to change it.
+        /// some of them open except at Oak Ridge, whose roster is full, and two in-services the AM staff attend
+        /// after their shift, on Tuesday and Thursday. The staff educator has Thursday's open to change it.
         /// </summary>
         public static List<ShiftAssignment> GenerateWeek(string facilityId, DateTime sunday)
         {
@@ -114,7 +117,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                         ? date.AddDays(1).AddHours(endHour)
                         : date.AddHours(endHour);
 
-                    var isUnassigned = rng.NextDouble() < 0.3;
+                    var isUnassigned = facilityId != FullyStaffedFacilityId && rng.NextDouble() < 0.3;
                     var staffIndex = rng.Next(Staff.Count);
                     var staff = isUnassigned ? null : Staff[staffIndex];
                     var careItems = rng.Next(2, 8);

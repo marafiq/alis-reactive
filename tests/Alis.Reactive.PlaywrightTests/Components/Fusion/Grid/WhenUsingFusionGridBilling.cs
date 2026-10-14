@@ -52,6 +52,7 @@ public class WhenUsingFusionGridBilling : PlaywrightTestBase
     private ILocator ClearFilters => Page.Locator("#billing-clear-filters");
     private ILocator AddCharges => Page.Locator("#billing-add-open");
     private ILocator OpenCharges => Page.Locator("#add-charge-save");
+    private ILocator CancelCharges => Page.Locator("#add-charge-cancel");
     private ILocator AddChargeDialog => Page.Locator("#add-charge-dialog");
     private ILocator SaveRateChanges => Page.Locator("#billing-save-all");
     private ILocator RaiseSelectedRates => Page.Locator("#billing-bulk-increase");
@@ -180,16 +181,21 @@ public class WhenUsingFusionGridBilling : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // Each filter left set would keep the board narrowed: all three are set before they are cleared.
     [Test]
     public async Task clearing_the_filters_brings_back_every_resident()
     {
         await NavigateAndBoot();
+        await CareLevelFilter.Select("Skilled Nursing");
+        await WingFilter.Select("East");
         await ClickWhenStable(UnbilledOnly);
-        await Expect(Summary).ToHaveTextAsync("12 residents (Pending): $73,485 outstanding.", new() { Timeout = 10000 });
+        await Expect(Summary).ToHaveTextAsync("2 residents (Skilled Nursing, East wing, Pending): $17,555 outstanding.", new() { Timeout = 10000 });
 
         await ClickWhenStable(ClearFilters);
 
         await Expect(Summary).ToHaveTextAsync(WholeBoard, new() { Timeout = 10000 });
+        await Expect(CareLevelFilter.Input).ToHaveValueAsync("");
+        await Expect(WingFilter.Input).ToHaveValueAsync("");
         await Expect(StatusFilter.Input).ToHaveValueAsync("");
         await Expect(Board.Rows.Nth(1)).ToContainTextAsync("Amina Patel");
         AssertNoConsoleErrors();
@@ -317,7 +323,22 @@ public class WhenUsingFusionGridBilling : PlaywrightTestBase
         await Expect(_plan.ErrorFor(m => m.NewResidentName)).ToHaveTextAsync("Amina Patel already has charges this month.", new() { Timeout = 10000 });
         await Expect(AddChargeDialog).ToBeVisibleAsync();
         await Expect(Summary).ToHaveTextAsync(WholeBoard);
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
+    }
+
+    [Test]
+    public async Task cancelling_new_charges_closes_the_form()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(AddCharges);
+        await Expect(AddChargeDialog).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await NewResidentName.FillAndBlur("Agnes Whitlock");
+
+        await ClickWhenStable(CancelCharges);
+
+        await Expect(AddChargeDialog).ToBeHiddenAsync(new() { Timeout = 10000 });
+        await Expect(Summary).ToHaveTextAsync(WholeBoard);
+        AssertNoConsoleErrors();
     }
 
     // Six of the nine Memory Care families owe this month; the other three have paid.

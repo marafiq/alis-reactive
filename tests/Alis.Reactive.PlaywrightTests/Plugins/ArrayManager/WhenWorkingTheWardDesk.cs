@@ -3,8 +3,8 @@ namespace Alis.Reactive.PlaywrightTests.Plugins.ArrayManager;
 /// <summary>
 /// As the night supervisor at the ward desk, I want the ward's census read out (who is in residence, their
 /// care hours, where the round starts, anyone critical, any bed open), tonight's staffing planned from that
-/// census, and the next visitor pass previewed, so that the night starts staffed for the residents
-/// actually on the ward.
+/// census, and a visitor's pass printed, so that the night starts staffed for the residents actually on
+/// the ward and a visitor reaches them.
 /// </summary>
 /// <remarks>
 /// The census is read through the page's plugins (Scripts/sandbox-plugins.ts): the array plugin counts,
@@ -36,6 +36,8 @@ public class WhenWorkingTheWardDesk : PlaywrightTestBase
     private ILocator OpenTheMemoryCareWard => Page.Locator("#memory-ward-btn");
     private ILocator RequestStaffing => Page.Locator("#request-staffing-btn");
     private ILocator StaffingPlan => Page.Locator("#staffing-plan");
+    private ILocator PrintDanielsPass => Page.Locator("#print-pass-btn");
+    private ILocator VisitorPass => Page.Locator("#visitor-pass");
     private ILocator PassHeading => Page.Locator("#pass-heading");
     private ILocator PassCharges => Page.Locator("#pass-charges");
 
@@ -152,13 +154,18 @@ public class WhenWorkingTheWardDesk : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Each literal reaches the plugin as its declared kind: a bool, a long, a DateTime (a Date on the day
-    // picked), a decimal and a double. The plugin writes "?" for any argument of another kind.
+    // The desk issues the pass with details the page knows: each reaches the plugin as its declared kind, a
+    // bool (escorted), a long past int's range (the pass number), a DateTime (a Date on the day of the visit),
+    // a decimal (the parking fee) and a double (the hours). The plugin writes "?" for a detail of another kind.
     [Test]
-    public async Task the_visitor_pass_preview_reads_each_detail_as_its_kind()
+    public async Task printing_daniel_reeds_pass_shows_it_escorted_numbered_dated_and_charged()
     {
         await OpenTheDesk();
+        await Expect(VisitorPass).ToBeHiddenAsync();
 
+        await ClickWhenStable(PrintDanielsPass);
+
+        await Expect(VisitorPass).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(PassHeading).ToHaveTextAsync("Escorted visitor · pass 4000000001 · 2026-11-14");
         await Expect(PassCharges).ToHaveTextAsync("Parking $12.50 · 1.5 hours");
         AssertNoConsoleErrors();

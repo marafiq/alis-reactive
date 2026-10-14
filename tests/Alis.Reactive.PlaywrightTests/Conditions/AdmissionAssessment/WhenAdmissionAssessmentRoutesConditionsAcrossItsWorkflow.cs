@@ -35,6 +35,10 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
     private ILocator NeuroResult => Page.Locator("#neuro-result");
     private ILocator PainAlert => Page.Locator("#pain-result");
     private ILocator PainLocationRequired => Page.Locator("#location-required");
+    private ILocator FallRiskResult => Page.Locator("#fallrisk-result");
+    private ILocator SubmitButton => Page.Locator("#submit-btn");
+    private ILocator Submitting => Page.Locator("#submit-spinner");
+    private ILocator SubmitResult => Page.Locator("#submit-result");
 
     private async Task NavigateAndBoot()
     {
@@ -73,6 +77,7 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
     {
         await FillAndBlur<Step1DemographicsModel>(m => m.Age, age);
         await Expect(RiskBadge).ToHaveTextAsync(expectedBadge, new() { Timeout = 5000 });
+        await Expect(RiskBadge).ToBeVisibleAsync();
     }
 
     private async Task CompleteStep1(string residentName, string age, string diagnosis)
@@ -131,6 +136,7 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
     public async Task an_age_from_65_is_standard_risk_and_under_65_is_low_risk()
     {
         await NavigateAndBoot();
+        await Expect(RiskBadge).ToBeHiddenAsync();
 
         await EnterAge("65", "Standard Risk");
         await Expect(DropDown<Step1DemographicsModel>(m => m.RiskTier).Input).ToHaveValueAsync("Standard");
@@ -280,6 +286,7 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
 
         await Expect(HypertensionResult).ToHaveTextAsync(
             "Hypertension flagged for Harold Jenkins: systolic 141 mmHg, cardiology referral", new() { Timeout = 5000 });
+        await Expect(HypertensionResult).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
@@ -294,6 +301,7 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
 
         await Expect(HypertensionResult).ToHaveTextAsync(
             "Systolic 140 or under: no cardiology referral.", new() { Timeout = 5000 });
+        await Expect(HypertensionResult).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
@@ -308,6 +316,7 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
 
         await Expect(DiabetesResult).ToHaveTextAsync(
             "Uncontrolled Type 2 diabetes: A1C 9.1%, endocrinology referral", new() { Timeout = 5000 });
+        await Expect(DiabetesResult).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
@@ -321,6 +330,7 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
 
         await Expect(DiabetesResult).ToHaveTextAsync(
             "A1C at 9% or under: no endocrinology referral.", new() { Timeout = 5000 });
+        await Expect(DiabetesResult).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
@@ -337,12 +347,13 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
 
         await FillAndBlur<Step3FunctionalModel>(m => m.FallRiskScore, "8");
         await ClickWhenStable(Page.Locator("#check-fallrisk-btn"));
-        await Expect(Page.Locator("#fallrisk-result")).ToHaveTextAsync("Continuous monitoring required", new() { Timeout = 5000 });
+        await Expect(FallRiskResult).ToHaveTextAsync("Continuous monitoring required", new() { Timeout = 5000 });
+        await Expect(FallRiskResult).ToBeVisibleAsync();
         await Expect(Input<Step3FunctionalModel>(m => m.MonitoringLevel)).ToHaveValueAsync("Continuous");
 
         await FillAndBlur<Step3FunctionalModel>(m => m.FallRiskScore, "5");
         await ClickWhenStable(Page.Locator("#check-fallrisk-btn"));
-        await Expect(Page.Locator("#fallrisk-result")).ToHaveTextAsync("Standard monitoring", new() { Timeout = 5000 });
+        await Expect(FallRiskResult).ToHaveTextAsync("Standard monitoring", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
@@ -358,7 +369,8 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         await FillAndBlur<Step3FunctionalModel>(m => m.FallRiskScore, "8");
         await ClickWhenStable(Page.Locator("#check-fallrisk-btn"));
 
-        await Expect(Page.Locator("#fallrisk-result")).ToHaveTextAsync("Standard monitoring", new() { Timeout = 5000 });
+        await Expect(FallRiskResult).ToHaveTextAsync("Standard monitoring", new() { Timeout = 5000 });
+        await Expect(FallRiskResult).ToBeVisibleAsync();
         await Expect(Input<Step3FunctionalModel>(m => m.MonitoringLevel)).Not.ToHaveValueAsync("Continuous");
         AssertNoConsoleErrors();
     }
@@ -374,6 +386,7 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
 
         await Expect(RoomSetup).ToHaveTextAsync(
             "Accessible room scheduled for Robert Miles, who uses a wheelchair", new() { Timeout = 5000 });
+        await Expect(RoomSetup).ToBeVisibleAsync();
         await Expect(EscortNeeded).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
@@ -405,6 +418,7 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         await DropDown<Step3FunctionalModel>(m => m.InjuryType).Select("Head Injury");
 
         await Expect(NeuroResult).ToHaveTextAsync("Neuro consult ordered for Robert Miles: Head Injury", new() { Timeout = 5000 });
+        await Expect(NeuroResult).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
@@ -419,6 +433,7 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         await DropDown<Step3FunctionalModel>(m => m.InjuryType).Select("Fracture");
 
         await Expect(NeuroResult).ToHaveTextAsync("Noted", new() { Timeout = 5000 });
+        await Expect(NeuroResult).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
@@ -477,23 +492,55 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
 
     // Step 4: review and submit
 
+    // The page refuses the screening before it is sent, so nothing says it is being submitted, and the same
+    // button submits it once the contact is added.
     [Test]
-    public async Task step4_blocks_submission_without_contact_and_succeeds_after_the_saved_steps_are_complete()
+    public async Task a_screening_refused_for_its_missing_contact_is_not_shown_as_submitting_and_submits_once_the_contact_is_added()
     {
         await NavigateAndBoot();
         await CompleteStep1("Evelyn Hart", "74", "Other");
         await CompleteStep2();
         await CompleteStep3();
 
-        await ClickWhenStable(Page.Locator("#submit-btn"));
+        await ClickWhenStable(SubmitButton);
         await Expect(ErrorFor("screening-form", nameof(Step4ReviewModel.EmergencyContact)))
             .ToHaveTextAsync("'Emergency Contact' is required.", new() { Timeout = 5000 });
+        await Expect(Submitting).ToBeHiddenAsync();
         await Expect(Page.Locator("#step-4")).ToBeVisibleAsync();
 
         await FillAndBlur<Step4ReviewModel>(m => m.EmergencyContact, "Sam Hart 555-0101");
-        await ClickWhenStable(Page.Locator("#submit-btn"));
+        await ClickWhenStable(SubmitButton);
 
-        await Expect(Page.Locator("#submit-result")).ToHaveTextAsync("Assessment complete for Evelyn Hart", new() { Timeout = 5000 });
+        await Expect(SubmitResult).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(SubmitResult).ToHaveTextAsync("Assessment complete for Evelyn Hart");
+        AssertNoConsoleErrors();
+    }
+
+    // The server takes its time over a screening; the page says it is submitting until the answer comes back.
+    [Test]
+    public async Task a_screening_shows_it_is_submitting_until_the_server_completes_the_assessment()
+    {
+        await NavigateAndBoot();
+        await CompleteStep1("Evelyn Hart", "74", "Other");
+        await CompleteStep2();
+        await CompleteStep3();
+        await FillAndBlur<Step4ReviewModel>(m => m.EmergencyContact, "Sam Hart 555-0101");
+        var answerReleased = new SemaphoreSlim(0);
+        await Page.RouteAsync("**/Sandbox/Conditions/AdmissionAssessment/Submit", async route =>
+        {
+            await answerReleased.WaitAsync(TimeSpan.FromSeconds(30));
+            await route.ContinueAsync();
+        });
+        await Expect(Submitting).ToBeHiddenAsync();
+
+        await ClickWhenStable(SubmitButton);
+
+        await Expect(Submitting).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(SubmitResult).ToBeHiddenAsync();
+        answerReleased.Release();
+        await Expect(SubmitResult).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(SubmitResult).ToHaveTextAsync("Assessment complete for Evelyn Hart");
+        await Expect(Submitting).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 }

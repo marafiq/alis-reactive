@@ -124,9 +124,9 @@ public class WhenUsingFusionRating : PlaywrightTestBase
         await Expect(Reply).ToHaveTextAsync("The same as September.");
 
         await ClickWhenStable(SendMyRating);
+        await Expect(Recorded).ToBeVisibleAsync(new() { Timeout = 10000 });
         await Expect(Recorded).ToHaveTextAsync(
-            "Thank you, Margaret. We recorded 3 stars for October. Maple Grove's October average is now 4.1 stars from 24 residents.",
-            new() { Timeout = 10000 });
+            "Thank you, Margaret. We recorded 3 stars for October. Maple Grove's October average is now 4.1 stars from 24 residents.");
         AssertNoConsoleErrors();
     }
 
@@ -149,12 +149,13 @@ public class WhenUsingFusionRating : PlaywrightTestBase
     {
         await OpenTheSurvey();
         await Rate(5);
+        await Expect(Recorded).ToBeHiddenAsync();
 
         await ClickWhenStable(SendMyRating);
 
+        await Expect(Recorded).ToBeVisibleAsync(new() { Timeout = 10000 });
         await Expect(Recorded).ToHaveTextAsync(
-            "Thank you, Margaret. We recorded 5 stars for October. Maple Grove's October average is now 4.2 stars from 24 residents.",
-            new() { Timeout = 10000 });
+            "Thank you, Margaret. We recorded 5 stars for October. Maple Grove's October average is now 4.2 stars from 24 residents.");
         AssertNoConsoleErrors();
     }
 
@@ -168,9 +169,9 @@ public class WhenUsingFusionRating : PlaywrightTestBase
 
         await ClickWhenStable(SendMyRating);
 
+        await Expect(Recorded).ToBeVisibleAsync(new() { Timeout = 10000 });
         await Expect(Recorded).ToHaveTextAsync(
-            "Thank you, Margaret. We recorded 2 stars for October. Maple Grove's October average is now 4.0 stars from 24 residents. Your note goes to Maple wing's care manager.",
-            new() { Timeout = 10000 });
+            "Thank you, Margaret. We recorded 2 stars for October. Maple Grove's October average is now 4.0 stars from 24 residents. Your note goes to Maple wing's care manager.");
         AssertNoConsoleErrors();
     }
 }

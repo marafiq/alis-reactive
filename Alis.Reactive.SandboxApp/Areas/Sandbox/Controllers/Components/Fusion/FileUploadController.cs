@@ -17,16 +17,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         [HttpPost("Attach")]
-        public IActionResult Attach([FromForm] WoundAttachmentsModel attachments)
+        public IActionResult Attach([FromForm] WoundAttachmentsModel woundCare)
         {
-            var result = new WoundAttachmentsValidator().Validate(attachments);
+            var result = new WoundAttachmentsValidator().Validate(woundCare);
             if (!result.IsValid)
                 return BadRequest(new { errors = result.ErrorsByField });
 
-            var files = attachments.Attachments!.Select(WoundAttachmentsValidator.Described);
+            var files = woundCare.Attachments!.Select(WoundAttachmentsValidator.Described);
             return Ok(new WoundAttachmentsAnswer
             {
-                Message = $"Attached to Margaret Hale's record for the {attachments.WoundSite!.ToLowerInvariant()} wound: {string.Join(" and ", files)}."
+                Message = $"Attached to Margaret Hale's record for the {woundCare.WoundSite!.ToLowerInvariant()} wound: {string.Join(" and ", files)}."
             });
         }
     }

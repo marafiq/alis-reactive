@@ -20,17 +20,8 @@ public class SandboxStaticStateTests
     // Billing session store is the exemplar), not an allowlist entry.
     private static readonly string[] Allowlist =
     [
-        // -- Keyed per flow id or per world: each wizard run / drill world reads
-        //    its own key, so worlds do not collide. Migrate to session stores as
-        //    touched.
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns.AdmissionWizardController.Step1Drafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns.AdmissionWizardController.Step2Drafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns.AdmissionWizardController.Step3Drafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns.AdmissionWizardController.Step4Drafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions.AdmissionAssessmentController.Step1Drafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions.AdmissionAssessmentController.Step2Drafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions.AdmissionAssessmentController.Step3Drafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions.AdmissionAssessmentController.Step4Drafts",
+        // -- Keyed per drill world: each drill world reads its own key, so worlds
+        //    do not collide. Migrate to session stores as touched.
         "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline.RealTimeController.DrillWorlds",
         "Alis.Reactive.SandboxApp.Hubs.ResidentStatusHub.DrillConnections",
         "Alis.Reactive.SandboxApp.Hubs.ResidentStatusHub.BrokenDrills",

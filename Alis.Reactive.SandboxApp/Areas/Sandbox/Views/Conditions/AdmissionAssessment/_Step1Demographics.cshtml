@@ -35,21 +35,20 @@
                     {
                         t.Component<FusionDropDownList>(m => m.RiskTier).Value.Set("High");
                         t.Element("risk-badge").Text.Set("High Risk");
-                        t.Element("risk-badge").Show();
                     })
                     .ElseIf(ageComp.Value).Gte(65m)
                     .Then(t =>
                     {
                         t.Component<FusionDropDownList>(m => m.RiskTier).Value.Set("Standard");
                         t.Element("risk-badge").Text.Set("Standard Risk");
-                        t.Element("risk-badge").Show();
                     })
                     .Else(e =>
                     {
                         e.Component<FusionDropDownList>(m => m.RiskTier).Value.Set("Low");
                         e.Element("risk-badge").Text.Set("Low Risk");
-                        e.Element("risk-badge").Show();
                     });
+                // Every age has a tier, so the badge shows once an age is entered.
+                p.Element("risk-badge").Show();
             }); }
     </native-grid>
 

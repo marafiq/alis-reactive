@@ -192,6 +192,6 @@ public class WhenUsingFusionGridResidentEditForm : PlaywrightTestBase
         await Expect(Referrals.Cell("Rosa Diaz", FirstReviewColumn)).ToHaveTextAsync("2026-10-26");
         await Expect(Referrals.Rows).ToHaveCountAsync(3);
         await Expect(Residents.Row("Rosa Diaz")).ToHaveCountAsync(0);
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 }

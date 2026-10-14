@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Globalization;
 using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InPlaceEditor;
@@ -53,8 +54,18 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
     private ILocator RecordNumberStatus => Page.Locator("#card-mrn-status");
     private ILocator RecordNumberInput => RecordNumber.Root.Locator("input.e-maskedtextbox").First;
 
+    // Every save the page sends the server, by its address: .../UpdateProfile, .../UpdateDateOfBirth and the rest.
+    private ConcurrentQueue<string> _savesSent = null!;
+
+    private int SavesSentTo(string action) => _savesSent.Count(url => url.EndsWith($"{Path}/{action}"));
+
     private async Task OpenTheProfile()
     {
+        _savesSent = new ConcurrentQueue<string>();
+        Page.Request += (_, request) =>
+        {
+            if (request.Method == "POST" && request.Url.Contains(Path)) _savesSent.Enqueue(request.Url);
+        };
         await NavigateToAndWaitForBoot(Path);
         await Expect(PreferredName.ShownValue).ToHaveTextAsync("Ellie", new() { Timeout = 10000 });
         await Expect(MonthlyRate.ShownValue).ToHaveTextAsync("$4,500", new() { Timeout = 10000 });
@@ -78,7 +89,7 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
     private async Task ChooseMemoryCare()
     {
         await CareLevel.Open();
-        await CareLevel.ListInput.ClickAsync(new() { Force = true });
+        await ClickWhenStable(CareLevel.ListInput);
         await CareLevel.ListItem("Memory Care").ClickAsync();
     }
 
@@ -120,7 +131,23 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
 
         await Expect(SaveProfileReminder).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(PreferredName.ShownValue).ToHaveTextAsync("Nell");
-        await Expect(ProfileStatus).ToHaveTextAsync("No changes saved yet.");
+        AssertNoConsoleErrors();
+    }
+
+    // Enter keeps the name for the profile without saving it: the one save sent is Save profile's.
+    [Test]
+    public async Task saving_the_profile_after_pressing_enter_takes_the_reminder_away()
+    {
+        await OpenTheProfile();
+        await PreferredName.OpenAndType("Nell");
+        await PreferredName.Input.PressAsync("Enter");
+        await Expect(SaveProfileReminder).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        await ClickWhenStable(SaveProfile);
+
+        await Expect(ProfileStatus).ToHaveTextAsync("Saved Eleanor Vance's profile. Preferred name: Nell.", new() { Timeout = 10000 });
+        await Expect(SaveProfileReminder).ToBeHiddenAsync();
+        Assert.That(SavesSentTo("UpdateProfile"), Is.EqualTo(1));
         AssertNoConsoleErrors();
     }
 
@@ -170,13 +197,14 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
         await AdmissionDate.SelectDate(tomorrow.Year, tomorrow.Month, tomorrow.Day);
         await ClickWhenStable(SaveProfile);
         await Expect(ErrorFor(admissionDateId)).ToHaveTextAsync("The admission date cannot be after today.", new() { Timeout = 5000 });
-        await Expect(ProfileStatus).ToHaveTextAsync("No changes saved yet.");
 
         // Today is the boundary: "not after today" accepts it.
         await AdmissionDate.SelectDate(today.Year, today.Month, today.Day);
         await ClickWhenStable(SaveProfile);
         await Expect(ProfileStatus).ToHaveTextAsync("Saved Eleanor Vance's profile. Preferred name: Ellie.", new() { Timeout = 10000 });
         await Expect(ErrorFor(admissionDateId)).ToBeHiddenAsync();
+        // The refused date was never sent: the one save is today's.
+        Assert.That(SavesSentTo("UpdateProfile"), Is.EqualTo(1));
         AssertNoConsoleErrors();
     }
 
@@ -220,7 +248,7 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
         // Today is the boundary: a date of birth must be before it.
         await Expect(ErrorFor(IdGenerator.For<DateOfBirthCorrection>(m => m.Value)))
             .ToHaveTextAsync("A date of birth must be before today.", new() { Timeout = 5000 });
-        await Expect(DateOfBirthStatus).ToHaveTextAsync("");
+        Assert.That(SavesSentTo("UpdateDateOfBirth"), Is.Zero);
         AssertNoConsoleErrors();
     }
 
@@ -246,7 +274,8 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
 
         await ChooseMemoryCare();
 
-        await Expect(CareLevelPreview).ToHaveTextAsync("From Assisted Living to Memory Care: $6,200 a month.", new() { Timeout = 5000 });
+        await Expect(CareLevelPreview).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(CareLevelPreview).ToHaveTextAsync("From Assisted Living to Memory Care: $6,200 a month.");
         await Expect(CareLevelStatus).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
@@ -341,7 +370,7 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
         await Expect(ErrorFor(IdGenerator.For<MonthlyRateCorrection>(m => m.Value)))
             .ToHaveTextAsync("Enter a monthly rate above $0.", new() { Timeout = 5000 });
         await Expect(MonthlyRate.ActionButtons).ToBeVisibleAsync();
-        await Expect(MonthlyRateStatus).ToHaveTextAsync("");
+        Assert.That(SavesSentTo("UpdateMonthlyRate"), Is.Zero);
         AssertNoConsoleErrors();
     }
 
@@ -354,12 +383,13 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
 
         await Expect(ErrorFor(IdGenerator.For<LastHospitalStayCorrection>(m => m.Value)))
             .ToHaveTextAsync("A hospital stay cannot begin in the future.", new() { Timeout = 5000 });
-        await Expect(LastHospitalStayStatus).ToHaveTextAsync("");
 
         await LastHospitalStay.OpenAndType("3/2/2024 9:30 AM");
         await LastHospitalStay.Input.PressAsync("Enter");
 
         await Expect(LastHospitalStayStatus).ToHaveTextAsync("Last hospital stay saved: March 2, 2024 at 9:30 AM.", new() { Timeout = 10000 });
+        // The future stay was never sent: the one save is the earlier stay's.
+        Assert.That(SavesSentTo("UpdateLastHospitalStay"), Is.EqualTo(1));
         AssertNoConsoleErrors();
     }
 
@@ -395,7 +425,7 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
 
         await Expect(ErrorFor(IdGenerator.For<MedicalRecordNumberCorrection>(m => m.Value)))
             .ToHaveTextAsync("A medical record number is three letters and four digits.", new() { Timeout = 5000 });
-        await Expect(RecordNumberStatus).ToHaveTextAsync("");
+        Assert.That(SavesSentTo("UpdateMedicalRecordNumber"), Is.Zero);
         AssertNoConsoleErrors();
     }
 }

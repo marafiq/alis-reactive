@@ -22,7 +22,9 @@ namespace Alis.Reactive.PlaywrightTests.Patterns.MoveInPacket;
 /// confirmed. Each test fills one part and reads that part's sentence; the parts it leaves empty are sent
 /// empty. Every value a test reads back differs from the value the field opens with, except the record
 /// number and the name, which come from the referral. Saving or sending without the resident's name sends
-/// nothing: the request count shows it, because the server refuses such a packet as well.
+/// nothing: the request count shows it, because the server refuses such a packet as well. The count is read
+/// once the name is given back and the packet saved or sent, so a request the refused click had sent would
+/// have been counted by then.
 /// </remarks>
 [TestFixture]
 public class WhenCoordinatorCompletesMoveInPacket : PlaywrightTestBase
@@ -38,6 +40,7 @@ public class WhenCoordinatorCompletesMoveInPacket : PlaywrightTestBase
     private ILocator SavePacket => Page.Locator("#save-packet-btn");
     private ILocator SendPacket => Page.Locator("#send-packet-btn");
     private ILocator PacketStatus => Page.Locator("#packet-status");
+    private ILocator PacketReceipt => Page.Locator("#packet-receipt");
     private ILocator ResidentReceipt => Page.Locator("#receipt-resident");
     private ILocator CareReceipt => Page.Locator("#receipt-care");
     private ILocator ScheduleReceipt => Page.Locator("#receipt-schedule");
@@ -58,6 +61,7 @@ public class WhenCoordinatorCompletesMoveInPacket : PlaywrightTestBase
     {
         await ClickWhenStable(SavePacket);
         await Expect(PacketStatus).ToHaveTextAsync("Saved to Margaret Thompson's move-in packet.", new() { Timeout = 10000 });
+        await Expect(PacketReceipt).ToBeVisibleAsync();
     }
 
     private async Task SendThePacket()
@@ -65,6 +69,7 @@ public class WhenCoordinatorCompletesMoveInPacket : PlaywrightTestBase
         await ClickWhenStable(SendPacket);
         await Expect(PacketStatus).ToHaveTextAsync(
             "The business office received Margaret Thompson's move-in packet.", new() { Timeout = 10000 });
+        await Expect(PacketReceipt).ToBeVisibleAsync();
     }
 
     private async Task FillTheResident()
@@ -109,7 +114,7 @@ public class WhenCoordinatorCompletesMoveInPacket : PlaywrightTestBase
 
         await Expect(ResidentName.Input).ToHaveValueAsync("Margaret Thompson");
         await Expect(PacketStatus).ToHaveTextAsync("Not saved yet.");
-        await Expect(ResidentReceipt).ToBeHiddenAsync();
+        await Expect(PacketReceipt).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
@@ -236,7 +241,7 @@ public class WhenCoordinatorCompletesMoveInPacket : PlaywrightTestBase
     }
 
     [Test]
-    public async Task saving_without_the_residents_name_asks_for_it_and_saves_nothing()
+    public async Task saving_without_the_residents_name_asks_for_it_and_saves_nothing_until_it_is_given()
     {
         await NavigateAndBoot();
         await ResidentName.Clear();
@@ -246,12 +251,15 @@ public class WhenCoordinatorCompletesMoveInPacket : PlaywrightTestBase
         await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync("Enter the resident's name.", new() { Timeout = 5000 });
         await Expect(ResidentName.Input).ToHaveClassAsync(ErrorStyle);
         await Expect(PacketStatus).ToHaveTextAsync("Not saved yet.");
-        Assert.That(_packetsSent, Is.Empty, "A packet the page can see has no resident is not saved.");
+
+        await ResidentName.Fill("Margaret Thompson");
+        await SaveThePacket();
+        Assert.That(_packetsSent, Has.Count.EqualTo(1), "A packet the page can see has no resident is not saved; the one save is the one with her name.");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task sending_without_the_residents_name_asks_for_it_and_sends_nothing()
+    public async Task sending_without_the_residents_name_asks_for_it_and_sends_nothing_until_it_is_given()
     {
         await NavigateAndBoot();
         await ResidentName.Clear();
@@ -260,7 +268,10 @@ public class WhenCoordinatorCompletesMoveInPacket : PlaywrightTestBase
 
         await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync("Enter the resident's name.", new() { Timeout = 5000 });
         await Expect(PacketStatus).ToHaveTextAsync("Not saved yet.");
-        Assert.That(_packetsSent, Is.Empty, "A packet the page can see has no resident is not sent.");
+
+        await ResidentName.Fill("Margaret Thompson");
+        await SendThePacket();
+        Assert.That(_packetsSent, Has.Count.EqualTo(1), "A packet the page can see has no resident is not sent; the one sent is the one with her name.");
         AssertNoConsoleErrors();
     }
 

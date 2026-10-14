@@ -85,31 +85,22 @@
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Element("submit-spinner").Show();
-                p.Element("submit-text").Hide();
+                // A screening the page refuses is never sent, so it never shows as submitting.
                 p.Post(submitUrl)
                  .Gather(g => g.Form())
                  .Validate<Step4Validator>("screening-form")
+                 .WhileLoading(l => l.Element("submit-spinner").Show())
                  .Response(r => r
                     .OnSuccess<SubmitScreeningResponse>((json, s) =>
                     {
                         s.Element("submit-result").Text.Set(json.Get(x => x.Message));
                         s.Element("submit-result").Show();
-                        s.Element("submit-spinner").Hide();
-                        s.Element("submit-text").Show();
                     })
-                    .OnError(400, e =>
-                    {
-                        e.ValidationErrors("screening-form");
-                        e.Element("submit-spinner").Hide();
-                        e.Element("submit-text").Show();
-                    }));
+                    .OnError(400, e => e.ValidationErrors("screening-form")))
+                 .Finally(f => f.Element("submit-spinner").Hide());
             }))
     </native-hstack>
-    <p class="font-mono text-sm mt-2">
-        <span id="submit-spinner" hidden class="text-accent">Submitting...</span>
-        <span id="submit-text"></span>
-    </p>
+    <p id="submit-spinner" hidden class="text-sm text-accent mt-2">Submitting...</p>
 </native-card-body></native-card>
 
 @Html.RenderPlan(plan)

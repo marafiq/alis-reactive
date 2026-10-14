@@ -14,9 +14,10 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Schedule;
 /// <remarks>
 /// <para>
 /// Each test opens a new browser, whose schedule starts from the seeded weeks: shifts staffed or left open the
-/// same way on every run, and two in-services a week for the AM staff, Falls prevention on Tuesday and Safe
-/// resident transfers on Thursday, which the staff educator, Dana Whitfield, has open. The server answers every
-/// load with a summary of what it answered for: the facility, how many shifts need coverage, and the dates.
+/// same way on every run (Oak Ridge's roster is full, so none of its shifts is open), and two in-services a week
+/// for the AM staff, Falls prevention on Tuesday and Safe resident transfers on Thursday, which the staff
+/// educator, Dana Whitfield, has open. The server answers every load with a summary of what it answered for:
+/// the facility, how many shifts need coverage, and the dates.
 /// </para>
 /// <para>
 /// Not exercised. <c>DataBind</c>: Syncfusion applies <c>eventSettings.dataSource</c> on the next tick without
@@ -53,6 +54,7 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
     private ILocator Selection => Page.Locator("#schedule-selection");
     private ILocator AgencyStatus => Page.Locator("#agency-status");
     private ILocator AddShiftHint => Page.Locator("#add-shift-hint");
+    private ILocator AllCoveredNote => Page.Locator("#all-covered-note");
     private ILocator InServiceNote => Page.Locator("#in-service-note");
     private ILocator LockedNote => Page.Locator("#schedule-locked-note");
     private ILocator NewAssignmentDialog => Page.Locator("#new-assignment-dialog");
@@ -234,11 +236,32 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await Schedule.ViewButton("Month").ClickAsync();
         await Expect(Summary).ToHaveTextAsync(MonthSummary("Maple Grove", DateTime.Today), new() { Timeout = 10000 });
 
+        await Expect(AddShiftHint).ToBeHiddenAsync();
+
         await Schedule.ClickEmptyPartOf(Schedule.Cell(DateTime.Today, groupIndex: 1));
 
-        await Expect(AddShiftHint).ToHaveTextAsync("A shift starts at an hour: open a day or a week and click the hour it starts.", new() { Timeout = 5000 });
+        await Expect(AddShiftHint).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(AddShiftHint).ToHaveTextAsync("A shift starts at an hour: open a day or a week and click the hour it starts.");
         await Expect(NewAssignmentDialog).ToBeHiddenAsync();
         await Expect(Schedule.Details).ToHaveCountAsync(0);
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task clicking_an_hour_after_the_hint_offers_the_shift_and_takes_the_hint_away()
+    {
+        await NavigateAndWaitForSchedule();
+        await Schedule.ViewButton("Month").ClickAsync();
+        await Expect(Summary).ToHaveTextAsync(MonthSummary("Maple Grove", DateTime.Today), new() { Timeout = 10000 });
+        await Schedule.ClickEmptyPartOf(Schedule.Cell(DateTime.Today, groupIndex: 1));
+        await Expect(AddShiftHint).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Schedule.ViewButton("Week").ClickAsync();
+        await Expect(Summary).ToHaveTextAsync(WeekSummary("Maple Grove", DateTime.Today), new() { Timeout = 10000 });
+
+        await ClickOpenHourToday();
+
+        await Expect(NewAssignmentDialog).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(AddShiftHint).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
@@ -443,6 +466,24 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // Oak Ridge's roster is full: the schedule holds no open shift for the editor to open on.
+    [Test]
+    public async Task covering_the_next_open_shift_of_a_full_roster_says_every_shift_is_covered()
+    {
+        await NavigateAndWaitForSchedule();
+        await Facility.Select("Oak Ridge Senior Living");
+        await Expect(Summary).ToHaveTextAsync(new Regex("^Oak Ridge Senior Living: 0 of 21 shifts need coverage"), new() { Timeout = 10000 });
+        await Expect(AllCoveredNote).ToBeHiddenAsync();
+
+        await ClickWhenStable(Page.Locator("#cover-next-open-shift"));
+
+        await Expect(AllCoveredNote).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(AllCoveredNote).ToHaveTextAsync("Every shift on the schedule is covered.");
+        await Expect(AssignmentForm).ToHaveCountAsync(0);
+        await Expect(Schedule.Editor).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task double_clicking_a_shift_opens_the_assignment_drawer_instead_of_the_built_in_editor()
     {
@@ -480,10 +521,12 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await NavigateAndWaitForSchedule();
         var shownWeek = await Schedule.DateRange.InnerTextAsync();
         await ScheduleLocked.Check();
+        await Expect(LockedNote).ToBeHiddenAsync();
 
         await Schedule.Next.ClickAsync();
 
-        await Expect(LockedNote).ToHaveTextAsync("The schedule is locked for payroll; it stays on this week.", new() { Timeout = 5000 });
+        await Expect(LockedNote).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(LockedNote).ToHaveTextAsync("The schedule is locked for payroll; it stays on this week.");
         await Expect(Schedule.DateRange).ToHaveTextAsync(shownWeek);
         await Expect(Summary).ToHaveTextAsync(WeekSummary("Maple Grove", DateTime.Today));
         await Expect(StaffedShifts.First).ToBeVisibleAsync();
@@ -495,10 +538,12 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
     {
         await NavigateAndWaitForSchedule();
         await ScheduleLocked.Check();
+        await Expect(LockedNote).ToBeHiddenAsync();
 
         await Schedule.Open(StaffedShifts.First);
 
-        await Expect(LockedNote).ToHaveTextAsync("The schedule is locked for payroll; unlock it to open a shift.", new() { Timeout = 5000 });
+        await Expect(LockedNote).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(LockedNote).ToHaveTextAsync("The schedule is locked for payroll; unlock it to open a shift.");
         await Expect(Schedule.Details).ToHaveCountAsync(0);
 
         await ScheduleLocked.Input.UncheckAsync();
@@ -624,6 +669,7 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await Schedule.OpenToChange(Schedule.Appointments("In-service: Safe resident transfers"));
         await Expect(Schedule.Editor).ToBeVisibleAsync(new() { Timeout = 10000 });
         await Expect(Schedule.EditorField("subject")).ToHaveValueAsync("In-service: Safe resident transfers");
+        await Expect(InServiceNote).ToBeHiddenAsync();
 
         answerReleased.Release();
 
@@ -631,6 +677,8 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
             "Dana Whitfield is changing the Safe resident transfers in-service right now, so it was closed here. Try again in a few minutes.",
             new() { Timeout = 10000 });
         await Expect(Schedule.Editor).ToBeHiddenAsync(new() { Timeout = 5000 });
+        // Closing the editor hides the note; the refusal shows its note after the close.
+        await Expect(InServiceNote).ToBeVisibleAsync();
         AssertNoConsoleErrorsExcept("the server responded with a status of 409");
     }
 }

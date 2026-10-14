@@ -4,11 +4,17 @@ using Alis.Reactive.Fusion.Components;
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
-    /// The care operations board: the admit dialog's fields. The board's fast filters are chips, so no filter
-    /// fields live here.
+    /// The care operations board: the risk and care level its chips chose, which every request for the board's
+    /// rows sends, and the admit dialog's fields.
     /// </summary>
     public class CareOpsViewModel
     {
+        /// <summary>The risk the risk chips chose; empty or "All" lists every risk.</summary>
+        public string? FilterRisk { get; set; }
+
+        /// <summary>The care level the care-level chips chose; empty or "All" lists every care level.</summary>
+        public string? FilterCareLevel { get; set; }
+
         public string? NewResidentName { get; set; }
         public string? NewWing { get; set; }
         public string? NewCareLevel { get; set; }
@@ -51,7 +57,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string Summary { get; set; } = "";
     }
 
-    /// <summary>The page the grid asks for, and the fast filter a chip chose.</summary>
+    /// <summary>The page and sort the grid asks for, and the fast filters the chips chose.</summary>
     public class CareOpsDataRequest
     {
         public int Skip { get; set; }

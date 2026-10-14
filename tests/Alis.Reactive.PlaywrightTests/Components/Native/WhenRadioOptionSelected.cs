@@ -133,6 +133,36 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     }
 
     [Test]
+    public async Task choosing_a_private_room_after_the_suite_warning_takes_the_warning_away()
+    {
+        await NavigateAndBoot();
+        await CareLevel.Choose("Memory Care");
+        await RoomType.Choose("Private suite");
+        await Expect(SuiteWarning).ToBeVisibleAsync();
+
+        await RoomType.Choose("Private room");
+
+        await Expect(SuiteWarning).ToBeHiddenAsync();
+        await Expect(SummaryRoom).ToHaveTextAsync("Private room");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task choosing_assisted_living_after_the_suite_warning_takes_the_warning_away()
+    {
+        await NavigateAndBoot();
+        await CareLevel.Choose("Memory Care");
+        await RoomType.Choose("Private suite");
+        await Expect(SuiteWarning).ToBeVisibleAsync();
+
+        await CareLevel.Choose("Assisted Living");
+
+        await Expect(SuiteWarning).ToBeHiddenAsync();
+        await Expect(SummaryCare).ToHaveTextAsync("Assisted Living");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task a_suite_for_assisted_living_is_not_warned_against()
     {
         await NavigateAndBoot();

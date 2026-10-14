@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
@@ -13,8 +14,10 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 /// The census holds 24 residents, ten to a page by name: Abigail Moore (Low risk, Nora Ellis, 1 open task)
 /// first and Esther Cole last on page one, 62 open care tasks in all. Four residents are at critical risk,
 /// seven in Memory Care, and five at high risk make the watch list, Amina Patel (Malik Stone, 6 open tasks)
-/// first. Beatrice Lane's review, October 15, is the soonest. The server answers every change with the
-/// board's first page and a sentence that says what it did; a flag or discharge from the watch list
+/// first. Beatrice Lane's review, October 15, is the soonest; eight residents are at low risk, Esther Cole among
+/// them. The chips choose one risk and one care level; every request for the board's rows (a chip, a sort, a page,
+/// a watch-list refresh) sends both, and a chip clicked again lets its choice go. The server answers every change
+/// with the board's first page and a sentence that says what it did; a flag or discharge from the watch list
 /// reloads both the list and the census. The census lives in the browser's session, so every test starts from
 /// the census as filed.
 /// Not exercised:
@@ -32,6 +35,8 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
     private const string Path = "/Sandbox/Components/Grid/CareOps";
     private const string GridId = "careops-grid";
     private const string WholeCensus = "24 residents on the census: 62 open care tasks.";
+    private const string CriticalResidents = "4 residents at Critical risk: 18 open care tasks.";
+    private const string MemoryCareResidents = "7 Memory Care residents: 26 open care tasks.";
 
     // The grid numbers its columns from 1, the tick box first.
     private const int RiskColumn = 6;
@@ -53,8 +58,10 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
     private ILocator QuickAction(string resident, string action) => Watched(resident).Locator("a").Filter(new() { HasText = action });
     private ILocator ConfirmDialog => Page.Locator("#alisConfirmDialog");
     private ILocator ConfirmOk => ConfirmDialog.Locator("button.e-primary");
+    private ILocator ConfirmCancel => ConfirmDialog.GetByRole(AriaRole.Button, new() { Name = "Cancel" });
     private ILocator AdmitResident => Page.Locator("#careops-admit-open");
     private ILocator Admit => Page.Locator("#admit-save");
+    private ILocator CancelAdmission => Page.Locator("#admit-cancel");
     private ILocator AdmitDialog => Page.Locator("#admit-dialog");
     private FusionChipListLocator RiskChips => new(Page, "careops-risk-chips");
     private FusionChipListLocator CareChips => new(Page, "careops-care-chips");
@@ -67,8 +74,16 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
     private ILocator ErrorFor(System.Linq.Expressions.Expression<Func<CareOpsViewModel, object?>> member) =>
         Page.Locator($"#{IdGenerator.For(member)}_error");
 
+    // Every discharge the page asks the server for, from the board or the watch list.
+    private ConcurrentQueue<string> _dischargesSent = null!;
+
     private async Task NavigateAndBoot()
     {
+        _dischargesSent = new ConcurrentQueue<string>();
+        Page.Request += (_, request) =>
+        {
+            if (request.Url.Contains("/Sandbox/Components/Grid/CareOpsDischarge")) _dischargesSent.Enqueue(request.Url);
+        };
         await NavigateToAndWaitForBoot(Path);
         await Expect(Summary).ToHaveTextAsync(WholeCensus, new() { Timeout = 10000 });
         await Expect(Board.Rows).ToHaveCountAsync(10, new() { Timeout = 10000 });
@@ -110,7 +125,7 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
 
         await ClickWhenStable(RiskChips.Chip("Critical"));
 
-        await Expect(Summary).ToHaveTextAsync("4 residents at Critical risk: 18 open care tasks.", new() { Timeout = 10000 });
+        await Expect(Summary).ToHaveTextAsync(CriticalResidents, new() { Timeout = 10000 });
         await Expect(Board.Rows).ToHaveCountAsync(4);
         await Expect(Board.Rows.First).ToContainTextAsync("Beatrice Lane");
         await Expect(Board.Rows.Last).ToContainTextAsync("Mara Thompson");
@@ -124,10 +139,88 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
 
         await ClickWhenStable(CareChips.Chip("Memory Care"));
 
-        await Expect(Summary).ToHaveTextAsync("7 Memory Care residents: 26 open care tasks.", new() { Timeout = 10000 });
+        await Expect(Summary).ToHaveTextAsync(MemoryCareResidents, new() { Timeout = 10000 });
         await Expect(Board.Rows).ToHaveCountAsync(7);
         await Expect(Board.Rows.First).ToContainTextAsync("Amina Patel");
         await Expect(Board.Rows.Last).ToContainTextAsync("Yara Ahmed");
+        AssertNoConsoleErrors();
+    }
+
+    // Harold Chen is the one Memory Care resident at critical risk.
+    [Test]
+    public async Task the_critical_chip_keeps_to_the_memory_care_residents_already_chosen()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(CareChips.Chip("Memory Care"));
+        await Expect(Summary).ToHaveTextAsync(MemoryCareResidents, new() { Timeout = 10000 });
+
+        await ClickWhenStable(RiskChips.Chip("Critical"));
+
+        await Expect(Summary).ToHaveTextAsync("1 Memory Care resident at Critical risk: 6 open care tasks.", new() { Timeout = 10000 });
+        await Expect(Board.Rows).ToHaveCountAsync(1);
+        await Expect(Board.Rows.First).ToContainTextAsync("Harold Chen");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task choosing_all_risks_widens_the_board_back_to_the_memory_care_residents()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(CareChips.Chip("Memory Care"));
+        await Expect(Summary).ToHaveTextAsync(MemoryCareResidents, new() { Timeout = 10000 });
+        await ClickWhenStable(RiskChips.Chip("Critical"));
+        await Expect(Board.Rows).ToHaveCountAsync(1, new() { Timeout = 10000 });
+
+        await ClickWhenStable(RiskChips.Chip("All"));
+
+        await Expect(Summary).ToHaveTextAsync(MemoryCareResidents, new() { Timeout = 10000 });
+        await Expect(Board.Rows).ToHaveCountAsync(7);
+        await Expect(Board.Rows.First).ToContainTextAsync("Amina Patel");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task choosing_all_care_levels_brings_back_the_whole_census()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(CareChips.Chip("Memory Care"));
+        await Expect(Summary).ToHaveTextAsync(MemoryCareResidents, new() { Timeout = 10000 });
+
+        await ClickWhenStable(CareChips.Chip("All"));
+
+        await Expect(Summary).ToHaveTextAsync(WholeCensus, new() { Timeout = 10000 });
+        await Expect(Board.Rows).ToHaveCountAsync(10);
+        await Expect(Board.Rows.First).ToContainTextAsync("Abigail Moore");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task clicking_the_critical_chip_again_brings_back_every_risk()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(RiskChips.Chip("Critical"));
+        await Expect(Summary).ToHaveTextAsync(CriticalResidents, new() { Timeout = 10000 });
+
+        await ClickWhenStable(RiskChips.Chip("Critical"));
+
+        await Expect(RiskChips.SelectedChips).ToHaveCountAsync(0, new() { Timeout = 10000 });
+        await Expect(Summary).ToHaveTextAsync(WholeCensus, new() { Timeout = 10000 });
+        await Expect(Board.Rows).ToHaveCountAsync(10);
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task clicking_the_memory_care_chip_again_brings_back_every_care_level()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(CareChips.Chip("Memory Care"));
+        await Expect(Summary).ToHaveTextAsync(MemoryCareResidents, new() { Timeout = 10000 });
+
+        await ClickWhenStable(CareChips.Chip("Memory Care"));
+
+        await Expect(CareChips.SelectedChips).ToHaveCountAsync(0, new() { Timeout = 10000 });
+        await Expect(Summary).ToHaveTextAsync(WholeCensus, new() { Timeout = 10000 });
+        await Expect(Board.Rows).ToHaveCountAsync(10);
         AssertNoConsoleErrors();
     }
 
@@ -142,6 +235,24 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         await Expect(Board.Rows.Nth(1)).ToContainTextAsync("Amina Patel");
         await Expect(Board.Rows.Last).ToContainTextAsync("Dorothy Fleming");
         await Expect(Board.Rows).ToHaveCountAsync(10);
+        AssertNoConsoleErrors();
+    }
+
+    // Sorting asks the server for the board again, and the chosen chip goes with it: by open tasks, Mara Thompson's
+    // three come first and Harold Chen's six last.
+    [Test]
+    public async Task sorting_the_critical_residents_keeps_to_critical_risk()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(RiskChips.Chip("Critical"));
+        await Expect(Summary).ToHaveTextAsync(CriticalResidents, new() { Timeout = 10000 });
+
+        await ClickWhenStable(Board.Header("Open Tasks"));
+
+        await Expect(Board.Rows.First).ToContainTextAsync("Mara Thompson", new() { Timeout = 10000 });
+        await Expect(Board.Rows.Last).ToContainTextAsync("Harold Chen");
+        await Expect(Board.Rows).ToHaveCountAsync(4);
+        await Expect(Summary).ToHaveTextAsync(CriticalResidents);
         AssertNoConsoleErrors();
     }
 
@@ -215,7 +326,7 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
 
         await Expect(Summary).ToHaveTextAsync(
             $"Clara Hoffman: {ResidentCareItemValidator.CriticalNeedsAnOpenTask}", new() { Timeout = 10000 });
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -275,6 +386,24 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The low-risk chip asks the server again after the answer: a discharge sent on Cancel would come first.
+    [Test]
+    public async Task cancelling_the_discharge_keeps_the_ticked_resident_on_the_census()
+    {
+        await NavigateAndBoot();
+        await TickResident("Esther Cole");
+        await ClickWhenStable(DischargeTicked);
+        await Expect(ConfirmDialog).ToContainTextAsync("Discharge the ticked residents from the active census?", new() { Timeout = 10000 });
+
+        await ClickWhenStable(ConfirmCancel);
+
+        await ClickWhenStable(RiskChips.Chip("Low"));
+        await Expect(Summary).ToHaveTextAsync("8 residents at Low risk: 6 open care tasks.", new() { Timeout = 10000 });
+        await Expect(Board.Row("Esther Cole")).ToHaveCountAsync(1);
+        Assert.That(_dischargesSent, Is.Empty);
+        AssertNoConsoleErrors();
+    }
+
     // The flag raises one refresh event, and the page has two listeners for it: one reloads the watch list,
     // the other the census.
     [Test]
@@ -302,6 +431,24 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         await Expect(Watched("Bilal Khan")).ToHaveCountAsync(0, new() { Timeout = 10000 });
         await Expect(Summary).ToHaveTextAsync("23 residents on the census: 59 open care tasks.", new() { Timeout = 10000 });
         await Expect(Board.Row("Bilal Khan")).ToHaveCountAsync(0);
+        AssertNoConsoleErrors();
+    }
+
+    // Flagging Amina Patel reloads the watch list after the answer: a discharge sent on Cancel would come first.
+    [Test]
+    public async Task cancelling_a_watched_residents_discharge_keeps_them_on_the_watch_list()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(QuickAction("Bilal Khan", "Discharge"));
+        await Expect(ConfirmDialog).ToContainTextAsync("Discharge Bilal Khan from the active census?", new() { Timeout = 10000 });
+
+        await ClickWhenStable(ConfirmCancel);
+
+        await ClickWhenStable(QuickAction("Amina Patel", "Flag Critical"));
+        await Expect(Watched("Amina Patel")).ToHaveCountAsync(0, new() { Timeout = 10000 });
+        await Expect(WatchList).ToHaveCountAsync(4);
+        await Expect(Watched("Bilal Khan")).ToHaveCountAsync(1);
+        Assert.That(_dischargesSent, Is.Empty);
         AssertNoConsoleErrors();
     }
 
@@ -343,6 +490,21 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         await Expect(Board.Rows.Nth(1)).ToContainTextAsync("Agnes Whitlock");
         await Expect(Board.Cell("Agnes Whitlock", NurseColumn)).ToHaveTextAsync("Night Float Team");
         await Expect(Board.Cell("Agnes Whitlock", OpenTasksColumn)).ToHaveTextAsync("2");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task cancelling_an_admission_closes_the_form()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(AdmitResident);
+        await Expect(AdmitDialog).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await NewResidentName.FillAndBlur("Agnes Whitlock");
+
+        await ClickWhenStable(CancelAdmission);
+
+        await Expect(AdmitDialog).ToBeHiddenAsync(new() { Timeout = 10000 });
+        await Expect(Summary).ToHaveTextAsync(WholeCensus);
         AssertNoConsoleErrors();
     }
 }

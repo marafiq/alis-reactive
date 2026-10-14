@@ -105,7 +105,8 @@ public class WhenNurseRecordsNightRoomChecks : PlaywrightTestBase
         await Expect(NightCare).ToBeHiddenAsync();
 
         await ChooseRoom("Maple 112", "Lillian Ford");
-        await Expect(NightCare).ToHaveTextAsync("Night care: Bed alarm on; walk her to the bathroom if she is up.", new() { Timeout = 10000 });
+        await Expect(NightCare).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(NightCare).ToHaveTextAsync("Night care: Bed alarm on; walk her to the bathroom if she is up.");
 
         await ChooseRoom("Maple 114", "Samuel Ortiz");
         await Expect(NightCare).ToHaveTextAsync("Night care: Turn him at 02:00 and 04:00.", new() { Timeout = 10000 });
@@ -113,11 +114,17 @@ public class WhenNurseRecordsNightRoomChecks : PlaywrightTestBase
     }
 
     // The resident travels in a hidden field with no message slot, so its message is in the summary. The
-    // server naming the resident clears it at once, before the check is recorded again.
+    // server naming the resident clears it at once, before the check is recorded again: the resident's night
+    // care, which arrives after the summary clears, has come, and no check has gone to the server.
     [Test]
     public async Task choosing_the_room_clears_the_missing_resident_from_the_summary_at_once()
     {
         await NavigateAndBoot();
+        var checksSent = 0;
+        Page.Request += (_, request) =>
+        {
+            if (request.Url.Contains("/NightRound/Record")) Interlocked.Increment(ref checksSent);
+        };
         await StartTheRound();
         await ClickWhenStable(RecordCheck);
         await Expect(ValidationSummary).ToBeVisibleAsync(new() { Timeout = 5000 });
@@ -126,6 +133,8 @@ public class WhenNurseRecordsNightRoomChecks : PlaywrightTestBase
         await ChooseRoom("Maple 112", "Lillian Ford");
 
         await Expect(ValidationSummary).ToBeHiddenAsync();
+        await Expect(NightCare).ToBeVisibleAsync(new() { Timeout = 10000 });
+        Assert.That(checksSent, Is.EqualTo(0), "Choosing the room records no check.");
         await Expect(CheckStatus).ToHaveTextAsync("No rooms checked yet.");
         AssertNoConsoleErrors();
     }

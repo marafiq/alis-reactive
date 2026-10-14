@@ -58,13 +58,7 @@
     }
 
     Html.On(plan, t => t.DomReady(p =>
-    {
-        // The visitor pass preview: literal arguments of each kind, as the plugin receives them.
-        p.Element("pass-heading").Text.Set(visitorPass.Heading(true, 4000000001L, new DateTime(2026, 11, 14)));
-        p.Element("pass-charges").Text.Set(visitorPass.Charges(12.50m, 1.5));
-
-        p.Get(birchUrl).Response(r => r.OnSuccess<WardCensusResponse>((ward, s) => ShowWard(s, ward)));
-    }));
+        p.Get(birchUrl).Response(r => r.OnSuccess<WardCensusResponse>((ward, s) => ShowWard(s, ward)))));
 }
 
 <native-vstack gap="Lg">
@@ -122,10 +116,23 @@
 
     <native-card><native-card-body>
         <native-heading level="H2">Visitor pass</native-heading>
-        <native-vstack gap="Xs" class="mt-2 text-sm">
-            <p id="pass-heading">&mdash;</p>
-            <p id="pass-charges">&mdash;</p>
-        </native-vstack>
+        <p class="text-sm text-text-secondary">
+            Daniel Reed visits his father, Thomas Reed, on Saturday 14 November; an aide walks him up to Birch ward.
+        </p>
+        @(Html.NativeButton("print-pass-btn", "Print Daniel Reed's Pass")
+            .CssClass(Button + " mt-3")
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+            {
+                // The desk issues his pass: escorted, its number, the day, the parking fee and the visit's hours.
+                p.Element("pass-heading").Text.Set(visitorPass.Heading(true, 4000000001L, new DateTime(2026, 11, 14)));
+                p.Element("pass-charges").Text.Set(visitorPass.Charges(12.50m, 1.5));
+                p.Element("visitor-pass").Show();
+            }))
+        <div id="visitor-pass" hidden class="mt-3 rounded-md border border-border px-4 py-3 text-sm">
+            <p class="font-medium">Daniel Reed, visiting Thomas Reed</p>
+            <p id="pass-heading"></p>
+            <p id="pass-charges"></p>
+        </div>
     </native-card-body></native-card>
 </native-vstack>
 
