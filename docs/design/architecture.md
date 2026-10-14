@@ -7,6 +7,15 @@ lowering, and what each built-in object must do) is [`grammar.md`](grammar.md), 
 was built and what was not; the component method as built is
 [`bring-your-own-component.md`](bring-your-own-component.md).
 
+> **Two times.** Sections 0 to 12 are the proposal as written at `195d3a1` (v6, 2026-10-11), amended
+> in places since. Where they say "today", give a count or cite a `file:line`, they describe the code
+> before the redesign, and most files they cite are gone (`live-clear.ts`, `inject.ts`,
+> `request-payload-writer.ts`, `rule-engine.ts`, `native-action-link.ts`, `merge-policy.ts`,
+> `ComponentRef.cs`). Their code blocks are the proposal's notation unless a paragraph marked
+> "As built" cites the source. The "As built" paragraphs, the view and its plan in section 0.5, and
+> section 13 are current: each was checked against the code at `e837ad94`, and each code example in
+> them is copied from the file it cites.
+
 The constraints:
 - everything is fully typed;
 - every feature is preserved;
@@ -49,15 +58,18 @@ A new component or a new feature adds vocabulary, never grammar. This is the inv
 the framework itself: when HTTP, validation, partials and realtime are ordinary declarations, any
 component can do what they do.
 
-Today each feature brings a grammar of its own, and the generated contract has 136 interfaces, 60
-unions and 65 kinds:
-- gather has six verbs (`Include`, `IncludeAll`, `FromEvent`, `RouteParam`, `FromUrl`, `Static`);
-- requests have their own routing (`RequestPlan`, `ResponseRoute`, `RequestChain`);
-- conditions, validation rules and validation conditions are three boolean grammars with two
+Before the redesign (at `195d3a1`) each feature brought a grammar of its own, and the generated
+contract had 136 interfaces, 60 unions and 65 kinds:
+- gather had six verbs (`Include`, `IncludeAll`, `FromEvent`, `RouteParam`, `FromUrl`, `Static`);
+- requests had their own routing (`RequestPlan`, `ResponseRoute`, `RequestChain`);
+- conditions, validation rules and validation conditions were three boolean grammars with two
   evaluators;
-- five trigger kinds each have their own shape;
-- dispatch, inject and show-errors are reaction kinds;
-- eight read kinds and five source kinds say "a value from somewhere".
+- five trigger kinds each had their own shape;
+- dispatch, inject and show-errors were reaction kinds;
+- eight read kinds and five source kinds said "a value from somewhere".
+
+At `e837ad94` the generated contract (`Alis.Reactive.Assets/runtime/types/plan.ts`) has 39 interfaces
+and 9 unions.
 
 ### 0.2 The productions
 
@@ -92,7 +104,9 @@ expr     := lit(json, shape)             42, "east", [1, 2]
 entry    := name: expr | ...expr
 ```
 
-One handler form, six statements, nine expressions, two locators. The operator set is C#'s own
+One handler form, six statements, nine expressions, two locators. The generated contract at
+`e837ad94` has exactly these: `Statement` (`Alis.Reactive.Assets/runtime/types/plan.ts:174-180`),
+`Expr` (`:63-72`) and `ObjectLocator` (`:28-30`). The operator set is C#'s own
 (comparison, logical, arithmetic, `??`, `?:`) plus conversions, `empty` and `matches` (a regular
 expression test, since the grammar constructs no objects). It is closed because C#'s is.
 
@@ -159,42 +173,56 @@ expression test, since the grammar constructs no objects). It is closed because 
 ### 0.5 One sentence, lowered
 
 The owner's fluent API keeps its shape. Each fluent method lowers to fixed productions, so the plan
-says exactly what runs. The `ShiftHandover` link (`V/HttpPipeline/ShiftHandover/Index.cshtml:30-39`),
-written with object handles:
+says exactly what runs. The Shift Handover page's link, as the view writes it
+(`Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/ShiftHandover/Index.cshtml:30-38`):
 
 ```csharp
-Html.NativeActionLink($"mark-read-{note.Key}", "Mark Read", markReadUrl, link => link
+@(Html.NativeActionLink($"mark-read-{note.Key}", "Mark Read", markReadUrl, link => link
     .Post()
     .Gather(g => g.Header("X-Shift", "Night"))
-    .WhileLoading(l => loader.Show())
+    .WhileLoading(l => l.Component<NativeLoader>().Show())
     .Response(r => r
-        .OnSuccess<HandoverNoteRead>((json, s) => status.Text.Set(json.Get(x => x.Message)))
-        .OnError<HandoverNoteRead>(400, (json, e) => status.Text.Set(json.Get(x => x.Message)))
-        .OnError<HandoverNoteRead>(409, (json, e) => status.Text.Set(json.Get(x => x.Message))))
-    .Finally(f => loader.Hide()));
+        .OnSuccess<HandoverNoteRead>((json, s) => s.Element("handover-status").Text.Set(json.Get(x => x.Message)))
+        .OnError<HandoverNoteRead>(400, (json, e) => e.Element("handover-status").Text.Set(json.Get(x => x.Message)))
+        .OnError<HandoverNoteRead>(409, (json, e) => e.Element("handover-status").Text.Set(json.Get(x => x.Message))))
+    .Finally(f => f.Component<NativeLoader>().Hide()))
 ```
 
-The plan it renders, written as JavaScript for reading (the JSON is the same tree). `link`,
-`loader`, `status` and `http` stand for `obj(id)` nodes:
+The plan it renders, written as JavaScript for reading (the JSON is the same tree). `link`, `loader`,
+`status` and `http` stand for `obj(id)` nodes, and `res1` is the name the plan gives the response. The
+guard is the link's own (`Alis.Reactive.Native/Components/NativeActionLink/NativeActionLink.cs:113-124`),
+the statements around `send` are the request's (`Alis.Reactive/PlanModel/Requests/RequestStep.cs:43-75`,
+the status arms `:226-245`), and `send` takes the record `alis.http` reads
+(`Alis.Reactive.Assets/runtime/modules/http.ts:24-33`):
 
 ```js
 on(link, "click", e) {
-  if (!(e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) {
+  if (e.button === 0 && !e.defaultPrevented && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
     e.preventDefault();
     loader.show();                                          // WhileLoading
     try {
-      const req = {};                                       // the gathered record: the request snapshot
-      const res = await http.send({ method: "POST", url: link.href, values: req,
-                                    headers: { "X-Shift": "Night" }, format: "json" });
-      if (res.ok) status.textContent = res.body.message;    // OnSuccess
-      else if (res.status === 400) status.textContent = res.body.message;
-      else if (res.status === 409) status.textContent = res.body.message;
+      const res1 = await http.send({ method: "POST", url: "<the link's href>", route: {}, values: {},
+                                     arrays: [], headers: { "X-Shift": "Night" }, format: "json" });
+      if (res1.ok) status.textContent = res1.body.message;  // OnSuccess
+      else if (res1.status === 400) status.textContent = res1.body.message;
+      else if (res1.status === 409) status.textContent = res1.body.message;
     } finally {
       loader.hide();                                        // Finally
     }
   }
 }
 ```
+
+Proof: Alis.Reactive.PlaywrightTests.HttpPipeline.ShiftHandover.WhenChargeNurseMarksHandoverRead.marking_a_note_read_tells_the_server_which_shift_read_it
+— `await Expect(HandoverStatus).ToHaveTextAsync("Helen Park's handover note is marked read by the night shift.");`
+(tests/Alis.Reactive.PlaywrightTests/HttpPipeline/ShiftHandover/WhenChargeNurseMarksHandoverRead.cs:78), the server
+reading the header; the 409 route and Finally:
+Alis.Reactive.PlaywrightTests.HttpPipeline.ShiftHandover.WhenChargeNurseMarksHandoverRead.a_note_already_marked_read_is_refused_and_the_loader_still_lifts
+— `await Expect(Loader).ToBeHiddenAsync();` (tests/Alis.Reactive.PlaywrightTests/HttpPipeline/ShiftHandover/WhenChargeNurseMarksHandoverRead.cs:107),
+then the refusal's message (:108); the guard:
+Alis.Reactive.PlaywrightTests.HttpPipeline.ShiftHandover.WhenChargeNurseMarksHandoverRead.a_ctrl_click_opens_the_note_in_a_new_tab_and_marks_nothing_read
+— `Assert.That(markReads, Is.Empty, "A Ctrl or Cmd click sends no request from the page.");`
+(tests/Alis.Reactive.PlaywrightTests/HttpPipeline/ShiftHandover/WhenChargeNurseMarksHandoverRead.cs:67).
 
 The inventoried rows (`use-cases/`) fall out of the shape instead of special code:
 
@@ -218,7 +246,9 @@ inside `When(x => x.Status == Status.Discharged, ..)` becomes one test of the fo
 ```
 
 The check and the condition are expressions, so the browser evaluates them with the same evaluator
-as conditions and arrays. There is no rule engine.
+as conditions and arrays. There is no rule engine. (The test above is the proposal's notation. As
+built, a form's data lists its fields, `{ id, name, value, tests }`, and each test is
+`{ rule, check, when, message }`: `Alis.Reactive.Assets/runtime/types/plan.ts:50-61, 143-148`.)
 
 ### 0.6 What the grammar removes
 
@@ -262,7 +292,7 @@ These are the features that make Alis.Reactive what it is. The design must keep 
 
 ## 2. What a JavaScript object is, measured
 
-Measured from the 66 declarations at HEAD, plus the other objects the DSL reaches.
+Measured at `195d3a1` from the 66 declarations of that commit, plus the other objects the DSL reaches.
 
 | Kind | Count or examples | What it needs |
 |---|---|---|
@@ -271,7 +301,7 @@ Measured from the 66 declarations at HEAD, plus the other objects the DSL reache
 | Returning method | 13 | used as a value: in text, conditions, gather, arrays |
 | Generic member | 3, plus 15 row-field arguments and 3 fixed mode arguments | typed by the app's row type |
 | Event | 145, with 128 payload classes holding 370 data fields | sync payload reads and writes; payload methods (4) after an async gap |
-| Returned object | `getColumnByField(f).visible` (vendor API; no view yet) | members on a value a method returned |
+| Returned object | `getColumnByField(f).visible` (vendor API; no view at `195d3a1`; since `d9aedc4` declared with `InvokeObject<T>` and used as `sheet.GetColumnByField(wing).HeaderText.Set(args.Value)`, `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Grid/CareStaffColumns.cshtml:71`) | members on a value a method returned |
 | App object | Drawer, Loader, Toast, Confirm | fixed ID; Confirm is asynchronous |
 | DOM element | text, html, classes, show/hide; `classList`, `children` as arrays | members of the element |
 | Plugin | functions, properties, commands, a root function | found by name; arguments of any kind |
@@ -472,6 +502,27 @@ public sealed class FusionGridRowSelected<TRow> : JsObject      // a payload is 
   generic declaration `FusionGrid<TRow>` (row-typed members stay generic methods with
   `Field.Of`/`Field<TValue>` arguments), and `Event` and `Message<T>` (events stay `TypedEvent<T>`;
   data payloads are `Data<T>`). The plan carries each member's JavaScript path; no key names a member.
+  The Grid as it ships (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:29, 51, 66, 107, 115,
+  181, 229-230` and `:300-307`, doc comments left out):
+
+  ```csharp
+  public sealed class FusionGrid : FusionComponent
+  {
+      public void SelectRow(Arg<int> index) => Call(index);
+      public TypedSource<TRow[]> GetSelectedRecords<TRow>() where TRow : class => Invoke<TRow[]>();
+      public void ShowColumn(Field key) => Call(key, Fixed("field"), name: "showColumns");
+      public FusionGridColumn GetColumnByField(Field field) => InvokeObject<FusionGridColumn>(field);
+      public void SetCellValue<TValue>(Arg<int> key, Field<TValue> field, Arg<TValue> value) => Call(key, field, value);
+      public TypedEvent<FusionGridRowSelectedArgs<TRow>> RowSelected<TRow>() where TRow : class =>
+          Event<FusionGridRowSelectedArgs<TRow>>();
+  }
+
+  public sealed class FusionGridColumn : JsObject
+  {
+      public Prop<string> HeaderText => Prop<string>();
+      public Prop<bool> Visible => Prop<bool>();
+  }
+  ```
 
 ### 4.2 Inputs
 
@@ -491,7 +542,15 @@ This replaces two things:
 - the runtime's hard-coded `"change"` (`live-clear.ts:102`).
 
 As built: `IInputComponent.Input` returns `ComponentInput.Of(Value, committedBy: SomeEvent)`; the
-model carries each input's commit event and re-raises it as `alis:commit`.
+model carries each input's commit event and re-raises it as `alis:commit`
+(`Alis.Reactive.Assets/runtime/modules/model.ts:160-175`). The form clears a field's message on
+`input` in the capture phase, ahead of the component (`d9dccd69`), and re-checks it on `blur` and
+`alis:commit` (`Alis.Reactive.Assets/runtime/modules/form/form.ts:234-240`). A component commits on
+the event after which its value is final: the in-place editor on `EndEdit`, after EJ2 stores the value
+(`bfe0834c`; `Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditor.cs:52`), the
+uploader on `FilesChanged`, once EJ2 holds the chosen files (`beab8f92`;
+`Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:42`). Components row 136
+gives the tests.
 
 The uploader declares its value as its files. That removes the special case for Syncfusion's
 `rawFile` (`request-payload-writer.ts:163`).
@@ -567,6 +626,21 @@ p.When(args.Value).Gt(100m).Then(t => ceiling.Value.Set(100m))
   - Today's left fold (`ConditionContinuation.cs:43-57`) and the render-time throw inside groups
     (`:134-140`) become impossible to write.
 - **Confirm.** `p.Confirm("..")` stays as shorthand for `p.When(confirm.Ask("..")).Truthy()`.
+- **As built** (section 13). `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Conditions/NumericCondition/Index.cshtml:96-102`:
+
+  ```csharp
+  p.When(hr.Value).Gt(threshold.Value)
+      .Then(t => t.Element("threshold-band").Text.Set("Over the care-plan limit"))
+      .ElseIf(hr.Value).Lt(threshold.Value)
+      .Then(t => t.Element("threshold-band").Text.Set("Under the care-plan limit"))
+      .ElseIf(hr.Value).Eq(threshold.Value)
+      .Then(t => t.Element("threshold-band").Text.Set("At the care-plan limit"))
+      .Else(e => e.Element("threshold-band").Text.Set("No care-plan limit set"));
+  ```
+
+  A group mixes `And` and `Or`: `.And(g => g.When(dose.Get(x => x.Pulse)).Between(60, 100).Or(physicianSaysGive.Checked).Truthy())`
+  (`Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Conditions/MedicationRound/Index.cshtml:73`). `p.Confirm(..)` writes
+  a `let` that awaits `confirm.ask(..)` and an `if` on its answer (`Alis.Reactive/PlanModel/Conditions/ConditionGraph.cs:280-288`).
 
 ### 4.6 Requests, gather and the URL
 
@@ -614,12 +688,28 @@ p.Post(url)
     view model as the request. `Set` takes any value source or a literal. A source's type must be the
     member's type or derive from it, so an `int?` value cannot fill an `int` member; a `T[]` fills `T[]`,
     `List<T>` or `IEnumerable<T>`; a nullable member is left empty with a typed null.
-  - An event payload member is the payload's own member: `g.Set(x => x.Q, args.Text)`.
+  - An event payload member is the payload's own member: `.Gather<DirectorySearch>(g => g.Set(x => x.Name, args.Text))`
+    (`Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/AutoComplete/Index.cshtml:67`).
   - Rendering checks that every placeholder is filled, that a member is set once, and that a
     `Form(m => m.X)` field is a member of `TRequest` of a type its value binds to.
   - In ASP.NET Core an action that binds a JSON body takes its route values as parameters beside the
-    `[FromBody]` class (`Hold(string slotId, [FromBody] HoldRequest hold)`). The page's request class
-    is then the body class plus the route members (`HoldVisitRequest : HoldRequest { SlotId }`).
+    `[FromBody]` class (`HoldVisit(string slotId, [FromBody] HoldRequest? hold)`,
+    `Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Brought/VisitPlannerController.FrontDesk.cs:45`).
+    The page's request class is then the body class plus the route members
+    (`HoldVisitRequest : HoldRequest { SlotId }`,
+    `Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Brought/VisitPlanner/FrontDeskHoldsModel.cs:82-85`),
+    gathered on the front desk page (`Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/FrontDesk.cshtml:90-97`):
+
+    ```csharp
+    .Then(added => added.Post(holdUrl)
+        .Gather<HoldVisitRequest>(g => g
+            .Set(x => x.SlotId, args.Added)
+            .Set(x => x.VisitsThisWeek, added.Component<VisitPlanner>(m => m.VisitSlots).Count)
+            .Set(x => x.Family, p.Url<FrontDeskQuery>().Get(q => q.Family))
+            .Set(x => x.Source, "front-desk")
+            .Header("X-Wing", added.Component<VisitPlanner>(m => m.VisitSlots).Wing))
+        .AsJson()
+    ```
   - Keys are binding names: `{"Address":{"City":..}}` in JSON, `Address.City` in a query or form data.
   - The deleted surface: every `Include` form, `IncludeAll`, `FromEvent`, `RouteParam`, `FromUrl`
     (gather and `p.FromUrl`), `Static`, `GatherBuilder.Plugin`, `p.Post(url, g => ..)` and
@@ -634,7 +724,8 @@ p.Post(url)
     the request URL (`native-action-link.ts:65`) go.
   - The request takes the link's `href`, so the URL is written once.
   - The single-request rule is a type: the link offers exactly one request. Analyzer `ALIS002` and
-    the render-time checks go.
+    the render-time checks go. (As built, section 13: a second request, or none, throws at render, and
+    `ALIS002` keeps only what the link's own plan cannot have, `Validate` and `Form()`.)
   - Modifier-clicks stay with the browser: the handler's first `if` reads the payload's modifier
     keys.
 
@@ -694,6 +785,24 @@ p.Dispatch(CareEvents.Flagged, e => e.Set(x => x.ResidentId, row.Get(r => r.Id))
   events (`Reconnecting`, `Reconnected`, `Closed`) and its properties (`State`, `ReadyState`) come
   from the same model, with no realtime-specific grammar. No view uses them yet, so each one ships
   with a journey that proves it.
+- **As built** (`e837ad94`): realtime keeps two triggers over typed declarations. A stream derives
+  `ServerPushStream` and a hub `SignalRHub`; their messages are members
+  (`Alis.Reactive.SandboxApp/Areas/Sandbox/Models/HttpPipeline/RealTime/RealTimeModel.cs:11-16`,
+  `Alis.Reactive.SandboxApp/Hubs/ResidentStatusHub.cs:56-62`):
+
+  ```csharp
+  public sealed class FacilityAlertStream : ServerPushStream
+  {
+      public ServerPushMessage<FacilityAlert> Alert => Message<FacilityAlert>("facility-alert");
+
+      public ServerPushMessage AllClear => Message("all-clear");
+  }
+  ```
+
+  A page subscribes with `t.ServerPush(ServerPushStream.At<FacilityAlertStream>($"/api/facility-alerts?drill={drillId}"), s => s.Alert,`
+  (`Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/RealTime/Index.cshtml:15`) and
+  `Html.On(plan, t => t.SignalR(SignalRHub.At<ResidentStatusFeed>($"/hubs/resident-status?drill={drillId}"), h => h.StatusChanged,`
+  (`:41`). `invoke`, `send`, and a connection's own events and properties are not declared.
 
 ### 4.8 Elements, plugins and app objects
 
@@ -719,6 +828,24 @@ These are all declarations, used the same way as components.
   The name is the plugin's only string. `RegisterPlugin`, `PluginTypeBuilder`,
   `PluginMemberBuilder` and `PluginContract.cs` are deleted. Each use carries its path and shape,
   as it does for components. A root function is `Invoke<T>(.., name: "")`.
+
+  As built, the base class's constructor names the plugin
+  (`Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Brought/VisitPlanner/VisitBoardModel.cs:76-85`,
+  doc comment left out), and the page registers it and calls it
+  (`var slugify = plan.RegisterPlugin<VisitBoardSlugPlugin>();`, `slugify.Slug(planner.Wing)`:
+  `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/VisitBoard.cshtml:13, 33`):
+
+  ```csharp
+  public sealed class VisitBoardSlugPlugin : Plugin
+  {
+      public VisitBoardSlugPlugin()
+          : base("slugify")
+      {
+      }
+
+      public TypedSource<string> Slug(Arg<string> text) => Invoke<string>(text, name: "");
+  }
+  ```
 - **Built-ins.** The document, HTTP, the model, forms and slots are declarations too, located as
   plugins of the framework's bundle (`plugin("alis.document")` and so on):
   - the document's `Ready` event, `Raise(event, detail)` and `Query`;
@@ -732,6 +859,13 @@ These are all declarations, used the same way as components.
   - `p.Component<NativeDrawer>()`, `p.Component<FusionToast>()` and `p.Component<Confirm>()`.
   - Confirm's `Ask` is an async member. The Fusion package's confirm module defines it on the dialog
     element, so the `window.alis.confirm` global (`confirm.ts:103`) goes.
+  - As built: Confirm is the `alis.confirm` plugin that `p.Confirm(..)` asks; the Fusion confirm
+    provides it on a page that renders its dialog (`Alis.Reactive.Assets/components/fusion/confirm.ts:104-112`),
+    or a page gives its own (section 13). The drawer, loader and toast are reached through any
+    scope's `Component<NativeDrawer>()`, `Component<NativeLoader>()` and `Component<FusionToast>()`
+    (`p.Component<NativeDrawer>().Size.Set(DrawerSize.Sm);`, `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/Index.cshtml:29`;
+    `.WhileLoading(l => l.Component<NativeLoader>().Show())`, `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/ShiftHandover/Index.cshtml:33`;
+    `var toast = s.Component<FusionToast>();`, `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/_AddResidentFormPartial.cshtml:50`).
 
 ### 4.9 Validation: FluentValidation's grammar, owned by the framework
 
@@ -750,6 +884,22 @@ public sealed class AdmissionValidator : ReactiveValidator<Admission>
         RuleFor(x => x.Room).MustAsync(rooms.IsFreeAsync).WithMessage("That room is taken.");
     }
 }
+```
+
+As built, from the move-in review
+(`Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Validation/MoveInReview/MoveInReviewValidator.cs:37-39, 62, 94, 107-108`):
+
+```csharp
+RuleFor(x => x.ReassessmentPlan).NotEmpty().WithMessage("A moderate fall risk needs a reassessment plan.")
+    .When(x => x.FallRiskScore >= 5 && x.FallRiskScore <= 7)
+    .MaximumLength(120).WithMessage("Keep the reassessment plan under 120 characters.");
+
+RuleFor(x => x.WristbandCode).WristbandCode();
+
+RuleFor(x => x.ReviewedBy).NotEmpty().ServerOnly();
+
+public static IRuleBuilderOptions<T, string?> WristbandCode<T>(this IRuleBuilder<T, string?> rule) =>
+    rule.Matches(@"^WB-\d{6}$").WithMessage("Enter the wristband code as WB- and six digits, like WB-104233.");
 ```
 
 - **One statement per rule.** The developer writes FluentValidation's grammar; the framework
@@ -789,8 +939,8 @@ public sealed class AdmissionValidator : ReactiveValidator<Admission>
     today's `'Age' must be greater than 0.`.
   - Dates compare as timestamps.
   - A regex pattern reaches the browser only when JavaScript reads it the same way. A pattern with
-    an option JavaScript lacks, or with .NET-only syntax, stays on the server (`Checks.cs`,
-    `JavaScriptPattern`).
+    an option JavaScript lacks, or with .NET-only syntax, stays on the server
+    (`Alis.Reactive.FluentValidator/Checks.cs:146`, `JavaScriptPattern`).
 - **The form is an object.** `plugin("alis.form", id)` holds the projected tests and the inputs bound to
   it. `Validate()`, `ShowErrors(problem)` and `Values` are its members, and live clearing and
   revalidation happen inside it. Each test is `{ field, check, when, message }`, where `check` and
@@ -808,7 +958,7 @@ public sealed class AdmissionValidator : ReactiveValidator<Admission>
 Six rules, for developers and for agents:
 
 1. **Target before source, callback last.** `Set(target, source)`, `Header(name, source)`,
-   `OnError<T>(status, callback)`, `On(event, callback)`, `ServerPush<T>(url, type, callback)`,
+   `OnError<T>(status, callback)`, `CustomEvent(event, callback)`, `ServerPush(stream, s => s.Message, callback)`,
    `.Reactive(c => c.Event, callback)`.
 2. **A callback's parameters are the payload or result, then the scope:** `(args, p)`,
    `(res, s)`, `(msg, p)`, `(e, p)`, or just `(p)`.
@@ -822,26 +972,27 @@ Six rules, for developers and for agents:
    - `Set` writes.
    - `Get` reads a data path.
 
-As built (`f36f62e`, section 13):
+As built (`f36f62e`, section 13). Each "Now" is a line of the sandbox at `e837ad94` (view paths
+under `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/`):
 
-| Before | Now |
-|---|---|
-| `p.When(args, x => x.Value).Gt(100m)` | `p.When(args.Value).Gt(100m)` |
-| `p.Component<FusionNumericTextBox>(m => m.Rate).Set(c => c.Min, 0m)` | `rate.Min.Set(0m)` |
-| `grid.Call(c => c.SelectRow, 2)` | `grid.SelectRow(2)` |
-| `p.Payload(args).Set(a => a.PreventDefaultAction, true)` | `args.PreventDefaultAction.Set(true)` |
-| `s.Payload(args).Call(a => a.UpdateData, res.Read(x => x.Items))` | `args.UpdateData(res.Get(x => x.Items))` |
-| `g.Include(grid.Get(c => c.GetSelectedRecords<R>()), "selectedRecords")` | `g.Set(x => x.SelectedRecords, grid.GetSelectedRecords<R>())` |
-| `g.RouteParam("cardId", args, x => x.Data.Id)` | `g.Set(x => x.CardId, args.Data.Get(d => d.Id))` |
-| `g.FromEvent(args, x => x.Text, "q")` | `g.Set(x => x.Q, args.Text)` |
-| `g.FromUrl("facilityId")` | `g.Set(x => x.FacilityId, p.Url<FacilityQuery>().Get(q => q.FacilityId))` |
-| `.Header("X-Category", args, x => x.Category)` | `g.Header("X-Category", args.Category)` |
-| `p.When(p.FromUrl<int>("page")).Gt(1)` | `p.When(p.Url<PageQuery>().Get(q => q.Page)).Gt(1)` |
-| `p.FromDom("dom-card", "classList").Count()` | `p.Element("dom-card").ClassList.Items.Count()` |
-| `p.Plugin(tools.Count).Arg(items).Arg("status")` | `tools.Count(items, "status")` |
-| `NativeActionLink(text, url, p => p.Post(url)..)` | `Html.NativeActionLink(id, text, url, link => link.Post()..)` |
-| `DispatchWith<T>("flagged", d => ..)` + `CustomEvent<T>("flagged", ..)` | `p.Dispatch(CareEvents.Flagged, e => e.Set(..))` + `t.CustomEvent(CareEvents.Flagged, (e, p) => ..)` |
-| `ClientRule(x => x.Age).GreaterThan(0m, "msg")` + `RuleFor(x => x.Age).GreaterThan(0m)` | `RuleFor(x => x.Age).GreaterThan(0m).WithMessage("msg")` |
+| Before | Now | Where |
+|---|---|---|
+| `p.When(args, x => x.Value).Gt(100m)` | `p.When(args.Value).Gt(p.Url<FrontDeskQuery>().Get(q => q.MaxVisitors))` | `Components/Brought/VisitPlanner/FrontDesk.cshtml:152` |
+| `p.Component<FusionNumericTextBox>(m => m.Rate).Set(c => c.Min, 0m)` | `p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Min.Set(2);` | `Components/Fusion/NumericTextBox/Index.cshtml:72` |
+| `grid.Call(c => c.SelectRow, 2)` | `roster.SelectRow(roster.GetRowIndexByPrimaryKey(departure.ResidentId));` | `Components/Fusion/Grid/BatchRosterChange.cshtml:42` |
+| `p.Payload(args).Set(a => a.PreventDefaultAction, true)` | `args.PreventDefaultAction.Set(true);` | `Components/Fusion/AutoComplete/Index.cshtml:65` |
+| `s.Payload(args).Call(a => a.UpdateData, res.Read(x => x.Items))` | `.Else(some => args.UpdateData(found.Get(x => x.Physicians)));` | `Components/Fusion/AutoComplete/Index.cshtml:75` |
+| `g.Include(grid.Get(c => c.GetSelectedRecords<R>()), "selectedRecords")` | `.Gather<DirectoryRoundsRequest>(g => g.Set(x => x.Residents, grid.GetSelectedRecords<DirectoryResident>()))` | `Components/Fusion/Grid/Directory.cshtml:212` |
+| `g.RouteParam("cardId", args, x => x.Data.Id)` | `.Set(x => x.ResidentId, args.Data.Get(x => x.ResidentId))` | `Components/Fusion/Grid/ActionCompleteSaveEdit.cshtml:51` |
+| `g.FromEvent(args, x => x.Text, "q")` | `.Gather<DirectorySearch>(g => g.Set(x => x.Name, args.Text))` | `Components/Fusion/AutoComplete/Index.cshtml:67` |
+| `g.FromUrl("facilityId")` | `.Set(x => x.Family, p.Url<FrontDeskQuery>().Get(q => q.Family))` | `Components/Brought/VisitPlanner/FrontDesk.cshtml:94` |
+| `.Header("X-Category", args, x => x.Category)` | `.Header("X-Wing", added.Component<VisitPlanner>(m => m.VisitSlots).Wing))` | `Components/Brought/VisitPlanner/FrontDesk.cshtml:96` |
+| `p.When(p.FromUrl<int>("page")).Gt(1)` | `p.When(args.Value).Gt(p.Url<FrontDeskQuery>().Get(q => q.MaxVisitors))` | `Components/Brought/VisitPlanner/FrontDesk.cshtml:152` |
+| `p.FromDom("dom-card", "classList").Count()` | `.And(p.Element($"{r.Key}-flag").ClassList.Items.Any(flag => flag == fallRisk)).Truthy()` | `Components/Fusion/ContextMenu/Index.cshtml:86` |
+| `p.Plugin(tools.Count).Arg(items).Arg("status")` | `TypedSource<string> boardCode = slugify.Slug(planner.Wing);` | `Components/Brought/VisitPlanner/VisitBoard.cshtml:33` |
+| `NativeActionLink(text, url, p => p.Post(url)..)` | `@(Html.NativeActionLink($"mark-read-{note.Key}", "Mark Read", markReadUrl, link => link` then `.Post()` | `HttpPipeline/ShiftHandover/Index.cshtml:30-31` |
+| `DispatchWith<T>("flagged", d => ..)` + `CustomEvent<T>("flagged", ..)` | `p.Dispatch(FireDrillEvents.ResidentMissing)` + `Html.On(plan, t => t.CustomEvent(FireDrillEvents.ResidentMissing, p =>` | `Components/Native/NativeButton/Index.cshtml:58, 13` |
+| `ClientRule(x => x.Age).GreaterThan(0m, "msg")` + `RuleFor(x => x.Age).GreaterThan(0m)` | `RuleFor(x => x.ReassessmentPlan).NotEmpty().WithMessage("A moderate fall risk needs a reassessment plan.")` | `Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Validation/MoveInReview/MoveInReviewValidator.cs:37` |
 
 ## 6. One expression compiler
 
@@ -864,7 +1015,7 @@ How it works:
   member table (`grammar.md` section 2.3). A new member is one table row and no runtime change.
 - **Anything else** fails at render, naming the construct. In a validator's `When` or `Unless`,
   a condition the browser cannot evaluate keeps the rules under it on the server instead
-  (`Rules.cs`, `Conditions<T>.TryForBrowser`).
+  (`Alis.Reactive.FluentValidator/Rules.cs:59`, `Conditions<T>.TryForBrowser`).
 
 ## 7. Component onboarding, inverted
 
@@ -894,6 +1045,21 @@ The core and the runtime carry no knowledge of any component. These leftovers go
 **Proof.** Tom Select, and a second brought component from a different library, ship with zero edits
 to the core or the runtime. The architecture test fails if the core or runtime names a vendor or a
 component.
+
+As built (`e837ad94`): every leftover in the table is gone. The form re-checks a field on
+`alis:commit` (`Alis.Reactive.Assets/runtime/modules/form/form.ts:234-240`); a slot re-creates the
+`<script>` nodes it inserts (`Alis.Reactive.Assets/runtime/modules/slot.ts:62-74`); the uploader
+declares its value as its files (`Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:19`);
+Confirm is a plugin (`Alis.Reactive.Assets/components/fusion/confirm.ts:104-112`); CheckList and
+RadioGroup are component code (`Alis.Reactive.Assets/components/native/check-list.ts`,
+`radio-group.ts`). Declarations are not generic over the app's types: a row-typed member is a generic
+method (`GetSelectedRecords<TRow>()`, section 4.1), and an input implements `IInputComponent` with
+`ComponentInput.Of(..)` (section 4.2). `field.Identity` and the render-time identity check were not
+built: two attempts broke Syncfusion pages in CI and were reverted
+([`bring-your-own-component.md`](bring-your-own-component.md), Status). The brought components are
+Tom Select and the sandbox's own visit planner (`Alis.Reactive.SandboxApp/BroughtComponents/`), and
+the architecture test fails if the runtime and the framework's component code import each other
+(`Alis.Reactive.Assets/runtime/__tests__/architecture.test.ts:120-134`).
 
 ## 8. The runtime: an interpreter and its modules
 
@@ -956,9 +1122,15 @@ component.
   - every translation layer (`ToPlanRule`, `ToPlanCondition`): the C# domain is the JSON.
 - **Composition.** Plans with one `planId` join their maps and handlers. A slot owns the plans it
   loaded.
-- **Today versus target.** Today's contract has 136 interfaces, 60 unions and 65 kinds. The grammar
-  needs about 25 node types: six statements, nine expressions, two locators, and the handler,
-  plan, input, form, test, shape and path. The real count is measured when the generator runs.
+- **Today versus target.** Before the redesign the contract had 136 interfaces, 60 unions and 65
+  kinds. The grammar needs about 25 node types: six statements, nine expressions, two locators, and
+  the handler, plan, input, form, test, shape and path. The real count is measured when the generator
+  runs.
+- **As built** (`e837ad94`): the generated contract has 39 interfaces and 9 unions. The document is
+  `{ version: 4, planId, vendors, objects, handlers }`
+  (`Alis.Reactive.Assets/runtime/types/plan.ts:13-19`): owners (the page, a slot) are the runtime's,
+  not plan data, and a plugin object's `data` is a model's inputs, a form's fields or nothing
+  (`:45-48`).
 
 **Diagrams and traces:** the design review page "Alis.Reactive Object Model"
 (https://claude.ai/artifact/MhD8NHsoMNBKmuNXABsdbu). It draws the grammar and lowers real views
@@ -968,7 +1140,10 @@ through it.
 
 The use cases were inventoried from the DSL source and the views, not from the tests. Each was then
 mapped to the Playwright test that fails if it breaks. The lists are in
-[`use-cases/`](use-cases/).
+[`use-cases/`](use-cases/). The table below is that inventory as read at `0452a4e`, before step 0: it
+is history. Each file's "Status at HEAD" says where every row stands at `e837ad94`; for components,
+115 of the 128 rows are proven, 10 more are proven with some of their members not mapped there, 2 are
+partly proven and 1 has no test.
 
 | Area | Use cases | Proven | Weak | Plan-only | No test |
 |---|---|---|---|---|---|
@@ -978,7 +1153,8 @@ mapped to the Playwright test that fails if it breaks. The lists are in
 | Validation | 117 | 72 | 7 | 9 | 29 |
 | **Total** | **531** | **369** | **51** | **21** | **90** |
 
-Realtime is part of step 0. Its gaps, from `use-cases/http.md`:
+Realtime is part of step 0. Its gaps at `0452a4e`, from `use-cases/http.md` (history; that file's
+"Status at HEAD" is current):
 
 | Status | Rows | What is missing |
 |---|---|---|
@@ -1074,16 +1250,22 @@ built and what is not.
   (`f36f62e`), after the audit first kept descriptors and verbs. Choice C of section 3 is what ships: a
   declaration's members are real C# members, and a page uses the object as the object.
   - Declarations: `public Prop<decimal> Min => Prop<decimal>();`, `public ReadOnly<bool> IsInteracted =>
-    ReadOnly<bool>();`, `public void SelectRow(Arg<int> index) => Call(index);`, `public
-    TypedSource<int[]> GetSelectedRowIndexes() => Invoke<int[]>();`, `CallAsync` and `InvokeAsync<T>` for
+    ReadOnly<bool>();` (`Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:22, 63`),
+    `public void SelectRow(Arg<int> index) => Call(index);`, `public
+    TypedSource<int[]> GetSelectedRowIndexes() => Invoke<int[]>();`
+    (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:51, 62`), `CallAsync` and `InvokeAsync<T>` for
     a promise, `Fixed(..)` for an argument the declaration fixes, `Pass<TDeclared, TSource>(..)` for a
     wider declared type, and `name:` where the JavaScript name is not the C# name camel-cased (`""`
     for a plugin that is itself a function).
-  - Pages: `p.Component<T>(..)` returns the declaration, live in the callback (`rate.Min.Set(0m)`,
-    `grid.Refresh()`, `p.When(rate.Value).Gt(100m)`); an event payload is a declaration bound to the
-    handler's parameter (`args.Cancel.Set(true)`, `args.UpdateData(json.Get(x => x.Items))`); a
-    response, custom-event or push payload is `Data<T>` (`json.Get(x => x.Name)`, and `json` itself is
-    the whole body); `p.Element(id)` is an `HtmlElement` (`Text.Set`, `Html.Set`, `ClassList.Add`,
+  - Pages (views under `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/`): `p.Component<T>(..)` returns the declaration, live in the callback
+    (`p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Min.Set(2)`,
+    `Components/Fusion/NumericTextBox/Index.cshtml:72`; `p.Component<FusionPivotView>(ReportId).Refresh()`,
+    `Components/Fusion/PivotView/Index.cshtml:41`; `p.When(hr.Value).Gt(threshold.Value)`,
+    `Conditions/NumericCondition/Index.cshtml:96`); an event payload is a declaration bound to the
+    handler's parameter (`args.Cancel.Set(true)`, `Components/Fusion/FusionInPlaceEditor/Index.cshtml:46`;
+    `args.UpdateData(found.Get(x => x.Physicians))`, `Components/Fusion/AutoComplete/Index.cshtml:75`); a
+    response, custom-event or push payload is `Data<T>` (`json.Get(x => x.Message)`,
+    `HttpPipeline/ShiftHandover/Index.cshtml:35`, and `json` itself is the whole body); `p.Element(id)` is an `HtmlElement` (`Text.Set`, `Html.Set`, `ClassList.Add`,
     `Children`, `Show`, `Hide`); a plugin is a declaration `plan.RegisterPlugin<T>()` returns.
   - One source is one argument: the `(source, x => x.Path)` pairs, `DispatchWith`, `AsSource` and the
     pair overloads of conditions and arrays are gone; a `ReactiveArray<T>` is itself a source.
@@ -1116,7 +1298,8 @@ built and what is not.
     `p.Plugin(name, member)`, `p.Plugin(name)`. A `Plugin` subclass names the plugin and declares each
     member as any declaration does (`public TypedSource<string> Slug(Arg<string> text) =>
     Invoke<string>(text, name: "");`); `plan.RegisterPlugin<TPlugin>()` adds it to the plan and returns
-    it, and the page calls its members (`slugify.Slug(args.Get(x => x.Category))`). The `[Plugin]`
+    it, and the page calls its members (`slugify.Slug(planner.Wing)`,
+    `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/VisitBoard.cshtml:33`). The `[Plugin]`
     attribute form of section 4.8 is not built: the base-class constructor names the plugin.
   - links (section 4.6): `Html.NativeActionLink(id, text, url, link => link.Post()..)`. The id is the
     developer's; the generated counter id is gone. The callback's `NativeActionLinkRequest` offers
@@ -1146,8 +1329,9 @@ built and what is not.
     `FusionGridValidation.From<TRow>(plan.ClientRules<TValidator>())`; no view injects
     `IClientValidationRuleSource`.
   - a generic member infers its type argument (`e4d4720`): a `TypedSource<T>` is an `Arg<T>`, so
-    `kanban.AddCard(json.Get(x => x.Card), 0)` needs no `<CareCard>`, and a grid's `Field<TValue>`
-    infers the value's type.
+    `s.Component<FusionKanban>(BoardId).AddCard(json.Get(x => x.WorkOrder), 0)` needs no `<WorkOrder>`
+    (`Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Kanban/Index.cshtml:77`), and a grid's `Field<TValue>` infers the value's
+    type.
   - declarations are ordinary nullable-annotated C# (`2696e3e`); the `#nullable disable annotations`
     region is gone.
   - a public browser-rule contract (`6ac4198`): `ClientRule`, `ClientCondition` and `ClientRuleSet`;
@@ -1159,8 +1343,8 @@ built and what is not.
   - nested and returned objects (section 4.1): `Object<T>()` declares a property that holds an object
     with members of its own (`schedule.EventSettings.DataSource`, `pivot.DataSourceSettings.DataSource`,
     the visit planner's `Labels.Empty`), and `InvokeObject<T>(..)` a method that returns one
-    (`grid.GetColumnByField(..).HeaderText.Set("Neighborhood"); grid.RefreshHeader();` on the care
-    staff columns page). No runtime change: the grammar already reads, writes and calls on any
+    (`sheet.GetColumnByField(wing).HeaderText.Set(args.Value);` then `sheet.RefreshHeader();` on the
+    care staff columns page, `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Grid/CareStaffColumns.cshtml:71-72`). No runtime change: the grammar already reads, writes and calls on any
     expression. The twenty harness pages rendered byte-identical plans with the nested labels
     (`d9aedc4`).
   - a chained request is given its parent's success body: `Chained<TResponse>((body, next) => ..)`
@@ -1198,8 +1382,8 @@ built and what is not.
   when the behavior breaks, written against a real-app page and blind-reviewed (197 tests reviewed, 42
   flagged and fixed); "Status at HEAD" at the end of each `use-cases/` file gives the test. Three rows
   have no page that could show them (validation 81, http 53 and 121: render-time and analyzer
-  checks), and parts of components rows 54 and 88 stay open with the reason recorded there. The pass
-  found and fixed, each proven by its new test:
+  checks), and parts of components rows 54 and 88 stayed open; the work after it closed them (below).
+  The pass found and fixed, each proven by its new test:
   - a SignalR method declared without a payload never ran: the hub module dropped a call with no
     argument (`1ca7c9a`);
   - a server-push event declared without a payload needs a JSON data line, which its declaration now
@@ -1214,3 +1398,19 @@ built and what is not.
     (`f856951`);
   - four tests used `page.evaluate`; two of them dispatched PascalCase payload keys, so their reads
     missed and the else branches ran whatever was sent (`1ca7c9a`).
+- **Built after the step 0 pass**, each proven by the tests that `use-cases/components.md` ("Status at
+  HEAD") names; CI run 38568507905 on `e837ad94` passed every test, two InPlaceEditor
+  medical-record-number tests only on a re-run:
+  - the rest of components row 54 is used by journeys and proven, among it Dialog `RefreshPosition`
+    (`17420df1`) and Schedule `CloseEditor` (`7c373175`), and so are the events of row 88;
+  - a value the page writes to a NativeCheckList or NativeRadioGroup checks exactly the boxes or the
+    radio it names, and a NativeHiddenField raises `change` for a new value (`e4fd8d32`; components
+    rows 88 and 135);
+  - the uploader's input commits on `FilesChanged` (`beab8f92`) and the in-place editor's on `EndEdit`
+    (`bfe0834c`), and the form clears a message on `input` in the capture phase (`d9dccd69`):
+    components row 136;
+  - a ChipList with single selection reads through `GetSelectedChip()` (`4cae6570`; components row
+    137);
+  - the Schedule's `ActionBegin<TEvent>()` and `PopupOpen<TEvent>()` are typed by the page's event
+    class, and an in-service saved or deleted in EJ2's editor reaches the server (`e837ad94`;
+    components rows 78 and 98).

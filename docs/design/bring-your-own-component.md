@@ -23,9 +23,10 @@ simply the first ones.
    destroys at the right moment, including inside partials.
 
 2. **A component is declared once, by its own API.** One class names the object's members as C#
-   members: `public Prop<decimal> Min => Prop<decimal>();`, `public void Increment() => Call();`,
-   `public TypedEvent<TArgs> Change => Event<TArgs>();`, and says which vendor it comes
-   from. The JavaScript name is the C# name camel-cased unless `name:` gives another. Its event
+   members (`FusionNumericTextBox.cs`): `public Prop<decimal> Min => Prop<decimal>();`,
+   `public void Increment() => Call();`,
+   `public TypedEvent<FusionNumericTextBoxChangeArgs> Change => Event<FusionNumericTextBoxChangeArgs>();`,
+   and says which vendor it comes from. The JavaScript name is the C# name camel-cased unless `name:` gives another. Its event
    payloads are declarations too. Nothing else is written per component: no per-member extension
    methods, no events class, no reactive extension, no registration profile.
 
@@ -34,9 +35,12 @@ simply the first ones.
    ...)` serves every component, Fusion, Native or brought.
 
 4. **A JavaScript object is used as the object.** `p.Component<T>(..)` returns the declaration,
-   live in the callback: `rate.Min.Set(0m)`, `grid.Refresh()`, `p.When(rate.Value).Gt(100m)`. A
-   payload is a JavaScript object too: `args.PreventDefaultAction.Set(true)`, `p.When(args.Text)`,
-   `args.UpdateData(json.Get(x => x.Items))`. Every value is a literal or any typed source the DSL
+   live in the callback: `p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Min.Set(2)`,
+   `p.Component<FusionPivotView>(ReportId).Refresh()`, `p.When(hr.Value).Gte(threshold.Value)`. A
+   payload is a JavaScript object too: `args.PreventDefaultAction.Set(true)`, `p.When(args.Text).Eq(away.Name)`,
+   `args.UpdateData(found.Get(x => x.Physicians))`. (Sandbox views: `Fusion/NumericTextBox/Index.cshtml:72`,
+   `Fusion/PivotView/Index.cshtml:41`, `Conditions/NumericCondition/Index.cshtml:91`,
+   `Fusion/AutoComplete/Index.cshtml:65, 75`, `Fusion/ListView/Index.cshtml:35`.) Every value is a literal or any typed source the DSL
    already has: another component's member, a method's result, a payload or response read, a URL
    parameter, a plugin, an array.
 
@@ -57,8 +61,11 @@ simply the first ones.
 
 ## The method
 
-What a developer writes to bring a component. Syncfusion's NumericTextBox, as it now ships (an
-excerpt of `Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs`):
+What a developer writes to bring a component. Syncfusion's NumericTextBox, as it ships at `e837ad94`
+(`Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs`: lines 16-41 and 50,
+54-64, and 88-97, with the doc comments and the `FocusIn`, `FocusOut`, `Focus` and `Blur` members left out). The
+last method is the render helper: the framework supplies the ID and name, and the markup is the
+component's own:
 
 ```csharp
 public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
@@ -80,23 +87,23 @@ public class FusionNumericTextBoxChangeArgs : JsObject
     public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
 }
 
-// Render: the framework supplies the ID and name; the markup is the component's own.
-public static RenderedComponent<FusionNumericTextBox, TModel> FusionNumericTextBox<TModel, TProp>(
-    this InputBoundField<TModel, TProp> field, Action<NumericTextBoxBuilder> build)
+public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionNumericTextBox, TModel> FusionNumericTextBox<TModel, TProp>(
+    this InputBoundField<TModel, TProp> field,
+    Action<NumericTextBoxBuilder> build)
     where TModel : class
 {
     var builder = field.Helper.EJS().NumericTextBoxFor(field.Expression)
         .HtmlAttributes(new Dictionary<string, object> { ["id"] = field.ElementId, ["name"] = field.BindingPath });
     build(builder);
-    return field.Render<FusionNumericTextBox>(builder.Render());
+    return field.Render<global::Alis.Reactive.Fusion.Components.FusionNumericTextBox>(builder.Render());
 }
 ```
 
 What every view then has, with no further code from the component author
-(`Views/Components/Fusion/NumericTextBox/Index.cshtml`):
+(`Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/NumericTextBox/Index.cshtml:26-39` and `:68-74`):
 
 ```csharp
-Html.InputField(plan, m => m.MealsPerWeek, o => o.Label("Catered meals per week"))
+@{ Html.InputField(plan, m => m.MealsPerWeek, o => o.Label("Catered meals per week"))
     .FusionNumericTextBox(b => b
         .Min(4).Max(21).Step(1).Value(Model.MealsPerWeek).ShowSpinButton(false))
     .Reactive(evt => evt.Change, (args, p) =>
@@ -109,18 +116,29 @@ Html.InputField(plan, m => m.MealsPerWeek, o => o.Label("Catered meals per week"
                 .Text.Set("You entered this number of meals."))
             .Else(applied => applied.Element("meals-source")
                 .Text.Set("This number of meals was applied from a plan template."));
-    });
+    }); }
 
-Html.NativeButton("meals-reduced-diet", "Allow a reduced-diet plan (fewer meals)")
+@(Html.NativeButton("meals-reduced-diet", "Allow a reduced-diet plan (fewer meals)")
+    .CssClass(ButtonSecondary)
     .Reactive(plan, evt => evt.Click, (args, p) =>
     {
         p.Component<FusionNumericTextBox>(m => m.MealsPerWeek).Min.Set(2);
         p.Element("meals-floor-note").Text.Set("A reduced-diet plan is now allowed — you can enter as few as 2 meals.");
-    });
+    }))
 ```
 
+Alis.Reactive.PlaywrightTests.Components.Fusion.NumericTextBox.WhenNumericValueEntered.a_meal_count_applied_from_a_template_is_marked_as_applied
+proves the first: `await Expect(MealsSource).ToHaveTextAsync("This number of meals was applied from a plan template.");`
+(tests/Alis.Reactive.PlaywrightTests/Components/Fusion/NumericTextBox/WhenNumericValueEntered.cs:108);
+Alis.Reactive.PlaywrightTests.Components.Fusion.NumericTextBox.WhenNumericValueEntered.allowing_a_reduced_diet_lets_the_meal_count_drop_below_the_standard_floor
+the second: `await Expect(Meals.Input).ToHaveValueAsync("3.00");`
+(tests/Alis.Reactive.PlaywrightTests/Components/Fusion/NumericTextBox/WhenNumericValueEntered.cs:171), where the same entry
+was raised to `4.00` before the click (:163).
+
 A payload with behavior declares its methods the same way
-(`FusionAutoComplete.cs`, used by `Views/Components/Fusion/AutoComplete/Index.cshtml`):
+(`FusionAutoCompleteFilteringArgs`, `Alis.Reactive.Fusion/Components/FusionAutoComplete/FusionAutoComplete.cs:98-114`, doc comments left out), and
+the Notify Physician page uses them
+(`Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/AutoComplete/Index.cshtml:62-77`):
 
 ```csharp
 public class FusionAutoCompleteFilteringArgs : JsObject
@@ -133,17 +151,32 @@ public class FusionAutoCompleteFilteringArgs : JsObject
 
 .Reactive(evt => evt.Filtering, (args, p) =>
 {
+    // The directory answers for what was typed; until it does, her care team is not offered.
     args.PreventDefaultAction.Set(true);
-    p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
-     .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, args.Text))
-     .Response(r => r.OnSuccess<MedicationSearchResponse>((json, s) =>
-         args.UpdateData(json.Get(j => j.Medications))));
+    p.Get(Url.SandboxRoute("Search", "AutoComplete"))
+        .Gather<DirectorySearch>(g => g.Set(x => x.Name, args.Text))
+        .WhileLoading(l => l.Element("directory-status").Text.Set("Searching the physician directory..."))
+        .Response(r => r.OnSuccess<DirectoryMatches>((found, s) =>
+        {
+            s.Element("directory-status").Text.Set(found.Get(x => x.Summary));
+            // A name nobody in the directory has closes the list the last search left open.
+            s.When(found.Get(x => x.Count)).Eq(0)
+                .Then(none => none.Component<FusionAutoComplete>(m => m.Physician).HidePopup())
+                .Else(some => args.UpdateData(found.Get(x => x.Physicians)));
+        }));
 })
 ```
 
+Alis.Reactive.PlaywrightTests.Components.Fusion.AutoComplete.WhenUsingFusionAutoComplete.typing_part_of_a_name_offers_the_physicians_the_directory_matches proves `UpdateData`:
+`await Expect(Physician.PopupItems).ToHaveTextAsync(new[] { "Dr. Anita Patel", "Dr. Lena Patterson" });`
+(tests/Alis.Reactive.PlaywrightTests/Components/Fusion/AutoComplete/WhenUsingFusionAutoComplete.cs:88); Alis.Reactive.PlaywrightTests.Components.Fusion.AutoComplete.WhenUsingFusionAutoComplete.while_the_directory_is_searched_her_care_team_is_not_offered_for_what_was_typed proves
+`PreventDefaultAction`: `await Expect(Physician.PopupItems).ToHaveCountAsync(0);` (tests/Alis.Reactive.PlaywrightTests/Components/Fusion/AutoComplete/WhenUsingFusionAutoComplete.cs:102), while the search is
+still running (:101, :103); Alis.Reactive.PlaywrightTests.Components.Fusion.AutoComplete.WhenUsingFusionAutoComplete.a_name_nobody_in_the_directory_has_closes_the_list_and_says_so proves the `Then`
+branch: `await Expect(Physician.Popup).ToBeHiddenAsync();` (tests/Alis.Reactive.PlaywrightTests/Components/Fusion/AutoComplete/WhenUsingFusionAutoComplete.cs:119).
+
 Each write or call is its own statement and lands in the callback it is written in, whichever
-variable holds the object: `args.UpdateData(..)` above runs in the success callback, after the
-response arrives, against the same payload object.
+variable holds the object: `args.UpdateData(..)` above runs in the success callback's `Else` branch,
+after the response arrives, against the same payload object.
 
 Vocabulary, by what the JavaScript object has:
 
@@ -157,52 +190,63 @@ Vocabulary, by what the JavaScript object has:
 | event | `public TypedEvent<TArgs> X => Event<TArgs>();` | `.Reactive(evt => evt.X, (args, p) => ...)` |
 | payload field | `ReadOnly<T>`, or `Prop<T>` when the component reads it back (`Cancel`) | `p.When(args.F)`, `args.Cancel.Set(true)` |
 | payload method | a method on a payload that derives from `JsObject` | `args.EndEdit()` |
-| plugin | a class deriving `Plugin`, registered with `plan.RegisterPlugin<T>()` | `slug.Slug(name.Value)` |
+| plugin | a class deriving `Plugin`, registered with `plan.RegisterPlugin<T>()` | `slugify.Slug(planner.Wing)` |
 
 Arguments. Each parameter is an `Arg<T>`: a literal converts to it, and a `TypedSource<T>` is one,
-so literals and runtime values mix: `planner.Book(args.Added, visitors.Value, "Bring the photo album")`.
-A generic method infers its type argument from a runtime value: `kanban.AddCard(json.Get(x => x.Card), 0)`;
-given only literals, it names it: `kanban.AddCard<CareCard>(card, 0)`. An enum literal is its member name, or the
-text its `[JsonStringEnumMemberName]` gives (`"notequal"`); a `DateTime` is ISO text; a response
-`json` is itself the whole body. Name each parameter as the JavaScript API names it.
+so literals and runtime values mix: `p.Component<FusionMention>(HandoffMentionId).Search(nextNurse.Value, 64, 640)`
+(`Fusion/Mention/Index.cshtml:99`). A generic method infers its type argument from a runtime value:
+`s.Component<FusionKanban>(BoardId).AddCard(json.Get(x => x.WorkOrder), 0)` (`Fusion/Kanban/Index.cshtml:77`);
+given only literals, it names it: `p.Component<FusionGrid>(RosterId).AddRecordAt<MapleRosterResident>(respiteGuest, 0)`
+(`Fusion/Grid/Editing.cshtml:102`). An enum literal is its member name, or the text its
+`[JsonStringEnumMemberName]` gives (`"notequal"`, `Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:287`);
+a `DateTime` travels as ISO text and reaches the method as a `Date`, the shape its parameter declares
+(`Alis.Reactive.Assets/runtime/grammar/evaluate.ts:58`); a response `json` is itself the whole body. Name each
+parameter as the JavaScript API names it.
 
-Row and item members. `Field.Of((Resident r) => r.CareLevel)` is the camel-case name a
-component uses for a member (`"careLevel"`, nested `"address.city"`). `Field<TValue>` carries the
-member's type, so `grid.SetCellValue(6001, Field.Of((Resident r) => r.OpenTasks), 4)` infers `int` from
-the field and only compiles with a value of that type. A declaration takes a field as `Field` or
+Row and item members. `Field.Of((DirectoryResident r) => r.RiskLevel)` is the camel-case name a
+component uses for a member (`"riskLevel"`; nested members are dotted, `"address.city"`,
+`Alis.Reactive/Components/Contracts/Field.cs:17`). `Field<TValue>` carries the member's type, so
+`SetCellValue(count.Get(x => x.ResidentId), Field.Of((EveningRoundsResident x) => x.OpenTasks), count.Get(x => x.OpenTasks))`
+(`Fusion/Grid/KeyedUpdate.cshtml:48-49`) infers `int` from the field and only compiles with a value of that type. A declaration takes a field as `Field` or
 `Field<TValue>`, not an `Arg`: a field is named when the view renders.
 
 Generic members. A member typed by the app's own class is a generic method of the declaration:
-`grid.GetSelectedRecords<Resident>()`, `.Reactive(evt => evt.RowSelected<Resident>(), ...)`,
-`kanban.AddCard(json.Get(x => x.Card), 0)`.
+`grid.GetSelectedRecords<DirectoryResident>()`, `.Reactive(evt => evt.RowSelected<DirectoryResident>(), (args, p) =>`
+(`Fusion/Grid/Directory.cshtml:212, 169`), `AddCard(json.Get(x => x.WorkOrder), 0)`.
 
 Fixed arguments. When the JavaScript method always takes a mode the page never chooses, the
 declaration passes it: `public void ShowColumn(Field key) => Call(key, Fixed("field"), name:
-"showColumns");`, so the page passes only the field. Where the JavaScript method takes a wider type
+"showColumns");` (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:107`), so the page passes only the field. Where the JavaScript method takes a wider type
 than the page's own list, `Pass<TDeclared, TSource>(items)` passes it (`UpdateData` above).
 
 Names are the component's own: a member's JavaScript name is its C# name camel-cased, and `name:`
-gives another, one JavaScript name; a plugin that is itself a function declares it with `name: ""`.
+gives another, one JavaScript name; a plugin that is itself a function declares it with `name: ""`
+(`Invoke<string>(text, name: "")`, `Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Brought/VisitPlanner/VisitBoardModel.cs:84`).
 A field of each item of a list is read through the list property, typed by its items:
-`OfferedDays => Slots.Each(slot => slot.Day)` reads every slot's `day`. A property that holds
+`OfferedDays => Slots.Each(slot => slot.Day)` reads every slot's `day`
+(`Alis.Reactive.SandboxApp/BroughtComponents/VisitPlanner/VisitPlanner.cs:56`). A property that holds
 an object with members of its own is declared as that object, `Object<T>()`
-(`schedule.EventSettings.DataSource`), and a method that returns one as `InvokeObject<T>(..)`
-(`grid.GetColumnByField(..).HeaderText`). Events are named like every other member, by the C# name
-camel-cased (Tooltip's `AfterOpen` is EJ2's `afterOpen`). Every use of a member writes its
+(`schedule.EventSettings.DataSource`, `Fusion/Schedule/Index.cshtml:47`), and a method that returns one as
+`InvokeObject<T>(..)` (`sheet.GetColumnByField(wing).HeaderText`, `Fusion/Grid/CareStaffColumns.cshtml:71`). Events are named like every other member, by the C# name
+camel-cased (Tooltip's `AfterOpen` is EJ2's `afterOpen`, `Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltip.cs:41`). Every use of a member writes its
 JavaScript path into the plan, so two C# members can type two signatures of one JavaScript method
 and a generic member's type arguments never conflict. A brought vendor and its
 components live in the app's own assembly; nothing needs framework internals, and the Fusion and
 Native assemblies are built the same way.
 
 Rendering. An input renders through its field, `field.Render<T>(markup)` (or a `TextWriter`
-callback); a hidden one through `Html.InputField(plan, m => m.X, o => o.Hidden())`, which drops the
-label and message wrapper. Anything else renders against the plan with the ID the developer
+callback, `Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditor.cs:80`); a hidden one through
+`o.Hidden()` (`Alis.Reactive/InputField/InputFieldOptions.cs:33`), which drops the label and message wrapper;
+pages write it `@Html.HiddenFieldFor(plan, m => m.Wing)` (`Native/NativeHiddenField/Index.cshtml:24`). Anything else renders against the plan with the ID the developer
 chose, `plan.Render<T>(elementId, markup)`. Each returns the handle `.Reactive` hangs off.
 
 App-level objects are objects too. The drawer and loader elements carry the members their
 declarations name (`open()`, `close()`, `size`; `show()`, `hide()`, `target`, `timeout`),
-defined by their runtime modules; the toast declares Syncfusion's own members, its
-look typed as `FusionToastTone`. `p.Confirm("...")` asks through the confirm dialog's layout host.
+defined by the framework's component code (`Alis.Reactive.Assets/components/native/drawer.ts`, `loader.ts`);
+the toast declares Syncfusion's own members, its look typed as `FusionToastTone`
+(`toast.Tone.Set(FusionToastTone.Success)`, `Patterns/Todo/Index.cshtml:52`). `p.Confirm("...")` asks the
+`alis.confirm` plugin: the Fusion confirm on a page whose layout renders its dialog
+(`Alis.Reactive.Assets/components/fusion/confirm.ts:104-112`), or a page's own, as the Room Holds page gives one.
 
 ## Deliverables
 
@@ -215,9 +259,10 @@ with the core `.Reactive`. (D1 shipped it as three verbs over descriptors, `Set(
 the handle model below replaced them with the members themselves.)
 FusionNumericTextBox and FusionAutoComplete are brought with it: one file each, their per-member
 extensions, events classes and reactive extensions deleted, their views moved to the verbs.
-Plan JSON keeps its shape; no runtime change. Proof: the NumericTextBox and AutoComplete suites
+Plan JSON keeps its shape; no runtime change. Proof at `92875d7`: the NumericTextBox and AutoComplete suites
 and every journey whose view uses them (Conditions, AdmissionAssessment, AdmissionWizard,
-VitalsAlert, EscalationRouting, PlaygroundSyntax, ComponentGather, BddExperiment).
+VitalsAlert, EscalationRouting, PlaygroundSyntax, ComponentGather, BddExperiment). PlaygroundSyntax and
+ComponentGather were replaced since by Room Offer (`17420df1`) and Move-in Packet (`7c373175`).
 
 **D2. Vendors as data.** The plan carries each vendor (object path, subscribe, unsubscribe,
 payload); one runtime driver replaces the per-vendor drivers and event adapters and their
@@ -244,7 +289,7 @@ the core C# and the runtime name no vendor and no component. Proof: the full sui
 - **D3 done:** Tom Select brought in the sandbox assembly (`714e96e`); its reservation test now
   asserts the binding name include-all posts (`71eecfd`).
 - **D4 done:** all 51 Fusion slices and the 8 Native slices are one declaration each
-  (`7698bda` through `e48f207`); the drawer, loader and toast are objects with declared members
+  (`7698bda` through `e48f207`; nine Native slices at `e837ad94`, with NativeActionLink, below); the drawer, loader and toast are objects with declared members
   (`49f3bec`, `fc8b4d2`); Fusion and Native compile on the core's public surface, with
   `InternalsVisibleTo` for both removed (`c597a3a`). The core names no component; the runtime names
   no vendor, as the architecture test enforces.
@@ -267,13 +312,19 @@ the core C# and the runtime name no vendor and no component. Proof: the full sui
   `InputBoundField<,>`, wherever it is declared, not only the shipped slices' namespaces.
 - **Shipped components construct like brought ones.** The framework's own component code lives in
   `Alis.Reactive.Assets/components/`, beside the runtime, and reaches it only through `alis:mount`,
-  `alis:unmount` and `window.__alisPlugins`: CheckList, RadioGroup, Drawer, Loader, Confirm (a
-  plugin), SmartTextArea, SmartPasteButton and Mention's element bridge. Their helpers render data
+  `alis:unmount` and `window.__alisPlugins`: CheckList, RadioGroup, HiddenField, Drawer, Loader, Confirm
+  (a plugin), FileUpload, SmartTextArea, SmartPasteButton and Mention's element bridge
+  (`Alis.Reactive.Assets/components/native/`, `components/fusion/`). Their helpers render data
   attributes, never an inline `<script>`. The architecture test fails if either side imports the
-  other.
+  other (`Alis.Reactive.Assets/runtime/__tests__/architecture.test.ts:120-134`). Since `e4fd8d32` a value
+  the page writes to a NativeCheckList or NativeRadioGroup checks exactly the boxes or the radio it names, and a
+  NativeHiddenField raises `change` for a new value; since `beab8f92` the uploader's input commits on
+  `FilesChanged`, which its component code raises once EJ2 holds the chosen files.
 - Proof on `615a49b`: CI run 38124316949 green, `gate / test` and all five Playwright shards,
   with no failed or flaky-test annotations; `verify-net48` green (net48 build and pack without
-  `InternalsVisibleTo`, IIS Express boot).
+  `InternalsVisibleTo`, IIS Express boot). At `e837ad94`: CI run 38568507905 green, 1,583 tests
+  passing at the first attempt and two InPlaceEditor medical-record-number tests only on a re-run
+  (flaky-test annotations); `verify-net48` run 38568508122 green.
 - The method grew, as the slices needed it: arguments that mix literals and sources,
   `Field`, generic members, fixed arguments, signature keys, `plan.Render`, hidden fields.
 - **A widget the sandbox wrote itself** (`532b2fa` onward): the visit planner

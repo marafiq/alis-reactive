@@ -5,7 +5,7 @@ introduces the grammar and says why; this file says exactly what it is, what it 
 object in the vocabulary must do. Where the two differ, this file governs.
 
 It was checked against all 531 inventoried use cases, then reviewed adversarially against the code
-(section 9). Every decision that changes something a user can see today is listed in section 8,
+(section 9). Every decision that changes something a user could see at `195d3a1` is listed in section 8,
 with its rows.
 
 **What is built** is recorded in section 11: which parts run as specified and which decisions are
@@ -238,8 +238,9 @@ runtime change.
 | a declared element's `GetAttribute(n)`, `HasAttribute(n)` | `getAttribute(n)`, `hasAttribute(n)` |
 | operators, `??`, `?:`, casts | the operators of 2.2 |
 
-These are today's members (`ReactiveArray.cs:28-121`, `ElementExpressionCompiler.cs:20-25,
-219-230`) plus those the validation `When` conditions need. Today's allow-list names JavaScript's
+These are the members built at `e837ad94` (`Alis.Reactive/PlanAuthoring/Arrays/ReactiveArray.cs:33-149`,
+and the allow-list and string operators of `Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs:21-26,
+219-232`) plus those the validation `When` conditions need. That allow-list names JavaScript's
 date methods directly (`getDay`, `getTime`) on any C# method of that name, and no view calls one;
 here they are reached from `DateTime`'s own members. Members architecture.md once listed and
 nothing uses yet (`First`, `Distinct`, `Skip`, `Take`, `SelectMany`, `Min`, `Max`, `Average`,
@@ -283,7 +284,9 @@ at render: a handle used outside the block that binds it throws, and names the h
 **A sync value is read where it is used.** A `Value<T>` from a property or a returning method is a
 read, like a property getter, so each use reads the current value. `var before = rate.Value;`
 then `rate.Value.Set(5)` makes `before` read 5. To keep the value as it is now, bind it:
-`var before = p.Let(rate.Value);` emits `let`, and `before` reads the binding.
+`var before = p.Let(rate.Value);` emits `let`, and `before` reads the binding. `p.Let` is specified,
+not built: at `e837ad94` no builder has a `Let` member (`git grep -n -w Let -- Alis.Reactive` finds only
+the grammar's internal `G.Let`, `Alis.Reactive/Grammar/G.cs:72`), so a value is always read where it is used.
 
 **Plan order is C# evaluation order.** An async member emits its `let … await` where it is called,
 in the active scope, and returns a value that names the result:
@@ -327,9 +330,10 @@ A failing handler is logged and stops no other handler.
    only the slot's handlers, so a ready handler that loads a slot does not run again.
 3. **Booted marks.** After the page starts, the root element gets `data-alis-booted="true"`,
    `window.__alisReactiveBoot` is set to `{ booted, planId }`, and the document raises `alis:booted`
-   with `detail.planId`, as today (`boot.ts:137-144`). The Playwright tests wait on these.
+   with `detail.planId` (`Alis.Reactive.Assets/runtime/root.ts:58-60`). The Playwright tests wait on these.
 4. **Unloading a slot** runs its owner's disposers, and the boot-owned ones stay. A block that is
-   already running finishes, as it does today; nothing aborts it.
+   already running finishes; nothing aborts it (`Alis.Reactive.Assets/runtime/modules/slot.ts:54-60`
+   disposes the owner and nothing else).
 5. **Mount events.** The app hears `alis:unmount` and `alis:mount` on the document, with
    `detail.root`, around every change of content. This is the public contract with app bundles
    that construct and destroy their own widgets.
@@ -398,7 +402,7 @@ if (form.validate()) {                            // .Validate<V>(container); ou
     else if (res.status === 409) { …OnError(409)… }
     else { …untyped OnError… }                    // also reached by status 0
   } finally { …Finally… }                         // emitted only when Finally exists
-  if (res.ok) { …Chained((res, p) => …)… }
+  if (res.ok) { …Chained<TResponse>((res, next) => …)… }   // PlanAuthoring/Requests/ResponseBuilder.cs:135
 }
 ```
 
@@ -420,7 +424,9 @@ if (form.validate()) {                            // .Validate<V>(container); ou
 
 ### 5.2 Templates
 
-A button inside a vendor template (`FusionTemplate.EventButton(text, event, e => e.Member, m => m.Row)`)
+A button inside a vendor template (`FusionTemplate.Create<TRow>()` … `.EventButton(text, event, e => e.Member, m => m.Row)`;
+`Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Grid/CareReview.cshtml:17` writes
+`.EventButton("Start review", WingReviewEvents.StartReview, e => e.ResidentId, m => m.ResidentId, "e-small")`)
 raises a declared `AppEvent<T>` and fills one payload member from the row. It renders
 `data-alis-raise="name"` and its detail as attributes, not an inline `onclick`. The document module raises the event when it
 is clicked (6.1), and handlers hear it with `on(document, name)`.
@@ -437,7 +443,7 @@ imports none of them. The obligations are numbered so that tests and code can ci
   starts, after every handler of that owner has subscribed (3.5), and never again.
 - **D2 `raise(name, detail)`.** Synchronous. It dispatches a non-bubbling `CustomEvent` with detail
   `{}` when none is given. A listener's payload is `detail`, or the event itself when the detail is
-  missing (`trigger.ts:95-100`).
+  missing (`Alis.Reactive.Assets/runtime/modules/document.ts:26-28, 93-96`).
 - **D3 `query`.** The query string as a record, read the way MVC binds `[FromQuery]`:
   - keys match case-insensitively;
   - an array member reads every value;
@@ -458,15 +464,15 @@ imports none of them. The obligations are numbered so that tests and code can ci
   - An array becomes repeated keys.
   - A missing scalar is sent empty (`name=`).
   - A missing array sends no key, because `name=` binds as a collection holding one null
-    (`request-payload-writer.ts:94-108`).
+    (`Alis.Reactive.Assets/runtime/modules/http.ts:112-128`).
   - A `File` cannot be sent in a GET; it is a boundary error.
 - **H3 JSON.** `values` is the body. It is a binding read (2.1): dates serialize as their local text, and `""`
-  is sent as `null` (`request-payload-writer.ts:235-240`). An empty record sends no body.
+  is sent as `null` (`Alis.Reactive.Assets/runtime/modules/http.ts:168-178`). An empty record sends no body.
 - **H4 Form data.** One entry per key.
   - Arrays repeat the key.
   - A `File` is appended with its name, and a date is its local text.
   - A missing scalar is sent empty.
-  - A missing array sends no entry (`request-payload-writer.ts:110-122`).
+  - A missing array sends no entry (`Alis.Reactive.Assets/runtime/modules/http.ts:136-153`).
 - **H5 Headers.** A header whose value is missing is omitted.
 - **H6 Body.** The body is read by Content-Type: JSON is parsed, text and HTML stay text, and an
   empty or other body is missing.
@@ -484,7 +490,8 @@ imports none of them. The obligations are numbered so that tests and code can ci
   gathered `Form(m => ..)` field, wherever in the composition it was rendered; missing when no plan
   renders it.
 - **M4 Commit.** Each input carries `committed`, the event its component declares as the one that
-  commits a value (`ComponentInput.Of(Value, committedBy: ...)`). When the plan that renders the
+  commits a value (`ComponentInput.Of(Value, committedBy: ...)`,
+  `Alis.Reactive/Components/Contracts/ComponentInput.cs:41`). When the plan that renders the
   input starts, the model subscribes it and re-raises it on the input's element as the bubbling DOM
   event `alis:commit`, once per element and for as long as the owner lives.
 
@@ -517,10 +524,10 @@ imports none of them. The obligations are numbered so that tests and code can ci
   - When `problem` is a record with `errors`, it joins each field's messages with a space (each is a
     sentence) and matches a test field by its exact binding name. Anything else goes to the summary.
   - When `problem` is not a record (an empty or non-JSON body), it runs `validate()` instead
-    (`execute.ts:215-228`).
+    (`Alis.Reactive.Assets/runtime/modules/form/form.ts:192-198`).
 - **F9 Composition.** Tests from plans that share a `planId` are joined per owner. A slot's load or
   unload removes exactly its own tests and subscriptions, then clears and hides the summary of the
-  plans it touched (`boot.ts:70-94`). Content rendered with the page belongs to the page even inside
+  plans it touched (`Alis.Reactive.Assets/runtime/modules/form/form.ts:273, 277-281`). Content rendered with the page belongs to the page even inside
   a slot's container: when a load replaces it, its tests stay, and its fields, no longer rendered,
   are checked as missing values (F5). A form whose steps replace each other in one slot therefore
   loads its first step into the slot too (the intake journey, `Validation/IntakeSteps`).
@@ -576,10 +583,12 @@ imports none of them. The obligations are numbered so that tests and code can ci
   - L2: `hide()` cancels the timer and returns the loader to `<body>`, hidden. It also returns there
     when its target leaves the page.
 - **Drawer** (Native):
-  - W1: Closing empties its content element without unloading the slot loaded into it, as today.
+  - W1: Closing empties its content element without unloading the slot loaded into it
+    (`Alis.Reactive.Assets/components/native/drawer.ts:51-52`).
 - **Toast** (Fusion): its declared members, and no obligation beyond them.
 - **Native CheckList and RadioGroup:** the native module defines `value` and `isInteracted` on the
-  element, replacing today's inline view scripts.
+  element (`Alis.Reactive.Assets/components/native/check-list.ts`, `radio-group.ts`), replacing the
+  inline view scripts of `195d3a1`.
 
 ### 6.9 Elements and vendor objects
 
@@ -650,7 +659,8 @@ A rule reaches the browser unless something in it only the server can do. No lis
 | `Must`, `MustAsync` | the predicate | none: server-only |
 
 - **Custom checks** are extension methods that compose the vocabulary, so they run in both places:
-  `WristbandCode()` is `Matches(@"^WB-\d{6}$").WithMessage(..)`.
+  `WristbandCode()` is `Matches(@"^WB-\d{6}$").WithMessage(..)`
+  (`Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Validation/MoveInReview/MoveInReviewValidator.cs:107-108`).
 - **Empty values** follow model binding: `v` and `model` are binding reads (2.1). A non-nullable
   number reads an empty input as 0, a nullable one as `null`, and text that is empty or only
   whitespace as `null`. So `MinimumLength`, `Matches` and `EmailAddress` pass on an empty optional
@@ -677,13 +687,16 @@ of complex items has none. The decision is made at render and is deterministic.
 The Fusion grid maps a validator's browser rules (`plan.ClientRules<TValidator>()`) to Syncfusion's
 column rules, keeping only those EJ2 decides as the server does: `required`, `minLength`,
 `maxLength`, numeric `min`, `max` and `range`, and one pattern per column. `EmailAddress()` and
-`Url()` reach the cell as EJ2's `regex` with the patterns the form tests them with (`ClientRule.TextPattern`),
+`Url()` reach the cell as EJ2's `regex` with the patterns the form tests them with (`ClientRule.TextPattern`,
+`Alis.Reactive/Validation/ClientRule.cs:52`),
 because EJ2's own `email` and `url` rules decide differently. It reads the rules, not the plan.
 
 ## 8. Decisions that change what a user can see
 
 Each change is deliberate and named here, so that nothing changes silently. The rows are in
 `use-cases/`. A frozen fixture that fails on one of these comes to the owner; it is not edited.
+"Today" in the Why column means the code at `195d3a1`, when this table was written; section 11 says
+which decisions are applied.
 
 | Change | Rows | Why |
 |---|---|---|
@@ -698,10 +711,10 @@ Each change is deliberate and named here, so that nothing changes silently. The 
 | Template buttons raise events through `data-alis-raise` | components (ambiguity 9) | Views and templates carry no JavaScript. |
 | A stream retry keeps each subscription's owner | http 105, 106 | Today a retried slot subscription is never released. |
 | Enum literals are names | conditions (ambiguity 13) | Today `Eq(enum)` emits the number while the input reads the name, so it can never match. |
-| The Pivot audit view sends the current view as two members, route and body | `Components/Fusion/PivotView/Index.cshtml:59-61` | A placeholder member fills only the path. |
-| `p.Request` is deleted | none | No builder exposes it (`Source.cs:73` has no caller). |
-| A plugin method's date arguments arrive as `Date` objects | conditions 152 | Every plugin member is declared with typed arguments. Today an open-argument plugin call receives a date literal as a number (`evaluate.ts:46`). |
-| Three fixtures that parse plan JSON or call deleted APIs are rewritten to assert behavior in step 0, before the assertions freeze | `WhenComplexArrayItemRulesApply.cs:76-82`, `WhenReactiveValidatorsDeclareClientRules.cs:166-185`, `WhenAGridColumnGeneratesNativeValidationFromClientRules.cs:17-25` | A test of plan shape is not a test of behavior. |
+| The Pivot audit view sends the current view as two members, route and body | `Components/Fusion/PivotView/Index.cshtml:59-61` at `195d3a1`; at `e837ad94` the occupancy report's board packet sends the view in the path only and the layout in the body (`Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/PivotView/Index.cshtml:182-186`) | A placeholder member fills only the path. |
+| `p.Request` is deleted | none | No builder exposed it (`Source.cs:73` had no caller); `Source.cs` was deleted in `6d573d39`, and no builder has a `Request` member at `e837ad94`. |
+| A plugin method's date arguments arrive as `Date` objects | conditions 152 | Every plugin member is declared with typed arguments. Today an open-argument plugin call receives a date literal as a number (the old runtime's `evaluate.ts:46`, deleted in `9e66edea`). |
+| Three fixtures that parse plan JSON or call deleted APIs are rewritten to assert behavior in step 0, before the assertions freeze | `WhenComplexArrayItemRulesApply.cs:76-82`, `WhenReactiveValidatorsDeclareClientRules.cs:166-185`, `WhenAGridColumnGeneratesNativeValidationFromClientRules.cs:17-25`, at `195d3a1`; the last two were deleted in `52c62881`, replaced by journeys | A test of plan shape is not a test of behavior. |
 
 ## 9. Coverage
 
@@ -723,7 +736,7 @@ vocabulary used, the sentence, and a verdict:
 - **"Needs a named obligation"** means the sentence is in the grammar, and the behavior depends on a
   rule section 2 or 6 now states exactly.
 - **Where the obligations land.** Most of the conditions rows depend on the operator table (2.2),
-  which states today's comparison semantics instead of borrowing JavaScript's.
+  which states the comparison semantics of `195d3a1` instead of borrowing JavaScript's.
 - **How the tables were made.** Each table was produced by one reader per area against the code, and
   spot-checked. They record the verdicts before this file's decisions; the last two columns above
   apply the decisions.
@@ -732,7 +745,7 @@ vocabulary used, the sentence, and a verdict:
   citation re-opened here. All 12 are applied:
   - paths split into member and data reads (1.3);
   - binding reads (2.1);
-  - today's wire rules for GET, JSON and form data (H2-H4);
+  - the wire rules of `195d3a1` for GET, JSON and form data (H2-H4);
   - `ValidationErrors` without a body validates (F8);
   - `ready` belongs to the owner being started (D1);
   - the complete member table (2.3);
@@ -785,8 +798,10 @@ proves it is named in the pull request.
 **Built as specified**
 - The plan document, the two locators, the six statements and nine expressions (`Alis.Reactive/Grammar`),
   the generated contract (`tools/PlanContractGenerator`), and the interpreter with its modules
-  (`Alis.Reactive.Assets/runtime`). The runtime is 2,480 lines of TypeScript, down from 6,134, and
-  the framework's own components add 452 in `components/`.
+  (`Alis.Reactive.Assets/runtime`). At `e837ad94` the runtime is 2,495 lines of TypeScript (its tracked
+  `.ts` files outside `__tests__` and the generated `types/`), down from 6,134, and the framework's own
+  components add 548 in `components/`, which now also hold the uploader's `fusion/file-upload.ts` and the
+  native `hidden-field.ts`.
 - C# has one model: the builders place steps (`PlanModel/Reactions/Steps.cs`,
   `PlanModel/Requests/RequestStep.cs`) where they are written, and each step, value
   (`ValueExpression`) and condition (`ConditionGraph`) writes its own productions in the scope it is
@@ -825,6 +840,17 @@ proves it is named in the pull request.
   objects and names no vendor. A list path can be read, not written, called or subscribed to, and
   reads at most one list.
 
+**Where the build differs from the specification**
+- `p.Let` (3.3) is not built: no builder has a `Let` member.
+- Where the C# sits at `e837ad94`: the productions in `Alis.Reactive/Grammar`, the object contract in
+  `Alis.Reactive/Components/Contracts`, the fluent API and the lambda compiler
+  (`Arrays/ElementExpressionCompiler.cs`) in `Alis.Reactive/PlanAuthoring`, and the one model that writes
+  the grammar in `Alis.Reactive/PlanModel`. Section 10's `Objects`, `Authoring` and `Compiler` folders
+  were not made.
+- `alis.stream` and `alis.hub` are registered by the framework's own bundle with the other modules
+  (`Alis.Reactive.Assets/runtime/root.ts:32-38`), not by a separate realtime package as 1.1 and 6.6 to
+  6.7 name it.
+
 **Decisions of section 8 applied**
 - `AddReactiveClientValidation` is gone: a browser rule always has the server rule it came from.
 - `Include` enforces on the server as well.
@@ -841,7 +867,9 @@ proves it is named in the pull request.
   button, stepper, native checkbox, checklist, dropdown, radio group, array plugin). Each now reads
   the grammar plan; none asserts less than before except an overload key (`startAt(number)`,
   `addPromptResponse(string,boolean)`) and an access mode (`readwrite`) the grammar does not carry.
-  Five client-rule tests were renamed from the retired `WhenField` vocabulary.
+  Five client-rule tests were renamed from the retired `WhenField` vocabulary. Later, `52c62881` deleted
+  the client-rule, behavior-graph, gather-input, link-request and capital-members fixtures, each row
+  they stood in for now proven by a journey in a browser.
 
 - Binding reads (2.1): request bodies and validation read each input as MVC binds it.
 - Empty values follow the server: every check is the server rule's verdict on the bound value
