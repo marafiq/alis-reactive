@@ -211,14 +211,15 @@ public class WhenUsingFusionStepper : PlaywrightTestBase
     }
 
     [Test]
-    public async Task hovering_an_admission_step_names_it()
+    public async Task hovering_the_next_admission_step_names_it()
     {
         await NavigateAndBoot();
 
-        await AdmissionSteps.Step("Complete").HoverAsync(new() { Force = true });
+        // A linear stepper takes the pointer only on the steps beside the open one (EJ2's e-linear rule).
+        await AdmissionSteps.StepLabel("Review").HoverAsync();
 
         await Expect(AdmissionSteps.Tooltip).ToBeVisibleAsync(new() { Timeout = 5000 });
-        await Expect(AdmissionSteps.Tooltip).ToContainTextAsync("Complete");
+        await Expect(AdmissionSteps.Tooltip).ToContainTextAsync("Review");
         AssertNoConsoleErrors();
     }
 }
