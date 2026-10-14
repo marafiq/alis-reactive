@@ -7,6 +7,7 @@ import "./native/hidden-field";
 import "./native/drawer";
 import "./native/loader";
 import "./fusion/confirm";
+import "./fusion/file-upload";
 import "./fusion/mention";
 import "./fusion/smart-text-area";
 import "./fusion/smart-paste-button";

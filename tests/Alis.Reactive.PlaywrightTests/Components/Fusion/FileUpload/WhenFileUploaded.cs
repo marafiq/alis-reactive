@@ -9,16 +9,15 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.FileUpload;
 /// wound record holds the right documents and nothing I sent goes missing without my knowing.
 /// </summary>
 /// <remarks>
-/// Margaret Hale's left heel wound is reviewed. The checklist ticks off the consent form when a PDF is chosen and
-/// the photo when a JPG or PNG is chosen; an empty file is a scan that did not take and is not added. The record
-/// keeps PDFs and JPG or PNG photos of at most 5 MB: the server reads the files and refuses the whole attachment
-/// when one is too large or of another kind, naming each file it received with its size.
-/// Not exercised: the uploader's own re-check of its required rule when files are chosen
-/// (<c>IInputComponent.Input</c> commits on <c>Selected</c>). EJ2 raises <c>selected</c> before it adds the chosen
-/// files to <c>filesData</c> (uploader.js:1349-1351, 1380-1409), and the form re-checks a field in that same event
-/// (runtime modules/form/form.ts:236-237, modules/model.ts:163-168), so the check reads the files chosen before;
-/// a first choice shows "Attach the signed consent and the wound photo." until the next choice or the attach.
-/// The file items' <c>RawFile</c> is read through <c>Files</c>, which the attach sends.
+/// Margaret Hale's left heel wound is reviewed. The checklist ticks off the consent form while a PDF is chosen and
+/// the photo while a JPG or PNG is chosen, following each choice and each removal; an empty file is a scan that did
+/// not take and is not added. The form re-checks the files each time the uploader's files change
+/// (<c>FilesChanged</c>, which the framework raises once EJ2 has added or removed them, since EJ2's own
+/// <c>selected</c> and <c>removing</c> come before). The record keeps PDFs and JPG or PNG photos of at most 5 MB: the
+/// server reads the files and refuses the whole attachment when one is too large or of another kind, naming each
+/// file it received with its size.
+/// The file items' <c>RawFile</c> is read through <c>Files</c>, which the attach sends. Files are chosen through the
+/// file dialog; dropped or pasted files reach the same <c>selected</c> event (uploader.js:1264, 936).
 /// </remarks>
 [TestFixture]
 public class WhenFileUploaded : PlaywrightTestBase
@@ -28,6 +27,7 @@ public class WhenFileUploaded : PlaywrightTestBase
 
     private static readonly FilePayload SignedConsent = FileOf("consent-form.pdf", "%PDF-1.7 signed consent", "application/pdf");
     private static readonly FilePayload WoundPhoto = FileOf("wound-photo.jpg", "JPEG wound photo", "image/jpeg");
+    private static readonly FilePayload EmptyConsentScan = FileOf("consent-scan.pdf", "", "application/pdf");
 
     private PagePlan<WoundAttachmentsModel> _plan = null!;
 
@@ -79,11 +79,39 @@ public class WhenFileUploaded : PlaywrightTestBase
     }
 
     [Test]
+    public async Task choosing_the_consent_and_the_photo_does_not_ask_for_them()
+    {
+        await OpenTheWoundRecord();
+
+        await Files.Choose(SignedConsent, WoundPhoto);
+
+        await Expect(ConsentChosen).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(PhotoChosen).ToBeVisibleAsync();
+        await Expect(FilesError).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task choosing_both_after_a_refused_attach_clears_the_request_at_once()
+    {
+        await OpenTheWoundRecord();
+        await ClickWhenStable(AttachToRecord);
+        await Expect(FilesError).ToHaveTextAsync(AttachBoth, new() { Timeout = 5000 });
+
+        await Files.Choose(SignedConsent, WoundPhoto);
+
+        await Expect(PhotoChosen).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(FilesError).ToBeHiddenAsync();
+        await Expect(Status).ToHaveTextAsync("Nothing attached yet.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task an_empty_scan_is_not_added_and_the_nurse_is_asked_to_scan_it_again()
     {
         await OpenTheWoundRecord();
 
-        await Files.Choose(FileOf("consent-scan.pdf", "", "application/pdf"));
+        await Files.Choose(EmptyConsentScan);
 
         await Expect(EmptyScan).ToHaveTextAsync("consent-scan.pdf is empty. Scan it again before attaching it.", new() { Timeout = 5000 });
         await Expect(EmptyScan).ToBeVisibleAsync();
@@ -96,6 +124,56 @@ public class WhenFileUploaded : PlaywrightTestBase
         await Expect(ConsentChosen).ToBeVisibleAsync();
         await Expect(Files.Choices).ToHaveCountAsync(1);
         await Expect(Files.Choices).ToContainTextAsync("consent-form");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task an_empty_scan_after_a_refused_attach_keeps_the_request()
+    {
+        await OpenTheWoundRecord();
+        await ClickWhenStable(AttachToRecord);
+        await Expect(FilesError).ToHaveTextAsync(AttachBoth, new() { Timeout = 5000 });
+
+        await Files.Choose(EmptyConsentScan);
+
+        await Expect(EmptyScan).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(FilesError).ToHaveTextAsync(AttachBoth);
+        await Expect(Files.Choices).ToHaveCountAsync(0);
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task removing_the_chosen_files_asks_for_the_consent_and_the_photo_again()
+    {
+        await OpenTheWoundRecord();
+        await Files.Choose(SignedConsent, WoundPhoto);
+        await Expect(PhotoChosen).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(FilesError).ToBeHiddenAsync();
+
+        await Files.Remove(SignedConsent.Name);
+
+        await Expect(FilesError).ToHaveTextAsync(AttachBoth, new() { Timeout = 5000 });
+        await Expect(Files.Choices).ToHaveCountAsync(0);
+        await Expect(ConsentChosen).ToBeHiddenAsync();
+        await Expect(PhotoChosen).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task removing_the_photo_unticks_it_and_keeps_the_consent()
+    {
+        await OpenTheWoundRecord();
+        await Files.Choose(SignedConsent);
+        await Expect(ConsentChosen).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Files.Choose(WoundPhoto);
+        await Expect(PhotoChosen).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        await Files.Remove(WoundPhoto.Name);
+
+        await Expect(PhotoChosen).ToBeHiddenAsync(new() { Timeout = 5000 });
+        await Expect(ConsentChosen).ToBeVisibleAsync();
+        await Expect(Files.Choices).ToHaveCountAsync(1);
+        await Expect(FilesError).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 

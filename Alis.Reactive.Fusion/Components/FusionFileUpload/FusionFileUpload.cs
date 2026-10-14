@@ -21,12 +21,25 @@ namespace Alis.Reactive.Fusion.Components
         // The uploader lists its files as items that each carry the browser's file.
         private ReadOnly<IReadOnlyList<FusionUploaderFile>> FilesData => ReadOnly<IReadOnlyList<FusionUploaderFile>>();
 
-        /// <summary>Raised when the user selects files.</summary>
+        /// <summary>Raised when the user selects files, before the uploader adds them; set <c>Cancel</c> to refuse them.</summary>
         public TypedEvent<FusionFileUploadSelectedArgs> Selected =>
             Event<FusionFileUploadSelectedArgs>();
 
+        /// <summary>
+        /// Raised once the uploader holds the files the user chose: after files are added or a selection is
+        /// refused, and after the user removes a file.
+        /// </summary>
+        /// <remarks>
+        /// The framework raises it, not Syncfusion: the Uploader raises <c>selected</c> and <c>removing</c>
+        /// before it adds or removes the files and nothing after, so the framework's uploader code raises
+        /// <c>filesChanged</c> once it has. The input commits on it, so a form re-checks the files the user
+        /// now sees. Clearing the files (a form reset) raises nothing.
+        /// </remarks>
+        public TypedEvent<FusionFileUploadFilesChangedArgs> FilesChanged =>
+            Event<FusionFileUploadFilesChangedArgs>();
+
         /// <inheritdoc />
-        ComponentInput IInputComponent.Input => ComponentInput.Of(Files, committedBy: Selected);
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Files, committedBy: FilesChanged);
     }
 
     /// <summary>Payload of <see cref="FusionFileUpload.Selected"/>.</summary>
@@ -37,6 +50,13 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to refuse the selection.</summary>
         public Prop<bool> Cancel => Prop<bool>();
+    }
+
+    /// <summary>Payload of <see cref="FusionFileUpload.FilesChanged"/>.</summary>
+    public class FusionFileUploadFilesChangedArgs : JsObject
+    {
+        /// <summary>The files the uploader holds now: <c>p.From(args.FilesData).Count()</c> counts them.</summary>
+        public ReadOnly<IReadOnlyList<FusionUploaderFile>> FilesData => ReadOnly<IReadOnlyList<FusionUploaderFile>>();
     }
 
     /// <summary>A file the uploader lists, by the names its JavaScript API uses.</summary>
@@ -87,7 +107,12 @@ namespace Alis.Reactive.Fusion.Components
         {
             var builder = setup.Helper.EJS().Uploader(setup.ElementId)
                 .AutoUpload(false)
-                .HtmlAttributes(new Dictionary<string, object> { ["name"] = setup.BindingPath });
+                .HtmlAttributes(new Dictionary<string, object>
+                {
+                    ["name"] = setup.BindingPath,
+                    // The framework's uploader code finds the uploader by it and raises FilesChanged.
+                    ["data-alis-file-upload"] = ""
+                });
             build(builder);
             return setup.Render<global::Alis.Reactive.Fusion.Components.FusionFileUpload>(builder.Render());
         }

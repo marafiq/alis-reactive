@@ -28,4 +28,8 @@ public sealed class FusionFileUploadLocator
 
     /// <summary>Chooses files the way the file dialog does.</summary>
     public async Task Choose(params FilePayload[] files) => await Input.SetInputFilesAsync(files);
+
+    /// <summary>Removes the choice that lists the file, by clicking its remove icon.</summary>
+    public async Task Remove(string fileName) =>
+        await Choices.Filter(new() { HasText = fileName }).Locator(".e-file-remove-btn").ClickAsync();
 }

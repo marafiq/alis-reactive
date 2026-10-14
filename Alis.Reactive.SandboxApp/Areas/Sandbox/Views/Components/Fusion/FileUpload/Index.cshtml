@@ -41,15 +41,19 @@
                                 empty.Element("empty-scan-name").Text.Set(chosen.Find(file => file.Size == 0, file => file.Name));
                                 empty.Element("empty-scan").Show();
                             })
-                            .Else(added =>
-                            {
-                                added.Element("empty-scan").Hide();
-                                added.When(chosen.Any(file => file.Type == "pdf" || file.Type == "PDF")).Truthy()
-                                    .Then(consent => consent.Element("consent-chosen").Show());
-                                added.When(chosen.Any(file => file.Type == "jpg" || file.Type == "jpeg" || file.Type == "png"
-                                        || file.Type == "JPG" || file.Type == "JPEG" || file.Type == "PNG")).Truthy()
-                                    .Then(photo => photo.Element("photo-chosen").Show());
-                            });
+                            .Else(added => added.Element("empty-scan").Hide());
+                    })
+                    // The checklist ticks off what the uploader holds, after each choice and each removal.
+                    .Reactive(evt => evt.FilesChanged, (args, p) =>
+                    {
+                        var held = p.From(args.FilesData);
+                        p.When(held.Any(file => file.Type == "pdf" || file.Type == "PDF")).Truthy()
+                            .Then(consent => consent.Element("consent-chosen").Show())
+                            .Else(consent => consent.Element("consent-chosen").Hide());
+                        p.When(held.Any(file => file.Type == "jpg" || file.Type == "jpeg" || file.Type == "png"
+                                || file.Type == "JPG" || file.Type == "JPEG" || file.Type == "PNG")).Truthy()
+                            .Then(photo => photo.Element("photo-chosen").Show())
+                            .Else(photo => photo.Element("photo-chosen").Hide());
                     }); }
 
                 <p id="empty-scan" hidden class="text-sm text-amber-700"><span id="empty-scan-name"></span> is empty. Scan it again before attaching it.</p>
