@@ -9,6 +9,8 @@
     ViewData["Title"] = "Care Operations";
 
     const string GridId = "careops-grid";
+    const string RiskChipsId = "careops-risk-chips";
+    const string CareChipsId = "careops-care-chips";
     const string AdmitFormId = "careops-admit-form";
     const int PageSize = 10;
     const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
@@ -44,7 +46,8 @@
             .Gather<CareOpsDataRequest>(g => g
                 .Set(x => x.Skip, 0)
                 .Set(x => x.Take, PageSize)
-                .Form(m => m.FilterRisk, m => m.FilterCareLevel))
+                .Set(x => x.FilterRisk, p.Component<FusionChipList>(RiskChipsId).GetSelectedChip().Text)
+                .Set(x => x.FilterCareLevel, p.Component<FusionChipList>(CareChipsId).GetSelectedChip().Text))
             .Response(r => r.OnSuccess<CareOpsResponse>(ShowBoard));
 
     void LoadWatchList(PipelineBuilder<CareOpsViewModel> p) =>
@@ -87,7 +90,10 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Post(Url.SandboxRoute("CareOpsAdmit", "Grid"))
-                        .Gather(g => g.Form(m => m.NewResidentName, m => m.NewWing, m => m.NewCareLevel, m => m.NewRiskLevel, m => m.NewOpenTasks))
+                        .Gather(g => g
+                            .Form(m => m.NewResidentName, m => m.NewWing, m => m.NewCareLevel, m => m.NewRiskLevel, m => m.NewOpenTasks)
+                            .Set(x => x.FilterRisk, p.Component<FusionChipList>(RiskChipsId).GetSelectedChip().Text)
+                            .Set(x => x.FilterCareLevel, p.Component<FusionChipList>(CareChipsId).GetSelectedChip().Text))
                         .Validate<CareOpsAdmitValidator>(AdmitFormId)
                         .Response(r => r
                             .OnSuccess<CareOpsResponse>((board, s) =>
@@ -112,37 +118,22 @@
 
     <native-card><native-card-body>
         <native-heading level="H2">Fast Filters</native-heading>
-        @* The chips' choices, kept for every request the board makes: a chip, a sort, a page, a refresh. *@
-        @Html.HiddenFieldFor(plan, m => m.FilterRisk)
-        @Html.HiddenFieldFor(plan, m => m.FilterCareLevel)
+        @* Every request that answers with the board's rows reads the chips: a chip, a sort, a page, a refresh and each
+           change. A chip clicked again lets its choice go, and then the chips choose none. *@
         <native-vstack gap="Sm" class="mt-4">
             <div>
                 <p class="mb-1 text-xs font-medium uppercase tracking-wide text-text-muted">Risk</p>
-                @(Html.FusionChipList(plan, "careops-risk-chips", b => b
+                @(Html.FusionChipList(plan, RiskChipsId, b => b
                     .Chips(riskChips)
                     .Selection(Selection.Single))
-                    .Reactive(evt => evt.Click, (args, p) =>
-                    {
-                        // A chip clicked again lets its risk go.
-                        p.When(args.Selected).Truthy()
-                            .Then(chosen => chosen.Component<NativeHiddenField>(m => m.FilterRisk).Value.Set(args.Text))
-                            .Else(released => released.Component<NativeHiddenField>(m => m.FilterRisk).Value.Set(""));
-                        LoadCensus(p);
-                    }))
+                    .Reactive(evt => evt.Click, (_, p) => LoadCensus(p)))
             </div>
             <div>
                 <p class="mb-1 text-xs font-medium uppercase tracking-wide text-text-muted">Care level</p>
-                @(Html.FusionChipList(plan, "careops-care-chips", b => b
+                @(Html.FusionChipList(plan, CareChipsId, b => b
                     .Chips(careChips)
                     .Selection(Selection.Single))
-                    .Reactive(evt => evt.Click, (args, p) =>
-                    {
-                        // A chip clicked again lets its care level go.
-                        p.When(args.Selected).Truthy()
-                            .Then(chosen => chosen.Component<NativeHiddenField>(m => m.FilterCareLevel).Value.Set(args.Text))
-                            .Else(released => released.Component<NativeHiddenField>(m => m.FilterCareLevel).Value.Set(""));
-                        LoadCensus(p);
-                    }))
+                    .Reactive(evt => evt.Click, (_, p) => LoadCensus(p)))
             </div>
         </native-vstack>
     </native-card-body></native-card>
@@ -159,7 +150,10 @@
                     var grid = p.Component<FusionGrid>(GridId);
                     grid.SaveCell();
                     p.Post(Url.SandboxRoute("CareOpsSave", "Grid"))
-                        .Gather<CareOpsSaveRequest>(g => g.Set(x => x.BatchChanges, grid.GetBatchChanges<ResidentCareItem>()))
+                        .Gather<CareOpsSaveRequest>(g => g
+                            .Set(x => x.BatchChanges, grid.GetBatchChanges<ResidentCareItem>())
+                            .Set(x => x.FilterRisk, p.Component<FusionChipList>(RiskChipsId).GetSelectedChip().Text)
+                            .Set(x => x.FilterCareLevel, p.Component<FusionChipList>(CareChipsId).GetSelectedChip().Text))
                         .Response(r => r
                             .OnSuccess<CareOpsResponse>(ShowBoard)
                             .OnError<CareOpsResponse>(400, (refused, e) =>
@@ -173,7 +167,9 @@
                     p.Post(Url.SandboxRoute("CareOpsBulkNurse", "Grid"))
                         .Gather<CareOpsBulkRequest>(g => g
                             .Set(x => x.Nurse, "Night Float Team")
-                            .Set(x => x.SelectedRecords, grid.GetSelectedRecords<ResidentCareItem>()))
+                            .Set(x => x.SelectedRecords, grid.GetSelectedRecords<ResidentCareItem>())
+                            .Set(x => x.FilterRisk, p.Component<FusionChipList>(RiskChipsId).GetSelectedChip().Text)
+                            .Set(x => x.FilterCareLevel, p.Component<FusionChipList>(CareChipsId).GetSelectedChip().Text))
                         .Response(r => r.OnSuccess<CareOpsResponse>(ShowBoard));
                 }))
             @(Html.NativeButton("careops-flag-risk", "Flag Ticked Critical")
@@ -184,13 +180,18 @@
                     p.Post(Url.SandboxRoute("CareOpsBulkRisk", "Grid"))
                         .Gather<CareOpsBulkRequest>(g => g
                             .Set(x => x.Risk, "Critical")
-                            .Set(x => x.SelectedRecords, grid.GetSelectedRecords<ResidentCareItem>()))
+                            .Set(x => x.SelectedRecords, grid.GetSelectedRecords<ResidentCareItem>())
+                            .Set(x => x.FilterRisk, p.Component<FusionChipList>(RiskChipsId).GetSelectedChip().Text)
+                            .Set(x => x.FilterCareLevel, p.Component<FusionChipList>(CareChipsId).GetSelectedChip().Text))
                         .Response(r => r.OnSuccess<CareOpsResponse>(ShowBoard));
                 }))
             @(Html.NativeActionLink("careops-discharge-selected", "Discharge Ticked", Url.SandboxRoute("CareOpsDischargeSelected", "Grid"), link => link
                 .Confirm("Discharge the ticked residents from the active census?")
                 .Then(confirmed => confirmed.Post()
-                    .Gather<CareOpsBulkRequest>(g => g.Set(x => x.SelectedRecords, confirmed.Component<FusionGrid>(GridId).GetSelectedRecords<ResidentCareItem>()))
+                    .Gather<CareOpsBulkRequest>(g => g
+                        .Set(x => x.SelectedRecords, confirmed.Component<FusionGrid>(GridId).GetSelectedRecords<ResidentCareItem>())
+                        .Set(x => x.FilterRisk, confirmed.Component<FusionChipList>(RiskChipsId).GetSelectedChip().Text)
+                        .Set(x => x.FilterCareLevel, confirmed.Component<FusionChipList>(CareChipsId).GetSelectedChip().Text))
                     .Response(r => r.OnSuccess<CareOpsResponse>(ShowBoard))))
                 .CssClass("inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700"))
         </native-hstack>
@@ -229,7 +230,8 @@
                         .Set(x => x.Skip, args.Skip)
                         .Set(x => x.Take, args.Take)
                         .Set(x => x.Sorted, args.Sorted)
-                        .Form(m => m.FilterRisk, m => m.FilterCareLevel))
+                        .Set(x => x.FilterRisk, p.Component<FusionChipList>(RiskChipsId).GetSelectedChip().Text)
+                        .Set(x => x.FilterCareLevel, p.Component<FusionChipList>(CareChipsId).GetSelectedChip().Text))
                     .Response(r => r.OnSuccess<CareOpsResponse>(ShowBoard))))
     </native-card-body></native-card>
 

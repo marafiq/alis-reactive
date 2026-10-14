@@ -4,15 +4,15 @@ using Alis.Reactive.Fusion.Components;
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
-    /// The care operations board: the risk and care level its chips chose, which every request for the board's
-    /// rows sends, and the admit dialog's fields.
+    /// The care operations board's admit dialog: the new resident's fields, and the risk and care level the board's
+    /// chips chose, which the admission sends so that the board it answers with keeps to them.
     /// </summary>
     public class CareOpsViewModel
     {
-        /// <summary>The risk the risk chips chose; empty or "All" lists every risk.</summary>
+        /// <summary>The risk the risk chips chose; none or "All" lists every risk.</summary>
         public string? FilterRisk { get; set; }
 
-        /// <summary>The care level the care-level chips chose; empty or "All" lists every care level.</summary>
+        /// <summary>The care level the care-level chips chose; none or "All" lists every care level.</summary>
         public string? FilterCareLevel { get; set; }
 
         public string? NewResidentName { get; set; }
@@ -47,8 +47,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     }
 
     /// <summary>
-    /// The board's first page or the page the grid asked for (<c>{result, count}</c>), and the sentence that
-    /// says what the server did.
+    /// The page the grid asked for, or the first page after a change, of the residents the chips chose
+    /// (<c>{result, count}</c>), and the sentence that says what the server did.
     /// </summary>
     public class CareOpsResponse
     {
@@ -67,18 +67,22 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? FilterCareLevel { get; set; }
     }
 
-    /// <summary>The residents ticked on the board, and the nurse or risk they take.</summary>
+    /// <summary>The residents ticked on the board, the nurse or risk they take, and the fast filters the chips chose.</summary>
     public class CareOpsBulkRequest
     {
         public List<ResidentCareItem>? SelectedRecords { get; set; }
         public string? Nurse { get; set; }
         public string? Risk { get; set; }
+        public string? FilterRisk { get; set; }
+        public string? FilterCareLevel { get; set; }
     }
 
-    /// <summary>The care levels, risks, nurses, tasks and review days changed in the grid.</summary>
+    /// <summary>The care levels, risks, nurses, tasks and review days changed in the grid, and the fast filters the chips chose.</summary>
     public class CareOpsSaveRequest
     {
         public FusionGridBatchChanges<ResidentCareItem>? BatchChanges { get; set; }
+        public string? FilterRisk { get; set; }
+        public string? FilterCareLevel { get; set; }
     }
 
     /// <summary>The admit dialog's rules.</summary>

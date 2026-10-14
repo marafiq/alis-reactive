@@ -8,9 +8,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     /// <summary>
     /// Care operations: the director of nursing narrows the care census by risk or care level, edits care
     /// levels, risks, nurses, open tasks and review days in the grid, reassigns, flags or discharges the
-    /// residents ticked on the board, admits a resident, and works the high-risk watch list. The census lives
-    /// in the browser session (seeded on first visit), so each browser keeps its own board while its changes
-    /// persist.
+    /// residents ticked on the board, admits a resident, and works the high-risk watch list. Every answer with
+    /// the board's rows keeps to the risk and care level the chips chose. The census lives in the browser
+    /// session (seeded on first visit), so each browser keeps its own board while its changes persist.
     /// </summary>
     public partial class GridController
     {
@@ -29,9 +29,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         {
             var risk = CareFilter(request.FilterRisk);
             var careLevel = CareFilter(request.FilterCareLevel);
-            var rows = SortCare(GetCareCensus()
-                .Where(r => risk == null || r.RiskLevel == risk)
-                .Where(r => careLevel == null || r.CareLevel == careLevel), request.Sorted).ToList();
+            var rows = SortCare(CareChosen(GetCareCensus(), risk, careLevel), request.Sorted).ToList();
 
             return Ok(new CareOpsResponse
             {
@@ -71,7 +69,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             }
             SaveCareCensus(census);
 
-            return CareBoard(census, edited.Count switch
+            return CareBoard(census, request.FilterRisk, request.FilterCareLevel, edited.Count switch
             {
                 0 => "There are no care-plan changes to save.",
                 1 => $"Saved care-plan changes for {edited[0].ResidentName}.",
@@ -88,7 +86,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 row.PrimaryNurse = request.Nurse!;
             SaveCareCensus(census);
 
-            return CareBoard(census, reassigned.Count == 0
+            return CareBoard(census, request.FilterRisk, request.FilterCareLevel, reassigned.Count == 0
                 ? "Tick the residents to reassign first."
                 : $"Reassigned {CareNames(reassigned)} to the {request.Nurse}.");
         }
@@ -102,7 +100,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 row.RiskLevel = request.Risk!;
             SaveCareCensus(census);
 
-            return CareBoard(census, flagged.Count == 0
+            return CareBoard(census, request.FilterRisk, request.FilterCareLevel, flagged.Count == 0
                 ? "Tick the residents to flag first."
                 : $"Flagged {CareNames(flagged)} at {request.Risk} risk.");
         }
@@ -115,7 +113,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             census.RemoveAll(discharged.Contains);
             SaveCareCensus(census);
 
-            return CareBoard(census, discharged.Count == 0
+            return CareBoard(census, request.FilterRisk, request.FilterCareLevel, discharged.Count == 0
                 ? "Tick the residents to discharge first."
                 : $"Discharged {CareNames(discharged)}.");
         }
@@ -143,7 +141,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             census.Add(row);
             SaveCareCensus(census);
 
-            return CareBoard(census, $"Admitted {row.ResidentName} to {row.Wing} wing, {row.CareLevel}, at {row.RiskLevel} risk.");
+            return CareBoard(census, request.FilterRisk, request.FilterCareLevel, $"Admitted {row.ResidentName} to {row.Wing} wing, {row.CareLevel}, at {row.RiskLevel} risk.");
         }
 
         // The high-risk watch list: each resident at high risk, by name, with their quick actions.
@@ -186,12 +184,19 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private void SaveCareCensus(List<ResidentCareItem> census) =>
             HttpContext.Session.SetString(CareSessionKey, JsonSerializer.Serialize(census));
 
-        // After a change the board shows its first page again, by name, with what the change did.
-        private OkObjectResult CareBoard(List<ResidentCareItem> census, string summary)
+        // After a change the board shows the first page of the residents the chips chose, by name, with what the
+        // change did.
+        private OkObjectResult CareBoard(List<ResidentCareItem> census, string? filterRisk, string? filterCareLevel, string summary)
         {
-            var rows = SortCare(census, null).ToList();
+            var rows = SortCare(CareChosen(census, CareFilter(filterRisk), CareFilter(filterCareLevel)), null).ToList();
             return Ok(new CareOpsResponse { Result = rows.Take(CarePageSize).ToList(), Count = rows.Count, Summary = summary });
         }
+
+        // The residents at the risk and care level the chips chose; no choice keeps every resident.
+        private static IEnumerable<ResidentCareItem> CareChosen(IEnumerable<ResidentCareItem> census, string? risk, string? careLevel) =>
+            census
+                .Where(r => risk == null || r.RiskLevel == risk)
+                .Where(r => careLevel == null || r.CareLevel == careLevel);
 
         private static List<ResidentCareItem> CarePicked(List<ResidentCareItem> census, CareOpsBulkRequest request)
         {
@@ -205,7 +210,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 ? residents[0].ResidentName
                 : $"{string.Join(", ", residents.Take(residents.Count - 1).Select(r => r.ResidentName))} and {residents[^1].ResidentName}";
 
-        // A chip's text, where "All" chooses no filter.
+        // A chip's text, where "All", or no chip, chooses no filter.
         private static string? CareFilter(string? chip) =>
             string.IsNullOrWhiteSpace(chip) || chip == "All" ? null : chip;
 

@@ -13,14 +13,24 @@ namespace Alis.Reactive.Fusion.Components
     /// The Syncfusion ChipList, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Render it with <c>Html.FusionChipList(plan, "diet-chips", b =&gt; ...)</c>, then reach it in a callback and
     /// use its members directly. The JavaScript <c>select</c> and <c>remove</c> take several argument types; each
     /// is its own member:
+    /// </para>
     /// <code>
     /// var chips = p.Component&lt;FusionChipList&gt;("diet-chips");
     /// chips.SelectByIndexes(new[] { 0, 2 });
     /// chips.SelectByText(new[] { "Diabetic" });
     /// </code>
+    /// <para>
+    /// What the selection reads as depends on the list's selection mode, so each mode has its own members. With
+    /// <c>Selection.Single</c>, <c>getSelectedChips()</c> returns the one selected chip and <c>selectedChips</c>
+    /// holds one value (chip-list.js:758-763, 921-930): read <see cref="GetSelectedChip"/>,
+    /// <see cref="SelectedChipIndex"/> and <see cref="SelectedChipValue"/>. With <c>Selection.Multiple</c> both
+    /// hold lists: read <see cref="GetSelectedChips"/>, <see cref="SelectedChipIndexes"/> and
+    /// <see cref="SelectedChipValues"/>. While no chip is selected, the selected chip or chips read as nothing.
+    /// </para>
     /// </remarks>
     public sealed class FusionChipList : FusionComponent
     {
@@ -52,16 +62,35 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="index">The chip's zero-based index.</param>
         public TypedSource<FusionChipData> Find(Arg<int> index) => Invoke<FusionChipData>(index);
 
-        /// <summary>The selected chips.</summary>
+        /// <summary>The selected chip of a list with <c>Selection.Single</c>: its text, index and data.</summary>
+        /// <remarks>Its members read as nothing while no chip is selected, for example after the selected chip is clicked again.</remarks>
+        public FusionSelectedChip GetSelectedChip() => InvokeObject<FusionSelectedChip>(name: "getSelectedChips");
+
+        /// <summary>The selected chips of a list with <c>Selection.Multiple</c>: their texts and data; nothing while no chip is selected.</summary>
         public TypedSource<FusionSelectedChips> GetSelectedChips() => Invoke<FusionSelectedChips>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
         public void DataBind() => Call();
 
-        /// <summary>The selected chips, by value.</summary>
+        /// <summary>The selected chip's value, for a list with <c>Selection.Single</c> whose chips have values.</summary>
+        /// <remarks>
+        /// Read only: with single selection, a value written here clears the selection and selects no chip
+        /// (chip-list.js:672-703, 1075-1077). Select a chip with <see cref="SelectedChipIndex"/> or <see cref="SelectByIndex"/>.
+        /// </remarks>
+        public ReadOnly<string> SelectedChipValue => ReadOnly<string>("selectedChips");
+
+        /// <summary>The selected chip's zero-based index, for a list with <c>Selection.Single</c> whose chips have no values.</summary>
+        /// <remarks>
+        /// Writing an index selects that chip in place of the selected one; call <see cref="DataBind"/> to apply it at
+        /// once. While no chip is selected it holds no index: an empty list until a chip is first chosen, then
+        /// <see langword="null"/> once the selected chip is clicked again (chip-list.js:896, 930).
+        /// </remarks>
+        public Prop<int> SelectedChipIndex => Prop<int>("selectedChips");
+
+        /// <summary>The selected chips, by value, for a list with <c>Selection.Multiple</c> whose chips have values.</summary>
         public Prop<string[]> SelectedChipValues => Prop<string[]>("selectedChips");
 
-        /// <summary>The selected chips, by zero-based index.</summary>
+        /// <summary>The selected chips, by zero-based index, for a list with <c>Selection.Multiple</c> whose chips have no values.</summary>
         public Prop<int[]> SelectedChipIndexes => Prop<int[]>("selectedChips");
 
         /// <summary>Raised when the user clicks a chip.</summary>
@@ -106,7 +135,8 @@ namespace Alis.Reactive.Fusion.Components
         public int Index { get; set; }
     }
 
-    /// <summary>A selected chip's data as <see cref="FusionSelectedChips"/> reports it.</summary>
+    /// <summary>A selected chip's data as <see cref="FusionSelectedChip"/> and <see cref="FusionSelectedChips"/> report it: the chip as the list was given it.</summary>
+    /// <remarks>A list given its chips as plain texts reports each chip's data as its text, not as this object.</remarks>
     public class FusionChipItem
     {
         /// <summary>The chip text.</summary>
@@ -116,7 +146,21 @@ namespace Alis.Reactive.Fusion.Components
         public string Value { get; set; } = "";
     }
 
-    /// <summary>The selected chips as <see cref="FusionChipList.GetSelectedChips"/> returns them.</summary>
+    /// <summary>The selected chip of a list with <c>Selection.Single</c>, as <see cref="FusionChipList.GetSelectedChip"/> returns it.</summary>
+    /// <remarks>Each member reads as nothing while no chip is selected.</remarks>
+    public sealed class FusionSelectedChip : JsObject
+    {
+        /// <summary>The chip's text.</summary>
+        public ReadOnly<string> Text => ReadOnly<string>();
+
+        /// <summary>The chip's zero-based index.</summary>
+        public ReadOnly<int> Index => ReadOnly<int>();
+
+        /// <summary>The chip as the list was given it: its text and value.</summary>
+        public ReadOnly<FusionChipItem> Data => ReadOnly<FusionChipItem>();
+    }
+
+    /// <summary>The selected chips of a list with <c>Selection.Multiple</c>, as <see cref="FusionChipList.GetSelectedChips"/> returns them.</summary>
     public class FusionSelectedChips
     {
         /// <summary>Texts of the selected chips.</summary>

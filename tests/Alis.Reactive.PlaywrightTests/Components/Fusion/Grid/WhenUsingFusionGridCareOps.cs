@@ -15,14 +15,18 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 /// first and Esther Cole last on page one, 62 open care tasks in all. Four residents are at critical risk,
 /// seven in Memory Care, and five at high risk make the watch list, Amina Patel (Malik Stone, 6 open tasks)
 /// first. Beatrice Lane's review, October 15, is the soonest; eight residents are at low risk, Esther Cole among
-/// them. The chips choose one risk and one care level; every request for the board's rows (a chip, a sort, a page,
-/// a watch-list refresh) sends both, and a chip clicked again lets its choice go. The server answers every change
-/// with the board's first page and a sentence that says what it did; a flag or discharge from the watch list
-/// reloads both the list and the census. The census lives in the browser's session, so every test starts from
-/// the census as filed.
+/// them. The chips choose one risk and one care level. Every request that answers with the board's rows reads the
+/// text of the chip each list has chosen: a chip, a sort, a page, a watch-list refresh, and each save,
+/// reassignment, flag, discharge and admission. A chip clicked again lets its choice go. The server answers every
+/// change with the first page of the residents the chips chose and a sentence that says what it did; a flag or
+/// discharge from the watch list reloads both the list and the census. The census lives in the browser's session,
+/// so every test starts from the census as filed.
 /// Not exercised:
 /// DataStateChange's Name, RequiresCounts, Group, Where, Search and Action: the board pages and sorts on the
 /// server; WhenUsingFusionGridCensus and WhenUsingFusionGridDirectory read the rest.
+/// The chip lists' SelectedChipIndex and SelectedChipValue, and the selected chip's Index and Data: the board asks
+/// for its residents by the chosen chip's text. The chips' click payload: the board reads the chips themselves;
+/// WhenUsingFusionChipList reads its Text and Selected.
 /// The care level and risk cell editors and the review day's date editor: the nurse's editor proves the
 /// typed select editor here; WhenUsingFusionGridResidentEditForm and WhenUsingFusionGridInlineEdit prove a
 /// select and a date editor saved.
@@ -37,6 +41,9 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
     private const string WholeCensus = "24 residents on the census: 62 open care tasks.";
     private const string CriticalResidents = "4 residents at Critical risk: 18 open care tasks.";
     private const string MemoryCareResidents = "7 Memory Care residents: 26 open care tasks.";
+    private const string HighRiskResidents = "5 residents at High risk: 23 open care tasks.";
+    private const string LowRiskResidents = "8 residents at Low risk: 6 open care tasks.";
+    private const string SkilledNursingResidents = "6 Skilled Nursing residents: 24 open care tasks.";
 
     // The grid numbers its columns from 1, the tick box first.
     private const int RiskColumn = 6;
@@ -97,6 +104,13 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         await Board.Cell(resident, OpenTasksColumn).DblClickAsync();
         await Expect(OpenTasksEditor).ToHaveValueAsync(current, new() { Timeout = 10000 });
         await OpenTasksEditor.FillAsync(value);
+    }
+
+    // Clicks a chip and waits for the board to answer with the residents the chips now choose.
+    private async Task Choose(FusionChipListLocator chips, string chip, string board)
+    {
+        await ClickWhenStable(chips.Chip(chip));
+        await Expect(Summary).ToHaveTextAsync(board, new() { Timeout = 10000 });
     }
 
     private async Task TickResident(string resident)
@@ -256,6 +270,22 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // By open tasks, Yara Ahmed's one comes first and Harold Chen's six last among the Memory Care residents.
+    [Test]
+    public async Task sorting_the_memory_care_residents_keeps_to_memory_care()
+    {
+        await NavigateAndBoot();
+        await Choose(CareChips, "Memory Care", MemoryCareResidents);
+
+        await ClickWhenStable(Board.Header("Open Tasks"));
+
+        await Expect(Board.Rows.First).ToContainTextAsync("Yara Ahmed", new() { Timeout = 10000 });
+        await Expect(Board.Rows.Last).ToContainTextAsync("Harold Chen");
+        await Expect(Board.Rows).ToHaveCountAsync(7);
+        await Expect(Summary).ToHaveTextAsync(MemoryCareResidents);
+        AssertNoConsoleErrors();
+    }
+
     // A list that opened on its first nurse would reassign the resident when the cell is left untouched.
     [Test]
     public async Task the_nurse_editor_opens_on_the_residents_own_nurse()
@@ -315,6 +345,24 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // Amina Patel, Bilal Khan and Priya Shah are the Memory Care residents at high risk.
+    [Test]
+    public async Task saved_care_changes_come_back_on_the_board_the_chips_chose()
+    {
+        await NavigateAndBoot();
+        await Choose(RiskChips, "High", HighRiskResidents);
+        await Choose(CareChips, "Memory Care", "3 Memory Care residents at High risk: 14 open care tasks.");
+        await EditOpenTasks("Amina Patel", "6", "5");
+
+        await ClickWhenStable(SaveCareChanges);
+
+        await Expect(Summary).ToHaveTextAsync("Saved care-plan changes for Amina Patel.", new() { Timeout = 10000 });
+        await Expect(Board.Rows).ToHaveCountAsync(3);
+        await Expect(Board.Rows.Last).ToContainTextAsync("Priya Shah");
+        await Expect(Board.Cell("Amina Patel", OpenTasksColumn)).ToHaveTextAsync("5");
+        AssertNoConsoleErrors();
+    }
+
     // The cell lets the edit through; the server checks the critical-risk rule and keeps the census as filed.
     [Test]
     public async Task a_critical_resident_left_with_no_open_tasks_is_refused_when_the_changes_are_saved()
@@ -345,6 +393,23 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // Beatrice Lane, Clara Hoffman and Mara Thompson are the Skilled Nursing residents at critical risk.
+    [Test]
+    public async Task a_reassigned_resident_comes_back_on_the_board_the_chips_chose()
+    {
+        await NavigateAndBoot();
+        await Choose(CareChips, "Skilled Nursing", SkilledNursingResidents);
+        await Choose(RiskChips, "Critical", "3 Skilled Nursing residents at Critical risk: 12 open care tasks.");
+        await TickResident("Beatrice Lane");
+
+        await ClickWhenStable(ReassignTicked);
+
+        await Expect(Summary).ToHaveTextAsync("Reassigned Beatrice Lane to the Night Float Team.", new() { Timeout = 10000 });
+        await Expect(Board.Rows).ToHaveCountAsync(3);
+        await Expect(Board.Cell("Beatrice Lane", NurseColumn)).ToHaveTextAsync("Night Float Team");
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task reassigning_with_nobody_ticked_reassigns_no_one()
     {
@@ -370,6 +435,23 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // Esther Cole, Leo Simmons and Ruth Carter are the Assisted Living residents at low risk.
+    [Test]
+    public async Task a_resident_flagged_critical_leaves_a_board_kept_to_low_risk()
+    {
+        await NavigateAndBoot();
+        await Choose(RiskChips, "Low", LowRiskResidents);
+        await Choose(CareChips, "Assisted Living", "3 Assisted Living residents at Low risk: 3 open care tasks.");
+        await TickResident("Esther Cole");
+
+        await ClickWhenStable(FlagTickedCritical);
+
+        await Expect(Summary).ToHaveTextAsync("Flagged Esther Cole at Critical risk.", new() { Timeout = 10000 });
+        await Expect(Board.Rows).ToHaveCountAsync(2);
+        await Expect(Board.Row("Esther Cole")).ToHaveCountAsync(0);
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task a_ticked_resident_discharged_after_confirming_leaves_the_census()
     {
@@ -386,6 +468,24 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    [Test]
+    public async Task a_discharged_resident_leaves_the_board_the_chips_chose()
+    {
+        await NavigateAndBoot();
+        await Choose(CareChips, "Skilled Nursing", SkilledNursingResidents);
+        await Choose(RiskChips, "Critical", "3 Skilled Nursing residents at Critical risk: 12 open care tasks.");
+        await TickResident("Mara Thompson");
+
+        await ClickWhenStable(DischargeTicked);
+        await Expect(ConfirmDialog).ToContainTextAsync("Discharge the ticked residents from the active census?", new() { Timeout = 10000 });
+        await ClickWhenStable(ConfirmOk);
+
+        await Expect(Summary).ToHaveTextAsync("Discharged Mara Thompson.", new() { Timeout = 10000 });
+        await Expect(Board.Rows).ToHaveCountAsync(2);
+        await Expect(Board.Rows.Last).ToContainTextAsync("Clara Hoffman");
+        AssertNoConsoleErrors();
+    }
+
     // The low-risk chip asks the server again after the answer: a discharge sent on Cancel would come first.
     [Test]
     public async Task cancelling_the_discharge_keeps_the_ticked_resident_on_the_census()
@@ -398,7 +498,7 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         await ClickWhenStable(ConfirmCancel);
 
         await ClickWhenStable(RiskChips.Chip("Low"));
-        await Expect(Summary).ToHaveTextAsync("8 residents at Low risk: 6 open care tasks.", new() { Timeout = 10000 });
+        await Expect(Summary).ToHaveTextAsync(LowRiskResidents, new() { Timeout = 10000 });
         await Expect(Board.Row("Esther Cole")).ToHaveCountAsync(1);
         Assert.That(_dischargesSent, Is.Empty);
         AssertNoConsoleErrors();
@@ -490,6 +590,29 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         await Expect(Board.Rows.Nth(1)).ToContainTextAsync("Agnes Whitlock");
         await Expect(Board.Cell("Agnes Whitlock", NurseColumn)).ToHaveTextAsync("Night Float Team");
         await Expect(Board.Cell("Agnes Whitlock", OpenTasksColumn)).ToHaveTextAsync("2");
+        AssertNoConsoleErrors();
+    }
+
+    // Agnes Whitlock files first by name among the Memory Care residents at high risk.
+    [Test]
+    public async Task an_admitted_resident_joins_the_board_the_chips_chose()
+    {
+        await NavigateAndBoot();
+        await Choose(CareChips, "Memory Care", MemoryCareResidents);
+        await Choose(RiskChips, "High", "3 Memory Care residents at High risk: 14 open care tasks.");
+        await ClickWhenStable(AdmitResident);
+        await Expect(AdmitDialog).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await NewResidentName.FillAndBlur("Agnes Whitlock");
+        await NewWing.Select("West");
+        await NewCareLevel.Select("Memory Care");
+        await NewRiskLevel.Select("High");
+        await NewOpenTasks.FillAndBlur("2");
+
+        await ClickWhenStable(Admit);
+
+        await Expect(Summary).ToHaveTextAsync("Admitted Agnes Whitlock to West wing, Memory Care, at High risk.", new() { Timeout = 10000 });
+        await Expect(Board.Rows).ToHaveCountAsync(4);
+        await Expect(Board.Rows.First).ToContainTextAsync("Agnes Whitlock");
         AssertNoConsoleErrors();
     }
 
