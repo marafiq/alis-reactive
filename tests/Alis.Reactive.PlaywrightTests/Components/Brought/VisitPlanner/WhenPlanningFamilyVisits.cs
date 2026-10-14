@@ -311,7 +311,7 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
 
         await Expect(Confirmation).ToHaveTextAsync("Visits saved for Margaret Hale: Mon 10:00 AM, Sun 11:00 AM.");
         Assert.That(_saves, Has.Count.EqualTo(2));
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]

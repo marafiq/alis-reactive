@@ -81,7 +81,7 @@ public class WhenUsingFusionGridKeyedUpdate : PlaywrightTestBase
 
         await Expect(Status).ToHaveTextAsync("Victor Nguyen has no open tasks left.", new() { Timeout = 10000 });
         await Expect(Cell("Victor Nguyen", OpenTasksColumn)).ToHaveTextAsync("0");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -125,6 +125,6 @@ public class WhenUsingFusionGridKeyedUpdate : PlaywrightTestBase
         await Expect(Status).ToHaveTextAsync("Pick a resident on the board first.", new() { Timeout = 10000 });
         await Expect(Cell("Martha Collins", FallRiskColumn)).ToHaveTextAsync("Low");
         await Expect(Cell("Victor Nguyen", FallRiskColumn)).ToHaveTextAsync("Low");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 }

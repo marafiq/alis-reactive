@@ -113,7 +113,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("ConfirmEmail")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -126,7 +126,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -159,7 +159,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -175,7 +175,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("MemoryAssessmentScore")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -241,7 +241,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("PhysicianName")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -306,7 +306,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("ReasonForNoContact")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -594,6 +594,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("MemoryAssessmentScore")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 }

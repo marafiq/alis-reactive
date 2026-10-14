@@ -164,7 +164,7 @@ public class WhenHoldingVisitsAtTheFrontDesk : PlaywrightTestBase
         await Expect(Resident).ToHaveTextAsync("Unknown resident");
         await Expect(Family).ToHaveTextAsync("Family");
         await Expect(Loading).ToBeHiddenAsync();
-        AssertNoConsoleErrorsExcept("404");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 404");
     }
 
     [Test]
@@ -210,7 +210,7 @@ public class WhenHoldingVisitsAtTheFrontDesk : PlaywrightTestBase
         await Expect(Toast).ToHaveClassAsync(DangerTone);
         await Expect(Planner.Time("Sat 11:00 AM")).ToHaveAttributeAsync("aria-pressed", "false");
         await Expect(Planner.Booked).ToHaveCountAsync(1);
-        AssertNoConsoleErrorsExcept("409");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 409");
     }
 
     [Test]
@@ -222,7 +222,7 @@ public class WhenHoldingVisitsAtTheFrontDesk : PlaywrightTestBase
 
         await Expect(Status).ToHaveTextAsync("The front desk is not answering; the time is booked here but not held.");
         await Expect(Planner.Time("Sun 11:00 AM")).ToHaveAttributeAsync("aria-pressed", "true");
-        AssertNoConsoleErrorsExcept("503");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 503");
     }
 
     [Test]

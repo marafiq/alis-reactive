@@ -208,7 +208,7 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
         await Expect(_plan.ErrorFor(m => m.CareLevel)).ToBeHiddenAsync();
         await Expect(CareLevel).Not.ToHaveClassAsync(new Regex(@"\balis-has-error\b"));
         Assert.That(_finishesSent, Has.Count.EqualTo(2), "Each Finish asks the server once.");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -251,6 +251,6 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
         await Expect(IntakeStatus).ToHaveTextAsync("Assisted living intake saved for Jane Smith.", new() { Timeout = 5000 });
         await Expect(ValidationSummary).ToBeHiddenAsync();
         Assert.That(_finishesSent, Has.Count.EqualTo(2));
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 }

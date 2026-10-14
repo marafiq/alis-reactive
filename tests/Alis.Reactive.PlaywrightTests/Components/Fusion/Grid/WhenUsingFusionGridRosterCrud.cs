@@ -104,7 +104,7 @@ public class WhenUsingFusionGridRosterCrud : PlaywrightTestBase
         await Expect(Status).ToHaveTextAsync("Suite 108 is Clara Jensen's. Choose another suite.", new() { Timeout = 10000 });
         await Expect(Rows).ToHaveCountAsync(6);
         await Expect(Roster).Not.ToContainTextAsync("Margaret Hale");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -134,7 +134,7 @@ public class WhenUsingFusionGridRosterCrud : PlaywrightTestBase
 
         await Expect(Status).ToHaveTextAsync("Pick the resident who is moving in the roster.", new() { Timeout = 10000 });
         await Expect(Cell("Bernard Okafor", SuiteColumn)).ToHaveTextAsync("104");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -164,6 +164,6 @@ public class WhenUsingFusionGridRosterCrud : PlaywrightTestBase
             "Frank Delgado's final invoice is still open; the business office closes it before the move-out.", new() { Timeout = 10000 });
         await Expect(Rows).ToHaveCountAsync(6);
         await Expect(Row("Frank Delgado")).ToHaveCountAsync(1);
-        AssertNoConsoleErrorsExcept("409");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 409");
     }
 }

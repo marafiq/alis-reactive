@@ -112,7 +112,7 @@ public class WhenUsingFusionGridSelection : PlaywrightTestBase
         await Expect(SeatedResidents).ToHaveCountAsync(0, new() { Timeout = 10000 });
         await ClickWhenStable(BookTheBus);
         await Expect(Status).ToHaveTextAsync("Seat at least one resident before booking the bus.", new() { Timeout = 10000 });
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -144,6 +144,6 @@ public class WhenUsingFusionGridSelection : PlaywrightTestBase
         await ClickWhenStable(BookTheBus);
 
         await Expect(Status).ToHaveTextAsync("The bus seats 4; take 1 resident off before booking.", new() { Timeout = 10000 });
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 }

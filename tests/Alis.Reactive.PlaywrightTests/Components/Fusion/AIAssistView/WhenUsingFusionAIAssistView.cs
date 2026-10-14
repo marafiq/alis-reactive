@@ -292,6 +292,6 @@ public class WhenUsingFusionAIAssistView : PlaywrightTestBase
 
         await Expect(Status).ToHaveTextAsync("Type the question for the charge nurse first.", new() { Timeout = 5000 });
         // The browser logs the refused request's 400; nothing else may fail.
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 }

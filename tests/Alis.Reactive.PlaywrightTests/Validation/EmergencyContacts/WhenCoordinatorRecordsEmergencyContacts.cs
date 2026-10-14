@@ -109,7 +109,7 @@ public class WhenCoordinatorRecordsEmergencyContacts : PlaywrightTestBase
         await ClickWhenStable(SaveIntake);
         await Expect(IntakeStatus).ToHaveTextAsync("Intake saved for Helen Park with 2 emergency contact(s).");
         Assert.That(_intakesSent, Has.Count.EqualTo(2));
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     // Save Contacts, under the contacts section, comes before Save Intake, and the section does not hold

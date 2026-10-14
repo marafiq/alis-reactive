@@ -102,7 +102,7 @@ public class WhenUsingFusionGridInlineEdit : PlaywrightTestBase
             "The care team does not meet on Saturdays. Henry Liu's review stays on Friday, October 16.",
             new() { Timeout = 10000 });
         await Expect(NextReview("Henry Liu")).ToHaveTextAsync("2026-10-16");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]

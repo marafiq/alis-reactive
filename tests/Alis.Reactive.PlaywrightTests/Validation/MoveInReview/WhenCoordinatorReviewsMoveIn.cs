@@ -79,7 +79,7 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         await ClickWhenStable(SaveReview);
         await Expect(ReviewStatus).ToHaveTextAsync(Saved);
         Assert.That(_reviewsSent, Has.Count.EqualTo(2));
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -101,7 +101,7 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         await ClickWhenStable(SaveReview);
         await Expect(ReviewStatus).ToHaveTextAsync(Saved);
         Assert.That(_reviewsSent, Has.Count.EqualTo(2));
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -240,7 +240,7 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         await Expect(ReviewStatus).ToHaveTextAsync(Saved);
         await Expect(ValidationSummary).ToBeHiddenAsync();
         Assert.That(_reviewsSent, Has.Count.EqualTo(2));
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -508,7 +508,7 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         await Expect(ReviewStatus).ToHaveTextAsync(Saved);
         await Expect(ValidationSummary).ToBeHiddenAsync();
         Assert.That(_reviewsSent, Has.Count.EqualTo(2), "Five digits pass on the server, as the page let them through.");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -546,6 +546,6 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         await Expect(ReviewStatus).ToHaveTextAsync(Saved);
         await Expect(ValidationSummary).ToBeHiddenAsync();
         Assert.That(_reviewsSent, Has.Count.EqualTo(2));
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 }

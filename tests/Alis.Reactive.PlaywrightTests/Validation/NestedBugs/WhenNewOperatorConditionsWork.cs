@@ -33,7 +33,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("JobTitle")).Not.ToContainTextAsync("Adults");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -70,7 +70,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("Name")).Not.ToContainTextAsync("Guardian");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -94,7 +94,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("Notes")).Not.ToContainTextAsync("high-acuity");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -118,7 +118,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("Phone")).Not.ToContainTextAsync("urgent");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -142,6 +142,6 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("Name")).Not.ToContainTextAsync("email provided");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 }

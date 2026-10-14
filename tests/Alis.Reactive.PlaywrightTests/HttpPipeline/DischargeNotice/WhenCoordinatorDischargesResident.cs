@@ -78,6 +78,6 @@ public class WhenCoordinatorDischargesResident : PlaywrightTestBase
 
         await Expect(FamilyStatus("rosa")).ToHaveTextAsync("Family not contacted yet.");
         Assert.That(phoneNotices, Is.Empty, "A refused discharge sends no family notice.");
-        AssertNoConsoleErrorsExcept("409", NoticeServiceDown);
+        AssertNoConsoleErrorsExcept("the server responded with a status of 409", NoticeServiceDown);
     }
 }

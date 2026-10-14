@@ -268,7 +268,7 @@ public class WhenUsingFusionGridEditing : PlaywrightTestBase
             "No resident named Rosa Diaz lives on Maple wing.", new() { Timeout = 10000 });
         await Expect(CorrectionStatus).ToHaveTextAsync("No corrections applied yet.");
         await Expect(Rows).ToHaveCountAsync(6);
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]

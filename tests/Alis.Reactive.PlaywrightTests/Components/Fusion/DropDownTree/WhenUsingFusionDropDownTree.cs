@@ -154,7 +154,7 @@ public class WhenUsingFusionDropDownTree : PlaywrightTestBase
         await BuildingPlan.SelectItem("North wing");
 
         await Expect(HoldStatus).ToHaveTextAsync("North wing is not a room. Choose one of its rooms.", new() { Timeout = 5000 });
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]

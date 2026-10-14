@@ -73,7 +73,7 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
             "**/Sandbox/Validation/RoomHold/Hold**");
         Assert.That(_holdsSent, Has.Count.EqualTo(2), "Each Place Hold asks the server once.");
         await Expect(ValidationSummary).ToHaveTextAsync(RoomHeldElsewhere);
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]
@@ -93,7 +93,7 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
         await Expect(RoomHoldStatus).ToHaveTextAsync("Maple 216 is held for Jane Smith.");
         await Expect(ValidationSummary).ToBeHiddenAsync();
         Assert.That(_holdsSent, Has.Count.EqualTo(2));
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     // The office's one-hold-per-prospect rule asks the office's hold book, which only the server can:
@@ -118,7 +118,7 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
         await Expect(RoomHoldStatus).ToHaveTextAsync("Maple 216 is held for Jane Smith.");
         await Expect(_plan.ErrorFor(m => m.ProspectName)).ToBeHiddenAsync();
         Assert.That(_holdsSent, Has.Count.EqualTo(2));
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]

@@ -223,7 +223,7 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
         await Expect(Cell(WorkOrderStatus.Open, MaintenanceWing.Birch)).ToContainTextAsync("Faucet drips in the kitchenette");
         await Expect(Cell(WorkOrderStatus.InProgress, MaintenanceWing.Birch)).Not.ToContainTextAsync("Faucet drips in the kitchenette");
         // The browser logs the refused change's 409; nothing else may fail.
-        AssertNoConsoleErrorsExcept("409");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 409");
     }
 
     [Test]
@@ -344,7 +344,7 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
         await Expect(Status).ToHaveTextAsync("No new calls from the front desk.", new() { Timeout = 5000 });
         await Expect(Board.Card("Toilet running nonstop")).ToHaveCountAsync(1);
         // The browser logs the empty answer's 404; nothing else may fail.
-        AssertNoConsoleErrorsExcept("404");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 404");
     }
 
     [Test]

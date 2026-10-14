@@ -246,6 +246,6 @@ public class WhenUsingFusionChipList : PlaywrightTestBase
         await ClickWhenStable(PostToCalendar);
 
         await Expect(PostStatus).ToHaveTextAsync("Choose where the trip goes before posting it.", new() { Timeout = 5000 });
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 }

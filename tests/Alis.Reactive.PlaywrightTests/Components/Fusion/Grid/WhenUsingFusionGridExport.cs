@@ -178,6 +178,6 @@ public class WhenUsingFusionGridExport : PlaywrightTestBase
         await Expect(Summary).ToHaveTextAsync("November's census is still open; it closes on November 30.", new() { Timeout = 10000 });
         await Expect(Rows).ToHaveCountAsync(6);
         await Expect(Rows.Nth(4)).ToContainTextAsync("Theodore Banks");
-        AssertNoConsoleErrorsExcept("409");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 409");
     }
 }
