@@ -1,64 +1,61 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.GridOperationsModel
-@using Alis.Reactive.Native.Components
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ShiftScheduleViewModel
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @{
-    ViewData["Title"] = "Care-Staff Grid Tooling";
+    ViewData["Title"] = "Shift Schedule";
 
-    const string GridId = "grid-tooling-grid";
-    const string Button = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+    const string GridId = "shift-schedule";
+    const string WeekendItem = "shift-schedule-weekend";
+    const string ColumnsItem = "shift-schedule-columns";
 
-    var plan = Html.ReactivePlan<GridOperationsModel>();
+    // A page holds one day's three shifts, Monday first, so Saturday is the sixth page.
+    const int ShiftsPerDay = 3;
+    const int SaturdayPage = 6;
 
-    var columns = FusionGridColumns.Of<ResidentDirectoryGridItem>();
+    var plan = Html.ReactivePlan<ShiftScheduleViewModel>();
+
+    var columns = FusionGridColumns.Of<ScheduledShift>();
 
     Html.On(plan, t => t.DomReady(p =>
-        p.Get(Url.SandboxRoute("OperationRows", "Grid"))
-            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
-            {
-                s.Component<FusionGrid>(GridId).DataSource.Set(json);
-                s.Element("tooling-status").Text.Set("loaded");
-            }))));
+        p.Get(Url.SandboxRoute("GridToolingShifts", "Grid"))
+            .Response(r => r.OnSuccess<List<ScheduledShift>>((shifts, s) =>
+                s.Component<FusionGrid>(GridId).DataSource.Set(shifts)))));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Care-Staff Grid Tooling</native-heading>
-    <native-text color="Secondary">
-        Jump to a roster page and open the column chooser.
-    </native-text>
+    <div>
+        <native-heading level="H1">Shift Schedule</native-heading>
+        <native-text color="Secondary">
+            Week of October 19, one day to a page. Weekend shifts fill last, so check them first; an open shift
+            has nobody on it yet.
+        </native-text>
+    </div>
 
-    <native-hstack gap="Sm" class="flex-wrap">
-        @(Html.NativeButton("tooling-go-page", "Go To Page 2")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).GoToPage(2);
-                p.Element("tooling-status").Text.Set("goToPage called");
-            }))
-        @(Html.NativeButton("tooling-column-chooser", "Open Column Chooser")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).OpenColumnChooser();
-                p.Element("tooling-status").Text.Set("showColumnChooser called");
-            }))
-    </native-hstack>
-
-    <p class="font-mono text-sm">Status: <span id="tooling-status" class="text-text-muted">waiting</span></p>
-
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        @(Html.FusionGrid<GridOperationsModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+    <native-card><native-card-body>
+        @(Html.FusionGrid<ShiftScheduleViewModel, ScheduledShift>(plan, GridId, b => b
             .AllowPaging(true)
             .ShowColumnChooser(true)
-            .PageSettings(new GridPageSettings { PageSize = 4 })
+            .PageSettings(new GridPageSettings { PageSize = ShiftsPerDay })
+            .Toolbar(new List<object>
+            {
+                new { text = "Weekend", id = WeekendItem },
+                new { text = "Choose columns", id = ColumnsItem }
+            })
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", IsPrimaryKey = true, TextAlign = TextAlign.Right, Visible = false },
-                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "240" },
-                new GridColumn { Field = columns.Field(r => r.RiskLevel), HeaderText = "Risk", Width = "150" },
-                new GridColumn { Field = columns.Field(r => r.OpenTasks), HeaderText = "Open Tasks", Width = "130", TextAlign = TextAlign.Right }
-            })))
-    </section>
+                new GridColumn { Field = columns.Field(r => r.ShiftId), HeaderText = "ID", IsPrimaryKey = true, Visible = false, ShowInColumnChooser = false },
+                new GridColumn { Field = columns.Field(r => r.Day), HeaderText = "Day", Width = "140", ShowInColumnChooser = false },
+                new GridColumn { Field = columns.Field(r => r.Shift), HeaderText = "Shift", Width = "110" },
+                new GridColumn { Field = columns.Field(r => r.Nurse), HeaderText = "Nurse", Width = "170" },
+                new GridColumn { Field = columns.Field(r => r.Aide), HeaderText = "Aide", Width = "170" }
+            }))
+            .Reactive(evt => evt.ToolbarClick, (args, p) =>
+            {
+                var item = args.Item.Get(x => x.Id);
+                p.When(item).Eq(WeekendItem).Then(t => t.Component<FusionGrid>(GridId).GoToPage(SaturdayPage))
+                    .ElseIf(item).Eq(ColumnsItem).Then(t => t.Component<FusionGrid>(GridId).OpenColumnChooser());
+            }))
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

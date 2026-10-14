@@ -113,16 +113,3 @@ registeredPlugins.push({
     if (region !== null) region.textContent = String(line ?? "");
   },
 });
-
-const orderMarks = new Map<string, string[]>();
-
-registeredPlugins.push({
-  name: "order",
-  instance: (key: unknown, mark: unknown) => {
-    const sequenceKey = String(key ?? "");
-    const marks = orderMarks.get(sequenceKey) ?? [];
-    marks.push(String(mark ?? ""));
-    orderMarks.set(sequenceKey, marks);
-    return marks.join(">");
-  },
-});

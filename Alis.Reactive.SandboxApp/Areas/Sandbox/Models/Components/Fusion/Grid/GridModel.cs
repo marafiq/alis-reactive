@@ -37,24 +37,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string PrimaryNurse { get; set; } = "";
         public int OpenTasks { get; set; }
         public string NextReviewDate { get; set; } = "";
-
-        public string? Key { get; set; }
-        public int Count { get; set; }
-        public List<ResidentDirectoryGridItem>? Items { get; set; }
-        public string? Field { get; set; }
-    }
-
-    public class ResidentDirectoryResponse
-    {
-        public List<ResidentDirectoryGridItem> Result { get; set; } = new();
-        public int Count { get; set; }
-        public string Summary { get; set; } = "";
-    }
-
-    /// <summary>Nested envelope so the grid can bind from a nested data-source property path.</summary>
-    public class ResidentRosterEnvelope
-    {
-        public ResidentDirectoryResponse Page { get; set; } = new();
     }
 
     public class ResidentDirectorySelectionResponse
@@ -76,20 +58,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public decimal? PatchOpenTasks { get; set; }
     }
 
-    public class ResidentGridEditResponse
-    {
-        public ResidentDirectoryGridItem Row { get; set; } = new ResidentDirectoryGridItem();
-        public string Summary { get; set; } = "";
-    }
-
     public class ResidentGridOperationsResponse
     {
         public ResidentDirectoryGridItem Row { get; set; } = new ResidentDirectoryGridItem();
-        public string Summary { get; set; } = "";
-    }
-
-    public class ResidentGridBatchSummaryResponse
-    {
         public string Summary { get; set; } = "";
     }
 
@@ -120,21 +91,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public int ActionPageSize { get; set; }
     }
 
-    /// <summary>The body <c>POST Grid/DirectoryData</c> binds: the grid's data state and the directory filters.</summary>
-    public class ResidentDirectoryRequest
-    {
-        public int Skip { get; set; }
-        public int Take { get; set; }
-        public List<FusionGridSortColumn>? Sorted { get; set; }
-        public List<string>? Group { get; set; }
-        public List<FusionGridTextFilterCriterion>? Where { get; set; }
-        public List<FusionGridSearchDescriptor>? Search { get; set; }
-        public string? ResidentSearch { get; set; }
-        public string? CareLevel { get; set; }
-        public string? RiskLevel { get; set; }
-        public decimal? MinimumAge { get; set; }
-    }
-
     /// <summary>The body <c>POST Grid/SelectionIndexes</c> binds.</summary>
     public class ResidentSelectionIndexesRequest
     {
@@ -157,12 +113,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     public class ResidentRowIndexRequest
     {
         public int RowIndex { get; set; }
-    }
-
-    /// <summary>The body <c>POST Grid/BatchSummary</c> binds.</summary>
-    public class ResidentGridBatchSummaryRequest
-    {
-        public FusionGridBatchChanges<ResidentDirectoryGridItem>? BatchChanges { get; set; }
     }
 
     /// <summary>The document events the GridOperations page raises and hears.</summary>

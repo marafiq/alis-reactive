@@ -1,78 +1,88 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.CarePlanReviewsViewModel
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @{
-    ViewData["Title"] = "Care-Ops Inline Resident Edit";
+    ViewData["Title"] = "Care-Plan Reviews";
 
-    const string GridId = "inline-edit-grid";
-    const string Button = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+    const string GridId = "care-plan-reviews";
+    const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+    const string ButtonLink = "rounded-md px-2 py-1 text-sm font-medium text-primary underline-offset-2 hover:underline";
 
-    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+    var plan = Html.ReactivePlan<CarePlanReviewsViewModel>();
 
-    var columns = FusionGridColumns.Of<ResidentDirectoryGridItem>();
+    var columns = FusionGridColumns.Of<CarePlanReview>();
 
-    // Focused scenario: a care lead opens, cancels, and commits an inline edit on a resident row.
     Html.On(plan, t => t.DomReady(p =>
-        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
-            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
-            {
-                s.Component<FusionGrid>(GridId).DataSource.Set(json);
-                s.Element("inline-status").Text.Set("loaded");
-            }))));
+        p.Get(Url.SandboxRoute("InlineEditReviews", "Grid"))
+            .Response(r => r.OnSuccess<List<CarePlanReview>>((reviews, s) =>
+                s.Component<FusionGrid>(GridId).DataSource.Set(reviews)))));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Care-Ops Inline Resident Edit</native-heading>
-    <native-text color="Secondary">
-        Open an inline editor on the first resident, cancel it, then commit it.
-    </native-text>
+    <div>
+        <native-heading level="H1">Care-Plan Reviews</native-heading>
+        <native-text color="Secondary">
+            Birch wing. Move a resident's next care-plan review to a day that suits the family; the care team's
+            calendar books the new day when you save it.
+        </native-text>
+    </div>
 
-    <native-hstack gap="Sm" class="flex-wrap">
-        @(Html.NativeButton("inline-start-edit", "Edit First Resident")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
+    <native-card><native-card-body>
+        <native-heading level="H2">Due this week</native-heading>
+        <native-hstack gap="Sm" class="mt-2 flex-wrap">
+            @foreach (var due in Model.DueThisWeek)
             {
-                var grid = p.Component<FusionGrid>(GridId);
-                grid.SelectRow(0);
-                grid.StartEdit();
-                p.Element("inline-status").Text.Set("startEdit called");
-            }))
-        @(Html.NativeButton("inline-close-edit", "Cancel Edit")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).CloseEdit();
-                p.Element("inline-status").Text.Set("closeEdit called");
-            }))
-        @(Html.NativeButton("inline-end-edit", "Save Edit")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).EndEdit();
-                p.Element("inline-status").Text.Set("endEdit called");
-            }))
-    </native-hstack>
+                @(Html.NativeButton(due.ButtonId, due.Label)
+                    .CssClass(ButtonLink)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
+                    {
+                        var reviews = p.Component<FusionGrid>(GridId);
+                        reviews.SelectRow(reviews.GetRowIndexByPrimaryKey(due.ResidentId));
+                        reviews.StartEdit();
+                    }))
+            }
+        </native-hstack>
+    </native-card-body></native-card>
 
-    <p class="font-mono text-sm">Status: <span id="inline-status" class="text-text-muted">waiting</span></p>
+    <native-card><native-card-body>
+        <native-hstack gap="Sm" class="mb-4 flex-wrap">
+            @(Html.NativeButton("review-save", "Save")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (_, p) => p.Component<FusionGrid>(GridId).EndEdit()))
+            @(Html.NativeButton("review-cancel", "Cancel")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (_, p) => p.Component<FusionGrid>(GridId).CloseEdit()))
+        </native-hstack>
 
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+        @(Html.FusionGrid<CarePlanReviewsViewModel, CarePlanReview>(plan, GridId, b => b
             .AllowSelection(true)
-            .EditSettings(new GridEditSettings
-            {
-                AllowEditing = true,
-                AllowEditOnDblClick = false,
-                Mode = EditMode.Normal,
-                ShowConfirmDialog = false
-            })
+            .EditSettings(new GridEditSettings { AllowEditing = true, Mode = EditMode.Normal })
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", IsPrimaryKey = true, AllowEditing = false, Visible = false },
-                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "220" },
-                new GridColumn { Field = columns.Field(r => r.OpenTasks), HeaderText = "Open Tasks", Width = "140", TextAlign = TextAlign.Right, EditType = "numericedit" }
-            })))
-    </section>
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", IsPrimaryKey = true, Visible = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "170", AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.Suite), HeaderText = "Suite", Width = "90", AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care level", Width = "160", AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.NextReview), HeaderText = "Next review", Width = "170", EditTemplate = FusionGridEditTemplates.DateInput((CarePlanReview r) => r.NextReview) }
+            }))
+            .Reactive(evt => evt.ActionComplete<CarePlanReview>(), (args, p) =>
+                p.When(args.RequestType).Eq("save").Then(saved =>
+                    saved.Post(Url.SandboxRoute("InlineEditBooking", "Grid"))
+                        .Gather<CarePlanReviewBooking>(g => g.Set(x => x.Review, args.Data))
+                        .Response(r => r
+                            .OnSuccess<CarePlanReviewAnswer>((booked, s) =>
+                                s.Element("review-status").Text.Set(booked.Get(x => x.Summary)))
+                            .OnError<CarePlanReviewAnswer>(400, (refused, e) =>
+                            {
+                                // The calendar keeps the day on file, so the row goes back to it.
+                                e.Component<FusionGrid>(GridId).SetRowData(refused.Get(x => x.Review.ResidentId), refused.Get(x => x.Review));
+                                e.Element("review-status").Text.Set(refused.Get(x => x.Summary));
+                            })))))
+
+        <p id="review-status" role="status" class="mt-4 text-sm font-medium">No reviews moved yet.</p>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

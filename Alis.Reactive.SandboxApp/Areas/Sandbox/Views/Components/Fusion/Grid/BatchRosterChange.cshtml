@@ -1,112 +1,134 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.SuiteTurnoverViewModel
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @{
-    ViewData["Title"] = "Care-Ops Batch Roster Change";
+    ViewData["Title"] = "Suite Turnover";
 
-    const string GridId = "resident-roster-batch-grid";
+    const string RosterId = "turnover-roster";
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-subtle";
     const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
-    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
 
-    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
-
-    var columns = FusionGridColumns.Of<ResidentDirectoryGridItem>();
-
-    List<GridColumn> RosterColumns() => new List<GridColumn>
-    {
-        new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
-        new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "200" },
-        new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "160" },
-        new GridColumn { Field = columns.Field(r => r.Wing), HeaderText = "Wing", Width = "120" }
-    };
+    var plan = Html.ReactivePlan<SuiteTurnoverViewModel>();
+    var columns = FusionGridColumns.Of<SuiteTurnoverResident>();
+    var departure = Model.Departure;
+    var arrival = Model.Arrival;
 
     Html.On(plan, t => t.DomReady(p =>
-        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
-            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
-            {
-                s.Component<FusionGrid>(GridId).DataSource.Set(json);
-                s.Element("roster-load-status").Text.Set("loaded roster rows");
-            }))));
+        p.Get(Url.SandboxRoute("SuiteTurnoverRoster", "Grid"))
+            .Response(r => r.OnSuccess<List<SuiteTurnoverResident>>((residents, s) =>
+                s.Component<FusionGrid>(RosterId).DataSource.Set(residents)))));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Care-Ops Batch Roster Change</native-heading>
-    <native-text color="Secondary">
-        A care director discharges a resident and admits a new one in a single batch, then reviews
-        the pending change before committing. <code>beforeBatchSave</code> reads both the
-        <code>AddedRecords</code> and <code>DeletedRecords</code> of the batch.
-    </native-text>
+    <div>
+        <native-heading level="H1">Suite Turnover</native-heading>
+        <native-text color="Secondary">
+            Maple wing admissions. Suite @departure.Suite turns over today: record the move-out and the move-in on the
+            roster, then save them together once housekeeping has turned the suite over.
+        </native-text>
+    </div>
 
-    <p class="font-mono text-sm">Load status: <span id="roster-load-status" class="text-text-muted">waiting</span></p>
+    <native-card><native-card-body>
+        <native-heading level="H2">Suite @departure.Suite today</native-heading>
+        <ul class="mt-3 space-y-3">
+            <li class="flex flex-wrap items-center justify-between gap-2 text-sm">
+                <span><span class="font-medium">@departure.ResidentName</span> moves out this morning</span>
+                @(Html.NativeButton("turnover-record-move-out", "Record the move-out")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
+                    {
+                        var roster = p.Component<FusionGrid>(RosterId);
+                        roster.SelectRow(roster.GetRowIndexByPrimaryKey(departure.ResidentId));
+                        roster.DeleteRecord();
+                    }))
+            </li>
+            <li class="flex flex-wrap items-center justify-between gap-2 text-sm">
+                <span><span class="font-medium">@arrival.ResidentName</span> moves in this afternoon, @arrival.CareLevel</span>
+                @(Html.NativeButton("turnover-record-move-in", "Record the move-in")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
+                        p.Component<FusionGrid>(RosterId).AddRecord<SuiteTurnoverResident>(arrival)))
+            </li>
+        </ul>
+        <div class="mt-4">
+            @{ Html.InputField(plan, m => m.HousekeepingSignedOff, o => o.Label($"Housekeeping has turned suite {departure.Suite} over"))
+                .NativeCheckBox(b => b.CssClass("rounded border-border")); }
+        </div>
+    </native-card-body></native-card>
 
-    <native-hstack gap="Sm" class="flex-wrap">
-        @(Html.NativeButton("roster-discharge", "Discharge First Resident")
-            .CssClass(ButtonSecondary)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var grid = p.Component<FusionGrid>(GridId);
-                grid.SelectRow(0);
-                grid.DeleteRecord();
-                p.Element("roster-command-status").Text.Set("discharge staged");
-            }))
-        @(Html.NativeButton("roster-admit", "Admit Zara")
-            .CssClass(ButtonSecondary)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).AddRecord<ResidentDirectoryGridItem>(new ResidentDirectoryGridItem
+    <native-card><native-card-body>
+        <native-heading level="H2">Maple wing roster</native-heading>
+        <div class="mt-3">
+            @(Html.FusionGrid<SuiteTurnoverViewModel, SuiteTurnoverResident>(plan, RosterId, b => b
+                .AllowSelection(true)
+                .EditSettings(new GridEditSettings
                 {
-                    ResidentId = 9001,
-                    ResidentName = "Zara Admitted",
-                    Age = 70,
-                    CareLevel = "Assisted Living",
-                    Wing = "North",
-                    Suite = "N-118",
-                    RiskLevel = "Low",
-                    PrimaryNurse = "Nora Ellis",
-                    OpenTasks = 1,
-                    NextReviewDate = "2026-06-30"
-                });
-                p.Element("roster-command-status").Text.Set("admit staged");
-            }))
-        @(Html.NativeButton("roster-review", "Review And Commit")
-            .CssClass(ButtonPrimary)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).EndEdit();
-                p.Element("roster-command-status").Text.Set("endEdit called");
-            }))
-    </native-hstack>
+                    AllowAdding = true,
+                    AllowDeleting = true,
+                    Mode = EditMode.Batch,
+                    ShowConfirmDialog = false,
+                    ShowDeleteConfirmDialog = false
+                })
+                .Columns(new List<GridColumn>
+                {
+                    new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true },
+                    new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "180" },
+                    new GridColumn { Field = columns.Field(r => r.Suite), HeaderText = "Suite", Width = "90" },
+                    new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care level", Width = "160" }
+                }))
+                .Reactive(evt => evt.BeforeBatchSave<SuiteTurnoverResident>(), (args, p) =>
+                {
+                    var leaving = p.From(args.BatchChanges.Get(x => x.DeletedRecords));
+                    var arriving = p.From(args.BatchChanges.Get(x => x.AddedRecords));
+                    p.When(leaving.Any()).Truthy()
+                        .Then(t =>
+                        {
+                            t.Element("turnover-moving-out-name").Text.Set(args.BatchChanges.Get(x => x.DeletedRecords[0].ResidentName));
+                            t.Element("turnover-moving-out").Show();
+                        })
+                        .Else(e => e.Element("turnover-moving-out").Hide());
+                    p.When(arriving.Any()).Truthy()
+                        .Then(t =>
+                        {
+                            t.Element("turnover-moving-in-name").Text.Set(args.BatchChanges.Get(x => x.AddedRecords[0].ResidentName));
+                            t.Element("turnover-moving-in").Show();
+                        })
+                        .Else(e => e.Element("turnover-moving-in").Hide());
+                    p.When(leaving.Any()).Falsy().And(arriving.Any()).Falsy()
+                        .Then(nothing => nothing.Element("turnover-status").Text.Set("No move is recorded yet, so there is nothing to save."))
+                        .ElseIf(p.Component<NativeCheckBox>(m => m.HousekeepingSignedOff).Checked).Falsy()
+                        .Then(held =>
+                        {
+                            // The roster keeps the turnover unsaved until the suite is ready for the move-in.
+                            args.Cancel.Set(true);
+                            held.Element("turnover-held").Show();
+                        })
+                        .Else(saving =>
+                        {
+                            saving.Element("turnover-held").Hide();
+                            saving.Post(Url.SandboxRoute("SuiteTurnoverSave", "Grid"))
+                                .Gather<SuiteTurnoverChanges>(g => g.Set(x => x.Changes, args.BatchChanges))
+                                .Response(r => r.OnSuccess<SuiteTurnoverRecorded>((recorded, s) =>
+                                    s.Element("turnover-status").Text.Set(recorded.Get(x => x.Summary))));
+                        });
+                }))
+        </div>
 
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, GridId, b => b
-            .AllowSelection(true)
-            .Toolbar(new List<string> { "Add", "Delete", "Update", "Cancel" })
-            .EditSettings(new GridEditSettings
-            {
-                AllowEditing = true,
-                AllowAdding = true,
-                AllowDeleting = true,
-                AllowEditOnDblClick = false,
-                Mode = EditMode.Batch,
-                ShowConfirmDialog = false
-            })
-            .Columns(RosterColumns()))
-            .Reactive(evt => evt.BeforeBatchSave<ResidentDirectoryGridItem>(), (args, p) =>
-            {
-                p.Element("roster-added-resident").Text.Set(args.BatchChanges.Get(x => x.AddedRecords[0].ResidentName));
-                p.Element("roster-deleted-resident").Text.Set(args.BatchChanges.Get(x => x.DeletedRecords[0].ResidentName));
-                args.Cancel.Set(true);
-                p.Element("roster-review-status").Text.Set("batch reviewed");
-            }))
-
-        <native-grid cols="C2" gap="Base" class="mt-4 font-mono text-sm">
-            <p>Command: <span id="roster-command-status" class="text-text-muted">waiting</span></p>
-            <p>Review: <span id="roster-review-status" class="text-text-muted">waiting</span></p>
-            <p>Admitted resident: <span id="roster-added-resident" class="text-text-muted">waiting</span></p>
-            <p>Discharged resident: <span id="roster-deleted-resident" class="text-text-muted">waiting</span></p>
-        </native-grid>
-    </section>
+        <native-hstack gap="Sm" align="Center" class="mt-4 flex-wrap">
+            @(Html.NativeButton("turnover-save", "Save the turnover")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (_, p) => p.Component<FusionGrid>(RosterId).EndEdit()))
+            <p id="turnover-status" role="status" class="text-sm">The turnover has not been saved.</p>
+        </native-hstack>
+        <div class="mt-2 space-y-1 text-sm">
+            <p id="turnover-moving-out" hidden>Moving out: <span id="turnover-moving-out-name"></span></p>
+            <p id="turnover-moving-in" hidden>Moving in: <span id="turnover-moving-in-name"></span></p>
+            <p id="turnover-held" hidden class="text-red-700">
+                Housekeeping has not turned the suite over yet, so the roster keeps the turnover unsaved.
+            </p>
+        </div>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

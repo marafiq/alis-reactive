@@ -1,0 +1,155 @@
+@model ShiftEmailLinkPageModel
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Resident File";
+
+    const string TabButton = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
+
+    var plan = Html.ReactivePlan<ShiftEmailLinkPageModel>();
+    var chartUrl = Url.SandboxRouteTemplate("Chart", "ShiftEmailLink", "residentId");
+    var lastDoseUrl = Url.SandboxRouteTemplate("LastDose", "ShiftEmailLink", "residentId", "medication");
+    var notesUrl = Url.SandboxRouteTemplate("Notes", "ShiftEmailLink", "residentId");
+    var partnersUrl = Url.SandboxRouteTemplate("PartnerCheck", "ShiftEmailLink", "residentId");
+
+    // The link names the shift, the wings covered and the page of notes, and opens the medications
+    // when it names them; any other link opens the overview.
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var link = p.Url<ShiftEmailLinkQuery>();
+        p.Element("link-shift").Text.Set(link.Get(q => q.Shift));
+        p.Element("link-wings").Text.Set(link.Get(q => q.Wing));
+        p.Element("notes-page").Text.Set(link.Get(q => q.Page));
+        p.When(link.Get(q => q.Tab)).Eq("medications")
+         .Then(medications => medications.Element("file-medications").Show())
+         .Else(overview => overview.Element("file-overview").Show());
+        p.When(link.Get(q => q.Page)).Gt(1)
+         .Then(older => older.Element("notes-older-hint").Show());
+    }));
+
+    // The chart is asked of the community the link names, for the dose due on the link's shift; then the
+    // page asks when that dose was last given.
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var link = p.Url<ShiftEmailLinkQuery>();
+        p.Get(chartUrl)
+         .Gather<ShiftEmailChartRequest>(g => g
+             .Set(x => x.ResidentId, link.Get(q => q.Resident))
+             .Header("X-Community", link.Get(q => q.Community))
+             .Set(x => x.Shift, link.Get(q => q.Shift)))
+         .Response(r => r
+             .OnSuccess<ShiftEmailChart>((chart, s) =>
+             {
+                 s.Element("file-resident").Text.Set(chart.Get(x => x.Name));
+                 s.Element("file-room").Text.Set(chart.Get(x => x.Room));
+                 s.Element("file-community").Text.Set(chart.Get(x => x.Community));
+                 s.Element("due-dose").Text.Set(chart.Get(x => x.DueDose));
+                 var sameLink = s.Url<ShiftEmailLinkQuery>();
+                 s.Get(lastDoseUrl)
+                  .Gather<ShiftEmailDoseRequest>(g => g
+                      .Set(x => x.ResidentId, sameLink.Get(q => q.Resident))
+                      .Set(x => x.Medication, chart.Get(x => x.DueMedication))
+                      .Header("X-Community", sameLink.Get(q => q.Community)))
+                  .Response(dose => dose.OnSuccess<ShiftEmailLastDose>((given, d) =>
+                      d.Element("last-dose").Text.Set(given.Get(x => x.LastGiven))));
+             })
+             .OnError<ShiftEmailRefusal>(404, (refusal, e) => e.Element("file-refusal").Text.Set(refusal.Get(x => x.Message))));
+    }));
+
+    // The shift notes open at the page the link names, for the link's shift.
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var link = p.Url<ShiftEmailLinkQuery>();
+        p.Get(notesUrl)
+         .Gather<ShiftEmailNotesRequest>(g => g
+             .Set(x => x.ResidentId, link.Get(q => q.Resident))
+             .Set(x => x.Shift, link.Get(q => q.Shift))
+             .Set(x => x.Page, link.Get(q => q.Page))
+             .Header("X-Community", link.Get(q => q.Community)))
+         .Response(r => r.OnSuccess<ShiftEmailNotes>((notes, s) => s.Element("notes-entry").Text.Set(notes.Get(x => x.Entry))));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Resident File</native-heading>
+        <native-text color="Secondary">
+            Opened from the <span id="link-shift" class="font-medium"></span> shift email. Covering wings: <span id="link-wings" class="font-medium"></span>.
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Xs">
+            <p class="text-sm">Resident: <span id="file-resident" class="font-medium">No chart open.</span></p>
+            <p class="text-sm text-text-secondary"><span id="file-room"></span> <span id="file-community"></span></p>
+            <p id="file-refusal" class="text-sm text-danger"></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-hstack gap="Sm">
+        @(Html.NativeButton("file-overview-tab", "Overview")
+            .CssClass(TabButton)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Element("file-medications").Hide();
+                p.Element("file-overview").Show();
+            }))
+        @(Html.NativeButton("file-medications-tab", "Medications")
+            .CssClass(TabButton)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Element("file-overview").Hide();
+                p.Element("file-medications").Show();
+            }))
+    </native-hstack>
+
+    <section id="file-overview" hidden>
+        <native-card><native-card-body>
+            <native-vstack gap="Sm">
+                <native-heading level="H2">Shift notes</native-heading>
+                <p class="text-sm text-text-secondary">Page <span id="notes-page"></span></p>
+                <p id="notes-entry" class="text-sm"></p>
+                <p id="notes-older-hint" class="text-sm text-text-muted" hidden>These are older notes; the newest are on page 1.</p>
+            </native-vstack>
+        </native-card-body></native-card>
+    </section>
+
+    <section id="file-medications" hidden>
+        <native-card><native-card-body>
+            <native-vstack gap="Sm">
+                <native-heading level="H2">Medications</native-heading>
+                <p class="text-sm">Due this shift: <span id="due-dose" class="font-medium"></span></p>
+                <p id="last-dose" class="text-sm text-text-secondary"></p>
+                @(Html.NativeButton("check-partners-btn", "Check Pharmacy and Lab")
+                    .CssClass("self-start rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        // The gateway forwards each check to the partner its X-Partner header names; both are
+                        // asked side by side.
+                        var link = p.Url<ShiftEmailLinkQuery>();
+                        p.Element("partners-status").Text.Set("Checking with the pharmacy and the lab...");
+                        p.Parallel(
+                                pharmacy => pharmacy.Get(partnersUrl)
+                                    .Gather<ShiftEmailPartnerRequest>(g => g
+                                        .Set(x => x.ResidentId, link.Get(q => q.Resident))
+                                        .Header("X-Partner", "riverside-pharmacy")
+                                        .Header("X-Community", link.Get(q => q.Community)))
+                                    .Response(r => r.OnSuccess<ShiftEmailPartnerAnswer>((answer, s) =>
+                                        s.Element("pharmacy-answer").Text.Set(answer.Get(x => x.Answer)))),
+                                lab => lab.Get(partnersUrl)
+                                    .Gather<ShiftEmailPartnerRequest>(g => g
+                                        .Set(x => x.ResidentId, link.Get(q => q.Resident))
+                                        .Header("X-Partner", "northgate-lab")
+                                        .Header("X-Community", link.Get(q => q.Community)))
+                                    .Response(r => r.OnSuccess<ShiftEmailPartnerAnswer>((answer, s) =>
+                                        s.Element("lab-answer").Text.Set(answer.Get(x => x.Answer)))))
+                            .OnAllSettled(done => done.Element("partners-status").Text.Set("Pharmacy and lab checked."));
+                    }))
+                <p id="partners-status" class="text-sm text-text-muted">Not checked this shift.</p>
+                <p id="pharmacy-answer" class="text-sm"></p>
+                <p id="lab-answer" class="text-sm"></p>
+            </native-vstack>
+        </native-card-body></native-card>
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

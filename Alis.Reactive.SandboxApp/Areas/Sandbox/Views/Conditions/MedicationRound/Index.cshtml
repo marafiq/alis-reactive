@@ -1,0 +1,218 @@
+@using System.Globalization
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.MedicationRound
+@model MedicationRoundModel
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Medication Round";
+
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
+    var roundDate = Model.RoundDate;
+    var plan = Html.ReactivePlan<MedicationRoundModel>();
+
+    // What the aide sees for the dose just opened: each check, then whether the dose can be given.
+    Html.On(plan, t => t.CustomEvent<RoundDose>(MedicationRoundEvents.DoseOpened, (dose, p) =>
+    {
+        p.Element("dose-resident").Text.Set(dose.Get(x => x.Resident));
+        p.Element("dose-medication").Text.Set(dose.Get(x => x.Medication));
+        p.Element("dose-checks").Show();
+
+        p.When(dose.Get(x => x.OnWing)).Truthy()
+            .Then(then => then.Element("check-whereabouts").Text.Set("On the wing."))
+            .Else(otherwise => otherwise.Element("check-whereabouts").Text.Set("Away from the wing. Come back to this dose."));
+
+        p.Element("pulse-reading").Text.Set(dose.Get(x => x.Pulse));
+        p.When(dose.Get(x => x.Pulse)).Between(60, 100)
+            .Then(then => then.Element("check-pulse").Text.Set("within 60 to 100."))
+            .Else(otherwise => otherwise.Element("check-pulse").Text.Set("outside 60 to 100."));
+
+        p.Element("temperature-reading").Text.Set(dose.Get(x => x.Temperature));
+        p.When(dose.Get(x => x.Temperature)).Gt(100.4)
+            .Or(dose.Get(x => x.Temperature)).Lt(96.0)
+            .Then(then => then.Element("check-temperature").Text.Set("out of range. Take it again."))
+            .Else(otherwise => otherwise.Element("check-temperature").Text.Set("normal."));
+
+        p.When(dose.Get(x => x.MinutesSinceLastDose)).Gte(240L)
+            .Then(then => then.Element("check-last-dose").Text.Set("4 or more hours ago."))
+            .Else(otherwise => otherwise.Element("check-last-dose").Text.Set("Less than 4 hours ago. Do not repeat it yet."));
+
+        p.When(dose.Get(x => x.Order)).IsNull()
+            .Then(then => then.Element("check-order").Text.Set("None on file. Call the pharmacy."))
+            .ElseIf(dose.Get(x => x.Order!.StopDate)).Gt(roundDate)
+            .And(g => g.When(dose.Get(x => x.Order!.SignedBy)).NotNull())
+            .Then(then => then.Element("check-order").Text.Set("Signed by the physician and current."))
+            .ElseIf(dose.Get(x => x.Order!.StopDate)).Gt(roundDate)
+            .Then(then => then.Element("check-order").Text.Set("Verbal order, not yet signed by the physician."))
+            .Else(otherwise => otherwise.Element("check-order").Text.Set("Ended. Call the physician."));
+
+        p.When(dose.Get(x => x.Order!.Route)).Eq("By mouth")
+            .Then(then => then.Element("check-route").Text.Set("By mouth, with a full glass of water."))
+            .Else(otherwise => otherwise.Element("check-route").Text.Set("Check the route on the order."));
+
+        p.When(dose.Get(x => x.Allergies)).IsEmpty()
+            .Then(then => then.Element("check-allergies").Text.Set("None on file."))
+            .Else(otherwise => otherwise.Element("check-allergies").Text.Set(dose.Get(x => x.Allergies)));
+
+        p.When(dose.Get(x => x.Status)).Eq("Due").Not()
+            .Then(then => then.Element("check-status").Text.Set(dose.Get(x => x.Status)))
+            .Else(otherwise => otherwise.Element("check-status").Text.Set("Due now"));
+
+        p.When(dose.Get(x => x.ForPain)).Truthy()
+            .Then(then =>
+            {
+                then.Element("check-pain").Show();
+                then.When(dose.Get(x => x.PainScore)).IsNull()
+                    .Then(ask => ask.Element("pain-score").Text.Set("not asked yet. Ask the resident before you give it."))
+                    .Else(asked => asked.Element("pain-score").Text.Set(dose.Get(x => x.PainScore)));
+            })
+            .Else(otherwise => otherwise.Element("check-pain").Hide());
+
+        // A dose is given only when it is due, the pulse is in range (or the physician says give),
+        // the resident is on the wing, the order is current, and the last dose was 4 or more hours ago.
+        var physicianSaysGive = p.Component<NativeCheckBox>(m => m.PhysicianSaysGive);
+        p.When(dose.Get(x => x.Status)).NotIn("On hold", "Not available")
+            .And(g => g.When(dose.Get(x => x.Pulse)).Between(60, 100).Or(physicianSaysGive.Checked).Truthy())
+            .And(dose.Get(x => x.OnWing)).Truthy()
+            .And(dose.Get(x => x.Order!.StopDate)).Gt(roundDate)
+            .And(dose.Get(x => x.MinutesSinceLastDose)).Gte(240L)
+            .Then(then => then.Element("dose-verdict").Text.Set("Clear to give."))
+            .Else(otherwise => otherwise.Element("dose-verdict").Text.Set("Hold this dose."));
+    }));
+
+    // The charge nurse hears of a fever, or of a time-critical dose missed because the resident is away,
+    // before the round ends; once raised, the alert stays up for the rest of the round.
+    Html.On(plan, t => t.CustomEvent<RoundDose>(MedicationRoundEvents.DoseOpened, (dose, p) =>
+        p.When(dose.Get(x => x.Temperature)).Gt(100.4)
+            .Or(g => g.When(dose.Get(x => x.OnWing)).Falsy().And(dose.Get(x => x.TimeCritical)).Truthy())
+            .Then(then => then.Element("charge-nurse-alert").Show())));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Morning medication round</native-heading>
+        <native-text color="Secondary">
+            Maple wing &middot; @roundDate.ToString("dddd d MMMM yyyy", CultureInfo.InvariantCulture) &middot; 08:00. Check each dose before you give it.
+        </native-text>
+    </div>
+
+    <p id="charge-nurse-alert" hidden class="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+        Tell the charge nurse before the round ends: a resident has a fever, or has missed a time-critical dose.
+    </p>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Doses due</native-heading>
+        <table class="mt-3 w-full text-left text-sm">
+            <thead class="text-text-secondary">
+                <tr><th class="py-1">Resident</th><th class="py-1">Room</th><th class="py-1">Medication</th><th class="py-1"></th></tr>
+            </thead>
+            <tbody>
+                @foreach (var dose in Model.Doses)
+                {
+                    <tr class="border-t border-border">
+                        <td class="py-1.5">@dose.Resident</td>
+                        <td class="py-1.5">@dose.Room</td>
+                        <td class="py-1.5">@dose.Medication</td>
+                        <td class="py-1.5 text-right">
+                            @(Html.NativeButton($"check-dose-{dose.Room}", "Check")
+                                .CssClass(Button)
+                                .Reactive(plan, evt => evt.Click, (_, p) => p.Dispatch(MedicationRoundEvents.DoseOpened, dose)))
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Before you give</native-heading>
+        <p id="dose-resident" class="mt-2 font-medium">Choose a dose to check.</p>
+        <p id="dose-medication" class="text-sm text-text-secondary"></p>
+
+        <div id="dose-checks" hidden class="mt-4">
+            <dl class="grid grid-cols-[9rem_1fr] gap-x-4 gap-y-2 text-sm">
+                <dt class="text-text-secondary">Whereabouts</dt>
+                <dd id="check-whereabouts"></dd>
+                <dt class="text-text-secondary">Pulse</dt>
+                <dd><span id="pulse-reading"></span> bpm, <span id="check-pulse"></span></dd>
+                <dt class="text-text-secondary">Temperature</dt>
+                <dd><span id="temperature-reading"></span> &deg;F, <span id="check-temperature"></span></dd>
+                <dt class="text-text-secondary">Last given</dt>
+                <dd id="check-last-dose"></dd>
+                <dt class="text-text-secondary">Order</dt>
+                <dd id="check-order"></dd>
+                <dt class="text-text-secondary">How to give</dt>
+                <dd id="check-route"></dd>
+                <dt class="text-text-secondary">Allergies</dt>
+                <dd id="check-allergies"></dd>
+                <dt class="text-text-secondary">Status</dt>
+                <dd id="check-status"></dd>
+            </dl>
+            <p id="check-pain" hidden class="mt-2 text-sm">Pain score: <span id="pain-score"></span></p>
+
+            <native-vstack gap="Sm" class="mt-4 rounded-md border border-border px-3 py-3">
+                <p id="dose-verdict" class="text-sm font-semibold"></p>
+                @{ Html.InputField(plan, m => m.PhysicianSaysGive, o => o.Label("The physician has been called and says give it despite the pulse"))
+                    .NativeCheckBox(b => b.CssClass("rounded border-border")); }
+                <p class="text-xs text-text-muted">Tick it, then check the dose again.</p>
+            </native-vstack>
+        </div>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Scan and record</native-heading>
+        <native-vstack gap="Base" class="mt-3">
+            <native-vstack gap="Xs">
+                @{ Html.InputField(plan, m => m.LabelScan, o => o.Label("Pharmacy label"))
+                    .NativeTextBox(b => b.Placeholder("Scan or type the label number"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.When(args.Value).Matches(@"^MGP-(C2-)?\d{6}$")
+                            .Then(then => then.Element("label-check").Text.Set("Label read."))
+                            .ElseIf(args.Value).StartsWith("MGP-")
+                            .Then(then => then.Element("label-check").Text.Set("The label did not read cleanly. Scan it again."))
+                            .Else(otherwise => otherwise.Element("label-check").Text.Set("This is not a Maple Grove Pharmacy label. Scan the pharmacy label."));
+                        p.When(args.Value).Contains("-C2-")
+                            .Then(then => then.Element("controlled-note").Show())
+                            .Else(otherwise => otherwise.Element("controlled-note").Hide());
+                    }); }
+                <p id="label-check" class="text-sm"></p>
+                <p id="controlled-note" hidden class="text-sm text-amber-800">
+                    Controlled medication: count it with a second nurse, who signs in below as witness.
+                </p>
+            </native-vstack>
+
+            <native-vstack gap="Xs">
+                @{ Html.InputField(plan, m => m.WitnessEmail, o => o.Label("Witness (controlled medications)"))
+                    .NativeTextBox(b => b.Placeholder("Staff email"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                        p.When(args.Value).EndsWith("@maplegrove.org")
+                            .Then(then => then.Element("witness-check").Text.Set("Witness on staff."))
+                            .Else(otherwise => otherwise.Element("witness-check").Text.Set("The witness must sign in with a Maple Grove address."))); }
+                <p id="witness-check" class="text-sm"></p>
+            </native-vstack>
+
+            <native-vstack gap="Xs">
+                @(Html.NativeButton("record-dose-btn", "Record as given")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
+                        p.Confirm("Record this dose as given?")
+                            .Then(then => then.Element("record-status").Text.Set("Recorded as given."))
+                            .Else(otherwise => otherwise.Element("record-status").Text.Set("Not recorded. The dose is still due."))))
+                <p id="record-status" class="text-sm"></p>
+            </native-vstack>
+
+            <native-vstack gap="Xs">
+                @{ Html.InputField(plan, m => m.HoldReason, o => o.Label("Reason for holding"))
+                    .NativeTextBox(b => b.Placeholder("Why the dose is held"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                        p.When(args.Value).IsEmpty()
+                            .Then(then => then.Element("hold-reason-check").Text.Set("Say why the dose is held."))
+                            .ElseIf(args.Value).MinLength(10)
+                            .Then(then => then.Element("hold-reason-check").Text.Set("Reason noted."))
+                            .Else(otherwise => otherwise.Element("hold-reason-check").Text.Set("Say a little more: at least 10 characters."))); }
+                <p id="hold-reason-check" class="text-sm"></p>
+            </native-vstack>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

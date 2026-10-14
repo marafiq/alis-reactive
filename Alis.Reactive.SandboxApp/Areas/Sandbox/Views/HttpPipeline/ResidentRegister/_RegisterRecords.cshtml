@@ -1,0 +1,33 @@
+@model IReadOnlyList<RegisterRecord>
+@using Alis.Reactive.Native.Components
+
+@* Each record's "Remove duplicate" link carries its own plan, so the list works the same when it is
+   reloaded into the page after a change. *@
+<native-vstack gap="Xs">
+    @foreach (var record in Model)
+    {
+        <div id="record-@record.RecordId" class="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm">
+            <div>
+                <span class="font-medium text-text">@record.Name</span>
+                <span class="text-text-secondary"> · </span><span id="record-@(record.RecordId)-room" class="text-text-secondary">@record.Room</span>
+                <span class="text-text-secondary"> · record @record.RecordId · @(record.HoldsCarePlan ? "care plan on file" : "no care plan")</span>
+            </div>
+            @(Html.NativeActionLink($"remove-record-{record.RecordId}", "Remove duplicate", Url.SandboxRoute("RemoveDuplicate", "ResidentRegister", new { recordId = record.RecordId }), link => link
+                .Confirm($"Remove record {record.RecordId} for {record.Name} as a duplicate entry?")
+                .Then(remove => remove
+                    .Delete()
+                    .Gather<RegisterRecordRemoval>(g => g.Set(x => x.Reason, "duplicate entry"))
+                    .WhileLoading(l => l.Element("register-status").Text.Set($"Removing record {record.RecordId}..."))
+                    .Response(r => r
+                        .OnSuccess<RegisterRecordRemoved>((removed, s) =>
+                        {
+                            s.Element("register-status").Text.Set(removed.Get(x => x.Message));
+                            s.Dispatch(ResidentRegisterEvents.RegisterChanged);
+                        })
+                        .OnError(409, kept => kept.Element("register-status")
+                            .Text.Set($"{record.Name}'s record {record.RecordId} holds a care plan and was kept."))))
+                .Else(keep => keep.Element("register-status").Text.Set($"Kept record {record.RecordId} for {record.Name}.")))
+                .CssClass("font-medium text-danger hover:underline"))
+        </div>
+    }
+</native-vstack>

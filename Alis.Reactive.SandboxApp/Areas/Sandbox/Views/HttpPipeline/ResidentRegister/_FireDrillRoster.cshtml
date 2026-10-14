@@ -1,0 +1,11 @@
+@model RegisterRoster
+
+<div class="rounded-md border border-border px-4 py-3">
+    <h3 class="text-sm font-semibold text-text">@Model.Wing wing fire-drill roster</h3>
+    <ol class="mt-2 list-decimal pl-5 text-sm">
+        @foreach (var record in Model.Records)
+        {
+            <li>@record.Room: @record.Name</li>
+        }
+    </ol>
+</div>

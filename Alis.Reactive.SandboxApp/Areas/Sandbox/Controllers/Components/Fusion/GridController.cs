@@ -64,101 +64,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new GridOperationsModel());
         }
 
-        [HttpGet("BatchTaskUpdate")]
-        public IActionResult BatchTaskUpdate()
-        {
-            ViewBag.EditRows = ResidentDirectory.Take(8).Select(ToGridItem).ToList();
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/BatchTaskUpdate.cshtml",
-                new ResidentGridEditingModel());
-        }
-
-        [HttpGet("InlineEdit")]
-        public IActionResult InlineEdit()
-        {
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/InlineEdit.cshtml",
-                new ResidentGridEditingModel());
-        }
-
-        [HttpGet("RosterCrud")]
-        public IActionResult RosterCrud()
-        {
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/RosterCrud.cshtml",
-                new ResidentGridEditingModel());
-        }
-
-        [HttpGet("RosterSelection")]
-        public IActionResult RosterSelection()
-        {
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/RosterSelection.cshtml",
-                new GridOperationsModel());
-        }
-
-        [HttpGet("KeyedUpdate")]
-        public IActionResult KeyedUpdate()
-        {
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/KeyedUpdate.cshtml",
-                new GridOperationsModel());
-        }
-
         [HttpGet("CareReview")]
         public IActionResult CareReview()
         {
             return View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/CareReview.cshtml",
                 new GridOperationsModel());
-        }
-
-        [HttpGet("GridTooling")]
-        public IActionResult GridTooling()
-        {
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/GridTooling.cshtml",
-                new GridOperationsModel());
-        }
-
-        [HttpGet("RosterExport")]
-        public IActionResult RosterExport()
-        {
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/RosterExport.cshtml",
-                new GridOperationsModel());
-        }
-
-        [HttpGet("ColumnFit")]
-        public IActionResult ColumnFit()
-        {
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/ColumnFit.cshtml",
-                new GridOperationsModel());
-        }
-
-        [HttpGet("BatchRiskReview")]
-        public IActionResult BatchRiskReview()
-        {
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/BatchRiskReview.cshtml",
-                new ResidentGridEditingModel());
-        }
-
-        [HttpGet("LockedResidentEdit")]
-        public IActionResult LockedResidentEdit()
-        {
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/LockedResidentEdit.cshtml",
-                new ResidentGridEditingModel());
-        }
-
-        [HttpGet("BatchRosterChange")]
-        public IActionResult BatchRosterChange()
-        {
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/BatchRosterChange.cshtml",
-                new ResidentGridEditingModel());
         }
 
         [HttpGet("ResidentEditForm")]
@@ -169,27 +80,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new ResidentGridEditingModel());
         }
 
-        [HttpGet("ServerRoster")]
-        public IActionResult ServerRoster()
-        {
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/ServerRoster.cshtml",
-                new ResidentGridEditingModel());
-        }
-
         [HttpGet("BuilderRoster")]
         public IActionResult BuilderRoster()
         {
             return View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/BuilderRoster.cshtml",
-                new ResidentGridEditingModel());
-        }
-
-        [HttpGet("BatchChangeReview")]
-        public IActionResult BatchChangeReview()
-        {
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/BatchChangeReview.cshtml",
                 new ResidentGridEditingModel());
         }
 
@@ -269,36 +164,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             var paged = query.Skip(request.Skip).Take(request.Take > 0 ? request.Take : 10).ToList();
 
             return Ok(new ResidentGridResponse { Result = paged, Count = total });
-        }
-
-        [HttpPost("DirectoryData")]
-        public IActionResult DirectoryData([FromBody] ResidentDirectoryRequest? request)
-        {
-            request ??= new ResidentDirectoryRequest();
-            var rows = ApplyDirectoryRequest(ResidentDirectory, request).ToList();
-            var total = rows.Count;
-
-            if (request.Group is { Count: > 0 })
-            {
-                var groupedRows = GroupDirectoryRows(rows, request.Group, 0);
-                return Ok(new ResidentDirectoryResponse
-                {
-                    Result = groupedRows,
-                    Count = total,
-                    Summary = $"{total} residents grouped by {ToDisplayName(request.Group[0])}"
-                });
-            }
-
-            var skip = Math.Max(request.Skip, 0);
-            var take = request.Take > 0 ? request.Take : 8;
-            var page = rows.Skip(skip).Take(take).Select(ToGridItem).ToList();
-
-            return Ok(new ResidentDirectoryResponse
-            {
-                Result = page,
-                Count = total,
-                Summary = $"{total} residents matched"
-            });
         }
 
         [HttpPost("SelectionIndexes")]
@@ -390,67 +255,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        [HttpPost("BatchSummary")]
-        public IActionResult BatchSummary([FromBody] ResidentGridBatchSummaryRequest request)
-        {
-            var changes = request.BatchChanges ?? new FusionGridBatchChanges<ResidentDirectoryGridItem>();
-            return Ok(new ResidentGridBatchSummaryResponse
-            {
-                Summary =
-                    $"batch added {changes.AddedRecords.Count}, changed {changes.ChangedRecords.Count}, deleted {changes.DeletedRecords.Count}"
-            });
-        }
-
-        [HttpPost("NestedRoster")]
-        public IActionResult NestedRoster()
-        {
-            var page = ResidentDirectory.Take(8).Select(ToGridItem).ToList();
-            return Ok(new ResidentRosterEnvelope
-            {
-                Page = new ResidentDirectoryResponse { Result = page, Count = page.Count }
-            });
-        }
-
-        [HttpPost("UpdateFirstResidentRow")]
-        public IActionResult UpdateFirstResidentRow()
-        {
-            // Key-preserving update: the row keeps resident 6000's primary key so
-            // grid.updateRow replaces the row in place rather than changing its identity.
-            var row = ToGridItem(ResidentDirectory[0]);
-            row.ResidentName = "Amina Server Updated";
-            row.RiskLevel = "High";
-            row.PrimaryNurse = "Clinical Review Team";
-            return Ok(new ResidentGridEditResponse
-            {
-                Row = row,
-                Summary = $"{row.ResidentName} updated on the server"
-            });
-        }
-
-        [HttpPost("CreateEditResident")]
-        public IActionResult CreateEditResident()
-        {
-            var row = new ResidentDirectoryGridItem
-            {
-                ResidentId = 7200,
-                ResidentName = "Sofia Server",
-                Age = 79,
-                CareLevel = "Assisted Living",
-                Wing = "East",
-                Suite = "E-512",
-                RiskLevel = "Moderate",
-                PrimaryNurse = "Elena Ruiz",
-                OpenTasks = 2,
-                NextReviewDate = "2026-06-24"
-            };
-
-            return Ok(new ResidentGridEditResponse
-            {
-                Row = row,
-                Summary = $"{row.ResidentName} loaded from the server"
-            });
-        }
-
         private static List<ResidentGridItem> GenerateResidents()
         {
             var firstNames = new[]
@@ -486,191 +290,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
             return residents;
         }
-
-        private static IEnumerable<ResidentDirectoryRecord> ApplyDirectoryRequest(
-            IEnumerable<ResidentDirectoryRecord> source,
-            ResidentDirectoryRequest request)
-        {
-            var query = source;
-
-            if (!string.IsNullOrWhiteSpace(request.ResidentSearch))
-                query = query.Where(r => r.ResidentName.Contains(
-                    request.ResidentSearch,
-                    StringComparison.OrdinalIgnoreCase));
-
-            if (!string.IsNullOrWhiteSpace(request.CareLevel))
-                query = query.Where(r => r.CareLevel.Equals(
-                    request.CareLevel,
-                    StringComparison.OrdinalIgnoreCase));
-
-            if (!string.IsNullOrWhiteSpace(request.RiskLevel))
-                query = query.Where(r => r.RiskLevel.Equals(
-                    request.RiskLevel,
-                    StringComparison.OrdinalIgnoreCase));
-
-            if (request.MinimumAge.HasValue)
-                query = query.Where(r => r.Age >= (int)request.MinimumAge.Value);
-
-            query = ApplyGridFilters(query, request.Where);
-            query = ApplyGridSearch(query, request.Search);
-            query = ApplyGridSorting(query, request.Sorted);
-
-            return query;
-        }
-
-        private static IEnumerable<ResidentDirectoryRecord> ApplyGridSearch(
-            IEnumerable<ResidentDirectoryRecord> source,
-            List<FusionGridSearchDescriptor>? search)
-        {
-            var active = search?.FirstOrDefault(s => !string.IsNullOrWhiteSpace(s.Key));
-            if (active == null)
-                return source;
-
-            var fields = active.Fields is { Count: > 0 }
-                ? active.Fields
-                : new List<string>
-                {
-                    "residentName", "careLevel", "wing", "suite", "riskLevel", "primaryNurse"
-                };
-
-            return source.Where(row => fields.Any(field =>
-                ReadDirectoryText(row, field).Contains(active.Key!, StringComparison.OrdinalIgnoreCase)));
-        }
-
-        private static IEnumerable<ResidentDirectoryRecord> ApplyGridFilters(
-            IEnumerable<ResidentDirectoryRecord> source,
-            List<FusionGridTextFilterCriterion>? filters)
-        {
-            var flattened = FlattenGridFilters(filters).ToList();
-            if (flattened.Count == 0)
-                return source;
-
-            return source.Where(row => flattened.All(filter =>
-            {
-                if (string.IsNullOrWhiteSpace(filter.Field) || string.IsNullOrWhiteSpace(filter.Value))
-                    return true;
-
-                var actual = ReadDirectoryText(row, filter.Field);
-                var comparison = filter.IgnoreCase
-                    ? StringComparison.OrdinalIgnoreCase
-                    : StringComparison.Ordinal;
-
-                return filter.Operator switch
-                {
-                    "equal" => actual.Equals(filter.Value, comparison),
-                    "notequal" => !actual.Equals(filter.Value, comparison),
-                    "startswith" => actual.StartsWith(filter.Value, comparison),
-                    "endswith" => actual.EndsWith(filter.Value, comparison),
-                    _ => actual.Contains(filter.Value, comparison)
-                };
-            }));
-        }
-
-        private static IEnumerable<FusionGridTextFilterCriterion> FlattenGridFilters(
-            IEnumerable<FusionGridTextFilterCriterion>? filters)
-        {
-            if (filters == null)
-                yield break;
-
-            foreach (var filter in filters)
-            {
-                if (filter.IsComplex && filter.Predicates is { Count: > 0 })
-                {
-                    foreach (var child in FlattenGridFilters(filter.Predicates))
-                        yield return child;
-                }
-                else
-                {
-                    yield return filter;
-                }
-            }
-        }
-
-        private static IEnumerable<ResidentDirectoryRecord> ApplyGridSorting(
-            IEnumerable<ResidentDirectoryRecord> source,
-            List<FusionGridSortColumn>? sorted)
-        {
-            if (sorted == null || sorted.Count == 0)
-                return source.OrderBy(r => r.ResidentName);
-
-            IOrderedEnumerable<ResidentDirectoryRecord>? ordered = null;
-            foreach (var sort in sorted.Where(s => !string.IsNullOrWhiteSpace(s.Name)))
-            {
-                var descending = sort.Direction.Equals("descending", StringComparison.OrdinalIgnoreCase);
-                ordered = ordered == null
-                    ? descending
-                        ? source.OrderByDescending(row => ReadDirectorySortValue(row, sort.Name))
-                        : source.OrderBy(row => ReadDirectorySortValue(row, sort.Name))
-                    : descending
-                        ? ordered.ThenByDescending(row => ReadDirectorySortValue(row, sort.Name))
-                        : ordered.ThenBy(row => ReadDirectorySortValue(row, sort.Name));
-            }
-
-            return ordered ?? source.OrderBy(r => r.ResidentName);
-        }
-
-        private static List<ResidentDirectoryGridItem> GroupDirectoryRows(
-            List<ResidentDirectoryRecord> rows,
-            List<string> groupFields,
-            int level)
-        {
-            if (level >= groupFields.Count)
-                return rows.Select(ToGridItem).ToList();
-
-            var field = groupFields[level];
-            return rows
-                .GroupBy(row => ReadDirectoryText(row, field))
-                .OrderBy(group => group.Key)
-                .Select(group => new ResidentDirectoryGridItem
-                {
-                    Key = group.Key,
-                    Count = group.Count(),
-                    Field = field,
-                    Items = GroupDirectoryRows(group.ToList(), groupFields, level + 1)
-                })
-                .ToList();
-        }
-
-        private static object ReadDirectorySortValue(ResidentDirectoryRecord row, string field) =>
-            field switch
-            {
-                "residentId" => row.ResidentId,
-                "residentName" => row.ResidentName,
-                "age" => row.Age,
-                "careLevel" => row.CareLevel,
-                "wing" => row.Wing,
-                "suite" => row.Suite,
-                "riskLevel" => row.RiskLevel,
-                "primaryNurse" => row.PrimaryNurse,
-                "openTasks" => row.OpenTasks,
-                "nextReviewDate" => row.NextReviewDate,
-                _ => row.ResidentName
-            };
-
-        private static string ReadDirectoryText(ResidentDirectoryRecord row, string field) =>
-            field switch
-            {
-                "residentId" => row.ResidentId.ToString(),
-                "residentName" => row.ResidentName,
-                "age" => row.Age.ToString(),
-                "careLevel" => row.CareLevel,
-                "wing" => row.Wing,
-                "suite" => row.Suite,
-                "riskLevel" => row.RiskLevel,
-                "primaryNurse" => row.PrimaryNurse,
-                "openTasks" => row.OpenTasks.ToString(),
-                "nextReviewDate" => row.NextReviewDate.ToString("yyyy-MM-dd"),
-                _ => ""
-            };
-
-        private static string ToDisplayName(string field) =>
-            field switch
-            {
-                "careLevel" => "care level",
-                "riskLevel" => "risk level",
-                "wing" => "wing",
-                _ => field
-            };
 
         private static ResidentDirectoryGridItem ToGridItem(ResidentDirectoryRecord row) =>
             new ResidentDirectoryGridItem

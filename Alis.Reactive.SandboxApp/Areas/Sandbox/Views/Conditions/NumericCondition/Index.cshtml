@@ -1,27 +1,22 @@
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.NumericCondition
 @model NumericConditionModel
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
-    ViewData["Title"] = "Numeric Conditions";
+    ViewData["Title"] = "Vital Signs";
 
     var plan = Html.ReactivePlan<NumericConditionModel>();
-
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Numeric Conditions — Vital Signs</native-heading>
-    <native-text color="Secondary">
-        Conditions with FusionNumericTextBox: simple Gt, ElseIf ladder, AND compound,
-        and cross-component source-vs-source comparison. Senior living domain: vital sign thresholds.
-    </native-text>
+    <div>
+        <native-heading level="H1">Vital signs</native-heading>
+        <native-text color="Secondary">Margaret Hale &middot; Room 214 &middot; morning check. Enter each reading as you take it.</native-text>
+    </div>
 
     <native-card><native-card-body>
-        <native-heading level="H2">1. Simple Condition — Gt(100)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Enter a heart rate. Values above 100 show a tachycardia warning.
-            Uses <code>When(comp.Value).Gt(100m)</code> as a component-read condition.
-        </p>
-        <native-grid cols="C2" gap="Base" class="mb-4">
+        <native-heading level="H2">Heart rate</native-heading>
+        <native-grid cols="C2" gap="Base" class="mt-3">
             @{ Html.InputField(plan, m => m.HeartRate, o => o.Label("Heart Rate (bpm)"))
                 .FusionNumericTextBox(b => b
                     .Min(0).Max(300).Step(1))
@@ -49,27 +44,13 @@
                         .Else(e => e.Element("hr-zone").Text.Set("Low"));
                 }); }
         </native-grid>
-        <p class="font-mono text-sm">Warning: <span id="tachycardia-warning" hidden class="text-rose-600">&mdash;</span></p>
+        <p class="mt-2 text-sm">Zone: <span id="hr-zone" class="font-medium">&mdash;</span></p>
+        <p id="tachycardia-warning" hidden class="mt-1 text-sm text-rose-600">&mdash;</p>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">2. ElseIf Ladder — Heart Rate Zones</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Same heart rate field drives a multi-branch condition:
-            <code>Gte(120) → "Critical" / Gte(100) → "High" / Gte(60) → "Normal" / Else → "Low"</code>.
-            Uses component-read source with ElseIf chaining.
-        </p>
-        <p class="font-mono text-sm">Zone: <span id="hr-zone" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">3. AND Compound — Normal Range</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Blood pressure field uses a compound condition:
-            <code>When(comp.Value).Gte(60m).And(comp.Value).Lte(120m)</code> shows "Normal range".
-            Outside that range shows "Out of range".
-        </p>
-        <native-grid cols="C2" gap="Base" class="mb-4">
+        <native-heading level="H2">Blood pressure</native-heading>
+        <native-grid cols="C2" gap="Base" class="mt-3">
             @{ Html.InputField(plan, m => m.BloodPressure, o => o.Label("Systolic BP (mmHg)"))
                 .FusionNumericTextBox(b => b
                     .Min(0).Max(300).Step(1))
@@ -88,31 +69,28 @@
                         });
                 }); }
         </native-grid>
-        <p class="font-mono text-sm">Range: <span id="bp-range" class="text-text-muted">&mdash;</span></p>
+        <p class="mt-2 text-sm">Systolic: <span id="bp-range" class="font-medium">&mdash;</span></p>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">4. Cross-Component — Value vs Threshold</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Compares heart rate against a configurable threshold using source-vs-source:
-            <code>When(hr.Value).Gte(threshold.Value)</code>.
-            Button-triggered so both components are read at click time.
-        </p>
-        <native-grid cols="C2" gap="Base" class="mb-4">
-            @{ Html.InputField(plan, m => m.ThresholdValue, o => o.Label("Threshold (bpm)"))
+        <native-heading level="H2">Care-plan heart rate limit</native-heading>
+        <p class="text-sm text-text-secondary">Her care plan sets a heart rate limit. Check this morning's reading against it.</p>
+        <native-grid cols="C2" gap="Base" class="mt-3">
+            @{ Html.InputField(plan, m => m.ThresholdValue, o => o.Label("Care-plan limit (bpm)"))
                 .FusionNumericTextBox(b => b
                     .Min(0).Max(300).Step(1)); }
         </native-grid>
         <native-hstack gap="None" class="mt-3">
-            @(Html.NativeButton("check-threshold-btn", "Check Against Threshold")
+            @(Html.NativeButton("check-threshold-btn", "Check against the limit")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var hr = p.Component<FusionNumericTextBox>(m => m.HeartRate);
                     var threshold = p.Component<FusionNumericTextBox>(m => m.ThresholdValue);
+                    // A reading at or over the limit is taken again in 15 minutes.
                     p.When(hr.Value).Gte(threshold.Value)
-                        .Then(t => t.Element("threshold-result").Text.Set("Above threshold"))
-                        .Else(e => e.Element("threshold-result").Text.Set("Below threshold"));
+                        .Then(t => t.Element("threshold-recheck").Text.Set("Recheck the heart rate in 15 minutes."))
+                        .Else(e => e.Element("threshold-recheck").Text.Set("No recheck needed."));
 
                     // Where the reading sits against the resident's care-plan limit.
                     p.When(hr.Value).Gt(threshold.Value)
@@ -129,8 +107,8 @@
                         .Else(e => e.Element("threshold-call").Text.Set("Call the nurse"));
                 }))
         </native-hstack>
-        <p class="font-mono text-sm mt-2">Result: <span id="threshold-result" class="text-text-muted">&mdash;</span></p>
-        <p class="text-sm mt-1">Care-plan limit: <span id="threshold-band" class="font-medium">&mdash;</span></p>
+        <p class="text-sm mt-2">Reading: <span id="threshold-band" class="font-medium">&mdash;</span></p>
+        <p id="threshold-recheck" class="text-sm mt-1"></p>
         <p class="text-sm mt-1">Nurse call: <span id="threshold-call" class="font-medium">&mdash;</span></p>
     </native-card-body></native-card>
 

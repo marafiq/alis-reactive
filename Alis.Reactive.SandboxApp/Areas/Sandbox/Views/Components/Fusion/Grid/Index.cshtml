@@ -21,40 +21,40 @@
         {
             ("Editing", "Maple wing roster", "Inline roster corrections: open a resident due for review, save or discard, admit from the waiting list, move out, and apply a validated handoff correction; a move into memory care is refused as a roster edit"),
             ("BeginEditNormal", "Care reviews", "A dialog review form for each resident; opening a review checks the record out, and a record on hold for a hospital transfer stays closed"),
-            ("InlineEdit", "Inline edit", "Open, cancel, and commit a row's inline editor via typed startEdit, closeEdit, and endEdit method calls"),
-            ("LockedResidentEdit", "Locked resident edit", "Programmatic row selection and edit start, with a BeginEdit handler that cancels editing for a locked resident"),
+            ("InlineEdit", "Care-plan reviews", "Move a resident's next review inline; the calendar books a weekday and refuses a weekend, which goes back to the day on file"),
+            ("LockedResidentEdit", "Resident records", "Update a family's phone on a resident's record; a discharged resident's record stays closed and the page says why"),
             ("ResidentEditForm", "Edit form templates", "Inline cell editors and a labeled dialog admission form, each typed edit template rendering its own dropdown, date, or number editor"),
             ("ResidentAdmissionAudit", "Move-in day", "Move arrivals onto the roster and departures off it; an unsigned residency agreement refuses the move-in"),
             ("ActionCompleteSaveEdit", "Pharmacy name corrections", "Inline corrections on the roster; a saved change of name goes to the pharmacy with the old and new name, and other changes send nothing"),
         }),
         ("Batch editing", new[]
         {
-            ("BatchTaskUpdate", "Batch task update", "Batch-editing a numeric task-count cell via typed editCell, updateCell, and saveCell method calls on loaded rows"),
+            ("BatchTaskUpdate", "Day task board", "Keep the wing's open-task counts current, mark a resident's tasks all done, and hand the board to the evening shift"),
             ("BatchCellEdit", "Evening task count", "Count open tasks and missed doses, bring in the task board, and hold the save while a resident has eight open tasks"),
-            ("BatchRiskReview", "Batch risk review", "Batch-mode grid flagging a resident's risk via UpdateCell, then gathering pending batch changes for a posted review summary"),
-            ("BatchRosterChange", "Batch roster change", "Staging an admit and discharge as one batch, then reviewing added and deleted records before commit"),
-            ("BatchChangeReview", "Batch change review", "Batch-editing task counts, then binding a review grid from the beforeBatchSave event payload's changed records"),
+            ("BatchRiskReview", "Falls huddle", "Raise the fall risk of residents who fell overnight, change other risks in the cell, and send the changes to care planning"),
+            ("BatchRosterChange", "Suite turnover", "Record a move-out and a move-in as one batch, held until housekeeping signs off the suite"),
+            ("BatchChangeReview", "Night safety checks", "Correct the aides' checks, review the changes in a second grid, reopen one, and save them to the night log"),
             ("FamilyContacts", "Family contacts", "Batch cell editing whose cells check the contact validator's rules: name, phone pattern, email, portal link and visit bounds"),
             ("ShiftTaskTally", "Shift task tally", "Batch counts at shift change: impossible counts are refused in the cell, an eMAR sync updates a count, and the tally waits for the supervisor when a resident carries ten or more tasks"),
         }),
         ("Rows, selection & review", new[]
         {
-            ("RosterCrud", "Roster CRUD", "Add, replace, select, and delete grid rows via typed AddRecord, UpdateRow, and DeleteSelectedRecord method calls"),
-            ("KeyedUpdate", "Keyed update", "Update a resident's cell or replace an entire row by primary key using typed grid method calls"),
-            ("RosterSelection", "Roster selection", "Multiple-row selection via typed SelectRow, SelectRowsByRange, and ClearSelection method calls, with status updates and fetched roster data"),
+            ("RosterCrud", "Cedar wing front desk", "Admit into a free suite in suite order, move a resident to another suite, and record today's move-outs as the server answers"),
+            ("KeyedUpdate", "Evening rounds", "Record a task done or a fall for the resident picked on the board, or bring in their chart; the answer changes that row by key"),
+            ("RosterSelection", "Botanical garden outing", "Seat the first four to sign up or the resident turned away last time, clear the bus, and book it; the server names who goes"),
             ("CareReview", "Care review", "Multi-row selection with typed grid method calls gathering current-view, row-index, and selected-record summaries from the server"),
             ("CareStaffColumns", "Care staff columns", "Hiding, restoring, and reordering grid columns via typed method calls, with reorderable headers and DomReady-loaded data"),
         }),
         ("Columns, tooling & print", new[]
         {
-            ("ColumnFit", "Column fit", "Auto-fitting a single wide column or all columns to their content via typed grid method calls"),
-            ("GridTooling", "Grid tooling", "Paged resident grid with column chooser, navigated and toggled by buttons calling typed grid methods"),
-            ("RosterExport", "Roster export", "CSV, Excel, and PDF roster export triggered by typed grid method calls with status feedback"),
+            ("ColumnFit", "Evening med pass", "A compact sheet that cuts long names short; widen the medication column or every column to read names in full"),
+            ("GridTooling", "Shift schedule", "A day to a page; the grid's toolbar jumps to the weekend and opens the column chooser"),
+            ("RosterExport", "Monthly census", "Download a closed month's census as Excel, CSV or PDF; an open month is refused"),
             ("PrintableRoster", "Printable roster", "Printing the resident roster grid via a typed Print method call that opens the browser print view"),
         }),
         ("Data source binding", new[]
         {
-            ("ServerRoster", "Server-backed roster", "Server-backed roster binding with server-driven admit, keyed row update, patch, and nested data-source loads from typed responses"),
+            ("ServerRoster", "Resident roster", "Bring today's changes from the record onto the roster: an arrival placed by suite, a new care level, an approved suite move, and wing tabs"),
             ("BuilderRoster", "Builder-owned roster", "Server-rendered fixed roster bound directly through the grid builder's own data source with selectable rows, no fetch"),
             ("RemoteAdaptorRoster", "Remote DataManager adaptor", "Remote DataManager URL-adaptor binding that fetches the paged {result, count} roster itself, with paging and row selection"),
         }),

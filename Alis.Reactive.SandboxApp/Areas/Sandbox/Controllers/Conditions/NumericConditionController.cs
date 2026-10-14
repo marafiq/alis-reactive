@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.NumericCondition;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 

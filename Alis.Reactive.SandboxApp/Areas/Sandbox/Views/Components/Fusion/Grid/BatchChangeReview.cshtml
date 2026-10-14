@@ -1,91 +1,100 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.NightChecksViewModel
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
-@using Alis.Reactive
 @{
-    ViewData["Title"] = "Care-Ops Batch Change Review";
+    ViewData["Title"] = "Night Safety Checks";
 
-    const string EditGridId = "batch-review-edit-grid";
-    const string ReviewGridId = "batch-review-changed-grid";
+    const string ChecksId = "night-checks-grid";
+    const string ReviewId = "night-checks-review";
+    const string Button = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
     const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
-    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
 
-    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
-
-    var columns = FusionGridColumns.Of<ResidentDirectoryGridItem>();
-
-    List<GridColumn> Columns() => new List<GridColumn>
-    {
-        new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false },
-        new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "200" },
-        new GridColumn { Field = columns.Field(r => r.OpenTasks), HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right, EditType = "numericedit" }
-    };
+    var plan = Html.ReactivePlan<NightChecksViewModel>();
+    var columns = FusionGridColumns.Of<NightCheckResident>();
+    var checksDone = Field.Of((NightCheckResident r) => r.ChecksDone);
 
     Html.On(plan, t => t.DomReady(p =>
-        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
-            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
-            {
-                s.Component<FusionGrid>(EditGridId).DataSource.Set(json);
-                s.Element("review-load-status").Text.Set("loaded review rows");
-            }))));
+        p.Get(Url.SandboxRoute("NightChecksTonight", "Grid"))
+            .Response(r => r.OnSuccess<List<NightCheckResident>>((residents, s) =>
+                s.Component<FusionGrid>(ChecksId).DataSource.Set(residents)))));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Care-Ops Batch Change Review</native-heading>
-    <native-text color="Secondary">
-        A nurse manager batch-edits open-task counts. On commit, the review grid binds straight from the
-        <code>beforeBatchSave</code> event payload's changed records - an event-payload data source.
-    </native-text>
+    <div>
+        <native-heading level="H1">Night Safety Checks</native-heading>
+        <native-text color="Secondary">
+            Cedar wing, night shift. Correct the two-hourly checks the aides recorded, review the changes, then save them
+            to the night log.
+        </native-text>
+    </div>
 
-    <p class="font-mono text-sm">Load status: <span id="review-load-status" class="text-text-muted">waiting</span></p>
+    <native-card><native-card-body>
+        @(Html.FusionGrid<NightChecksViewModel, NightCheckResident>(plan, ChecksId, b => b
+            .EditSettings(new GridEditSettings { AllowEditing = true, Mode = EditMode.Batch, ShowConfirmDialog = false })
+            .Columns(new List<GridColumn>
+            {
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "180", AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.Room), HeaderText = "Room", Width = "90", AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.ChecksDone), HeaderText = "Checks tonight", Width = "150", TextAlign = TextAlign.Right, EditType = "numericedit" }
+            }))
+            .Reactive(evt => evt.BeforeBatchSave<NightCheckResident>(), (args, p) =>
+            {
+                // The changes wait for the charge nurse to confirm them; the night log, not the grid, saves them.
+                args.Cancel.Set(true);
+                p.Component<FusionGrid>(ReviewId).DataSource.Set(args.BatchChanges.Get(x => x.ChangedRecords));
+                var changed = p.From(args.BatchChanges.Get(x => x.ChangedRecords));
+                p.When(changed.Any()).Truthy()
+                    .Then(t => t.Element("night-checks-status").Text.Set("Check the changes below, then save them to the night log."))
+                    .Else(e => e.Element("night-checks-status").Text.Set("No checks changed tonight; there is nothing to save."));
+            }))
 
-    <native-hstack gap="Sm" class="flex-wrap">
-        @(Html.NativeButton("review-edit-cell", "Edit Tasks Cell")
-            .CssClass(ButtonSecondary)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(EditGridId).EditCell(0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks));
-                p.Element("review-command").Text.Set("editCell called");
-            }))
-        @(Html.NativeButton("review-save-cell", "Save Cell")
-            .CssClass(ButtonSecondary)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(EditGridId).SaveCell();
-                p.Element("review-command").Text.Set("saveCell called");
-            }))
-        @(Html.NativeButton("review-commit", "Commit And Review")
-            .CssClass(ButtonPrimary)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(EditGridId).EndEdit();
-                p.Element("review-command").Text.Set("endEdit called");
-            }))
-    </native-hstack>
+        <native-hstack gap="Sm" align="Center" class="mt-4 flex-wrap">
+            @(Html.NativeButton("night-checks-review-changes", "Review changes")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) => p.Component<FusionGrid>(ChecksId).EndEdit()))
+            <p id="night-checks-status" role="status" class="text-sm">Tonight's corrections are not saved to the night log yet.</p>
+        </native-hstack>
+    </native-card-body></native-card>
 
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        <native-heading level="H2">Batch Edit</native-heading>
-        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, EditGridId, b => b
-            .AllowSelection(true)
-            .Toolbar(new List<string> { "Update", "Cancel" })
-            .EditSettings(new GridEditSettings { AllowEditing = true, AllowEditOnDblClick = false, Mode = EditMode.Batch, ShowConfirmDialog = false })
-            .Columns(Columns()))
-            .Reactive(evt => evt.BeforeBatchSave<ResidentDirectoryGridItem>(), (args, p) =>
-            {
-                // Data source [event payload path]: bind the review grid from the event payload array.
-                p.Component<FusionGrid>(ReviewGridId).DataSource.Set(args.BatchChanges.Get(x => x.ChangedRecords));
-                p.Element("review-bound-status").Text.Set("review bound from event");
-            }))
-    </section>
+    <native-card><native-card-body>
+        <native-heading level="H2">Changes to save</native-heading>
+        <native-text color="Secondary">Choose a change to correct it.</native-text>
+        <div class="mt-3">
+            @(Html.FusionGrid<NightChecksViewModel, NightCheckResident>(plan, ReviewId, b => b
+                .Columns(new List<GridColumn>
+                {
+                    new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true },
+                    new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "180" },
+                    new GridColumn { Field = columns.Field(r => r.Room), HeaderText = "Room", Width = "90" },
+                    new GridColumn { Field = columns.Field(r => r.ChecksDone), HeaderText = "Checks tonight", Width = "150", TextAlign = TextAlign.Right }
+                }))
+                .Reactive(evt => evt.RecordClick<NightCheckResident>(), (args, p) =>
+                {
+                    var checks = p.Component<FusionGrid>(ChecksId);
+                    checks.EditCell(checks.GetRowIndexByPrimaryKey(args.RowData.Get(r => r.ResidentId)), checksDone);
+                }))
+        </div>
 
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        <native-heading level="H2">Changed Residents (bound from beforeBatchSave payload)</native-heading>
-        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, ReviewGridId, b => b
-            .Columns(Columns())))
-        <p class="mt-4 font-mono text-sm">Command: <span id="review-command" class="text-text-muted">waiting</span></p>
-        <p class="font-mono text-sm">Review bind: <span id="review-bound-status" class="text-text-muted">waiting</span></p>
-    </section>
+        <native-hstack gap="Sm" align="Center" class="mt-4 flex-wrap">
+            @(Html.NativeButton("night-checks-save", "Save to the night log")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    var checks = p.Component<FusionGrid>(ChecksId);
+                    checks.SaveCell();
+                    p.Post(Url.SandboxRoute("NightChecksLog", "Grid"))
+                        .Gather<NightCheckChanges>(g => g.Set(x => x.Changes, checks.GetBatchChanges<NightCheckResident>()))
+                        .Response(r => r.OnSuccess<NightChecksLogged>((logged, s) =>
+                        {
+                            s.Component<FusionGrid>(ChecksId).DataSource.Set(logged.Get(x => x.Residents));
+                            s.Component<FusionGrid>(ReviewId).Rows<NightCheckResident>().Set(Array.Empty<NightCheckResident>());
+                            s.Element("night-checks-status").Text.Set(logged.Get(x => x.Summary));
+                        }));
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)
