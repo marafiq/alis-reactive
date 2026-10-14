@@ -25,8 +25,6 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var comp = p.Component<FusionNumericTextBox>(m => m.A1cLevel);
-                p.Element("a1c-echo").Text.Set(comp.Value);
-
                 p.When(comp.Value).Gt(9m)
                     .Then(then =>
                     {
@@ -42,7 +40,7 @@
                     })
                     .Else(e =>
                     {
-                        e.Element("uncontrolled-result").Text.Set("Controlled");
+                        e.Element("uncontrolled-result").Text.Set("A1C at 9% or under: no endocrinology referral.");
                         e.Element("uncontrolled-result").Show();
                     });
             }); }
@@ -60,10 +58,9 @@
             }); }
     </native-grid>
 
-    <native-vstack gap="Xs" class="font-mono text-sm mb-4">
-        <p>A1C: <span id="a1c-echo" class="text-text-muted">&mdash;</span></p>
-        <p><span id="uncontrolled-spinner" hidden class="text-accent">Sending alert...</span></p>
-        <div id="uncontrolled-result" hidden class="rounded-md bg-rose-50 border border-rose-200 px-3 py-2 text-sm text-rose-700"></div>
+    <native-vstack gap="Xs" class="mb-4">
+        <p id="uncontrolled-spinner" hidden class="text-sm text-accent">Sending alert...</p>
+        <p id="uncontrolled-result" hidden class="text-sm font-medium"></p>
     </native-vstack>
 
     <div id="insulin-details" hidden>

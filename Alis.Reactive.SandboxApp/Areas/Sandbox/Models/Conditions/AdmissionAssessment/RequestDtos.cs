@@ -6,12 +6,6 @@ public sealed class PhysicianSearchQuery
     public string Q { get; set; } = "";
 }
 
-public class VerifyVeteranRequest
-{
-    public string VaId { get; set; } = "";
-    public string ServiceBranch { get; set; } = "";
-}
-
 public class AlertElopementRequest
 {
     public string ResidentName { get; set; } = "";

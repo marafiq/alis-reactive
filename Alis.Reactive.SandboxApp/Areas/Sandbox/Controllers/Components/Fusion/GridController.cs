@@ -9,7 +9,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     public partial class GridController : Controller
     {
         private static readonly List<ResidentGridItem> AllResidents = GenerateResidents();
-        private static readonly List<ResidentDirectoryRecord> ResidentDirectory = GenerateResidentDirectory();
 
         [HttpGet("")]
         public IActionResult Index()
@@ -41,14 +40,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new ResidentGridEditingModel());
         }
 
-        [HttpGet("ResidentEditForm")]
-        public IActionResult ResidentEditForm()
-        {
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/ResidentEditForm.cshtml",
-                new ResidentGridEditingModel());
-        }
-
         [HttpGet("BuilderRoster")]
         public IActionResult BuilderRoster()
         {
@@ -71,12 +62,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/PrintableRoster.cshtml",
                 new ResidentGridEditingModel());
-        }
-
-        [HttpGet("EditingRows")]
-        public IActionResult EditingRows()
-        {
-            return Ok(ResidentDirectory.Take(16).Select(ToGridItem).ToList());
         }
 
         /// <summary>
@@ -128,58 +113,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return residents;
         }
 
-        private static ResidentDirectoryGridItem ToGridItem(ResidentDirectoryRecord row) =>
-            new ResidentDirectoryGridItem
-            {
-                ResidentId = row.ResidentId,
-                ResidentName = row.ResidentName,
-                Age = row.Age,
-                CareLevel = row.CareLevel,
-                Wing = row.Wing,
-                Suite = row.Suite,
-                RiskLevel = row.RiskLevel,
-                PrimaryNurse = row.PrimaryNurse,
-                OpenTasks = row.OpenTasks,
-                NextReviewDate = row.NextReviewDate.ToString("yyyy-MM-dd")
-            };
-
-        private static List<ResidentDirectoryRecord> GenerateResidentDirectory()
-        {
-            var names = new[]
-            {
-                "Amina Patel", "Grace Bennett", "Henry Liu", "Irene Morgan",
-                "Jonah Reed", "Katherine Ortiz", "Leo Simmons", "Mara Thompson",
-                "Noah Walsh", "Priya Shah", "Ruth Carter", "Samuel Diaz",
-                "Tara Novak", "Victor Chen", "Wendy Price", "Yara Ahmed"
-            };
-            var careLevels = new[] { "Independent", "Assisted Living", "Memory Care", "Skilled Nursing" };
-            var wings = new[] { "North", "East", "West", "South" };
-            var suites = new[] { "101", "112", "118", "205", "211", "301", "312", "401" };
-            var risks = new[] { "Low", "Moderate", "High" };
-            var nurses = new[] { "Nora Ellis", "Malik Stone", "Elena Ruiz", "Owen Park" };
-
-            var rows = new List<ResidentDirectoryRecord>();
-            for (var i = 0; i < 240; i++)
-            {
-                var careLevel = careLevels[i % careLevels.Length];
-                var wing = wings[(i / 2) % wings.Length];
-                var risk = risks[(i + (careLevel == "Memory Care" ? 1 : 0)) % risks.Length];
-                rows.Add(new ResidentDirectoryRecord(
-                    6000 + i,
-                    names[i % names.Length],
-                    67 + (i * 7 % 29),
-                    careLevel,
-                    wing,
-                    $"{wing[0]}-{suites[i % suites.Length]}",
-                    risk,
-                    nurses[i % nurses.Length],
-                    i * 3 % 8,
-                    new DateOnly(2026, 6, 1).AddDays(i % 21)));
-            }
-
-            return rows;
-        }
-
         private static IActionResult ValidationError(IReadOnlyDictionary<string, string[]> errors) =>
             new BadRequestObjectResult(new { errors });
 
@@ -190,16 +123,4 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return result.IsValid;
         }
     }
-
-    public sealed record ResidentDirectoryRecord(
-        int ResidentId,
-        string ResidentName,
-        int Age,
-        string CareLevel,
-        string Wing,
-        string Suite,
-        string RiskLevel,
-        string PrimaryNurse,
-        int OpenTasks,
-        DateOnly NextReviewDate);
 }

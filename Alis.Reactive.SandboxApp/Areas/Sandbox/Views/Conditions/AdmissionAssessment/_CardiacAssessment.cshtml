@@ -21,8 +21,6 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var comp = p.Component<FusionNumericTextBox>(m => m.SystolicBP);
-                p.Element("bp-echo").Text.Set(comp.Value);
-
                 p.When(comp.Value).Gt(140m)
                     .Then(then =>
                     {
@@ -38,7 +36,7 @@
                     })
                     .Else(e =>
                     {
-                        e.Element("hypertension-result").Text.Set("Normal");
+                        e.Element("hypertension-result").Text.Set("Systolic 140 or under: no cardiology referral.");
                         e.Element("hypertension-result").Show();
                     });
             }); }
@@ -54,10 +52,9 @@
             }); }
     </native-grid>
 
-    <native-vstack gap="Xs" class="font-mono text-sm mb-4">
-        <p>BP: <span id="bp-echo" class="text-text-muted">&mdash;</span></p>
-        <p><span id="hypertension-spinner" hidden class="text-accent">Sending alert...</span></p>
-        <div id="hypertension-result" hidden class="rounded-md bg-rose-50 border border-rose-200 px-3 py-2 text-sm text-rose-700"></div>
+    <native-vstack gap="Xs" class="mb-4">
+        <p id="hypertension-spinner" hidden class="text-sm text-accent">Sending alert...</p>
+        <p id="hypertension-result" hidden class="text-sm font-medium"></p>
     </native-vstack>
 
     <div id="pacemaker-details" hidden>

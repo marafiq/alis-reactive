@@ -12,9 +12,12 @@
 }
 
 <native-card><native-card-body id="step1-form">
-    <native-heading level="H2">Step 1: Demographics</native-heading>
+    <native-hstack gap="Sm" align="Center">
+        <native-heading level="H2">Step 1: Demographics</native-heading>
+        <span id="risk-badge" hidden class="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-semibold text-accent"></span>
+    </native-hstack>
     <p class="text-sm text-text-secondary mb-4">
-        Basic resident information. Age auto-calculates risk tier. Diagnosis determines which clinical sections appear in Step 2.
+        Basic resident information. Age sets the risk tier. Diagnosis determines which clinical sections appear in Step 2.
     </p>
 
     <native-grid cols="C2" gap="Base" class="mb-4">
@@ -27,8 +30,6 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var ageComp = p.Component<FusionNumericTextBox>(m => m.Age);
-                p.Element("age-echo").Text.Set(ageComp.Value);
-
                 p.When(ageComp.Value).Gte(85m)
                     .Then(t =>
                     {
@@ -49,8 +50,6 @@
                         e.Element("risk-badge").Text.Set("Low Risk");
                         e.Element("risk-badge").Show();
                     });
-
-                p.Element("age-status").Text.Set("assessed");
             }); }
     </native-grid>
 
@@ -112,12 +111,6 @@
             }); }
     </native-grid>
 
-    <native-vstack gap="Xs" class="font-mono text-sm mb-4">
-        <p>Age echo: <span id="age-echo" class="text-text-muted">&mdash;</span></p>
-        <p>Risk: <span id="risk-badge" hidden class="font-semibold text-accent">&mdash;</span></p>
-        <p>Age status: <span id="age-status" class="text-text-muted">&mdash;</span></p>
-    </native-vstack>
-
     <div id="veteran-section" hidden>
         <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.VaId, o => o.Label("VA ID"))
@@ -145,6 +138,10 @@
                         s.Component<NativeHiddenField, Step2ClinicalModel>(m => m.ScreeningId).Value.Set(json.Get(x => x.ScreeningId));
                         s.Component<NativeHiddenField, Step3FunctionalModel>(m => m.ScreeningId).Value.Set(json.Get(x => x.ScreeningId));
                         s.Component<NativeHiddenField, Step4ReviewModel>(m => m.ScreeningId).Value.Set(json.Get(x => x.ScreeningId));
+                        // The clinical and functional alerts name the resident entered here.
+                        var residentName = s.Component<NativeTextBox>(m => m.ResidentName).Value;
+                        s.Component<NativeHiddenField, Step2ClinicalModel>(m => m.ResidentName).Value.Set(residentName);
+                        s.Component<NativeHiddenField, Step3FunctionalModel>(m => m.ResidentName).Value.Set(residentName);
                         // Step 3 judges fall risk against the age entered here.
                         s.Component<FusionNumericTextBox, Step3FunctionalModel>(m => m.Age).Value.Set(s.Component<FusionNumericTextBox>(m => m.Age).Value);
 

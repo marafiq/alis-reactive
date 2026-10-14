@@ -37,13 +37,6 @@ registeredPlugins.push({
 });
 
 registeredPlugins.push({
-  name: "analytics",
-  instance: {
-    track: (_event: string) => undefined,
-  }
-});
-
-registeredPlugins.push({
   name: "slugify",
   instance: (value: unknown) =>
     String(value ?? "")

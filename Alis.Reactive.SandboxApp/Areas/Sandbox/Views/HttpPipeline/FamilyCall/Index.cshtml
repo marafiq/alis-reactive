@@ -1,0 +1,55 @@
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.HttpPipeline.FamilyCall
+@model FamilyCallModel
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Family Call";
+
+    var plan = Html.ReactivePlan<FamilyCallModel>();
+    var emergencyContactUrl = Url.SandboxRoute("EmergencyContact", "FamilyCall");
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Family call</native-heading>
+        <native-text color="Secondary">
+            Night shift, 2:10 a.m. Walter Cho slipped getting out of bed and is unhurt. His family is called
+            after every fall, whatever the hour.
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-heading level="H2">Emergency contact</native-heading>
+
+            @(Html.NativeButton("look-up-contact-btn", "Look up his emergency contact")
+                .CssClass("self-start rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Get(emergencyContactUrl)
+                        .WhileLoading(l => l.Element("contact-loading").Show())
+                        .Response(r => r.OnSuccess<FamilyPortalAnswer>((answer, s) =>
+                        {
+                            s.Element("contact-loading").Hide();
+                            s.Element("contact-name").Text.Set(answer.Get(x => x.Resident.EmergencyContact.Name));
+                            s.Element("contact-relationship").Text.Set(answer.Get(x => x.Resident.EmergencyContact.Relationship));
+                            s.Element("contact-resident").Text.Set(answer.Get(x => x.Resident.Name));
+                            s.Element("contact-room").Text.Set(answer.Get(x => x.Resident.Room));
+                            s.Element("contact-phone").Text.Set(answer.Get(x => x.Resident.EmergencyContact.Phone));
+                            s.Element("contact-card").Show();
+                        }));
+                }))
+
+            <p id="contact-loading" hidden class="text-sm text-text-secondary">Asking the family portal...</p>
+
+            <div id="contact-card" hidden class="rounded-md border border-border px-3 py-2">
+                <p class="text-sm">
+                    <span id="contact-name" class="font-medium"></span> (<span id="contact-relationship"></span>) is
+                    the emergency contact of <span id="contact-resident"></span>, room <span id="contact-room"></span>.
+                </p>
+                <p class="text-sm">Call <span id="contact-phone" class="font-medium"></span>.</p>
+            </div>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

@@ -5,13 +5,15 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     /// <summary>
-    /// Point-in-Time Schedule sandbox — server-driven shift schedule. Each browser's changes live in its
-    /// own <see cref="ScheduleWorld"/>, so a save is visible on the next GET and to no other browser.
+    /// The staffing coordinator's shift schedule. Each browser's changes live in its own
+    /// <see cref="ScheduleWorld"/>, so a save is visible on the next GET and to no other browser.
     /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/Schedule")]
     public class ScheduleController : Controller
     {
+        private const string DefaultFacilityId = "maple-grove";
+
         private ScheduleWorld World => new(HttpContext.Session);
 
         [HttpGet("")]
@@ -19,55 +21,50 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         {
             return View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Schedule/Index.cshtml",
-                new PointInTimeScheduleModel { SelectedFacilityId = "mystery-manor" });
+                new PointInTimeScheduleModel { SelectedFacilityId = DefaultFacilityId });
         }
 
         /// <summary>
-        /// Loads the Schedule data source for the selected facility and visible range.
-        /// Parameter names match the members of <see cref="ScheduleAssignmentsQuery"/> and
-        /// <see cref="ScheduleNavigationQuery"/>, which the Reactive Plan gathers.
+        /// The facility's shifts for the dates a view shows around a date, and the server's summary of them.
+        /// The view is in the path (<c>{currentView}</c>), as the page gathers it from the schedule or from
+        /// its navigating event; the date and the facility are in the query.
         /// </summary>
-        [HttpGet("~/api/schedule/assignments")]
-        public IActionResult GetAssignments(string? selectedFacilityId, string? currentDate, string? currentView)
+        [HttpGet("Shifts/{currentView}")]
+        public IActionResult Shifts(string currentView, string? selectedFacilityId, DateTime? currentDate)
         {
-            var facilityId = selectedFacilityId ?? "mystery-manor";
-            DateTime anchor;
-            if (!string.IsNullOrEmpty(currentDate) && DateTime.TryParse(currentDate, out var parsed))
-                anchor = parsed;
-            else
-                anchor = DateTime.Today;
+            var facility = FakeScheduleData.Facilities.FirstOrDefault(f => f.Id == selectedFacilityId);
+            if (facility == null || currentDate == null)
+                return BadRequest(new { error = "Say which facility and which date the schedule shows." });
 
-            var (rangeStart, rangeEnd) = CalculateDateRange(anchor, currentView ?? "Week");
-            var data = World.GetAssignments(facilityId, rangeStart, rangeEnd);
-            return Ok(data);
+            var (rangeStart, rangeEnd) = CalculateDateRange(currentDate.Value, currentView);
+            return Ok(World.GetAssignments(facility, rangeStart, rangeEnd));
         }
 
-        [HttpGet("~/api/schedule/view/{currentView}/echo")]
-        public IActionResult EchoView(string currentView)
+        /// <summary>
+        /// Asks the staffing agency to cover the open shifts among those the schedule holds.
+        /// </summary>
+        [HttpPost("AgencyRequest")]
+        public IActionResult AgencyRequest([FromBody] AgencyCoverRequest request)
         {
-            return Ok(new ScheduleViewRouteResponse
-            {
-                CurrentView = currentView
-            });
+            var open = request.Shifts.Count(s => s.IsUnassigned && !s.IsInService);
+            var summary = open == 0
+                ? "Every shift on the schedule is covered; nothing was sent to Staffing Plus."
+                : string.Format(CultureInfo.InvariantCulture, "Asked Staffing Plus to cover {0} open {1}.", open, open == 1 ? "shift" : "shifts");
+            return Ok(new AgencyCoverAnswer { Summary = summary });
         }
 
-        [HttpGet("~/api/schedule/view/{currentView}/summary")]
-        public IActionResult ViewSummary(string currentView)
+        /// <summary>
+        /// Answers whether the in-service opened in the schedule's editor is the coordinator's to change:
+        /// 409 while someone else has it open.
+        /// </summary>
+        [HttpPost("InServiceClaim")]
+        public IActionResult InServiceClaim([FromBody] InServiceClaimRequest request)
         {
-            return Ok(new ScheduleViewRouteResponse
-            {
-                CurrentView = currentView,
-                Summary = $"summary:{currentView}"
-            });
-        }
+            var claim = World.ClaimInService(request.InServiceId);
+            if (claim == null) return NotFound(new { error = "In-service not found." });
 
-        [HttpPost("~/api/schedule/events/audit")]
-        public IActionResult AuditEvents([FromBody] ScheduleEventsAuditRequest request)
-        {
-            return Ok(new ScheduleEventsAuditResponse
-            {
-                Count = request.Events.Count
-            });
+            var (refused, answer) = claim.Value;
+            return refused ? Conflict(answer) : Ok(answer);
         }
 
         private static (DateTime start, DateTime end) CalculateDateRange(DateTime anchor, string view)
@@ -77,7 +74,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 "Day" => (anchor.Date, anchor.Date.AddDays(1)),
                 "WorkWeek" => WorkWeekRange(anchor),
                 "Month" => MonthRange(anchor),
-                "Agenda" => (anchor.Date, anchor.Date.AddDays(30)),
+                "Agenda" => (anchor.Date, anchor.Date.AddDays(7)),
                 _ => WeekRange(anchor), // "Week" and default
             };
         }
@@ -166,7 +163,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 StartTime = query.StartTime.ToString("s", CultureInfo.InvariantCulture),
                 EndTime = query.EndTime.ToString("s", CultureInfo.InvariantCulture),
                 ShiftId = query.GroupIndex + 1,
-                FacilityId = query.SelectedFacilityId ?? "mystery-manor",
+                FacilityId = query.SelectedFacilityId ?? DefaultFacilityId,
             };
             return PartialView(
                 "~/Areas/Sandbox/Views/Components/Fusion/Schedule/_NewAssignmentForm.cshtml",
@@ -186,7 +183,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 return BadRequest(new { error = "Start and end time are required." });
 
             var assignment = World.CreateAssignment(
-                model.FacilityId ?? "mystery-manor",
+                model.FacilityId ?? DefaultFacilityId,
                 DateTime.Parse(model.StartTime),
                 DateTime.Parse(model.EndTime),
                 model.ShiftId,
@@ -196,24 +193,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 return BadRequest(new { error = "Could not create assignment. Staff not found." });
 
             return Ok(assignment);
-        }
-
-        /// <summary>
-        /// Loads staff options for assignment dialog dropdowns.
-        /// </summary>
-        [HttpGet("~/api/schedule/staff")]
-        public IActionResult GetStaff()
-        {
-            return Ok(FakeScheduleData.Staff);
-        }
-
-        /// <summary>
-        /// Loads facility options for the Schedule filter dropdown.
-        /// </summary>
-        [HttpGet("~/api/schedule/facilities")]
-        public IActionResult GetFacilities()
-        {
-            return Ok(FakeScheduleData.Facilities);
         }
     }
 }

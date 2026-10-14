@@ -1,4 +1,5 @@
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using System.Globalization;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Rating;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
@@ -7,27 +8,41 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     [Route("Sandbox/Components/Rating")]
     public class RatingController : Controller
     {
+        // The October ratings the other 23 Maple Grove residents have sent.
+        private static readonly IReadOnlyList<double> OtherResidentsOctoberScores =
+            [5, 4, 4, 5, 3, 4, 5, 4, 4, 5, 3, 4, 5, 4, 4, 5, 4, 3, 5, 4, 4, 5, 2];
+
         [HttpGet("")]
         public IActionResult Index()
         {
-            return View("~/Areas/Sandbox/Views/Components/Fusion/Rating/Index.cshtml", new RatingModel
+            return View("~/Areas/Sandbox/Views/Components/Fusion/Rating/Index.cshtml", new SatisfactionSurveyModel
             {
-                SatisfactionScore = 3
+                LastMonthScore = 3
             });
         }
 
-        [HttpPost("Echo")]
-        public IActionResult Echo([FromBody] RatingEchoRequest request)
+        // Records the rating and answers with October's average across the community.
+        [HttpPost("Send")]
+        public IActionResult Send([FromBody] SurveyResponse response)
         {
-            var result = new RatingSurveyValidator().Validate(new RatingModel { SatisfactionScore = request.SatisfactionScore });
+            var result = new SatisfactionSurveyValidator().Validate(new SatisfactionSurveyModel
+            {
+                SatisfactionScore = response.SatisfactionScore,
+                WhatChanged = response.WhatChanged
+            });
             if (!result.IsValid)
                 return BadRequest(new { errors = result.ErrorsByField });
 
-            return Ok(new RatingEchoResponse
+            var scores = OtherResidentsOctoberScores.Append(response.SatisfactionScore).ToList();
+            var average = scores.Average().ToString("0.0", CultureInfo.InvariantCulture);
+            var stars = response.SatisfactionScore == 1 ? "1 star" : $"{response.SatisfactionScore:0} stars";
+            var careManager = string.IsNullOrWhiteSpace(response.WhatChanged)
+                ? ""
+                : " Your note goes to Maple wing's care manager.";
+
+            return Ok(new SurveyAnswer
             {
-                SatisfactionScore = request.SatisfactionScore,
-                Summary = "Thank you. We recorded your satisfaction rating of "
-                    + request.SatisfactionScore + " of 5 stars."
+                Message = $"Thank you, Margaret. We recorded {stars} for October. Maple Grove's October average is now {average} stars from {scores.Count} residents.{careManager}"
             });
         }
     }

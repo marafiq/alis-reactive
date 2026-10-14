@@ -3,8 +3,8 @@ using Alis.Reactive.Fusion.Components;
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
-    /// Point-in-Time Schedule state for server-filtered data loading.
-    /// Filters drive each data-source request; the schedule never holds the full dataset.
+    /// The staffing coordinator's shift schedule: the facility whose shifts it shows, and the two switches
+    /// the coordinator keeps beside it.
     /// </summary>
     public class PointInTimeScheduleModel
     {
@@ -18,8 +18,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     }
 
     /// <summary>
-    /// Shift assignment event rendered by the Schedule data source.
-    /// Maps to Syncfusion Schedule eventSettings.dataSource items.
+    /// One entry of the schedule: a shift (staffed, or open until someone covers it) or an in-service the
+    /// shift's staff attend. Maps to Syncfusion Schedule eventSettings.dataSource items.
     /// </summary>
     public class ShiftAssignment
     {
@@ -39,6 +39,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? ResidentNames { get; set; }
         public string Description { get; set; } = "";
         public string? CategoryColor { get; set; }
+
+        /// <summary>An in-service: training the shift's staff attend. It opens in the schedule's own editor.</summary>
+        public bool IsInService { get; set; }
+
+        /// <summary>Who else has the in-service open to change it right now; empty when no one does.</summary>
+        public string OpenBy { get; set; } = "";
+
+        /// <summary>A shift someone covers; its details offer to edit or reassign it.</summary>
+        public bool IsStaffedShift => !IsUnassigned && !IsInService;
     }
 
     /// <summary>
@@ -72,38 +81,35 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     }
 
     /// <summary>
-    /// Schedule data-source response for server-filtered assignment loading.
+    /// The shifts of the dates a view shows, and the server's summary of them: the facility, the dates it
+    /// answered for, and how many shifts still need someone.
     /// </summary>
     public class ScheduleDataResponse
     {
         public List<ShiftAssignment> Assignments { get; set; } = new();
-        public List<ShiftResource> Shifts { get; set; } = new();
-        public int UnassignedCount { get; set; }
-    }
-
-    /// <summary>The query of <c>GET api/schedule/assignments</c>: the facility, and the date and view the schedule shows.</summary>
-    public sealed class ScheduleAssignmentsQuery
-    {
-        public string? SelectedFacilityId { get; set; }
-        public DateTime? CurrentDate { get; set; }
-        public string? CurrentView { get; set; }
+        public string Summary { get; set; } = "";
     }
 
     /// <summary>
-    /// The query of <c>GET api/schedule/assignments</c> as the schedule navigates, whose navigating event
-    /// hands the new date as text.
+    /// The request of <c>GET Schedule/Shifts/{currentView}</c> as the page reads it from the schedule: the
+    /// view (in the path), the date it shows and the facility.
+    /// </summary>
+    public sealed class ScheduleAssignmentsQuery
+    {
+        public string CurrentView { get; set; } = "";
+        public DateTime CurrentDate { get; set; }
+        public string? SelectedFacilityId { get; set; }
+    }
+
+    /// <summary>
+    /// The request of <c>GET Schedule/Shifts/{currentView}</c> as the schedule navigates, whose navigating
+    /// event hands the date it moves to as text.
     /// </summary>
     public sealed class ScheduleNavigationQuery
     {
-        public string? SelectedFacilityId { get; set; }
-        public string? CurrentDate { get; set; }
-        public string? CurrentView { get; set; }
-    }
-
-    /// <summary>A request about one schedule view: <c>{currentView}</c> in the path of <c>api/schedule/view/{currentView}/echo</c> and <c>/summary</c>.</summary>
-    public sealed class ScheduleViewRequest
-    {
         public string CurrentView { get; set; } = "";
+        public string CurrentDate { get; set; } = "";
+        public string? SelectedFacilityId { get; set; }
     }
 
     /// <summary>The query of <c>GET Schedule/EditForm</c>: the assignment whose edit form loads.</summary>
@@ -124,20 +130,28 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? SelectedFacilityId { get; set; }
     }
 
-    public class ScheduleViewRouteResponse
+    /// <summary>The request of <c>POST Schedule/AgencyRequest</c>: the shifts the schedule holds.</summary>
+    public sealed class AgencyCoverRequest
     {
-        public string CurrentView { get; set; } = "";
+        public List<ShiftAssignment> Shifts { get; set; } = new();
+    }
+
+    /// <summary>The agency's answer: which of the sent shifts it was asked to cover.</summary>
+    public sealed class AgencyCoverAnswer
+    {
         public string Summary { get; set; } = "";
     }
 
-    public class ScheduleEventsAuditRequest
+    /// <summary>The request of <c>POST Schedule/InServiceClaim</c>: the in-service the coordinator opened.</summary>
+    public sealed class InServiceClaimRequest
     {
-        public List<ShiftAssignment> Events { get; set; } = new();
+        public int InServiceId { get; set; }
     }
 
-    public class ScheduleEventsAuditResponse
+    /// <summary>The server's answer to opening an in-service: whether it is the coordinator's to change.</summary>
+    public sealed class InServiceClaimAnswer
     {
-        public int Count { get; set; }
+        public string Note { get; set; } = "";
     }
 
     /// <summary>
@@ -165,7 +179,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public int AssignmentId { get; set; }
         public int? StaffId { get; set; }
-        public string? Notes { get; set; }
     }
 
     /// <summary>The request of <c>POST api/schedule/cancel-shift</c>: the shift to take off the schedule.</summary>

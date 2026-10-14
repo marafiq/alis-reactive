@@ -6,13 +6,35 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Schedule;
 
 /// <summary>
-/// As a scheduling coordinator, I staff, change and cancel the week's shifts where the schedule shows them,
-/// in the assignment drawer and the new-assignment dialog, so that every shift has someone on it.
+/// As a staffing coordinator, I keep the week's AM, PM and night shifts covered where the schedule shows them:
+/// I staff, add and cancel shifts in the assignment drawer and the new-assignment dialog, ask the agency for
+/// the open ones, and change an in-service in the schedule's own editor unless someone else has it open, so that
+/// every shift has someone on it and no change is made twice at once.
 /// </summary>
 /// <remarks>
-/// <c>CloseEditor</c> is not exercised: Syncfusion's own event editor never opens on this page. Its
-/// <c>PopupOpen</c> cancels every popup of type "Editor" and opens the assignment drawer instead, and
-/// Syncfusion then destroys the editor's dialog, so <c>closeEditor</c> has nothing to close.
+/// <para>
+/// Each test opens a new browser, whose schedule starts from the seeded weeks: shifts staffed or left open the
+/// same way on every run, and two in-services a week for the AM staff, Falls prevention on Tuesday and Safe
+/// resident transfers on Thursday, which the staff educator, Dana Whitfield, has open. The server answers every
+/// load with a summary of what it answered for: the facility, how many shifts need coverage, and the dates.
+/// </para>
+/// <para>
+/// Not exercised. <c>DataBind</c>: Syncfusion applies <c>eventSettings.dataSource</c> on the next tick without
+/// it (ej2-base base.js:147) and reads the events through a promise either way (crud.js:41), so no later step of
+/// the same pipeline sees a difference; the page calls it after each load. <c>Navigating</c>'s
+/// <c>PreviousDate</c>, <c>PreviousView</c>, <c>ViewIndex</c> and <c>Cancel</c>, and <c>EventRendered</c>'s
+/// <c>Type</c>: no step of the journey needs them; the payroll lock stops a move in <c>ActionBegin</c>, which
+/// Syncfusion raises before <c>Navigating</c> (schedule.js:671-676). <c>CellClick</c>'s all-day row: it has no
+/// height while no all-day event is on the week, so <c>IsAllDay</c> is clicked in a month's day. Saving or
+/// deleting an in-service in the schedule's own editor: <c>ActionBegin</c> declares none of the records
+/// Syncfusion hands it (<c>changedRecords</c>, crud.js:316; <c>deletedRecords</c>, crud.js:657), so the page
+/// cannot send the change to the server yet.
+/// </para>
+/// <para>
+/// The new-assignment dialog's staff list is located by <c>IdGenerator</c>: the dialog's partial plan lands
+/// before the page's own plan in the document, so <c>PagePlan.FromPage</c> would read the partial's plan once it
+/// loads. The page's own inputs are read from its plan at boot.
+/// </para>
 /// </remarks>
 [TestFixture]
 public class WhenUsingFusionSchedule : PlaywrightTestBase
@@ -21,66 +43,30 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
     private static readonly Regex StaffedShift = new(@"\((CNA|RN|LPN)\)");
 
-    // Shifts as the schedule shows them; the page's "Selected shift" line repeats a subject, so
-    // these look only inside the schedule.
-    private ILocator StaffedShifts => Page.Locator("#shift-schedule").GetByText(StaffedShift);
-    private ILocator OpenShifts => Page.Locator("#shift-schedule").GetByText(new Regex("UNASSIGNED"));
-    private ILocator Status => Page.Locator("#status");
-    private ILocator ShownWeek => Page.Locator("#schedule-week");
-    private ILocator SelectedShift => Page.Locator("#selected-shift");
+    private PagePlan<PointInTimeScheduleModel> _plan = null!;
+
+    private FusionScheduleLocator Schedule => new(Page, "shift-schedule");
+    private ILocator StaffedShifts => Schedule.Root.GetByText(StaffedShift);
+    private ILocator OpenShifts => Schedule.Root.GetByText(new Regex("UNASSIGNED"));
+    private ILocator Summary => Page.Locator("#schedule-summary");
+    private ILocator Loading => Page.Locator("#schedule-loading");
+    private ILocator Selection => Page.Locator("#schedule-selection");
+    private ILocator AgencyStatus => Page.Locator("#agency-status");
+    private ILocator AddShiftHint => Page.Locator("#add-shift-hint");
+    private ILocator InServiceNote => Page.Locator("#in-service-note");
     private ILocator LockedNote => Page.Locator("#schedule-locked-note");
     private ILocator NewAssignmentDialog => Page.Locator("#new-assignment-dialog");
-    private ILocator NextWeek => Page.Locator("#shift-schedule .e-toolbar-item.e-next button");
-    private ILocator OpenQuickInfo => Page.Locator(".e-quick-popup-wrapper.e-popup-open");
+    private ILocator Drawer => Page.Locator("#alis-drawer");
+    private ILocator AssignmentForm => Page.Locator("#assignment-form");
 
-    private NativeCheckBoxLocator ScheduleLocked =>
-        new(Page, IdGenerator.For<PointInTimeScheduleModel>(m => m.ScheduleLocked));
-    private NativeCheckBoxLocator NeedsCoverageOnly =>
-        new(Page, IdGenerator.For<PointInTimeScheduleModel>(m => m.NeedsCoverageOnly));
-    private DropDownListLocator Facility =>
-        new(Page, IdGenerator.For<PointInTimeScheduleModel>(m => m.SelectedFacilityId));
+    private DropDownListLocator Facility => _plan.DropDownList(m => m.SelectedFacilityId);
+    private NativeCheckBoxLocator ScheduleLocked => _plan.NativeCheckBox(m => m.ScheduleLocked);
+    private NativeCheckBoxLocator NeedsCoverageOnly => _plan.NativeCheckBox(m => m.NeedsCoverageOnly);
     private DropDownListLocator NewShiftStaff =>
         new(Page, IdGenerator.For<NewAssignmentModel>(m => m.StaffId));
 
-    // The list opens from its own button; a click outside the modal dialog would close the dialog.
-    private async Task ChooseNewShiftStaff(string staff)
-    {
-        await NewShiftStaff.Open();
-        await NewShiftStaff.Popup.GetByText(staff, new() { Exact = true }).ClickAsync();
-        await Expect(NewShiftStaff.Popup).ToBeHiddenAsync();
-    }
-
-    // The schedule's shifts for one staff member or label, as the schedule renders them.
-    private ILocator ShiftsOf(string subject) =>
-        Page.Locator("#shift-schedule .e-appointment").Filter(new() { HasText = subject });
-
-    // A shift by its subject and start, by the name the schedule gives it for screen readers ("AM
-    // Shift"s event - Jane Blonde (CNA) Begin From Tuesday, October 13, 2026 at 4:00:00 PM ..."), in a
-    // shift column. The space before AM or PM may be a narrow one, as newer browsers format times.
-    private ILocator ShiftAt(string subject, DateTime start, int shiftColumn) =>
-        Page.Locator($"#shift-schedule .e-appointment[data-group-index='{shiftColumn}']").And(
-            Page.Locator("#shift-schedule").GetByRole(AriaRole.Button, new()
-            {
-                NameRegex = new Regex(
-                    Regex.Escape($"{subject} Begin From {start.ToString("dddd, MMMM d, yyyy", CultureInfo.InvariantCulture)} at " +
-                                 start.ToString("h:mm:ss", CultureInfo.InvariantCulture)) +
-                    @"\W?" + start.ToString("tt", CultureInfo.InvariantCulture)),
-            }));
-
-    // A work cell of the week's grid, by its start (data-date is the start's epoch milliseconds in the
-    // browser's zone, the same zone the tests run in) and its shift column (0 = AM, 1 = PM, 2 = Night).
-    private ILocator WorkCell(DateTime start, int shiftColumn) =>
-        Page.Locator($"#shift-schedule td.e-work-cells[data-group-index='{shiftColumn}'][data-date='{new DateTimeOffset(start).ToUnixTimeMilliseconds()}']");
-
     // The AM shift runs 6:00 AM to 2:00 PM, so its column is open at 4:00 PM every day.
     private static DateTime OpenHourToday => DateTime.Today.AddHours(16);
-
-    private async Task ClickOpenHourToday()
-    {
-        var cell = WorkCell(OpenHourToday, shiftColumn: 0);
-        await cell.ScrollIntoViewIfNeededAsync();
-        await cell.ClickAsync();
-    }
 
     // The whole schedule fits in the window, so a cell is in view exactly when the schedule's own
     // scrolling shows it.
@@ -95,200 +81,164 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-        await Expect(Page.Locator("#status"))
-            .Not.ToHaveTextAsync("Loading...", new() { Timeout = 10000 });
+        _plan = await PagePlan<PointInTimeScheduleModel>.FromPage(Page);
+        await Expect(Summary).ToHaveTextAsync(WeekSummary("Maple Grove", DateTime.Today), new() { Timeout = 10000 });
     }
 
-    // Opens a shift the way a coordinator does: bring it into view, then click it. A bare click
-    // on a shift outside the visible hours scrolls and clicks in the same frame, the scroll event
-    // lands after the click, and Schedule closes QuickInfo on any content scroll, so an overnight
-    // shift at the bottom of the day would never show its actions.
-    private static async Task OpenShift(ILocator shift)
+    // The server's summary of a week: Sunday to Saturday, three shifts a day.
+    private static Regex WeekSummary(string facility, DateTime day)
     {
-        await shift.ScrollIntoViewIfNeededAsync();
-        await shift.ClickAsync();
+        var sunday = day.Date.AddDays(-(int)day.DayOfWeek);
+        return SummaryOf(facility, 21, sunday, sunday.AddDays(6));
     }
+
+    // The server's summary of a month as the month view shows it: whole weeks, from the Sunday on or before the
+    // first to the Saturday on or after the last.
+    private static Regex MonthSummary(string facility, DateTime day)
+    {
+        var first = new DateTime(day.Year, day.Month, 1);
+        var last = first.AddMonths(1).AddDays(-1);
+        var from = first.AddDays(-(int)first.DayOfWeek);
+        var to = last.AddDays(6 - (int)last.DayOfWeek);
+        return SummaryOf(facility, ((to - from).Days + 1) * 3, from, to);
+    }
+
+    // "Maple Grove: 6 of 21 shifts need coverage from October 11 to October 17, 2026."
+    private static Regex SummaryOf(string facility, int shifts, DateTime from, DateTime to) =>
+        new("^" + Regex.Escape($"{facility}: ") + @"\d+" +
+            Regex.Escape($" of {shifts} shifts need coverage from {from.ToString("MMMM d", CultureInfo.InvariantCulture)} " +
+                         $"to {to.ToString("MMMM d, yyyy", CultureInfo.InvariantCulture)}.") + "$");
+
+    private async Task<int> ShiftsNeedingCoverage() =>
+        int.Parse(Regex.Match(await Summary.InnerTextAsync(), @": (\d+) of").Groups[1].Value, CultureInfo.InvariantCulture);
+
+    private async Task ClickOpenHourToday()
+    {
+        var cell = Schedule.Cell(OpenHourToday, groupIndex: 0);
+        await cell.ScrollIntoViewIfNeededAsync();
+        await cell.ClickAsync();
+    }
+
+    // The list opens from its own button; a click outside the modal dialog would close the dialog.
+    private async Task ChooseNewShiftStaff(string staff)
+    {
+        await NewShiftStaff.Open();
+        await NewShiftStaff.Popup.GetByText(staff, new() { Exact = true }).ClickAsync();
+        await Expect(NewShiftStaff.Popup).ToBeHiddenAsync();
+    }
+
+    private async Task AddShiftAtOpenHourToday(string staff)
+    {
+        await ClickOpenHourToday();
+        await Expect(NewAssignmentDialog).ToContainTextAsync("Staff Member", new() { Timeout = 10000 });
+        await ChooseNewShiftStaff(staff);
+        await ClickWhenStable(Page.Locator("#btn-create-assignment"));
+    }
+
+    private ILocator StaffChoice(string staff) =>
+        AssignmentForm.GetByRole(AriaRole.Radio, new() { Name = staff, Exact = true });
 
     [Test]
-    public async Task route_template_gather_reads_schedule_current_view_and_reuses_it_in_chained_request()
+    public async Task the_week_opens_with_its_shifts_and_how_many_need_coverage()
     {
         await NavigateAndWaitForSchedule();
 
-        await Page.Locator("#route-template-schedule-btn").ClickAsync();
-
-        await Expect(Page.Locator("#route-view"))
-            .ToHaveTextAsync("Week", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#route-view-summary"))
-            .ToHaveTextAsync("summary:Week", new() { Timeout = 5000 });
-
+        await Expect(Summary).ToHaveTextAsync(WeekSummary("Maple Grove", DateTime.Today));
+        await Expect(StaffedShifts.First).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(OpenShifts.First).ToBeVisibleAsync();
+        await Expect(Schedule.Appointments("In-service: Falls prevention")).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task gather_reads_schedule_method_return_value()
+    public async Task changing_the_facility_reloads_the_schedule_until_it_is_ready()
     {
         await NavigateAndWaitForSchedule();
+        await Expect(Loading).ToBeHiddenAsync(new() { Timeout = 10000 });
+        var shiftsReleased = new SemaphoreSlim(0);
+        await Page.RouteAsync("**/Schedule/Shifts/**", async route =>
+        {
+            await shiftsReleased.WaitAsync(TimeSpan.FromSeconds(30));
+            await route.ContinueAsync();
+        });
 
-        await Page.Locator("#audit-events-btn").ClickAsync();
+        await Facility.Select("Sunrise Gardens");
 
-        await Expect(Page.Locator("#schedule-events-count"))
-            .ToHaveTextAsync(new Regex("^[1-9][0-9]*$"), new() { Timeout = 10000 });
-
+        // The schedule says it is loading while Sunrise Gardens' shifts are asked for; only the schedule's
+        // dataBound, after they bind, takes that away.
+        await Expect(Loading).ToBeVisibleAsync(new() { Timeout = 10000 });
+        shiftsReleased.Release();
+        await Expect(Summary).ToHaveTextAsync(WeekSummary("Sunrise Gardens", DateTime.Today), new() { Timeout = 10000 });
+        await Expect(Loading).ToBeHiddenAsync(new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task schedule_binds_the_weeks_shift_assignments_from_the_server()
+    public async Task changing_the_facility_keeps_the_week_the_schedule_shows()
     {
         await NavigateAndWaitForSchedule();
+        var nextWeek = DateTime.Today.AddDays(7);
+        await Schedule.Next.ClickAsync();
+        await Expect(Summary).ToHaveTextAsync(WeekSummary("Maple Grove", nextWeek), new() { Timeout = 10000 });
 
-        // The DomReady GET returns the week's assignments; OnSuccess sets the data source
-        // binds them and the Schedule renders each as an appointment labelled with
-        // the staff member and role. If the data source or the load breaks, no
-        // appointment renders and this fails.
-        await Expect(Page.GetByText(new Regex(@"\((CNA|RN|LPN)\)")).First)
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Facility.Select("Sunrise Gardens");
 
-        // The same success response carries UnassignedCount, read into the page
-        // after databind. While the data source is unbound it shows "--"; a numeric
-        // value proves the typed response body was consumed.
-        await Expect(Page.Locator("#unassigned-count"))
-            .ToHaveTextAsync(new Regex(@"^\d+$"), new() { Timeout = 10000 });
-
+        await Expect(Summary).ToHaveTextAsync(WeekSummary("Sunrise Gardens", nextWeek), new() { Timeout = 10000 });
+        await Expect(StaffedShifts.First).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task clicking_an_assigned_shift_shows_staff_details_and_edit_actions()
+    public async Task moving_to_next_week_loads_that_weeks_shifts_and_names_the_week()
     {
         await NavigateAndWaitForSchedule();
 
-        // Click an assigned shift (one labelled with a staff role).
-        await OpenShift(Page.GetByText(new Regex(@"\((CNA|RN|LPN)\)")).First);
+        await Schedule.Next.ClickAsync();
 
-        // EventClick opens the QuickInfo popup, whose custom template binds the
-        // assignment: the staff phone in the content and Edit/Reassign actions in
-        // the footer. None of this text exists in the DOM until the popup opens and
-        // the template renders the clicked appointment's data, so each assertion
-        // fails if the event wiring or the QuickInfo template breaks.
-        await Expect(Page.GetByText("Reassign", new() { Exact = true }))
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Expect(Page.GetByText(new Regex(@"\d{3}-\d{4}")).First)
-            .ToBeVisibleAsync(new() { Timeout = 5000 });
-
+        // The week's grid starts empty: only the navigating handler's request fills it.
+        await Expect(Summary).ToHaveTextAsync(WeekSummary("Maple Grove", DateTime.Today.AddDays(7)), new() { Timeout = 10000 });
+        await Expect(StaffedShifts.First).ToBeVisibleAsync(new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task editing_a_shift_opens_the_edit_drawer_with_the_assignment_form()
+    public async Task switching_to_the_month_loads_every_shift_the_month_shows()
     {
         await NavigateAndWaitForSchedule();
 
-        // Open the QuickInfo for an assigned shift, then choose Edit.
-        await OpenShift(Page.GetByText(new Regex(@"\((CNA|RN|LPN)\)")).First);
-        await Page.GetByText("Edit", new() { Exact = true }).ClickAsync();
+        await Schedule.ViewButton("Month").ClickAsync();
 
-        // schedule:edit loads the EditForm partial into the drawer and opens it.
-        // "Save Assignment" and the "Assignment #N" label live only in that partial,
-        // so they are absent until the dispatch loads the drawer content — each
-        // fails if the QuickInfo action, the custom-event wiring, or the partial
-        // load into the drawer breaks.
-        await Expect(Page.GetByText("Save Assignment"))
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Expect(Page.GetByText(new Regex(@"Assignment #\d+")))
-            .ToBeVisibleAsync(new() { Timeout = 5000 });
-
+        await Expect(Summary).ToHaveTextAsync(MonthSummary("Maple Grove", DateTime.Today), new() { Timeout = 10000 });
+        await Expect(StaffedShifts.First).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task assigning_staff_to_an_open_shift_reduces_open_shifts_and_persists_on_reload()
+    public async Task moving_to_the_next_month_loads_that_months_shifts()
     {
         await NavigateAndWaitForSchedule();
+        await Schedule.ViewButton("Month").ClickAsync();
+        await Expect(Summary).ToHaveTextAsync(MonthSummary("Maple Grove", DateTime.Today), new() { Timeout = 10000 });
 
-        // The page shows how many shifts still need coverage.
-        var openShifts = Page.Locator("#unassigned-count");
-        await Expect(openShifts).ToHaveTextAsync(new Regex(@"^\d+$"), new() { Timeout = 10000 });
-        var before = int.Parse(await openShifts.InnerTextAsync());
-        Assert.That(before, Is.GreaterThan(0), "the scenario needs at least one open shift to cover");
+        await Schedule.Next.ClickAsync();
 
-        // Open an unassigned shift and choose to staff it.
-        await OpenShift(Page.GetByText(new Regex("UNASSIGNED")).First);
-        await Page.GetByText("Assign Staff", new() { Exact = true }).ClickAsync();
-
-        // Wait for the drawer to finish sliding in and its form to render.
-        await Expect(Page.Locator("#alis-drawer")).ToHaveClassAsync(new Regex("alis-drawer--visible"), new() { Timeout = 10000 });
-        await Expect(Page.Locator("#assignment-form")).ToBeVisibleAsync(new() { Timeout = 10000 });
-
-        // Pick a staff member from the radio group (pre-visible options, no popup),
-        // then save.
-        var tomsShifts = await ShiftsOf("Tom Hardy (LPN)").CountAsync();
-        await Page.Locator("#assignment-form").GetByText("Tom Hardy (LPN)").ClickAsync();
-        await ClickWhenStable(Page.Locator("#btn-save-assignment"));
-
-        // The save persists server-side (POST /api/schedule/assign); the shift shows Tom Hardy where
-        // it is, the schedule reloads the week, and one fewer shift needs coverage.
-        await Expect(ShiftsOf("Tom Hardy (LPN)")).ToHaveCountAsync(tomsShifts + 1, new() { Timeout = 15000 });
-        await Expect(openShifts).ToHaveTextAsync((before - 1).ToString(), new() { Timeout = 15000 });
-
-        // Reload the whole page: the assignment is still there — it persisted on the
-        // server, not only in the client's component state.
-        await Page.ReloadAsync();
-        await WaitForTraceMessage("booted", 10000);
-        await Expect(openShifts).ToHaveTextAsync((before - 1).ToString(), new() { Timeout = 10000 });
-
+        await Expect(Summary).ToHaveTextAsync(MonthSummary("Maple Grove", DateTime.Today.AddMonths(1)), new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
 
-    // The schedule's editor opens on the first shift no one covers, and the page's PopupOpen hands it to
-    // the drawer: an open shift has no staff member chosen, where an assigned one would.
+    // A PM cell holds one shift a day, so its lower corner is empty in every month.
     [Test]
-    public async Task covering_the_next_open_shift_opens_its_assignment_form_with_no_one_chosen()
+    public async Task clicking_a_day_of_the_month_asks_for_the_hour_the_shift_starts()
     {
         await NavigateAndWaitForSchedule();
-        await Expect(OpenShifts.First).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Schedule.ViewButton("Month").ClickAsync();
+        await Expect(Summary).ToHaveTextAsync(MonthSummary("Maple Grove", DateTime.Today), new() { Timeout = 10000 });
 
-        await ClickWhenStable(Page.Locator("#cover-next-open-shift"));
+        await Schedule.ClickEmptyPartOf(Schedule.Cell(DateTime.Today, groupIndex: 1));
 
-        await Expect(Page.Locator("#alis-drawer")).ToHaveClassAsync(new Regex("alis-drawer--visible"), new() { Timeout = 10000 });
-        await Expect(Page.Locator("#assignment-form")).ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Expect(Page.Locator("#assignment-form input[type=radio]").First).ToBeVisibleAsync();
-        await Expect(Page.Locator("#assignment-form input[type=radio]:checked")).ToHaveCountAsync(0);
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task clicking_an_unassigned_shift_offers_to_assign_staff()
-    {
-        await NavigateAndWaitForSchedule();
-
-        await OpenShift(Page.GetByText(new Regex("UNASSIGNED")).First);
-
-        // The QuickInfo template renders its unassigned branch: an Assign Staff
-        // action (assigned shifts get Edit/Reassign instead). The action exists
-        // only in that branch's footer, so it fails if the conditional template or
-        // the event wiring breaks.
-        await Expect(Page.GetByText("Assign Staff", new() { Exact = true }))
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task reassigning_a_shift_opens_the_assignment_drawer()
-    {
-        await NavigateAndWaitForSchedule();
-
-        await OpenShift(Page.GetByText(new Regex(@"\((CNA|RN|LPN)\)")).First);
-        await Page.GetByText("Reassign", new() { Exact = true }).ClickAsync();
-
-        // schedule:reassign is a distinct custom-event handler from schedule:edit;
-        // it loads the assignment form into the drawer. "Save Assignment" and the
-        // "Assignment #N" label exist only in that partial, so this fails if the
-        // reassign action or its event wiring breaks.
-        await Expect(Page.GetByText("Save Assignment")).ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Expect(Page.GetByText(new Regex(@"Assignment #\d+"))).ToBeVisibleAsync(new() { Timeout = 5000 });
-
+        await Expect(AddShiftHint).ToHaveTextAsync("A shift starts at an hour: open a day or a week and click the hour it starts.", new() { Timeout = 5000 });
+        await Expect(NewAssignmentDialog).ToBeHiddenAsync();
+        await Expect(Schedule.Details).ToHaveCountAsync(0);
         AssertNoConsoleErrors();
     }
 
@@ -299,14 +249,17 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
         await ClickOpenHourToday();
 
-        // The form loads with the clicked cell's shift and start, read from the cellClick payload.
+        // The form loads with the clicked cell's shift, start and end, read from the cellClick payload.
         await Expect(NewAssignmentDialog).ToBeVisibleAsync(new() { Timeout = 10000 });
         await Expect(NewAssignmentDialog).ToContainTextAsync("Shift: AM Shift (6:00 AM - 2:00 PM)", new() { Timeout = 10000 });
         await Expect(NewAssignmentDialog).ToContainTextAsync(
             "Start: " + OpenHourToday.ToString("MMM d, yyyy h:mm tt", CultureInfo.InvariantCulture));
+        await Expect(NewAssignmentDialog).ToContainTextAsync(
+            "End: " + OpenHourToday.AddHours(1).ToString("MMM d, yyyy h:mm tt", CultureInfo.InvariantCulture));
 
-        // The empty cell's own QuickInfo is cancelled in popupOpen, so only the dialog shows.
-        await Expect(OpenQuickInfo).ToHaveCountAsync(0);
+        // The empty cell's own details are cancelled in popupOpen, so only the dialog shows.
+        await Expect(Schedule.Details).ToHaveCountAsync(0);
+        await Expect(AddShiftHint).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
@@ -317,48 +270,21 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         var weekLoads = 0;
         Page.Request += (_, request) =>
         {
-            if (request.Url.Contains("/api/schedule/assignments")) Interlocked.Increment(ref weekLoads);
+            if (request.Url.Contains("/Schedule/Shifts/")) Interlocked.Increment(ref weekLoads);
         };
-        await ClickOpenHourToday();
-        await Expect(NewAssignmentDialog).ToContainTextAsync("Staff Member", new() { Timeout = 10000 });
+        var janetsShifts = await Schedule.Appointments("Janet Brooks (CNA)").CountAsync();
 
-        var janesShifts = await ShiftsOf("Jane Blonde (CNA)").CountAsync();
-        await ChooseNewShiftStaff("Jane Blonde (CNA)");
-        await ClickWhenStable(Page.Locator("#btn-create-assignment"));
+        await AddShiftAtOpenHourToday("Janet Brooks (CNA)");
 
         await Expect(NewAssignmentDialog).ToBeHiddenAsync(new() { Timeout = 10000 });
-        await Expect(ShiftsOf("Jane Blonde (CNA)")).ToHaveCountAsync(janesShifts + 1, new() { Timeout = 10000 });
-        await Expect(ShiftAt("Jane Blonde (CNA)", OpenHourToday, shiftColumn: 0)).ToBeVisibleAsync();
+        await Expect(Schedule.Appointments("Janet Brooks (CNA)")).ToHaveCountAsync(janetsShifts + 1, new() { Timeout = 10000 });
+        await Expect(Schedule.Appointment("Janet Brooks (CNA)", OpenHourToday, groupIndex: 0)).ToBeVisibleAsync();
         Assert.That(weekLoads, Is.EqualTo(0), "The new shift joins the week the schedule shows; the week is not reloaded.");
 
         // The shift was saved in this coordinator's schedule, so it is there after a reload.
         await Page.ReloadAsync();
         await WaitForTraceMessage("booted", 10000);
-        await Expect(ShiftAt("Jane Blonde (CNA)", OpenHourToday, shiftColumn: 0)).ToBeVisibleAsync(new() { Timeout = 10000 });
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task cancelling_a_shift_takes_it_off_the_week()
-    {
-        await NavigateAndWaitForSchedule();
-        await ClickOpenHourToday();
-        await Expect(NewAssignmentDialog).ToContainTextAsync("Staff Member", new() { Timeout = 10000 });
-        await ChooseNewShiftStaff("Pat Night (CNA)");
-        await ClickWhenStable(Page.Locator("#btn-create-assignment"));
-        var patsShift = ShiftAt("Pat Night (CNA)", OpenHourToday, shiftColumn: 0);
-        await Expect(patsShift).ToBeVisibleAsync(new() { Timeout = 10000 });
-
-        await OpenShift(patsShift);
-        await Page.GetByText("Edit", new() { Exact = true }).ClickAsync();
-        await Expect(Page.Locator("#assignment-form")).ToBeVisibleAsync(new() { Timeout = 10000 });
-        await ClickWhenStable(Page.Locator("#btn-cancel-shift"));
-
-        await Expect(patsShift).ToHaveCountAsync(0, new() { Timeout = 10000 });
-        await Page.ReloadAsync();
-        await WaitForTraceMessage("booted", 10000);
-        await Expect(StaffedShifts.First).ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Expect(patsShift).ToHaveCountAsync(0);
+        await Expect(Schedule.Appointment("Janet Brooks (CNA)", OpenHourToday, groupIndex: 0)).ToBeVisibleAsync(new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
 
@@ -391,37 +317,160 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
     }
 
     [Test]
-    public async Task printing_the_schedule_opens_the_print_view_with_the_weeks_shifts()
+    public async Task cancelling_a_shift_takes_it_off_the_week()
     {
         await NavigateAndWaitForSchedule();
+        await AddShiftAtOpenHourToday("Pat Nguyen (CNA)");
+        var patsShift = Schedule.Appointment("Pat Nguyen (CNA)", OpenHourToday, groupIndex: 0);
+        await Expect(patsShift).ToBeVisibleAsync(new() { Timeout = 10000 });
+
+        await Schedule.Open(patsShift);
+        await Schedule.Details.GetByText("Edit", new() { Exact = true }).ClickAsync();
+        await Expect(AssignmentForm).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await ClickWhenStable(Page.Locator("#btn-cancel-shift"));
+
+        await Expect(patsShift).ToHaveCountAsync(0, new() { Timeout = 10000 });
+        await Page.ReloadAsync();
+        await WaitForTraceMessage("booted", 10000);
         await Expect(StaffedShifts.First).ToBeVisibleAsync(new() { Timeout = 10000 });
-
-        var printView = await Page.RunAndWaitForPopupAsync(async () =>
-        {
-            await ClickWhenStable(Page.Locator("#print-btn"));
-        });
-
-        await printView.WaitForLoadStateAsync();
-        await Expect(printView.Locator("body")).ToContainTextAsync(StaffedShift, new() { Timeout = 10000 });
-        await Expect(printView.Locator("body")).ToContainTextAsync("UNASSIGNED", new() { Timeout = 10000 });
+        await Expect(patsShift).ToHaveCountAsync(0);
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task moving_to_next_week_loads_that_weeks_shifts_and_names_the_week()
+    public async Task clicking_an_assigned_shift_shows_staff_details_and_edit_actions()
     {
         await NavigateAndWaitForSchedule();
-        await Expect(StaffedShifts.First).ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Expect(ShownWeek).ToHaveTextAsync(new Regex(@"^\d{4}-\d{2}-\d{2}"));
-        var shownWeek = DateTime.Parse(await ShownWeek.TextContentAsync() ?? "", CultureInfo.InvariantCulture);
 
-        await NextWeek.ClickAsync();
+        await Schedule.Open(StaffedShifts.First);
 
-        // The week's grid starts empty: only the navigating handler's request fills it.
-        await Expect(StaffedShifts.First).ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Expect(ShownWeek).ToHaveTextAsync(
-            new Regex("^" + Regex.Escape(shownWeek.AddDays(7).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))),
-            new() { Timeout = 5000 });
+        // The details' template binds the clicked shift: its staff phone in the content, Edit and Reassign in
+        // the footer. None of this exists until the popup renders the shift.
+        await Expect(Schedule.Details.GetByText("Reassign", new() { Exact = true })).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Schedule.Details.GetByText(new Regex(@"\d{3}-\d{4}"))).ToBeVisibleAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task clicking_an_unassigned_shift_offers_to_assign_staff()
+    {
+        await NavigateAndWaitForSchedule();
+
+        await Schedule.Open(OpenShifts.First);
+
+        await Expect(Schedule.Details.GetByText("Assign Staff", new() { Exact = true })).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Schedule.Details.GetByText("Reassign", new() { Exact = true })).ToHaveCountAsync(0);
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task editing_a_shift_opens_the_edit_drawer_with_the_assignment_form()
+    {
+        await NavigateAndWaitForSchedule();
+        var shift = StaffedShifts.First;
+        var staff = await shift.InnerTextAsync();
+        await Schedule.Open(shift);
+
+        await Schedule.Details.GetByText("Edit", new() { Exact = true }).ClickAsync();
+
+        // The drawer loads the clicked shift's assignment: its staff member is the one chosen.
+        await Expect(Drawer).ToHaveClassAsync(new Regex("alis-drawer--visible"), new() { Timeout = 10000 });
+        await Expect(Page.Locator("#alis-drawer-title")).ToHaveTextAsync("Edit Shift Assignment");
+        await Expect(StaffChoice(staff)).ToBeCheckedAsync(new() { Timeout = 10000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task reassigning_a_shift_opens_the_assignment_drawer()
+    {
+        await NavigateAndWaitForSchedule();
+        var shift = StaffedShifts.First;
+        var staff = await shift.InnerTextAsync();
+        await Schedule.Open(shift);
+
+        await Schedule.Details.GetByText("Reassign", new() { Exact = true }).ClickAsync();
+
+        await Expect(Drawer).ToHaveClassAsync(new Regex("alis-drawer--visible"), new() { Timeout = 10000 });
+        await Expect(Page.Locator("#alis-drawer-title")).ToHaveTextAsync("Reassign Shift");
+        await Expect(StaffChoice(staff)).ToBeCheckedAsync(new() { Timeout = 10000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task assigning_staff_to_an_open_shift_reduces_open_shifts_and_persists_on_reload()
+    {
+        await NavigateAndWaitForSchedule();
+        var before = await ShiftsNeedingCoverage();
+        Assert.That(before, Is.GreaterThan(0), "the scenario needs at least one open shift to cover");
+        var openShift = Schedule.Appointments(new Regex("UNASSIGNED")).First;
+        var start = await Schedule.StartOf(openShift);
+        var group = await Schedule.GroupOf(openShift);
+
+        await Schedule.Open(openShift);
+        await Schedule.Details.GetByText("Assign Staff", new() { Exact = true }).ClickAsync();
+        await Expect(Drawer).ToHaveClassAsync(new Regex("alis-drawer--visible"), new() { Timeout = 10000 });
+        await Expect(AssignmentForm).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await AssignmentForm.GetByText("Tom Harding (LPN)").ClickAsync();
+        await ClickWhenStable(Page.Locator("#btn-save-assignment"));
+
+        // The shift shows Tom where it is, and the week the server answers with has one fewer open shift.
+        await Expect(Schedule.Appointment("Tom Harding (LPN)", start, group).First).ToBeVisibleAsync(new() { Timeout = 15000 });
+        await Expect(Summary).ToHaveTextAsync(new Regex($@": {before - 1} of 21 shifts"), new() { Timeout = 15000 });
+
+        // It was saved on the server, not only in the schedule.
+        await Page.ReloadAsync();
+        await WaitForTraceMessage("booted", 10000);
+        await Expect(Summary).ToHaveTextAsync(new Regex($@": {before - 1} of 21 shifts"), new() { Timeout = 10000 });
+        await Expect(Schedule.Appointment("Tom Harding (LPN)", start, group).First).ToBeVisibleAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // The schedule's editor opens on the first shift no one covers, and the page's PopupOpen hands it to
+    // the drawer: an open shift has no staff member chosen, where an assigned one would.
+    [Test]
+    public async Task covering_the_next_open_shift_opens_its_assignment_form_with_no_one_chosen()
+    {
+        await NavigateAndWaitForSchedule();
+        await Expect(OpenShifts.First).ToBeVisibleAsync(new() { Timeout = 10000 });
+
+        await ClickWhenStable(Page.Locator("#cover-next-open-shift"));
+
+        await Expect(Drawer).ToHaveClassAsync(new Regex("alis-drawer--visible"), new() { Timeout = 10000 });
+        await Expect(AssignmentForm).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(AssignmentForm.GetByRole(AriaRole.Radio).First).ToBeVisibleAsync();
+        await Expect(AssignmentForm.GetByRole(AriaRole.Radio, new() { Checked = true })).ToHaveCountAsync(0);
+        await Expect(Schedule.Editor).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task double_clicking_a_shift_opens_the_assignment_drawer_instead_of_the_built_in_editor()
+    {
+        await NavigateAndWaitForSchedule();
+        var shift = StaffedShifts.First;
+        var staff = await shift.InnerTextAsync();
+
+        await Schedule.OpenToChange(shift);
+
+        // popupOpen cancels Syncfusion's editor (type "Editor") and loads the shift's assignment instead.
+        await Expect(StaffChoice(staff)).ToBeCheckedAsync(new() { Timeout = 10000 });
+        await Expect(Schedule.Editor).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task closing_a_shifts_details_clears_the_selected_shift()
+    {
+        await NavigateAndWaitForSchedule();
+        var shift = StaffedShifts.First;
+        var staff = await shift.InnerTextAsync();
+
+        await Schedule.Open(shift);
+        await Expect(Selection).ToHaveTextAsync(staff, new() { Timeout = 10000 });
+
+        await Schedule.DetailsClose.ClickAsync();
+
+        await Expect(Selection).ToHaveTextAsync("Nothing selected.", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
@@ -429,14 +478,14 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
     public async Task a_schedule_locked_for_payroll_stays_on_its_week()
     {
         await NavigateAndWaitForSchedule();
-        await Expect(ShownWeek).ToHaveTextAsync(new Regex(@"^\d{4}-\d{2}-\d{2}"));
-        var shownWeek = await ShownWeek.TextContentAsync() ?? "";
+        var shownWeek = await Schedule.DateRange.InnerTextAsync();
         await ScheduleLocked.Check();
 
-        await NextWeek.ClickAsync();
+        await Schedule.Next.ClickAsync();
 
         await Expect(LockedNote).ToHaveTextAsync("The schedule is locked for payroll; it stays on this week.", new() { Timeout = 5000 });
-        await Expect(ShownWeek).ToHaveTextAsync(shownWeek);
+        await Expect(Schedule.DateRange).ToHaveTextAsync(shownWeek);
+        await Expect(Summary).ToHaveTextAsync(WeekSummary("Maple Grove", DateTime.Today));
         await Expect(StaffedShifts.First).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
@@ -447,29 +496,15 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await NavigateAndWaitForSchedule();
         await ScheduleLocked.Check();
 
-        await OpenShift(StaffedShifts.First);
+        await Schedule.Open(StaffedShifts.First);
 
         await Expect(LockedNote).ToHaveTextAsync("The schedule is locked for payroll; unlock it to open a shift.", new() { Timeout = 5000 });
-        await Expect(Page.GetByText("Reassign", new() { Exact = true })).ToHaveCountAsync(0);
+        await Expect(Schedule.Details).ToHaveCountAsync(0);
 
         await ScheduleLocked.Input.UncheckAsync();
-        await OpenShift(StaffedShifts.First);
+        await Schedule.Open(StaffedShifts.First);
 
-        await Expect(Page.GetByText("Reassign", new() { Exact = true })).ToBeVisibleAsync(new() { Timeout = 10000 });
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task closing_a_shifts_details_clears_the_selected_shift()
-    {
-        await NavigateAndWaitForSchedule();
-
-        await OpenShift(StaffedShifts.First);
-        await Expect(SelectedShift).ToHaveTextAsync(StaffedShift, new() { Timeout = 10000 });
-
-        await Page.Locator(".e-quick-popup-wrapper .e-close").ClickAsync();
-
-        await Expect(SelectedShift).ToHaveTextAsync("No shift selected.", new() { Timeout = 5000 });
+        await Expect(Schedule.Details.GetByText("Reassign", new() { Exact = true })).ToBeVisibleAsync(new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
 
@@ -492,34 +527,11 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
     }
 
     [Test]
-    public async Task changing_the_facility_reloads_the_schedule_until_it_is_ready()
-    {
-        await NavigateAndWaitForSchedule();
-        await Expect(Status).ToHaveTextAsync("Ready", new() { Timeout = 10000 });
-        var assignmentsReleased = new SemaphoreSlim(0);
-        await Page.RouteAsync("**/api/schedule/assignments**", async route =>
-        {
-            await assignmentsReleased.WaitAsync(TimeSpan.FromSeconds(30));
-            await route.ContinueAsync();
-        });
-
-        await Facility.Select("Sunrise Gardens");
-
-        // The change handler says "Loading..." while Sunrise Gardens' shifts are asked for; only the
-        // schedule's dataBound, after they bind, says "Ready".
-        await Expect(Status).ToHaveTextAsync("Loading...", new() { Timeout = 10000 });
-        assignmentsReleased.Release();
-        await Expect(Status).ToHaveTextAsync("Ready", new() { Timeout = 10000 });
-        await Expect(StaffedShifts.First).ToBeVisibleAsync();
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
     public async Task jumping_to_a_shift_brings_its_first_hour_into_view()
     {
         await NavigateAndWaitForSchedule();
-        var amShiftStart = WorkCell(DateTime.Today.AddHours(6), shiftColumn: 0);
-        var nightShiftStart = WorkCell(DateTime.Today.AddHours(22), shiftColumn: 2);
+        var amShiftStart = Schedule.Cell(DateTime.Today.AddHours(6), groupIndex: 0);
+        var nightShiftStart = Schedule.Cell(DateTime.Today.AddHours(22), groupIndex: 2);
 
         // The schedule opens at the start of the work hours (6 AM), so the night shift comes first.
         await Page.Locator("#schedule-show-night").ClickAsync();
@@ -535,17 +547,90 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
     }
 
     [Test]
-    public async Task double_clicking_a_shift_opens_the_assignment_drawer_instead_of_the_built_in_editor()
+    public async Task printing_the_schedule_opens_the_print_view_with_the_weeks_shifts()
     {
         await NavigateAndWaitForSchedule();
-        var shift = StaffedShifts.First;
-        await shift.ScrollIntoViewIfNeededAsync();
+        await Expect(StaffedShifts.First).ToBeVisibleAsync(new() { Timeout = 10000 });
 
-        await shift.DblClickAsync();
+        var printView = await Page.RunAndWaitForPopupAsync(async () =>
+        {
+            await ClickWhenStable(Page.Locator("#print-btn"));
+        });
 
-        // popupOpen cancels Syncfusion's editor (type "Editor") and loads the assignment form instead.
-        await Expect(Page.GetByText("Save Assignment")).ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Expect(Page.Locator(".e-schedule-dialog.e-popup-open")).ToHaveCountAsync(0);
+        await printView.WaitForLoadStateAsync();
+        await Expect(printView.Locator("body")).ToContainTextAsync(StaffedShift, new() { Timeout = 10000 });
+        await Expect(printView.Locator("body")).ToContainTextAsync("UNASSIGNED", new() { Timeout = 10000 });
         AssertNoConsoleErrors();
+    }
+
+    // The schedule's own events go to the agency; it counts the open ones among them, which are the ones the
+    // server's summary counts.
+    [Test]
+    public async Task asking_the_agency_sends_every_open_shift_the_schedule_holds()
+    {
+        await NavigateAndWaitForSchedule();
+        var open = await ShiftsNeedingCoverage();
+        Assert.That(open, Is.GreaterThan(0), "the scenario needs at least one open shift to send");
+
+        await ClickWhenStable(Page.Locator("#ask-agency-btn"));
+
+        await Expect(AgencyStatus).ToHaveTextAsync(
+            $"Asked Staffing Plus to cover {open} open {(open == 1 ? "shift" : "shifts")}.", new() { Timeout = 10000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task double_clicking_an_in_service_opens_it_in_the_schedules_own_editor()
+    {
+        await NavigateAndWaitForSchedule();
+
+        await Schedule.OpenToChange(Schedule.Appointments("In-service: Falls prevention"));
+
+        await Expect(Schedule.Editor).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Schedule.EditorField("subject")).ToHaveValueAsync("In-service: Falls prevention");
+        await Expect(InServiceNote).ToHaveTextAsync("The Falls prevention in-service is yours to change until you close it.", new() { Timeout = 10000 });
+        // The server's answer that it is free leaves the editor open.
+        await Expect(Schedule.Editor).ToBeVisibleAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task closing_an_in_service_unsaved_takes_away_the_note_that_it_is_yours()
+    {
+        await NavigateAndWaitForSchedule();
+        await Schedule.OpenToChange(Schedule.Appointments("In-service: Falls prevention"));
+        await Expect(InServiceNote).ToBeVisibleAsync(new() { Timeout = 10000 });
+
+        await Schedule.EditorCancel.ClickAsync();
+
+        await Expect(Schedule.Editor).ToBeHiddenAsync(new() { Timeout = 5000 });
+        await Expect(InServiceNote).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // The editor is open while the server is asked; nothing the coordinator does closes it. The server's
+    // answer that Dana Whitfield has the in-service open is what closes it.
+    [Test]
+    public async Task an_in_service_someone_else_is_changing_closes_and_says_who_has_it()
+    {
+        await NavigateAndWaitForSchedule();
+        var answerReleased = new SemaphoreSlim(0);
+        await Page.RouteAsync("**/Schedule/InServiceClaim", async route =>
+        {
+            await answerReleased.WaitAsync(TimeSpan.FromSeconds(30));
+            await route.ContinueAsync();
+        });
+
+        await Schedule.OpenToChange(Schedule.Appointments("In-service: Safe resident transfers"));
+        await Expect(Schedule.Editor).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Schedule.EditorField("subject")).ToHaveValueAsync("In-service: Safe resident transfers");
+
+        answerReleased.Release();
+
+        await Expect(InServiceNote).ToHaveTextAsync(
+            "Dana Whitfield is changing the Safe resident transfers in-service right now, so it was closed here. Try again in a few minutes.",
+            new() { Timeout = 10000 });
+        await Expect(Schedule.Editor).ToBeHiddenAsync(new() { Timeout = 5000 });
+        AssertNoConsoleErrorsExcept("the server responded with a status of 409");
     }
 }

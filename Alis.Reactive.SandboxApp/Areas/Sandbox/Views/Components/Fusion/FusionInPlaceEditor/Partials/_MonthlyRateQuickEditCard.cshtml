@@ -1,56 +1,59 @@
-@model MonthlyRateQuickEdit
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InPlaceEditor
+@model MonthlyRateCorrection
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using SfInPlace = Syncfusion.EJ2.InPlaceEditor
 @{
-    var plan = Html.ReactivePlan<MonthlyRateQuickEdit>();
-    var updateUrl = Url.Action("UpdateMonthlyRate", "FusionInPlaceEditor", new { area = "Sandbox" })
-        ?? throw new InvalidOperationException("Could not resolve FusionInPlaceEditor.UpdateMonthlyRate.");
+    var plan = Html.ReactivePlan<MonthlyRateCorrection>();
 }
 
-<section id="card-monthly-rate" class="rounded-lg border border-border bg-white p-6 shadow-sm mb-4">
-    <h3 class="text-sm font-semibold mb-3">Quick-edit: Monthly Rate — one validator, page and server</h3>
-    <p class="text-xs text-text-secondary mb-2">
-        One <code>MonthlyRateQuickEditValidator</code> drives both sides. Client metadata declares the
-        <code>GreaterThan/LessThanOrEqualTo</code> rules and blocks the POST on invalid input.
-        A <code>Must()</code> rule that simulates a DB lookup is server-only and runs
-        server-only: enter <strong>7777</strong> to watch the client pass, the server reject with
-        <code>{ errors: { Value: [...] } }</code>, and <code>.OnError(400, e => e.ValidationErrors(formId))</code>
-        render the message into the per-field validation slot.
-    </p>
-
+<div id="card-monthly-rate" class="border-t border-border pt-3">
     @Html.HiddenFieldFor(plan, m => m.ResidentId)
 
-    @{ Html.InputField(plan, m => m.Value, o => o.Label("Monthly Rate"))
+    @{ Html.InputField(plan, m => m.Value, o => o.Label("Monthly rate"))
         .FusionInPlaceEditor(b => b
             .Type(SfInPlace.InputType.Numeric)
             .Mode(SfInPlace.RenderMode.Inline)
             .EditableOn(SfInPlace.EditableType.Click)
             .Model(new { format = "C0", min = 0, max = 25000, step = 50 }))
-        .Reactive(evt => evt.BeginEdit, (args, p) =>
+        .Reactive(evt => evt.ActionBegin, (args, p) =>
         {
-            p.Component<FusionInPlaceEditor>(m => m.Value).Element.ClassList.Remove("alis-editor-saved");
-        })
-        .Reactive(evt => evt.ActionSuccess, (args, p) =>
-        {
-            p.Post(updateUrl)
-             .Gather(g => g.Form(m => m.Value, m => m.ResidentId))
-             .Validate<MonthlyRateQuickEditValidator>("card-monthly-rate")
+            // Billing confirms a rate before the editor closes: the page sends the editor's own commit data
+            // and closes the editor with the rate billing keeps.
+            args.Cancel.Set(true);
+            p.Post(Url.SandboxRoute("UpdateMonthlyRate", "FusionInPlaceEditor"))
+             .Gather<MonthlyRateChange>(g => g.Form(m => m.ResidentId).Set(x => x.Change, args.Data))
+             .Validate<MonthlyRateCorrectionValidator>("card-monthly-rate")
              .Response(r => r
-                .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
+                .OnSuccess<MonthlyRateSaved>((saved, s) =>
                 {
-                    s.Element("card-monthly-rate-display").Text.Set(json.Get(x => x.DisplayValue));
-                    s.Component<FusionInPlaceEditor>(m => m.Value).Element.ClassList.Add("alis-editor-saved");
+                    s.Component<FusionInPlaceEditor>(m => m.Value).Value.Set(saved.Get(x => x.Rate));
+                    s.Element("card-monthly-rate-status").Text.Set(saved.Get(x => x.Message));
                 })
-                .OnError(400, e => e.ValidationErrors("card-monthly-rate"))
-                .OnError<InPlaceEditorCommitError>((err, e) =>
+                .OnError(400, e =>
                 {
-                    e.Element("card-monthly-rate-error").Text.Set(err.Get(x => x.Message));
-                }));
+                    // The editor is still open: the cursor goes back into it, then billing's reason shows under it.
+                    e.Component<FusionInPlaceEditor>(m => m.Value).SetFocus();
+                    e.ValidationErrors("card-monthly-rate");
+                })
+                .OnError<CorrectionRefused>((refused, e) =>
+                    e.Element("card-monthly-rate-status").Text.Set(refused.Get(x => x.Message))));
         }); }
 
-    <p class="text-sm mt-3">Display: <span id="card-monthly-rate-display" class="font-mono text-text-muted">unchanged</span></p>
-    <p class="text-sm">Other error: <span id="card-monthly-rate-error" class="text-red-600"></span></p>
-</section>
+    @{ Html.InputField(plan, m => m.CustomRate, o => o.Label("Custom rate"))
+        .NativeCheckBox(b => b.CssClass("rounded border-border"))
+        .Reactive(evt => evt.Change, (args, p) =>
+            p.When(args.Checked).Truthy()
+                .Then(custom => custom.Component<FusionInPlaceEditor>(m => m.Value).Disable(false))
+                .Else(byLevel => byLevel.Component<FusionInPlaceEditor>(m => m.Value).Disable(true))); }
+
+    <p class="text-xs text-text-secondary">The monthly rate follows the care level unless a custom rate is set.</p>
+    <p id="card-monthly-rate-status" class="text-sm text-text-secondary"></p>
+</div>
+
+@{
+    // The rate follows the care level until the coordinator sets a custom rate.
+    Html.On(plan, t => t.DomReady(p => p.Component<FusionInPlaceEditor>(m => m.Value).Disable(true)));
+}
 
 @Html.RenderPlan(plan)

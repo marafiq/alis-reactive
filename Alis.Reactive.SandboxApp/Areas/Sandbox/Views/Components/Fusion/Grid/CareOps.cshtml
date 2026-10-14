@@ -6,10 +6,11 @@
 @using Syncfusion.EJ2.Buttons
 @using Syncfusion.EJ2.Grids
 @{
-    ViewData["Title"] = "FusionGrid Care Operations";
+    ViewData["Title"] = "Care Operations";
 
     const string GridId = "careops-grid";
     const string AdmitFormId = "careops-admit-form";
+    const int PageSize = 10;
     const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
     const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
     const string ButtonAccent = "rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90";
@@ -18,27 +19,11 @@
 
     var columns = FusionGridColumns.Of<ResidentCareItem>();
 
-    // The grid's cell editor checks the rules ResidentCareItemValidator gives the browser.
+    // The grid's open-tasks cell checks the range ResidentCareItemValidator gives the browser.
     var careValidation = FusionGridValidation.From<ResidentCareItem>(plan.ClientRules<ResidentCareItemValidator>());
 
-    var wings = (List<string>)ViewBag.Wings;
-    var careLevels = (List<string>)ViewBag.CareLevels;
-    var riskLevels = (List<string>)ViewBag.RiskLevels;
-    var nurses = (List<string>)ViewBag.Nurses;
-    var careLevelEditOptions = careLevels.Where(c => !string.IsNullOrEmpty(c)).ToArray();
-    var riskEditOptions = riskLevels.Where(r => !string.IsNullOrEmpty(r)).ToArray();
-    var nurseEditOptions = nurses.ToArray();
-
-    var riskChips = new List<ChipCollection>
-    {
-        new() { Text = "All" }, new() { Text = "Low" }, new() { Text = "Moderate" },
-        new() { Text = "High" }, new() { Text = "Critical" }
-    };
-    var careChips = new List<ChipCollection>
-    {
-        new() { Text = "All" }, new() { Text = "Independent" }, new() { Text = "Assisted Living" },
-        new() { Text = "Memory Care" }, new() { Text = "Skilled Nursing" }
-    };
+    var riskChips = new[] { "All" }.Concat(CareOpsOptions.RiskLevels).Select(text => new ChipCollection { Text = text }).ToList();
+    var careChips = new[] { "All" }.Concat(CareOpsOptions.CareLevels).Select(text => new ChipCollection { Text = text }).ToList();
 
     var riskTemplate = FusionTemplate.Create<ResidentCareItem>()
         .When(m => m.RiskLevel == "Critical",
@@ -46,98 +31,80 @@
             @else: e => e.Badge(m => m.RiskLevel, "rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700"))
         .Render();
 
-    void LoadCareOps(PipelineBuilder<CareOpsViewModel> p, string status)
+    // The board as the server answers it, and the sentence that says what the server did.
+    void ShowBoard(Data<CareOpsResponse> board, PipelineBuilder<CareOpsViewModel> s)
     {
-        p.Post(Url.SandboxRoute("CareOpsData", "Grid"))
-            .Gather<CareOpsDataRequest>(g => g.Set(x => x.Skip, 0).Set(x => x.Take, 10))
-            .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
-            {
-                s.Component<FusionGrid>(GridId).DataSource.Set(json);
-                s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
-                s.Element("careops-status").Text.Set(status);
-            }));
+        s.Component<FusionGrid>(GridId).DataSource.Set(board);
+        s.Element("careops-summary").Text.Set(board.Get(x => x.Summary));
     }
+
+    void LoadCensus(PipelineBuilder<CareOpsViewModel> p) =>
+        p.Post(Url.SandboxRoute("CareOpsData", "Grid"))
+            .Gather<CareOpsDataRequest>(g => g.Set(x => x.Skip, 0).Set(x => x.Take, PageSize))
+            .Response(r => r.OnSuccess<CareOpsResponse>(ShowBoard));
+
+    void LoadWatchList(PipelineBuilder<CareOpsViewModel> p) =>
+        p.Get(Url.SandboxRoute("CareOpsActionRows", "Grid"))
+            .Response(r => r.OnSuccess(s => s.Into("careops-action-rows")));
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        LoadCareOps(p, "loaded care census");
-        p.Get(Url.SandboxRoute("CareOpsActionRows", "Grid"))
-            .Response(r => r.OnSuccess(s => s.Into("careops-action-rows")));
+        LoadCensus(p);
+        LoadWatchList(p);
     }));
 
-    Html.On(plan, t => t.CustomEvent(CareOpsEvents.CareopsRowsRefresh, p =>
-    {
-        p.Get(Url.SandboxRoute("CareOpsActionRows", "Grid"))
-            .Response(r => r.OnSuccess(s => s.Into("careops-action-rows")));
-    }));
-
-    Html.On(plan, t => t.CustomEvent(CareOpsEvents.CareopsRowsRefresh, p => LoadCareOps(p, "census updated")));
+    // A resident flagged or discharged from the watch list changes both the list and the census.
+    Html.On(plan, t => t.CustomEvent(CareOpsEvents.CareopsRowsRefresh, LoadWatchList));
+    Html.On(plan, t => t.CustomEvent(CareOpsEvents.CareopsRowsRefresh, LoadCensus));
 }
 
 <div id="admit-dialog" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
     <div class="w-full max-w-xl rounded-lg border border-border bg-white p-6 shadow-xl">
         <native-heading level="H2">Admit Resident</native-heading>
-        <native-text color="Secondary">Validated through the same ReactiveValidator the form layer uses.</native-text>
+        <native-text color="Secondary">The new resident joins the census with the night float team until a primary nurse is assigned.</native-text>
         <form id="@AdmitFormId" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
             @{ Html.InputField(plan, m => m.NewResidentName, o => o.Required().Label("Resident"))
                 .FusionTextBox(b => b.Placeholder("Resident name").ShowClearButton(true)); }
             @{ Html.InputField(plan, m => m.NewWing, o => o.Required().Label("Wing"))
-                .FusionDropDownList(b => b.DataSource(wings).Placeholder("Select wing")); }
+                .FusionDropDownList(b => b.DataSource(CareOpsOptions.Wings).Placeholder("Select wing")); }
             @{ Html.InputField(plan, m => m.NewCareLevel, o => o.Required().Label("Care level"))
-                .FusionDropDownList(b => b.DataSource(careLevels).Placeholder("Select care level")); }
-            @{ Html.InputField(plan, m => m.NewRiskLevel, o => o.Required().Label("Risk level"))
-                .FusionDropDownList(b => b.DataSource(riskLevels).Placeholder("Select risk")); }
-            @{ Html.InputField(plan, m => m.NewOpenTasks, o => o.Required().Label("Open tasks"))
-                .FusionNumericTextBox(b => b.Format("n0").Min(0).Max(12).Step(1).Placeholder("0")); }
+                .FusionDropDownList(b => b.DataSource(CareOpsOptions.CareLevels).Placeholder("Select care level")); }
+            @{ Html.InputField(plan, m => m.NewRiskLevel, o => o.Required().Label("Risk"))
+                .FusionDropDownList(b => b.DataSource(CareOpsOptions.RiskLevels).Placeholder("Select risk")); }
+            @{ Html.InputField(plan, m => m.NewOpenTasks, o => o.Required().Label("Open care tasks"))
+                .FusionNumericTextBox(b => b.Format("n0").Min(0).Max(7).Step(1).Placeholder("0")); }
         </form>
         <native-hstack gap="Sm" justify="End" class="mt-5">
             @(Html.NativeButton("admit-cancel", "Cancel")
                 .CssClass(ButtonSecondary)
-                .Reactive(plan, evt => evt.Click, (args, p) => { p.Element("admit-dialog").ClassList.Add("hidden"); }))
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Element("admit-dialog").ClassList.Add("hidden")))
             @(Html.NativeButton("admit-save", "Admit")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Post(Url.SandboxRoute("CareOpsAdmit", "Grid"))
-                    .Gather(g => g.Form(m => m.NewResidentName, m => m.NewWing, m => m.NewCareLevel, m => m.NewRiskLevel, m => m.NewOpenTasks))
-                    .Validate<CareOpsAdmitValidator>(AdmitFormId)
-                    .Response(r => r
-                        .OnSuccess<CareOpsResponse>((json, s) =>
-                        {
-                            s.Component<FusionGrid>(GridId).DataSource.Set(json);
-                            s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
-                            s.Element("careops-status").Text.Set("resident admitted");
-                            s.Element("admit-dialog").ClassList.Add("hidden");
-                        })
-                        .OnError(400, e =>
-                        {
-                            e.ValidationErrors(AdmitFormId);
-                            e.Element("careops-status").Text.Set("admit validation failed");
-                        }));
+                        .Gather(g => g.Form(m => m.NewResidentName, m => m.NewWing, m => m.NewCareLevel, m => m.NewRiskLevel, m => m.NewOpenTasks))
+                        .Validate<CareOpsAdmitValidator>(AdmitFormId)
+                        .Response(r => r
+                            .OnSuccess<CareOpsResponse>((board, s) =>
+                            {
+                                ShowBoard(board, s);
+                                s.Element("admit-dialog").ClassList.Add("hidden");
+                            })
+                            .OnError(400, e => e.ValidationErrors(AdmitFormId)));
                 }))
         </native-hstack>
     </div>
 </div>
 
 <native-vstack gap="Lg">
-    <native-hstack justify="Between" align="Center" class="flex-wrap gap-3">
-        <div>
-            <native-heading level="H1">Care Operations Board</native-heading>
-            <native-text color="Secondary">
-                Chip fast-filters, checkbox bulk selection, dropdown/date cell editors, frozen columns, sticky header, and per-row discharge action links.
-            </native-text>
-        </div>
-        <native-hstack gap="Sm" class="flex-wrap">
-            <a asp-area="Sandbox" asp-controller="Grid" asp-action="Billing"
-               class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
-                Billing board
-            </a>
-            <a asp-area="Sandbox" asp-controller="Grid" asp-action="Editing"
-               class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
-                Editing grid
-            </a>
-        </native-hstack>
-    </native-hstack>
+    <div>
+        <native-heading level="H1">Care Operations</native-heading>
+        <native-text color="Secondary">
+            Maple Grove director of nursing. Narrow the census by risk or care level, correct a resident's care in the
+            grid, act on the residents you tick, and work the high-risk watch list.
+        </native-text>
+    </div>
 
     <native-card><native-card-body>
         <native-heading level="H2">Fast Filters</native-heading>
@@ -148,19 +115,12 @@
                     .Chips(riskChips)
                     .Selection(Selection.Single))
                     .Reactive(evt => evt.Click, (args, p) =>
-                    {
                         p.Post(Url.SandboxRoute("CareOpsData", "Grid"))
                             .Gather<CareOpsDataRequest>(g => g
                                 .Set(x => x.Skip, 0)
-                                .Set(x => x.Take, 10)
+                                .Set(x => x.Take, PageSize)
                                 .Set(x => x.FilterRisk, args.Text))
-                            .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
-                            {
-                                s.Component<FusionGrid>(GridId).DataSource.Set(json);
-                                s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
-                                s.Element("careops-status").Text.Set(args.Text);
-                            }));
-                    }))
+                            .Response(r => r.OnSuccess<CareOpsResponse>(ShowBoard))))
             </div>
             <div>
                 <p class="mb-1 text-xs font-medium uppercase tracking-wide text-text-muted">Care level</p>
@@ -168,33 +128,22 @@
                     .Chips(careChips)
                     .Selection(Selection.Single))
                     .Reactive(evt => evt.Click, (args, p) =>
-                    {
                         p.Post(Url.SandboxRoute("CareOpsData", "Grid"))
                             .Gather<CareOpsDataRequest>(g => g
                                 .Set(x => x.Skip, 0)
-                                .Set(x => x.Take, 10)
+                                .Set(x => x.Take, PageSize)
                                 .Set(x => x.FilterCareLevel, args.Text))
-                            .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
-                            {
-                                s.Component<FusionGrid>(GridId).DataSource.Set(json);
-                                s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
-                                s.Element("careops-status").Text.Set(args.Text);
-                            }));
-                    }))
+                            .Response(r => r.OnSuccess<CareOpsResponse>(ShowBoard))))
             </div>
         </native-vstack>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Bulk Care Operations</native-heading>
-        <native-text color="Secondary">
-            Select residents with the checkboxes, edit Care Level / Risk / Nurse / Tasks / Review date in the grid, then save or bulk-apply.
-        </native-text>
-        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+        <native-hstack gap="Sm" class="mb-4 flex-wrap">
             @(Html.NativeButton("careops-admit-open", "Admit Resident")
                 .CssClass(ButtonAccent)
-                .Reactive(plan, evt => evt.Click, (args, p) => { p.Element("admit-dialog").ClassList.Remove("hidden"); }))
-            @(Html.NativeButton("careops-save-all", "Save All Care Edits")
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Element("admit-dialog").ClassList.Remove("hidden")))
+            @(Html.NativeButton("careops-save-all", "Save Care Changes")
                 .CssClass(ButtonPrimary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
@@ -203,20 +152,12 @@
                     p.Post(Url.SandboxRoute("CareOpsSave", "Grid"))
                         .Gather<CareOpsSaveRequest>(g => g.Set(x => x.BatchChanges, grid.GetBatchChanges<ResidentCareItem>()))
                         .Response(r => r
-                            .OnSuccess<CareOpsResponse>((json, s) =>
-                            {
-                                s.Component<FusionGrid>(GridId).DataSource.Set(json);
-                                s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
-                                s.Element("careops-status").Text.Set("care edits saved");
-                            })
-                            .OnError<CareOpsResponse>(400, (json, e) =>
-                            {
-                                e.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
-                                e.Element("careops-status").Text.Set("care edits refused");
-                            }));
+                            .OnSuccess<CareOpsResponse>(ShowBoard)
+                            .OnError<CareOpsResponse>(400, (refused, e) =>
+                                e.Element("careops-summary").Text.Set(refused.Get(x => x.Summary))));
                 }))
-            @(Html.NativeButton("careops-reassign", "Reassign Selected To Night Float")
-                .CssClass(ButtonPrimary)
+            @(Html.NativeButton("careops-reassign", "Reassign Ticked To Night Float")
+                .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var grid = p.Component<FusionGrid>(GridId);
@@ -224,14 +165,9 @@
                         .Gather<CareOpsBulkRequest>(g => g
                             .Set(x => x.Nurse, "Night Float Team")
                             .Set(x => x.SelectedRecords, grid.GetSelectedRecords<ResidentCareItem>()))
-                        .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
-                        {
-                            s.Component<FusionGrid>(GridId).DataSource.Set(json);
-                            s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
-                            s.Element("careops-status").Text.Set("nurse reassigned");
-                        }));
+                        .Response(r => r.OnSuccess<CareOpsResponse>(ShowBoard));
                 }))
-            @(Html.NativeButton("careops-flag-risk", "Flag Selected Critical")
+            @(Html.NativeButton("careops-flag-risk", "Flag Ticked Critical")
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
@@ -240,32 +176,18 @@
                         .Gather<CareOpsBulkRequest>(g => g
                             .Set(x => x.Risk, "Critical")
                             .Set(x => x.SelectedRecords, grid.GetSelectedRecords<ResidentCareItem>()))
-                        .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
-                        {
-                            s.Component<FusionGrid>(GridId).DataSource.Set(json);
-                            s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
-                            s.Element("careops-status").Text.Set("residents flagged critical");
-                        }));
+                        .Response(r => r.OnSuccess<CareOpsResponse>(ShowBoard));
                 }))
-            @(Html.NativeActionLink("careops-discharge-selected", "Discharge Selected", Url.SandboxRoute("CareOpsDischargeSelected", "Grid"), link => link
-                .Confirm("Discharge the selected resident(s) from the active census?")
+            @(Html.NativeActionLink("careops-discharge-selected", "Discharge Ticked", Url.SandboxRoute("CareOpsDischargeSelected", "Grid"), link => link
+                .Confirm("Discharge the ticked residents from the active census?")
                 .Then(confirmed => confirmed.Post()
                     .Gather<CareOpsBulkRequest>(g => g.Set(x => x.SelectedRecords, confirmed.Component<FusionGrid>(GridId).GetSelectedRecords<ResidentCareItem>()))
-                    .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
-                    {
-                        s.Component<FusionGrid>(GridId).DataSource.Set(json);
-                        s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
-                        s.Element("careops-status").Text.Set("resident discharged");
-                    }))))
+                    .Response(r => r.OnSuccess<CareOpsResponse>(ShowBoard))))
                 .CssClass("inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700"))
         </native-hstack>
-        <native-vstack gap="Xs" class="mt-4 font-mono text-sm">
-            <p>Status: <span id="careops-status" class="text-text-muted">waiting</span></p>
-            <p>Summary: <span id="careops-summary" class="text-text-muted">waiting</span></p>
-        </native-vstack>
-    </native-card-body></native-card>
 
-    <native-card><native-card-body>
+        <p id="careops-summary" role="status" class="mb-3 text-sm font-medium">Loading the care census…</p>
+
         @(Html.FusionGrid<CareOpsViewModel, ResidentCareItem>(plan, GridId, b => b
             .AllowPaging(true)
             .AllowSorting(true)
@@ -279,45 +201,33 @@
                 PersistSelection = true
             })
             .EditSettings(new GridEditSettings { AllowEditing = true, Mode = EditMode.Batch, ShowConfirmDialog = false })
-            .PageSettings(new GridPageSettings { PageSize = 10 })
+            .PageSettings(new GridPageSettings { PageSize = PageSize })
             .Columns(new List<GridColumn>
             {
                 new GridColumn { Type = "checkbox", Width = "50", AllowEditing = false, Freeze = FreezeDirection.Left },
                 new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "90", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false, Freeze = FreezeDirection.Left },
                 new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "190", AllowEditing = false, Freeze = FreezeDirection.Left },
                 new GridColumn { Field = columns.Field(r => r.Wing), HeaderText = "Wing", Width = "120", AllowEditing = false },
-                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "180", EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.CareLevel, careLevelEditOptions) },
-                new GridColumn { Field = columns.Field(r => r.RiskLevel), HeaderText = "Risk", Width = "150", Template = riskTemplate, EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.RiskLevel, riskEditOptions) },
-                new GridColumn { Field = columns.Field(r => r.PrimaryNurse), HeaderText = "Primary Nurse", Width = "200", EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.PrimaryNurse, nurseEditOptions) },
+                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "180", EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.CareLevel, CareOpsOptions.CareLevels) },
+                new GridColumn { Field = columns.Field(r => r.RiskLevel), HeaderText = "Risk", Width = "150", Template = riskTemplate, EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.RiskLevel, CareOpsOptions.RiskLevels) },
+                new GridColumn { Field = columns.Field(r => r.PrimaryNurse), HeaderText = "Primary Nurse", Width = "200", EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.PrimaryNurse, CareOpsOptions.Nurses) },
                 new GridColumn { Field = columns.Field(r => r.OpenTasks), HeaderText = "Open Tasks", Width = "130", TextAlign = TextAlign.Right, EditType = "numericedit", ValidationRules = careValidation.Field(r => r.OpenTasks) },
                 new GridColumn { Field = columns.Field(r => r.NextReview), HeaderText = "Next Review", Width = "150", EditTemplate = FusionGridEditTemplates.DateInput((ResidentCareItem r) => r.NextReview) }
             }))
             .Reactive(evt => evt.DataStateChange, (args, p) =>
-            {
-                p.When(args.Action.Get(x => x.RequestType)).NotEq(FusionGridAction.Refresh)
-                    .Then(t =>
-                    {
-                        t.Post(Url.SandboxRoute("CareOpsData", "Grid"))
-                            .Gather<CareOpsDataRequest>(g => g
-                                .Set(x => x.Skip, args.Skip)
-                                .Set(x => x.Take, args.Take)
-                                .Set(x => x.Sorted, args.Sorted))
-                            .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
-                            {
-                                s.Component<FusionGrid>(GridId).DataSource.Set(json);
-                                s.Element("careops-summary").Text.Set(json.Get(x => x.Summary));
-                                s.Element("careops-status").Text.Set("grid state sent to server");
-                            }));
-                    });
-            }))
+                p.Post(Url.SandboxRoute("CareOpsData", "Grid"))
+                    .Gather<CareOpsDataRequest>(g => g
+                        .Set(x => x.Skip, args.Skip)
+                        .Set(x => x.Take, args.Take)
+                        .Set(x => x.Sorted, args.Sorted))
+                    .Response(r => r.OnSuccess<CareOpsResponse>(ShowBoard))))
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Per-Resident Quick Actions</native-heading>
+        <native-heading level="H2">High-Risk Watch List</native-heading>
         <native-text color="Secondary">
-            Each row is a real NativeActionLink — Flag Critical (immediate) and Discharge (confirm-gated). The list re-injects itself after each action.
+            Each resident at high risk. Flag a resident critical when their care needs it, or discharge them after confirming.
         </native-text>
-        <p class="mt-2 font-mono text-sm">Action: <span id="careops-rows-status" class="text-text-muted">waiting</span></p>
         <div id="careops-action-rows" class="mt-3"></div>
     </native-card-body></native-card>
 </native-vstack>

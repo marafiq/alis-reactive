@@ -21,8 +21,6 @@
             .Reactive(evt => evt.Change, (args, p) =>
             {
                 var comp = p.Component<FusionNumericTextBox>(m => m.CognitiveScore);
-                p.Element("score-echo").Text.Set(comp.Value);
-
                 p.When(comp.Value).Lt(15m)
                     .Then(t =>
                     {
@@ -40,8 +38,6 @@
                         e.Component<NativeHiddenField>(m => m.CareUnit).Value.Set("Standard Assisted Living");
                         e.Element("cognitive-status").Text.Set("Mild/Normal — Standard");
                     });
-
-                p.Element("cognitive-scored").Text.Set("scored");
             }); }
 
         @{ Html.InputField(plan, m => m.Wanders, o => o.Label("Wanders"))
@@ -55,11 +51,7 @@
             }); }
     </native-grid>
 
-    <native-vstack gap="Xs" class="font-mono text-sm mb-4">
-        <p>Score: <span id="score-echo" class="text-text-muted">&mdash;</span></p>
-        <p>Status: <span id="cognitive-status" class="text-text-muted">&mdash;</span></p>
-        <p>Scored: <span id="cognitive-scored" class="text-text-muted">&mdash;</span></p>
-    </native-vstack>
+    <p class="text-sm mb-4">Assessment: <span id="cognitive-status" class="font-medium">enter the score</span></p>
 
     <div id="wander-details" hidden>
         <native-grid cols="C2" gap="Base" class="mb-4">
@@ -90,8 +82,8 @@
                 }); }
         </native-grid>
 
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p><span id="elopement-spinner" hidden class="text-accent">Sending alert...</span></p>
+        <native-vstack gap="Xs">
+            <p id="elopement-spinner" hidden class="text-sm text-accent">Sending alert...</p>
             <div id="elopement-result" hidden class="rounded-md bg-rose-50 border border-rose-200 px-3 py-2 text-sm text-rose-700"></div>
         </native-vstack>
     </div>

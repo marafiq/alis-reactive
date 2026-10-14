@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 
@@ -11,6 +12,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     public sealed class ScheduleWorld
     {
         private const string WeekKeyPrefix = "schedule-week:";
+        private const string InServicePrefix = "In-service: ";
         private readonly ISession _session;
 
         public ScheduleWorld(ISession session)
@@ -18,18 +20,25 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             _session = session;
         }
 
-        /// <summary>The facility's shifts that start in the range, across every week it touches.</summary>
-        public ScheduleDataResponse GetAssignments(string facilityId, DateTime rangeStart, DateTime rangeEnd)
+        /// <summary>
+        /// The facility's shifts and in-services that start in the range, across every week it touches, and
+        /// how many of its shifts still need someone.
+        /// </summary>
+        public ScheduleDataResponse GetAssignments(Facility facility, DateTime rangeStart, DateTime rangeEnd)
         {
             var assignments = new List<ShiftAssignment>();
             for (var sunday = SundayOf(rangeStart); sunday < rangeEnd; sunday = sunday.AddDays(7))
-                assignments.AddRange(Week(facilityId, sunday).Where(a => a.StartTime >= rangeStart && a.StartTime < rangeEnd));
+                assignments.AddRange(Week(facility.Id, sunday).Where(a => a.StartTime >= rangeStart && a.StartTime < rangeEnd));
 
+            var shifts = assignments.Where(a => !a.IsInService).ToList();
+            var lastDay = rangeEnd.AddDays(-1);
             return new ScheduleDataResponse
             {
                 Assignments = assignments,
-                Shifts = FakeScheduleData.Shifts,
-                UnassignedCount = assignments.Count(a => a.IsUnassigned),
+                Summary = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0}: {1} of {2} shifts need coverage from {3:MMMM d} to {4:MMMM d, yyyy}.",
+                    facility.Name, shifts.Count(a => a.IsUnassigned), shifts.Count, rangeStart, lastDay),
             };
         }
 
@@ -72,6 +81,23 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             week.Add(assignment);
             Save(WeekKey(facilityId, sunday), week);
             return assignment;
+        }
+
+        /// <summary>
+        /// Whether the coordinator may change the in-service the schedule opened: refused while someone else has it
+        /// open. Null when this browser's schedule has no such in-service.
+        /// </summary>
+        public (bool Refused, InServiceClaimAnswer Answer)? ClaimInService(int inServiceId)
+        {
+            var inService = FindAssignment(inServiceId);
+            if (inService is not { IsInService: true }) return null;
+
+            var training = inService.Subject.Replace(InServicePrefix, "");
+            var refused = inService.OpenBy.Length > 0;
+            var note = refused
+                ? $"{inService.OpenBy} is changing the {training} in-service right now, so it was closed here. Try again in a few minutes."
+                : $"The {training} in-service is yours to change until you close it.";
+            return (refused, new InServiceClaimAnswer { Note = note });
         }
 
         private ShiftAssignment? Change(int assignmentId, Action<ShiftAssignment> change)

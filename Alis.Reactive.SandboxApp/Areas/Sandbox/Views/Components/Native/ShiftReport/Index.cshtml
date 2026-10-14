@@ -1,98 +1,113 @@
-@model ShiftReportModel
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Native.ShiftReport
+@model ShiftAlertReviewModel
+@using Alis.Reactive.Builders
 @using Alis.Reactive.Native.Components
 @{
-    ViewData["Title"] = "ShiftReport";
+    ViewData["Title"] = "Shift Alert Review";
 
-    var plan = Html.ReactivePlan<ShiftReportModel>();
+    const string ShiftButton = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
 
-    // Custom-event payload array is queried through element members inside the Reactive Plan.
-    Html.On(plan, t => t.CustomEvent<ShiftReportPayload>(ShiftReportEvents.ShiftReport, (payload, p) =>
+    var plan = Html.ReactivePlan<ShiftAlertReviewModel>();
+
+    // The review reads whichever shift's alerts the page announces, by each alert's members.
+    Html.On(plan, t => t.CustomEvent<ShiftAlertsLoaded>(ShiftAlertEvents.Loaded, (shift, p) =>
     {
-        var alerts = p.From(payload.Get(x => x.Alerts));
+        var alerts = p.From(shift.Get(x => x.Alerts));
+        var critical = alerts.Where(a => a.Severity == AlertSeverity.Critical);
 
+        p.Element("shift-choose").Hide();
+        p.Element("shift-review").Show();
+        p.Element("shift-name").Text.Set(shift.Get(x => x.Shift));
         p.Element("alert-total").Text.Set(alerts.Count());
-        p.Element("critical-count").Text.Set(alerts.Count(a => a.Severity == "critical"));
-        p.Element("critical-priority-sum").Text.Set(
-            alerts.Where(a => a.Severity == "critical").Sum(a => a.Priority));
-        p.Element("top-critical").Text.Set(
-            alerts.Where(a => a.Severity == "critical").OrderByDescending(a => a.Priority).Find(a => true, a => a.Resident));
+        p.Element("critical-count").Text.Set(alerts.Count(a => a.Severity == AlertSeverity.Critical));
+        p.Element("critical-priority-sum").Text.Set(critical.Sum(a => a.Priority));
+        p.Element("top-critical").Text.Set(critical.OrderByDescending(a => a.Priority).Find(a => true, a => a.Resident));
 
-        p.When(alerts.Any(a => a.Severity == "critical" && !a.Acknowledged)).Truthy()
-         .Then(then => then.Element("unack-warning").Show())
-         .Else(els => els.Element("unack-clear").Show());
+        p.When(alerts.Any(a => a.Severity == AlertSeverity.Critical && !a.Acknowledged)).Truthy()
+            .Then(open =>
+            {
+                open.Element("unack-warning").Show();
+                open.Element("unack-clear").Hide();
+            })
+            .Else(acknowledged =>
+            {
+                acknowledged.Element("unack-clear").Show();
+                acknowledged.Element("unack-warning").Hide();
+            });
 
         // Two or more unacknowledged critical alerts go to the charge nurse.
-        p.When(alerts.Count(a => a.Severity == "critical" && !a.Acknowledged)).Gte(2)
-         .Then(then => then.Element("charge-nurse-escalation").Show())
-         .Else(els => els.Element("charge-nurse-escalation").Hide());
+        p.When(alerts.Count(a => a.Severity == AlertSeverity.Critical && !a.Acknowledged)).Gte(2)
+            .Then(then => then.Element("charge-nurse-escalation").Show())
+            .Else(els => els.Element("charge-nurse-escalation").Hide());
 
         // The open alerts' priorities add up to the shift's load; over 10 calls in a float nurse.
         p.When(alerts.Where(a => !a.Acknowledged).Sum(a => a.Priority)).Gt(10)
-         .Then(then => then.Element("float-nurse").Show())
-         .Else(els => els.Element("float-nurse").Hide());
+            .Then(then => then.Element("float-nurse").Show())
+            .Else(els => els.Element("float-nurse").Hide());
 
         // The most urgent open alert decides whether the on-call physician is paged.
-        p.When(alerts.OrderByDescending(a => a.Priority).Find(a => !a.Acknowledged, a => a.Severity)).Eq("critical")
-         .Then(then => then.Element("page-physician").Show())
-         .Else(els => els.Element("page-physician").Hide());
+        p.When(alerts.OrderByDescending(a => a.Priority).Find(a => !a.Acknowledged, a => a.Severity)).Eq(AlertSeverity.Critical)
+            .Then(then => then.Element("page-physician").Show())
+            .Else(els => els.Element("page-physician").Hide());
 
         // Any open urgent alert, whatever its priority, needs a follow-up this shift.
-        p.When(alerts.Where(a => a.Severity == "urgent" && !a.Acknowledged).Any()).Truthy()
-         .Then(then => then.Element("urgent-followup").Show())
-         .Else(els => els.Element("urgent-followup").Hide());
+        p.When(alerts.Where(a => a.Severity == AlertSeverity.Urgent && !a.Acknowledged).Any()).Truthy()
+            .Then(then => then.Element("urgent-followup").Show())
+            .Else(els => els.Element("urgent-followup").Hide());
 
-        // Every alert acknowledged closes the shift's alert review.
+        // Every alert acknowledged: the shift report is ready to sign.
         p.When(alerts.All(a => a.Acknowledged)).Truthy()
-         .Then(then => then.Element("all-acknowledged").Show())
-         .Else(els => els.Element("all-acknowledged").Hide());
+            .Then(then => then.Element("all-acknowledged").Show())
+            .Else(els => els.Element("all-acknowledged").Hide());
     }));
 
-    Html.NativeButton("load-report-btn", "Generate Shift Report")
-        .Reactive(plan, evt => evt.Click, (args, p) =>
-            p.Get(Url.SandboxRoute("Alerts", "ShiftReport"))
-             .Response(r => r.OnSuccess<AlertsResponse>((json, s) =>
-                 s.Dispatch<ShiftReportPayload>(ShiftReportEvents.ShiftReport, b =>
-                     b.Set(x => x.Alerts, json.Get(x => x.Alerts))))));
+    // A shift's alerts come from the alert log and are announced to the review.
+    void OpenShift(PipelineBuilder<ShiftAlertReviewModel> p, string url) =>
+        p.Get(url).Response(r => r.OnSuccess<ShiftAlertsResponse>((json, s) =>
+            s.Dispatch<ShiftAlertsLoaded>(ShiftAlertEvents.Loaded, d => d
+                .Set(x => x.Shift, json.Get(x => x.Shift))
+                .Set(x => x.Alerts, json.Get(x => x.Alerts)))));
 
-    Html.NativeButton("clear-report-btn", "Generate Clear Report")
-        .Reactive(plan, evt => evt.Click, (args, p) =>
-            p.Get(Url.SandboxRoute("AlertsAllClear", "ShiftReport"))
-             .Response(r => r.OnSuccess<AlertsResponse>((json, s) =>
-                 s.Dispatch<ShiftReportPayload>(ShiftReportEvents.ShiftReport, b =>
-                     b.Set(x => x.Alerts, json.Get(x => x.Alerts))))));
+    var dayUrl = Url.SandboxRoute("DayShift", "ShiftReport");
+    var eveningUrl = Url.SandboxRoute("EveningShift", "ShiftReport");
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">ShiftReport &mdash; operate on a custom event payload array</native-heading>
+    <native-heading level="H1">Shift Alert Review</native-heading>
     <native-text color="Secondary">
-        The custom event <code>shift-report</code> carries <code>ResidentAlert[]</code>. Its handler runs the
-        array DSL over the payload's element members, e.g.
-        <code>alerts.Where(a =&gt; a.Severity == "critical").OrderByDescending(a =&gt; a.Priority).Find(...)</code>.
-        Deterministic, in the plan &mdash; no plugin, no JS.
+        Maple wing. Review each shift's alerts before you sign the shift report.
     </native-text>
 
-    <native-card><native-card-body>
-        <div class="flex items-center gap-3">
-            @(Html.NativeButton("load-report-btn", "Generate Shift Report")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"))
-            @(Html.NativeButton("clear-report-btn", "Generate Clear Report")
-                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors"))
-        </div>
+    <native-hstack gap="Sm" class="flex-wrap">
+        @(Html.NativeButton("day-shift-btn", "Day shift")
+            .CssClass(ShiftButton)
+            .Reactive(plan, evt => evt.Click, (_, p) => OpenShift(p, dayUrl)))
+        @(Html.NativeButton("evening-shift-btn", "Evening shift")
+            .CssClass(ShiftButton)
+            .Reactive(plan, evt => evt.Click, (_, p) => OpenShift(p, eveningUrl)))
+    </native-hstack>
 
-        <native-vstack gap="Xs" class="font-mono text-sm mt-4">
-            <p>Total alerts: <span id="alert-total">&mdash;</span></p>
-            <p>Critical: <span id="critical-count">&mdash;</span></p>
-            <p>Critical priority sum: <span id="critical-priority-sum">&mdash;</span></p>
-            <p>Top critical (by priority): <span id="top-critical">&mdash;</span></p>
-            <p id="unack-warning" hidden class="text-red-600">&#9888; Unacknowledged critical alert present</p>
-            <p id="unack-clear" hidden class="text-green-600">All critical alerts acknowledged</p>
-            <p id="charge-nurse-escalation" hidden class="text-red-600">Escalate to the charge nurse: two or more critical alerts are unacknowledged.</p>
-            <p id="float-nurse" hidden class="text-amber-600">The open alert load is high: call in a float nurse.</p>
-            <p id="page-physician" hidden class="text-red-600">Page the on-call physician: the most urgent open alert is critical.</p>
-            <p id="urgent-followup" hidden class="text-amber-600">Follow up on the urgent alerts this shift.</p>
-            <p id="all-acknowledged" hidden class="text-green-600">Every alert this shift is acknowledged.</p>
-        </native-vstack>
-    </native-card-body></native-card>
+    <p id="shift-choose" class="text-sm text-text-muted">Choose a shift to review its alerts.</p>
+
+    <section id="shift-review" hidden>
+        <native-card><native-card-body>
+            <native-heading level="H2"><span id="shift-name"></span></native-heading>
+            <native-vstack gap="Xs" class="mt-3 text-sm">
+                <p id="alert-summary"><span id="alert-total"></span> alerts this shift, <span id="critical-count"></span> of them critical.</p>
+                <p id="critical-priority">Critical alert priority: <span id="critical-priority-sum"></span> points.</p>
+                <p id="most-urgent-critical">Most urgent critical alert: <span id="top-critical"></span>.</p>
+            </native-vstack>
+            <native-vstack gap="Xs" class="mt-4 text-sm font-medium">
+                <p id="unack-warning" hidden class="text-red-700">A critical alert is still unacknowledged.</p>
+                <p id="unack-clear" hidden class="text-green-700">Every critical alert is acknowledged.</p>
+                <p id="charge-nurse-escalation" hidden class="text-red-700">Escalate to the charge nurse: two or more critical alerts are unacknowledged.</p>
+                <p id="float-nurse" hidden class="text-amber-700">The open alert load is high: call in a float nurse.</p>
+                <p id="page-physician" hidden class="text-red-700">Page the on-call physician: the most urgent open alert is critical.</p>
+                <p id="urgent-followup" hidden class="text-amber-700">Follow up on the urgent alerts this shift.</p>
+                <p id="all-acknowledged" hidden class="text-green-700">Every alert this shift is acknowledged. The shift report is ready to sign.</p>
+            </native-vstack>
+        </native-card-body></native-card>
+    </section>
 </native-vstack>
 
 @Html.RenderPlan(plan)

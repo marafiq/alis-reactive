@@ -53,12 +53,7 @@ public class AdmissionAssessmentController : Controller
         ViewBag.Diagnoses = new[] { "Alzheimer's", "Parkinson's", "Heart Disease", "Diabetes", "Stroke", "Other" };
         ViewBag.FallOptions = new[] { "None", "1-2 falls", "3+ falls" };
         ViewBag.MobilityAids = new[] { "None", "Cane", "Walker", "Wheelchair" };
-        ViewBag.WanderFreqs = new[] { "Rarely", "Sometimes", "Frequently" };
-        ViewBag.InsulinSchedules = new[] { "Morning", "Evening", "Both", "As Needed" };
-        ViewBag.InjuryTypes = new[] { "Bruise", "Fracture", "Head Injury", "Other" };
-        ViewBag.DiabetesTypes = new[] { "Type 1", "Type 2" };
         ViewBag.ServiceBranches = new[] { "Army", "Navy", "Air Force", "Marines", "Coast Guard" };
-        ViewBag.ScreeningId = id;
 
         var model = new WizardShellModel
         {
@@ -132,30 +127,14 @@ public class AdmissionAssessmentController : Controller
         return Ok(new PhysicianSearchResponse { Physicians = filtered });
     }
 
-    [HttpPost("VerifyVeteran")]
-    public async Task<IActionResult> VerifyVeteran([FromBody] VerifyVeteranRequest? request)
-    {
-        await Task.Delay(600);
-
-        var eligible = request?.VaId?.StartsWith("VA-", StringComparison.OrdinalIgnoreCase) == true;
-
-        return Ok(new VerifyVaResponse
-        {
-            Message = eligible
-                ? $"VA eligibility confirmed for {request?.VaId}"
-                : $"VA ID '{request?.VaId}' not recognized — must start with VA-",
-            Eligible = eligible
-        });
-    }
-
+    // Each alert names what the page sent it, so an alert missing a field reads differently.
     [HttpPost("AlertElopement")]
     public async Task<IActionResult> AlertElopement([FromBody] AlertElopementRequest? request)
     {
         await Task.Delay(400);
         return Ok(new ScreeningAlertResponse
         {
-            Message = $"Elopement risk flagged for {request?.ResidentName}",
-            Urgency = "high"
+            Message = $"Elopement risk flagged for {request?.ResidentName}: wanders {request?.WanderFrequency.ToLowerInvariant()}"
         });
     }
 
@@ -165,8 +144,8 @@ public class AdmissionAssessmentController : Controller
         await Task.Delay(400);
         return Ok(new ScreeningAlertResponse
         {
-            Message = $"Hypertension flagged: {request?.SystolicBP}mmHg — cardiology referral",
-            Urgency = "moderate"
+            Message = FormattableString.Invariant(
+                $"Hypertension flagged for {request?.ResidentName}: systolic {request?.SystolicBP:0} mmHg, cardiology referral")
         });
     }
 
@@ -176,8 +155,8 @@ public class AdmissionAssessmentController : Controller
         await Task.Delay(400);
         return Ok(new ScreeningAlertResponse
         {
-            Message = $"Uncontrolled {request?.DiabetesType} diabetes: A1C {request?.A1cLevel} — endocrinology referral",
-            Urgency = "high"
+            Message = FormattableString.Invariant(
+                $"Uncontrolled {request?.DiabetesType} diabetes: A1C {request?.A1cLevel:0.0}%, endocrinology referral")
         });
     }
 
@@ -187,8 +166,7 @@ public class AdmissionAssessmentController : Controller
         await Task.Delay(400);
         return Ok(new ScreeningAlertResponse
         {
-            Message = $"Neuro consult ordered for {request?.ResidentName} — {request?.InjuryType}",
-            Urgency = "immediate"
+            Message = $"Neuro consult ordered for {request?.ResidentName}: {request?.InjuryType}"
         });
     }
 
@@ -198,8 +176,8 @@ public class AdmissionAssessmentController : Controller
         await Task.Delay(400);
         return Ok(new ScreeningAlertResponse
         {
-            Message = $"Pain management required: level {request?.PainLevel} at {request?.PainLocation}",
-            Urgency = "immediate"
+            Message = FormattableString.Invariant(
+                $"Pain management required: level {request?.PainLevel:0} at {request?.PainLocation}")
         });
     }
 
@@ -209,8 +187,7 @@ public class AdmissionAssessmentController : Controller
         await Task.Delay(500);
         return Ok(new ScreeningAlertResponse
         {
-            Message = $"Accessible room scheduled for {request?.ResidentName}",
-            Urgency = "routine"
+            Message = $"Accessible room scheduled for {request?.ResidentName}, who uses a {request?.MobilityAid.ToLowerInvariant()}"
         });
     }
 

@@ -8,7 +8,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public static readonly List<Facility> Facilities = new()
         {
-            new Facility { Id = "mystery-manor", Name = "Mystery Manor" },
+            new Facility { Id = "maple-grove", Name = "Maple Grove" },
             new Facility { Id = "sunrise-gardens", Name = "Sunrise Gardens" },
             new Facility { Id = "oak-ridge", Name = "Oak Ridge Senior Living" },
         };
@@ -22,15 +22,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
         public static readonly List<StaffMember> Staff = new()
         {
-            new StaffMember { Id = 1, Name = "Jane Blonde", Role = "CNA", Phone = "555-0101" },
-            new StaffMember { Id = 2, Name = "Mike Ross", Role = "RN", Phone = "555-0102" },
-            new StaffMember { Id = 3, Name = "Sarah Connor", Role = "CNA", Phone = "555-0103" },
-            new StaffMember { Id = 4, Name = "Tom Hardy", Role = "LPN", Phone = "555-0104" },
+            new StaffMember { Id = 1, Name = "Janet Brooks", Role = "CNA", Phone = "555-0101" },
+            new StaffMember { Id = 2, Name = "Marcus Reid", Role = "RN", Phone = "555-0102" },
+            new StaffMember { Id = 3, Name = "Sarah Collins", Role = "CNA", Phone = "555-0103" },
+            new StaffMember { Id = 4, Name = "Tom Harding", Role = "LPN", Phone = "555-0104" },
             new StaffMember { Id = 5, Name = "Lisa Chen", Role = "RN", Phone = "555-0105" },
-            new StaffMember { Id = 6, Name = "Pat Night", Role = "CNA", Phone = "555-0106" },
+            new StaffMember { Id = 6, Name = "Pat Nguyen", Role = "CNA", Phone = "555-0106" },
             new StaffMember { Id = 7, Name = "Maria Garcia", Role = "RN", Phone = "555-0107" },
             new StaffMember { Id = 8, Name = "James Wilson", Role = "LPN", Phone = "555-0108" },
         };
+
+        /// <summary>The staff educator who teaches the in-services.</summary>
+        public const string StaffEducator = "Dana Whitfield";
 
         private static readonly string[][] ResidentGroups = new[]
         {
@@ -86,7 +89,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             return seed;
         }
 
-        /// <summary>The week a facility starts with, the same on every run, machine and CI shard.</summary>
+        /// <summary>
+        /// The week a facility starts with, the same on every run, machine and CI shard: three shifts a day,
+        /// and two in-services the AM staff attend after their shift, on Tuesday and Thursday. The staff
+        /// educator has Thursday's open to change it.
+        /// </summary>
         public static List<ShiftAssignment> GenerateWeek(string facilityId, DateTime sunday)
         {
             var seed = StableSeed(facilityId, sunday);
@@ -138,8 +145,23 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                 }
             }
 
+            assignments.Add(InService(++id, "In-service: Falls prevention", sunday.AddDays(2), openBy: ""));
+            assignments.Add(InService(++id, "In-service: Safe resident transfers", sunday.AddDays(4), openBy: StaffEducator));
             return assignments;
         }
+
+        // An hour of training for the AM staff, from 2:30 PM, just after their shift ends.
+        private static ShiftAssignment InService(int id, string subject, DateTime day, string openBy) => new()
+        {
+            Id = id,
+            Subject = subject,
+            StartTime = day.AddHours(14.5),
+            EndTime = day.AddHours(15.5),
+            ShiftId = 1,
+            IsInService = true,
+            OpenBy = openBy,
+            Description = $"Maple wing day room | for the AM shift | taught by {StaffEducator}",
+        };
 
         private static (int start, int end) GetShiftHours(int shiftId) => shiftId switch
         {

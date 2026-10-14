@@ -11,16 +11,16 @@
         <h2 class="text-lg font-semibold text-text-primary">Cascading</h2>
     </div>
     <native-grid cols="C3" gap="Base">
-        <a asp-area="Sandbox" asp-controller="Cascading" asp-action="Index"
+        <a asp-area="Sandbox" asp-controller="BedAssignment" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    Cascading
+                    Bed Assignment
                 </h3>
                 <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Select a country, see states load from the server, then select a state to load cities — full dependent chain
+                Choose a wing, then a room with an open bed, then the bed: each list follows the one before from the server, and the server confirms the bed assigned
             </p>
         </a>
     </native-grid>
@@ -74,16 +74,16 @@
         <h2 class="text-lg font-semibold text-text-primary">Workflows</h2>
     </div>
     <native-grid cols="C3" gap="Base">
-        <a asp-area="Sandbox" asp-controller="ComponentGather" asp-action="Index"
+        <a asp-area="Sandbox" asp-controller="MoveInPacket" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
             <native-hstack justify="Between" align="Start">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                    ComponentGather
+                    Move-in Packet
                 </h3>
                 <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Fill in multiple component types (text, numeric, dropdown, checkbox) then POST — see all values gathered into a single JSON payload
+                Complete a new resident's packet with one answer from every kind of field, save it and send it to the business office; each confirms every answer it received
             </p>
         </a>
 

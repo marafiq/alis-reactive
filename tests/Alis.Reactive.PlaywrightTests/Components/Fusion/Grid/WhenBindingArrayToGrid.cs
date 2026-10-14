@@ -1,66 +1,77 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-// Roster loads once over HTTP, then client-side transforms feed the data source.
-// Re-filtering reads the grid's own dataSource member with no HTTP round trip.
+/// <summary>
+/// As the front desk, I want the resident roster listed by name and narrowed to the active residents for the
+/// day's sign-in sheet without waiting on the server again, so that the sheet is ready while the family is
+/// still at the desk.
+/// </summary>
+/// <remarks>
+/// The server sends Bo, Di, Ada, Ed and Cy in that order; the page sorts them by name before the grid shows
+/// them. Narrowing reads the rows the grid holds (its <c>dataSource</c>) and keeps the active ones, with no
+/// request. Not exercised here: the sort after narrowing, because the rows the grid holds are already in name
+/// order; Refresh, because writing the grid's data source redraws it anyway (WhenUsingFusionGridBilling's
+/// raising_a_selected_residents_rate_five_percent_shows_the_new_rate fails when Refresh breaks).
+/// </remarks>
 [TestFixture]
 public class WhenBindingArrayToGrid : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/ArrayGrid";
 
-    private async Task NavigateAndWaitForRoster()
+    private ILocator Rows => Page.Locator("#roster-grid .e-row");
+    private ILocator NameIn(int row) => Rows.Nth(row).Locator("td").First;
+    private ILocator Showing => Page.Locator("#roster-showing");
+    private ILocator ShowActiveOnly => Page.Locator("#show-active-btn");
+
+    private async Task OpenTheRoster()
     {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
-        await Expect(Page.Locator("#grid-status"))
-            .ToHaveTextAsync("roster loaded", new() { Timeout = 10000 });
+        await NavigateToAndWaitForBoot(Path);
+        await Expect(Rows).ToHaveCountAsync(5, new() { Timeout = 10000 });
     }
 
     [Test]
-    public async Task roster_loads_into_grid_sorted_by_name()
+    public async Task the_roster_lists_every_resident_by_name()
     {
-        await NavigateAndWaitForRoster();
+        await OpenTheRoster();
 
-        var rows = Page.Locator("#roster-grid .e-row");
-        await Expect(rows).ToHaveCountAsync(5, new() { Timeout = 10000 });
-
-        await Expect(rows.First).ToContainTextAsync("Ada", new() { Timeout = 5000 });
-
+        await Expect(NameIn(0)).ToHaveTextAsync("Ada");
+        await Expect(NameIn(1)).ToHaveTextAsync("Bo");
+        await Expect(NameIn(2)).ToHaveTextAsync("Cy");
+        await Expect(NameIn(3)).ToHaveTextAsync("Di");
+        await Expect(NameIn(4)).ToHaveTextAsync("Ed");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task showing_active_only_filters_the_grid_client_side()
+    public async Task showing_active_only_narrows_the_roster_without_asking_the_server_again()
     {
-        await NavigateAndWaitForRoster();
-        await Expect(Page.Locator("#roster-grid .e-row")).ToHaveCountAsync(5, new() { Timeout = 10000 });
+        await OpenTheRoster();
 
-        var rosterRequestsAfterClick = 0;
-        void OnRequest(object? _, Microsoft.Playwright.IRequest observedRequest)
+        var rosterRequests = 0;
+        void CountRosterRequests(object? _, Microsoft.Playwright.IRequest request)
         {
-            if (observedRequest.Url.Contains("/Sandbox/Components/ArrayGrid/Residents"))
-                rosterRequestsAfterClick++;
+            if (request.Url.Contains("/Sandbox/Components/ArrayGrid/Residents"))
+                rosterRequests++;
         }
 
-        Page.Request += OnRequest;
+        Page.Request += CountRosterRequests;
         try
         {
-            await Page.Locator("#show-active-btn").ClickAsync();
+            await ClickWhenStable(ShowActiveOnly);
 
-            await Expect(Page.Locator("#grid-status"))
-                .ToHaveTextAsync("active only", new() { Timeout = 5000 });
-
-            await Expect(Page.Locator("#roster-grid .e-row")).ToHaveCountAsync(3, new() { Timeout = 10000 });
-            await Expect(Page.Locator("#roster-grid")).Not.ToContainTextAsync("discharged", new() { Timeout = 5000 });
-            await Expect(Page.Locator("#roster-grid")).Not.ToContainTextAsync("critical", new() { Timeout = 5000 });
+            await Expect(Rows).ToHaveCountAsync(3, new() { Timeout = 10000 });
+            await Expect(NameIn(0)).ToHaveTextAsync("Ada");
+            await Expect(NameIn(1)).ToHaveTextAsync("Cy");
+            await Expect(NameIn(2)).ToHaveTextAsync("Ed");
+            await Expect(Page.Locator("#roster-grid")).Not.ToContainTextAsync("discharged");
+            await Expect(Page.Locator("#roster-grid")).Not.ToContainTextAsync("critical");
+            await Expect(Showing).ToHaveTextAsync("Active residents, by name.");
         }
         finally
         {
-            Page.Request -= OnRequest;
+            Page.Request -= CountRosterRequests;
         }
 
-        Assert.That(rosterRequestsAfterClick, Is.EqualTo(0),
-            "The active-only workflow must read the current Grid dataSource and rebind client-side without fetching the roster again.");
-
+        Assert.That(rosterRequests, Is.EqualTo(0), "Narrowing reads the rows on screen; it does not fetch the roster again.");
         AssertNoConsoleErrors();
     }
 }

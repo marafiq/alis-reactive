@@ -4,8 +4,8 @@ using Alis.Reactive.Fusion.Components;
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
-    /// Care Operations state carries the templated admit-resident inputs.
-    /// Fast filters come from chips, so no filter fields live here.
+    /// The care operations board: the admit dialog's fields. The board's fast filters are chips, so no filter
+    /// fields live here.
     /// </summary>
     public class CareOpsViewModel
     {
@@ -16,7 +16,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public decimal? NewOpenTasks { get; set; }
     }
 
-    /// <summary>Resident care row used as both server store record and grid DTO.</summary>
+    /// <summary>The choices the board's chips, cell editors and admit dialog offer.</summary>
+    public static class CareOpsOptions
+    {
+        public static readonly IReadOnlyList<string> Wings = new[] { "North", "East", "West", "South" };
+        public static readonly IReadOnlyList<string> CareLevels = new[] { "Independent", "Assisted Living", "Memory Care", "Skilled Nursing" };
+        public static readonly IReadOnlyList<string> RiskLevels = new[] { "Low", "Moderate", "High", "Critical" };
+        public static readonly IReadOnlyList<string> Nurses = new[] { "Nora Ellis", "Malik Stone", "Elena Ruiz", "Owen Park", "Night Float Team" };
+    }
+
+    /// <summary>A resident's care on the board: risk, primary nurse, open care tasks and next review.</summary>
     public class ResidentCareItem
     {
         public int ResidentId { get; set; }
@@ -26,10 +35,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string RiskLevel { get; set; } = "";
         public string PrimaryNurse { get; set; } = "";
         public int OpenTasks { get; set; }
+
+        /// <summary>The day of the next care review, as the date editor writes it: <c>2026-10-16</c>.</summary>
         public string NextReview { get; set; } = "";
     }
 
-    /// <summary>Care grid response shaped for Syncfusion custom binding: {result, count}.</summary>
+    /// <summary>
+    /// The board's first page or the page the grid asked for (<c>{result, count}</c>), and the sentence that
+    /// says what the server did.
+    /// </summary>
     public class CareOpsResponse
     {
         public List<ResidentCareItem> Result { get; set; } = new();
@@ -37,6 +51,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string Summary { get; set; } = "";
     }
 
+    /// <summary>The page the grid asks for, and the fast filter a chip chose.</summary>
     public class CareOpsDataRequest
     {
         public int Skip { get; set; }
@@ -46,6 +61,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? FilterCareLevel { get; set; }
     }
 
+    /// <summary>The residents ticked on the board, and the nurse or risk they take.</summary>
     public class CareOpsBulkRequest
     {
         public List<ResidentCareItem>? SelectedRecords { get; set; }
@@ -53,36 +69,36 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? Risk { get; set; }
     }
 
+    /// <summary>The care levels, risks, nurses, tasks and review days changed in the grid.</summary>
     public class CareOpsSaveRequest
     {
         public FusionGridBatchChanges<ResidentCareItem>? BatchChanges { get; set; }
     }
 
-    /// <summary>Client and server validation for the templated admit-resident dialog.</summary>
+    /// <summary>The admit dialog's rules.</summary>
     public class CareOpsAdmitValidator : ReactiveValidator<CareOpsViewModel>
     {
         public CareOpsAdmitValidator()
         {
-            RuleFor(x => x.NewResidentName).NotEmpty().WithMessage("Resident name is required.");
+            RuleFor(x => x.NewResidentName)
+                .NotEmpty().WithMessage("Enter the resident's name.")
+                .MinimumLength(3).WithMessage("Write the resident's full name.");
 
-            RuleFor(x => x.NewResidentName).MinimumLength(3).WithMessage("Resident name must be at least 3 characters.");
+            RuleFor(x => x.NewWing).NotEmpty().WithMessage("Choose the resident's wing.");
 
-            RuleFor(x => x.NewWing).NotEmpty().WithMessage("Wing is required.");
+            RuleFor(x => x.NewCareLevel).NotEmpty().WithMessage("Choose the resident's care level.");
 
-            RuleFor(x => x.NewCareLevel).NotEmpty().WithMessage("Care level is required.");
+            RuleFor(x => x.NewRiskLevel).NotEmpty().WithMessage("Choose the resident's risk.");
 
-            RuleFor(x => x.NewRiskLevel).NotEmpty().WithMessage("Risk level is required.");
-
-            RuleFor(x => x.NewOpenTasks).NotEmpty().WithMessage("Open tasks is required.");
-
-            RuleFor(x => x.NewOpenTasks).InclusiveBetween(0m, 12m).WithMessage("Open tasks must be between 0 and 12.");
+            RuleFor(x => x.NewOpenTasks)
+                .NotNull().WithMessage("Enter the resident's open care tasks, or 0.")
+                .InclusiveBetween(0m, 7m).WithMessage("Open tasks run from 0 to 7.");
         }
     }
 
     /// <summary>
-    /// Client and server validation for an in-cell care row edit. The same
-    /// validator rules drive EJ2-native column validation in the grid
-    /// (via <c>FusionGridValidation</c>) and a full server check on save.
+    /// The rules for a resident's care row. The grid's open-tasks cell checks the range as the server does
+    /// when the edits are saved; the server alone checks the rule that holds only for critical-risk rows.
     /// </summary>
     public class ResidentCareItemValidator : ReactiveValidator<ResidentCareItem>
     {
@@ -91,7 +107,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
         public ResidentCareItemValidator()
         {
-            RuleFor(r => r.OpenTasks).InclusiveBetween(0, 7).WithMessage("Open tasks must be between 0 and 7.");
+            RuleFor(r => r.OpenTasks).InclusiveBetween(0, 7).WithMessage("Open tasks run from 0 to 7.");
 
             // A grid column's rule holds for every row, so this one, which holds only for critical-risk
             // rows, is checked when the edits are saved.
@@ -103,6 +119,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     /// <summary>The document events the CareOps page raises and hears.</summary>
     public static class CareOpsEvents
     {
+        /// <summary>A resident on the high-risk watch list was flagged or discharged.</summary>
         public static readonly AppEvent CareopsRowsRefresh = AppEvent.Named("careops-rows-refresh");
     }
 }

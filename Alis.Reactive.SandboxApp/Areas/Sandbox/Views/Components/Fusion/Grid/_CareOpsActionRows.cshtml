@@ -1,41 +1,33 @@
 @model IReadOnlyList<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentCareItem>
 @using Alis.Reactive.Native.Components
 
-@* Per-row NativeActionLink list: each resident gets its own server-rendered action
-   links. The runtime wires every <a data-reactive-link> through a single delegated
-   click listener, so this partial can be re-injected via Into() with no re-wiring. *@
-<native-vstack gap="Xs">
+@* The high-risk watch list. Each resident's quick actions are action links with plans of their own, so the
+   list works each time the page loads it again. *@
+@if (Model.Count == 0)
+{
+    <p class="text-sm text-text-muted">No resident is at high risk.</p>
+    return;
+}
+<ul class="flex flex-col gap-2">
     @foreach (var row in Model)
     {
-        <div data-testid="careops-action-row-@row.ResidentId"
-             class="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm">
+        <li class="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm">
             <div>
                 <span class="font-medium text-text">@row.ResidentName</span>
-                <span class="text-text-secondary"> · @row.Wing wing · @row.CareLevel · @row.RiskLevel risk</span>
+                <span class="text-text-secondary"> · @row.Wing wing · @row.CareLevel · @row.OpenTasks open tasks</span>
             </div>
             <native-hstack gap="Base">
                 @(Html.NativeActionLink($"careops-flag-{row.ResidentId}", "Flag Critical", Url.SandboxRoute("CareOpsFlagOne", "Grid", new { id = row.ResidentId }), link => link
                     .Post()
-                    .Response(r => r.OnSuccess(s =>
-                    {
-                        s.Element("careops-rows-status").Text.Set($"{row.ResidentName} flagged critical");
-                        s.Dispatch(CareOpsEvents.CareopsRowsRefresh);
-                    })))
-                    .CssClass("font-medium text-amber-700 hover:text-amber-800")
-                    .Attr("data-testid", $"careops-flag-{row.ResidentId}"))
+                    .Response(r => r.OnSuccess(s => s.Dispatch(CareOpsEvents.CareopsRowsRefresh))))
+                    .CssClass("font-medium text-amber-700 hover:text-amber-800"))
                 @(Html.NativeActionLink($"careops-discharge-{row.ResidentId}", "Discharge", Url.SandboxRoute("CareOpsDischargeOne", "Grid", new { id = row.ResidentId }), link => link
                     .Confirm($"Discharge {row.ResidentName} from the active census?")
-                    .Then(t => t
+                    .Then(confirmed => confirmed
                         .Post()
-                        .Response(r => r.OnSuccess(s =>
-                        {
-                            s.Element("careops-rows-status").Text.Set($"{row.ResidentName} discharged");
-                            s.Dispatch(CareOpsEvents.CareopsRowsRefresh);
-                        })))
-                    .Else(e => e.Element("careops-rows-status").Text.Set($"kept {row.ResidentName}")))
-                    .CssClass("font-medium text-red-600 hover:text-red-700")
-                    .Attr("data-testid", $"careops-discharge-{row.ResidentId}"))
+                        .Response(r => r.OnSuccess(s => s.Dispatch(CareOpsEvents.CareopsRowsRefresh)))))
+                    .CssClass("font-medium text-red-600 hover:text-red-700"))
             </native-hstack>
-        </div>
+        </li>
     }
-</native-vstack>
+</ul>

@@ -4,8 +4,7 @@ using Alis.Reactive.Fusion.Components;
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
-    /// Month-end billing state carries server-side filter inputs and the
-    /// templated add-charge dialog inputs.
+    /// The month-end billing board: the filters that narrow the board, and the add-charge dialog's fields.
     /// </summary>
     public class ResidentBillingViewModel
     {
@@ -19,7 +18,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public decimal? NewAddOnCharges { get; set; }
     }
 
-    /// <summary>Resident monthly billing row used as both server store record and grid DTO.</summary>
+    /// <summary>The choices the board's filters and the add-charge dialog offer.</summary>
+    public static class MonthEndBillingOptions
+    {
+        public static readonly IReadOnlyList<string> CareLevels = new[] { "Independent", "Assisted Living", "Memory Care", "Skilled Nursing" };
+        public static readonly IReadOnlyList<string> Wings = new[] { "North", "East", "West", "South" };
+        public static readonly IReadOnlyList<string> Statuses = new[] { "Pending", "Billed", "Paid" };
+    }
+
+    /// <summary>A resident's charges for the month, one row of the board.</summary>
     public class ResidentBillingItem
     {
         public int ResidentId { get; set; }
@@ -29,10 +36,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public decimal MonthlyRate { get; set; }
         public decimal AddOnCharges { get; set; }
         public decimal BalanceDue { get; set; }
+
+        /// <summary>Pending (not yet billed), Billed, or Paid.</summary>
         public string BillingStatus { get; set; } = "";
     }
 
-    /// <summary>Billing grid response shaped for Syncfusion custom binding: {result, count}.</summary>
+    /// <summary>
+    /// One page of the board, as the grid takes it (<c>{result, count}</c>), and the sentence that says what
+    /// the board holds and what is outstanding.
+    /// </summary>
     public class ResidentBillingResponse
     {
         public List<ResidentBillingItem> Result { get; set; } = new();
@@ -40,56 +52,64 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string Summary { get; set; } = "";
     }
 
-    /// <summary>Single-row response for templated dialog adds and per-row server patches.</summary>
-    public class ResidentBillingRowResponse
-    {
-        public ResidentBillingItem Row { get; set; } = new ResidentBillingItem();
-        public string Summary { get; set; } = "";
-    }
-
+    /// <summary>The page of the board the grid asks for: its paging, its sort, and the board's filters.</summary>
     public class BillingDataRequest
     {
         public int Skip { get; set; }
         public int Take { get; set; }
         public List<FusionGridSortColumn>? Sorted { get; set; }
-        public List<string>? Group { get; set; }
         public string? FilterCareLevel { get; set; }
         public string? FilterWing { get; set; }
         public string? FilterStatus { get; set; }
     }
 
+    /// <summary>The residents picked on the board, for a rate increase or to mark billed.</summary>
     public class BillingBulkRequest
     {
         public List<ResidentBillingItem>? SelectedRecords { get; set; }
-        public decimal? Percent { get; set; }
+        public decimal Percent { get; set; }
     }
 
+    /// <summary>The rates and add-ons changed in the grid.</summary>
     public class BillingSaveRequest
     {
         public FusionGridBatchChanges<ResidentBillingItem>? BatchChanges { get; set; }
     }
 
+    /// <summary>The board's filters, for the statements emailed to the families it holds.</summary>
+    public class BillingStatementsRequest
+    {
+        public string? FilterCareLevel { get; set; }
+        public string? FilterWing { get; set; }
+        public string? FilterStatus { get; set; }
+    }
+
+    /// <summary>What the business office did, as the manager is told.</summary>
+    public class BillingAnswer
+    {
+        public string Summary { get; set; } = "";
+    }
+
     /// <summary>
-    /// Client and server validation for the templated add-charge dialog.
-    /// Only the New* fields participate; the filter inputs are untouched.
+    /// The add-charge dialog's rules. Only the New* fields take part; the filters are not the dialog's.
     /// </summary>
     public class ResidentBillingAddValidator : ReactiveValidator<ResidentBillingViewModel>
     {
         public ResidentBillingAddValidator()
         {
-            RuleFor(x => x.NewResidentName).NotEmpty().WithMessage("Resident name is required.");
+            RuleFor(x => x.NewResidentName)
+                .NotEmpty().WithMessage("Enter the resident's name.")
+                .MinimumLength(3).WithMessage("Write the resident's full name.");
 
-            RuleFor(x => x.NewResidentName).MinimumLength(3).WithMessage("Resident name must be at least 3 characters.");
+            RuleFor(x => x.NewCareLevel).NotEmpty().WithMessage("Choose the resident's care level.");
 
-            RuleFor(x => x.NewCareLevel).NotEmpty().WithMessage("Care level is required.");
+            RuleFor(x => x.NewMonthlyRate)
+                .NotNull().WithMessage("Enter the monthly rate.")
+                .InclusiveBetween(0m, 20000m).WithMessage("A monthly rate runs from $0 to $20,000.");
 
-            RuleFor(x => x.NewMonthlyRate).NotEmpty().WithMessage("Monthly rate is required.");
-
-            RuleFor(x => x.NewMonthlyRate).InclusiveBetween(0m, 20000m).WithMessage("Monthly rate must be between 0 and 20,000.");
-
-            RuleFor(x => x.NewAddOnCharges).NotEmpty().WithMessage("Add-on charges are required.");
-
-            RuleFor(x => x.NewAddOnCharges).InclusiveBetween(0m, 5000m).WithMessage("Add-on charges must be between 0 and 5,000.");
+            RuleFor(x => x.NewAddOnCharges)
+                .NotNull().WithMessage("Enter the add-on charges, or 0 for none.")
+                .InclusiveBetween(0m, 5000m).WithMessage("Add-on charges run from $0 to $5,000.");
         }
     }
 }

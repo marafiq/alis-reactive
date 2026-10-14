@@ -3,44 +3,30 @@
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @{
-    ViewData["Title"] = "ArrayGrid";
+    ViewData["Title"] = "Resident Roster";
 
     var plan = Html.ReactivePlan<ArrayGridModel>();
 
-    var columns = FusionGridColumns.Of<ResidentRow>();
+    var columns = FusionGridColumns.Of<RosterResident>();
 
-    // HTTP array flows through ReactiveArray ordering before binding the grid dataSource.
+    // The roster arrives in no order; the browser sorts it by name before the grid shows it.
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("Residents", "ArrayGrid"))
-         .Response(r => r.OnSuccess<ResidentRosterResponse>((json, s) =>
+         .Response(r => r.OnSuccess<RosterResponse>((json, s) =>
          {
-             var roster = p.From(json.Get(x => x.Residents));
+             var roster = s.From(json.Get(x => x.Residents));
              s.Component<FusionGrid>("roster-grid").DataSource.Set(roster.OrderBy(x => x.Name));
-             s.Element("grid-status").Text.Set("roster loaded");
          }))));
-
-    // Client-side path reads and rebinds the grid's current dataSource.
-    Html.NativeButton("show-active-btn", "Show Active Only")
-        .Reactive(plan, evt => evt.Click, (args, p) =>
-        {
-            var current = p.From(p.Component<FusionGrid>("roster-grid").Rows<ResidentRow>());
-            var rosterGrid = p.Component<FusionGrid>("roster-grid");
-            rosterGrid.DataSource.Set(current.Where(x => x.Status == "active").OrderBy(x => x.Name));
-            rosterGrid.Refresh();
-            p.Element("grid-status").Text.Set("active only");
-        });
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">ArrayGrid &mdash; client-side transform into a grid data source</native-heading>
+    <native-heading level="H1">Resident Roster</native-heading>
     <native-text color="Secondary">
-        The array DSL is just value routing: <code>p.From(roster).Where(x =&gt; x.Status == "active").OrderBy(x =&gt; x.Name)</code>
-        flows into the grid's <code>dataSource</code> member via <code>rosterGrid.DataSource.Set(source)</code>.
-        The filter runs in the plan over element members &mdash; no HTTP round-trip, no per-row code.
+        Front desk. Every resident by name; narrow the roster to the active residents for the day's sign-in sheet.
     </native-text>
 
     <native-card><native-card-body>
-        @(Html.FusionGrid<ArrayGridModel, ResidentRow>(plan, "roster-grid", b => b
+        @(Html.FusionGrid<ArrayGridModel, RosterResident>(plan, "roster-grid", b => b
             .Columns(new List<GridColumn>
             {
                 new GridColumn { Field = columns.Field(r => r.Name), HeaderText = "Name", Width = "160" },
@@ -51,8 +37,17 @@
 
         <div class="mt-4 flex items-center gap-3">
             @(Html.NativeButton("show-active-btn", "Show Active Only")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"))
-            <span class="font-mono text-sm">Status: <span id="grid-status" class="text-text-muted">&mdash;</span></span>
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    // The active residents come from the rows on screen, not from the server again.
+                    var rosterGrid = p.Component<FusionGrid>("roster-grid");
+                    var onScreen = p.From(rosterGrid.Rows<RosterResident>());
+                    rosterGrid.DataSource.Set(onScreen.Where(x => x.Status == "active").OrderBy(x => x.Name));
+                    rosterGrid.Refresh();
+                    p.Element("roster-showing").Text.Set("Active residents, by name.");
+                }))
+            <p id="roster-showing" class="text-sm text-text-secondary">Every resident, by name.</p>
         </div>
     </native-card-body></native-card>
 </native-vstack>
