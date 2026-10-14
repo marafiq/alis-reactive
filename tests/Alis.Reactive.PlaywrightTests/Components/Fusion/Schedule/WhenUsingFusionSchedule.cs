@@ -8,8 +8,9 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Schedule;
 /// <summary>
 /// As a staffing coordinator, I keep the week's AM, PM and night shifts covered where the schedule shows them:
 /// I staff, add and cancel shifts in the assignment drawer and the new-assignment dialog, ask the agency for
-/// the open ones, and change an in-service in the schedule's own editor unless someone else has it open, so that
-/// every shift has someone on it and no change is made twice at once.
+/// the open ones, and change or delete an in-service in the schedule's own editor unless someone else has it
+/// open, so that every shift has someone on it, every change is saved on the server, and no change is made
+/// twice at once.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -26,10 +27,19 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Schedule;
 /// <c>PreviousDate</c>, <c>PreviousView</c>, <c>ViewIndex</c> and <c>Cancel</c>, and <c>EventRendered</c>'s
 /// <c>Type</c>: no step of the journey needs them; the payroll lock stops a move in <c>ActionBegin</c>, which
 /// Syncfusion raises before <c>Navigating</c> (schedule.js:671-676). <c>CellClick</c>'s all-day row: it has no
-/// height while no all-day event is on the week, so <c>IsAllDay</c> is clicked in a month's day. Saving or
-/// deleting an in-service in the schedule's own editor: <c>ActionBegin</c> declares none of the records
-/// Syncfusion hands it (<c>changedRecords</c>, crud.js:316; <c>deletedRecords</c>, crud.js:657), so the page
-/// cannot send the change to the server yet.
+/// height while no all-day event is on the week, so <c>IsAllDay</c> is clicked in a month's day.
+/// <c>ActionBegin</c>'s <c>AddedRecords</c>: the page reads no added event; a new shift is saved on the server
+/// before <c>AddEvent</c> shows it, and the editor never opens on an empty hour. Moving an in-service to other
+/// hours in the editor: the server keeps it at the hour after the AM shift and its answer says so; no test
+/// moves one.
+/// </para>
+/// <para>
+/// An in-service saved or deleted in the schedule's editor reaches <c>ActionBegin</c> with its record in
+/// <c>ChangedRecords</c> (crud.js:314-317, from the editor's save, event-window.js:1434 and 1725) or
+/// <c>DeletedRecords</c> (crud.js:655-657, from the delete alert, quick-popups.js:1008-1009). The page cancels
+/// the schedule's own change, posts the record to the server and reloads the week with what it saved. A
+/// shift the drawer saves or cancels passes <c>ActionBegin</c> too (<c>SaveEvent</c>, crud.js:722;
+/// <c>DeleteEvent</c>, crud.js:657), after the server already has it, and is not sent again.
 /// </para>
 /// <para>
 /// The new-assignment dialog's staff list is located by <c>IdGenerator</c>: the dialog's partial plan lands
@@ -139,6 +149,53 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
     private ILocator StaffChoice(string staff) =>
         AssignmentForm.GetByRole(AriaRole.Radio, new() { Name = staff, Exact = true });
+
+    // Opens the first open shift's assignment in the drawer and chooses Tom Harding; returns where the shift is.
+    private async Task<(DateTime Start, int Group)> ChooseTomForTheFirstOpenShift()
+    {
+        var openShift = Schedule.Appointments(new Regex("UNASSIGNED")).First;
+        var start = await Schedule.StartOf(openShift);
+        var group = await Schedule.GroupOf(openShift);
+        await Schedule.Open(openShift);
+        await Schedule.Details.GetByText("Assign Staff", new() { Exact = true }).ClickAsync();
+        await Expect(Drawer).ToHaveClassAsync(new Regex("alis-drawer--visible"), new() { Timeout = 10000 });
+        await Expect(AssignmentForm).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await AssignmentForm.GetByText("Tom Harding (LPN)").ClickAsync();
+        return (start, group);
+    }
+
+    private const string RenamedFallsPreventionTitle = "In-service: Falls prevention and hip protectors";
+
+    // Falls prevention is the AM staff's in-service on this week's Tuesday at 2:30 PM, after their shift.
+    private static DateTime FallsPreventionStart => DateTime.Today.AddDays(2 - (int)DateTime.Today.DayOfWeek).AddHours(14.5);
+
+    private ILocator FallsPrevention =>
+        Schedule.Appointment("In-service: Falls prevention", FallsPreventionStart, groupIndex: 0);
+
+    private ILocator RenamedFallsPrevention =>
+        Schedule.Appointment(RenamedFallsPreventionTitle, FallsPreventionStart, groupIndex: 0);
+
+    // The server answers that Falls prevention is the coordinator's to change, and the editor stays open on it.
+    private async Task OpenFallsPreventionInTheEditor()
+    {
+        await Schedule.OpenToChange(FallsPrevention);
+        await Expect(InServiceNote).ToHaveTextAsync(
+            "The Falls prevention in-service is yours to change until you close it.", new() { Timeout = 10000 });
+    }
+
+    // Holds the page's requests to the URL until the test releases them; Asked completes once the page sent one.
+    private async Task<(Task Asked, SemaphoreSlim Released)> Hold(string url)
+    {
+        var asked = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var released = new SemaphoreSlim(0);
+        await Page.RouteAsync(url, async route =>
+        {
+            asked.TrySetResult();
+            await released.WaitAsync(TimeSpan.FromSeconds(30));
+            await route.ContinueAsync();
+        });
+        return (asked.Task, released);
+    }
 
     [Test]
     public async Task the_week_opens_with_its_shifts_and_how_many_need_coverage()
@@ -425,15 +482,8 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await NavigateAndWaitForSchedule();
         var before = await ShiftsNeedingCoverage();
         Assert.That(before, Is.GreaterThan(0), "the scenario needs at least one open shift to cover");
-        var openShift = Schedule.Appointments(new Regex("UNASSIGNED")).First;
-        var start = await Schedule.StartOf(openShift);
-        var group = await Schedule.GroupOf(openShift);
+        var (start, group) = await ChooseTomForTheFirstOpenShift();
 
-        await Schedule.Open(openShift);
-        await Schedule.Details.GetByText("Assign Staff", new() { Exact = true }).ClickAsync();
-        await Expect(Drawer).ToHaveClassAsync(new Regex("alis-drawer--visible"), new() { Timeout = 10000 });
-        await Expect(AssignmentForm).ToBeVisibleAsync(new() { Timeout = 10000 });
-        await AssignmentForm.GetByText("Tom Harding (LPN)").ClickAsync();
         await ClickWhenStable(Page.Locator("#btn-save-assignment"));
 
         // The shift shows Tom where it is, and the week the server answers with has one fewer open shift.
@@ -445,6 +495,29 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await WaitForTraceMessage("booted", 10000);
         await Expect(Summary).ToHaveTextAsync(new Regex($@": {before - 1} of 21 shifts"), new() { Timeout = 10000 });
         await Expect(Schedule.Appointment("Tom Harding (LPN)", start, group).First).ToBeVisibleAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // The drawer's save hands the saved shift to the schedule, which raises the same ActionBegin an in-service
+    // saved in the editor raises; the server already has the shift.
+    [Test]
+    public async Task a_shift_staffed_in_the_drawer_is_not_sent_again_as_an_in_service()
+    {
+        await NavigateAndWaitForSchedule();
+        var before = await ShiftsNeedingCoverage();
+        Assert.That(before, Is.GreaterThan(0), "the scenario needs at least one open shift to cover");
+        var inServiceSaves = 0;
+        Page.Request += (_, request) =>
+        {
+            if (request.Url.Contains("/Schedule/SaveInService")) Interlocked.Increment(ref inServiceSaves);
+        };
+        var (start, group) = await ChooseTomForTheFirstOpenShift();
+
+        await ClickWhenStable(Page.Locator("#btn-save-assignment"));
+
+        await Expect(Schedule.Appointment("Tom Harding (LPN)", start, group).First).ToBeVisibleAsync(new() { Timeout = 15000 });
+        await Expect(Summary).ToHaveTextAsync(new Regex($@": {before - 1} of 21 shifts"), new() { Timeout = 15000 });
+        Assert.That(inServiceSaves, Is.EqualTo(0), "A shift is no in-service; the server is not asked to save it as one.");
         AssertNoConsoleErrors();
     }
 
@@ -680,5 +753,98 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         // Closing the editor hides the note; the refusal shows its note after the close.
         await Expect(InServiceNote).ToBeVisibleAsync();
         AssertNoConsoleErrorsExcept("the server responded with a status of 409");
+    }
+
+    [Test]
+    public async Task changing_an_in_services_title_in_the_editor_keeps_it_after_the_week_reloads()
+    {
+        await NavigateAndWaitForSchedule();
+        await OpenFallsPreventionInTheEditor();
+        await Schedule.EditorField("subject").FillAsync(RenamedFallsPreventionTitle);
+
+        await Schedule.EditorSave.ClickAsync();
+
+        // The server says what it saved, and the week it reloads shows the new title.
+        await Expect(InServiceNote).ToHaveTextAsync(
+            "Saved the Falls prevention and hip protectors in-service, on Tuesday at 2:30 PM after the AM shift.",
+            new() { Timeout = 10000 });
+        await Expect(RenamedFallsPrevention).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(FallsPrevention).ToHaveCountAsync(0);
+
+        // It was saved on the server, not only in the schedule.
+        await Page.ReloadAsync();
+        await WaitForTraceMessage("booted", 10000);
+        await Expect(RenamedFallsPrevention).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(FallsPrevention).ToHaveCountAsync(0);
+        AssertNoConsoleErrors();
+    }
+
+    // The schedule's own save of the change is cancelled. Were it not, the schedule would show the new title before
+    // the server had saved anything, and the reload the page makes after any save the schedule makes would put the
+    // old one back; the week's loads are held, so that unsaved title would stay on screen.
+    [Test]
+    public async Task a_changed_in_service_shows_its_new_title_only_once_the_server_saved_it()
+    {
+        await NavigateAndWaitForSchedule();
+        var (saveAsked, saveReleased) = await Hold("**/Schedule/SaveInService");
+        var (_, weekReleased) = await Hold("**/Schedule/Shifts/**");
+        await OpenFallsPreventionInTheEditor();
+        await Schedule.EditorField("subject").FillAsync(RenamedFallsPreventionTitle);
+
+        await Schedule.EditorSave.ClickAsync();
+
+        await saveAsked.WaitAsync(TimeSpan.FromSeconds(10));
+        await Expect(Schedule.Editor).ToBeHiddenAsync();
+        await Expect(FallsPrevention).ToBeVisibleAsync();
+        await Expect(RenamedFallsPrevention).ToHaveCountAsync(0);
+
+        saveReleased.Release();
+        weekReleased.Release();
+
+        await Expect(RenamedFallsPrevention).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(FallsPrevention).ToHaveCountAsync(0);
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task deleting_an_in_service_in_the_editor_takes_it_off_the_week()
+    {
+        await NavigateAndWaitForSchedule();
+        await OpenFallsPreventionInTheEditor();
+        await Schedule.EditorDelete.ClickAsync();
+
+        await Schedule.ConfirmDelete.ClickAsync();
+
+        await Expect(InServiceNote).ToHaveTextAsync(
+            "Took the Falls prevention in-service off Tuesday's schedule.", new() { Timeout = 10000 });
+        await Expect(FallsPrevention).ToHaveCountAsync(0, new() { Timeout = 10000 });
+
+        // It was taken off on the server: the week comes back with Thursday's in-service and without Tuesday's.
+        await Page.ReloadAsync();
+        await WaitForTraceMessage("booted", 10000);
+        await Expect(Schedule.Appointments("In-service: Safe resident transfers")).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(FallsPrevention).ToHaveCountAsync(0);
+        AssertNoConsoleErrors();
+    }
+
+    // The schedule's own delete is cancelled: until the server has taken the in-service off, the week keeps it.
+    [Test]
+    public async Task a_deleted_in_service_stays_on_the_week_until_the_server_took_it_off()
+    {
+        await NavigateAndWaitForSchedule();
+        var (removalAsked, removalReleased) = await Hold("**/Schedule/RemoveInService");
+        await OpenFallsPreventionInTheEditor();
+        await Schedule.EditorDelete.ClickAsync();
+
+        await Schedule.ConfirmDelete.ClickAsync();
+
+        await removalAsked.WaitAsync(TimeSpan.FromSeconds(10));
+        await Expect(Schedule.Alert).ToBeHiddenAsync();
+        await Expect(FallsPrevention).ToBeVisibleAsync();
+
+        removalReleased.Release();
+
+        await Expect(FallsPrevention).ToHaveCountAsync(0, new() { Timeout = 10000 });
+        AssertNoConsoleErrors();
     }
 }

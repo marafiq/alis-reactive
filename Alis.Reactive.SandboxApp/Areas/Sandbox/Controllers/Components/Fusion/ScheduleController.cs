@@ -67,6 +67,25 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return refused ? Conflict(answer) : Ok(answer);
         }
 
+        /// <summary>
+        /// Saves an in-service changed in the schedule's editor, which the page holds back from the schedule until
+        /// the server answers what it saved.
+        /// </summary>
+        [HttpPost("SaveInService")]
+        public IActionResult SaveInService([FromBody] InServiceChange change)
+        {
+            var answer = World.SaveInService(change.InServiceId, change.Subject, change.Description);
+            return answer == null ? NotFound(new { error = "In-service not found." }) : Ok(answer);
+        }
+
+        /// <summary>Takes an in-service deleted in the schedule's editor off this browser's schedule.</summary>
+        [HttpPost("RemoveInService")]
+        public IActionResult RemoveInService([FromBody] InServiceRemoval removal)
+        {
+            var answer = World.RemoveInService(removal.InServiceId);
+            return answer == null ? NotFound(new { error = "In-service not found." }) : Ok(answer);
+        }
+
         private static (DateTime start, DateTime end) CalculateDateRange(DateTime anchor, string view)
         {
             return view switch

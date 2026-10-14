@@ -5,8 +5,8 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// A Syncfusion Schedule: its appointments, its cells, its header bar, the details popup an appointment opens
-/// and its own event editor.
+/// A Syncfusion Schedule: its appointments, its cells, its header bar, the details popup an appointment opens,
+/// its own event editor and its alert.
 /// </summary>
 public sealed class FusionScheduleLocator
 {
@@ -106,6 +106,18 @@ public sealed class FusionScheduleLocator
 
     /// <summary>The event editor's Cancel button.</summary>
     public ILocator EditorCancel => Editor.Locator(".e-event-cancel");
+
+    /// <summary>The event editor's Save button.</summary>
+    public ILocator EditorSave => Editor.Locator(".e-event-save");
+
+    /// <summary>The event editor's Delete button; the schedule then asks in its alert before it deletes.</summary>
+    public ILocator EditorDelete => Editor.Locator(".e-event-delete");
+
+    /// <summary>The schedule's own alert: the question before a delete, and its other alerts.</summary>
+    public ILocator Alert => _page.Locator($"#{_componentId}QuickDialog");
+
+    /// <summary>The alert's Delete button, which deletes the event the alert asked about.</summary>
+    public ILocator ConfirmDelete => Alert.GetByRole(AriaRole.Button, new() { Name = "Delete", Exact = true });
 
     /// <summary>
     /// Opens an appointment's details the way a hand does: bring it into view, then click it. A bare click on an

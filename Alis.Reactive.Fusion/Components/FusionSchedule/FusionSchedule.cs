@@ -16,9 +16,11 @@ namespace Alis.Reactive.Fusion.Components
     /// Render it with <c>Html.FusionSchedule(plan, "shift-schedule", b =&gt; ...)</c>, reach it with
     /// <c>var schedule = p.Component&lt;FusionSchedule&gt;("shift-schedule");</c> and use its members directly:
     /// <c>schedule.ScrollTo("09:00");</c>. Event data is typed by your event class:
-    /// <c>schedule.GetEvents&lt;Shift&gt;()</c> reads the events as <c>Shift[]</c>, and
+    /// <c>schedule.GetEvents&lt;Shift&gt;()</c> reads the events as <c>Shift[]</c>,
     /// <c>.Reactive(evt =&gt; evt.EventRendered&lt;Shift&gt;(), (args, p) =&gt; ...)</c> hands each rendered
-    /// <c>Shift</c> over as <c>args.Data</c>.
+    /// <c>Shift</c> over as <c>args.Data</c>, and <c>.Reactive(evt =&gt; evt.ActionBegin&lt;Shift&gt;(), ...)</c>
+    /// hands the shifts an action adds, saves or deletes over as <c>args.AddedRecords</c>,
+    /// <c>args.ChangedRecords</c> and <c>args.DeletedRecords</c>.
     /// </remarks>
     public sealed class FusionSchedule : FusionComponent
     {
@@ -91,9 +93,12 @@ namespace Alis.Reactive.Fusion.Components
         public TypedEvent<FusionScheduleEventClickArgs> EventClick =>
             Event<FusionScheduleEventClickArgs>();
 
-        /// <summary>Raised before an action runs.</summary>
-        public TypedEvent<FusionScheduleActionBeginArgs> ActionBegin =>
-            Event<FusionScheduleActionBeginArgs>();
+        /// <summary>
+        /// Raised before an action runs: a move to another date or view, or an event added, saved or deleted.
+        /// </summary>
+        /// <typeparam name="TEvent">Your event class; the payload's records read the events the action carries as it.</typeparam>
+        public TypedEvent<FusionScheduleActionBeginArgs<TEvent>> ActionBegin<TEvent>() where TEvent : class =>
+            Event<FusionScheduleActionBeginArgs<TEvent>>();
 
         /// <summary>Raised after an action completes.</summary>
         public TypedEvent<FusionScheduleActionCompleteArgs> ActionComplete =>
@@ -103,9 +108,10 @@ namespace Alis.Reactive.Fusion.Components
         public TypedEvent<FusionScheduleNavigatingArgs> Navigating =>
             Event<FusionScheduleNavigatingArgs>();
 
-        /// <summary>Raised before a popup opens.</summary>
-        public TypedEvent<FusionSchedulePopupOpenArgs> PopupOpen =>
-            Event<FusionSchedulePopupOpenArgs>();
+        /// <summary>Raised before a popup opens: an event's details, the event editor, a delete alert, ...</summary>
+        /// <typeparam name="TEvent">Your event class; the payload's <c>Data</c> reads the event the popup is for as it.</typeparam>
+        public TypedEvent<FusionSchedulePopupOpenArgs<TEvent>> PopupOpen<TEvent>() where TEvent : class =>
+            Event<FusionSchedulePopupOpenArgs<TEvent>>();
 
         /// <summary>Raised before a popup closes.</summary>
         public TypedEvent<FusionSchedulePopupCloseArgs> PopupClose =>
@@ -144,14 +150,39 @@ namespace Alis.Reactive.Fusion.Components
         public Prop<bool> Cancel => Prop<bool>();
     }
 
-    /// <summary>Payload of <see cref="FusionSchedule.ActionBegin"/>.</summary>
-    public class FusionScheduleActionBeginArgs : JsObject
+    /// <summary>Payload of <see cref="FusionSchedule.ActionBegin{TEvent}"/>.</summary>
+    /// <remarks>
+    /// An event action hands its events over as arrays, whichever way it started (the schedule's editor or delete
+    /// alert, or <c>AddEvent</c>, <c>SaveEvent</c> and <c>DeleteEvent</c>): an added event is in
+    /// <see cref="AddedRecords"/>, a saved one in <see cref="ChangedRecords"/> and a deleted one in
+    /// <see cref="DeletedRecords"/>. A recurring event differs: deleting one occurrence, or it and those after it,
+    /// hands them over in <see cref="ChangedRecords"/>, and saving the whole series lists the occurrences it drops
+    /// in <see cref="DeletedRecords"/>. A move to another date or view carries no records, which
+    /// <c>p.From(args.ChangedRecords)</c> reads as an empty list. The payload's <c>data</c> is not declared: it
+    /// changes shape with the action (the added events, the one event the editor saves, occurrence and parent
+    /// pairs for a recurring event).
+    /// </remarks>
+    /// <typeparam name="TEvent">Your event class.</typeparam>
+    public class FusionScheduleActionBeginArgs<TEvent> : JsObject
+        where TEvent : class
     {
-        /// <summary>The kind of action.</summary>
+        /// <summary>
+        /// The kind of action: <c>"dateNavigate"</c>, <c>"viewNavigate"</c>, <c>"eventCreate"</c>,
+        /// <c>"eventChange"</c>, <c>"eventRemove"</c>, ...
+        /// </summary>
         public ReadOnly<string> RequestType => ReadOnly<string>();
 
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
+
+        /// <summary>The events being added.</summary>
+        public ReadOnly<TEvent[]> AddedRecords => ReadOnly<TEvent[]>();
+
+        /// <summary>The events being saved, each with the values it is saved with.</summary>
+        public ReadOnly<TEvent[]> ChangedRecords => ReadOnly<TEvent[]>();
+
+        /// <summary>The events being deleted.</summary>
+        public ReadOnly<TEvent[]> DeletedRecords => ReadOnly<TEvent[]>();
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.ActionComplete"/>.</summary>
@@ -167,11 +198,11 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary><c>"date"</c> or <c>"view"</c>.</summary>
         public ReadOnly<string> Action => ReadOnly<string>();
 
-        /// <summary>The date the schedule moves to.</summary>
-        public ReadOnly<string> CurrentDate => ReadOnly<string>();
+        /// <summary>The date the schedule moves to; for a view switch, the date it shows.</summary>
+        public ReadOnly<DateTime> CurrentDate => ReadOnly<DateTime>();
 
-        /// <summary>The date it shows now.</summary>
-        public ReadOnly<string> PreviousDate => ReadOnly<string>();
+        /// <summary>The date it shows now; only a date move carries it.</summary>
+        public ReadOnly<DateTime> PreviousDate => ReadOnly<DateTime>();
 
         /// <summary>The view it moves to.</summary>
         public ReadOnly<string> CurrentView => ReadOnly<string>();
@@ -186,27 +217,22 @@ namespace Alis.Reactive.Fusion.Components
         public Prop<bool> Cancel => Prop<bool>();
     }
 
-    /// <summary>Payload of <see cref="FusionSchedule.PopupOpen"/>.</summary>
-    public class FusionSchedulePopupOpenArgs : JsObject
+    /// <summary>Payload of <see cref="FusionSchedule.PopupOpen{TEvent}"/>.</summary>
+    /// <typeparam name="TEvent">Your event class.</typeparam>
+    public class FusionSchedulePopupOpenArgs<TEvent> : JsObject
+        where TEvent : class
     {
-        /// <summary>The popup: <c>"QuickInfo"</c>, <c>"Editor"</c>, ...</summary>
+        /// <summary>The popup: <c>"QuickInfo"</c>, <c>"Editor"</c>, <c>"DeleteAlert"</c>, ...</summary>
         public ReadOnly<string> Type => ReadOnly<string>();
 
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
 
-        /// <summary>The event or cell the popup is for.</summary>
-        public ReadOnly<FusionSchedulePopupData> Data => ReadOnly<FusionSchedulePopupData>();
-    }
-
-    /// <summary>The event a popup is for, as <see cref="FusionSchedulePopupOpenArgs"/> reports it.</summary>
-    public class FusionSchedulePopupData
-    {
-        /// <summary>The event ID; 0 for an empty cell.</summary>
-        public int Id { get; set; }
-
-        /// <summary>The event subject.</summary>
-        public string Subject { get; set; } = "";
+        /// <summary>
+        /// The event the popup is for. A popup for an empty cell holds only the cell's start, end and resource, so the
+        /// event's own members, its key among them, read as unset.
+        /// </summary>
+        public ReadOnly<TEvent> Data => ReadOnly<TEvent>();
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.PopupClose"/>.</summary>
@@ -236,10 +262,6 @@ namespace Alis.Reactive.Fusion.Components
         public ReadOnly<string> Type => ReadOnly<string>();
     }
 
-    /// <summary>
-    /// Editor action for schedule event operations. Mirrors the Syncfusion EJ2 Schedule
-    /// <c>CurrentAction</c> values one-to-one; each name serializes to its EJ2 string.
-    /// </summary>
     /// <summary>The schedule's <c>eventSettings</c>: its events.</summary>
     public sealed class FusionScheduleEventSettings : JsObject
     {
@@ -247,6 +269,10 @@ namespace Alis.Reactive.Fusion.Components
         public Prop<object> DataSource => Prop<object>();
     }
 
+    /// <summary>
+    /// Editor action for schedule event operations. Mirrors the Syncfusion EJ2 Schedule
+    /// <c>CurrentAction</c> values one-to-one; each name serializes to its EJ2 string.
+    /// </summary>
     public enum ScheduleAction
     {
         /// <summary>Add a new event.</summary>

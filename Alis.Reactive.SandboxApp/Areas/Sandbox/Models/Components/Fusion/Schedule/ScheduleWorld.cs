@@ -54,19 +54,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         }
 
         /// <summary>Takes the shift off the schedule and returns it; null when the shift is unknown.</summary>
-        public ShiftAssignment? CancelAssignment(int assignmentId)
-        {
-            foreach (var (key, assignments) in OpenedWeeks())
-            {
-                var assignment = assignments.FirstOrDefault(a => a.Id == assignmentId);
-                if (assignment == null) continue;
-
-                assignments.Remove(assignment);
-                Save(key, assignments);
-                return assignment;
-            }
-            return null;
-        }
+        public ShiftAssignment? CancelAssignment(int assignmentId) => TakeOff(assignmentId);
 
         /// <summary>Adds a staffed shift to the facility's week; null when the staff member is unknown.</summary>
         public ShiftAssignment? CreateAssignment(string facilityId, DateTime startTime, DateTime endTime, int shiftId, int staffId)
@@ -87,17 +75,74 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         /// Whether the coordinator may change the in-service the schedule opened: refused while someone else has it
         /// open. Null when this browser's schedule has no such in-service.
         /// </summary>
-        public (bool Refused, InServiceClaimAnswer Answer)? ClaimInService(int inServiceId)
+        public (bool Refused, InServiceAnswer Answer)? ClaimInService(int inServiceId)
         {
-            var inService = FindAssignment(inServiceId);
-            if (inService is not { IsInService: true }) return null;
+            var inService = FindInService(inServiceId);
+            if (inService == null) return null;
 
-            var training = inService.Subject.Replace(InServicePrefix, "");
+            var training = TrainingOf(inService);
             var refused = inService.OpenBy.Length > 0;
             var note = refused
                 ? $"{inService.OpenBy} is changing the {training} in-service right now, so it was closed here. Try again in a few minutes."
                 : $"The {training} in-service is yours to change until you close it.";
-            return (refused, new InServiceClaimAnswer { Note = note });
+            return (refused, new InServiceAnswer { Note = note });
+        }
+
+        /// <summary>
+        /// Saves the title and description the coordinator gave an in-service. Its hour stays the one after the AM
+        /// shift, whatever the editor showed, and the answer says so. Null when this browser's schedule has no such
+        /// in-service.
+        /// </summary>
+        public InServiceAnswer? SaveInService(int inServiceId, string subject, string description)
+        {
+            if (FindInService(inServiceId) == null) return null;
+
+            var saved = Change(inServiceId, inService =>
+            {
+                inService.Subject = subject;
+                inService.Description = description;
+            })!;
+            return new InServiceAnswer
+            {
+                Note = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Saved the {0} in-service, on {1:dddd} at {1:h:mm tt} after the AM shift.",
+                    TrainingOf(saved), saved.StartTime),
+            };
+        }
+
+        /// <summary>Takes an in-service off the schedule; null when this browser's schedule has no such in-service.</summary>
+        public InServiceAnswer? RemoveInService(int inServiceId)
+        {
+            if (FindInService(inServiceId) == null) return null;
+
+            var removed = TakeOff(inServiceId)!;
+            return new InServiceAnswer
+            {
+                Note = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Took the {0} in-service off {1:dddd}'s schedule.",
+                    TrainingOf(removed), removed.StartTime),
+            };
+        }
+
+        private ShiftAssignment? FindInService(int inServiceId) =>
+            FindAssignment(inServiceId) is { IsInService: true } inService ? inService : null;
+
+        private static string TrainingOf(ShiftAssignment inService) => inService.Subject.Replace(InServicePrefix, "");
+
+        private ShiftAssignment? TakeOff(int assignmentId)
+        {
+            foreach (var (key, assignments) in OpenedWeeks())
+            {
+                var assignment = assignments.FirstOrDefault(a => a.Id == assignmentId);
+                if (assignment == null) continue;
+
+                assignments.Remove(assignment);
+                Save(key, assignments);
+                return assignment;
+            }
+            return null;
         }
 
         private ShiftAssignment? Change(int assignmentId, Action<ShiftAssignment> change)

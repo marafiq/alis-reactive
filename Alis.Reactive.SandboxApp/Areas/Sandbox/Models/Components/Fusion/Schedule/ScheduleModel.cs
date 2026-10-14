@@ -91,24 +91,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     }
 
     /// <summary>
-    /// The request of <c>GET Schedule/Shifts/{currentView}</c> as the page reads it from the schedule: the
-    /// view (in the path), the date it shows and the facility.
+    /// The request of <c>GET Schedule/Shifts/{currentView}</c>: the view (in the path) and the date it shows, as
+    /// the page reads them from the schedule or from its navigating event, and the facility.
     /// </summary>
     public sealed class ScheduleAssignmentsQuery
     {
         public string CurrentView { get; set; } = "";
         public DateTime CurrentDate { get; set; }
-        public string? SelectedFacilityId { get; set; }
-    }
-
-    /// <summary>
-    /// The request of <c>GET Schedule/Shifts/{currentView}</c> as the schedule navigates, whose navigating
-    /// event hands the date it moves to as text.
-    /// </summary>
-    public sealed class ScheduleNavigationQuery
-    {
-        public string CurrentView { get; set; } = "";
-        public string CurrentDate { get; set; } = "";
         public string? SelectedFacilityId { get; set; }
     }
 
@@ -148,8 +137,28 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public int InServiceId { get; set; }
     }
 
-    /// <summary>The server's answer to opening an in-service: whether it is the coordinator's to change.</summary>
-    public sealed class InServiceClaimAnswer
+    /// <summary>
+    /// The request of <c>POST Schedule/SaveInService</c>: the in-service changed in the schedule's editor, and the
+    /// title and description it was given there.
+    /// </summary>
+    public sealed class InServiceChange
+    {
+        public int InServiceId { get; set; }
+        public string Subject { get; set; } = "";
+        public string Description { get; set; } = "";
+    }
+
+    /// <summary>The request of <c>POST Schedule/RemoveInService</c>: the in-service deleted in the schedule's editor.</summary>
+    public sealed class InServiceRemoval
+    {
+        public int InServiceId { get; set; }
+    }
+
+    /// <summary>
+    /// The server's word on an in-service the coordinator opened, saved or deleted: whether it is theirs to change,
+    /// or what it saved.
+    /// </summary>
+    public sealed class InServiceAnswer
     {
         public string Note { get; set; } = "";
     }
