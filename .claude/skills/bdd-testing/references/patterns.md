@@ -206,43 +206,65 @@ When(x => x.AddressType == "Custom Address", () =>
 
 ## TS Unit Test DOM Setup
 
-DOM setup must match production exactly:
+Vitest drives the runtime with plans built from `runtime/__tests__/support/plan.ts`: `s` (shapes),
+`e` (expressions), `st` (statements), `element(id, vendor)` and `plugin(name, key, data)` (object
+locators), `plan(objects, handlers)`, `on(object, event, param, ...statements)` and
+`fakeWidget(id, members)` for a component object. A test starts an owner with
+`startOwner(Owner.page(), [plan(...)])` after registering the modules it needs. From
+`runtime/__tests__/form.test.ts:24-53` (its `render` helper left out):
 
 ```typescript
-// GOOD — production-accurate
-const desc = {
-    formId: "resident-form",
-    planId: "App.Models.ResidentModel",
-    fields: [...]
-};
+// A required text field: the check passes when the value is not blank.
+function requiredField(id: string, name: string, message: string, when = e.lit(true)): FormField {
+  return {
+    id,
+    name,
+    value: e.get(e.obj(id), ["value"], s.string),
+    tests: [{ rule: "required", check: e.fn(["v"], e.op("not", e.op("empty", e.ref("v")))) as never, when, message }],
+  };
+}
 
-// BAD — no planId, wrong ID format
-const desc = { formId: "form", fields: [...] };
+function field(id: string, value = ""): string {
+  return `<input id="${id}" value="${value}"><span><span id="${id}_error" hidden></span></span>`;
+}
+
+function startForm(
+  fields: FormField[],
+  containerId = "admission",
+  summary = "Test_Plan_validation_summary",
+  others: string[] = [],
+): FormObject {
+  const data: FormPluginData = { kind: "form", summary, fields };
+  const objects: Record<string, ReturnType<typeof element>> = { form: plugin("alis.form", containerId, data) };
+  for (const id of [...fields.map(f => f.id), ...others]) objects[id] = element(id, "native");
+  startOwner(Owner.page(), [plan(objects, [])]);
+  return formModule.object(containerId) as FormObject;
+}
 ```
 
-Required DOM elements:
-- Summary div: `data-reactive-validation-summary="{planId}"`
-- Form: `id` matches descriptor's `formId`
-- Error spans: `data-valmsg-for="{fieldName}"`
-- Hidden sections: `hidden` attribute
-- Component IDs: `{TypeScope}__{PropertyPath}` from IdGenerator
+The DOM a test renders carries the IDs the rendered page carries, each reached by `getElementById`:
+- A field: its `IdGenerator` ID, `{Namespace_Type}__{Member_Path}`
+- Its inline message slot: `{id}_error` (`modules/form/display.ts:82`)
+- The plan's summary: the plan ID with `.` and `+` as `_`, then `_validation_summary`
+  (`Alis.Reactive/Razor/Extensions/PlanExtensions.cs`, `PlanElementId.ValidationSummaryFor`)
+- The form's container: the ID the view passes to `Validate<T>(...)`
 
 ---
 
 ## Orchestrator Routing Tests
 
-Test WHERE the error goes, not just pass/fail:
+Test WHERE a message goes, not just pass/fail. From `runtime/__tests__/form.test.ts:80-88`:
 
 ```typescript
-validate(desc);
-expect(errorSpan("Name")!.textContent).toBe("required");      // inline
-expect(summaryDiv().textContent).toBe("");                      // NOT in summary
-expect(summaryDiv().hasAttribute("hidden")).toBe(true);         // summary hidden
-
-// Hidden field → summary only:
-validate(desc);
-expect(errorSpan("HiddenField")!.textContent).toBe("");        // NOT inline
-expect(summaryDiv().textContent).toContain("Hidden required");  // IN summary
+it("puts a message in the summary when the inline slot cannot render", () => {
+  render(`<form id="admission"><input id="Name"><div hidden><span id="Name_error"></span></div></form>` +
+    `<div id="Test_Plan_validation_summary" hidden></div>`);
+  const form = startForm([requiredField("Name", "Name", "Enter the resident's name.")]);
+  form.validate();
+  const summary = document.getElementById("Test_Plan_validation_summary")!;
+  expect(summary.hidden).toBe(false);
+  expect(summary.textContent).toBe("Enter the resident's name.");
+});
 ```
 
 ---
@@ -251,9 +273,9 @@ expect(summaryDiv().textContent).toContain("Hidden required");  // IN summary
 
 | Symptom | Wrong Fix | Right Fix |
 |---------|-----------|-----------|
-| Phantom summary errors | Revert unenriched→summary | Fix validator scope (too wide) |
+| Phantom summary errors | Hide the summary | Scope the validator to the fields the page renders (Validator Scoping Rules above) |
 | Address rules missing client-side | Rules under a method-group `When` | Write the condition as a lambda: `When(x => ..., () => ...)` |
-| Condition fires on empty dropdown | Revert fail-closed | Fix eq/neq to return false on empty source |
-| Hidden field error silently passes | Remove hidden field validation | Move `valid = false` outside `if (summaryEl)` |
+| An `Eq` condition never matches an empty dropdown | Give the dropdown a default value | Test for nothing chosen with `IsEmpty()`: a missing value equals only another missing value, as in C# (`runtime/grammar/operators.ts:9-13`) |
+| A field's message never shows inside a hidden section | Skip validating hidden fields | Give its rule the condition that hides the section (`When(x => ..., ...)`); a message whose inline slot cannot render goes to the summary (`modules/form/form.ts`, F6) |
 
 When confused — **ASK the user**. Cost of asking: one message. Cost of guessing: hours of patch-fixing.

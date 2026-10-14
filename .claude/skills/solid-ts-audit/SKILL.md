@@ -1,6 +1,6 @@
 ---
 name: solid-ts-audit
-description: Audits TypeScript modules for SOLID violations, coupling issues, and code smells. Applies before proposing structural changes to TS runtime modules. Covers adding new command kinds, trigger kinds, or vendor types to verify extensibility.
+description: Audits TypeScript modules for SOLID violations, coupling issues, and code smells. Applies before proposing structural changes to TS runtime modules. Covers adding a statement or expression kind, a module, or a vendor to verify extensibility.
 ---
 
 # SOLID TypeScript Module Audit
@@ -16,7 +16,7 @@ Audit TS modules using SOLID principles (Uncle Bob), code smells (Fowler), and c
 ## When to Use
 
 - Before proposing structural changes to any `.ts` module
-- When adding a new command kind, trigger kind, or vendor type
+- When adding a statement or expression kind, a module (a built-in object such as `alis.http`), or a vendor
 - When a bug fix requires touching 3+ files (Shotgun Surgery signal)
 - When reviewing module boundaries after feature additions
 - When `git log` shows the same files changing together repeatedly
@@ -47,24 +47,24 @@ For each module, ask: **"WHO would request changes to this module?"**
 
 | Actor | Meaning | Example |
 |-------|---------|---------|
-| "Anyone adding a new command kind" | Extension actor | types.ts, execute.ts |
-| "Anyone changing vendor resolution" | Vendor actor | component.ts |
-| "Anyone changing coercion semantics" | Data transformation actor | resolver.ts |
-| "Anyone changing validation display" | UI actor | error-display.ts |
+| "Anyone adding a statement or expression kind" | Grammar actor | `grammar/execute.ts`, `grammar/evaluate.ts` |
+| "Anyone changing how a vendor's object is found or subscribed" | Vendor actor | `objects/vendor-driver.ts` |
+| "Anyone changing how a value converts for an operator" | Data transformation actor | `grammar/shape.ts`, `grammar/operators.ts` |
+| "Anyone changing how validation messages show" | UI actor | `modules/form/display.ts` |
 
-2+ actors = Divergent Change. One actor through multiple operations (e.g., `resolver.ts` resolve + coerce) is cohesive.
+2+ actors = Divergent Change. One actor through multiple operations (e.g., `grammar/shape.ts` checks a shape and converts to it: `shaped`, `asNumber`, `asDate`) is cohesive.
 
 ### Step 2: Change-Relative Coupling Analysis
 
 | Change scenario | Files touched | Verdict |
 |-----------------|---------------|---------|
-| Add new command kind | ? | >2 = Shotgun Surgery |
-| Add new trigger kind | ? | >2 = Shotgun Surgery |
-| Add new vendor | ? | >1 = coupling leak |
-| Add new coercion type | ? | >2 = Shotgun Surgery |
-| Add new validation rule | ? | >2 = Shotgun Surgery |
-| Make a command kind async | ? | >1 = sync/async boundary cascade |
-| Fix a bug in conditions | ? | >1 = cascade risk |
+| Add a statement or expression kind | ? | >2 runtime files (beyond the regenerated `types/plan.ts`) = Shotgun Surgery |
+| Add a component | ? | >0 = the plan is missing information (component tripwire) |
+| Add a vendor | ? | >0 = coupling leak: a vendor is plan data `objects/vendor-driver.ts` follows |
+| Add a shape or operator | ? | >2 = Shotgun Surgery |
+| Add a validation rule | ? | >2 = Shotgun Surgery |
+| Make a statement awaited | ? | >1 = sync/async boundary cascade |
+| Fix a bug in conditions (the `if` statement) | ? | >1 = cascade risk |
 
 **How to measure:** `git log --name-only` on related commits. Files that change together ARE coupled. Only audit coupling for changes that ACTUALLY happen or are LIKELY to happen.
 
@@ -82,33 +82,25 @@ For each module, ask: **"WHO would request changes to this module?"**
 
 ### Step 4: Dependency Direction (DIP)
 
-Dependencies must point toward stability.
+Dependencies must point toward stability. The layers of `Alis.Reactive.Assets/runtime/`, as the
+import-direction test in `runtime/__tests__/architecture.test.ts` enforces them:
 
 ```
 Most stable (pure, no deps)     ←  Everything depends inward
-├── walk.ts                         (zero deps)
-├── types.ts                        (zero deps)
-├── trace.ts                        (zero deps)
-├── resolver.ts                     (depends on walk, component, trace)
-├── component.ts                    (depends on walk, trace)
-├── rule-engine.ts                  (depends on types only)
-├── condition.ts (validation)       (depends on types only)
-│
-├── element.ts                      (depends on resolver, component)
-├── conditions.ts (guards)          (depends on resolver, coerce, trace, assert-never)
-├── commands.ts                     (depends on element, conditions, validation, inject)
-├── execute.ts                      (depends on commands, conditions, pipeline)
-├── pipeline/http/gather            (colocated in execution/ — same actor)
-├── gather.ts                       (depends on component, walk, coerce, trace, assert-never)
-├── retry-indicator.ts              (depends on types, trace)
-├── server-push.ts                  (depends on execute, retry-indicator, trace)
-├── signalr.ts                      (depends on execute, retry-indicator, trace, @microsoft/signalr)
-│
-├── trigger.ts                      (depends on execute, server-push, signalr)
-├── boot.ts                         (depends on trigger, enrichment, validation, walk-reactions)
-├── root.ts                         (depends on boot — entry point)
+├── shared/       assert-never, javascript-string (zero deps)
+├── types/        the generated contract, plan.ts (zero deps)
+├── diagnostics/  trace (shared only)
+├── grammar/      shape, operators, paths, evaluate, execute: the interpreter (grammar, types, shared, diagnostics)
+├── objects/      vendor-driver, owner, world, modules: locating objects (+ grammar)
+├── plans/        discover, start, mount-events: starting an owner (+ objects)
+├── modules/      document, http, model, form, slot: the built-in objects (+ plans)
+├── realtime/     stream, hub, retry-indicator (objects, types, shared, diagnostics)
+├── root.ts       registers the modules and boots the page (entry point; nothing imports it)
 Least stable (side effects, DOM)
 ```
+
+The framework's component code (`Alis.Reactive.Assets/components/`) sits beside the runtime, not on
+this ladder: neither side imports the other.
 
 **Violation signal:** A pure module importing from a side-effect module. A stable module importing from a volatile module.
 
@@ -127,18 +119,19 @@ For each discriminated union in the generated contract (`runtime/types/plan.ts`)
 For each module, count: exports used by other modules vs total exports.
 
 ```
-Module: resolver.ts
-  Exports: resolveSource, resolveEventPath, resolveSourceAs (3)
-  Used by element.ts: resolveSource (1/3)
-  Used by conditions.ts: resolveSource, resolveSourceAs (2/3)
-  Note: coerce lives in core/coerce.ts, not resolver.ts
+Module: grammar/evaluate.ts
+  Exports: World, Scope, childScope, evaluate, modeOf, labelOf, evaluateStatement, isPromise (8)
+  Used by grammar/execute.ts: childScope, evaluate, evaluateStatement, isPromise, labelOf, modeOf, Scope (7/8)
+  Used by modules/model.ts and modules/form/form.ts: evaluate (1/8)
+  Used by plans/start.ts: isPromise (1/8)
+  Used by objects/world.ts: World (1/8)
 ```
 
 **If <50% of exports are used by any single consumer,** the module may be too broad. Consider splitting.
 
-**Concrete ISP violation:** `PlanRegistry` is exported from `merge-plan.ts` but has zero external importers. All consumers use the delegating functions (`mergePlan`, `getPlan`, etc.). The class export violates ISP — it exposes internals that no consumer needs.
+**What a violation looks like:** an export with zero importers outside its own module (and its tests) exposes internals no consumer needs; make it module-private.
 
-**Exception:** Utility modules (walk.ts) can have broad exports — they serve many consumers by design.
+**Exception:** Utility modules (`shared/`, `grammar/operators.ts`) can have broad exports — they serve many consumers by design.
 
 ## Refactoring Decision Framework
 
@@ -171,10 +164,10 @@ default: assertNever(cmd, "command kind");
 ```
 Zero cost. Compile-time enforcement. Strict improvement over silent miss.
 
-### Async vs Sync Dual Path
-- Current dual path: zero overhead, ~40 lines duplicated — **acceptable for 4 stable reaction kinds**
-- Unified async: eliminates duplication, 1 microtick/await overhead — negligible at UI scale
-- Revisit if reaction kinds grow to 8+
+### Sync Until the First Await
+- `grammar/execute.ts` runs a block synchronously until its first awaited statement and continues when that settles; a block with no awaited statement never returns a promise
+- This is load-bearing, not an optimization: a vendor reads a payload's `cancel` in the same turn the handler runs, so a handler that always returned a promise would miss it
+- Only `do` and `let` with `await` wait; making any other statement async is a sync/async boundary change
 
 ### Chaining vs Function Dispatch
 - **C# DSL chaining** — correct for configuration (Fowler endorses for value objects)
@@ -191,9 +184,9 @@ Zero cost. Compile-time enforcement. Strict improvement over silent miss.
 - Introduce Parameter Object only when same group travels across multiple call sites
 
 ### Types
-- ~60 types for our plan executor = lean (TanStack Query has 60+, tsc has hundreds)
-- Types should map 1:1 to JSON plan primitives — correct for schema-validated contract
-- Optional fields handle variants — don't create per-variant subtypes (type explosion)
+- The runtime's types come from `types/plan.ts`, generated from the C# grammar; never hand-written beside it
+- Types map 1:1 to the plan grammar's productions (statements, expressions, object locators, shapes, operators)
+- A runtime-only type earns its place by naming execution state (a scope, an owner), never by re-describing plan JSON
 
 ## Architecture Constraints (Non-Negotiable)
 
@@ -202,25 +195,25 @@ Zero cost. Compile-time enforcement. Strict improvement over silent miss.
 3. **No fallbacks** — fail fast, throw on missing data, no silent defaults
 4. **No wide selectors** — forces thinking deeply about correct behavior
 5. **No caching** — premature for now, will add when needed
-6. **No inline JS in views** — auto-boot.ts handles discovery
+6. **No inline JS in views** — `root.ts` boots and `plans/discover.ts` finds the plan scripts
 
 ## Audit Discipline — NEVER Rubber-Stamp
 
 **"PASS" is earned, not given.** Every module must be challenged:
 
-1. **Trace the actual runtime behavior** — don't just read the code structure. Ask: "what happens when a Syncfusion ComboBox changes? Does this event reach the listener? Does the DOM walk find the right element?" If you can't answer from the code, it's not audited.
-2. **Challenge every DOM interaction** — is this using an ID (good) or scanning (bad)? Is this vendor-agnostic or does it accidentally depend on DOM structure?
+1. **Trace the actual runtime behavior** — don't just read the code structure. Ask: "what happens when a Syncfusion ComboBox changes? Does `objects/vendor-driver.ts` subscribe where the plan's vendor data says? Does the handler's payload read the path the plan names?" If you can't answer from the code, it's not audited.
+2. **Challenge every DOM interaction** — is this using an ID (good) or scanning (bad)? Is this vendor-blind, or does it depend on one vendor's DOM structure?
 3. **Test the extension story** — don't just say "open for extension." Actually walk through adding a new component/vendor/rule and count the files that change.
 4. **Question silent skips** — every `if (!x) return` is a potential swallowed bug. Is it intentional or lazy? Does the caller know this silently no-ops?
-5. **Verify against real component behavior** — SF components fire events on ej2 instances, not DOM elements. Native inputs fire "input"/"change" on the DOM element. Does the module handle both paths or only one?
+5. **Verify against real component behavior** — a Syncfusion component raises events on its own object, a native input on the DOM element; the plan's vendor data says which. Does the module follow that data for both, or assume one?
 
 **If you find yourself writing "PASS" without finding at least one question worth investigating, you're not auditing — you're skimming.**
 
 ## Red Flags — STOP and Investigate
 
-- Module imports from 5+ other modules (possible god module). Exception: dispatcher modules (like commands.ts) that coordinate N command handlers MUST import those handlers. Check whether each import maps to a distinct case in a switch — if so, it is coordination, not a god module.
+- Module imports from 5+ other modules (possible god module). Exception: an entry point (`root.ts`) that registers every module MUST import them. Check whether each import is one registration — if so, it is coordination, not a god module.
 - Circular imports between any two modules
-- `vendor` string checked outside component.ts
+- A vendor named anywhere in `runtime/` (vendor knowledge lives in the plan's vendor data and in `components/`)
 - Module-level `let` mutated by 3+ functions
 - Same `switch(x.kind)` in 2+ files
 - Function with 6+ parameters or any boolean flag parameter
@@ -230,7 +223,7 @@ Zero cost. Compile-time enforcement. Strict improvement over silent miss.
 - Non-null assertion (`!`) hiding potential null paths — the `!` bypasses TypeScript's null check. Verify the runtime path handles null before accepting `!`.
 - Test file exists but tests don't cover the change scenario
 
-**Test coverage note:** Only 3 of these red flags have automated architecture tests: `ej2_instances`, `ej.base`, and `window.alis` writes. The vendor string checks at `trigger.ts:45` and `live-clear.ts:44` are NOT caught by architecture tests.
+**Test coverage note:** `runtime/__tests__/architecture.test.ts` checks four of these mechanically: wide DOM queries outside the allowlisted boundaries, Syncfusion knowledge in the runtime, imports against the layer direction (and nothing importing `root.ts`), and imports between the runtime and `components/`. Every other red flag needs a reader.
 
 ## What This Skill Does NOT Cover
 
