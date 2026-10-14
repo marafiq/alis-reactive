@@ -26,7 +26,7 @@
                 // The field is emptied and her care team comes back to the list, whatever the last search or
                 // the on-call list left there; her attending is chosen from it, and the page says whom.
                 var physician = p.Component<FusionAutoComplete>(m => m.Physician);
-                physician.Value.Set(null);
+                physician.Clear();
                 physician.DataBind();
                 physician.DataSource.Set(Model.CareTeam);
                 physician.Value.Set(Model.Attending);
@@ -140,7 +140,7 @@
                             // The field opens again, empty, with the cursor in it for the next name.
                             var physician = p.Component<FusionAutoComplete>(m => m.Physician);
                             physician.Enabled.Set(true);
-                            physician.Value.Set(null);
+                            physician.Clear();
                             physician.DataBind();
                             physician.FocusIn();
                             p.Element("page-again").Hide();

@@ -70,7 +70,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         [HttpPost("Save")]
         public IActionResult Save([FromBody] ReferralIntakeSave referral)
         {
-            var words = referral.IntakeNote.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).Length;
+            var words = string.IsNullOrWhiteSpace(referral.IntakeNote)
+                ? 0
+                : referral.IntakeNote.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).Length;
             var note = words == 0 ? "no intake note" : $"a {words}-word intake note";
             return Ok(new ReferralIntakeSaved
             {

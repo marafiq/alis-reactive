@@ -23,7 +23,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The selected value; <see langword="null"/> when empty.</summary>
         public Prop<string> Value => Prop<string>();
 
-        /// <summary>The text shown in the input, without changing the selected value.</summary>
+        /// <summary>The text shown for the selection; writing it selects the item that shows this text.</summary>
         public Prop<string> Text => Prop<string>();
 
         /// <summary>The items the popup suggests from.</summary>
@@ -47,6 +47,9 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Closes the suggestion popup.</summary>
         public void HidePopup() => Call();
+
+        /// <summary>Clears the selection and the text; call <see cref="DataBind"/> to apply it at once.</summary>
+        public void Clear() => Call();
 
         /// <summary>Raised when the selected value changes.</summary>
         public TypedEvent<FusionAutoCompleteChangeArgs> Change =>
