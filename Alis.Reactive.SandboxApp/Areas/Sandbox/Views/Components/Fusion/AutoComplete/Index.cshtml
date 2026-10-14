@@ -94,14 +94,14 @@
                                     s.Element("physician-contact").Show();
                                 }));
                             // Two physicians can share part of a name: one the nurse chose by name is confirmed
-                            // with the answering service, and the keyboard goes away so the callback shows.
+                            // with the answering service, and the keyboard goes away so the callback shows. The page
+                            // empties the field before it fills one in, so the note is already down for those.
                             chosen.When(args.IsInteracted).Truthy()
                                 .Then(byName =>
                                 {
                                     byName.Element("check-physician").Show();
                                     byName.Component<FusionAutoComplete>(m => m.Physician).FocusOut();
-                                })
-                                .Else(filledIn => filledIn.Element("check-physician").Hide());
+                                });
                         });
                 }); }
             <p id="directory-status" class="text-sm text-text-muted">Type part of a name to search the physician directory.</p>

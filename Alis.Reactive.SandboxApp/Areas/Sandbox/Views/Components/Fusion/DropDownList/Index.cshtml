@@ -79,9 +79,9 @@
                         });
                 })
                 .Reactive(evt => evt.Blur, (_, p) =>
+                    // Choosing a care level takes the hint away (the Change above), so leaving the field only shows it.
                     p.When(p.Component<FusionDropDownList>(m => m.CareLevel).Value).IsEmpty()
-                        .Then(none => none.Element("care-level-hint").Show())
-                        .Else(chosen => chosen.Element("care-level-hint").Hide())); }
+                        .Then(none => none.Element("care-level-hint").Show())); }
             <p id="care-level-hint" hidden class="text-sm text-text-muted">Choose a care level to see the wings that offer it.</p>
             <p id="referral-note" hidden class="text-sm text-text-muted">Care level taken from the St. Mary's referral.</p>
 
