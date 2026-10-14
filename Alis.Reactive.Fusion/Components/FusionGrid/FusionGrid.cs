@@ -147,6 +147,7 @@ namespace Alis.Reactive.Fusion.Components
         public void AddRecord<TRow>(Arg<TRow> data) where TRow : class => Call(data);
 
         /// <summary>Adds a row at a zero-based index.</summary>
+        /// <remarks>In batch edit mode EJ2 ignores the index and adds the row where <c>newRowPosition</c> says (batch-edit.js:301-303).</remarks>
         /// <typeparam name="TRow">Your row class.</typeparam>
         /// <param name="data">The row to add.</param>
         /// <param name="index">The zero-based index the row takes.</param>
@@ -155,9 +156,14 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Deletes the selected row.</summary>
         public void DeleteRecord() => Call();
 
-        /// <summary>Replaces the row at a zero-based index.</summary>
+        /// <summary>Replaces a row with the given data.</summary>
+        /// <remarks>
+        /// EJ2 saves the data against the row whose primary key it carries; the index only has to name a row
+        /// on the page (normal-edit.js:250-272, data.js:473-481). Read the index with
+        /// <see cref="GetRowIndexByPrimaryKey"/> so both name the same row.
+        /// </remarks>
         /// <typeparam name="TRow">Your row class.</typeparam>
-        /// <param name="index">The zero-based index of the row.</param>
+        /// <param name="index">The zero-based index of a row on the page.</param>
         /// <param name="data">The row that replaces it.</param>
         public void UpdateRow<TRow>(Arg<int> index, Arg<TRow> data) where TRow : class => Call(index, data);
 

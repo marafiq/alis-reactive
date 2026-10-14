@@ -89,7 +89,10 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="builder">The Syncfusion builder being configured.</param>
         /// <param name="text">The row member shown as the selection's text.</param>
         /// <param name="value">The row member submitted as the selected value.</param>
-        /// <param name="groupBy">The row member the rows are grouped by.</param>
+        /// <param name="groupBy">
+        /// The row member the rows are grouped by; it must also be one of the list's columns, or EJ2 fails to render
+        /// the list (multi-column-combo-box.js:618-640).
+        /// </param>
         public static MultiColumnComboBoxBuilder Fields<TItem>(
             this MultiColumnComboBoxBuilder builder,
             Expression<Func<TItem, object?>> text,

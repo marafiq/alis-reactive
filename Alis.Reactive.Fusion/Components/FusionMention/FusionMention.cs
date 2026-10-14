@@ -54,7 +54,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The picked suggestion's value.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
 
-        /// <summary>Whether user interaction made the pick.</summary>
+        /// <summary>Whether user interaction made the pick; always true, as EJ2 raises Change only for a pick made by key or click (mention.js:1231, 1553).</summary>
         public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 

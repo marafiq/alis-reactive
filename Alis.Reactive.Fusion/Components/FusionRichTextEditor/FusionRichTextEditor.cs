@@ -21,7 +21,10 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Moves focus into the editor.</summary>
         public void FocusIn() => Call();
 
-        /// <summary>Raised when the content changes and focus leaves the editor.</summary>
+        /// <summary>
+        /// Raised when the content changed: when focus leaves the editor (IsInteracted true), and while the
+        /// person types, at the editor's save interval (IsInteracted false).
+        /// </summary>
         public TypedEvent<FusionRichTextEditorChangeArgs> Change =>
             Event<FusionRichTextEditorChangeArgs>();
 
