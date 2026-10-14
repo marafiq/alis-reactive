@@ -18,10 +18,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DropDownList;
 /// Not exercised: the render helper without a build step (a list rendered with nothing to choose is no
 /// placement). The Focus and Blur payloads carry nothing to read. Change's IsInteracted cannot be told apart
 /// from the payload's <c>e</c> and <c>event</c> fields, which EJ2 fills from the same browser event
-/// (drop-down-list.js:1859-1869). The care level's Blur hides the reminder to choose one when a care level is
-/// chosen, but no gesture leaves that reminder for the Blur alone to take down: the reminder shows only on
-/// leaving an empty care level, and the care level's Change, which every choice raises (by hand or from the
-/// referral), takes it down first.
+/// (drop-down-list.js:1859-1869).
 /// </remarks>
 [TestFixture]
 public class WhenUsingFusionDropDownList : PlaywrightTestBase

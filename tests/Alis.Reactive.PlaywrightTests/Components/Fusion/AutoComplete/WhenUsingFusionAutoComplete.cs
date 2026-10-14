@@ -20,9 +20,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.AutoComplete;
 /// Enabled is written here (the page locks and opens the field); it is not read. The Fields overload with
 /// a group member is not used: no physician list here is grouped (the MultiSelect diet order groups
 /// allergies by kind). Change's e, item and itemData fields are not declared; IsInteracted is EJ2's reading
-/// of e. The Change that hides the reminder to confirm for a physician the page fills in is not proven on
-/// its own: the page fills in only her attending, and Page Her Attending first empties the field, whose
-/// Change (empty) takes the reminder down before the attending's Change comes.
+/// of e.
 /// </remarks>
 [TestFixture]
 public class WhenUsingFusionAutoComplete : PlaywrightTestBase
