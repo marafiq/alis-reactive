@@ -13,6 +13,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     public sealed class DropDownListController : Controller
     {
         private const string Resident = "Eleanor Whitfield";
+        private const string Community = "maple-grove";
 
         private static readonly IReadOnlyList<CareLevelOption> CareLevels =
         [
@@ -37,11 +38,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         [HttpGet("")]
         public IActionResult Index() =>
             View("~/Areas/Sandbox/Views/Components/Fusion/DropDownList/Index.cshtml",
-                new FusionDropDownListModel { CareLevels = CareLevels });
+                new FusionDropDownListModel { CareLevels = CareLevels, Community = Community });
 
+        // The wings are Maple Grove's: a wing list asked of another community, or of none, is not found.
         [HttpGet("Wings")]
-        public IActionResult Wings([FromQuery] WingListQuery query)
+        public IActionResult Wings([FromQuery] string community, [FromQuery] WingListQuery query)
         {
+            if (community != Community)
+                return NotFound();
+
             var offering = CommunityWings.Where(wing => wing.CareLevel == query.CareLevel).ToList();
             if (offering.Count == 0)
                 return NotFound();

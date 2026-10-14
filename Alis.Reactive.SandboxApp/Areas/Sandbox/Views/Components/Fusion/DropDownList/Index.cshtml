@@ -55,7 +55,9 @@
                         .Else(chosen =>
                         {
                             chosen.Element("care-level-hint").Hide();
-                            chosen.Get(Url.SandboxRoute("Wings", "DropDownList"))
+                            // The wing list is the community's: MVC writes the community into the URL's query,
+                            // and the care level joins it there.
+                            chosen.Get(Url.SandboxRoute("Wings", "DropDownList", new { community = Model.Community }))
                                 .Gather<WingListQuery>(g => g.Set(x => x.CareLevel, args.Value))
                                 .Response(r => r.OnSuccess<WingList>((offered, s) =>
                                 {

@@ -16,6 +16,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.DropDo
 
         /// <summary>The care levels the community offers.</summary>
         public IReadOnlyList<CareLevelOption> CareLevels { get; init; } = [];
+
+        /// <summary>The community the resident moves into, by its code; the wing list is that community's.</summary>
+        public string Community { get; init; } = "";
     }
 
     /// <summary>A care level: the code the placement keeps and the name the coordinator reads.</summary>

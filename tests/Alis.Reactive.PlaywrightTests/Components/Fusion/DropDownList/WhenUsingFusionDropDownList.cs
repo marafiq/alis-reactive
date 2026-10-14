@@ -14,7 +14,9 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DropDownList;
 /// Memory Care in Willow and Juniper (Garden house), neither with a room open, and Juniper's waitlist is full
 /// until spring, which only admissions knows. The St. Mary's referral recommends Memory Care. A care level with
 /// an open room fills in that wing; one without moves the cursor to the wing list and opens it. Entering the
-/// wing list opens it once a care level has filled it.
+/// wing list opens it once a care level has filled it. The page asks for the wings by a URL that already
+/// holds a query, Maple Grove's (<c>?community=maple-grove</c>), and the care level joins it there; the
+/// server finds no wing list without both, so every test that shows a wing list proves the join.
 /// Not exercised: the render helper without a build step (a list rendered with nothing to choose is no
 /// placement). The Focus and Blur payloads carry nothing to read. Change's IsInteracted cannot be told apart
 /// from the payload's <c>e</c> and <c>event</c> fields, which EJ2 fills from the same browser event
