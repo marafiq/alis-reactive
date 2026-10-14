@@ -28,8 +28,8 @@ namespace Alis.Reactive.PlanModel
         internal FormPluginData Form(IReadOnlyList<CheckedField> fields) =>
             new FormPluginData(SummaryId, fields.Select(Field).ToList());
 
-        /// <summary>The element id of the plan's validation summary.</summary>
-        private string SummaryId => _scope.PlanId.Replace('.', '_').Replace('+', '_') + "_validation_summary";
+        /// <summary>The element id of the plan's validation summary, as <c>Html.RenderPlan</c> renders it.</summary>
+        private string SummaryId => PlanElementId.ValidationSummaryFor(_scope.PlanId);
 
         private FormField Field(CheckedField field)
         {
