@@ -78,11 +78,13 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
         await MonthlyRate.Input.PressAsync("Enter");
     }
 
+    // The coordinator enters the number in one go, as a paste does: the mask has a placeholder, so it moves
+    // the caret to its first blank in a timeout after focus (mask-base.js:350-369), and keys typed one by one
+    // right after the editor opens can land before or after that move (two CI runs lost the number this way).
     private async Task TypeTheRecordNumber(string recordNumber)
     {
         await RecordNumber.Open();
-        await RecordNumberInput.FillAsync("");
-        await RecordNumberInput.PressSequentiallyAsync(recordNumber);
+        await RecordNumberInput.FillAsync(recordNumber);
         await RecordNumberInput.PressAsync("Enter");
     }
 
