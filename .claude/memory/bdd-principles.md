@@ -118,10 +118,10 @@ Every input component test covers all seven:
 
 | Element | Pattern | Example |
 |---------|---------|---------|
-| Folder | `PascalCase` concern | `AllModulesTogether/Cascading/` |
-| Test class | `When{BehaviorHappens}` | `WhenParentSelectionFiltersDependentList` |
-| Test method | `snake_case_scenario_with_outcome` | `empty_veteran_id_shows_required_error_when_veteran_checked` |
-| No vendor prefix | Folder conveys vendor | `Components/Fusion/WhenDateSelected.cs` |
+| Folder | `PascalCase` concern | `Patterns/BedAssignment/` |
+| Test class | `When{BehaviorHappens}` | `WhenCoordinatorAssignsABed` |
+| Test method | `snake_case_scenario_with_outcome` | `a_number_pasted_without_all_ten_digits_is_refused_at_once` |
+| No vendor prefix | Folder conveys vendor | `Components/Fusion/DatePicker/WhenDateSelected.cs` |
 
 ## No-Hack Rules
 

@@ -43,7 +43,7 @@ SOURCE :=
   -- The page's URL, plugins and arrays
   | p.Url<TQuery>().Get(q => q.Tab)
   | slugify.Slug(planner.Wing)
-  | p.Element("dom-card").ClassList.Items.Any(x => x == "care-memory")
+  | p.Element(table).ClassList.Items.Any(flag => flag == "memory-care")
 
 -- Getting a component:
 var comp = p.Component<FusionNumericTextBox>(m => m.Amount);
@@ -51,10 +51,11 @@ var comp = p.Component<FusionAutoComplete>(m => m.Name);
 var comp = s.Component<FusionSwitch>(m => m.IsActive);    -- 's' in response handler
 ```
 
-**A response body as source: supported.** Inside a response route, `json` is `Data<T>`:
-`s.When(json.Get(j => j.Status)).Eq("approved")` starts a condition on the response body, and guards
-compose with `.And(json.Get(j => j.Count)).Gt(0)` / `.Or(..)`
-(`Conditions/ResponseConditions/Index.cshtml`).
+**A response body as source: supported.** Inside a response route the body is `Data<T>`:
+`s.When(answer.Get(x => x.Finding)).Eq("interaction")` starts a condition on the response body, guards
+compose with `.And(answer.Get(x => x.Severity)).Gte(7)` / `.Or(..)`, and the body can be either side
+of a source-vs-source comparison: `s.When(args.Value).Eq(entry.Get(x => x.Dispensed))`
+(`Conditions/PharmacyReview/Index.cshtml:136, 71`).
 
 ## Operator — What to Check
 
@@ -201,63 +202,108 @@ Only in user-initiated pipelines (Click). Never in DomReady.
 
 ## Source-vs-Source
 
-From `Conditions/NumericCondition/Index.cshtml`:
+From `Conditions/NumericCondition/Index.cshtml:88-93` (Vital Signs):
 
 ```
 var hr = p.Component<FusionNumericTextBox>(m => m.HeartRate);
 var threshold = p.Component<FusionNumericTextBox>(m => m.ThresholdValue);
+
 p.When(hr.Value).Gte(threshold.Value)
-    .Then(t => t.Element("threshold-result").Text.Set("Above threshold"))
-    .Else(e => e.Element("threshold-result").Text.Set("Below threshold"));
+    .Then(t => t.Element("threshold-recheck").Text.Set("Recheck the heart rate in 15 minutes."))
+    .Else(e => e.Element("threshold-recheck").Text.Set("No recheck needed."));
 ```
 
 Both sides must be `TypedSource<TProp>` with same `TProp`.
 
 ## Recipes — Common Patterns
 
-In `Conditions/Guards/Index.cshtml` the payload is a custom event's (`CustomEvent<ScorePayload>`),
-so `args` is `Data<ScorePayload>` and a member reads with `args.Get(x => x.Score)`. Inside a
-component's `.Reactive`, the payload's members are read directly: `args.Value`.
+In `Conditions/MedicationRound/Index.cshtml` the payload is a custom event's
+(`CustomEvent<RoundDose>`), so `dose` is `Data<RoundDose>` and a member reads with
+`dose.Get(x => x.Pulse)`. Inside a component's `.Reactive`, the payload's members are read
+directly: `args.Value`.
 
-**ElseIf chain (multi-tier):**
+**ElseIf chain (multi-tier)** from `Conditions/MedicationRound/Index.cshtml:38-45` (`roundDate` is the
+round's date, fixed when the view renders):
 ```
-p.When(args.Get(x => x.Score)).Gte(90)
-    .Then(then => then.Element("grade").Text.Set("A"))
-    .ElseIf(args.Get(x => x.Score)).Gte(80)
-    .Then(then => then.Element("grade").Text.Set("B"))
-    .Else(else_ => else_.Element("grade").Text.Set("F"))
+p.When(dose.Get(x => x.Order)).IsNull()
+    .Then(then => then.Element("check-order").Text.Set("None on file. Call the pharmacy."))
+    .ElseIf(dose.Get(x => x.Order!.StopDate)).Gt(roundDate)
+    .And(g => g.When(dose.Get(x => x.Order!.SignedBy)).NotNull())
+    .Then(then => then.Element("check-order").Text.Set("Signed by the physician and current."))
+    .ElseIf(dose.Get(x => x.Order!.StopDate)).Gt(roundDate)
+    .Then(then => then.Element("check-order").Text.Set("Verbal order, not yet signed by the physician."))
+    .Else(otherwise => otherwise.Element("check-order").Text.Set("Ended. Call the physician."));
 ```
 
-**And + Or (mixed — needs a group)** from `Conditions/EscalationRouting/Index.cshtml`:
+**And + Or (mixed — needs a group)** from `Conditions/EscalationRouting/Index.cshtml:181-187`:
 ```
 p.When(assessment.Value).Gte(85m)
     .And(cs => cs.When(supervisorOverride.Checked).Truthy()
         .Or(careTrack.Value).Eq("memory"))
-    .Then(then => then.Dispatch(EscalationRoutingEvents.ComponentRouteIsolation))
+    .Then(then =>
+    {
+        then.Dispatch(EscalationRoutingEvents.ComponentRouteIsolation);
+    })
 ```
 
-**Multiple independent conditions in one pipeline** from `Components/Fusion/DropDownList/Index.cshtml`:
+**Multiple independent conditions in one pipeline** from `Components/Fusion/DropDownList/Index.cshtml:101-113`
+(the wing list's `Change`):
 ```
-p.When(args.Value).Eq("Electronics")
-    .Then(t => t.Element("args-condition").Text.Set("electronics selected"))
-    .Else(e => e.Element("args-condition").Text.Set("other category"));
-var comp = p.Component<FusionDropDownList>(m => m.Category);
-p.When(comp.Value).NotNull()
-    .Then(then => then.Element("selected-indicator").Show())
-    .Else(else_ => else_.Element("selected-indicator").Hide());
+var wing = p.Component<FusionDropDownList>(m => m.Wing);
+p.When(args.Value).IsEmpty()
+    .Then(none => none.Element("placement").Hide())
+    .Else(chosen =>
+    {
+        chosen.Element("placement-care-level").Text.Set(p.Component<FusionDropDownList>(m => m.CareLevel).Text);
+        chosen.Element("placement-wing").Text.Set(wing.Text);
+        chosen.Element("placement").Show();
+    });
+// The clear button empties the wing and leaves its list open; the page closes the list and
+// ends the edit.
+p.When(args.Value).IsEmpty().And(args.IsInteracted).Truthy()
+    .Then(cleared => wing.FocusOut());
 ```
 These are independent — both evaluate, neither blocks the other.
 
-**Condition inside HTTP response (body or component source)** from `Conditions/ResponseConditions/Index.cshtml`:
+**Condition inside HTTP response (body or component source)** from `Conditions/PharmacyReview/Index.cshtml:113-150`
+(`Hold` is the view's helper that checks or clears the hold box; the second condition guards a nested request):
 ```
-.OnSuccess<ApprovalResponse>((json, s) =>
+.OnSuccess<PharmacyReviewAnswer>((answer, s) =>
 {
-    s.When(json.Get(j => j.Status)).Eq("approved")
-     .Then(then =>
-     {
-         then.Element("s1-badge").Show();
-         then.Element("s1-result").Text.Set("approved");
-     })
-     .Else(el => el.Element("s1-result").Text.Set("not approved"));
+    s.Element("review-detail").Text.Set(answer.Get(x => x.Detail));
+    s.When(answer.Get(x => x.Finding)).Eq("interaction")
+        .Then(interaction =>
+        {
+            interaction.Element("review-finding").Text.Set("Interaction found");
+            Hold(interaction, true);
+        })
+        .ElseIf(answer.Get(x => x.Finding)).Eq("duplicate")
+        .Then(duplicate =>
+        {
+            duplicate.Element("review-finding").Text.Set("Duplicate therapy");
+            Hold(duplicate, true);
+        })
+        .Else(clear =>
+        {
+            clear.Element("review-finding").Text.Set("No concerns");
+            Hold(clear, false);
+        });
+
+    // A major interaction, 7 of 10 or worse, pages the physician with the pharmacy's words.
+    s.Element("physician-page").Text.Set("No physician page needed.");
+    s.When(answer.Get(x => x.Finding)).Eq("interaction").And(answer.Get(x => x.Severity)).Gte(7)
+        .Then(major =>
+        {
+            major.Element("physician-page").Text.Set("Paging the physician...");
+            major.Post(pageUrl)
+                .Gather<PhysicianPageRequest>(g => g
+                    .Set(x => x.ResidentId, resident.Value)
+                    .Set(x => x.Reason, answer.Get(x => x.Detail)))
+                .Response(page => page
+                    .OnSuccess<PhysicianPaged>((paged, sent) =>
+                        sent.Element("physician-page").Text.Set(paged.Get(x => x.Message)))
+                    .OnError(failed =>
+                        failed.Element("physician-page").Text.Set("The page did not go through: call the physician directly.")));
+        });
 })
 ```

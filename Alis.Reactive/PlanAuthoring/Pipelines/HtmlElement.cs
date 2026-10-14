@@ -43,7 +43,8 @@ namespace Alis.Reactive
         public ElementClassList ClassList { get; }
 
         /// <summary>The element's child elements (<c>children</c>), for counting and testing:
-        /// <c>p.Element("risk-list").Children.Count(x =&gt; x.GetAttribute("data-risk") == "high")</c>.</summary>
+        /// <c>var seats = p.Element($"{table}-seats").Children;</c> counts the seats needing close supervision
+        /// with <c>seats.Count(seat =&gt; seat.GetAttribute("data-supervision") == "close")</c>.</summary>
         public ReactiveArray<ChildElement> Children =>
             new ReactiveArray<ChildElement>(Read("children"), Shape.FromClrType(typeof(ChildElement)));
 
@@ -131,7 +132,7 @@ namespace Alis.Reactive
         {
         }
 
-        /// <summary>The value of the child's attribute, read in the browser: <c>x =&gt; x.GetAttribute("data-risk")</c>.</summary>
+        /// <summary>The value of the child's attribute, read in the browser: <c>seat =&gt; seat.GetAttribute("data-supervision")</c>.</summary>
         /// <param name="name">The attribute's name.</param>
         public string? GetAttribute(string name) =>
             throw new InvalidOperationException("A child element is read in the browser, inside an array predicate or projection.");

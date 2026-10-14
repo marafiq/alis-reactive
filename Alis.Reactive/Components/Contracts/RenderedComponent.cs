@@ -22,9 +22,13 @@ namespace Alis.Reactive
     /// </remarks>
     /// <example>
     /// <code>
-    /// Html.InputField(plan, m =&gt; m.Rate)
-    ///     .FusionNumericTextBox(b =&gt; b.Min(0))
-    ///     .Reactive(evt =&gt; evt.Change, (args, p) =&gt; p.Element("rate-echo").Text.Set(args.Value));
+    /// Html.InputField(plan, m =&gt; m.MinAge, o =&gt; o.Label("Aged at least"))
+    ///     .FusionNumericTextBox(b =&gt; b
+    ///         .Format("n0")
+    ///         .Min(60)
+    ///         .Max(110)
+    ///         .Placeholder("Every age"))
+    ///     .Reactive(evt =&gt; evt.Change, (_, p) =&gt; p.Component&lt;FusionGrid&gt;(GridId).Refresh());
     /// </code>
     /// </example>
     /// <typeparam name="TComponent">The component declaration whose events can be selected.</typeparam>

@@ -120,7 +120,7 @@ For each discriminated union in the generated contract (`runtime/types/plan.ts`)
 2. **Is the resolved root substitutable?** After `resolveRoot()`, does ANY downstream code check vendor? If yes = LSP violation.
 3. **Can you add a new kind by writing NEW code only?** If modifying existing code = OCP violation.
 
-**Acceptable OCP cost:** Adding a new reaction kind requires updating the C# plan domain, regenerating `types/plan.ts`, one runtime switch (e.g., `execution/reactions/execute.ts`) + tests. That's the minimum. If it requires more, investigate.
+**Acceptable OCP cost:** Adding a new reaction kind requires updating the C# plan domain, regenerating `types/plan.ts`, one runtime switch (e.g., the statement switch in `runtime/grammar/execute.ts`) + tests. That's the minimum. If it requires more, investigate.
 
 ### Step 6: Export Surface Check (ISP)
 

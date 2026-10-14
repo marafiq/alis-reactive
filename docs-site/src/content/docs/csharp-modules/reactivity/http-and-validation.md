@@ -42,12 +42,13 @@ member you set, the input wins.
 ## What if the action binds another class?
 
 Name that class with `Gather<TRequest>`. Each member is a typed lambda over
-`TRequest`, so there is no parameter name to misspell. Inside an AutoComplete's
-`Filtering` event, `args.Text` is the text typed so far:
+`TRequest`, so there is no parameter name to misspell. From the notify physician
+page, where the directory search binds `Search([FromQuery] DirectorySearch search)`
+and, inside the AutoComplete's `Filtering` event, `args.Text` is the text typed so far:
 
 ```csharp
-p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
- .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, args.Text))
+p.Get(Url.SandboxRoute("Search", "AutoComplete"))
+    .Gather<DirectorySearch>(g => g.Set(x => x.Name, args.Text))
 ```
 
 `Form(m => ..)` works here too. Each input you name must also be a member of
@@ -87,7 +88,7 @@ The page's request class is the body class plus the route members:
 ```csharp
 public sealed class HoldVisitRequest : HoldRequest
 {
-    public string SlotId { get; set; } = "";
+    public string? SlotId { get; set; }
 }
 ```
 
@@ -257,12 +258,14 @@ When(x => x.IsUrgent, () =>
 });
 ```
 
-A condition can also follow a rule's checks, and it applies to the checks written before it. From
-the move-in review page:
+A condition can also follow a rule's checks, and it applies to the checks written before it; a check
+written after it is not under it. From the move-in review page, where a moderate score needs a
+reassessment plan and every plan is kept short:
 
 ```csharp
 RuleFor(x => x.ReassessmentPlan).NotEmpty().WithMessage("A moderate fall risk needs a reassessment plan.")
-    .When(x => x.FallRiskScore >= 5 && x.FallRiskScore <= 7);
+    .When(x => x.FallRiskScore >= 5 && x.FallRiskScore <= 7)
+    .MaximumLength(120).WithMessage("Keep the reassessment plan under 120 characters.");
 ```
 
 The browser understands comparisons of model members with values, `string.IsNullOrEmpty`,

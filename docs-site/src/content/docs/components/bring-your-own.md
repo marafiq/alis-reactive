@@ -107,9 +107,13 @@ as the `"field"` key the grid's column methods always take.
 `IInputComponent.Input`, implemented explicitly, is what makes it an input: the
 value a form posts, gather reads and validation checks, and the event that
 commits it. A form checks the field again whenever that event fires. The commit
-event is whatever the component raises when a value is settled:
-`change` for most, `valueChanged` for a rating, `selected` for an uploader, or a
-name of your own, as `weekChanged` is here. The framework never assumes one.
+event is whatever the component raises once it holds the settled value:
+`change` for most, `valueChanged` for a rating, `endEdit` for an in-place
+editor, or a name of your own, as `weekChanged` is here. When the component
+raises nothing at that moment, your own code can: Syncfusion's uploader raises
+`selected` before it adds the chosen files, so the framework's own uploader
+code raises `filesChanged` once it holds them, and the uploader commits on that.
+The framework never assumes one.
 
 An awaited method (`CallAsync`) holds the steps after its call until its promise
 settles, and an awaited read (`InvokeAsync<T>`) is the value it settles with. A
@@ -200,7 +204,8 @@ var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
 planner.Select(planner.FirstOpen());
 
 p.When(p.Component<VisitPlanner>(m => m.VisitSlots).IsBooked("sun-11")).Truthy()
-    .Then(t => t.Element("brunch-status").Text.Set("Sunday brunch is booked."));
+    .Then(t => t.Element("brunch-status").Text.Set("Sunday brunch is booked."))
+    .Else(e => e.Element("brunch-status").Text.Set("Sunday brunch is still open."));
 
 p.When(args.Added).NotEmpty()
     .Then(added => added.Component<VisitPlanner>(m => m.VisitSlots).Book(args.Added,
@@ -222,8 +227,9 @@ A response fills its properties like any other value:
 
 The Syncfusion and native components that ship with Alis.Reactive are declared
 exactly this way, against the same public surface, and the ones that need
-JavaScript of their own (the native check list, the smart text area, the
-confirm dialog) are constructed on `alis:mount` as in step 1. The sandbox also
+JavaScript of their own (the native check list, radio group and hidden field,
+the uploader, the smart text area, the confirm dialog) are constructed on
+`alis:mount` as in step 1. The sandbox also
 brings [Tom Select](https://tom-select.js.org), an npm package, the same way
 (`BroughtComponents/TomSelect/TomSelect.cs`).
 

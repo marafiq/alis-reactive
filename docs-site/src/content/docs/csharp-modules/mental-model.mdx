@@ -83,7 +83,7 @@ The same value-source idea appears across the DSL.
 | --- | --- |
 | Event payload | `p.When(args.Checked)` |
 | Component member | `p.Component<FusionDropDownList>(m => m.UnitId).Value` |
-| URL query string | `p.Url<HttpShowcaseQuery>().Get(q => q.ResidentId)` |
+| URL query string | `p.Url<ShiftEmailLinkQuery>().Get(q => q.Resident)` |
 | Response body | `body.Get(x => x.Message)`, or `body` itself |
 | Plugin return value | `slugify.Slug(planner.Wing)` |
 

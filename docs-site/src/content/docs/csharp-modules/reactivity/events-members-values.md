@@ -45,11 +45,21 @@ the page that raises it and the page that hears it cannot disagree on either. Fr
 board page:
 
 ```csharp
+/// <summary>What the board's change log is told after the planner answers a push.</summary>
 public sealed class BoardChange
 {
     public string Summary { get; set; } = "";
 
     public int Booked { get; set; }
+
+    /// <summary>The code of the desk that saw the change.</summary>
+    public string Desk { get; set; } = "";
+
+    /// <summary>Whether the change took a time this family had booked.</summary>
+    public bool ReleasedHere { get; set; }
+
+    /// <summary>How many of this family's booked times the change took.</summary>
+    public int Released { get; set; }
 }
 
 public static class VisitBoardEvents
@@ -63,18 +73,28 @@ Html.On(plan, t => t.CustomEvent<BoardChange>(VisitBoardEvents.BoardChanged, (ch
 {
     p.Element("board-log").Text.Set(change.Get(x => x.Summary));
     p.Element("board-log-booked").Text.Set(change.Get(x => x.Booked));
+    p.Element("board-log-desk").Text.Set(change.Get(x => x.Desk));
+    p.Element("board-log-released").Text.Set(change.Get(x => x.Released));
+    p.When(change.Get(x => x.ReleasedHere)).Truthy()
+        .Then(lost => lost.Element("board-log-lost").Show())
+        .Else(kept => kept.Element("board-log-lost").Hide());
 }));
 ```
 
 `change.Get(x => x.Summary)` reads one member of the payload. Pipelines raise
 the same event, filling each member from a value. The board raises it when
-another desk takes a time; `taken` is that server message and `planner` the
-page's visit planner:
+another desk takes a time, from whichever branch handled it (`branch`);
+`taken` is that server message, `planner` the page's visit planner and
+`slugify` the page's plugin:
 
 ```csharp
-p.Dispatch<BoardChange>(VisitBoardEvents.BoardChanged, change => change
-    .Set(x => x.Summary, taken.Get(x => x.Message))
-    .Set(x => x.Booked, planner.Count));
+void TellTheLog(PipelineBuilder<VisitBoardModel> branch, bool releasedHere, int released) =>
+    branch.Dispatch<BoardChange>(VisitBoardEvents.BoardChanged, change => change
+        .Set(x => x.Summary, taken.Get(x => x.Message))
+        .Set(x => x.Booked, planner.Count)
+        .Set(x => x.Desk, slugify.Slug(planner.Wing))
+        .Set(x => x.ReleasedHere, releasedHere)
+        .Set(x => x.Released, released));
 ```
 
 An event with no payload is `AppEvent.Named("name")`, heard with `t.CustomEvent(evt, p => ...)` and
@@ -121,23 +141,35 @@ any value, shown as it arrives.
 A component is a JavaScript object. Its C# class declares the properties,
 methods and events its own API has, and you use them as members of the object.
 `p.Component<T>(..)` returns the component itself, so hold it in a variable
-named for its role. From the cascading page, in a request's success route
-(`s`, with the response body `json`):
+named for its role. From the notify physician page, in a request's success
+route (`s`, with the response body `onCall`), the on-call physicians are
+written to the list's `DataSource`, and its `DataBind()` and `ShowPopup()`
+methods are called:
 
 ```csharp
-var city = s.Component<FusionDropDownList>(m => m.City);
-city.DataSource.Set(json.Get(j => j.Cities));   // write a property
-city.DataBind();                                // call a method
+var physician = s.Component<FusionAutoComplete>(m => m.Physician);
+physician.DataSource.Set(onCall.Get(x => x.Physicians));
+physician.DataBind();
+physician.ShowPopup();
 ```
 
 Each write and each call is its own statement, and it runs in the callback
 you write it in. A write takes a literal or any value: another component, an
-event payload, a response body, a URL parameter.
+event payload, a response body, a URL parameter. From the admission placement
+page, a literal written to the care level's `Text`, and a response body's
+member written to the wing's `Value`:
 
 ```csharp
-p.Component<FusionDropDownList>(m => m.Category).Value.Set("Books");
-p.Component<FusionDropDownList>(m => m.Category).ShowPopup();
+p.Component<FusionDropDownList>(m => m.CareLevel).Text.Set("Memory Care");
 ```
+
+```csharp
+wing.Value.Set(offered.Get(x => x.OpenRoomWing));
+wing.DataBind();
+```
+
+To empty a drop-down list or an autocomplete, call its `Clear()`: writing
+empty text to `Value` leaves the old choice in place.
 
 Each component offers exactly the members its class declares.
 
@@ -145,12 +177,17 @@ Each component offers exactly the members its class declares.
 
 A property is itself a value, and so is a method that returns one.
 
+From the care level review page:
+
 ```csharp
 var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
+var protocol = p.Component<FusionDropDownList>(m => m.Protocol);
 
-p.Element("s1-current-level").Text.Set(careLevel.Value);
 p.When(careLevel.Value).Eq("Memory Care")
-    .Then(then => then.Component<FusionDropDownList>(m => m.Protocol).Value.Set("Enhanced Monitoring"));
+    .Then(_ => protocol.Value.Set("Enhanced Monitoring"))
+    .ElseIf(careLevel.Value).Eq("Skilled Nursing")
+    .Then(_ => protocol.Value.Set("Full Clinical"))
+    .Else(_ => protocol.Value.Set("Basic Support"));
 ```
 
 The value is read in the browser when the step runs.
@@ -159,35 +196,52 @@ The value is read in the browser when the step runs.
 
 The object an event hands you is used as the object. Its members are values,
 a member the component reads back can be written, and its methods can be
-called:
+called. From the notify physician page, where typing part of a name searches
+the physician directory:
 
 ```csharp
 .Reactive(evt => evt.Filtering, (args, p) =>
 {
+    // The directory answers for what was typed; until it does, her care team is not offered.
     args.PreventDefaultAction.Set(true);
-    p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
-     .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, args.Text))
-     .Response(r => r
-        .OnSuccess<MedicationSearchResponse>((json, s) =>
+    p.Get(Url.SandboxRoute("Search", "AutoComplete"))
+        .Gather<DirectorySearch>(g => g.Set(x => x.Name, args.Text))
+        .WhileLoading(l => l.Element("directory-status").Text.Set("Searching the physician directory..."))
+        .Response(r => r.OnSuccess<DirectoryMatches>((found, s) =>
         {
-            args.UpdateData(json.Get(j => j.Medications));
-            s.Element("filter-status").Text.Set("results loaded");
+            s.Element("directory-status").Text.Set(found.Get(x => x.Summary));
+            // A name nobody in the directory has closes the list the last search left open.
+            s.When(found.Get(x => x.Count)).Eq(0)
+                .Then(none => none.Component<FusionAutoComplete>(m => m.Physician).HidePopup())
+                .Else(some => args.UpdateData(found.Get(x => x.Physicians)));
         }));
 })
 ```
 
-`args.Text` is the text typed so far, sent as the request's `MedicationType`.
-`args.UpdateData(..)` hands the results to the popup.
+`args.PreventDefaultAction.Set(true)` keeps the list from filtering on its own,
+`args.Text` is the text typed so far, sent as the request's `Name`, and
+`args.UpdateData(..)` hands the matches to the popup.
 
 ## Value Sources
 
 The same values are reused everywhere.
 
+An event payload (bed assignment), the page's URL (resident file, where
+`link` is `p.Url<ShiftEmailLinkQuery>()`) and a response body (resident
+register):
+
 ```csharp
-p.Element("change-value").Text.Set(args.Value);
-p.When(p.Url<HttpShowcaseQuery>().Get(q => q.Tab)).Eq("medications")
- .Then(then => then.Element("url-cond-meds").Show());
-s.Element("load-first").Text.Set(json.Get(x => x.First));
+chosen.Element("held-bed").Text.Set(args.Value);
+```
+
+```csharp
+p.When(link.Get(q => q.Tab)).Eq("medications")
+ .Then(medications => medications.Element("file-medications").Show())
+ .Else(overview => overview.Element("file-overview").Show());
+```
+
+```csharp
+s.Element("register-newest").Text.Set(summary.Get(x => x.NewestResident));
 ```
 
 Use them for conditions, element text, request members (route values
@@ -203,10 +257,20 @@ written where you read it. From the escalation routing page:
 p.When(assessment.Value).Gte(85m)
     .And(cs => cs.When(supervisorOverride.Checked).Truthy()
         .Or(careTrack.Value).Eq("memory"))
-    .Then(then => then.Dispatch(EscalationRoutingEvents.ComponentRouteIsolation))
+    .Then(then =>
+    {
+        then.Dispatch(EscalationRoutingEvents.ComponentRouteIsolation);
+    })
     .ElseIf(assessment.Value).Gte(60m)
     .And(cs => cs.When(supervisorOverride.Checked).Truthy().Not())
-    .Then(then => then.Dispatch(EscalationRoutingEvents.ComponentRouteMonitor));
+    .Then(then =>
+    {
+        then.Dispatch(EscalationRoutingEvents.ComponentRouteMonitor);
+    })
+    .Else(else_ =>
+    {
+        else_.Dispatch(EscalationRoutingEvents.ComponentRouteRoutine);
+    });
 ```
 
 The first branch reads "85 or more, and either an override or the memory track". `Not()` negates
@@ -217,26 +281,37 @@ operator only where it means something: `Gt` and `Between` on numbers and dates,
 ## How do I read the page's URL?
 
 Describe the query string with the class the page's action binds with
-`[FromQuery]`, and read it through `p.Url<TQuery>()`:
+`[FromQuery]`, and read it through `p.Url<TQuery>()`. From the resident file
+page, opened from a link in the shift email such as
+`?community=maple-grove&resident=1042&shift=Night&tab=medications&page=2&wing=Maple&wing=Cedar`:
 
 ```csharp
-public sealed class HttpShowcaseQuery
+public sealed class ShiftEmailLinkQuery
 {
-    public string? Tab { get; set; }
-    public int FacilityId { get; set; }
+    public string Community { get; set; } = "";
+
+    public int Resident { get; set; }
+
+    public string Shift { get; set; } = "";
+
+    public string Tab { get; set; } = "";
+
     public int Page { get; set; }
-    public int ResidentId { get; set; }
+
     public string[] Wing { get; set; } = Array.Empty<string>();
 }
 ```
 
 ```csharp
-var link = p.Url<HttpShowcaseQuery>();
+var link = p.Url<ShiftEmailLinkQuery>();
+p.Element("link-shift").Text.Set(link.Get(q => q.Shift));
+p.Element("link-wings").Text.Set(link.Get(q => q.Wing));
+p.Element("notes-page").Text.Set(link.Get(q => q.Page));
+p.When(link.Get(q => q.Tab)).Eq("medications")
+ .Then(medications => medications.Element("file-medications").Show())
+ .Else(overview => overview.Element("file-overview").Show());
 p.When(link.Get(q => q.Page)).Gt(1)
- .Then(then => then.Element("url-cond-prev").Show())
- .Else(els => els.Element("url-cond-prev").Hide());
-
-p.Element("url-display-wings").Text.Set(link.Get(q => q.Wing));
+ .Then(older => older.Element("notes-older-hint").Show());
 ```
 
 Each member reads the key of its name, ignoring case. A single-value member reads

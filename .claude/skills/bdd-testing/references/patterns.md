@@ -17,24 +17,17 @@
 
 ```
 tests/Alis.Reactive.PlaywrightTests/
-├── AllModulesTogether/
-│   ├── Cascading/
-│   ├── CrossVendor/
-│   ├── FormPatterns/
-│   ├── ReactiveWiring/
-│   └── Workflows/
 ├── Components/
 │   ├── AppLevel/
-│   ├── Fusion/
+│   ├── Brought/
+│   ├── Fusion/          (one folder per component: DatePicker/, Grid/, ...)
 │   └── Native/
-├── Conditions/
-│   └── WithComponents/
+├── Conditions/          (one folder per journey: MedicationRound/, PharmacyReview/, ...)
 ├── CoreBehaviors/
-├── HttpPipeline/
-│   └── RealTime/
-└── Validation/
-    ├── Contract/
-    └── Rules/
+├── HttpPipeline/        (ResidentRegister/, ShiftEmailLink/, RealTime/, ...)
+├── Patterns/            (BedAssignment/, MoveInPacket/, Workflows/, ...)
+├── Plugins/
+└── Validation/          (Contract/, Rules/, MoveInReview/, ...)
 ```
 
 Each fixture has:
@@ -43,28 +36,32 @@ Each fixture has:
 - Full journey tests, not fragments
 - No shared state between fixtures
 
-```csharp
-// NOTE: This pattern uses hardcoded IDs and string-based locators (legacy).
-// New tests should prefer PagePlan<TModel> for compile-time safety.
-// The codebase is mid-migration; both patterns coexist.
+This fixture uses hardcoded IDs and string-based locators (legacy). New tests should prefer
+`PagePlan<TModel>` for compile-time safety; the codebase is mid-migration and both patterns coexist.
+The opening of `Validation/Contract/WhenAjaxPartialsLoadWithValidation.cs` (lines 5-18):
 
+```csharp
 [TestFixture]
-public class WhenValidatingResidentAdmission : PlaywrightTestBase
+public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
 {
-    private const string Path = "/Sandbox/ValidationContract";
-    private const string R = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentModel__";
+    private const string Path = "/Sandbox/Validation/Contract/AjaxPartial";
+    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentModel__";
 
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
-    private ILocator ErrorFor(string field) => Page.Locator($"#resident-form span[data-valmsg-for='{field}']");
     private ILocator SummaryDiv => Page.Locator("[data-reactive-validation-summary]");
-    private ILocator Input(string suffix) => Page.Locator($"#{R}{suffix}");
     private ILocator Result => Page.Locator("#result");
-}
+
+    private ILocator ErrorFor(string fieldName) =>
+        Page.Locator($"#resident-form span[data-valmsg-for='{fieldName}']");
+
+    private ILocator Input(string suffix) => Page.Locator($"#{ModelIdPrefix}{suffix}");
 ```
 
 ---
 
 ## Full Journey Test Example
+
+From `Validation/Contract/WhenAjaxPartialsLoadWithValidation.cs:53-92`:
 
 ```csharp
 [Test]
@@ -73,31 +70,37 @@ public async Task full_ajax_partial_lifecycle()
     await NavigateTo(Path);
     await WaitForTraceMessage("booted", 5000);
 
-    // Step 1: Submit with placeholder — parent errors only, no address in summary
-    await SubmitBtn.ClickAsync();
+    await ClickWhenStable(SubmitBtn);
+    await Expect(ErrorFor("Name")).ToContainTextAsync("required");
     await Expect(ErrorFor("Name")).ToBeVisibleAsync();
-    await Expect(SummaryDiv).ToBeHiddenAsync(); // NO phantom address errors
-
-    // Step 2: Select Facility Address — still no address errors
-    await Input("AddressType").SelectOptionAsync("Facility Address");
-    await SubmitBtn.ClickAsync();
+    await Expect(ErrorFor("Email")).ToContainTextAsync("required");
     await Expect(SummaryDiv).ToBeHiddenAsync();
 
-    // Step 3: Select Custom Address → partial loads
-    await Input("AddressType").SelectOptionAsync("Custom Address");
-    await Expect(Input("Address_Street")).ToBeVisibleAsync(new() { Timeout = 5000 });
+    await Input("AddressType").SelectOptionAsync("Facility Address");
+    await ClickWhenStable(SubmitBtn);
+    await Expect(ErrorFor("Name")).ToContainTextAsync("required");
+    await Expect(SummaryDiv).ToBeHiddenAsync();
 
-    // Step 4: Submit with empty address — inline errors
-    await SubmitBtn.ClickAsync();
+    await FillParentFields();
+    await SelectCustomAddress();
+
+    await ClickWhenStable(SubmitBtn);
     await Expect(ErrorFor("Address.Street")).ToContainTextAsync("required");
+    await Expect(ErrorFor("Address.Street")).ToBeVisibleAsync();
+    await Expect(ErrorFor("Address.City")).ToContainTextAsync("required");
+    await Expect(ErrorFor("Address.ZipCode")).ToContainTextAsync("required");
+    await Expect(SummaryDiv).ToBeHiddenAsync();
 
-    // Step 5: Fill all → success
     await FillParentFields();
     await Input("Address_Street").FillAsync("123 Sunrise Blvd");
     await Input("Address_City").FillAsync("Palm Springs");
     await Input("Address_ZipCode").FillAsync("92262");
-    await SubmitBtn.ClickAsync();
+    await ClickWhenStable(SubmitBtn);
+
     await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
+    await Expect(ErrorFor("Name")).Not.ToBeVisibleAsync();
+    await Expect(ErrorFor("Address.Street")).Not.ToBeVisibleAsync();
+    await Expect(SummaryDiv).ToBeHiddenAsync();
 
     AssertNoConsoleErrors();
 }
@@ -107,29 +110,26 @@ public async Task full_ajax_partial_lifecycle()
 
 ## State Transition Testing
 
+Choosing a care level changes which fields are required. From
+`Validation/Contract/WhenHiddenFieldsSkipValidation.cs:106-123` (sibling tests cover Independent and
+Memory Care):
+
 ```csharp
 [Test]
-public async Task changing_care_level_changes_which_fields_are_required()
+public async Task assisted_living_shows_physician_section_and_requires_physician()
 {
     await NavigateTo(Path);
     await WaitForTraceMessage("booted", 5000);
+
     await FillAllRequired();
-
-    // Independent → PhysicianName not required
-    await Input("CareLevel").SelectOptionAsync("Independent");
-    await SubmitBtn.ClickAsync();
-    await Expect(ErrorFor("PhysicianName")).Not.ToBeVisibleAsync();
-    await Expect(SummaryDiv).ToBeHiddenAsync();
-
-    // Assisted Living → PhysicianName required
     await Input("CareLevel").SelectOptionAsync("Assisted Living");
-    await SubmitBtn.ClickAsync();
-    await Expect(ErrorFor("PhysicianName")).ToContainTextAsync("required");
 
-    // Back to Independent → PhysicianName gone
-    await Input("CareLevel").SelectOptionAsync("Independent");
-    await SubmitBtn.ClickAsync();
-    await Expect(ErrorFor("PhysicianName")).Not.ToBeVisibleAsync();
+    await Expect(Page.Locator("#physician-section")).ToBeVisibleAsync();
+
+    await ClickWhenStable(SubmitBtn);
+    await Expect(ErrorFor("PhysicianName")).ToContainTextAsync("required");
+    await Expect(ErrorFor("MemoryAssessmentScore")).Not.ToBeVisibleAsync();
+    await Expect(SummaryDiv).ToBeHiddenAsync();
 
     AssertNoConsoleErrors();
 }
@@ -139,22 +139,46 @@ public async Task changing_care_level_changes_which_fields_are_required()
 
 ## Validator Scoping Rules
 
-Validators must match form scope — only rules for fields the page renders:
+Validators must match form scope — only rules for fields the page renders.
+From `Models/Validation/Contract/ResidentValidator.cs:50-86`, the validator of the page whose
+form renders no physician or memory fields:
 
 ```csharp
 // CORRECT — scoped to page's fields
+
+// ServerPartial omits rules for fields that page does not render.
 public class ServerPartialValidator : ReactiveValidator<ResidentModel>
 {
     public ServerPartialValidator()
     {
-        RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required.");
+        RuleFor(x => x.Name)
+            .NotEmpty().WithMessage("'Name' is required.")
+            .MinimumLength(2).WithMessage("'Name' must have a minimum length of 2.");
         RuleFor(x => x.Email)
-            .NotEmpty().WithMessage("Email is required.")
-            .EmailAddress().WithMessage("Enter a valid email.");
+            .NotEmpty().WithMessage("'Email' is required.")
+            .EmailAddress().WithMessage("'Email' must be a valid email address.");
+        RuleFor(x => x.CareLevel).NotEmpty().WithMessage("'Care Level' is required.");
+
+        RuleFor(x => x.ConfirmEmail)
+            .NotEmpty().WithMessage("'Confirm Email' is required.")
+            .Equal(x => x.Email).WithMessage("'Confirm Email' must match 'Email'.");
+
         When(x => x.IsVeteran, () =>
         {
-            RuleFor(x => x.VeteranId).NotEmpty().WithMessage("Veteran ID is required.");
+            RuleFor(x => x.VeteranId).NotEmpty().WithMessage("'Veteran ID' is required when veteran.");
         });
+
+        When(x => x.HasEmergencyContact, () =>
+        {
+            RuleFor(x => x.EmergencyName).NotEmpty().WithMessage("'Emergency Name' is required.");
+            RuleFor(x => x.EmergencyPhone).NotEmpty().WithMessage("'Emergency Phone' is required.");
+        });
+
+        When(x => !x.HasEmergencyContact, () =>
+        {
+            RuleFor(x => x.ReasonForNoContact).NotEmpty().WithMessage("'Reason' is required when no emergency contact.");
+        });
+
         RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator());
     }
 }

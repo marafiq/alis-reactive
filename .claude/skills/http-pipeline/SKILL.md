@@ -50,26 +50,30 @@ parameter name comes from a typed member; there are no string parameter names.
 | The action binds | Write | Sandbox source |
 |------------------|-------|----------------|
 | the view model, `Reserve([FromBody] SuiteAssignmentModel assignment)` | `.Gather(g => g.Form())` | `Components/Brought/TomSelect/Index.cshtml:85` |
-| a query class, `Medications([FromQuery] MedicationSearchQuery query)` | `.Gather<MedicationSearchQuery>(g => ..)` | `Components/Fusion/AutoComplete/Index.cshtml:138` |
+| a query class, `Search([FromQuery] DirectorySearch search)` | `.Gather<DirectorySearch>(g => ..)` | `Components/Fusion/AutoComplete/Index.cshtml:67` |
 | a route value, `Rate(string suiteType)` | `.Gather<SuiteQuery>(g => g.Set(x => x.SuiteType, ..))` | `Components/Brought/TomSelect/Index.cshtml:44` |
-| a body class, `AlertHypertension([FromBody] AlertHypertensionRequest? request)` | `.Gather<AlertHypertensionRequest>(g => ..)` | `Conditions/AdmissionAssessment/_CardiacAssessment.cshtml:31` |
-| route values and a JSON body (ASP.NET Core), `HoldVisit(string slotId, [FromBody] HoldRequest? hold)` | `.Gather<HoldVisitRequest>(g => ..)` where `HoldVisitRequest : HoldRequest { SlotId }` | `Components/Brought/VisitPlanner/FrontDesk.cshtml:83` |
+| a body class, `AlertHypertension([FromBody] AlertHypertensionRequest? request)` | `.Gather<AlertHypertensionRequest>(g => ..)` | `Conditions/AdmissionAssessment/_CardiacAssessment.cshtml:29` |
+| route values and a JSON body (ASP.NET Core), `HoldVisit(string slotId, [FromBody] HoldRequest? hold)` | `.Gather<HoldVisitRequest>(g => ..)` where `HoldVisitRequest : HoldRequest { SlotId }` | `Components/Brought/VisitPlanner/FrontDesk.cshtml:91` |
 
 In ASP.NET Core an action that binds a JSON body takes its route values as their own parameters.
 The page's request class is then the body class plus the route members:
 
 ```csharp
-// Models/Components/Brought/VisitPlanner/FrontDeskHoldsModel.cs
+// Models/Components/Brought/VisitPlanner/FrontDeskHoldsModel.cs:70-84
+/// <summary>The body of a hold or a badge, which the desk's actions bind with [FromBody].</summary>
 public class HoldRequest
 {
     public int VisitsThisWeek { get; set; }
+
     public string? Family { get; set; }
+
     public string? Source { get; set; }
 }
 
+/// <summary>A hold or a badge as the page sends it: the time in the path, the rest in the body.</summary>
 public sealed class HoldVisitRequest : HoldRequest
 {
-    public string SlotId { get; set; } = "";
+    public string? SlotId { get; set; }
 }
 ```
 
@@ -136,7 +140,7 @@ cannot fill a member that may not be missing. A `T[]` source fills a `T[]`, `Lis
 
 ### Examples
 
-Route value from a brought component (`Components/Brought/TomSelect/Index.cshtml:41-44`):
+Route value from a brought component (`Components/Brought/TomSelect/Index.cshtml:15, 41-44`):
 
 ```csharp
 var suite = p.Component<TomSelect>(m => m.SuiteType);
@@ -144,7 +148,7 @@ quote.Get(rateUrl)   // rateUrl = Url.SandboxRouteTemplate("Rate", "TomSelect", 
     .Gather<SuiteQuery>(g => g.Set(x => x.SuiteType, suite.Value))
 ```
 
-Route value, body members and a header in one request (`Components/Brought/VisitPlanner/FrontDesk.cshtml:82-88`;
+Route value, body members and a header in one request (`Components/Brought/VisitPlanner/FrontDesk.cshtml:90-96`;
 `holdUrl` is `.../FrontDesk/Hold/{slotId}`):
 
 ```csharp
@@ -157,45 +161,47 @@ added.Post(holdUrl)
         .Header("X-Wing", added.Component<VisitPlanner>(m => m.VisitSlots).Wing))
 ```
 
-Every input of the form, plus one member the form does not carry (`Validation/MoveInReview/Index.cshtml:42`):
+Every input of the form, plus one member the form does not carry (`Validation/MoveInReview/Index.cshtml:63`):
 
 ```csharp
 p.Post(Url.SandboxRoute("Save", "MoveInReview")).Gather(g => g.Form().Set(x => x.Pharmacy.Network, "Riverside Health"))
 ```
 
-Named inputs into a request class other than the view model (`Conditions/AdmissionAssessment/_CardiacAssessment.cshtml:30-31`):
+Named inputs into a request class other than the view model (`Conditions/AdmissionAssessment/_CardiacAssessment.cshtml:28-29`):
 
 ```csharp
 then.Post(alertHypertensionUrl)
  .Gather<AlertHypertensionRequest>(g => g.Form(m => m.SystolicBP, m => m.ResidentName))
 ```
 
-Literal members and one input (`Components/Fusion/Grid/Index.cshtml:124-128`):
+Literal members, fixed when the view renders (`Components/Fusion/Grid/Census.cshtml:25-29`; `PageSize` is
+the view's `const int`):
 
 ```csharp
-p.Post(Url.SandboxRoute("Data", "Grid"))
- .Gather<GridDataRequest>(g => g
-     .Set(x => x.Skip, 0)
-     .Set(x => x.Take, 10)
-     .Form(m => m.MinAge))
+p.Post(Url.SandboxRoute("CensusResidents", "Grid"))
+    .Gather<AgeCensusQuery>(g => g
+        .Set(x => x.Skip, 0)
+        .Set(x => x.Take, PageSize)
+        .Set(x => x.RequiresCounts, true))
 ```
 
-Headers only, request class = the view model (`HttpPipeline/Http/Index.cshtml:667-671`):
+Headers beside a route member, one header a literal and one read from the URL
+(`HttpPipeline/ShiftEmailLink/Index.cshtml:131-135`; `partnersUrl` is `.../Residents/{residentId}/Partners`):
 
 ```csharp
-p.Get(Url.SandboxRoute("EchoHeadersPost", "Http"))
- .Gather(g => g
-     .Header("X-Api-Version", "2024-01-15")
-     .Header("X-Request-Id", "test-header-123")
-     .Header("X-Tenant-Id", "facility-42"))
+pharmacy => pharmacy.Get(partnersUrl)
+    .Gather<ShiftEmailPartnerRequest>(g => g
+        .Set(x => x.ResidentId, link.Get(q => q.Resident))
+        .Header("X-Partner", "riverside-pharmacy")
+        .Header("X-Community", link.Get(q => q.Community)))
 ```
 
-Form data, for files (`Components/Fusion/FileUpload/Index.cshtml:45-47`):
+Form data, for files (`Components/Fusion/FileUpload/Index.cshtml:68-70`):
 
 ```csharp
-p.Post(Url.SandboxRoute("Echo", "FileUpload"))
- .Gather(g => g.Form())
- .AsFormData()
+p.Post(Url.SandboxRoute("Attach", "FileUpload"))
+    .Gather(g => g.Form())
+    .AsFormData()
 ```
 
 ## The Page's URL Query: `p.Url<TQuery>()`
@@ -205,75 +211,94 @@ binding name, matched ignoring case. A scalar member reads the key's first value
 every value of the key. The result is a source like any other: conditions, `Text.Set`, `Set`, `Header`.
 
 ```csharp
-// Models/HttpPipeline/Http/HttpShowcaseModel.cs
-public sealed class HttpShowcaseQuery
+// Models/HttpPipeline/ShiftEmailLink/ShiftEmailLinkModel.cs:17-30
+public sealed class ShiftEmailLinkQuery
 {
-    public string? Tab { get; set; }
-    public int FacilityId { get; set; }
+    public string Community { get; set; } = "";
+
+    public int Resident { get; set; }
+
+    public string Shift { get; set; } = "";
+
+    public string Tab { get; set; } = "";
+
     public int Page { get; set; }
-    public int ResidentId { get; set; }
+
     public string[] Wing { get; set; } = Array.Empty<string>();
 }
 ```
 
 ```csharp
-// HttpPipeline/Http/Index.cshtml:31-38, 43-46 (two DomReady handlers in the view)
-var link = p.Url<HttpShowcaseQuery>();
+// HttpPipeline/ShiftEmailLink/Index.cshtml:18-26
+var link = p.Url<ShiftEmailLinkQuery>();
+p.Element("link-shift").Text.Set(link.Get(q => q.Shift));
+p.Element("link-wings").Text.Set(link.Get(q => q.Wing));
+p.Element("notes-page").Text.Set(link.Get(q => q.Page));
 p.When(link.Get(q => q.Tab)).Eq("medications")
- .Then(then => then.Element("url-cond-meds").Show())
- .Else(els => els.Element("url-cond-meds").Hide());
-
+ .Then(medications => medications.Element("file-medications").Show())
+ .Else(overview => overview.Element("file-overview").Show());
 p.When(link.Get(q => q.Page)).Gt(1)
- .Then(then => then.Element("url-cond-prev").Show())
- .Else(els => els.Element("url-cond-prev").Hide());
-
-p.Element("url-display-wings").Text.Set(link.Get(q => q.Wing));     // every ?wing= value
+ .Then(older => older.Element("notes-older-hint").Show());
 ```
 
+`link.Get(q => q.Wing)` reads every `?wing=` value of the link.
+
 URL members fill a route value, a header and a query member of another request
-(`HttpPipeline/Http/Index.cshtml:480-485`; the URL is `.../ComposeEcho/{id}`):
+(`HttpPipeline/ShiftEmailLink/Index.cshtml:33-38`; `chartUrl` is `.../Residents/{residentId}/Chart`):
 
 ```csharp
-var link = p.Url<HttpShowcaseQuery>();
-p.Get(Url.SandboxRouteTemplate("ComposeEcho", "Http", "id"))
- .Gather<ComposeEchoQuery>(g => g
-     .Set(x => x.Id, link.Get(q => q.ResidentId))
-     .Header("X-Tab", link.Get(q => q.Tab))
-     .Set(x => x.Facility, link.Get(q => q.FacilityId)))
+var link = p.Url<ShiftEmailLinkQuery>();
+p.Get(chartUrl)
+ .Gather<ShiftEmailChartRequest>(g => g
+     .Set(x => x.ResidentId, link.Get(q => q.Resident))
+     .Header("X-Community", link.Get(q => q.Community))
+     .Set(x => x.Shift, link.Get(q => q.Shift)))
 ```
 
 ## Event Payload Members: `args.Member`
 
 `args` is the object the event handed its callback, declared as a `JsObject`. Each of its members is a
-source; a member whose value is data reads further with `Get` (`Components/Fusion/Grid/Index.cshtml:167-181`):
+source; a member whose value is data reads further with `Get` (`Components/Fusion/Grid/Census.cshtml:70-83`):
 
 ```csharp
-t.Post(Url.SandboxRoute("Data", "Grid"))
- .Gather<GridDataRequest>(g => g
-     .Set(x => x.EventName, args.Name)
-     .Set(x => x.Skip, args.Skip)
-     .Set(x => x.Take, args.Take)
-     .Set(x => x.ActionCurrentPage, args.Action.Get(x => x.CurrentPage))
-     .Set(x => x.Sorted, args.Sorted)
-     .Form(m => m.MinAge))
+.Reactive(evt => evt.DataStateChange, (args, p) =>
+    p.Post(Url.SandboxRoute("CensusResidents", "Grid"))
+        .Gather<AgeCensusQuery>(g => g
+            .Set(x => x.Skip, args.Skip)
+            .Set(x => x.Take, args.Take)
+            .Set(x => x.RequiresCounts, args.RequiresCounts)
+            .Set(x => x.Sorted, args.Sorted)
+            .Set(x => x.Change, args.Action.Get(a => a.RequestType))
+            .Set(x => x.SortedColumn, args.Action.Get(a => a.ColumnName))
+            .Set(x => x.SortedDirection, args.Action.Get(a => a.Direction))
+            .Set(x => x.ToPage, args.Action.Get(a => a.CurrentPage))
+            .Set(x => x.FromPage, args.Action.Get(a => a.PreviousPage))
+            .Set(x => x.PageSize, args.Action.Get(a => a.PageSize))
+            .Form(m => m.MinAge))
 ```
 
 ## Chaining From a Response
 
-A request nested in `OnSuccess` sets members from that response (`HttpPipeline/Http/Index.cshtml:500-508`;
-`FacilityResident/{facilityId}/{residentId}`):
+A request nested in `OnSuccess` sets members from that response (`HttpPipeline/ShiftEmailLink/Index.cshtml:40-54`;
+`lastDoseUrl` is `.../Residents/{residentId}/Doses/{medication}`, one route value from the page's URL and
+one from the chart just answered):
 
 ```csharp
-p.Get(Url.SandboxRouteTemplate("ResidentById", "Http", "id"))
- .Gather<ResidentLookup>(g => g.Set(x => x.Id, p.Url<HttpShowcaseQuery>().Get(q => q.ResidentId)))
- .Response(r => r
-    .OnSuccess<ResidentByIdResponse>((json, s) =>
-    {
-        s.Get(Url.SandboxRouteTemplate("FacilityResident", "Http", "facilityId", "residentId"))
-         .Gather<FacilityResidentLookup>(g => g
-            .Set(x => x.FacilityId, s.Url<HttpShowcaseQuery>().Get(q => q.FacilityId))
-            .Set(x => x.ResidentId, json.Get(x => x.ResidentId)))
-         ...
+.OnSuccess<ShiftEmailChart>((chart, s) =>
+{
+    s.Element("file-resident").Text.Set(chart.Get(x => x.Name));
+    s.Element("file-room").Text.Set(chart.Get(x => x.Room));
+    s.Element("file-community").Text.Set(chart.Get(x => x.Community));
+    s.Element("due-dose").Text.Set(chart.Get(x => x.DueDose));
+    var sameLink = s.Url<ShiftEmailLinkQuery>();
+    s.Get(lastDoseUrl)
+     .Gather<ShiftEmailDoseRequest>(g => g
+         .Set(x => x.ResidentId, sameLink.Get(q => q.Resident))
+         .Set(x => x.Medication, chart.Get(x => x.DueMedication))
+         .Header("X-Community", sameLink.Get(q => q.Community)))
+     .Response(dose => dose.OnSuccess<ShiftEmailLastDose>((given, d) =>
+         d.Element("last-dose").Text.Set(given.Get(x => x.LastGiven))));
+})
 ```
 
 ## Response Grammar
@@ -291,7 +316,7 @@ HANDLER := (s => { PIPELINE_COMMANDS })
 
 TYPED_HANDLER := ((json, s) => {
     s.Element("x").Text.Set(json.Get(x => x.Property));
-    s.Component<FusionDropDownList>(m => m.City).DataSource.Set(json.Get(j => j.Cities));
+    s.Component<FusionDropDownList>(m => m.Room).DataSource.Set(json.Get(j => j.Rooms));
 })
 
 CHAINED_REQUEST := (c => c.VERB(url).CHAIN)     -- full request chain
@@ -302,109 +327,161 @@ CHAINED_REQUEST := (c => c.VERB(url).CHAIN)     -- full request chain
 ## Typed Response (`Data<T>`)
 
 `json` is `Data<TResponse>`: `json.Get(x => x.Member)` reads a member, and `json` itself is the whole
-body (`HttpPipeline/Http/Index.cshtml`, `Components/Fusion/Grid/Index.cshtml`):
+body (`HttpPipeline/ResidentRegister/Index.cshtml:22-28`; `Components/Fusion/Grid/Census.cshtml:16-22`, where
+the grid's data source is the whole `{result, count}` body):
 
 ```csharp
-.OnSuccess<ResidentsResponse>((json, s) =>
+.Response(r => r.OnSuccess<RegisterSummary>((summary, s) =>
 {
-    s.Element("load-first").Text.Set(json.Get(x => x.First));
-    s.Element("load-count").Text.Set(json.Get(x => x.Count));
-})
+    s.Element("register-loading").Hide();
+    s.Element("register-record-count").Text.Set(summary.Get(x => x.Records));
+    s.Element("register-resident-count").Text.Set(summary.Get(x => x.Residents));
+    s.Element("register-newest").Text.Set(summary.Get(x => x.NewestResident));
+}))
 
-.OnSuccess<ResidentGridResponse>((json, s) =>
+// The residents the server answers with, how many the census counts, and what the last change did.
+void ShowCensus(Data<AgeCensusPage> answer, PipelineBuilder<AgeCensusViewModel> s)
 {
-    s.Component<FusionGrid>("residents-grid").DataSource.Set(json);   // the whole body
-})
+    s.Component<FusionGrid>(GridId).DataSource.Set(answer);
+    s.Element("census-summary").Text.Set(answer.Get(x => x.Summary));
+    s.Element("census-change").Text.Set(answer.Get(x => x.Change));
+}
 ```
 
-A member reads by its camel-case JSON name. `TResponse` must be a class.
+A member reads by its camel-case JSON name. `TResponse` must be a class (a record class works).
+A typed handler can be a local function of the view, passed as `.OnSuccess<AgeCensusPage>(ShowCensus)`.
 
 ## Error Handling
 
+One `OnError` handler per status code, typed or not (`HttpPipeline/ResidentRegister/Index.cshtml:86-102`):
+
 ```csharp
 .Response(r => r
-    .OnSuccess<T>((json, s) => { ... })
-    .OnError(400, e => e.ValidationErrors("formId"))    // display field errors
-    .OnError(500, e => e.Element("error").Text.Set("Server error")))
+   .OnSuccess<RegisterRoomMoved>((moved, s) =>
+   {
+       s.Element("move-status").Text.Set(moved.Get(x => x.Message));
+       s.Element("move-status").ClassList.Remove("text-danger");
+       s.Dispatch(ResidentRegisterEvents.RegisterChanged);
+   })
+   .OnError(422, e =>
+   {
+       e.Element("move-status").Text.Set("Choose a resident and the room they move to.");
+       e.Element("move-status").ClassList.Add("text-danger");
+   })
+   .OnError<RegisterRoomTaken>(409, (taken, e) =>
+   {
+       e.Element("move-status").Text.Set(taken.Get(x => x.Reason));
+       e.Element("move-status").ClassList.Add("text-danger");
+   }));
 ```
 
-Multiple `OnError` handlers allowed (one per status code). `ValidationErrors("formId")` maps server 400 response to field-level error display.
-A typed error body reads like a success body (`Components/Brought/VisitPlanner/FrontDesk.cshtml`):
+`ValidationErrors("formId")` maps a server 400 response to field-level error display
+(`Components/Fusion/AutoComplete/Index.cshtml:134`: `.OnError(400, e => e.ValidationErrors(FormId))`).
+A typed error body reads like a success body (`Components/Brought/VisitPlanner/FrontDesk.cshtml:115-124`):
 
 ```csharp
 .OnError<DeskConflict>(409, (conflict, e) =>
 {
     e.Component<VisitPlanner>(m => m.VisitSlots).Value.Set(conflict.Get(x => x.Held));
     e.Element("desk-status").Text.Set(conflict.Get(x => x.Message));
+    var toast = e.Component<FusionToast>();
+    toast.Title.Set("Time not held");
+    toast.Content.Set(conflict.Get(x => x.Message));
+    toast.Tone.Set(FusionToastTone.Danger);
+    toast.Show();
 })
 ```
 
 ## WhileLoading
 
+From `Components/AppLevel/Loader/Index.cshtml:26-37`:
+
 ```csharp
-p.Get("/api/data")
+p.Get(Url.SandboxRoute("Census", "Loader"))
  .WhileLoading(l =>
  {
-     l.Element("spinner").Show();
-     l.Element("btn").ClassList.Add("disabled");
+     var loader = l.Component<NativeLoader>();
+     loader.Timeout.Set(3000);
+     loader.Show();
  })
- .Response(r => r.OnSuccess(s =>
+ .Response(r => r.OnSuccess<CensusSummary>((json, s) =>
  {
-     s.Element("spinner").Hide();
-     s.Element("btn").ClassList.Remove("disabled");
- }))
+     s.Component<NativeLoader>().Hide();
+     s.Element("census-status").Text.Set(json.Get(x => x.Summary));
+ }));
 ```
 
 Commands execute before the HTTP request fires. **Sequential commands only** — no conditions, HTTP, or parallel inside WhileLoading.
 
 ## Chained Requests
 
-From `HttpPipeline/Http/Index.cshtml`:
+From `HttpPipeline/DischargeNotice/Index.cshtml:31-49` (a discharge the office refuses notifies no one):
 
 ```csharp
-p.Get(Url.SandboxRoute("Residents", "Http"))
+p.Post(Url.SandboxRoute("Discharge", "DischargeNotice", new { resident = resident.Key }))
  .Response(r => r
-    .OnSuccess<ResidentsResponse>((json, s) =>
+    .OnSuccess<DischargeResult>((json, s) =>
     {
-        s.Element("chain-resident-first").Text.Set(json.Get(x => x.First));
+        s.Element($"{resident.Key}-discharge-status").Text.Set(json.Get(x => x.Message));
+    })
+    .OnError<DischargeResult>(409, (refused, e) =>
+    {
+        e.Element($"{resident.Key}-discharge-status").Text.Set(refused.Get(x => x.Message));
     })
     .Chained(c => c
-        .Get(Url.SandboxRoute("Facilities", "Http"))
-        .Response(r2 => r2.OnSuccess<FacilitiesResponse>((json2, s2) =>
-        {
-            s2.Element("chain-facility-first").Text.Set(json2.Get(x => x.First));
-        }))))
+        .Post(Url.SandboxRoute("NotifyFamily", "DischargeNotice"))
+        .Gather<FamilyNoticeRequest>(g => g.Set(x => x.Channel, resident.Channel))
+        .Response(notice => notice
+            .OnError<FamilyNoticeResult>(503, (json, e) =>
+            {
+                e.Element($"{resident.Key}-family-reason").Text.Set(json.Get(x => x.Message));
+                e.Element($"{resident.Key}-family-status").Text.Set("The family was not notified.");
+            }))));
 ```
 
 Chained fires **only on 2xx success** of the parent request. Can nest further.
 
-To send what the first answer said, take its body as the callback's first parameter (from
-`Components/Brought/VisitPlanner/FrontDesk.cshtml`):
+To send what the first answer said, take its body as the callback's first parameter
+(`Components/Brought/VisitPlanner/FrontDesk.cshtml:52-63`):
 
 ```csharp
 .Chained<ResidentWeekResponse>((week, holds) => holds.Get(holdsUrl)
-    .Gather<FrontDeskResident>(g => g.Header("X-Wing", week.Get(x => x.Wing)))
-    .Response(answer => answer.OnSuccess<FamilyHoldsResponse>((held, s) => ...)))
+    .Gather<FrontDeskResident>(g => g
+        .Set(x => x.ResidentId, link.Get(q => q.Resident))
+        .Header("X-Family", link.Get(q => q.Family))
+        .Header("X-Wing", week.Get(x => x.Wing)))
+    .Response(answer => answer.OnSuccess<FamilyHoldsResponse>((held, s) =>
+    {
+        planner.Value.Set(held.Get(x => x.Held));
+        s.Element("desk-family").Text.Set(held.Get(x => x.Family));
+        s.Element("desk-name").Text.Set(held.Get(x => x.Desk));
+        s.Element("desk-held").Text.Set(planner.Count);
+    })))
 ```
 
 ## Parallel Requests
 
-From `HttpPipeline/Http/Index.cshtml`:
+From `HttpPipeline/ShiftEmailLink/Index.cshtml:128-145` (each branch is routed by its own `X-Partner` header):
 
 ```csharp
-p.Element("parallel-spinner").Show();
+var link = p.Url<ShiftEmailLinkQuery>();
+p.Element("partners-status").Text.Set("Checking with the pharmacy and the lab...");
 p.Parallel(
-    a => a.Get(Url.SandboxRoute("Residents", "Http"))
-          .Response(ra => ra.OnSuccess<ResidentsResponse>((json, sa) =>
-              sa.Element("parallel-resident-first").Text.Set(json.Get(x => x.First)))),
-    b => b.Get(Url.SandboxRoute("Facilities", "Http"))
-          .Response(rb => rb.OnSuccess<FacilitiesResponse>((json, sb) =>
-              sb.Element("parallel-facility-first").Text.Set(json.Get(x => x.First))))
-).OnAllSettled(s =>
-{
-    s.Element("parallel-spinner").Hide();
-    s.Element("parallel-all").Text.Set("All parallel requests completed!");
-});
+        pharmacy => pharmacy.Get(partnersUrl)
+            .Gather<ShiftEmailPartnerRequest>(g => g
+                .Set(x => x.ResidentId, link.Get(q => q.Resident))
+                .Header("X-Partner", "riverside-pharmacy")
+                .Header("X-Community", link.Get(q => q.Community)))
+            .Response(r => r.OnSuccess<ShiftEmailPartnerAnswer>((answer, s) =>
+                s.Element("pharmacy-answer").Text.Set(answer.Get(x => x.Answer)))),
+        lab => lab.Get(partnersUrl)
+            .Gather<ShiftEmailPartnerRequest>(g => g
+                .Set(x => x.ResidentId, link.Get(q => q.Resident))
+                .Header("X-Partner", "northgate-lab")
+                .Header("X-Community", link.Get(q => q.Community)))
+            .Response(r => r.OnSuccess<ShiftEmailPartnerAnswer>((answer, s) =>
+                s.Element("lab-answer").Text.Set(answer.Get(x => x.Answer)))))
+    .OnAllSettled(done => done.Element("partners-status").Text.Set("Pharmacy and lab checked."));
 ```
 
 All branches fire concurrently. `OnAllSettled` fires after ALL complete (success or failure).
@@ -412,19 +489,23 @@ All branches fire concurrently. `OnAllSettled` fires after ALL complete (success
 
 ## Complete Patterns
 
-**Pattern 1: Server-filtered dropdown (Filtering event)**
-Source: `Components/Fusion/AutoComplete/Index.cshtml:134-145`; the action binds `[FromQuery] MedicationSearchQuery`.
+**Pattern 1: Server-filtered list (Filtering event)**
+Source: `Components/Fusion/AutoComplete/Index.cshtml:62-77`; the action binds `[FromQuery] DirectorySearch`.
 ```csharp
 .Reactive(evt => evt.Filtering, (args, p) =>
 {
+    // The directory answers for what was typed; until it does, her care team is not offered.
     args.PreventDefaultAction.Set(true);
-    p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
-     .Gather<MedicationSearchQuery>(g => g.Set(x => x.MedicationType, args.Text))
-     .Response(r => r
-        .OnSuccess<MedicationSearchResponse>((json, s) =>
+    p.Get(Url.SandboxRoute("Search", "AutoComplete"))
+        .Gather<DirectorySearch>(g => g.Set(x => x.Name, args.Text))
+        .WhileLoading(l => l.Element("directory-status").Text.Set("Searching the physician directory..."))
+        .Response(r => r.OnSuccess<DirectoryMatches>((found, s) =>
         {
-            args.UpdateData(json.Get(j => j.Medications));
-            s.Element("filter-status").Text.Set("results loaded");
+            s.Element("directory-status").Text.Set(found.Get(x => x.Summary));
+            // A name nobody in the directory has closes the list the last search left open.
+            s.When(found.Get(x => x.Count)).Eq(0)
+                .Then(none => none.Component<FusionAutoComplete>(m => m.Physician).HidePopup())
+                .Else(some => args.UpdateData(found.Get(x => x.Physicians)));
         }));
 })
 ```
@@ -447,21 +528,23 @@ p.Post(Url.SandboxRoute("Save", "Todo")).Gather(g => g.Form())
 ```
 
 **Pattern 3: Cascade (parent change populates child)**
-Source: `Patterns/Cascading/Index.cshtml:43-59`; the action binds `[FromQuery] string? Country`, and
-`CityLookupQuery { string? Country }` names that query for the page.
+Source: `Patterns/BedAssignment/Index.cshtml:24-37`; the action binds `[FromQuery] WingRoomsQuery`
+(`WingRoomsQuery { string Wing }`).
 ```csharp
-.Reactive(evt => evt.Change, (args, p) =>
-{
-    p.Get(Url.SandboxRoute("Cities", "Cascading"))
-     .Gather<CityLookupQuery>(g => g.Form(m => m.Country))
-     .Response(r => r
-        .OnSuccess<CityLookupResponse>((json, s) =>
-        {
-            var city = s.Component<FusionDropDownList>(m => m.City);
-            city.DataSource.Set(json.Get(j => j.Cities));
-            city.DataBind();
-        }));
-})
+@{ Html.InputField(plan, m => m.Wing, o => o.Label("Wing"))
+    .FusionDropDownList(b => b
+        .DataSource(Model.Wings)
+        .Fields<BedWing>(w => w.Name, w => w.Code)
+        .Placeholder("Choose a wing"))
+    .Reactive(evt => evt.Change, (args, p) =>
+        p.Get(roomsUrl)
+            .Gather<WingRoomsQuery>(g => g.Form(m => m.Wing))
+            .Response(r => r.OnSuccess<WingRooms>((offered, s) =>
+            {
+                // The new wing's rooms replace the old; a room chosen before is cleared, and its beds with it.
+                s.Component<FusionDropDownList>(m => m.Room).DataSource.Set(offered.Get(x => x.Rooms));
+                s.Element("room-summary").Text.Set(offered.Get(x => x.Summary));
+            }))); }
 ```
 
 ## Key Rules
@@ -471,7 +554,7 @@ Source: `Patterns/Cascading/Index.cshtml:43-59`; the action binds `[FromQuery] s
 - **Form() for the form's inputs** — `Form()` sends every input, `Form(m => ..)` the named ones, each by its binding name
 - **The payload for filtering** — `Set(x => x.M, args.Text)` sends the text typed during the keystroke
 - **updateData for filtering** — the ONLY correct SF API for async filtered data
-- **Call DataBind after setting DataSource** — needed for cascade patterns (not needed after a payload's UpdateData)
+- **Call DataBind after setting DataSource when a later step in the same pipeline depends on the new items** — Admission Placement writes the wing list, then `Value`, calls `DataBind()`, then reads `Text` (`Components/Fusion/DropDownList/Index.cshtml:62-69`); Bed Assignment's cascade writes `DataSource` alone (not needed after a payload's UpdateData)
 - **PreventDefault before async HTTP** — suppresses SF "No records found" flash
 - **WhileLoading is sequential only** — no conditions or nested HTTP
 - **OnAllSettled is sequential only** — no conditions or nested HTTP

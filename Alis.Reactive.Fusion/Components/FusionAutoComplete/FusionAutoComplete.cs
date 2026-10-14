@@ -77,13 +77,22 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>Payload of <see cref="FusionAutoComplete.Filtering"/>.</summary>
     /// <remarks>
     /// Server-side filtering: suppress the built-in filter, request matches, then hand them to the
-    /// popup.
+    /// popup. Here the directory search binds <c>DirectorySearch { Name }</c> and answers
+    /// <c>DirectoryMatches { Physicians, Count, Summary }</c>; a search that matches nobody closes the
+    /// popup instead.
     /// <code>
     /// args.PreventDefaultAction.Set(true);
     /// p.Get(url)
-    ///  .Gather&lt;MedicationSearchQuery&gt;(g =&gt; g.Set(x =&gt; x.MedicationType, args.Text))
-    ///  .Response(r =&gt; r.OnSuccess&lt;MedicationSearchResponse&gt;((json, s) =&gt;
-    ///      args.UpdateData(json.Get(j =&gt; j.Medications))));
+    ///     .Gather&lt;DirectorySearch&gt;(g =&gt; g.Set(x =&gt; x.Name, args.Text))
+    ///     .WhileLoading(l =&gt; l.Element("directory-status").Text.Set("Searching the physician directory..."))
+    ///     .Response(r =&gt; r.OnSuccess&lt;DirectoryMatches&gt;((found, s) =&gt;
+    ///     {
+    ///         s.Element("directory-status").Text.Set(found.Get(x =&gt; x.Summary));
+    ///         // A name nobody in the directory has closes the list the last search left open.
+    ///         s.When(found.Get(x =&gt; x.Count)).Eq(0)
+    ///             .Then(none =&gt; none.Component&lt;FusionAutoComplete&gt;(m =&gt; m.Physician).HidePopup())
+    ///             .Else(some =&gt; args.UpdateData(found.Get(x =&gt; x.Physicians)));
+    ///     }));
     /// </code>
     /// </remarks>
     public class FusionAutoCompleteFilteringArgs : JsObject
