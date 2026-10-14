@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.DropDowns;
 
@@ -86,6 +87,23 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>Renders a <see cref="FusionComboBox"/> for a model-bound field.</summary>
     public static class FusionComboBoxHtmlExtensions
     {
+        /// <summary>Maps display text and selected value fields using typed item expressions.</summary>
+        /// <typeparam name="TItem">The item class the data source holds.</typeparam>
+        /// <param name="builder">The Syncfusion builder being configured.</param>
+        /// <param name="text">The item member shown as each option's text.</param>
+        /// <param name="value">The item member submitted as each option's value.</param>
+        public static ComboBoxBuilder Fields<TItem>(
+            this ComboBoxBuilder builder,
+            Expression<Func<TItem, object?>> text,
+            Expression<Func<TItem, object?>> value)
+        {
+            return builder.Fields(new ComboBoxFieldSettings
+            {
+                Text = Field.Of(text).Name,
+                Value = Field.Of(value).Name
+            });
+        }
+
         /// <summary>Renders a FusionComboBox with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
         /// <typeparam name="TModel">The view's model type.</typeparam>
         /// <typeparam name="TProp">The bound model property's type.</typeparam>

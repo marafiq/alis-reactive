@@ -1,118 +1,154 @@
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.AIAssistView
 @model AIAssistViewModel
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.InteractiveChat
 @{
-    ViewData["Title"] = "FusionAIAssistView";
+    ViewData["Title"] = "Care-plan Assistant";
+
+    const string AssistantId = "care-ai";
+    const string NotesToggleId = "notes-toggle-btn";
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
 
     var plan = Html.ReactivePlan<AIAssistViewModel>();
+    var commonQuestions = new[]
+    {
+        "What follow-ups are due this week?",
+        "Draft a family update",
+        "List fall-risk interventions"
+    };
+    var savedNotes = "<div class=\"p-4\"><p class=\"text-sm font-medium\">Saved by the care team</p>"
+        + "<ul id=\"saved-notes\" class=\"mt-2 list-disc pl-5 text-sm\">"
+        + string.Concat(Model.SavedNotes.Select(note => $"<li>{Html.Encode(note)}</li>"))
+        + "</ul></div>";
+    var nightHandoff = new FusionAIAssistViewPromptModel
+    {
+        Prompt = Model.NightHandoff.Question,
+        Response = Model.NightHandoff.Answer
+    };
+
+    // The resident's chart links here with a question, which is asked on arrival:
+    // ?ask=What follow-ups are due this week?
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var ask = p.Url<AssistantLink>().Get(q => q.Ask);
+        p.When(ask).NotEmpty()
+            .Then(asked => asked.Component<FusionAIAssistView>(AssistantId).ExecutePrompt(ask));
+    }));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionAIAssistView</native-heading>
+    <native-heading level="H1">Care-plan Assistant</native-heading>
     <native-text color="Secondary">
-        Syncfusion builder owns initial chat configuration. Reactive owns runtime prompt execution,
-        response updates, scroll behavior, and typed event payloads.
+        @Model.ResidentName · @Model.Room · @Model.CareLevel. Ask the community's assistant about her care-plan
+        follow-ups; it answers from the care team's records.
     </native-text>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Runtime Commands</native-heading>
-        <native-hstack gap="Sm" class="mt-4">
-            @(Html.NativeButton("execute-prompt-btn", "Run Typed Prompt")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+        <native-hstack gap="Sm" class="mb-4 flex-wrap">
+            @(Html.NativeButton(NotesToggleId, "Open saved notes")
+                .CssClass(Button)
                 .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionAIAssistView>("care-ai").ExecutePrompt("Summarize the medication changes");
-                    p.Element("command-status").Text.Set("executePrompt called");
+                    // The notes take the conversation's place, and the button brings it back.
+                    var assistant = p.Component<FusionAIAssistView>(AssistantId);
+                    var toggle = p.Component<NativeButton>(NotesToggleId);
+                    p.When(assistant.ActiveView).Eq(0)
+                        .Then(notes =>
+                        {
+                            assistant.ActiveView.Set(1);
+                            toggle.TextContent.Set("Back to the conversation");
+                            notes.Element("conversation-actions").Hide();
+                        })
+                        .Else(conversation =>
+                        {
+                            assistant.ActiveView.Set(0);
+                            toggle.TextContent.Set("Open saved notes");
+                            conversation.Element("conversation-actions").Show();
+                        });
                 }))
-
-            @(Html.NativeButton("append-object-response-btn", "Append Object Response")
-                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
-                .Reactive(plan, evt => evt.Click, (_, p) =>
-                {
-                    p.Component<FusionAIAssistView>("care-ai").AddPromptResponseModel(new FusionAIAssistViewPromptModel { Prompt = "Care plan follow up", Response = "Schedule hydration checks and confirm the updated medication list with the nurse." }, true);
-                    p.Element("object-response-status").Text.Set("object response added");
-                }))
-
-            @(Html.NativeButton("set-prompt-btn", "Set Prompt")
-                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
-                .Reactive(plan, evt => evt.Click, (_, p) =>
-                {
-                    var assist = p.Component<FusionAIAssistView>("care-ai");
-                    assist.Prompt.Set("Prepare discharge summary");
-                    p.Element("current-prompt").Text.Set(assist.Prompt);
-                }))
-
-            @(Html.NativeButton("read-active-view-btn", "Read Active View")
-                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
-                .Reactive(plan, evt => evt.Click, (_, p) =>
-                {
-                    p.Element("active-view").Text.Set(
-                        p.Component<FusionAIAssistView>("care-ai").ActiveView);
-                }))
-
-            @(Html.NativeButton("scroll-bottom-btn", "Jump to Latest Answer")
-                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
-                .Reactive(plan, evt => evt.Click, (_, p) =>
-                    p.Component<FusionAIAssistView>("care-ai").ScrollToBottom()))
         </native-hstack>
 
-        <native-vstack gap="Xs" class="font-mono text-sm mt-4">
-            <p>Command: <span id="command-status" class="text-text-muted">-</span></p>
-            <p>Object response: <span id="object-response-status" class="text-text-muted">-</span></p>
-            <p>Current prompt: <span id="current-prompt" class="text-text-muted">-</span></p>
-            <p>Active view: <span id="active-view" class="text-text-muted">-</span></p>
-        </native-vstack>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">AIAssistView Component</native-heading>
-
-        @(Html.FusionAIAssistView(plan, "care-ai", b =>
+        @(Html.FusionAIAssistView(plan, AssistantId, b =>
         {
-            b.Height("420px");
+            b.Height("460px");
             b.Width("100%");
-            b.PromptPlaceholder("Ask about care coordination");
-            b.PromptSuggestions(new[]
+            b.ShowHeader(false);
+            b.Views(view =>
             {
-                "Summarize today notes",
-                "Draft family update",
-                "List fall-risk interventions"
+                view.Type(AssistViewType.Assist).Name("Conversation").Add();
+                view.Type(AssistViewType.Custom).Name("Notes").ViewTemplate(savedNotes).Add();
             });
-            b.PromptSuggestionsHeader("Care prompts");
-            b.ShowClearButton(true);
+            b.PromptPlaceholder("Ask about Margaret's care plan");
+            b.PromptSuggestionsHeader("Common questions");
+            b.PromptSuggestions(commonQuestions);
         })
         .Reactive(evt => evt.PromptChanged, (args, p) =>
         {
-            p.Element("prompt-changed-value").Text.Set(args.Value);
+            // A question cleared from the box is named, in case it was cleared by mistake.
+            p.When(args.Value).IsEmpty()
+                .Then(cleared =>
+                {
+                    cleared.Element("question-cleared-text").Text.Set(args.PreviousValue);
+                    cleared.Element("question-cleared").Show();
+                })
+                .Else(typed => typed.Element("question-cleared").Hide());
         })
         .Reactive(evt => evt.PromptRequest, (args, p) =>
         {
-            p.Element("request-prompt").Text.Set(args.Prompt);
-            p.Element("request-status").Text.Set("promptRequest fired");
-            // The answer comes from the care team's notes on the server.
-            p.Get(Url.SandboxRoute("Reply", "AIAssistView"))
-             .Gather<AIAssistReplyQuery>(g => g.Set(x => x.Prompt, args.Prompt))
-             .Response(r => r.OnSuccess<AIAssistReply>((reply, s) =>
-                 s.Component<FusionAIAssistView>("care-ai").AddPromptResponse(reply.Get(x => x.Answer), true)));
+            // The care team's records answer on the server, which names the common questions not asked.
+            var assistant = p.Component<FusionAIAssistView>(AssistantId);
+            p.Post(Url.SandboxRoute("Answer", "AIAssistView"))
+             .Gather<AssistantQuestion>(g => g
+                 .Set(x => x.Prompt, args.Prompt)
+                 .Set(x => x.Suggestions, args.PromptSuggestions))
+             .Response(r => r.OnSuccess<AssistantAnswer>((answer, s) =>
+                 assistant.AddPromptResponse(answer.Get(x => x.Answer), true)));
         })
         .Reactive(evt => evt.StopRespondingClick, (args, p) =>
         {
-            p.Element("stopped-prompt").Text.Set(args.Prompt);
-            p.Element("assist-stopped").Show();
+            // The stopped question goes back in the box to edit; the server stops preparing its answer.
+            p.Component<FusionAIAssistView>(AssistantId).Prompt.Set(args.Prompt);
+            p.Post(Url.SandboxRoute("StopAnswer", "AIAssistView"))
+             .Gather<StoppedAnswer>(g => g.Set(x => x.QuestionIndex, args.DataIndex))
+             .Response(r => r.OnSuccess<AssistantStatus>((stopped, s) =>
+                 s.Element("assistant-status").Text.Set(stopped.Get(x => x.Summary))));
         }))
+
+        <p id="question-cleared" hidden class="mt-2 text-sm text-text-muted">Cleared “<span id="question-cleared-text"></span>”.</p>
+
+        <native-hstack id="conversation-actions" gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("add-handoff-btn", "Add the night handoff")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    // The handoff joins the conversation once, and the conversation shows it.
+                    var assistant = p.Component<FusionAIAssistView>(AssistantId);
+                    assistant.AddPromptResponseModel(nightHandoff, true);
+                    assistant.ScrollToBottom();
+                    p.Element("add-handoff-btn").Hide();
+                }))
+            @(Html.NativeButton("ask-nurse-btn", "Ask the charge nurse instead")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    // The question typed for the assistant goes to the charge nurse, and leaves the box.
+                    var assistant = p.Component<FusionAIAssistView>(AssistantId);
+                    p.Post(Url.SandboxRoute("AskNurse", "AIAssistView"))
+                     .Gather<NurseQuestion>(g => g.Set(x => x.Question, assistant.Prompt))
+                     .Response(r => r
+                         .OnSuccess<AssistantStatus>((sent, s) =>
+                         {
+                             s.Element("assistant-status").Text.Set(sent.Get(x => x.Summary));
+                             assistant.Prompt.Set("");
+                         })
+                         .OnError<AssistantStatus>(400, (refused, e) =>
+                             e.Element("assistant-status").Text.Set(refused.Get(x => x.Summary))));
+                }))
+        </native-hstack>
+
+        <p id="assistant-status" role="status" class="mt-2 text-sm text-text-secondary"></p>
     </native-card-body></native-card>
-
-    <p id="assist-stopped" class="text-sm text-text-secondary" hidden>Stopped the answer to "<span id="stopped-prompt"></span>".</p>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Event Signals</native-heading>
-        <native-vstack gap="Xs" class="font-mono text-sm mt-4">
-            <p>Prompt changed: <span id="prompt-changed-value" class="text-text-muted">-</span></p>
-            <p>Request status: <span id="request-status" class="text-text-muted">-</span></p>
-            <p>Request prompt: <span id="request-prompt" class="text-text-muted">-</span></p>
-        </native-vstack>
-    </native-card-body></native-card>
-
 </native-vstack>
 
 @Html.RenderPlan(plan)

@@ -2,6 +2,7 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
+/// <summary>A Syncfusion DropDownButton: the button and the popup menu it opens.</summary>
 public sealed class FusionDropDownButtonLocator
 {
     private readonly IPage _page;
@@ -15,30 +16,17 @@ public sealed class FusionDropDownButtonLocator
 
     public ILocator Button => _page.Locator($"#{_componentId}");
 
+    /// <summary>The popup that holds the menu while it is open.</summary>
     public ILocator Popup => _page.Locator($"#{_componentId}-popup");
 
-    public ILocator Items => Popup.Locator("li.e-item");
-
+    /// <summary>The menu item whose text is exactly <paramref name="text"/>.</summary>
     public ILocator Item(string text) =>
         _page.Locator($"//*[@id='{_componentId}-popup']//li[contains(concat(' ', normalize-space(@class), ' '), ' e-item ') and normalize-space(.)='{text}']");
 
-    public async Task<string> ClassAttribute() =>
-        await Button.GetAttributeAsync("class") ?? string.Empty;
-
-    public async Task<string> PopupClassAttribute() =>
-        await Popup.GetAttributeAsync("class") ?? string.Empty;
-
-    public async Task<bool> HasClass(string className)
+    /// <summary>Opens the menu and chooses the item with this text.</summary>
+    public async Task Choose(string text)
     {
-        var classes = await ClassAttribute();
-        return classes.Split(' ').Contains(className);
+        await Button.ClickAsync();
+        await Item(text).ClickAsync();
     }
-
-    public async Task<bool> PopupHasClass(string className)
-    {
-        var classes = await PopupClassAttribute();
-        return classes.Split(' ').Contains(className);
-    }
-
-    public async Task<bool> IsPopupOpen() => await PopupHasClass("e-popup-open");
 }

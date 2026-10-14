@@ -78,9 +78,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Left position of the menu, in pixels.</summary>
         public ReadOnly<double> Left => ReadOnly<double>();
 
-        /// <summary>Whether the menu opens with focus.</summary>
-        public ReadOnly<bool?> IsFocused => ReadOnly<bool?>();
-
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }

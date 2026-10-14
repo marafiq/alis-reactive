@@ -1,178 +1,116 @@
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.SplitButton
 @model FusionSplitButtonModel
-@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Builders
 @using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
+@using Microsoft.AspNetCore.Mvc.Rendering
 @{
-    ViewData["Title"] = "FusionSplitButton";
+    ViewData["Title"] = "Care Note";
 
-    const string menuId = "resident-split-actions";
+    const string SaveId = "care-note-save";
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+
     var plan = Html.ReactivePlan<FusionSplitButtonModel>();
-
-    Html.On(plan, t => t.DomReady(p =>
+    var saveUrl = Url.SandboxRoute("Save", "SplitButton");
+    var kinds = new List<SelectListItem>
     {
-        var menu = p.Component<FusionSplitButton>(menuId);
-        menu.Content.Set("Ready Review");
-        menu.DataBind();
-        p.Element("content-echo").Text.Set(menu.Content);
-    }));
+        new SelectListItem("Daily care", "Daily care"),
+        new SelectListItem("Fall", "Fall"),
+        new SelectListItem("Medication change", "Medication change")
+    };
+
+    // What the coordinator sees once the chart answers: a saved note is saved again as changes, and a
+    // follow-up that is done leaves the save menu.
+    void ShowSaved(Data<CareNoteSaved> saved, PipelineBuilder<FusionSplitButtonModel> s)
+    {
+        var save = s.Component<FusionSplitButton>(SaveId);
+        s.Element("care-note-status").Text.Set(saved.Get(x => x.Message));
+        s.When(saved.Get(x => x.Saved)).Truthy().Then(t =>
+        {
+            save.Content.Set("Save changes");
+            save.RemoveItems(saved.Get(x => x.FinishedActions), true);
+        });
+    }
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionSplitButton</native-heading>
+    <native-heading level="H1">Care Note</native-heading>
+    <native-text color="Secondary">Margaret Hale, Maple 214. Write what happened, sign it, and save it to her chart.</native-text>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Primary and Secondary Actions</native-heading>
-        <native-hstack gap="Base" align="Center">
-            @(Html.FusionSplitButton(plan, menuId, b => b
-                .Content("Initial Review")
-                .CssClass("care-split-actions")
-                .Items(new[]
+        <native-vstack gap="Base">
+            @{ Html.InputField(plan, m => m.Kind, o => o.Label("About"))
+                .NativeDropDown(b => b.Items(kinds).CssClass(Field))
+                .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    new { id = "assign", text = "Assign nurse", disabled = false },
-                    new { id = "schedule", text = "Schedule visit", disabled = false },
-                    new { id = "hold", text = "Place hold", disabled = true }
-                }))
-                .Reactive(evt => evt.Click, (args, p) =>
+                    // A note about a fall marks the save button: the family hears about every fall.
+                    var save = p.Component<FusionSplitButton>(SaveId);
+                    p.When(args.Value).Eq("Fall")
+                        .Then(t => save.CssClass.Set("e-warning"))
+                        .Else(e => save.CssClass.Set("e-primary"));
+                }); }
+            @{ Html.InputField(plan, m => m.Note, o => o.Label("What happened"))
+                .NativeTextArea(b => b.Rows(4).CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.Signed, o => o.Label("I gave or saw this care myself"))
+                .NativeCheckBox(b => b.CssClass("rounded border-border"))
+                .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("primary-click-state").Text.Set("primary clicked");
-                    p.Element("command-state").Text.Set("primary clicked");
-                })
-                .Reactive(evt => evt.Select, (args, p) =>
-                {
-                    p.Element("selected-id").Text.Set(args.Item.Get(x => x.Id));
-                    p.Element("selected-text").Text.Set(args.Item.Get(x => x.Text));
-                    p.Element("selected-disabled").Text.Set(args.Item.Get(x => x.Disabled));
-                    p.When(args.Item.Get(x => x.Id)).Eq("assign")
-                        .Then(t => t.Element("selected-condition").Text.Set("assign selected"))
-                        .Else(e => e.Element("selected-condition").Text.Set("other selected"));
-                }))
-        </native-hstack>
+                    // A disabled button takes no focus: Save is enabled at once, then given the keyboard.
+                    var save = p.Component<FusionSplitButton>(SaveId);
+                    p.When(args.Checked).Truthy()
+                        .Then(t =>
+                        {
+                            save.Disabled.Set(false);
+                            save.DataBind();
+                            save.FocusIn();
+                        })
+                        .Else(e => save.Disabled.Set(true));
+                }); }
 
-        <native-hstack gap="Sm" class="mt-4 flex-wrap">
-            @(Html.NativeButton("set-content-btn", "Set Content")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var menu = p.Component<FusionSplitButton>(menuId);
-                    menu.Content.Set("Discharge Review");
-                    menu.DataBind();
-                    p.Element("content-echo").Text.Set(menu.Content);
-                    p.Element("command-state").Text.Set("content set");
-                }))
-            @(Html.NativeButton("disable-split-btn", "Disable")
-                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var menu = p.Component<FusionSplitButton>(menuId);
-                    menu.Disabled.Set(true);
-                    menu.DataBind();
-                    p.Element("disabled-echo").Text.Set(menu.Disabled);
-                    p.Element("command-state").Text.Set("disabled");
-                }))
-            @(Html.NativeButton("enable-split-btn", "Enable")
-                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var menu = p.Component<FusionSplitButton>(menuId);
-                    menu.Disabled.Set(false);
-                    menu.DataBind();
-                    p.Element("disabled-echo").Text.Set(menu.Disabled);
-                    p.Element("command-state").Text.Set("enabled");
-                }))
-            @(Html.NativeButton("set-css-btn", "Set Css")
-                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var menu = p.Component<FusionSplitButton>(menuId);
-                    menu.CssClass.Set("e-success extra-class");
-                    menu.DataBind();
-                    p.Element("css-echo").Text.Set(menu.CssClass);
-                    p.Element("command-state").Text.Set("css set");
-                }))
-            @(Html.NativeButton("toggle-split-btn", "Toggle Menu")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionSplitButton>(menuId).Toggle();
-                    p.Element("toggle-state").Text.Set("toggle called");
-                }))
-            @(Html.NativeButton("focus-split-btn", "Focus Split")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionSplitButton>(menuId).FocusIn();
-                    p.Element("focus-state").Text.Set("focus called");
-                }))
-            @(Html.NativeButton("remove-schedule-btn", "Remove Schedule")
-                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionSplitButton>(menuId).RemoveItems(new[] { "Schedule visit" }, false);
-                    p.Element("remove-state").Text.Set("schedule removed");
-                }))
-            @(Html.NativeButton("remove-hold-btn", "Remove Hold")
-                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionSplitButton>(menuId).RemoveItems(new[] { "hold" }, true);
-                    p.Element("remove-state").Text.Set("hold removed");
-                }))
-            @(Html.NativeButton("check-disabled-btn", "Check Disabled")
-                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var menu = p.Component<FusionSplitButton>(menuId);
-                    p.When(menu.Disabled).Eq(true)
-                        .Then(t => t.Element("disabled-state").Text.Set("disabled"))
-                        .Else(e => e.Element("disabled-state").Text.Set("enabled"));
-                }))
-        </native-hstack>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Gather</native-heading>
-        @(Html.NativeButton("gather-btn", "Gather SplitButton")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var menu = p.Component<FusionSplitButton>(menuId);
-                p.Post(Url.SandboxRoute("Echo", "SplitButton"))
-                    .Gather<FusionSplitButtonEchoRequest>(g => g
-                        .Set(x => x.Content, menu.Content)
-                        .Set(x => x.Disabled, menu.Disabled)
-                        .Set(x => x.CssClass, menu.CssClass))
-                    .Response(r => r.OnSuccess<FusionSplitButtonEchoResponse>((json, s) =>
+            <native-hstack gap="Base" align="Center" class="flex-wrap">
+                @(Html.FusionSplitButton(plan, SaveId, b => b
+                    .Content("Save note")
+                    .CssClass("e-primary")
+                    .Disabled(true)
+                    .Items(new[]
                     {
-                        s.Element("gather-content").Text.Set(json.Get(x => x.Content));
-                        s.Element("gather-disabled").Text.Set(json.Get(x => x.Disabled));
-                        s.Element("gather-css").Text.Set(json.Get(x => x.CssClass));
-                        s.Element("gather-summary").Text.Set(json.Get(x => x.Summary));
-                    }));
-            }))
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Trace</native-heading>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>Command: <span id="command-state" class="text-text-muted">pending</span></p>
-            <p>Content echo: <span id="content-echo" class="text-text-muted">pending</span></p>
-            <p>Disabled echo: <span id="disabled-echo" class="text-text-muted">pending</span></p>
-            <p>Css echo: <span id="css-echo" class="text-text-muted">pending</span></p>
-            <p>Toggle state: <span id="toggle-state" class="text-text-muted">pending</span></p>
-            <p>Focus state: <span id="focus-state" class="text-text-muted">pending</span></p>
-            <p>Remove state: <span id="remove-state" class="text-text-muted">pending</span></p>
-            <p>Disabled state: <span id="disabled-state" class="text-text-muted">pending</span></p>
-            <p>Primary click: <span id="primary-click-state" class="text-text-muted">pending</span></p>
-            <p>Selected id: <span id="selected-id" class="text-text-muted">pending</span></p>
-            <p>Selected text: <span id="selected-text" class="text-text-muted">pending</span></p>
-            <p>Selected disabled: <span id="selected-disabled" class="text-text-muted">pending</span></p>
-            <p>Selected condition: <span id="selected-condition" class="text-text-muted">pending</span></p>
-            <p>Gather content: <span id="gather-content" class="text-text-muted">pending</span></p>
-            <p>Gather disabled: <span id="gather-disabled" class="text-text-muted">pending</span></p>
-            <p>Gather css: <span id="gather-css" class="text-text-muted">pending</span></p>
-            <p>Gather summary: <span id="gather-summary" class="text-text-muted">pending</span></p>
+                        new { id = "notify-family", text = "Save and notify family" },
+                        new { id = "flag-nurse", text = "Save and flag for the nurse" }
+                    }))
+                    .Reactive(evt => evt.Click, (_, p) =>
+                    {
+                        // A new note about a fall is not saved quietly: the save menu opens on the family's option.
+                        var kind = p.Component<NativeDropDown>(m => m.Kind);
+                        var save = p.Component<FusionSplitButton>(SaveId);
+                        p.When(kind.Value).Eq("Fall").And(save.Content).Eq("Save note")
+                            .Then(fall =>
+                            {
+                                fall.Element("care-note-status").Text.Set("A fall is shared with the family. Choose Save and notify family.");
+                                save.Toggle();
+                            })
+                            .Else(plain => plain.Post(saveUrl)
+                                .Gather<CareNoteSave>(g => g.Form(m => m.Kind, m => m.Note).Set(x => x.Action, "save"))
+                                .Response(r => r.OnSuccess<CareNoteSaved>(ShowSaved)));
+                    })
+                    .Reactive(evt => evt.Select, (args, p) =>
+                    {
+                        p.Post(saveUrl)
+                            .Gather<CareNoteSave>(g => g.Form(m => m.Kind, m => m.Note).Set(x => x.Action, args.Item.Get(x => x.Id)))
+                            .Response(r => r.OnSuccess<CareNoteSaved>((saved, s) =>
+                            {
+                                ShowSaved(saved, s);
+                                s.When(saved.Get(x => x.Saved)).Truthy().Then(t =>
+                                {
+                                    t.Element("care-note-last-action").Text.Set(args.Item.Get(x => x.Text));
+                                    t.Element("care-note-last-action-line").Show();
+                                });
+                            }));
+                    }))
+                <p id="care-note-status" class="text-sm font-medium">Not saved yet.</p>
+            </native-hstack>
+            <p id="care-note-last-action-line" hidden class="text-xs text-text-muted">Last action: <span id="care-note-last-action"></span></p>
         </native-vstack>
     </native-card-body></native-card>
-
 </native-vstack>
 
 @Html.RenderPlan(plan)

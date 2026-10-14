@@ -69,11 +69,12 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <see cref="FusionAIAssistView.PromptRequest"/>.</summary>
+    /// <remarks>
+    /// The assistant has already shown the prompt when it raises the event, and reads nothing back from it,
+    /// so a prompt cannot be refused here.
+    /// </remarks>
     public class FusionAIAssistViewPromptRequestArgs : JsObject
     {
-        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
-
         /// <summary>The prompt the user sent.</summary>
         public ReadOnly<string> Prompt => ReadOnly<string>();
 

@@ -1,196 +1,154 @@
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ComboBox
 @model FusionComboBoxModel
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.DropDowns
 @{
-    ViewData["Title"] = "FusionComboBox";
+    ViewData["Title"] = "Medication Pass";
+
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
+    const string PrimaryButton = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+    const string TextInput = "rounded-md border border-border px-3 py-1.5 text-sm";
 
     var plan = Html.ReactivePlan<FusionComboBoxModel>();
-    var residents = (List<ComboBoxResidentItem>)ViewBag.Residents;
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        var combo = p.Component<FusionComboBox>(m => m.Resident);
-        combo.Value.Set("alice");
-        combo.DataBind();
-        p.Element("value-echo").Text.Set(combo.Value);
-        p.Element("text-echo").Text.Set(combo.Text);
-        p.Element("index-echo").Text.Set(combo.Index);
-    }));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionComboBox</native-heading>
+    <native-heading level="H1">Medication Pass</native-heading>
+    <native-text color="Secondary">Maple wing, 08:00 round, cart 2. Scan the resident's wristband, or type their last name.</native-text>
+
+    @* The page's commands sit above the resident picker, where its list cannot cover them. *@
+    <native-hstack gap="Sm" class="flex-wrap">
+        @(Html.NativeButton("start-round-btn", "Start Round")
+            .CssClass(PrimaryButton)
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+            {
+                // The round starts with the first resident on it, and says whom.
+                var resident = p.Component<FusionComboBox>(m => m.Resident);
+                resident.Index.Set(0);
+                resident.DataBind();
+                p.Element("round-first-resident").Text.Set(resident.Text);
+                p.Element("round-started").Show();
+            }))
+        <p id="round-started" hidden class="text-sm">Round started with <span id="round-first-resident" class="font-medium"></span>.</p>
+    </native-hstack>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Resident ComboBox</native-heading>
-        <native-grid cols="C2" gap="Base">
-            @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident (SF ComboBox)"))
-                .FusionComboBox(b => b
-                    .DataSource(residents)
-                    .Fields(new ComboBoxFieldSettings { Text = "text", Value = "value" })
-                    .Placeholder("Select or enter a resident")
-                    .AllowCustom(true)
-                    .PopupHeight("160px"))
-                .Reactive(evt => evt.Change, (args, p) =>
-                {
-                    p.Element("change-value").Text.Set(args.Value);
-                    p.Element("change-interacted").Text.Set(args.IsInteracted);
-                    p.When(args.Value).Eq("alice")
-                        .Then(t => t.Element("args-condition").Text.Set("alice selected"))
-                        .Else(e => e.Element("args-condition").Text.Set("other resident"));
-
-                    var combo = p.Component<FusionComboBox>(m => m.Resident);
-                    p.Element("event-text").Text.Set(combo.Text);
-                    p.When(combo.Value).NotNull()
-                        .Then(t =>
-                        {
-                            t.Element("selected-indicator").Show();
-                            t.Element("selected-indicator").Text.Set("selected");
-                        })
-                        .Else(e => e.Element("selected-indicator").Hide());
-                })
-                .Reactive(evt => evt.Focus, (args, p) =>
-                {
-                    p.Element("focus-state").Text.Set("focused");
-                })
-                .Reactive(evt => evt.Blur, (args, p) =>
-                {
-                    p.Element("blur-state").Text.Set("blurred");
-                }); }
-        </native-grid>
-
-        <native-hstack gap="Sm" class="mt-4 flex-wrap">
-            @(Html.NativeButton("set-value-btn", "Set Value")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var combo = p.Component<FusionComboBox>(m => m.Resident);
-                    combo.Value.Set("bennett");
-                    combo.DataBind();
-                    p.Element("value-echo").Text.Set(combo.Value);
-                    p.Element("text-echo").Text.Set(combo.Text);
-                    p.Element("index-echo").Text.Set(combo.Index);
-                    p.Element("command-state").Text.Set("value set");
-                }))
-            @(Html.NativeButton("set-text-btn", "Set Text")
-                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var combo = p.Component<FusionComboBox>(m => m.Resident);
-                    combo.Text.Set("Carey");
-                    combo.DataBind();
-                    p.Element("value-echo").Text.Set(combo.Value);
-                    p.Element("text-echo").Text.Set(combo.Text);
-                    p.Element("index-echo").Text.Set(combo.Index);
-                    p.Element("command-state").Text.Set("text set");
-                }))
-            @(Html.NativeButton("set-index-btn", "Set Index")
-                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var combo = p.Component<FusionComboBox>(m => m.Resident);
-                    combo.Index.Set(3);
-                    combo.DataBind();
-                    p.Element("value-echo").Text.Set(combo.Value);
-                    p.Element("text-echo").Text.Set(combo.Text);
-                    p.Element("index-echo").Text.Set(combo.Index);
-                    p.Element("command-state").Text.Set("index set");
-                }))
-            @(Html.NativeButton("show-popup-btn", "Show Popup")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionComboBox>(m => m.Resident).ShowPopup();
-                }))
-            @(Html.NativeButton("hide-popup-btn", "Hide Popup")
-                .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionComboBox>(m => m.Resident).HidePopup();
-                }))
-            @(Html.NativeButton("focus-combo-btn", "Focus")
-                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionComboBox>(m => m.Resident).FocusIn();
-                }))
-            @(Html.NativeButton("blur-combo-btn", "Blur")
-                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionComboBox>(m => m.Resident).FocusOut();
-                }))
-            @(Html.NativeButton("clear-combo-btn", "Clear")
-                .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var combo = p.Component<FusionComboBox>(m => m.Resident);
-                    combo.Clear();
-                    combo.DataBind();
-                    p.Element("command-state").Text.Set("cleared");
-                    p.Element("value-echo").Text.Set(combo.Value);
-                    p.Element("text-echo").Text.Set(combo.Text);
-                    p.When(combo.Value).NotNull()
-                        .Then(t => t.Element("selected-indicator").Show())
-                        .Else(e => e.Element("selected-indicator").Hide());
-                }))
-            @(Html.NativeButton("check-index-btn", "Check Index")
-                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var combo = p.Component<FusionComboBox>(m => m.Resident);
-                    p.When(combo.Index).Eq(3)
-                        .Then(t => t.Element("index-condition").Text.Set("index three"))
-                        .Else(e => e.Element("index-condition").Text.Set("other index"));
-                }))
+        <native-hstack gap="Sm" class="flex-wrap">
+            <p class="text-sm text-red-700">Okafor, Grace's 07:30 insulin is overdue.</p>
+            @(Html.NativeButton("open-overdue-btn", "Open Okafor, Grace")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                    p.Component<FusionComboBox>(m => m.Resident).Text.Set("Okafor, Grace")))
         </native-hstack>
     </native-card-body></native-card>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">Gather</native-heading>
-        @(Html.NativeButton("gather-btn", "Gather ComboBox")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var combo = p.Component<FusionComboBox>(m => m.Resident);
-                p.Post(Url.SandboxRoute("Echo", "ComboBox"))
-                    .Gather<FusionComboBoxEchoRequest>(g => g
-                        .Set(x => x.Value, combo.Value)
-                        .Set(x => x.Text, combo.Text)
-                        .Set(x => x.Index, combo.Index))
-                    .Response(r => r.OnSuccess<FusionComboBoxEchoResponse>((json, s) =>
+    <native-grid cols="C2" gap="Lg">
+        <native-card><native-card-body>
+            <native-vstack gap="Base">
+                @{ Html.InputField(plan, m => m.Wristband, o => o.Label("Wristband"))
+                    .NativeTextBox(b => b.CssClass(TextInput).Placeholder("Scan the wristband"))
+                    .Reactive(evt => evt.Change, (args, p) =>
                     {
-                        s.Element("gather-value").Text.Set(json.Get(x => x.Value));
-                        s.Element("gather-text").Text.Set(json.Get(x => x.Text));
-                        s.Element("gather-index").Text.Set(json.Get(x => x.Index));
-                        s.Element("gather-summary").Text.Set(json.Get(x => x.Summary));
-                    }));
-            }))
-    </native-card-body></native-card>
+                        // The scanner reads the resident's id; a wristband from another round picks nobody.
+                        var resident = p.Component<FusionComboBox>(m => m.Resident);
+                        resident.Value.Set(args.Value);
+                        resident.DataBind();
+                        p.When(resident.Value).IsEmpty()
+                            .Then(unknown => unknown.Element("wristband-unknown").Show())
+                            .Else(known => known.Element("wristband-unknown").Hide());
+                    }); }
+                <p id="wristband-unknown" hidden class="text-sm text-red-700">That wristband is not on the 08:00 round.</p>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">Trace</native-heading>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>Command: <span id="command-state" class="text-text-muted">pending</span></p>
-            <p>Value echo: <span id="value-echo" class="text-text-muted">pending</span></p>
-            <p>Text echo: <span id="text-echo" class="text-text-muted">pending</span></p>
-            <p>Index echo: <span id="index-echo" class="text-text-muted">pending</span></p>
-            <p>Change value: <span id="change-value" class="text-text-muted">pending</span></p>
-            <p>Change interacted: <span id="change-interacted" class="text-text-muted">pending</span></p>
-            <p>Event text: <span id="event-text" class="text-text-muted">pending</span></p>
-            <p>Args condition: <span id="args-condition" class="text-text-muted">pending</span></p>
-            <p>Selected: <span id="selected-indicator" hidden class="text-emerald-600">pending</span></p>
-            <p>Focus state: <span id="focus-state" class="text-text-muted">pending</span></p>
-            <p>Blur state: <span id="blur-state" class="text-text-muted">pending</span></p>
-            <p>Index condition: <span id="index-condition" class="text-text-muted">pending</span></p>
-            <p>Gather value: <span id="gather-value" class="text-text-muted">pending</span></p>
-            <p>Gather text: <span id="gather-text" class="text-text-muted">pending</span></p>
-            <p>Gather index: <span id="gather-index" class="text-text-muted">pending</span></p>
-            <p>Gather summary: <span id="gather-summary" class="text-text-muted">pending</span></p>
-        </native-vstack>
-    </native-card-body></native-card>
+                @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident"))
+                    .FusionComboBox(b => b
+                        .DataSource(Model.Round)
+                        .Fields<RoundResident>(r => r.Name, r => r.Id)
+                        .AllowCustom(false)
+                        .Placeholder("Type a last name")
+                        .PopupHeight("220px"))
+                    .Reactive(evt => evt.Focus, (_, p) => p.Component<FusionComboBox>(m => m.Resident).ShowPopup())
+                    .Reactive(evt => evt.Blur, (_, p) =>
+                    {
+                        p.When(p.Component<FusionComboBox>(m => m.Resident).Value).IsEmpty()
+                            .Then(none => none.Element("resident-missing").Show())
+                            .Else(chosen => chosen.Element("resident-missing").Hide());
+                    })
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.When(args.Value).IsEmpty()
+                            .Then(cleared =>
+                            {
+                                // Clearing the resident closes the list and takes their chart down.
+                                cleared.Component<FusionComboBox>(m => m.Resident).HidePopup();
+                                cleared.Element("resident-chart").Hide();
+                                cleared.Element("check-wristband").Hide();
+                                cleared.Element("chart-empty").Show();
+                            })
+                            .Else(chosen =>
+                            {
+                                chosen.Element("resident-missing").Hide();
+                                chosen.Get(Url.SandboxRoute("Chart", "ComboBox"))
+                                    .Gather<DoseCheckQuery>(g => g.Set(x => x.ResidentId, args.Value))
+                                    .Response(r => r.OnSuccess<DoseCheck>((chart, s) =>
+                                    {
+                                        s.Element("resident-room").Text.Set(chart.Get(x => x.Room));
+                                        s.Element("resident-allergies").Text.Set(chart.Get(x => x.Allergies));
+                                        s.Element("chart-empty").Hide();
+                                        s.Element("resident-chart").Show();
+                                        // A resident chosen by name is checked against their wristband before the
+                                        // first dose, and the keyboard goes away so the chart shows.
+                                        s.When(args.IsInteracted).Truthy()
+                                            .Then(byName =>
+                                            {
+                                                byName.Element("check-wristband").Show();
+                                                byName.Component<FusionComboBox>(m => m.Resident).FocusOut();
+                                            })
+                                            .Else(scanned => scanned.Element("check-wristband").Hide());
+                                    }));
+                            });
+                    }); }
+                <p id="resident-missing" hidden class="text-sm text-text-muted">No resident chosen. Scan a wristband or type a last name.</p>
+                <p id="check-wristband" hidden class="text-sm text-amber-700">Chosen by name: check the wristband before the first dose.</p>
+            </native-vstack>
+        </native-card-body></native-card>
 
+        <native-card><native-card-body>
+            <native-vstack gap="Base">
+                <native-heading level="H2">Chart</native-heading>
+                <p id="chart-empty" class="text-sm text-text-muted">Choose a resident to see their room and allergies.</p>
+                <div id="resident-chart" hidden>
+                    <dl class="grid grid-cols-2 gap-2 text-sm">
+                        <dt class="text-text-muted">Room</dt>
+                        <dd id="resident-room" class="font-medium"></dd>
+                        <dt class="text-text-muted">Allergies</dt>
+                        <dd id="resident-allergies" class="font-medium"></dd>
+                    </dl>
+                </div>
+                @(Html.NativeButton("record-pass-btn", "Record 08:00 Medications Given")
+                    .CssClass(PrimaryButton)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
+                    {
+                        var resident = p.Component<FusionComboBox>(m => m.Resident);
+                        p.When(resident.Value).IsEmpty()
+                            .Then(none => none.Element("pass-status").Text.Set("Choose a resident before recording medications."))
+                            .Else(chosen => chosen.Post(Url.SandboxRoute("Record", "ComboBox"))
+                                .Gather<MedicationPassRecord>(g => g
+                                    .Form(m => m.Resident)
+                                    .Set(x => x.RoundPosition, resident.Index))
+                                .Response(r => r.OnSuccess<MedicationPassStatus>((recorded, s) =>
+                                {
+                                    // The dose is on the record: the picker empties and opens for the next resident.
+                                    s.Element("pass-status").Text.Set(recorded.Get(x => x.Message));
+                                    resident.Clear();
+                                    resident.DataBind();
+                                    resident.FocusIn();
+                                })));
+                    }))
+                <p id="pass-status" class="text-sm">No medications recorded yet this round.</p>
+            </native-vstack>
+        </native-card-body></native-card>
+    </native-grid>
 </native-vstack>
 
 @Html.RenderPlan(plan)
