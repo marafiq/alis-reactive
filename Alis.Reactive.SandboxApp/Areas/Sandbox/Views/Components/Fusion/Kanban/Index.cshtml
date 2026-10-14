@@ -16,7 +16,7 @@
     var plan = Html.ReactivePlan<MaintenanceBoardModel>();
 
     // The work order members the board reads, named by the work order's own members.
-    var id = Field.Of((WorkOrder w) => w.Id).Name;
+    var number = Field.Of((WorkOrder w) => w.Number).Name;
     var status = Field.Of((WorkOrder w) => w.Status).Name;
     var wing = Field.Of((WorkOrder w) => w.Wing).Name;
     var wingName = Field.Of((WorkOrder w) => w.WingName).Name;
@@ -143,7 +143,7 @@
                 b.KeyField(status);
                 b.DataSource(new List<WorkOrder>());
                 b.AllowDragAndDrop(true);
-                b.CardSettings(new KanbanCardSettings { HeaderField = id, ContentField = summary, Template = workOrderCard });
+                b.CardSettings(new KanbanCardSettings { HeaderField = number, ContentField = summary, Template = workOrderCard });
                 // Each column is a line: the work-order system keeps the place of every work order in it.
                 b.SortSettings(new KanbanSortSettings { SortBy = SortOrderBy.Custom, Field = queue });
                 b.SwimlaneSettings(new KanbanSwimlaneSettings { KeyField = wing, TextField = wingName, ShowItemCount = false });
@@ -151,7 +151,7 @@
                 {
                     Fields = new List<object>
                     {
-                        new { key = id, text = "Work order", type = "TextBox" },
+                        new { key = number, text = "Work order", type = "TextBox" },
                         new { key = status, text = "Status", type = "DropDown" },
                         new { key = wing, text = "Wing", type = "DropDown" },
                         new { key = room, text = "Room", type = "TextBox" },
@@ -190,8 +190,8 @@
                 p.Element("work-order-room").Text.Set(args.Data.Get(w => w.Room));
                 p.Element("work-order-technician").Text.Set(args.Data.Get(w => w.Technician));
                 p.Element("work-order-details").Show();
-                p.Get(Url.SandboxRouteTemplate("History", "Kanban", "workOrderId"))
-                 .Gather<WorkOrderLookup>(g => g.Set(x => x.WorkOrderId, args.Data.Get(w => w.Id)))
+                p.Get(Url.SandboxRouteTemplate("History", "Kanban", "workOrderNumber"))
+                 .Gather<WorkOrderLookup>(g => g.Set(x => x.WorkOrderNumber, args.Data.Get(w => w.Number)))
                  .Response(r => r.OnSuccess<WorkOrderHistory>((json, s) =>
                      s.Element("work-order-history").Text.Set(json.Get(x => x.History))));
             })
@@ -296,8 +296,8 @@
                     // A work order another technician is updating closes again and says who has it.
                     .ElseIf(args.RequestType).Eq(BoardRequestType.EditDialog)
                     .Then(t =>
-                        t.Get(Url.SandboxRouteTemplate("Hold", "Kanban", "workOrderId"))
-                         .Gather<WorkOrderLookup>(g => g.Set(x => x.WorkOrderId, args.Data.Get(w => w.Id)))
+                        t.Get(Url.SandboxRouteTemplate("Hold", "Kanban", "workOrderNumber"))
+                         .Gather<WorkOrderLookup>(g => g.Set(x => x.WorkOrderNumber, args.Data.Get(w => w.Number)))
                          .Response(r => r.OnSuccess<WorkOrderHold>((hold, s) =>
                              s.When(hold.Get(x => x.HeldBy)).NotEmpty()
                                  .Then(held =>

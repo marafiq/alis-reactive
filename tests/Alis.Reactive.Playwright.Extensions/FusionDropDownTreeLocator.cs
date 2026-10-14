@@ -3,8 +3,9 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// A Syncfusion DropDownTree: the input <c>#{componentId}</c> that shows the chosen node's text, the popup
-/// <c>#{componentId}_options</c> it opens, and the tree <c>#{componentId}_tree</c> inside it.
+/// A Syncfusion DropDownTree: the input <c>#{componentId}</c> that shows the chosen node's text, the box
+/// around it a user clicks, the popup <c>#{componentId}_options</c> it opens, and the tree
+/// <c>#{componentId}_tree</c> inside it.
 /// </summary>
 public sealed class FusionDropDownTreeLocator
 {
@@ -19,6 +20,13 @@ public sealed class FusionDropDownTreeLocator
 
     public ILocator Input => _page.Locator($"#{_componentId}");
 
+    /// <summary>
+    /// The input group around the input: the box a pointer lands on, since the theme lets the pointer pass
+    /// through the input (<c>.e-ddt .e-dropdowntree { pointer-events: none }</c>), and the element whose
+    /// mouseup opens and closes the tree.
+    /// </summary>
+    public ILocator Wrapper => Input.Locator("xpath=..");
+
     /// <summary>The popup; it exists only once the tree has opened.</summary>
     public ILocator Popup => _page.Locator($"#{_componentId}_options");
 
@@ -27,10 +35,10 @@ public sealed class FusionDropDownTreeLocator
     public ILocator TreeItemText(string text) =>
         Tree.Locator(".e-list-text").GetByText(text, new() { Exact = true });
 
-    /// <summary>Clicks the input, which opens the closed tree, and waits for the popup.</summary>
+    /// <summary>Clicks the box, which opens the closed tree, and waits for the popup.</summary>
     public async Task Open(int timeoutMs = 15000)
     {
-        await Input.ClickWhenStableAsync(_page, timeoutMs);
+        await Wrapper.ClickWhenStableAsync(_page, timeoutMs);
         await Popup.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = timeoutMs });
     }
 

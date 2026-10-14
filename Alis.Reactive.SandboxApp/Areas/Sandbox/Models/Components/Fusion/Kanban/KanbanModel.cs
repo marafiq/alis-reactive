@@ -55,7 +55,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Kanban
     /// <summary>A work order: what is wrong, in which room, who fixes it, and its place in its column's line.</summary>
     public sealed record WorkOrder
     {
-        public int Id { get; init; }
+        /// <summary>
+        /// The number the work-order system gives it, the board's key for it. It is not named <c>Id</c>: the card
+        /// dialog names each field's input by its member, and an input named <c>id</c> hides the dialog form's own
+        /// <c>id</c>, which EJ2 looks the form up by before it saves (ej2-kanban dialog.js:334-335), so Save would
+        /// do nothing.
+        /// </summary>
+        public int Number { get; init; }
         public string Status { get; init; } = WorkOrderStatus.Open;
         public string Summary { get; init; } = "";
         public string Room { get; init; } = "";
@@ -105,7 +111,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Kanban
     /// <summary>One work order, by the number in the path.</summary>
     public sealed class WorkOrderLookup
     {
-        public int WorkOrderId { get; init; }
+        public int WorkOrderNumber { get; init; }
     }
 
     public sealed class WorkOrderHistory

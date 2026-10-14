@@ -237,6 +237,8 @@ public class WhenUsingFusionContextMenu : PlaywrightTestBase
     {
         await NavigateAndBoot();
         await StartTheHandover();
+        // Where the card is when the nurse clicks: the handover note that opens above the board then moves it down.
+        var card = await ArthursCard.BoundingBoxAsync();
 
         await RightClickArthur();
 
@@ -244,7 +246,6 @@ public class WhenUsingFusionContextMenu : PlaywrightTestBase
         await Expect(ArthursMenu.Root).ToBeHiddenAsync();
         await Expect(HandoverNote).ToHaveTextAsync("3 actions for Arthur Bell wait until the handover ends.");
         // The click lands inside the card's 1px border; EJ2 opens the menu one pixel past the pointer.
-        var card = await ArthursCard.BoundingBoxAsync();
         var menu = await HandoverMenu.Root.BoundingBoxAsync();
         Assert.That(menu!.X, Is.EqualTo(card!.X + ClickX + 1).Within(3), "the menu's left edge sits at the click");
         Assert.That(menu.Y, Is.EqualTo(card.Y + ClickY + 1).Within(3), "the menu's top edge sits at the click");

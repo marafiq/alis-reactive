@@ -15,19 +15,19 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         // Each browser keeps its own work orders in its session, seeded on first read, so one test's
         // changes are never another's.
         private const string BoardKey = "maintenanceBoard";
-        private const string NextIdKey = "maintenanceNextWorkOrderId";
+        private const string NextNumberKey = "maintenanceNextWorkOrderNumber";
         private const string FrontDeskCallTakenKey = "maintenanceFrontDeskCallTaken";
         private const string BrakeCableArrivedKey = "maintenanceBrakeCableArrived";
-        private const int FirstNewWorkOrderId = 110;
+        private const int FirstNewWorkOrderNumber = 110;
 
         // Walter Finch's wheelchair waits on a brake cable that is back-ordered until Friday.
-        private const int WheelchairWorkOrderId = 101;
+        private const int WheelchairWorkOrder = 101;
 
         // Ana Ruiz is updating the call light work order at her desk.
-        private const int HeldWorkOrderId = 102;
+        private const int HeldWorkOrder = 102;
 
         // The family in Birch 106 withdrew the faucet request this morning; the board does not know yet.
-        private const int WithdrawnWorkOrderId = 105;
+        private const int WithdrawnWorkOrder = 105;
 
         [HttpGet("")]
         [HttpGet("Index")]
@@ -56,16 +56,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             };
         }
 
-        [HttpGet("History/{workOrderId:int}")]
-        public IActionResult History(int workOrderId)
+        [HttpGet("History/{workOrderNumber:int}")]
+        public IActionResult History(int workOrderNumber)
         {
-            return Ok(new WorkOrderHistory { History = HistoryOf(workOrderId) });
+            return Ok(new WorkOrderHistory { History = HistoryOf(workOrderNumber) });
         }
 
-        [HttpGet("Hold/{workOrderId:int}")]
-        public IActionResult Hold(int workOrderId)
+        [HttpGet("Hold/{workOrderNumber:int}")]
+        public IActionResult Hold(int workOrderNumber)
         {
-            return Ok(workOrderId == HeldWorkOrderId
+            return Ok(workOrderNumber == HeldWorkOrder
                 ? new WorkOrderHold { HeldBy = "Ana Ruiz", Message = "Ana Ruiz is updating this work order; try again when she is done." }
                 : new WorkOrderHold());
         }
@@ -78,7 +78,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             {
                 WorkOrder = new WorkOrder
                 {
-                    Id = TakeNextId(),
+                    Number = TakeNextNumber(),
                     Status = WorkOrderStatus.Open,
                     Wing = MaintenanceWing.Maple,
                     WingName = WingNameOf(MaintenanceWing.Maple)
@@ -98,7 +98,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             {
                 WorkOrder = new WorkOrder
                 {
-                    Id = TakeNextId(),
+                    Number = TakeNextNumber(),
                     Status = WorkOrderStatus.Open,
                     Summary = "Toilet running nonstop",
                     Room = "Birch 110",
@@ -115,12 +115,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         public IActionResult PartArrived()
         {
             HttpContext.Session.SetString(BrakeCableArrivedKey, "arrived");
-            var wheelchair = LoadBoard().Single(workOrder => workOrder.Id == WheelchairWorkOrderId);
+            var wheelchair = LoadBoard().Single(workOrder => workOrder.Number == WheelchairWorkOrder);
             return Ok(new PartArrival { WorkOrder = wheelchair with { Status = WorkOrderStatus.InProgress } });
         }
 
         [HttpPost("WorkLists")]
-        public IActionResult SendWorkLists([FromBody] WorkLists lists)
+        public IActionResult WorkLists([FromBody] WorkLists lists)
         {
             return Ok(new WorkListsSent
             {
@@ -142,7 +142,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Ok(new MaintenanceBoard
             {
                 WorkOrders = [.. board],
-                Message = $"Added work order {first.Id}, {first.Summary}, to {ColumnName(first.Status)}."
+                Message = $"Added work order {first.Number}, {first.Summary}, to {ColumnName(first.Status)}."
             });
         }
 
@@ -153,11 +153,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
             var board = LoadBoard();
             var changed = change.ChangedRecords[0];
-            var existing = board.SingleOrDefault(workOrder => workOrder.Id == changed.Id);
+            var existing = board.SingleOrDefault(workOrder => workOrder.Number == changed.Number);
             if (existing == null)
-                return Conflict(new WorkOrderRefusal { Message = $"Work order {changed.Id} is no longer on the board." });
+                return Conflict(new WorkOrderRefusal { Message = $"Work order {changed.Number} is no longer on the board." });
 
-            if (existing.Id == WithdrawnWorkOrderId)
+            if (existing.Number == WithdrawnWorkOrder)
                 return Conflict(new WorkOrderRefusal
                 {
                     Message = "The family in Birch 106 withdrew the faucet request this morning, so the work order stays where it was."
@@ -194,8 +194,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             {
                 WorkOrders = [.. board],
                 Message = moved
-                    ? $"Moved work order {updated.Id}, {updated.Summary}, to {ColumnName(updated.Status)}."
-                    : $"Saved work order {updated.Id}: {updated.Summary}."
+                    ? $"Moved work order {updated.Number}, {updated.Summary}, to {ColumnName(updated.Status)}."
+                    : $"Saved work order {updated.Number}: {updated.Summary}."
             });
         }
 
@@ -206,10 +206,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
             var unsigned = change.DeletedRecords.FirstOrDefault(workOrder => !workOrder.SignedOff);
             if (unsigned != null)
-                return Conflict(new WorkOrderRefusal { Message = $"Work order {unsigned.Id} has no sign-off yet, so nothing was filed away." });
+                return Conflict(new WorkOrderRefusal { Message = $"Work order {unsigned.Number} has no sign-off yet, so nothing was filed away." });
 
-            var filed = change.DeletedRecords.Select(workOrder => workOrder.Id).ToHashSet();
-            var board = LoadBoard().Where(workOrder => !filed.Contains(workOrder.Id)).ToList();
+            var filed = change.DeletedRecords.Select(workOrder => workOrder.Number).ToHashSet();
+            var board = LoadBoard().Where(workOrder => !filed.Contains(workOrder.Number)).ToList();
             SaveBoard(board);
 
             return Ok(new MaintenanceBoard
@@ -221,7 +221,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         // Starting the wheelchair repair before the brake cable arrives parks it in the Blocked column.
         private bool WaitsForItsPart(WorkOrder existing, WorkOrder changed) =>
-            existing.Id == WheelchairWorkOrderId
+            existing.Number == WheelchairWorkOrder
             && existing.Status == WorkOrderStatus.Open
             && changed.Status == WorkOrderStatus.InProgress
             && HttpContext.Session.GetString(BrakeCableArrivedKey) == null;
@@ -230,7 +230,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         // and numbers that line from 0.
         private static List<WorkOrder> PlaceInLine(List<WorkOrder> board, WorkOrder workOrder, int? place)
         {
-            var others = board.Where(other => other.Id != workOrder.Id).ToList();
+            var others = board.Where(other => other.Number != workOrder.Number).ToList();
             bool InLine(WorkOrder other) => other.Status == workOrder.Status && other.Wing == workOrder.Wing;
 
             var line = others.Where(InLine).OrderBy(other => other.Queue).ToList();
@@ -252,7 +252,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         private static string WingNameOf(string wing) => $"{wing} wing";
 
-        private static string HistoryOf(int workOrderId) => workOrderId switch
+        private static string HistoryOf(int workOrderNumber) => workOrderNumber switch
         {
             101 => "Walter Finch's daughter reported it Monday; Dev Patel took it Monday afternoon.",
             102 => "The night nurse reported it at 2 a.m.; Dev Patel took it at the morning huddle.",
@@ -270,10 +270,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private void SaveBoard(List<WorkOrder> board) =>
             HttpContext.Session.SetString(BoardKey, JsonSerializer.Serialize(board));
 
-        private int TakeNextId()
+        private int TakeNextNumber()
         {
-            var next = HttpContext.Session.GetInt32(NextIdKey) ?? FirstNewWorkOrderId;
-            HttpContext.Session.SetInt32(NextIdKey, next + 1);
+            var next = HttpContext.Session.GetInt32(NextNumberKey) ?? FirstNewWorkOrderNumber;
+            HttpContext.Session.SetInt32(NextNumberKey, next + 1);
             return next;
         }
 
@@ -291,10 +291,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             Seed(107, WorkOrderStatus.Done, 1, "Hang new curtains", "Birch 101", MaintenanceWing.Birch, WorkOrderPriority.Routine, "Ana Ruiz") with { SignedOff = true, FinishedToday = true }
         ];
 
-        private static WorkOrder Seed(int id, string status, int queue, string summary, string room, string wing, string priority, string technician) =>
+        private static WorkOrder Seed(int number, string status, int queue, string summary, string room, string wing, string priority, string technician) =>
             new()
             {
-                Id = id,
+                Number = number,
                 Status = status,
                 Queue = queue,
                 Summary = summary,

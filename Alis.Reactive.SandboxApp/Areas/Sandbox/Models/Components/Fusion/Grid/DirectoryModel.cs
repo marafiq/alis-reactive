@@ -35,17 +35,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string PrimaryNurse { get; set; } = "";
     }
 
-    /// <summary>The residents who share a value of a grouped column, as the grid draws a group.</summary>
-    public class DirectoryGroup
-    {
-        public string Key { get; set; } = "";
-        public int Count { get; set; }
-        public string Field { get; set; } = "";
-
-        /// <summary>The group's residents, or the groups of the next grouped column.</summary>
-        public List<object> Items { get; set; } = new();
-    }
-
     /// <summary>
     /// What the grid asks for: the page, the sort, the filters, the search and the grouping it shows, and
     /// the change that made it ask.
@@ -76,8 +65,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     /// <summary>The residents the grid shows, how many match, and what the last change did.</summary>
     public class DirectoryResults
     {
-        /// <summary>The residents of the page, or every matching resident in groups.</summary>
-        public List<object> Result { get; set; } = new();
+        /// <summary>The residents of the page or, when grouped, every matching resident; the grid draws the groups.</summary>
+        public List<DirectoryResident> Result { get; set; } = new();
         public int Count { get; set; }
         public string Summary { get; set; } = "";
         public string Change { get; set; } = "";

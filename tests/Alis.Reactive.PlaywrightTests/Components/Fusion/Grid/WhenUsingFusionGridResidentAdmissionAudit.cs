@@ -1,3 +1,5 @@
+using Alis.Reactive.Playwright.Extensions;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
 /// <summary>
@@ -20,10 +22,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 public class WhenUsingFusionGridResidentAdmissionAudit : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/ResidentAdmissionAudit";
-    private const string GridId = "move-in-roster";
 
-    private ILocator Roster => Page.Locator($"#{GridId} .e-content");
-    private ILocator Rows => Page.Locator($"#{GridId} .e-row");
+    private FusionGridLocator Roster => new(Page, "move-in-roster");
     private ILocator LastChange => Page.Locator("#roster-change");
     private ILocator Refused => Page.Locator("#move-in-refused");
     private ILocator MoveInZara => Page.Locator("#move-in-9101");
@@ -33,7 +33,7 @@ public class WhenUsingFusionGridResidentAdmissionAudit : PlaywrightTestBase
     private async Task NavigateAndBoot()
     {
         await NavigateToAndWaitForBoot(Path);
-        await Expect(Rows).ToHaveCountAsync(6, new() { Timeout = 10000 });
+        await Expect(Roster.Rows).ToHaveCountAsync(6, new() { Timeout = 10000 });
     }
 
     [Test]
@@ -43,8 +43,8 @@ public class WhenUsingFusionGridResidentAdmissionAudit : PlaywrightTestBase
 
         await ClickWhenStable(MoveInZara);
 
-        await Expect(Rows).ToHaveCountAsync(7, new() { Timeout = 10000 });
-        await Expect(Rows.First).ToContainTextAsync("Zara Ahmed");
+        await Expect(Roster.Rows).ToHaveCountAsync(7, new() { Timeout = 10000 });
+        await Expect(Roster.Rows.First).ToContainTextAsync("Zara Ahmed");
         await Expect(LastChange).ToHaveTextAsync("Last change: Zara Ahmed moved in.", new() { Timeout = 10000 });
         await Expect(Refused).ToBeHiddenAsync();
         AssertNoConsoleErrors();
@@ -59,8 +59,8 @@ public class WhenUsingFusionGridResidentAdmissionAudit : PlaywrightTestBase
 
         await Expect(Refused).ToHaveTextAsync(
             "Walter Price cannot move in until the residency agreement is signed.", new() { Timeout = 10000 });
-        await Expect(Roster).Not.ToContainTextAsync("Walter Price");
-        await Expect(Rows).ToHaveCountAsync(6);
+        await Expect(Roster.Row("Walter Price")).ToHaveCountAsync(0);
+        await Expect(Roster.Rows).ToHaveCountAsync(6);
         await Expect(LastChange).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
@@ -76,7 +76,7 @@ public class WhenUsingFusionGridResidentAdmissionAudit : PlaywrightTestBase
 
         await Expect(LastChange).ToHaveTextAsync("Last change: Zara Ahmed moved in.", new() { Timeout = 10000 });
         await Expect(Refused).ToBeHiddenAsync();
-        await Expect(Roster).Not.ToContainTextAsync("Walter Price");
+        await Expect(Roster.Row("Walter Price")).ToHaveCountAsync(0);
         AssertNoConsoleErrors();
     }
 
@@ -91,9 +91,9 @@ public class WhenUsingFusionGridResidentAdmissionAudit : PlaywrightTestBase
         await ClickWhenStable(MoveOutHenry);
 
         await Expect(LastChange).ToHaveTextAsync("Last change: Henry Liu moved out.", new() { Timeout = 10000 });
-        await Expect(Roster).Not.ToContainTextAsync("Henry Liu");
-        await Expect(Roster).ToContainTextAsync("Zara Ahmed");
-        await Expect(Rows).ToHaveCountAsync(6);
+        await Expect(Roster.Row("Henry Liu")).ToHaveCountAsync(0);
+        await Expect(Roster.Row("Zara Ahmed")).ToHaveCountAsync(1);
+        await Expect(Roster.Rows).ToHaveCountAsync(6);
         AssertNoConsoleErrors();
     }
 }

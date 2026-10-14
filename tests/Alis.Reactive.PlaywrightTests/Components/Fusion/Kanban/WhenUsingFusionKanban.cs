@@ -355,7 +355,7 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
         await ClickWhenStable(NewWorkOrder);
 
         await Expect(Board.Dialog).ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Expect(DialogInput(w => w.Id)).ToHaveValueAsync("110");
+        await Expect(DialogInput(w => w.Number)).ToHaveValueAsync("110");
         await DialogInput(w => w.Room).FillAsync("Maple 220");
         await DialogInput(w => w.Summary).FillAsync("Door sticks at the threshold");
         await ClickWhenStable(Board.DialogButton("Save"));

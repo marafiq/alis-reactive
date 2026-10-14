@@ -84,19 +84,21 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 throw new ArgumentException("The grid asked for pages of no residents.");
 
             var matching = DirectorySorted(DirectorySearched(DirectoryFiltered(DirectoryOnFile, query.Where), query.Search), query.Sorted)
+                .Select(ToDirectoryResident)
                 .ToList();
             var total = matching.Count;
             var results = new DirectoryResults { Count = total, Change = DirectoryChange(query, total) };
 
+            // A grouped directory shows every matching resident; the grid draws the groups from them.
             if (query.Group.Count > 0)
             {
-                results.Result = DirectoryGrouped(matching, query.Group, 0);
+                results.Result = matching;
                 results.Summary = $"Showing all {total} {DirectoryResidentNoun(total)}.";
                 return results;
             }
 
             var page = matching.Skip(query.Skip).Take(query.Take).ToList();
-            results.Result = page.Select(ToDirectoryResident).Cast<object>().ToList();
+            results.Result = page;
             results.Summary = DirectorySummary(query, total, page.Count);
             return results;
         }
@@ -228,24 +230,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return ordered == null ? residents.OrderBy(bySurname, StringComparer.Ordinal) : ordered.ThenBy(bySurname, StringComparer.Ordinal);
         }
 
-        private static List<object> DirectoryGrouped(IReadOnlyList<DirectoryEntry> residents, IReadOnlyList<string> fields, int level)
-        {
-            if (level == fields.Count)
-                return residents.Select(ToDirectoryResident).Cast<object>().ToList();
-
-            var column = DirectoryColumnOf(fields[level]);
-            return residents
-                .GroupBy(column.Text)
-                .Select(group => (object)new DirectoryGroup
-                {
-                    Key = group.Key,
-                    Count = group.Count(),
-                    Field = column.Field,
-                    Items = DirectoryGrouped(group.ToList(), fields, level + 1)
-                })
-                .ToList();
-        }
-
         private static List<DirectorySurnameTab> DirectorySurnameTabs()
         {
             var surnames = DirectoryOnFile.OrderBy(DirectoryColumnOf(Field.Of((DirectoryResident r) => r.ResidentName).Name).SortKey, StringComparer.Ordinal)
@@ -261,9 +245,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         private static DirectoryColumn DirectoryColumnOf(string field) =>
-            DirectoryColumns.TryGetValue(field, out var column)
-                ? column
-                : throw new ArgumentException($"The directory has no column '{field}'.");
+            Array.Find(DirectoryColumns, column => column.Field == field)
+                ?? throw new ArgumentException($"The directory has no column '{field}'.");
 
         private static string DirectoryFirstNameFirst(string surnameFirst)
         {
@@ -317,7 +300,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         private static readonly string[] DirectoryRiskOrder = { "Low", "Moderate", "High" };
 
-        private static readonly Dictionary<string, DirectoryColumn> DirectoryColumns = new DirectoryColumn[]
+        private static readonly DirectoryColumn[] DirectoryColumns =
         {
             new(Field.Of((DirectoryResident r) => r.ResidentId).Name, "resident number", r => r.ResidentId.ToString(), r => r.ResidentId.ToString("D5"), true),
             new(Field.Of((DirectoryResident r) => r.ResidentName).Name, "name", r => r.ResidentName, r => DirectoryWithoutAccents(r.ResidentName).ToUpperInvariant(), false),
@@ -328,7 +311,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             new(Field.Of((DirectoryResident r) => r.RiskLevel).Name, "risk", r => r.RiskLevel, r => Array.IndexOf(DirectoryRiskOrder, r.RiskLevel).ToString(), true),
             new(Field.Of((DirectoryResident r) => r.OpenTasks).Name, "open tasks", r => r.OpenTasks.ToString(), r => r.OpenTasks.ToString("D2"), true),
             new(Field.Of((DirectoryResident r) => r.PrimaryNurse).Name, "primary nurse", r => r.PrimaryNurse, r => r.PrimaryNurse, false)
-        }.ToDictionary(column => column.Field);
+        };
 
         // Surname order. Care level follows the row, a wing holds four rows in turn, risk follows pairs of rows.
         private static readonly DirectoryEntry[] DirectoryOnFile = new[]

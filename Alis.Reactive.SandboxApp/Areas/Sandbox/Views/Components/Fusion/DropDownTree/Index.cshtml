@@ -22,6 +22,7 @@
 
     <native-card><native-card-body id="@FormId">
         <native-grid cols="C2" gap="Lg">
+            @* The plan's list opens below it, or over the fields above it when the window has no room below. *@
             <native-vstack gap="Base">
                 @{ Html.InputField(plan, m => m.Resident, o => o.Required().Label("Moving in"))
                     .NativeDropDown(b => b.Items(residents).Placeholder("-- Choose a resident --").CssClass(InputCss))
@@ -51,28 +52,6 @@
                                             none.Element("no-deposit").Show();
                                         })));
                         });
-                    }); }
-
-                @{ Html.InputField(plan, m => m.RoomNumber, o => o.Label("Room number"))
-                    .NativeTextBox(b => b.CssClass(InputCss).Placeholder("Oak 110"))
-                    .Reactive(evt => evt.Change, (args, p) =>
-                    {
-                        // A typed room number picks that room on the plan; a number the plan does not have is refused.
-                        var rooms = p.Component<FusionDropDownTree>(m => m.Room);
-                        p.When(args.Value).IsEmpty()
-                            .Then(blank => blank.Element("unknown-room").Hide())
-                            .Else(typed =>
-                            {
-                                rooms.Text.Set(args.Value);
-                                rooms.DataBind();
-                                typed.When(rooms.Text).Eq(args.Value)
-                                    .Then(found => found.Element("unknown-room").Hide())
-                                    .Else(unknown =>
-                                    {
-                                        unknown.Element("unknown-room-number").Text.Set(args.Value);
-                                        unknown.Element("unknown-room").Show();
-                                    });
-                            });
                     }); }
 
                 @{ Html.InputField(plan, m => m.Room, o => o.Required().Label("Room"))
@@ -115,8 +94,30 @@
                 <p id="hold-status" class="text-sm font-medium">No room is held yet.</p>
             </native-vstack>
 
-            @* The commands sit beside the building plan, where its list cannot cover them. *@
+            @* The room number and the commands sit beside the building plan, where its list cannot cover them. *@
             <native-vstack gap="Base">
+                @{ Html.InputField(plan, m => m.RoomNumber, o => o.Label("Room number"))
+                    .NativeTextBox(b => b.CssClass(InputCss).Placeholder("Oak 110"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        // A typed room number picks that room on the plan; a number the plan does not have is refused.
+                        var rooms = p.Component<FusionDropDownTree>(m => m.Room);
+                        p.When(args.Value).IsEmpty()
+                            .Then(blank => blank.Element("unknown-room").Hide())
+                            .Else(typed =>
+                            {
+                                rooms.Text.Set(args.Value);
+                                rooms.DataBind();
+                                typed.When(rooms.Text).Eq(args.Value)
+                                    .Then(found => found.Element("unknown-room").Hide())
+                                    .Else(unknown =>
+                                    {
+                                        unknown.Element("unknown-room-number").Text.Set(args.Value);
+                                        unknown.Element("unknown-room").Show();
+                                    });
+                            });
+                    }); }
+
                 <native-hstack gap="Sm" class="flex-wrap">
                     @(Html.NativeButton("release-room-btn", "Release Room")
                         .CssClass(ButtonCss)

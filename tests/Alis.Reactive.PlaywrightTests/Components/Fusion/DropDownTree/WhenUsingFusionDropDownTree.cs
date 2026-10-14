@@ -119,6 +119,18 @@ public class WhenUsingFusionDropDownTree : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The hold is posted after the number would have been written, so the box is read once it is settled.
+    [Test]
+    public async Task the_room_a_deposit_holds_does_not_write_its_number()
+    {
+        await NavigateAndBoot();
+
+        await ChooseRuthAlvarez();
+
+        await Expect(RoomNumber.Input).ToHaveValueAsync("");
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task picking_another_room_releases_the_one_held_before()
     {
