@@ -35,6 +35,7 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     private ILocator AssessmentNotice => Page.Locator("#assessment-notice");
     private ILocator SuiteWarning => Page.Locator("#suite-warning");
     private ILocator SummaryCare => Page.Locator("#summary-care");
+    private ILocator SummaryRoom => Page.Locator("#summary-room");
     private ILocator SummaryMeals => Page.Locator("#summary-meals");
     private ILocator SavePreferences => Page.Locator("#save-preferences-btn");
     private ILocator UseReferralCareLevel => Page.Locator("#use-referral-care-level-btn");
@@ -55,6 +56,30 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
         await MealPlan.Choose("Vegetarian");
 
         await Expect(SummaryMeals).ToHaveTextAsync("Vegetarian");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task choosing_a_care_level_puts_it_on_the_move_in_summary()
+    {
+        await NavigateAndBoot();
+        await Expect(SummaryCare).ToHaveTextAsync("Not chosen");
+
+        await CareLevel.Choose("Assisted Living");
+
+        await Expect(SummaryCare).ToHaveTextAsync("Assisted Living");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task choosing_a_room_type_puts_it_on_the_move_in_summary()
+    {
+        await NavigateAndBoot();
+        await Expect(SummaryRoom).ToHaveTextAsync("Not chosen");
+
+        await RoomType.Choose("Private room");
+
+        await Expect(SummaryRoom).ToHaveTextAsync("Private room");
         AssertNoConsoleErrors();
     }
 

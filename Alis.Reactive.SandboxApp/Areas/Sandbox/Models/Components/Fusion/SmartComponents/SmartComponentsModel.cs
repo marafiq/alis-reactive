@@ -21,8 +21,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.SmartC
         /// <summary>Why the resident is referred.</summary>
         public string? Reason { get; set; }
 
-        /// <summary>The coordinator's intake note; <see langword="null"/> when none is written, as the smart text area holds no value until typed in.</summary>
-        public string? IntakeNote { get; set; }
+        /// <summary>The coordinator's intake note.</summary>
+        public string IntakeNote { get; set; } = string.Empty;
 
         /// <summary>Today's referrals in the inbox, by ID and the line the inbox shows.</summary>
         public IReadOnlyList<IncomingReferral> Inbox { get; set; } = [];

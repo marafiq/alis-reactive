@@ -216,7 +216,7 @@ public class WhenNurseRecordsFallPreventionRound : PlaywrightTestBase
         await Expect(_plan.ErrorFor(m => m.Precautions)).ToHaveTextAsync(
             "A resident who fell in the last 30 days needs the bed alarm on.", new() { Timeout = 10000 });
         await Expect(Status).ToHaveTextAsync("The round is not recorded yet.");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
     [Test]

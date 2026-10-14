@@ -144,6 +144,22 @@ public class WhenTextInputChanges : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // Clearing the phone after a sign-in raises no change, so only the signed-in answer puts the hint back.
+    [Test]
+    public async Task signing_in_a_returning_visitor_puts_back_the_hint_for_the_next_one()
+    {
+        await NavigateAndBoot();
+        await WriteAndMoveOn(Phone, "555-0142");
+        await Expect(PhoneLookup).ToHaveTextAsync("Welcome back: Eleanor Vance last visited Margaret Hale on 3 October.");
+        await Visiting.Select("Margaret Hale");
+
+        await ClickWhenStable(SignIn);
+
+        await Expect(Status).ToHaveTextAsync("Eleanor Vance is signed in to visit Margaret Hale.");
+        await Expect(PhoneLookup).ToHaveTextAsync("A returning visitor is found by their phone number.");
+        AssertNoConsoleErrors();
+    }
+
     // The click leaves the cursor on the button; the signed-in answer moves it.
     [Test]
     public async Task after_a_sign_in_the_cursor_waits_in_the_phone_for_the_next_visitor()

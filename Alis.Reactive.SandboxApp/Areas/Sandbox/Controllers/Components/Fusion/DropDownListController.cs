@@ -5,7 +5,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     /// <summary>
     /// Admissions at Maple Grove places Eleanor Whitfield: the care levels the community offers, the wings
-    /// that offer each one with the wing that has a room open this week, and the placement itself.
+    /// that offer each one with the wing that has a room open this week, and the placement itself, which
+    /// admissions refuses for a wing whose waitlist is full.
     /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/DropDownList")]
@@ -21,7 +22,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         ];
 
         // Each wing offers one care level; a wing with a room open this week takes a resident now, the
-        // others take her on their waitlist.
+        // others take her on their waitlist, unless it is full.
         private static readonly IReadOnlyList<CommunityWing> CommunityWings =
         [
             new("birch", "Birch", "Main building", "independent", OpenRoom: true),
@@ -30,7 +31,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             new("cedar", "Cedar", "Main building", "assisted", OpenRoom: true),
             new("laurel", "Laurel", "Garden house", "assisted", OpenRoom: false),
             new("willow", "Willow", "Garden house", "memory", OpenRoom: false),
-            new("juniper", "Juniper", "Garden house", "memory", OpenRoom: false)
+            new("juniper", "Juniper", "Garden house", "memory", OpenRoom: false, WaitlistFull: true)
         ];
 
         [HttpGet("")]
@@ -59,6 +60,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             var wing = CommunityWings.FirstOrDefault(candidate => candidate.Code == placement.Wing);
             if (level is null || wing is null || wing.CareLevel != level.Code)
                 return BadRequest(new PlacementConfirmation { Message = "Choose a care level and one of the wings that offer it." });
+            if (wing.WaitlistFull)
+                return BadRequest(new PlacementConfirmation { Message = $"{wing.Name}'s waitlist is full until spring; choose another wing for {Resident}." });
 
             return Ok(new PlacementConfirmation
             {
@@ -68,6 +71,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        private sealed record CommunityWing(string Code, string Name, string Building, string CareLevel, bool OpenRoom);
+        private sealed record CommunityWing(string Code, string Name, string Building, string CareLevel, bool OpenRoom, bool WaitlistFull = false);
     }
 }

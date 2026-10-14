@@ -143,6 +143,6 @@ public class WhenUsingFusionGridOperations : PlaywrightTestBase
         await Expect(Status).ToHaveTextAsync("Pick the resident the review team saw.", new() { Timeout = 10000 });
         await Expect(Badge("Katherine Ortiz")).ToHaveTextAsync("High");
         await Expect(Board.Cell("Leo Simmons", OpenTasksColumn)).ToHaveTextAsync("2");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 }

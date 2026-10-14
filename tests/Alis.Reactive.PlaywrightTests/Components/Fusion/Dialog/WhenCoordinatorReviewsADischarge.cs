@@ -24,6 +24,7 @@ public class WhenCoordinatorReviewsADischarge : PlaywrightTestBase
     private ILocator ChooseHint => Page.Locator("#discharge-choose");
     private ILocator ReviewStatus => Page.Locator("#discharge-status");
     private ILocator ReviewDischarge => Page.Locator("#review-discharge");
+    private ILocator Blocked => Page.Locator("#discharge-blocked");
     private ILocator Overlay => Page.Locator("#discharge-dialog + .e-dlg-overlay");
 
     // The review's title bar, where the coordinator takes hold of it to drag it.
@@ -66,10 +67,26 @@ public class WhenCoordinatorReviewsADischarge : PlaywrightTestBase
         await ReviewDischarge.ClickAsync();
 
         // beforeOpen cancels the open and says why; the review never starts.
-        await Expect(Page.Locator("#discharge-blocked"))
-            .ToHaveTextAsync("Close Margaret's open care tasks before reviewing her discharge.", new() { Timeout = 5000 });
+        await Expect(Blocked).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Blocked).ToHaveTextAsync("Close Margaret's open care tasks before reviewing her discharge.");
         await Expect(Dialog).ToBeHiddenAsync();
         await Expect(ReviewStatus).ToHaveTextAsync("not started");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task once_the_care_tasks_are_closed_the_review_opens_and_the_reason_goes()
+    {
+        await NavigateToAndWaitForVisibleSignal(Path, "#review-discharge");
+        await CareTasksOpen.Check();
+        await ReviewDischarge.ClickAsync();
+        await Expect(Blocked).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await CareTasksOpen.Input.UncheckAsync();
+
+        await ReviewDischarge.ClickAsync();
+
+        await Expect(Dialog).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Blocked).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 

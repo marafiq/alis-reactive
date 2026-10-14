@@ -11,18 +11,23 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DropDownList;
 /// <remarks>
 /// Eleanor Whitfield moves in on Monday. Independent Living is offered in Birch (room open) and Aspen;
 /// Assisted Living in Maple and Cedar (Main building, Cedar has the open room) and Laurel (Garden house);
-/// Memory Care in Willow and Juniper (Garden house), neither with a room open. The St. Mary's referral
-/// recommends Memory Care. A care level with an open room fills in that wing; one without moves the cursor
-/// to the wing list and opens it. Entering the wing list opens it once a care level has filled it.
+/// Memory Care in Willow and Juniper (Garden house), neither with a room open, and Juniper's waitlist is full
+/// until spring, which only admissions knows. The St. Mary's referral recommends Memory Care. A care level with
+/// an open room fills in that wing; one without moves the cursor to the wing list and opens it. Entering the
+/// wing list opens it once a care level has filled it.
 /// Not exercised: the render helper without a build step (a list rendered with nothing to choose is no
 /// placement). The Focus and Blur payloads carry nothing to read. Change's IsInteracted cannot be told apart
 /// from the payload's <c>e</c> and <c>event</c> fields, which EJ2 fills from the same browser event
-/// (drop-down-list.js:1859-1869).
+/// (drop-down-list.js:1859-1869). The care level's Blur hides the reminder to choose one when a care level is
+/// chosen, but no gesture leaves that reminder for the Blur alone to take down: the reminder shows only on
+/// leaving an empty care level, and the care level's Change, which every choice raises (by hand or from the
+/// referral), takes it down first.
 /// </remarks>
 [TestFixture]
 public class WhenUsingFusionDropDownList : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/DropDownList";
+    private const string Refused = "the server responded with a status of 400";
 
     private PagePlan<FusionDropDownListModel> _plan = null!;
 
@@ -48,7 +53,8 @@ public class WhenUsingFusionDropDownList : PlaywrightTestBase
     private async Task ChooseAssistedLiving()
     {
         await CareLevel.Choose("Assisted Living");
-        await Expect(OpenRoom).ToHaveTextAsync("A room is open this week in Cedar.", new() { Timeout = 5000 });
+        await Expect(OpenRoom).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(OpenRoom).ToHaveTextAsync("A room is open this week in Cedar.");
     }
 
     [Test]
@@ -58,8 +64,10 @@ public class WhenUsingFusionDropDownList : PlaywrightTestBase
 
         await CareLevel.Choose("Assisted Living");
 
-        await Expect(OpenRoom).ToHaveTextAsync("A room is open this week in Cedar.", new() { Timeout = 5000 });
+        await Expect(OpenRoom).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(OpenRoom).ToHaveTextAsync("A room is open this week in Cedar.");
         await Expect(Wing.Input).ToHaveValueAsync("Cedar");
+        await Expect(Placement).ToBeVisibleAsync();
         await Expect(Placement).ToHaveTextAsync("Eleanor Whitfield: Assisted Living, Cedar wing.");
         AssertNoConsoleErrors();
     }
@@ -130,9 +138,26 @@ public class WhenUsingFusionDropDownList : PlaywrightTestBase
 
         await CareLevel.Wrapper.PressAsync("Tab");
 
-        await Expect(CareLevelHint).ToHaveTextAsync("Choose a care level to see the wings that offer it.", new() { Timeout = 5000 });
+        await Expect(CareLevelHint).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(CareLevelHint).ToHaveTextAsync("Choose a care level to see the wings that offer it.");
         await Expect(Wing.Wrapper).ToBeFocusedAsync();
         await Expect(Wing.Popup).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // Choosing from the list keeps the cursor in the care level, so its Blur does not run; the choice itself
+    // takes the reminder down.
+    [Test]
+    public async Task choosing_a_care_level_takes_down_the_reminder_to_choose_one()
+    {
+        await NavigateAndBoot();
+        await CareLevel.Wrapper.PressAsync("Tab");
+        await Expect(CareLevelHint).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        await ChooseAssistedLiving();
+
+        await Expect(CareLevelHint).ToBeHiddenAsync();
+        await Expect(CareLevel.Wrapper).ToBeFocusedAsync();
         AssertNoConsoleErrors();
     }
 
@@ -178,6 +203,7 @@ public class WhenUsingFusionDropDownList : PlaywrightTestBase
         await ClickWhenStable(UseReferral);
 
         await Expect(CareLevel.Input).ToHaveValueAsync("Memory Care", new() { Timeout = 5000 });
+        await Expect(ReferralNote).ToBeVisibleAsync();
         await Expect(ReferralNote).ToHaveTextAsync("Care level taken from the St. Mary's referral.");
         await Expect(NoOpenRoom).ToBeVisibleAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -217,13 +243,31 @@ public class WhenUsingFusionDropDownList : PlaywrightTestBase
         await CareLevel.Choose("Memory Care");
         await Expect(Wing.Popup).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Wing.Pick("Willow");
-        await Expect(Placement).ToHaveTextAsync("Eleanor Whitfield: Memory Care, Willow wing.", new() { Timeout = 5000 });
+        await Expect(Placement).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Placement).ToHaveTextAsync("Eleanor Whitfield: Memory Care, Willow wing.");
 
         await ClickWhenStable(Admit);
 
         await Expect(AdmissionStatus).ToHaveTextAsync(
             "Eleanor Whitfield is on the waitlist for Willow (Memory Care).", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
+    }
+
+    // The page cannot know a waitlist is full; admissions refuses the placement and says why.
+    [Test]
+    public async Task admitting_to_a_wing_whose_waitlist_is_full_is_refused()
+    {
+        await NavigateAndBoot();
+        await CareLevel.Choose("Memory Care");
+        await Expect(Wing.Popup).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Wing.Pick("Juniper");
+        await Expect(Wing.Input).ToHaveValueAsync("Juniper", new() { Timeout = 5000 });
+
+        await ClickWhenStable(Admit);
+
+        await Expect(AdmissionStatus).ToHaveTextAsync(
+            "Juniper's waitlist is full until spring; choose another wing for Eleanor Whitfield.", new() { Timeout = 5000 });
+        AssertNoConsoleErrorsExcept(Refused);
     }
 
     [Test]

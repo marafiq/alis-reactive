@@ -20,7 +20,9 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.AutoComplete;
 /// Enabled is written here (the page locks and opens the field); it is not read. The Fields overload with
 /// a group member is not used: no physician list here is grouped (the MultiSelect diet order groups
 /// allergies by kind). Change's e, item and itemData fields are not declared; IsInteracted is EJ2's reading
-/// of e.
+/// of e. The Change that hides the reminder to confirm for a physician the page fills in is not proven on
+/// its own: the page fills in only her attending, and Page Her Attending first empties the field, whose
+/// Change (empty) takes the reminder down before the attending's Change comes.
 /// </remarks>
 [TestFixture]
 public class WhenUsingFusionAutoComplete : PlaywrightTestBase
@@ -126,7 +128,8 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
         await ChooseByName("oka", "Dr. James Okafor");
 
         await Expect(Physician.Input).ToHaveValueAsync("Dr. James Okafor");
-        await Expect(Specialty).ToHaveTextAsync("Cardiology", new() { Timeout = 5000 });
+        await Expect(Contact).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Specialty).ToHaveTextAsync("Cardiology");
         await Expect(Callback).ToHaveTextAsync("555-0148");
         AssertNoConsoleErrors();
     }
@@ -152,6 +155,7 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
         await ClickWhenStable(PageHerAttending);
 
         await Expect(Physician.Input).ToHaveValueAsync("Dr. Anita Patel", new() { Timeout = 5000 });
+        await Expect(AttendingFilled).ToBeVisibleAsync();
         await Expect(AttendingFilled).ToHaveTextAsync("Her attending, Dr. Anita Patel, is filled in.");
         await Expect(Specialty).ToHaveTextAsync("Geriatrics", new() { Timeout = 5000 });
         await Expect(CheckPhysician).ToBeHiddenAsync();
@@ -169,6 +173,7 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
         await ClickWhenStable(PageHerAttending);
 
         await Expect(Physician.Input).ToHaveValueAsync("Dr. Anita Patel", new() { Timeout = 5000 });
+        await Expect(AttendingFilled).ToBeVisibleAsync();
         await Expect(AttendingFilled).ToHaveTextAsync("Her attending, Dr. Anita Patel, is filled in.");
         await Expect(Specialty).ToHaveTextAsync("Geriatrics", new() { Timeout = 5000 });
         await Expect(CheckPhysician).ToBeHiddenAsync();
@@ -186,6 +191,7 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
         await ClickWhenStable(PageHerAttending);
 
         await Expect(Physician.Input).ToHaveValueAsync("Dr. Anita Patel", new() { Timeout = 5000 });
+        await Expect(AttendingFilled).ToBeVisibleAsync();
         await Expect(AttendingFilled).ToHaveTextAsync("Her attending, Dr. Anita Patel, is filled in.");
         await Expect(Specialty).ToHaveTextAsync("Geriatrics", new() { Timeout = 5000 });
         AssertNoConsoleErrors();

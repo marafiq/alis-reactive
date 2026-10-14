@@ -66,6 +66,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         await Trip.Select("Medical appointment");
 
         await Expect(Escort.Input).ToHaveValueAsync("Nurse aide");
+        await Expect(MedicalNote).ToBeVisibleAsync();
         await Expect(MedicalNote).ToHaveTextAsync("A nurse aide goes with every medical appointment. Bring the resident's medication list and insurance card.");
         AssertNoConsoleErrors();
     }
@@ -103,6 +104,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
 
         await ClickWhenStable(BookTheVan);
 
+        await Expect(VanBusy).ToBeVisibleAsync();
         await Expect(VanBusy).ToHaveTextAsync("The van is out at 10:00 AM. 11:00 AM is free and now chosen; book again to confirm.");
         await Expect(Departure.Input).ToHaveValueAsync("11:00 AM");
         await Expect(Status).ToHaveTextAsync("");

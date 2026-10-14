@@ -41,6 +41,25 @@ public sealed class InputMaskLocator
     private static bool HasEnteredCharacters(string maskedValue) =>
         maskedValue.Any(char.IsLetterOrDigit);
 
+    /// <summary>
+    /// Types characters key by key over whatever the field holds: selects it all, then types, as a person
+    /// replacing a number does. Each key commits, so the field raises <c>change</c> as it is typed.
+    /// </summary>
+    /// <remarks>
+    /// Typing must not depend on where the caret was left. A caret after the mask's last blank refuses every
+    /// key (mask-base.js:858), and a browser may restore it there when the field is focused other than by a
+    /// click on it. A click on the input moves the caret to the first blank 110 ms later (mask-base.js:350-369),
+    /// and a key released with the caret at the start puts it back there once the task ends
+    /// (mask-base.js:816-822): keys typed in either window land out of order. Select-all then type does
+    /// neither. A mask with a placeholder also moves the caret 110 ms after any focus (mask-base.js:350-352);
+    /// use <see cref="Fill"/> there.
+    /// </remarks>
+    public async Task Type(string characters)
+    {
+        await Input.PressAsync("ControlOrMeta+a");
+        await Input.PressSequentiallyAsync(characters, new() { Delay = 20 });
+    }
+
     public async Task Focus() => await Input.ClickAsync();
 
     public async Task Blur() => await Input.PressAsync("Tab");

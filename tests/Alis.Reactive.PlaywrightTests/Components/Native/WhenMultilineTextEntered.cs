@@ -100,6 +100,7 @@ public class WhenMultilineTextEntered : PlaywrightTestBase
 
         await WriteTheIncident("Mr. Benson slipped in the hallway at 7 PM; no injury.");
 
+        await Expect(IncidentFlag).ToBeVisibleAsync();
         await Expect(IncidentFlag).ToHaveTextAsync("The night nurse reads this first: Mr. Benson slipped in the hallway at 7 PM; no injury.");
         await Expect(NoIncident).ToBeHiddenAsync();
         AssertNoConsoleErrors();

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Native.CheckBox;
 
@@ -35,8 +36,15 @@ public class WhenAideLogsEveningShower : PlaywrightTestBase
     private ILocator SaveLog => Page.Locator("#save-shower-log-btn");
     private ILocator Status => Page.Locator("#shower-log-status");
 
+    private ConcurrentQueue<string> _logsSent = null!;
+
     private async Task NavigateAndBoot()
     {
+        _logsSent = new ConcurrentQueue<string>();
+        Page.Request += (_, request) =>
+        {
+            if (request.Url.Contains("/Sandbox/Components/CheckBox/ShowerLog/Save")) _logsSent.Enqueue(request.Url);
+        };
         await NavigateToAndWaitForBoot(Path);
         _plan = await PagePlan<ShowerLog>.FromPage(Page);
     }
@@ -111,6 +119,19 @@ public class WhenAideLogsEveningShower : PlaywrightTestBase
     }
 
     [Test]
+    public async Task a_skin_concern_taken_back_puts_the_nurse_step_away()
+    {
+        await NavigateAndBoot();
+        await SkinConcern.Check();
+        await Expect(SkinConcernStep).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        await SkinConcern.Input.UncheckAsync();
+
+        await Expect(SkinConcernStep).ToBeHiddenAsync(new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task the_log_is_not_saved_until_the_water_temperature_is_checked()
     {
         await NavigateAndBoot();
@@ -150,6 +171,8 @@ public class WhenAideLogsEveningShower : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // Leaving the nurse step for Save shows the message before Save is handled, so the refused log is shown never
+    // to leave the page by the save that follows: the log with the nurse told is the only one sent.
     [Test]
     public async Task a_skin_concern_must_be_passed_to_the_nurse_before_saving()
     {
@@ -161,7 +184,14 @@ public class WhenAideLogsEveningShower : PlaywrightTestBase
 
         await Expect(_plan.ErrorFor(m => m.NurseTold))
             .ToHaveTextAsync("Tell the nurse on duty about the skin concern before you save.", new() { Timeout = 5000 });
+        await Expect(_plan.ErrorFor(m => m.NurseTold)).ToBeVisibleAsync();
         await Expect(Status).ToHaveTextAsync("The shower log is not saved yet.");
+        await NurseTold.Check();
+        await ClickWhenStable(SaveLog);
+        await Expect(Status).ToHaveTextAsync(
+            "Shower log saved for Dorothy Reyes: shower given with the shower chair; skin concern reported to the nurse.",
+            new() { Timeout = 10000 });
+        Assert.That(_logsSent, Has.Count.EqualTo(1), "Only the log with the nurse told is sent.");
         AssertNoConsoleErrors();
     }
 

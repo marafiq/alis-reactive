@@ -5,7 +5,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 /// grid page to list each grid journey as a card that opens it, so that every journey can be reached.
 /// </summary>
 /// <remarks>
-/// The grid page carries no grid of its own: each journey is its own page with its own fixture.
+/// The grid page carries no grid of its own: each journey is its own page with its own fixture, so no test
+/// here opens a journey.
 /// </remarks>
 [TestFixture]
 public class WhenUsingFusionGrid : PlaywrightTestBase
@@ -30,15 +31,13 @@ public class WhenUsingFusionGrid : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The card leads to the census journey's own page; what that page shows is its own fixture's to prove.
     [Test]
-    public async Task the_census_by_age_card_opens_the_census()
+    public async Task the_census_by_age_card_leads_to_the_census()
     {
         await NavigateTo(GridPath);
 
-        await ClickWhenStable(JourneyCard("Census by age"));
-
-        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Census by Age", Level = 1 })).ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Expect(Page.Locator("#census-summary")).ToHaveTextAsync("Showing 1–10 of 45 residents.", new() { Timeout = 10000 });
+        await Expect(JourneyCard("Census by age")).ToHaveAttributeAsync("href", "/Sandbox/Components/Grid/Census", new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
 }

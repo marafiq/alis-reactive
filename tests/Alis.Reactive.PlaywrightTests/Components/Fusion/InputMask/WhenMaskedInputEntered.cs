@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InputMask;
 
@@ -12,9 +13,10 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InputMask;
 /// <c>FamilyPhoneNumbersValidator</c> each time a field commits (the mask commits on every key, mask-base.js:734)
 /// and on Save; the server checks them again. Ticking "Daniel is also her emergency contact" copies his number
 /// into the emergency field; a copy raises the field's Change with IsInteracted false (mask-base.js:741-761,
-/// 1083), a key the desk presses raises it with IsInteracted true.
-/// Digits are typed after a click on the field's label: a click on the input itself makes EJ2 move the caret to
-/// the first blank 110 ms later (mask-base.js:350-369), which would scatter digits typed in that window.
+/// 1083), a key the desk presses raises it with IsInteracted true. The desk reaches a field by its label and
+/// types over what it holds (<see cref="InputMaskLocator.Type"/>): typing from wherever the caret was left
+/// loses every key when Chromium restores it after the mask's last blank on a label click.
+/// A refused Save sends nothing: each refusal test checks no save request left the page.
 /// </remarks>
 [TestFixture]
 public class WhenMaskedInputEntered : PlaywrightTestBase
@@ -23,25 +25,32 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
 
     private PagePlan<InputMaskModel> _plan = null!;
 
-    private ILocator FamilyPhone => _plan.InputMask(m => m.FamilyPhone).Input;
-    private ILocator EmergencyPhone => _plan.InputMask(m => m.EmergencyPhone).Input;
+    private InputMaskLocator FamilyPhone => _plan.InputMask(m => m.FamilyPhone);
+    private InputMaskLocator EmergencyPhone => _plan.InputMask(m => m.EmergencyPhone);
     private ILocator SamePerson => _plan.NativeCheckBox(m => m.EmergencyIsFamily).Input;
     private ILocator Copied => Page.Locator("#emergency-copied");
     private ILocator SaveNumbers => Page.Locator("#save-phones-btn");
     private ILocator Status => Page.Locator("#phones-status");
 
+    private ConcurrentQueue<string> _savesSent = null!;
+
     private async Task NavigateAndBoot()
     {
+        _savesSent = new ConcurrentQueue<string>();
+        Page.Request += (_, request) =>
+        {
+            if (request.Url.Contains("/Sandbox/Components/InputMask/Save")) _savesSent.Enqueue(request.Url);
+        };
         await NavigateToAndWaitForBoot(Path);
         _plan = await PagePlan<InputMaskModel>.FromPage(Page);
-        await Expect(FamilyPhone).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(FamilyPhone.Input).ToBeVisibleAsync(new() { Timeout = 10000 });
     }
 
-    private async Task TypeDigits(ILocator field, string digits)
+    private async Task TypeDigits(InputMaskLocator field, string digits)
     {
-        var id = await field.GetAttributeAsync("id");
+        var id = await field.Input.GetAttributeAsync("id");
         await Page.Locator($"label[for='{id}']").ClickAsync();
-        await field.PressSequentiallyAsync(digits, new() { Delay = 20 });
+        await field.Type(digits);
     }
 
     [Test]
@@ -51,9 +60,10 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
 
         await TypeDigits(FamilyPhone, "617555");
 
-        await Expect(FamilyPhone).ToHaveValueAsync("(617) 555-____");
+        await Expect(FamilyPhone.Input).ToHaveValueAsync("(617) 555-____");
         await Expect(_plan.ErrorFor(m => m.FamilyPhone))
             .ToHaveTextAsync("Enter all ten digits of the family member's phone number.", new() { Timeout = 5000 });
+        await Expect(_plan.ErrorFor(m => m.FamilyPhone)).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
@@ -64,25 +74,31 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
         await TypeDigits(FamilyPhone, "617555");
         await Expect(_plan.ErrorFor(m => m.FamilyPhone)).ToBeVisibleAsync(new() { Timeout = 5000 });
 
-        await FamilyPhone.PressSequentiallyAsync("0142", new() { Delay = 20 });
+        await FamilyPhone.Input.PressSequentiallyAsync("0142", new() { Delay = 20 });
 
-        await Expect(FamilyPhone).ToHaveValueAsync("(617) 555-0142");
+        await Expect(FamilyPhone.Input).ToHaveValueAsync("(617) 555-0142");
         await Expect(_plan.ErrorFor(m => m.FamilyPhone)).ToBeHiddenAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
+    // The family phone's message is already on screen as it is typed; the emergency phone's, left empty, comes
+    // only from the Save, so it shows the Save was handled before the requests are counted.
     [Test]
     public async Task saving_with_an_unfinished_family_phone_is_refused()
     {
         await NavigateAndBoot();
         await TypeDigits(FamilyPhone, "617555");
-        await TypeDigits(EmergencyPhone, "6175550199");
 
         await ClickWhenStable(SaveNumbers);
 
+        await Expect(_plan.ErrorFor(m => m.EmergencyPhone))
+            .ToHaveTextAsync("Enter the emergency contact's phone number.", new() { Timeout = 5000 });
+        await Expect(_plan.ErrorFor(m => m.EmergencyPhone)).ToBeVisibleAsync();
         await Expect(_plan.ErrorFor(m => m.FamilyPhone))
-            .ToHaveTextAsync("Enter all ten digits of the family member's phone number.", new() { Timeout = 5000 });
+            .ToHaveTextAsync("Enter all ten digits of the family member's phone number.");
+        await Expect(_plan.ErrorFor(m => m.FamilyPhone)).ToBeVisibleAsync();
         await Expect(Status).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "Numbers the page can see are unfinished are not sent.");
         AssertNoConsoleErrors();
     }
 
@@ -96,8 +112,10 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
 
         await Expect(_plan.ErrorFor(m => m.EmergencyPhone))
             .ToHaveTextAsync("Enter the emergency contact's phone number.", new() { Timeout = 5000 });
+        await Expect(_plan.ErrorFor(m => m.EmergencyPhone)).ToBeVisibleAsync();
         await Expect(_plan.ErrorFor(m => m.FamilyPhone)).ToBeHiddenAsync();
         await Expect(Status).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "Numbers the page can see are missing are not sent.");
         AssertNoConsoleErrors();
     }
 
@@ -124,7 +142,7 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
 
         await SamePerson.CheckAsync();
 
-        await Expect(EmergencyPhone).ToHaveValueAsync("(617) 555-0142", new() { Timeout = 5000 });
+        await Expect(EmergencyPhone.Input).ToHaveValueAsync("(617) 555-0142", new() { Timeout = 5000 });
         await Expect(Copied).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
@@ -135,7 +153,7 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
         await NavigateAndBoot();
         await TypeDigits(FamilyPhone, "6175550142");
         await SamePerson.CheckAsync();
-        await Expect(EmergencyPhone).ToHaveValueAsync("(617) 555-0142", new() { Timeout = 5000 });
+        await Expect(EmergencyPhone.Input).ToHaveValueAsync("(617) 555-0142", new() { Timeout = 5000 });
 
         await ClickWhenStable(SaveNumbers);
 
@@ -153,13 +171,9 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
         await SamePerson.CheckAsync();
         await Expect(Copied).ToBeVisibleAsync(new() { Timeout = 5000 });
 
-        var id = await EmergencyPhone.GetAttributeAsync("id");
-        await Page.Locator($"label[for='{id}']").ClickAsync();
-        await Page.Keyboard.PressAsync("ControlOrMeta+a");
-        await Page.Keyboard.PressAsync("Backspace");
-        await EmergencyPhone.PressSequentiallyAsync("6175550199", new() { Delay = 20 });
+        await TypeDigits(EmergencyPhone, "6175550199");
 
-        await Expect(EmergencyPhone).ToHaveValueAsync("(617) 555-0199");
+        await Expect(EmergencyPhone.Input).ToHaveValueAsync("(617) 555-0199");
         await Expect(Copied).ToBeHiddenAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
@@ -170,12 +184,12 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
         await NavigateAndBoot();
         await TypeDigits(FamilyPhone, "6175550142");
         await SamePerson.CheckAsync();
-        await Expect(EmergencyPhone).ToHaveValueAsync("(617) 555-0142", new() { Timeout = 5000 });
+        await Expect(EmergencyPhone.Input).ToHaveValueAsync("(617) 555-0142", new() { Timeout = 5000 });
 
         await SamePerson.UncheckAsync();
 
-        await Expect(EmergencyPhone).ToBeFocusedAsync(new() { Timeout = 5000 });
-        await Expect(EmergencyPhone).ToHaveValueAsync("(___) ___-____");
+        await Expect(EmergencyPhone.Input).ToBeFocusedAsync(new() { Timeout = 5000 });
+        await Expect(EmergencyPhone.Input).ToHaveValueAsync("(___) ___-____");
         await Expect(Copied).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }

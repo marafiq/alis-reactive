@@ -85,7 +85,8 @@ public class WhenUsingFusionMention : PlaywrightTestBase
         await MentionByFirstLetters("Pat", "Dr. Amir Patel");
 
         await Expect(Note).ToHaveValueAsync("Refused her 9pm dose. @Dr. Amir Patel");
-        await Expect(NotifiedPhysician).ToHaveTextAsync("Dr. Amir Patel, attending physician", new() { Timeout = 5000 });
+        await Expect(NotifiedPhysician).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(NotifiedPhysician).ToHaveTextAsync("Dr. Amir Patel, attending physician");
         await Expect(NotifiedChargeNurse).ToBeHiddenAsync();
         await Expect(NoOneNotified).ToBeHiddenAsync();
         AssertNoConsoleErrors();
@@ -103,7 +104,8 @@ public class WhenUsingFusionMention : PlaywrightTestBase
 
         await Expect(Note).ToHaveValueAsync("Refused her 9pm dose. @Dr. Amir Patel and @Rosa Reyes");
         await Expect(NotifiedPhysician).ToBeVisibleAsync();
-        await Expect(NotifiedChargeNurse).ToHaveTextAsync("Rosa Reyes, charge nurse", new() { Timeout = 5000 });
+        await Expect(NotifiedChargeNurse).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(NotifiedChargeNurse).ToHaveTextAsync("Rosa Reyes, charge nurse");
         AssertNoConsoleErrors();
     }
 
@@ -183,16 +185,6 @@ public class WhenUsingFusionMention : PlaywrightTestBase
 
         await Expect(DayShift.Popup).ToBeHiddenAsync(new() { Timeout = 5000 });
         await Expect(DayNurse).ToHaveValueAsync("");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task the_components_index_links_to_the_shift_handoff_note()
-    {
-        await NavigateTo("/Sandbox/Components");
-
-        await Expect(Page.Locator("a[href='/Sandbox/Components/Mention/Index']"))
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
 }

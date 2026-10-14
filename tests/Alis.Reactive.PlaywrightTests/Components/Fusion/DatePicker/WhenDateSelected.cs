@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
@@ -12,6 +13,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DatePicker;
 /// Dorothy Klein moves into Maple 118, ready from Monday, November 2 and held for her through Monday,
 /// November 30. The page and the server check the hold; only the server checks the weekday. A day the page
 /// refuses is never sent: the server would refuse it too, with a 400 the console reports and the tests refuse.
+/// A day refused as it is picked shows its message before Book is pressed, so that test counts the bookings.
 /// Each admission day picked asks the server for the first care-plan review, which it proposes two weeks
 /// later; a day inside the hold is then settled and the field lets the keyboard go. The browser runs in
 /// America/Los_Angeles, west of UTC: a day sent, answered or shown as a UTC instant would read as the day
@@ -33,6 +35,8 @@ public class WhenDateSelected : PlaywrightTestBase
     private ILocator BookAdmission => Page.Locator("#book-admission-btn");
     private ILocator Status => Page.Locator("#admission-status");
 
+    private ConcurrentQueue<string> _bookingsSent = null!;
+
     // West of UTC: a day read or written as a UTC instant would show and book as the day before.
     public override BrowserNewContextOptions ContextOptions()
     {
@@ -44,6 +48,11 @@ public class WhenDateSelected : PlaywrightTestBase
 
     private async Task NavigateAndBoot()
     {
+        _bookingsSent = new ConcurrentQueue<string>();
+        Page.Request += (_, request) =>
+        {
+            if (request.Url.Contains("/Sandbox/Components/FusionDatePicker/BookAdmission")) _bookingsSent.Enqueue(request.Url);
+        };
         await NavigateToAndWaitForBoot(Path);
         _plan = await PagePlan<FusionDatePickerModel>.FromPage(Page);
         await Expect(AdmissionDay.CalendarIcon).ToBeVisibleAsync(new() { Timeout = 5000 });
@@ -118,16 +127,26 @@ public class WhenDateSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The message is on screen as soon as the day is picked, so the refused day is shown never to leave the
+    // page by the booking that follows: the last day held is the only booking the server receives.
     [Test]
     public async Task a_day_after_the_hold_ends_is_not_booked()
     {
         await NavigateAndBoot();
         await AdmissionDay.SelectDate(2026, 12, 1);
+        await Expect(FirstReview.Input).ToHaveValueAsync("12/15/2026");
 
         await ClickWhenStable(BookAdmission);
 
         await Expect(AdmissionDayMessage).ToHaveTextAsync("Maple 118 is held for Dorothy through Monday, November 30.");
+        await Expect(AdmissionDayMessage).ToBeVisibleAsync();
         await Expect(Status).ToHaveTextAsync("Not booked yet.");
+        await AdmissionDay.SelectDate(2026, 11, 30);
+        await Expect(FirstReview.Input).ToHaveValueAsync("12/14/2026");
+        await ClickWhenStable(BookAdmission);
+        await Expect(Status).ToHaveTextAsync(
+            "Dorothy Klein moves into Maple 118 on Monday, November 30, 2026. Her first care-plan review is on Monday, December 14, 2026.");
+        Assert.That(_bookingsSent, Has.Count.EqualTo(1), "Only the day inside the hold is sent.");
         AssertNoConsoleErrors();
     }
 

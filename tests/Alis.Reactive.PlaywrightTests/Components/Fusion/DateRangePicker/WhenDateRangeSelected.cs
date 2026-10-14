@@ -117,6 +117,19 @@ public class WhenDateRangeSelected : PlaywrightTestBase
     }
 
     [Test]
+    public async Task clearing_the_stay_dates_takes_the_price_away()
+    {
+        await NavigateAndBoot();
+        await PickTheFamilysWeek();
+
+        await Stay.Clear();
+        await Stay.Blur();
+
+        await Expect(StayQuote).ToHaveTextAsync("Pick the stay dates to see the price.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task reserving_the_stay_books_the_days_picked()
     {
         await NavigateAndBoot();

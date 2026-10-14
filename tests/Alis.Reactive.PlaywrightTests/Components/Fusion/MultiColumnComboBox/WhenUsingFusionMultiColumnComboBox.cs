@@ -63,7 +63,8 @@ public class WhenUsingFusionMultiColumnComboBox : PlaywrightTestBase
 
         await ChooseShift(WillowTonight);
 
-        await Expect(NobodyYet).ToHaveTextAsync("Nobody has volunteered for this shift yet. Choose a nurse from the list.", new() { Timeout = 5000 });
+        await Expect(NobodyYet).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(NobodyYet).ToHaveTextAsync("Nobody has volunteered for this shift yet. Choose a nurse from the list.");
         await Expect(Nurse.Popup).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(Nurse.Row("Grace Kim")).ToBeVisibleAsync();
         AssertNoConsoleErrors();
@@ -77,7 +78,8 @@ public class WhenUsingFusionMultiColumnComboBox : PlaywrightTestBase
 
         await ChooseShift(MapleTomorrow);
 
-        await Expect(VolunteerNote).ToHaveTextAsync("Jordan Ellis volunteered by text for this shift.", new() { Timeout = 5000 });
+        await Expect(VolunteerNote).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(VolunteerNote).ToHaveTextAsync("Jordan Ellis volunteered by text for this shift.");
         await Expect(Nurse.Input).ToHaveValueAsync("Jordan Ellis");
         await Expect(Nurse.Popup).ToBeHiddenAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -90,7 +92,8 @@ public class WhenUsingFusionMultiColumnComboBox : PlaywrightTestBase
 
         await ChooseShift(MapleTomorrow);
 
-        await Expect(NurseWeek).ToHaveTextAsync("Jordan Ellis has worked 16 of 40 hours this week.", new() { Timeout = 5000 });
+        await Expect(NurseWeek).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(NurseWeek).ToHaveTextAsync("Jordan Ellis has worked 16 of 40 hours this week.");
         await Expect(CallToConfirm).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
@@ -102,7 +105,8 @@ public class WhenUsingFusionMultiColumnComboBox : PlaywrightTestBase
 
         await ChooseShift(CedarSaturday);
 
-        await Expect(ShiftCovered).ToHaveTextAsync("Ana Lima already covers this shift.", new() { Timeout = 5000 });
+        await Expect(ShiftCovered).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(ShiftCovered).ToHaveTextAsync("Ana Lima already covers this shift.");
         await Expect(Nurse.Popup).ToBeHiddenAsync(new() { Timeout = 5000 });
         await Expect(Nurse.Wrapper).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex(@"\be-input-focus\b"));
         await Expect(Nurse.Input).ToHaveValueAsync("");
@@ -128,7 +132,8 @@ public class WhenUsingFusionMultiColumnComboBox : PlaywrightTestBase
 
         await Nurse.Choose("Sam Ortiz");
 
-        await Expect(CallToConfirm).ToHaveTextAsync("Call Sam Ortiz to confirm before assigning the shift.", new() { Timeout = 5000 });
+        await Expect(CallToConfirm).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(CallToConfirm).ToHaveTextAsync("Call Sam Ortiz to confirm before assigning the shift.");
         await Expect(Nurse.Input).ToHaveValueAsync("Sam Ortiz");
         AssertNoConsoleErrors();
     }
@@ -140,8 +145,8 @@ public class WhenUsingFusionMultiColumnComboBox : PlaywrightTestBase
 
         await Nurse.Choose("Marcus Bell");
 
-        await Expect(NurseWeek).ToHaveTextAsync(
-            "Marcus Bell has worked 40 of 40 hours this week; this shift would be overtime.", new() { Timeout = 5000 });
+        await Expect(NurseWeek).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(NurseWeek).ToHaveTextAsync("Marcus Bell has worked 40 of 40 hours this week; this shift would be overtime.");
         AssertNoConsoleErrors();
     }
 
@@ -155,6 +160,7 @@ public class WhenUsingFusionMultiColumnComboBox : PlaywrightTestBase
         await Nurse.Choose("Ana Lima");
 
         await Expect(VolunteerNote).ToBeHiddenAsync(new() { Timeout = 5000 });
+        await Expect(CallToConfirm).ToBeVisibleAsync();
         await Expect(CallToConfirm).ToHaveTextAsync("Call Ana Lima to confirm before assigning the shift.");
         AssertNoConsoleErrors();
     }
@@ -167,8 +173,28 @@ public class WhenUsingFusionMultiColumnComboBox : PlaywrightTestBase
         await ClickWhenStable(ChooseGraceKim);
 
         await Expect(Nurse.Input).ToHaveValueAsync("Grace Kim", new() { Timeout = 5000 });
-        await Expect(NurseWeek).ToHaveTextAsync("Grace Kim has worked 24 of 40 hours this week.", new() { Timeout = 5000 });
+        await Expect(NurseWeek).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(NurseWeek).ToHaveTextAsync("Grace Kim has worked 24 of 40 hours this week.");
         await Expect(CallToConfirm).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // Erasing the name and pressing Enter empties the field; the list holds no row for empty text.
+    [Test]
+    public async Task erasing_the_nurse_takes_down_the_call_to_confirm_and_her_hours()
+    {
+        await NavigateAndBoot();
+        await Nurse.Choose("Sam Ortiz");
+        await Expect(CallToConfirm).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(NurseWeek).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        await Nurse.Input.PressAsync("ControlOrMeta+a");
+        await Nurse.Input.PressAsync("Backspace");
+        await Nurse.Input.PressAsync("Enter");
+
+        await Expect(Nurse.Input).ToHaveValueAsync("", new() { Timeout = 5000 });
+        await Expect(CallToConfirm).ToBeHiddenAsync(new() { Timeout = 5000 });
+        await Expect(NurseWeek).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 

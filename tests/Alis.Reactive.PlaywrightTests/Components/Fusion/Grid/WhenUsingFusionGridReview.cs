@@ -150,6 +150,6 @@ public class WhenUsingFusionGridReview : PlaywrightTestBase
 
         await Expect(Status).ToHaveTextAsync("Henry Liu's review is already under way.", new() { Timeout = 10000 });
         await Expect(Reviews.Cell("Henry Liu", ReviewColumn)).ToHaveTextAsync("Under way");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 }

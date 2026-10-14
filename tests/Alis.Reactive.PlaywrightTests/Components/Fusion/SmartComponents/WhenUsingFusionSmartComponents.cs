@@ -44,6 +44,8 @@ public class WhenUsingFusionSmartComponents : PlaywrightTestBase
     private ILocator SaveReferral => Page.Locator("#save-referral-btn");
     private ILocator NoteStatus => Page.Locator("#note-status");
     private ILocator IntakeStatus => Page.Locator("#intake-status");
+    private ILocator SuggestionAdded => Page.Locator("#suggestion-added");
+    private ILocator DoseLeftOut => Page.Locator("#dose-left-out");
 
     private async Task NavigateAndBoot()
     {
@@ -203,7 +205,8 @@ public class WhenUsingFusionSmartComponents : PlaywrightTestBase
 
         await Note.PressAsync("Tab");
 
-        await Expect(Page.Locator("#suggestion-added-text")).ToHaveTextAsync("tour scheduled for Thursday", new() { Timeout = 5000 });
+        await Expect(SuggestionAdded).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#suggestion-added-text")).ToHaveTextAsync("tour scheduled for Thursday");
         await Expect(Note).ToHaveValueAsync("Family tour scheduled for Thursday ");
         await Expect(Note).ToBeFocusedAsync();
         AssertNoConsoleErrors();
@@ -216,18 +219,23 @@ public class WhenUsingFusionSmartComponents : PlaywrightTestBase
 
         await WriteInTheNote("Started on metformin");
 
-        await Expect(Page.Locator("#dose-left-out")).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(DoseLeftOut).ToBeVisibleAsync(new() { Timeout = 10000 });
         await Expect(Note).ToHaveValueAsync("Started on metformin");
         AssertNoConsoleErrors();
     }
 
+    // The suggestion shows in the note, after the cursor, until Tab takes it.
     [Test]
-    public async Task the_components_index_links_to_the_referral_intake()
+    public async Task a_suggested_phrase_after_a_left_out_dose_takes_the_dose_warning_down()
     {
-        await NavigateTo("/Sandbox/Components");
+        await NavigateAndBoot();
+        await WriteInTheNote("Started on metformin");
+        await Expect(DoseLeftOut).ToBeVisibleAsync(new() { Timeout = 10000 });
 
-        await Expect(Page.Locator("a[href='/Sandbox/Components/SmartComponents/Index']").First)
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Note.PressSequentiallyAsync(", spoke with the family", new() { Delay = 20 });
+
+        await Expect(Note).ToHaveValueAsync("Started on metformin, spoke with the family tour scheduled for Thursday ", new() { Timeout = 10000 });
+        await Expect(DoseLeftOut).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 }

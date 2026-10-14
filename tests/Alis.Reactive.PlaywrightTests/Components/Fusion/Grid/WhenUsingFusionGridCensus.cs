@@ -18,7 +18,10 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 /// Not exercised: DataStateChange's Name, which EJ2 writes as the event's own name on every payload
 /// (ej2-base observer.js:92), and its Action's Name, Type and Cancel: the Action is the actionBegin payload EJ2
 /// already ran (ej2-grids actions/data.js:609), so they read actionBegin, actionBegin and false whenever the
-/// event comes, and no server answer can depend on them.
+/// event comes, and no server answer can depend on them. The page's answer to a refused request (400) is not
+/// exercised: the census refuses only a request the grid cannot make (pages of no residents, a column, a
+/// direction or a change it does not know), and every page, sort, page size and age the office manager can
+/// ask for is one it reads; the age box keeps the age between 60 and 110.
 /// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridCensus : PlaywrightTestBase

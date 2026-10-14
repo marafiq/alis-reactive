@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.MultiSelect;
 
@@ -40,8 +41,15 @@ public class WhenUsingFusionMultiSelect : PlaywrightTestBase
     private ILocator SaveDietOrder => Page.Locator("#save-diet-order-btn");
     private ILocator SaveStatus => Page.Locator("#save-status");
 
+    private ConcurrentQueue<string> _ordersSent = null!;
+
     private async Task NavigateAndBoot()
     {
+        _ordersSent = new ConcurrentQueue<string>();
+        Page.Request += (_, request) =>
+        {
+            if (request.Url.Contains("/Sandbox/Components/MultiSelect/Save")) _ordersSent.Enqueue(request.Url);
+        };
         await NavigateToAndWaitForBoot(Path);
         _plan = await PagePlan<FusionMultiSelectModel>.FromPage(Page);
         await Expect(AllergyChips).ToHaveTextAsync(new[] { "Peanuts" }, new() { Timeout = 5000 });
@@ -225,6 +233,8 @@ public class WhenUsingFusionMultiSelect : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // Leaving the emptied allergies shows the message before Save is pressed, so the refused order is shown never
+    // to leave the page by the save that follows: the order with No known allergies is the only one sent.
     [Test]
     public async Task saving_without_her_allergies_asks_for_them()
     {
@@ -234,7 +244,14 @@ public class WhenUsingFusionMultiSelect : PlaywrightTestBase
         await ClickWhenStable(SaveDietOrder);
 
         await Expect(_plan.ErrorFor(m => m.Allergies)).ToHaveTextAsync("Record her allergies, or choose No known allergies.", new() { Timeout = 5000 });
+        await Expect(_plan.ErrorFor(m => m.Allergies)).ToBeVisibleAsync();
         await Expect(SaveStatus).ToHaveTextAsync("Not saved yet.");
+        await Allergies.SelectItem("No known allergies");
+        await ClickWhenStable(SaveDietOrder);
+        await Expect(SaveStatus).ToHaveTextAsync(
+            "Saved. Allergies: No known allergies. Texture: Regular. Snacks: none. Never served: none. Supplements: none.",
+            new() { Timeout = 5000 });
+        Assert.That(_ordersSent, Has.Count.EqualTo(1), "Only the order that records her allergies is sent.");
         AssertNoConsoleErrors();
     }
 

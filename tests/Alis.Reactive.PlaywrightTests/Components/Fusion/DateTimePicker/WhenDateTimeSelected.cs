@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
@@ -14,7 +15,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DateTimePicker;
 /// holding Thursday, November 12 at 2:00 PM. Each time entered asks the clinic whether she is in then; a time
 /// she is in, inside the window, is settled and the field lets the keyboard go. The page and the server check
 /// the window; only the server checks the clinic hours. A time the page refuses is never sent: the server
-/// would refuse it too, with a 400 the console reports and the tests refuse. The browser runs in
+/// would refuse it too, with a 400 the console reports and the tests refuse. A time refused as it is picked
+/// shows its message before Schedule is pressed, so that test counts the times sent. The browser runs in
 /// America/Los_Angeles, west of UTC: a time sent, answered or shown as a UTC instant would read eight hours
 /// early.
 /// Not exercised: the render helper without a build step, since the appointment shows a placeholder.
@@ -34,6 +36,8 @@ public class WhenDateTimeSelected : PlaywrightTestBase
     private ILocator ScheduleFollowUp => Page.Locator("#schedule-follow-up-btn");
     private ILocator Status => Page.Locator("#follow-up-status");
 
+    private ConcurrentQueue<string> _schedulesSent = null!;
+
     // West of UTC: a time read or written as a UTC instant would show and book eight hours early.
     public override BrowserNewContextOptions ContextOptions()
     {
@@ -45,6 +49,11 @@ public class WhenDateTimeSelected : PlaywrightTestBase
 
     private async Task NavigateAndBoot()
     {
+        _schedulesSent = new ConcurrentQueue<string>();
+        Page.Request += (_, request) =>
+        {
+            if (request.Url.Contains("/Sandbox/Components/DateTimePicker/ScheduleFollowUp")) _schedulesSent.Enqueue(request.Url);
+        };
         await NavigateToAndWaitForBoot(Path);
         _plan = await PagePlan<DateTimePickerModel>.FromPage(Page);
         await Expect(Appointment.CalendarIcon).ToBeVisibleAsync(new() { Timeout = 5000 });
@@ -123,6 +132,50 @@ public class WhenDateTimeSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // Friday, November 6 at 10:00 AM is in clinic hours but before the window opens: the clinic says she is in,
+    // and the page still keeps the cursor in the field.
+    [Test]
+    public async Task a_time_before_the_follow_up_window_opens_is_refused_as_it_is_entered_and_the_cursor_stays()
+    {
+        await NavigateAndBoot();
+
+        await EnterTime("11/6/2026 10:00 AM");
+
+        await Expect(ClinicAnswer).ToHaveTextAsync("Dr. Osei is in clinic on Friday, November 6 at 10:00 AM.");
+        await Expect(AppointmentMessage).ToHaveTextAsync("Dr. Osei's first opening after the hospital stay is Monday, November 9.");
+        await Expect(AppointmentMessage).ToBeVisibleAsync();
+        await Expect(Appointment.Input).ToBeFocusedAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // The clinic is slow to answer about 6:00 PM: its answer is held until the nurse has entered 10:30 AM and seen
+    // that answer, then arrives about a time no longer in the field. Scheduling afterwards orders the check after
+    // the late answer was handled.
+    [Test]
+    public async Task a_late_answer_about_a_time_since_changed_does_not_replace_the_answer_for_the_time_entered()
+    {
+        await NavigateAndBoot();
+        var firstAnswerHeld = new SemaphoreSlim(0);
+        var asked = 0;
+        await Page.RouteAsync(url => url.Contains("/Sandbox/Components/DateTimePicker/ClinicHours"), async route =>
+        {
+            if (Interlocked.Increment(ref asked) == 1) await firstAnswerHeld.WaitAsync(TimeSpan.FromSeconds(30));
+            await route.ContinueAsync();
+        });
+        await EnterTime("11/10/2026 6:00 PM");
+        await EnterTime("11/10/2026 10:30 AM");
+        await Expect(ClinicAnswer).ToHaveTextAsync("Dr. Osei is in clinic on Tuesday, November 10 at 10:30 AM.");
+
+        await Page.RunAndWaitForRequestFinishedAsync(
+            () => { firstAnswerHeld.Release(); return Task.CompletedTask; },
+            new() { Predicate = request => request.Url.Contains("2026-11-10T18") });
+        await ClickWhenStable(ScheduleFollowUp);
+        await Expect(Status).ToHaveTextAsync("Arthur Bell sees Dr. Osei on Tuesday, November 10 at 10:30 AM.");
+
+        await Expect(ClinicAnswer).ToHaveTextAsync("Dr. Osei is in clinic on Tuesday, November 10 at 10:30 AM.");
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task scheduling_without_a_time_asks_for_one()
     {
@@ -135,6 +188,8 @@ public class WhenDateTimeSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The message is on screen as soon as the time is picked, so the refused time is shown never to leave the
+    // page by the scheduling that follows: her first opening is the only time the clinic receives.
     [Test]
     public async Task a_time_before_dr_osei_can_see_arthur_is_not_scheduled()
     {
@@ -145,7 +200,13 @@ public class WhenDateTimeSelected : PlaywrightTestBase
         await ClickWhenStable(ScheduleFollowUp);
 
         await Expect(AppointmentMessage).ToHaveTextAsync("Dr. Osei's first opening after the hospital stay is Monday, November 9.");
+        await Expect(AppointmentMessage).ToBeVisibleAsync();
         await Expect(Status).ToHaveTextAsync("Not scheduled yet.");
+        await Appointment.Select(2026, 11, 9, "10:00 AM");
+        await Expect(Appointment.Input).ToHaveValueAsync("11/9/2026 10:00 AM");
+        await ClickWhenStable(ScheduleFollowUp);
+        await Expect(Status).ToHaveTextAsync("Arthur Bell sees Dr. Osei on Monday, November 9 at 10:00 AM.");
+        Assert.That(_schedulesSent, Has.Count.EqualTo(1), "Only the time inside the window is sent.");
         AssertNoConsoleErrors();
     }
 
