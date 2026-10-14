@@ -1,132 +1,136 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.BulletChart.FusionBulletChartModel
-@using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.BulletChart
+@model FusionBulletChartModel
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
 @using Syncfusion.EJ2.Charts
-@using BulletRange = Syncfusion.EJ2.Charts.Range
 @{
-    ViewData["Title"] = "FusionBulletChart";
+    ViewData["Title"] = "Weekly Staffing";
 
-    const string BulletChartId = "resident-bullet-chart";
-    var clickAuditUrl = Url.Action("ClickAudit", "BulletChart", new { area = "Sandbox" })
-        ?? throw new InvalidOperationException("Could not resolve BulletChart.ClickAudit.");
+    const string NursingChartId = "nursing-hours-chart";
+    const string AgencyChartId = "agency-hours-chart";
 
-    var plan = Html.ReactivePlan<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.BulletChart.FusionBulletChartModel>();
-    var data = new List<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.BulletChart.BulletChartPoint>
-    {
-        new() { Category = "North Wing", Value = 72, Target = 80 },
-        new() { Category = "South Wing", Value = 54, Target = 68 },
-        new() { Category = "Rehab", Value = 88, Target = 92 }
-    };
+    var plan = Html.ReactivePlan<FusionBulletChartModel>();
+    var shiftsUrl = Url.SandboxRoute("WingShifts", "BulletChart");
+    var wingField = Alis.Reactive.Field.Of((WingHours w) => w.Wing).Name;
+    var hoursField = Alis.Reactive.Field.Of((WingHours w) => w.Hours).Name;
+    var targetField = Alis.Reactive.Field.Of((WingHours w) => w.Target).Name;
 
-    var ranges = new List<BulletRange>
-    {
-        new() { End = 40, Name = "Poor", Color = "#ef4444" },
-        new() { End = 70, Name = "Average", Color = "#f59e0b" },
-        new() { End = 100, Name = "Good", Color = "#10b981" }
-    };
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        var chart = p.Component<FusionBulletChart>(BulletChartId);
-        p.Element("tooltip-state").Text.Set("pending");
-        p.Element("tooltip-value").Text.Set("pending");
-        p.Element("tooltip-target").Text.Set("pending");
-        p.Element("tooltip-name").Text.Set("pending");
-        p.Element("tooltip-template").Text.Set("pending");
-        p.Element("tooltip-text").Text.Set("pending");
-        p.Element("mouse-click-state").Text.Set("pending");
-        p.Element("mouse-click-target").Text.Set("pending");
-        p.Element("mouse-click-x").Text.Set("pending");
-        p.Element("mouse-click-y").Text.Set("pending");
-        p.Element("actual-index-negative").Text.Set(chart.GetActualIndex(-1, 3));
-        p.Element("actual-index-overflow").Text.Set(chart.GetActualIndex(3, 3));
-    }));
+    // The wing at a place in the chart's order.
+    void ShowWing(PipelineBuilder<FusionBulletChartModel> p, TypedSource<int> place, string elementId) =>
+        p.When(place).Eq(0).Then(t => t.Element(elementId).Text.Set(StaffingWeek.Nursing[0].Wing))
+            .ElseIf(place).Eq(1).Then(t => t.Element(elementId).Text.Set(StaffingWeek.Nursing[1].Wing))
+            .ElseIf(place).Eq(2).Then(t => t.Element(elementId).Text.Set(StaffingWeek.Nursing[2].Wing))
+            .ElseIf(place).Eq(3).Then(t => t.Element(elementId).Text.Set(StaffingWeek.Nursing[3].Wing));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionBulletChart</native-heading>
+    <native-heading level="H1">Weekly Staffing</native-heading>
     <native-text color="Secondary">
-        Bullet chart slice. Exercises load and render lifecycle events, tooltip payload updates, click payloads, and a wrapped index method read.
+        Week of October 5. The hours each wing worked against its budget, and the agency hours it used against its cap.
+        Point at a wing for its numbers; click a wing's nursing bar for the week's shifts.
     </native-text>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Bullet chart</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Hover the feature bar to trigger tooltip rendering and click it to capture mouse metadata.
-        </p>
+        <native-heading level="H2">Nursing hours</native-heading>
 
-        @(Html.FusionBulletChart(plan, BulletChartId, b =>
+        @(Html.FusionBulletChart(plan, NursingChartId, b =>
         {
             b.Width("100%");
-            b.Height("280px");
-            b.Title("Resident readiness");
-            b.Subtitle("Load, tooltip, click, and method reads");
+            b.Height("260px");
             b.Minimum(0);
-            b.Maximum(100);
-            b.Interval(20);
-            b.CategoryField("category");
-            b.ValueField("value");
-            b.TargetField("target");
-            b.DataSource(data);
-            b.Ranges(ranges);
-            b.Tooltip(new BulletChartBulletTooltipSettings
-            {
-                Enable = true
-            });
+            b.Maximum(1000);
+            b.Interval(200);
+            b.CategoryField(wingField);
+            b.ValueField(hoursField);
+            b.TargetField(targetField);
+            b.DataSource(StaffingWeek.Nursing);
+            b.Tooltip(new BulletChartBulletTooltipSettings { Enable = true });
         })
         .Reactive(evt => evt.TooltipRender, (args, p) =>
         {
-            p.Element("tooltip-state").Text.Set("rendered");
-            p.Element("tooltip-value").Text.Set(args.Value);
-            p.Element("tooltip-target").Text.Set(args.Target.Get(x => x[0]));
-            p.Element("tooltip-name").Text.Set(args.Name);
-            p.When(args.Template).NotEmpty()
-                .Then(t => t.Element("tooltip-template").Text.Set(args.Template))
-                .Else(e => e.Element("tooltip-template").Text.Set("none"));
-            args.Text.Set("Bullet tooltip rewritten");
-            p.Element("tooltip-text").Text.Set(args.Text);
+            args.Text.Set("Click the bar for this wing's shifts");
+            p.Element("nursing-hours-worked").Text.Set(args.Value);
+            p.Element("nursing-hours-budgeted").Text.Set(args.Target.Get(x => x[0]));
+            p.Element("nursing-hours-readout").Show();
         })
         .Reactive(evt => evt.BulletChartMouseClick, (args, p) =>
         {
-            p.Element("mouse-click-state").Text.Set("clicked");
-            p.Element("mouse-click-target").Text.Set(args.Target);
-            p.Element("mouse-click-x").Text.Set(args.X);
-            p.Element("mouse-click-y").Text.Set(args.Y);
-            p.Post(clickAuditUrl)
-                .Gather<FusionBulletChartClickAuditRequest>(g => g
-                    .Set(x => x.Target, args.Target)
-                    .Set(x => x.X, args.X)
-                    .Set(x => x.Y, args.Y))
-                .Response(r => r.OnSuccess<FusionBulletChartClickAuditResponse>((json, s) =>
+            // Only a wing's bar or budget line opens its shifts.
+            p.When(args.Target).Contains("Measure_")
+                .Then(t =>
                 {
-                    s.Element("click-audit-message").Text.Set(json.Get(x => x.Message));
-                    s.Element("click-audit-wing").Text.Set(json.Get(x => x.Wing));
-                    s.Element("click-audit-coordinates").Text.Set(json.Get(x => x.Coordinates));
-                }));
+                    t.Element("wing-shifts-hint").Hide();
+                    t.Post(shiftsUrl)
+                        .Gather<WingShiftsRequest>(g => g.Set(x => x.Bar, args.Target))
+                        .Response(r => r.OnSuccess<WingShifts>((json, s) =>
+                        {
+                            s.Element("wing-shifts-wing").Text.Set(json.Get(x => x.Wing));
+                            s.Element("wing-shifts-summary").Text.Set(json.Get(x => x.Summary));
+                            s.Element("wing-shifts").Show();
+                        }));
+                })
+                .Else(e => e.Element("wing-shifts-hint").Show());
         }))
+
+        <p id="nursing-hours-readout" hidden aria-live="polite" class="mt-2 text-sm">Worked <span id="nursing-hours-worked" class="font-medium"></span> of <span id="nursing-hours-budgeted" class="font-medium"></span> budgeted hours.</p>
+        <p id="wing-shifts-hint" hidden class="mt-2 text-sm text-text-muted">Click a wing's bar or budget line to open its shifts.</p>
+
+        <section id="wing-shifts" hidden class="mt-4 rounded-md border border-border p-3">
+            <h3 class="text-sm font-semibold"><span id="wing-shifts-wing"></span> shifts this week</h3>
+            <p id="wing-shifts-summary" class="text-sm"></p>
+        </section>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Trace</native-heading>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>Tooltip state: <span id="tooltip-state" class="text-text-muted">pending</span></p>
-            <p>Tooltip value: <span id="tooltip-value" class="text-text-muted">pending</span></p>
-            <p>Tooltip target: <span id="tooltip-target" class="text-text-muted">pending</span></p>
-            <p>Tooltip name: <span id="tooltip-name" class="text-text-muted">pending</span></p>
-            <p>Tooltip template: <span id="tooltip-template" class="text-text-muted">pending</span></p>
-            <p>Tooltip text: <span id="tooltip-text" class="text-text-muted">pending</span></p>
-            <p>Mouse click state: <span id="mouse-click-state" class="text-text-muted">pending</span></p>
-            <p>Mouse click target: <span id="mouse-click-target" class="text-text-muted">pending</span></p>
-            <p>Mouse click x: <span id="mouse-click-x" class="text-text-muted">pending</span></p>
-            <p>Mouse click y: <span id="mouse-click-y" class="text-text-muted">pending</span></p>
-            <p>Click audit message: <span id="click-audit-message" class="text-text-muted">pending</span></p>
-            <p>Click audit wing: <span id="click-audit-wing" class="text-text-muted">pending</span></p>
-            <p>Click audit coordinates: <span id="click-audit-coordinates" class="text-text-muted">pending</span></p>
-            <p>Actual index -1: <span id="actual-index-negative" class="text-text-muted">pending</span></p>
-            <p>Actual index 3: <span id="actual-index-overflow" class="text-text-muted">pending</span></p>
-        </native-vstack>
+        <native-heading level="H2">Agency hours</native-heading>
+
+        @(Html.FusionBulletChart(plan, AgencyChartId, b =>
+        {
+            b.Width("100%");
+            b.Height("260px");
+            b.Minimum(0);
+            b.Maximum(150);
+            b.Interval(30);
+            b.CategoryField(wingField);
+            b.ValueField(hoursField);
+            b.TargetField(targetField);
+            b.DataSource(StaffingWeek.Agency);
+            b.Tooltip(new BulletChartBulletTooltipSettings
+            {
+                Enable = true,
+                Template = "<span>${value} h used of the ${target} h cap</span>"
+            });
+        })
+        .Reactive(evt => evt.TooltipRender, (args, p) =>
+            // The tooltip card is repeated under the chart, where it stays and a screen reader reads it.
+            p.Element("agency-hours-readout").Html.Set(args.Template)))
+
+        <p id="agency-hours-readout" aria-live="polite" class="mt-2 text-sm">Point at a wing to read its agency hours.</p>
     </native-card-body></native-card>
 
+    <native-card><native-card-body>
+        <native-heading level="H2">Huddle round</native-heading>
+        <p class="text-sm text-text-secondary mb-2">
+            The huddle goes through the wings in the chart's order with each charge nurse. Tick each wing once it is reviewed.
+        </p>
+
+        @{ Html.InputField(plan, m => m.ReviewedWings, o => o.Label("Reviewed"))
+            .NativeCheckList(b =>
+            {
+                foreach (var wing in StaffingWeek.Nursing)
+                    b.Option(wing.Wing);
+            })
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                // After the last wing the round starts over at the first.
+                var reviewed = p.From(args.Value).Count();
+                var next = p.Component<FusionBulletChart>(NursingChartId).GetActualIndex(reviewed, StaffingWeek.Nursing.Count);
+                ShowWing(p, next, "huddle-next");
+            }); }
+
+        <p class="mt-2 text-sm">Up next: <span id="huddle-next" class="font-medium">@StaffingWeek.Nursing[0].Wing</span></p>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

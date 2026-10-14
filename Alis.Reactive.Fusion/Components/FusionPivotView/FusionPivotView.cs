@@ -15,14 +15,15 @@ namespace Alis.Reactive.Fusion.Components
     /// <remarks>
     /// Render it with <c>Html.FusionPivotView(plan, "care-pivot", b =&gt; ...)</c>, reach it with
     /// <c>var pivot = p.Component&lt;FusionPivotView&gt;("care-pivot");</c> and use its members directly:
-    /// <c>pivot.DataSourceSettings.DataSource.Set(json.Get(x =&gt; x.Rows)); pivot.Refresh();</c>.
+    /// <c>pivot.DataSourceSettings.DataSource.Set(json.Get(x =&gt; x.Rows));</c>, which redraws the pivot.
     /// </remarks>
     public sealed class FusionPivotView : FusionComponent
     {
-        /// <summary>The shown view: <c>"Table"</c> or <c>"Chart"</c>.</summary>
-        public Prop<string> CurrentView => Prop<string>();
+        /// <summary>The shown view: <c>"Table"</c> or <c>"Chart"</c>, as the pivot's toolbar switches it.</summary>
+        /// <remarks>EJ2 keeps it as a plain field that nothing on screen follows, so it is read, not written.</remarks>
+        public ReadOnly<string> CurrentView => ReadOnly<string>();
 
-        /// <summary>The rows the pivot summarizes and how; call <see cref="Refresh"/> after writing them.</summary>
+        /// <summary>The rows the pivot summarizes and how; writing the rows redraws the pivot.</summary>
         public FusionPivotViewDataSourceSettings DataSourceSettings => Object<FusionPivotViewDataSourceSettings>();
 
         /// <summary>Re-renders the pivot from its data source.</summary>

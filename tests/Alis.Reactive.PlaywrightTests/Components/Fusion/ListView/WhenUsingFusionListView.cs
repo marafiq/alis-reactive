@@ -1,104 +1,183 @@
+using System.Text.RegularExpressions;
 using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ListView;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.ListView;
 
+/// <summary>
+/// As the day charge nurse on Maple wing, I want to walk the evening nurse through the residents in round order
+/// and tick off what I finish before I leave, so that no resident is missed at the handoff and nothing is left
+/// for the evening shift that I should have done.
+/// </summary>
+/// <remarks>
+/// The round is Arthur Bell, Ruth Coleman, Helen Park, Walter Dean and Grace Liu. Helen Park is at St. Mary's
+/// Hospital, so the round does not open her and skips her when it moves on. Opening a resident the nurse clicks
+/// fetches their note by their place on the round; handing a resident off moves the round on to the next resident
+/// in the building, whose note comes with the handoff's answer, and after Grace Liu the round is complete.
+/// A resident the page selects after a handoff raises Select without IsInteracted or Index (list-view.js:1084-1110,
+/// 1130-1150), which is how the round tells its own move from the nurse's click. Before you leave is a checkbox
+/// list of the day nurse's last tasks; its Select carries the task and whether it is now checked.
+/// </remarks>
 [TestFixture]
 public class WhenUsingFusionListView : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/FusionListView";
+    private static readonly Regex Selected = new(@"\be-active\b");
 
-    private FusionListViewLocator Residents => new(Page, "resident-list");
-    private FusionListViewLocator Tasks => new(Page, "task-list");
+    private FusionListViewLocator Round => new(Page, "handoff-round");
+    private FusionListViewLocator BeforeYouLeave => new(Page, "leaving-checklist");
+    private ILocator RoundStatus => Page.Locator("#round-status");
+    private ILocator AwayNotice => Page.Locator("#away-notice");
+    private ILocator RoundComplete => Page.Locator("#round-complete");
+    private ILocator Note => Page.Locator("#handoff-note");
+    private ILocator NoteResident => Page.Locator("#handoff-note-resident");
+    private ILocator NoteText => Page.Locator("#handoff-note-text");
+    private ILocator HandedOff => Page.Locator("#handed-off-btn");
+    private ILocator ChecklistStatus => Page.Locator("#checklist-status");
+    private ILocator AllCovered => Page.Locator("#all-covered-btn");
+    private ILocator ClearChecklist => Page.Locator("#clear-checklist-btn");
 
     private async Task NavigateAndBoot()
     {
-        await NavigateToAndWaitForTextSignal(Path, "#command-state", "pending");
+        await NavigateToAndWaitForBoot(Path);
+        await Expect(Round.Item("Arthur Bell")).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(BeforeYouLeave.Item("Call lights tested")).ToBeVisibleAsync(new() { Timeout = 5000 });
+    }
+
+    private async Task OpenResident(string name)
+    {
+        await Round.ClickItem(name);
+        await Expect(NoteResident).ToHaveTextAsync(name, new() { Timeout = 5000 });
     }
 
     [Test]
-    public async Task page_loads_without_errors()
+    public async Task clicking_a_resident_opens_their_handoff_note()
     {
         await NavigateAndBoot();
-        await Expect(Page).ToHaveTitleAsync("FusionListView — Alis.Reactive Sandbox");
+
+        await Round.ClickItem("Ruth Coleman");
+
+        await Expect(Note).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(NoteResident).ToHaveTextAsync("Ruth Coleman");
+        await Expect(NoteText).ToHaveTextAsync("New walker delivered today. Physical therapy at 4 PM; encourage fluids.");
+        await Expect(RoundStatus).ToHaveTextAsync("Opened Ruth Coleman");
+        await Expect(Round.Item("Ruth Coleman")).ToHaveClassAsync(Selected);
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task select_text_and_unselect_text_methods_update_selection()
+    public async Task handing_off_a_resident_moves_the_round_on_to_the_next_one_in_the_building()
     {
         await NavigateAndBoot();
+        await OpenResident("Ruth Coleman");
 
-        await Page.Locator("#select-bennett-btn").ClickAsync();
-        await Expect(Page.Locator("#command-state")).ToHaveTextAsync("selected Bennett", new() { Timeout = 5000 });
-        Assert.That(await Residents.IsSelected("Bennett"), Is.True);
+        await ClickWhenStable(HandedOff);
 
-        await Page.Locator("#unselect-bennett-btn").ClickAsync();
-        await Expect(Page.Locator("#command-state")).ToHaveTextAsync("unselected Bennett", new() { Timeout = 5000 });
-        Assert.That(await Residents.IsSelected("Bennett"), Is.False);
+        await Expect(Round.Item("Walter Dean")).ToHaveClassAsync(Selected, new() { Timeout = 5000 });
+        await Expect(Round.SelectedItems).ToHaveCountAsync(1);
+        await Expect(RoundStatus).ToHaveTextAsync("Up next: Walter Dean");
+        await Expect(NoteResident).ToHaveTextAsync("Walter Dean");
+        await Expect(NoteText).ToHaveTextAsync("Refused breakfast and lunch. His daughter visits at 6 PM; let her know.");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task check_all_and_uncheck_all_methods_update_checkbox_items()
+    public async Task handing_off_again_hands_off_the_resident_the_round_moved_on_to()
     {
         await NavigateAndBoot();
+        await OpenResident("Ruth Coleman");
+        await ClickWhenStable(HandedOff);
+        await Expect(RoundStatus).ToHaveTextAsync("Up next: Walter Dean", new() { Timeout = 5000 });
 
-        await Page.Locator("#check-all-btn").ClickAsync();
-        await Expect(Page.Locator("#task-command-state")).ToHaveTextAsync("checked all", new() { Timeout = 5000 });
-        await Expect(Tasks.CheckedIcon("Hydration")).ToHaveCountAsync(1);
-        await Expect(Tasks.CheckedIcon("Mobility")).ToHaveCountAsync(1);
-        await Expect(Tasks.CheckedIcon("Dining")).ToHaveCountAsync(1);
+        await ClickWhenStable(HandedOff);
 
-        await Page.Locator("#uncheck-all-btn").ClickAsync();
-        await Expect(Page.Locator("#task-command-state")).ToHaveTextAsync("unchecked all", new() { Timeout = 5000 });
-        await Expect(Tasks.CheckedIcon("Hydration")).ToHaveCountAsync(0);
-        await Expect(Tasks.CheckedIcon("Mobility")).ToHaveCountAsync(0);
-        await Expect(Tasks.CheckedIcon("Dining")).ToHaveCountAsync(0);
+        await Expect(Round.Item("Grace Liu")).ToHaveClassAsync(Selected, new() { Timeout = 5000 });
+        await Expect(RoundStatus).ToHaveTextAsync("Up next: Grace Liu");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task selected_event_reads_scalar_payload_and_conditions()
+    public async Task a_resident_out_of_the_building_is_not_opened_on_the_round()
     {
         await NavigateAndBoot();
 
-        await Residents.ClickItem("Alice");
+        await Round.ClickItem("Helen Park");
 
-        await Expect(Page.Locator("#selected-text")).ToHaveTextAsync("Alice", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#selected-index")).ToHaveTextAsync("0", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#selected-interacted")).ToHaveTextAsync("true", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#selected-kind")).ToHaveTextAsync("primary", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#cancel-state")).ToHaveTextAsync("allowed", new() { Timeout = 5000 });
-        Assert.That(await Residents.IsSelected("Alice"), Is.True);
+        await Expect(AwayNotice).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(AwayNotice).ToHaveTextAsync("Helen Park is at St. Mary's Hospital until Thursday. The hospital has the handoff.");
+        await Expect(Round.Item("Helen Park")).Not.ToHaveClassAsync(Selected);
+        await Expect(Note).ToBeHiddenAsync();
+        await Expect(RoundStatus).ToHaveTextAsync("Up next: Arthur Bell");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task selected_event_cancel_mutation_prevents_selection()
+    public async Task handing_off_the_last_resident_completes_the_round_and_leaves_no_one_open()
     {
         await NavigateAndBoot();
+        await OpenResident("Grace Liu");
+        await Expect(Round.Item("Grace Liu")).ToHaveClassAsync(Selected);
 
-        await Residents.ClickItem("Carey");
+        await ClickWhenStable(HandedOff);
 
-        await Expect(Page.Locator("#selected-text")).ToHaveTextAsync("Carey", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#selected-index")).ToHaveTextAsync("2", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#selected-interacted")).ToHaveTextAsync("true", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#cancel-state")).ToHaveTextAsync("cancelled", new() { Timeout = 5000 });
-        Assert.That(await Residents.IsSelected("Carey"), Is.False);
+        await Expect(RoundComplete).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Round.Item("Grace Liu")).Not.ToHaveClassAsync(Selected);
+        await Expect(Round.SelectedItems).ToHaveCountAsync(0);
+        await Expect(Note).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task checkbox_selected_event_reads_checked_state()
+    public async Task ticking_a_task_notes_it_as_covered()
     {
         await NavigateAndBoot();
 
-        await Tasks.ClickItem("Hydration");
+        await BeforeYouLeave.ClickItem("Call lights tested");
 
-        await Expect(Page.Locator("#task-selected-text")).ToHaveTextAsync("Hydration", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#task-checked")).ToHaveTextAsync("true", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#task-check-state")).ToHaveTextAsync("checked", new() { Timeout = 5000 });
-        await Expect(Tasks.CheckedIcon("Hydration")).ToHaveCountAsync(1);
+        await Expect(BeforeYouLeave.CheckMark("Call lights tested")).ToHaveCountAsync(1, new() { Timeout = 5000 });
+        await Expect(ChecklistStatus).ToHaveTextAsync("Covered: Call lights tested");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task unticking_a_task_notes_it_as_reopened()
+    {
+        await NavigateAndBoot();
+        await BeforeYouLeave.ClickItem("Call lights tested");
+        await Expect(ChecklistStatus).ToHaveTextAsync("Covered: Call lights tested", new() { Timeout = 5000 });
+
+        await BeforeYouLeave.ClickItem("Call lights tested");
+
+        await Expect(BeforeYouLeave.CheckMark("Call lights tested")).ToHaveCountAsync(0, new() { Timeout = 5000 });
+        await Expect(ChecklistStatus).ToHaveTextAsync("Reopened: Call lights tested");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task all_covered_ticks_every_task()
+    {
+        await NavigateAndBoot();
+
+        await ClickWhenStable(AllCovered);
+
+        foreach (var task in MapleHandoff.BeforeLeaving)
+            await Expect(BeforeYouLeave.CheckMark(task)).ToHaveCountAsync(1, new() { Timeout = 5000 });
+        await Expect(ChecklistStatus).ToHaveTextAsync("Covered: every item");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task clearing_the_checklist_unticks_every_task()
+    {
+        await NavigateAndBoot();
+        await BeforeYouLeave.ClickItem("Narcotics count matched");
+        await BeforeYouLeave.ClickItem("Incidents logged");
+        await Expect(BeforeYouLeave.CheckMarks).ToHaveCountAsync(2, new() { Timeout = 5000 });
+
+        await ClickWhenStable(ClearChecklist);
+
+        await Expect(BeforeYouLeave.CheckMarks).ToHaveCountAsync(0, new() { Timeout = 5000 });
+        await Expect(ChecklistStatus).ToHaveTextAsync("Nothing covered yet.");
         AssertNoConsoleErrors();
     }
 }

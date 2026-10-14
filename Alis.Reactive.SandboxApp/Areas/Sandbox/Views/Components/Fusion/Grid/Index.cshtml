@@ -12,29 +12,30 @@
     {
         ("Boards", new[]
         {
-            ("Directory", "Resident directory", "Server-driven paging, sorting, filtering, search, grouping, and virtual scrolling with typed row events and public method calls"),
+            ("Directory", "Resident directory", "Find residents by name, wing, care level, risk or nurse; open their card and step through tonight's rounds"),
             ("Operations", "Operations board", "Column show/hide/reorder, keyed cell and row updates, view and selection queries, and typed template actions"),
             ("Billing", "Billing board", "Server-side paging, sorting, batch rate edits, multi-select bulk increases, validated dialog admits, custom toolbar, and exports"),
             ("CareOps", "Care-ops board", "Batch cell editing with dropdown, date, and numeric editors, checkbox bulk selection, chip filters, and validation-backed care updates"),
         }),
         ("Inline & dialog editing", new[]
         {
-            ("Editing", "Editing workflows", "Inline, batch, and dialog-template editing with typed method calls, cancelable events, gathered batch changes, and validation-backed grid updates"),
-            ("BeginEditNormal", "BeginEdit (normal + dialog)", "Inline and dialog edit modes with typed startEdit, selectRow, closeEdit calls and a beginEdit event that cancels locked rows"),
+            ("Editing", "Maple wing roster", "Inline roster corrections: open a resident due for review, save or discard, admit from the waiting list, move out, and apply a validated handoff correction; a move into memory care is refused as a roster edit"),
+            ("BeginEditNormal", "Care reviews", "A dialog review form for each resident; opening a review checks the record out, and a record on hold for a hospital transfer stays closed"),
             ("InlineEdit", "Inline edit", "Open, cancel, and commit a row's inline editor via typed startEdit, closeEdit, and endEdit method calls"),
             ("LockedResidentEdit", "Locked resident edit", "Programmatic row selection and edit start, with a BeginEdit handler that cancels editing for a locked resident"),
             ("ResidentEditForm", "Edit form templates", "Inline cell editors and a labeled dialog admission form, each typed edit template rendering its own dropdown, date, or number editor"),
-            ("ResidentAdmissionAudit", "Admission audit (add/delete)", "Adding and deleting rows via typed methods, with edit-action payloads audited and a blocked admission cancelled before persisting"),
-            ("ActionCompleteSaveEdit", "ActionComplete proof", "Normal-mode inline editing with Edit/Update/Cancel toolbar, typed select and edit commands, and ActionComplete surfacing save request details"),
+            ("ResidentAdmissionAudit", "Move-in day", "Move arrivals onto the roster and departures off it; an unsigned residency agreement refuses the move-in"),
+            ("ActionCompleteSaveEdit", "Pharmacy name corrections", "Inline corrections on the roster; a saved change of name goes to the pharmacy with the old and new name, and other changes send nothing"),
         }),
         ("Batch editing", new[]
         {
             ("BatchTaskUpdate", "Batch task update", "Batch-editing a numeric task-count cell via typed editCell, updateCell, and saveCell method calls on loaded rows"),
-            ("BatchCellEdit", "Batch cell edit", "Batch-mode cell editing via typed editCell/updateCell/saveCell calls, with cellSave and beforeBatchSave validation cancels and gathered batch changes"),
+            ("BatchCellEdit", "Evening task count", "Count open tasks and missed doses, bring in the task board, and hold the save while a resident has eight open tasks"),
             ("BatchRiskReview", "Batch risk review", "Batch-mode grid flagging a resident's risk via UpdateCell, then gathering pending batch changes for a posted review summary"),
             ("BatchRosterChange", "Batch roster change", "Staging an admit and discharge as one batch, then reviewing added and deleted records before commit"),
             ("BatchChangeReview", "Batch change review", "Batch-editing task counts, then binding a review grid from the beforeBatchSave event payload's changed records"),
             ("FamilyContacts", "Family contacts", "Batch cell editing whose cells check the contact validator's rules: name, phone pattern, email, portal link and visit bounds"),
+            ("ShiftTaskTally", "Shift task tally", "Batch counts at shift change: impossible counts are refused in the cell, an eMAR sync updates a count, and the tally waits for the supervisor when a resident carries ten or more tasks"),
         }),
         ("Rows, selection & review", new[]
         {

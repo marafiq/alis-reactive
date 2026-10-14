@@ -1,116 +1,148 @@
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ListView
 @model FusionListViewModel
-@using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
 @{
-    ViewData["Title"] = "FusionListView";
+    ViewData["Title"] = "Shift Handoff";
 
-    const string ResidentListId = "resident-list";
-    const string TaskListId = "task-list";
+    const string RoundId = "handoff-round";
+    const string ChecklistId = "leaving-checklist";
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
 
     var plan = Html.ReactivePlan<FusionListViewModel>();
-    var residents = (string[])ViewBag.Residents;
-    var tasks = (string[])ViewBag.Tasks;
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        p.Element("command-state").Text.Set("ready");
-    }));
+    var noteUrl = Url.SandboxRoute("RoundNote", "ListView");
+    var handOffUrl = Url.SandboxRoute("HandOff", "ListView");
+    var residents = MapleHandoff.Round.Select(resident => resident.Name).ToArray();
+    var away = MapleHandoff.Away;
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionListView</native-heading>
+    <native-heading level="H1">Shift Handoff</native-heading>
+    <native-text color="Secondary">
+        Maple wing, day shift to evening shift. Open each resident on the round, read the note to the evening nurse,
+        then hand them off. Finish the checklist before you leave the wing.
+    </native-text>
 
     <native-grid cols="C2" gap="Base">
         <native-card><native-card-body>
-            <native-heading level="H2">Residents</native-heading>
-            @(Html.FusionListView(plan, ResidentListId, b => b
+            <native-heading level="H2">Round</native-heading>
+            @(Html.FusionListView(plan, RoundId, b => b
                 .DataSource(residents)
-                .Height("210px"))
+                .Height("300px"))
                 .Reactive(evt => evt.Select, (args, p) =>
                 {
-                    p.Element("selected-text").Text.Set(args.Text);
-                    p.Element("selected-index").Text.Set(args.Index);
-                    p.Element("selected-interacted").Text.Set(args.IsInteracted);
-                    p.When(args.Text).Eq("Alice")
-                        .Then(t => t.Element("selected-kind").Text.Set("primary"))
-                        .Else(e => e.Element("selected-kind").Text.Set("other"));
-                    p.When(args.Text).Eq("Carey")
+                    var handoffResident = p.Component<NativeHiddenField>(m => m.HandoffResident);
+                    p.When(args.Text).Eq(away.Name)
                         .Then(t =>
                         {
+                            // A resident out of the building is not opened on the round.
                             args.Cancel.Set(true);
-                            t.Element("cancel-state").Text.Set("cancelled");
+                            t.Element("away-notice").Show();
                         })
-                        .Else(e => e.Element("cancel-state").Text.Set("allowed"));
+                        .ElseIf(args.IsInteracted).Truthy()
+                        .Then(t =>
+                        {
+                            t.Element("away-notice").Hide();
+                            handoffResident.Value.Set(args.Text);
+                            t.Element("round-move").Text.Set("Opened");
+                            t.Element("round-resident").Text.Set(args.Text);
+                            t.Get(noteUrl)
+                                .Gather<RoundNoteQuery>(g => g.Set(x => x.Place, args.Index))
+                                .Response(r => r.OnSuccess<RoundNote>((json, s) =>
+                                {
+                                    s.Element("handoff-note-resident").Text.Set(json.Get(x => x.Resident));
+                                    s.Element("handoff-note-text").Text.Set(json.Get(x => x.Note));
+                                    s.Element("handoff-note-empty").Hide();
+                                    s.Element("handoff-note").Show();
+                                }));
+                        })
+                        .Else(e =>
+                        {
+                            // The round moved on after a handoff; the handoff's answer carried the note.
+                            e.Element("away-notice").Hide();
+                            handoffResident.Value.Set(args.Text);
+                            e.Element("round-move").Text.Set("Up next:");
+                            e.Element("round-resident").Text.Set(args.Text);
+                        });
                 }))
+
+            <p id="round-status" class="mt-3 text-sm"><span id="round-move">Up next:</span> <span id="round-resident" class="font-medium">@residents[0]</span></p>
+            <p id="away-notice" hidden class="mt-1 text-sm text-amber-700">@(away.Name) is at @(away.Away). The hospital has the handoff.</p>
+            <p id="round-complete" hidden class="mt-3 text-sm text-green-700">The round is complete. Every resident in the building is handed off.</p>
         </native-card-body></native-card>
 
         <native-card><native-card-body>
-            <native-heading level="H2">Care Tasks</native-heading>
-            @(Html.FusionListView(plan, TaskListId, b => b
-                .DataSource(tasks)
-                .ShowCheckBox(true)
-                .Height("210px"))
-                .Reactive(evt => evt.Select, (args, p) =>
-                {
-                    p.Element("task-selected-text").Text.Set(args.Text);
-                    p.Element("task-checked").Text.Set(args.IsChecked);
-                    p.When(args.IsChecked).Truthy()
-                        .Then(t => t.Element("task-check-state").Text.Set("checked"))
-                        .Else(e => e.Element("task-check-state").Text.Set("unchecked"));
-                }))
+            <native-heading level="H2">Handoff note</native-heading>
+            <p id="handoff-note-empty" class="text-sm text-text-muted">Open a resident on the round to read their note.</p>
+            <section id="handoff-note" hidden class="mt-3">
+                <h3 id="handoff-note-resident" class="text-sm font-semibold"></h3>
+                <p id="handoff-note-text" class="mt-1 text-sm"></p>
+                @Html.HiddenFieldFor(plan, m => m.HandoffResident)
+                <native-hstack gap="Sm" class="mt-3">
+                    @(Html.NativeButton("handed-off-btn", "Handed off")
+                        .CssClass(Button)
+                        .Reactive(plan, evt => evt.Click, (_, p) =>
+                        {
+                            p.Post(handOffUrl)
+                                .Gather<HandOffRequest>(g => g.Set(x => x.Resident, p.Component<NativeHiddenField>(m => m.HandoffResident).Value))
+                                .Response(r => r.OnSuccess<HandOffAnswer>((json, s) =>
+                                {
+                                    s.When(json.Get(x => x.Next)).NotEmpty()
+                                        .Then(next =>
+                                        {
+                                            next.Element("handoff-note-resident").Text.Set(json.Get(x => x.Next));
+                                            next.Element("handoff-note-text").Text.Set(json.Get(x => x.NextNote));
+                                            next.Component<FusionListView>(RoundId).SelectItem(json.Get(x => x.Next));
+                                        })
+                                        .Else(done =>
+                                        {
+                                            done.Component<FusionListView>(RoundId).UnselectItem(json.Get(x => x.HandedOff));
+                                            done.Element("handoff-note").Hide();
+                                            done.Element("round-status").Hide();
+                                            done.Element("round-complete").Show();
+                                        });
+                                }));
+                        }))
+                </native-hstack>
+            </section>
         </native-card-body></native-card>
     </native-grid>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Commands</native-heading>
-        <native-hstack gap="Sm" class="flex-wrap">
-            @(Html.NativeButton("select-bennett-btn", "Select Bennett")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
+        <native-heading level="H2">Before you leave</native-heading>
+        @(Html.FusionListView(plan, ChecklistId, b => b
+            .DataSource(MapleHandoff.BeforeLeaving.ToArray())
+            .ShowCheckBox(true)
+            .Height("300px"))
+            .Reactive(evt => evt.Select, (args, p) =>
+            {
+                p.When(args.IsChecked).Truthy()
+                    .Then(t => t.Element("checklist-change").Text.Set("Covered:"))
+                    .Else(e => e.Element("checklist-change").Text.Set("Reopened:"));
+                p.Element("checklist-item").Text.Set(args.Text);
+            }))
+
+        <p id="checklist-status" class="mt-3 text-sm"><span id="checklist-change">Nothing covered yet.</span> <span id="checklist-item" class="font-medium"></span></p>
+
+        <native-hstack gap="Sm" class="mt-3">
+            @(Html.NativeButton("all-covered-btn", "All covered")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionListView>(ResidentListId).SelectItem("Bennett");
-                    p.Element("command-state").Text.Set("selected Bennett");
+                    p.Component<FusionListView>(ChecklistId).CheckAllItems();
+                    p.Element("checklist-change").Text.Set("Covered:");
+                    p.Element("checklist-item").Text.Set("every item");
                 }))
-            @(Html.NativeButton("unselect-bennett-btn", "Unselect Bennett")
-                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
+            @(Html.NativeButton("clear-checklist-btn", "Clear checklist")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
                 {
-                    p.Component<FusionListView>(ResidentListId).UnselectItem("Bennett");
-                    p.Element("command-state").Text.Set("unselected Bennett");
-                }))
-            @(Html.NativeButton("check-all-btn", "Check All")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionListView>(TaskListId).CheckAllItems();
-                    p.Element("task-command-state").Text.Set("checked all");
-                }))
-            @(Html.NativeButton("uncheck-all-btn", "Uncheck All")
-                .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionListView>(TaskListId).UncheckAllItems();
-                    p.Element("task-command-state").Text.Set("unchecked all");
+                    p.Component<FusionListView>(ChecklistId).UncheckAllItems();
+                    p.Element("checklist-change").Text.Set("Nothing covered yet.");
+                    p.Element("checklist-item").Text.Set("");
                 }))
         </native-hstack>
     </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Trace</native-heading>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>Command: <span id="command-state" class="text-text-muted">pending</span></p>
-            <p>Selected text: <span id="selected-text" class="text-text-muted">pending</span></p>
-            <p>Selected index: <span id="selected-index" class="text-text-muted">pending</span></p>
-            <p>Selected interacted: <span id="selected-interacted" class="text-text-muted">pending</span></p>
-            <p>Selected kind: <span id="selected-kind" class="text-text-muted">pending</span></p>
-            <p>Cancel state: <span id="cancel-state" class="text-text-muted">pending</span></p>
-            <p>Task command: <span id="task-command-state" class="text-text-muted">pending</span></p>
-            <p>Task selected text: <span id="task-selected-text" class="text-text-muted">pending</span></p>
-            <p>Task checked: <span id="task-checked" class="text-text-muted">pending</span></p>
-            <p>Task check state: <span id="task-check-state" class="text-text-muted">pending</span></p>
-        </native-vstack>
-    </native-card-body></native-card>
-
 </native-vstack>
 
 @Html.RenderPlan(plan)

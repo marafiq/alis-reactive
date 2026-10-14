@@ -290,16 +290,6 @@ namespace Alis.Reactive.Fusion.Components
         EndsWith
     }
 
-    /// <summary>
-    /// Event args for Syncfusion Grid's <c>dataStateChange</c> event.
-    /// </summary>
-    /// <remarks>
-    /// Syncfusion emits a variant-specific payload for each data-state trigger.
-    /// <c>skip</c>, <c>take</c>, and <c>requiresCounts</c> are common in
-    /// custom-binding rows, while <c>sorted</c>, <c>group</c>, <c>where</c>,
-    /// and <c>search</c> appear only on the trigger variants that emit them.
-    /// Do not infer missing fields from another variant.
-    /// </remarks>
     /// <summary>A grid column, as <see cref="FusionGrid.GetColumnByField"/> returns it.</summary>
     public sealed class FusionGridColumn : JsObject
     {
@@ -310,6 +300,16 @@ namespace Alis.Reactive.Fusion.Components
         public Prop<bool> Visible => Prop<bool>();
     }
 
+    /// <summary>
+    /// Event args for Syncfusion Grid's <c>dataStateChange</c> event.
+    /// </summary>
+    /// <remarks>
+    /// Syncfusion emits a variant-specific payload for each data-state trigger.
+    /// <c>skip</c>, <c>take</c>, and <c>requiresCounts</c> are common in
+    /// custom-binding rows, while <c>sorted</c>, <c>group</c>, <c>where</c>,
+    /// and <c>search</c> appear only on the trigger variants that emit them.
+    /// Do not infer missing fields from another variant.
+    /// </remarks>
     public class FusionGridDataStateChangeArgs : JsObject
     {
         /// <summary>Syncfusion event name injected by the EJ2 event observer.</summary>

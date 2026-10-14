@@ -153,7 +153,7 @@ namespace Alis.Reactive.Fusion.Components
         public TypedEvent<FusionKanbanDialogArgs<TCard>> DialogClose<TCard>() where TCard : class, new() =>
             Event<FusionKanbanDialogArgs<TCard>>();
 
-        /// <summary>Raised when the user changes cards; commit them, then call <c>EndEdit</c>.</summary>
+        /// <summary>Raised when the user changes cards; send the change to the server, then end or cancel it.</summary>
         /// <typeparam name="TCard">Your card class.</typeparam>
         public TypedEvent<FusionKanbanDataSourceChangedArgs<TCard>> DataSourceChanged<TCard>() where TCard : class, new() =>
             Event<FusionKanbanDataSourceChangedArgs<TCard>>();
@@ -278,7 +278,11 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>Payload of <c>DataSourceChanged</c>.</summary>
-    /// <remarks>Commit the change, then finish it: <c>args.EndEdit()</c>.</remarks>
+    /// <remarks>
+    /// Send the change to the server, then end it (<c>args.EndEdit()</c>) or cancel it (<c>args.CancelEdit()</c>).
+    /// A board bound to the server's cards shows the server's answer by writing it back
+    /// (<c>board.Cards&lt;T&gt;().Set(..)</c>).
+    /// </remarks>
     /// <typeparam name="TCard">Your card class.</typeparam>
     public class FusionKanbanDataSourceChangedArgs<TCard> : JsObject
         where TCard : class, new()
@@ -298,10 +302,15 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Zero-based index of the change.</summary>
         public ReadOnly<int> Index => ReadOnly<int>();
 
-        /// <summary>Applies the change to the board.</summary>
+        /// <summary>
+        /// Ends the change: the board copies it into its own cards. Call it once the server has the change.
+        /// </summary>
         public void EndEdit() => Call();
 
-        /// <summary>Reverts the change.</summary>
+        /// <summary>
+        /// Cancels the change the server refused: the board stops waiting and hides its spinner. It does not put
+        /// a moved card back; write the server's cards to the board for that.
+        /// </summary>
         public void CancelEdit() => Call();
     }
 

@@ -1,163 +1,141 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.TaskCountViewModel
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
-@using Alis.Reactive
 @{
-    ViewData["Title"] = "Care-Ops Batch Task Update";
+    ViewData["Title"] = "Evening Task Count";
 
-    const string BatchGridId = "resident-batch-edit-grid";
+    const string GridId = "task-count-grid";
+    const string Button = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
     const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
-    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
-    const string ButtonAccent = "rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90";
 
-    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+    // No shift leaves more open tasks than this with one resident: a larger number is a slip of the keyboard.
+    const int MostOpenTasks = 20;
 
-    var columns = FusionGridColumns.Of<ResidentDirectoryGridItem>();
+    // At this many open tasks the night supervisor hears about the resident before the count is saved.
+    const int SupervisorOpenTasks = 8;
 
-    List<GridColumn> EditColumns() => new List<GridColumn>
-    {
-        new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
-        new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "180" },
-        new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care Level", Width = "150" },
-        new GridColumn { Field = columns.Field(r => r.Wing), HeaderText = "Wing", Width = "110" },
-        new GridColumn { Field = columns.Field(r => r.OpenTasks), HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right }
-    };
-
-    Html.On(plan, t => t.DomReady(p =>
-        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
-            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
-            {
-                s.Component<FusionGrid>(BatchGridId).DataSource.Set(json);
-                s.Element("batch-load-status").Text.Set("loaded batch rows");
-            }))));
+    var plan = Html.ReactivePlan<TaskCountViewModel>();
+    var columns = FusionGridColumns.Of<TaskCountRow>();
+    var openTasks = Field.Of((TaskCountRow r) => r.OpenTasks);
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Care-Ops Batch Task Update</native-heading>
-    <native-text color="Secondary">
-        A nurse manager batch-edits open-task counts across residents. Each cell save fires
-        <code>cellSave</code>/<code>cellSaved</code>; the manager blocks an impossible per-cell value (99),
-        and the system blocks committing a batch that pushes a resident to 8 open tasks via
-        <code>beforeBatchSave</code> before the change persists.
-    </native-text>
+    <div>
+        <native-heading level="H1">Evening Task Count</native-heading>
+        <native-text color="Secondary">
+            Maple wing, evening shift. Record each resident's open tasks and missed doses, then save the count
+            for the night shift.
+        </native-text>
+    </div>
 
-    <p class="font-mono text-sm">Load status: <span id="batch-load-status" class="text-text-muted">waiting</span></p>
+    <native-card><native-card-body>
+        <native-hstack gap="Sm" class="mb-4 flex-wrap">
+            @(Html.NativeButton("start-count", "Start the count")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) => p.Component<FusionGrid>(GridId).EditCell(0, openTasks)))
+            @(Html.NativeButton("check-task-board", "Check the task board")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                    p.Post(Url.SandboxRoute("TaskCountTaskBoard", "Grid"))
+                        .Response(r => r.OnSuccess<TaskBoardCount>((board, s) =>
+                        {
+                            s.Component<FusionGrid>(GridId).UpdateCell(board.Get(x => x.RowIndex), openTasks, board.Get(x => x.OpenTasks));
+                            s.Element("count-status").Text.Set(board.Get(x => x.Summary));
+                        }))))
+            @(Html.NativeButton("review-count", "Review changes")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(GridId);
+                    grid.SaveCell();
+                    p.Post(Url.SandboxRoute("TaskCountReview", "Grid"))
+                        .Gather<TaskCountChanges>(g => g.Set(x => x.Changes, grid.GetBatchChanges<TaskCountRow>()))
+                        .Response(r => r.OnSuccess<TaskCountSummary>((review, s) =>
+                            s.Element("count-status").Text.Set(review.Get(x => x.Summary))));
+                }))
+            @(Html.NativeButton("save-count", "Save the count")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (_, p) => p.Component<FusionGrid>(GridId).EndEdit()))
+        </native-hstack>
 
-    <native-hstack gap="Sm" class="flex-wrap">
-        @(Html.NativeButton("batch-edit-cell", "Edit Tasks Cell")
-            .CssClass(ButtonSecondary)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
+        @(Html.FusionGrid<TaskCountViewModel, TaskCountRow>(plan, GridId, b => b
+            .DataSource(Model.Residents)
+            .EditSettings(new GridEditSettings { AllowEditing = true, Mode = EditMode.Batch, ShowConfirmDialog = false })
+            .Columns(new List<GridColumn>
             {
-                p.Component<FusionGrid>(BatchGridId).EditCell(0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks));
-                p.Element("batch-command-status").Text.Set("editCell called");
+                new GridColumn { Field = columns.Field(r => r.Room), HeaderText = "Room", Width = "90", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "180", AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.OpenTasks), HeaderText = "Open tasks", Width = "130", TextAlign = TextAlign.Right, EditType = "numericedit" },
+                new GridColumn { Field = columns.Field(r => r.MissedDoses), HeaderText = "Missed doses", Width = "140", TextAlign = TextAlign.Right, EditType = "numericedit" }
             }))
-        @(Html.NativeButton("batch-update-cell", "Set Tasks To 6")
-            .CssClass(ButtonPrimary)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
+            .Reactive(evt => evt.CellSave<TaskCountRow, int>(), (args, p) =>
             {
-                p.Component<FusionGrid>(BatchGridId).UpdateCell(0, Field.Of((ResidentDirectoryGridItem x) => x.OpenTasks), 6);
-                p.Element("batch-command-status").Text.Set("updateCell called");
-            }))
-        @(Html.NativeButton("batch-save-cell", "Save Cell")
-            .CssClass(ButtonSecondary)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(BatchGridId).SaveCell();
-                p.Element("batch-command-status").Text.Set("saveCell called");
-            }))
-        @(Html.NativeButton("batch-gather-changes", "Gather Changes")
-            .CssClass(ButtonAccent)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var grid = p.Component<FusionGrid>(BatchGridId);
-                p.Post(Url.SandboxRoute("BatchSummary", "Grid"))
-                    .Gather<ResidentGridBatchSummaryRequest>(g => g.Set(x => x.BatchChanges, grid.GetBatchChanges<ResidentDirectoryGridItem>()))
-                    .Response(r => r.OnSuccess<ResidentGridBatchSummaryResponse>((json, s) =>
-                    {
-                        s.Element("batch-summary").Text.Set(json.Get(x => x.Summary));
-                    }));
-            }))
-        @(Html.NativeButton("batch-end-edit", "Commit Batch")
-            .CssClass(ButtonPrimary)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(BatchGridId).EndEdit();
-                p.Element("batch-command-status").Text.Set("endEdit called");
-            }))
-    </native-hstack>
-
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, BatchGridId, b => b
-            .AllowSelection(true)
-            .Toolbar(new List<string> { "Update", "Cancel" })
-            .EditSettings(new GridEditSettings
-            {
-                AllowEditing = true,
-                AllowEditOnDblClick = false,
-                Mode = EditMode.Batch,
-                ShowConfirmDialog = false
-            })
-            .Columns(EditColumns()))
-            .Reactive(evt => evt.CellSave<ResidentDirectoryGridItem, int>(), (args, p) =>
-            {
-                p.Element("batch-cell-save-column").Text.Set(args.ColumnName);
-                p.Element("batch-cell-save-value").Text.Set(args.Value);
-                p.Element("batch-cell-save-previous").Text.Set(args.PreviousValue);
-                p.Element("batch-cell-save-resident").Text.Set(args.RowData.Get(x => x.ResidentName));
-                p.Element("batch-cell-save-cancel").Text.Set(args.Cancel);
-                p.When(args.Value).Eq(99)
-                    .Then(t =>
+                p.When(args.ColumnName).Eq(columns.Field(r => r.OpenTasks)).And(args.Value).Gt(MostOpenTasks)
+                    .Then(refused =>
                     {
                         args.Cancel.Set(true);
-                        t.Element("batch-cell-save-cancelled").Text.Set("blocked 99");
-                    });
+                        refused.Element("count-refused-resident").Text.Set(args.RowData.Get(r => r.ResidentName));
+                        refused.Element("count-refused-value").Text.Set(args.Value);
+                        refused.Element("count-refused-kept").Text.Set(args.PreviousValue);
+                        refused.Element("count-refused").Show();
+                    })
+                    .Else(accepted => accepted.Element("count-refused").Hide());
             })
-            .Reactive(evt => evt.CellSaved<ResidentDirectoryGridItem, int>(), (args, p) =>
+            .Reactive(evt => evt.CellSaved<TaskCountRow, int>(), (args, p) =>
             {
-                p.Element("batch-cell-saved-column").Text.Set(args.ColumnName);
-                p.Element("batch-cell-saved-value").Text.Set(args.Value);
-                p.Element("batch-cell-saved-previous").Text.Set(args.PreviousValue);
-                p.Element("batch-cell-saved-resident").Text.Set(args.RowData.Get(x => x.ResidentName));
+                p.When(args.Value).NotEq(args.PreviousValue).Then(noted =>
+                {
+                    noted.Element("count-unsaved-resident").Text.Set(args.RowData.Get(r => r.ResidentName));
+                    noted.When(args.ColumnName).Eq(columns.Field(r => r.OpenTasks))
+                        .Then(tasks => tasks.Element("count-unsaved-column").Text.Set("open tasks"))
+                        .Else(doses => doses.Element("count-unsaved-column").Text.Set("missed doses"));
+                    noted.Element("count-unsaved-from").Text.Set(args.PreviousValue);
+                    noted.Element("count-unsaved-to").Text.Set(args.Value);
+                    noted.Element("count-unsaved").Show();
+                });
             })
-            .Reactive(evt => evt.BeforeBatchSave<ResidentDirectoryGridItem>(), (args, p) =>
+            .Reactive(evt => evt.BeforeBatchSave<TaskCountRow>(), (args, p) =>
             {
-                p.Element("batch-before-save-resident").Text.Set(args.BatchChanges.Get(x => x.ChangedRecords[0].ResidentName));
-                p.Element("batch-before-save-tasks").Text.Set(args.BatchChanges.Get(x => x.ChangedRecords[0].OpenTasks));
-                p.Element("batch-before-save-cancel").Text.Set(args.Cancel);
-                p.When(args.BatchChanges.Get(x => x.ChangedRecords[0].OpenTasks)).Eq(8)
-                    .Then(t =>
+                var changed = p.From(args.BatchChanges.Get(x => x.ChangedRecords));
+                p.When(changed.Any(r => r.OpenTasks >= SupervisorOpenTasks)).Truthy()
+                    .Then(held =>
                     {
                         args.Cancel.Set(true);
-                        t.Element("batch-before-save-cancelled").Text.Set("blocked batch 8");
-                        t.Element("batch-action-complete").Text.Set("waiting after cancelled batch");
+                        held.Element("count-held-resident").Text.Set(changed.Find(r => r.OpenTasks >= SupervisorOpenTasks, r => r.ResidentName));
+                        held.Element("count-held-tasks").Text.Set(changed.Find(r => r.OpenTasks >= SupervisorOpenTasks, r => r.OpenTasks));
+                        held.Element("count-held").Show();
+                    })
+                    .Else(saving =>
+                    {
+                        saving.Element("count-held").Hide();
+                        saving.Post(Url.SandboxRoute("TaskCountSave", "Grid"))
+                            .Gather<TaskCountChanges>(g => g.Set(x => x.Changes, args.BatchChanges))
+                            .Response(r => r.OnSuccess<TaskCountSummary>((saved, s) =>
+                                s.Element("count-status").Text.Set(saved.Get(x => x.Summary))));
                     });
             })
-            .Reactive(evt => evt.ActionComplete<ResidentDirectoryGridItem>(), (args, p) =>
+            .Reactive(evt => evt.ActionComplete<TaskCountRow>(), (args, p) =>
             {
-                p.Element("batch-action-complete").Text.Set(args.RequestType);
+                p.When(args.RequestType).Eq("batchsave").Then(saved => saved.Element("count-unsaved").Hide());
             }))
 
-        <native-grid cols="C4" gap="Base" class="mt-4 font-mono text-sm">
-            <p>Status: <span id="batch-command-status" class="text-text-muted">waiting</span></p>
-            <p>Cell column: <span id="batch-cell-save-column" class="text-text-muted">waiting</span></p>
-            <p>Cell value: <span id="batch-cell-save-value" class="text-text-muted">waiting</span></p>
-            <p>Cell previous: <span id="batch-cell-save-previous" class="text-text-muted">waiting</span></p>
-            <p>Cell resident: <span id="batch-cell-save-resident" class="text-text-muted">waiting</span></p>
-            <p>Cell cancel: <span id="batch-cell-save-cancel" class="text-text-muted">waiting</span></p>
-            <p>Cell blocked: <span id="batch-cell-save-cancelled" class="text-text-muted">not blocked</span></p>
-            <p>Cell saved column: <span id="batch-cell-saved-column" class="text-text-muted">waiting</span></p>
-            <p>Cell saved: <span id="batch-cell-saved-value" class="text-text-muted">waiting</span></p>
-            <p>Cell saved previous: <span id="batch-cell-saved-previous" class="text-text-muted">waiting</span></p>
-            <p>Cell saved resident: <span id="batch-cell-saved-resident" class="text-text-muted">waiting</span></p>
-            <p>Batch resident: <span id="batch-before-save-resident" class="text-text-muted">waiting</span></p>
-            <p>Batch tasks: <span id="batch-before-save-tasks" class="text-text-muted">waiting</span></p>
-            <p>Batch cancel: <span id="batch-before-save-cancel" class="text-text-muted">waiting</span></p>
-            <p>Batch blocked: <span id="batch-before-save-cancelled" class="text-text-muted">not blocked</span></p>
-            <p>Batch action: <span id="batch-action-complete" class="text-text-muted">waiting</span></p>
-            <p>Batch summary: <span id="batch-summary" class="text-text-muted">not gathered</span></p>
-        </native-grid>
-    </section>
+        <div class="mt-4 space-y-1 text-sm">
+            <p id="count-status" role="status">Tonight's count has not been saved.</p>
+            <p id="count-unsaved" hidden>
+                Not saved yet: <span id="count-unsaved-resident"></span>, <span id="count-unsaved-column"></span>
+                <span id="count-unsaved-from"></span> → <span id="count-unsaved-to"></span>.
+            </p>
+            <p id="count-refused" hidden class="text-red-700">
+                <span id="count-refused-resident"></span>: <span id="count-refused-value"></span> open tasks is more
+                than a shift can hold. The count stays at <span id="count-refused-kept"></span>.
+            </p>
+            <p id="count-held" hidden class="text-red-700">
+                <span id="count-held-resident"></span> would have <span id="count-held-tasks"></span> open tasks.
+                Page the night supervisor before saving the count.
+            </p>
+        </div>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

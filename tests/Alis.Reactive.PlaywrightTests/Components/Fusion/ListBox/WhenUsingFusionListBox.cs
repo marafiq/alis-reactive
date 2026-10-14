@@ -1,144 +1,165 @@
+using System.Text.RegularExpressions;
 using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ListBox;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.ListBox;
 
+/// <summary>
+/// As the activities coordinator, I want to choose who rides the morning bus to Thursday's garden outing, with
+/// everyone else on the afternoon bus, so that the morning bus is not overfilled, the residents in wheelchairs
+/// get the lift, and nobody misses a morning appointment for the trip.
+/// </summary>
+/// <remarks>
+/// Eight residents signed up; the list's selection is the morning bus, which seats six. Walter Dean and Margaret
+/// Hale ride in wheelchairs and the lift is on the morning bus only. Ruth Coleman and Dorothy Kim have
+/// appointments that morning. Last Thursday Arthur Bell, Grace Liu and Samuel Ortiz rode in the morning.
+/// Last week's groups are applied with DataBind before the lift riders are selected: without it the list still
+/// shows the old selection when SelectItems reads the selection back from the list (list-box.js:891-911,
+/// 2225-2246), that read-back cancels the pending write (ej2-base base.js:60-75), and only the lift riders end up
+/// on the morning bus.
+/// Not exercised: SelectItems and EnableItems by text (their third argument false); every call here names the
+/// residents by ID, which is what the page holds.
+/// </remarks>
 [TestFixture]
 public class WhenUsingFusionListBox : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/FusionListBox";
+    private static readonly Regex Selected = new(@"\be-selected\b");
+    private static readonly Regex Disabled = new(@"\be-disabled\b");
 
-    private FusionListBoxLocator Residents => new(Page, "resident-list-box");
+    private PagePlan<FusionListBoxModel> _plan = null!;
+
+    private FusionListBoxLocator MorningBus => new(Page, "morning-bus");
+    private ILocator SeatsTaken => Page.Locator("#morning-seats-taken");
+    private ILocator BusFull => Page.Locator("#morning-bus-full");
+    private ILocator LastWeek => Page.Locator("#last-week-btn");
+    private ILocator SelectEveryone => Page.Locator("#select-everyone-btn");
+    private ILocator ClearMorningBus => Page.Locator("#clear-morning-bus-btn");
+    private ILocator AppointmentsNote => Page.Locator("#appointments-note");
+    private ILocator SaveGroups => Page.Locator("#save-groups-btn");
+    private ILocator GroupsStatus => Page.Locator("#groups-status");
+    private NativeCheckBoxLocator AppointmentsRideLater => _plan.NativeCheckBox(m => m.MorningAppointmentsRideLater);
 
     private async Task NavigateAndBoot()
     {
-        await NavigateToAndWaitForTextSignal(Path, "#value-echo", "pending");
+        await NavigateToAndWaitForBoot(Path);
+        _plan = await PagePlan<FusionListBoxModel>.FromPage(Page);
+        await Expect(MorningBus.Item("Arthur Bell")).ToBeVisibleAsync(new() { Timeout = 5000 });
     }
 
     [Test]
-    public async Task page_loads_without_errors()
+    public async Task choosing_residents_counts_the_seats_taken_on_the_morning_bus()
     {
         await NavigateAndBoot();
-        await Expect(Page).ToHaveTitleAsync("FusionListBox — Alis.Reactive Sandbox");
+
+        await MorningBus.ClickItem("Arthur Bell");
+        await MorningBus.CtrlClickItem("Walter Dean");
+
+        await Expect(SeatsTaken).ToHaveTextAsync("2", new() { Timeout = 5000 });
+        await Expect(MorningBus.Item("Arthur Bell")).ToHaveClassAsync(Selected);
+        await Expect(MorningBus.Item("Walter Dean")).ToHaveClassAsync(Selected);
+        await Expect(BusFull).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task dom_ready_set_value_and_value_source_condition_update_trace()
+    public async Task selecting_everyone_warns_that_the_morning_bus_seats_six()
     {
         await NavigateAndBoot();
 
-        await Expect(Page.Locator("#value-state")).ToHaveTextAsync("has values", new() { Timeout = 5000 });
-        Assert.That(await Residents.IsSelected("Alice"), Is.True);
-        Assert.That(await Residents.IsSelected("Bennett"), Is.False);
+        await ClickWhenStable(SelectEveryone);
+
+        await Expect(MorningBus.SelectedItems).ToHaveCountAsync(OutingDay.SignedUp.Count, new() { Timeout = 5000 });
+        await Expect(SeatsTaken).ToHaveTextAsync("8");
+        await Expect(BusFull).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task set_value_and_data_bind_update_selection()
+    public async Task clearing_the_morning_bus_sends_everyone_to_the_afternoon()
     {
         await NavigateAndBoot();
+        await MorningBus.ClickItem("Arthur Bell");
+        await Expect(SeatsTaken).ToHaveTextAsync("1", new() { Timeout = 5000 });
 
-        await Page.Locator("#set-value-btn").ClickAsync();
+        await ClickWhenStable(ClearMorningBus);
 
-        await Expect(Page.Locator("#command-state")).ToHaveTextAsync("value set", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#value-echo")).ToHaveTextAsync("bennett,dawson", new() { Timeout = 5000 });
-        Assert.That(await Residents.IsSelected("Alice"), Is.False);
-        Assert.That(await Residents.IsSelected("Bennett"), Is.True);
-        Assert.That(await Residents.IsSelected("Dawson"), Is.True);
+        await Expect(MorningBus.SelectedItems).ToHaveCountAsync(0, new() { Timeout = 5000 });
+        await Expect(SeatsTaken).ToHaveTextAsync("0");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task select_and_unselect_values_update_value_and_emit_change()
+    public async Task last_weeks_groups_come_back_with_the_lift_riders_on_the_morning_bus()
     {
         await NavigateAndBoot();
 
-        await Page.Locator("#select-carey-btn").ClickAsync();
+        await ClickWhenStable(LastWeek);
 
-        await Expect(Page.Locator("#command-state")).ToHaveTextAsync("carey selected", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#value-echo")).ToHaveTextAsync("alice,carey", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#change-value")).ToHaveTextAsync("alice,carey", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#change-state")).ToHaveTextAsync("has values", new() { Timeout = 5000 });
-        Assert.That(await Residents.IsSelected("Carey"), Is.True);
-
-        await Page.Locator("#unselect-carey-btn").ClickAsync();
-
-        await Expect(Page.Locator("#command-state")).ToHaveTextAsync("carey unselected", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#value-echo")).ToHaveTextAsync("alice", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#change-value")).ToHaveTextAsync("alice", new() { Timeout = 5000 });
-        Assert.That(await Residents.IsSelected("Carey"), Is.False);
+        await Expect(SeatsTaken).ToHaveTextAsync("5", new() { Timeout = 5000 });
+        foreach (var rider in new[] { "Arthur Bell", "Grace Liu", "Samuel Ortiz", "Walter Dean", "Margaret Hale" })
+            await Expect(MorningBus.Item(rider)).ToHaveClassAsync(Selected);
+        await Expect(MorningBus.SelectedItems).ToHaveCountAsync(5);
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task select_all_and_unselect_all_update_values()
+    public async Task a_resident_with_a_morning_appointment_leaves_the_morning_bus_and_cannot_rejoin_it()
     {
         await NavigateAndBoot();
+        await MorningBus.ClickItem("Ruth Coleman");
+        await Expect(SeatsTaken).ToHaveTextAsync("1", new() { Timeout = 5000 });
 
-        await Page.Locator("#select-all-btn").ClickAsync();
+        await AppointmentsRideLater.Check();
 
-        await Expect(Page.Locator("#command-state")).ToHaveTextAsync("all selected", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#value-echo")).ToHaveTextAsync("alice,bennett,carey,dawson", new() { Timeout = 5000 });
-        Assert.That(await Residents.IsSelected("Alice"), Is.True);
-        Assert.That(await Residents.IsSelected("Bennett"), Is.True);
-        Assert.That(await Residents.IsSelected("Carey"), Is.True);
-        Assert.That(await Residents.IsSelected("Dawson"), Is.True);
-
-        await Page.Locator("#unselect-all-btn").ClickAsync();
-
-        await Expect(Page.Locator("#command-state")).ToHaveTextAsync("all unselected", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#value-echo")).ToHaveTextAsync(string.Empty, new() { Timeout = 5000 });
-        await Expect(Page.Locator("#value-state")).ToHaveTextAsync("empty", new() { Timeout = 5000 });
-        Assert.That(await Residents.IsSelected("Alice"), Is.False);
-        Assert.That(await Residents.IsSelected("Bennett"), Is.False);
-        Assert.That(await Residents.IsSelected("Carey"), Is.False);
-        Assert.That(await Residents.IsSelected("Dawson"), Is.False);
+        await Expect(MorningBus.Item("Ruth Coleman")).Not.ToHaveClassAsync(Selected, new() { Timeout = 5000 });
+        await Expect(MorningBus.Item("Ruth Coleman")).ToHaveClassAsync(Disabled);
+        await Expect(MorningBus.Item("Dorothy Kim")).ToHaveClassAsync(Disabled);
+        await Expect(MorningBus.Item("Arthur Bell")).Not.ToHaveClassAsync(Disabled);
+        await Expect(SeatsTaken).ToHaveTextAsync("0");
+        await Expect(AppointmentsNote).ToHaveTextAsync("Ruth Coleman and Dorothy Kim ride in the afternoon.");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task disable_and_enable_values_update_item_state()
+    public async Task lifting_the_appointment_rule_lets_those_residents_ride_in_the_morning_again()
     {
         await NavigateAndBoot();
+        await AppointmentsRideLater.Check();
+        await Expect(MorningBus.Item("Ruth Coleman")).ToHaveClassAsync(Disabled, new() { Timeout = 5000 });
 
-        await Page.Locator("#disable-carey-btn").ClickAsync();
+        await AppointmentsRideLater.Input.UncheckAsync();
 
-        await Expect(Page.Locator("#command-state")).ToHaveTextAsync("carey disabled", new() { Timeout = 5000 });
-        Assert.That(await Residents.IsDisabled("Carey"), Is.True);
-
-        await Page.Locator("#enable-carey-btn").ClickAsync();
-
-        await Expect(Page.Locator("#command-state")).ToHaveTextAsync("carey enabled", new() { Timeout = 5000 });
-        Assert.That(await Residents.IsDisabled("Carey"), Is.False);
+        await Expect(MorningBus.Item("Ruth Coleman")).Not.ToHaveClassAsync(Disabled, new() { Timeout = 5000 });
+        await MorningBus.ClickItem("Ruth Coleman");
+        await Expect(MorningBus.Item("Ruth Coleman")).ToHaveClassAsync(Selected);
+        await Expect(SeatsTaken).ToHaveTextAsync("1");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task changed_event_reads_value_payload_from_user_click()
+    public async Task saving_the_groups_tells_the_office_who_rides_in_the_morning()
     {
         await NavigateAndBoot();
+        await MorningBus.ClickItem("Arthur Bell");
+        await MorningBus.CtrlClickItem("Walter Dean");
+        await Expect(SeatsTaken).ToHaveTextAsync("2", new() { Timeout = 5000 });
 
-        await Residents.ClickItem("Bennett");
+        await ClickWhenStable(SaveGroups);
 
-        await Expect(Page.Locator("#change-value")).ToHaveTextAsync("bennett", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#change-state")).ToHaveTextAsync("has values", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#selected-indicator")).ToHaveTextAsync("selected", new() { Timeout = 5000 });
-        Assert.That(await Residents.IsSelected("Bennett"), Is.True);
+        await Expect(GroupsStatus).ToHaveTextAsync(
+            "Saved. Morning bus: Arthur Bell, Walter Dean. The other 6 ride in the afternoon.", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task gather_posts_value_source_to_real_endpoint()
+    public async Task saving_before_anyone_is_chosen_asks_who_rides_in_the_morning()
     {
         await NavigateAndBoot();
 
-        await Page.Locator("#set-value-btn").ClickAsync();
-        await Expect(Page.Locator("#value-echo")).ToHaveTextAsync("bennett,dawson", new() { Timeout = 5000 });
+        await ClickWhenStable(SaveGroups);
 
-        await Page.Locator("#gather-btn").ClickAsync();
-
-        await Expect(Page.Locator("#gather-value")).ToHaveTextAsync("bennett,dawson", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#gather-count")).ToHaveTextAsync("2", new() { Timeout = 5000 });
+        await Expect(GroupsStatus).ToHaveTextAsync("Choose who rides the morning bus before saving.", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 }

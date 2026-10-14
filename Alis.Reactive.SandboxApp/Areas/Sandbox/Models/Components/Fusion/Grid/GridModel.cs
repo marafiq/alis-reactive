@@ -1,4 +1,3 @@
-using Alis.Reactive.FluentValidator;
 using Alis.Reactive.Fusion.Components;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
@@ -24,14 +23,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public List<ResidentGridItem> Result { get; set; } = new();
         public int Count { get; set; }
-    }
-
-    public class ResidentDirectoryModel
-    {
-        public string? ResidentSearch { get; set; }
-        public string? CareLevel { get; set; }
-        public string? RiskLevel { get; set; }
-        public decimal? MinimumAge { get; set; }
     }
 
     public class ResidentDirectoryGridItem
@@ -144,13 +135,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public decimal? MinimumAge { get; set; }
     }
 
-    /// <summary>The body <c>POST Grid/SelectResident</c> binds: the selected row's resident and index.</summary>
-    public class ResidentSelectionRequest
-    {
-        public int ResidentId { get; set; }
-        public int RowIndex { get; set; }
-    }
-
     /// <summary>The body <c>POST Grid/SelectionIndexes</c> binds.</summary>
     public class ResidentSelectionIndexesRequest
     {
@@ -179,26 +163,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     public class ResidentGridBatchSummaryRequest
     {
         public FusionGridBatchChanges<ResidentDirectoryGridItem>? BatchChanges { get; set; }
-    }
-
-    public class ResidentGridEditingValidator : ReactiveValidator<ResidentGridEditingModel>
-    {
-        public ResidentGridEditingValidator()
-        {
-            RuleFor(x => x.ResidentName).NotEmpty().WithMessage("Resident name is required.");
-
-            RuleFor(x => x.ResidentName).MinimumLength(3).WithMessage("Resident name must be at least 3 characters.");
-
-            RuleFor(x => x.RiskLevel).NotEmpty().WithMessage("Risk level is required.");
-
-            RuleFor(x => x.RiskLevel)
-                .Must(value => value is "Low" or "Moderate" or "High")
-                .WithMessage("Risk level must be Low, Moderate, or High.");
-
-            RuleFor(x => x.OpenTasks).NotEmpty().WithMessage("Open tasks is required.");
-
-            RuleFor(x => x.OpenTasks).InclusiveBetween(0m, 7m).WithMessage("Open tasks must be between 0 and 7.");
-        }
     }
 
     /// <summary>The document events the GridOperations page raises and hears.</summary>

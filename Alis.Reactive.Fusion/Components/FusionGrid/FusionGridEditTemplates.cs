@@ -109,7 +109,9 @@ namespace Alis.Reactive.Fusion.Components
             {
                 html.Append("<option value=\"")
                   .Append(encoder.Encode(value))
-                  .Append("\">")
+                  .Append('"')
+                  .Append(SelectedWhenRowHolds(fieldName, value))
+                  .Append('>')
                   .Append(encoder.Encode(text))
                   .Append("</option>");
             }
@@ -117,6 +119,11 @@ namespace Alis.Reactive.Fusion.Components
             html.Append("</select>");
             return html.ToString();
         }
+
+        // The option the editing row holds opens selected: the Syncfusion template engine fills the
+        // editor from the row, and a list that opened on its first option would save that option.
+        internal static string SelectedWhenRowHolds(string fieldName, string value) =>
+            "${if(" + fieldName + " === '" + value.Replace("\\", "\\\\").Replace("'", "\\'") + "')} selected${/if}";
     }
 
     /// <summary>
@@ -185,7 +192,9 @@ namespace Alis.Reactive.Fusion.Components
             {
                 if (string.IsNullOrEmpty(option)) continue;
                 var encoded = encoder.Encode(option);
-                html.Append("<option value=\"").Append(encoded).Append("\">").Append(encoded).Append("</option>");
+                html.Append("<option value=\"").Append(encoded).Append('"')
+                    .Append(FusionGridEditTemplates.SelectedWhenRowHolds(name, option))
+                    .Append('>').Append(encoded).Append("</option>");
             }
             html.Append("</select>");
             return html.ToString();

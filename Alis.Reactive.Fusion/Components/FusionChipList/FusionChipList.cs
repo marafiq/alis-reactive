@@ -68,7 +68,7 @@ namespace Alis.Reactive.Fusion.Components
         public TypedEvent<FusionChipListClickArgs> Click =>
             Event<FusionChipListClickArgs>();
 
-        /// <summary>Raised after the user deletes a chip.</summary>
+        /// <summary>Raised after a chip is removed, by its delete icon or by <see cref="RemoveByIndex"/> and <see cref="RemoveByIndexes"/>.</summary>
         public TypedEvent<FusionChipListDeletedArgs> Deleted =>
             Event<FusionChipListDeletedArgs>();
     }
@@ -124,9 +124,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Data of the selected chips.</summary>
         public FusionChipItem[] Data { get; set; } = Array.Empty<FusionChipItem>();
-
-        /// <summary>Zero-based indexes of the selected chips.</summary>
-        public int[] Indexes { get; set; } = Array.Empty<int>();
     }
 
     /// <summary>

@@ -1,162 +1,182 @@
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ChipList
 @model ChipListModel
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Native.Components
+@using Microsoft.AspNetCore.Mvc.Rendering
 @using Syncfusion.EJ2.Buttons
 @{
-    ViewData["Title"] = "ChipList";
+    ViewData["Title"] = "Outing Planner";
+
+    const string InterestsId = "trip-interests";
+    const string AskedToGoId = "trip-asked-to-go";
+    const string RidersId = "trip-riders";
+    const string RepeatDaysId = "trip-repeat-days";
+    // The bus seats four; a rider signed up after the fourth waits for a seat.
+    const int BusSeats = 4;
+    const string ButtonCss = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
+    const string PrimaryButtonCss = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+    const string InputCss = "rounded-md border border-border px-3 py-1.5 text-sm";
 
     var plan = Html.ReactivePlan<ChipListModel>();
+    var destinations = Model.Destinations.Select(destination => new SelectListItem(destination.Name, destination.Id)).ToList();
+    var interests = Model.Interests.Select(interest => new ChipCollection { Text = interest.Name, Value = interest.Id }).ToList();
 
-    Html.On(plan, t => t.CustomEvent<ChipSelectionPayload>(ChipListEvents.ChipSelectionRead, (payload, p) =>
+    // The trip's tags decide whom the front desk invites.
+    Html.On(plan, t => t.CustomEvent<OutingTags>(OutingEvents.Tagged, (tags, p) =>
+        p.Post(Url.SandboxRoute("Invitees", "ChipList"))
+            .Gather<InviteeQuery>(g => g
+                .Set(x => x.TagNames, tags.Get(x => x.Selection.Texts))
+                .Set(x => x.Interests, p.From(tags.Get(x => x.Selection.Data)).Select(tag => tag.Value)))
+            .Response(r => r.OnSuccess<InviteeList>((invitees, s) =>
+                s.Element("invitees").Text.Set(invitees.Get(x => x.Message))))));
+
+    // A seat a rider gives up goes to the first resident on the wait list, who is now in the last seat.
+    Html.On(plan, t => t.CustomEvent<OpenSeat>(OutingEvents.SeatOpened, (seat, p) =>
     {
-        p.Element("selected-chip-texts").Text.Set(payload.Get(x => x.Selection.Texts));
-        p.Element("found-chip-text").Text.Set(payload.Get(x => x.Found.Text));
+        p.Element("wait-list-left").Hide();
+        p.When(seat.Get(x => x.NextInLine.Index)).Lt(0)
+            .Then(nobodyWaiting =>
+            {
+                nobodyWaiting.Element("seat-taken").Hide();
+                nobodyWaiting.Element("seat-open-rider").Text.Set(seat.Get(x => x.Rider));
+                nobodyWaiting.Element("seat-open").Show();
+            })
+            .Else(movedUp =>
+            {
+                movedUp.Element("seat-open").Hide();
+                movedUp.Element("seat-taken-rider").Text.Set(seat.Get(x => x.Rider));
+                movedUp.Element("seat-taken-by").Text.Set(seat.Get(x => x.NextInLine.Text));
+                movedUp.Element("seat-taken").Show();
+            });
     }));
-
-    var chips = new List<ChipCollection>
-    {
-        new() { Text = "Fall Risk", Value = "fall" },
-        new() { Text = "Hydration", Value = "hydration" },
-        new() { Text = "Medication Review", Value = "meds" }
-    };
-
-    var indexChips = new[] { "Routine", "Urgent", "Follow Up" };
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionChipList</native-heading>
+    <native-heading level="H1">Outing Planner</native-heading>
+    <native-text color="Secondary">The bus leaves the front entrance at 10:00. Choose where the next outing goes, tag it with the residents' interests, sign up who rides, and set the days it repeats.</native-text>
 
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+    <native-card><native-card-body>
         <native-vstack gap="Base">
-            @(Html.FusionChipList(plan, "care-tags", b => b
-                .Chips(chips)
-                .Selection(Selection.Multiple)
-                .EnableDelete(true))
+            <native-heading level="H2">Destination and tags</native-heading>
+            @{ Html.InputField(plan, m => m.Destination, o => o.Required().Label("Destination"))
+                .NativeDropDown(b => b.Items(destinations).Placeholder("-- Choose a destination --").CssClass(InputCss))
+                .Reactive(evt => evt.Change, (args, p) =>
+                    p.When(args.Value).NotEmpty().Then(chosen => chosen.Get(Url.SandboxRoute("Destination", "ChipList"))
+                        .Gather<DestinationQuery>(g => g.Set(x => x.Destination, args.Value))
+                        .Response(r => r.OnSuccess<DestinationOuting>((destination, s) =>
+                        {
+                            // The destination's tags replace the trip's; the invitations follow the tags it now shows.
+                            var tags = s.Component<FusionChipList>(InterestsId);
+                            tags.SelectedChipValues.Set(destination.Get(x => x.Tags));
+                            tags.DataBind();
+                            s.Dispatch<OutingTags>(OutingEvents.Tagged, b => b.Set(x => x.Selection, tags.GetSelectedChips()));
+                            // The trip repeats on the destination's own day, in place of the days chosen before.
+                            var days = s.Component<FusionChipList>(RepeatDaysId);
+                            days.SelectedChipIndexes.Set(Array.Empty<int>());
+                            days.DataBind();
+                            days.SelectByIndex(destination.Get(x => x.Day));
+                        })))); }
+
+            @(Html.FusionChipList(plan, InterestsId, b => b
+                .Chips(interests)
+                .Selection(Selection.Multiple))
                 .Reactive(evt => evt.Click, (args, p) =>
                 {
-                    p.Element("chip-clicked").Text.Set(args.Text);
-                })
-                .Reactive(evt => evt.Deleted, (args, p) =>
-                {
-                    p.Element("chip-deleted").Text.Set(args.Text);
+                    p.Element("tag-change-name").Text.Set(args.Text);
+                    p.When(args.Selected).Truthy()
+                        .Then(on => on.Element("tag-change-verb").Text.Set("added to"))
+                        .Else(off => off.Element("tag-change-verb").Text.Set("taken off"));
+                    p.Element("tag-change").Show();
+                    p.Dispatch<OutingTags>(OutingEvents.Tagged, b => b.Set(x => x.Selection, p.Component<FusionChipList>(InterestsId).GetSelectedChips()));
                 }))
+            <p id="tag-change" hidden class="text-sm"><span id="tag-change-name" class="font-medium"></span> <span id="tag-change-verb"></span> the trip's tags.</p>
+            <p id="invitees" class="text-sm">Tag the trip to see whom to invite.</p>
+        </native-vstack>
+    </native-card-body></native-card>
 
-            <native-hstack gap="Sm" class="flex-wrap">
-                @(Html.NativeButton("add-chip-btn", "Add Wound Care")
-                    .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
+    <native-grid cols="C2" gap="Lg">
+        <native-card><native-card-body>
+            <native-vstack gap="Base">
+                <native-heading level="H2">Asked to go</native-heading>
+                <native-text color="Secondary">Residents who asked the front desk. Click one to sign them up.</native-text>
+                @(Html.FusionChipList(plan, AskedToGoId, b => b.Chips(Model.AskedToGo.ToArray()))
+                    .Reactive(evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionChipList>("care-tags").Add("Wound Care");
-                        p.Element("chip-command-status").Text.Set("add called");
+                        p.Component<FusionChipList>(RidersId).Add(args.Text);
+                        p.Component<FusionChipList>(AskedToGoId).RemoveByIndex(args.Index);
                     }))
-                @(Html.NativeButton("select-index-chip-btn", "Select Index")
-                    .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                    {
-                        p.Component<FusionChipList>("care-tags").SelectByIndex(1);
-                        p.Element("chip-command-status").Text.Set("select index called");
-                    }))
-                @(Html.NativeButton("select-text-chip-btn", "Select Text")
-                    .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                    {
-                        var tagList = p.Component<FusionChipList>("care-tags");
-                        tagList.Add("Wound Care");
-                        tagList.SelectByText(new[] { "Hydration", "Wound Care" });
-                        p.Dispatch<ChipSelectionPayload>(ChipListEvents.ChipSelectionRead, payload =>
+            </native-vstack>
+        </native-card-body></native-card>
+
+        <native-card><native-card-body>
+            <native-vstack gap="Base">
+                <native-heading level="H2">On the bus</native-heading>
+                <native-text color="Secondary">The bus seats four, in sign-up order; anyone after the fourth waits for a seat. Highlighted riders use the wheelchair lift.</native-text>
+                @(Html.FusionChipList(plan, RidersId, b => b
+                    .Chips(Model.Riders.ToArray())
+                    .Selection(Selection.Multiple)
+                    .EnableDelete(true))
+                    .Reactive(evt => evt.Deleted, (args, p) =>
+                        p.When(args.Index).Lt(BusSeats)
+                            .Then(seated => seated.Dispatch<OpenSeat>(OutingEvents.SeatOpened, b => b
+                                .Set(x => x.Rider, args.Text)
+                                .Set(x => x.NextInLine, seated.Component<FusionChipList>(RidersId).Find(BusSeats - 1))))
+                            .Else(waiting =>
+                            {
+                                waiting.Element("seat-open").Hide();
+                                waiting.Element("seat-taken").Hide();
+                                waiting.Element("wait-list-left-rider").Text.Set(args.Text);
+                                waiting.Element("wait-list-left").Show();
+                            })))
+                <p id="seat-taken" hidden class="text-sm"><span id="seat-taken-rider" class="font-medium"></span> is off the bus. <span id="seat-taken-by" class="font-medium"></span> comes off the wait list.</p>
+                <p id="seat-open" hidden class="text-sm"><span id="seat-open-rider" class="font-medium"></span> is off the bus. A seat is open.</p>
+                <p id="wait-list-left" hidden class="text-sm"><span id="wait-list-left-rider" class="font-medium"></span> leaves the wait list.</p>
+                <native-hstack gap="Sm" class="flex-wrap">
+                    @(Html.NativeButton("mark-lift-riders-btn", "Mark Lift Riders")
+                        .CssClass(ButtonCss)
+                        .Reactive(plan, evt => evt.Click, (_, p) =>
+                            p.Get(Url.SandboxRoute("LiftRiders", "ChipList"))
+                                .Response(r => r.OnSuccess<LiftRiderList>((lift, s) =>
+                                    s.Component<FusionChipList>(RidersId).SelectByText(lift.Get(x => x.Names))))))
+                    @(Html.NativeButton("lift-out-of-service-btn", "Lift Out of Service")
+                        .CssClass(ButtonCss)
+                        .Reactive(plan, evt => evt.Click, (_, p) =>
                         {
-                            payload.Set(x => x.Selection, tagList.GetSelectedChips());
-                            payload.Set(x => x.Found, tagList.Find(1));
-                        });
-                        p.Element("chip-command-status").Text.Set("select text called");
-                    }))
-                @(Html.NativeButton("remove-chip-btn", "Remove First")
-                    .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                    {
-                        p.Component<FusionChipList>("care-tags").RemoveByIndex(0);
-                        p.Element("chip-command-status").Text.Set("remove called");
-                    }))
-                @(Html.NativeButton("read-selected-values-btn", "Read Selected Values")
-                    .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                    {
-                        var tagList = p.Component<FusionChipList>("care-tags");
-                        tagList.SelectByText(new[] { "Hydration", "Medication Review" });
-                        p.Element("selected-chip-values").Text.Set(tagList.SelectedChipValues);
-                        p.Element("chip-command-status").Text.Set("selected values read");
-                    }))
-                @(Html.NativeButton("apply-chip-filters-btn", "Apply Filters")
-                    .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                    {
-                        var tagList = p.Component<FusionChipList>("care-tags");
-                        p.Post(Url.SandboxRoute("QuickFilter", "ChipList"))
-                         .Gather<ChipQuickFilterRequest>(g => g.Set(x => x.Filters, tagList.SelectedChipValues))
-                         .Response(r => r.OnSuccess<ChipQuickFilterResponse>((json, s) =>
-                         {
-                             s.Element("quick-filter-values").Text.Set(json.Get(x => x.Filters));
-                             s.Element("quick-filter-count").Text.Set(json.Get(x => x.Count));
-                             s.Element("quick-filter-names").Text.Set(json.Get(x => x.Names));
-                             s.Element("chip-command-status").Text.Set("filters applied");
-                         }));
-                    }))
-            </native-hstack>
-
-            <native-vstack gap="Xs" class="font-mono text-sm">
-                <p>Command: <span id="chip-command-status">idle</span></p>
-                <p>Clicked: <span id="chip-clicked">none</span></p>
-                <p>Deleted: <span id="chip-deleted">none</span></p>
-                <p>Selected texts: <span id="selected-chip-texts">none</span></p>
-                <p>Selected values: <span id="selected-chip-values">none</span></p>
-                <p>Found chip: <span id="found-chip-text">none</span></p>
-                <p>Quick filter values: <span id="quick-filter-values">none</span></p>
-                <p>Quick filter count: <span id="quick-filter-count">none</span></p>
-                <p>Quick filter names: <span id="quick-filter-names">none</span></p>
+                            // Without the lift, a rider who needs it cannot board.
+                            var riders = p.Component<FusionChipList>(RidersId);
+                            riders.RemoveByIndexes(riders.SelectedChipIndexes);
+                        }))
+                </native-hstack>
             </native-vstack>
-        </native-vstack>
-    </section>
+        </native-card-body></native-card>
+    </native-grid>
 
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+    <native-card><native-card-body>
         <native-vstack gap="Base">
-            @(Html.FusionChipList(plan, "index-tags", b => b
-                .Chips(indexChips)
+            <native-heading level="H2">Repeats every</native-heading>
+            @(Html.FusionChipList(plan, RepeatDaysId, b => b
+                .Chips(Model.WeekDays.ToArray())
                 .Selection(Selection.Multiple)))
-
             <native-hstack gap="Sm" class="flex-wrap">
-                @(Html.NativeButton("select-indexes-chip-btn", "Select Indexes")
-                    .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                    {
-                        p.Component<FusionChipList>("index-tags").SelectByIndexes(new[] { 0, 2 });
-                        p.Element("index-chip-command-status").Text.Set("select indexes called");
-                    }))
-                @(Html.NativeButton("set-selected-indexes-btn", "Set Selected Indexes")
-                    .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                    {
-                        var tagList = p.Component<FusionChipList>("index-tags");
-                        tagList.SelectedChipIndexes.Set(new[] { 0, 2 });
-                        tagList.DataBind();
-                        p.Element("selected-chip-indexes").Text.Set(tagList.SelectedChipIndexes);
-                        p.Element("index-chip-command-status").Text.Set("selected indexes set");
-                    }))
-                @(Html.NativeButton("remove-indexes-chip-btn", "Remove Indexes")
-                    .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                    {
-                        p.Component<FusionChipList>("index-tags").RemoveByIndexes(new[] { 0, 2 });
-                        p.Element("index-chip-command-status").Text.Set("remove indexes called");
-                    }))
+                @(Html.NativeButton("add-weekends-btn", "Add Weekends")
+                    .CssClass(ButtonCss)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
+                        p.Component<FusionChipList>(RepeatDaysId).SelectByIndexes(new[] { (int)DayOfWeek.Sunday, (int)DayOfWeek.Saturday })))
+                @(Html.NativeButton("post-outing-btn", "Post to Calendar")
+                    .CssClass(PrimaryButtonCss)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
+                        p.Post(Url.SandboxRoute("Post", "ChipList"))
+                            .Gather<OutingPost>(g => g
+                                .Form(m => m.Destination)
+                                .Set(x => x.Tags, p.Component<FusionChipList>(InterestsId).SelectedChipValues)
+                                .Set(x => x.RepeatDays, p.Component<FusionChipList>(RepeatDaysId).SelectedChipIndexes))
+                            .Response(r => r
+                                .OnSuccess<OutingPosted>((posted, s) => s.Element("post-status").Text.Set(posted.Get(x => x.Message)))
+                                .OnError<OutingPosted>(400, (refused, e) => e.Element("post-status").Text.Set(refused.Get(x => x.Message))))))
             </native-hstack>
-
-            <native-vstack gap="Xs" class="font-mono text-sm">
-                <p>Index command: <span id="index-chip-command-status">idle</span></p>
-                <p>Selected indexes: <span id="selected-chip-indexes">none</span></p>
-            </native-vstack>
+            <p id="post-status" class="text-sm">Not on the activities calendar yet.</p>
         </native-vstack>
-    </section>
-
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

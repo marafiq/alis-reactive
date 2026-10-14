@@ -18,29 +18,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return View("~/Areas/Sandbox/Views/Components/Fusion/Grid/Index.cshtml", new GridModel());
         }
 
-        [HttpGet("Directory")]
-        public IActionResult Directory()
-        {
-            ViewBag.CareLevels = new List<string>
-            {
-                "", "Independent", "Assisted Living", "Memory Care", "Skilled Nursing"
-            };
-            ViewBag.RiskLevels = new List<string>
-            {
-                "", "Low", "Moderate", "High"
-            };
-
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/Directory.cshtml",
-                new ResidentDirectoryModel());
-        }
-
         [HttpGet("Editing")]
         public IActionResult Editing()
         {
-            ViewBag.EditRows = ResidentDirectory.Take(16).Select(ToGridItem).ToList();
-            ViewBag.RiskLevels = new List<string> { "", "Low", "Moderate", "High" };
-
             return View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/Editing.cshtml",
                 new ResidentGridEditingModel());
@@ -173,14 +153,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new ResidentGridEditingModel());
         }
 
-        [HttpGet("BatchCellEdit")]
-        public IActionResult BatchCellEdit()
-        {
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/BatchCellEdit.cshtml",
-                new ResidentGridEditingModel());
-        }
-
         [HttpGet("BatchRosterChange")]
         public IActionResult BatchRosterChange()
         {
@@ -194,14 +166,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         {
             return View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/ResidentEditForm.cshtml",
-                new ResidentGridEditingModel());
-        }
-
-        [HttpGet("ResidentAdmissionAudit")]
-        public IActionResult ResidentAdmissionAudit()
-        {
-            return View(
-                "~/Areas/Sandbox/Views/Components/Fusion/Grid/ResidentAdmissionAudit.cshtml",
                 new ResidentGridEditingModel());
         }
 
@@ -334,26 +298,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 Result = page,
                 Count = total,
                 Summary = $"{total} residents matched"
-            });
-        }
-
-        [HttpPost("SelectResident")]
-        public IActionResult SelectResident([FromBody] ResidentSelectionRequest request)
-        {
-            var resident = ResidentDirectory.FirstOrDefault(r => r.ResidentId == request.ResidentId);
-            if (resident == null)
-            {
-                return Ok(new ResidentDirectorySelectionResponse
-                {
-                    Summary = $"No resident selected at row {request.RowIndex}"
-                });
-            }
-
-            return Ok(new ResidentDirectorySelectionResponse
-            {
-                ResidentName = resident.ResidentName,
-                Summary =
-                    $"{resident.ResidentName}: {resident.CareLevel}, {resident.Wing} wing, {resident.OpenTasks} open tasks"
             });
         }
 
@@ -504,36 +448,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             {
                 Row = row,
                 Summary = $"{row.ResidentName} loaded from the server"
-            });
-        }
-
-        [HttpPost("ValidateEditDraft")]
-        public IActionResult ValidateEditDraft([FromBody] ResidentGridEditingModel? request)
-        {
-            if (request == null)
-                return ValidationError(new Dictionary<string, string[]> { ["ResidentName"] = ["Request body is required."] });
-
-            if (!TryValidate(new ResidentGridEditingValidator(), request, out var error))
-                return error;
-
-            var row = new ResidentDirectoryGridItem
-            {
-                ResidentId = 6000,
-                ResidentName = request.ResidentName!,
-                Age = 83,
-                CareLevel = "Memory Care",
-                Wing = "North",
-                Suite = "N-401",
-                RiskLevel = request.RiskLevel!,
-                PrimaryNurse = "Nora Ellis",
-                OpenTasks = (int)request.OpenTasks!.Value,
-                NextReviewDate = "2026-06-18"
-            };
-
-            return Ok(new ResidentGridEditResponse
-            {
-                Row = row,
-                Summary = $"{row.ResidentName} passed validation and updated row 1"
             });
         }
 

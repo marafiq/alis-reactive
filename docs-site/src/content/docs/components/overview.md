@@ -23,10 +23,10 @@ A component that is not a form input renders against the plan with an ID you
 choose, and the same ID targets it:
 
 ```csharp
-@(Html.FusionGrid<ResidentDirectoryModel, ResidentDirectoryGridItem>(plan, "resident-directory-grid", b => b
+@(Html.FusionGrid<DirectoryViewModel, DirectoryResident>(plan, "resident-directory-grid", b => b
     .AllowSelection(true)
     .Columns(Columns()))
-    .Reactive(evt => evt.RowSelected<ResidentDirectoryGridItem>(), (args, p) => { ... }))
+    .Reactive(evt => evt.RowSelected<DirectoryResident>(), (args, p) => { ... }))
 ```
 
 ## React

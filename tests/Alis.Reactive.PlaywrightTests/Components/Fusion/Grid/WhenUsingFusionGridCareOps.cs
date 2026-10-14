@@ -50,6 +50,21 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // A list that opened on its first nurse would reassign the resident when the cell is left untouched.
+    [Test]
+    public async Task the_nurse_editor_opens_on_the_residents_own_nurse()
+    {
+        await NavigateCareOps();
+
+        await Page.Locator($"#{GridId}")
+            .GetByRole(AriaRole.Gridcell).Filter(new() { HasText = "Malik Stone" }).First.DblClickAsync();
+
+        var editor = Page.Locator($"#{GridId} select[name='primaryNurse']");
+        await Expect(editor).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(editor).ToHaveValueAsync("Malik Stone");
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task editing_nurse_with_the_typed_select_editor_saves_to_the_server()
     {
