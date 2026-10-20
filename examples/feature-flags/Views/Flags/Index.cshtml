@@ -1,0 +1,49 @@
+@model FlagsPageModel
+@{
+    ViewData["Title"] = "Feature flags";
+    var plan = Html.ReactivePlan<FlagsPageModel>();
+
+    // The page is a shell: the list and the first flag of the app load into their slots.
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Parallel(
+            list => list.Get(FlagRoutes.List)
+                .Gather(g => g.Static("App", Model.App).Static("Filter", FlagFilters.All))
+                .Response(r => r.OnSuccess(s => s.Into(FlagIds.ListSlot))),
+            detail => detail.Get(FlagRoutes.Detail)
+                .Gather(g => g.Static("app", Model.App))
+                .Response(r => r.OnSuccess(s => s.Into(FlagIds.DetailSlot))));
+    }));
+
+    // A flag was saved, created, or opened in another app: reload the list for that app,
+    // keeping the filter and search the user already set.
+    Html.On(plan, t => t.CustomEvent<FlagsChanged>(FlagEvents.FlagsChanged, (changed, p) =>
+    {
+        p.Get(FlagRoutes.List)
+            .Gather(g => g
+                .FromEvent(changed, x => x.App, "App")
+                .Include<NativeRadioGroup, FlagsPageModel>(m => m.Filter)
+                .Include<NativeTextBox, FlagsPageModel>(m => m.Query))
+            .Response(r => r.OnSuccess(s => s.Into(FlagIds.ListSlot)));
+    }));
+}
+
+<header class="ff-bar">
+    <span class="ff-bar__title">Feature flags</span>
+    <span class="ff-bar__sub">ALIS admin</span>
+</header>
+
+<div id="@FlagIds.Shell" class="ff-shell">
+    <section class="ff-pane ff-pane--list" aria-label="Feature flags">
+        <div id="@FlagIds.ListSlot" class="ff-slot">
+            <p class="ff-loading">Loading flags…</p>
+        </div>
+    </section>
+    <section class="ff-pane ff-pane--detail" aria-label="Flag">
+        <div id="@FlagIds.DetailSlot" class="ff-slot ff-slot--detail">
+            <p class="ff-loading">Loading flag…</p>
+        </div>
+    </section>
+</div>
+
+@Html.RenderPlan(plan)

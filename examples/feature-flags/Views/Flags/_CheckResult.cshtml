@@ -1,0 +1,38 @@
+@model CommunityCheckModel
+@{
+    var plan = Html.ResolvePlan<CommunityCheckModel>();
+    var result = ViewData["Result"] as CheckResultScreen;
+}
+
+@if (result is null)
+{
+    <p class="ff-hint">Pick a community to see every flag and why.</p>
+}
+else
+{
+    <div class="ff-check__summary">
+        <span class="ff-muted">@result.Where</span>
+        <span class="ff-check__count">@result.Summary</span>
+    </div>
+    <div class="ff-check__flags">
+        @foreach (var row in result.Rows)
+        {
+            <div class="ff-line ff-line--link">
+                <span class="ff-line__text">
+                    @(Html.NativeButton($"check-open-{row.FlagId}", row.Name)
+                        .CssClass("ff-line__open")
+                        .Reactive(plan, evt => evt.Click, (args, p) =>
+                        {
+                            p.Component<NativeDrawer>().Close();
+                            FlagPipelines.OpenFlag(p, row.FlagId);
+                        }))
+                    <span class="ff-muted">@row.Reason</span>
+                </span>
+                <span class="ff-pill ff-pill--@row.Pill.Kind">@row.Pill.Text</span>
+                <svg class="ff-chev" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+            </div>
+        }
+    </div>
+}
+
+@Html.RenderPlan(plan)

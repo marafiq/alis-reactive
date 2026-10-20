@@ -1,0 +1,7 @@
+@model SaveSummaryScreen
+<span class="fd__savebar-title">@Model.Title</span>
+<span class="fd__savebar-sub">@Model.Sub</span>
+@if (Model.Problem.Length > 0)
+{
+    <span class="fd__savebar-problem">@Model.Problem</span>
+}

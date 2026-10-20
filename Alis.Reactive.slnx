@@ -122,6 +122,7 @@
   </Folder>
   <Folder Name="/examples/">
     <Project Path="examples/resident-intake/ResidentIntake.csproj" />
+    <Project Path="examples/feature-flags/FeatureFlags.csproj" />
   </Folder>
   <Folder Name="/build/">
     <File Path="package.json" />

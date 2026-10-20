@@ -1,0 +1,130 @@
+@model FlagsPageModel
+@{
+    var plan = Html.ResolvePlan<FlagsPageModel>();
+    var screen = (FlagListScreen)ViewData["Screen"]!;
+
+    // Every list control reloads this slot with the app, filter and search together.
+    void ReloadList(Alis.Reactive.Builders.PipelineBuilder<FlagsPageModel> p) =>
+        p.Get(FlagRoutes.List)
+            .Gather(g => g
+                .Include<NativeRadioGroup, FlagsPageModel>(m => m.App)
+                .Include<NativeRadioGroup, FlagsPageModel>(m => m.Filter)
+                .Include<NativeTextBox, FlagsPageModel>(m => m.Query))
+            .Response(r => r.OnSuccess(s => s.Into(FlagIds.ListSlot)));
+}
+
+<div class="ff-list">
+    <div class="ff-list__head">
+        <div class="ff-list__title-row">
+            <h1 class="ff-h1">Feature flags</h1>
+            @(Html.NativeButton("new-flag", "New flag")
+                .CssClass("ff-btn ff-btn--primary ff-btn--plus")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Get(FlagRoutes.New)
+                        .Gather(g => g.Include<NativeRadioGroup, FlagsPageModel>(m => m.App))
+                        .Response(r => r.OnSuccess(s =>
+                        {
+                            s.Into(FlagIds.DetailSlot);
+                            s.Element(FlagIds.Shell).AddClass(FlagIds.ShowDetail);
+                        }));
+                }))
+        </div>
+
+        <div class="ff-apptabs-wrap">
+            @{ Html.InputField(plan, m => m.App, o => o.Label("App"))
+                .NativeRadioGroup(b =>
+                {
+                    foreach (var tab in screen.Apps)
+                        b.Option(tab.Code, tab.Name, tab.Count.ToString());
+                    b.CssClass("ff-apptabs")
+                        .OptionCssClass("ff-apptab")
+                        .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        {
+                            // A new app: reload the list, and open that app's first flag beside it.
+                            p.Parallel(
+                                list => list.Get(FlagRoutes.List)
+                                    .Gather(g => g
+                                        .Include<NativeRadioGroup, FlagsPageModel>(m => m.App)
+                                        .Static("Filter", FlagFilters.All)
+                                        .Include<NativeTextBox, FlagsPageModel>(m => m.Query))
+                                    .Response(r => r.OnSuccess(s => s.Into(FlagIds.ListSlot))),
+                                detail => detail.Get(FlagRoutes.Detail)
+                                    .Gather(g => g.FromEvent(args, x => x.Value, "app"))
+                                    .Response(r => r.OnSuccess(s => s.Into(FlagIds.DetailSlot))));
+                        });
+                }); }
+        </div>
+
+        @(Html.NativeButton("open-community-check", "What's on for a community?")
+            .CssClass("ff-check-btn")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Get(FlagRoutes.Check)
+                    .Gather(g => g.Include<NativeRadioGroup, FlagsPageModel>(m => m.App))
+                    .Response(r => r.OnSuccess(s => s.Into(FlagIds.DrawerContent)));
+                p.Element(FlagIds.DrawerTitle).SetText("What's on for a community?");
+                p.Component<NativeDrawer>().SetSize(DrawerSize.Md);
+                p.Component<NativeDrawer>().Open();
+            }))
+
+        <div class="ff-search">
+            @{ Html.InputField(plan, m => m.Query, o => o.Label("Find a flag"))
+                .NativeTextBox(b => b
+                    .Type("search")
+                    .Placeholder("Find a flag")
+                    .CssClass("ff-input")
+                    .Reactive(plan, evt => evt.Changed, (args, p) => ReloadList(p))); }
+        </div>
+
+        <div class="ff-segments-wrap">
+            @{ Html.InputField(plan, m => m.Filter, o => o.Label("Show flags"))
+                .NativeRadioGroup(b => b
+                    .Option(FlagFilters.All, $"All {screen.FilterCounts[FlagFilters.All]}")
+                    .Option(FlagFilters.Everyone, $"Everyone {screen.FilterCounts[FlagFilters.Everyone]}")
+                    .Option(FlagFilters.Some, $"Some {screen.FilterCounts[FlagFilters.Some]}")
+                    .Option(FlagFilters.Off, $"Off {screen.FilterCounts[FlagFilters.Off]}")
+                    .CssClass("ff-segments")
+                    .OptionCssClass("ff-segment")
+                    .Reactive(plan, evt => evt.Changed, (args, p) => ReloadList(p))); }
+        </div>
+    </div>
+
+    @if (screen.Rows.Count == 0)
+    {
+        <p class="ff-empty">No flags match.</p>
+    }
+    else
+    {
+        <ul class="ff-rows" role="list">
+            @foreach (var row in screen.Rows)
+            {
+                <li id="row-@row.Id" class="ff-row">
+                    <div class="ff-row__top">
+                        <span class="ff-row__name">
+                            @(Html.NativeButton($"open-{row.Id}", row.Name)
+                                .CssClass("ff-row__open")
+                                .Reactive(plan, evt => evt.Click, (args, p) => FlagPipelines.OpenFlag(p, row.Id)))
+                        </span>
+                        @if (row.IsNew)
+                        {
+                            <span class="ff-badge-new">NEW</span>
+                        }
+                        <svg class="ff-chev" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                    </div>
+                    <span class="ff-status ff-status--@row.DotState"><span class="ff-dot" aria-hidden="true"></span>@row.Status</span>
+                    <partial name="_SiteStrip" model="row.Strip"/>
+                    <span class="ff-row__meta">
+                        @foreach (var also in row.AlsoIn)
+                        {
+                            <span class="ff-chip">@also</span>
+                        }
+                        <span>@row.Changed</span>
+                    </span>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@Html.RenderPlan(plan)

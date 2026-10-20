@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] · ALIS admin</title>
+    <link rel="stylesheet" href="~/css/design-system.dev.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/css/syncfusion.dev.css" asp-append-version="true"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="~/css/flags.css" asp-append-version="true"/>
+</head>
+<body class="alis-root ff">
+@RenderBody()
+
+<script src="~/vendor/syncfusion/dist/ej2.min.js"></script>
+@Html.FusionToast()
+@Html.EJS().ScriptManager()
+@Html.NativeDrawer()
+<script src="~/js/flags-plugins.js" asp-append-version="true"></script>
+<script src="~/scripts/alis-reactive.dev.js" asp-append-version="true"></script>
+</body>
+</html>

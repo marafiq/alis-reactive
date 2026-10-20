@@ -1,0 +1,11 @@
+@model IReadOnlyList<StripCell>
+@* One bar per site; the fill is the share of that site's communities that have the flag. *@
+<span class="ff-strip" role="img" aria-label="@string.Join(", ", Model.Select(c => c.Title))">
+    @foreach (var cell in Model)
+    {
+        <span class="ff-strip__cell">
+            <span class="ff-bar-fill ff-bar-fill--@cell.Fill.State" style="--fill: @(cell.Fill.Percent)%"></span>
+            <span class="ff-strip__label">@cell.Label</span>
+        </span>
+    }
+</span>

@@ -1,0 +1,385 @@
+@model FlagEditModel
+@{
+    // One flag = one form. Create and edit are the same screen; an empty Id means new.
+    var plan = Html.ReactivePlan<FlagEditModel>();
+    var screen = (FlagDetailScreen)ViewData["Detail"]!;
+    var isNew = screen.IsNew;
+    var historyShown = screen.History.Take(3).ToList();
+    var historyMore = screen.History.Skip(3).ToList();
+
+    ViewData["Who"] = screen.Who;
+    ViewData["KeyProblem"] = screen.KeyProblem;
+    ViewData["Snippets"] = screen.Snippets;
+
+    void Refresh(Alis.Reactive.Builders.PipelineBuilder<FlagEditModel> p) => FlagPipelines.RefreshDraft(p, isNew);
+}
+
+@if (!isNew)
+{
+    @* The open flag is highlighted in the list beside it. *@
+    <style>@@media (min-width: 860px) { @($"#row-{Model.Id}") { background: var(--ff-current); } }</style>
+}
+
+<div class="fd">
+    <div class="fd__scroll">
+        <div class="fd__head">
+            <div class="fd__head-inner">
+                @(Html.NativeButton("flag-back", "All flags")
+                    .CssClass("fd__back")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Element(FlagIds.Shell).RemoveClass(FlagIds.ShowDetail);
+                    }))
+                <div class="fd__title">
+                    <div class="fd__title-text">
+                        <h2 class="ff-h2">@screen.HeaderName</h2>
+                        <span class="fd__ident">
+                            <span class="ff-app-badge">@screen.AppName</span>
+                            <code class="ff-code">@screen.KeyShown</code>
+                        </span>
+                        @if (!isNew && !string.IsNullOrWhiteSpace(Model.Description))
+                        {
+                            <span class="fd__desc">@Model.Description</span>
+                        }
+                        @if (screen.LastChanged.Length > 0)
+                        {
+                            <span class="ff-muted">@screen.LastChanged</span>
+                        }
+                    </div>
+                    <div class="fd__switch">
+                        @{ Html.InputField(plan, m => m.On, o => o.Label("Flag switch"))
+                            .FusionSwitch(b => b
+                                .OnLabel("On")
+                                .OffLabel("Off")
+                                .Reactive(plan, evt => evt.Changed, (args, p) => Refresh(p))); }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="@FlagIds.Form" class="fd__body">
+            @Html.HiddenFieldFor(plan, m => m.Id)
+            @Html.HiddenFieldFor(plan, m => m.App)
+            @Html.HiddenFieldFor(plan, m => m.CopiedFrom)
+            @Html.HiddenFieldFor(plan, m => m.CopySource)
+
+            @if (isNew)
+            {
+                @Html.HiddenFieldFor(plan, m => m.KeyTouched)
+                <section class="ff-card ff-card--form" aria-label="Name and key">
+                    @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
+                        .NativeTextBox(b => b
+                            .Placeholder("e.g. Fall risk alerts")
+                            .CssClass("ff-input ff-input--strong")
+                            .Reactive(plan, evt => evt.Changed, (args, p) =>
+                            {
+                                // The key follows the name until it is typed by hand.
+                                p.Post(FlagRoutes.KeyField)
+                                    .Gather(g => g.IncludeAll())
+                                    .Response(r => r.OnSuccess(s =>
+                                    {
+                                        s.Into(FlagIds.KeyFieldSlot);
+                                        FlagPipelines.RefreshDraft(s, isNew: true);
+                                    }));
+                            })); }
+
+                    <div id="@FlagIds.KeyFieldSlot">
+                        <partial name="_KeyField" model="Model"/>
+                    </div>
+
+                    @{ Html.InputField(plan, m => m.Description, o => o.Label("What it does"))
+                        .NativeTextArea(b => b
+                            .Rows(2)
+                            .Placeholder("One line staff and support will understand")
+                            .CssClass("ff-input ff-textarea")
+                            .Reactive(plan, evt => evt.Changed, (args, p) => Refresh(p))); }
+                </section>
+            }
+
+            <section id="@FlagIds.WhoHasItSlot" class="ff-card" aria-label="Who has it">
+                <partial name="_WhoHasIt" model="Model"/>
+            </section>
+
+            <section class="ff-card ff-card--roomy" aria-labelledby="turn-on-h">
+                <div class="ff-card__intro">
+                    <h3 id="turn-on-h" class="ff-h3">Turn on for</h3>
+                    <p class="ff-note">Picking a site or company includes every community in it.</p>
+                </div>
+
+                <div class="ff-everyone">
+                    <span class="ff-everyone__text" aria-hidden="true">
+                        <span class="ff-everyone__title">Everyone</span>
+                        <span class="ff-muted">Every site, company and community, now and later</span>
+                    </span>
+                    <div class="ff-everyone__switch">
+                    @{ Html.InputField(plan, m => m.Everyone, o => o.Label("Everyone: every site, company and community, now and later"))
+                        .FusionSwitch(b => b
+                            .Reactive(plan, evt => evt.Changed, (args, p) =>
+                            {
+                                p.When(args, a => a.Checked).Truthy()
+                                    .Then(t =>
+                                    {
+                                        t.Element(FlagIds.PickFields).Hide();
+                                        t.Element(FlagIds.EveryoneNote).Show();
+                                    })
+                                    .Else(e =>
+                                    {
+                                        e.Element(FlagIds.PickFields).Show();
+                                        e.Element(FlagIds.EveryoneNote).Hide();
+                                    });
+                                Refresh(p);
+                            })); }
+                    </div>
+                </div>
+
+                <p id="@FlagIds.EveryoneNote" class="ff-note" hidden="@(Model.Everyone ? null : "hidden")">
+                    Everyone in @screen.AppName has it. Use Keep off for exceptions.
+                </p>
+
+                <div id="@FlagIds.PickFields" class="ff-pickers" hidden="@(Model.Everyone ? "hidden" : null)">
+                    @{ Html.InputField(plan, m => m.Sites, o => o.Label("Sites"))
+                        .FusionMultiSelect(b => b
+                            .DataSource(screen.SiteItems)
+                            .Fields<PickItem>(t => t.Name, v => v.Id)
+                            .Mode(VisualMode.CheckBox)
+                            .AllowFiltering(true)
+                            .FilterBarPlaceholder("Find a site")
+                            .Placeholder("Add sites")
+                            .Reactive(plan, evt => evt.Changed, (args, p) => Refresh(p))); }
+
+                    @{ Html.InputField(plan, m => m.Companies, o => o.Label("Companies"))
+                        .FusionMultiSelect(b => b
+                            .DataSource(screen.CompanyItems)
+                            .Fields<PickItem>(t => t.Name, v => v.Id, g => g.Group)
+                            .Mode(VisualMode.CheckBox)
+                            .EnableGroupCheckBox(true)
+                            .AllowFiltering(true)
+                            .FilterBarPlaceholder("Find a company")
+                            .Placeholder("Add companies")
+                            .Reactive(plan, evt => evt.Changed, (args, p) => Refresh(p))); }
+
+                    @{ Html.InputField(plan, m => m.Communities, o => o.Label("Communities"))
+                        .FusionMultiSelect(b => b
+                            .DataSource(screen.CommunityItems)
+                            .Fields<PickItem>(t => t.Name, v => v.Id, g => g.Group)
+                            .Mode(VisualMode.CheckBox)
+                            .EnableGroupCheckBox(true)
+                            .AllowFiltering(true)
+                            .FilterBarPlaceholder("Find a community")
+                            .Placeholder("Add communities")
+                            .Reactive(plan, evt => evt.Changed, (args, p) => Refresh(p))); }
+                </div>
+            </section>
+
+            <section class="ff-card" aria-labelledby="keep-off-h">
+                <div class="ff-card__intro">
+                    <h3 id="keep-off-h" class="ff-h3">Keep off for <span class="ff-optional">· optional</span></h3>
+                    <p class="ff-note">These never get it, even when their site or company is picked above.</p>
+                </div>
+                <div class="ff-keepoff">
+                    @{ Html.InputField(plan, m => m.KeepOff, o => o.Label("Sites, companies or communities to keep off"))
+                        .FusionMultiSelect(b => b
+                            .DataSource(screen.KeepOffItems)
+                            .Fields<PickItem>(t => t.Name, v => v.Id, g => g.Group)
+                            .Mode(VisualMode.CheckBox)
+                            .AllowFiltering(true)
+                            .FilterBarPlaceholder("Find a site, company or community")
+                            .Placeholder("Add a site, company or community")
+                            .Reactive(plan, evt => evt.Changed, (args, p) => Refresh(p))); }
+                </div>
+            </section>
+
+            @if (!isNew)
+            {
+                <section class="ff-card ff-card--list" aria-labelledby="other-apps-h">
+                    <h3 id="other-apps-h" class="ff-h3">Other apps</h3>
+                    <p class="ff-note">Same key, separate flag in each app, each with its own rollout.</p>
+                    @foreach (var other in screen.OtherApps)
+                    {
+                        <div class="ff-line ff-line--link">
+                            @if (other.TwinId is not null)
+                            {
+                                <span class="ff-line__text">
+                                    @(Html.NativeButton($"other-{other.Code}", other.Name)
+                                        .CssClass("ff-line__open")
+                                        .Reactive(plan, evt => evt.Click, (args, p) =>
+                                        {
+                                            FlagPipelines.OpenFlag(p, other.TwinId!);
+                                            FlagPipelines.ListChanged(p, other.Code);
+                                        }))
+                                    <span class="ff-muted">@other.Status</span>
+                                </span>
+                                <span class="ff-pill ff-pill--@other.Pill!.Kind">@other.Pill.Text</span>
+                                <svg class="ff-chev" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                            }
+                            else
+                            {
+                                <span class="ff-line__text">
+                                    <span class="ff-line__name">@other.Name</span>
+                                    <span class="ff-muted">@other.Status</span>
+                                </span>
+                                @(Html.NativeButton($"copy-to-{other.Code}", "Copy here")
+                                    .CssClass("ff-btn ff-btn--outline")
+                                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                                    {
+                                        p.Get(FlagRoutes.New)
+                                            .Gather(g => g.Static("app", other.Code).Static("copyFrom", Model.Id))
+                                            .Response(r => r.OnSuccess(s =>
+                                            {
+                                                s.Into(FlagIds.DetailSlot);
+                                                FlagPipelines.ListChanged(s, other.Code);
+                                            }));
+                                    }))
+                            }
+                        </div>
+                    }
+                </section>
+
+                <section class="ff-card ff-card--list" aria-labelledby="history-h">
+                    <h3 id="history-h" class="ff-h3">History</h3>
+                    @foreach (var entry in historyShown)
+                    {
+                        <partial name="_HistoryEntry" model="entry"/>
+                    }
+                    @if (historyMore.Count > 0)
+                    {
+                        <div id="@FlagIds.HistoryMore" hidden>
+                            @foreach (var entry in historyMore)
+                            {
+                                <partial name="_HistoryEntry" model="entry"/>
+                            }
+                        </div>
+                        <div id="@FlagIds.HistoryToggle">
+                            @(Html.NativeButton("history-show-all", $"Show all {screen.History.Count}")
+                                .CssClass("ff-link-btn")
+                                .Reactive(plan, evt => evt.Click, (args, p) =>
+                                {
+                                    p.Element(FlagIds.HistoryMore).Show();
+                                    p.Element(FlagIds.HistoryToggle).Hide();
+                                }))
+                        </div>
+                    }
+                </section>
+            }
+
+            <section id="@FlagIds.DevPanel" class="@(isNew ? "ff-card ff-collapsible is-open" : "ff-card ff-collapsible")">
+                @(Html.NativeButton("dev-toggle", "For developers")
+                    .CssClass("ff-collapsible__toggle ff-collapsible__toggle--code")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Element(FlagIds.DevPanel).ToggleClass(FlagIds.Open);
+                    }))
+                <div class="ff-collapsible__body">
+                    <p class="ff-note">Same calls on .NET 4.8 and .NET 10. Inject IScopedFeatureFlags per request, IFeatureFlags for jobs.</p>
+                    <div id="@FlagIds.DevSnippetsSlot">
+                        <partial name="_DevSnippets" model="Model"/>
+                    </div>
+                </div>
+            </section>
+
+            @if (!isNew)
+            {
+                <section id="@FlagIds.DetailsPanel" class="ff-card ff-collapsible">
+                    @(Html.NativeButton("details-toggle", "Name and description")
+                        .CssClass("ff-collapsible__toggle ff-collapsible__toggle--edit")
+                        .Reactive(plan, evt => evt.Click, (args, p) =>
+                        {
+                            p.Element(FlagIds.DetailsPanel).ToggleClass(FlagIds.Open);
+                        }))
+                    <div class="ff-collapsible__body">
+                        @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
+                            .NativeTextBox(b => b
+                                .CssClass("ff-input")
+                                .Reactive(plan, evt => evt.Changed, (args, p) => Refresh(p))); }
+                        @{ Html.InputField(plan, m => m.Description, o => o.Label("What it does"))
+                            .NativeTextArea(b => b
+                                .Rows(2)
+                                .CssClass("ff-input ff-textarea")
+                                .Reactive(plan, evt => evt.Changed, (args, p) => Refresh(p))); }
+                        <p class="ff-note">The key can't change once code uses it.</p>
+                    </div>
+                </section>
+            }
+        </div>
+    </div>
+
+    <div id="@FlagIds.SaveBar" class="fd__savebar" role="region" aria-label="Save" hidden="@(isNew ? null : "hidden")">
+        <div class="fd__savebar-inner">
+            <div id="@FlagIds.SaveSummarySlot" class="fd__savebar-summary">
+                <partial name="_SaveSummary" model="screen.Save"/>
+            </div>
+            @if (isNew)
+            {
+                @(Html.NativeButton("cancel-new", "Cancel")
+                    .CssClass("ff-btn ff-btn--quiet")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        if (screen.IsCopy)
+                        {
+                            // A copy goes back to the flag it was copied from.
+                            FlagPipelines.OpenFlag(p, Model.CopySource);
+                            FlagPipelines.ListChanged(p, Model.CopiedFrom);
+                            return;
+                        }
+
+                        p.Get(FlagRoutes.Detail)
+                            .Gather(g => g.Static("app", Model.App))
+                            .Response(r => r.OnSuccess(s =>
+                            {
+                                s.Into(FlagIds.DetailSlot);
+                                s.Element(FlagIds.Shell).RemoveClass(FlagIds.ShowDetail);
+                            }));
+                    }))
+                @(Html.NativeButton("create-flag", "Create flag")
+                    .CssClass("ff-btn ff-btn--primary")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Post(FlagRoutes.Create)
+                            .Gather(g => g.IncludeAll())
+                            .Validate<NewFlagValidator>(FlagIds.Form)
+                            .Response(r => r
+                                .OnSuccess(s =>
+                                {
+                                    s.Into(FlagIds.DetailSlot);
+                                    FlagPipelines.ListChanged(s, Model.App);
+                                    FlagPipelines.Toast(s, $"Flag created in {screen.AppName}", "Developers can check it now.");
+                                })
+                                .OnError(400, e => e.ValidationErrors(FlagIds.Form)));
+                    }))
+            }
+            else
+            {
+                @(Html.NativeButton("discard-changes", "Discard")
+                    .CssClass("ff-btn ff-btn--quiet")
+                    .Reactive(plan, evt => evt.Click, (args, p) => FlagPipelines.OpenFlag(p, Model.Id)))
+                @(Html.NativeButton("save-flag", "Save")
+                    .CssClass("ff-btn ff-btn--primary")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        // The name lives in a folded section; unfold it so a missing name is visible.
+                        p.When(p.Component<NativeTextBox>(m => m.Name).Value()).IsEmpty()
+                            .Then(t => t.Element(FlagIds.DetailsPanel).AddClass(FlagIds.Open));
+
+                        p.Post(FlagRoutes.Save)
+                            .Gather(g => g.IncludeAll())
+                            .Validate<FlagEditValidator>(FlagIds.Form)
+                            .Response(r => r
+                                .OnSuccess(s =>
+                                {
+                                    s.Into(FlagIds.DetailSlot);
+                                    FlagPipelines.ListChanged(s, Model.App);
+                                    FlagPipelines.Toast(s, "Saved", "Communities pick up the change within 10 seconds.");
+                                })
+                                .OnError(400, e =>
+                                {
+                                    e.Element(FlagIds.DetailsPanel).AddClass(FlagIds.Open);
+                                    e.ValidationErrors(FlagIds.Form);
+                                }));
+                    }))
+            }
+        </div>
+    </div>
+</div>
+
+@Html.EJS().ScriptManager()
+@Html.RenderPlan(plan)

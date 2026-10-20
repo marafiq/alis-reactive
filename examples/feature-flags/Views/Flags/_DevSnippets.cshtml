@@ -1,0 +1,26 @@
+@model FlagEditModel
+@{
+    var plan = Html.ResolvePlan<FlagEditModel>();
+    var clipboard = plan.RegisterPlugin<ClipboardPlugin>();
+    var snippets = (IReadOnlyList<Snippet>)ViewData["Snippets"]!;
+}
+
+<div class="ff-snippets">
+    @for (var i = 0; i < snippets.Count; i++)
+    {
+        var snippet = snippets[i];
+        <div class="ff-snippet">
+            <span class="ff-snippet__lang">@snippet.Lang</span>
+            <code class="ff-snippet__code">@snippet.Code</code>
+            @(Html.NativeButton($"copy-snippet-{i}", "Copy")
+                .CssClass("ff-snippet__copy")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Plugin(clipboard.WriteText).Arg(snippet.Code).Fire();
+                    FlagPipelines.Toast(p, "Copied", snippet.Lang + " is on your clipboard.");
+                }))
+        </div>
+    }
+</div>
+
+@Html.RenderPlan(plan)

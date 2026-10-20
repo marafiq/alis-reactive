@@ -1,0 +1,29 @@
+@model FlagEditModel
+@{
+    var plan = Html.ResolvePlan<FlagEditModel>();
+    var keyProblem = ViewData["KeyProblem"] as string ?? "";
+}
+
+@{ Html.InputField(plan, m => m.Key, o => o.Required().Label("Key used in code · filled in from the name"))
+    .NativeTextBox(b => b
+        .Placeholder("fall-risk-alerts")
+        .CssClass("ff-input ff-input--code")
+        .Reactive(plan, evt => evt.Changed, (args, p) =>
+        {
+            // Typed by hand: the name stops filling it in.
+            p.Component<NativeHiddenField>(m => m.KeyTouched).SetValue("true");
+            p.Post(FlagRoutes.KeyField)
+                .Gather(g => g.IncludeAll())
+                .Response(r => r.OnSuccess(s =>
+                {
+                    s.Into(FlagIds.KeyFieldSlot);
+                    FlagPipelines.RefreshDraft(s, isNew: true);
+                }));
+        })); }
+
+@if (keyProblem.Length > 0)
+{
+    <p class="ff-field-problem" role="status">@keyProblem</p>
+}
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,74 @@
+@model FlagEditModel
+@{
+    var plan = Html.ResolvePlan<FlagEditModel>();
+    var who = (WhoHasItScreen)ViewData["Who"]!;
+}
+
+@* Which site is open travels with the form, so every recompute keeps it open. *@
+@Html.HiddenFieldFor(plan, m => m.WhoSite)
+
+<div class="ff-card__head">
+    <h3 class="ff-h3">Who has it</h3>
+    @if (who.ShowAfterSave)
+    {
+        <span class="ff-after-save">After you save</span>
+    }
+</div>
+
+<div class="ff-who__count">
+    <span class="ff-who__num">@who.Count</span>
+    <span class="ff-who__text">@who.Text</span>
+</div>
+
+<div class="ff-who__strip" role="group" aria-label="Sites">
+    @foreach (var cell in who.Strip)
+    {
+        <div class="@(cell.Selected ? "ff-site is-selected" : "ff-site")" title="@cell.Title">
+            <span class="ff-bar-fill ff-bar-fill--@cell.Fill.State" style="--fill: @(cell.Fill.Percent)%"></span>
+            @(Html.NativeButton($"who-site-{cell.SiteId}", cell.Label)
+                .CssClass("ff-site__open")
+                .Reactive(plan, evt => evt.Click, (args, p) => FlagPipelines.PickSite(p, cell.SiteId)))
+            <span class="ff-site__sub">@cell.Fill.On/@cell.Fill.Of</span>
+        </div>
+    }
+</div>
+
+@if (who.HasSelection)
+{
+    <div class="ff-who__detail">
+        <span class="ff-who__detail-title">@who.SelectedTitle</span>
+        @foreach (var group in who.Groups)
+        {
+            <div class="ff-who__group">
+                <span class="ff-overline">@group.Title</span>
+                @foreach (var item in group.Items)
+                {
+                    <div class="ff-line">
+                        <span class="ff-line__text">
+                            <span>@item.Name</span>
+                            <span class="ff-muted">@item.Reason</span>
+                        </span>
+                        <span class="ff-pill ff-pill--@item.Pill.Kind">@item.Pill.Text</span>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p class="ff-hint">Tap a site to see each community and why.</p>
+}
+
+@if (who.ShowAppWide)
+{
+    <div class="ff-line ff-line--top">
+        <span class="ff-line__text">
+            <span>Checks with no community</span>
+            <span class="ff-muted">@who.AppWideSub</span>
+        </span>
+        <span class="ff-pill ff-pill--@who.AppWidePill.Kind">@who.AppWidePill.Text</span>
+    </div>
+}
+
+@Html.RenderPlan(plan)

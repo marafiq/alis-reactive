@@ -1,0 +1,33 @@
+@model CommunityCheckModel
+@{
+    var plan = Html.ReactivePlan<CommunityCheckModel>();
+    var choices = (IReadOnlyList<PickItem>)ViewData["Choices"]!;
+}
+
+<div class="ff-check">
+    @Html.HiddenFieldFor(plan, m => m.App)
+
+    @{ Html.InputField(plan, m => m.CommunityId, o => o.Label("Community"))
+        .FusionDropDownList(b => b
+            .DataSource(choices)
+            .Fields<PickItem>(t => t.Name, v => v.Id, g => g.Group)
+            .AllowFiltering(true)
+            .FilterType(FilterType.Contains)
+            .FilterBarPlaceholder("Find a community or city")
+            .Placeholder("Find a community or city")
+            .Reactive(plan, evt => evt.Changed, (args, p) =>
+            {
+                p.Get(FlagRoutes.CheckResult)
+                    .Gather(g => g
+                        .Include<NativeHiddenField, CommunityCheckModel>(m => m.App)
+                        .Include<FusionDropDownList, CommunityCheckModel>(m => m.CommunityId))
+                    .Response(r => r.OnSuccess(s => s.Into(FlagIds.CheckResultSlot)));
+            })); }
+
+    <div id="@FlagIds.CheckResultSlot" class="ff-check__result">
+        <p class="ff-hint">Pick a community to see every flag in @Apps.Get(Model.App).Name and why it is on or off there.</p>
+    </div>
+</div>
+
+@Html.EJS().ScriptManager()
+@Html.RenderPlan(plan)
