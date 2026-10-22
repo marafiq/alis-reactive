@@ -25,8 +25,9 @@
                         .Gather(g => g.Include<NativeRadioGroup, FlagsPageModel>(m => m.App))
                         .Response(r => r.OnSuccess(s =>
                         {
-                            s.Into(FlagIds.DetailSlot);
+                            // Shown first so the form's pickers render at their real width.
                             s.Element(FlagIds.Shell).AddClass(FlagIds.ShowDetail);
+                            s.Into(FlagIds.DetailSlot);
                         }));
                 }))
         </div>

@@ -39,15 +39,19 @@ public static class FlagPipelines
             .Response(r => r.OnSuccess(s => s.Into(FlagIds.WhoHasItSlot)));
     }
 
-    /// <summary>Load one flag into the detail pane; on phones the pane slides in.</summary>
+    /// <summary>
+    /// Load one flag into the detail pane; on phones the pane slides in. The pane is shown
+    /// before the flag goes in: Syncfusion pickers measure themselves as they render, and a
+    /// picker rendered in the hidden phone pane shows "1 selected" or nothing at all.
+    /// </summary>
     public static void OpenFlag<TModel>(PipelineBuilder<TModel> p, string flagId) where TModel : class
     {
         p.Get(FlagRoutes.Detail)
             .Gather(g => g.Static("id", flagId))
             .Response(r => r.OnSuccess(s =>
             {
-                s.Into(FlagIds.DetailSlot);
                 s.Element(FlagIds.Shell).AddClass(FlagIds.ShowDetail);
+                s.Into(FlagIds.DetailSlot);
             }));
     }
 
