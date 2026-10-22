@@ -8,7 +8,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
     /// <summary>
     /// Typed DataSource item for the country dropdown.
-    /// PascalCase C# → camelCase JSON via global JsonConvert.DefaultSettings in Program.cs.
+    /// PascalCase C# → camelCase JSON via FusionJson.ContractResolver (JsonConvert.DefaultSettings in Program.cs).
     /// No [JsonProperty] needed. Fields reference camelCase: text, value, continent.
     /// </summary>
     public class CountryItem
@@ -20,7 +20,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
     /// <summary>
     /// Typed DataSource item for the city dropdown.
-    /// PascalCase C# → camelCase JSON via global JsonConvert.DefaultSettings in Program.cs.
+    /// PascalCase C# → camelCase JSON via FusionJson.ContractResolver (JsonConvert.DefaultSettings in Program.cs).
     /// No [JsonProperty] needed. Fields reference camelCase: text, value, state, population.
     /// </summary>
     public class CityItem

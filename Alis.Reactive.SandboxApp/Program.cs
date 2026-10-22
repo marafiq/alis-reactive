@@ -1,13 +1,14 @@
 using Alis.Reactive.FluentValidator;
+using Alis.Reactive.Fusion;
 using Alis.Reactive.SandboxApp.Hubs;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
-// Syncfusion EJ2 DataSource rendering reads Newtonsoft defaults; keep sandbox API payloads camelCase.
+// Syncfusion renders data sources and its own options with Newtonsoft defaults: camel case
+// the sandbox's data, keep the names Syncfusion pins (Toast and Dialog position "X", "Y").
 JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 {
-    ContractResolver = new CamelCasePropertyNamesContractResolver()
+    ContractResolver = FusionJson.ContractResolver
 };
 
 var builder = WebApplication.CreateBuilder(args);
