@@ -104,6 +104,28 @@ public class WhenManagingTodoItems : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The layout's toast host asks Syncfusion for the bottom-right corner. A global Newtonsoft
+    // naming policy that renames Syncfusion's pinned "X"/"Y" drops that request and the toast
+    // falls back to the top left, over the page header.
+    [Test]
+    public async Task save_confirmation_appears_in_the_bottom_right_corner()
+    {
+        await NavigateAndBoot();
+        await _plan.TextBox(m => m.Title).FillAndBlur("Buy groceries");
+
+        await SaveBtn.ClickAsync();
+
+        await Expect(SaveToast)
+            .ToContainTextAsync("Todo saved successfully", new() { Timeout = 5000 });
+        var toast = (await SaveToast.BoundingBoxAsync())!;
+        var window = Page.ViewportSize!;
+        var toastCenterX = toast.X + toast.Width / 2;
+        var toastCenterY = toast.Y + toast.Height / 2;
+        Assert.That(toastCenterX, Is.GreaterThan(window.Width / 2), "confirmation sits on the right half of the window");
+        Assert.That(toastCenterY, Is.GreaterThan(window.Height / 2), "confirmation sits on the bottom half of the window");
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task saving_urgent_todo_with_due_date_succeeds()
     {

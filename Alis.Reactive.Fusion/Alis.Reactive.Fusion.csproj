@@ -21,6 +21,9 @@
     <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
       <PackageReference Include="Syncfusion.EJ2.MVC5" Version="33.1.47" />
       <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
+      <!-- AddReactiveFusion() extends IServiceCollection on both TFMs; net10 gets it from the
+           ASP.NET Core framework reference. Same version AlisReactive.FluentValidator uses. -->
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12" />
       <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
       <PackageReference Include="PolySharp" Version="1.16.0" PrivateAssets="all" />
       <Reference Include="System.Web" />
