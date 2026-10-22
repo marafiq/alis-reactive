@@ -1,4 +1,5 @@
 using FeatureFlags.Domain;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace FeatureFlags.Models;
 
@@ -62,6 +63,11 @@ public class FlagEditModel
     /// <summary>Site the user just tapped in the strip. Not an input; sent with that tap only.</summary>
     public string PickSite { get; set; } = "";
 
+    /// <summary>
+    /// Not an input. MVC validation walks every property of a posted form before the action
+    /// runs, and a posted form can carry a JSON null Id (see <see cref="Normalized"/>).
+    /// </summary>
+    [ValidateNever]
     public bool IsNew => Id.Length == 0;
 
     /// <summary>
