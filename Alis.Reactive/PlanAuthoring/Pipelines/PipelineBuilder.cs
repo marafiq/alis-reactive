@@ -97,10 +97,10 @@ namespace Alis.Reactive.Builders
         /// </param>
         /// <returns>An authoring handle joined to the generated component ID.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>(
-            Expression<Func<TModel, object>> expr)
+            Expression<Func<TModel, object?>> expr)
             where TComponent : IComponent, new()
         {
-            var elementId = IdGenerator.For<TModel, object>(expr);
+            var elementId = IdGenerator.For(expr);
             return new ComponentRef<TComponent, TModel>(elementId, this);
         }
 
@@ -112,11 +112,11 @@ namespace Alis.Reactive.Builders
         /// </param>
         /// <returns>An authoring handle joined to the other model's generated component ID.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent, TOtherModel>(
-            Expression<Func<TOtherModel, object>> expr)
+            Expression<Func<TOtherModel, object?>> expr)
             where TComponent : IComponent, new()
             where TOtherModel : class
         {
-            var elementId = IdGenerator.For<TOtherModel, object>(expr);
+            var elementId = IdGenerator.For(expr);
             return new ComponentRef<TComponent, TModel>(elementId, this);
         }
 
