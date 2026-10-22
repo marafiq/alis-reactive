@@ -183,6 +183,9 @@ body.ff {
 .ff-input--code { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 14px; }
 .ff-textarea { height: auto; min-height: 68px; padding: 10px 12px; line-height: 1.45; resize: vertical; }
 .ff-field-problem { margin: 0; font-size: 12.5px; font-weight: 500; color: var(--ff-warn); }
+/* Create re-checks the key on the server and puts the same clash message in the key field's
+   own error slot; show it once. */
+#key-field:has([data-valmsg-for="Key"]:not(:empty)) .ff-field-problem { display: none; }
 
 .ff-pill { flex: none; padding: 2px 9px; border-radius: 10px; font-size: 12px; font-weight: 600; }
 .ff-pill--on { background: var(--ff-blue-soft); color: var(--ff-blue-ink); }
