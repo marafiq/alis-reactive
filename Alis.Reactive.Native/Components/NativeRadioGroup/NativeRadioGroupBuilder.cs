@@ -193,7 +193,10 @@ namespace Alis.Reactive.Native.Components
             writer.Write("</div>");
 
             // Inline initialization works on page load and partial injection without DOM scanning.
-            writer.Write($@"<script>(function(){{var h=document.getElementById(""{encodedId}"");h.isInteracted=false;h.parentElement.addEventListener(""change"",function(e){{if(e.target.type!==""radio"")return;h.value=e.target.value;h.isInteracted=true;h.dispatchEvent(new Event(""change"",{{bubbles:true}}));}});}})();</script>");
+            // The group listens in the capture phase: reactions are wired on each radio, so the
+            // hidden value must be synced before they run or a reaction that reads the group
+            // (Include, Value()) sees the previous option.
+            writer.Write($@"<script>(function(){{var h=document.getElementById(""{encodedId}"");h.isInteracted=false;h.parentElement.addEventListener(""change"",function(e){{if(e.target.type!==""radio"")return;h.value=e.target.value;h.isInteracted=true;h.dispatchEvent(new Event(""change"",{{bubbles:true}}));}},true);}})();</script>");
         }
     }
 }
