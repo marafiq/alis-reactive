@@ -143,6 +143,7 @@
                             .Fields<PickItem>(t => t.Name, v => v.Id)
                             .Mode(VisualMode.CheckBox)
                             .AllowFiltering(true)
+                            .FilterType(FilterType.Contains)
                             .FilterBarPlaceholder("Find a site")
                             .Placeholder("Add sites")
                             .Reactive(plan, evt => evt.Changed, (args, p) => Refresh(p))); }
@@ -154,6 +155,7 @@
                             .Mode(VisualMode.CheckBox)
                             .EnableGroupCheckBox(true)
                             .AllowFiltering(true)
+                            .FilterType(FilterType.Contains)
                             .FilterBarPlaceholder("Find a company")
                             .Placeholder("Add companies")
                             .Reactive(plan, evt => evt.Changed, (args, p) => Refresh(p))); }
@@ -165,6 +167,7 @@
                             .Mode(VisualMode.CheckBox)
                             .EnableGroupCheckBox(true)
                             .AllowFiltering(true)
+                            .FilterType(FilterType.Contains)
                             .FilterBarPlaceholder("Find a community")
                             .Placeholder("Add communities")
                             .Reactive(plan, evt => evt.Changed, (args, p) => Refresh(p))); }
@@ -183,6 +186,7 @@
                             .Fields<PickItem>(t => t.Name, v => v.Id, g => g.Group)
                             .Mode(VisualMode.CheckBox)
                             .AllowFiltering(true)
+                            .FilterType(FilterType.Contains)
                             .FilterBarPlaceholder("Find a site, company or community")
                             .Placeholder("Add a site, company or community")
                             .Reactive(plan, evt => evt.Changed, (args, p) => Refresh(p))); }
