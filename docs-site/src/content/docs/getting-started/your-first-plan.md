@@ -32,6 +32,23 @@ builder.Services.AddReactiveFluentValidation(validation =>
     validation.AddFromAssemblyContaining<Program>());
 ```
 
+## Register Fusion Components
+
+Register Fusion in `Program.cs` so Syncfusion components show your data and keep
+their own settings.
+
+```csharp
+using Alis.Reactive.Fusion;
+
+builder.Services.AddReactiveFusion();
+```
+
+Syncfusion writes your data sources and its own options with Newtonsoft.Json.
+This call sends your data in camel case, so `Fields<TItem>(...)` finds each item's
+text and value, and keeps the names Syncfusion fixes, such as the corner the toast
+appears in. If your app also assigns `JsonConvert.DefaultSettings`, call
+`AddReactiveFusion()` after that line; it keeps your other settings.
+
 ## Load Browser Assets
 
 Package builds copy versioned assets into `wwwroot`. Link the copied filenames

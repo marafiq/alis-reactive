@@ -8,7 +8,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
     /// <summary>
     /// Typed DataSource item for the facility multi-column combo box.
-    /// PascalCase C# -> camelCase JSON via FusionJson.ContractResolver (JsonConvert.DefaultSettings in Program.cs).
+    /// PascalCase C# -> camelCase JSON via AddReactiveFusion() in Program.cs.
     /// Fields reference the camelCase names: text, value, city, capacity.
     /// </summary>
     public class FacilityItem

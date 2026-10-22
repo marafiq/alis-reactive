@@ -2,14 +2,6 @@ using Alis.Reactive.FluentValidator;
 using Alis.Reactive.Fusion;
 using Alis.Reactive.SandboxApp.Hubs;
 using Microsoft.Extensions.FileProviders;
-using Newtonsoft.Json;
-
-// Syncfusion renders data sources and its own options with Newtonsoft defaults: camel case
-// the sandbox's data, keep the names Syncfusion pins (Toast and Dialog position "X", "Y").
-JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-{
-    ContractResolver = FusionJson.ContractResolver
-};
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +17,7 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(2));
 builder.Services.AddReactiveFluentValidation(validation =>
     validation.AddFromAssemblyContaining<Program>());
+builder.Services.AddReactiveFusion();
 
 // Disable demo broadcasts in Playwright so realtime tests control their own events.
 if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ALIS_NO_BROADCAST")))
