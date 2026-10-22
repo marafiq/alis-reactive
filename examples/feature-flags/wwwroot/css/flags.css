@@ -111,7 +111,8 @@ body.ff {
 .ff-note { margin: 0; font-size: 13px; line-height: 1.45; color: var(--ff-muted); }
 .ff-hint { margin: 0; font-size: 13px; color: var(--ff-muted-2); }
 .ff-optional { font-size: 13px; font-weight: 400; color: var(--ff-muted-2); }
-.ff-code { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12.5px; color: var(--ff-muted); }
+/* body.ff raises this over the design system's `.alis-root code` mono font. */
+.ff .ff-code { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12.5px; color: var(--ff-muted); }
 
 .ff-chev {
   flex: none;
