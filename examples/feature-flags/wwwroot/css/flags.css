@@ -67,7 +67,7 @@ body.ff {
 
 .ff-shell { flex: 1; min-height: 0; display: flex; }
 .ff-pane { min-height: 0; }
-.ff-pane--list { flex: 1; overflow-y: auto; background: var(--ff-surface); }
+.ff-pane--list { position: relative; flex: 1; overflow-y: auto; background: var(--ff-surface); }
 .ff-pane--detail { flex: 1; min-width: 0; display: none; flex-direction: column; }
 .ff-shell.is-detail .ff-pane--list { display: none; }
 .ff-shell.is-detail .ff-pane--detail { display: flex; }
@@ -341,7 +341,7 @@ body.ff {
 /* ── One flag ─────────────────────────────────────────────────────────── */
 
 .fd { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.fd__scroll { flex: 1; min-height: 0; overflow-y: auto; }
+.fd__scroll { position: relative; flex: 1; min-height: 0; overflow-y: auto; }
 
 .fd__head { background: #FFFFFF; border-bottom: 1px solid var(--ff-line-2); }
 .fd__head-inner {
