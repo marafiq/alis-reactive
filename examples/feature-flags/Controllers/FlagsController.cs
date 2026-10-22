@@ -72,6 +72,11 @@ public class FlagsController(FlagStore store, FlagScreens screens) : Controller
         return PartialView("_KeyField", form);
     }
 
+    /// <summary>The name, app and key at the top of the form; a new flag's follow what is typed.</summary>
+    [HttpPost(FlagRoutes.Headline)]
+    public IActionResult Headline([FromBody] FlagEditModel form) =>
+        PartialView("_FlagHeadline", screens.Detail(form.Normalized()));
+
     [HttpPost(FlagRoutes.DevSnippets)]
     public IActionResult DevSnippets([FromBody] FlagEditModel form)
     {

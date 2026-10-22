@@ -31,20 +31,8 @@
                         p.Element(FlagIds.Shell).RemoveClass(FlagIds.ShowDetail);
                     }))
                 <div class="fd__title">
-                    <div class="fd__title-text">
-                        <h2 class="ff-h2">@screen.HeaderName</h2>
-                        <span class="fd__ident">
-                            <span class="ff-app-badge">@screen.AppName</span>
-                            <code class="ff-code">@screen.KeyShown</code>
-                        </span>
-                        @if (!isNew && !string.IsNullOrWhiteSpace(Model.Description))
-                        {
-                            <span class="fd__desc">@Model.Description</span>
-                        }
-                        @if (screen.LastChanged.Length > 0)
-                        {
-                            <span class="ff-muted">@screen.LastChanged</span>
-                        }
+                    <div id="@FlagIds.HeadlineSlot" class="fd__title-text">
+                        <partial name="_FlagHeadline" model="screen"/>
                     </div>
                     <div class="fd__switch">
                         @{ Html.InputField(plan, m => m.On, o => o.Label("Flag switch"))

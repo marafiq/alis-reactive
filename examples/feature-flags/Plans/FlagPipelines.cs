@@ -15,7 +15,8 @@ public static class FlagPipelines
     /// <summary>
     /// Any change on the form: show the save bar, then ask the server what the draft
     /// means. The whole form goes up; "Who has it" and the save summary come back as HTML.
-    /// New flags also refresh the code snippets, since their key is still being typed.
+    /// New flags also refresh the headline and the code snippets, since their name and key
+    /// are still being typed.
     /// </summary>
     public static void RefreshDraft(PipelineBuilder<FlagEditModel> p, bool isNew)
     {
@@ -23,7 +24,7 @@ public static class FlagPipelines
 
         if (isNew)
         {
-            p.Parallel(WhoHasIt, SaveSummary, DevSnippets);
+            p.Parallel(WhoHasIt, SaveSummary, DevSnippets, Headline);
             return;
         }
 
@@ -75,6 +76,11 @@ public static class FlagPipelines
         request.Post(FlagRoutes.SaveSummary)
             .Gather(g => g.IncludeAll())
             .Response(r => r.OnSuccess(s => s.Into(FlagIds.SaveSummarySlot)));
+
+    private static void Headline(HttpRequestBuilder<FlagEditModel> request) =>
+        request.Post(FlagRoutes.Headline)
+            .Gather(g => g.IncludeAll())
+            .Response(r => r.OnSuccess(s => s.Into(FlagIds.HeadlineSlot)));
 
     private static void DevSnippets(HttpRequestBuilder<FlagEditModel> request) =>
         request.Post(FlagRoutes.DevSnippets)

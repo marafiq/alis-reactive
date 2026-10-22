@@ -11,6 +11,7 @@ public static class FlagRoutes
     public const string SaveSummary = "/flags/save-summary";
     public const string KeyField = "/flags/key-field";
     public const string DevSnippets = "/flags/dev-snippets";
+    public const string Headline = "/flags/headline";
     public const string Save = "/flags/save";
     public const string Create = "/flags/create";
     public const string Check = "/flags/check";
@@ -34,6 +35,7 @@ public static class FlagIds
     public const string SaveSummarySlot = "save-summary";
     public const string KeyFieldSlot = "key-field";
     public const string DevSnippetsSlot = "dev-snippets";
+    public const string HeadlineSlot = "flag-headline";
     public const string SaveBar = "save-bar";
     public const string PickFields = "pick-fields";
     public const string EveryoneNote = "everyone-note";

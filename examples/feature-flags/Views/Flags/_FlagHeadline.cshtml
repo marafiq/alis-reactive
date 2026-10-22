@@ -1,0 +1,15 @@
+@model FlagDetailScreen
+@* Name, app and key. A new flag's headline is recomputed as its name and key are typed. *@
+<h2 class="ff-h2">@Model.HeaderName</h2>
+<span class="fd__ident">
+    <span class="ff-app-badge">@Model.AppName</span>
+    <code class="ff-code">@Model.KeyShown</code>
+</span>
+@if (!Model.IsNew && !string.IsNullOrWhiteSpace(Model.Form.Description))
+{
+    <span class="fd__desc">@Model.Form.Description</span>
+}
+@if (Model.LastChanged.Length > 0)
+{
+    <span class="ff-muted">@Model.LastChanged</span>
+}
