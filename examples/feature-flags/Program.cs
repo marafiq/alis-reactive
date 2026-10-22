@@ -2,14 +2,6 @@ using Alis.Reactive.FluentValidator;
 using FeatureFlags.Domain;
 using FeatureFlags.Models;
 using Microsoft.Extensions.FileProviders;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-
-// Syncfusion EJ2 DataSource rendering reads Newtonsoft defaults, so picker data stays camelCase.
-JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-{
-    ContractResolver = new CamelCasePropertyNamesContractResolver()
-};
 
 var builder = WebApplication.CreateBuilder(args);
 

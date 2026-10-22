@@ -1,5 +1,6 @@
 using FeatureFlags.Domain;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Newtonsoft.Json;
 
 namespace FeatureFlags.Models;
 
@@ -134,5 +135,11 @@ public class CommunityCheckModel
     public string CommunityId { get; set; } = "";
 }
 
-/// <summary>One option in a site, company or community picker.</summary>
-public sealed record PickItem(string Id, string Name, string Group);
+/// <summary>
+/// One option in a site, company or community picker. Syncfusion serializes picker data with
+/// Newtonsoft; the names match the camel-case field mapping that Fields(...) emits.
+/// </summary>
+public sealed record PickItem(
+    [property: JsonProperty("id")] string Id,
+    [property: JsonProperty("name")] string Name,
+    [property: JsonProperty("group")] string Group);
