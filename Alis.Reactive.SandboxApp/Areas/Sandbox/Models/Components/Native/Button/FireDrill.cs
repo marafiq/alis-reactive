@@ -11,6 +11,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Native.Button
     public static class FireDrillEvents
     {
         /// <summary>A resident is not where the drill expects them.</summary>
-        public static readonly AppEvent ResidentMissing = AppEvent.Named("fire-drill-resident-missing");
+        public static readonly AppEvent ResidentMissing = AppEvent.Declare();
     }
 }

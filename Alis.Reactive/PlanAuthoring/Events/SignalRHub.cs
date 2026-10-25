@@ -1,20 +1,24 @@
+using System.Runtime.CompilerServices;
+
 namespace Alis.Reactive
 {
     /// <summary>
-    /// A SignalR hub, declared once: the methods the server calls on the page, by name, with the
-    /// argument each sends.
+    /// A SignalR hub, declared once: the methods the server calls on the page, each named by its member,
+    /// with the argument each sends.
     /// </summary>
     /// <remarks>
     /// <code>
     /// public sealed class ResidentStatusUpdates : SignalRHub
     /// {
-    ///     public SignalRMessage&lt;ResidentStatus&gt; StatusChanged =&gt; Message&lt;ResidentStatus&gt;("StatusChanged");
+    ///     public SignalRMessage&lt;ResidentStatus&gt; StatusChanged =&gt; Message&lt;ResidentStatus&gt;();
     /// }
     ///
     /// Html.On(plan, t =&gt; t.SignalR(SignalRHub.At&lt;ResidentStatusUpdates&gt;("/hubs/resident-status"), h =&gt; h.StatusChanged, (status, p) =&gt; ...));
     /// </code>
-    /// The server calls each method by its declared <c>Name</c>, so the hub and the page cannot disagree
-    /// on it. The page loads the SignalR client script before the framework's.
+    /// A method's name is its member's name camel-cased (<c>StatusChanged</c> is <c>statusChanged</c>; SignalR
+    /// matches it in any case) unless <c>name:</c> gives another. The server calls each method by its declared
+    /// <c>Name</c>, so the hub and the page cannot disagree on it. The page loads the SignalR client script
+    /// before the framework's.
     /// </remarks>
     public abstract class SignalRHub
     {
@@ -26,16 +30,18 @@ namespace Alis.Reactive
             new SignalRSource<THub>(DeclaredName.RequiredUrl(url), new THub());
 
         /// <summary>Declares a method the server calls with no argument the page reads.</summary>
-        /// <param name="methodName">The client method name the server invokes.</param>
-        protected static SignalRMessage Message(string methodName) =>
-            new SignalRMessage(DeclaredName.Required(methodName));
+        /// <param name="name">The client method name, when it is not the declaring member's name camel-cased.</param>
+        /// <param name="declaredBy">The declaring member; the compiler supplies it.</param>
+        protected static SignalRMessage Message(string? name = null, [CallerMemberName] string declaredBy = "") =>
+            new SignalRMessage(DeclaredName.Of(name, declaredBy));
 
         /// <summary>Declares a method the server calls with one <typeparamref name="TPayload"/> argument.</summary>
         /// <typeparam name="TPayload">The argument, read by camel-case JSON names.</typeparam>
-        /// <param name="methodName">The client method name the server invokes.</param>
-        protected static SignalRMessage<TPayload> Message<TPayload>(string methodName)
+        /// <param name="name">The client method name, when it is not the declaring member's name camel-cased.</param>
+        /// <param name="declaredBy">The declaring member; the compiler supplies it.</param>
+        protected static SignalRMessage<TPayload> Message<TPayload>(string? name = null, [CallerMemberName] string declaredBy = "")
             where TPayload : class, new() =>
-            new SignalRMessage<TPayload>(DeclaredName.Required(methodName));
+            new SignalRMessage<TPayload>(DeclaredName.Of(name, declaredBy));
     }
 
     /// <summary>A declared hub at a URL; see <see cref="SignalRHub.At{THub}"/>.</summary>

@@ -7,7 +7,7 @@ public class NotificationHub : Hub { }
 /// <summary>The client methods <see cref="NotificationHub"/> calls on a page.</summary>
 public sealed class NotificationFeed : SignalRHub
 {
-    public SignalRMessage<NotificationPayload> ReceiveNotification => Message<NotificationPayload>("ReceiveNotification");
+    public SignalRMessage<NotificationPayload> ReceiveNotification => Message<NotificationPayload>();
 }
 
 public class NotificationPayload

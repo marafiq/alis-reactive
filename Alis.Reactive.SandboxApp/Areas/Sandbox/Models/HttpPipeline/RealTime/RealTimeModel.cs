@@ -11,9 +11,9 @@ public class FacilityAlert
 /// <summary>The facility alert stream: an alert, and the all-clear that ends a drill.</summary>
 public sealed class FacilityAlertStream : ServerPushStream
 {
-    public ServerPushMessage<FacilityAlert> Alert => Message<FacilityAlert>("facility-alert");
+    public ServerPushMessage<FacilityAlert> Alert => Message<FacilityAlert>();
 
-    public ServerPushMessage AllClear => Message("all-clear");
+    public ServerPushMessage AllClear => Message();
 }
 
 public class ResidentPanelModel { }

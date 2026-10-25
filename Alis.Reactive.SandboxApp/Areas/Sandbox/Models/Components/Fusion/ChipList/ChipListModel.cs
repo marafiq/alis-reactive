@@ -110,8 +110,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ChipLi
     /// <summary>The document events the outing planner raises and hears.</summary>
     public static class OutingEvents
     {
-        public static readonly AppEvent<OutingTags> Tagged = AppEvent.Named<OutingTags>("outing-tagged");
+        public static readonly AppEvent<OutingTags> Tagged = AppEvent.Declare<OutingTags>();
 
-        public static readonly AppEvent<OpenSeat> SeatOpened = AppEvent.Named<OpenSeat>("outing-seat-opened");
+        public static readonly AppEvent<OpenSeat> SeatOpened = AppEvent.Declare<OpenSeat>();
     }
 }

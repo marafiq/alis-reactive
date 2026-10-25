@@ -53,7 +53,7 @@ namespace Alis.Reactive.Builders
         {
             if (!_draft.HasFields)
                 throw new InvalidOperationException(
-                    "Dispatch payload must have at least one field. An event with no payload is declared with AppEvent.Named(name) and raised with Dispatch(appEvent).");
+                    "Dispatch payload must have at least one field. An event with no payload is declared with AppEvent.Declare() and raised with Dispatch(appEvent).");
 
             return _draft.ToValueExpression();
         }

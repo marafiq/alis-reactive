@@ -36,7 +36,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Raises a declared document event with no payload.</summary>
-        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Named(string)"/>.</param>
+        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Declare(string, string)"/>.</param>
         /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
         public PipelineBuilder<TModel> Dispatch(AppEvent appEvent)
         {
@@ -47,7 +47,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Raises a declared document event without its payload: a listener reads every member as missing.</summary>
         /// <typeparam name="TPayload">The payload the event declares.</typeparam>
-        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Named{TPayload}(string)"/>.</param>
+        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Declare{TPayload}(string, string)"/>.</param>
         /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
         public PipelineBuilder<TModel> Dispatch<TPayload>(AppEvent<TPayload> appEvent)
             where TPayload : class, new()
@@ -59,7 +59,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Raises a declared document event with a payload fixed when the view renders.</summary>
         /// <typeparam name="TPayload">The payload the event declares.</typeparam>
-        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Named{TPayload}(string)"/>.</param>
+        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Declare{TPayload}(string, string)"/>.</param>
         /// <param name="payload">The payload, written into the plan.</param>
         /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
         public PipelineBuilder<TModel> Dispatch<TPayload>(AppEvent<TPayload> appEvent, TPayload payload)
@@ -79,7 +79,7 @@ namespace Alis.Reactive.Builders
         /// fixed when the view renders.
         /// </remarks>
         /// <typeparam name="TPayload">The payload the event declares.</typeparam>
-        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Named{TPayload}(string)"/>.</param>
+        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Declare{TPayload}(string, string)"/>.</param>
         /// <param name="configure">Maps payload fields to value sources or literals.</param>
         /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
         public PipelineBuilder<TModel> Dispatch<TPayload>(

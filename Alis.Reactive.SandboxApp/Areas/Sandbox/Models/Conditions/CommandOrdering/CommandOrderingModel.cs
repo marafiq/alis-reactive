@@ -13,5 +13,5 @@ public class CommandOrderingPayload
 /// <summary>The document events the CommandOrdering page raises and hears.</summary>
 public static class CommandOrderingEvents
 {
-    public static readonly AppEvent<CommandOrderingPayload> OrderingTest = AppEvent.Named<CommandOrderingPayload>("ordering-test");
+    public static readonly AppEvent<CommandOrderingPayload> OrderingTest = AppEvent.Declare<CommandOrderingPayload>();
 }

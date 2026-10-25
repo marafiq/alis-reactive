@@ -1,6 +1,6 @@
 namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 
-// Dispatch chain under test: dom-ready -> "test" -> "test-received" -> "final".
+// Dispatch chain under test: dom-ready -> "test" -> "testReceived" -> "final".
 [TestFixture]
 public class WhenEventsChainAcrossListeners : PlaywrightTestBase
 {
@@ -18,7 +18,7 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
 
         await Expect(step1).ToContainTextAsync("dom-ready fired");
         await Expect(step2).ToContainTextAsync("\"test\" received");
-        await Expect(step3).ToContainTextAsync("\"test-received\" received");
+        await Expect(step3).ToContainTextAsync("\"testReceived\" received");
 
         AssertNoConsoleErrors();
     }
@@ -88,17 +88,17 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
             .ToList();
 
         var testDispatchIndex = dispatches.FindIndex(m =>
-            m.Contains("\"event\":\"test\"") && !m.Contains("test-received"));
+            m.Contains("\"event\":\"test\"") && !m.Contains("testReceived"));
         var receivedDispatchIndex = dispatches.FindIndex(m =>
-            m.Contains("\"event\":\"test-received\""));
+            m.Contains("\"event\":\"testReceived\""));
         var finalDispatchIndex = dispatches.FindIndex(m =>
             m.Contains("\"event\":\"final\""));
 
         Assert.That(testDispatchIndex, Is.GreaterThanOrEqualTo(0), "test dispatch must be traced");
         Assert.That(receivedDispatchIndex, Is.GreaterThan(testDispatchIndex),
-            "test-received must dispatch after test");
+            "testReceived must dispatch after test");
         Assert.That(finalDispatchIndex, Is.GreaterThan(receivedDispatchIndex),
-            "final must dispatch after test-received");
+            "final must dispatch after testReceived");
     }
 
     [Test]

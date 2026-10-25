@@ -15,7 +15,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     /// <summary>The document events the DispatchSource page raises and hears.</summary>
     public static class DispatchSourceEvents
     {
-        public static readonly AppEvent DoTransfer = AppEvent.Named("do-transfer");
-        public static readonly AppEvent<DispatchSourceModel> Transfer = AppEvent.Named<DispatchSourceModel>("transfer");
+        public static readonly AppEvent DoTransfer = AppEvent.Declare();
+        public static readonly AppEvent<DispatchSourceModel> Transfer = AppEvent.Declare<DispatchSourceModel>();
     }
 }

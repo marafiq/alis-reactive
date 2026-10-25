@@ -72,6 +72,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     public static class ResidentRegisterEvents
     {
         /// <summary>A record was removed or a resident moved: the list of records is out of date.</summary>
-        public static readonly AppEvent RegisterChanged = AppEvent.Named("resident-register-changed");
+        public static readonly AppEvent RegisterChanged = AppEvent.Declare();
     }
 }

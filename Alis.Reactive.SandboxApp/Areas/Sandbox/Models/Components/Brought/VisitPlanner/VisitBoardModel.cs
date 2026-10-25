@@ -117,14 +117,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
     /// </summary>
     public sealed class VisitBoardStream : ServerPushStream
     {
-        public ServerPushMessage<SlotTaken> SlotTaken => Message<SlotTaken>("slot-taken");
+        public ServerPushMessage<SlotTaken> SlotTaken => Message<SlotTaken>();
 
-        public ServerPushMessage<DesksWatching> DesksWatching => Message<DesksWatching>("desks-watching");
+        public ServerPushMessage<DesksWatching> DesksWatching => Message<DesksWatching>();
     }
 
     /// <summary>The document events the VisitBoard page raises and hears.</summary>
     public static class VisitBoardEvents
     {
-        public static readonly AppEvent<BoardChange> BoardChanged = AppEvent.Named<BoardChange>("board-changed");
+        public static readonly AppEvent<BoardChange> BoardChanged = AppEvent.Declare<BoardChange>();
     }
 }

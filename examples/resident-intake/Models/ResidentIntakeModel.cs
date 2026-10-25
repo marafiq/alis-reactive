@@ -29,5 +29,5 @@ public class ResidentIntakeModel
 public static class IntakeEvents
 {
     /// <summary>Raised once the intake is saved; the page then loads its summary.</summary>
-    public static readonly AppEvent IntakeSaved = AppEvent.Named("intake-saved");
+    public static readonly AppEvent IntakeSaved = AppEvent.Declare();
 }

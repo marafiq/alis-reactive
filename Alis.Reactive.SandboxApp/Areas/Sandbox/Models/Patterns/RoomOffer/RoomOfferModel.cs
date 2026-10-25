@@ -29,7 +29,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.RoomOffer
     public static class RoomOfferEvents
     {
         /// <summary>The coordinator started the offer over for the next prospective resident.</summary>
-        public static readonly AppEvent StartedOver = AppEvent.Named("room-offer-started-over");
+        public static readonly AppEvent StartedOver = AppEvent.Declare();
     }
 
     /// <summary>The server's confirmation that the offer was sent.</summary>

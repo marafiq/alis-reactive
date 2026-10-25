@@ -55,10 +55,10 @@ public class ResidentStatusHub : Hub
 /// <summary>The client methods <see cref="ResidentStatusHub"/> calls on a page.</summary>
 public sealed class ResidentStatusFeed : SignalRHub
 {
-    public SignalRMessage<ResidentStatusPayload> StatusChanged => Message<ResidentStatusPayload>("StatusChanged");
+    public SignalRMessage<ResidentStatusPayload> StatusChanged => Message<ResidentStatusPayload>();
 
     /// <summary>The board was cleared at shift change: called with no argument.</summary>
-    public SignalRMessage BoardCleared => Message("BoardCleared");
+    public SignalRMessage BoardCleared => Message();
 }
 
 public class ResidentStatusPayload

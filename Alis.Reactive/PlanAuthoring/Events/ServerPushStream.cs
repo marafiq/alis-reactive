@@ -1,20 +1,23 @@
+using System.Runtime.CompilerServices;
+
 namespace Alis.Reactive
 {
     /// <summary>
-    /// A server-sent event stream (an <c>EventSource</c>), declared once: the events it sends, by the
-    /// names the server writes, with the payloads they carry.
+    /// A server-sent event stream (an <c>EventSource</c>), declared once: the events it sends, each named
+    /// by its member, with the payloads they carry.
     /// </summary>
     /// <remarks>
     /// <code>
     /// public sealed class FacilityAlerts : ServerPushStream
     /// {
-    ///     public ServerPushMessage&lt;FacilityAlert&gt; Alert =&gt; Message&lt;FacilityAlert&gt;("facility-alert");
+    ///     public ServerPushMessage&lt;FacilityAlert&gt; Alert =&gt; Message&lt;FacilityAlert&gt;();
     /// }
     ///
     /// Html.On(plan, t =&gt; t.ServerPush(ServerPushStream.At&lt;FacilityAlerts&gt;(url), s =&gt; s.Alert, (alert, p) =&gt; ...));
     /// </code>
-    /// Messages the server sends without an event name are <c>Message("message")</c>. The server writes
-    /// each event under its declared <c>Name</c>, so the stream and the page cannot disagree on it.
+    /// An event's SSE name is its member's name camel-cased (<c>Alert</c> is <c>alert</c>) unless <c>name:</c>
+    /// gives another; messages the server sends with no event name are <c>Message(name: "message")</c>. The
+    /// server writes each event under its declared <c>Name</c>, so the stream and the page cannot disagree on it.
     /// </remarks>
     public abstract class ServerPushStream
     {
@@ -30,16 +33,18 @@ namespace Alis.Reactive
         /// The server still writes a data line, as JSON (<c>data: {}</c>): a browser drops an event that
         /// has no data, and the page reads every event's data as JSON.
         /// </remarks>
-        /// <param name="eventType">The SSE event name the server writes.</param>
-        protected static ServerPushMessage Message(string eventType) =>
-            new ServerPushMessage(DeclaredName.Required(eventType));
+        /// <param name="name">The SSE event name, when it is not the declaring member's name camel-cased.</param>
+        /// <param name="declaredBy">The declaring member; the compiler supplies it.</param>
+        protected static ServerPushMessage Message(string? name = null, [CallerMemberName] string declaredBy = "") =>
+            new ServerPushMessage(DeclaredName.Of(name, declaredBy));
 
         /// <summary>Declares an event the stream sends with a JSON <typeparamref name="TPayload"/>.</summary>
         /// <typeparam name="TPayload">The event's data, read by camel-case JSON names.</typeparam>
-        /// <param name="eventType">The SSE event name the server writes.</param>
-        protected static ServerPushMessage<TPayload> Message<TPayload>(string eventType)
+        /// <param name="name">The SSE event name, when it is not the declaring member's name camel-cased.</param>
+        /// <param name="declaredBy">The declaring member; the compiler supplies it.</param>
+        protected static ServerPushMessage<TPayload> Message<TPayload>(string? name = null, [CallerMemberName] string declaredBy = "")
             where TPayload : class, new() =>
-            new ServerPushMessage<TPayload>(DeclaredName.Required(eventType));
+            new ServerPushMessage<TPayload>(DeclaredName.Of(name, declaredBy));
     }
 
     /// <summary>A declared stream at a URL; see <see cref="ServerPushStream.At{TStream}"/>.</summary>

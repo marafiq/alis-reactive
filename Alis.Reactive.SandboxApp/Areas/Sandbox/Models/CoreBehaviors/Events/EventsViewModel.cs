@@ -8,8 +8,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     /// <summary>The document events the Events page raises and hears.</summary>
     public static class EventsEvents
     {
-        public static readonly AppEvent<EventsViewModel> Final = AppEvent.Named<EventsViewModel>("final");
-        public static readonly AppEvent Test = AppEvent.Named("test");
-        public static readonly AppEvent<EventsViewModel> TestReceived = AppEvent.Named<EventsViewModel>("test-received");
+        public static readonly AppEvent<EventsViewModel> Final = AppEvent.Declare<EventsViewModel>();
+        public static readonly AppEvent Test = AppEvent.Declare();
+        public static readonly AppEvent<EventsViewModel> TestReceived = AppEvent.Declare<EventsViewModel>();
     }
 }

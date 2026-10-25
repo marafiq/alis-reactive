@@ -51,6 +51,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Native.ShiftR
     /// <summary>The document events the shift alert review raises and hears.</summary>
     public static class ShiftAlertEvents
     {
-        public static readonly AppEvent<ShiftAlertsLoaded> Loaded = AppEvent.Named<ShiftAlertsLoaded>("shift-alerts-loaded");
+        public static readonly AppEvent<ShiftAlertsLoaded> Loaded = AppEvent.Declare<ShiftAlertsLoaded>();
     }
 }

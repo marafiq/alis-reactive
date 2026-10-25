@@ -23,12 +23,12 @@ public class EscalationRoutingCareTrackOption
 /// <summary>The document events the EscalationRouting page raises and hears.</summary>
 public static class EscalationRoutingEvents
 {
-    public static readonly AppEvent ComponentRouteIsolation = AppEvent.Named("component-route-isolation");
-    public static readonly AppEvent ComponentRouteMonitor = AppEvent.Named("component-route-monitor");
-    public static readonly AppEvent ComponentRouteRoutine = AppEvent.Named("component-route-routine");
-    public static readonly AppEvent<EscalationRoutingTriggerPayload> EscalationTriggerRoute = AppEvent.Named<EscalationRoutingTriggerPayload>("escalation-trigger-route");
-    public static readonly AppEvent RefreshComponentRouting = AppEvent.Named("refresh-component-routing");
-    public static readonly AppEvent RouteExpedited = AppEvent.Named("route-expedited");
-    public static readonly AppEvent RouteIsolation = AppEvent.Named("route-isolation");
-    public static readonly AppEvent RouteRoutine = AppEvent.Named("route-routine");
+    public static readonly AppEvent ComponentRouteIsolation = AppEvent.Declare();
+    public static readonly AppEvent ComponentRouteMonitor = AppEvent.Declare();
+    public static readonly AppEvent ComponentRouteRoutine = AppEvent.Declare();
+    public static readonly AppEvent<EscalationRoutingTriggerPayload> EscalationTriggerRoute = AppEvent.Declare<EscalationRoutingTriggerPayload>();
+    public static readonly AppEvent RefreshComponentRouting = AppEvent.Declare();
+    public static readonly AppEvent RouteExpedited = AppEvent.Declare();
+    public static readonly AppEvent RouteIsolation = AppEvent.Declare();
+    public static readonly AppEvent RouteRoutine = AppEvent.Declare();
 }

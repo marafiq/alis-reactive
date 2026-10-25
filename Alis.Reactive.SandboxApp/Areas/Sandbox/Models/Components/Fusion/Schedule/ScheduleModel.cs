@@ -213,7 +213,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     /// <summary>The document events the PointInTimeSchedule page raises and hears.</summary>
     public static class PointInTimeScheduleEvents
     {
-        public static readonly AppEvent<ScheduleActionPayload> ScheduleEdit = AppEvent.Named<ScheduleActionPayload>("schedule:edit");
-        public static readonly AppEvent<ScheduleActionPayload> ScheduleReassign = AppEvent.Named<ScheduleActionPayload>("schedule:reassign");
+        public static readonly AppEvent<ScheduleActionPayload> ScheduleEdit = AppEvent.Declare<ScheduleActionPayload>();
+        public static readonly AppEvent<ScheduleActionPayload> ScheduleReassign = AppEvent.Declare<ScheduleActionPayload>();
     }
 }

@@ -15,14 +15,14 @@
     Html.On(plan, t => t.CustomEvent(EventsEvents.Test, p =>
     {
         p.Element("step-2").ClassList.Add("text-green-600");
-        p.Element("step-2").Text.Set("\"test\" received → dispatched \"test-received\"");
+        p.Element("step-2").Text.Set("\"test\" received → dispatched \"testReceived\"");
         p.Dispatch(EventsEvents.TestReceived);
     }));
 
     Html.On(plan, t => t.CustomEvent<EventsViewModel>(EventsEvents.TestReceived, (payload, p) =>
     {
         p.Element("step-3").ClassList.Add("text-green-600");
-        p.Element("step-3").Text.Set("\"test-received\" received → dispatched \"final\" with payload");
+        p.Element("step-3").Text.Set("\"testReceived\" received → dispatched \"final\" with payload");
         p.Dispatch(EventsEvents.Final, new EventsViewModel { EventName = "done" });
     }));
 
@@ -38,7 +38,7 @@
 <native-vstack gap="Lg">
     <native-heading level="H1">Events &amp; Dispatch</native-heading>
     <native-text color="Secondary">
-        Three-hop event chain: dom-ready dispatches "test" &rarr; "test-received" &rarr; "final" with payload.
+        Three-hop event chain: dom-ready dispatches "test" &rarr; "testReceived" &rarr; "final" with payload.
         Open DevTools console to see trace output.
     </native-text>
 
@@ -47,7 +47,7 @@
         <native-vstack gap="Sm" class="font-mono text-sm">
             <p id="step-1" class="text-text-muted">Step 1: waiting for dom-ready...</p>
             <p id="step-2" class="text-text-muted">Step 2: waiting for "test" event...</p>
-            <p id="step-3" class="text-text-muted">Step 3: waiting for "test-received" event...</p>
+            <p id="step-3" class="text-text-muted">Step 3: waiting for "testReceived" event...</p>
             <p id="chain-status" class="text-text-muted mt-4">Chain not started</p>
         </native-vstack>
     </native-card-body></native-card>

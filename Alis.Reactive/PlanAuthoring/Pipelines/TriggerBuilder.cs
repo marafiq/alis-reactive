@@ -30,7 +30,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Runs a pipeline each time a declared document event is raised.</summary>
-        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Named(string)"/>.</param>
+        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Declare(string, string)"/>.</param>
         /// <param name="pipeline">Builds the reaction graph for each raise.</param>
         public TriggerBuilder<TModel> CustomEvent(AppEvent appEvent, Action<PipelineBuilder<TModel>> pipeline)
         {
@@ -40,7 +40,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Runs a pipeline each time a declared document event is raised, reading its payload.</summary>
         /// <typeparam name="TPayload">The payload the event declares. A member is read by its camel-case JSON name (<c>MRN</c> reads <c>mrn</c>), the name <c>Dispatch</c> writes.</typeparam>
-        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Named{TPayload}(string)"/>.</param>
+        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Declare{TPayload}(string, string)"/>.</param>
         /// <param name="pipeline">Builds the reaction graph, given the payload (<c>payload.Get(x =&gt; x.UnitId)</c>) and the pipeline.</param>
         public TriggerBuilder<TModel> CustomEvent<TPayload>(AppEvent<TPayload> appEvent,
             Action<Data<TPayload>, PipelineBuilder<TModel>> pipeline)
@@ -52,7 +52,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Runs a pipeline each time a declared document event is raised, without reading its payload.</summary>
         /// <typeparam name="TPayload">The payload the event declares.</typeparam>
-        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Named{TPayload}(string)"/>.</param>
+        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Declare{TPayload}(string, string)"/>.</param>
         /// <param name="pipeline">Builds the reaction graph for each raise.</param>
         public TriggerBuilder<TModel> CustomEvent<TPayload>(AppEvent<TPayload> appEvent,
             Action<PipelineBuilder<TModel>> pipeline)

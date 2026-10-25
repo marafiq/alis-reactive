@@ -62,6 +62,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     public static class WingReviewEvents
     {
         /// <summary>Raised by a resident's Start review button with that resident's key.</summary>
-        public static readonly AppEvent<WingReviewStart> StartReview = AppEvent.Named<WingReviewStart>("wing-review:start");
+        public static readonly AppEvent<WingReviewStart> StartReview = AppEvent.Declare<WingReviewStart>();
     }
 }

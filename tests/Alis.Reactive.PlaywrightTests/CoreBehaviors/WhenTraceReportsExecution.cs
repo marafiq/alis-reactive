@@ -55,7 +55,7 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         AssertTraceContains("execute", "\"event\":\"test\"");
-        AssertTraceContains("execute", "\"event\":\"test-received\"");
+        AssertTraceContains("execute", "\"event\":\"testReceived\"");
         AssertTraceContains("execute", "\"event\":\"final\"");
 
         AssertNoConsoleErrors();
@@ -72,12 +72,12 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
             .ToList();
 
         Assert.That(dispatchMessages, Has.Count.EqualTo(3),
-            "Exactly 3 dispatch traces expected (test, test-received, final)");
+            "Exactly 3 dispatch traces expected (test, testReceived, final)");
 
         Assert.That(dispatchMessages.Any(m => m.Contains("\"event\":\"test\"")), Is.True,
             "Dispatch trace must include event name 'test'");
-        Assert.That(dispatchMessages.Any(m => m.Contains("\"event\":\"test-received\"")), Is.True,
-            "Dispatch trace must include event name 'test-received'");
+        Assert.That(dispatchMessages.Any(m => m.Contains("\"event\":\"testReceived\"")), Is.True,
+            "Dispatch trace must include event name 'testReceived'");
         Assert.That(dispatchMessages.Any(m => m.Contains("\"event\":\"final\"")), Is.True,
             "Dispatch trace must include event name 'final'");
 

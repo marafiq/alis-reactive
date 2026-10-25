@@ -130,6 +130,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     public static class CareOpsEvents
     {
         /// <summary>A resident on the high-risk watch list was flagged or discharged.</summary>
-        public static readonly AppEvent CareopsRowsRefresh = AppEvent.Named("careops-rows-refresh");
+        public static readonly AppEvent CareopsRowsRefresh = AppEvent.Declare();
     }
 }

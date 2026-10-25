@@ -71,5 +71,5 @@ public class RoundDoseOrder
 public static class MedicationRoundEvents
 {
     /// <summary>The aide opened a dose on the round to check it.</summary>
-    public static readonly AppEvent<RoundDose> DoseOpened = AppEvent.Named<RoundDose>("round-dose-opened");
+    public static readonly AppEvent<RoundDose> DoseOpened = AppEvent.Declare<RoundDose>();
 }
