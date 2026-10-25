@@ -11,14 +11,10 @@ node_modules/
 .vs/
 .worktrees/
 /tools/*
-!/tools/ApiDocGenerator/
 !/tools/PlanContractGenerator/
 
-# docs-site (Starlight)
-docs-site/node_modules/
-docs-site/dist/
-docs-site/.astro/
-docs-site/public/d2/
+# SonarQube scanner output
+.sonarqube/
 .DS_Store
 tests/Alis.Reactive.PlaywrightTests/TestResults/
 TestResults/
@@ -34,13 +30,6 @@ Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js
 Alis.Reactive.SandboxApp/wwwroot/js/sandbox-components.js
 Alis.Reactive.SandboxApp/wwwroot/js/sandbox-components.css
 Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css
-
-# The downloadable example zip is regenerated fresh on every docs deploy
-# (see .github/workflows/deploy-docs.yml — runs rebuild-example-app.sh
-# before `npm run build`). Tracking the zip would only serve a stale copy
-# until someone manually rebuilds and commits; CI is the source of truth.
-# Local dev regenerates on demand by running scripts/rebuild-example-app.sh.
-docs-site/public/downloads/resident-intake.zip
 
 # AlisReactive NuGet copies versioned bundles into consumer wwwroot after every
 # build (see Alis.Reactive/build/AlisReactive.targets CopyAlisReactiveAssets).

@@ -46,7 +46,6 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 | `nightly.yml` | 03:30 UTC Mon-Fri on `main`; manual | `gate`; `report-failure` | the watched browser signal: opens/updates issue `ci-nightly-failure` on red | never |
 | `nuget-publish.yml` | push of a `v*` tag; manual runs gate only | `verify-tag` -> `gate` -> `pack-and-publish` | the release: tag shape, both suites, six packages | nuget.org + GitHub Release |
 | `verify-net48.yml` | pushes and PRs to `main` / `release/*`; manual | net48 build+pack on Windows; IIS Express boot proof | PR merge (both required) | never |
-| `deploy-docs.yml` | pushes to `main` touching docs or public C#; pull requests touching the same paths (build only); manual | `build-docs`; `deploy` (skipped on pull requests) | the docs still build (PR); Pages deployment (`main`) | GitHub Pages, from `main` only |
 
 ## One gate definition
 
@@ -137,8 +136,7 @@ is listed in `RetryExceptions` (NUnit 4.6.1,
 [RetryAttribute](https://docs.nunit.org/articles/nunit/writing-tests/attributes/retry.html)),
 and Playwright timeouts are exceptions, not assertions.
 
-PR #58 (2026-03-25) had a 4x retry loop living in `deploy-docs.yml`; it did not survive the
-workflow split. The retry now lives in the wrapper so it is the same locally and in CI.
+The retry lives in the wrapper so it is the same locally and in CI.
 
 ### Timeouts
 
@@ -218,7 +216,7 @@ until proven otherwise. The convention:
 
 - **Least privilege.** Every workflow declares `permissions: contents: read` at the top; jobs widen
   only what they need (`checks: write` for the shard summary, `contents: write` for the GitHub
-  Release, `issues: write` for the nightly reporter, Pages scopes in `deploy-docs.yml`)
+  Release, `issues: write` for the nightly reporter)
   ([security hardening](https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions)).
 - **Pinning policy.** GitHub-owned `actions/*` stay on major tags (`@v4`), the accepted trade-off
   for first-party actions; every third-party action is pinned to a full commit SHA with the version
@@ -246,7 +244,7 @@ until proven otherwise. The convention:
   and block the merge, which is why the `pull_request` trigger has no filter. The filter lists the
   gate's own files (`gate.yml`, `.github/actions/**`) so a CI change is tested by CI.
 - **Dependabot.** `.github/dependabot.yml`: monthly, grouped minor/patch updates for GitHub
-  Actions, npm (root workspaces and `docs-site`) and NuGet. Details in "Dependency updates" below.
+  Actions, npm and NuGet. Details in "Dependency updates" below.
 
 ## Dependency updates
 
@@ -266,9 +264,6 @@ until proven otherwise. The convention:
   never Syncfusion (npm and NuGet move together, deliberately, one patch behind the newest weekly
   release, with a new license key per major), never `Microsoft.CodeAnalysis.*` (the analyzers'
   Roslyn version is the minimum compiler every consumer needs).
-- **What proves a `docs-site` update.** The gate and `scripts/test.sh` never build `docs-site`. A PR
-  that touches it is proven by the `build-docs` check that `deploy-docs.yml` runs on pull requests
-  (Node 22, `npm ci`, `npm run build`), not by the gate's green.
 - **The secret it needs.** Workflows started by Dependabot read **Dependabot secrets**, not Actions
   secrets. Without `SYNCFUSION_LICENSE_KEY` in that store the job log shows
   `Syncfusion__LicenseKey:` empty and the InPlaceEditor and Drawer tests time out behind the

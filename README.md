@@ -110,8 +110,7 @@ touch the framework internals.
    you also add the `AlisReactive.Fusion` package. The version is baked into the filename.
    *(This copy fires for **package** references only. The in-repo `examples/resident-intake`
    uses local **project** references for source-contract testing, so it does not auto-copy the
-   CSS that way — rebuild it against the published packages with `scripts/rebuild-example-app.sh`
-   to see the packaged design system end to end.)*
+   CSS that way.)*
 
 2. **Link the stylesheet and mark the root** in `_Layout.cshtml` — exactly as the
    example app and sandbox do. The filename carries the version of the package you
@@ -147,9 +146,8 @@ touch the framework internals.
    </div>
    ```
 
-4. **Go deeper** in the docs site (`docs-site/`) and the
-   `Alis.Reactive.DesignSystem/Layout` + `Tokens` source — the enums there are the full,
-   typed vocabulary; there is no untyped string surface to discover.
+4. **Go deeper** in the `Alis.Reactive.DesignSystem/Layout` + `Tokens` source — the enums there
+   are the full, typed vocabulary; there is no untyped string surface to discover.
 
 ## Repo Layout
 
@@ -157,7 +155,7 @@ touch the framework internals.
 Alis.Reactive/                    C# core library (packed as AlisReactive NuGet)
 Alis.Reactive.Native/             C# native-component library
 Alis.Reactive.Fusion/             C# Syncfusion-component library
-Alis.Reactive.FluentValidator/    C# client-validation metadata adapter
+Alis.Reactive.FluentValidator/    C# validation rules in FluentValidation's grammar, server and browser
 Alis.Reactive.NativeTagHelpers/   C# tag helpers (net10 only)
 Alis.Reactive.Analyzers/          Roslyn analyzers (shipped inside AlisReactive)
 Alis.Reactive.DesignSystem/       C# design-system tokens + layout helpers

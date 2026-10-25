@@ -22,8 +22,7 @@
     "lint": "eslint Alis.Reactive.Assets/runtime/ Alis.Reactive.SandboxApp/Scripts/",
     "lint:fix": "eslint Alis.Reactive.Assets/runtime/ Alis.Reactive.SandboxApp/Scripts/ --fix",
     "test": "npm run test -w Alis.Reactive.Assets && npm run test -w Alis.Reactive.SandboxApp",
-    "test:watch": "npm run test:watch -w Alis.Reactive.Assets",
-    "build:api-docs": "dotnet run --project tools/ApiDocGenerator"
+    "test:watch": "npm run test:watch -w Alis.Reactive.Assets"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

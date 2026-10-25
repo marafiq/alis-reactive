@@ -45,25 +45,6 @@ updates:
       # release, and every major needs a new license key.
       - dependency-name: "@syncfusion/*"
 
-  - package-ecosystem: npm
-    directory: /docs-site
-    schedule:
-      interval: monthly
-      time: "06:00"
-      timezone: Etc/UTC
-    labels: [dependencies]
-    open-pull-requests-limit: 2
-    groups:
-      docs-site-minor-and-patch:
-        patterns: ["*"]
-        update-types: [minor, patch]
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
-      # Starlight is 0.x, so its "minor" releases can raise the Astro major it needs (0.42 requires
-      # Astro 7): it moves together with Astro in one deliberate docs-site upgrade.
-      - dependency-name: "@astrojs/starlight"
-
   - package-ecosystem: nuget
     directory: /
     schedule:

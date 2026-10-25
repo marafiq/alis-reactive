@@ -8,27 +8,9 @@
     <File Path=".claude/memory/coding-principles.md" />
     <File Path=".claude/memory/docs-principles.md" />
   </Folder>
-  <Folder Name="/docs-site/">
-    <File Path="docs-site/astro.config.mjs" />
-    <File Path="docs-site/package.json" />
-    <File Path="docs-site/tsconfig.json" />
-    <File Path="docs-site/.gitignore" />
-  </Folder>
-  <Folder Name="/docs-site/content/">
-    <File Path="docs-site/src/content/docs/index.mdx" />
-    <File Path="docs-site/src/content/docs/why.mdx" />
-  </Folder>
-  <Folder Name="/docs-site/content/getting-started/">
-    <File Path="docs-site/src/content/docs/getting-started/your-first-plan.md" />
-  </Folder>
-  <Folder Name="/docs-site/content/csharp-modules/">
-    <File Path="docs-site/src/content/docs/csharp-modules/mental-model.mdx" />
-  </Folder>
-  <Folder Name="/docs-site/content/components/">
-    <File Path="docs-site/src/content/docs/components/overview.md" />
-  </Folder>
-  <Folder Name="/docs-site/content/reference/">
-    <File Path="docs-site/src/content/docs/reference/build-commands.md" />
+  <Folder Name="/docs/">
+    <File Path="docs/design/grammar.md" />
+    <File Path="docs/design/bring-your-own-component.md" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Alis.Reactive.ArchitectureTests/Alis.Reactive.ArchitectureTests.csproj" />
@@ -45,7 +27,6 @@
   <Project Path="Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj" />
   <Project Path="Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj" />
   <Folder Name="/tools/">
-    <Project Path="tools/ApiDocGenerator/ApiDocGenerator.csproj" />
     <Project Path="tools/PlanContractGenerator/PlanContractGenerator.csproj" />
   </Folder>
   <Folder Name="/examples/">
