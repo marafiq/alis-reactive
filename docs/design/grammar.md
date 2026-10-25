@@ -1,15 +1,10 @@
 # The grammar: specification
 
-This is the specification the code is written from. [`architecture.md`](architecture.md) section 0
-introduces the grammar and says why; this file says exactly what it is, what it means, and what each
-object in the vocabulary must do. Where the two differ, this file governs.
-
-It was checked against all 531 inventoried use cases, then reviewed adversarially against the code
-(section 9). Every decision that changes something a user could see at `195d3a1` is listed in section 8,
-with its rows.
-
-**What is built** is recorded in section 11: which parts run as specified and which decisions are
-applied.
+This is the specification the code is written from: what the plan is, what it means, and what each
+object in the vocabulary must do. The C# productions are in `Alis.Reactive/Grammar`, the generated
+contract in `Alis.Reactive.Assets/runtime/types/plan.ts`, and the interpreter in
+`Alis.Reactive.Assets/runtime/grammar`. How a component joins the vocabulary is
+[`bring-your-own-component.md`](bring-your-own-component.md).
 
 **The rule behind every decision:** the browser computes what the C# the developer wrote would
 compute. Types, operators, evaluation order, scoping and empty values follow C#, and the server's
@@ -32,9 +27,8 @@ handler   := { on: object, event, param, do: block }
 That is the whole document. The grammar names no feature.
 
 - **Plugins.** A module is registered by name by a JavaScript bundle:
-  - the framework's own bundle registers `alis.document`, `alis.http`, `alis.model`, `alis.form` and
-    `alis.slot`;
-  - the realtime package registers `alis.stream` and `alis.hub`;
+  - the framework's own bundle registers `alis.document`, `alis.http`, `alis.model`, `alis.form`,
+    `alis.slot`, `alis.stream` and `alis.hub`;
   - an app registers its own plugins.
 
   `key` picks one object of the module (empty for a singleton): a form's container ID, a slot's
@@ -238,11 +232,11 @@ runtime change.
 | a declared element's `GetAttribute(n)`, `HasAttribute(n)` | `getAttribute(n)`, `hasAttribute(n)` |
 | operators, `??`, `?:`, casts | the operators of 2.2 |
 
-These are the members built at `e837ad94` (`Alis.Reactive/PlanAuthoring/Arrays/ReactiveArray.cs:33-149`,
-and the allow-list and string operators of `Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs:21-26,
-219-232`) plus those the validation `When` conditions need. That allow-list names JavaScript's
+These are the members built (`Alis.Reactive/PlanAuthoring/Arrays/ReactiveArray.cs`, and the
+allow-list and string operators of `Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs`)
+plus those the validation `When` conditions need. That allow-list names JavaScript's
 date methods directly (`getDay`, `getTime`) on any C# method of that name, and no view calls one;
-here they are reached from `DateTime`'s own members. Members architecture.md once listed and
+here they are reached from `DateTime`'s own members. Members that
 nothing uses yet (`First`, `Distinct`, `Skip`, `Take`, `SelectMany`, `Min`, `Max`, `Average`,
 `ThenBy`, `Concat`) are added the same way, each with a journey that proves it.
 
@@ -281,12 +275,10 @@ at render: a handle used outside the block that binds it throws, and names the h
   or `let` may return a promise: an awaiting statement settles it, a `do` without `await` lets it
   run. A promise anywhere else comes from a member declared sync, and the call fails (3.4).
 
-**A sync value is read where it is used.** A `Value<T>` from a property or a returning method is a
-read, like a property getter, so each use reads the current value. `var before = rate.Value;`
-then `rate.Value.Set(5)` makes `before` read 5. To keep the value as it is now, bind it:
-`var before = p.Let(rate.Value);` emits `let`, and `before` reads the binding. `p.Let` is specified,
-not built: at `e837ad94` no builder has a `Let` member (`git grep -n -w Let -- Alis.Reactive` finds only
-the grammar's internal `G.Let`, `Alis.Reactive/Grammar/G.cs:72`), so a value is always read where it is used.
+**A sync value is read where it is used.** A value from a property or a returning method is a read,
+like a property getter, so each use reads the current value: `var before = rate.Value;` then
+`rate.Value.Set(5)` makes `before` read 5. Statements run in plan order, so a step written before
+the write reads the earlier value.
 
 **Plan order is C# evaluation order.** An async member emits its `let … await` where it is called,
 in the active scope, and returns a value that names the result:
@@ -551,7 +543,7 @@ imports none of them. The obligations are numbered so that tests and code can ci
 - **S3 Element.** The container is found with `getElementById` at every call, so a slot can sit
   inside content that appears after boot.
 
-### 6.6 `stream` (`plugin("alis.stream", url)`, realtime package)
+### 6.6 `stream` (`plugin("alis.stream", url)`)
 
 - **R1 One connection.** One `EventSource` per URL, counted by subscriptions, and closed when the
   last one is released.
@@ -560,7 +552,7 @@ imports none of them. The obligations are numbered so that tests and code can ci
 - **R3 Retry.** A permanent close adds a marker to `#alis-realtime-connection-retry-container`. One
   click retries every dropped connection, and the retried subscriptions keep their owners.
 
-### 6.7 `hub` (`plugin("alis.hub", url)`, realtime package)
+### 6.7 `hub` (`plugin("alis.hub", url)`)
 
 - **B1 One connection.** One `HubConnection` per URL, counted by subscriptions, with credentials and
   automatic reconnect.
@@ -588,7 +580,7 @@ imports none of them. The obligations are numbered so that tests and code can ci
 - **Toast** (Fusion): its declared members, and no obligation beyond them.
 - **Native CheckList and RadioGroup:** the native module defines `value` and `isInteracted` on the
   element (`Alis.Reactive.Assets/components/native/check-list.ts`, `radio-group.ts`), replacing the
-  inline view scripts of `195d3a1`.
+  inline view scripts.
 
 ### 6.9 Elements and vendor objects
 
@@ -691,194 +683,36 @@ column rules, keeping only those EJ2 decides as the server does: `required`, `mi
 `Alis.Reactive/Validation/ClientRule.cs:52`),
 because EJ2's own `email` and `url` rules decide differently. It reads the rules, not the plan.
 
-## 8. Decisions that change what a user can see
+## 8. Where the code is
 
-Each change is deliberate and named here, so that nothing changes silently. The rows are in
-`use-cases/`. A frozen fixture that fails on one of these comes to the owner; it is not edited.
-"Today" in the Why column means the code at `195d3a1`, when this table was written; section 11 says
-which decisions are applied.
-
-| Change | Rows | Why |
-|---|---|---|
-| Empty values follow the server: `ExclusiveBetween` on a non-nullable number fails on empty; `GreaterThan(date)` on `DateTime?` passes on empty; `Equal`/`NotEqual` no longer skip empty; `When(x => x.Age < 18)` on `int` fires on empty | validation 22, 28, 33, 34, 37, 39, 48 | Today the browser accepts what the server rejects, or rejects what it accepts. Written once means one answer. |
-| Email and credit-card checks follow the server's | validation rows using them | Same reason. Today the browser requires a dot that the server does not, and strips letters that the server rejects. |
-| `NotEmpty` on a collection of complex items is server-only | validation 74 | It has no input. Today it always blocks, which is a defect. |
-| `Include` enforces on the server as well | validation 76 | Today `ClientRulesFrom` is browser-only. |
-| `AddReactiveClientValidation` is replaced by `ReactiveValidator` validators registered through DI | validation 77 | A browser rule always has a server rule behind it. |
-| A URL query read (`p.Url<TQuery>()`) matches keys case-insensitively, and an array reads every value | conditions 14-16, 68, 138; http 26, 38, 42-50 | It reads the query the way MVC binds it. Today it is case-sensitive and reads the first value. This widens matching only. |
-| A response handle reads the response it names | http (ambiguity 9) | Today a handle reads whichever response is current, so an outer handle inside a nested route reads the inner response. No view relies on that. |
-| A link is an element with an ID the view chooses, and it carries its own plan script | components 117; http 113-121 | It replaces the delegated listener, the plan in `data-reactive-link`, and the runtime rewriting the request URL. The fixtures locate links by `data-testid`. |
-| Template buttons raise events through `data-alis-raise` | components (ambiguity 9) | Views and templates carry no JavaScript. |
-| A stream retry keeps each subscription's owner | http 105, 106 | Today a retried slot subscription is never released. |
-| Enum literals are names | conditions (ambiguity 13) | Today `Eq(enum)` emits the number while the input reads the name, so it can never match. |
-| The Pivot audit view sends the current view as two members, route and body | `Components/Fusion/PivotView/Index.cshtml:59-61` at `195d3a1`; at `e837ad94` the occupancy report's board packet sends the view in the path only and the layout in the body (`Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/PivotView/Index.cshtml:182-186`) | A placeholder member fills only the path. |
-| `p.Request` is deleted | none | No builder exposed it (`Source.cs:73` had no caller); `Source.cs` was deleted in `6d573d39`, and no builder has a `Request` member at `e837ad94`. |
-| A plugin method's date arguments arrive as `Date` objects | conditions 152 | Every plugin member is declared with typed arguments. Today an open-argument plugin call receives a date literal as a number (the old runtime's `evaluate.ts:46`, deleted in `9e66edea`). |
-| Three fixtures that parse plan JSON or call deleted APIs are rewritten to assert behavior in step 0, before the assertions freeze | `WhenComplexArrayItemRulesApply.cs:76-82`, `WhenReactiveValidatorsDeclareClientRules.cs:166-185`, `WhenAGridColumnGeneratesNativeValidationFromClientRules.cs:17-25`, at `195d3a1`; the last two were deleted in `52c62881`, replaced by journeys | A test of plan shape is not a test of behavior. |
-
-## 9. Coverage
-
-All 531 use cases were lowered into this grammar at `195d3a1`. Each table gives, for every row, the
-vocabulary used, the sentence, and a verdict:
-[`use-cases/lowering-components.md`](use-cases/lowering-components.md),
-[`use-cases/lowering-http.md`](use-cases/lowering-http.md),
-[`use-cases/lowering-conditions.md`](use-cases/lowering-conditions.md),
-[`use-cases/lowering-validation.md`](use-cases/lowering-validation.md).
-
-| Area | Rows | Expressed | Needs a named obligation | Render only | Gap at first lowering | Gaps left |
-|---|---|---|---|---|---|---|
-| Components | 128 | 104 | 13 | 10 | 1 | 0: the uploader's value is an expression (1.1) |
-| HTTP, URL, realtime, partials, links | 121 | 74 | 44 | 3 | 0 | 0 |
-| Conditions, arrays, dispatch, elements, plugins | 165 | 37 | 124 | 3 | 1 | 0: declared object members inside lambdas (2.3) |
-| Validation | 117 | 47 | 51 | 8 | 11 | 0: rows 68 and 115 resolved by 7.4 and F7; the other 9 are decisions in section 8 |
-| **Total** | **531** | **262** | **232** | **24** | **13** | **0** |
-
-- **"Needs a named obligation"** means the sentence is in the grammar, and the behavior depends on a
-  rule section 2 or 6 now states exactly.
-- **Where the obligations land.** Most of the conditions rows depend on the operator table (2.2),
-  which states the comparison semantics of `195d3a1` instead of borrowing JavaScript's.
-- **How the tables were made.** Each table was produced by one reader per area against the code, and
-  spot-checked. They record the verdicts before this file's decisions; the last two columns above
-  apply the decisions.
-- **Review.** An independent reviewer checked this file against the code. The verdict was "accept
-  with fixes": 23 findings raised, 12 confirmed and 11 dropped by the reviewer, each confirmed
-  citation re-opened here. All 12 are applied:
-  - paths split into member and data reads (1.3);
-  - binding reads (2.1);
-  - the wire rules of `195d3a1` for GET, JSON and form data (H2-H4);
-  - `ValidationErrors` without a body validates (F8);
-  - `ready` belongs to the owner being started (D1);
-  - the complete member table (2.3);
-  - modules as plugins, so the grammar names no feature (1.1);
-  - peers read by path, and `Otherwise` (7.3, 7.4);
-  - booted marks and summary clearing (3.5, F9);
-  - sync values read at use, with `p.Let` (3.3);
-  - the document-event payload and plugin date arguments (D2, section 8).
-
-## 10. Where the code goes
-
-**C#**
-- `Alis.Reactive/Grammar`: one sealed, immutable class per production in 1.1 and 1.2, with internal
-  constructors, invariants checked in the constructor, and one-to-one serialization. This is the
-  plan contract, and the generator reads these classes.
-- `Alis.Reactive/Objects`: the object contract and the built-in declarations.
-  - `JsObject`, `Prop<T>`, `ReadOnly<T>`, `Value<T>`, `Arg<T>`, `Event`, `Event<T>`, `Message<T>`;
-  - `Document`, `Http`, `Model<T>`, `Form`, `Slot`, `EventStream`, `HubConnection`, `HtmlElement`
-    and the DOM event payloads.
-- `Alis.Reactive/Authoring`:
-  - the plan, the block stack and binding scopes;
-  - the fluent API of section 5: handlers, conditions, requests, dispatch, parallel and URL.
-- `Alis.Reactive/Compiler`: lambdas to `fn`, through the one member table (2.3).
-- `Alis.Reactive.FluentValidator`: the projection (section 7) and its typed model.
+**C#** (`Alis.Reactive`)
+- `Grammar`: one sealed class per production in 1.1 and 1.2, with internal constructors, invariants
+  checked in the constructor, and one-to-one serialization. This is the plan contract; the generator
+  (`tools/PlanContractGenerator`) reads these classes.
+- `Components/Contracts`: the object contract every declaration is written with (`JsObject`,
+  `Component`, `Prop<T>`, `ReadOnly<T>`, `Arg<T>`, `TypedEvent<T>`, `ComponentVendor`,
+  `ComponentInput`).
+- `PlanAuthoring`: the fluent API (handlers, conditions, requests, dispatch, parallel, URL, plugins)
+  and the lambda compiler (`Arrays/ElementExpressionCompiler.cs`) through the one member table (2.3).
+- `PlanModel`: the one model that writes the grammar: steps (`Reactions/Steps.cs`), requests
+  (`Requests/RequestStep.cs`), values (`Values/ValueExpression.cs`), conditions
+  (`Conditions/ConditionGraph.cs`), the form writer and the scope that binds responses and awaited
+  reads (`Writing/`). `PlanBuildContext.Write` writes the plan once at render.
+- `Alis.Reactive.FluentValidator`: the projection of section 7 and its typed model.
 - `Alis.Reactive.Fusion`, `Alis.Reactive.Native`: vendors, declarations, render helpers, Confirm,
   Toast, Drawer, Loader, and the grid's column rules.
 
-**TypeScript runtime**
-- `runtime/grammar`: `evaluate` (the nine expressions, the operators, the shapes), `execute` (the six
-  statements, await) and `environment`. It imports nothing below.
-- `runtime/objects`: the two locators, the vendor driver, the plugin modules registered by name, and
-  owners.
-- `runtime/plans`: discovery, composition, boot and mount events.
-- `runtime/modules`: `alis.document`, `alis.http`, `alis.model`, `alis.form`, `alis.slot`. They are
-  registered by the framework bundle, receive the evaluator, and do not import the executor.
-- `runtime/realtime`: `alis.stream`, `alis.hub` and the retry indicator. The hub module ships the
-  SignalR client inside the framework's bundle, so a page with a hub trigger needs no other script.
+**TypeScript** (`Alis.Reactive.Assets`)
+- `runtime/grammar`: `evaluate` (the nine expressions), `execute` (the six statements, await),
+  `operators`, `paths`, `shape` and `environment`. It imports nothing below.
+- `runtime/objects`: the two locators (`world`), the vendor driver, the modules registered by name,
+  and owners.
+- `runtime/plans`: discovery, start and the mount events.
+- `runtime/modules`: `alis.document`, `alis.http`, `alis.model`, `alis.form`, `alis.slot`;
+  `runtime/realtime`: `alis.stream`, `alis.hub` and the retry indicator. The framework bundle
+  registers all seven; they receive the evaluator and do not import the executor.
 - `components/` (beside `runtime/`, in the same shipped bundle): the framework's own component code,
-  built only on `alis:mount`, `alis:unmount` and `window.__alisPlugins`, as an app's is: CheckList,
-  RadioGroup, Drawer, Loader, Confirm, SmartTextArea, SmartPasteButton, Mention.
+  built only on `alis:mount`, `alis:unmount` and `window.__alisPlugins`, as an app's is.
 
 The architecture test enforces the import directions, that the runtime names no vendor, and that
 `components/` and `runtime/` import nothing from each other.
-
-## 11. Implementation status
-
-As built on `feature/component-redesign`. Playwright is the proof of each line; the CI run that
-proves it is named in the pull request.
-
-**Built as specified**
-- The plan document, the two locators, the six statements and nine expressions (`Alis.Reactive/Grammar`),
-  the generated contract (`tools/PlanContractGenerator`), and the interpreter with its modules
-  (`Alis.Reactive.Assets/runtime`). At `e837ad94` the runtime is 2,495 lines of TypeScript (its tracked
-  `.ts` files outside `__tests__` and the generated `types/`), down from 6,134, and the framework's own
-  components add 548 in `components/`, which now also hold the uploader's `fusion/file-upload.ts` and the
-  native `hidden-field.ts`.
-- C# has one model: the builders place steps (`PlanModel/Reactions/Steps.cs`,
-  `PlanModel/Requests/RequestStep.cs`) where they are written, and each step, value
-  (`ValueExpression`) and condition (`ConditionGraph`) writes its own productions in the scope it is
-  used in (`PlanModel/Writing/Scope.cs`). `PlanBuildContext.Write` writes the plan at render: the
-  objects, the model's inputs, each form's rules (`FormWriter`) and the handlers. There is no
-  separate semantic graph and no lowering pass.
-- Validation projection (section 7): `Alis.Reactive.FluentValidator` implements FluentValidation's
-  grammar itself and does not reference the FluentValidation package. Each check is a term with a
-  server half (`Check<T, TValue>.Passes`) and, when the browser decides it the same way, a browser
-  half (`IBrowserCheck.ForBrowser`) that returns the core's public `ClientRule`; the C# predicates
-  `Must` and `MustAsync` have none. Conditions are expressions: the server compiles them and
-  `BrowserCondition` translates them into `ClientCondition` when it can, for blocks and for a rule's
-  own `.When`. `SetValidator`, `RuleForEach(...).SetValidator`, `Include` and `ChildRules` bring
-  the child validator's rules under the enclosing conditions. `Matches` carries `IgnoreCase`,
-  `Multiline` and `Singleline` as flags. A comparison's other member is read by its path from the
-  model, wherever it is. The rules are read per request, from the validator that request resolves
-  (7.1). A differential run checked the change: the 83 sandbox validators and six probes of every
-  term, condition form and message placeholder, each on 1,500 generated models, gave the same browser
-  rules and the same server messages as the FluentValidation-based engine it replaced. The
-  differences were deliberate: a rule's own `.When` now reaches the browser; a browser message fills
-  `{Name:format}` placeholders, and a check whose message is only about the entered value stays on
-  the server instead of showing an empty or raw message; and the sandbox's wristband check, now
-  composed from `Matches`, refuses an explicit `""` as `Matches` does (a cleared input is sent as
-  null, so the page is unaffected).
-
-- Promise-returning members (section 5): a method declared with `CallAsync` writes a call as
-  `do await call(…)`, on a component, a plugin or an event's payload alike, and a read of one
-  declared with `InvokeAsync<T>` as `let r = await call(…)` before the statement that reads it. A
-  comparison that reads one is written as its own `if`, so else-if order and short-circuit hold. Inside an array
-  operation's lambda or a validation rule such a read is refused at render.
-
-- List paths: a member path may read each item of a list, `filesData[].rawFile`, written as
-  `get(o, ["filesData", "[]", "rawFile"])`; the runtime reads the rest of the path on each item, in
-  the path's own mode (1.3). The uploader declares its value that way (`FilesData.Each(file =>
-  file.RawFile)` writes the path), so `alis.http` sends `File`
-  objects and names no vendor. A list path can be read, not written, called or subscribed to, and
-  reads at most one list.
-
-**Where the build differs from the specification**
-- `p.Let` (3.3) is not built: no builder has a `Let` member.
-- Where the C# sits at `e837ad94`: the productions in `Alis.Reactive/Grammar`, the object contract in
-  `Alis.Reactive/Components/Contracts`, the fluent API and the lambda compiler
-  (`Arrays/ElementExpressionCompiler.cs`) in `Alis.Reactive/PlanAuthoring`, and the one model that writes
-  the grammar in `Alis.Reactive/PlanModel`. Section 10's `Objects`, `Authoring` and `Compiler` folders
-  were not made.
-- `alis.stream` and `alis.hub` are registered by the framework's own bundle with the other modules
-  (`Alis.Reactive.Assets/runtime/root.ts:32-38`), not by a separate realtime package as 1.1 and 6.6 to
-  6.7 name it.
-
-**Decisions of section 8 applied**
-- `AddReactiveClientValidation` is gone: a browser rule always has the server rule it came from.
-- `Include` enforces on the server as well.
-- URL query keys (`p.Url<TQuery>()`) match case-insensitively, and an array member reads every
-  value of its key (D3).
-- A link is an element with a view-chosen id carrying its own plan script.
-- Template buttons raise events through `data-alis-raise`.
-- A stream retry keeps each subscription's owner.
-- Enum literals in validation conditions are names.
-- The three fixtures that parsed plan JSON were rewritten; so were the other fixtures that read the
-  retired plan JSON: plan boots, behavior graph, gather input, capital members, grid, native action
-  link, client rules (harness and two fixtures, the app-level one deleted with its API), array item
-  rules, and the plan-JSON assertions of nine pages (AI assist view, date range picker, progress
-  button, stepper, native checkbox, checklist, dropdown, radio group, array plugin). Each now reads
-  the grammar plan; none asserts less than before except an overload key (`startAt(number)`,
-  `addPromptResponse(string,boolean)`) and an access mode (`readwrite`) the grammar does not carry.
-  Five client-rule tests were renamed from the retired `WhenField` vocabulary. Later, `52c62881` deleted
-  the client-rule, behavior-graph, gather-input, link-request and capital-members fixtures, each row
-  they stood in for now proven by a journey in a browser.
-
-- Binding reads (2.1): request bodies and validation read each input as MVC binds it.
-- Empty values follow the server: every check is the server rule's verdict on the bound value
-  (7.4), so `ExclusiveBetween` on an empty non-nullable number fails (it is 0), `GreaterThan` on an
-  empty nullable passes, and `Equal`/`NotEqual` compare an empty value instead of skipping it.
-  `NotEmpty` on a collection reads as `atLeastOne`.
-- Email and credit-card checks are the server's: one `@` with something on each side; dashes
-  and spaces dropped, every other character a digit, then Luhn, with no minimum length.
-- A response handle reads the response it names: each request's routes bind its handle, so a handle
-  read inside a nested request's route reads its own request's response (`ResponseHandle`).
-  `Into(...)`, which names no handle, injects the response of the request it follows.
-
