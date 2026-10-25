@@ -45,7 +45,7 @@ Cascade examples use real Gather pattern (`Patterns/BedAssignment/Index.cshtml:3
 5. Code comments must be truthful. Research actual behavior before writing.
 6. No em-dashes in XML docs. Rider grammar linter flags them as redundant punctuation. Use colons or restructure.
 7. Run Rider diagnostics on every file touched before committing.
-8. When launching doc agents, the FIRST instruction must be: load `dotnet-xml-docs` skill. Do not bury it in a setup section.
+8. When launching doc agents, the FIRST instruction must be: read `.claude/memory/docs-principles.md`. Do not bury it in a setup section.
 9. No "runtime" in summaries or remarks (see Dev-Facing Voice above).
 10. No implementation details in summaries (see Dev-Facing Voice above).
 11. Avoid jargon; prefer concrete ASP.NET terms developers already know.

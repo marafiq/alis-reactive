@@ -14,8 +14,8 @@ Behavior is done when a Playwright test proves it in a real browser, and not bef
 - The test fails when the behavior breaks. Ask what defect would still pass it.
 - Run through `scripts/playwright.sh` on assets built from the current source. A hook blocks raw
   `dotnet test` on the Playwright project or the solution.
-- Load the `bdd-testing` skill before writing a test. `tests/Alis.Reactive.PlaywrightTests/CLAUDE.md`
-  has the local rules.
+- Read `.claude/memory/bdd-principles.md` before writing a test.
+  `tests/Alis.Reactive.PlaywrightTests/CLAUDE.md` has the local rules.
 
 Playwright is the only verification; everything else is waste as proof. Typecheck, vitest and
 `dotnet build` are feedback while coding, nothing more. Do not build other gates, coverage maps,
@@ -55,7 +55,7 @@ public surface, with zero TypeScript runtime changes.
 C# DSL → steps, values and conditions that each write the plan grammar where they are used
 (`Alis.Reactive/PlanModel`) → plan JSON in the view (`Html.RenderPlan(plan)`) → generated TS contract
 (`runtime/types/plan.ts`) → TypeScript runtime executes the plan. There is one C# model; no semantic
-graph and no lowering pass sit between the builders and the grammar.
+graph and no lowering pass sit between the builders and the grammar. The grammar is specified in `docs/design/grammar.md`.
 
 - C# never executes browser behavior. The runtime never invents behavior the plan does not carry.
   Make invalid behavior unrepresentable in the plan domain.
@@ -127,20 +127,10 @@ Everything else stays sync.
 - Syncfusion EJ2 33.1.47 with npm and NuGet pinned together; upgrade with
   `node scripts/pin-syncfusion.mjs <version>`.
 
-## Skills and local guidance
+## Local guidance
 
-| Skill | Use for |
-|-------|---------|
-| `reactive-dsl` | Plan, triggers, Element, Dispatch, Component, InputField |
-| `http-pipeline` | Get/Post, Gather, Response, Chained, Parallel, WhileLoading, Into |
-| `conditions-dsl` | When/Then/ElseIf/Else, operators, guards |
-| `validation-rules` | Validation rules in FluentValidation's grammar (written once, run on server and browser), Validate, ValidationErrors |
-| `bdd-testing` | Playwright tests; load before writing one |
-| `modern-csharp` | C# 14 patterns for the plan domain |
-| `dotnet-xml-docs` | XML docs on the public C# surface |
-| `solid-ts-audit` | Structural work on the TS runtime |
-
-Conventions with worked examples: `.claude/memory/coding-principles.md` (C# naming, callback
+The code and its XML docs are the reference: read the declaration, the builder and a sandbox
+page before writing a view, a component or a test. Conventions with worked examples: `.claude/memory/coding-principles.md` (C# naming, callback
 parameter names, fail-fast), `.claude/memory/docs-principles.md` (docs voice) and
 `.claude/memory/bdd-principles.md` (Playwright BDD rules).
 

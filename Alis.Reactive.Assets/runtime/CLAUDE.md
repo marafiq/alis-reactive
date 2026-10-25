@@ -3,7 +3,7 @@
 Root CLAUDE.md is authoritative. This directory runs the plans C# renders. The plan is a small
 grammar (`docs/design/grammar.md`, normative): objects located on elements or made by registered
 modules, handlers of their events, six statements and nine expressions. The interpreter names no
-feature; every feature is a module. Load `solid-ts-audit` for structural work.
+feature; every feature is a module.
 
 ## Layout and import directions
 

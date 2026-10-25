@@ -8,32 +8,6 @@
     <File Path=".claude/memory/coding-principles.md" />
     <File Path=".claude/memory/docs-principles.md" />
   </Folder>
-  <Folder Name="/.claude/skills/reactive-dsl/">
-    <File Path=".claude/skills/reactive-dsl/SKILL.md" />
-  </Folder>
-  <Folder Name="/.claude/skills/http-pipeline/">
-    <File Path=".claude/skills/http-pipeline/SKILL.md" />
-  </Folder>
-  <Folder Name="/.claude/skills/conditions-dsl/">
-    <File Path=".claude/skills/conditions-dsl/SKILL.md" />
-  </Folder>
-  <Folder Name="/.claude/skills/solid-ts-audit/">
-    <File Path=".claude/skills/solid-ts-audit/SKILL.md" />
-  </Folder>
-  <Folder Name="/.claude/skills/modern-csharp/">
-    <File Path=".claude/skills/modern-csharp/SKILL.md" />
-  </Folder>
-  <Folder Name="/.claude/skills/" />
-  <Folder Name="/.claude/skills/bdd-testing/">
-    <File Path=".claude/skills/bdd-testing/SKILL.md" />
-  </Folder>
-  <Folder Name="/.claude/skills/bdd-testing/references/">
-    <File Path=".claude/skills/bdd-testing/references/patterns.md" />
-    <File Path=".claude/skills/bdd-testing/references/first-principles.md" />
-  </Folder>
-  <Folder Name="/.claude/skills/validation-rules/">
-    <File Path=".claude/skills/validation-rules/SKILL.md" />
-  </Folder>
   <Folder Name="/docs-site/">
     <File Path="docs-site/astro.config.mjs" />
     <File Path="docs-site/package.json" />

@@ -1,6 +1,6 @@
 # Playwright Behavior Tests
 
-Root CLAUDE.md is authoritative. Load the `bdd-testing` skill before writing or
+Root CLAUDE.md is authoritative. Read `memory/bdd-principles.md` before writing or
 modifying any test here. Fixtures are C# — `modern-csharp` standards apply to
 them like any production code.
 
