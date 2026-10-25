@@ -30,7 +30,7 @@ namespace Alis.Reactive
 #endif
         where TModel : class
     {
-        // Internal because Html.InputField creates the slot used by validation and gather.
+        // Internal because Html.InputField decides the input's identity, which validation and gather read.
         internal InputBoundField(
 #if NET48
             HtmlHelper<TModel> html,
@@ -43,7 +43,7 @@ namespace Alis.Reactive
         {
         }
 
-        // Component extensions render only after registration; public rendering would bypass the component pipeline.
+        // A render helper renders through Render<TComponent>, which tells the plan which component holds the value.
 #if NET48
         internal void Render(IHtmlString content)
         {
@@ -62,7 +62,7 @@ namespace Alis.Reactive
         public RenderedComponent<TComponent, TModel> Render<TComponent>(IHtmlString content)
             where TComponent : IInputComponent, new()
         {
-            RegisterInputComponent(InputComponentRegistrationProfile.For<TComponent>());
+            AddRenderedInput(new TComponent());
             Render(content);
             return new RenderedComponent<TComponent, TModel>(Plan, ElementId);
         }
@@ -84,7 +84,7 @@ namespace Alis.Reactive
         public RenderedComponent<TComponent, TModel> Render<TComponent>(IHtmlContent content)
             where TComponent : IInputComponent, new()
         {
-            RegisterInputComponent(InputComponentRegistrationProfile.For<TComponent>());
+            AddRenderedInput(new TComponent());
             Render(content);
             return new RenderedComponent<TComponent, TModel>(Plan, ElementId);
         }
@@ -102,7 +102,7 @@ namespace Alis.Reactive
             where TComponent : IInputComponent, new()
         {
             if (write == null) throw new System.ArgumentNullException(nameof(write));
-            RegisterInputComponent(InputComponentRegistrationProfile.For<TComponent>());
+            AddRenderedInput(new TComponent());
             Render(() => write(Writer));
             return new RenderedComponent<TComponent, TModel>(Plan, ElementId);
         }

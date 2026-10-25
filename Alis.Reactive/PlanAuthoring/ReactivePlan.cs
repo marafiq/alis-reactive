@@ -14,8 +14,7 @@ namespace Alis.Reactive
     /// <typeparam name="TModel">The view's model, whose members name the plan's inputs.</typeparam>
     public sealed class ReactivePlan<TModel> where TModel : class
     {
-        private readonly RegisteredInputComponents _registeredInputComponents =
-            new RegisteredInputComponents();
+        private readonly RenderedInputs _renderedInputs = new RenderedInputs();
 
         private readonly PlanId _planId;
         private readonly PlanBuildContext _context;
@@ -45,7 +44,7 @@ namespace Alis.Reactive
             _planId = planId ?? throw new ArgumentNullException(nameof(planId));
             _scope = scope;
             _services = services;
-            _context = new PlanBuildContext(_planId.Value, _registeredInputComponents);
+            _context = new PlanBuildContext(_planId.Value, _renderedInputs);
         }
 
         /// <summary>The plan's identifier: the model type's full name, or the element's id for an element plan.</summary>
@@ -53,8 +52,7 @@ namespace Alis.Reactive
         /// <summary>Whether this plan is rendered by a partial view and merges into the owning view's Active Plan.</summary>
         public bool IsPartial => _scope.IsPartial;
         internal bool RendersValidationSummary => _scope.RendersValidationSummary;
-        internal IReadOnlyDictionary<string, ComponentRegistration> RegisteredInputComponents =>
-            _registeredInputComponents.Snapshot();
+        internal IReadOnlyDictionary<string, RenderedInput> RenderedInputs => _renderedInputs.Snapshot();
         internal PlanBuildContext Context => _context;
 
         /// <summary>Registers a plugin with the plan; the returned plugin's members are used directly.</summary>
@@ -101,14 +99,13 @@ namespace Alis.Reactive
             return new RenderedComponent<TComponent, TModel>(this, elementId, markup);
         }
 
-        internal void RegisterInputComponent(ComponentRegistration registration)
+        internal void AddRenderedInput(RenderedInput input)
         {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            _registeredInputComponents.Add(registration.RegisteredBindingPath, registration);
+            if (input == null) throw new ArgumentNullException(nameof(input));
+            _renderedInputs.Add(input);
         }
 
-        internal bool HasRegisteredInputComponent(BindingPath bindingPath) =>
-            _registeredInputComponents.Contains(bindingPath);
+        internal bool HasRenderedInput(BindingPath binding) => _renderedInputs.Contains(binding);
 
         /// <summary>
         /// The browser rules <typeparamref name="TValidator"/> declares, resolved from the services the plan
@@ -141,19 +138,19 @@ namespace Alis.Reactive
         // Every rendered input joins the plan, then each validated form takes its validator's rules.
         private void ResolveAll(IServiceProvider? services)
         {
-            _context.DeclareRegisteredInputs();
+            _context.DeclareRenderedInputs();
 
             var validated = _context.ValidatedRequests.FirstOrDefault();
             if (validated?.Validation is not { } validation)
                 return;
 
             var ruleSource = RequireClientValidationRuleSource(services, validation.ValidatorName, $"Request at '{validated.Url}'");
-            var registeredInputs = _registeredInputComponents.Snapshot();
+            var renderedInputs = _renderedInputs.Snapshot();
             foreach (var request in _context.ValidatedRequests)
             {
                 if (!(request.Validation is { } form)) continue;
                 var fields = form.Rules(ruleSource);
-                _context.Check(form.Form, CheckedField.Bind(fields, registeredInputs, typeof(TModel)).ToList());
+                _context.Check(form.Form, CheckedField.Bind(fields, renderedInputs, typeof(TModel)).ToList());
             }
         }
 

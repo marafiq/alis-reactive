@@ -74,12 +74,12 @@ namespace Alis.Reactive
         {
             var options = configuration.CreateOptions();
 #if NET48
-            // System.Web.Mvc NameFor honors HtmlFieldPrefix and returns MvcHtmlString; the slot stores a string binding path.
+            // System.Web.Mvc NameFor honors HtmlFieldPrefix and returns MvcHtmlString; the identity keeps the binding path as text.
             var bindingName = html.NameFor(expression).ToHtmlString();
 #else
             var bindingName = html.NameFor(expression);
 #endif
-            var componentSlot = ModelBoundInputComponentSlot.For<TModel, TProp>(
+            var identity = InputIdentity.For<TModel, TProp>(
                 expression,
                 bindingName,
                 html.ViewData.TemplateInfo.HtmlFieldPrefix);
@@ -87,7 +87,7 @@ namespace Alis.Reactive
                 plan,
                 expression,
                 options,
-                componentSlot);
+                identity);
 
             return new InputBoundField<TModel, TProp>(
                 html,

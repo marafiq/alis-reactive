@@ -17,7 +17,7 @@ namespace Alis.Reactive.PlanModel
         private const string EventParam = "e";
 
         private readonly string _planId;
-        private readonly RegisteredInputComponents _registrations;
+        private readonly RenderedInputs _inputs;
         private readonly List<DeclaredObject> _declared = new List<DeclaredObject>();
         private readonly Dictionary<string, DeclaredObject> _declaredById = new Dictionary<string, DeclaredObject>(StringComparer.Ordinal);
         private readonly List<(Func<ObjectTable, string> On, string Event, Block Body)> _handlers =
@@ -29,10 +29,10 @@ namespace Alis.Reactive.PlanModel
         // The callbacks being built, innermost last: a step lands in the innermost one.
         private readonly Stack<Block> _blocks = new Stack<Block>();
 
-        internal PlanBuildContext(string planId, RegisteredInputComponents registrations)
+        internal PlanBuildContext(string planId, RenderedInputs inputs)
         {
             _planId = planId ?? throw new ArgumentNullException(nameof(planId));
-            _registrations = registrations ?? throw new ArgumentNullException(nameof(registrations));
+            _inputs = inputs ?? throw new ArgumentNullException(nameof(inputs));
         }
 
         // ── callbacks ────────────────────────────────────────────────────────────
@@ -157,10 +157,10 @@ namespace Alis.Reactive.PlanModel
         }
 
         /// <summary>Every input the view rendered is an element of the plan, after the elements its steps name.</summary>
-        internal void DeclareRegisteredInputs()
+        internal void DeclareRenderedInputs()
         {
-            foreach (var registration in _registrations.Entries)
-                DeclareComponent(registration.Value.ComponentId, registration.Value.ComponentVendor);
+            foreach (var input in _inputs.Entries)
+                DeclareComponent(input.Value.ComponentId, input.Value.ComponentVendor);
         }
 
         // Each input this plan rendered: its MVC name, its JSON body path, its value read in the model's
@@ -170,16 +170,15 @@ namespace Alis.Reactive.PlanModel
             var inputs = new Dictionary<string, InputBinding>(StringComparer.Ordinal);
             foreach (var declared in _declared)
             {
-                if (!_registrations.TryFindForComponent(ComponentId.Of(declared.Id), out var registration)) continue;
+                if (!_inputs.TryFindForComponent(ComponentId.Of(declared.Id), out var rendered)) continue;
 
-                var input = registration.Input;
                 var value = G.Get(
                     G.Obj(objects.Element(declared.Id)),
-                    input.ValuePath.Segments.Select(segment => segment.ToPathText()).ToList(),
-                    registration.Shape);
+                    rendered.Input.ValuePath.Segments.Select(segment => segment.ToPathText()).ToList(),
+                    rendered.Shape);
                 inputs.Add(
                     declared.Id,
-                    new InputBinding(registration.BindingPath, BodyPath(registration.RegisteredBindingPath.Path), value, registration.Shape, input.CommittedBy.Value));
+                    new InputBinding(rendered.BindingPath, BodyPath(rendered.Binding.Path), value, rendered.Shape, rendered.Input.CommittedBy.Value));
             }
 
             return inputs;

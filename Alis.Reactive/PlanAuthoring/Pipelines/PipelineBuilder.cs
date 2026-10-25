@@ -105,7 +105,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The component: <c>rate.Min.Set(0m)</c>, <c>rate.Increment()</c>, <c>p.When(rate.Value).Gt(1m)</c>.</returns>
         public TComponent Component<TComponent>(Expression<Func<TModel, object?>> expr)
             where TComponent : JsObject, IComponent, new() =>
-            Live<TComponent>(ComponentObjectTarget.For<TComponent>(IdGenerator.For<TModel, object?>(expr)));
+            Live<TComponent>(IdGenerator.For<TModel, object?>(expr));
 
         /// <summary>The component the view rendered for a member of another model, such as a partial's.</summary>
         /// <typeparam name="TComponent">The component's declaration.</typeparam>
@@ -115,7 +115,7 @@ namespace Alis.Reactive.Builders
         public TComponent Component<TComponent, TOtherModel>(Expression<Func<TOtherModel, object?>> expr)
             where TComponent : JsObject, IComponent, new()
             where TOtherModel : class =>
-            Live<TComponent>(ComponentObjectTarget.For<TComponent>(IdGenerator.For<TOtherModel, object?>(expr)));
+            Live<TComponent>(IdGenerator.For<TOtherModel, object?>(expr));
 
         /// <summary>The component the view rendered with an id it chose.</summary>
         /// <typeparam name="TComponent">The component's declaration.</typeparam>
@@ -123,20 +123,24 @@ namespace Alis.Reactive.Builders
         /// <returns>The component: <c>grid.Refresh()</c>, <c>grid.SelectRow(0)</c>.</returns>
         public TComponent Component<TComponent>(string refId)
             where TComponent : JsObject, IComponent, new() =>
-            Live<TComponent>(ComponentObjectTarget.For<TComponent>(refId));
+            Live<TComponent>(refId);
 
         /// <summary>An app object the layout renders once, at the id its declaration names: Toast, Drawer, Loader.</summary>
         /// <typeparam name="TComponent">The app object's declaration.</typeparam>
         /// <returns>The app object: <c>toast.Content.Set("Saved")</c>, <c>toast.Show()</c>.</returns>
         public TComponent Component<TComponent>()
-            where TComponent : JsObject, IAppLevelComponent, new() =>
-            Live<TComponent>(ComponentObjectTarget.ForLayout<TComponent>());
-
-        private TComponent Live<TComponent>(ComponentObjectTarget target)
-            where TComponent : JsObject, new()
+            where TComponent : JsObject, IAppLevelComponent, new()
         {
             var component = new TComponent();
-            component.BindTo(new ComponentBinding(target, Context));
+            component.BindTo(new ComponentBinding(component.DefaultId, component.Vendor, Context));
+            return component;
+        }
+
+        private TComponent Live<TComponent>(string componentId)
+            where TComponent : JsObject, IComponent, new()
+        {
+            var component = new TComponent();
+            component.BindTo(new ComponentBinding(componentId, component.Vendor, Context));
             return component;
         }
 

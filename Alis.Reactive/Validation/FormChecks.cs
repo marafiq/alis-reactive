@@ -40,16 +40,16 @@ namespace Alis.Reactive.Validation
         /// </summary>
         internal static IEnumerable<CheckedField> Bind(
             IReadOnlyList<ClientValidationField> fields,
-            IReadOnlyDictionary<string, ComponentRegistration> registeredInputs,
+            IReadOnlyDictionary<string, RenderedInput> renderedInputs,
             Type modelType)
         {
-            var values = new FormFieldValues(registeredInputs, modelType);
+            var values = new FormFieldValues(renderedInputs, modelType);
             foreach (var field in fields)
             {
                 if (field.HasRules)
                     yield return values.Check(field);
 
-                foreach (var itemField in RenderedItemFields(field.FieldName, field.ItemFields, registeredInputs.Keys))
+                foreach (var itemField in RenderedItemFields(field.FieldName, field.ItemFields, renderedInputs.Keys))
                     yield return values.Check(itemField);
             }
         }
@@ -59,19 +59,19 @@ namespace Alis.Reactive.Validation
         private static IEnumerable<ClientValidationField> RenderedItemFields(
             string collectionPath,
             IReadOnlyList<ClientValidationField> itemFields,
-            IEnumerable<string> registeredPaths)
+            IEnumerable<string> renderedPaths)
         {
-            foreach (var registeredPath in registeredPaths)
+            foreach (var renderedPath in renderedPaths)
                 foreach (var itemField in itemFields)
                 {
-                    if (!TryRenderedItem(collectionPath, itemField.FieldName, registeredPath, out var itemPrefix, out var isDirectField))
+                    if (!TryRenderedItem(collectionPath, itemField.FieldName, renderedPath, out var itemPrefix, out var isDirectField))
                         continue;
 
                     var renderedField = itemField.RenderedAt(itemPrefix);
                     if (isDirectField && renderedField.HasRules)
                         yield return renderedField;
 
-                    foreach (var nestedItemField in RenderedItemFields(renderedField.FieldName, renderedField.ItemFields, new[] { registeredPath }))
+                    foreach (var nestedItemField in RenderedItemFields(renderedField.FieldName, renderedField.ItemFields, new[] { renderedPath }))
                         yield return nestedItemField;
                 }
         }
@@ -79,7 +79,7 @@ namespace Alis.Reactive.Validation
         private static bool TryRenderedItem(
             string collectionPath,
             string itemFieldPath,
-            string registeredPath,
+            string renderedPath,
             out string itemPrefix,
             out bool isDirectField)
         {
@@ -87,17 +87,17 @@ namespace Alis.Reactive.Validation
             isDirectField = false;
 
             var openingBracket = collectionPath.Length;
-            if (!registeredPath.StartsWith(collectionPath + "[", StringComparison.Ordinal)) return false;
+            if (!renderedPath.StartsWith(collectionPath + "[", StringComparison.Ordinal)) return false;
 
-            var closingBracket = registeredPath.IndexOf(']', openingBracket + 1);
+            var closingBracket = renderedPath.IndexOf(']', openingBracket + 1);
             if (closingBracket < 0) return false;
 
-            var prefix = registeredPath.Substring(0, closingBracket + 1);
+            var prefix = renderedPath.Substring(0, closingBracket + 1);
             var renderedItemFieldPath = prefix + "." + itemFieldPath;
-            isDirectField = string.Equals(registeredPath, renderedItemFieldPath, StringComparison.Ordinal);
+            isDirectField = string.Equals(renderedPath, renderedItemFieldPath, StringComparison.Ordinal);
             var nestedField =
-                registeredPath.StartsWith(renderedItemFieldPath + ".", StringComparison.Ordinal) ||
-                registeredPath.StartsWith(renderedItemFieldPath + "[", StringComparison.Ordinal);
+                renderedPath.StartsWith(renderedItemFieldPath + ".", StringComparison.Ordinal) ||
+                renderedPath.StartsWith(renderedItemFieldPath + "[", StringComparison.Ordinal);
             if (!isDirectField && !nestedField) return false;
 
             itemPrefix = prefix;
@@ -112,18 +112,18 @@ namespace Alis.Reactive.Validation
     /// </summary>
     internal sealed class FormFieldValues
     {
-        private readonly IReadOnlyDictionary<string, ComponentRegistration> _registeredInputs;
+        private readonly IReadOnlyDictionary<string, RenderedInput> _renderedInputs;
         private readonly Type _modelType;
 
-        internal FormFieldValues(IReadOnlyDictionary<string, ComponentRegistration> registeredInputs, Type modelType)
+        internal FormFieldValues(IReadOnlyDictionary<string, RenderedInput> renderedInputs, Type modelType)
         {
-            _registeredInputs = registeredInputs;
+            _renderedInputs = renderedInputs;
             _modelType = modelType;
         }
 
         internal (string Id, Shape Shape) Resolve(FieldReference field) =>
-            _registeredInputs.TryGetValue(field.Path, out var registration)
-                ? (registration.ComponentId, registration.Shape)
+            _renderedInputs.TryGetValue(field.Path, out var rendered)
+                ? (rendered.ComponentId, rendered.Shape)
                 : (IdGenerator.For(_modelType, field.Path), field.Shape);
 
         internal ValueExpression Value(FieldReference field)

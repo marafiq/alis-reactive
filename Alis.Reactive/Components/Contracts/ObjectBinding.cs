@@ -56,18 +56,21 @@ namespace Alis.Reactive
     /// <summary>A component on an element the plan renders or locates by id.</summary>
     internal sealed class ComponentBinding : ObjectBinding
     {
-        private readonly ComponentObjectTarget _target;
+        private readonly string _componentId;
+        private readonly ComponentVendor _vendor;
 
-        internal ComponentBinding(ComponentObjectTarget target, PlanBuildContext context)
+        internal ComponentBinding(string componentId, ComponentVendor vendor, PlanBuildContext context)
             : base(context)
         {
-            _target = target ?? throw new ArgumentNullException(nameof(target));
+            if (string.IsNullOrWhiteSpace(componentId)) throw new ArgumentException("Component ID required.", nameof(componentId));
+            _componentId = componentId;
+            _vendor = vendor ?? throw new ArgumentNullException(nameof(vendor));
         }
 
         protected override Receiver Locate()
         {
-            Context.DeclareComponent(_target.ComponentId, _target.Vendor);
-            return Receiver.Element(_target.ComponentId);
+            Context.DeclareComponent(_componentId, _vendor);
+            return Receiver.Element(_componentId);
         }
     }
 

@@ -82,8 +82,18 @@ namespace Alis.Reactive
             where TArgs : JsObject
         {
             if (eventSelector == null) throw new ArgumentNullException(nameof(eventSelector));
+            if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
+            var typedEvent = eventSelector(Declaration)
+                ?? throw new ArgumentException("Select one of the component's events, for example evt => evt.Change.", nameof(eventSelector));
 
-            ComponentEventOnboarding.Wire(_plan, _componentId, Declaration.Vendor, eventSelector(Declaration), pipeline);
+            var context = _plan.Context;
+            var args = typedEvent.Args;
+            args.BindTo(new EventPayloadBinding(context));
+            var body = PipelineBuilder<TModel>.Build(context, p => pipeline(args, p));
+
+            // The component joins the plan after the elements its own callback names.
+            context.DeclareComponent(_componentId, Declaration.Vendor);
+            context.On(objects => objects.Element(_componentId), typedEvent.ObjectEvent, body);
             return this;
         }
 
