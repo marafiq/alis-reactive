@@ -14,7 +14,6 @@ public static class LocatorInteractionExtensions
         {
             Console.WriteLine(
                 $"ClickWhenStableAsync retrying after timeout for locator '{locator}': {ex.Message}");
-            // TODO: Replace this fixed retry pause with a behavior-focused locator stability signal.
             await page.WaitForTimeoutAsync(250);
             await locator.ClickAsync(new() { Timeout = timeoutMs });
         }

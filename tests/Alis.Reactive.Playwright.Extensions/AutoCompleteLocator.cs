@@ -36,7 +36,6 @@ public sealed class AutoCompleteLocator
         catch (TimeoutException)
         {
             await Clear();
-            // TODO: Replace this fixed retry pause with a Syncfusion popup-ready signal.
             await _page.WaitForTimeoutAsync(250);
             await TypeAndWaitForPopup(text, delayMs);
         }
