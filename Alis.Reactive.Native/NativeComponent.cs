@@ -9,9 +9,9 @@ namespace Alis.Reactive.Native
     /// <code>
     /// public sealed class NativeCheckBox : NativeComponent, IInputComponent
     /// {
-    ///     public Prop&lt;bool&gt; Checked =&gt; Prop&lt;bool&gt;();
-    ///     public void Focus() =&gt; Call();
-    ///     public TypedEvent&lt;NativeCheckBoxChangeArgs&gt; Change =&gt; Event&lt;NativeCheckBoxChangeArgs&gt;();
+    ///     public Property&lt;bool&gt; Checked =&gt; Property&lt;bool&gt;();
+    ///     public void Focus() =&gt; Method();
+    ///     public Event&lt;NativeCheckBoxChangeArgs&gt; Change =&gt; Event&lt;NativeCheckBoxChangeArgs&gt;();
     ///     ComponentInput IInputComponent.Input =&gt; ComponentInput.Of(Checked, committedBy: Change);
     /// }
     /// </code>

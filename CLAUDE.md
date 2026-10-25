@@ -79,7 +79,7 @@ These terms stay identical across C#, generated TS, runtime, tests and docs.
 | Module | What it is |
 |--------|-----------|
 | Triggers and reactions | On load or an event, run a pipeline: set a property, call a method, dispatch, update an element. |
-| ValueExpression | The one way to read a value: component or plugin member, URL param, event payload, success or error body, request snapshot, literal, object, array. A second resolver is a defect. |
+| ValueExpression | The one way to read a value: component or plugin member, a method's result, URL param, event payload, success or error body, literal, object, array. A second resolver is a defect. |
 | HTTP pipeline | Get, Post, Put, Delete. Gather is `target <- source`. Responses open success and error scopes. Chained runs after success and may gather from it; Parallel completes after all branches settle. WhileLoading, Into. |
 | Conditions | When, ElseIf, Else graphs over the same value sources, in authored order; first match wins. |
 | Validation | Rules are written once, in FluentValidation's grammar, on a `ReactiveValidator<T>` registered through DI; the framework implements the grammar and does not use the FluentValidation package. Each check defines what the server decides and, when the browser can decide it the same way, the rule the plan carries, bound by component ID. What only the server can do stays there by what it is: `Must`, `MustAsync`, a message built from the model, a condition with no browser form, `.ServerOnly()`. |

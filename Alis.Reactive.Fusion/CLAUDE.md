@@ -13,21 +13,32 @@ intentional; there are no shared behavior base classes.
 ## Declaring members
 
 Each JavaScript member is a real C# member. Its JavaScript name is the C# name camel-cased, unless
-`name:` gives one. From `FusionGrid.cs`, `FusionNumericTextBox.cs` and `FusionToast.cs`:
+`name:` gives one. From `FusionGrid.cs`, `FusionNumericTextBox.cs`, `FusionSchedule.cs` and
+`FusionToast.cs`:
 
 ```csharp
-public Prop<decimal> Value => Prop<decimal>();                                 // read and written
+public Property<decimal> Value => Property<decimal>();                         // read and written
 public ReadOnly<bool> IsInteracted => ReadOnly<bool>();                        // read (on a payload)
-public Prop<FusionToastTone> Tone => Prop<FusionToastTone>("cssClass");       // a JavaScript name of its own
-public void Refresh() => Call();                                               // a method
-public void SelectRow(Arg<int> index) => Call(index);                          // a method with an argument
-public TypedSource<int[]> GetSelectedRowIndexes() => Invoke<int[]>();          // a method that returns a value
-public void HideColumn(Arg<Field> key) => Call(key, Fixed("field"), name: "hideColumns");
-public TypedEvent<FusionNumericTextBoxChangeArgs> Change => Event<FusionNumericTextBoxChangeArgs>();   // an event
+public Property<FusionToastTone> Tone => Property<FusionToastTone>("cssClass"); // a JavaScript name of its own
+public void Refresh() => Method();                                             // a method
+public void SelectRow(Arg<int> index) => Method(index);                        // a method with an argument
+public TypedSource<int[]> GetSelectedRowIndexes() => Method<int[]>();          // a method that returns a value
+public FusionGridColumn GetColumnByField(Field field) => Object<FusionGridColumn>(field);  // a method that returns an object
+public void HideColumn(Field key) => Method(key, Fixed("field"), name: "hideColumns");
+public FusionScheduleEventSettings EventSettings => Object<FusionScheduleEventSettings>(); // an object the component holds
+public Event<FusionNumericTextBoxChangeArgs> Change => Event<FusionNumericTextBoxChangeArgs>();   // an event
 ```
 
-- `CallAsync()` and `InvokeAsync<T>()` declare a method that returns a promise; the steps after it
-  wait for it to settle.
+- `ReadOnly<T>` is a property the page reads, `Property<T>` one it reads and writes, `WriteOnly<T>`
+  one it writes and never reads.
+- `MethodAsync()` and `MethodAsync<T>()` declare a method that returns a promise: the steps after a
+  `MethodAsync()` wait for it to settle; the step that first uses a `MethodAsync<T>()` result waits
+  for its value.
+- A method that returns a value or an object (`Method<T>()`, `MethodAsync<T>()`, `Object<T>()` on a
+  method) runs once per callback, before the first line that uses its result, or at its own line
+  when no line does; every later use reads what it returned.
+- `Object<T>()` on a property declares an object the component holds, with members and events of
+  its own; `Objects<T>()` a list of them (`At(i)`, `Count`, `Each(item => item.Field)`).
 - `Arg<T>` parameters take a literal or a value read when the step runs, in the JavaScript method's
   own order. Name each parameter as the EJ2 API names it.
 - `Fixed(literal)` is an argument the JavaScript method always takes and the page never chooses,
@@ -35,8 +46,8 @@ public TypedEvent<FusionNumericTextBoxChangeArgs> Change => Event<FusionNumericT
   own list where EJ2 declares a wider type (`FusionAutoCompleteFilteringArgs.UpdateData`).
 - Members typed by the app's class are generic methods (`GetSelectedRecords<TRow>()`,
   `RowSelected<TRow>()`); row members are `Field` arguments.
-- An event payload is a class deriving `JsObject`: `ReadOnly<T>` for what it carries, `Prop<T>` for
-  what EJ2 reads back after the handler (`Cancel`, `PreventDefaultAction`), and methods for what it
+- An event payload is a class deriving `JsObject`: `ReadOnly<T>` for what it carries, `Property<T>`
+  for what EJ2 reads back after the handler (`Cancel`, `PreventDefaultAction`), and methods for what it
   can do (`UpdateData`). Plain data inside a payload (a row, an action) stays a plain class.
 
 The method in full: `docs/design/bring-your-own-component.md`.

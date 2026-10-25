@@ -12,8 +12,8 @@ namespace Alis.Reactive
     /// <code>
     /// public sealed class FusionRating : FusionComponent, IInputComponent
     /// {
-    ///     public Prop&lt;double&gt; Value =&gt; Prop&lt;double&gt;();
-    ///     public TypedEvent&lt;FusionRatingValueChangedArgs&gt; ValueChanged =&gt;
+    ///     public Property&lt;double&gt; Value =&gt; Property&lt;double&gt;();
+    ///     public Event&lt;FusionRatingValueChangedArgs&gt; ValueChanged =&gt;
     ///         Event&lt;FusionRatingValueChangedArgs&gt;();
     ///
     ///     ComponentInput IInputComponent.Input =&gt; ComponentInput.Of(Value, committedBy: ValueChanged);

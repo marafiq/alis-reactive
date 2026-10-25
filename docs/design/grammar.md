@@ -21,11 +21,15 @@ vendor    := name -> { objectPath, subscribe, unsubscribe, payload: argument | e
 object    := id -> locator
 locator   := element(id, vendor)            found on an element, through its vendor's data
            | plugin(name, key, data)        made by the module a bundle registered under `name`
-handler   := { on: object, event, param, do: block }
+handler   := { on: object, path, event, param, do: block }
 ```
 
 That is the whole document. The grammar names no feature.
 
+- **Handler path.** `path` is the member path from the object `on` names to the object whose
+  `event` is heard: empty for the object itself, the holding member's path for an object it holds
+  (`Object<T>()` on a property). The vendor subscribes on the object at that path; a plugin has no
+  path.
 - **Plugins.** A module is registered by name by a JavaScript bundle:
   - the framework's own bundle registers `alis.document`, `alis.http`, `alis.model`, `alis.form`,
     `alis.slot`, `alis.stream` and `alis.hub`;
@@ -249,6 +253,11 @@ A block runs in an environment of names:
 - `let` binds a name for the rest of its block;
 - `fn` binds its parameters for its body.
 
+A method that returns a value or an object is bound once per block: the `let` that holds its result
+is hoisted before the statement that first reads it (with `await` when the method is async, 3.3),
+and every later read in the block, or in a block inside it, is `ref` of that name. A result no
+statement reads is bound at the method's own line. A read never runs the method again.
+
 A `try` body's top-level bindings stay in scope after the `try`. Code after a `try` runs only when
 the body completed, so each of them was bound.
 
@@ -275,15 +284,16 @@ at render: a handle used outside the block that binds it throws, and names the h
   or `let` may return a promise: an awaiting statement settles it, a `do` without `await` lets it
   run. A promise anywhere else comes from a member declared sync, and the call fails (3.4).
 
-**A sync value is read where it is used.** A value from a property or a returning method is a read,
-like a property getter, so each use reads the current value: `var before = rate.Value;` then
-`rate.Value.Set(5)` makes `before` read 5. Statements run in plan order, so a step written before
-the write reads the earlier value.
+**A property is read where it is used.** A property read is a read, like a property getter, so each
+use reads the current value: `var before = rate.Value;` then `rate.Value.Set(5)` makes `before`
+read 5. Statements run in plan order, so a step written before the write reads the earlier value. A
+method's result is not re-read: it is bound once (3.1).
 
-**Plan order is C# evaluation order.** An async member emits its `let … await` where it is called,
-in the active scope, and returns a value that names the result:
+**Plan order is C# evaluation order.** A returning method emits its `let` (`let … await` when the
+method is async) before the statement that first reads the result, in the active scope, and returns
+a value that names the result:
 - the value is read, never invoked again, however often it is used;
-- an async call written as an argument runs before the statement it feeds, as C# evaluates arguments
+- a call written as an argument runs before the statement it feeds, as C# evaluates arguments
   first.
 
 The fluent builders that take callbacks (`p.Confirm`, groups, `ElseIf`) build their conditions in
@@ -360,11 +370,11 @@ form lowers to fixed productions.
 | `t.DomReady(p => …)` | `on(document, "ready", _)` |
 | `t.CustomEvent(appEvent, (e, p) => …)` | `on(document, name, e)`; the payload is `detail`, or the event when it has none |
 | `t.ServerPush(ServerPushStream.At<S>(url), s => s.M, …)`, `t.SignalR(SignalRHub.At<H>(url), h => h.M, …)` | `on(stream, name, e)`, `on(hub, name, e)` |
-| `var c = p.Component<C>(…); c.P.Set(v)`, a `Prop<T>` | `set(o, ["p"], shape, v)` |
-| `c.M(a, b)`, a method declared with `Call` | `do(call(o, ["m"], [a, b]))` |
-| `c.P`, a `ReadOnly<T>` or `Prop<T>` read | `get(o, ["p"], shape)` |
-| `c.F(a)`, a method declared with `Invoke<T>` | `call(o, ["f"], [a], shape)` |
-| a method declared with `CallAsync` or `InvokeAsync<T>` | `do await call(…)`; a read is `let t = await call(…)` where it is called, and the value is `ref t` |
+| `var c = p.Component<C>(…); c.P.Set(v)`, a `Property<T>` or `WriteOnly<T>` | `set(o, ["p"], shape, v)` |
+| `c.M(a, b)`, a method declared with `Method(a, b)` | `do(call(o, ["m"], [a, b]))` |
+| `c.P`, a `ReadOnly<T>` or `Property<T>` read | `get(o, ["p"], shape)` |
+| `c.F(a)`, a method declared with `Method<T>(a)` or `Object<T>(a)` | `let t = call(o, ["f"], [a], shape)` before the statement that first reads it; the value is `ref t` (3.1) |
+| a method declared with `MethodAsync()` or `MethodAsync<T>()` | `do await call(…)`; a read is `let t = await call(…)` before the statement that first reads it, and the value is `ref t` |
 | `args.A.Get(x => x.B)`, `json.Get(x => x.A.B)` | `get(v, ["a", "b"], shape)` |
 | `args.Cancel.Set(true)`, `args.UpdateData(items)` | `set(v, ["cancel"], ..)`, `do(call(v, ["updateData"], [..]))` on the handler's parameter |
 | `p.Element(id).Text.Set(v)` | `set(el, ["textContent"], text, v)` |
@@ -388,7 +398,7 @@ form lowers to fixed productions.
 if (form.validate()) {                            // .Validate<V>(container); outermost
   …WhileLoading…
   try {
-    const req = record(…Gather…);                 // the request snapshot
+    const req = record(…Gather…);                 // the gathered request
     const res = await http.send({ method, url, route, values: req, headers, format });
     if (res.ok) { …OnSuccess by status, exact first… }
     else if (res.status === 409) { …OnError(409)… }
@@ -571,9 +581,11 @@ imports none of them. The obligations are numbered so that tests and code can ci
   - C3: Escape inside the dialog never reaches the document.
   - C4: A missing dialog is a boundary error that names `FusionConfirmDialog`.
 - **Loader** (Native):
-  - L1: `show(target?, timeout?)` moves the loader into the target and starts the auto-hide timer.
-  - L2: `hide()` cancels the timer and returns the loader to `<body>`, hidden. It also returns there
-    when its target leaves the page.
+  - L1: `show()` shows the loader inside the element its `target` property names, positioned over
+    it, or over the viewport when `target` is empty; a `timeout` above 0 starts the auto-hide
+    timer. `target` and `timeout` are properties the page sets before the show.
+  - L2: `hide()` cancels the timer, returns the loader to `<body>` hidden, and clears `target` and
+    `timeout`. It also returns there, hidden, when its target leaves the page.
 - **Drawer** (Native):
   - W1: Closing empties its content element without unloading the slot loaded into it
     (`Alis.Reactive.Assets/components/native/drawer.ts:51-52`).
@@ -690,14 +702,14 @@ because EJ2's own `email` and `url` rules decide differently. It reads the rules
   checked in the constructor, and one-to-one serialization. This is the plan contract; the generator
   (`tools/PlanContractGenerator`) reads these classes.
 - `Components/Contracts`: the object contract every declaration is written with (`JsObject`,
-  `Component`, `Prop<T>`, `ReadOnly<T>`, `Arg<T>`, `TypedEvent<T>`, `ComponentVendor`,
-  `ComponentInput`).
+  `Component`, `Property<T>`, `ReadOnly<T>`, `WriteOnly<T>`, `Objects<T>`, `Arg<T>`,
+  `ComponentVendor`, `ComponentInput`; `Event<TArgs>` and `Event` are in `PlanAuthoring/Events`).
 - `PlanAuthoring`: the fluent API (handlers, conditions, requests, dispatch, parallel, URL, plugins)
   and the lambda compiler (`Arrays/ElementExpressionCompiler.cs`) through the one member table (2.3).
 - `PlanModel`: the one model that writes the grammar: steps (`Reactions/Steps.cs`), requests
   (`Requests/RequestStep.cs`), values (`Values/ValueExpression.cs`), conditions
-  (`Conditions/ConditionGraph.cs`), the form writer and the scope that binds responses and awaited
-  reads (`Writing/`). `PlanBuildContext.Write` writes the plan once at render.
+  (`Conditions/ConditionGraph.cs`), the form writer and the scope that binds responses and method
+  results (`Writing/`). `PlanBuildContext.Write` writes the plan once at render.
 - `Alis.Reactive.FluentValidator`: the projection of section 7 and its typed model.
 - `Alis.Reactive.Fusion`, `Alis.Reactive.Native`: vendors, declarations, render helpers, Confirm,
   Toast, Drawer, Loader, and the grid's column rules.

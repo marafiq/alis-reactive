@@ -219,7 +219,7 @@ namespace Alis.Reactive.Grammar
         public string Message { get; }
     }
 
-    /// <summary><c>on(object, event, param) { do }</c>: a handler of an object's event.</summary>
+    /// <summary><c>on(object, path, event, param) { do }</c>: a handler of an event of the object, or of the object it holds at <c>path</c>.</summary>
     internal sealed class Handler
     {
         internal Handler(string on, IReadOnlyList<string> path, string eventName, string param, IReadOnlyList<Statement> body)

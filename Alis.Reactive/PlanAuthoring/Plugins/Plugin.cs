@@ -11,9 +11,9 @@ namespace Alis.Reactive
     /// public sealed class SlugPlugin : Plugin
     /// {
     ///     public SlugPlugin() : base("slugify") { }
-    ///     public TypedSource&lt;string&gt; Slug(Arg&lt;string&gt; text) =&gt; Invoke&lt;string&gt;(text, name: "");   // the plugin is itself a function
-    ///     public TypedSource&lt;int&gt; Count(Arg&lt;object[]&gt; items) =&gt; Invoke&lt;int&gt;(items);              // a member function
-    ///     public void Mark(Arg&lt;string&gt; step) =&gt; Call(step);                                           // a member called for its effect
+    ///     public TypedSource&lt;string&gt; Slug(Arg&lt;string&gt; text) =&gt; Method&lt;string&gt;(text, name: "");   // the plugin is itself a function
+    ///     public TypedSource&lt;int&gt; Count(Arg&lt;string[]&gt; items) =&gt; Method&lt;int&gt;(items);              // a member function
+    ///     public void Mark(Arg&lt;string&gt; step) =&gt; Method(step);                                         // a member called for its effect
     ///     public ReadOnly&lt;string&gt; Version =&gt; ReadOnly&lt;string&gt;();                                     // a member read
     /// }
     ///

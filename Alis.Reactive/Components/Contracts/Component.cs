@@ -10,10 +10,10 @@ namespace Alis.Reactive
     /// <code>
     /// public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
     /// {
-    ///     public Prop&lt;decimal&gt; Value =&gt; Prop&lt;decimal&gt;();
-    ///     public Prop&lt;decimal&gt; Min =&gt; Prop&lt;decimal&gt;();
-    ///     public void Increment() =&gt; Call();
-    ///     public TypedEvent&lt;FusionNumericTextBoxChangeArgs&gt; Change =&gt; Event&lt;FusionNumericTextBoxChangeArgs&gt;();
+    ///     public Property&lt;decimal&gt; Value =&gt; Property&lt;decimal&gt;();
+    ///     public Property&lt;decimal&gt; Min =&gt; Property&lt;decimal&gt;();
+    ///     public void Increment() =&gt; Method();
+    ///     public Event&lt;FusionNumericTextBoxChangeArgs&gt; Change =&gt; Event&lt;FusionNumericTextBoxChangeArgs&gt;();
     ///     ComponentInput IInputComponent.Input =&gt; ComponentInput.Of(Value, committedBy: Change);
     /// }
     /// </code>
