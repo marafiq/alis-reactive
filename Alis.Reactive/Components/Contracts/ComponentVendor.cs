@@ -1,5 +1,6 @@
 using System;
 using System.Text.RegularExpressions;
+using Alis.Reactive.Components;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 
@@ -64,6 +65,7 @@ namespace Alis.Reactive
         /// <param name="subscribe">The object's method that adds an event listener, for example <c>"on"</c>.</param>
         /// <param name="unsubscribe">The object's method that removes an event listener, for example <c>"off"</c>.</param>
         /// <param name="payload">What a listener receives, and so what <c>args</c> reads.</param>
+        [TypedDslExemption("The vendor boundary: a library is described by the JavaScript names it uses for its object and its subscribe and unsubscribe methods.")]
         public static ComponentVendor Define(
             string name,
             string objectPath,

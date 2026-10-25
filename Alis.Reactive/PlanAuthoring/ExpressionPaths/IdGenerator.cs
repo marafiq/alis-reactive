@@ -59,7 +59,7 @@ namespace Alis.Reactive
         /// <param name="modelType">Model type used to derive the scope prefix.</param>
         /// <param name="propertyPath">Dot-separated property path, for example <c>"Address.City"</c>.</param>
         /// <returns>A scoped element ID like <c>Namespace_Model__Address_City</c>.</returns>
-        public static string For(Type modelType, string propertyPath)
+        internal static string For(Type modelType, string propertyPath)
         {
             var scope = TypeScope(modelType);
             return scope + "__" + ExpressionPathHelper.ToMvcElementId(propertyPath);
@@ -74,7 +74,7 @@ namespace Alis.Reactive
         /// </remarks>
         /// <param name="type">Type whose full name provides the scope.</param>
         /// <returns>An HTML-safe scope string with dots and plus signs replaced by underscores.</returns>
-        public static string TypeScope(Type type)
+        internal static string TypeScope(Type type)
         {
             return type.FullName!.Replace('.', '_').Replace('+', '_');
         }

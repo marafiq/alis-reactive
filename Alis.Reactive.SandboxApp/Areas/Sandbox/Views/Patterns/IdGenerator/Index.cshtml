@@ -109,10 +109,6 @@
         <h2 class="text-sm font-semibold mb-2">3. Generated IDs</h2>
         <native-vstack gap="Sm" id="id-inspection" class="text-xs font-mono">
             <native-hstack gap="None" justify="Between" class="bg-slate-50 rounded px-3 py-2">
-                <span class="text-text-secondary">IdGenerator prefix</span>
-                <span class="text-emerald-700" id="id-prefix">@(IdGenerator.TypeScope(typeof(IdGeneratorModel)))</span>
-            </native-hstack>
-            <native-hstack gap="None" justify="Between" class="bg-slate-50 rounded px-3 py-2">
                 <span class="text-text-secondary">m => m.Amount</span>
                 <span class="text-emerald-700">@(IdGenerator.For<IdGeneratorModel>(m => m.Amount))</span>
             </native-hstack>

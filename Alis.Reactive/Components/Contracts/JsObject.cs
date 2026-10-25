@@ -226,8 +226,9 @@ namespace Alis.Reactive
         /// An argument the method always takes, fixed by the declaration rather than by the caller, for
         /// example the kind of key a column method is given: <c>Call(column, Fixed("field"))</c>.
         /// </summary>
+        /// <typeparam name="TValue">The literal's type.</typeparam>
         /// <param name="value">The literal, written into the plan.</param>
-        protected static Arg Fixed(object value) => Arg.Fixed(value);
+        protected static Arg Fixed<TValue>(TValue value) where TValue : notnull => Arg.Fixed(value);
 
         /// <summary>
         /// Passes a value of any type the declared parameter type accepts, for a method that takes, say, items
