@@ -9,7 +9,7 @@ namespace Alis.Reactive.Components
     /// framework does not own). Every use carries a concrete reason and is greppable, so the set
     /// of sanctioned untyped escapes stays small, visible, and auditable — never a silent loophole.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public sealed class TypedDslExemptionAttribute : Attribute
     {
         /// <summary>Exempts the method, for the given reason.</summary>

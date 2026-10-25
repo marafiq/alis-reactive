@@ -24,6 +24,7 @@
        build\AlisReactiveAssets.targets, packed under this package's id name so
        NuGet auto-imports it into the consumer build. -->
   <ItemGroup>
+    <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <None Include="$(AlisAssetsDist)\css\design-system.dev.css" Pack="true" PackagePath="build\assets\css\design-system.css" />
     <None Include="$(AlisAssetsDist)\css\design-system.dev.css" Pack="true" PackagePath="buildTransitive\assets\css\design-system.css" />
     <None Include="..\build\AlisReactiveAssets.targets" Pack="true" PackagePath="build\AlisReactive.DesignSystem.targets" />

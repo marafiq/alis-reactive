@@ -258,8 +258,6 @@ What the method does not yet do. Each is a known gap, not a hidden one.
   element from their init script, so a render-time check cannot tell a forgotten id from a vendor's.
 - A declaration is not generic over the app's row type (`FusionGrid<TRow>`); row-typed members are
   generic methods with `Field` arguments.
-- Realtime streams and hubs name their messages by a string at declaration; every other member is
-  named by its C# member.
 - The validation grammar covers what the sandbox uses. Rule sets, cascade modes, dependent rules,
   custom validators, enum membership and precision checks are not built; an app that needs one
   adds it as a check.
