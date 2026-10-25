@@ -62,6 +62,13 @@ namespace Alis.Reactive
         protected Prop<TValue> Prop<TValue>(string? name = null, [CallerMemberName] string declaredBy = "") =>
             new Prop<TValue>(this, ComponentProperty<TValue>.At(JavaScriptPath(name, declaredBy)));
 
+        /// <summary>Declares a property the page writes and never reads: the object has a setter and no getter.</summary>
+        /// <typeparam name="TValue">The C# type of the value.</typeparam>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the property.</param>
+        protected WriteOnly<TValue> WriteOnly<TValue>(string? name = null, [CallerMemberName] string declaredBy = "") =>
+            new WriteOnly<TValue>(this, ComponentProperty<TValue>.At(JavaScriptPath(name, declaredBy)));
+
         /// <summary>
         /// Declares a property that holds an object with members of its own, declared as its own class:
         /// <c>public FusionScheduleEventSettings EventSettings =&gt; Object&lt;FusionScheduleEventSettings&gt;();</c>,

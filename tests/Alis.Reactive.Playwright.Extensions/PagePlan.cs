@@ -30,6 +30,7 @@ public sealed class PagePlan<TModel> where TModel : class
 
         using var doc = JsonDocument.Parse(json);
         var components = new Dictionary<string, BoundComponent>(StringComparer.OrdinalIgnoreCase);
+        var elements = new List<BoundComponent>();
         var objects = doc.RootElement.GetProperty("objects");
 
         // Every element the plan locates, keyed by the member path its generated id ends with.
@@ -41,10 +42,13 @@ public sealed class PagePlan<TModel> where TModel : class
             var id = locator.GetProperty("id").GetString()!;
             var vendor = locator.GetProperty("vendor").GetString()!;
             var bindingPath = ExtractBindingPath(id);
-            components[bindingPath] = new BoundComponent(id, bindingPath, id, vendor, vendor + ".component." + id);
+            var element = new BoundComponent(id, bindingPath, id, vendor, vendor + ".component." + id);
+            elements.Add(element);
+            components[bindingPath] = element;
         }
 
-        // The model's inputs also answer to their MVC binding name ("Address.City").
+        // The model's inputs answer to their MVC binding name ("Address.City") before any other element
+        // whose id ends the same way, such as a page element named after the member it shows.
         foreach (var entry in objects.EnumerateObject())
         {
             var locator = entry.Value;
@@ -56,8 +60,8 @@ public sealed class PagePlan<TModel> where TModel : class
             foreach (var input in locator.GetProperty("data").GetProperty("inputs").EnumerateObject())
             {
                 var bindingPath = input.Value.GetProperty("name").GetString()!;
-                if (!components.Values.Any(component => component.ElementId == input.Name)) continue;
-                var element = components.Values.First(component => component.ElementId == input.Name);
+                var element = elements.FirstOrDefault(component => component.ElementId == input.Name);
+                if (element == null) continue;
                 components[bindingPath] = element with { BindingPath = bindingPath };
             }
         }

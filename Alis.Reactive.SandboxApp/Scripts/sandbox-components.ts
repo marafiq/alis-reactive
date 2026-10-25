@@ -6,6 +6,7 @@
 import TomSelect from "tom-select";
 import "tom-select/dist/css/tom-select.css";
 import { VisitPlanner, visitPlannerHosts } from "./visit-planner";
+import { Thermostat, thermostatHosts } from "./thermostat";
 import "./house-confirm";
 
 interface MountEventDetail {
@@ -30,6 +31,9 @@ document.addEventListener("alis:mount", event => {
   for (const host of visitPlannerHosts(root)) {
     if (host.visitPlanner === undefined) new VisitPlanner(host);
   }
+  for (const host of thermostatHosts(root)) {
+    if (host.thermostat === undefined) new Thermostat(host);
+  }
 });
 
 document.addEventListener("alis:unmount", event => {
@@ -39,5 +43,8 @@ document.addEventListener("alis:unmount", event => {
   }
   for (const host of visitPlannerHosts(root)) {
     host.visitPlanner?.destroy();
+  }
+  for (const host of thermostatHosts(root)) {
+    host.thermostat?.destroy();
   }
 });

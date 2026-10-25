@@ -109,6 +109,39 @@ namespace Alis.Reactive
     }
 
     /// <summary>Reads a field of every item of a list property.</summary>
+    /// <summary>
+    /// A property the page writes and never reads: the JavaScript object has a setter and no getter, such
+    /// as a code that unlocks it. It is not a source, so a read of it does not compile.
+    /// </summary>
+    /// <typeparam name="TValue">The C# type of the value.</typeparam>
+    public sealed class WriteOnly<TValue>
+    {
+        private readonly JsObject _owner;
+        private readonly ComponentProperty<TValue> _member;
+
+        internal WriteOnly(JsObject owner, ComponentProperty<TValue> member)
+        {
+            _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+            _member = member ?? throw new ArgumentNullException(nameof(member));
+        }
+
+        /// <summary>Writes a literal.</summary>
+        /// <param name="value">The value to write.</param>
+        public void Set(TValue value) =>
+            _owner.Binding.Set(_member, value is Arg source
+                ? source.Expression
+                : ValueExpression.LiteralFor(value, _member.Shape));
+
+        /// <summary>Writes a value read when the step runs.</summary>
+        /// <typeparam name="TSource">The type of the value read, assignable to the property.</typeparam>
+        /// <param name="source">The value read when the step runs.</param>
+        public void Set<TSource>(TypedSource<TSource> source) where TSource : TValue
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            _owner.Binding.Set(_member, source.Expression);
+        }
+    }
+
     public static class ListPropertyExtensions
     {
         /// <summary>
