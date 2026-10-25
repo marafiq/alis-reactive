@@ -111,15 +111,13 @@ namespace Alis.Reactive.FluentValidator
             _validators = new HashSet<Type>(registered.SelectMany(types => types.Types));
         }
 
-        public IReadOnlyList<ClientValidationField> GetClientRules(Type validationSourceType)
+        public IReadOnlyList<ClientValidationField> GetClientRules<TValidator>() where TValidator : class
         {
-            if (validationSourceType == null) throw new ArgumentNullException(nameof(validationSourceType));
-            if (!_validators.Contains(validationSourceType))
+            if (!_validators.Contains(typeof(TValidator)))
                 throw new InvalidOperationException(
-                    $"No validator '{validationSourceType.FullName}' is registered for the page's browser rules. " +
+                    $"No validator '{typeof(TValidator).FullName}' is registered for the page's browser rules. " +
                     "Register it with services.AddReactiveFluentValidation(validation => validation.Add<TValidator>()).");
-
-            return ((ReactiveValidator)_services.GetRequiredService(validationSourceType)).ClientRules();
+            return ((ReactiveValidator)(object)_services.GetRequiredService<TValidator>()).ClientRules();
         }
     }
 }

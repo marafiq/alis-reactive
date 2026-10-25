@@ -98,7 +98,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             if (string.IsNullOrWhiteSpace(formId)) throw new ArgumentException("Form ID required.", nameof(formId));
             var firstValidation = Step.Validation == null;
-            Step.Validation = (typeof(TValidationSource), formId);
+            Step.Validation = new FormValidation(source => source.GetClientRules<TValidationSource>(), typeof(TValidationSource).Name, formId);
             if (firstValidation) _context.ValidateBefore(Step);
             return this;
         }

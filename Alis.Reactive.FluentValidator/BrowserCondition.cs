@@ -96,7 +96,8 @@ namespace Alis.Reactive.FluentValidator
                 if (!fieldOnLeft && !fieldOnRight) return null;
 
                 var member = fieldOnLeft ? expression.Left : expression.Right;
-                var value = Evaluate(fieldOnLeft ? expression.Right : expression.Left);
+                var operand = fieldOnLeft ? expression.Right : expression.Left;
+                var value = Evaluate(operand);
                 var op = fieldOnLeft ? expression.NodeType : Mirrored(expression.NodeType);
 
                 if (value == null)
@@ -106,8 +107,7 @@ namespace Alis.Reactive.FluentValidator
                     return null;
                 }
 
-                var field = ModelMember(member);
-                return ClientCondition.Compare(PathOf(field), field.Type, ComparisonOf(op), value);
+                return ClientCondition.Compare(Lambda(member), ComparisonOf(op), operand);
             }
 
             private ClientCondition? Call(MethodCallExpression call)
@@ -115,35 +115,26 @@ namespace Alis.Reactive.FluentValidator
                 if (IsStringMethod(call, nameof(string.IsNullOrEmpty)) && IsField(call.Arguments[0]))
                     return Is(call.Arguments[0], ClientValueTest.Empty);
 
-                if (TryText(call, out var textField, out var test, out var operand))
-                {
-                    var field = ModelMember(textField);
-                    return ClientCondition.Text(PathOf(field), field.Type, test, operand);
-                }
+                if (TryText(call, out var textField, out var test, out var text))
+                    return ClientCondition.Text(Lambda(textField), test, text);
 
                 if (TryMembership(call, out var member, out var values))
                     return In(member, values);
 
-                if (TryCollectionContains(call, out var collection, out var item, out var itemType))
-                {
-                    var field = ModelMember(collection);
-                    return ClientCondition.Holds(PathOf(field), field.Type, item, itemType);
-                }
+                if (TryCollectionContains(call, out var collection, out var item))
+                    return ClientCondition.Holds(Lambda(collection), item);
 
                 return null;
             }
 
-            private ClientCondition Is(Expression member, ClientValueTest test)
-            {
-                var field = ModelMember(member);
-                return ClientCondition.Is(PathOf(field), field.Type, test);
-            }
+            private ClientCondition Is(Expression member, ClientValueTest test) =>
+                ClientCondition.Is(Lambda(member), test);
 
-            private ClientCondition In(Expression member, IReadOnlyList<object?> values)
-            {
-                var field = ModelMember(member);
-                return ClientCondition.In(PathOf(field), field.Type, values);
-            }
+            private ClientCondition In(Expression member, Expression values) =>
+                ClientCondition.In(Lambda(member), values);
+
+            // The member as a path from the model: x.Score.Value reads x.Score, whose browser value is the number or nothing.
+            private LambdaExpression Lambda(Expression member) => Expression.Lambda(ModelMember(member), _model);
 
             // x.Name.Contains("a"), x.Name.StartsWith("a"), x.Name.EndsWith("a"), Regex.IsMatch(x.Name, "a").
             private bool TryText(MethodCallExpression call, out Expression field, out ClientTextTest test, out string operand)
@@ -180,15 +171,15 @@ namespace Alis.Reactive.FluentValidator
             }
 
             // values.Contains(x.Code): the field is one of a fixed set of values.
-            private bool TryMembership(MethodCallExpression call, out Expression field, out IReadOnlyList<object?> values)
+            private bool TryMembership(MethodCallExpression call, out Expression field, out Expression values)
             {
                 field = null!;
-                values = Array.Empty<object?>();
+                values = null!;
                 if (!TryContains(call, out var source, out var candidate)) return false;
                 if (!IsFixed(source) || !IsField(candidate)) return false;
 
                 field = candidate;
-                values = ((IEnumerable)Evaluate(source)!).Cast<object?>().ToArray();
+                values = source;
                 return true;
             }
 
@@ -196,18 +187,15 @@ namespace Alis.Reactive.FluentValidator
             private bool TryCollectionContains(
                 MethodCallExpression call,
                 out Expression collection,
-                out object? item,
-                out Type itemType)
+                out Expression item)
             {
                 collection = null!;
-                item = null;
-                itemType = typeof(object);
+                item = null!;
                 if (!TryContains(call, out var source, out var candidate)) return false;
                 if (!IsField(source) || !IsFixed(candidate)) return false;
 
                 collection = source;
-                item = Evaluate(candidate);
-                itemType = StripConvert(candidate).Type;
+                item = candidate;
                 return true;
             }
 
@@ -292,15 +280,6 @@ namespace Alis.Reactive.FluentValidator
 
             // An expression that reads nothing of the model: a constant, or a captured variable.
             private bool IsFixed(Expression expression) => !new ModelReads(_model).Find(expression);
-
-            // The member's path in the validator's model: its members' names, joined by dots.
-            private static string PathOf(Expression member)
-            {
-                var names = new List<string>();
-                for (var current = StripConvert(member); current is MemberExpression chain && chain.Expression != null; current = StripConvert(chain.Expression))
-                    names.Insert(0, chain.Member.Name);
-                return string.Join(".", names);
-            }
 
             private static object? Evaluate(Expression expression) =>
                 Expression.Lambda(expression).Compile().DynamicInvoke();

@@ -118,8 +118,8 @@ namespace Alis.Reactive
         /// <typeparam name="TValidator">The validator registered with <c>AddReactiveFluentValidation</c>.</typeparam>
         /// <returns>Each field the validator names, with the rules the browser can evaluate.</returns>
         public IReadOnlyList<ClientValidationField> ClientRules<TValidator>() where TValidator : class =>
-            RequireClientValidationRuleSource(_services, typeof(TValidator), "This view")
-                .GetClientRules(typeof(TValidator));
+            RequireClientValidationRuleSource(_services, typeof(TValidator).Name, "This view")
+                .GetClientRules<TValidator>();
 
         /// <summary>Registers components, resolves validation, and serializes the Reactive Plan as compact JSON.</summary>
         /// <returns>Compact Reactive Plan JSON ready for a <c>data-reactive-plan</c> script.</returns>
@@ -147,19 +147,19 @@ namespace Alis.Reactive
             if (validated?.Validation is not { } validation)
                 return;
 
-            var ruleSource = RequireClientValidationRuleSource(services, validation.Source, $"Request at '{validated.Url}'");
+            var ruleSource = RequireClientValidationRuleSource(services, validation.ValidatorName, $"Request at '{validated.Url}'");
             var registeredInputs = _registeredInputComponents.Snapshot();
             foreach (var request in _context.ValidatedRequests)
             {
                 if (!(request.Validation is { } form)) continue;
-                var fields = ruleSource.GetClientRules(form.Source);
+                var fields = form.Rules(ruleSource);
                 _context.Check(form.Form, CheckedField.Bind(fields, registeredInputs, typeof(TModel)).ToList());
             }
         }
 
         private static IClientValidationRuleSource RequireClientValidationRuleSource(
             IServiceProvider? services,
-            Type validationSource,
+            string validatorName,
             string requiredBy)
         {
             // ASP.NET Core flows the source through the per-request IServiceProvider.
@@ -176,13 +176,13 @@ namespace Alis.Reactive
 
 #if NET48
             throw new InvalidOperationException(
-                $"{requiredBy} specifies validation source '{validationSource.Name}', " +
+                $"{requiredBy} specifies validation source '{validatorName}', " +
                 "but no IClientValidationRuleSource could be resolved. " +
                 "Register the validators with AddReactiveFluentValidation(...) and bridge it to " +
                 "MVC5 by calling DependencyResolver.SetResolver(...) in Application_Start.");
 #else
             throw new InvalidOperationException(
-                $"{requiredBy} specifies validation source '{validationSource.Name}', " +
+                $"{requiredBy} specifies validation source '{validatorName}', " +
                 "but no IClientValidationRuleSource is registered in DI. " +
                 "Register the validators with services.AddReactiveFluentValidation(...), " +
                 "or register your own IClientValidationRuleSource.");

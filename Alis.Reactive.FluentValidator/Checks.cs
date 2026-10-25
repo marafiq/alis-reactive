@@ -243,9 +243,9 @@ namespace Alis.Reactive.FluentValidator
     internal sealed class CompareCheck<T, TValue> : Check<T, TValue>, IBrowserCheck
     {
         private readonly ClientComparison _comparison;
-        private readonly Operand<T> _operand;
+        private readonly Operand<T, TValue> _operand;
 
-        internal CompareCheck(ClientComparison comparison, Operand<T> operand)
+        internal CompareCheck(ClientComparison comparison, Operand<T, TValue> operand)
         {
             _comparison = comparison;
             _operand = operand;
@@ -290,12 +290,15 @@ namespace Alis.Reactive.FluentValidator
         public IEnumerable<ClientRule> ForBrowser(string message) => _operand.ForBrowser(_comparison, message);
     }
 
-    /// <summary>What a comparison compares with: a literal, or another member of the model.</summary>
-    internal abstract class Operand<T>
+    /// <summary>
+    /// What a comparison compares the value with: a fixed value of the member's type, or another member
+    /// of the model.
+    /// </summary>
+    internal abstract class Operand<T, TValue>
     {
-        internal static Operand<T> Literal(object? value) => new LiteralOperand(value);
+        internal static Operand<T, TValue> Literal(TValue value) => new LiteralOperand(value);
 
-        internal static Operand<T> Member(ModelMember<T> member) => new MemberOperand(member);
+        internal static Operand<T, TValue> Member(ModelMember<T> member) => new MemberOperand(member);
 
         internal abstract object? ValueIn(T instance);
 
@@ -305,11 +308,11 @@ namespace Alis.Reactive.FluentValidator
 
         internal abstract IEnumerable<ClientRule> ForBrowser(ClientComparison comparison, string message);
 
-        private sealed class LiteralOperand : Operand<T>
+        private sealed class LiteralOperand : Operand<T, TValue>
         {
-            private readonly object? _value;
+            private readonly TValue _value;
 
-            internal LiteralOperand(object? value)
+            internal LiteralOperand(TValue value)
             {
                 _value = value;
             }
@@ -325,7 +328,7 @@ namespace Alis.Reactive.FluentValidator
                 _value == null ? Array.Empty<ClientRule>() : new[] { ClientRule.Compare(comparison, _value, message) };
         }
 
-        private sealed class MemberOperand : Operand<T>
+        private sealed class MemberOperand : Operand<T, TValue>
         {
             private readonly ModelMember<T> _member;
 
@@ -344,19 +347,21 @@ namespace Alis.Reactive.FluentValidator
             internal override IEnumerable<ClientRule> ForBrowser(ClientComparison comparison, string message) =>
                 _member.Path == null
                     ? Array.Empty<ClientRule>()
-                    : new[] { ClientRule.CompareWith(comparison, _member.Path, _member.Type, message) };
+                    : new[] { ClientRule.CompareWith(comparison, _member.Expression, message) };
         }
     }
 
     /// <summary>A value within two bounds, both included or both excluded. A null value passes.</summary>
     internal sealed class BetweenCheck<T, TValue> : Check<T, TValue>, IBrowserCheck
     {
-        private readonly object _from;
-        private readonly object _to;
+        private readonly TValue _from;
+        private readonly TValue _to;
         private readonly bool _inclusive;
 
-        internal BetweenCheck(object from, object to, bool inclusive)
+        internal BetweenCheck(TValue from, TValue to, bool inclusive)
         {
+            if (from == null) throw new ArgumentNullException(nameof(from), "A range needs both bounds.");
+            if (to == null) throw new ArgumentNullException(nameof(to), "A range needs both bounds.");
             if (Comparer.Default.Compare(to, from) < 0)
                 throw new ArgumentOutOfRangeException(nameof(to), "The upper bound is below the lower bound.");
             _from = from;

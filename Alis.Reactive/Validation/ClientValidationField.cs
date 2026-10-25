@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Validation
@@ -75,9 +76,9 @@ namespace Alis.Reactive.Validation
     /// <example>
     /// <code>
     /// var rules = new ClientRuleSet();
-    /// rules.Add("ResidentName", typeof(string), ClientRule.NotEmpty("'Resident Name' must not be empty."));
-    /// rules.Add("ServiceNumber", typeof(string), ClientRule.NotEmpty("'Service Number' must not be empty.")
-    ///     .When(ClientCondition.Is("IsVeteran", typeof(bool), ClientValueTest.Truthy)));
+    /// rules.Add((Admission x) =&gt; x.ResidentName, ClientRule.NotEmpty("'Resident Name' must not be empty."));
+    /// rules.Add((Admission x) =&gt; x.ServiceNumber, ClientRule.NotEmpty("'Service Number' must not be empty.")
+    ///     .When(ClientCondition.Is((Admission x) =&gt; x.IsVeteran, ClientValueTest.Truthy)));
     /// return rules.Fields;
     /// </code>
     /// </example>
@@ -87,51 +88,49 @@ namespace Alis.Reactive.Validation
         private readonly List<Entry> _order = new List<Entry>();
 
         /// <summary>Adds a rule on a member.</summary>
-        /// <param name="field">The member's path in the validator's model.</param>
-        /// <param name="valueType">The member's type.</param>
+        /// <param name="member">The member, as a path from the validator's model: <c>x =&gt; x.Address.City</c>.</param>
         /// <param name="rule">The rule, under the condition it is declared under.</param>
-        public void Add(string field, Type valueType, ClientRule rule)
+        public void Add(LambdaExpression member, ClientRule rule)
         {
             if (rule == null) throw new ArgumentNullException(nameof(rule));
-            var reference = FieldReference.Of(field, valueType);
+            var reference = FieldReference.Of(member);
             if (!rule.TryFor(reference.Shape, out var resolved)) return;
-
             Ensure(resolved.Condition.Fields);
             Ensure(reference);
             AddRule(reference, resolved);
         }
 
         /// <summary>Adds the rules of each item of a collection member: a validator applied to every item.</summary>
-        /// <param name="collection">The collection member's path.</param>
-        /// <param name="collectionType">The collection member's type.</param>
+        /// <param name="collection">The collection member, as a path from the validator's model.</param>
         /// <param name="itemFields">The item's members and rules, by their paths in the item.</param>
         /// <param name="when">The condition the collection's rule is declared under.</param>
-        public void Add(string collection, Type collectionType, IEnumerable<ClientValidationField> itemFields, ClientCondition when)
+        public void AddItems(LambdaExpression collection, IEnumerable<ClientValidationField> itemFields, ClientCondition when)
         {
             if (itemFields == null) throw new ArgumentNullException(nameof(itemFields));
             if (when == null) throw new ArgumentNullException(nameof(when));
-
             Ensure(when.Fields);
-            var entry = Ensure(FieldReference.Of(collection, collectionType));
+            var entry = Ensure(FieldReference.Of(collection));
             foreach (var itemField in itemFields)
                 entry.ItemFields.Add(itemField.ScopedBy(when));
         }
 
-        /// <summary>
-        /// Adds a child validator's members under the member that holds them, or in place for a validator
-        /// included whole.
-        /// </summary>
+        /// <summary>Adds a validator's members in place: a validator included whole.</summary>
+        /// <param name="fields">The included validator's members and rules.</param>
+        /// <param name="when">The condition the inclusion is declared under.</param>
+        public void Add(IEnumerable<ClientValidationField> fields, ClientCondition when) => AddUnder("", fields, when);
+
+        /// <summary>Adds a child validator's members under the member that holds them.</summary>
+        /// <param name="owner">The member that holds them, as a path from the validator's model.</param>
         /// <param name="fields">The child validator's members and rules.</param>
-        /// <param name="owner">The member that holds them; empty for a validator included whole.</param>
         /// <param name="when">The condition the child's rule is declared under.</param>
-        public void Add(IEnumerable<ClientValidationField> fields, string owner, ClientCondition when)
+        public void Add(LambdaExpression owner, IEnumerable<ClientValidationField> fields, ClientCondition when) =>
+            AddUnder(FieldReference.Of(owner).Path, fields, when);
+
+        private void AddUnder(string prefix, IEnumerable<ClientValidationField> fields, ClientCondition when)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
-            if (owner == null) throw new ArgumentNullException(nameof(owner));
             if (when == null) throw new ArgumentNullException(nameof(when));
-
             Ensure(when.Fields);
-            var prefix = owner.Length == 0 ? owner : FieldReference.NamedPath(owner, nameof(owner));
             foreach (var field in fields)
             {
                 var target = field.PrefixedBy(prefix, when);

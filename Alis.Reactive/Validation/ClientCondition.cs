@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Validation
@@ -67,12 +69,12 @@ namespace Alis.Reactive.Validation
 
     /// <summary>
     /// A condition a browser rule applies under: a test of the model's members against values the
-    /// condition fixes, joined by all-of, any-of and not. A member is named by its path in the validator's
-    /// model (<c>"Address.City"</c>) and typed by its C# type.
+    /// condition fixes, joined by all-of, any-of and not. A member is named as a path from the model,
+    /// <c>x =&gt; x.Address.City</c>, and typed by its C# type.
     /// </summary>
     /// <remarks>
     /// A validator builds one from a rule's own condition: <c>ReactiveValidator</c>'s
-    /// <c>When(x =&gt; x.IsVeteran)</c> is <c>ClientCondition.Is("IsVeteran", typeof(bool), ClientValueTest.Truthy)</c>.
+    /// <c>When(x =&gt; x.IsVeteran)</c> is <c>ClientCondition.Is(x =&gt; x.IsVeteran, ClientValueTest.Truthy)</c>.
     /// </remarks>
     public abstract class ClientCondition
     {
@@ -82,59 +84,58 @@ namespace Alis.Reactive.Validation
         public static ClientCondition Always { get; } = new AlwaysCondition();
 
         /// <summary>Tests the member's value alone.</summary>
-        /// <param name="field">The member's path.</param>
-        /// <param name="fieldType">The member's type.</param>
+        /// <param name="member">The member, as a path from the model: <c>x =&gt; x.IsVeteran</c>.</param>
         /// <param name="test">The test.</param>
-        public static ClientCondition Is(string field, Type fieldType, ClientValueTest test) =>
-            new FieldTest(FieldReference.Of(field, fieldType), UnaryOperator(test), TestValue.None);
+        public static ClientCondition Is(LambdaExpression member, ClientValueTest test) =>
+            new FieldTest(FieldReference.Of(member), UnaryOperator(test), TestValue.None);
 
         /// <summary>Compares the member with a value.</summary>
-        /// <param name="field">The member's path.</param>
-        /// <param name="fieldType">The member's type.</param>
+        /// <param name="member">The member, as a path from the model.</param>
         /// <param name="comparison">The comparison.</param>
-        /// <param name="value">The value, read as the member's type: an enum compared through its number is its member.</param>
-        public static ClientCondition Compare(string field, Type fieldType, ClientComparison comparison, object value)
+        /// <param name="value">The value, a constant or a captured variable, read as the member's type: an enum compared through its number is its member.</param>
+        public static ClientCondition Compare(LambdaExpression member, ClientComparison comparison, Expression value)
         {
-            if (value == null) throw new ArgumentNullException(nameof(value), "Test a missing value with ClientValueTest.Null.");
-            return new FieldTest(FieldReference.Of(field, fieldType), ComparisonOperator(comparison), TestValue.Literal(LiteralOf(fieldType, value)));
+            var field = FieldReference.Of(member);
+            var fixedValue = ConditionValue.Evaluate(value)
+                ?? throw new ArgumentNullException(nameof(value), "Test a missing value with ClientValueTest.Null.");
+            return new FieldTest(field, ComparisonOperator(comparison), TestValue.Literal(LiteralOf(field.Type, fixedValue)));
         }
 
         /// <summary>The member is one of the values.</summary>
-        /// <param name="field">The member's path.</param>
-        /// <param name="fieldType">The member's type.</param>
-        /// <param name="values">The values, each read as the member's type.</param>
-        public static ClientCondition In(string field, Type fieldType, IEnumerable<object?> values)
+        /// <param name="member">The member, as a path from the model.</param>
+        /// <param name="values">The values, a constant or captured collection, each read as the member's type.</param>
+        public static ClientCondition In(LambdaExpression member, Expression values)
         {
-            if (values == null) throw new ArgumentNullException(nameof(values));
+            var field = FieldReference.Of(member);
+            var fixedValues = ConditionValue.Evaluate(values) as IEnumerable
+                ?? throw new ArgumentException("The values must be a collection.", nameof(values));
             return new FieldTest(
-                FieldReference.Of(field, fieldType),
+                field,
                 CompareOperator.In,
-                TestValue.List(values.Select(value => LiteralOf(fieldType, value)).ToArray()));
+                TestValue.List(fixedValues.Cast<object?>().Select(value => LiteralOf(field.Type, value)).ToArray()));
         }
 
         /// <summary>Tests a text member against fixed text.</summary>
-        /// <param name="field">The member's path.</param>
-        /// <param name="fieldType">The member's type.</param>
+        /// <param name="member">The text member, as a path from the model.</param>
         /// <param name="test">The test.</param>
         /// <param name="text">The text, or the pattern for <see cref="ClientTextTest.Matches"/>.</param>
-        public static ClientCondition Text(string field, Type fieldType, ClientTextTest test, string text)
+        public static ClientCondition Text(LambdaExpression member, ClientTextTest test, string text)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
-            return new FieldTest(FieldReference.Of(field, fieldType), TextOperator(test), TestValue.Text(text));
+            return new FieldTest(FieldReference.Of(member), TextOperator(test), TestValue.Text(text));
         }
 
         /// <summary>The collection member holds the item.</summary>
-        /// <param name="collection">The collection member's path.</param>
-        /// <param name="collectionType">The collection member's type.</param>
-        /// <param name="item">The item, read as <paramref name="itemType"/>.</param>
-        /// <param name="itemType">The item's type.</param>
-        public static ClientCondition Holds(string collection, Type collectionType, object? item, Type itemType)
+        /// <param name="collection">The collection member, as a path from the model.</param>
+        /// <param name="item">The item, a constant or a captured variable, read as its own type.</param>
+        public static ClientCondition Holds(LambdaExpression collection, Expression item)
         {
-            if (itemType == null) throw new ArgumentNullException(nameof(itemType));
+            if (item == null) throw new ArgumentNullException(nameof(item));
+            var itemType = ConditionValue.TypeOf(item);
             return new FieldTest(
-                FieldReference.Of(collection, collectionType),
+                FieldReference.Of(collection),
                 CompareOperator.ArrayContains,
-                TestValue.Item(LiteralOf(itemType, item), Shape.FromClrType(itemType)));
+                TestValue.Item(LiteralOf(itemType, ConditionValue.Evaluate(item)), Shape.FromClrType(itemType)));
         }
 
         /// <summary>Every term holds.</summary>
@@ -395,35 +396,64 @@ namespace Alis.Reactive.Validation
     /// A member of the validator's model, by its path (<c>"Address.City"</c>, <c>"Lines[0].Qty"</c>) and its
     /// value's shape.
     /// </summary>
+    /// <summary>A member of the validator's model: its path and the shape of its value.</summary>
     internal sealed class FieldReference
     {
-        private FieldReference(string path, Shape shape)
+        private FieldReference(string path, Type type, Shape shape)
         {
             Path = path;
+            Type = type;
             Shape = shape;
         }
 
         internal string Path { get; }
 
+        internal Type Type { get; }
+
         internal Shape Shape { get; }
 
-        internal static FieldReference Of(string path, Type type)
+        // x => x.Address.City is "Address.City", typed string. Anything but a chain of members from the
+        // model's parameter names no member.
+        internal static FieldReference Of(LambdaExpression member)
         {
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            return new FieldReference(NamedPath(path, nameof(path)), Shape.FromClrType(type));
+            if (member == null) throw new ArgumentNullException(nameof(member));
+            var body = ConditionValue.StripConvert(member.Body);
+            var names = new List<string>();
+            var current = body;
+            while (current is MemberExpression chain && chain.Expression != null)
+            {
+                names.Insert(0, chain.Member.Name);
+                current = ConditionValue.StripConvert(chain.Expression);
+            }
+
+            var isMemberOfTheModel = member.Parameters.Count == 1 && current == member.Parameters[0] && names.Count > 0;
+            if (!isMemberOfTheModel)
+                throw new ArgumentException(
+                    $"A browser rule names a member of the model, like x => x.Address.City; {member} does not.", nameof(member));
+            return new FieldReference(string.Join(".", names), body.Type, Shape.FromClrType(body.Type));
         }
 
-        /// <summary>A path that names a member at every step: no empty path, no empty step.</summary>
-        internal static string NamedPath(string path, string parameter)
-        {
-            if (path == null) throw new ArgumentNullException(parameter);
-            if (path.Split('.').Any(string.IsNullOrWhiteSpace))
-                throw new ArgumentException($"Validation field path '{path}' must name a member at every step.", parameter);
-            return path;
-        }
-
-        /// <summary>This member as the model that holds it under <paramref name="prefix"/> names it; an empty prefix is that model itself.</summary>
         internal FieldReference PrefixedBy(string prefix) =>
-            prefix.Length == 0 ? this : new FieldReference(prefix + "." + Path, Shape);
+            prefix.Length == 0 ? this : new FieldReference(prefix + "." + Path, Type, Shape);
+    }
+
+    // A value a condition fixes: a constant, or a variable the lambda captured, evaluated once at render.
+    internal static class ConditionValue
+    {
+        internal static object? Evaluate(Expression value)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            return Expression.Lambda<Func<object?>>(Expression.Convert(value, typeof(object))).Compile()();
+        }
+
+        internal static Type TypeOf(Expression value) => StripConvert(value).Type;
+
+        internal static Expression StripConvert(Expression expression)
+        {
+            while (expression is UnaryExpression unary
+                   && (unary.NodeType == ExpressionType.Convert || unary.NodeType == ExpressionType.ConvertChecked))
+                expression = unary.Operand;
+            return expression;
+        }
     }
 }

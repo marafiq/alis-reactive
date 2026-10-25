@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace Alis.Reactive.Validation
@@ -11,8 +10,8 @@ namespace Alis.Reactive.Validation
     public interface IClientValidationRuleSource
     {
         /// <summary>The browser rules the validator declares.</summary>
-        /// <param name="validationSourceType">The validator's type.</param>
+        /// <typeparam name="TValidator">The validator's type.</typeparam>
         /// <returns>Each member the validator names, with its rules.</returns>
-        IReadOnlyList<ClientValidationField> GetClientRules(Type validationSourceType);
+        IReadOnlyList<ClientValidationField> GetClientRules<TValidator>() where TValidator : class;
     }
 }

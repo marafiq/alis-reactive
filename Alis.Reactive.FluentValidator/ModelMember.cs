@@ -19,8 +19,9 @@ namespace Alis.Reactive.FluentValidator
 
         private readonly Func<T, object?> _read;
 
-        private ModelMember(string? path, string name, Type type, Func<T, object?> read, string written)
+        private ModelMember(LambdaExpression expression, string? path, string name, Type type, Func<T, object?> read, string written)
         {
+            Expression = expression;
             Path = path;
             Name = name;
             Type = type;
@@ -29,6 +30,9 @@ namespace Alis.Reactive.FluentValidator
         }
 
         /// <summary>The member's path from the model, as model binding names it; null for a computed value.</summary>
+        /// <summary>The member as the validator wrote it: the path a browser rule names it by.</summary>
+        internal LambdaExpression Expression { get; }
+
         internal string? Path { get; }
 
         /// <summary>The member's own name: the last step of its path.</summary>
@@ -63,7 +67,7 @@ namespace Alis.Reactive.FluentValidator
             var path = PathOf(body, expression.Parameters[0]);
             var name = body is MemberExpression member ? member.Member.Name : "";
             var read = path == null ? Reader(expression) : PathReaders.GetOrAdd(path, _ => Reader(expression));
-            return new ModelMember<T>(path, name, body.Type, read, expression.ToString());
+            return new ModelMember<T>(expression, path, name, body.Type, read, expression.ToString());
         }
 
         private static Func<T, object?> Reader<TValue>(Expression<Func<T, TValue>> expression)

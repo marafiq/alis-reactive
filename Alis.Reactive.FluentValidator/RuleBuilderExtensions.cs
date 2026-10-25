@@ -85,141 +85,141 @@ namespace Alis.Reactive.FluentValidator
 
         /// <summary>The value equals <paramref name="value"/>.</summary>
         public static IRuleBuilderOptions<T, TProperty> Equal<T, TProperty>(this IRuleBuilder<T, TProperty> rule, TProperty value) =>
-            Compared(rule, ClientComparison.Equal, Operand<T>.Literal(value));
+            ComparedWithValue(rule, ClientComparison.Equal, value);
 
         /// <summary>The value equals another member's: <c>RuleFor(x =&gt; x.ConfirmEmail).Equal(x =&gt; x.Email)</c>.</summary>
         public static IRuleBuilderOptions<T, TProperty> Equal<T, TProperty>(this IRuleBuilder<T, TProperty> rule, Expression<Func<T, TProperty>> member) =>
-            Compared(rule, ClientComparison.Equal, Peer(member));
+            ComparedWithMember(rule, ClientComparison.Equal, member);
 
         /// <summary>The value differs from <paramref name="value"/>.</summary>
         public static IRuleBuilderOptions<T, TProperty> NotEqual<T, TProperty>(this IRuleBuilder<T, TProperty> rule, TProperty value) =>
-            Compared(rule, ClientComparison.NotEqual, Operand<T>.Literal(value));
+            ComparedWithValue(rule, ClientComparison.NotEqual, value);
 
         /// <summary>The value differs from another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty> NotEqual<T, TProperty>(this IRuleBuilder<T, TProperty> rule, Expression<Func<T, TProperty>> member) =>
-            Compared(rule, ClientComparison.NotEqual, Peer(member));
+            ComparedWithMember(rule, ClientComparison.NotEqual, member);
 
         // ---- Order: a missing value passes (pair with NotNull to require one); a missing other member fails.
 
         /// <summary>The value is greater than <paramref name="value"/>.</summary>
         public static IRuleBuilderOptions<T, TProperty> GreaterThan<T, TProperty>(this IRuleBuilder<T, TProperty> rule, TProperty value)
             where TProperty : IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.GreaterThan, Literal<T>(value));
+            ComparedWithValue(rule, ClientComparison.GreaterThan, Required(value));
 
         /// <summary>The value is greater than <paramref name="value"/>.</summary>
         public static IRuleBuilderOptions<T, TProperty?> GreaterThan<T, TProperty>(this IRuleBuilder<T, TProperty?> rule, TProperty value)
             where TProperty : struct, IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.GreaterThan, Literal<T>(value));
+            ComparedWithValue(rule, ClientComparison.GreaterThan, Required(value));
 
         /// <summary>The value is greater than another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty> GreaterThan<T, TProperty>(this IRuleBuilder<T, TProperty> rule, Expression<Func<T, TProperty>> member)
             where TProperty : IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.GreaterThan, Peer(member));
+            ComparedWithMember(rule, ClientComparison.GreaterThan, member);
 
         /// <summary>The value is greater than another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty?> GreaterThan<T, TProperty>(this IRuleBuilder<T, TProperty?> rule, Expression<Func<T, TProperty>> member)
             where TProperty : struct, IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.GreaterThan, Peer(member));
+            ComparedWithMember(rule, ClientComparison.GreaterThan, member);
 
         /// <summary>The value is greater than another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty?> GreaterThan<T, TProperty>(this IRuleBuilder<T, TProperty?> rule, Expression<Func<T, TProperty?>> member)
             where TProperty : struct, IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.GreaterThan, Peer(member));
+            ComparedWithMember(rule, ClientComparison.GreaterThan, member);
 
         /// <summary>The value is greater than another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty> GreaterThan<T, TProperty>(this IRuleBuilder<T, TProperty> rule, Expression<Func<T, TProperty?>> member)
             where TProperty : struct, IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.GreaterThan, Peer(member));
+            ComparedWithMember(rule, ClientComparison.GreaterThan, member);
 
         /// <summary>The value is at least <paramref name="value"/>.</summary>
         public static IRuleBuilderOptions<T, TProperty> GreaterThanOrEqualTo<T, TProperty>(this IRuleBuilder<T, TProperty> rule, TProperty value)
             where TProperty : IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.GreaterThanOrEqual, Literal<T>(value));
+            ComparedWithValue(rule, ClientComparison.GreaterThanOrEqual, Required(value));
 
         /// <summary>The value is at least <paramref name="value"/>.</summary>
         public static IRuleBuilderOptions<T, TProperty?> GreaterThanOrEqualTo<T, TProperty>(this IRuleBuilder<T, TProperty?> rule, TProperty value)
             where TProperty : struct, IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.GreaterThanOrEqual, Literal<T>(value));
+            ComparedWithValue(rule, ClientComparison.GreaterThanOrEqual, Required(value));
 
         /// <summary>The value is at least another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty> GreaterThanOrEqualTo<T, TProperty>(this IRuleBuilder<T, TProperty> rule, Expression<Func<T, TProperty>> member)
             where TProperty : IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.GreaterThanOrEqual, Peer(member));
+            ComparedWithMember(rule, ClientComparison.GreaterThanOrEqual, member);
 
         /// <summary>The value is at least another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty?> GreaterThanOrEqualTo<T, TProperty>(this IRuleBuilder<T, TProperty?> rule, Expression<Func<T, TProperty>> member)
             where TProperty : struct, IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.GreaterThanOrEqual, Peer(member));
+            ComparedWithMember(rule, ClientComparison.GreaterThanOrEqual, member);
 
         /// <summary>The value is at least another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty?> GreaterThanOrEqualTo<T, TProperty>(this IRuleBuilder<T, TProperty?> rule, Expression<Func<T, TProperty?>> member)
             where TProperty : struct, IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.GreaterThanOrEqual, Peer(member));
+            ComparedWithMember(rule, ClientComparison.GreaterThanOrEqual, member);
 
         /// <summary>The value is at least another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty> GreaterThanOrEqualTo<T, TProperty>(this IRuleBuilder<T, TProperty> rule, Expression<Func<T, TProperty?>> member)
             where TProperty : struct, IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.GreaterThanOrEqual, Peer(member));
+            ComparedWithMember(rule, ClientComparison.GreaterThanOrEqual, member);
 
         /// <summary>The value is less than <paramref name="value"/>.</summary>
         public static IRuleBuilderOptions<T, TProperty> LessThan<T, TProperty>(this IRuleBuilder<T, TProperty> rule, TProperty value)
             where TProperty : IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.LessThan, Literal<T>(value));
+            ComparedWithValue(rule, ClientComparison.LessThan, Required(value));
 
         /// <summary>The value is less than <paramref name="value"/>.</summary>
         public static IRuleBuilderOptions<T, TProperty?> LessThan<T, TProperty>(this IRuleBuilder<T, TProperty?> rule, TProperty value)
             where TProperty : struct, IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.LessThan, Literal<T>(value));
+            ComparedWithValue(rule, ClientComparison.LessThan, Required(value));
 
         /// <summary>The value is less than another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty> LessThan<T, TProperty>(this IRuleBuilder<T, TProperty> rule, Expression<Func<T, TProperty>> member)
             where TProperty : IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.LessThan, Peer(member));
+            ComparedWithMember(rule, ClientComparison.LessThan, member);
 
         /// <summary>The value is less than another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty?> LessThan<T, TProperty>(this IRuleBuilder<T, TProperty?> rule, Expression<Func<T, TProperty>> member)
             where TProperty : struct, IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.LessThan, Peer(member));
+            ComparedWithMember(rule, ClientComparison.LessThan, member);
 
         /// <summary>The value is less than another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty?> LessThan<T, TProperty>(this IRuleBuilder<T, TProperty?> rule, Expression<Func<T, TProperty?>> member)
             where TProperty : struct, IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.LessThan, Peer(member));
+            ComparedWithMember(rule, ClientComparison.LessThan, member);
 
         /// <summary>The value is less than another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty> LessThan<T, TProperty>(this IRuleBuilder<T, TProperty> rule, Expression<Func<T, TProperty?>> member)
             where TProperty : struct, IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.LessThan, Peer(member));
+            ComparedWithMember(rule, ClientComparison.LessThan, member);
 
         /// <summary>The value is at most <paramref name="value"/>.</summary>
         public static IRuleBuilderOptions<T, TProperty> LessThanOrEqualTo<T, TProperty>(this IRuleBuilder<T, TProperty> rule, TProperty value)
             where TProperty : IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.LessThanOrEqual, Literal<T>(value));
+            ComparedWithValue(rule, ClientComparison.LessThanOrEqual, Required(value));
 
         /// <summary>The value is at most <paramref name="value"/>.</summary>
         public static IRuleBuilderOptions<T, TProperty?> LessThanOrEqualTo<T, TProperty>(this IRuleBuilder<T, TProperty?> rule, TProperty value)
             where TProperty : struct, IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.LessThanOrEqual, Literal<T>(value));
+            ComparedWithValue(rule, ClientComparison.LessThanOrEqual, Required(value));
 
         /// <summary>The value is at most another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty> LessThanOrEqualTo<T, TProperty>(this IRuleBuilder<T, TProperty> rule, Expression<Func<T, TProperty>> member)
             where TProperty : IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.LessThanOrEqual, Peer(member));
+            ComparedWithMember(rule, ClientComparison.LessThanOrEqual, member);
 
         /// <summary>The value is at most another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty?> LessThanOrEqualTo<T, TProperty>(this IRuleBuilder<T, TProperty?> rule, Expression<Func<T, TProperty>> member)
             where TProperty : struct, IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.LessThanOrEqual, Peer(member));
+            ComparedWithMember(rule, ClientComparison.LessThanOrEqual, member);
 
         /// <summary>The value is at most another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty?> LessThanOrEqualTo<T, TProperty>(this IRuleBuilder<T, TProperty?> rule, Expression<Func<T, TProperty?>> member)
             where TProperty : struct, IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.LessThanOrEqual, Peer(member));
+            ComparedWithMember(rule, ClientComparison.LessThanOrEqual, member);
 
         /// <summary>The value is at most another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty> LessThanOrEqualTo<T, TProperty>(this IRuleBuilder<T, TProperty> rule, Expression<Func<T, TProperty?>> member)
             where TProperty : struct, IComparable<TProperty>, IComparable =>
-            Compared(rule, ClientComparison.LessThanOrEqual, Peer(member));
+            ComparedWithMember(rule, ClientComparison.LessThanOrEqual, member);
 
         /// <summary>The value is within <paramref name="from"/> and <paramref name="to"/>, both included. A missing value passes.</summary>
         public static IRuleBuilderOptions<T, TProperty> InclusiveBetween<T, TProperty>(this IRuleBuilder<T, TProperty> rule, TProperty from, TProperty to)
@@ -283,20 +283,20 @@ namespace Alis.Reactive.FluentValidator
             return RuleTarget.Of(rule).Add(check);
         }
 
-        private static IRuleBuilderOptions<T, TValue> Compared<T, TValue>(IRuleBuilder<T, TValue> rule, ClientComparison comparison, Operand<T> operand) =>
-            Add(rule, new CompareCheck<T, TValue>(comparison, operand));
+        private static IRuleBuilderOptions<T, TValue> ComparedWithValue<T, TValue>(IRuleBuilder<T, TValue> rule, ClientComparison comparison, TValue value) =>
+            Add(rule, new CompareCheck<T, TValue>(comparison, Operand<T, TValue>.Literal(value)));
 
-        // An order needs something to compare with.
-        private static Operand<T> Literal<T>(object? value) =>
-            Operand<T>.Literal(value ?? throw new ArgumentNullException(nameof(value), "Compare with a value, not null; NotNull or Empty test for null."));
-
-        private static Operand<T> Peer<T, TPeer>(Expression<Func<T, TPeer>> member)
+        private static IRuleBuilderOptions<T, TValue> ComparedWithMember<T, TValue, TPeer>(IRuleBuilder<T, TValue> rule, ClientComparison comparison, Expression<Func<T, TPeer>> member)
         {
             if (member == null) throw new ArgumentNullException(nameof(member));
-            return Operand<T>.Member(ModelMember<T>.Of(member));
+            return Add(rule, new CompareCheck<T, TValue>(comparison, Operand<T, TValue>.Member(ModelMember<T>.Of(member))));
         }
 
-        private static object Bound<TProperty>(TProperty bound, string name) =>
+        // An order needs something to compare with.
+        private static TValue Required<TValue>(TValue value) =>
+            value ?? throw new ArgumentNullException(nameof(value), "Compare with a value, not null; NotNull or Empty test for null.");
+
+        private static TProperty Bound<TProperty>(TProperty bound, string name) =>
             bound ?? throw new ArgumentNullException(name, "A range needs both bounds.");
     }
 }

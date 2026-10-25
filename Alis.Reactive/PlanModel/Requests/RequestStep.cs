@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Alis.Reactive.Builders.Requests;
 using Alis.Reactive.Grammar;
+using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.PlanModel
 {
@@ -26,7 +27,7 @@ namespace Alis.Reactive.PlanModel
 
         internal ResponseRoutes Routes { get; set; } = new ResponseRoutes();
 
-        internal (Type Source, string Form)? Validation { get; set; }
+        internal FormValidation? Validation { get; set; }
 
         internal string Url => _url;
 
@@ -243,5 +244,26 @@ namespace Alis.Reactive.PlanModel
             var otherwise = catchAll == null ? G.NoStatements : catchAll.Write(routeScope);
             return arms.Count == 0 ? otherwise : new[] { G.If(arms, otherwise) };
         }
+    }
+
+    // The form a request validates before it is sent, and the browser rules it reads from the validator the
+    // request names.
+    internal sealed class FormValidation
+    {
+        internal FormValidation(
+            Func<IClientValidationRuleSource, IReadOnlyList<ClientValidationField>> rules,
+            string validatorName,
+            string form)
+        {
+            Rules = rules ?? throw new ArgumentNullException(nameof(rules));
+            ValidatorName = validatorName ?? throw new ArgumentNullException(nameof(validatorName));
+            Form = form ?? throw new ArgumentNullException(nameof(form));
+        }
+
+        internal Func<IClientValidationRuleSource, IReadOnlyList<ClientValidationField>> Rules { get; }
+
+        internal string ValidatorName { get; }
+
+        internal string Form { get; }
     }
 }

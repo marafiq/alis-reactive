@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Alis.Reactive.Components;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.Fusion.Components
@@ -66,6 +67,7 @@ namespace Alis.Reactive.Fusion.Components
         /// </remarks>
         /// <typeparam name="TField">The type of the column's member.</typeparam>
         /// <param name="field">The column's member, for example <c>r =&gt; r.OpenTasks</c>.</param>
+        [TypedDslExemption("Syncfusion's column ValidationRules take a dictionary of its own rule values; the rules themselves are read as typed ClientRule members.")]
         public IReadOnlyDictionary<string, object>? Field<TField>(Expression<Func<TRow, TField>> field)
         {
             if (field == null) throw new ArgumentNullException(nameof(field));
@@ -118,45 +120,37 @@ namespace Alis.Reactive.Fusion.Components
 
         private static void Add(Dictionary<string, object> rules, ClientRule rule)
         {
-            var key = rule.Name;
-            switch (key)
+            switch (rule.Kind)
             {
-                case "required":
-                    rules[key] = new object[] { true, rule.Message };
+                case ClientRuleKind.Required:
+                    rules["required"] = new object[] { true, rule.Message };
                     break;
-
-                case "minLength":
-                case "maxLength":
-                    if (rule.LiteralOperand is int length)
-                        rules[key] = new object[] { length, rule.Message };
+                case ClientRuleKind.MinLength:
+                    if (rule.Length is int min) rules["minLength"] = new object[] { min, rule.Message };
                     break;
-
+                case ClientRuleKind.MaxLength:
+                    if (rule.Length is int max) rules["maxLength"] = new object[] { max, rule.Message };
+                    break;
                 // EJ2 tests one pattern per column, with no flags; a second pattern is the server's.
-                case "regex":
-                case "email":
-                case "url":
+                case ClientRuleKind.Pattern:
+                case ClientRuleKind.Email:
+                case ClientRuleKind.Url:
                     if (rule.TextPattern is string pattern && !rules.ContainsKey("regex"))
                         rules["regex"] = new object[] { pattern, rule.Message };
                     break;
-
-                case "min":
-                case "max":
-                    if (IsNumeric(rule.LiteralOperand))
-                        rules[key] = new object[] { rule.LiteralOperand!, rule.Message };
+                case ClientRuleKind.Comparison:
+                    if (rule.Number is decimal number && rule.Comparison == ClientComparison.GreaterThanOrEqual)
+                        rules["min"] = new object[] { number, rule.Message };
+                    else if (rule.Number is decimal maximum && rule.Comparison == ClientComparison.LessThanOrEqual)
+                        rules["max"] = new object[] { maximum, rule.Message };
                     break;
-
-                case "range":
-                    var bounds = rule.RangeOperand;
-                    if (bounds is { Length: 2 } && IsNumeric(bounds[0]) && IsNumeric(bounds[1]))
-                        rules["range"] = new object[] { new[] { bounds[0], bounds[1] }, rule.Message };
+                case ClientRuleKind.Range:
+                    if (rule.NumericRange is { } bounds)
+                        rules["range"] = new object[] { new[] { bounds.From, bounds.To }, rule.Message };
                     break;
-
-                // gt, lt, exclusiveRange, equalTo, notEqual, notEqualTo, creditCard, atLeastOne,
-                // empty: no EJ2 FormValidator equivalent, so the server checks them on save.
+                // Other comparisons, exclusive ranges, credit card, at-least-one and empty have no EJ2
+                // FormValidator equivalent, so the server checks them on save.
             }
         }
-
-        private static bool IsNumeric(object? value) =>
-            value is byte or sbyte or short or ushort or int or uint or long or ulong or decimal or double or float;
     }
 }
