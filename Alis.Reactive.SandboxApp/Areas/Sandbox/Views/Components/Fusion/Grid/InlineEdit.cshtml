@@ -17,7 +17,7 @@
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("InlineEditReviews", "Grid"))
             .Response(r => r.OnSuccess<List<CarePlanReview>>((reviews, s) =>
-                s.Component<FusionGrid>(GridId).DataSource.Set(reviews)))));
+                s.Component<FusionGrid>(GridId).Rows<CarePlanReview>().Set(reviews)))));
 }
 
 <native-vstack gap="Lg">

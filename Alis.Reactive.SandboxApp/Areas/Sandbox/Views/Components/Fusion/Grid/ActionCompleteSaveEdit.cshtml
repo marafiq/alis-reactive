@@ -13,7 +13,7 @@
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("ActionCompleteSaveEditRoster", "Grid"))
             .Response(r => r.OnSuccess<List<PharmacyRosterResident>>((residents, s) =>
-                s.Component<FusionGrid>(RosterId).DataSource.Set(residents)))));
+                s.Component<FusionGrid>(RosterId).Rows<PharmacyRosterResident>().Set(residents)))));
 }
 
 <native-vstack gap="Lg">

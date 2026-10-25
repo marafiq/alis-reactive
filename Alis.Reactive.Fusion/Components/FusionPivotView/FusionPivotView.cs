@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 #if NET48
 using System.Web.Mvc;
 #else
@@ -15,7 +16,7 @@ namespace Alis.Reactive.Fusion.Components
     /// <remarks>
     /// Render it with <c>Html.FusionPivotView(plan, "care-pivot", b =&gt; ...)</c>, reach it with
     /// <c>var pivot = p.Component&lt;FusionPivotView&gt;("care-pivot");</c> and use its members directly:
-    /// <c>pivot.DataSourceSettings.DataSource.Set(json.Get(x =&gt; x.Rows));</c>, which redraws the pivot.
+    /// <c>pivot.DataSourceSettings.Rows&lt;CensusRow&gt;().Set(json.Get(x =&gt; x.Rows));</c>, which redraws the pivot.
     /// </remarks>
     public sealed class FusionPivotView : FusionComponent
     {
@@ -104,8 +105,9 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>The pivot's <c>dataSourceSettings</c>: the rows it summarizes.</summary>
     public sealed class FusionPivotViewDataSourceSettings : JsObject
     {
-        /// <summary>The rows.</summary>
-        public Prop<object> DataSource => Prop<object>();
+        /// <summary>The rows, typed by your row class.</summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
+        public Prop<IEnumerable<TRow>> Rows<TRow>() where TRow : class => Prop<IEnumerable<TRow>>("dataSource");
     }
 
     /// <summary>

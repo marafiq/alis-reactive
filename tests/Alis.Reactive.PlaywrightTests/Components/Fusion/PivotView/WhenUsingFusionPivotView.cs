@@ -18,7 +18,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.PivotView;
 /// Not exercised:
 /// writing <c>CurrentView</c>: EJ2 keeps it as a plain field that nothing on screen follows; its own
 /// toolbar switches the view, and Refresh resets the field from the display option.
-/// Reading <c>DataSourceSettings.DataSource</c>: the page never needs the rows back.
+/// Reading <c>DataSourceSettings.Rows&lt;T&gt;()</c>: the page never needs the rows back.
 /// The cell's <c>ActualValue</c>: it differs from <c>Value</c> only in a drilled row whose subtotals are
 /// hidden, and this report shows every subtotal.
 /// The cell's <c>RowIndex</c> and <c>ColIndex</c>: positions in EJ2's cell matrix, which no figure names.

@@ -16,7 +16,7 @@
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("RosterSelectionSignUps", "Grid"))
             .Response(r => r.OnSuccess<List<GardenOutingSignUp>>((signUps, s) =>
-                s.Component<FusionGrid>(SignUpsId).DataSource.Set(signUps)))));
+                s.Component<FusionGrid>(SignUpsId).Rows<GardenOutingSignUp>().Set(signUps)))));
 }
 
 <native-vstack gap="Lg">

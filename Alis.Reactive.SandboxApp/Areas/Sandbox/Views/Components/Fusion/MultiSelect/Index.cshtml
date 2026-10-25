@@ -53,7 +53,7 @@
                             .Response(r => r.OnSuccess<TextureSnacks>((allowed, s) =>
                             {
                                 var snacks = s.Component<FusionMultiSelect>(m => m.Snacks);
-                                snacks.DataSource.Set(allowed.Get(x => x.Snacks));
+                                snacks.Items<MenuChoice>().Set(allowed.Get(x => x.Snacks));
                                 snacks.DataBind();
                                 snacks.ShowPopup();
                             }))); }

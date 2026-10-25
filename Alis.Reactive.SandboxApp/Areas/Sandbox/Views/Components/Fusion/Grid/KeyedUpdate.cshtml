@@ -25,7 +25,7 @@
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("KeyedUpdateBoard", "Grid"))
             .Response(r => r.OnSuccess<List<EveningRoundsResident>>((residents, s) =>
-                s.Component<FusionGrid>(BoardId).DataSource.Set(residents)))));
+                s.Component<FusionGrid>(BoardId).Rows<EveningRoundsResident>().Set(residents)))));
 }
 
 <native-vstack gap="Lg">

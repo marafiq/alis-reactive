@@ -48,7 +48,7 @@
                         .Response(r => r
                             .OnSuccess<FamilyContactsSaved>((json, s) =>
                             {
-                                s.Component<FusionGrid>(GridId).DataSource.Set(json.Get(x => x.Contacts));
+                                s.Component<FusionGrid>(GridId).Rows<FamilyContact>().Set(json.Get(x => x.Contacts));
                                 s.Element("family-contacts-status").Text.Set(json.Get(x => x.Summary));
                             })
                             .OnError<FamilyContactsSaved>(400, (json, e) =>

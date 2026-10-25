@@ -44,7 +44,7 @@
     void ShowShifts(Data<ScheduleDataResponse> week, PipelineBuilder<PointInTimeScheduleModel> s)
     {
         var schedule = s.Component<FusionSchedule>(ScheduleId);
-        schedule.EventSettings.DataSource.Set(week.Get(w => w.Assignments));
+        schedule.EventSettings.Events<ShiftAssignment>().Set(week.Get(w => w.Assignments));
         schedule.DataBind();
         s.Element("schedule-summary").Text.Set(week.Get(w => w.Summary));
     }

@@ -10,14 +10,14 @@
                   .Response(r => r.OnSuccess<FacilitiesResponse>((json, s) =>
                   {
                       var facilityId = s.Component<FusionDropDownList>(m => m.FacilityId);
-                      facilityId.DataSource.Set(json.Get(j => j.Facilities));
+                      facilityId.Items<LookupItem>().Set(json.Get(j => j.Facilities));
                       facilityId.DataBind();
                   })),
             b => b.Get("/Intake/CareLevels")
                   .Response(r => r.OnSuccess<CareLevelsResponse>((json, s) =>
                   {
                       var careLevel = s.Component<FusionDropDownList>(m => m.CareLevel);
-                      careLevel.DataSource.Set(json.Get(j => j.Levels));
+                      careLevel.Items<LookupItem>().Set(json.Get(j => j.Levels));
                       careLevel.DataBind();
                   }))
         ).OnAllSettled(s =>
@@ -93,7 +93,7 @@
                                 .OnSuccess<UnitsResponse>((json, s) =>
                                 {
                                     var unitId = s.Component<FusionDropDownList>(m => m.UnitId);
-                                    unitId.DataSource.Set(json.Get(j => j.Units));
+                                    unitId.Items<LookupItem>().Set(json.Get(j => j.Units));
                                     unitId.DataBind();
                                 })),
                         b => b.Get("/Intake/FacilityInfo")

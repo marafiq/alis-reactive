@@ -215,7 +215,7 @@ item of a list is read through the list property, typed by its items:
 `OfferedDays => Slots.Each(slot => slot.Day)` reads every slot's `day`
 (`Alis.Reactive.SandboxApp/BroughtComponents/VisitPlanner/VisitPlanner.cs`). A property that holds
 an object with members of its own is declared as that object, `Object<T>()`
-(`schedule.EventSettings.DataSource`, `Components/Fusion/Schedule/Index.cshtml`), and a method that
+(`schedule.EventSettings.Events<ShiftAssignment>()`, `Components/Fusion/Schedule/Index.cshtml`), and a method that
 returns one as `InvokeObject<T>(..)` (`sheet.GetColumnByField(wing).HeaderText`,
 `Components/Fusion/Grid/CareStaffColumns.cshtml`). Events are named like every other member, by the
 C# name camel-cased (Tooltip's `AfterOpen` is EJ2's `afterOpen`). Every use of a member writes its

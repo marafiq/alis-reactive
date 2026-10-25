@@ -16,7 +16,7 @@
     // The residents the server answers with, how many the census counts, and what the last change did.
     void ShowCensus(Data<AgeCensusPage> answer, PipelineBuilder<AgeCensusViewModel> s)
     {
-        s.Component<FusionGrid>(GridId).DataSource.Set(answer);
+        s.Component<FusionGrid>(GridId).Page<AgeCensusResident>().Set(answer);
         s.Element("census-summary").Text.Set(answer.Get(x => x.Summary));
         s.Element("census-change").Text.Set(answer.Get(x => x.Change));
     }

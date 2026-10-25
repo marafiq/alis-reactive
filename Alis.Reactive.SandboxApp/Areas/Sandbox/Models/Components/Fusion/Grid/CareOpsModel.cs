@@ -50,9 +50,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     /// The page the grid asked for, or the first page after a change, of the residents the chips chose
     /// (<c>{result, count}</c>), and the sentence that says what the server did.
     /// </summary>
-    public class CareOpsResponse
+    public class CareOpsResponse : IFusionGridPage<ResidentCareItem>
     {
         public List<ResidentCareItem> Result { get; set; } = new();
+
+        IReadOnlyList<ResidentCareItem> IFusionGridPage<ResidentCareItem>.Result => Result;
         public int Count { get; set; }
         public string Summary { get; set; } = "";
     }

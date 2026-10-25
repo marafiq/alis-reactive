@@ -50,7 +50,7 @@
                             // The clear button empties the care level and leaves its list open; the page closes
                             // the list, and the wings of the old care level go with it.
                             careLevel.HidePopup();
-                            wing.DataSource.Set(Array.Empty<PlacementWing>());
+                            wing.Items<PlacementWing>().Set(Array.Empty<PlacementWing>());
                         })
                         .Else(chosen =>
                         {
@@ -61,7 +61,7 @@
                                 .Gather<WingListQuery>(g => g.Set(x => x.CareLevel, args.Value))
                                 .Response(r => r.OnSuccess<WingList>((offered, s) =>
                                 {
-                                    wing.DataSource.Set(offered.Get(x => x.Wings));
+                                    wing.Items<PlacementWing>().Set(offered.Get(x => x.Wings));
                                     s.When(offered.Get(x => x.OpenRoomWing)).NotEmpty()
                                         .Then(open =>
                                         {

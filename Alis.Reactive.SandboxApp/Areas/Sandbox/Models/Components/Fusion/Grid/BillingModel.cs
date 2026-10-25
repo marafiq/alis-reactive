@@ -45,9 +45,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     /// One page of the board, as the grid takes it (<c>{result, count}</c>), and the sentence that says what
     /// the board holds and what is outstanding.
     /// </summary>
-    public class ResidentBillingResponse
+    public class ResidentBillingResponse : IFusionGridPage<ResidentBillingItem>
     {
         public List<ResidentBillingItem> Result { get; set; } = new();
+
+        IReadOnlyList<ResidentBillingItem> IFusionGridPage<ResidentBillingItem>.Result => Result;
         public int Count { get; set; }
         public string Summary { get; set; } = "";
     }

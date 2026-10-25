@@ -16,7 +16,7 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionFileUpload : FusionComponent, IInputComponent
     {
         /// <summary>The selected files, as the browser's <c>File</c> objects a form-data request sends.</summary>
-        public ReadOnly<IReadOnlyList<object>> Files => FilesData.Each(file => file.RawFile!);
+        public ReadOnly<IReadOnlyList<BrowserFile>> Files => FilesData.Each(file => file.RawFile!);
 
         // The uploader lists its files as items that each carry the browser's file.
         private ReadOnly<IReadOnlyList<FusionUploaderFile>> FilesData => ReadOnly<IReadOnlyList<FusionUploaderFile>>();
@@ -73,7 +73,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>The browser's own <c>File</c>, which a form-data request sends.</summary>
         /// <remarks>Only the browser holds it; a server-side copy of the item has none, so it may be null.</remarks>
-        public object? RawFile { get; set; }
+        public BrowserFile? RawFile { get; set; }
     }
 
     /// <summary>

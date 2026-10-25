@@ -28,12 +28,16 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionGrid : FusionComponent
     {
-        /// <summary>The rows; write an array, or a response body that is one.</summary>
-        public Prop<object> DataSource => Prop<object>();
-
         /// <summary>The rows, typed by your row class.</summary>
         /// <typeparam name="TRow">Your row class.</typeparam>
-        public Prop<TRow[]> Rows<TRow>() where TRow : class => Prop<TRow[]>("dataSource");
+        public Prop<IEnumerable<TRow>> Rows<TRow>() where TRow : class => Prop<IEnumerable<TRow>>("dataSource");
+
+        /// <summary>
+        /// The rows as one page of a remote result, for a grid the server pages: a response that implements
+        /// <see cref="IFusionGridPage{TRow}"/> with the page's rows and the total count.
+        /// </summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
+        public Prop<IFusionGridPage<TRow>> Page<TRow>() where TRow : class => Prop<IFusionGridPage<TRow>>("dataSource");
 
         /// <summary>Renders the rows again from the data source.</summary>
         public void Refresh() => Call();

@@ -21,7 +21,7 @@
             .Gather<RecordRosterWingQuery>(g => g.Set(x => x.Wing, wing))
             .Response(r => r.OnSuccess<RecordRosterWing>((answer, s) =>
             {
-                s.Component<FusionGrid>(RosterId).DataSource.Set(answer.Get(x => x.Page.Result));
+                s.Component<FusionGrid>(RosterId).Rows<RecordRosterResident>().Set(answer.Get(x => x.Page.Result));
                 s.Element("roster-wing").Text.Set(answer.Get(x => x.Wing));
                 s.Element("roster-record-status").Text.Set(answer.Get(x => x.Page.Summary));
             }));
@@ -30,7 +30,7 @@
         p.Get(Url.SandboxRoute("RecordRosterCedar", "Grid"))
             .Response(r => r.OnSuccess<RecordRosterPage>((page, s) =>
             {
-                s.Component<FusionGrid>(RosterId).DataSource.Set(page.Get(x => x.Result));
+                s.Component<FusionGrid>(RosterId).Rows<RecordRosterResident>().Set(page.Get(x => x.Result));
                 s.Element("roster-record-status").Text.Set(page.Get(x => x.Summary));
             }))));
 }

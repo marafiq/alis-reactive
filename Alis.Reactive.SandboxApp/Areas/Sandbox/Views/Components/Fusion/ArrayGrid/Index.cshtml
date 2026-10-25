@@ -15,7 +15,7 @@
          .Response(r => r.OnSuccess<RosterResponse>((json, s) =>
          {
              var roster = s.From(json.Get(x => x.Residents));
-             s.Component<FusionGrid>("roster-grid").DataSource.Set(roster.OrderBy(x => x.Name));
+             s.Component<FusionGrid>("roster-grid").Rows<RosterResident>().Set(roster.OrderBy(x => x.Name));
          }))));
 }
 
@@ -43,7 +43,7 @@
                     // The active residents come from the rows on screen, not from the server again.
                     var rosterGrid = p.Component<FusionGrid>("roster-grid");
                     var onScreen = p.From(rosterGrid.Rows<RosterResident>());
-                    rosterGrid.DataSource.Set(onScreen.Where(x => x.Status == "active").OrderBy(x => x.Name));
+                    rosterGrid.Rows<RosterResident>().Set(onScreen.Where(x => x.Status == "active").OrderBy(x => x.Name));
                     rosterGrid.Refresh();
                     p.Element("roster-showing").Text.Set("Active residents, by name.");
                 }))

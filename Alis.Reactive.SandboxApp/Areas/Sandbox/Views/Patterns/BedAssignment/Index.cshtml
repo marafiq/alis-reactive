@@ -32,7 +32,7 @@
                             .Response(r => r.OnSuccess<WingRooms>((offered, s) =>
                             {
                                 // The new wing's rooms replace the old; a room chosen before is cleared, and its beds with it.
-                                s.Component<FusionDropDownList>(m => m.Room).DataSource.Set(offered.Get(x => x.Rooms));
+                                s.Component<FusionDropDownList>(m => m.Room).Items<BedRoom>().Set(offered.Get(x => x.Rooms));
                                 s.Element("room-summary").Text.Set(offered.Get(x => x.Summary));
                             }))); }
 
@@ -47,14 +47,14 @@
                         p.When(args.Value).IsEmpty()
                             .Then(none =>
                             {
-                                bed.DataSource.Set(Array.Empty<OpenBed>());
+                                bed.Items<OpenBed>().Set(Array.Empty<OpenBed>());
                                 none.Element("bed-summary").Text.Set("Choose a room to see its open beds.");
                             })
                             .Else(chosen => chosen.Get(bedsUrl)
                                 .Gather<RoomBedsQuery>(g => g.Form(m => m.Wing, m => m.Room))
                                 .Response(r => r.OnSuccess<RoomBeds>((open, s) =>
                                 {
-                                    bed.DataSource.Set(open.Get(x => x.Beds));
+                                    bed.Items<OpenBed>().Set(open.Get(x => x.Beds));
                                     s.Element("bed-summary").Text.Set(open.Get(x => x.Summary));
                                 })));
                     }); }

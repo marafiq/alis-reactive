@@ -26,9 +26,10 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The text shown for the selection; writing it selects the item that shows this text.</summary>
         public Prop<string> Text => Prop<string>();
 
-        /// <summary>The items the popup suggests from.</summary>
+        /// <summary>The items the popup suggests from, typed by your item class.</summary>
         /// <remarks>Call <see cref="DataBind"/> after writing it outside a filtering event.</remarks>
-        public Prop<IEnumerable<object>> DataSource => Prop<IEnumerable<object>>();
+        /// <typeparam name="TItem">Your item class.</typeparam>
+        public Prop<IEnumerable<TItem>> Items<TItem>() where TItem : class => Prop<IEnumerable<TItem>>("dataSource");
 
         /// <summary>Whether the input accepts interaction.</summary>
         public Prop<bool> Enabled => Prop<bool>();

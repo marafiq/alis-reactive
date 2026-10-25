@@ -32,7 +32,7 @@
                      .Gather<OccupancyCensusQuery>(g => g.Set(x => x.Community, p.Url<OccupancyReportQuery>().Get(q => q.Community)))
                      .Response(r => r.OnSuccess<OccupancyCensus>((json, s) =>
                      {
-                         s.Component<FusionPivotView>(ReportId).DataSourceSettings.DataSource.Set(json.Get(x => x.Rows));
+                         s.Component<FusionPivotView>(ReportId).DataSourceSettings.Rows<OccupancyCensusRow>().Set(json.Get(x => x.Rows));
                          s.Element("report-period").Text.Set(json.Get(x => x.Period));
                      }));
                 }))

@@ -43,7 +43,7 @@
          .Response(r => r.OnSuccess<MaintenanceBoard>((json, s) =>
          {
              var board = s.Component<FusionKanban>(BoardId);
-             board.DataSource.Set(json.Get(x => x.WorkOrders));
+             board.Cards<WorkOrder>().Set(json.Get(x => x.WorkOrders));
              board.DataBind();
          }))));
 }

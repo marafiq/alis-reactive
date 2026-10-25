@@ -36,7 +36,7 @@
     // The board as the server answers it, and the sentence that says what the server did.
     void ShowBoard(Data<CareOpsResponse> board, PipelineBuilder<CareOpsViewModel> s)
     {
-        s.Component<FusionGrid>(GridId).DataSource.Set(board);
+        s.Component<FusionGrid>(GridId).Page<ResidentCareItem>().Set(board);
         s.Element("careops-summary").Text.Set(board.Get(x => x.Summary));
     }
 

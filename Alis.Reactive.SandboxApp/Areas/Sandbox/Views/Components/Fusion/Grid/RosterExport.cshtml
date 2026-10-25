@@ -28,7 +28,7 @@
             .Response(r => r
                 .OnSuccess<MonthlyCensus>((census, s) =>
                 {
-                    s.Component<FusionGrid>(CensusId).DataSource.Set(census.Get(x => x.Residents));
+                    s.Component<FusionGrid>(CensusId).Rows<MonthlyCensusResident>().Set(census.Get(x => x.Residents));
                     s.Element("census-summary").Text.Set(census.Get(x => x.Summary));
                 })
                 .OnError<MonthlyCensus>(409, (open, e) =>

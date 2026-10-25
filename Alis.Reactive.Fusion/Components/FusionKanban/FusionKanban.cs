@@ -24,12 +24,9 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionKanban : FusionComponent
     {
-        /// <summary>The cards; call <see cref="DataBind"/> after writing them.</summary>
-        public Prop<object> DataSource => Prop<object>();
-
         /// <summary>The cards, typed by your card class.</summary>
         /// <typeparam name="TCard">Your card class.</typeparam>
-        public Prop<TCard[]> Cards<TCard>() where TCard : class => Prop<TCard[]>("dataSource");
+        public Prop<IEnumerable<TCard>> Cards<TCard>() where TCard : class => Prop<IEnumerable<TCard>>("dataSource");
 
         /// <summary>The cards in the column with this key.</summary>
         /// <typeparam name="TCard">Your card class.</typeparam>
@@ -51,12 +48,14 @@ namespace Alis.Reactive.Fusion.Components
         public void AddCard<TCard>(Arg<TCard> cardData, Arg<int> index) where TCard : class => Call(cardData, index);
 
         /// <summary>Replaces the card with the same key.</summary>
+        /// <typeparam name="TCard">Your card class.</typeparam>
         /// <param name="cardData">The changed card.</param>
-        public void UpdateCard(Arg<object> cardData) => Call(cardData);
+        public void UpdateCard<TCard>(Arg<TCard> cardData) where TCard : class => Call(cardData);
 
         /// <summary>Deletes a card, given the card or its key.</summary>
-        /// <param name="cardData">The card to delete, or its key.</param>
-        public void DeleteCard(Arg<object> cardData) => Call(cardData);
+        /// <typeparam name="TCard">Your card class, or an array of it.</typeparam>
+        /// <param name="cardData">The card to delete, or the cards.</param>
+        public void DeleteCard<TCard>(Arg<TCard> cardData) where TCard : class => Call(cardData);
 
         /// <summary>Adds a column at a zero-based index.</summary>
         /// <param name="columnOptions">The column to add.</param>

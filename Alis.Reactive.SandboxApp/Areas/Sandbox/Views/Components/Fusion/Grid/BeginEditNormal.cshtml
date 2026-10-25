@@ -15,7 +15,7 @@
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("BeginEditNormalRoster", "Grid"))
             .Response(r => r.OnSuccess<List<CareReviewResident>>((residents, s) =>
-                s.Component<FusionGrid>(ReviewListId).DataSource.Set(residents)))));
+                s.Component<FusionGrid>(ReviewListId).Rows<CareReviewResident>().Set(residents)))));
 }
 
 <native-vstack gap="Lg">

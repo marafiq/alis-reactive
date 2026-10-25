@@ -77,7 +77,7 @@
                         {
                             // The nurse list takes the new roster, and the cursor moves to it, ready for a name.
                             var nurse = s.Component<FusionMultiColumnComboBox>(m => m.CoveringNurse);
-                            nurse.DataSource.Set(roster.Get(x => x.Nurses));
+                            nurse.Rows<RosterNurse>().Set(roster.Get(x => x.Nurses));
                             nurse.FocusIn();
                         }))); }
 

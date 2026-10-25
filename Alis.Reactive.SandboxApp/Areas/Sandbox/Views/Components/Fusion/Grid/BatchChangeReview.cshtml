@@ -17,7 +17,7 @@
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("NightChecksTonight", "Grid"))
             .Response(r => r.OnSuccess<List<NightCheckResident>>((residents, s) =>
-                s.Component<FusionGrid>(ChecksId).DataSource.Set(residents)))));
+                s.Component<FusionGrid>(ChecksId).Rows<NightCheckResident>().Set(residents)))));
 }
 
 <native-vstack gap="Lg">
@@ -43,7 +43,7 @@
             {
                 // The changes wait for the charge nurse to confirm them; the night log, not the grid, saves them.
                 args.Cancel.Set(true);
-                p.Component<FusionGrid>(ReviewId).DataSource.Set(args.BatchChanges.Get(x => x.ChangedRecords));
+                p.Component<FusionGrid>(ReviewId).Rows<NightCheckResident>().Set(args.BatchChanges.Get(x => x.ChangedRecords));
                 var changed = p.From(args.BatchChanges.Get(x => x.ChangedRecords));
                 p.When(changed.Any()).Truthy()
                     .Then(t => t.Element("night-checks-status").Text.Set("Check the changes below, then save them to the night log."))
@@ -88,7 +88,7 @@
                         .Gather<NightCheckChanges>(g => g.Set(x => x.Changes, checks.GetBatchChanges<NightCheckResident>()))
                         .Response(r => r.OnSuccess<NightChecksLogged>((logged, s) =>
                         {
-                            s.Component<FusionGrid>(ChecksId).DataSource.Set(logged.Get(x => x.Residents));
+                            s.Component<FusionGrid>(ChecksId).Rows<NightCheckResident>().Set(logged.Get(x => x.Residents));
                             s.Component<FusionGrid>(ReviewId).Rows<NightCheckResident>().Set(Array.Empty<NightCheckResident>());
                             s.Element("night-checks-status").Text.Set(logged.Get(x => x.Summary));
                         }));

@@ -26,7 +26,7 @@
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("HuddleSheetResidents", "Grid"))
             .Response(r => r.OnSuccess<List<HuddleSheetResident>>((residents, s) =>
-                s.Component<FusionGrid>(SheetId).DataSource.Set(residents)))));
+                s.Component<FusionGrid>(SheetId).Rows<HuddleSheetResident>().Set(residents)))));
 }
 
 <native-vstack gap="Lg">

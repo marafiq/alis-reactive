@@ -18,8 +18,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The selected values.</summary>
         public Prop<string[]> Value => Prop<string[]>();
 
-        /// <summary>The items the list offers. Call <see cref="DataBind"/> after writing it outside a filtering event.</summary>
-        public Prop<IEnumerable<object>> DataSource => Prop<IEnumerable<object>>();
+        /// <summary>The items the list offers, typed by your item class. Call <see cref="DataBind"/> after writing it outside a filtering event.</summary>
+        /// <typeparam name="TItem">Your item class.</typeparam>
+        public Prop<IEnumerable<TItem>> Items<TItem>() where TItem : class => Prop<IEnumerable<TItem>>("dataSource");
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
         public void DataBind() => Call();

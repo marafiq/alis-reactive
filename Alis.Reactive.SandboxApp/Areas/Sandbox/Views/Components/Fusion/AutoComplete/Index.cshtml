@@ -28,7 +28,7 @@
                 var physician = p.Component<FusionAutoComplete>(m => m.Physician);
                 physician.Clear();
                 physician.DataBind();
-                physician.DataSource.Set(Model.CareTeam);
+                physician.Items<PhysicianListing>().Set(Model.CareTeam);
                 physician.Value.Set(Model.Attending);
                 physician.DataBind();
                 p.Element("attending-name").Text.Set(physician.Text);
@@ -42,7 +42,7 @@
                     {
                         // Tonight's on-call physicians replace her care team in the list, opened for the nurse.
                         var physician = s.Component<FusionAutoComplete>(m => m.Physician);
-                        physician.DataSource.Set(onCall.Get(x => x.Physicians));
+                        physician.Items<PhysicianListing>().Set(onCall.Get(x => x.Physicians));
                         physician.DataBind();
                         physician.ShowPopup();
                     }))))

@@ -22,8 +22,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The text shown for the selection.</summary>
         public Prop<string> Text => Prop<string>();
 
-        /// <summary>The rows the popup offers; call <see cref="DataBind"/> after writing it.</summary>
-        public Prop<object> DataSource => Prop<object>();
+        /// <summary>The rows the popup offers, typed by your row class; call <see cref="DataBind"/> after writing it.</summary>
+        /// <typeparam name="TRow">Your row class.</typeparam>
+        public Prop<IEnumerable<TRow>> Rows<TRow>() where TRow : class => Prop<IEnumerable<TRow>>("dataSource");
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
         public void DataBind() => Call();

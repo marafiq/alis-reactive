@@ -78,7 +78,7 @@ A path is a list of segments: a member name, an array index, or `[]`, which read
 path on each item of the list before it (`filesData[].rawFile` is every file's `rawFile`; a list
 inside a list is refused where it is declared). The C# side never mixes member and data segments in
 one node:
-- **member segments** come from declarations (`grid.DataSource`, `schedule.EventSettings.DataSource`);
+- **member segments** come from declarations (`grid.Rows<Resident>()`, `schedule.EventSettings.Events<Shift>()`);
 - **data segments** come from `Get(x => x.A.B)` over a data type.
 
 A member read followed by a data read is two nested `get` nodes.

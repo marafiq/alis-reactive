@@ -1,3 +1,4 @@
+using Alis.Reactive.Fusion.Components;
 using Alis.Reactive.FluentValidator;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InPlaceEditor
@@ -81,7 +82,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InPlac
     {
         public string? ResidentId { get; set; }
 
-        public IDictionary<string, object>? Change { get; set; }
+        public FusionInPlaceEditorSubmission? Change { get; set; }
     }
 
     /// <summary>What billing answers when it accepts a rate: the rate as it keeps it.</summary>

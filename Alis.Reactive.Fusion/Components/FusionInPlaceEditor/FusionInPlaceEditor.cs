@@ -135,18 +135,32 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>Payload of <see cref="FusionInPlaceEditor.ActionBegin"/>.</summary>
     public class FusionInPlaceEditorActionBeginArgs : JsObject
     {
-        /// <summary>The data about to be submitted.</summary>
-        public ReadOnly<IDictionary<string, object>> Data => ReadOnly<IDictionary<string, object>>();
+        /// <summary>What is about to be submitted: the field's name, the record's key and the value.</summary>
+        public ReadOnly<FusionInPlaceEditorSubmission> Data => ReadOnly<FusionInPlaceEditorSubmission>();
 
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Prop<bool> Cancel => Prop<bool>();
     }
 
+    /// <summary>What the editor submits for a field: as EJ2 names its members.</summary>
+    public sealed class FusionInPlaceEditorSubmission
+    {
+        /// <summary>The field's name, as the editor was rendered with.</summary>
+        public string Name { get; set; } = "";
+
+        /// <summary>The record's key, as the editor was rendered with.</summary>
+        public string PrimaryKey { get; set; } = "";
+
+        /// <summary>The committed value, as text.</summary>
+        public string Value { get; set; } = "";
+    }
+
     /// <summary>Payload of <see cref="FusionInPlaceEditor.ActionSuccess"/>.</summary>
     public class FusionInPlaceEditorActionSuccessArgs : JsObject
     {
-        /// <summary>The server's answer.</summary>
-        public ReadOnly<object> Data => ReadOnly<object>();
+        /// <summary>The server's answer, typed by the class the editor's own request returns.</summary>
+        /// <typeparam name="TResponse">The answer's class.</typeparam>
+        public ReadOnly<TResponse> Data<TResponse>() where TResponse : class => ReadOnly<TResponse>();
 
         /// <summary>The submitted value.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();

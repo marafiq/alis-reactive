@@ -19,7 +19,7 @@
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("GridToolingShifts", "Grid"))
             .Response(r => r.OnSuccess<List<ScheduledShift>>((shifts, s) =>
-                s.Component<FusionGrid>(GridId).DataSource.Set(shifts)))));
+                s.Component<FusionGrid>(GridId).Rows<ScheduledShift>().Set(shifts)))));
 }
 
 <native-vstack gap="Lg">

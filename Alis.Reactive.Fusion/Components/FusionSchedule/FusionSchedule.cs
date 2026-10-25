@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 #if NET48
 using System.Web.Mvc;
 #else
@@ -265,8 +266,9 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>The schedule's <c>eventSettings</c>: its events.</summary>
     public sealed class FusionScheduleEventSettings : JsObject
     {
-        /// <summary>The events.</summary>
-        public Prop<object> DataSource => Prop<object>();
+        /// <summary>The events, typed by your event class.</summary>
+        /// <typeparam name="TEvent">Your event class.</typeparam>
+        public Prop<IEnumerable<TEvent>> Events<TEvent>() where TEvent : class => Prop<IEnumerable<TEvent>>("dataSource");
     }
 
     /// <summary>

@@ -19,7 +19,7 @@
     // The residents the directory answers with, how many match, and what the last change did.
     void ShowDirectory(Data<DirectoryResults> answer, PipelineBuilder<DirectoryViewModel> s)
     {
-        s.Component<FusionGrid>(GridId).DataSource.Set(answer);
+        s.Component<FusionGrid>(GridId).Page<DirectoryResident>().Set(answer);
         s.Element("directory-summary").Text.Set(answer.Get(x => x.Summary));
         s.Element("directory-change").Text.Set(answer.Get(x => x.Change));
     }

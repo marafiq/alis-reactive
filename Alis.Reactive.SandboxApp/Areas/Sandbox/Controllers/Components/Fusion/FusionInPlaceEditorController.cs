@@ -71,7 +71,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         [HttpPost("UpdateMonthlyRate")]
         public IActionResult UpdateMonthlyRate([FromBody] MonthlyRateChange change)
         {
-            var sent = change.Change != null && change.Change.TryGetValue("value", out var value) ? value?.ToString() : null;
+            var sent = change.Change?.Value;
             var rate = decimal.TryParse(sent, NumberStyles.Number, CultureInfo.InvariantCulture, out var parsed) ? parsed : 0m;
             var result = new MonthlyRateCorrectionValidator().Validate(new MonthlyRateCorrection
             {

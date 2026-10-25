@@ -34,5 +34,11 @@ namespace Alis.Reactive.Builders
         public ReactiveArray<TElement> From<TElement>(TypedSource<List<TElement>> source) =>
             new ReactiveArray<TElement>(source.Expression, Shape.FromClrType(typeof(TElement)));
 
+        /// <summary>The array operations over a sequence a declaration reads or a response carries.</summary>
+        /// <typeparam name="TElement">The element type.</typeparam>
+        /// <param name="source">The sequence.</param>
+        public ReactiveArray<TElement> From<TElement>(TypedSource<IEnumerable<TElement>> source) =>
+            new ReactiveArray<TElement>(source.Expression, Shape.FromClrType(typeof(TElement)));
+
     }
 }

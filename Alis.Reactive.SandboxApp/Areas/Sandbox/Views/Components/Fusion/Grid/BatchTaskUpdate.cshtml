@@ -16,7 +16,7 @@
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("DayTaskBoardResidents", "Grid"))
             .Response(r => r.OnSuccess<List<DayTaskBoardResident>>((residents, s) =>
-                s.Component<FusionGrid>(BoardId).DataSource.Set(residents)))));
+                s.Component<FusionGrid>(BoardId).Rows<DayTaskBoardResident>().Set(residents)))));
 }
 
 <native-vstack gap="Lg">
@@ -57,7 +57,7 @@
                         .Gather<DayTaskBoardChanges>(g => g.Set(x => x.Changes, board.GetBatchChanges<DayTaskBoardResident>()))
                         .Response(r => r.OnSuccess<DayTaskBoardHandedOver>((handedOver, s) =>
                         {
-                            s.Component<FusionGrid>(BoardId).DataSource.Set(handedOver.Get(x => x.Residents));
+                            s.Component<FusionGrid>(BoardId).Rows<DayTaskBoardResident>().Set(handedOver.Get(x => x.Residents));
                             s.Element("board-status").Text.Set(handedOver.Get(x => x.Summary));
                         }));
                 }))

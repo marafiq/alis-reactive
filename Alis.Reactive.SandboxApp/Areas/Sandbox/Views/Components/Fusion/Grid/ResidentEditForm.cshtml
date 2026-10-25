@@ -27,8 +27,8 @@
         p.Get(Url.SandboxRoute("ResidentEditFormDesk", "Grid"))
             .Response(r => r.OnSuccess<AdmissionsDesk>((desk, s) =>
             {
-                s.Component<FusionGrid>(ResidentsId).DataSource.Set(desk.Get(x => x.Residents));
-                s.Component<FusionGrid>(ReferralsId).DataSource.Set(desk.Get(x => x.Referrals));
+                s.Component<FusionGrid>(ResidentsId).Rows<AdmissionsResident>().Set(desk.Get(x => x.Residents));
+                s.Component<FusionGrid>(ReferralsId).Rows<AdmissionsReferral>().Set(desk.Get(x => x.Referrals));
             }))));
 }
 
@@ -120,14 +120,14 @@
                         .Response(r => r
                             .OnSuccess<AdmissionsDesk>((desk, s) =>
                             {
-                                s.Component<FusionGrid>(ResidentsId).DataSource.Set(desk.Get(x => x.Residents));
-                                s.Component<FusionGrid>(ReferralsId).DataSource.Set(desk.Get(x => x.Referrals));
+                                s.Component<FusionGrid>(ResidentsId).Rows<AdmissionsResident>().Set(desk.Get(x => x.Residents));
+                                s.Component<FusionGrid>(ReferralsId).Rows<AdmissionsReferral>().Set(desk.Get(x => x.Referrals));
                                 s.Element("desk-status").Text.Set(desk.Get(x => x.Summary));
                             })
                             // The referral stays waiting, as it is on file.
                             .OnError<AdmissionsDesk>(400, (refused, e) =>
                             {
-                                e.Component<FusionGrid>(ReferralsId).DataSource.Set(refused.Get(x => x.Referrals));
+                                e.Component<FusionGrid>(ReferralsId).Rows<AdmissionsReferral>().Set(refused.Get(x => x.Referrals));
                                 e.Element("desk-status").Text.Set(refused.Get(x => x.Summary));
                             })))))
     </native-card-body></native-card>

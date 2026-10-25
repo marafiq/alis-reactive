@@ -21,7 +21,7 @@
         .DomReady(p =>
             p.Get(Url.SandboxRoute("WingReviewResidents", "Grid"))
                 .Response(r => r.OnSuccess<List<WingReviewResident>>((residents, s) =>
-                    s.Component<FusionGrid>(GridId).DataSource.Set(residents))))
+                    s.Component<FusionGrid>(GridId).Rows<WingReviewResident>().Set(residents))))
         .CustomEvent(WingReviewEvents.StartReview, (start, p) =>
             p.Post(Url.SandboxRoute("WingReviewStart", "Grid"))
                 .Gather<WingReviewStart>(g => g.Set(x => x.ResidentId, start.Get(x => x.ResidentId)))

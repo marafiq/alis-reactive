@@ -39,7 +39,7 @@
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("RosterCrudRoster", "Grid"))
             .Response(r => r.OnSuccess<List<CedarResident>>((residents, s) =>
-                s.Component<FusionGrid>(RosterId).DataSource.Set(residents)))));
+                s.Component<FusionGrid>(RosterId).Rows<CedarResident>().Set(residents)))));
 }
 
 <native-vstack gap="Lg">

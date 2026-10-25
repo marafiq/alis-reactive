@@ -15,7 +15,7 @@
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("ColumnFitDoses", "Grid"))
             .Response(r => r.OnSuccess<List<MedPassDose>>((doses, s) =>
-                s.Component<FusionGrid>(GridId).DataSource.Set(doses)))));
+                s.Component<FusionGrid>(GridId).Rows<MedPassDose>().Set(doses)))));
 }
 
 <native-vstack gap="Lg">

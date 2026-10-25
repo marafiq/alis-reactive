@@ -32,7 +32,7 @@
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("ClinicalUpdatesBoard", "Grid"))
             .Response(r => r.OnSuccess<List<ClinicalUpdatesResident>>((residents, s) =>
-                s.Component<FusionGrid>(BoardId).DataSource.Set(residents)))));
+                s.Component<FusionGrid>(BoardId).Rows<ClinicalUpdatesResident>().Set(residents)))));
 }
 
 <native-vstack gap="Lg">

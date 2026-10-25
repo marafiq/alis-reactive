@@ -50,9 +50,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     }
 
     /// <summary>The residents of the page, how many the census counts, and what the last change did.</summary>
-    public class AgeCensusPage
+    public class AgeCensusPage : IFusionGridPage<AgeCensusResident>
     {
         public List<AgeCensusResident> Result { get; set; } = new();
+
+        IReadOnlyList<AgeCensusResident> IFusionGridPage<AgeCensusResident>.Result => Result;
         public int Count { get; set; }
         public string Summary { get; set; } = "";
         public string Change { get; set; } = "";

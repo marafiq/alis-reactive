@@ -29,7 +29,7 @@
     // A page of the board as the server answers it, and the sentence that says what the board holds.
     void ShowBoard(Data<ResidentBillingResponse> board, PipelineBuilder<ResidentBillingViewModel> s)
     {
-        s.Component<FusionGrid>(GridId).DataSource.Set(board);
+        s.Component<FusionGrid>(GridId).Page<ResidentBillingItem>().Set(board);
         s.Element("billing-summary").Text.Set(board.Get(x => x.Summary));
     }
 

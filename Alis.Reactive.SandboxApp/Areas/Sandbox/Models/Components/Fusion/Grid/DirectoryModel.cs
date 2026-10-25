@@ -63,10 +63,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     }
 
     /// <summary>The residents the grid shows, how many match, and what the last change did.</summary>
-    public class DirectoryResults
+    public class DirectoryResults : IFusionGridPage<DirectoryResident>
     {
         /// <summary>The residents of the page or, when grouped, every matching resident; the grid draws the groups.</summary>
         public List<DirectoryResident> Result { get; set; } = new();
+
+        IReadOnlyList<DirectoryResident> IFusionGridPage<DirectoryResident>.Result => Result;
         public int Count { get; set; }
         public string Summary { get; set; } = "";
         public string Change { get; set; } = "";
