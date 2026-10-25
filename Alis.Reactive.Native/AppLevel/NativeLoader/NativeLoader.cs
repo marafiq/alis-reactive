@@ -30,16 +30,16 @@ namespace Alis.Reactive.Native.AppLevel
         public string DefaultId => ElementId;
 
         /// <summary>The ID of the element the loader covers on its next show; hiding clears it.</summary>
-        public Prop<string> Target => Prop<string>();
+        public Property<string> Target => Property<string>();
 
         /// <summary>Milliseconds after which the next show hides itself; hiding clears it.</summary>
-        public Prop<int> Timeout => Prop<int>();
+        public Property<int> Timeout => Property<int>();
 
         /// <summary>Shows the loader.</summary>
-        public void Show() => Call();
+        public void Show() => Method();
 
         /// <summary>Hides the loader.</summary>
-        public void Hide() => Call();
+        public void Hide() => Method();
     }
 
     /// <summary>Renders the page's <see cref="NativeLoader"/>.</summary>

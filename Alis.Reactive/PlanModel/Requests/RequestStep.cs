@@ -50,7 +50,7 @@ namespace Alis.Reactive.PlanModel
             var routeScope = scope.WithResponse(Routes.Handle, response);
 
             // A gathered value that returns a promise settles just before the request is sent.
-            var exchange = scope.WithAwaitedReads(() => new[]
+            var exchange = scope.WithHoisted(() => new[]
             {
                 G.Let(response, G.CallTyped(G.Obj(scope.Objects.Http()), "send", Shape.None, SendArgument(method, input, scope)), awaits: true),
             }).ToList();

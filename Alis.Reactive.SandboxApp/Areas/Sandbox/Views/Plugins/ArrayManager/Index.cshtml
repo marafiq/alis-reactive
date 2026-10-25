@@ -147,15 +147,15 @@
         {
         }
 
-        public TypedSource<int> Count(Arg<object> items) => Invoke<int>(items);
+        public TypedSource<int> Count(Arg<object> items) => Method<int>(items);
 
-        public TypedSource<object> Pluck(Arg<object> items, Arg<int> index, Arg<string> field) => Invoke<object>(items, index, field);
+        public TypedSource<object> Pluck(Arg<object> items, Arg<int> index, Arg<string> field) => Method<object>(items, index, field);
 
-        public TypedSource<object> Filter(Arg<object> items, Arg<string> field, Arg<string> value) => Invoke<object>(items, field, value);
+        public TypedSource<object> Filter(Arg<object> items, Arg<string> field, Arg<string> value) => Method<object>(items, field, value);
 
-        public TypedSource<int> Sum(Arg<object> items, Arg<string> field) => Invoke<int>(items, field);
+        public TypedSource<int> Sum(Arg<object> items, Arg<string> field) => Method<int>(items, field);
 
-        public TypedSource<bool> Some(Arg<object> items, Arg<string> field, Arg<string> value) => Invoke<bool>(items, field, value);
+        public TypedSource<bool> Some(Arg<object> items, Arg<string> field, Arg<string> value) => Method<bool>(items, field, value);
     }
 
     private sealed class CommunityPlugin : Plugin
@@ -177,10 +177,10 @@
         }
 
         /// <summary>The pass's heading: whether the visitor is escorted, the pass number and the day of the visit.</summary>
-        public TypedSource<string> Heading(Arg<bool> escorted, Arg<long> number, Arg<DateTime> day) => Invoke<string>(escorted, number, day);
+        public TypedSource<string> Heading(Arg<bool> escorted, Arg<long> number, Arg<DateTime> day) => Method<string>(escorted, number, day);
 
         /// <summary>The pass's charges: the parking fee and how many hours the visit lasts.</summary>
-        public TypedSource<string> Charges(Arg<decimal> parking, Arg<double> hours) => Invoke<string>(parking, hours);
+        public TypedSource<string> Charges(Arg<decimal> parking, Arg<double> hours) => Method<string>(parking, hours);
     }
 
     private sealed class SlugifyPlugin : Plugin
@@ -190,6 +190,6 @@
         {
         }
 
-        public TypedSource<string> Slug(Arg<string> text) => Invoke<string>(text, name: "");
+        public TypedSource<string> Slug(Arg<string> text) => Method<string>(text, name: "");
     }
 }

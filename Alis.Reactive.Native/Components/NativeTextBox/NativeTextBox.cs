@@ -16,13 +16,13 @@ namespace Alis.Reactive.Native.Components
     public sealed class NativeTextBox : NativeComponent, IInputComponent
     {
         /// <summary>The input value; empty text when nothing is entered.</summary>
-        public Prop<string> Value => Prop<string>();
+        public Property<string> Value => Property<string>();
 
         /// <summary>Moves focus to the element.</summary>
-        public void Focus() => Call();
+        public void Focus() => Method();
 
         /// <summary>Raised when the value changes and the element loses focus.</summary>
-        public TypedEvent<NativeTextBoxChangeArgs> Change =>
+        public Event<NativeTextBoxChangeArgs> Change =>
             Event<NativeTextBoxChangeArgs>();
 
         /// <inheritdoc />

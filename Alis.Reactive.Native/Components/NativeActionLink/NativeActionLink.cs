@@ -35,7 +35,7 @@ namespace Alis.Reactive.Native.Components
         public override ComponentVendor Vendor => LinkVendor;
 
         /// <summary>Raised when the user clicks the link.</summary>
-        public TypedEvent<NativeActionLinkClickArgs> Click => Event<NativeActionLinkClickArgs>();
+        public Event<NativeActionLinkClickArgs> Click => Event<NativeActionLinkClickArgs>();
     }
 
     /// <summary>The DOM click a <see cref="NativeActionLink"/> receives.</summary>
@@ -60,7 +60,7 @@ namespace Alis.Reactive.Native.Components
         public ReadOnly<bool> AltKey => ReadOnly<bool>();
 
         /// <summary>Stops the browser from following the link.</summary>
-        public void PreventDefault() => Call();
+        public void PreventDefault() => Method();
     }
 
     /// <summary>

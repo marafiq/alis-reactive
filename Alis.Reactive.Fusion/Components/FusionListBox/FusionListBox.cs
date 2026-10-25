@@ -20,29 +20,29 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionListBox : FusionComponent
     {
         /// <summary>The selected values.</summary>
-        public Prop<string[]> Value => Prop<string[]>();
+        public Property<string[]> Value => Property<string[]>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>Selects (<see langword="true"/>) or clears the items; the third argument says the first holds values, not texts.</summary>
         /// <param name="items">The items, by text, or by value when <paramref name="isValue"/> is <see langword="true"/>.</param>
         /// <param name="state"><see langword="true"/> to select the items; <see langword="false"/> to clear them.</param>
         /// <param name="isValue"><see langword="true"/> when <paramref name="items"/> holds values, not texts.</param>
-        public void SelectItems(Arg<string[]> items, Arg<bool> state, Arg<bool> isValue) => Call(items, state, isValue);
+        public void SelectItems(Arg<string[]> items, Arg<bool> state, Arg<bool> isValue) => Method(items, state, isValue);
 
         /// <summary>Selects (<see langword="true"/>) or clears every item.</summary>
         /// <param name="state"><see langword="true"/> to select every item; <see langword="false"/> to clear them all.</param>
-        public void SelectAll(Arg<bool> state) => Call(state);
+        public void SelectAll(Arg<bool> state) => Method(state);
 
         /// <summary>Enables (<see langword="true"/>) or disables the items; the third argument says the first holds values, not texts.</summary>
         /// <param name="items">The items, by text, or by value when <paramref name="isValue"/> is <see langword="true"/>.</param>
         /// <param name="enable"><see langword="true"/> to enable the items; <see langword="false"/> to disable them.</param>
         /// <param name="isValue"><see langword="true"/> when <paramref name="items"/> holds values, not texts.</param>
-        public void EnableItems(Arg<string[]> items, Arg<bool> enable, Arg<bool> isValue) => Call(items, enable, isValue);
+        public void EnableItems(Arg<string[]> items, Arg<bool> enable, Arg<bool> isValue) => Method(items, enable, isValue);
 
         /// <summary>Raised when the selection changes.</summary>
-        public TypedEvent<FusionListBoxChangeArgs> Change =>
+        public Event<FusionListBoxChangeArgs> Change =>
             Event<FusionListBoxChangeArgs>();
     }
 

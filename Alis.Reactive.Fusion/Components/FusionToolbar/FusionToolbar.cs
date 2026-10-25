@@ -21,10 +21,10 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Disables (<see langword="true"/>) or enables (<see langword="false"/>) the whole toolbar.</summary>
         /// <param name="value"><see langword="true"/> to disable the toolbar; <see langword="false"/> to enable it.</param>
-        public void Disable(Arg<bool> value) => Call(value);
+        public void Disable(Arg<bool> value) => Method(value);
 
         /// <summary>Raised when the user clicks a toolbar item.</summary>
-        public TypedEvent<FusionToolbarClickedArgs> Clicked =>
+        public Event<FusionToolbarClickedArgs> Clicked =>
             Event<FusionToolbarClickedArgs>();
     }
 

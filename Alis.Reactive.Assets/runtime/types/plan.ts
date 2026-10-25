@@ -166,6 +166,7 @@ export interface NoPluginData {
 
 export interface Handler {
   on: string;
+  path: string[];
   event: string;
   param: string;
   do: Statement[];

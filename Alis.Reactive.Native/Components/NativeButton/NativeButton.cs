@@ -22,13 +22,13 @@ namespace Alis.Reactive.Native.Components
     public sealed class NativeButton : NativeComponent
     {
         /// <summary>The button text.</summary>
-        public Prop<string> TextContent => Prop<string>();
+        public Property<string> TextContent => Property<string>();
 
         /// <summary>Moves focus to the button.</summary>
-        public void Focus() => Call();
+        public void Focus() => Method();
 
         /// <summary>Raised when the user clicks the button.</summary>
-        public TypedEvent<NativeButtonClickArgs> Click =>
+        public Event<NativeButtonClickArgs> Click =>
             Event<NativeButtonClickArgs>();
     }
 

@@ -20,25 +20,25 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionDropDownTree : FusionComponent, IInputComponent
     {
         /// <summary>The selected node values; <see langword="null"/> clears them.</summary>
-        public Prop<string[]> Value => Prop<string[]>();
+        public Property<string[]> Value => Property<string[]>();
 
         /// <summary>The text shown for the selection.</summary>
-        public Prop<string> Text => Prop<string>();
+        public Property<string> Text => Property<string>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>Opens the popup.</summary>
-        public void ShowPopup() => Call();
+        public void ShowPopup() => Method();
 
         /// <summary>Closes the popup.</summary>
-        public void HidePopup() => Call();
+        public void HidePopup() => Method();
 
         /// <summary>Clears the selection.</summary>
-        public void Clear() => Call();
+        public void Clear() => Method();
 
         /// <summary>Raised when the selection changes.</summary>
-        public TypedEvent<FusionDropDownTreeChangeArgs> Change =>
+        public Event<FusionDropDownTreeChangeArgs> Change =>
             Event<FusionDropDownTreeChangeArgs>();
 
         /// <inheritdoc />

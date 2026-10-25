@@ -16,31 +16,31 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionInPlaceEditor : FusionComponent, IInputComponent
     {
         /// <summary>The edited value.</summary>
-        public Prop<string?> Value => Prop<string?>();
+        public Property<string?> Value => Property<string?>();
 
         /// <summary>Disables (<see langword="true"/>) or enables the editor.</summary>
         /// <param name="value"><see langword="true"/> to disable the editor; <see langword="false"/> to enable it.</param>
-        public void Disable(Arg<bool> value) => Call(value);
+        public void Disable(Arg<bool> value) => Method(value);
 
         /// <summary>Saves the edited value.</summary>
-        public void Save() => Call();
+        public void Save() => Method();
 
         /// <summary>Moves focus into the editor.</summary>
-        public void SetFocus() => Call();
+        public void SetFocus() => Method();
 
         /// <summary>The editor's element: <c>editor.Element.ClassList.Add("alis-editor-saved")</c>.</summary>
         public FusionInPlaceEditorElement Element => Object<FusionInPlaceEditorElement>();
 
         /// <summary>Raised before the editor opens.</summary>
-        public TypedEvent<FusionInPlaceEditorBeginEditArgs> BeginEdit =>
+        public Event<FusionInPlaceEditorBeginEditArgs> BeginEdit =>
             Event<FusionInPlaceEditorBeginEditArgs>();
 
         /// <summary>Raised before the editor closes.</summary>
-        public TypedEvent<FusionInPlaceEditorEndEditArgs> EndEdit =>
+        public Event<FusionInPlaceEditorEndEditArgs> EndEdit =>
             Event<FusionInPlaceEditorEndEditArgs>();
 
         /// <summary>Raised when the value changes.</summary>
-        public TypedEvent<FusionInPlaceEditorChangeArgs> Change =>
+        public Event<FusionInPlaceEditorChangeArgs> Change =>
             Event<FusionInPlaceEditorChangeArgs>();
 
         /// <inheritdoc />
@@ -52,19 +52,19 @@ namespace Alis.Reactive.Fusion.Components
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: EndEdit);
 
         /// <summary>Raised before the value is submitted.</summary>
-        public TypedEvent<FusionInPlaceEditorActionBeginArgs> ActionBegin =>
+        public Event<FusionInPlaceEditorActionBeginArgs> ActionBegin =>
             Event<FusionInPlaceEditorActionBeginArgs>();
 
         /// <summary>Raised after the value is submitted.</summary>
-        public TypedEvent<FusionInPlaceEditorActionSuccessArgs> ActionSuccess =>
+        public Event<FusionInPlaceEditorActionSuccessArgs> ActionSuccess =>
             Event<FusionInPlaceEditorActionSuccessArgs>();
 
         /// <summary>Raised when the user clicks save.</summary>
-        public TypedEvent<FusionInPlaceEditorSubmitClickArgs> SubmitClick =>
+        public Event<FusionInPlaceEditorSubmitClickArgs> SubmitClick =>
             Event<FusionInPlaceEditorSubmitClickArgs>();
 
         /// <summary>Raised when the user clicks cancel.</summary>
-        public TypedEvent<FusionInPlaceEditorCancelClickArgs> CancelClick =>
+        public Event<FusionInPlaceEditorCancelClickArgs> CancelClick =>
             Event<FusionInPlaceEditorCancelClickArgs>();
     }
 
@@ -80,18 +80,18 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Adds a CSS class.</summary>
         /// <param name="tokens">The CSS class to add.</param>
-        public void Add(Arg<string> tokens) => Call(tokens);
+        public void Add(Arg<string> tokens) => Method(tokens);
 
         /// <summary>Removes a CSS class.</summary>
         /// <param name="tokens">The CSS class to remove.</param>
-        public void Remove(Arg<string> tokens) => Call(tokens);
+        public void Remove(Arg<string> tokens) => Method(tokens);
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.BeginEdit"/>.</summary>
     public class FusionInPlaceEditorBeginEditArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
 
         /// <summary>Whether the editor opens without taking focus.</summary>
         public ReadOnly<bool> CancelFocus => ReadOnly<bool>();
@@ -110,7 +110,7 @@ namespace Alis.Reactive.Fusion.Components
         public ReadOnly<string> Action => ReadOnly<string>();
 
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
 
         /// <summary>The edit mode.</summary>
         public ReadOnly<string> Mode => ReadOnly<string>();
@@ -139,7 +139,7 @@ namespace Alis.Reactive.Fusion.Components
         public ReadOnly<FusionInPlaceEditorSubmission> Data => ReadOnly<FusionInPlaceEditorSubmission>();
 
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>What the editor submits for a field: as EJ2 names its members.</summary>

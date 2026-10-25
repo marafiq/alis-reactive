@@ -42,7 +42,13 @@ namespace Alis.Reactive
         }
 
         internal ValueExpression Invoke(ComponentMethod method, IReadOnlyList<ValueExpression> args, Shape returns) =>
-            ValueExpression.Invoke(Locate(), G.PathOf(method.Path), args, method.ArgumentShapes, returns, method.Awaits, method.Name);
+            ValueExpression.MethodResult(
+                ValueExpression.Invoke(Locate(), G.PathOf(method.Path), args, method.ArgumentShapes, returns, method.Name),
+                method.Name,
+                method.Awaits);
+
+        // The line a method with a result is written on: it runs there when no earlier statement read the result.
+        internal void RunsAtThisLine(ValueExpression result) => Context.AddStep(new MethodResultStep(result));
 
         // "target" and "[0]" read "target[0]"; "slot" and "label" read "slot.label".
         private static string Join(string member, string path) =>
@@ -103,23 +109,19 @@ namespace Alis.Reactive
     }
 
     /// <summary>
-    /// The object one of another object's methods returns, such as a grid's column. Each use of it calls
-    /// the method again, where the use is written.
+    /// The object one of another object's methods returns, such as a grid's column. The method runs once,
+    /// before the first use of the object in a block, and each use reads the object it returned.
     /// </summary>
     internal sealed class ReturnedObjectBinding : ObjectBinding
     {
-        private readonly ObjectBinding _owner;
-        private readonly ComponentMethod _method;
-        private readonly IReadOnlyList<ValueExpression> _args;
-
         internal ReturnedObjectBinding(ObjectBinding owner, ComponentMethod method, IReadOnlyList<ValueExpression> args)
             : base(owner.Context)
         {
-            _owner = owner;
-            _method = method;
-            _args = args;
+            Result = owner.Invoke(method, args, Shape.Any);
         }
 
-        protected override Receiver Locate() => Receiver.Returned(_owner.Invoke(_method, _args, Shape.Any));
+        internal ValueExpression Result { get; }
+
+        protected override Receiver Locate() => Receiver.Returned(Result);
     }
 }

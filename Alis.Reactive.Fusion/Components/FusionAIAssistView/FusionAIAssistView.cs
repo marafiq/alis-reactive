@@ -23,38 +23,38 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionAIAssistView : FusionComponent
     {
         /// <summary>The prompt text in the input.</summary>
-        public Prop<string> Prompt => Prop<string>();
+        public Property<string> Prompt => Property<string>();
 
         /// <summary>The zero-based index of the shown view.</summary>
-        public Prop<int> ActiveView => Prop<int>();
+        public Property<int> ActiveView => Property<int>();
 
         /// <summary>Sends a prompt as if the user typed it.</summary>
         /// <param name="prompt">The prompt text to send; it must not be empty.</param>
-        public void ExecutePrompt(Arg<string> prompt) => Call(prompt);
+        public void ExecutePrompt(Arg<string> prompt) => Method(prompt);
 
         /// <summary>Adds response text to the latest prompt; the second argument says whether it is the final update.</summary>
         /// <param name="outputResponse">The response text for the latest prompt.</param>
         /// <param name="isFinalUpdate"><see langword="true"/> when this is the last update, which hides the stop-responding button.</param>
-        public void AddPromptResponse(Arg<string> outputResponse, Arg<bool> isFinalUpdate) => Call(outputResponse, isFinalUpdate);
+        public void AddPromptResponse(Arg<string> outputResponse, Arg<bool> isFinalUpdate) => Method(outputResponse, isFinalUpdate);
 
         /// <summary>Adds a prompt with its response; the second argument says whether it is the final update.</summary>
         /// <param name="outputResponse">The prompt and its response; when the prompt is the one being answered it fills that response, otherwise both are added to the conversation.</param>
         /// <param name="isFinalUpdate"><see langword="true"/> when this is the last update, which hides the stop-responding button.</param>
-        public void AddPromptResponseModel(Arg<FusionAIAssistViewPromptModel> outputResponse, Arg<bool> isFinalUpdate) => Call(outputResponse, isFinalUpdate, name: "addPromptResponse");
+        public void AddPromptResponseModel(Arg<FusionAIAssistViewPromptModel> outputResponse, Arg<bool> isFinalUpdate) => Method(outputResponse, isFinalUpdate, name: "addPromptResponse");
 
         /// <summary>Scrolls the conversation to the latest response.</summary>
-        public void ScrollToBottom() => Call();
+        public void ScrollToBottom() => Method();
 
         /// <summary>Raised when the user sends a prompt.</summary>
-        public TypedEvent<FusionAIAssistViewPromptRequestArgs> PromptRequest =>
+        public Event<FusionAIAssistViewPromptRequestArgs> PromptRequest =>
             Event<FusionAIAssistViewPromptRequestArgs>();
 
         /// <summary>Raised when the prompt text changes.</summary>
-        public TypedEvent<FusionAIAssistViewPromptChangedArgs> PromptChanged =>
+        public Event<FusionAIAssistViewPromptChangedArgs> PromptChanged =>
             Event<FusionAIAssistViewPromptChangedArgs>();
 
         /// <summary>Raised when the user stops a response.</summary>
-        public TypedEvent<FusionAIAssistViewStopRespondingClickArgs> StopRespondingClick =>
+        public Event<FusionAIAssistViewStopRespondingClickArgs> StopRespondingClick =>
             Event<FusionAIAssistViewStopRespondingClickArgs>();
     }
 

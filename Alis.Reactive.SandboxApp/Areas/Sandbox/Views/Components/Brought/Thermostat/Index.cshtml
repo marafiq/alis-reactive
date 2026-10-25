@@ -35,7 +35,7 @@
 
     var plan = Html.ReactivePlan<RoomComfortModel>();
 
-    // The wing's policy sets the range and the night setting as the page opens.
+    // The wing's policy sets the range and the night setting as the page opens; the room's zones are listed.
     Html.On(plan, t => t.DomReady(p =>
         p.Get(Url.SandboxRoute("Policy", "Thermostat"))
             .Response(r => r.OnSuccess<ComfortPolicy>((policy, s) =>
@@ -46,6 +46,10 @@
                 s.Element("range-min").Text.Set(policy.Get(x => x.Min));
                 s.Element("range-max").Text.Set(policy.Get(x => x.Max));
                 s.Element("next-change").Text.Set(thermostat.Schedule.NextChange());
+                s.Element("zone-count").Text.Set(thermostat.Zones.Count);
+                s.When(thermostat.Zones.Each(zone => zone.Name)).ArrayContains("Bath")
+                    .Then(bath => bath.Element("bath-zone").Show())
+                    .Else(none => none.Element("bath-zone").Hide());
                 DescribeComfort(s);
             }))));
 }
@@ -61,7 +65,7 @@
     <native-card><native-card-body id="@FormId">
         <native-vstack gap="Base">
             @{ Html.InputField(plan, m => m.Target, o => o.Required().Label("Target temperature"))
-                .Thermostat(currentTemperature: 68, pin: "1234", locked: true)
+                .Thermostat(currentTemperature: 68, pin: "1234", locked: true, zones: new[] { "Bedroom", "Bath" })
                 .Reactive(evt => evt.TargetChanging, (args, p) =>
                     // The wing's range is the limit: a target outside it is capped at the nearest allowed degree.
                     p.When(args.Requested).NotEq(args.Clamp())
@@ -88,7 +92,13 @@
                         .Then(night => night.Element("night-active").Show())
                         .Else(day => day.Element("night-active").Hide());
                 })
-                .Reactive(evt => evt.Unlocked, (args, p) =>
+                .Reactive(evt => evt.Schedule.Applied, (args, p) =>
+                {
+                    // The schedule's own event: the thermostat's nested object raises it.
+                    p.Element("night-applied").Text.Set(args.Target);
+                    p.Element("night-active").Show();
+                })
+                .Reactive(evt => evt.Unlocked, p =>
                     p.Element("lock-status").Text.Set("Thermostat unlocked for Margaret's room.")); }
 
             <native-vstack gap="Xs">
@@ -97,8 +107,10 @@
                 <p id="away" class="text-sm text-text-secondary" hidden>The room is <span id="distance"></span>° from the target; about <span id="minutes"></span> minutes to get there.</p>
                 <p id="capped" class="text-sm text-warning" hidden>Capped at the wing's limit.</p>
                 <native-text color="Secondary">Wing range <span id="range-min"></span>–<span id="range-max"></span>°F · Night setting <span id="next-change"></span></native-text>
-                <p id="night-active" class="text-sm text-success" hidden>Night setting active.</p>
+                <p id="night-active" class="text-sm text-success" hidden>Night setting active: <span id="night-applied"></span>°F applied.</p>
                 <native-text color="Secondary">Mode <span id="mode">heat</span> · Reading <span id="reading"></span></native-text>
+                <native-text color="Secondary"><span id="zone-count">0</span> zones in the room.</native-text>
+                <p id="bath-zone" class="text-sm text-text-secondary" hidden>The bath has its own zone at <span id="bath-target">@Model.Target</span>°F. <span id="bath-boosted" hidden>Boosted for the bath hour.</span></p>
             </native-vstack>
 
             <native-hstack gap="Sm" class="flex-wrap">
@@ -125,6 +137,22 @@
                 @(Html.NativeButton("off", "Off")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) => SetMode(p, ThermostatMode.Off)))
+                @(Html.NativeButton("boost-bath", "Boost the bath")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        // One zone of the list, used as the object: its own method, property and function.
+                        var bath = p.Component<Thermostat>(m => m.Target).Zones.At(1);
+                        bath.Boost();
+                        p.Element("bath-target").Text.Set(bath.Target);
+                        p.When(bath.IsBoosted()).Truthy()
+                            .Then(boosted => boosted.Element("bath-boosted").Show())
+                            .Else(plain => plain.Element("bath-boosted").Hide());
+                    }))
+                @(Html.NativeButton("quiet-hours", "Quiet hours overnight")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                        p.Component<Thermostat>(m => m.Target).SetQuietHours(new[] { "9:00 PM", "7:00 AM" })))
             </native-hstack>
 
             <native-grid cols="C2" gap="Base">

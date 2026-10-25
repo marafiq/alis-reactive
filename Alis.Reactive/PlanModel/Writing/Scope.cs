@@ -15,16 +15,21 @@ namespace Alis.Reactive.PlanModel
         private readonly PlanWriter _plan;
         private readonly string? _item;
         private readonly ResponseFrame? _responses;
+        private readonly ResultFrame? _results;
 
-        private Scope(PlanWriter plan, string eventParam, ResponseFrame? responses, string? item)
+        private Scope(PlanWriter plan, string eventParam, ResponseFrame? responses, string? item, ResultFrame? results)
         {
             _plan = plan;
             EventParam = eventParam;
             _responses = responses;
             _item = item;
+            _results = results;
         }
 
-        internal static Scope ForHandler(PlanWriter plan, string eventParam) => new Scope(plan, eventParam, null, null);
+        internal static Scope ForHandler(PlanWriter plan, string eventParam) => new Scope(plan, eventParam, null, null, null);
+
+        /// <summary>The scope of a block: it binds the method results its statements use, and sees its parent's.</summary>
+        internal Scope ForBlock() => new Scope(_plan, EventParam, _responses, _item, new ResultFrame(_results));
 
         internal ObjectTable Objects => _plan.Objects;
 
@@ -38,9 +43,29 @@ namespace Alis.Reactive.PlanModel
         internal string Fresh(string stem) => _plan.Fresh(stem);
 
         internal Scope WithResponse(ResponseHandle handle, string binding) =>
-            new Scope(_plan, EventParam, new ResponseFrame(handle, binding, _responses), _item);
+            new Scope(_plan, EventParam, new ResponseFrame(handle, binding, _responses), _item, _results);
 
-        internal Scope WithItem(string name) => new Scope(_plan, EventParam, _responses, name);
+        internal Scope WithItem(string name) => new Scope(_plan, EventParam, _responses, name, _results);
+
+        /// <summary>
+        /// What a method returned, bound once per block by a <c>let</c> hoisted before the statement that
+        /// first reads it; a later read in the block, or in a block inside it, is the name (grammar.md 3.1).
+        /// </summary>
+        internal Expr Result(object result, string stem, bool awaits, string member, Func<Expr> call)
+        {
+            for (var frame = _results; frame != null; frame = frame.Outer)
+                if (frame.TryGet(result, out var bound)) return G.Ref(bound);
+
+            if (_results == null)
+                throw new InvalidOperationException(
+                    $"Plan '{PlanId}' calls '{member}' outside a reaction. Call a method inside a trigger, a component's " +
+                    ".Reactive, Then, Else, OnSuccess, OnError, WhileLoading, Finally or OnAllSettled callback.");
+
+            var name = Fresh(stem);
+            _plan.Hoist(G.Let(name, call(), awaits), member);
+            _results.Add(result, name);
+            return G.Ref(name);
+        }
 
         /// <summary>The binding of the response the handle names; the innermost one for <see cref="ResponseHandle.Innermost"/>.</summary>
         internal string? ResponseOf(ResponseHandle handle)
@@ -52,15 +77,30 @@ namespace Alis.Reactive.PlanModel
         }
 
         /// <summary>
-        /// Writes one statement's worth of steps; a value it reads that returns a promise settles in a
-        /// <c>let</c> just before them.
+        /// Writes one statement's worth of steps; the let that binds a method result the statement reads,
+        /// awaited when the method returns a promise, lands just before them.
         /// </summary>
-        internal IReadOnlyList<Statement> WithAwaitedReads(Func<IReadOnlyList<Statement>> write) => _plan.WithAwaitedReads(write);
+        internal IReadOnlyList<Statement> WithHoisted(Func<IReadOnlyList<Statement>> write) => _plan.WithHoisted(write);
 
-        /// <summary>Writes a value where nothing waits for a promise: inside an array operation's lambda.</summary>
-        internal T WithoutAwaiting<T>(Func<T> write) => _plan.WithoutAwaiting(write);
+        /// <summary>Writes a value where no statement runs before it is read: inside an array operation's lambda.</summary>
+        internal T WithoutHoisting<T>(Func<T> write) => _plan.WithoutHoisting(write);
 
-        internal Expr Awaited(Expr call, string member) => _plan.Awaited(call, member);
+
+        private sealed class ResultFrame
+        {
+            private readonly Dictionary<object, string> _bound = new Dictionary<object, string>();
+
+            internal ResultFrame(ResultFrame? outer)
+            {
+                Outer = outer;
+            }
+
+            internal ResultFrame? Outer { get; }
+
+            internal bool TryGet(object result, out string name) => _bound.TryGetValue(result, out name!);
+
+            internal void Add(object result, string name) => _bound.Add(result, name);
+        }
 
         private sealed class ResponseFrame
         {
@@ -88,13 +128,14 @@ namespace Alis.Reactive.PlanModel
         internal static ResponseHandle Innermost { get; } = new ResponseHandle();
     }
 
-    /// <summary>The plan being written: its objects, its fresh names and the awaited reads of the statement being written.</summary>
+    /// <summary>The plan being written: its objects, its fresh names and the statements hoisted before the one being written.</summary>
     internal sealed class PlanWriter
     {
         private int _names;
 
-        // The awaited reads of the statement being written; null where nothing can wait for one.
-        private List<Statement>? _awaitedReads;
+        // The statements hoisted before the statement being written, such as the let that binds a method's
+        // result; null where no statement can run before a value is read, as in an array operation.
+        private List<Statement>? _hoisted;
 
         internal PlanWriter(string planId, ObjectTable objects)
         {
@@ -108,47 +149,46 @@ namespace Alis.Reactive.PlanModel
 
         internal string Fresh(string stem) => stem + (++_names).ToString(CultureInfo.InvariantCulture);
 
-        internal IReadOnlyList<Statement> WithAwaitedReads(Func<IReadOnlyList<Statement>> write)
+        internal IReadOnlyList<Statement> WithHoisted(Func<IReadOnlyList<Statement>> write)
         {
-            var outer = _awaitedReads;
-            var awaited = new List<Statement>();
-            _awaitedReads = awaited;
+            var outer = _hoisted;
+            var hoisted = new List<Statement>();
+            _hoisted = hoisted;
             try
             {
                 var statements = write();
-                return awaited.Count == 0 ? statements : awaited.Concat(statements).ToList();
+                return hoisted.Count == 0 ? statements : hoisted.Concat(statements).ToList();
             }
             finally
             {
-                _awaitedReads = outer;
+                _hoisted = outer;
             }
         }
 
-        internal T WithoutAwaiting<T>(Func<T> write)
+        internal T WithoutHoisting<T>(Func<T> write)
         {
-            var outer = _awaitedReads;
-            _awaitedReads = null;
+            var outer = _hoisted;
+            _hoisted = null;
             try
             {
                 return write();
             }
             finally
             {
-                _awaitedReads = outer;
+                _hoisted = outer;
             }
         }
 
-        internal Expr Awaited(Expr call, string member)
+        internal void Hoist(Statement statement, string member)
         {
-            if (_awaitedReads == null)
+            if (_hoisted == null)
                 throw new InvalidOperationException(
-                    $"Plan '{PlanId}' reads '{member}', which returns a promise, inside an array operation or a " +
-                    "validation rule, where nothing waits for it. Read it in a reaction step instead.");
+                    $"Plan '{PlanId}' calls '{member}' inside an array operation or a validation rule, where no " +
+                    "statement runs before the value is read. Call it in a reaction step instead.");
 
-            var settled = Fresh("r");
-            _awaitedReads.Add(G.Let(settled, call, awaits: true));
-            return G.Ref(settled);
+            _hoisted.Add(statement);
         }
+
     }
 
     /// <summary>

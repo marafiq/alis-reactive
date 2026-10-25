@@ -21,47 +21,47 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionDropDownList : FusionComponent, IInputComponent
     {
         /// <summary>The selected value; <see langword="null"/> when empty.</summary>
-        public Prop<string> Value => Prop<string>();
+        public Property<string> Value => Property<string>();
 
         /// <summary>The text shown for the selection; writing it selects the item that shows this text.</summary>
-        public Prop<string> Text => Prop<string>();
+        public Property<string> Text => Property<string>();
 
         /// <summary>The items the list offers, typed by your item class.</summary>
         /// <remarks>Call <see cref="DataBind"/> after writing it so the list renders the new items.</remarks>
         /// <typeparam name="TItem">Your item class.</typeparam>
-        public Prop<IEnumerable<TItem>> Items<TItem>() where TItem : class => Prop<IEnumerable<TItem>>("dataSource");
+        public Property<IEnumerable<TItem>> Items<TItem>() where TItem : class => Property<IEnumerable<TItem>>("dataSource");
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>Moves focus into the list.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
 
         /// <summary>Removes focus from the list.</summary>
-        public void FocusOut() => Call();
+        public void FocusOut() => Method();
 
         /// <summary>Opens the popup.</summary>
-        public void ShowPopup() => Call();
+        public void ShowPopup() => Method();
 
         /// <summary>Closes the popup.</summary>
-        public void HidePopup() => Call();
+        public void HidePopup() => Method();
 
         /// <summary>Clears the selection and the text; call <see cref="DataBind"/> to apply it at once.</summary>
-        public void Clear() => Call();
+        public void Clear() => Method();
 
         /// <summary>Raised when the selected value changes.</summary>
-        public TypedEvent<FusionDropDownListChangeArgs> Change =>
+        public Event<FusionDropDownListChangeArgs> Change =>
             Event<FusionDropDownListChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the list receives focus.</summary>
-        public TypedEvent<FusionDropDownListFocusArgs> Focus =>
+        public Event<FusionDropDownListFocusArgs> Focus =>
             Event<FusionDropDownListFocusArgs>();
 
         /// <summary>Raised when the list loses focus.</summary>
-        public TypedEvent<FusionDropDownListBlurArgs> Blur =>
+        public Event<FusionDropDownListBlurArgs> Blur =>
             Event<FusionDropDownListBlurArgs>();
     }
 

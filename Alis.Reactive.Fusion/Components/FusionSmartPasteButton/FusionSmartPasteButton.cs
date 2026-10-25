@@ -11,12 +11,12 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionSmartPasteButton : FusionComponent
     {
         /// <summary>Whether the button is disabled.</summary>
-        public Prop<bool> Disabled => Prop<bool>();
+        public Property<bool> Disabled => Property<bool>();
 
         /// <summary>Clicks the button, pasting the clipboard into the form.</summary>
-        public void Click() => Call();
+        public void Click() => Method();
 
         /// <summary>Moves focus to the button.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
     }
 }

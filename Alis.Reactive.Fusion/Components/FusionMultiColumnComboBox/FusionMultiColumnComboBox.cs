@@ -17,32 +17,32 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionMultiColumnComboBox : FusionComponent, IInputComponent
     {
         /// <summary>The selected value; <see langword="null"/> when empty.</summary>
-        public Prop<string> Value => Prop<string>();
+        public Property<string> Value => Property<string>();
 
         /// <summary>The text shown for the selection.</summary>
-        public Prop<string> Text => Prop<string>();
+        public Property<string> Text => Property<string>();
 
         /// <summary>The rows the popup offers, typed by your row class; call <see cref="DataBind"/> after writing it.</summary>
         /// <typeparam name="TRow">Your row class.</typeparam>
-        public Prop<IEnumerable<TRow>> Rows<TRow>() where TRow : class => Prop<IEnumerable<TRow>>("dataSource");
+        public Property<IEnumerable<TRow>> Rows<TRow>() where TRow : class => Property<IEnumerable<TRow>>("dataSource");
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>Moves focus into the input.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
 
         /// <summary>Removes focus from the input.</summary>
-        public void FocusOut() => Call();
+        public void FocusOut() => Method();
 
         /// <summary>Opens the popup.</summary>
-        public void ShowPopup() => Call();
+        public void ShowPopup() => Method();
 
         /// <summary>Closes the popup.</summary>
-        public void HidePopup() => Call();
+        public void HidePopup() => Method();
 
         /// <summary>Raised when the selection changes.</summary>
-        public TypedEvent<FusionMultiColumnComboBoxChangeArgs> Change =>
+        public Event<FusionMultiColumnComboBoxChangeArgs> Change =>
             Event<FusionMultiColumnComboBoxChangeArgs>();
 
         /// <inheritdoc />

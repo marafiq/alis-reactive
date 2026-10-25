@@ -38,7 +38,7 @@ namespace Alis.Reactive
         /// <typeparam name="TArgs">The payload of the committing event.</typeparam>
         /// <param name="value">The property that holds the value, declared on the component.</param>
         /// <param name="committedBy">The event the component raises when the person commits a value.</param>
-        public static ComponentInput Of<TValue, TArgs>(ReadOnly<TValue> value, TypedEvent<TArgs> committedBy)
+        public static ComponentInput Of<TValue, TArgs>(ReadOnly<TValue> value, Event<TArgs> committedBy)
             where TArgs : JsObject
         {
             if (value == null) throw new ArgumentNullException(nameof(value));

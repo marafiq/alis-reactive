@@ -16,36 +16,36 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
     {
         /// <summary>The numeric value.</summary>
-        public Prop<decimal> Value => Prop<decimal>();
+        public Property<decimal> Value => Property<decimal>();
 
         /// <summary>The minimum allowed value.</summary>
-        public Prop<decimal> Min => Prop<decimal>();
+        public Property<decimal> Min => Property<decimal>();
 
         /// <summary>Moves focus into the input.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
 
         /// <summary>Removes focus from the input.</summary>
-        public void FocusOut() => Call();
+        public void FocusOut() => Method();
 
         /// <summary>Increments the value by one step.</summary>
-        public void Increment() => Call();
+        public void Increment() => Method();
 
         /// <summary>Decrements the value by one step.</summary>
-        public void Decrement() => Call();
+        public void Decrement() => Method();
 
         /// <summary>Raised when the value changes.</summary>
-        public TypedEvent<FusionNumericTextBoxChangeArgs> Change =>
+        public Event<FusionNumericTextBoxChangeArgs> Change =>
             Event<FusionNumericTextBoxChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the input receives focus.</summary>
-        public TypedEvent<FusionNumericTextBoxFocusArgs> Focus =>
+        public Event<FusionNumericTextBoxFocusArgs> Focus =>
             Event<FusionNumericTextBoxFocusArgs>();
 
         /// <summary>Raised when the input loses focus.</summary>
-        public TypedEvent<FusionNumericTextBoxBlurArgs> Blur =>
+        public Event<FusionNumericTextBoxBlurArgs> Blur =>
             Event<FusionNumericTextBoxBlurArgs>();
     }
 

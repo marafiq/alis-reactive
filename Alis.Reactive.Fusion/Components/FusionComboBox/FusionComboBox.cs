@@ -21,45 +21,45 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionComboBox : FusionComponent, IInputComponent
     {
         /// <summary>The selected value.</summary>
-        public Prop<string> Value => Prop<string>();
+        public Property<string> Value => Property<string>();
 
         /// <summary>The text shown in the input.</summary>
-        public Prop<string> Text => Prop<string>();
+        public Property<string> Text => Property<string>();
 
         /// <summary>The zero-based index of the selected item.</summary>
-        public Prop<int?> Index => Prop<int?>();
+        public Property<int?> Index => Property<int?>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>Moves focus into the input.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
 
         /// <summary>Removes focus from the input.</summary>
-        public void FocusOut() => Call();
+        public void FocusOut() => Method();
 
         /// <summary>Opens the popup.</summary>
-        public void ShowPopup() => Call();
+        public void ShowPopup() => Method();
 
         /// <summary>Closes the popup.</summary>
-        public void HidePopup() => Call();
+        public void HidePopup() => Method();
 
         /// <summary>Clears the selection and the text.</summary>
-        public void Clear() => Call();
+        public void Clear() => Method();
 
         /// <summary>Raised when the selected value changes.</summary>
-        public TypedEvent<FusionComboBoxChangeArgs> Change =>
+        public Event<FusionComboBoxChangeArgs> Change =>
             Event<FusionComboBoxChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the input receives focus.</summary>
-        public TypedEvent<FusionComboBoxFocusArgs> Focus =>
+        public Event<FusionComboBoxFocusArgs> Focus =>
             Event<FusionComboBoxFocusArgs>();
 
         /// <summary>Raised when the input loses focus.</summary>
-        public TypedEvent<FusionComboBoxBlurArgs> Blur =>
+        public Event<FusionComboBoxBlurArgs> Blur =>
             Event<FusionComboBoxBlurArgs>();
     }
 

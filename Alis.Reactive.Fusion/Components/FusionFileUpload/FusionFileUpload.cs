@@ -22,7 +22,7 @@ namespace Alis.Reactive.Fusion.Components
         private ReadOnly<IReadOnlyList<FusionUploaderFile>> FilesData => ReadOnly<IReadOnlyList<FusionUploaderFile>>();
 
         /// <summary>Raised when the user selects files, before the uploader adds them; set <c>Cancel</c> to refuse them.</summary>
-        public TypedEvent<FusionFileUploadSelectedArgs> Selected =>
+        public Event<FusionFileUploadSelectedArgs> Selected =>
             Event<FusionFileUploadSelectedArgs>();
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <c>filesChanged</c> once it has. The input commits on it, so a form re-checks the files the user
         /// now sees. Clearing the files (a form reset) raises nothing.
         /// </remarks>
-        public TypedEvent<FusionFileUploadFilesChangedArgs> FilesChanged =>
+        public Event<FusionFileUploadFilesChangedArgs> FilesChanged =>
             Event<FusionFileUploadFilesChangedArgs>();
 
         /// <inheritdoc />
@@ -49,7 +49,7 @@ namespace Alis.Reactive.Fusion.Components
         public ReadOnly<IReadOnlyList<FusionUploaderFile>> FilesData => ReadOnly<IReadOnlyList<FusionUploaderFile>>();
 
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to refuse the selection.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionFileUpload.FilesChanged"/>.</summary>

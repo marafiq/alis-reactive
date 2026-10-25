@@ -73,7 +73,7 @@ namespace Alis.Reactive.PlanModel
 
         // A comparison that reads a promise: its awaited reads settle, then the `if` runs.
         internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
-            IsSynchronous ? base.Guard(then, otherwise, scope) : scope.WithAwaitedReads(() => base.Guard(then, otherwise, scope));
+            IsSynchronous ? base.Guard(then, otherwise, scope) : scope.WithHoisted(() => base.Guard(then, otherwise, scope));
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ namespace Alis.Reactive.PlanModel
         }
 
         internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
-            IsSynchronous ? base.Guard(then, otherwise, scope) : scope.WithAwaitedReads(() => base.Guard(then, otherwise, scope));
+            IsSynchronous ? base.Guard(then, otherwise, scope) : scope.WithHoisted(() => base.Guard(then, otherwise, scope));
 
         private Expr Right(Shape shape, Scope scope) =>
             _right is LiteralExpression literal ? G.Lit(literal.Value, shape) : G.As(_right.Write(scope), shape);

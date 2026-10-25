@@ -66,3 +66,22 @@
   margin: 0;
   color: #b45309;
 }
+
+.thermostat .th-zones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #475569;
+}
+
+.thermostat .th-zone {
+  display: inline-flex;
+  gap: 0.35rem;
+}
+
+.thermostat .th-zone-boost {
+  color: #b45309;
+}

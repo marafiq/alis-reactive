@@ -81,7 +81,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
         }
 
         /// <summary>The plugin is itself the function: it takes text and returns its slug.</summary>
-        public TypedSource<string> Slug(Arg<string> text) => Invoke<string>(text, name: "");
+        public TypedSource<string> Slug(Arg<string> text) => Method<string>(text, name: "");
     }
 
     /// <summary>The board's activity list (Scripts/sandbox-plugins.ts): each line recorded shows in it.</summary>
@@ -93,7 +93,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
         }
 
         /// <summary>Adds a line to the activity list.</summary>
-        public void Record(Arg<string> line) => Call(line);
+        public void Record(Arg<string> line) => Method(line);
 
         /// <summary>How many lines the activity list holds.</summary>
         public ReadOnly<int> Entries => ReadOnly<int>();
@@ -108,7 +108,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
         }
 
         /// <summary>The plugin is itself the function: it reads a line out in the board's status region.</summary>
-        public void Say(Arg<string> line) => Call(line, name: "");
+        public void Say(Arg<string> line) => Method(line, name: "");
     }
 
     /// <summary>

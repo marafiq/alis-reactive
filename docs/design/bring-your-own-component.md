@@ -16,8 +16,8 @@ components. The plan a page renders is specified in [`grammar.md`](grammar.md).
    destroys at the right moment, including inside partials.
 
 2. **A component is declared once, by its own API.** One class names the object's members as C#
-   members: `public Prop<decimal> Min => Prop<decimal>();`, `public void Increment() => Call();`,
-   `public TypedEvent<FusionNumericTextBoxChangeArgs> Change => Event<FusionNumericTextBoxChangeArgs>();`,
+   members: `public Property<decimal> Min => Property<decimal>();`, `public void Increment() => Method();`,
+   `public Event<FusionNumericTextBoxChangeArgs> Change => Event<FusionNumericTextBoxChangeArgs>();`,
    and says which vendor it comes from. The JavaScript name is the C# name camel-cased unless
    `name:` gives another. Its event payloads are declarations too. Nothing else is written per
    component: no per-member extension methods, no events class, no reactive extension, no
@@ -60,15 +60,17 @@ with `off(name, fn)`, and hands a listener the event's payload.
 
 | The object has | Members |
 |----------------|---------|
-| properties read and written | `value` (the target), `mode`, `schedule.night` |
-| properties read | `current`, `locked`, `schedule.active` |
+| properties read and written | `value` (the target), `mode`, `schedule.night`, `zones[i].target` |
+| properties read | `current`, `locked`, `schedule.active`, `zones[i].name` |
 | a property written only | `pin`, a setter without a getter |
-| methods that return nothing | `increase()`, `hold(minutes)`, `setRange(min, max)`, `applyPlan(plan)`, `schedule.apply()` |
-| methods that return a value | `isComfortable()`, `distanceTo(target)`, `estimate(target, mode)`, `describe(plan)`, `schedule.nextChange()` |
+| methods that return nothing | `increase()`, `hold(minutes)`, `setRange(min, max)`, `setQuietHours(hours)`, `applyPlan(plan)`, `schedule.apply()`, `zones[i].boost()` |
+| methods that return a value | `isComfortable()`, `distanceTo(target)`, `estimate(target, mode)`, `describe(plan)`, `schedule.nextChange()`, `zones[i].isBoosted()` |
 | a method that returns an object | `reading()`: `value`, `unit`, `label()` |
 | an event without a payload | `unlocked` |
 | an event whose payload is an object | `targetChanging`: `requested`, `previous`, `cancel`, `reason`, `clamp()`, `accept()` |
 | the event that commits the value | `targetChanged`: `value`, `previous` |
+| an event of a nested object | `schedule.applied`: `target`, raised by the schedule itself |
+| a list of objects | `zones`: each with `name`, `target`, `boost()`, `isBoosted()` |
 
 **Step 1: say where the object is.** The vendor is the three facts the framework needs, and the
 only strings in the declaration:
@@ -88,66 +90,74 @@ The app constructs and destroys the widget as it would anyway, in listeners for 
 `alis:unmount` (`Alis.Reactive.SandboxApp/Scripts/sandbox-components.ts`); the framework raises them
 for the page at boot and for every injected partial.
 
-**Step 2: declare each member under its JavaScript name.** The C# member's name, camel-cased, is
-the JavaScript name: the `Call()` inside `Increase()` calls `increase()`, because the compiler hands
-the declaring member's name to every `Prop`, `ReadOnly`, `WriteOnly`, `Call`, `Invoke` and `Event`.
-`name:` gives another name where JavaScript differs. The kind of C# member says what the JavaScript
-member is (`Alis.Reactive.SandboxApp/BroughtComponents/Thermostat/Thermostat.cs`, doc comments left
-out):
+**Step 2: declare each member under its JavaScript name, as the kind of member it is.** Every word
+is a noun for the member kind: `Property`, `ReadOnly`, `WriteOnly`, `Object`, `Objects`, `Method`,
+`MethodAsync`, `Event`. The C# member's name, camel-cased, is the JavaScript name: the `Method()`
+inside `Increase()` names `increase()`, because the compiler hands the declaring member's name to each
+of those. `name:` gives another name where JavaScript differs. Whether `Object<T>()` is held or returned
+is said by the C# member being a property or a method
+(`Alis.Reactive.SandboxApp/BroughtComponents/Thermostat/Thermostat.cs`, doc comments left out):
 
 ```csharp
-    public Prop<int> Value => Prop<int>();                                        // read and written
-    public Prop<ThermostatMode> Mode => Prop<ThermostatMode>();                   // an enum, by its JavaScript text
+    public Property<int> Value => Property<int>();                                // read and written
+    public Property<ThermostatMode> Mode => Property<ThermostatMode>();           // an enum, by its JavaScript text
     public ReadOnly<int> Current => ReadOnly<int>();                              // read
     public ReadOnly<bool> Locked => ReadOnly<bool>();
     public WriteOnly<string> Pin => WriteOnly<string>();                          // written only: a read does not compile
     public ThermostatSchedule Schedule => Object<ThermostatSchedule>();           // an object with members of its own
+    public Objects<ThermostatZone> Zones => Objects<ThermostatZone>();            // a list of objects with members of their own
 
-    public void Increase() => Call();                                             // no argument
-    public void Hold(Arg<decimal> minutes) => Call(minutes);                      // one
-    public void SetRange(Arg<int> min, Arg<int> max) => Call(min, max);           // several
-    public void ApplyPlan(Arg<ComfortPlan> plan) => Call(plan);                   // an object
+    public void Increase() => Method();                                           // no argument
+    public void Hold(Arg<decimal> minutes) => Method(minutes);                    // one
+    public void SetRange(Arg<int> min, Arg<int> max) => Method(min, max);         // several
+    public void SetQuietHours(Arg<IReadOnlyList<string>> hours) => Method(hours); // a list
+    public void ApplyPlan(Arg<ComfortPlan> plan) => Method(plan);                 // an object
 
-    public TypedSource<bool> IsComfortable() => Invoke<bool>();                   // returns a value
-    public TypedSource<int> DistanceTo(Arg<int> target) => Invoke<int>(target);
-    public TypedSource<int> Estimate(Arg<int> target, Arg<ThermostatMode> mode) => Invoke<int>(target, mode);
-    public TypedSource<string> Describe(Arg<ComfortPlan> plan) => Invoke<string>(plan);
-    public ThermostatReading Reading() => InvokeObject<ThermostatReading>();      // returns an object
+    public TypedSource<bool> IsComfortable() => Method<bool>();                   // returns a value
+    public TypedSource<int> DistanceTo(Arg<int> target) => Method<int>(target);
+    public TypedSource<int> Estimate(Arg<int> target, Arg<ThermostatMode> mode) => Method<int>(target, mode);
+    public TypedSource<string> Describe(Arg<ComfortPlan> plan) => Method<string>(plan);
+    public ThermostatReading Reading() => Object<ThermostatReading>();            // returns an object
 
-    public TypedEvent<ThermostatUnlockedArgs> Unlocked => Event<ThermostatUnlockedArgs>();
-    public TypedEvent<ThermostatTargetChangingArgs> TargetChanging => Event<ThermostatTargetChangingArgs>();
-    public TypedEvent<ThermostatTargetChangedArgs> TargetChanged => Event<ThermostatTargetChangedArgs>();
+    public Event Unlocked => Event();                                             // carries nothing
+    public Event<ThermostatTargetChangingArgs> TargetChanging => Event<ThermostatTargetChangingArgs>();
+    public Event<ThermostatTargetChangedArgs> TargetChanged => Event<ThermostatTargetChangedArgs>();
 
     ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: TargetChanged);
 }
 
 public sealed class ThermostatSchedule : JsObject                   // thermostat.schedule
 {
-    public Prop<int> Night => Prop<int>();
+    public Property<int> Night => Property<int>();
     public ReadOnly<bool> Active => ReadOnly<bool>();
-    public void Apply() => Call();                                   // schedule.apply()
-    public TypedSource<string> NextChange() => Invoke<string>();     // schedule.nextChange()
+    public void Apply() => Method();                                 // schedule.apply()
+    public TypedSource<string> NextChange() => Method<string>();     // schedule.nextChange()
+    public Event<ThermostatScheduleAppliedArgs> Applied => Event<ThermostatScheduleAppliedArgs>(); // schedule.on("applied", ..)
+}
+
+public sealed class ThermostatZone : JsObject                       // one of thermostat.zones
+{
+    public ReadOnly<string> Name => ReadOnly<string>();
+    public Property<int> Target => Property<int>();
+    public void Boost() => Method();                                 // zones[i].boost()
+    public TypedSource<bool> IsBoosted() => Method<bool>();
 }
 
 public sealed class ThermostatReading : JsObject                    // what reading() returns
 {
     public ReadOnly<int> Value => ReadOnly<int>();
     public ReadOnly<string> Unit => ReadOnly<string>();
-    public TypedSource<string> Label() => Invoke<string>();
-}
-
-public class ThermostatUnlockedArgs : JsObject                      // an event that carries nothing
-{
+    public TypedSource<string> Label() => Method<string>();
 }
 
 public class ThermostatTargetChangingArgs : JsObject                // a payload the page reads, writes and calls
 {
     public ReadOnly<int> Requested => ReadOnly<int>();
     public ReadOnly<int> Previous => ReadOnly<int>();
-    public Prop<bool> Cancel => Prop<bool>();
-    public Prop<string> Reason => Prop<string>();
-    public TypedSource<int> Clamp() => Invoke<int>();
-    public void Accept() => Call();
+    public Property<bool> Cancel => Property<bool>();
+    public Property<string> Reason => Property<string>();
+    public TypedSource<int> Clamp() => Method<int>();
+    public void Accept() => Method();
 }
 
 public class ThermostatTargetChangedArgs : JsObject
@@ -168,7 +178,9 @@ public enum ThermostatMode
 The last line of the component is what forms need: which property holds the value and which event
 commits it. Validation, gather and `alis:commit` follow from it with no further code. `ComfortPlan`
 is an ordinary C# data class; an argument of that type reaches the method as the object of its
-members by their JSON names, whether the page wrote it or a response carried it.
+members by their JSON names, whether the page wrote it or a response carried it. A method that
+returns a value runs once per callback, before the first line that reads its result, or at its own
+line when no line does; a `MethodAsync<T>` result makes that first line wait for the promise.
 
 **Step 3: render it, then use it as the object.** The render helper writes the component's own
 markup with the id and name the framework derives from the model, and hands the markup back:
@@ -222,7 +234,9 @@ Html.InputField(plan, m => m.Target, o => o.Required().Label("Target temperature
             .Then(near => near.Element("comfortable").Show())
             .Else(far => far.Element("comfortable").Hide());
     })
-    .Reactive(evt => evt.Unlocked, (args, p) =>
+    .Reactive(evt => evt.Schedule.Applied, (args, p) =>              // the nested object's own event
+        p.Element("night-applied").Text.Set(args.Target))
+    .Reactive(evt => evt.Unlocked, p =>                               // an event that carries nothing
         p.Element("lock-status").Text.Set("Thermostat unlocked for Margaret's room."));
 
 // On load, the wing's policy from the server sets the range and the night setting.
@@ -243,16 +257,22 @@ thermostat.Pin.Set(p.Component<NativeTextBox>(m => m.Pin).Value);           // w
 thermostat.Mode.Set(ThermostatMode.Cool);
 thermostat.Schedule.Apply();                                                 // a nested method
 p.Element("reading").Text.Set(thermostat.Reading().Label());                 // a method on a returned object
+thermostat.SetQuietHours(new[] { "9:00 PM", "7:00 AM" });                    // a list argument
+var bath = thermostat.Zones.At(1);                                           // one item of the list, as the object
+bath.Boost();
+p.When(bath.IsBoosted()).Truthy().Then(boosted => boosted.Element("bath-boosted").Show());
+p.When(thermostat.Zones.Each(zone => zone.Name)).ArrayContains("Bath").Then(..);
 thermostat.ApplyPlan(nightPlan);                                             // the response body as the argument
 thermostat.ApplyPlan(new ComfortPlan { Target = 72, Mode = ThermostatMode.Cool, Nights = new List<NightSetting> { new NightSetting { Day = "Every night", Target = 72 } } });
 ```
 
 The plan carries each use as the member's JavaScript path on the located object. `thermostat.Increase()`
 is `{"kind":"call","target":{"kind":"obj","id":"..RoomComfortModel__Target"},"path":["increase"],"args":[]}`,
-the thermostat is `{"kind":"element","id":"..RoomComfortModel__Target","vendor":"thermostat"}`, and the
-vendor entry `{"objectPath":["thermostat"],"subscribe":"on","unsubscribe":"off","payload":"argument"}`
-tells the runtime where the object is and how to listen. The runtime names neither the thermostat nor
-any vendor.
+a result read is a `let` before the statement that reads it and a `ref` in it, a handler of the
+schedule's event carries `"path":["schedule"]`, the thermostat is
+`{"kind":"element","id":"..RoomComfortModel__Target","vendor":"thermostat"}`, and the vendor entry
+`{"objectPath":["thermostat"],"subscribe":"on","unsubscribe":"off","payload":"argument"}` tells the
+runtime where the object is and how to listen. The runtime names neither the thermostat nor any vendor.
 
 **Step 4: prove it in a browser.** `WhenSettingRoomComfort`
 (`tests/Alis.Reactive.PlaywrightTests/Components/Brought/Thermostat/`) drives one kind of member per
@@ -278,14 +298,19 @@ Vocabulary, by what the JavaScript object has:
 
 | JavaScript | Declared as | Used as |
 |------------|-------------|---------|
-| property read and written | `public Prop<T> X => Prop<T>();` | `x.X.Set(value or source)`; `x.X` is a source |
+| property read and written | `public Property<T> X => Property<T>();` | `x.X.Set(value or source)`; `x.X` is a source |
 | property read | `public ReadOnly<T> X => ReadOnly<T>();` | `x.X` is a source; `x.X.Get(v => v.Member)` reads into its value |
 | property written only | `public WriteOnly<T> X => WriteOnly<T>();` | `x.X.Set(value or source)`; it is not a source, so a read does not compile |
-| method | `public void X(Arg<T1> a, ..) => Call(a, ..);` | `x.X(..)` |
-| method that returns | `public TypedSource<R> X(Arg<T1> a, ..) => Invoke<R>(a, ..);` | `x.X(..)` is a source |
-| method that returns a promise | `CallAsync(..)` or `InvokeAsync<R>(..)` | the steps after it wait; the source is the settled value |
-| event | `public TypedEvent<TArgs> X => Event<TArgs>();` | `.Reactive(evt => evt.X, (args, p) => ...)` |
-| payload field | `ReadOnly<T>`, or `Prop<T>` when the component reads it back (`Cancel`) | `p.When(args.F)`, `args.Cancel.Set(true)` |
+| object held by a property | `public TObj X => Object<TObj>();`, `TObj : JsObject` | `x.X.Member`, `x.X.Apply()` |
+| list of objects | `public Objects<TItem> X => Objects<TItem>();` | `x.X.At(i).Member`, `x.X.Count`, `x.X.Each(item => item.Member)` |
+| method | `public void X(Arg<T1> a, ..) => Method(a, ..);` | `x.X(..)` |
+| method that returns | `public TypedSource<R> X(Arg<T1> a, ..) => Method<R>(a, ..);` | `x.X(..)` is a source, bound once before its first use |
+| method that returns an object | `public TObj X(Arg<T1> a, ..) => Object<TObj>(a, ..);` | `x.X(..).Member` |
+| method that returns a promise | `MethodAsync(..)` or `MethodAsync<R>(..)` | the steps after it wait; the source is the settled value |
+| event | `public Event<TArgs> X => Event<TArgs>();` | `.Reactive(evt => evt.X, (args, p) => ...)` |
+| event without a payload | `public Event X => Event();` | `.Reactive(evt => evt.X, p => ...)` |
+| event of a nested object | `Event<TArgs>()` on the nested object's class | `.Reactive(evt => evt.Nested.X, (args, p) => ...)` |
+| payload field | `ReadOnly<T>`, or `Property<T>` when the component reads it back (`Cancel`) | `p.When(args.F)`, `args.Cancel.Set(true)` |
 | payload method | a method on a payload that derives from `JsObject` | `args.EndEdit()` |
 | plugin | a class deriving `Plugin`, registered with `plan.RegisterPlugin<T>()` | `slugify.Slug(planner.Wing)` |
 
@@ -315,21 +340,21 @@ is named when the view renders.
 (`Components/Fusion/Grid/Directory.cshtml`), `AddCard(json.Get(x => x.WorkOrder), 0)`.
 
 **Fixed arguments.** When the JavaScript method always takes a mode the page never chooses, the
-declaration passes it: `public void ShowColumn(Field key) => Call(key, Fixed("field"), name: "showColumns");`
+declaration passes it: `public void ShowColumn(Field key) => Method(key, Fixed("field"), name: "showColumns");`
 (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs`), so the page passes only the field.
 Where the JavaScript method takes a wider type than the page's own list,
 `Pass<TDeclared, TSource>(items)` passes it (`UpdateData` in `FusionAutoCompleteFilteringArgs`).
 
 **Names** are the component's own: a member's JavaScript name is its C# name camel-cased, and
 `name:` gives another, one JavaScript name; a plugin that is itself a function declares it with
-`name: ""` (`Invoke<string>(text, name: "")`, the visit board's slug plugin under
+`name: ""` (`Method<string>(text, name: "")`, the visit board's slug plugin under
 `Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Brought/VisitPlanner/`). A field of each
 item of a list is read through the list property, typed by its items:
 `OfferedDays => Slots.Each(slot => slot.Day)` reads every slot's `day`
 (`Alis.Reactive.SandboxApp/BroughtComponents/VisitPlanner/VisitPlanner.cs`). A property that holds
 an object with members of its own is declared as that object, `Object<T>()`
 (`schedule.EventSettings.Events<ShiftAssignment>()`, `Components/Fusion/Schedule/Index.cshtml`), and a method that
-returns one as `InvokeObject<T>(..)` (`sheet.GetColumnByField(wing).HeaderText`,
+returns one as `Object<T>(..)` (`sheet.GetColumnByField(wing).HeaderText`,
 `Components/Fusion/Grid/CareStaffColumns.cshtml`). Events are named like every other member, by the
 C# name camel-cased (Tooltip's `AfterOpen` is EJ2's `afterOpen`). Every use of a member writes its
 JavaScript path into the plan, so two C# members can type two signatures of one JavaScript method

@@ -35,7 +35,7 @@ function contribute(world: PlanWorld, owner: Owner): void {
 function subscribeHandlers(world: PlanWorld, owner: Owner): void {
   for (const handler of world.plan.handlers) {
     try {
-      world.subscribe(handler.on, handler.event, payload => runHandler(handler, payload, world), owner);
+      world.subscribe(handler.on, handler.path, handler.event, payload => runHandler(handler, payload, world), owner);
     } catch (error) {
       log.error("handler.subscribe-failed", { error: toJavaScriptString(error), on: handler.on, event: handler.event });
     }

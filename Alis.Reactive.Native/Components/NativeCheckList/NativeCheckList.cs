@@ -15,10 +15,10 @@ namespace Alis.Reactive.Native.Components
         /// The checked values. Writing them checks exactly the boxes whose values they hold and raises no
         /// event, as a write to any native input raises none.
         /// </summary>
-        public Prop<string[]> Value => Prop<string[]>();
+        public Property<string[]> Value => Property<string[]>();
 
         /// <summary>Raised when the user checks or clears a box.</summary>
-        public TypedEvent<NativeCheckListChangeArgs> Change =>
+        public Event<NativeCheckListChangeArgs> Change =>
             Event<NativeCheckListChangeArgs>();
 
         /// <inheritdoc />

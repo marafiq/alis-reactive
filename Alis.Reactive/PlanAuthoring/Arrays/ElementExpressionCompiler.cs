@@ -149,7 +149,7 @@ namespace Alis.Reactive.Builders.Arrays
 
                 var methodPath = string.IsNullOrEmpty(receiverPath) ? methodName : receiverPath + "." + methodName;
                 return ValueExpression.Invoke(
-                    Receiver.Item, G.PathOf(Path.Parse(methodPath)), methodArgs, G.NoShapes, Shape.FromClrType(node.Type), awaits: false, methodName);
+                    Receiver.Item, G.PathOf(Path.Parse(methodPath)), methodArgs, G.NoShapes, Shape.FromClrType(node.Type), methodName);
             }
 
             if (ReferencesParameter(node, element))

@@ -31,13 +31,13 @@ namespace Alis.Reactive.Native.AppLevel
         public string DefaultId => ElementId;
 
         /// <summary>The panel width; closing the drawer resets it.</summary>
-        public Prop<DrawerSize> Size => Prop<DrawerSize>();
+        public Property<DrawerSize> Size => Property<DrawerSize>();
 
         /// <summary>Slides the drawer in.</summary>
-        public void Open() => Call();
+        public void Open() => Method();
 
         /// <summary>Slides the drawer out; its content and heading clear when it has closed.</summary>
-        public void Close() => Call();
+        public void Close() => Method();
     }
 
     /// <summary>The width of the <see cref="NativeDrawer"/> panel.</summary>

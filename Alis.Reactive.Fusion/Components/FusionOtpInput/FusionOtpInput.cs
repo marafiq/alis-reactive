@@ -16,34 +16,34 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionOtpInput : FusionComponent, IInputComponent
     {
         /// <summary>The passcode; <see langword="null"/> when empty.</summary>
-        public Prop<string> Value => Prop<string>();
+        public Property<string> Value => Property<string>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>Moves focus into the first empty field.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
 
         /// <summary>Removes focus from the fields.</summary>
-        public void FocusOut() => Call();
+        public void FocusOut() => Method();
 
         /// <summary>Raised as a field changes while the user types.</summary>
-        public TypedEvent<FusionOtpInputInputArgs> Input =>
+        public Event<FusionOtpInputInputArgs> Input =>
             Event<FusionOtpInputInputArgs>();
 
         /// <summary>Raised when the complete passcode changes.</summary>
-        public TypedEvent<FusionOtpInputValueChangedArgs> ValueChanged =>
+        public Event<FusionOtpInputValueChangedArgs> ValueChanged =>
             Event<FusionOtpInputValueChangedArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: ValueChanged);
 
         /// <summary>Raised when a field receives focus.</summary>
-        public TypedEvent<FusionOtpInputFocusArgs> Focus =>
+        public Event<FusionOtpInputFocusArgs> Focus =>
             Event<FusionOtpInputFocusArgs>();
 
         /// <summary>Raised when a field loses focus.</summary>
-        public TypedEvent<FusionOtpInputBlurArgs> Blur =>
+        public Event<FusionOtpInputBlurArgs> Blur =>
             Event<FusionOtpInputBlurArgs>();
     }
 

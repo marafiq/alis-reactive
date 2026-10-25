@@ -24,20 +24,20 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionCarousel : FusionComponent
     {
         /// <summary>The zero-based index of the shown slide.</summary>
-        public Prop<int> SelectedIndex => Prop<int>();
+        public Property<int> SelectedIndex => Property<int>();
 
         /// <summary>Shows the next slide.</summary>
-        public void Next() => Call();
+        public void Next() => Method();
 
         /// <summary>Shows the previous slide.</summary>
-        public void Prev() => Call();
+        public void Prev() => Method();
 
         /// <summary>Raised before the slide changes.</summary>
-        public TypedEvent<FusionCarouselSlideChangingArgs> SlideChanging =>
+        public Event<FusionCarouselSlideChangingArgs> SlideChanging =>
             Event<FusionCarouselSlideChangingArgs>();
 
         /// <summary>Raised after the slide changes.</summary>
-        public TypedEvent<FusionCarouselSlideChangedArgs> SlideChanged =>
+        public Event<FusionCarouselSlideChangedArgs> SlideChanged =>
             Event<FusionCarouselSlideChangedArgs>();
     }
 
@@ -57,7 +57,7 @@ namespace Alis.Reactive.Fusion.Components
         public ReadOnly<string> SlideDirection => ReadOnly<string>();
 
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionCarousel.SlideChanged"/>.</summary>

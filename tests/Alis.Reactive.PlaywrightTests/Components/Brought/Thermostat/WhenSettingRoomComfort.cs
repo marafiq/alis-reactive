@@ -10,9 +10,9 @@ namespace Alis.Reactive.PlaywrightTests.Components.Brought.Thermostat;
 /// <remarks>
 /// The thermostat is a widget the sandbox wrote itself (Scripts/thermostat.ts) and declares in its own
 /// assembly (BroughtComponents/Thermostat). Each test drives one kind of member through the page:
-/// properties read, written and written only; methods with no argument, one, several and an object;
-/// functions, one returning an object; a nested object with members of its own; and events with and
-/// without a payload.
+/// properties read, written and written only; methods with no argument, one, several, a list and an
+/// object; functions, one returning an object; a nested object with members and an event of its own; a
+/// list of objects used one item at a time; and events with and without a payload.
 /// </remarks>
 [TestFixture]
 public class WhenSettingRoomComfort : PlaywrightTestBase
@@ -34,11 +34,16 @@ public class WhenSettingRoomComfort : PlaywrightTestBase
     private ILocator RangeMax => Page.Locator("#range-max");
     private ILocator NextChange => Page.Locator("#next-change");
     private ILocator NightActive => Page.Locator("#night-active");
+    private ILocator NightApplied => Page.Locator("#night-applied");
     private ILocator Mode => Page.Locator("#mode");
     private ILocator Reading => Page.Locator("#reading");
     private ILocator LockStatus => Page.Locator("#lock-status");
     private ILocator PlanSummary => Page.Locator("#plan-summary");
     private ILocator Confirmation => Page.Locator("#confirmation");
+    private ILocator ZoneCount => Page.Locator("#zone-count");
+    private ILocator BathZone => Page.Locator("#bath-zone");
+    private ILocator BathTarget => Page.Locator("#bath-target");
+    private ILocator BathBoosted => Page.Locator("#bath-boosted");
 
     private ILocator Warmer => Page.Locator("#warmer");
     private ILocator Cooler => Page.Locator("#cooler");
@@ -47,6 +52,8 @@ public class WhenSettingRoomComfort : PlaywrightTestBase
     private ILocator NightMode => Page.Locator("#night-mode");
     private ILocator Cool => Page.Locator("#cool");
     private ILocator Off => Page.Locator("#off");
+    private ILocator BoostBath => Page.Locator("#boost-bath");
+    private ILocator QuietHours => Page.Locator("#quiet-hours");
     private ILocator WingPlan => Page.Locator("#wing-plan");
     private ILocator SummerPlan => Page.Locator("#summer-plan");
     private ILocator Save => Page.Locator("#save-comfort");
@@ -72,6 +79,35 @@ public class WhenSettingRoomComfort : PlaywrightTestBase
         await Expect(Distance).ToHaveTextAsync("2");
         await Expect(Minutes).ToHaveTextAsync("8");
         await Expect(Comfortable).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task the_room_lists_its_zones_on_open()
+    {
+        await OpenRoom();
+
+        await Expect(ZoneCount).ToHaveTextAsync("2");
+        await Expect(BathZone).ToBeVisibleAsync();
+        await Expect(BathTarget).ToHaveTextAsync("70");
+        await Expect(Thermostat.ZoneTarget("Bath")).ToHaveTextAsync("70°F");
+        await Expect(BathBoosted).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task boosting_the_bath_zone_warms_it_on_its_own()
+    {
+        await OpenRoom();
+
+        await BoostBath.ClickAsync();
+
+        await Expect(BathTarget).ToHaveTextAsync("72");
+        await Expect(BathBoosted).ToBeVisibleAsync();
+        await Expect(Thermostat.ZoneTarget("Bath")).ToHaveTextAsync("72°F");
+        await Expect(Thermostat.ZoneBoost("Bath")).ToHaveTextAsync("Boosted");
+        await Expect(Thermostat.ZoneBoost("Bedroom")).ToHaveTextAsync("");
+        await Expect(Target).ToHaveTextAsync("70");
         AssertNoConsoleErrors();
     }
 
@@ -139,6 +175,18 @@ public class WhenSettingRoomComfort : PlaywrightTestBase
     }
 
     [Test]
+    public async Task quiet_hours_keep_the_fan_quiet_overnight()
+    {
+        await OpenRoom();
+        await Expect(Thermostat.Quiet).ToHaveTextAsync("");
+
+        await QuietHours.ClickAsync();
+
+        await Expect(Thermostat.Quiet).ToHaveTextAsync("Quiet 9:00 PM to 7:00 AM");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task the_right_pin_unlocks_the_thermostats_own_buttons()
     {
         await OpenRoom();
@@ -173,7 +221,7 @@ public class WhenSettingRoomComfort : PlaywrightTestBase
     }
 
     [Test]
-    public async Task night_mode_applies_the_wings_night_setting()
+    public async Task night_mode_applies_the_wings_night_setting_and_the_schedule_says_so()
     {
         await OpenRoom();
 
@@ -182,6 +230,7 @@ public class WhenSettingRoomComfort : PlaywrightTestBase
         await Expect(Target).ToHaveTextAsync("66");
         await Expect(Previous).ToHaveTextAsync("70");
         await Expect(NightActive).ToBeVisibleAsync();
+        await Expect(NightApplied).ToHaveTextAsync("66");
         await Expect(NextChange).ToHaveTextAsync("66°F at 9:00 PM");
         await Expect(Thermostat.TargetText).ToHaveTextAsync("66°F");
         AssertNoConsoleErrors();
@@ -269,8 +318,13 @@ public class WhenSettingRoomComfort : PlaywrightTestBase
         internal ILocator ModeText => _root.Locator(".th-mode");
         internal ILocator Range => _root.Locator(".th-range");
         internal ILocator Night => _root.Locator(".th-night");
+        internal ILocator Quiet => _root.Locator(".th-quiet");
         internal ILocator Lock => _root.Locator(".th-lock");
         internal ILocator Status => _root.Locator(".th-status");
         internal ILocator Up => _root.GetByRole(AriaRole.Button, new() { Name = "Warmer", Exact = true });
+
+        internal ILocator ZoneTarget(string zone) => _root.Locator($"li.th-zone[data-zone='{zone}'] .th-zone-target");
+
+        internal ILocator ZoneBoost(string zone) => _root.Locator($"li.th-zone[data-zone='{zone}'] .th-zone-boost");
     }
 }

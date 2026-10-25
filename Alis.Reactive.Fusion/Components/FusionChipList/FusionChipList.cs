@@ -36,41 +36,41 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Adds a chip with this text.</summary>
         /// <param name="text">The new chip's text.</param>
-        public void Add(Arg<string> text) => Call(text);
+        public void Add(Arg<string> text) => Method(text);
 
         /// <summary>Selects the chip at a zero-based index.</summary>
         /// <param name="index">The chip's zero-based index.</param>
-        public void SelectByIndex(Arg<int> index) => Call(index, name: "select");
+        public void SelectByIndex(Arg<int> index) => Method(index, name: "select");
 
         /// <summary>Selects the chips at these zero-based indexes.</summary>
         /// <param name="indexes">The chips' zero-based indexes.</param>
-        public void SelectByIndexes(Arg<int[]> indexes) => Call(indexes, name: "select");
+        public void SelectByIndexes(Arg<int[]> indexes) => Method(indexes, name: "select");
 
         /// <summary>Selects the chips with these texts.</summary>
         /// <param name="texts">The texts of the chips to select.</param>
-        public void SelectByText(Arg<string[]> texts) => Call(texts, Fixed("text"), name: "select");
+        public void SelectByText(Arg<string[]> texts) => Method(texts, Fixed("text"), name: "select");
 
         /// <summary>Removes the chip at a zero-based index.</summary>
         /// <param name="index">The chip's zero-based index.</param>
-        public void RemoveByIndex(Arg<int> index) => Call(index, name: "remove");
+        public void RemoveByIndex(Arg<int> index) => Method(index, name: "remove");
 
         /// <summary>Removes the chips at these zero-based indexes.</summary>
         /// <param name="indexes">The chips' zero-based indexes.</param>
-        public void RemoveByIndexes(Arg<int[]> indexes) => Call(indexes, name: "remove");
+        public void RemoveByIndexes(Arg<int[]> indexes) => Method(indexes, name: "remove");
 
         /// <summary>The chip at a zero-based index.</summary>
         /// <param name="index">The chip's zero-based index.</param>
-        public TypedSource<FusionChipData> Find(Arg<int> index) => Invoke<FusionChipData>(index);
+        public TypedSource<FusionChipData> Find(Arg<int> index) => Method<FusionChipData>(index);
 
         /// <summary>The selected chip of a list with <c>Selection.Single</c>: its text, index and data.</summary>
         /// <remarks>Its members read as nothing while no chip is selected, for example after the selected chip is clicked again.</remarks>
-        public FusionSelectedChip GetSelectedChip() => InvokeObject<FusionSelectedChip>(name: "getSelectedChips");
+        public FusionSelectedChip GetSelectedChip() => Object<FusionSelectedChip>(name: "getSelectedChips");
 
         /// <summary>The selected chips of a list with <c>Selection.Multiple</c>: their texts and data; nothing while no chip is selected.</summary>
-        public TypedSource<FusionSelectedChips> GetSelectedChips() => Invoke<FusionSelectedChips>();
+        public TypedSource<FusionSelectedChips> GetSelectedChips() => Method<FusionSelectedChips>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>The selected chip's value, for a list with <c>Selection.Single</c> whose chips have values.</summary>
         /// <remarks>
@@ -85,20 +85,20 @@ namespace Alis.Reactive.Fusion.Components
         /// once. While no chip is selected it holds no index: an empty list until a chip is first chosen, then
         /// <see langword="null"/> once the selected chip is clicked again (chip-list.js:896, 930).
         /// </remarks>
-        public Prop<int> SelectedChipIndex => Prop<int>("selectedChips");
+        public Property<int> SelectedChipIndex => Property<int>("selectedChips");
 
         /// <summary>The selected chips, by value, for a list with <c>Selection.Multiple</c> whose chips have values.</summary>
-        public Prop<string[]> SelectedChipValues => Prop<string[]>("selectedChips");
+        public Property<string[]> SelectedChipValues => Property<string[]>("selectedChips");
 
         /// <summary>The selected chips, by zero-based index, for a list with <c>Selection.Multiple</c> whose chips have no values.</summary>
-        public Prop<int[]> SelectedChipIndexes => Prop<int[]>("selectedChips");
+        public Property<int[]> SelectedChipIndexes => Property<int[]>("selectedChips");
 
         /// <summary>Raised when the user clicks a chip.</summary>
-        public TypedEvent<FusionChipListClickArgs> Click =>
+        public Event<FusionChipListClickArgs> Click =>
             Event<FusionChipListClickArgs>();
 
         /// <summary>Raised after a chip is removed, by its delete icon or by <see cref="RemoveByIndex"/> and <see cref="RemoveByIndexes"/>.</summary>
-        public TypedEvent<FusionChipListDeletedArgs> Deleted =>
+        public Event<FusionChipListDeletedArgs> Deleted =>
             Event<FusionChipListDeletedArgs>();
     }
 

@@ -25,34 +25,34 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionButton : FusionComponent
     {
         /// <summary>The button text.</summary>
-        public Prop<string> Content => Prop<string>();
+        public Property<string> Content => Property<string>();
 
         /// <summary>Whether the button is disabled.</summary>
-        public Prop<bool> Disabled => Prop<bool>();
+        public Property<bool> Disabled => Property<bool>();
 
         /// <summary>The icon CSS classes.</summary>
-        public Prop<string> IconCss => Prop<string>();
+        public Property<string> IconCss => Property<string>();
 
         /// <summary>Where the icon sits relative to the text.</summary>
-        public Prop<FusionButtonIconPosition> IconPosition => Prop<FusionButtonIconPosition>();
+        public Property<FusionButtonIconPosition> IconPosition => Property<FusionButtonIconPosition>();
 
         /// <summary>The CSS classes on the button.</summary>
-        public Prop<string> CssClass => Prop<string>();
+        public Property<string> CssClass => Property<string>();
 
         /// <summary>Whether the button has the primary style.</summary>
-        public Prop<bool> IsPrimary => Prop<bool>();
+        public Property<bool> IsPrimary => Property<bool>();
 
         /// <summary>Whether the button toggles its active state when clicked.</summary>
-        public Prop<bool> IsToggle => Prop<bool>();
+        public Property<bool> IsToggle => Property<bool>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>Clicks the button.</summary>
-        public void Click() => Call();
+        public void Click() => Method();
 
         /// <summary>Moves focus to the button.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
     }
 
     /// <summary>

@@ -79,9 +79,11 @@ namespace Alis.Reactive.PlanModel
             IReadOnlyList<ValueExpression> args,
             IReadOnlyList<Shape> argShapes,
             Shape shape,
-            bool awaits,
             string member) =>
-            new InvokeExpression(receiver, path, args, argShapes, shape, awaits, member);
+            new InvokeExpression(receiver, path, args, argShapes, shape, member);
+
+        internal static ValueExpression MethodResult(ValueExpression call, string member, bool awaits) =>
+            new MethodResultExpression(call, member, awaits);
 
         /// <summary>A query string key, as MVC binds it: a scalar from its first value, an array from all of them.</summary>
         internal static ValueExpression ReadUrl(string key, Shape shape) => new UrlRead(key, shape);
@@ -194,7 +196,6 @@ namespace Alis.Reactive.PlanModel
         private readonly IReadOnlyList<ValueExpression> _args;
         private readonly IReadOnlyList<Shape> _argShapes;
         private readonly Shape _shape;
-        private readonly bool _awaits;
         private readonly string _member;
 
         internal InvokeExpression(
@@ -203,7 +204,6 @@ namespace Alis.Reactive.PlanModel
             IReadOnlyList<ValueExpression> args,
             IReadOnlyList<Shape> argShapes,
             Shape shape,
-            bool awaits,
             string member)
         {
             _receiver = receiver ?? throw new ArgumentNullException(nameof(receiver));
@@ -211,21 +211,44 @@ namespace Alis.Reactive.PlanModel
             _args = args ?? throw new ArgumentNullException(nameof(args));
             _argShapes = argShapes ?? throw new ArgumentNullException(nameof(argShapes));
             _shape = shape ?? throw new ArgumentNullException(nameof(shape));
-            _awaits = awaits;
             _member = member ?? throw new ArgumentNullException(nameof(member));
         }
 
         internal override Shape OutputShape => _shape;
 
-        internal override bool ReadsAwaited => _awaits || _args.Any(arg => arg.ReadsAwaited);
+        internal override bool ReadsAwaited => _args.Any(arg => arg.ReadsAwaited);
 
         internal override Expr Write(Scope scope)
         {
             var (root, prefix) = _receiver.Locate(scope);
             var args = _args.Select(arg => arg.Write(scope)).ToList();
-            var call = G.Call(root, prefix.Concat(_path).ToList(), args, _argShapes, _shape);
-            return _awaits ? scope.Awaited(call, _member) : call;
+            return G.Call(root, prefix.Concat(_path).ToList(), args, _argShapes, _shape);
         }
+    }
+
+    /// <summary>
+    /// What a method returned: bound once per block, by a <c>let</c> hoisted before the statement that
+    /// first reads it, and read by name after. A promise is awaited by that <c>let</c> (grammar.md 3.1).
+    /// </summary>
+    internal sealed class MethodResultExpression : ValueExpression
+    {
+        private readonly ValueExpression _call;
+        private readonly string _member;
+        private readonly bool _awaits;
+
+        internal MethodResultExpression(ValueExpression call, string member, bool awaits)
+        {
+            _call = call ?? throw new ArgumentNullException(nameof(call));
+            _member = member ?? throw new ArgumentNullException(nameof(member));
+            _awaits = awaits;
+        }
+
+        internal override Shape OutputShape => _call.OutputShape;
+
+        internal override bool ReadsAwaited => _awaits || _call.ReadsAwaited;
+
+        internal override Expr Write(Scope scope) =>
+            scope.Result(this, JsonMemberName.Of(_member), _awaits, _member, () => _call.Write(scope));
     }
 
     internal sealed class UrlRead : ValueExpression
@@ -340,7 +363,7 @@ namespace Alis.Reactive.PlanModel
         internal override Expr Write(Scope scope)
         {
             var items = G.Op(Operator.ToArray, _source.Write(scope));
-            return scope.WithoutAwaiting(() => Operate(items, scope));
+            return scope.WithoutHoisting(() => Operate(items, scope));
         }
 
         private Expr Operate(Expr items, Scope scope)

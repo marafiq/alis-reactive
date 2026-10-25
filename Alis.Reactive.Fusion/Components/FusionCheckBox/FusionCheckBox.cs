@@ -21,25 +21,25 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionCheckBox : FusionComponent, IInputComponent
     {
         /// <summary>Whether the box is checked.</summary>
-        public Prop<bool> Checked => Prop<bool>();
+        public Property<bool> Checked => Property<bool>();
 
         /// <summary>Whether the box shows the indeterminate state.</summary>
-        public Prop<bool> Indeterminate => Prop<bool>();
+        public Property<bool> Indeterminate => Property<bool>();
 
         /// <summary>Whether the box is disabled.</summary>
-        public Prop<bool> Disabled => Prop<bool>();
+        public Property<bool> Disabled => Property<bool>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>Toggles the box as a click would, raising <see cref="Change"/>.</summary>
-        public void Click() => Call();
+        public void Click() => Method();
 
         /// <summary>Moves focus into the box.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
 
         /// <summary>Raised when the box is checked or cleared.</summary>
-        public TypedEvent<FusionCheckBoxChangeArgs> Change => Event<FusionCheckBoxChangeArgs>();
+        public Event<FusionCheckBoxChangeArgs> Change => Event<FusionCheckBoxChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Checked, committedBy: Change);

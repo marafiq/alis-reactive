@@ -15,10 +15,10 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionSwitch : FusionComponent, IInputComponent
     {
         /// <summary>Whether the switch is on.</summary>
-        public Prop<bool> Checked => Prop<bool>();
+        public Property<bool> Checked => Property<bool>();
 
         /// <summary>Raised when the switch is turned on or off.</summary>
-        public TypedEvent<FusionSwitchChangeArgs> Change => Event<FusionSwitchChangeArgs>();
+        public Event<FusionSwitchChangeArgs> Change => Event<FusionSwitchChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Checked, committedBy: Change);

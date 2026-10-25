@@ -165,7 +165,7 @@ function announceCommits(input: ModelInput, owner: Owner): void {
     element.dispatchEvent(new CustomEvent(COMMIT_EVENT, { bubbles: true }));
   };
   try {
-    input.world.subscribe(input.id, input.binding.committed, announce, owner);
+    input.world.subscribe(input.id, [], input.binding.committed, announce, owner);
   } catch (error) {
     log.error("input.commit-unwired", { input: input.id, event: input.binding.committed, error: toJavaScriptString(error) });
     return;

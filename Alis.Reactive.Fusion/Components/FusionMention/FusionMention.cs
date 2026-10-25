@@ -27,24 +27,24 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="text">The text the suggestions are filtered by.</param>
         /// <param name="positionX">The popup's horizontal position, in pixels.</param>
         /// <param name="positionY">The popup's vertical position, in pixels.</param>
-        public void Search(Arg<string> text, Arg<int> positionX, Arg<int> positionY) => Call(text, positionX, positionY);
+        public void Search(Arg<string> text, Arg<int> positionX, Arg<int> positionY) => Method(text, positionX, positionY);
 
         /// <summary>Opens the suggestion popup.</summary>
-        public void ShowPopup() => Call();
+        public void ShowPopup() => Method();
 
         /// <summary>Closes the suggestion popup.</summary>
-        public void HidePopup() => Call();
+        public void HidePopup() => Method();
 
         /// <summary>Raised when the user picks a suggestion.</summary>
-        public TypedEvent<FusionMentionChangeArgs> Change =>
+        public Event<FusionMentionChangeArgs> Change =>
             Event<FusionMentionChangeArgs>();
 
         /// <summary>Raised after the suggestion popup opens.</summary>
-        public TypedEvent<FusionMentionPopupArgs> Opened =>
+        public Event<FusionMentionPopupArgs> Opened =>
             Event<FusionMentionPopupArgs>();
 
         /// <summary>Raised after the suggestion popup closes.</summary>
-        public TypedEvent<FusionMentionPopupArgs> Closed =>
+        public Event<FusionMentionPopupArgs> Closed =>
             Event<FusionMentionPopupArgs>();
     }
 

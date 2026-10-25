@@ -77,24 +77,37 @@ namespace Alis.Reactive
         /// <param name="pipeline">The reaction, given the event's payload, live, and the pipeline.</param>
         /// <returns>This component, so further events can be wired.</returns>
         public RenderedComponent<TComponent, TModel> Reactive<TArgs>(
-            Func<TComponent, TypedEvent<TArgs>> eventSelector,
+            Func<TComponent, Event<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TArgs : JsObject
         {
             if (eventSelector == null) throw new ArgumentNullException(nameof(eventSelector));
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
-            var typedEvent = eventSelector(Declaration)
+            var declaredEvent = eventSelector(Declaration)
                 ?? throw new ArgumentException("Select one of the component's events, for example evt => evt.Change.", nameof(eventSelector));
 
             var context = _plan.Context;
-            var args = typedEvent.Args;
+            var args = declaredEvent.Args;
             args.BindTo(new EventPayloadBinding(context));
             var body = PipelineBuilder<TModel>.Build(context, p => pipeline(args, p));
 
             // The component joins the plan after the elements its own callback names.
             context.DeclareComponent(_componentId, Declaration.Vendor);
-            context.On(objects => objects.Element(_componentId), typedEvent.ObjectEvent, body);
+            context.On(objects => objects.Element(_componentId), declaredEvent.ObjectPath, declaredEvent.ObjectEvent, body);
             return this;
+        }
+
+        /// <summary>Runs <paramref name="pipeline"/> whenever the selected event fires; the event carries nothing.</summary>
+        /// <param name="eventSelector">Selects a declared event, for example <c>evt =&gt; evt.Unlocked</c>.</param>
+        /// <param name="pipeline">The reaction, given the pipeline.</param>
+        /// <returns>This component, so further events can follow.</returns>
+        public RenderedComponent<TComponent, TModel> Reactive(
+            Func<TComponent, Event> eventSelector,
+            Action<PipelineBuilder<TModel>> pipeline)
+        {
+            if (eventSelector == null) throw new ArgumentNullException(nameof(eventSelector));
+            if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
+            return Reactive<NoPayload>(eventSelector, (_, p) => pipeline(p));
         }
 
 #if NET48

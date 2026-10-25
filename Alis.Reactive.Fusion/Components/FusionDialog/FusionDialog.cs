@@ -23,32 +23,32 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionDialog : FusionComponent
     {
         /// <summary>Opens the dialog.</summary>
-        public void Show() => Call();
+        public void Show() => Method();
 
         /// <summary>Closes the dialog.</summary>
-        public void Hide() => Call();
+        public void Hide() => Method();
 
         /// <summary>Recomputes the dialog position after its content changes size.</summary>
-        public void RefreshPosition() => Call();
+        public void RefreshPosition() => Method();
 
         /// <summary>Raised before the dialog opens.</summary>
-        public TypedEvent<FusionDialogBeforeOpenArgs> BeforeOpen =>
+        public Event<FusionDialogBeforeOpenArgs> BeforeOpen =>
             Event<FusionDialogBeforeOpenArgs>();
 
         /// <summary>Raised before the dialog closes.</summary>
-        public TypedEvent<FusionDialogBeforeCloseArgs> BeforeClose =>
+        public Event<FusionDialogBeforeCloseArgs> BeforeClose =>
             Event<FusionDialogBeforeCloseArgs>();
 
         /// <summary>Raised after the dialog opens.</summary>
-        public TypedEvent<FusionDialogOpenArgs> Open =>
+        public Event<FusionDialogOpenArgs> Open =>
             Event<FusionDialogOpenArgs>();
 
         /// <summary>Raised after the dialog closes.</summary>
-        public TypedEvent<FusionDialogCloseArgs> Close =>
+        public Event<FusionDialogCloseArgs> Close =>
             Event<FusionDialogCloseArgs>();
 
         /// <summary>Raised when the user clicks the modal overlay.</summary>
-        public TypedEvent<FusionDialogOverlayClickArgs> OverlayClick =>
+        public Event<FusionDialogOverlayClickArgs> OverlayClick =>
             Event<FusionDialogOverlayClickArgs>();
     }
 
@@ -56,14 +56,14 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionDialogBeforeOpenArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionDialog.BeforeClose"/>.</summary>
     public class FusionDialogBeforeCloseArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
 
         /// <summary>Whether user interaction started the close.</summary>
         public ReadOnly<bool> IsInteracted => ReadOnly<bool>();

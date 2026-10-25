@@ -7,18 +7,10 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// A property of a JavaScript object that a page reads: a source wherever the DSL takes a value,
-    /// in conditions, writes, request members, arguments and arrays.
+    /// A property the page reads. It is a source wherever the DSL takes one: a reaction value, a condition,
+    /// a gather value, a route parameter, a header, a dispatch payload or a plugin argument.
     /// </summary>
-    /// <remarks>
-    /// Declared on a <see cref="JsObject"/> with <c>ReadOnly&lt;T&gt;()</c>. A property the page also
-    /// writes is a <see cref="Prop{TValue}"/>.
-    /// <code>
-    /// p.When(args.IsInteracted).Truthy()
-    /// p.When(rate.Value).Gt(100m)
-    /// </code>
-    /// </remarks>
-    /// <typeparam name="TValue">The C# type of the property's value.</typeparam>
+    /// <typeparam name="TValue">The C# type of the value.</typeparam>
     public class ReadOnly<TValue> : TypedSource<TValue>
     {
         internal ReadOnly(JsObject owner, ComponentProperty<TValue> member)
@@ -33,10 +25,9 @@ namespace Alis.Reactive
 
         internal override ValueExpression Expression => Owner.Binding.Read(Member, Shape);
 
-        /// <summary>Reads into the property's value, which is data: a row, a slot, a record.</summary>
-        /// <example><c>p.When(args.Slot.Get(s =&gt; s.Quiet)).Truthy()</c></example>
-        /// <typeparam name="TResult">The type of the member read.</typeparam>
-        /// <param name="path">The member, by the property's own type, for example <c>s =&gt; s.Label</c>.</param>
+        /// <summary>Reads a member of the value, for a value that is data: <c>args.Slot.Get(s =&gt; s.Label)</c>.</summary>
+        /// <typeparam name="TResult">The C# type of the member.</typeparam>
+        /// <param name="path">The member to read, for example <c>s =&gt; s.Label</c>.</param>
         public TypedSource<TResult> Get<TResult>(Expression<Func<TValue, TResult>> path)
         {
             if (path == null) throw new ArgumentNullException(nameof(path));
@@ -62,43 +53,25 @@ namespace Alis.Reactive
         }
     }
 
-    /// <summary>
-    /// A property of a JavaScript object that a page reads and writes. <see cref="Set(TValue)"/> writes
-    /// it in the callback the line is written in.
-    /// </summary>
-    /// <remarks>
-    /// Declared on a <see cref="JsObject"/> with <c>Prop&lt;T&gt;()</c>.
-    /// <code>
-    /// rate.Min.Set(0m);
-    /// rate.Value.Set(json.Get(x =&gt; x.Rate));
-    /// args.Cancel.Set(true);
-    /// </code>
-    /// </remarks>
-    /// <typeparam name="TValue">The C# type of the property's value.</typeparam>
-    public sealed class Prop<TValue> : ReadOnly<TValue>
+    /// <summary>A property the page reads and writes: <c>rate.Min.Set(0m)</c>, <c>p.When(rate.Min).Gt(0m)</c>.</summary>
+    /// <typeparam name="TValue">The C# type of the value.</typeparam>
+    public sealed class Property<TValue> : ReadOnly<TValue>
     {
-        internal Prop(JsObject owner, ComponentProperty<TValue> member)
+        internal Property(JsObject owner, ComponentProperty<TValue> member)
             : base(owner, member)
         {
         }
 
-        /// <summary>Writes a value fixed when the view renders.</summary>
-        /// <param name="value">The value, written into the plan.</param>
+        /// <summary>Writes a literal.</summary>
+        /// <param name="value">The value to write.</param>
         public void Set(TValue value) =>
             Owner.Binding.Set(Member, value is Arg source
                 ? source.Expression
                 : ValueExpression.LiteralFor(value, Member.Shape));
 
-        /// <summary>
-        /// Writes a value read when the step runs: another object's property, a method's result, an
-        /// event payload, a response, the URL or an array.
-        /// </summary>
-        /// <remarks>
-        /// The value's type must be the property's type or derive from it, so a value that may be missing
-        /// (<c>int?</c>) cannot fill a property that may not (<c>int</c>).
-        /// </remarks>
-        /// <typeparam name="TSource">The value's type.</typeparam>
-        /// <param name="source">The value.</param>
+        /// <summary>Writes a value read when the step runs.</summary>
+        /// <typeparam name="TSource">The type of the value read, assignable to the property.</typeparam>
+        /// <param name="source">The value read when the step runs.</param>
         public void Set<TSource>(TypedSource<TSource> source) where TSource : TValue
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
@@ -108,7 +81,6 @@ namespace Alis.Reactive
         internal void SetExpression(ValueExpression value) => Owner.Binding.Set(Member, value);
     }
 
-    /// <summary>Reads a field of every item of a list property.</summary>
     /// <summary>
     /// A property the page writes and never reads: the JavaScript object has a setter and no getter, such
     /// as a code that unlocks it. It is not a source, so a read of it does not compile.
@@ -142,17 +114,56 @@ namespace Alis.Reactive
         }
     }
 
+    /// <summary>
+    /// A list of objects with members of their own, held by a property or returned by a method:
+    /// <c>thermostat.Zones.At(1).Boost()</c>, <c>p.When(thermostat.Zones.Count).Gt(1)</c>,
+    /// <c>p.When(thermostat.Zones.Each(zone =&gt; zone.Name)).ArrayContains("Bath")</c>.
+    /// </summary>
+    /// <typeparam name="TItem">The declaration of each item.</typeparam>
+    public sealed class Objects<TItem>
+        where TItem : JsObject, new()
+    {
+        private readonly JsObject _owner;
+        private readonly string _prefix;
+
+        internal Objects(JsObject owner, string path)
+        {
+            _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+            _prefix = path.Length == 0 ? "" : path + ".";
+        }
+
+        /// <summary>The item at a position, used as the object: <c>thermostat.Zones.At(0).Target.Set(70)</c>.</summary>
+        /// <param name="index">The item's zero-based position.</param>
+        public TItem At(int index)
+        {
+            if (index < 0) throw new ArgumentOutOfRangeException(nameof(index), index, "An item's position is zero or more.");
+            return JsObject.Nested<TItem>(_owner, _prefix + index + ".");
+        }
+
+        /// <summary>How many items the list has: its <c>length</c>.</summary>
+        public ReadOnly<int> Count => new ReadOnly<int>(_owner, ComponentProperty<int>.At(_prefix + "length"));
+
+        /// <summary>A property of each item, as a list: <c>thermostat.Zones.Each(zone =&gt; zone.Name)</c>.</summary>
+        /// <typeparam name="TField">The C# type of the property.</typeparam>
+        /// <param name="property">The property to read of each item, for example <c>zone =&gt; zone.Name</c>.</param>
+        public ReadOnly<IReadOnlyList<TField>> Each<TField>(Func<TItem, ReadOnly<TField>> property)
+        {
+            if (property == null) throw new ArgumentNullException(nameof(property));
+            var eachItem = JsObject.Nested<TItem>(_owner, _prefix + "[].");
+            var member = property(eachItem)
+                ?? throw new ArgumentException("Select a property of the item, for example zone => zone.Name.", nameof(property));
+            return new ReadOnly<IReadOnlyList<TField>>(_owner, ComponentProperty<IReadOnlyList<TField>>.At(member.Member.JavaScriptPath));
+        }
+    }
+
+    /// <summary>Reads a field of each item of a list property.</summary>
     public static class ListPropertyExtensions
     {
-        /// <summary>
-        /// Declares the field of each item of a list property, read as a list of its own:
-        /// <c>public ReadOnly&lt;IReadOnlyList&lt;string&gt;&gt; OfferedDays =&gt; Slots.Each(slot =&gt; slot.Day);</c>
-        /// reads every slot's <c>day</c>.
-        /// </summary>
-        /// <typeparam name="TItem">The class each item of the list is, by the names its JavaScript uses.</typeparam>
-        /// <typeparam name="TField">The type of the field read from each item.</typeparam>
-        /// <param name="list">The list property, declared on the same object.</param>
-        /// <param name="field">The field of an item, for example <c>slot =&gt; slot.Day</c>.</param>
+        /// <summary>A field of each item, as a list: <c>planner.Slots.Each(slot =&gt; slot.Day)</c> reads every slot's <c>day</c>.</summary>
+        /// <typeparam name="TItem">The C# type of an item.</typeparam>
+        /// <typeparam name="TField">The C# type of the field.</typeparam>
+        /// <param name="list">The list property.</param>
+        /// <param name="field">The field to read of each item.</param>
         public static ReadOnly<IReadOnlyList<TField>> Each<TItem, TField>(
             this ReadOnly<IReadOnlyList<TItem>> list,
             Expression<Func<TItem, TField>> field)
@@ -168,14 +179,14 @@ namespace Alis.Reactive
         }
     }
 
-    /// <summary>Writes to properties whose value may be missing.</summary>
-    public static class PropExtensions
+    /// <summary>Writes a nullable property from a value that is never null.</summary>
+    public static class PropertyExtensions
     {
-        /// <summary>Writes a value read when the step runs to a property that may hold no value.</summary>
-        /// <typeparam name="TValue">The property's underlying type.</typeparam>
-        /// <param name="property">The property.</param>
-        /// <param name="source">A value of the property's underlying type.</param>
-        public static void Set<TValue>(this Prop<TValue?> property, TypedSource<TValue> source)
+        /// <summary>Writes a value read when the step runs into a nullable property.</summary>
+        /// <typeparam name="TValue">The C# type of the value.</typeparam>
+        /// <param name="property">The nullable property.</param>
+        /// <param name="source">The value read when the step runs.</param>
+        public static void Set<TValue>(this Property<TValue?> property, TypedSource<TValue> source)
             where TValue : struct
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
@@ -185,16 +196,14 @@ namespace Alis.Reactive
     }
 
     /// <summary>
-    /// One argument of a method a declaration declares: a literal, or a value read when the step runs.
+    /// An argument of a declared method: a literal, a value read when the step runs, or a field.
     /// </summary>
     public abstract class Arg
     {
         private protected Arg() { }
 
-        /// <summary>The value, read where the call is written.</summary>
         internal abstract ValueExpression Expression { get; }
 
-        /// <summary>The shape the method declares for this argument.</summary>
         internal abstract Shape Shape { get; }
 
         internal static Arg Fixed(object value)
@@ -210,8 +219,8 @@ namespace Alis.Reactive
             return new DeclaredArg(source, Shape.OfArgument(typeof(TDeclared)));
         }
 
-        /// <summary>A field of the row, item or card class, named when the view renders.</summary>
-        /// <param name="field">The field, for example <c>Field.Of((Resident r) =&gt; r.OpenTasks)</c>.</param>
+        /// <summary>A field is passed as its JavaScript name.</summary>
+        /// <param name="field">The field.</param>
         public static implicit operator Arg(Field field)
         {
             if (field == null) throw new ArgumentNullException(nameof(field));
@@ -239,28 +248,17 @@ namespace Alis.Reactive
     }
 
     /// <summary>
-    /// One argument of a method: a literal, or a value read when the step runs. A value read when the step
-    /// runs is an argument of its own type, so a generic method infers its type argument from it.
+    /// A typed argument of a declared method. A literal converts to it, and a <see cref="TypedSource{T}"/>
+    /// is one, so literals and runtime values mix: <c>grid.SelectRow(0)</c>, <c>grid.SelectRow(args.RowIndex)</c>.
     /// </summary>
-    /// <remarks>
-    /// A literal converts implicitly; a generic method given only literals names its type argument:
-    /// <c>kanban.AddCard&lt;CareCard&gt;(card, 0)</c>.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// planner.Book(args.Added, visitors.Value, "Bring the photo album");
-    /// kanban.AddCard(json.Get(x =&gt; x.Card), 0);
-    /// </code>
-    /// </example>
-    /// <typeparam name="T">The C# type the method declares for the argument.</typeparam>
+    /// <typeparam name="T">The C# type the JavaScript method takes.</typeparam>
     public abstract class Arg<T> : Arg
     {
         private protected Arg() { }
 
         internal override Shape Shape => Shape.OfArgument(typeof(T));
 
-        /// <summary>A literal argument, written into the plan.</summary>
-        /// <remarks>A parameter typed <c>object</c> takes any value read when the step runs, too.</remarks>
+        /// <summary>A literal is passed as it is.</summary>
         /// <param name="value">The literal.</param>
         public static implicit operator Arg<T>(T value) => new Literal(value);
 

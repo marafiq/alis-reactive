@@ -20,30 +20,30 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionStepper : FusionComponent
     {
         /// <summary>The zero-based index of the active step.</summary>
-        public Prop<int> ActiveStep => Prop<int>();
+        public Property<int> ActiveStep => Property<int>();
 
         /// <summary>Moves to the next step.</summary>
-        public void NextStep() => Call();
+        public void NextStep() => Method();
 
         /// <summary>Moves to the previous step.</summary>
-        public void PreviousStep() => Call();
+        public void PreviousStep() => Method();
 
         /// <summary>Returns to the first step and clears step states.</summary>
-        public void Reset() => Call();
+        public void Reset() => Method();
 
         /// <summary>Redraws the progress bar after the steps change.</summary>
-        public void RefreshProgressbar() => Call();
+        public void RefreshProgressbar() => Method();
 
         /// <summary>Raised after the active step changes.</summary>
-        public TypedEvent<FusionStepperChangedArgs> StepChanged =>
+        public Event<FusionStepperChangedArgs> StepChanged =>
             Event<FusionStepperChangedArgs>();
 
         /// <summary>Raised before the active step changes.</summary>
-        public TypedEvent<FusionStepperChangingArgs> StepChanging =>
+        public Event<FusionStepperChangingArgs> StepChanging =>
             Event<FusionStepperChangingArgs>();
 
         /// <summary>Raised when the user clicks a step.</summary>
-        public TypedEvent<FusionStepperClickArgs> StepClick =>
+        public Event<FusionStepperClickArgs> StepClick =>
             Event<FusionStepperClickArgs>();
     }
 
@@ -73,7 +73,7 @@ namespace Alis.Reactive.Fusion.Components
         public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
 
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionStepper.StepClick"/>.</summary>

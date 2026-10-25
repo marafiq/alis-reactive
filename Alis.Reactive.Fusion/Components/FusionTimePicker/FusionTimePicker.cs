@@ -17,16 +17,16 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionTimePicker : FusionComponent, IInputComponent
     {
         /// <summary>The selected time; the picker keeps the time of day.</summary>
-        public Prop<DateTime> Value => Prop<DateTime>();
+        public Property<DateTime> Value => Property<DateTime>();
 
         /// <summary>Moves focus into the input.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
 
         /// <summary>Removes focus from the input.</summary>
-        public void FocusOut() => Call();
+        public void FocusOut() => Method();
 
         /// <summary>Raised when the selected time changes.</summary>
-        public TypedEvent<FusionTimePickerChangeArgs> Change =>
+        public Event<FusionTimePickerChangeArgs> Change =>
             Event<FusionTimePickerChangeArgs>();
 
         /// <inheritdoc />

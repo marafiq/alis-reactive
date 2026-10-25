@@ -19,16 +19,16 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionDateRangePicker : FusionComponent, IInputComponent
     {
         /// <summary>The first day of the selected range.</summary>
-        public Prop<DateTime> StartDate => Prop<DateTime>();
+        public Property<DateTime> StartDate => Property<DateTime>();
 
         /// <summary>The last day of the selected range.</summary>
-        public Prop<DateTime> EndDate => Prop<DateTime>();
+        public Property<DateTime> EndDate => Property<DateTime>();
 
         /// <summary>The selected range as its start and end dates.</summary>
-        public Prop<DateTime[]> Value => Prop<DateTime[]>();
+        public Property<DateTime[]> Value => Property<DateTime[]>();
 
         /// <summary>Raised when the selected range changes.</summary>
-        public TypedEvent<FusionDateRangePickerChangeArgs> Change =>
+        public Event<FusionDateRangePickerChangeArgs> Change =>
             Event<FusionDateRangePickerChangeArgs>();
 
         /// <inheritdoc />

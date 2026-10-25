@@ -21,20 +21,20 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Selects the item with this text.</summary>
         /// <param name="item">The text of the item to select.</param>
-        public void SelectItem(Arg<string> item) => Call(item);
+        public void SelectItem(Arg<string> item) => Method(item);
 
         /// <summary>Clears the selection of the item with this text.</summary>
         /// <param name="item">The text of the item to clear.</param>
-        public void UnselectItem(Arg<string> item) => Call(item);
+        public void UnselectItem(Arg<string> item) => Method(item);
 
         /// <summary>Checks every item of a checkbox list.</summary>
-        public void CheckAllItems() => Call();
+        public void CheckAllItems() => Method();
 
         /// <summary>Unchecks every item of a checkbox list.</summary>
-        public void UncheckAllItems() => Call();
+        public void UncheckAllItems() => Method();
 
         /// <summary>Raised when an item is selected.</summary>
-        public TypedEvent<FusionListViewSelectArgs> Select =>
+        public Event<FusionListViewSelectArgs> Select =>
             Event<FusionListViewSelectArgs>();
     }
 
@@ -54,7 +54,7 @@ namespace Alis.Reactive.Fusion.Components
         public ReadOnly<bool?> IsChecked => ReadOnly<bool?>();
 
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>

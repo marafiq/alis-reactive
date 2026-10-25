@@ -20,16 +20,16 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionDateTimePicker : FusionComponent, IInputComponent
     {
         /// <summary>The selected date and time.</summary>
-        public Prop<DateTime> Value => Prop<DateTime>();
+        public Property<DateTime> Value => Property<DateTime>();
 
         /// <summary>Moves focus into the input.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
 
         /// <summary>Removes focus from the input.</summary>
-        public void FocusOut() => Call();
+        public void FocusOut() => Method();
 
         /// <summary>Raised when the selected date and time change.</summary>
-        public TypedEvent<FusionDateTimePickerChangeArgs> Change =>
+        public Event<FusionDateTimePickerChangeArgs> Change =>
             Event<FusionDateTimePickerChangeArgs>();
 
         /// <inheritdoc />

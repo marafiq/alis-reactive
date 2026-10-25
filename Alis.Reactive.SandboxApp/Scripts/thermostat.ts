@@ -3,15 +3,18 @@
 // the framework. It has every kind of member a JavaScript object can have:
 //
 //   properties  value (the target; read and written), mode (read and written), current (read only),
-//               locked (read only), pin (written only), schedule.night (read and written),
-//               schedule.active (read only)
-//   methods     increase(), decrease(), hold(minutes), setRange(min, max), applyPlan(plan),
-//               schedule.apply()
+//               locked (read only), pin (written only), schedule (an object: night read and written,
+//               active read only), zones (a list of objects: name read only, target read and written)
+//   methods     increase(), decrease(), hold(minutes), setRange(min, max), setQuietHours(hours),
+//               applyPlan(plan), schedule.apply(), zones[i].boost()
 //   functions   isComfortable(), distanceTo(target), estimate(target, mode), describe(plan),
-//               reading() (an object with value, unit and label()), schedule.nextChange()
+//               reading() (an object with value, unit and label()), schedule.nextChange(),
+//               zones[i].isBoosted()
 //   events      unlocked (no payload); targetChanging (a payload the page reads, writes and calls:
-//               requested, previous, cancel, reason, clamp(), accept()); targetChanged (value, previous).
-//               Listeners are added with on(name, fn) and removed with off(name, fn).
+//               requested, previous, cancel, reason, clamp(), accept()); targetChanged (value, previous);
+//               schedule.applied (target), raised by the schedule object itself.
+//               Listeners are added with on(name, fn) and removed with off(name, fn), on the thermostat
+//               and on its schedule alike.
 
 import "./thermostat.css";
 
@@ -44,14 +47,102 @@ export interface Reading {
   label(): string;
 }
 
-export interface Schedule {
-  night: number;
-  readonly active: boolean;
-  apply(): void;
-  nextChange(): string;
+type Listener = (payload: unknown) => void;
+
+/** Listeners by event name, the way the thermostat and its schedule both keep them. */
+class Listeners {
+  private readonly named = new Map<string, Set<Listener>>();
+
+  add(name: string, listener: Listener): void {
+    let listeners = this.named.get(name);
+    if (listeners === undefined) {
+      listeners = new Set();
+      this.named.set(name, listeners);
+    }
+    listeners.add(listener);
+  }
+
+  remove(name: string, listener: Listener): void {
+    this.named.get(name)?.delete(listener);
+  }
+
+  emit(name: string, payload: unknown): void {
+    for (const listener of [...(this.named.get(name) ?? [])]) listener(payload);
+  }
+
+  clear(): void {
+    this.named.clear();
+  }
 }
 
-type Listener = (payload: unknown) => void;
+/** The night schedule: an object of its own, with its own event. */
+export class Schedule {
+  private readonly listeners = new Listeners();
+  private nightTarget = 0;
+  private applied = false;
+
+  constructor(private readonly thermostat: Thermostat) {}
+
+  get night(): number {
+    return this.nightTarget;
+  }
+
+  set night(target: number) {
+    this.nightTarget = target;
+    this.thermostat.refresh();
+  }
+
+  get active(): boolean {
+    return this.applied;
+  }
+
+  /** Makes the night setting the target through the thermostat's own change; raises applied when it took. */
+  apply(): void {
+    if (this.nightTarget === 0) return;
+    this.applied = true;
+    this.thermostat.change(this.nightTarget);
+    if (this.thermostat.value === this.nightTarget) this.listeners.emit("applied", { target: this.nightTarget });
+  }
+
+  nextChange(): string {
+    return this.nightTarget === 0 ? "no night setting" : `${this.nightTarget}°F at 9:00 PM`;
+  }
+
+  on(name: string, listener: Listener): void {
+    this.listeners.add(name, listener);
+  }
+
+  off(name: string, listener: Listener): void {
+    this.listeners.remove(name, listener);
+  }
+}
+
+/** One zone of the room: an item of the thermostat's zones, with members of its own. */
+export class Zone {
+  private boosted = false;
+
+  constructor(private readonly thermostat: Thermostat, readonly name: string, private zoneTarget: number) {}
+
+  get target(): number {
+    return this.zoneTarget;
+  }
+
+  set target(value: number) {
+    this.zoneTarget = value;
+    this.thermostat.refresh();
+  }
+
+  /** Warms this zone two degrees above its target for a while. */
+  boost(): void {
+    this.boosted = true;
+    this.zoneTarget += 2;
+    this.thermostat.refresh();
+  }
+
+  isBoosted(): boolean {
+    return this.boosted;
+  }
+}
 
 export interface ThermostatHost extends HTMLElement {
   thermostat?: Thermostat;
@@ -65,7 +156,7 @@ const MINUTES_PER_DEGREE: Record<ThermostatMode, number> = { heat: 4, cool: 3, o
 
 export class Thermostat {
   private readonly host: ThermostatHost;
-  private readonly listeners = new Map<string, Set<Listener>>();
+  private readonly listeners = new Listeners();
   private readonly pinCode: string;
   private readonly unit = "F";
   private readonly room: number;
@@ -75,11 +166,13 @@ export class Thermostat {
   private min = 50;
   private max = 90;
   private status = "";
-  private nightTarget = 0;
-  private nightActive = false;
+  private quietHours: string[] = [];
 
-  /** The night schedule, an object of its own: night is read and written, active read, apply() and nextChange() called. */
+  /** The night schedule: an object with members and an event of its own. */
   readonly schedule: Schedule;
+
+  /** The room's zones: a list of objects with members of their own. */
+  readonly zones: Zone[];
 
   constructor(host: ThermostatHost) {
     this.host = host;
@@ -87,7 +180,11 @@ export class Thermostat {
     this.room = Number(host.dataset.current ?? "68");
     this.pinCode = host.dataset.pin ?? "";
     this.lockedValue = host.dataset.locked === "true";
-    this.schedule = this.createSchedule();
+    this.schedule = new Schedule(this);
+    this.zones = (host.dataset.zones ?? "")
+      .split(",")
+      .filter(name => name !== "")
+      .map(name => new Zone(this, name, this.target));
     host.addEventListener("click", this.onClick);
     host.thermostat = this;
     this.render();
@@ -132,7 +229,7 @@ export class Thermostat {
     this.lockedValue = false;
     this.status = "";
     this.render();
-    this.emit("unlocked", undefined);
+    this.listeners.emit("unlocked", undefined);
   }
 
   increase(): void {
@@ -155,15 +252,21 @@ export class Thermostat {
     this.render();
   }
 
+  /** The hours the thermostat keeps the fan quiet, from the first to the last. */
+  setQuietHours(hours: string[]): void {
+    this.quietHours = [...hours];
+    this.render();
+  }
+
   /** Applies a plan: its target and mode now, its first night setting for the night. */
   applyPlan(plan: ComfortPlan): void {
     const previous = this.target;
     this.modeValue = plan.mode;
-    this.nightTarget = plan.nights[0]?.target ?? this.nightTarget;
+    if (plan.nights[0] !== undefined) this.schedule.night = plan.nights[0].target;
     this.target = plan.target;
     this.status = "Plan applied";
     this.render();
-    if (previous !== this.target) this.emit("targetChanged", { value: this.target, previous });
+    if (previous !== this.target) this.listeners.emit("targetChanged", { value: this.target, previous });
   }
 
   isComfortable(): boolean {
@@ -192,16 +295,11 @@ export class Thermostat {
   }
 
   on(name: string, listener: Listener): void {
-    let named = this.listeners.get(name);
-    if (named === undefined) {
-      named = new Set();
-      this.listeners.set(name, named);
-    }
-    named.add(listener);
+    this.listeners.add(name, listener);
   }
 
   off(name: string, listener: Listener): void {
-    this.listeners.get(name)?.delete(listener);
+    this.listeners.remove(name, listener);
   }
 
   destroy(): void {
@@ -211,32 +309,8 @@ export class Thermostat {
     delete this.host.thermostat;
   }
 
-  private createSchedule(): Schedule {
-    const thermostat = this;
-    return {
-      get night(): number {
-        return thermostat.nightTarget;
-      },
-      set night(target: number) {
-        thermostat.nightTarget = target;
-        thermostat.render();
-      },
-      get active(): boolean {
-        return thermostat.nightActive;
-      },
-      apply(): void {
-        if (thermostat.nightTarget === 0) return;
-        thermostat.nightActive = true;
-        thermostat.change(thermostat.nightTarget);
-      },
-      nextChange(): string {
-        return thermostat.nightTarget === 0 ? "no night setting" : `${thermostat.nightTarget}°${thermostat.unit} at 9:00 PM`;
-      },
-    };
-  }
-
   /** Changes the target: targetChanging listeners may refuse it; a change raises targetChanged. */
-  private change(requested: number): void {
+  change(requested: number): void {
     const previous = this.target;
     let accepted = false;
     const change: TargetChange = {
@@ -250,7 +324,7 @@ export class Thermostat {
         accepted = true;
       },
     };
-    this.emit("targetChanging", change);
+    this.listeners.emit("targetChanging", change);
     if (change.cancel) {
       this.status = change.reason;
       this.render();
@@ -259,7 +333,12 @@ export class Thermostat {
     this.target = requested;
     this.status = accepted ? `Accepted ${requested}°${this.unit}` : "";
     this.render();
-    this.emit("targetChanged", { value: this.target, previous });
+    this.listeners.emit("targetChanged", { value: this.target, previous });
+  }
+
+  /** Shows the state again after a member of the schedule or a zone changed it. */
+  refresh(): void {
+    this.render();
   }
 
   private readonly onClick = (event: Event): void => {
@@ -269,10 +348,6 @@ export class Thermostat {
     else this.decrease();
   };
 
-  private emit(name: string, payload: unknown): void {
-    for (const listener of [...(this.listeners.get(name) ?? [])]) listener(payload);
-  }
-
   private render(): void {
     const head = element("div", "th-head");
     head.append(element("strong", "th-target", `${this.target}°${this.unit}`), element("span", "th-mode", this.modeValue));
@@ -281,8 +356,21 @@ export class Thermostat {
     body.append(
       element("span", "th-current", `Room ${this.room}°${this.unit}`),
       element("span", "th-range", `${this.min}–${this.max}°${this.unit}`),
-      element("span", "th-night", this.nightTarget === 0 ? "No night setting" : `Night ${this.nightTarget}°${this.unit}`),
+      element("span", "th-night", this.schedule.night === 0 ? "No night setting" : `Night ${this.schedule.night}°${this.unit}`),
+      element("span", "th-quiet", this.quietHours.length === 0 ? "" : `Quiet ${this.quietHours.join(" to ")}`),
     );
+
+    const zones = element("ul", "th-zones");
+    for (const zone of this.zones) {
+      const item = element("li", "th-zone");
+      item.dataset.zone = zone.name;
+      item.append(
+        element("span", "th-zone-name", zone.name),
+        element("span", "th-zone-target", `${zone.target}°${this.unit}`),
+        element("span", "th-zone-boost", zone.isBoosted() ? "Boosted" : ""),
+      );
+      zones.append(item);
+    }
 
     const controls = element("div", "th-controls");
     controls.append(
@@ -291,7 +379,7 @@ export class Thermostat {
       element("span", "th-lock", this.lockedValue ? "Locked" : "Unlocked"),
     );
 
-    this.host.replaceChildren(head, body, controls, element("p", "th-status", this.status));
+    this.host.replaceChildren(head, body, zones, controls, element("p", "th-status", this.status));
   }
 
   private button(className: string, text: string, label: string): HTMLButtonElement {

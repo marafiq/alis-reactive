@@ -16,10 +16,10 @@ namespace Alis.Reactive.Native.Components
         /// value and no other, or none for empty text, and raises no event, as a write to any native input
         /// raises none.
         /// </summary>
-        public Prop<string> Value => Prop<string>();
+        public Property<string> Value => Property<string>();
 
         /// <summary>Raised when the user chooses an option.</summary>
-        public TypedEvent<NativeRadioGroupChangeArgs> Change =>
+        public Event<NativeRadioGroupChangeArgs> Change =>
             Event<NativeRadioGroupChangeArgs>();
 
         /// <inheritdoc />

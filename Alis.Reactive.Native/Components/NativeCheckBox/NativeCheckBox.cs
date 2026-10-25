@@ -17,13 +17,13 @@ namespace Alis.Reactive.Native.Components
     public sealed class NativeCheckBox : NativeComponent, IInputComponent
     {
         /// <summary>Whether the box is checked.</summary>
-        public Prop<bool> Checked => Prop<bool>();
+        public Property<bool> Checked => Property<bool>();
 
         /// <summary>Moves focus to the element.</summary>
-        public void Focus() => Call();
+        public void Focus() => Method();
 
         /// <summary>Raised when the user checks or clears the box.</summary>
-        public TypedEvent<NativeCheckBoxChangeArgs> Change =>
+        public Event<NativeCheckBoxChangeArgs> Change =>
             Event<NativeCheckBoxChangeArgs>();
 
         /// <inheritdoc />

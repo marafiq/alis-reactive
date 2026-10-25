@@ -21,34 +21,34 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionSplitButton : FusionComponent
     {
         /// <summary>The button text.</summary>
-        public Prop<string> Content => Prop<string>();
+        public Property<string> Content => Property<string>();
 
         /// <summary>Whether the button is disabled.</summary>
-        public Prop<bool> Disabled => Prop<bool>();
+        public Property<bool> Disabled => Property<bool>();
 
         /// <summary>The CSS classes on the button.</summary>
-        public Prop<string> CssClass => Prop<string>();
+        public Property<string> CssClass => Property<string>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>Opens or closes the popup.</summary>
-        public void Toggle() => Call();
+        public void Toggle() => Method();
 
         /// <summary>Moves focus to the button.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
 
         /// <summary>Removes items by their text, or by their IDs when <paramref name="isUniqueId"/> is <see langword="true"/>.</summary>
         /// <param name="items">The texts, or the IDs, of the items to remove.</param>
         /// <param name="isUniqueId"><see langword="true"/> when <paramref name="items"/> holds item IDs.</param>
-        public void RemoveItems(Arg<string[]> items, Arg<bool> isUniqueId) => Call(items, isUniqueId);
+        public void RemoveItems(Arg<string[]> items, Arg<bool> isUniqueId) => Method(items, isUniqueId);
 
         /// <summary>Raised when the user clicks the primary button.</summary>
-        public TypedEvent<FusionSplitButtonClickArgs> Click =>
+        public Event<FusionSplitButtonClickArgs> Click =>
             Event<FusionSplitButtonClickArgs>();
 
         /// <summary>Raised when the user selects a popup item.</summary>
-        public TypedEvent<FusionSplitButtonSelectArgs> Select =>
+        public Event<FusionSplitButtonSelectArgs> Select =>
             Event<FusionSplitButtonSelectArgs>();
     }
 

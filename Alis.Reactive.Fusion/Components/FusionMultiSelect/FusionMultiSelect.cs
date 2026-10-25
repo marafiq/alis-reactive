@@ -16,30 +16,30 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionMultiSelect : FusionComponent, IInputComponent
     {
         /// <summary>The selected values.</summary>
-        public Prop<string[]> Value => Prop<string[]>();
+        public Property<string[]> Value => Property<string[]>();
 
         /// <summary>The items the list offers, typed by your item class. Call <see cref="DataBind"/> after writing it outside a filtering event.</summary>
         /// <typeparam name="TItem">Your item class.</typeparam>
-        public Prop<IEnumerable<TItem>> Items<TItem>() where TItem : class => Prop<IEnumerable<TItem>>("dataSource");
+        public Property<IEnumerable<TItem>> Items<TItem>() where TItem : class => Property<IEnumerable<TItem>>("dataSource");
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>Opens the selection popup.</summary>
-        public void ShowPopup() => Call();
+        public void ShowPopup() => Method();
 
         /// <summary>Closes the selection popup.</summary>
-        public void HidePopup() => Call();
+        public void HidePopup() => Method();
 
         /// <summary>Raised when the selection changes.</summary>
-        public TypedEvent<FusionMultiSelectChangeArgs> Change =>
+        public Event<FusionMultiSelectChangeArgs> Change =>
             Event<FusionMultiSelectChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised as the user types, before the popup filters its items.</summary>
-        public TypedEvent<FusionMultiSelectFilteringArgs> Filtering =>
+        public Event<FusionMultiSelectFilteringArgs> Filtering =>
             Event<FusionMultiSelectFilteringArgs>();
     }
 
@@ -66,13 +66,13 @@ namespace Alis.Reactive.Fusion.Components
         public ReadOnly<string> Text => ReadOnly<string>();
 
         /// <summary>Set to <see langword="true"/> to suppress the built-in client-side filter while a server request is in flight.</summary>
-        public Prop<bool> PreventDefaultAction => Prop<bool>();
+        public Property<bool> PreventDefaultAction => Property<bool>();
 
         /// <summary>Hands filtered items to the popup; valid after an HTTP response returns.</summary>
         /// <typeparam name="TItems">The items' type, such as the server's own list.</typeparam>
         /// <param name="items">The items to show, read when the step runs.</param>
         public void UpdateData<TItems>(TypedSource<TItems> items) where TItems : IEnumerable<object> =>
-            Call(Pass<IEnumerable<object>, TItems>(items));
+            Method(Pass<IEnumerable<object>, TItems>(items));
     }
 
     /// <summary>Renders a <see cref="FusionMultiSelect"/> for a model-bound field.</summary>

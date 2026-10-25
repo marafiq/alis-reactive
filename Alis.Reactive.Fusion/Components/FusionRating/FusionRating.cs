@@ -16,16 +16,16 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionRating : FusionComponent, IInputComponent
     {
         /// <summary>The rating.</summary>
-        public Prop<double> Value => Prop<double>();
+        public Property<double> Value => Property<double>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>Resets the rating to its minimum.</summary>
-        public void Reset() => Call();
+        public void Reset() => Method();
 
         /// <summary>Raised when the rating changes.</summary>
-        public TypedEvent<FusionRatingValueChangedArgs> ValueChanged =>
+        public Event<FusionRatingValueChangedArgs> ValueChanged =>
             Event<FusionRatingValueChangedArgs>();
 
         /// <inheritdoc />

@@ -26,33 +26,33 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Opens the menu at a top and left position, in pixels.</summary>
         /// <param name="top">The menu's vertical position, in pixels.</param>
         /// <param name="left">The menu's horizontal position, in pixels.</param>
-        public void Open(Arg<double> top, Arg<double> left) => Call(top, left);
+        public void Open(Arg<double> top, Arg<double> left) => Method(top, left);
 
         /// <summary>Closes the menu.</summary>
-        public void Close() => Call();
+        public void Close() => Method();
 
         /// <summary>Raised before each item renders.</summary>
-        public TypedEvent<FusionContextMenuBeforeItemRenderArgs> BeforeItemRender =>
+        public Event<FusionContextMenuBeforeItemRenderArgs> BeforeItemRender =>
             Event<FusionContextMenuBeforeItemRenderArgs>();
 
         /// <summary>Raised before a menu level opens.</summary>
-        public TypedEvent<FusionContextMenuBeforeOpenArgs> BeforeOpen =>
+        public Event<FusionContextMenuBeforeOpenArgs> BeforeOpen =>
             Event<FusionContextMenuBeforeOpenArgs>();
 
         /// <summary>Raised after a menu level opens.</summary>
-        public TypedEvent<FusionContextMenuOpenCloseArgs> OnOpen =>
+        public Event<FusionContextMenuOpenCloseArgs> OnOpen =>
             Event<FusionContextMenuOpenCloseArgs>();
 
         /// <summary>Raised before a menu level closes.</summary>
-        public TypedEvent<FusionContextMenuBeforeCloseArgs> BeforeClose =>
+        public Event<FusionContextMenuBeforeCloseArgs> BeforeClose =>
             Event<FusionContextMenuBeforeCloseArgs>();
 
         /// <summary>Raised after a menu level closes.</summary>
-        public TypedEvent<FusionContextMenuOpenCloseArgs> OnClose =>
+        public Event<FusionContextMenuOpenCloseArgs> OnClose =>
             Event<FusionContextMenuOpenCloseArgs>();
 
         /// <summary>Raised when the user selects an item.</summary>
-        public TypedEvent<FusionContextMenuSelectArgs> Select =>
+        public Event<FusionContextMenuSelectArgs> Select =>
             Event<FusionContextMenuSelectArgs>();
     }
 
@@ -79,7 +79,7 @@ namespace Alis.Reactive.Fusion.Components
         public ReadOnly<double> Left => ReadOnly<double>();
 
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionContextMenu.OnOpen"/> and <see cref="FusionContextMenu.OnClose"/>.</summary>
@@ -102,7 +102,7 @@ namespace Alis.Reactive.Fusion.Components
         public ReadOnly<FusionContextMenuItem> ParentItem => ReadOnly<FusionContextMenuItem>();
 
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionContextMenu.Select"/>.</summary>

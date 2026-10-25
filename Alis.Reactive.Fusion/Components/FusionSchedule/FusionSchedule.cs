@@ -26,25 +26,25 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionSchedule : FusionComponent
     {
         /// <summary>The shown view, for example <c>"Week"</c>.</summary>
-        public Prop<string> CurrentView => Prop<string>();
+        public Property<string> CurrentView => Property<string>();
 
         /// <summary>The date the view shows.</summary>
-        public Prop<DateTime> SelectedDate => Prop<DateTime>();
+        public Property<DateTime> SelectedDate => Property<DateTime>();
 
         /// <summary>The events and how they are read; call <see cref="DataBind"/> after writing them.</summary>
         public FusionScheduleEventSettings EventSettings => Object<FusionScheduleEventSettings>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>The events, typed by your event class.</summary>
         /// <typeparam name="TEvent">Your event class.</typeparam>
-        public TypedSource<TEvent[]> GetEvents<TEvent>() where TEvent : class => Invoke<TEvent[]>();
+        public TypedSource<TEvent[]> GetEvents<TEvent>() where TEvent : class => Method<TEvent[]>();
 
         /// <summary>Adds an event.</summary>
         /// <typeparam name="TEvent">Your event class, or an array of it.</typeparam>
         /// <param name="data">The event to add, or an array of events.</param>
-        public void AddEvent<TEvent>(Arg<TEvent> data) where TEvent : class => Call(data);
+        public void AddEvent<TEvent>(Arg<TEvent> data) where TEvent : class => Method(data);
 
         /// <summary>Saves an edited event.</summary>
         /// <typeparam name="TEvent">Your event class.</typeparam>
@@ -53,7 +53,7 @@ namespace Alis.Reactive.Fusion.Components
         /// For a recurring event, whether the edit applies to one occurrence
         /// (<see cref="ScheduleAction.EditOccurrence"/>) or the whole series (<see cref="ScheduleAction.EditSeries"/>).
         /// </param>
-        public void SaveEvent<TEvent>(Arg<TEvent> data, Arg<ScheduleAction> currentAction) where TEvent : class => Call(data, currentAction);
+        public void SaveEvent<TEvent>(Arg<TEvent> data, Arg<ScheduleAction> currentAction) where TEvent : class => Method(data, currentAction);
 
         /// <summary>Deletes an event, given the event or its key.</summary>
         /// <typeparam name="TKey">The type of the event's key, or your event class when you pass the event.</typeparam>
@@ -62,7 +62,7 @@ namespace Alis.Reactive.Fusion.Components
         /// What to delete: <see cref="ScheduleAction.Delete"/>, <see cref="ScheduleAction.DeleteOccurrence"/> or
         /// <see cref="ScheduleAction.DeleteSeries"/>.
         /// </param>
-        public void DeleteEvent<TKey>(Arg<TKey> id, Arg<ScheduleAction> currentAction) => Call(id, currentAction);
+        public void DeleteEvent<TKey>(Arg<TKey> id, Arg<ScheduleAction> currentAction) => Method(id, currentAction);
 
         /// <summary>Opens the event editor for an event.</summary>
         /// <typeparam name="TEvent">Your event class.</typeparam>
@@ -71,60 +71,60 @@ namespace Alis.Reactive.Fusion.Components
         /// What the editor opens for: <see cref="ScheduleAction.Add"/>, <see cref="ScheduleAction.Save"/>,
         /// <see cref="ScheduleAction.EditOccurrence"/> or <see cref="ScheduleAction.EditSeries"/>.
         /// </param>
-        public void OpenEditor<TEvent>(Arg<TEvent> data, Arg<ScheduleAction> action) where TEvent : class => Call(data, action);
+        public void OpenEditor<TEvent>(Arg<TEvent> data, Arg<ScheduleAction> action) where TEvent : class => Method(data, action);
 
         /// <summary>Closes the event editor.</summary>
-        public void CloseEditor() => Call();
+        public void CloseEditor() => Method();
 
         /// <summary>Re-renders the events.</summary>
-        public void RefreshEvents() => Call();
+        public void RefreshEvents() => Method();
 
         /// <summary>Prints the schedule.</summary>
-        public void Print() => Call();
+        public void Print() => Method();
 
         /// <summary>Scrolls to an hour, for example <c>"09:00"</c>.</summary>
         /// <param name="hour">The hour and minute to scroll to, in 24-hour form.</param>
-        public void ScrollTo(Arg<string> hour) => Call(hour);
+        public void ScrollTo(Arg<string> hour) => Method(hour);
 
         /// <summary>Raised when the user clicks a cell.</summary>
-        public TypedEvent<FusionScheduleCellClickArgs> CellClick =>
+        public Event<FusionScheduleCellClickArgs> CellClick =>
             Event<FusionScheduleCellClickArgs>();
 
         /// <summary>Raised when the user clicks an event.</summary>
-        public TypedEvent<FusionScheduleEventClickArgs> EventClick =>
+        public Event<FusionScheduleEventClickArgs> EventClick =>
             Event<FusionScheduleEventClickArgs>();
 
         /// <summary>
         /// Raised before an action runs: a move to another date or view, or an event added, saved or deleted.
         /// </summary>
         /// <typeparam name="TEvent">Your event class; the payload's records read the events the action carries as it.</typeparam>
-        public TypedEvent<FusionScheduleActionBeginArgs<TEvent>> ActionBegin<TEvent>() where TEvent : class =>
+        public Event<FusionScheduleActionBeginArgs<TEvent>> ActionBegin<TEvent>() where TEvent : class =>
             Event<FusionScheduleActionBeginArgs<TEvent>>();
 
         /// <summary>Raised after an action completes.</summary>
-        public TypedEvent<FusionScheduleActionCompleteArgs> ActionComplete =>
+        public Event<FusionScheduleActionCompleteArgs> ActionComplete =>
             Event<FusionScheduleActionCompleteArgs>();
 
         /// <summary>Raised before the view or date changes.</summary>
-        public TypedEvent<FusionScheduleNavigatingArgs> Navigating =>
+        public Event<FusionScheduleNavigatingArgs> Navigating =>
             Event<FusionScheduleNavigatingArgs>();
 
         /// <summary>Raised before a popup opens: an event's details, the event editor, a delete alert, ...</summary>
         /// <typeparam name="TEvent">Your event class; the payload's <c>Data</c> reads the event the popup is for as it.</typeparam>
-        public TypedEvent<FusionSchedulePopupOpenArgs<TEvent>> PopupOpen<TEvent>() where TEvent : class =>
+        public Event<FusionSchedulePopupOpenArgs<TEvent>> PopupOpen<TEvent>() where TEvent : class =>
             Event<FusionSchedulePopupOpenArgs<TEvent>>();
 
         /// <summary>Raised before a popup closes.</summary>
-        public TypedEvent<FusionSchedulePopupCloseArgs> PopupClose =>
+        public Event<FusionSchedulePopupCloseArgs> PopupClose =>
             Event<FusionSchedulePopupCloseArgs>();
 
         /// <summary>Raised after the schedule binds its events.</summary>
-        public TypedEvent<FusionScheduleDataBoundArgs> DataBound =>
+        public Event<FusionScheduleDataBoundArgs> DataBound =>
             Event<FusionScheduleDataBoundArgs>();
 
         /// <summary>Raised after each event renders.</summary>
         /// <typeparam name="TEvent">Your event class; the payload's <c>Data</c> reads the rendered event as it.</typeparam>
-        public TypedEvent<FusionScheduleEventRenderedArgs<TEvent>> EventRendered<TEvent>() where TEvent : class, new() =>
+        public Event<FusionScheduleEventRenderedArgs<TEvent>> EventRendered<TEvent>() where TEvent : class, new() =>
             Event<FusionScheduleEventRenderedArgs<TEvent>>();
     }
 
@@ -148,7 +148,7 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionScheduleEventClickArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.ActionBegin{TEvent}"/>.</summary>
@@ -174,7 +174,7 @@ namespace Alis.Reactive.Fusion.Components
         public ReadOnly<string> RequestType => ReadOnly<string>();
 
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
 
         /// <summary>The events being added.</summary>
         public ReadOnly<TEvent[]> AddedRecords => ReadOnly<TEvent[]>();
@@ -215,7 +215,7 @@ namespace Alis.Reactive.Fusion.Components
         public ReadOnly<int> ViewIndex => ReadOnly<int>();
 
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.PopupOpen{TEvent}"/>.</summary>
@@ -227,7 +227,7 @@ namespace Alis.Reactive.Fusion.Components
         public ReadOnly<string> Type => ReadOnly<string>();
 
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
 
         /// <summary>
         /// The event the popup is for. A popup for an empty cell holds only the cell's start, end and resource, so the
@@ -254,7 +254,7 @@ namespace Alis.Reactive.Fusion.Components
         where TEvent : class, new()
     {
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
 
         /// <summary>The rendered event.</summary>
         public ReadOnly<TEvent> Data => ReadOnly<TEvent>();
@@ -268,7 +268,7 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>The events, typed by your event class.</summary>
         /// <typeparam name="TEvent">Your event class.</typeparam>
-        public Prop<IEnumerable<TEvent>> Events<TEvent>() where TEvent : class => Prop<IEnumerable<TEvent>>("dataSource");
+        public Property<IEnumerable<TEvent>> Events<TEvent>() where TEvent : class => Property<IEnumerable<TEvent>>("dataSource");
     }
 
     /// <summary>

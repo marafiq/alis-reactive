@@ -42,17 +42,17 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
 
         /// <summary>The selected value, read from the original select. Change it with <see cref="SetValue"/>.</summary>
         /// <remarks>Tom Select keeps the original select in sync; its value is what a form posts.</remarks>
-        public Prop<string> Value => Input.Value;
+        public Property<string> Value => Input.Value;
 
         /// <summary>Selects an option by its value and raises <see cref="Change"/>.</summary>
         /// <param name="value">The option's value.</param>
-        public void SetValue(Arg<string> value) => Call(value);
+        public void SetValue(Arg<string> value) => Method(value);
 
         /// <summary>Clears the selection and raises <see cref="Change"/>.</summary>
-        public void Clear() => Call();
+        public void Clear() => Method();
 
         /// <summary>Raised when the selection changes, by the user or by <see cref="SetValue"/>.</summary>
-        public TypedEvent<TomSelectChangeArgs> Change => Event<TomSelectChangeArgs>();
+        public Event<TomSelectChangeArgs> Change => Event<TomSelectChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
@@ -65,7 +65,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     internal sealed class TomSelectInput : JsObject
     {
         /// <summary>The select's value: what a form posts.</summary>
-        public Prop<string> Value => Prop<string>();
+        public Property<string> Value => Property<string>();
     }
 
     /// <summary>

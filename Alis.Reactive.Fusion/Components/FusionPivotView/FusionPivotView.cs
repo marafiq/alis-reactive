@@ -28,28 +28,28 @@ namespace Alis.Reactive.Fusion.Components
         public FusionPivotViewDataSourceSettings DataSourceSettings => Object<FusionPivotViewDataSourceSettings>();
 
         /// <summary>Re-renders the pivot from its data source.</summary>
-        public void Refresh() => Call();
+        public void Refresh() => Method();
 
         /// <summary>The layout as JSON.</summary>
         /// <param name="isRemoveDatasource"><see langword="true"/> to leave the data source out of the JSON.</param>
-        public TypedSource<string> GetPersistData(Arg<bool> isRemoveDatasource) => Invoke<string>(isRemoveDatasource);
+        public TypedSource<string> GetPersistData(Arg<bool> isRemoveDatasource) => Method<string>(isRemoveDatasource);
 
         /// <summary>Restores a layout from its JSON.</summary>
         /// <param name="persistData">The layout JSON, as <see cref="GetPersistData"/> reads it.</param>
-        public void LoadPersistData(Arg<string> persistData) => Call(persistData);
+        public void LoadPersistData(Arg<string> persistData) => Method(persistData);
 
         /// <summary>Opens the conditional formatting dialog.</summary>
-        public void ShowConditionalFormattingDialog() => Call();
+        public void ShowConditionalFormattingDialog() => Method();
 
         /// <summary>Opens the calculated field dialog.</summary>
-        public void CreateCalculatedFieldDialog() => Call();
+        public void CreateCalculatedFieldDialog() => Method();
 
         /// <summary>Raised after the pivot renders its data.</summary>
-        public TypedEvent<FusionPivotViewDataBoundArgs> DataBound =>
+        public Event<FusionPivotViewDataBoundArgs> DataBound =>
             Event<FusionPivotViewDataBoundArgs>();
 
         /// <summary>Raised when the user selects a cell.</summary>
-        public TypedEvent<FusionPivotViewCellSelectingArgs> CellSelecting =>
+        public Event<FusionPivotViewCellSelectingArgs> CellSelecting =>
             Event<FusionPivotViewCellSelectingArgs>();
     }
 
@@ -107,7 +107,7 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>The rows, typed by your row class.</summary>
         /// <typeparam name="TRow">Your row class.</typeparam>
-        public Prop<IEnumerable<TRow>> Rows<TRow>() where TRow : class => Prop<IEnumerable<TRow>>("dataSource");
+        public Property<IEnumerable<TRow>> Rows<TRow>() where TRow : class => Property<IEnumerable<TRow>>("dataSource");
     }
 
     /// <summary>

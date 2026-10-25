@@ -16,16 +16,16 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionRichTextEditor : FusionComponent, IInputComponent
     {
         /// <summary>The content as HTML; <see langword="null"/> when empty.</summary>
-        public Prop<string> Value => Prop<string>();
+        public Property<string> Value => Property<string>();
 
         /// <summary>Moves focus into the editor.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
 
         /// <summary>
         /// Raised when the content changed: when focus leaves the editor (IsInteracted true), and while the
         /// person types, at the editor's save interval (IsInteracted false).
         /// </summary>
-        public TypedEvent<FusionRichTextEditorChangeArgs> Change =>
+        public Event<FusionRichTextEditorChangeArgs> Change =>
             Event<FusionRichTextEditorChangeArgs>();
 
         /// <inheritdoc />

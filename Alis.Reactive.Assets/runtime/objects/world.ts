@@ -4,6 +4,7 @@
 
 import type { ElementLocator, ObjectLocator, PlanDocument } from "../types/index";
 import type { World } from "../grammar/evaluate";
+import { read } from "../grammar/paths";
 import { moduleNamed } from "./modules";
 import type { Owner } from "./owner";
 import { subscribeVendor, vendorObject, type Listener } from "./vendor-driver";
@@ -23,9 +24,11 @@ export class PlanWorld implements World {
     return locator.kind === "element" ? document.getElementById(locator.id) : null;
   }
 
-  subscribe(id: string, event: string, listener: Listener, owner: Owner): void {
+  /** Subscribes on the object, or on the object at `path` under it: a nested object's own event. */
+  subscribe(id: string, path: readonly string[], event: string, listener: Listener, owner: Owner): void {
     const locator = this.locator(id);
     if (locator.kind === "plugin") {
+      if (path.length > 0) throw new Error(`[alis] plugin "${locator.name}" has no object at ${path.join(".")}`);
       const module = moduleNamed(locator.name);
       if (!module.subscribe) throw new Error(`[alis] plugin "${locator.name}" has no events`);
       module.subscribe(locator.key, event, listener, owner);
@@ -34,7 +37,8 @@ export class PlanWorld implements World {
 
     const vendor = this.vendor(locator);
     const root = vendorObject(this.requireElement(locator), locator.vendor, vendor);
-    owner.onDispose(subscribeVendor(root, locator.vendor, vendor, event, listener));
+    const target = path.length === 0 ? root : read(root, path, "checked", `#${locator.id}`);
+    owner.onDispose(subscribeVendor(target, locator.vendor, vendor, event, listener));
   }
 
   private locator(id: string): ObjectLocator {

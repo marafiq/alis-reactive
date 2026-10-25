@@ -16,13 +16,13 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionInputMask : FusionComponent, IInputComponent
     {
         /// <summary>The value without the mask's literal characters; <see langword="null"/> when empty.</summary>
-        public Prop<string> Value => Prop<string>();
+        public Property<string> Value => Property<string>();
 
         /// <summary>Moves focus into the input.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
 
         /// <summary>Raised when the value changes.</summary>
-        public TypedEvent<FusionInputMaskChangeArgs> Change =>
+        public Event<FusionInputMaskChangeArgs> Change =>
             Event<FusionInputMaskChangeArgs>();
 
         /// <inheritdoc />

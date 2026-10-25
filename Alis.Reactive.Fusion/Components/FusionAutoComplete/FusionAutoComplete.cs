@@ -21,46 +21,46 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionAutoComplete : FusionComponent, IInputComponent
     {
         /// <summary>The selected value; <see langword="null"/> when empty.</summary>
-        public Prop<string> Value => Prop<string>();
+        public Property<string> Value => Property<string>();
 
         /// <summary>The text shown for the selection; writing it selects the item that shows this text.</summary>
-        public Prop<string> Text => Prop<string>();
+        public Property<string> Text => Property<string>();
 
         /// <summary>The items the popup suggests from, typed by your item class.</summary>
         /// <remarks>Call <see cref="DataBind"/> after writing it outside a filtering event.</remarks>
         /// <typeparam name="TItem">Your item class.</typeparam>
-        public Prop<IEnumerable<TItem>> Items<TItem>() where TItem : class => Prop<IEnumerable<TItem>>("dataSource");
+        public Property<IEnumerable<TItem>> Items<TItem>() where TItem : class => Property<IEnumerable<TItem>>("dataSource");
 
         /// <summary>Whether the input accepts interaction.</summary>
-        public Prop<bool> Enabled => Prop<bool>();
+        public Property<bool> Enabled => Property<bool>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>Moves focus into the input.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
 
         /// <summary>Removes focus from the input.</summary>
-        public void FocusOut() => Call();
+        public void FocusOut() => Method();
 
         /// <summary>Opens the suggestion popup.</summary>
-        public void ShowPopup() => Call();
+        public void ShowPopup() => Method();
 
         /// <summary>Closes the suggestion popup.</summary>
-        public void HidePopup() => Call();
+        public void HidePopup() => Method();
 
         /// <summary>Clears the selection and the text; call <see cref="DataBind"/> to apply it at once.</summary>
-        public void Clear() => Call();
+        public void Clear() => Method();
 
         /// <summary>Raised when the selected value changes.</summary>
-        public TypedEvent<FusionAutoCompleteChangeArgs> Change =>
+        public Event<FusionAutoCompleteChangeArgs> Change =>
             Event<FusionAutoCompleteChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised as the user types, before the popup filters its items.</summary>
-        public TypedEvent<FusionAutoCompleteFilteringArgs> Filtering =>
+        public Event<FusionAutoCompleteFilteringArgs> Filtering =>
             Event<FusionAutoCompleteFilteringArgs>();
     }
 
@@ -105,13 +105,13 @@ namespace Alis.Reactive.Fusion.Components
         /// Set to <see langword="true"/> to suppress the built-in client-side filter, so the popup
         /// does not show "No records found" while a server request is in flight.
         /// </summary>
-        public Prop<bool> PreventDefaultAction => Prop<bool>();
+        public Property<bool> PreventDefaultAction => Property<bool>();
 
         /// <summary>Hands filtered items to the popup; valid after an HTTP response returns.</summary>
         /// <typeparam name="TItems">The items' type, such as the server's own list.</typeparam>
         /// <param name="items">The items to show, read when the step runs.</param>
         public void UpdateData<TItems>(TypedSource<TItems> items) where TItems : IEnumerable<object> =>
-            Call(Pass<IEnumerable<object>, TItems>(items));
+            Method(Pass<IEnumerable<object>, TItems>(items));
     }
 
     /// <summary>Renders a <see cref="FusionAutoComplete"/> for a model-bound field.</summary>

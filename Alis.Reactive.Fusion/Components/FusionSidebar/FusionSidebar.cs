@@ -20,23 +20,23 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionSidebar : FusionComponent
     {
         /// <summary>Whether the sidebar is open.</summary>
-        public Prop<bool> IsOpen => Prop<bool>();
+        public Property<bool> IsOpen => Property<bool>();
 
         /// <summary>Opens the sidebar.</summary>
-        public void Show() => Call();
+        public void Show() => Method();
 
         /// <summary>Closes the sidebar.</summary>
-        public void Hide() => Call();
+        public void Hide() => Method();
 
         /// <summary>Opens the sidebar when closed and closes it when open.</summary>
-        public void Toggle() => Call();
+        public void Toggle() => Method();
 
         /// <summary>Raised when the sidebar opens.</summary>
-        public TypedEvent<FusionSidebarTransitionArgs> Open =>
+        public Event<FusionSidebarTransitionArgs> Open =>
             Event<FusionSidebarTransitionArgs>();
 
         /// <summary>Raised when the sidebar closes.</summary>
-        public TypedEvent<FusionSidebarTransitionArgs> Close =>
+        public Event<FusionSidebarTransitionArgs> Close =>
             Event<FusionSidebarTransitionArgs>();
     }
 

@@ -20,16 +20,16 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionColorPicker : FusionComponent, IInputComponent
     {
         /// <summary>The color as a hex string with alpha, for example <c>#e11d48ff</c>; <see langword="null"/> clears it.</summary>
-        public Prop<string> Value => Prop<string>();
+        public Property<string> Value => Property<string>();
 
         /// <summary>Whether the picker is disabled.</summary>
-        public Prop<bool> Disabled => Prop<bool>();
+        public Property<bool> Disabled => Property<bool>();
 
         /// <summary>Opens or closes the picker popup.</summary>
-        public void Toggle() => Call();
+        public void Toggle() => Method();
 
         /// <summary>Raised when the color changes.</summary>
-        public TypedEvent<FusionColorPickerChangeArgs> Change =>
+        public Event<FusionColorPickerChangeArgs> Change =>
             Event<FusionColorPickerChangeArgs>();
 
         /// <inheritdoc />

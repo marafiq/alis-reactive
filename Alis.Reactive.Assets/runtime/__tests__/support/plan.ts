@@ -69,7 +69,7 @@ export function plan(
 }
 
 export function on(object: string, event: string, param: string, ...statements: Statement[]): Handler {
-  return { on: object, event, param, do: statements };
+  return { on: object, path: [], event, param, do: statements };
 }
 
 /** An element whose vendor object is a tiny event emitter under `widget`, like a Syncfusion instance. */

@@ -33,28 +33,28 @@ namespace Alis.Reactive.Fusion.AppLevel
         public string DefaultId => ElementId;
 
         /// <summary>The heading of the next toast.</summary>
-        public Prop<string> Title => Prop<string>();
+        public Property<string> Title => Property<string>();
 
         /// <summary>The message of the next toast.</summary>
-        public Prop<string> Content => Prop<string>();
+        public Property<string> Content => Property<string>();
 
         /// <summary>Milliseconds the next toast stays before it hides; 0 keeps it until closed.</summary>
-        public Prop<int> TimeOut => Prop<int>();
+        public Property<int> TimeOut => Property<int>();
 
         /// <summary>Whether the next toast shows a close button.</summary>
-        public Prop<bool> ShowCloseButton => Prop<bool>();
+        public Property<bool> ShowCloseButton => Property<bool>();
 
         /// <summary>Whether the next toast shows its remaining time as a progress bar.</summary>
-        public Prop<bool> ShowProgressBar => Prop<bool>();
+        public Property<bool> ShowProgressBar => Property<bool>();
 
         /// <summary>The look of the next toast: success, warning, danger or info.</summary>
-        public Prop<FusionToastTone> Tone => Prop<FusionToastTone>("cssClass");
+        public Property<FusionToastTone> Tone => Property<FusionToastTone>("cssClass");
 
         /// <summary>Shows a toast with the current title, content and settings.</summary>
-        public void Show() => Call();
+        public void Show() => Method();
 
         /// <summary>Hides the toast.</summary>
-        public void Hide() => Call();
+        public void Hide() => Method();
     }
 
     /// <summary>The look of a <see cref="FusionToast"/>, by Syncfusion's toast classes.</summary>

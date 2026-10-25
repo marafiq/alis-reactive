@@ -26,14 +26,14 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="index">The zero-based index to wrap.</param>
         /// <param name="totalLength">The number of items in the range.</param>
         /// <returns>The index within the range; an index already inside it comes back unchanged.</returns>
-        public TypedSource<int> GetActualIndex(Arg<int> index, Arg<int> totalLength) => Invoke<int>(index, totalLength);
+        public TypedSource<int> GetActualIndex(Arg<int> index, Arg<int> totalLength) => Method<int>(index, totalLength);
 
         /// <summary>Raised before a tooltip renders.</summary>
-        public TypedEvent<FusionBulletChartTooltipRenderArgs> TooltipRender =>
+        public Event<FusionBulletChartTooltipRenderArgs> TooltipRender =>
             Event<FusionBulletChartTooltipRenderArgs>();
 
         /// <summary>Raised when the user clicks the chart.</summary>
-        public TypedEvent<FusionBulletChartMouseClickArgs> BulletChartMouseClick =>
+        public Event<FusionBulletChartMouseClickArgs> BulletChartMouseClick =>
             Event<FusionBulletChartMouseClickArgs>();
     }
 
@@ -54,7 +54,7 @@ namespace Alis.Reactive.Fusion.Components
         public ReadOnly<string> Template => ReadOnly<string>();
 
         /// <summary>Tooltip text; write it to replace the text before it renders.</summary>
-        public Prop<string> Text => Prop<string>();
+        public Property<string> Text => Property<string>();
     }
 
     /// <summary>Payload of <see cref="FusionBulletChart.BulletChartMouseClick"/>.</summary>

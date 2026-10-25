@@ -21,43 +21,43 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionProgressButton : FusionComponent
     {
         /// <summary>The button text.</summary>
-        public Prop<string> Content => Prop<string>();
+        public Property<string> Content => Property<string>();
 
         /// <summary>Whether the button is disabled.</summary>
-        public Prop<bool> Disabled => Prop<bool>();
+        public Property<bool> Disabled => Property<bool>();
 
         /// <summary>The CSS classes on the button.</summary>
-        public Prop<string> CssClass => Prop<string>();
+        public Property<string> CssClass => Property<string>();
 
         /// <summary>Whether the button shows progress while it spins.</summary>
-        public Prop<bool> EnableProgress => Prop<bool>();
+        public Property<bool> EnableProgress => Property<bool>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>Starts the progress from the beginning.</summary>
-        public void Start() => Call();
+        public void Start() => Method();
 
         /// <summary>Starts the progress at a percentage.</summary>
         /// <param name="percent">The percent the progress starts at.</param>
-        public void StartAt(Arg<double> percent) => Call(percent, name: "start");
+        public void StartAt(Arg<double> percent) => Method(percent, name: "start");
 
         /// <summary>Completes the progress at once.</summary>
-        public void ProgressComplete() => Call();
+        public void ProgressComplete() => Method();
 
         /// <summary>Moves focus to the button.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
 
         /// <summary>Raised when the progress starts.</summary>
-        public TypedEvent<FusionProgressButtonProgressArgs> Begin =>
+        public Event<FusionProgressButtonProgressArgs> Begin =>
             Event<FusionProgressButtonProgressArgs>();
 
         /// <summary>Raised as the progress advances.</summary>
-        public TypedEvent<FusionProgressButtonProgressArgs> Progress =>
+        public Event<FusionProgressButtonProgressArgs> Progress =>
             Event<FusionProgressButtonProgressArgs>();
 
         /// <summary>Raised when the progress completes.</summary>
-        public TypedEvent<FusionProgressButtonProgressArgs> End =>
+        public Event<FusionProgressButtonProgressArgs> End =>
             Event<FusionProgressButtonProgressArgs>();
     }
 

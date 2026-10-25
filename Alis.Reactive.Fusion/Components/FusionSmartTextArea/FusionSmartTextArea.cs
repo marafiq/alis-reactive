@@ -21,24 +21,24 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionSmartTextArea : FusionComponent, IInputComponent
     {
         /// <summary>The text; <see langword="null"/> when empty.</summary>
-        public Prop<string> Value => Prop<string>();
+        public Property<string> Value => Property<string>();
 
         /// <summary>Moves focus into the text area.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
 
         /// <summary>Raised when the text is committed (on blur after an edit), as the EJ2 TextArea it extends.</summary>
-        public TypedEvent<FusionSmartTextAreaChangeArgs> Change =>
+        public Event<FusionSmartTextAreaChangeArgs> Change =>
             Event<FusionSmartTextAreaChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised before a suggestion is inserted.</summary>
-        public TypedEvent<FusionSmartTextAreaBeforeSuggestionInsertArgs> BeforeSuggestionInsert =>
+        public Event<FusionSmartTextAreaBeforeSuggestionInsertArgs> BeforeSuggestionInsert =>
             Event<FusionSmartTextAreaBeforeSuggestionInsertArgs>();
 
         /// <summary>Raised after a suggestion is inserted.</summary>
-        public TypedEvent<FusionSmartTextAreaAfterSuggestionInsertArgs> AfterSuggestionInsert =>
+        public Event<FusionSmartTextAreaAfterSuggestionInsertArgs> AfterSuggestionInsert =>
             Event<FusionSmartTextAreaAfterSuggestionInsertArgs>();
     }
 
@@ -62,7 +62,7 @@ namespace Alis.Reactive.Fusion.Components
         public ReadOnly<string> Text => ReadOnly<string>();
 
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionSmartTextArea.AfterSuggestionInsert"/>.</summary>

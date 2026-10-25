@@ -18,9 +18,31 @@ namespace Alis.Reactive.PlanModel
         internal IReadOnlyList<Statement> Write(Scope scope)
         {
             var block = new List<Statement>();
-            foreach (var step in _steps) step.WriteTo(block, scope);
+            var inner = scope.ForBlock();
+            foreach (var step in _steps) step.WriteTo(block, inner);
             return block;
         }
+    }
+
+    /// <summary>
+    /// The line a method that returns a value is written on. The method runs here when no earlier
+    /// statement of the block read its result; otherwise it already ran before that statement.
+    /// </summary>
+    internal sealed class MethodResultStep : Step
+    {
+        private readonly ValueExpression _result;
+
+        internal MethodResultStep(ValueExpression result)
+        {
+            _result = result ?? throw new ArgumentNullException(nameof(result));
+        }
+
+        internal override void WriteTo(List<Statement> block, Scope scope) =>
+            block.AddRange(scope.WithHoisted(() =>
+            {
+                _result.Write(scope);
+                return G.NoStatements;
+            }));
     }
 
     internal abstract class Step
@@ -47,7 +69,7 @@ namespace Alis.Reactive.PlanModel
         }
 
         internal override void WriteTo(List<Statement> block, Scope scope) =>
-            block.AddRange(scope.WithAwaitedReads(() =>
+            block.AddRange(scope.WithHoisted(() =>
             {
                 var value = _value.Write(scope);
                 var (root, prefix) = _target.Locate(scope);
@@ -74,7 +96,7 @@ namespace Alis.Reactive.PlanModel
         }
 
         internal override void WriteTo(List<Statement> block, Scope scope) =>
-            block.AddRange(scope.WithAwaitedReads(() =>
+            block.AddRange(scope.WithHoisted(() =>
             {
                 var args = _args.Select(arg => arg.Write(scope)).ToList();
                 var (root, prefix) = _target.Locate(scope);
@@ -96,7 +118,7 @@ namespace Alis.Reactive.PlanModel
         }
 
         internal override void WriteTo(List<Statement> block, Scope scope) =>
-            block.AddRange(scope.WithAwaitedReads(() =>
+            block.AddRange(scope.WithHoisted(() =>
             {
                 var detail = _payload == null ? G.Record() : _payload.Write(scope);
                 return new[] { G.Do(G.Call(G.Obj(scope.Objects.Document()), "raise", G.Lit(_event), detail)) };
@@ -116,7 +138,7 @@ namespace Alis.Reactive.PlanModel
         }
 
         internal override void WriteTo(List<Statement> block, Scope scope) =>
-            block.AddRange(scope.WithAwaitedReads(() => new[]
+            block.AddRange(scope.WithHoisted(() => new[]
             {
                 G.Do(G.Call(G.Obj(scope.Objects.Slot(_slot)), "load", _content.Write(scope))),
             }));
@@ -176,7 +198,9 @@ namespace Alis.Reactive.PlanModel
             _hasElse = true;
         }
 
-        internal override void WriteTo(List<Statement> block, Scope scope) => block.AddRange(Arms(0, scope));
+        // A branch is one statement: a method result its conditions read is bound before it.
+        internal override void WriteTo(List<Statement> block, Scope scope) =>
+            block.AddRange(scope.WithHoisted(() => Arms(0, scope)));
 
         private IReadOnlyList<Statement> Arms(int start, Scope scope)
         {

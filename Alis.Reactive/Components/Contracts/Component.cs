@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 
 namespace Alis.Reactive
 {
@@ -23,13 +22,5 @@ namespace Alis.Reactive
     {
         /// <inheritdoc />
         public abstract ComponentVendor Vendor { get; }
-
-        /// <summary>Declares an event the component raises; the C# name, camel-cased, is the JavaScript name unless one is given.</summary>
-        /// <typeparam name="TArgs">The object the event hands its callback, declared like any JavaScript object.</typeparam>
-        /// <param name="name">The JavaScript event name, when it is not the C# name camel-cased, for example <c>"open"</c> for <c>Opened</c>.</param>
-        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the event.</param>
-        protected static TypedEvent<TArgs> Event<TArgs>(string? name = null, [CallerMemberName] string declaredBy = "")
-            where TArgs : JsObject, new() =>
-            new TypedEvent<TArgs>(name ?? JsonMemberName.Of(declaredBy), new TArgs());
     }
 }

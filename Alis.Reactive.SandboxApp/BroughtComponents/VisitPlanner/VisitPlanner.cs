@@ -38,19 +38,19 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// <inheritdoc />
         public override ComponentVendor Vendor => VisitPlannerVendor;
         /// <summary>The booked time ids, in the week's order. Setting it raises no event.</summary>
-        public Prop<IReadOnlyList<string>> Value => Prop<IReadOnlyList<string>>();
+        public Property<IReadOnlyList<string>> Value => Property<IReadOnlyList<string>>();
 
         /// <summary>How many visits the resident's week allows.</summary>
-        public Prop<int> Capacity => Prop<int>();
+        public Property<int> Capacity => Property<int>();
 
         /// <summary>The wing the planner names in its heading.</summary>
-        public Prop<string> Wing => Prop<string>();
+        public Property<string> Wing => Property<string>();
 
         /// <summary>When <see langword="true"/>, the times cannot be booked or released.</summary>
-        public Prop<bool> ReadOnly => Prop<bool>();
+        public Property<bool> ReadOnly => Property<bool>();
 
         /// <summary>The times offered this week. Setting them raises <see cref="SlotsLoaded"/>.</summary>
-        public Prop<IReadOnlyList<VisitSlot>> Slots => Prop<IReadOnlyList<VisitSlot>>();
+        public Property<IReadOnlyList<VisitSlot>> Slots => Property<IReadOnlyList<VisitSlot>>();
 
         /// <summary>The day of each offered time.</summary>
         public ReadOnly<IReadOnlyList<string>> OfferedDays => Slots.Each(slot => slot.Day);
@@ -62,76 +62,76 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         public ReadOnly<int> Count => ReadOnly<int>();
 
         /// <summary>How many more visits the week allows.</summary>
-        public TypedSource<int> Remaining() => Invoke<int>();
+        public TypedSource<int> Remaining() => Method<int>();
 
         /// <summary>Whether a time is booked.</summary>
         /// <param name="slot">The time's id.</param>
-        public TypedSource<bool> IsBooked(Arg<string> slot) => Invoke<bool>(slot);
+        public TypedSource<bool> IsBooked(Arg<string> slot) => Method<bool>(slot);
 
         /// <summary>The first time that is neither booked nor in quiet hours; empty when there is none.</summary>
-        public TypedSource<string> FirstOpen() => Invoke<string>();
+        public TypedSource<string> FirstOpen() => Method<string>();
 
         /// <summary>The earliest booked time; empty when none is booked.</summary>
-        public TypedSource<string> FirstBooked() => Invoke<string>();
+        public TypedSource<string> FirstBooked() => Method<string>();
 
         /// <summary>
         /// Books a time: raises <see cref="BeforeBook"/>, then <see cref="WeekChanged"/>; raises
         /// <see cref="Full"/> instead when the week is full.
         /// </summary>
         /// <param name="slot">The time's id.</param>
-        public void Select(Arg<string> slot) => Call(slot);
+        public void Select(Arg<string> slot) => Method(slot);
 
         /// <summary>Releases a booked time and raises <see cref="WeekChanged"/>.</summary>
         /// <param name="slot">The time's id.</param>
-        public void Release(Arg<string> slot) => Call(slot);
+        public void Release(Arg<string> slot) => Method(slot);
 
         /// <summary>Releases every booked time and raises <see cref="WeekChanged"/>.</summary>
-        public void Clear() => Call();
+        public void Clear() => Method();
 
         /// <summary>Records who is coming to a booked time; the planner shows it under the time.</summary>
         /// <param name="slot">The booked time's id.</param>
         /// <param name="visitors">How many visitors are coming.</param>
         /// <param name="note">A note for the front desk.</param>
-        public void Book(Arg<string> slot, Arg<decimal> visitors, Arg<string> note) => Call(slot, visitors, note);
+        public void Book(Arg<string> slot, Arg<decimal> visitors, Arg<string> note) => Method(slot, visitors, note);
 
         /// <summary>Prepares the summary the family receives; the steps after it wait for its promise to settle.</summary>
-        public void PrepareSummary() => CallAsync();
+        public void PrepareSummary() => MethodAsync();
 
         /// <summary>The prepared summary, empty until one is prepared; the step that reads it waits for its promise.</summary>
-        public TypedSource<string> Summary() => InvokeAsync<string>();
+        public TypedSource<string> Summary() => MethodAsync<string>();
 
         /// <summary>Marks a time another family holds; it can no longer be booked here.</summary>
         /// <param name="slot">The time's id.</param>
         /// <param name="family">The name of the family that holds it, which the planner shows.</param>
-        public void MarkTaken(Arg<string> slot, Arg<string> family) => Call(slot, family);
+        public void MarkTaken(Arg<string> slot, Arg<string> family) => Method(slot, family);
 
         /// <summary>Moves focus to the first time that can be booked.</summary>
-        public void Focus() => Call();
+        public void Focus() => Method();
 
         /// <summary>
         /// Raised when the booked times change, by the user or by a method. The planner names it its own
         /// way; as its input's commit event it is the event a form checks the field again on.
         /// </summary>
-        public TypedEvent<VisitPlannerWeekChangedArgs> WeekChanged => Event<VisitPlannerWeekChangedArgs>();
+        public Event<VisitPlannerWeekChangedArgs> WeekChanged => Event<VisitPlannerWeekChangedArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: WeekChanged);
 
         /// <summary>Raised instead of booking when the week is full.</summary>
-        public TypedEvent<VisitPlannerFullArgs> Full => Event<VisitPlannerFullArgs>();
+        public Event<VisitPlannerFullArgs> Full => Event<VisitPlannerFullArgs>();
 
         /// <summary>Raised before a time is booked; set <see cref="VisitPlannerBeforeBookArgs.Cancel"/> to refuse it.</summary>
-        public TypedEvent<VisitPlannerBeforeBookArgs> BeforeBook => Event<VisitPlannerBeforeBookArgs>();
+        public Event<VisitPlannerBeforeBookArgs> BeforeBook => Event<VisitPlannerBeforeBookArgs>();
 
         /// <summary>Raised when the week's times are offered.</summary>
-        public TypedEvent<VisitPlannerSlotsLoadedArgs> SlotsLoaded => Event<VisitPlannerSlotsLoadedArgs>();
+        public Event<VisitPlannerSlotsLoadedArgs> SlotsLoaded => Event<VisitPlannerSlotsLoadedArgs>();
     }
 
     /// <summary>The planner's <c>labels</c>: what it says.</summary>
     public sealed class VisitPlannerLabels : JsObject
     {
         /// <summary>What the planner says before any time is offered.</summary>
-        public Prop<string> Empty => Prop<string>();
+        public Property<string> Empty => Property<string>();
     }
 
     /// <summary>A time the planner offers.</summary>
@@ -179,7 +179,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         public ReadOnly<string> Attempted => ReadOnly<string>();
 
         /// <summary>Puts the time that could not be booked on the waitlist; the planner shows it.</summary>
-        public void Waitlist() => Call();
+        public void Waitlist() => Method();
     }
 
     /// <summary>Payload of <see cref="VisitPlanner.BeforeBook"/>; the planner reads <see cref="Cancel"/> back.</summary>
@@ -189,7 +189,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         public ReadOnly<VisitSlot> Slot => ReadOnly<VisitSlot>();
 
         /// <summary>Set to <see langword="true"/> to refuse the booking: <c>args.Cancel.Set(true)</c>.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>Payload of <see cref="VisitPlanner.SlotsLoaded"/>.</summary>

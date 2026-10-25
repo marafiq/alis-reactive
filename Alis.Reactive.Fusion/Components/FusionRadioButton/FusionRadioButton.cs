@@ -21,25 +21,25 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionRadioButton : FusionComponent
     {
         /// <summary>Whether the radio button is checked.</summary>
-        public Prop<bool> Checked => Prop<bool>();
+        public Property<bool> Checked => Property<bool>();
 
         /// <summary>Whether the button is disabled.</summary>
-        public Prop<bool> Disabled => Prop<bool>();
+        public Property<bool> Disabled => Property<bool>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>The value of the checked radio button in the group.</summary>
-        public TypedSource<string> GetSelectedValue() => Invoke<string>();
+        public TypedSource<string> GetSelectedValue() => Method<string>();
 
         /// <summary>Clicks the radio button.</summary>
-        public void Click() => Call();
+        public void Click() => Method();
 
         /// <summary>Moves focus to the radio button.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
 
         /// <summary>Raised when the radio button becomes checked.</summary>
-        public TypedEvent<FusionRadioButtonChangeArgs> Change =>
+        public Event<FusionRadioButtonChangeArgs> Change =>
             Event<FusionRadioButtonChangeArgs>();
     }
 

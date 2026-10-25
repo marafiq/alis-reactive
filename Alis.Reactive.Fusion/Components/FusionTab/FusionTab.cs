@@ -20,19 +20,19 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionTab : FusionComponent
     {
         /// <summary>The zero-based index of the selected tab.</summary>
-        public Prop<int> SelectedItem => Prop<int>();
+        public Property<int> SelectedItem => Property<int>();
 
         /// <summary>Selects the tab at a zero-based index.</summary>
         /// <param name="index">The zero-based index of the tab to select.</param>
-        public void Select(Arg<int> index) => Call(index);
+        public void Select(Arg<int> index) => Method(index);
 
         /// <summary>Hides (<see langword="true"/>) or shows (<see langword="false"/>) the tab at a zero-based index.</summary>
         /// <param name="index">The zero-based index of the tab.</param>
         /// <param name="value"><see langword="true"/> to hide the tab; <see langword="false"/> to show it.</param>
-        public void HideTab(Arg<int> index, Arg<bool> value) => Call(index, value);
+        public void HideTab(Arg<int> index, Arg<bool> value) => Method(index, value);
 
         /// <summary>Raised after a tab is selected.</summary>
-        public TypedEvent<FusionTabSelectedArgs> Selected =>
+        public Event<FusionTabSelectedArgs> Selected =>
             Event<FusionTabSelectedArgs>();
     }
 

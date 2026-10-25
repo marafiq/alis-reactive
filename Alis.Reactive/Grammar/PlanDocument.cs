@@ -222,18 +222,20 @@ namespace Alis.Reactive.Grammar
     /// <summary><c>on(object, event, param) { do }</c>: a handler of an object's event.</summary>
     internal sealed class Handler
     {
-        internal Handler(string on, string eventName, string param, IReadOnlyList<Statement> body)
+        internal Handler(string on, IReadOnlyList<string> path, string eventName, string param, IReadOnlyList<Statement> body)
         {
             if (string.IsNullOrEmpty(on)) throw new ArgumentException("Object id required.", nameof(on));
             if (string.IsNullOrEmpty(eventName)) throw new ArgumentException("Event required.", nameof(eventName));
             if (string.IsNullOrEmpty(param)) throw new ArgumentException("Parameter name required.", nameof(param));
             On = on;
+            Path = path ?? throw new ArgumentNullException(nameof(path));
             Event = eventName;
             Param = param;
             Do = body ?? throw new ArgumentNullException(nameof(body));
         }
 
         public string On { get; }
+        public IReadOnlyList<string> Path { get; }
         public string Event { get; }
         public string Param { get; }
         public IReadOnlyList<Statement> Do { get; }

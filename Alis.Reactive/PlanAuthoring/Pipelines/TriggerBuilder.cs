@@ -1,4 +1,5 @@
 using System;
+using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders
@@ -132,14 +133,14 @@ namespace Alis.Reactive.Builders
 
         private TriggerBuilder<TModel> On(Func<ObjectTable, string> on, string eventName, Action<PipelineBuilder<TModel>> pipeline)
         {
-            _context.On(on, eventName, PipelineBuilder<TModel>.Build(_context, pipeline));
+            _context.On(on, G.NoPath, eventName, PipelineBuilder<TModel>.Build(_context, pipeline));
             return this;
         }
 
         private TriggerBuilder<TModel> On<TPayload>(Func<ObjectTable, string> on, string eventName, Action<Data<TPayload>, PipelineBuilder<TModel>> pipeline)
         {
             var payload = new Data<TPayload>(Receiver.Event);
-            _context.On(on, eventName, PipelineBuilder<TModel>.Build(_context, p => pipeline(payload, p)));
+            _context.On(on, G.NoPath, eventName, PipelineBuilder<TModel>.Build(_context, p => pipeline(payload, p)));
             return this;
         }
     }

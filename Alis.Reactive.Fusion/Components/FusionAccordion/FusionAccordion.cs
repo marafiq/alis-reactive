@@ -25,15 +25,15 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Expands (<see langword="true"/>) or collapses (<see langword="false"/>) the item at a zero-based index.</summary>
         /// <param name="isExpand"><see langword="true"/> to expand the item, <see langword="false"/> to collapse it.</param>
         /// <param name="index">The item's zero-based index.</param>
-        public void ExpandItem(Arg<bool> isExpand, Arg<int> index) => Call(isExpand, index);
+        public void ExpandItem(Arg<bool> isExpand, Arg<int> index) => Method(isExpand, index);
 
         /// <summary>Enables (<see langword="true"/>) or disables (<see langword="false"/>) the item at a zero-based index.</summary>
         /// <param name="index">The item's zero-based index.</param>
         /// <param name="isEnable"><see langword="true"/> to enable the item, <see langword="false"/> to disable it.</param>
-        public void EnableItem(Arg<int> index, Arg<bool> isEnable) => Call(index, isEnable);
+        public void EnableItem(Arg<int> index, Arg<bool> isEnable) => Method(index, isEnable);
 
         /// <summary>Raised after an item expands or collapses.</summary>
-        public TypedEvent<FusionAccordionExpandedArgs> Expanded =>
+        public Event<FusionAccordionExpandedArgs> Expanded =>
             Event<FusionAccordionExpandedArgs>();
     }
 

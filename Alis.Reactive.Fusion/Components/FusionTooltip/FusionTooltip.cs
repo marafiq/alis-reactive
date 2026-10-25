@@ -21,32 +21,32 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionTooltip : FusionComponent
     {
         /// <summary>Shows the tooltip.</summary>
-        public void Open() => Call();
+        public void Open() => Method();
 
         /// <summary>Hides the tooltip.</summary>
-        public void Close() => Call();
+        public void Close() => Method();
 
         /// <summary>Re-renders the tooltip for its current target.</summary>
-        public void Refresh() => Call();
+        public void Refresh() => Method();
 
         /// <summary>Raised before the tooltip opens.</summary>
-        public TypedEvent<FusionTooltipBeforeOpenArgs> BeforeOpen =>
+        public Event<FusionTooltipBeforeOpenArgs> BeforeOpen =>
             Event<FusionTooltipBeforeOpenArgs>();
 
         /// <summary>Raised before the tooltip closes.</summary>
-        public TypedEvent<FusionTooltipBeforeCloseArgs> BeforeClose =>
+        public Event<FusionTooltipBeforeCloseArgs> BeforeClose =>
             Event<FusionTooltipBeforeCloseArgs>();
 
         /// <summary>Raised after the tooltip opens.</summary>
-        public TypedEvent<FusionTooltipAfterOpenArgs> AfterOpen =>
+        public Event<FusionTooltipAfterOpenArgs> AfterOpen =>
             Event<FusionTooltipAfterOpenArgs>();
 
         /// <summary>Raised after the tooltip closes.</summary>
-        public TypedEvent<FusionTooltipAfterCloseArgs> AfterClose =>
+        public Event<FusionTooltipAfterCloseArgs> AfterClose =>
             Event<FusionTooltipAfterCloseArgs>();
 
         /// <summary>Raised before the tooltip renders its content.</summary>
-        public TypedEvent<FusionTooltipBeforeRenderArgs> BeforeRender =>
+        public Event<FusionTooltipBeforeRenderArgs> BeforeRender =>
             Event<FusionTooltipBeforeRenderArgs>();
     }
 
@@ -54,14 +54,14 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionTooltipBeforeOpenArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionTooltip.BeforeClose"/>.</summary>
     public class FusionTooltipBeforeCloseArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionTooltip.AfterOpen"/>; carries no data.</summary>
@@ -78,7 +78,7 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionTooltipBeforeRenderArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
-        public Prop<bool> Cancel => Prop<bool>();
+        public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>

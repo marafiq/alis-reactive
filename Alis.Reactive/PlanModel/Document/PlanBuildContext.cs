@@ -20,8 +20,8 @@ namespace Alis.Reactive.PlanModel
         private readonly RenderedInputs _inputs;
         private readonly List<DeclaredObject> _declared = new List<DeclaredObject>();
         private readonly Dictionary<string, DeclaredObject> _declaredById = new Dictionary<string, DeclaredObject>(StringComparer.Ordinal);
-        private readonly List<(Func<ObjectTable, string> On, string Event, Block Body)> _handlers =
-            new List<(Func<ObjectTable, string>, string, Block)>();
+        private readonly List<(Func<ObjectTable, string> On, IReadOnlyList<string> Path, string Event, Block Body)> _handlers =
+            new List<(Func<ObjectTable, string>, IReadOnlyList<string>, string, Block)>();
         private readonly HashSet<string> _plugins = new HashSet<string>(StringComparer.Ordinal);
         private readonly List<RequestStep> _validatedRequests = new List<RequestStep>();
         private readonly Dictionary<string, FormChecks> _forms = new Dictionary<string, FormChecks>(StringComparer.Ordinal);
@@ -70,8 +70,8 @@ namespace Alis.Reactive.PlanModel
         internal void AddStep(Step step) => ActiveBlock.Add(step);
 
         /// <summary>Runs <paramref name="body"/> each time an object the plan names raises <paramref name="eventName"/>.</summary>
-        internal void On(Func<ObjectTable, string> on, string eventName, Block body) =>
-            _handlers.Add((on, eventName, body));
+        internal void On(Func<ObjectTable, string> on, IReadOnlyList<string> path, string eventName, Block body) =>
+            _handlers.Add((on, path, eventName, body));
 
         // ── objects ──────────────────────────────────────────────────────────────
 
@@ -149,7 +149,7 @@ namespace Alis.Reactive.PlanModel
                 .Select(handler =>
                 {
                     var body = handler.Body.Write(Scope.ForHandler(plan, EventParam));
-                    return new Handler(handler.On(objects), handler.Event, EventParam, body);
+                    return new Handler(handler.On(objects), handler.Path, handler.Event, EventParam, body);
                 })
                 .ToList();
 

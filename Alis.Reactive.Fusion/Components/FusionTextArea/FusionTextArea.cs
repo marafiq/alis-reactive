@@ -16,34 +16,34 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionTextArea : FusionComponent, IInputComponent
     {
         /// <summary>The text; <see langword="null"/> when empty.</summary>
-        public Prop<string> Value => Prop<string>();
+        public Property<string> Value => Property<string>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>Moves focus into the textarea.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
 
         /// <summary>Removes focus from the textarea.</summary>
-        public void FocusOut() => Call();
+        public void FocusOut() => Method();
 
         /// <summary>Raised on every edit while typing.</summary>
-        public TypedEvent<FusionTextAreaInputArgs> Input =>
+        public Event<FusionTextAreaInputArgs> Input =>
             Event<FusionTextAreaInputArgs>();
 
         /// <summary>Raised when the text changes and focus leaves the textarea.</summary>
-        public TypedEvent<FusionTextAreaChangeArgs> Change =>
+        public Event<FusionTextAreaChangeArgs> Change =>
             Event<FusionTextAreaChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the textarea receives focus.</summary>
-        public TypedEvent<FusionTextAreaFocusArgs> Focus =>
+        public Event<FusionTextAreaFocusArgs> Focus =>
             Event<FusionTextAreaFocusArgs>();
 
         /// <summary>Raised when the textarea loses focus.</summary>
-        public TypedEvent<FusionTextAreaBlurArgs> Blur =>
+        public Event<FusionTextAreaBlurArgs> Blur =>
             Event<FusionTextAreaBlurArgs>();
     }
 

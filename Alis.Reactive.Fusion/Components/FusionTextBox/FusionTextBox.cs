@@ -16,39 +16,39 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionTextBox : FusionComponent, IInputComponent
     {
         /// <summary>The text; <see langword="null"/> when empty.</summary>
-        public Prop<string> Value => Prop<string>();
+        public Property<string> Value => Property<string>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>Moves focus into the input.</summary>
-        public void FocusIn() => Call();
+        public void FocusIn() => Method();
 
         /// <summary>Removes focus from the input.</summary>
-        public void FocusOut() => Call();
+        public void FocusOut() => Method();
 
         /// <summary>Adds an icon to the input.</summary>
         /// <param name="position">Where the icon goes: <c>"append"</c> or <c>"prepend"</c>.</param>
         /// <param name="icons">The icon's CSS classes.</param>
-        public void AddIcon(Arg<string> position, Arg<string> icons) => Call(position, icons);
+        public void AddIcon(Arg<string> position, Arg<string> icons) => Method(position, icons);
 
         /// <summary>Raised on every edit while typing.</summary>
-        public TypedEvent<FusionTextBoxInputArgs> Input =>
+        public Event<FusionTextBoxInputArgs> Input =>
             Event<FusionTextBoxInputArgs>();
 
         /// <summary>Raised when the text changes and focus leaves the input.</summary>
-        public TypedEvent<FusionTextBoxChangeArgs> Change =>
+        public Event<FusionTextBoxChangeArgs> Change =>
             Event<FusionTextBoxChangeArgs>();
 
         /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the input receives focus.</summary>
-        public TypedEvent<FusionTextBoxFocusArgs> Focus =>
+        public Event<FusionTextBoxFocusArgs> Focus =>
             Event<FusionTextBoxFocusArgs>();
 
         /// <summary>Raised when the input loses focus.</summary>
-        public TypedEvent<FusionTextBoxBlurArgs> Blur =>
+        public Event<FusionTextBoxBlurArgs> Blur =>
             Event<FusionTextBoxBlurArgs>();
     }
 

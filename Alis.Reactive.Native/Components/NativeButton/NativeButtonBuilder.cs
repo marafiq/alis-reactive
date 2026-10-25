@@ -44,7 +44,7 @@ namespace Alis.Reactive.Native.Components
         /// <returns>This builder, so configuration and further events can follow.</returns>
         public NativeButtonBuilder<TModel> Reactive<TArgs>(
             ReactivePlan<TModel> plan,
-            Func<NativeButton, TypedEvent<TArgs>> eventSelector,
+            Func<NativeButton, Event<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TArgs : JsObject
         {

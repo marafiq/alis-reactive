@@ -25,13 +25,13 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionBreadcrumb : FusionComponent
     {
         /// <summary>The URL of the active item.</summary>
-        public Prop<string> ActiveItem => Prop<string>();
+        public Property<string> ActiveItem => Property<string>();
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>Raised when the user clicks an item.</summary>
-        public TypedEvent<FusionBreadcrumbItemClickArgs> ItemClick =>
+        public Event<FusionBreadcrumbItemClickArgs> ItemClick =>
             Event<FusionBreadcrumbItemClickArgs>();
     }
 

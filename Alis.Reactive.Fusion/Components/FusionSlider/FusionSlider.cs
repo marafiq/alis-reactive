@@ -17,20 +17,20 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionSlider : FusionComponent, IInputComponent
     {
         /// <summary>The value of a single-handle slider.</summary>
-        public Prop<double> Value => Prop<double>();
+        public Property<double> Value => Property<double>();
 
         /// <summary>The start and end of a range slider.</summary>
-        public Prop<double[]> RangeValue => Prop<double[]>("value");
+        public Property<double[]> RangeValue => Property<double[]>("value");
 
         /// <summary>Applies pending property changes to the rendered component.</summary>
-        public void DataBind() => Call();
+        public void DataBind() => Method();
 
         /// <summary>Raised as the handle moves.</summary>
-        public TypedEvent<FusionSliderChangeArgs> Change =>
+        public Event<FusionSliderChangeArgs> Change =>
             Event<FusionSliderChangeArgs>();
 
         /// <summary>Raised when the handle comes to rest.</summary>
-        public TypedEvent<FusionSliderChangeArgs> Changed =>
+        public Event<FusionSliderChangeArgs> Changed =>
             Event<FusionSliderChangeArgs>();
 
         /// <inheritdoc />
