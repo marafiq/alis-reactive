@@ -80,16 +80,19 @@ namespace Alis.Reactive.Analyzers.ReactiveEvent
                 && memberAccess.Name.Identifier.Text == "Reactive";
         }
 
+        // The event selector is the argument written as evt => evt.Click, wherever the overload puts it:
+        // first on RenderedComponent.Reactive(selector, pipeline), second on
+        // NativeButtonBuilder.Reactive(plan, selector, pipeline). A pipeline lambda never has a bare member
+        // access as its body, so it is never taken for the selector.
         private static string? ExtractEventName(InvocationExpressionSyntax invocation)
         {
-            var args = invocation.ArgumentList.Arguments;
-            if (args.Count < 2)
-                return null;
-
-            if (args[1].Expression is SimpleLambdaExpressionSyntax lambda
-                && lambda.Body is MemberAccessExpressionSyntax memberAccess)
+            foreach (var argument in invocation.ArgumentList.Arguments)
             {
-                return memberAccess.Name.Identifier.Text;
+                if (argument.Expression is SimpleLambdaExpressionSyntax lambda
+                    && lambda.Body is MemberAccessExpressionSyntax memberAccess)
+                {
+                    return memberAccess.Name.Identifier.Text;
+                }
             }
 
             return null;
