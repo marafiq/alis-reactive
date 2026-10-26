@@ -13,6 +13,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public List<string> AdministrationChecks { get; set; } = new();
     }
 
+    /// <summary>The pharmacy's allergen list, which only the server consults.</summary>
+    public static class Pharmacy
+    {
+        private static readonly string[] Allergens = { "Penicillin", "Latex", "Sulfa", "Codeine", "Aspirin" };
+
+        public static bool Lists(string? allergen) =>
+            Array.Exists(Allergens, listed => string.Equals(listed, allergen?.Trim(), StringComparison.OrdinalIgnoreCase));
+    }
+
     public class MedicationLine
     {
         public string? Name { get; set; }

@@ -34,9 +34,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.ResidentName).NotEmpty().WithMessage("Enter the resident's name.");
             RuleForEach(x => x.Medications).SetValidator(new MedicationLineValidator());
 
-            // A check on each allergy line itself, when the resident has allergies.
+            // Checks on each allergy line itself, when the resident has allergies: named, which the browser
+            // checks too, and listed by the pharmacy, which only the server knows.
             When(x => x.HasAllergies, () =>
-                RuleForEach(x => x.Allergies).NotEmpty().WithMessage("Name the allergy or clear the line."));
+                RuleForEach(x => x.Allergies)
+                    .NotEmpty().WithMessage("Name the allergy or clear the line.")
+                    .Must(Pharmacy.Lists).WithMessage("The pharmacy does not list this allergen."));
 
             RuleFor(x => x.AdministrationChecks).NotEmpty().WithMessage("Tick at least one administration check.");
         }

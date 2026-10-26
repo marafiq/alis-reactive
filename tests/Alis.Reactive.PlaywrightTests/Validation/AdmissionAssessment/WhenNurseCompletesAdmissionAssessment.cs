@@ -253,7 +253,6 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
     }
 
     [Test]
-    [Ignore("Framework defect: the browser's Url rule checks only the scheme (ClientRule.cs:176, UrlPattern), so a link with a space in its host is sent and refused by the server, while the same rule on the server (UrlCheck, Uri.TryCreate) refuses it before anything is sent would.")]
     public async Task a_portal_link_with_a_space_in_it_is_refused_before_it_is_sent()
     {
         await NavigateAndBoot();
@@ -542,7 +541,6 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
     }
 
     [Test]
-    [Ignore("Framework defect: NotEmpty on a non-nullable enum reaches the browser as a required check on the enum's name (ClientRule.cs:122-123, FormWriter.cs:97-104), so the default member's name, 'NotSet', passes in the page while the server's NotEmpty (Emptiness.IsEmpty, Checks.cs:87) refuses the type's default.")]
     public async Task a_residency_left_not_set_is_refused_before_it_is_sent()
     {
         await NavigateAndBoot();
@@ -574,7 +572,6 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
     }
 
     [Test]
-    [Ignore("Framework defect: NotNull on a non-nullable bool is written as the browser's required check (ClientRule.cs:127-128 names it 'required', FormWriter.cs:55,100 refuses false), while the server's NotNull (Checks.cs:48) passes false.")]
     public async Task an_unticked_photo_consent_box_is_saved_as_a_no()
     {
         await NavigateAndBoot();
@@ -603,7 +600,6 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
     }
 
     [Test]
-    [Ignore("Framework defect: NotNull on a non-nullable int is written as the browser's required check (ClientRule.cs:127-128, FormWriter.cs:55,101 refuses 0), while the server's NotNull (Checks.cs:48) passes zero.")]
     public async Task no_falls_last_year_is_saved_as_zero()
     {
         await NavigateAndBoot();

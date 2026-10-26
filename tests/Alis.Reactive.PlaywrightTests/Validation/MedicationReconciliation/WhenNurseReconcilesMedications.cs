@@ -184,20 +184,22 @@ public class WhenNurseReconcilesMedications : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A check on the allergy line itself: the server runs it and names the line.
+    // A check on the allergy line that only the pharmacy can make: the server runs it, and its answer
+    // lands on the line it names, since the page knows the line.
     [Test]
-    public async Task a_blank_allergy_line_is_refused_by_the_mar_printer()
+    public async Task an_allergen_the_pharmacy_does_not_list_is_refused_by_the_mar_printer()
     {
         await NavigateAndBoot();
         await CompleteTheReconciliation();
         await HasAllergies.Check();
+        await Write(m => m.Allergies[0], "Moonlight");
         await Write(m => m.Allergies[1], "Penicillin");
 
         await ClickWhenStable(PrintTheMar);
 
-        await Expect(ValidationSummary).ToBeVisibleAsync();
-        await Expect(ValidationSummary.Locator("[data-valmsg-summary-for='Allergies[0]']"))
-            .ToHaveTextAsync("Name the allergy or clear the line.");
+        await Expect(ErrorFor(m => m.Allergies[0])).ToHaveTextAsync("The pharmacy does not list this allergen.");
+        await Expect(ErrorFor(m => m.Allergies[1])).ToHaveTextAsync("");
+        await Expect(ValidationSummary).ToBeHiddenAsync();
         await Expect(MarStatus).ToHaveTextAsync("The MAR was not printed.");
         Assert.That(_printsSent, Has.Count.EqualTo(1), "The MAR takes the reconciliation as it is; the server decides.");
 
@@ -209,7 +211,6 @@ public class WhenNurseReconcilesMedications : PlaywrightTestBase
     }
 
     [Test]
-    [Ignore("Framework defect: a check written directly on the items of RuleForEach (NotEmpty on each allergy) runs on the server (Rules.cs:221-233) but is never described to the browser, which takes only a child validator from a collection rule (Rules.cs:236-241), so the blank line is sent and refused by the server instead of being refused beside the line first.")]
     public async Task a_blank_allergy_line_is_refused_before_it_is_sent()
     {
         await NavigateAndBoot();

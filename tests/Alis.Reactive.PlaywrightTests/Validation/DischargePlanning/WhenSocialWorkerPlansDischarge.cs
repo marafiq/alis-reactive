@@ -221,7 +221,6 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
 
     // The same destinations as an array: the server asks for the summary, and so should the page.
     [Test]
-    [Ignore("Framework defect: C# 14 binds an enum array's Contains to MemoryExtensions.Contains(ReadOnlySpan<T>, T, IEqualityComparer<T>?) with three arguments (enums are not IEquatable<T>, so the two-argument span overload is inapplicable), and BrowserCondition.TryContains accepts only two-argument static calls (BrowserCondition.cs:210-211), so the condition has no browser form and its whole When block silently stays on the server.")]
     public async Task a_transfer_to_hospice_or_skilled_nursing_needs_the_nursing_summary_and_a_hospital_does_not()
     {
         await BeginThePlan();
