@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
@@ -48,76 +48,66 @@ namespace Alis.Reactive.Builders.Conditions
         public TNext NotEq(TypedSource<TProp> right) => CompareWith(CompareOperator.Neq, right);
 
         /// <summary>Matches a truthy value: not null, not zero, not empty.</summary>
-        public TNext Truthy() => Unary(CompareOperator.Truthy);
+        public TNext Truthy() => Unary(ValueTest.Truthy);
 
         /// <summary>Matches a falsy value: null, zero or empty.</summary>
-        public TNext Falsy() => Unary(CompareOperator.Falsy);
+        public TNext Falsy() => Unary(ValueTest.Falsy);
 
         /// <summary>Matches null.</summary>
-        public TNext IsNull() => Unary(CompareOperator.IsNull);
+        public TNext IsNull() => Unary(ValueTest.IsNull);
 
         /// <summary>Matches any value but null.</summary>
-        public TNext NotNull() => Unary(CompareOperator.NotNull);
+        public TNext NotNull() => Unary(ValueTest.NotNull);
 
         /// <summary>Matches an empty value: null, empty text or an empty collection.</summary>
-        public TNext IsEmpty() => Unary(CompareOperator.IsEmpty);
+        public TNext IsEmpty() => Unary(ValueTest.IsEmpty);
 
         /// <summary>Matches a value that is not empty.</summary>
-        public TNext NotEmpty() => Unary(CompareOperator.NotEmpty);
+        public TNext NotEmpty() => Unary(ValueTest.NotEmpty);
 
         /// <summary>Matches when the source is one of <paramref name="values"/>.</summary>
         /// <param name="values">The accepted values.</param>
-        public TNext In(params TProp[] values) => Among(CompareOperator.In, values);
+        public TNext In(params TProp[] values) => Among(values, negated: false);
 
         /// <summary>Matches when the source is none of <paramref name="values"/>.</summary>
         /// <param name="values">The rejected values.</param>
-        public TNext NotIn(params TProp[] values) => Among(CompareOperator.NotIn, values);
+        public TNext NotIn(params TProp[] values) => Among(values, negated: true);
 
         internal Shape Shape => _left.Shape;
 
         internal TNext CompareWith(CompareOperator op, object? literal) =>
-            _next(ConditionGraph.Binary(op, Left, ValueExpression.LiteralFor(literal, Shape), Shape));
+            _next(ConditionGraph.Ordered(op, Left, ValueExpression.LiteralFor(literal, Shape), Shape));
 
         internal TNext CompareWith<TRight>(CompareOperator op, TypedSource<TRight> right)
         {
             if (right == null) throw new ArgumentNullException(nameof(right));
-            return _next(ConditionGraph.Binary(op, Left, right.Expression, Shape));
+            return _next(ConditionGraph.Ordered(op, Left, right.Expression, Shape));
         }
 
-        internal TNext CompareWithText(CompareOperator op, string operand) =>
-            _next(ConditionGraph.Binary(op, Left, ValueExpression.LiteralFor(operand, PlanModel.Shape.String), Shape));
+        internal TNext CompareWithText(TextTest test, string text) =>
+            _next(ConditionGraph.Text(test, Left, text ?? throw new ArgumentNullException(nameof(text)), Shape));
 
         internal TNext CompareWithLength(int length)
         {
             var minimum = MinimumTextLength.From(length, nameof(length));
-            return _next(ConditionGraph.Binary(
-                CompareOperator.MinLength, Left, ValueExpression.LiteralFor(minimum.Value, PlanModel.Shape.Number), Shape));
+            return _next(ConditionGraph.MinLength(Left, minimum.Value, Shape));
         }
 
-        internal TNext CompareWithRange(object low, object high)
-        {
-            var endpoints = new List<ValueExpression> { ValueExpression.LiteralFor(low, Shape), ValueExpression.LiteralFor(high, Shape) };
-            return _next(ConditionGraph.Binary(
-                CompareOperator.Between, Left, ValueExpression.Array(endpoints, PlanModel.Shape.ArrayOf(Shape)), Shape));
-        }
+        internal TNext CompareWithRange(object low, object high) =>
+            _next(ConditionGraph.Range(Left, ValueExpression.LiteralFor(low, Shape), ValueExpression.LiteralFor(high, Shape), Shape));
 
         internal TNext ContainsItem(object? item) =>
-            _next(ConditionGraph.CollectionItem(
-                CompareOperator.ArrayContains, Left, ValueExpression.LiteralFor(item, _left.ElementShape), Shape, _left.ElementShape));
+            _next(ConditionGraph.ArrayContains(Left, ValueExpression.LiteralFor(item, _left.ElementShape), Shape, _left.ElementShape));
 
         private ValueExpression Left => _left.Expression;
 
-        private TNext Unary(CompareOperator op) => _next(ConditionGraph.Unary(op, Left, Shape));
+        private TNext Unary(ValueTest test) => _next(ConditionGraph.Unary(test, Left, Shape));
 
-        private TNext Among(CompareOperator op, TProp[] values)
+        private TNext Among(TProp[] values, bool negated)
         {
             if (values == null) throw new ArgumentNullException(nameof(values));
-            var left = Left;
-            var items = new List<ValueExpression>();
-            foreach (var value in values)
-                items.Add(ValueExpression.LiteralFor(value, Shape));
-
-            return _next(ConditionGraph.Binary(op, left, ValueExpression.Array(items, PlanModel.Shape.ArrayOf(Shape)), Shape));
+            var items = values.Select(value => ValueExpression.LiteralFor(value, Shape)).ToList();
+            return _next(ConditionGraph.Membership(Left, items, negated, Shape));
         }
     }
 }

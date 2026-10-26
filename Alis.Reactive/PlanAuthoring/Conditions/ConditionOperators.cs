@@ -105,22 +105,22 @@ namespace Alis.Reactive
         /// <summary>Matches text that contains <paramref name="substring"/>.</summary>
         public static TNext Contains<TModel, TText, TNext>(this ConditionSourceBuilder<TModel, TText, TNext> source, string substring)
             where TModel : class where TNext : Condition<TModel> where TText : IEnumerable<char>? =>
-            source.CompareWithText(CompareOperator.Contains, substring);
+            source.CompareWithText(TextTest.Contains, substring);
 
         /// <summary>Matches text that starts with <paramref name="prefix"/>.</summary>
         public static TNext StartsWith<TModel, TText, TNext>(this ConditionSourceBuilder<TModel, TText, TNext> source, string prefix)
             where TModel : class where TNext : Condition<TModel> where TText : IEnumerable<char>? =>
-            source.CompareWithText(CompareOperator.StartsWith, prefix);
+            source.CompareWithText(TextTest.StartsWith, prefix);
 
         /// <summary>Matches text that ends with <paramref name="suffix"/>.</summary>
         public static TNext EndsWith<TModel, TText, TNext>(this ConditionSourceBuilder<TModel, TText, TNext> source, string suffix)
             where TModel : class where TNext : Condition<TModel> where TText : IEnumerable<char>? =>
-            source.CompareWithText(CompareOperator.EndsWith, suffix);
+            source.CompareWithText(TextTest.EndsWith, suffix);
 
         /// <summary>Matches text the regular expression <paramref name="pattern"/> matches.</summary>
         public static TNext Matches<TModel, TText, TNext>(this ConditionSourceBuilder<TModel, TText, TNext> source, string pattern)
             where TModel : class where TNext : Condition<TModel> where TText : IEnumerable<char>? =>
-            source.CompareWithText(CompareOperator.Matches, pattern);
+            source.CompareWithText(TextTest.Matches, pattern);
 
         /// <summary>Matches text at least <paramref name="length"/> characters long.</summary>
         public static TNext MinLength<TModel, TText, TNext>(this ConditionSourceBuilder<TModel, TText, TNext> source, int length)

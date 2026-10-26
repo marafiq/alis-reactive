@@ -25,6 +25,9 @@ namespace Alis.Reactive.PlanModel
 
         internal abstract Expr Write(Scope scope);
 
+        /// <summary>The value as a comparison reads it: converted to the shape; a literal is written in it.</summary>
+        internal virtual Expr WriteAs(Shape shape, Scope scope) => G.As(Write(scope), shape);
+
         // ── literals ─────────────────────────────────────────────────────────────
 
         internal static ValueExpression Literal(bool value) => new LiteralExpression(value, Shape.Boolean);
@@ -163,6 +166,8 @@ namespace Alis.Reactive.PlanModel
         internal override Shape OutputShape => Shape;
 
         internal override Expr Write(Scope scope) => G.Lit(Value, Shape);
+
+        internal override Expr WriteAs(Shape shape, Scope scope) => G.Lit(Value, shape);
     }
 
     internal sealed class ReadExpression : ValueExpression

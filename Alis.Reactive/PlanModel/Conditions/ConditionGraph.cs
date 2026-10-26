@@ -6,23 +6,34 @@ using Alis.Reactive.Grammar;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// A condition over values: a comparison, all of, any of, not, or a question the user answers. It
-    /// writes itself as an expression where it is synchronous, and as the guard of an <c>if</c> where it
-    /// waits: a question is asked, or a promise settles, only when the condition reaches it.
+    /// A condition as the plan evaluates it: one node per comparison family, each carrying exactly its
+    /// operands, composed with All, Any and Not. A condition that waits (a method result that is a promise,
+    /// a user decision) guards its branches with the statements that settle it first.
     /// </summary>
     internal abstract class ConditionGraph
     {
         private protected ConditionGraph() { }
 
-        internal static ConditionGraph Unary(CompareOperator op, ValueExpression left, Shape shape) =>
-            new UnaryCondition(op, left, shape);
+        internal static ConditionGraph Unary(ValueTest test, ValueExpression left, Shape shape) =>
+            new UnaryCondition(test, left, shape);
 
-        internal static ConditionGraph Binary(CompareOperator op, ValueExpression left, ValueExpression right, Shape shape) =>
-            new BinaryCondition(op, left, right, shape, Shape.None);
+        internal static ConditionGraph Ordered(CompareOperator op, ValueExpression left, ValueExpression right, Shape shape) =>
+            new OrderedCondition(op, left, right, shape);
 
-        /// <summary>A collection compared with one item: <c>ArrayContains</c>.</summary>
-        internal static ConditionGraph CollectionItem(CompareOperator op, ValueExpression left, ValueExpression item, Shape collectionShape, Shape itemShape) =>
-            new BinaryCondition(op, left, item, collectionShape, itemShape);
+        internal static ConditionGraph Membership(ValueExpression left, IReadOnlyList<ValueExpression> items, bool negated, Shape shape) =>
+            new MembershipCondition(left, items, negated, shape);
+
+        internal static ConditionGraph Range(ValueExpression left, ValueExpression low, ValueExpression high, Shape shape) =>
+            new RangeCondition(left, low, high, shape);
+
+        internal static ConditionGraph ArrayContains(ValueExpression left, ValueExpression item, Shape collectionShape, Shape itemShape) =>
+            new ArrayContainsCondition(left, item, collectionShape, itemShape);
+
+        internal static ConditionGraph Text(TextTest test, ValueExpression left, string text, Shape shape) =>
+            new TextCondition(test, left, text, shape);
+
+        internal static ConditionGraph MinLength(ValueExpression left, int length, Shape shape) =>
+            new MinLengthCondition(left, length, shape);
 
         internal static ConditionGraph All(params ConditionGraph[] terms) => new AllCondition(terms.ToList());
 
@@ -36,152 +47,183 @@ namespace Alis.Reactive.PlanModel
 
         internal abstract Expr Write(Scope scope);
 
-        /// <summary>The statements that run <paramref name="then"/> when the condition holds and <paramref name="otherwise"/> when not.</summary>
         internal virtual IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
             new[] { G.If(Write(scope), then, otherwise) };
     }
 
-    /// <summary>A comparison with nothing on its right: truthy, null, empty and their negations.</summary>
-    internal sealed class UnaryCondition : ConditionGraph
+    /// <summary>A comparison of one value: it reads the value, converts it to the condition's shape, and tests it.</summary>
+    internal abstract class ValueCondition : ConditionGraph
     {
-        private readonly CompareOperator _op;
         private readonly ValueExpression _left;
-        private readonly Shape _shape;
 
-        internal UnaryCondition(CompareOperator op, ValueExpression left, Shape shape)
+        private protected ValueCondition(ValueExpression left, Shape shape)
         {
-            _op = op;
             _left = left ?? throw new ArgumentNullException(nameof(left));
-            _shape = shape;
+            Shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
 
-        internal override bool IsSynchronous => !_left.ReadsAwaited;
+        private protected Shape Shape { get; }
 
-        // The value is read, then converted to the condition's shape; null and empty test it unconverted.
-        internal override Expr Write(Scope scope)
-        {
-            var raw = _left.Write(scope);
-            var left = G.As(raw, _shape);
-            if (_op == CompareOperator.Truthy) return G.Op(Operator.Truthy, left);
-            if (_op == CompareOperator.Falsy) return G.Not(G.Op(Operator.Truthy, left));
-            if (_op == CompareOperator.IsNull) return G.Eq(raw, G.Null);
-            if (_op == CompareOperator.NotNull) return G.Op(Operator.Neq, raw, G.Null);
-            if (_op == CompareOperator.IsEmpty) return G.Op(Operator.Empty, raw);
-            if (_op == CompareOperator.NotEmpty) return G.Not(G.Op(Operator.Empty, raw));
-            throw new InvalidOperationException("Comparison '" + _op + "' needs a right operand.");
-        }
+        private protected virtual bool ReadsAwaited => _left.ReadsAwaited;
+
+        internal override bool IsSynchronous => !ReadsAwaited;
+
+        private protected Expr Raw(Scope scope) => _left.Write(scope);
+
+        private protected Expr Left(Scope scope) => G.As(Raw(scope), Shape);
 
         // A comparison that reads a promise: its awaited reads settle, then the `if` runs.
         internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
             IsSynchronous ? base.Guard(then, otherwise, scope) : scope.WithHoisted(() => base.Guard(then, otherwise, scope));
     }
 
-    /// <summary>
-    /// A comparison with a right operand: a value, a list (membership, a range), literal text (text tests,
-    /// a pattern) or, for <c>ArrayContains</c>, one item of the collection on the left.
-    /// </summary>
-    internal sealed class BinaryCondition : ConditionGraph
+    internal sealed class UnaryCondition : ValueCondition
     {
-        private readonly CompareOperator _op;
-        private readonly ValueExpression _left;
-        private readonly ValueExpression _right;
-        private readonly Shape _shape;
-        private readonly Shape _itemShape;
+        private readonly ValueTest _test;
 
-        internal BinaryCondition(CompareOperator op, ValueExpression left, ValueExpression right, Shape shape, Shape itemShape)
+        internal UnaryCondition(ValueTest test, ValueExpression left, Shape shape) : base(left, shape)
         {
-            _op = op;
-            _left = left ?? throw new ArgumentNullException(nameof(left));
-            _right = right ?? throw new ArgumentNullException(nameof(right));
-            _shape = shape;
-            _itemShape = itemShape;
+            _test = test ?? throw new ArgumentNullException(nameof(test));
         }
 
-        internal override bool IsSynchronous => !_left.ReadsAwaited && !_right.ReadsAwaited;
-
-        // The left value is read, then converted to the condition's shape; a literal on the right is written
-        // in that shape. A missing value stays missing on both sides (grammar.md 2.2).
+        // Null and empty test the value unconverted; truthiness tests it in the condition's shape.
         internal override Expr Write(Scope scope)
         {
-            var left = G.As(_left.Write(scope), _shape);
-            if (_op == CompareOperator.Eq) return G.Eq(left, Right(_shape, scope));
-            if (_op == CompareOperator.Neq) return G.Op(Operator.Neq, left, Right(_shape, scope));
-            if (_op == CompareOperator.Gt) return G.Op(Operator.Gt, left, Right(_shape, scope));
-            if (_op == CompareOperator.Gte) return G.Op(Operator.Gte, left, Right(_shape, scope));
-            if (_op == CompareOperator.Lt) return G.Op(Operator.Lt, left, Right(_shape, scope));
-            if (_op == CompareOperator.Lte) return G.Op(Operator.Lte, left, Right(_shape, scope));
-            if (_op == CompareOperator.In) return Membership(left, scope);
-            if (_op == CompareOperator.NotIn) return G.Not(Membership(left, scope));
-            if (_op == CompareOperator.Between) return Between(left, scope);
-            if (_op == CompareOperator.ArrayContains) return ArrayContains(left, scope);
-            if (_op == CompareOperator.Contains) return TextMethod(left, "includes");
-            if (_op == CompareOperator.StartsWith) return TextMethod(left, "startsWith");
-            if (_op == CompareOperator.EndsWith) return TextMethod(left, "endsWith");
-            if (_op == CompareOperator.Matches) return G.Op(Operator.Matches, left, G.Lit(LiteralText()), G.Lit(""));
-            if (_op == CompareOperator.MinLength)
-                return G.Op(Operator.Gte, G.Get(G.Op(Operator.ToText, left), new[] { "length" }, Shape.None), G.Lit(LiteralNumber()));
-            throw new InvalidOperationException("Comparison '" + _op + "' takes no right operand.");
+            var raw = Raw(scope);
+            if (_test == ValueTest.Truthy) return G.Op(Operator.Truthy, G.As(raw, Shape));
+            if (_test == ValueTest.Falsy) return G.Not(G.Op(Operator.Truthy, G.As(raw, Shape)));
+            if (_test == ValueTest.IsNull) return G.Eq(raw, G.Null);
+            if (_test == ValueTest.NotNull) return G.Op(Operator.Neq, raw, G.Null);
+            if (_test == ValueTest.IsEmpty) return G.Op(Operator.Empty, raw);
+            return G.Not(G.Op(Operator.Empty, raw));
+        }
+    }
+
+    /// <summary>The value ordered against another of its shape, a literal or a value read when the condition runs.</summary>
+    internal sealed class OrderedCondition : ValueCondition
+    {
+        private readonly CompareOperator _op;
+        private readonly ValueExpression _right;
+
+        internal OrderedCondition(CompareOperator op, ValueExpression left, ValueExpression right, Shape shape) : base(left, shape)
+        {
+            _op = op ?? throw new ArgumentNullException(nameof(op));
+            _right = right ?? throw new ArgumentNullException(nameof(right));
         }
 
-        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
-            IsSynchronous ? base.Guard(then, otherwise, scope) : scope.WithHoisted(() => base.Guard(then, otherwise, scope));
+        private protected override bool ReadsAwaited => base.ReadsAwaited || _right.ReadsAwaited;
 
-        private Expr Right(Shape shape, Scope scope) =>
-            _right is LiteralExpression literal ? G.Lit(literal.Value, shape) : G.As(_right.Write(scope), shape);
+        internal override Expr Write(Scope scope) => G.Op(_op.Operation, Left(scope), _right.WriteAs(Shape, scope));
+    }
 
-        private IReadOnlyList<Expr> RightItems(Scope scope)
+    /// <summary>The value among a list of values, read once and compared with each, as C#'s Contains does.</summary>
+    internal sealed class MembershipCondition : ValueCondition
+    {
+        private readonly IReadOnlyList<ValueExpression> _items;
+        private readonly bool _negated;
+
+        internal MembershipCondition(ValueExpression left, IReadOnlyList<ValueExpression> items, bool negated, Shape shape) : base(left, shape)
         {
-            var items = _right is ArrayExpression array
-                ? array.Items
-                : throw new InvalidOperationException("Comparison '" + _op + "' needs a list of values.");
-            return items
-                .Select(item => item is LiteralExpression literal ? G.Lit(literal.Value, _shape) : G.As(item.Write(scope), _shape))
-                .ToList();
+            _items = items ?? throw new ArgumentNullException(nameof(items));
+            _negated = negated;
         }
 
-        // The left value is read once and compared with each item, as C#'s Contains does.
-        private Expr Membership(Expr left, Scope scope)
+        private protected override bool ReadsAwaited => base.ReadsAwaited || _items.Any(item => item.ReadsAwaited);
+
+        internal override Expr Write(Scope scope)
         {
+            var left = Left(scope);
             var value = scope.Fresh("v");
             var item = scope.Fresh("i");
-            var items = G.List(RightItems(scope));
+            var items = G.List(_items.Select(candidate => candidate.WriteAs(Shape, scope)).ToList());
             var some = G.Call(items, new[] { "some" }, new Expr[] { G.Fn(G.Eq(G.Ref(item), G.Ref(value)), item) }, G.NoShapes, Shape.Boolean);
-            return G.Apply(G.Fn(some, value), left);
+            var among = G.Apply(G.Fn(some, value), left);
+            return _negated ? G.Not(among) : among;
+        }
+    }
+
+    /// <summary>The value between a lower and an upper bound, both included.</summary>
+    internal sealed class RangeCondition : ValueCondition
+    {
+        private readonly ValueExpression _low;
+        private readonly ValueExpression _high;
+
+        internal RangeCondition(ValueExpression left, ValueExpression low, ValueExpression high, Shape shape) : base(left, shape)
+        {
+            _low = low ?? throw new ArgumentNullException(nameof(low));
+            _high = high ?? throw new ArgumentNullException(nameof(high));
         }
 
-        private Expr Between(Expr left, Scope scope)
+        private protected override bool ReadsAwaited => base.ReadsAwaited || _low.ReadsAwaited || _high.ReadsAwaited;
+
+        internal override Expr Write(Scope scope)
         {
-            var bounds = RightItems(scope);
-            if (bounds.Count != 2) throw new InvalidOperationException("Between needs a lower and an upper bound.");
+            var left = Left(scope);
+            var low = _low.WriteAs(Shape, scope);
+            var high = _high.WriteAs(Shape, scope);
             var value = scope.Fresh("v");
-            var inRange = G.And(
-                G.Op(Operator.Gte, G.Ref(value), bounds[0]),
-                G.Op(Operator.Lte, G.Ref(value), bounds[1]));
+            var inRange = G.And(G.Op(Operator.Gte, G.Ref(value), low), G.Op(Operator.Lte, G.Ref(value), high));
             return G.Apply(G.Fn(inRange, value), left);
         }
+    }
 
-        private Expr ArrayContains(Expr left, Scope scope)
+    /// <summary>A list holding an item: each item converted to the item's shape and compared.</summary>
+    internal sealed class ArrayContainsCondition : ValueCondition
+    {
+        private readonly ValueExpression _item;
+        private readonly Shape _itemShape;
+
+        internal ArrayContainsCondition(ValueExpression left, ValueExpression item, Shape collectionShape, Shape itemShape) : base(left, collectionShape)
         {
+            _item = item ?? throw new ArgumentNullException(nameof(item));
+            _itemShape = itemShape ?? throw new ArgumentNullException(nameof(itemShape));
+        }
+
+        private protected override bool ReadsAwaited => base.ReadsAwaited || _item.ReadsAwaited;
+
+        internal override Expr Write(Scope scope)
+        {
+            var left = Left(scope);
             var items = scope.Fresh("c");
             var item = scope.Fresh("i");
-            var right = Right(_itemShape, scope);
-            var matches = G.Fn(G.Eq(G.As(G.Ref(item), _itemShape), right), item);
+            var matches = G.Fn(G.Eq(G.As(G.Ref(item), _itemShape), _item.WriteAs(_itemShape, scope)), item);
             var some = G.Call(G.Ref(items), new[] { "some" }, new Expr[] { matches }, G.NoShapes, Shape.None);
             return G.Apply(G.Fn(G.Op(Operator.Truthy, some), items), left);
         }
+    }
 
-        private Expr TextMethod(Expr left, string method) =>
-            G.Op(Operator.Truthy, G.Call(G.Op(Operator.ToText, left), new[] { method }, new Expr[] { G.Lit(LiteralText()) }, G.NoShapes, Shape.None));
+    /// <summary>The value, as text, holding, starting with, ending with or matching the given text.</summary>
+    internal sealed class TextCondition : ValueCondition
+    {
+        private readonly TextTest _test;
+        private readonly string _text;
 
-        private string LiteralText() =>
-            _right is LiteralExpression literal && literal.Value is string text
-                ? text
-                : throw new InvalidOperationException("Comparison '" + _op + "' needs literal text.");
+        internal TextCondition(TextTest test, ValueExpression left, string text, Shape shape) : base(left, shape)
+        {
+            _test = test ?? throw new ArgumentNullException(nameof(test));
+            _text = text ?? throw new ArgumentNullException(nameof(text));
+        }
 
-        private object LiteralNumber() =>
-            _right is LiteralExpression literal && literal.Value != null
-                ? literal.Value
-                : throw new InvalidOperationException("Comparison '" + _op + "' needs a literal number.");
+        internal override Expr Write(Scope scope)
+        {
+            var left = Left(scope);
+            if (_test.IsPattern) return G.Op(Operator.Matches, left, G.Lit(_text), G.Lit(""));
+            return G.Op(Operator.Truthy, G.Call(G.Op(Operator.ToText, left), new[] { _test.Method }, new Expr[] { G.Lit(_text) }, G.NoShapes, Shape.None));
+        }
+    }
+
+    /// <summary>The value, as text, at least so many characters long.</summary>
+    internal sealed class MinLengthCondition : ValueCondition
+    {
+        private readonly int _length;
+
+        internal MinLengthCondition(ValueExpression left, int length, Shape shape) : base(left, shape)
+        {
+            _length = length;
+        }
+
+        internal override Expr Write(Scope scope) =>
+            G.Op(Operator.Gte, G.Get(G.Op(Operator.ToText, Left(scope)), new[] { "length" }, Shape.None), G.Lit(_length));
     }
 
     internal sealed class AllCondition : ConditionGraph
@@ -262,7 +304,7 @@ namespace Alis.Reactive.PlanModel
             IsSynchronous ? base.Guard(then, otherwise, scope) : _term.Guard(otherwise, then, scope);
     }
 
-    /// <summary>A question the user answers in the confirm dialog: the steps after it wait for the answer.</summary>
+    /// <summary>A user decision: the confirm asks, and the branches wait for the answer.</summary>
     internal sealed class ConfirmCondition : ConditionGraph
     {
         private readonly string _message;

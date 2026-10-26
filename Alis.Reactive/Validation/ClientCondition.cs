@@ -86,8 +86,11 @@ namespace Alis.Reactive.Validation
         /// <summary>Tests the member's value alone.</summary>
         /// <param name="member">The member, as a path from the model: <c>x =&gt; x.IsVeteran</c>.</param>
         /// <param name="test">The test.</param>
-        public static ClientCondition Is(LambdaExpression member, ClientValueTest test) =>
-            new FieldTest(FieldReference.Of(member), UnaryOperator(test), TestValue.None);
+        public static ClientCondition Is(LambdaExpression member, ClientValueTest test)
+        {
+            var valueTest = ValueTestOf(test);
+            return new FieldTest(FieldReference.Of(member), (left, shape) => ConditionGraph.Unary(valueTest, left, shape));
+        }
 
         /// <summary>Compares the member with a value.</summary>
         /// <param name="member">The member, as a path from the model.</param>
@@ -96,9 +99,10 @@ namespace Alis.Reactive.Validation
         public static ClientCondition Compare(LambdaExpression member, ClientComparison comparison, Expression value)
         {
             var field = FieldReference.Of(member);
-            var fixedValue = ConditionValue.Evaluate(value)
-                ?? throw new ArgumentNullException(nameof(value), "Test a missing value with ClientValueTest.Null.");
-            return new FieldTest(field, ComparisonOperator(comparison), TestValue.Literal(LiteralOf(field.Type, fixedValue)));
+            var op = OperatorOf(comparison);
+            var fixedValue = LiteralOf(field.Type, ConditionValue.Evaluate(value)
+                ?? throw new ArgumentNullException(nameof(value), "Test a missing value with ClientValueTest.Null."));
+            return new FieldTest(field, (left, shape) => ConditionGraph.Ordered(op, left, ValueExpression.LiteralFor(fixedValue, shape), shape));
         }
 
         /// <summary>The member is one of the values.</summary>
@@ -109,10 +113,9 @@ namespace Alis.Reactive.Validation
             var field = FieldReference.Of(member);
             var fixedValues = ConditionValue.Evaluate(values) as IEnumerable
                 ?? throw new ArgumentException("The values must be a collection.", nameof(values));
-            return new FieldTest(
-                field,
-                CompareOperator.In,
-                TestValue.List(fixedValues.Cast<object?>().Select(value => LiteralOf(field.Type, value)).ToArray()));
+            var members = fixedValues.Cast<object?>().Select(value => LiteralOf(field.Type, value)).ToArray();
+            return new FieldTest(field, (left, shape) =>
+                ConditionGraph.Membership(left, members.Select(value => ValueExpression.LiteralFor(value, shape)).ToList(), negated: false, shape));
         }
 
         /// <summary>Tests a text member against fixed text.</summary>
@@ -122,7 +125,8 @@ namespace Alis.Reactive.Validation
         public static ClientCondition Text(LambdaExpression member, ClientTextTest test, string text)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
-            return new FieldTest(FieldReference.Of(member), TextOperator(test), TestValue.Text(text));
+            var textTest = TextTestOf(test);
+            return new FieldTest(FieldReference.Of(member), (left, shape) => ConditionGraph.Text(textTest, left, text, shape));
         }
 
         /// <summary>The collection member holds the item.</summary>
@@ -132,10 +136,10 @@ namespace Alis.Reactive.Validation
         {
             if (item == null) throw new ArgumentNullException(nameof(item));
             var itemType = ConditionValue.TypeOf(item);
-            return new FieldTest(
-                FieldReference.Of(collection),
-                CompareOperator.ArrayContains,
-                TestValue.Item(LiteralOf(itemType, ConditionValue.Evaluate(item)), Shape.FromClrType(itemType)));
+            var itemShape = Shape.FromClrType(itemType);
+            var fixedItem = LiteralOf(itemType, ConditionValue.Evaluate(item));
+            return new FieldTest(FieldReference.Of(collection), (left, shape) =>
+                ConditionGraph.ArrayContains(left, ValueExpression.LiteralFor(fixedItem, itemShape), shape, itemShape));
         }
 
         /// <summary>Every term holds.</summary>
@@ -188,18 +192,18 @@ namespace Alis.Reactive.Validation
             return asMemberType.GetType().IsEnum ? asMemberType.ToString() : asMemberType;
         }
 
-        private static CompareOperator UnaryOperator(ClientValueTest test) => test switch
+        private static ValueTest ValueTestOf(ClientValueTest test) => test switch
         {
-            ClientValueTest.Truthy => CompareOperator.Truthy,
-            ClientValueTest.Falsy => CompareOperator.Falsy,
-            ClientValueTest.Null => CompareOperator.IsNull,
-            ClientValueTest.NotNull => CompareOperator.NotNull,
-            ClientValueTest.Empty => CompareOperator.IsEmpty,
-            ClientValueTest.NotEmpty => CompareOperator.NotEmpty,
+            ClientValueTest.Truthy => ValueTest.Truthy,
+            ClientValueTest.Falsy => ValueTest.Falsy,
+            ClientValueTest.Null => ValueTest.IsNull,
+            ClientValueTest.NotNull => ValueTest.NotNull,
+            ClientValueTest.Empty => ValueTest.IsEmpty,
+            ClientValueTest.NotEmpty => ValueTest.NotEmpty,
             _ => throw new ArgumentOutOfRangeException(nameof(test), test, "Unknown value test."),
         };
 
-        private static CompareOperator ComparisonOperator(ClientComparison comparison) => comparison switch
+        private static CompareOperator OperatorOf(ClientComparison comparison) => comparison switch
         {
             ClientComparison.Equal => CompareOperator.Eq,
             ClientComparison.NotEqual => CompareOperator.Neq,
@@ -210,12 +214,12 @@ namespace Alis.Reactive.Validation
             _ => throw new ArgumentOutOfRangeException(nameof(comparison), comparison, "Unknown comparison."),
         };
 
-        private static CompareOperator TextOperator(ClientTextTest test) => test switch
+        private static TextTest TextTestOf(ClientTextTest test) => test switch
         {
-            ClientTextTest.Contains => CompareOperator.Contains,
-            ClientTextTest.StartsWith => CompareOperator.StartsWith,
-            ClientTextTest.EndsWith => CompareOperator.EndsWith,
-            ClientTextTest.Matches => CompareOperator.Matches,
+            ClientTextTest.Contains => TextTest.Contains,
+            ClientTextTest.StartsWith => TextTest.StartsWith,
+            ClientTextTest.EndsWith => TextTest.EndsWith,
+            ClientTextTest.Matches => TextTest.Matches,
             _ => throw new ArgumentOutOfRangeException(nameof(test), test, "Unknown text test."),
         };
 
@@ -231,29 +235,27 @@ namespace Alis.Reactive.Validation
                 throw new InvalidOperationException("A rule that always applies has no condition.");
         }
 
+        // A test of one member: when the form is written, the member is read as MVC binds it and tested in
+        // the type its input holds, by the graph the test builds for that read and shape.
         private sealed class FieldTest : ClientCondition
         {
             private readonly FieldReference _field;
-            private readonly CompareOperator _op;
-            private readonly TestValue _value;
+            private readonly Func<ValueExpression, Shape, ConditionGraph> _graph;
 
-            internal FieldTest(FieldReference field, CompareOperator op, TestValue value)
+            internal FieldTest(FieldReference field, Func<ValueExpression, Shape, ConditionGraph> graph)
             {
                 _field = field;
-                _op = op;
-                _value = value;
+                _graph = graph;
             }
 
-            internal override ClientCondition PrefixedBy(string prefix) =>
-                new FieldTest(_field.PrefixedBy(prefix), _op, _value);
+            internal override ClientCondition PrefixedBy(string prefix) => new FieldTest(_field.PrefixedBy(prefix), _graph);
 
             internal override IEnumerable<FieldReference> Fields => new[] { _field };
 
-            // The member is read as MVC binds it, then tested in the type its input holds.
             internal override ConditionGraph ToGraph(FormFieldValues fields)
             {
                 var input = fields.Resolve(_field);
-                return _value.Compare(_op, ValueExpression.ReadBound(input.Id, Shape.None), input.Shape);
+                return _graph(ValueExpression.ReadBound(input.Id, Shape.None), input.Shape);
             }
         }
 
@@ -307,86 +309,6 @@ namespace Alis.Reactive.Validation
             internal override IEnumerable<FieldReference> Fields => _term.Fields;
 
             internal override ConditionGraph ToGraph(FormFieldValues fields) => ConditionGraph.Not(_term.ToGraph(fields));
-        }
-
-        // What a test compares the member with: nothing, a literal in the member's type, text, a list
-        // of literals, or one item of the member's collection.
-        private abstract class TestValue
-        {
-            internal static TestValue None { get; } = new NoValue();
-
-            internal static TestValue Literal(object? value) => new LiteralValue(value);
-
-            internal static TestValue Text(string text) => new TextValue(text);
-
-            internal static TestValue List(IReadOnlyList<object?> items) => new ListValue(items);
-
-            internal static TestValue Item(object? item, Shape itemShape) => new ItemValue(item, itemShape);
-
-            internal abstract ConditionGraph Compare(CompareOperator op, ValueExpression left, Shape fieldShape);
-
-            private sealed class NoValue : TestValue
-            {
-                internal override ConditionGraph Compare(CompareOperator op, ValueExpression left, Shape fieldShape) =>
-                    ConditionGraph.Unary(op, left, fieldShape);
-            }
-
-            private sealed class LiteralValue : TestValue
-            {
-                private readonly object? _value;
-
-                internal LiteralValue(object? value)
-                {
-                    _value = value;
-                }
-
-                internal override ConditionGraph Compare(CompareOperator op, ValueExpression left, Shape fieldShape) =>
-                    ConditionGraph.Binary(op, left, ValueExpression.LiteralFor(_value, fieldShape), fieldShape);
-            }
-
-            private sealed class TextValue : TestValue
-            {
-                private readonly string _text;
-
-                internal TextValue(string text)
-                {
-                    _text = text;
-                }
-
-                internal override ConditionGraph Compare(CompareOperator op, ValueExpression left, Shape fieldShape) =>
-                    ConditionGraph.Binary(op, left, ValueExpression.LiteralFor(_text, Shape.String), fieldShape);
-            }
-
-            private sealed class ListValue : TestValue
-            {
-                private readonly IReadOnlyList<object?> _items;
-
-                internal ListValue(IReadOnlyList<object?> items)
-                {
-                    _items = items;
-                }
-
-                internal override ConditionGraph Compare(CompareOperator op, ValueExpression left, Shape fieldShape)
-                {
-                    var items = _items.Select(item => ValueExpression.LiteralFor(item, fieldShape)).ToList();
-                    return ConditionGraph.Binary(op, left, ValueExpression.Array(items, Shape.ArrayOf(fieldShape)), fieldShape);
-                }
-            }
-
-            private sealed class ItemValue : TestValue
-            {
-                private readonly object? _item;
-                private readonly Shape _itemShape;
-
-                internal ItemValue(object? item, Shape itemShape)
-                {
-                    _item = item;
-                    _itemShape = itemShape;
-                }
-
-                internal override ConditionGraph Compare(CompareOperator op, ValueExpression left, Shape fieldShape) =>
-                    ConditionGraph.CollectionItem(op, left, ValueExpression.LiteralFor(_item, _itemShape), fieldShape, _itemShape);
-            }
         }
     }
 

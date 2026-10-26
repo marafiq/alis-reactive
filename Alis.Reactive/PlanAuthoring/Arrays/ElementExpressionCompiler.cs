@@ -71,7 +71,7 @@ namespace Alis.Reactive.Builders.Arrays
             if (body is UnaryExpression unary && unary.NodeType == ExpressionType.Not)
                 return ConditionGraph.Not(CompileCondition(Unwrap(unary.Operand), element));
 
-            if (body is MethodCallExpression call && call.Object != null && TryStringOperator(call, out var textOperator))
+            if (body is MethodCallExpression call && call.Object != null && TryTextTest(call, out var textTest))
             {
                 var argument = Unwrap(call.Arguments[0]);
                 if (ReferencesParameter(argument, element))
@@ -79,15 +79,11 @@ namespace Alis.Reactive.Builders.Arrays
                         "String operation arguments (Contains/StartsWith/EndsWith) must be constants or captured " +
                         "values, not element-scope reads — the runtime text operand requires a literal. Got: " + argument);
 
-                return ConditionGraph.Binary(
-                    textOperator,
-                    CompileValue(Unwrap(call.Object), element),
-                    CompileValue(argument, element),
-                    Shape.String);
+                return ConditionGraph.Text(textTest, CompileValue(Unwrap(call.Object), element), FixedText(argument), Shape.String);
             }
 
             if (body.Type == typeof(bool))
-                return ConditionGraph.Unary(CompareOperator.Truthy, CompileValue(body, element), Shape.Boolean);
+                return ConditionGraph.Unary(ValueTest.Truthy, CompileValue(body, element), Shape.Boolean);
 
             throw new InvalidOperationException(
                 "Array predicate supports comparisons (== != > >= < <=), logical (&& || !), " +
@@ -116,7 +112,7 @@ namespace Alis.Reactive.Builders.Arrays
 
             var shape = Shape.FromClrType(memberOperand.Type);
 
-            return ConditionGraph.Binary(
+            return ConditionGraph.Ordered(
                 CompareOperatorFor(binary.NodeType), CompileValue(left, element), CompileValue(right, element), shape);
         }
 
@@ -195,21 +191,26 @@ namespace Alis.Reactive.Builders.Arrays
                 _ => throw new InvalidOperationException("Unsupported comparison node: " + nodeType),
             };
 
-        private static bool TryStringOperator(MethodCallExpression call, out CompareOperator op)
+        private static bool TryTextTest(MethodCallExpression call, out TextTest test)
         {
             if (call.Object?.Type == typeof(string) && call.Arguments.Count == 1)
             {
                 switch (call.Method.Name)
                 {
-                    case "Contains": op = CompareOperator.Contains; return true;
-                    case "StartsWith": op = CompareOperator.StartsWith; return true;
-                    case "EndsWith": op = CompareOperator.EndsWith; return true;
+                    case "Contains": test = TextTest.Contains; return true;
+                    case "StartsWith": test = TextTest.StartsWith; return true;
+                    case "EndsWith": test = TextTest.EndsWith; return true;
                 }
             }
 
-            op = CompareOperator.Eq;
+            test = TextTest.Contains;
             return false;
         }
+
+        // The text a string test compares with: a constant or a captured value, evaluated once here.
+        private static string FixedText(Expression argument) =>
+            Expression.Lambda(argument).Compile().DynamicInvoke() as string
+            ?? throw new InvalidOperationException("String operation arguments must be text. Got: " + argument);
 
         private static Expression Unwrap(Expression expression)
         {
