@@ -5,19 +5,20 @@
 //    before anything is sent.
 // H2 GET: values become the query string. An array becomes repeated keys, a missing scalar is sent
 //    empty, a missing array sends no key, and a File is a boundary error.
-// H3 JSON: values is the body; dates serialize as ISO and "" as null; an empty record sends no body.
+// H3 JSON: values is the body; a date is its local calendar text, an instant its UTC instant, and ""
+//    is null; an empty record sends no body.
 // H4 Form data: one entry per key; arrays repeat the key, a File is appended with its name, a date is
-//    ISO, a missing scalar is sent empty and a missing array sends no entry.
+//    its local calendar text, a missing scalar is sent empty and a missing array sends no entry.
 // H5 A header whose value is missing is omitted.
 // H6 The body is read by Content-Type: JSON parsed, text and HTML kept as text, anything else missing.
 // H7 Status 0 means no usable response: the network failed, or a JSON body could not be parsed.
 
 import type { Module } from "../objects/modules";
 import { asText, isMissing } from "../grammar/shape";
-import { scope } from "../diagnostics/trace";
+import { logger } from "../diagnostics/trace";
 import { toJavaScriptString } from "../shared/javascript-string";
 
-const log = scope("http");
+const log = logger("http");
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 

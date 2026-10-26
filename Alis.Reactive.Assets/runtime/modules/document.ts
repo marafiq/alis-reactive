@@ -9,10 +9,11 @@
 // D4 A click on an element carrying data-alis-raise raises that event with the element's detail.
 
 import type { Module } from "../objects/modules";
-import { scope } from "../diagnostics/trace";
+import { logger } from "../diagnostics/trace";
+import { isMissing } from "../grammar/shape";
 
-const executeLog = scope("execute");
-const triggerLog = scope("trigger");
+const executeLog = logger("execute");
+const triggerLog = logger("trigger");
 
 const RAISE_ATTRIBUTE = "data-alis-raise";
 const RAISE_DETAIL_ATTRIBUTE = "data-alis-detail";
@@ -68,7 +69,9 @@ function wireMarkupRaise(): void {
   if (markupRaiseWired) return;
   markupRaiseWired = true;
   document.addEventListener("click", event => {
-    const source = (event.target as Element | null)?.closest?.(`[${RAISE_ATTRIBUTE}]`);
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const source = target.closest(`[${RAISE_ATTRIBUTE}]`);
     if (!source) return;
     const name = source.getAttribute(RAISE_ATTRIBUTE);
     if (!name) return;
@@ -90,11 +93,11 @@ export const documentModule: Module = {
     }
 
     triggerLog.debug("document-event.listening", { event });
-    const handler = (domEvent: Event): void => {
+    const domListener = (domEvent: Event): void => {
       const detail = (domEvent as CustomEvent).detail;
-      listener(detail === null || detail === undefined ? domEvent : detail);
+      listener(isMissing(detail) ? domEvent : detail);
     };
-    document.addEventListener(event, handler);
-    owner.onDispose(() => document.removeEventListener(event, handler));
+    document.addEventListener(event, domListener);
+    owner.onDispose(() => document.removeEventListener(event, domListener));
   },
 };

@@ -10,10 +10,11 @@ import * as signalR from "@microsoft/signalr";
 import type { Module } from "../objects/modules";
 import type { Listener } from "../objects/vendor-driver";
 import { showRetryIndicator, removeRetryIndicator } from "./retry-indicator";
-import { scope } from "../diagnostics/trace";
+import { logger } from "../diagnostics/trace";
+import { isRecord } from "../shared/record";
 import { toJavaScriptString } from "../shared/javascript-string";
 
-const log = scope("signalr");
+const log = logger("signalr");
 
 interface Managed {
   readonly connection: signalR.HubConnection;
@@ -27,14 +28,13 @@ const hubs = new Map<string, Managed>();
 const startDelays = [0, 2000, 10000, 30000] as const;
 
 async function startWithRetry(managed: Managed, url: string): Promise<void> {
-  for (let attempt = 0; attempt < startDelays.length; attempt++) {
+  for (const [attempt, delay] of startDelays.entries()) {
     try {
       await managed.connection.start();
       log.info("connected", { hubUrl: url });
       removeRetryIndicator(url);
       return;
     } catch (error) {
-      const delay = startDelays[attempt]!;
       log.warn("start.retry", { hubUrl: url, attempt: attempt + 1, delay, error: toJavaScriptString(error) });
       await new Promise(resolve => setTimeout(resolve, delay));
     }
@@ -139,11 +139,11 @@ export const hubModule: Module = {
     managed.subscriptions += 1;
 
     if (LIFECYCLE_EVENTS.has(event)) {
-      let listeners = managed.lifecycle.get(event);
-      if (!listeners) managed.lifecycle.set(event, (listeners = new Set()));
+      const listeners = managed.lifecycle.get(event) ?? new Set<Listener>();
+      managed.lifecycle.set(event, listeners);
       listeners.add(listener);
       owner.onDispose(() => {
-        listeners!.delete(listener);
+        listeners.delete(listener);
         release(url, managed);
       });
       return;
@@ -151,20 +151,20 @@ export const hubModule: Module = {
 
     // A method the page declares without a payload is called with no argument; one declared with a
     // payload, with one object.
-    const handler = (...args: unknown[]): void => {
+    const onMethod = (...args: unknown[]): void => {
       log.debug("method.received", { hubUrl: url, method: event });
       const payload = args[0];
       const sentNothing = args.length === 0;
-      const sentOneObject = args.length === 1 && typeof payload === "object" && payload !== null && !Array.isArray(payload);
+      const sentOneObject = args.length === 1 && isRecord(payload);
       if (!sentNothing && !sentOneObject) {
         log.error("method.payload-unexpected", { hubUrl: url, method: event, count: args.length });
         return;
       }
       listener(payload);
     };
-    managed.connection.on(event, handler);
+    managed.connection.on(event, onMethod);
     owner.onDispose(() => {
-      managed.connection.off(event, handler);
+      managed.connection.off(event, onMethod);
       release(url, managed);
     });
     log.debug("method.listening", { hubUrl: url, method: event });

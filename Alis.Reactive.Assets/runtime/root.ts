@@ -15,9 +15,9 @@ import { formModule } from "./modules/form/form";
 import { slotModule } from "./modules/slot";
 import { streamModule } from "./realtime/stream";
 import { hubModule } from "./realtime/hub";
-import { scope } from "./diagnostics/trace";
+import { logger } from "./diagnostics/trace";
 
-const log = scope("boot");
+const log = logger("boot");
 
 interface PendingPlugin {
   readonly name: string;
@@ -26,7 +26,7 @@ interface PendingPlugin {
 
 interface RuntimeWindow extends Window {
   __alisPlugins?: PendingPlugin[];
-  __alisReactiveBoot?: { readonly booted: true; readonly planId: string };
+  __alisReactiveBoot?: { readonly booted: true };
 }
 
 registerModule("alis.document", documentModule);
@@ -51,12 +51,12 @@ function start(): void {
   announceMount(document.body);
 
   const plans = discoverPlans(document, false);
-  const planId = plans[0]?.planId ?? "";
-  log.info("booting", { plans: plans.map(plan => plan.planId) });
+  const planIds = plans.map(plan => plan.planId);
+  log.info("booting", { plans: planIds });
   startOwner(Owner.page(), plans);
 
   document.documentElement.dataset["alisBooted"] = "true";
-  runtimeWindow.__alisReactiveBoot = { booted: true, planId };
-  document.dispatchEvent(new CustomEvent("alis:booted", { detail: { planId } }));
-  log.info("booted", { planId });
+  runtimeWindow.__alisReactiveBoot = { booted: true };
+  document.dispatchEvent(new CustomEvent("alis:booted"));
+  log.info("booted", { plans: planIds });
 }

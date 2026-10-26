@@ -1,4 +1,4 @@
-// alis.stream (grammar.md 6.6), keyed by URL. Shipped with the realtime bundle.
+// alis.stream (grammar.md 6.6), keyed by URL, in the framework's bundle.
 // R1 One EventSource per URL, counted by subscriptions, closed when the last one is released.
 // R2 A named event subscribes by its name; unnamed messages arrive as "message". The payload is
 //    JSON.parse(data).
@@ -8,14 +8,14 @@
 import type { Module } from "../objects/modules";
 import type { Listener } from "../objects/vendor-driver";
 import { showRetryIndicator, removeRetryIndicator } from "./retry-indicator";
-import { scope } from "../diagnostics/trace";
+import { logger } from "../diagnostics/trace";
 import { toJavaScriptString } from "../shared/javascript-string";
 
-const log = scope("server-push");
+const log = logger("server-push");
 
 interface Subscription {
   readonly event: string;
-  readonly handler: EventListener;
+  readonly listener: EventListener;
 }
 
 interface Managed {
@@ -43,7 +43,7 @@ function open(url: string, managed?: Managed): EventSource {
     }
   };
   if (managed) {
-    for (const subscription of managed.subscriptions) source.addEventListener(subscription.event, subscription.handler);
+    for (const subscription of managed.subscriptions) source.addEventListener(subscription.event, subscription.listener);
   }
   return source;
 }
@@ -67,7 +67,7 @@ function retry(url: string): void {
 }
 
 function release(url: string, managed: Managed, subscription: Subscription): void {
-  managed.source.removeEventListener(subscription.event, subscription.handler);
+  managed.source.removeEventListener(subscription.event, subscription.listener);
   managed.subscriptions.delete(subscription);
   if (managed.subscriptions.size > 0) return;
 
@@ -80,6 +80,7 @@ function release(url: string, managed: Managed, subscription: Subscription): voi
 
 export const streamModule: Module = {
   object: url => ({
+    // A URL no handler listens to has no source: it reads as closed.
     get readyState() {
       return streams.get(url)?.source.readyState ?? EventSource.CLOSED;
     },
@@ -87,7 +88,7 @@ export const streamModule: Module = {
   }),
   subscribe(url: string, event: string, listener: Listener, owner) {
     const managed = managedFor(url);
-    const handler = ((message: MessageEvent) => {
+    const onMessage = ((message: MessageEvent) => {
       log.debug("message.received", { url, event });
       let payload: unknown;
       try {
@@ -98,9 +99,9 @@ export const streamModule: Module = {
       }
       listener(payload);
     }) as EventListener;
-    const subscription: Subscription = { event, handler };
+    const subscription: Subscription = { event, listener: onMessage };
     managed.subscriptions.add(subscription);
-    managed.source.addEventListener(event, handler);
+    managed.source.addEventListener(event, onMessage);
     owner.onDispose(() => release(url, managed, subscription));
     log.debug("event.listening", { url, event });
   },

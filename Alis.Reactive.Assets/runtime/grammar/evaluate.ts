@@ -7,7 +7,7 @@ import type { CallExpr, Expr, OpExpr, RecordExpr, Shape } from "../types/index";
 import { assertNever } from "../shared/assert-never";
 import { Environment } from "./environment";
 import { call, read, type PathMode } from "./paths";
-import { shaped } from "./shape";
+import { isMissing, shaped } from "./shape";
 import * as ops from "./operators";
 
 /** Resolves the located objects of the plan being run. */
@@ -24,13 +24,18 @@ export function childScope(scope: Scope): Scope {
   return { env: scope.env.child(), world: scope.world };
 }
 
+/** The scope a module evaluates a plan's own expressions in: nothing bound, the plan's objects. */
+export function rootScope(world: World): Scope {
+  return { env: Environment.root(), world };
+}
+
 export function evaluate(expr: Expr, scope: Scope): unknown {
   switch (expr.kind) {
     case "lit":    return shaped(expr.value, expr.shape);
     case "obj":    return scope.world.object(expr.id);
     case "ref":    return scope.env.lookup(expr.name);
     case "get":    return shaped(read(evaluate(expr.target, scope), expr.path, modeOf(expr.target), labelOf(expr.target)), expr.shape);
-    case "call":   return invoke(expr, scope, false);
+    case "call":   return evaluateCall(expr, scope, false);
     case "fn":     return closure(expr.params, expr.body, scope);
     case "record": return record(expr, scope);
     case "list":   return expr.items.map(item => evaluate(item, scope));
@@ -50,10 +55,10 @@ export function labelOf(target: Expr): string {
 
 /** A statement's expression: a call at its top may return a promise for the statement to settle. */
 export function evaluateStatement(expr: Expr, scope: Scope): unknown {
-  return expr.kind === "call" ? invoke(expr, scope, true) : evaluate(expr, scope);
+  return expr.kind === "call" ? evaluateCall(expr, scope, true) : evaluate(expr, scope);
 }
 
-function invoke(expr: CallExpr, scope: Scope, mayReturnPromise: boolean): unknown {
+function evaluateCall(expr: CallExpr, scope: Scope, mayReturnPromise: boolean): unknown {
   const receiver = evaluate(expr.target, scope);
   const args = expr.args.map((arg, index) => shapeArgument(evaluate(arg, scope), expr.argShapes[index]));
   const label = labelOf(expr.target);
@@ -65,7 +70,7 @@ function invoke(expr: CallExpr, scope: Scope, mayReturnPromise: boolean): unknow
 
 function unawaitedPromise(label: string, path: readonly string[]): Error {
   const member = path.length === 0 ? label : `${label}.${path.join(".")}`;
-  return new Error(`[alis] ${member} returned a promise where the plan reads a value; declare the method with CallAsync or InvokeAsync`);
+  return new Error(`[alis] ${member} returned a promise where the plan reads a value; declare it with MethodAsync`);
 }
 
 function shapeArgument(value: unknown, shape: Shape | undefined): unknown {
@@ -132,7 +137,7 @@ function operate(expr: OpExpr, scope: Scope): unknown {
 function coalesce(count: number, at: (index: number) => unknown): unknown {
   for (let index = 0; index < count - 1; index++) {
     const value = at(index);
-    if (value !== null && value !== undefined) return value;
+    if (!isMissing(value)) return value;
   }
   return at(count - 1);
 }

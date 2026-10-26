@@ -2,7 +2,7 @@
 // module registered under its name (grammar.md 1.1). Elements are looked up at every use and never
 // cached, so a slot's content can change underneath a plan (grammar.md E1).
 
-import type { ElementLocator, ObjectLocator, PlanDocument } from "../types/index";
+import type { ElementLocator, ObjectLocator, PlanDocument, Vendor } from "../types/index";
 import type { World } from "../grammar/evaluate";
 import { read } from "../grammar/paths";
 import { moduleNamed } from "./modules";
@@ -18,10 +18,9 @@ export class PlanWorld implements World {
     return vendorObject(this.requireElement(locator), locator.vendor, this.vendor(locator));
   }
 
-  /** The element behind an element locator, or null when it is not on the page. */
+  /** The element of an input, or null when it is not on the page. An input is always an element. */
   element(id: string): HTMLElement | null {
-    const locator = this.locator(id);
-    return locator.kind === "element" ? document.getElementById(locator.id) : null;
+    return document.getElementById((this.locator(id) as ElementLocator).id);
   }
 
   /** Subscribes on the object, or on the object at `path` under it: a nested object's own event. */
@@ -41,16 +40,13 @@ export class PlanWorld implements World {
     owner.onDispose(subscribeVendor(target, locator.vendor, vendor, event, listener));
   }
 
+  // The plan declares every object and vendor its handlers and expressions name (the C# object table).
   private locator(id: string): ObjectLocator {
-    const locator = this.plan.objects[id];
-    if (!locator) throw new Error(`[alis] plan "${this.plan.planId}" has no object "${id}"`);
-    return locator;
+    return this.plan.objects[id] as ObjectLocator;
   }
 
-  private vendor(locator: ElementLocator) {
-    const vendor = this.plan.vendors[locator.vendor];
-    if (!vendor) throw new Error(`[alis] plan "${this.plan.planId}" has no vendor "${locator.vendor}"`);
-    return vendor;
+  private vendor(locator: ElementLocator): Vendor {
+    return this.plan.vendors[locator.vendor] as Vendor;
   }
 
   private requireElement(locator: ElementLocator): HTMLElement {

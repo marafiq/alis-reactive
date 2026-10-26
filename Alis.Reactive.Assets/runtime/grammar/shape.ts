@@ -6,6 +6,7 @@
 import type { Shape } from "../types/index";
 import { assertNever } from "../shared/assert-never";
 import { toJavaScriptString } from "../shared/javascript-string";
+import { isRecord } from "../shared/record";
 
 export function isMissing(value: unknown): value is null | undefined {
   return value === null || value === undefined;
@@ -56,7 +57,9 @@ export function bound(value: unknown, shape: Shape): unknown {
 const EARLIEST_INSTANT = -62_135_596_800_000;
 
 function earliestDate(): Date {
-  return localMidnight(1, 1, 1)!;
+  const date = new Date(2000, 0, 1);
+  date.setFullYear(1, 0, 1);
+  return date;
 }
 
 /** Number shape: finite numbers; booleans as 1 or 0; text through Number (blank text is 0); dates as their time. */
@@ -164,11 +167,9 @@ function asArrayOf(value: unknown, item: Shape): unknown {
 // An object's declared members convert by their shapes; its other members stay as they arrived. When no
 // member changes, the object itself passes, so a library that keeps it by reference still has it.
 function asObjectOf(value: unknown, shape: Extract<Shape, { kind: "object" }>): unknown {
-  const isPlainRecord =
-    typeof value === "object" && value !== null && !Array.isArray(value) && !(value instanceof Date);
-  if (!isPlainRecord) return value;
+  if (!isRecord(value) || value instanceof Date) return value;
 
-  const record = value as Record<string, unknown>;
+  const record = value;
   let converted: Record<string, unknown> | undefined;
   for (const [name, fieldShape] of Object.entries(shape.fields)) {
     if (!Object.prototype.hasOwnProperty.call(record, name)) continue;

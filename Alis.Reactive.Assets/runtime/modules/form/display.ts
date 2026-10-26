@@ -55,27 +55,12 @@ export function hideSummaryDiv(summaryElement: HTMLElement): void {
 }
 
 export function canRenderInline(componentDomId: string): boolean {
-  const parent = findErrorSpan(componentDomId)?.parentElement;
-  if (parent === null || parent === undefined) return false;
-  for (let node: HTMLElement | null = parent; node; node = node.parentElement) {
-    if (node.hasAttribute("hidden") || node.style?.display === "none") return false;
+  const errorSpan = findErrorSpan(componentDomId);
+  if (errorSpan === null) return false;
+  for (let node: HTMLElement | null = errorSpan.parentElement; node; node = node.parentElement) {
+    if (node.hasAttribute("hidden") || node.style.display === "none") return false;
   }
   return true;
-}
-
-export function showServerErrorInline(
-  componentDomId: string,
-  message: string,
-  element?: HTMLElement,
-): void {
-  const errorSpan = findErrorSpan(componentDomId);
-  if (errorSpan) {
-    errorSpan.textContent = message;
-    errorSpan.removeAttribute("hidden");
-    errorSpan.style.display = "";
-  }
-
-  element?.classList.add(ERR_CLASS);
 }
 
 function findErrorSpan(componentDomId: string): HTMLElement | null {

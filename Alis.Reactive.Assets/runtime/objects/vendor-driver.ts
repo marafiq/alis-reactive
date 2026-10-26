@@ -84,18 +84,21 @@ function isAssignedListener(value: unknown): value is AssignedListener {
   return typeof value === "function" && "disposed" in value && "previous" in value;
 }
 
+// A member read off a payload is an optional path (grammar.md 1.3), so a listener argument the vendor
+// did not pass reads as missing members; nothing stands in for it.
 function payloadOf(vendor: Vendor, first: unknown): unknown {
   switch (vendor.payload) {
-    case "argument": return isMissing(first) ? {} : first;
+    case "argument": return first;
     case "element":  return elementPayload(first);
     default:         return assertNever(vendor.payload, "vendor payload");
   }
 }
 
 // A native input's handler reads the element, which stays valid after an await; a custom event
-// carries its detail.
+// carries its detail, or is the payload itself when it has none, as the document's events are.
 function elementPayload(first: unknown): unknown {
-  if (first instanceof CustomEvent) return isMissing(first.detail) ? {} : first.detail;
-  if (first instanceof Event) return first.currentTarget ?? first.target ?? first;
-  return isMissing(first) ? {} : first;
+  if (first instanceof CustomEvent) return isMissing(first.detail) ? first : first.detail;
+  // A vendor that hands the listener an event it did not dispatch has no current target.
+  if (first instanceof Event) return first.currentTarget ?? first;
+  return first;
 }

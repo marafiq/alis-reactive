@@ -7,6 +7,7 @@ import type { PlanDocument, PluginData } from "../types/index";
 import type { Listener } from "./vendor-driver";
 import type { Owner } from "./owner";
 import type { PlanWorld } from "./world";
+import { canHaveMembers } from "../grammar/paths";
 
 /** What a module receives with a plan's data contribution. */
 export interface Contribution {
@@ -41,8 +42,7 @@ export function moduleNamed(name: string): Module {
 
 /** An app plugin: an object or function the app bundle provides under a name. */
 export function registerPlugin(name: string, instance: unknown): void {
-  const canHaveMembers = (typeof instance === "object" && instance !== null) || typeof instance === "function";
-  if (!canHaveMembers) throw new Error(`[alis] plugin "${name}" must be an object or function`);
+  if (!canHaveMembers(instance)) throw new Error(`[alis] plugin "${name}" must be an object or function`);
   registerModule(name, { object: () => instance });
 }
 

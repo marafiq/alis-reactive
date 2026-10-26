@@ -5,9 +5,9 @@
 // one click retries every dropped connection. Without the element the behavior
 // is not invoked at all — that is a loud boundary error, never a fallback.
 
-import { scope } from "../diagnostics/trace";
+import { logger } from "../diagnostics/trace";
 
-const log = scope("retry-indicator");
+const log = logger("retry-indicator");
 
 const RETRY_ELEMENT_ID = "alis-realtime-connection-retry-container";
 const RETRY_ATTR = "data-reactive-retry";

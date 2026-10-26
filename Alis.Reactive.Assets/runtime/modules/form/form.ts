@@ -1,6 +1,6 @@
 // alis.form (grammar.md 6.4), keyed by the validation container's element id. Plans contribute their
-// fields under their owner; each field carries its own value read, committed event and tests, so the
-// form needs nothing but the evaluator.
+// fields under their owner; each field carries its own value read and tests, so the form needs
+// nothing but the evaluator.
 // F1 A test applies only when its field's element is inside the container; a missing container fails
 //    validation when the form has tests.
 // F3 Per field, tests whose `when` is false are skipped and the first failing check decides.
@@ -11,24 +11,25 @@
 // F7 At creation, and whenever HTML mounts (a field a partial loads): DOM `input` clears a field's
 //    message; DOM `blur` and alis:commit (the model re-raises each input's own commit event as it)
 //    revalidate it against every container that holds it. Each element is wired once.
-// F8 showErrors(problem) places server errors by exact binding name; without a record body it validates.
+// F8 showErrors(problem) places server errors by exact binding name; a body that is not a record is
+//    logged and shows nothing.
 // F9 A slot's load or unload removes exactly its own fields, then clears and hides the summary.
 
-import type { FormField } from "../../types/index";
+import type { FormField, FormTest } from "../../types/index";
 import type { Contribution, Module } from "../../objects/modules";
 import type { Owner } from "../../objects/owner";
 import type { PlanWorld } from "../../objects/world";
-import { Environment } from "../../grammar/environment";
-import { evaluate } from "../../grammar/evaluate";
+import { evaluate, rootScope } from "../../grammar/evaluate";
 import { asText } from "../../grammar/shape";
-import { scope } from "../../diagnostics/trace";
+import { isRecord } from "../../shared/record";
+import { logger } from "../../diagnostics/trace";
 import { COMMIT_EVENT, MOUNT_EVENT } from "../../plans/mount-events";
 import {
   addToSummary, canRenderInline, clearInline, clearSummary, hideSummaryDiv, removeSummaryEntry,
-  showInline, showServerErrorInline, showSummaryDiv, summaryHasEntries,
+  showInline, showSummaryDiv, summaryHasEntries,
 } from "./display";
 
-const log = scope("validation");
+const log = logger("validation");
 
 interface Entry {
   readonly field: FormField;
@@ -85,12 +86,12 @@ function clearAndHide(summary: HTMLElement | null): void {
 
 // ── evaluation ─────────────────────────────────────────────────────────────
 
-function evaluateWhen(entry: Entry, test: FormField["tests"][number]): boolean {
-  return !!evaluate(test.when, { env: Environment.root(), world: entry.world });
+function evaluateWhen(entry: Entry, test: FormTest): boolean {
+  return !!evaluate(test.when, rootScope(entry.world));
 }
 
-function checkPasses(entry: Entry, test: FormField["tests"][number], value: unknown): boolean {
-  const check = evaluate(test.check, { env: Environment.root(), world: entry.world }) as (value: unknown) => unknown;
+function checkPasses(entry: Entry, test: FormTest, value: unknown): boolean {
+  const check = evaluate(test.check, rootScope(entry.world)) as (value: unknown) => unknown;
   return !!check(value);
 }
 
@@ -105,7 +106,7 @@ function evaluateField(entry: Entry, container: HTMLElement, summary: HTMLElemen
   }
 
   const inlineHidden = !canRenderInline(field.id);
-  const value = evaluate(field.value, { env: Environment.root(), world: entry.world });
+  const value = evaluate(field.value, rootScope(entry.world));
   for (const test of field.tests) {
     if (!evaluateWhen(entry, test)) continue;
     if (checkPasses(entry, test, value)) continue;
@@ -190,8 +191,7 @@ function revalidate(field: HTMLElement): void {
 }
 
 function showErrors(containerId: string, problem: unknown): void {
-  const isRecord = typeof problem === "object" && problem !== null && !Array.isArray(problem);
-  if (!isRecord) {
+  if (!isRecord(problem)) {
     log.error("server-errors.not-a-record", { id: containerId });
     return;
   }
@@ -201,20 +201,20 @@ function showErrors(containerId: string, problem: unknown): void {
   for (const entry of entries) clearInline(entry.field.id);
   clearAndHide(summary);
 
-  const errors = (problem as Record<string, unknown>)["errors"];
-  if (typeof errors !== "object" || errors === null || Array.isArray(errors)) {
+  const errors = problem["errors"];
+  if (!isRecord(errors)) {
     log.warn("server-errors.wrong-shape");
     return;
   }
 
   // Each server message is a sentence (FluentValidation's and MVC's end with a period), so several read
   // one after another.
-  for (const [name, messages] of Object.entries(errors as Record<string, unknown>)) {
+  for (const [name, messages] of Object.entries(errors)) {
     const message = Array.isArray(messages) ? messages.join(" ") : asText(messages) ?? "";
     const entry = entries.find(candidate => candidate.field.name === name);
     const element = entry ? document.getElementById(entry.field.id) : null;
-    if (entry && element && canRenderInline(entry.field.id)) {
-      showServerErrorInline(entry.field.id, message, element);
+    if (entry && element !== null && canRenderInline(entry.field.id)) {
+      showInline(entry.field.id, message);
     } else {
       addSummaryError(summary, name, message);
     }

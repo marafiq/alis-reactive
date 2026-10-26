@@ -4,15 +4,15 @@
 // M1 `values`: every mounted input of the composed plan, read through its value expression as MVC
 //    binds it (a binding read, grammar.md 2.1), nested by its JSON body path. Unmounted inputs are
 //    skipped.
-//    `fill(record)` writes the same values into a record a request authored, leaf by leaf, so an
-//    authored value beside them (Address.Verified next to Address.City) is kept.
 // M2 `fields`: the same inputs, flat, keyed by MVC binding name; `arrays` names those holding arrays.
-// M3 `boundValueOf(id)`: one input's value as a binding read, for a rule or a gather that reads a
-//    field any plan of the composition rendered: what validation checks, so the browser judges what
-//    the server will; missing when no plan rendered it.
+// M3 `fill(record)` writes the values of M1 into a record a request authored, leaf by leaf, so an
+//    authored value beside them (Address.Verified next to Address.City) is kept.
 // M4 Each input's `committed` event is re-raised on its element as alis:commit, once per element and
 //    for as long as its owner lives. The plan that renders an input contributes it, so the widget
 //    exists by then, whenever the form that validates it was wired.
+// M5 `boundValueOf(id)`: one input's value as a binding read, for a rule or a gather that reads a
+//    field any plan of the composition rendered: what validation checks, so the browser judges what
+//    the server will; missing when no plan rendered it.
 
 import type { InputBinding, Shape } from "../types/index";
 import type { Contribution, Module } from "../objects/modules";
@@ -20,12 +20,13 @@ import type { PlanWorld } from "../objects/world";
 import { Environment } from "../grammar/environment";
 import { evaluate } from "../grammar/evaluate";
 import { bound } from "../grammar/shape";
+import { isRecord } from "../shared/record";
 import type { Owner } from "../objects/owner";
 import { COMMIT_EVENT } from "../plans/mount-events";
-import { scope } from "../diagnostics/trace";
+import { logger } from "../diagnostics/trace";
 import { toJavaScriptString } from "../shared/javascript-string";
 
-const log = scope("model");
+const log = logger("model");
 
 export interface ModelInput {
   readonly id: string;
@@ -123,14 +124,10 @@ function assignAt(root: Record<string, unknown>, path: readonly (string | number
     const nextIsIndex = typeof path[index + 1] === "number";
     const existing = parent[segment];
     if (nextIsIndex) parent[segment] = Array.isArray(existing) ? [...existing] : [];
-    else parent[segment] = isPlainRecord(existing) ? { ...existing } : {};
+    else parent[segment] = isRecord(existing) ? { ...existing } : {};
     parent = parent[segment] as Record<string | number, unknown>;
   }
   parent[path[path.length - 1]!] = value;
-}
-
-function isPlainRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 export const modelModule: Module = {
@@ -163,6 +160,8 @@ function announceCommits(input: ModelInput, owner: Owner): void {
   const announce = (): void => {
     element.dispatchEvent(new CustomEvent(COMMIT_EVENT, { bubbles: true }));
   };
+  // An input whose component is not constructed yet cannot announce its commits; the form then hears
+  // none for it, and the trace says so.
   try {
     input.world.subscribe(input.id, [], input.binding.committed, announce, owner);
   } catch (error) {
@@ -171,10 +170,6 @@ function announceCommits(input: ModelInput, owner: Owner): void {
   }
   announcing.add(element);
   owner.onDispose(() => announcing.delete(element));
-}
-
-export function modelFor(planId: string): ModelObject {
-  return modelObject(planId);
 }
 
 export function resetModelForTests(): void {

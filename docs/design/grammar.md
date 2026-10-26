@@ -43,12 +43,12 @@ That is the whole document. The grammar names no feature.
   contributes its data under its owner, and the module joins the contributions per key. The C#
   declaration of each module states its data type, so the generated contract types it too.
 - **Inputs and forms are module data.**
-  - The inputs of a view are `alis.model` data: `{ inputs: { id: { name, body, value, shape } } }`:
-    the MVC binding name, the JSON body path, the value as an expression of the located object, and
-    the shape it reads as.
-  - A form's fields are `alis.form` data: `{ summary, fields: [{ id, name, value, committed,
-    tests: [{ rule, check: fn(v), when, message }] }] }`. `committed` is the input's event that
-    revalidates the field; `rule` names the declaration a test came from, for traces only. An input
+  - The inputs of a view are `alis.model` data: `{ inputs: { id: { name, body, value, shape,
+    committed } } }`: the MVC binding name, the JSON body path, the value as an expression of the
+    located object, the shape it reads as, and the event that commits a value (M4).
+  - A form's fields are `alis.form` data: `{ summary, fields: [{ id, name, value,
+    tests: [{ rule, check: fn(v), when, message }] }] }`. `rule` names the declaration a test came
+    from, for traces only. An input
     does not name its form; membership is decided by containment (6.4), because a partial cannot
     know which form will contain it.
 - **No owner field.** The owner of a plan is whoever discovered it: the page at boot, or a slot when
@@ -99,7 +99,7 @@ A member read followed by a data read is two nested `get` nodes.
 - **Writes.**
   - A `set` rooted at `obj(id)` needs every segment, the final member included, so a write to a
     member the vendor does not have fails loudly instead of creating a property.
-  - Any other `set` needs the owner of its final member, and creates that member when absent, so a
+  - Any other `set` needs the object that holds its final member, and creates that member when absent, so a
     payload's `cancel` can always be written.
 
 Where a path is rooted decides how it is read; the runtime decides nothing else.
@@ -167,8 +167,7 @@ Literals are emitted already in their shape. Nothing else converts.
   becomes `null`.
 - A value that cannot be converted is kept as it is.
 
-These rules are `runtime/grammar/shape.ts`. Against the runtime the grammar replaced
-(`shape-convert.ts`), a date value is a `Date`, not a timestamp. So text, JSON and form data see the local day and time picked, with no offset, as
+These rules are `runtime/grammar/shape.ts`. A date value is a `Date`, not a timestamp, so text, JSON and form data see the local day and time picked, with no offset, as
 an HTML form posts a date (a UTC instant would move a day picked east of UTC to the day before, and
 a `DateOnly` member cannot bind a time), and every comparison sees the time (2.2). An instant is
 the exception: a `DateTimeOffset` names a moment, so it is sent as that moment in UTC, which binds
@@ -197,6 +196,7 @@ expression over the converted values.
 | `&&`, `\|\|`, `!` | Short-circuit, left to right. |
 | `+ - * / %` | C# arithmetic over numbers; `+` over texts concatenates. |
 | `??`, `?:` | As in C#. |
+| `-x` | C#'s unary minus over a number (`neg`). |
 | `truthy` | JavaScript's truthiness, applied after conversion. It is used by `Truthy()` and `Falsy()`. |
 | `empty` | True for `""`, missing, and an empty array. Nothing is trimmed. It is used by `IsEmpty()` and `NotEmpty()` in conditions. |
 | `matches(a, pattern, flags)` | False when `a` is missing; otherwise `new RegExp(pattern, flags).test(text(a))`. |
@@ -388,7 +388,7 @@ form lowers to fixed productions.
 | `p.Confirm(m).Then(t).Else(e)` | `let ok = await confirm.ask(m); if (ok) t else e` |
 | `p.Get/Post/Put/Delete(url)` | see 5.1 |
 | `.Into(elementId)` | `do(call(slot, ["load"], [ref res.body]))`, for the response of the request it follows |
-| `p.ValidationErrors(container)` | in a response route: `do(call(form, ["showErrors"], [ref res.body]))`; elsewhere: `do(call(form, ["validate"]))` |
+| `p.ValidationErrors(container)` | inside an error route only: `do(call(form, ["showErrors"], [get(ref res, ["body"])]))` |
 | `p.Parallel(a, b).OnAllSettled(c)` | `all(a, b); c` |
 | `p.Url<TQuery>().Get(q => q.X)` | `get(get(document, ["query"]), ["X"], shape)`, keyed by the member's binding name; an array member reads `queryAll` |
 | `tools.Count(items, "status")`, a member of a plugin from `plan.RegisterPlugin<T>()` | `call(plugin, ["count"], [..], shape)` |
@@ -401,7 +401,7 @@ if (form.validate()) {                            // .Validate<V>(container); ou
   …WhileLoading…
   try {
     const req = record(…Gather…);                 // the gathered request
-    const res = await http.send({ method, url, route, values: req, headers, format });
+    const res = await http.send({ method, url, route, values: req, arrays, headers, format });
     if (res.ok) { …OnSuccess by status, exact first… }
     else if (res.status === 409) { …OnError(409)… }
     else { …untyped OnError… }                    // also reached by status 0
@@ -445,9 +445,10 @@ imports none of them. The obligations are numbered so that tests and code can ci
 
 - **D1 `ready`.** An event of the owner being started. A `ready` handler runs when its own owner
   starts, after every handler of that owner has subscribed (3.5), and never again.
-- **D2 `raise(name, detail)`.** Synchronous. It dispatches a non-bubbling `CustomEvent` with detail
-  `{}` when none is given. A listener's payload is `detail`, or the event itself when the detail is
-  missing (`Alis.Reactive.Assets/runtime/modules/document.ts:26-28, 93-96`).
+- **D2 `raise(name, detail)`.** Synchronous. It dispatches a non-bubbling `CustomEvent` carrying the
+  detail the plan gives it; a dispatch without a payload gives an empty record. A listener's payload
+  is `detail`, or the event itself when the detail is missing
+  (`Alis.Reactive.Assets/runtime/modules/document.ts`).
 - **D3 `query`.** The query string as a record, read the way MVC binds `[FromQuery]`:
   - keys match case-insensitively;
   - an array member reads every value;
@@ -459,8 +460,9 @@ imports none of them. The obligations are numbered so that tests and code can ci
 
 ### 6.2 `http` (`plugin("alis.http")`)
 
-`send({ method, url, route, values, headers, format })` is async and resolves to
-`{ status, ok, body }`.
+`send({ method, url, route, values, arrays, headers, format })` is async and resolves to
+`{ status, ok, body }`. `arrays` names the members of `values` that hold arrays, so a missing one sends
+no key (H2) and no entry (H4).
 
 - **H1 Route.** Each `{name}` is filled from `route[name]` with `encodeURIComponent`. A missing
   route value throws before anything is sent.
@@ -501,12 +503,10 @@ imports none of them. The obligations are numbered so that tests and code can ci
 
 ### 6.4 `form` (`plugin("alis.form", containerId)`)
 
-`validate()` returns a bool; `showErrors(problem)`; tests come from the plan's `forms[containerId]`.
+`validate()` returns a bool; `showErrors(problem)`; the tests are the form's `alis.form` data (1.1).
 
 - **F1 Scope.** A test applies only when its field's element is inside the container element. A
   missing container fails validation when the form has tests.
-- **F2 Model.** A test's `model` is `model.values` of the composed plan, read fresh at every
-  evaluation.
 - **F3 First failure wins.** For each field, tests whose `when` is false are skipped, and the first
   failing `check` decides.
 - **F4 Validate.** First clear every inline message and the summary, then evaluate every field,
@@ -527,11 +527,11 @@ imports none of them. The obligations are numbered so that tests and code can ci
 - **F8 Server errors.** `showErrors(problem)` clears first.
   - When `problem` is a record with `errors`, it joins each field's messages with a space (each is a
     sentence) and matches a test field by its exact binding name. Anything else goes to the summary.
-  - When `problem` is not a record (an empty or non-JSON body), it runs `validate()` instead
-    (`Alis.Reactive.Assets/runtime/modules/form/form.ts:192-198`).
+  - When `problem` is not a record (an empty or non-JSON body), it logs `server-errors.not-a-record`
+    and shows nothing: the server said nothing the form can place.
 - **F9 Composition.** Tests from plans that share a `planId` are joined per owner. A slot's load or
   unload removes exactly its own tests and subscriptions, then clears and hides the summary of the
-  plans it touched (`Alis.Reactive.Assets/runtime/modules/form/form.ts:273, 277-281`). Content rendered with the page belongs to the page even inside
+  plans it touched (the form module's contribution in `Alis.Reactive.Assets/runtime/modules/form/form.ts`). Content rendered with the page belongs to the page even inside
   a slot's container: when a load replaces it, its tests stay, and its fields, no longer rendered,
   are checked as missing values (F5). A form whose steps replace each other in one slot therefore
   loads its first step into the slot too (the intake journey, `Validation/IntakeSteps`).
@@ -575,7 +575,7 @@ imports none of them. The obligations are numbered so that tests and code can ci
   async; `state` and `connectionId` are properties; `reconnecting`, `reconnected` and `close` are
   events.
 
-### 6.8 App objects (each its package's runtime module, element-located)
+### 6.8 App objects (each its package's runtime module, located as a plugin: `plugin("alis.confirm")`)
 
 - **Confirm** (Fusion):
   - C1: `ask(message)` is async and resolves true on OK, and false on Cancel, close or Escape.
@@ -605,7 +605,7 @@ imports none of them. The obligations are numbered so that tests and code can ci
     is the click's DOM `Event`, from which it reads the button, the modifier keys and
     `preventDefault`);
   - `element`: the element itself, for native inputs whose values are read after an `await`, or a
-    `CustomEvent`'s `detail`.
+    `CustomEvent`'s `detail`, or the event itself when it has none.
 - **E3 Writes.** A write converts by the member's shape: a date member receives a `Date`.
 - **E4 Listening.** The vendor's `listen` decides how a handler attaches to the object, or to the
   nested object the handler's path names:
@@ -658,7 +658,7 @@ A rule reaches the browser unless something in it only the server can do. No lis
 
 ### 7.4 The vocabulary
 
-| Term | Server | Browser check `(v, m)` |
+| Term | Server | Browser check `(v)` |
 |---|---|---|
 | `NotNull` | `v != null` | `v != null` |
 | `NotEmpty` | not null, blank text, an empty list or the type's default | by the property's type: text `v != null && v.trim() !== ""`; number `v != null && v !== 0`; collection `v != null && v.length > 0`; otherwise `v != null && v != default` |

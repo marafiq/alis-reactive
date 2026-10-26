@@ -10,10 +10,10 @@ import { executeBlock } from "../grammar/execute";
 import { moduleNamed } from "../objects/modules";
 import type { Owner } from "../objects/owner";
 import { PlanWorld } from "../objects/world";
-import { scope } from "../diagnostics/trace";
+import { logger } from "../diagnostics/trace";
 import { toJavaScriptString } from "../shared/javascript-string";
 
-const log = scope("plans");
+const log = logger("plans");
 
 export function startOwner(owner: Owner, plans: readonly PlanDocument[]): void {
   const worlds = plans.map(plan => new PlanWorld(plan));
@@ -32,6 +32,8 @@ function contribute(world: PlanWorld, owner: Owner): void {
   }
 }
 
+// A handler whose object is not constructed yet fails at the boundary when it subscribes; it stops
+// no other handler (grammar.md 3.4).
 function subscribeHandlers(world: PlanWorld, owner: Owner): void {
   for (const handler of world.plan.handlers) {
     try {

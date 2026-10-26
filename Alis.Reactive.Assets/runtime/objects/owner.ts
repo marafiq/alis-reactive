@@ -2,10 +2,10 @@
 // (handler subscriptions, plugin data contributions, connection subscriptions) and knows nothing about
 // what they are. Starting an owner runs the work waiting for its start: the document's `ready`.
 
-import { scope } from "../diagnostics/trace";
+import { logger } from "../diagnostics/trace";
 import { toJavaScriptString } from "../shared/javascript-string";
 
-const log = scope("owner");
+const log = logger("owner");
 
 export class Owner {
   private readonly disposers: (() => void)[] = [];
@@ -36,13 +36,14 @@ export class Owner {
   }
 
   whenStarted(hook: () => void): void {
-    if (this.started) return;
+    if (this.started) throw new Error(`[alis] ${this.name} has started; a ready handler subscribes before its owner starts`);
     this.startHooks.push(hook);
   }
 
   start(): void {
     if (this.started) return;
     this.started = true;
+    // A ready handler that throws stops no other (grammar.md 3.4).
     for (const hook of this.startHooks.splice(0)) {
       try {
         hook();
@@ -55,6 +56,7 @@ export class Owner {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    // A disposer that throws stops no other; the owner ends either way.
     for (const disposer of this.disposers.splice(0).reverse()) {
       try {
         disposer();

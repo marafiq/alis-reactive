@@ -11,9 +11,9 @@ import { Owner } from "../objects/owner";
 import { discoverPlans } from "../plans/discover";
 import { announceMount, announceUnmount } from "../plans/mount-events";
 import { startOwner } from "../plans/start";
-import { scope } from "../diagnostics/trace";
+import { logger } from "../diagnostics/trace";
 
-const log = scope("boot");
+const log = logger("boot");
 
 const owners = new Map<string, Owner>();
 

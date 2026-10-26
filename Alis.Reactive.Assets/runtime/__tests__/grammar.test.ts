@@ -283,9 +283,9 @@ describe("statements", () => {
     const isBooked = e.call(e.obj("planner"), ["isBooked"], [e.lit("sat-11")]);
 
     expect(() => executeBlock([st.if([[isBooked, [st.set(e.obj("planner"), ["status"], e.lit("booked"))]]])], scope))
-      .toThrow("[alis] #planner.isBooked returned a promise where the plan reads a value; declare the method with CallAsync or InvokeAsync");
-    expect(() => executeBlock([st.set(e.obj("planner"), ["status"], isBooked)], scope)).toThrow("declare the method with CallAsync or InvokeAsync");
-    expect(() => executeBlock([st.let("booked", isBooked)], scope)).toThrow("declare the method with CallAsync or InvokeAsync");
+      .toThrow("[alis] #planner.isBooked returned a promise where the plan reads a value; declare it with MethodAsync");
+    expect(() => executeBlock([st.set(e.obj("planner"), ["status"], isBooked)], scope)).toThrow("declare it with MethodAsync");
+    expect(() => executeBlock([st.let("booked", isBooked)], scope)).toThrow("declare it with MethodAsync");
     expect(planner.status).toBe("");
   });
 

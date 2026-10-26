@@ -18,7 +18,7 @@ export interface Logger {
   trace(msg: string, details?: unknown): void;
 }
 
-export function scope(name: string): Logger {
+export function logger(name: string): Logger {
   const tag = `[alis:${name}]`;
   return {
     error: (msg, details) => emit(LEVELS.error, tag, msg, details),

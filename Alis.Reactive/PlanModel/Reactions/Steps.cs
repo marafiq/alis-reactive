@@ -141,10 +141,7 @@ namespace Alis.Reactive.PlanModel
             }));
     }
 
-    /// <summary>
-    /// In a response route the form shows the problems the server sent; elsewhere it checks itself
-    /// (grammar.md F8).
-    /// </summary>
+    /// <summary>In an error route, the form shows the problems the server sent (grammar.md F8).</summary>
     internal sealed class ShowErrorsStep : Step
     {
         private readonly string _form;

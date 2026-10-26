@@ -338,12 +338,9 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>
-    /// An array operation, written as JavaScript's own method with a lambda. The source may wait for a
-    /// promise; the lambda body runs once per item, where nothing waits.
-    /// </summary>
-    /// <summary>
-    /// An operation over a list: the source is read as an array, and the operation's lambdas run per
-    /// item with hoisting off, so a method result read inside one is refused where it is written.
+    /// An operation over a list, written as JavaScript's own method with a lambda: the source is read as
+    /// an array, and the lambdas run per item with hoisting off, so a method result read inside one is
+    /// refused where it is written.
     /// </summary>
     internal abstract class ArrayOperation : ValueExpression
     {

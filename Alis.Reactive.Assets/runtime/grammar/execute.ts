@@ -4,13 +4,13 @@
 
 import type { Expr, SetStatement, Statement } from "../types/index";
 import { assertNever } from "../shared/assert-never";
-import { scope as logScope } from "../diagnostics/trace";
+import { logger } from "../diagnostics/trace";
 import { toJavaScriptString } from "../shared/javascript-string";
 import { childScope, evaluate, evaluateStatement, isPromise, labelOf, modeOf, type Scope } from "./evaluate";
 import { write } from "./paths";
 import { shaped } from "./shape";
 
-const log = logScope("execute");
+const log = logger("execute");
 
 export type Completion = void | Promise<void>;
 
